@@ -130,6 +130,8 @@ for k, bp in __blueprints do
     end
 end
 
+---@class Shield : moho.shield_methods, Entity
+---@field Brain AIBrain
 Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
@@ -142,6 +144,8 @@ Shield = Class(moho.shield_methods, Entity) {
         _c_CreateShield(self, spec)
     end,
 
+    ---@param self Shield
+    ---@param spec unknown is this Entity?
     OnCreate = function(self, spec)
         -- cache information that is used frequently
         self.Army = EntityGetArmy(self)
@@ -300,6 +304,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     OnEnergyDepleted = function(self)
         self.NoEnergyToSustain = true 
 
@@ -309,6 +314,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     OnEnergyViable = function(self)
         self.NoEnergyToSustain = false 
 
@@ -567,6 +573,10 @@ Shield = Class(moho.shield_methods, Entity) {
 
     CreateImpactEffect = function(self, vector)
 
+        if IsDestroyed(self) then
+            return
+        end
+
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
@@ -810,7 +820,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- remove the shield and the shield bar
             self:RemoveShield()
-            self:UpdateShieldRatio(-1)
+            self:UpdateShieldRatio(0)
 
             -- inform the owner that the shield is disabled
             self.Owner:OnShieldDisabled()
@@ -1014,6 +1024,7 @@ Shield = Class(moho.shield_methods, Entity) {
 }
 
 --- A bubble shield attached to a single unit.
+---@class PersonalBubble : Shield
 PersonalBubble = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1085,6 +1096,7 @@ PersonalBubble = Class(Shield) {
 
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
+---@class TransportShield : Shield
 TransportShield = Class(Shield) {
 
     OnCreate = function(self, spec)
@@ -1158,6 +1170,7 @@ TransportShield = Class(Shield) {
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
+---@class PersonalShield : Shield
 PersonalShield = Class(Shield){
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1192,6 +1205,10 @@ PersonalShield = Class(Shield){
     end,
 
     CreateImpactEffect = function(self, vector)
+
+        if IsDestroyed(self) then
+            return
+        end
 
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
@@ -1251,6 +1268,7 @@ PersonalShield = Class(Shield){
     end,
 }
 
+---@class AntiArtilleryShield : Shield
 AntiArtilleryShield = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1297,6 +1315,7 @@ AntiArtilleryShield = Class(Shield) {
 }
 
 -- Pretty much the same as personal shield (no collisions), but has its own mesh and special effects.
+---@class CzarShield : PersonalShield
 CzarShield = Class(PersonalShield) {
     OnCreate = function(self, spec)
         PersonalShield.OnCreate(self, spec)
@@ -1307,6 +1326,10 @@ CzarShield = Class(PersonalShield) {
 
 
     CreateImpactEffect = function(self, vector)
+
+        if IsDestroyed(self) then
+            return
+        end
 
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 

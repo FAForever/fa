@@ -24,6 +24,7 @@ local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categ
 local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
 
 -- STRUCTURE UNITS
+---@class StructureUnit : Unit
 StructureUnit = Class(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
@@ -278,11 +279,11 @@ StructureUnit = Class(Unit) {
 
     CreateDestructionEffects = function(self, overkillRatio)
         if explosion.GetAverageBoundingXZRadius(self) < 1.0 then
-            explosion.CreateScalableUnitExplosion(self, overkillRatio)
+            explosion.CreateScalableUnitExplosion(self)
         else
             explosion.CreateTimedStuctureUnitExplosion(self)
             WaitSeconds(0.5)
-            explosion.CreateScalableUnitExplosion(self, overkillRatio)
+            explosion.CreateScalableUnitExplosion(self)
         end
     end,
 
@@ -313,8 +314,26 @@ StructureUnit = Class(Unit) {
 
         if performUpgrade and order == 'Upgrade' then
             ChangeState(self, self.UpgradingState)
+
+            -- Fix an oddly specific bug to structures with damaged shields:
+            -- 1) let an engineer to assist the structure, repairing the damaged shield
+            -- 2) upgrade the structure while the shield is being healed
+            -- 3) engineer changes consumption target, but is in limbo - it consumes resources, but it doesn't repair the shield or help upgrade the structure
+
+            -- Luckily, engineers do not heal damaged shields on their own. It usually only happens when an engineer was specifically told to assist the shield,
+            -- therefore we add a check when we upgrade a structure that has a shield. For each guarding unit, check if this is the only command. If so,
+            -- re-issue the guard command
+            if self.MyShield then
+                local guards = self:GetGuards()
+                for k, guard in guards do
+                    if table.getn(guard:GetCommandQueue()) == 1 then
+                        IssueClearCommands({guard})
+                        IssueGuard({guard}, self)
+                    end
+                end
+            end
         end
-     end,
+    end,
 
     IdleState = State {
         Main = function(self)
@@ -323,17 +342,19 @@ StructureUnit = Class(Unit) {
 
     UpgradingState = State {
         Main = function(self)
-            local bp = self.Blueprint.Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
             self:DisableDefaultToggleCaps()
-            if bp.AnimationUpgrade then
+
+            local animation = self:GetUpgradeAnimation(self.UnitBeingBuilt)
+            if animation then
+
                 local unitBuilding = self.UnitBeingBuilt
                 self.AnimatorUpgradeManip = CreateAnimator(self)
                 self.Trash:Add(self.AnimatorUpgradeManip)
                 local fractionOfComplete = 0
                 self:StartUpgradeEffects(unitBuilding)
-                self.AnimatorUpgradeManip:PlayAnim(bp.AnimationUpgrade, false):SetRate(0)
+                self.AnimatorUpgradeManip:PlayAnim(animation, false):SetRate(0)
 
                 while fractionOfComplete < 1 and not self.Dead do
                     fractionOfComplete = unitBuilding:GetFractionComplete()
@@ -637,6 +658,7 @@ StructureUnit = Class(Unit) {
 }
 
 -- FACTORY UNITS
+---@class FactoryUnit : StructureUnit
 FactoryUnit = Class(StructureUnit) {
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
@@ -999,12 +1021,15 @@ FactoryUnit = Class(StructureUnit) {
 }
 
 -- AIR FACTORY UNITS
+---@class AirFactoryUnit : FactoryUnit
 AirFactoryUnit = Class(FactoryUnit) {}
 
 -- AIR STAGING PLATFORMS UNITS
+---@class AirStagingPlatformUnit : StructureUnit
 AirStagingPlatformUnit = Class(StructureUnit) { }
 
 -- ENERGY CREATION UNITS
+---@class ConcreteStructureUnit : StructureUnit
 ConcreteStructureUnit = Class(StructureUnit) {
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
@@ -1013,15 +1038,19 @@ ConcreteStructureUnit = Class(StructureUnit) {
 }
 
 -- ENERGY CREATION UNITS
+---@class EnergyCreationUnit : StructureUnit
 EnergyCreationUnit = Class(StructureUnit) { }
 
 -- ENERGY STORAGE UNITS
+---@class EnergyStorageUnit : StructureUnit
 EnergyStorageUnit = Class(StructureUnit) { }
 
 -- LAND FACTORY UNITS
+---@class LandFactoryUnit : FactoryUnit
 LandFactoryUnit = Class(FactoryUnit) {}
 
 -- MASS COLLECTION UNITS
+---@class MassCollectionUnit : StructureUnit
 MassCollectionUnit = Class(StructureUnit) {
 
     OnConsumptionActive = function(self)
@@ -1144,8 +1173,10 @@ MassCollectionUnit = Class(StructureUnit) {
 }
 
 -- MASS FABRICATION UNITS
+---@class MassFabricationUnit : StructureUnit
 MassFabricationUnit = Class(StructureUnit) {
 
+    ---@param self MassFabricationUnit
     OnScriptBitSet = function(self, bit)
         if bit == 4 then 
             -- no longer track us, we want to be disabled
@@ -1158,6 +1189,7 @@ MassFabricationUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self MassFabricationUnit
     OnScriptBitClear = function (self, bit)
         if bit == 4 then 
             -- make brain track us to enable / disable accordingly
@@ -1167,6 +1199,7 @@ MassFabricationUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self MassFabricationUnit
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
@@ -1238,9 +1271,11 @@ MassFabricationUnit = Class(StructureUnit) {
 }
 
 -- MASS STORAGE UNITS
+---@class MassStorageUnit : StructureUnit
 MassStorageUnit = Class(StructureUnit) { }
 
 -- RADAR UNITS
+---@class RadarUnit : StructureUnit
 RadarUnit = Class(StructureUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -1260,6 +1295,7 @@ RadarUnit = Class(StructureUnit) {
 }
 
 -- RADAR JAMMER UNITS
+---@class RadarJammerUnit : StructureUnit
 RadarJammerUnit = Class(StructureUnit) {
 
     -- Shut down intel while upgrading
@@ -1308,6 +1344,7 @@ RadarJammerUnit = Class(StructureUnit) {
 }
 
 -- SONAR UNITS
+---@class SonarUnit : StructureUnit
 SonarUnit = Class(StructureUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -1353,18 +1390,80 @@ SonarUnit = Class(StructureUnit) {
 }
 
 -- SEA FACTORY UNITS
+---@class SeaFactoryUnit : FactoryUnit
 SeaFactoryUnit = Class(FactoryUnit) {
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             self.UnitBeingBuilt:Destroy()
         end
     end,
+
+    CalculateRollOffPoint = function(self)
+
+        -- backwards compatible, don't try and fix mods that rely on the old logic
+        if not self.Blueprint.Physics.ComputeRollOffPoint then
+            return FactoryUnit.CalculateRollOffPoint(self)
+        end
+
+        -- retrieve our position
+        local px, py, pz = self:GetPositionXYZ()
+
+        -- retrieve roll off points
+        local bp = self.Blueprint.Physics.RollOffPoints
+        if not bp then 
+            return 0, px, py, pz 
+        end
+
+        -- retrieve rally point
+        local rallyPoint = self:GetRallyPoint()
+        if not rallyPoint then 
+            return 0, px, py, pz
+        end
+
+        -- find the attachpoint for the build location
+        local bone = (self:IsValidBone('Attachpoint') and 'Attachpoint') or (self:IsValidBone('Attachpoint01') and 'Attachpoint01')
+        local bx, by, bz = self:GetPositionXYZ(bone)
+        local ropx = bx - px
+        local modz = 1.0 + 0.1 * self.UnitBeingBuilt.Blueprint.SizeZ
+
+        -- find the nearest roll off point
+        local bpKey = 1
+        local distance, lowest = nil
+        for k, rolloffPoint in bp do
+
+            local ropz = modz * rolloffPoint.Z
+            distance = VDist2(rallyPoint[1], rallyPoint[3], ropx + px, ropz + pz)
+            if not lowest or distance < lowest then
+                bpKey = k
+                lowest = distance
+            end
+        end
+
+        -- finalize the computation
+        local fx, fy, fz, spin
+        local bpP = bp[bpKey]
+        local unitBP = self.UnitBeingBuilt.Blueprint.Display.ForcedBuildSpin
+        if unitBP then
+            spin = unitBP
+        else
+            spin = bpP.UnitSpin
+        end
+
+        fx = ropx + px
+        fy = bpP.Y + py
+        fz = modz * bpP.Z + pz
+
+        return spin, fx, fy, fz
+    end,
+
 }
 
 -- SHIELD STRCUTURE UNITS
+---@class ShieldStructureUnit : StructureUnit
 ShieldStructureUnit = Class(StructureUnit) { }
 
 -- TRANSPORT BEACON UNITS
+---@class TransportBeaconUnit : StructureUnit
 TransportBeaconUnit = Class(StructureUnit) {
 
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
@@ -1383,12 +1482,15 @@ TransportBeaconUnit = Class(StructureUnit) {
 }
 
 -- WALL STRCUTURE UNITS
+---@class WallStructureUnit : StructureUnit
 WallStructureUnit = Class(StructureUnit) { }
 
 -- QUANTUM GATE UNITS
+---@class QuantumGateUnit : FactoryUnit
 QuantumGateUnit = Class(FactoryUnit) { }
 
 -- MOBILE UNITS
+---@class MobileUnit : Unit
 MobileUnit = Class(Unit) {
 
     -- Added for engymod. When created, units must re-check their build restrictions
@@ -1453,6 +1555,7 @@ MobileUnit = Class(Unit) {
 }
 
 -- WALKING LAND UNITS
+---@class WalkingLandUnit : MobileUnit
 WalkingLandUnit = Class(MobileUnit) {
     WalkingAnim = nil,
     WalkingAnimRate = 1,
@@ -1496,6 +1599,7 @@ WalkingLandUnit = Class(MobileUnit) {
 
 -- SUB UNITS
 -- These units typically float under the water and have wake when they move
+---@class SubUnit : MobileUnit
 SubUnit = Class(MobileUnit) {
     -- Use default spark effect until underwater damaged states are made
     FxDamage1 = { EffectTemplate.DamageSparks01 },
@@ -1518,6 +1622,7 @@ SubUnit = Class(MobileUnit) {
 }
 
 -- AIR UNITS
+---@class AirUnit : MobileUnit
 AirUnit = Class(MobileUnit) {
     -- Contrails
     ContrailEffects = {'/effects/emitters/contrail_polytrail_01_emit.bp', },
@@ -1617,7 +1722,7 @@ AirUnit = Class(MobileUnit) {
 
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
+            EffectUtil.CreateEffectsOpti(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
             self.shallSink = true
             self.colliderProj:Destroy()
             self.colliderProj = nil
@@ -1723,6 +1828,7 @@ AirUnit = Class(MobileUnit) {
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
 local slotsData = {}
+---@class BaseTransport 
 BaseTransport = Class() {
     OnTransportAttach = function(self, attachBone, unit)
         self:PlayUnitSound('Load')
@@ -1791,6 +1897,7 @@ BaseTransport = Class() {
 }
 
 --- Base class for air transports.
+---@class BaseTransport : AirUnit
 AirTransport = Class(AirUnit, BaseTransport) {
     OnTransportAborted = function(self)
     end,
@@ -1862,9 +1969,11 @@ AirTransport = Class(AirUnit, BaseTransport) {
 }
 
 -- LAND UNITS
+---@class LandUnit : MobileUnit
 LandUnit = Class(MobileUnit) {}
 
 --  CONSTRUCTION UNITS
+---@class ConstructionUnit : MobileUnit
 ConstructionUnit = Class(MobileUnit) {
     OnCreate = function(self)
         MobileUnit.OnCreate(self)
@@ -1995,6 +2104,7 @@ ConstructionUnit = Class(MobileUnit) {
 
 -- SEA UNITS
 -- These units typically float on the water and have wake when they move
+---@class SeaUnit : MobileUnit
 SeaUnit = Class(MobileUnit){
     DeathThreadDestructionWaitTime = 0,
     ShowUnitDestructionDebris = false,
@@ -2008,6 +2118,7 @@ SeaUnit = Class(MobileUnit){
 }
 
 --- Base class for aircraft carriers.
+---@class AircraftCarrier : SeaUnit
 AircraftCarrier = Class(SeaUnit, BaseTransport) {
     OnKilled = function(self, instigator, type, overkillRatio)
         self:SaveCargoMass()
@@ -2017,8 +2128,10 @@ AircraftCarrier = Class(SeaUnit, BaseTransport) {
 }
 
 -- HOVERING LAND UNITS
+---@class HoverLandUnit : MobileUnit
 HoverLandUnit = Class(MobileUnit) { }
 
+---@class SlowHoverLandUnit : HoverLandUnit
 SlowHoverLandUnit = Class(HoverLandUnit) {
     OnLayerChange = function(self, new, old)
 
@@ -2029,7 +2142,7 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
 
-        local mult = self.Blueprint.Physics.WaterSpeedMultiplier
+        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
         if new == 'Water' then
             self:SetSpeedMult(mult)
         else
@@ -2039,15 +2152,17 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
 }
 
 -- AMPHIBIOUS LAND UNITS
+---@class AmphibiousLandUnit : MobileUnit
 AmphibiousLandUnit = Class(MobileUnit) { }
 
+---@class SlowAmphibiousLandUnit : AmphibiousLandUnit
 SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
     OnLayerChange = function(self, new, old)
 
         -- call base class to make sure self.layer is set
         HoverLandUnit.OnLayerChange(self, new, old)
 
-        local mult = self.Blueprint.Physics.WaterSpeedMultiplier
+        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
         if new == 'Seabed'  then
             self:SetSpeedMult(mult)
         else
@@ -2057,6 +2172,7 @@ SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
 }
 
 --- Base class for command units.
+---@class CommandUnit : WalkingLandUnit
 CommandUnit = Class(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
 
@@ -2293,6 +2409,7 @@ CommandUnit = Class(WalkingLandUnit) {
     end,
 }
 
+---@class ACUUnit : CommandUnit
 ACUUnit = Class(CommandUnit) {
     -- The "commander under attack" warnings.
     CreateShield = function(self, bpShield)
@@ -2378,10 +2495,6 @@ ACUUnit = Class(CommandUnit) {
             if IsAlly(self.Army, instigator.Army) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
                 WARN('Teamkill detected')
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
-            else
-                ForkThread(function()
-                    instigatorBrain:ReportScore()
-                end)
             end
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
@@ -2455,10 +2568,13 @@ ACUUnit = Class(CommandUnit) {
 }
 
 -- SHIELD HOVER UNITS
+---@class ShieldHoverLandUnit : HoverLandUnit
 ShieldHoverLandUnit = Class(HoverLandUnit) {}
 
 -- SHIELD LAND UNITS
+---@class ShieldLandUnit : LandUnit
 ShieldLandUnit = Class(LandUnit) {}
 
 -- SHIELD SEA UNITS
+---@class ShieldSeaUnit : SeaUnit
 ShieldSeaUnit = Class(SeaUnit) {}

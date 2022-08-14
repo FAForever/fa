@@ -1,16 +1,17 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/UES0305/UES0305_script.lua
---#**  Author(s):  John Comes
---#**
---#**  Summary  :  UEF T3 Mobile Sonar
---#**
---#**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/UES0305/UES0305_script.lua
+----**  Author(s):  John Comes
+----**
+----**  Summary  :  UEF T3 Mobile Sonar
+----**
+----**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
 local CreateBuildCubeThread = import('/lua/EffectUtilities.lua').CreateBuildCubeThread
 
+---@class UES0305 : TSeaUnit
 UES0305 = Class(TSeaUnit) {
     Weapons = {
         Torpedo01 = Class(TANTorpedoAngler) {},

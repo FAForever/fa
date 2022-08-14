@@ -1,63 +1,7 @@
---#################################################
---#   Generic Window Class
---#################################################
---#  In order for this class to work, you MUST hook in a styles table in your product.
---#  Here is an example:
---#local styles = {
---#    backgrounds = {
---#        notitle = {
---#            tl = '/game/mini-map-brd01/mini-map_brd_ul.dds',
---#            tr = '/game/mini-map-brd01/mini-map_brd_ur.dds',
---#            tm = '/game/mini-map-brd01/mini-map_brd_horz_um.dds',
---#            ml = '/game/mini-map-brd01/mini-map_brd_vert_l.dds',
---#            m = '/game/mini-map-brd01/mini-map_brd_m.dds',
---#            mr = '/game/mini-map-brd01/mini-map_brd_vert_r.dds',
---#            bl = '/game/mini-map-brd01/mini-map_brd_ll.dds',
---#            bm = '/game/mini-map-brd01/mini-map_brd_lm.dds',
---#            br = '/game/mini-map-brd01/mini-map_brd_lr.dds',
---#            borderColor = 'ff415055',
---#        },
---#        title = {
---#            tl = '/game/options_brd/options_brd_ul.dds',
---#            tr = '/game/options_brd/options_brd_ur.dds',
---#            tm = '/game/options_brd/options_brd_horz_um.dds',
---#            ml = '/game/options_brd/options_brd_vert_l.dds',
---#            m = '/game/options_brd/options_brd_m.dds',
---#            mr = '/game/options_brd/options_brd_vert_r.dds',
---#            bl = '/game/options_brd/options_brd_ll.dds',
---#            bm = '/game/options_brd/options_brd_lm.dds',
---#            br = '/game/options_brd/options_brd_lr.dds',
---#            borderColor = 'ff415055',
---#        },
---#    },
---#    closeButton = {
---#        up = '/dialogs/close_btn/close_btn_up.dds',
---#        down = '/dialogs/close_btn/close_btn_down.dds',
---#        over = '/dialogs/close_btn/close_btn_over.dds',
---#        dis = '/dialogs/close_btn/close_btn_dis.dds',
---#    },
---#    pinButton = {
---#        up = '/dialogs/pin/pin_up.dds',
---#        upSel = '/dialogs/pin/pinned_up.dds',
---#        over = '/dialogs/pin/pin_over.dds',
---#        overSel = '/dialogs/pin/pinned_over.dds',
---#        dis = '/dialogs/pin/pin_dis.dds',
---#        disSel = '/dialogs/pin/pinned_dis.dds',
---#    },
---#    configButton = {
---#        up = '/dialogs/config_btn/config_btn_up.dds',
---#        down = '/dialogs/config_btn/config_btn_down.dds',
---#        over = '/dialogs/config_btn/config_btn_over.dds',
---#        dis = '/dialogs/config_btn/config_btn_dis.dds',
---#    },
---#    title = {
---#        font = UIUtil.titleFont,
---#        color = UIUtil.fontColor,
---#        size = 14,
---#    },
---#    cursorFunc = UIUtil.GetCursor,
---#}
---#################################################
+----------------------------------------------------------------------------------------------------
+----   Generic Window Class
+----------------------------------------------------------------------------------------------------
+
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
@@ -69,8 +13,63 @@ local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
-styles = {}
+-- default style set
+styles = {
+    backgrounds = {
+        notitle = {
+            tl = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_ul.dds'),
+            tr = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_ur.dds'),
+            tm = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_horz_um.dds'),
+            ml = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_vert_l.dds'),
+            m = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_m.dds'),
+            mr = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_vert_r.dds'),
+            bl = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_ll.dds'),
+            bm = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_lm.dds'),
+            br = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_lr.dds'),
+            borderColor = 'ff415055',
+        },
+        title = {
+            tl = UIUtil.UIFile('/game/options_brd/options_brd_ul.dds'),
+            tr = UIUtil.UIFile('/game/options_brd/options_brd_ur.dds'),
+            tm = UIUtil.UIFile('/game/options_brd/options_brd_horz_um.dds'),
+            ml = UIUtil.UIFile('/game/options_brd/options_brd_vert_l.dds'),
+            m = UIUtil.UIFile('/game/options_brd/options_brd_m.dds'),
+            mr = UIUtil.UIFile('/game/options_brd/options_brd_vert_r.dds'),
+            bl = UIUtil.UIFile('/game/options_brd/options_brd_ll.dds'),
+            bm = UIUtil.UIFile('/game/options_brd/options_brd_lm.dds'),
+            br = UIUtil.UIFile('/game/options_brd/options_brd_lr.dds'),
+            borderColor = 'ff415055',
+        },
+    },
+    closeButton = {
+        up = UIUtil.SkinnableFile('/game/menu-btns/close_btn_up.dds'),
+        down = UIUtil.SkinnableFile('/game/menu-btns/close_btn_down.dds'),
+        over = UIUtil.SkinnableFile('/game/menu-btns/close_btn_over.dds'),
+        dis = UIUtil.SkinnableFile('/game/menu-btns/close_btn_dis.dds'),
+    },
+    pinButton = {
+        up = UIUtil.SkinnableFile('/game/menu-btns/pin_btn_up.dds'),
+        upSel = UIUtil.SkinnableFile('/game/menu-btns/pinned_btn_up.dds'),
+        over = UIUtil.SkinnableFile('/game/menu-btns/pin_btn_over.dds'),
+        overSel = UIUtil.SkinnableFile('/game/menu-btns/pinned_btn_over.dds'),
+        dis = UIUtil.SkinnableFile('/game/menu-btns/pin_btn_dis.dds'),
+        disSel = UIUtil.SkinnableFile('/game/menu-btns/pinned_btn_dis.dds'),
+    },
+    configButton = {
+        up = UIUtil.SkinnableFile('/game/menu-btns/config_btn_up.dds'),
+        down = UIUtil.SkinnableFile('/game/menu-btns/config_btn_down.dds'),
+        over = UIUtil.SkinnableFile('/game/menu-btns/config_btn_over.dds'),
+        dis = UIUtil.SkinnableFile('/game/menu-btns/config_btn_dis.dds'),
+    },
+    title = {
+        font = UIUtil.titleFont,
+        color = UIUtil.fontColor,
+        size = 14,
+    },
+    cursorFunc = UIUtil.GetCursor,
+}
 
+---@class Window
 Window = Class(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
         Group.__init(self, parent, tostring(title) .. "-window")
@@ -281,13 +280,14 @@ Window = Class(Group) {
         end
 
         self.ClientGroup = Group(self, 'window client group')
-        self.ClientGroup.Top:Set(self.TitleGroup.Bottom)
-        self.ClientGroup.Left:Set(self.ml.Right)
-        self.ClientGroup.Height:Set(function() return self.bm.Top() - self.TitleGroup.Bottom() end)
-        self.ClientGroup.Width:Set(function() return self.mr.Left() - self.ml.Right() end)
-        self.ClientGroup.Right:Set(self.mr.Left)
-        self.ClientGroup.Bottom:Set(self.bm.Top)
-        self.ClientGroup.Depth:Set(function() return self.window_m.Depth() + 1 end)
+        LayoutHelpers.ReusedLayoutFor(self.ClientGroup)
+            :Top(self.TitleGroup.Bottom)
+            :Left(self.ml.Right)
+            :Height(function() return self.bm.Top() - self.TitleGroup.Bottom() end)
+            :Width(function() return self.mr.Left() - self.ml.Right() end)
+            :Right(self.mr.Left)
+            :Bottom(self.bm.Top)
+            :Over(self.window_m)
 
         self.StartSizing = function(event, xControl, yControl)
             local drag = Dragger()

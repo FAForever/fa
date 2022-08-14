@@ -131,7 +131,7 @@ UnitBlueprint {
             RULEUTC_ProductionToggle = true,
         },
         UnitWeight = 1,
-        UpgradesTo = nil, #from the T3 fab
+        UpgradesTo = nil, --from the T3 fab
     },
     Interface = {
         HelpText = '<LOC urb1104_help>Mass Fabricator',

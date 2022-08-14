@@ -260,7 +260,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     GUI.content:DisableHitTest()
 
     GUI.progressBar = StatusBar(GUI.bg, 0, 1, false, false, nil, nil, true)
-    GUI.progressBar._bar:SetSolidColor('DDC0C0C0') --#DDC0C0C0
+    GUI.progressBar._bar:SetSolidColor('DDC0C0C0') ----DDC0C0C0
     GUI.progressBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     GUI.progressBar:SetValue(0)
     LayoutHelpers.SetHeight(GUI.progressBar, 5)
@@ -269,7 +269,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     LayoutHelpers.AtVerticalCenterIn(GUI.progressBar, GUI.bg)
 
     GUI.progressTxt = UIUtil.CreateText(GUI.bg, "Blueprints Loading ... ", 16, UIUtil.titleFont)
-    GUI.progressTxt:SetColor('FFAEACAC') -- #FFAEACAC
+    GUI.progressTxt:SetColor('FFAEACAC') -- --FFAEACAC
     LayoutHelpers.Above(GUI.progressTxt, GUI.progressBar, 5)
     LayoutHelpers.AtHorizontalCenterIn(GUI.progressTxt, GUI.bg)
 
@@ -443,7 +443,7 @@ function CreateControls(OnOk, OnCancel, isHost)
     LayoutHelpers.AtHorizontalCenterIn(GUI.title, GUI.bg)
 
     GUI.stats = UIUtil.CreateText(GUI.bg, "", 14, UIUtil.bodyFont)
-    GUI.stats:SetColor('ff8C8C8C') -- #ff8C8C8C
+    GUI.stats:SetColor('ff8C8C8C') -- --ff8C8C8C
     LayoutHelpers.AtTopIn(GUI.stats, GUI.bg, 10)
     LayoutHelpers.AtRightIn(GUI.stats, GUI.bg, 10)
     Tooltip.AddControlTooltip(GUI.stats, {
@@ -652,7 +652,7 @@ function CreateUnitIcon(parent, bp, faction)
     LayoutHelpers.AtLeftTopIn(modText, control, modPosition, modPosition - 3)
 
     if bp.Mod then
-        modFill:SetSolidColor('ffAA00FF')-- #ffAA00FF'
+        modFill:SetSolidColor('ffAA00FF')-- --ffAA00FF'
         modText:SetText('M')
         modText:SetColor('ffffffff')
     end
@@ -666,10 +666,10 @@ function CreateUnitIcon(parent, bp, faction)
 
     if bp.Type == 'UPGRADE' or
        bp.CategoriesHash.ISPREENHANCEDUNIT then
-        colors.TextChecked = 'ffffffff'  -- #ffffffff'
-        colors.TextUncheck = 'ffffffff'  -- #ffffffff'
-        colors.FillChecked = 'ad575757'  -- #ad575757'
-        colors.FillUncheck = '003e3d3d'  -- #003e3d3d'
+        colors.TextChecked = 'ffffffff'  -- --ffffffff'
+        colors.TextUncheck = 'ffffffff'  -- --ffffffff'
+        colors.FillChecked = 'ad575757'  -- --ad575757'
+        colors.FillUncheck = '003e3d3d'  -- --003e3d3d'
 
         checkbox.selector = overlay
         LayoutHelpers.SetDimensions(checkbox, cellSize, cellSize)
@@ -684,10 +684,10 @@ function CreateUnitIcon(parent, bp, faction)
             LayoutHelpers.AtLeftTopIn(techUI, control, 2, 2)
         end
     else
-        colors.TextChecked = 'ffC0C0C0' --#ffC0C0C0
-        colors.TextUncheck = 'ff000000' --#ff000000
-        colors.FillChecked = 'ff575757' --#ff575757
-        colors.FillUncheck = bp.Color or 'ff524A3E' --#ff524A3E
+        colors.TextChecked = 'ffC0C0C0' ----ffC0C0C0
+        colors.TextUncheck = 'ff000000' ----ff000000
+        colors.FillChecked = 'ff575757' ----ff575757
+        colors.FillUncheck = bp.Color or 'ff524A3E' ----ff524A3E
 
         fill:SetSolidColor(colors.FillUncheck)
         techUI:SetColor(colors.TextUncheck)

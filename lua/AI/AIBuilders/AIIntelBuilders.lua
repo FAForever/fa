@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIIntelBuilders.lua
-#**
-#**  Summary  : Default economic builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIIntelBuilders.lua
+--**
+--**  Summary  : Default economic builders for skirmish
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
@@ -31,10 +31,10 @@ BuilderGroup {
         PlatoonTemplate = 'T1AirScout',
         Priority = 700,
         BuilderConditions = {
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.SCOUT * categories.AIR}}, #DUNCAN - was 8
-            #{ UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.FACTORY }},
-            #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.FACTORY * categories.AIR } },
-            #{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, categories.AIR * categories.FACTORY } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.SCOUT * categories.AIR}}, --DUNCAN - was 8
+            --{ UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.FACTORY }},
+            --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.FACTORY * categories.AIR } },
+            --{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, categories.AIR * categories.FACTORY } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.SCOUT * categories.AIR } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -130,27 +130,27 @@ BuilderGroup {
         PlatoonTemplate = 'T1LandScout',
         Priority = 875,
         BuilderConditions = {
-            #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY - categories.TECH1 }},
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.LAND * categories.SCOUT }}, #DUNCAN - was 4
-            #{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.SCOUT * categories.LAND } },
+            --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY - categories.TECH1 }},
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.LAND * categories.SCOUT }}, --DUNCAN - was 4
+            --{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.SCOUT * categories.LAND } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            #{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
+            --{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
         BuilderType = 'Land',
     },
-    #Builder {
-    #    BuilderName = 'T1 Land Scout',
-    #    PlatoonTemplate = 'T1LandScout',
-    #    Priority = 850,
-    #    BuilderConditions = {
-    #        #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY - categories.TECH1 }},
-    #        { UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.LAND * categories.SCOUT }},
-    #        #{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.SCOUT * categories.LAND } },
-    #        { IBC, 'BrainNotLowPowerMode', {} },
-    #        #{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
-    #    },
-    #    BuilderType = 'Land',
-    #},
+    --Builder {
+    --    BuilderName = 'T1 Land Scout',
+    --    PlatoonTemplate = 'T1LandScout',
+    --    Priority = 850,
+    --    BuilderConditions = {
+    --        --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY - categories.TECH1 }},
+    --        { UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.LAND * categories.SCOUT }},
+    --        --{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.SCOUT * categories.LAND } },
+    --        { IBC, 'BrainNotLowPowerMode', {} },
+    --        --{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
+    --    },
+    --    BuilderType = 'Land',
+    --},
     Builder {
         BuilderName = 'T1 Land Scout Ratio Build',
         PlatoonTemplate = 'T1LandScout',
@@ -159,7 +159,7 @@ BuilderGroup {
             { UCBC, 'HaveUnitRatio', { 0.1, categories.LAND * categories.SCOUT, '<=', categories.LAND * categories.MOBILE - categories.ENGINEER }},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.SCOUT * categories.LAND } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.2 }}, #DUNCAN - was 0.9
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.2 }}, --DUNCAN - was 0.9
         },
         BuilderType = 'Land',
     },
@@ -171,7 +171,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Land Scout Form',
         BuilderConditions = {
-            #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY * categories.LAND - categories.TECH1 }},
+            --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY * categories.LAND - categories.TECH1 }},
         },
         PlatoonTemplate = 'T1LandScoutForm',
         Priority = 725,
@@ -189,12 +189,12 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 930,
         BuilderConditions = {
-            #DUNCAN - commented out
-            #{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER - categories.COMMAND - categories.TECH1 } },
+            --DUNCAN - commented out
+            --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER - categories.COMMAND - categories.TECH1 } },
             { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, (categories.RADAR + categories.OMNI) * categories.STRUCTURE}},
             { EBC, 'GreaterThanEconIncome',  { 0.5, 15 } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 1.2 }}, #DUNCAN - was 0.9,1.2
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 1.2 }}, --DUNCAN - was 0.9,1.2
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -261,7 +261,7 @@ BuilderGroup {
             { EBC, 'GreaterThanEconIncome',  { 2, 100 }},
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { IBC, 'BrainNotLowPowerMode', {} },
-            #DUNCAN - added
+            --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.RADAR * categories.STRUCTURE, 'RADAR STRUCTURE' } },
         },
         BuilderType = 'Any',
@@ -278,7 +278,7 @@ BuilderGroup {
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.OMNI * categories.STRUCTURE, 'RADAR STRUCTURE' } },
-            #DUNCAN - added
+            --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.RADAR * categories.STRUCTURE, 'RADAR STRUCTURE' } },
         },
         BuilderType = 'Any',
@@ -411,7 +411,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T2 Radar Upgrade Expansion',
         PlatoonTemplate = 'T2RadarUpgrade',
-        Priority = 1, #DUNCAN - changed to 1
+        Priority = 1, --DUNCAN - changed to 1
         BuilderConditions = {
             { EBC, 'GreaterThanEconIncome',  { 9, 500}},
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},

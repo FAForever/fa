@@ -1,16 +1,17 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAA0102/UAA0102_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Aeon Interceptor Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAA0102/UAA0102_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Aeon Interceptor Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
 local aWeapons = import('/lua/aeonweapons.lua')
 local AAASonicPulseBatteryWeapon = aWeapons.AAASonicPulseBatteryWeapon
 
+---@class UAA0102 : AAirUnit
 UAA0102 = Class(AAirUnit) {
 
     Weapons = {

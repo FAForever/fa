@@ -23,7 +23,7 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/sparkle_red_add_02.dds]],
+    Texture = '/textures/particles/sparkle_red_add_02.dds',
     XDirectionCurve = {
         XRange = 3.00,
         Keys = {

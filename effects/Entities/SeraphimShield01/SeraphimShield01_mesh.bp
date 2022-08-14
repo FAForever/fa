@@ -1,0 +1,16 @@
+MeshBlueprint {
+    LODs = {
+        {
+            MeshName = '/effects/Entities/Sphere01/Sphere01_lod0.scm',
+            AlbedoName = '/effects/Entities/SeraphimShield01/SeraphimShield01_Albedo.dds',
+            NormalsName = '/effects/Entities/SeraphimShield01/SeraphimShield01_Normals3.dds',
+            SpecularName = '/effects/Entities/SeraphimShield01/SeraphimShield01_Specular2.dds',
+            LookupName = '/effects/Entities/SeraphimShield01/ramp_yellow_to_purple_01.dds',
+            ShaderName = 'ShieldSeraphim',
+            LODCutoff = 1000,
+        },
+    },
+    IconFadeInZoom = 4,
+    SortOrder = 1000,
+    StraddleWater = true,
+}

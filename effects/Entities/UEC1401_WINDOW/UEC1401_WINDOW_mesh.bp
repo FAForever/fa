@@ -1,0 +1,15 @@
+MeshBlueprint {
+    LODs = {
+        {
+            MeshName = 'UEC1401_WINDOW_lod0.scm',
+            AlbedoName = 'UEC1401_WINDOW_Albedo.dds',
+            NormalsName = 'UEC1401_WINDOW_NormalsTS.dds',
+            SpecularName = 'UEC1401_WINDOW_SpecTeam.dds',
+            ShaderName = 'GlassAlpha',
+            LODCutoff = 200,
+        },
+    },
+    IconFadeInZoom = 4,
+    SortOrder = 1000,
+    StraddleWater = true,
+}

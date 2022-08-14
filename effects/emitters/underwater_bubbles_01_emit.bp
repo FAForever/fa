@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/water_bubbles.dds]],
-	RampTexture = [[/textures/particles/ramp_water_04.dds]],
+	Texture = '/textures/particles/water_bubbles.dds',
+	RampTexture = '/textures/particles/ramp_water_04.dds',
 	XDirectionCurve = {
 		XRange = 60.00,
 		Keys = {

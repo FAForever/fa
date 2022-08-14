@@ -1,14 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEB3104/UEB3104_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  UEF Omni Sensor Suite Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UEB3104/UEB3104_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  UEF Omni Sensor Suite Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local TRadarUnit = import('/lua/terranunits.lua').TRadarUnit
 
+---@class UEB3104 : TRadarUnit
 UEB3104 = Class(TRadarUnit) {
 
     OnIntelDisabled = function(self)

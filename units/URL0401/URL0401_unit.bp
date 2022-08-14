@@ -44,15 +44,6 @@
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 25,
-            Level3 = 45,
-            Level4 = 60,
-            Level5 = 80,
-        },
-    },
     BuildIconSortPriority = 10,
     Categories = {
         'PRODUCTSC1',
@@ -322,7 +313,6 @@
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 0.05,
             RenderFireClock = true,
-            TargetCheckInterval = 2,
             TargetPriorities = {
                 'EXPERIMENTAL MASSFABRICATION',
                 '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy
@@ -335,7 +325,7 @@
                 'TECH3 STRUCTURE',
                 'TECH3 MOBILE',
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Aim_Barrel_Muzzle',

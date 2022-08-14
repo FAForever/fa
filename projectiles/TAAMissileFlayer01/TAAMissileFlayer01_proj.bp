@@ -27,6 +27,7 @@ ProjectileBlueprint {
             LODs = {
                 {
                     ShaderName = 'NormalMappedAlpha',
+                     LODCutoff = 140,
                 },
             },
         },

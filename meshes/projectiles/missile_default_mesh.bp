@@ -1,0 +1,11 @@
+MeshBlueprint {
+    LODs = {
+        {
+            ShaderName = 'TMeshNoLighting',
+            LODCutoff = 130,
+            NormalsName = '/projectiles/TAAMissileFlayer01/TAAMissileFlayer01_normalsTS.dds',
+            MeshName = '/projectiles/TAAMissileFlayer01/TAAMissileFlayer01_lod0.scm',
+            AlbedoName = '/projectiles/TAAMissileFlayer01/TAAMissileFlayer01_albedo.dds',
+        },
+    },
+}

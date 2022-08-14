@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEB5103/UEB5103_script.lua
-#**  Author(s):  John Comes, David Tomandl
-#**
-#**  Summary  :  UEF Quantum Gate Beacon Unit
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UEB5103/UEB5103_script.lua
+--**  Author(s):  John Comes, David Tomandl
+--**
+--**  Summary  :  UEF Quantum Gate Beacon Unit
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
 
+---@class UEB5103 : TStructureUnit
 UEB5103 = Class(TStructureUnit) {
 	FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
 	FxTransportBeaconScale =1,

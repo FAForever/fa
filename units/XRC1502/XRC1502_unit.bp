@@ -17,7 +17,7 @@ UnitBlueprint {
         },
     },
     Categories = {
-        'Cybran',
+        'CYBRAN',
         'STRUCTURE',
         'CIVILIAN',
         'SELECTABLE',
@@ -139,7 +139,7 @@ UnitBlueprint {
     SelectionSizeZ = 1.55,
     SelectionThickness = 0.45,
 
-    # height
+    -- height
     SizeX = 2.5,
     SizeY = 0.8,
     SizeZ = 2.5,

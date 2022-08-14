@@ -1,14 +1,15 @@
-#****************************************************************************
-#** 
-#**  File     :  /cdimage/units/UAC1101/UAC1101_script.lua 
-#**  Author(s):  John Comes, David Tomandl 
-#** 
-#**  Summary  :  Aeon Residential Structure, Ver1
-#** 
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--** 
+--**  File     :  /cdimage/units/UAC1101/UAC1101_script.lua 
+--**  Author(s):  John Comes, David Tomandl 
+--** 
+--**  Summary  :  Aeon Residential Structure, Ver1
+--** 
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local ACivilianStructureUnit = import('/lua/aeonunits.lua').ACivilianStructureUnit
 
+---@class UAC1101 : ACivilianStructureUnit
 UAC1101 = Class(ACivilianStructureUnit) {
 
 	BoneB01 = 'Energy_Beam_01',

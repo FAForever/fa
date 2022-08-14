@@ -1,14 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB1301/UAB1301_script.lua
-#**  Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Aeon Power Generator Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB1301/UAB1301_script.lua
+--**  Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Aeon Power Generator Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AEnergyCreationUnit = import('/lua/aeonunits.lua').AEnergyCreationUnit
 
+---@class UAB1301 : AEnergyCreationUnit
 UAB1301 = Class(AEnergyCreationUnit) {
     AmbientEffects = 'AT3PowerAmbient',
     

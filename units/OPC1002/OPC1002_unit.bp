@@ -26,7 +26,6 @@ UnitBlueprint {
         'CYBRAN',
         'CIVILIAN',
         'OPERATION',
-        'SPECIALHIGHPRI',
         'MOBILE',
         'VISIBLETORECON',
         'RECLAIMABLE',

@@ -13,6 +13,7 @@ local SDFUltraChromaticBeamGenerator = SeraphimWeapons.SDFUltraChromaticBeamGene
 local SANAnaitTorpedo = SeraphimWeapons.SANAnaitTorpedo
 local SDFAjelluAntiTorpedoDefense = SeraphimWeapons.SDFAjelluAntiTorpedoDefense
 
+---@class XSS0201 : SSubUnit
 XSS0201 = Class(SSubUnit) {
     BackWakeEffect = {},
     Weapons = {

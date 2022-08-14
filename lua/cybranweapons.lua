@@ -20,31 +20,37 @@ local Explosion = import('defaultexplosions.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
 
+---@class CDFBrackmanCrabHackPegLauncherWeapon : DefaultProjectileWeapon
 CDFBrackmanCrabHackPegLauncherWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/proton_cannon_muzzle_01_emit.bp',
                      '/effects/emitters/proton_cannon_muzzle_02_emit.bp',},
 }
 
+---@class CDFParticleCannonWeapon : DefaultBeamWeapon
 CDFParticleCannonWeapon = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.ParticleCannonCollisionBeam,
     FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_01_emit.bp'},
 }
 
+---@class CDFProtonCannonWeapon : DefaultProjectileWeapon
 CDFProtonCannonWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/proton_cannon_muzzle_01_emit.bp',
                      '/effects/emitters/proton_cannon_muzzle_02_emit.bp',},
 }
 
+---@class CDFHvyProtonCannonWeapon : DefaultProjectileWeapon
 CDFHvyProtonCannonWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CHvyProtonCannonMuzzleflash,
 }
 
+---@class CDFOverchargeWeapon : OverchargeWeapon
 CDFOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.CMolecularRipperOverChargeFlash01,
     DesiredWeaponLabel = 'RightRipper'
 }
 
 -- COMMANDER ENHANCEMENT WEAPON!
+---@class CDFHeavyMicrowaveLaserGeneratorCom : DefaultBeamWeapon
 CDFHeavyMicrowaveLaserGeneratorCom = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam02,
     FxMuzzleFlash = {},
@@ -65,6 +71,7 @@ CDFHeavyMicrowaveLaserGeneratorCom = Class(DefaultBeamWeapon) {
 }
 
 -- SPIDER BOT WEAPON!
+---@class CDFHeavyMicrowaveLaserGenerator : DefaultBeamWeapon
 CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam01,
     FxMuzzleFlash = {},
@@ -115,18 +122,22 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
     end,
 }
 
+---@class CDFEMP : DefaultProjectileWeapon
 CDFEMP = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/laserturret_muzzle_flash_01_emit.bp',},
 }
 
+---@class CDFElectronBolterWeapon : DefaultProjectileWeapon
 CDFElectronBolterWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CElectronBolterMuzzleFlash01,
 }
 
+---@class CDFHeavyElectronBolterWeapon : DefaultProjectileWeapon
 CDFHeavyElectronBolterWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CElectronBolterMuzzleFlash02,
 }
 
+---@class CIFSmartCharge : DefaultProjectileWeapon
 CIFSmartCharge = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {},
     CreateProjectileAtMuzzle = function(self, muzzle)
@@ -139,9 +150,11 @@ CIFSmartCharge = Class(DefaultProjectileWeapon) {
     end,
 }
 
+---@class CANTorpedoLauncherWeapon : DefaultProjectileWeapon
 CANTorpedoLauncherWeapon = Class(DefaultProjectileWeapon) {
 }
 
+---@class CANNaniteTorpedoWeapon : DefaultProjectileWeapon
 CANNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
@@ -171,14 +184,17 @@ CANNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
     end,
 }
 
+---@class CDFMissileMesonWeapon : DefaultProjectileWeapon
 CDFMissileMesonWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {},
 }
 
+---@class CDFRocketIridiumWeapon : DefaultProjectileWeapon
 CDFRocketIridiumWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/muzzle_flash_01_emit.bp',},
 }
 
+---@class CDFRocketIridiumWeapon02 : DefaultProjectileWeapon
 CDFRocketIridiumWeapon02 = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
         '/effects/emitters/cybran_hoplight_muzzle_smoke_01_emit.bp',
@@ -186,22 +202,27 @@ CDFRocketIridiumWeapon02 = Class(DefaultProjectileWeapon) {
     },
 }
 
+---@class CIFMissileCorsairWeapon : DefaultProjectileWeapon
 CIFMissileCorsairWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/muzzle_flash_01_emit.bp',},
 }
 
+---@class CDFLaserPulseLightWeapon : DefaultProjectileWeapon
 CDFLaserPulseLightWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CLaserMuzzleFlash01,
 }
 
+---@class CDFLaserHeavyWeapon : DefaultProjectileWeapon
 CDFLaserHeavyWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CLaserMuzzleFlash02,
 }
 
+---@class CDFLaserHeavyWeapon02 : DefaultProjectileWeapon
 CDFLaserHeavyWeapon02 = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CLaserMuzzleFlash03,
 }
 
+---@class CDFLaserDisintegratorWeapon01 : DefaultProjectileWeapon
 CDFLaserDisintegratorWeapon01 = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = {
         '/effects/emitters/disintegrator_muzzle_charge_01_emit.bp',
@@ -215,6 +236,7 @@ CDFLaserDisintegratorWeapon01 = Class(DefaultProjectileWeapon) {
     },
 }
 
+---@class CDFLaserDisintegratorWeapon02 : DefaultProjectileWeapon
 CDFLaserDisintegratorWeapon02 = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = {
         '/effects/emitters/disintegrator_muzzle_charge_03_emit.bp',
@@ -226,6 +248,7 @@ CDFLaserDisintegratorWeapon02 = Class(DefaultProjectileWeapon) {
     },
 }
 
+---@class CDFHeavyDisintegratorWeapon : DefaultProjectileWeapon
 CDFHeavyDisintegratorWeapon = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = {},
     FxMuzzleFlash = {
@@ -237,9 +260,11 @@ CDFHeavyDisintegratorWeapon = Class(DefaultProjectileWeapon) {
     },
 }
 
+---@class CAAAutocannon : DefaultProjectileWeapon
 CAAAutocannon = Class(DefaultProjectileWeapon) {
 }
 
+---@class CAANanoDartWeapon : DefaultProjectileWeapon
 CAANanoDartWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
         '/effects/emitters/cannon_muzzle_flash_04_emit.bp',
@@ -247,6 +272,7 @@ CAANanoDartWeapon = Class(DefaultProjectileWeapon) {
     },
 }
 
+---@class CAABurstCloudFlakArtilleryWeapon : DefaultProjectileWeapon
 CAABurstCloudFlakArtilleryWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
@@ -275,22 +301,27 @@ CAABurstCloudFlakArtilleryWeapon = Class(DefaultProjectileWeapon) {
     end,
 }
 
+---@class CAAMissileNaniteWeapon : DefaultProjectileWeapon
 CAAMissileNaniteWeapon = Class(DefaultProjectileWeapon) {
     -- Uses default muzzle flash
 }
 
+---@class CIFGrenadeWeapon : DefaultProjectileWeapon
 CIFGrenadeWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_01_emit.bp',},
 }
 
+---@class CIFArtilleryWeapon : DefaultProjectileWeapon
 CIFArtilleryWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CArtilleryFlash01
 }
 
+---@class CIFMissileStrategicWeapon : DefaultProjectileWeapon
 CIFMissileStrategicWeapon = Class(DefaultProjectileWeapon) {
 }
 
 
+---@class CIFMissileLoaTacticalWeapon : DefaultProjectileWeapon
 CIFMissileLoaTacticalWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
         '/effects/emitters/cybran_tactical_missile_launch_01_emit.bp',
@@ -298,10 +329,12 @@ CIFMissileLoaTacticalWeapon = Class(DefaultProjectileWeapon) {
     },
 }
 
+---@class CIFBombNeutronWeapon : DefaultProjectileWeapon
 CIFBombNeutronWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
 }
 
+---@class CIFNaniteTorpedoWeapon : DefaultProjectileWeapon
 CIFNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
 
@@ -329,14 +362,17 @@ CIFNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
 }
 
 
+---@class CIFMissileLoaWeapon : DefaultProjectileWeapon
 CIFMissileLoaWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CIFCruiseMissileLaunchSmoke,
 }
 
+---@class CAMEMPMissileWeapon : DefaultProjectileWeapon
 CAMEMPMissileWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/missile_sam_muzzle_flash_01_emit.bp',},
 }
 
+---@class CAMZapperWeapon : DefaultBeamWeapon
 CAMZapperWeapon = Class(DefaultBeamWeapon) {
 
     BeamType = CollisionBeamFile.ZapperCollisionBeam,
@@ -382,11 +418,13 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
     end,
 }
 
+---@class CAMZapperWeapon02 : DefaultBeamWeapon
 CAMZapperWeapon02 = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.ZapperCollisionBeam,
     FxMuzzleFlash = {'/effects/emitters/cannon_muzzle_flash_01_emit.bp',},
 }
 
+---@class CAMZapperWeapon03 : DefaultBeamWeapon
 CAMZapperWeapon03 = Class(DefaultBeamWeapon) {
 
     BeamType = CollisionBeamFile.ZapperCollisionBeam,
@@ -432,17 +470,21 @@ CAMZapperWeapon03 = Class(DefaultBeamWeapon) {
     end,
 }
 
+---@class CCannonMolecularWeapon : DefaultProjectileWeapon
 CCannonMolecularWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CMolecularRipperFlash01,
 }
 
+---@class CEMPAutoCannon : DefaultProjectileWeapon
 CEMPAutoCannon = Class(DefaultProjectileWeapon) {
 }
 
+---@class CKrilTorpedoLauncherWeapon : DefaultProjectileWeapon
 CKrilTorpedoLauncherWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CKrilTorpedoLauncherMuzzleFlash01,
 }
 
+---@class CMobileKamikazeBombWeapon : KamikazeWeapon
 CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 

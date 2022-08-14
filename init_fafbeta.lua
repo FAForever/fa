@@ -65,6 +65,7 @@ integratedMods = LowerHashTable(integratedMods)
 -- mods that are deprecated, based on folder name
 local deprecatedMods = { }
 deprecatedMods["simspeed++"] = true
+deprecatedMods["#quality of performance 2022"] = true
 deprecatedMods = LowerHashTable(deprecatedMods)
 
 -- typical FA packages
@@ -72,15 +73,15 @@ local allowedAssetsScd = { }
 allowedAssetsScd["units.scd"] = true
 allowedAssetsScd["textures.scd"] = true
 allowedAssetsScd["skins.scd"] = true
-allowedAssetsScd["schook.scd"] = true
+allowedAssetsScd["schook.scd"] = false      -- completely embedded in the repository
 allowedAssetsScd["props.scd"] = true
 allowedAssetsScd["projectiles.scd"] = true
 allowedAssetsScd["objects.scd"] = true
-allowedAssetsScd["moholua.scd"] = true
-allowedAssetsScd["mohodata.scd"] = true
+allowedAssetsScd["moholua.scd"] = false     -- completely embedded in the repository
+allowedAssetsScd["mohodata.scd"] = false    -- completely embedded in the repository
 allowedAssetsScd["mods.scd"] = true
 allowedAssetsScd["meshes.scd"] = true
-allowedAssetsScd["lua.scd"] = true
+allowedAssetsScd["lua.scd"] = false         -- completely embedded in the repository
 allowedAssetsScd["loc_us.scd"] = true
 allowedAssetsScd["loc_es.scd"] = true
 allowedAssetsScd["loc_fr.scd"] = true
@@ -89,9 +90,8 @@ allowedAssetsScd["loc_de.scd"] = true
 allowedAssetsScd["loc_ru.scd"] = true
 allowedAssetsScd["env.scd"] = true
 allowedAssetsScd["effects.scd"] = true
-allowedAssetsScd["editor.scd"] = true
-allowedAssetsScd["ambience.scd"] = true
-allowedAssetsScd["lobbymanager_v105.scd"] = true
+allowedAssetsScd["editor.scd"] = false      -- Unused
+allowedAssetsScd["ambience.scd"] = false    -- Empty 
 allowedAssetsScd["sc_music.scd"] = true
 allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 
@@ -134,22 +134,6 @@ local function MountDirectory(dir, mountpoint)
     UpvaluedPathNext = UpvaluedPathNext + 1
 end
 
---- Mounts all allowed content in a directory, including scd and zip files, to the mountpoint.
--- @param dir The absolute path to the directory
--- @param mountpoint The path to use in the game (e.g., /maps/...)
-local function MountContent(dir, mountpoint, allowedAssets)
-    for _,entry in IoDir(dir .. '/*') do
-        if entry != '.' and entry != '..' then
-            local mp = StringLower(entry)
-            if allowedAssets[mp] then 
-                MountDirectory(dir .. '/' .. entry, mountpoint .. '/' .. mp)
-            else 
-                LOG("Prevented loading content that is not allowed: " .. entry)
-            end
-        end
-    end
-end
-
 --- Mounts all allowed content in a directory, including scd and zip files, directly.
 -- @param dir The absolute path to the directory
 -- @param mountpoint The path to use in the game (e.g., /maps/...)
@@ -158,9 +142,8 @@ local function MountAllowedContent(dir, pattern, allowedAssets)
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
             if allowedAssets[mp] then 
+                LOG("Mounting content: " .. entry)
                 MountDirectory(dir .. "/" .. entry, '/')
-            else 
-                LOG("Prevented loading content that is not allowed: " .. entry)
             end
         end
     end
@@ -445,7 +428,7 @@ allowedAssetsNxy["lua.nx4"] = true
 allowedAssetsNxy["meshes.nx4"] = true
 allowedAssetsNxy["mods.nx4"] = true
 allowedAssetsNxy["projectiles.nx4"] = true
-allowedAssetsNxy["schook.nx4"] = true
+-- allowedAssetsNxy["schook.nx4"] = true
 allowedAssetsNxy["textures.nx4"] = true
 allowedAssetsNxy["units.nx4"] = true
 allowedAssetsNxy = LowerHashTable(allowedAssetsNxy)

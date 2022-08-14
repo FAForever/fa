@@ -1,13 +1,13 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/EngineerPlatoonTemplates.lua
-#**
-#**  Summary  : Global platoon templates
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/EngineerPlatoonTemplates.lua
+--**
+--**  Summary  : Global platoon templates
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-### Engineer platoons to be formed
+------ Engineer platoons to be formed
 
 PlatoonTemplate {
     Name = 'CommanderAssistSorian',

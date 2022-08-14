@@ -41,6 +41,7 @@ local function PostProcessUnit(unit)
     local isAir = unit.CategoriesHash['AIR']
     local isBomber = unit.CategoriesHash['BOMBER']
     local isGunship = unit.CategoriesHash['GUNSHIP']
+    local isTransport = unit.CategoriesHash['TRANSPORTATION']
 
     local isTech1 = unit.CategoriesHash['TECH1']
     local isTech2 = unit.CategoriesHash['TECH2']
@@ -54,8 +55,8 @@ local function PostProcessUnit(unit)
         -- guarantee that the table exists
         unit.AI = unit.AI or { }
 
-        -- if it is set then we use that - allows balance team to make adjustments as they see fit
-        if not unit.AI.GuardScanRadius then 
+        -- if it is set then we use that - allows us to make adjustments as we see fit
+        if unit.AI.GuardScanRadius == nil then 
 
             -- structures don't need this value set
             if isStructure or isDummy then 
@@ -118,17 +119,75 @@ local function PostProcessUnit(unit)
     -- value used by formations to determine the distance between other air units. Note
     -- that the value must be of type unsigned integer!
 
-    if isAir and not (isExperimental or isStructure) then 
+    if  isAir and
+        not (
+            isExperimental or
+            isStructure or
+            (isTransport and not isGunship) -- uef tech 2 gunship is also a transport :)
+        ) 
+    then 
+        
         unit.Footprint = unit.Footprint or { }
+
+        -- determine footprint size based on type
         if isBomber then 
             unit.Footprint.SizeX = 4
             unit.Footprint.SizeZ = 4
         elseif isGunship then 
             unit.Footprint.SizeX = 3
-            unit.Footprint.SizeZ = 3 
+            unit.Footprint.SizeZ = 3
         else 
             unit.Footprint.SizeX = 2
             unit.Footprint.SizeZ = 2
+        end
+
+        -- limit their footprint size based on tech
+        if isTech1 then 
+            unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 2)
+            unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 2)
+        elseif isTech2 then 
+            unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 3)
+            unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 3)
+        elseif isTech3 then 
+            unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 4)
+            unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 4)
+        end
+    end
+
+    -- # Allow naval factories to correct their roll off points, as they are critical for ships not being stuck
+
+    if unit.CategoriesHash['FACTORY'] and unit.CategoriesHash['NAVAL'] then 
+        unit.Physics.CorrectNavalRollOffPoints = true
+    end
+
+    -- # Check size of collision boxes
+
+    if not isDummy then 
+
+        -- find maximum speed
+        local speed = unit.Physics.MaxSpeed
+        if unit.Air and unit.Air.MaxAirspeed then
+            speed = unit.Air.MaxAirspeed
+        end
+
+        -- determine if collision box is fine
+        if speed then
+            if unit.SizeSphere then
+                if unit.SizeSphere < 0.1 * speed then
+                    WARN(string.format("Overriding the size of the collision sphere of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons", tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeSphere = 0.1 * speed
+                end
+            else
+                if unit.SizeX < 0.1 * speed then
+                    WARN(string.format("Overriding the x axis of collision box of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons", tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeX = 0.1 * speed
+                end
+
+                if unit.SizeZ < 0.1 * speed then
+                    WARN(string.format("Overriding the z axis of collision box of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons", tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeZ = 0.1 * speed
+                end
+            end
         end
     end
 end
@@ -136,23 +195,6 @@ end
 --- Post-processes all units
 function PostProcessUnits(units)
     for k, unit in units do 
-
-        -- local oldGuardScanRadius = unit.AI.GuardScanRadius
-        -- local oldGuardScanRadiusWasSet = true
-        -- if not oldGuardScanRadius then 
-        --     oldGuardScanRadiusWasSet = false
-        --     local primaryWeapon = unit.Weapon[1]
-        --     if primaryWeapon then 
-        --         local maxRadius = primaryWeapon.MaxRadius or 0
-        --         local trackingRadius = primaryWeapon.TrackingRadius or 1.0
-        --         oldGuardScanRadius = trackingRadius * maxRadius
-        --     else 
-        --         oldGuardScanRadius = 25 -- default value
-        --     end
-        -- end
-
         PostProcessUnit(unit)
-
-        -- LOG("Processing: " .. unit.BlueprintId .. " - GuardScanRadius: " .. tostring(oldGuardScanRadius) .. " -> " .. tostring(unit.AI.GuardScanRadius) .. " (" .. tostring(unit.General.UnitName) .. ")")
     end
 end

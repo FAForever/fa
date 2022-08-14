@@ -889,6 +889,10 @@ Tooltips = {
         title = "<LOC tooltipui0668>Mods Enabled",
         description = "<LOC tooltipui0669>The host has enabled mods. Be sure to check the mod manager.",
     },
+    Lobby_patchnotes = {
+        title = "<LOC tooltipui2000>Patchnotes",
+        description = "<LOC tooltipui2001>Access to all previous patch notes made by and for the community",
+    },
     Lobby_Load = {
         title = "<LOC tooltipui0171>Load",
         description = "<LOC tooltipui0172>Load a previously saved skirmish game",

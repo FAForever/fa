@@ -1,14 +1,15 @@
-#****************************************************************************
-#** 
-#**  File     :  /cdimage/units/UAC1901/UAC1901_script.lua 
-#**  Author(s):  John Comes, David Tomandl 
-#** 
-#**  Summary  :  Seraphim Sacred Site, Ver1
-#** 
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--** 
+--**  File     :  /cdimage/units/UAC1901/UAC1901_script.lua 
+--**  Author(s):  John Comes, David Tomandl 
+--** 
+--**  Summary  :  Seraphim Sacred Site, Ver1
+--** 
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local ACivilianStructureUnit = import('/lua/aeonunits.lua').ACivilianStructureUnit
 
+---@class UAC1901 : ACivilianStructureUnit
 UAC1901 = Class(ACivilianStructureUnit) {
 	OnCreate = function(self)
 		ACivilianStructureUnit.OnCreate(self)

@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/URA0401/URA0401_script.lua
---#**  Author(s):  John Comes, Andres Mendez, Gordon Duclos
---#**
---#**  Summary  :  Cybran Gunship Script
---#**
---#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/URA0401/URA0401_script.lua
+----**  Author(s):  John Comes, Andres Mendez, Gordon Duclos
+----**
+----**  Summary  :  Cybran Gunship Script
+----**
+----**  Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CDFRocketIridiumWeapon = import('/lua/cybranweapons.lua').CDFRocketIridiumWeapon
 local CAAMissileNaniteWeapon = import('/lua/cybranweapons.lua').CAAMissileNaniteWeapon
@@ -14,6 +14,7 @@ local CDFHeavyElectronBolterWeapon = import('/lua/cybranweapons.lua').CDFHeavyEl
 local util = import('/lua/utilities.lua')
 local fxutil = import('/lua/effectutilities.lua')
 
+---@class URA0401 : CAirUnit
 URA0401 = Class(CAirUnit) {
     Weapons = {
         Missile01 = Class(CDFRocketIridiumWeapon) {},

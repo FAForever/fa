@@ -1,3 +1,4 @@
+---@class NukeAOE
 NukeAOE = Class() {
     Damage = false,
     Radius = false,

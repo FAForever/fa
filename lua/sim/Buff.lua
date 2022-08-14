@@ -1,33 +1,98 @@
---#****************************************************************************
---#**
---#**  File     :  /lua/sim/buff.lua
---#**
---#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+---@declare-global
+----****************************************************************************
+----**
+----**  File     :  /lua/sim/buff.lua
+----**
+----**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 
---# The Unit's BuffTable for applied buffs looks like this:
---#
---# Unit.Buffs = {
---#    Affects = {
---#        <AffectType (Regen/MaxHealth/etc)> = {
---#            BuffName = {
---#                Count = i,
---#                Add = X,
---#                Mult = X,
---#            }
---#        }
---#    }
---#    BuffTable = {
---#        <BuffType (LEVEL/CATEGORY)> = {
---#            BuffName = {
---#                Count = i,
---#                Trash = trashbag,
---#            }
---#        }
---#    }
+---- The Unit's BuffTable for applied buffs looks like this:
+----
+---- Unit.Buffs = {
+----    Affects = {
+----        <AffectType (Regen/MaxHealth/etc)> = {
+----            BuffName = {
+----                Count = i,
+----                Add = X,
+----                Mult = X,
+----            }
+----        }
+----    }
+----    BuffTable = {
+----        <BuffType (LEVEL/CATEGORY)> = {
+----            BuffName = {
+----                Count = i,
+----                Trash = trashbag,
+----            }
+----        }
+----    }
+
+---@alias BuffType
+---| AdjacencyBuffType
+---| CheatBuffType
+---| CommonBuffType
+---| OpBuffType
+---| UniqueBuffType
+---| VeterancyBuffType
+
+---@alias CommonBuffType
+---| 'BuildRate'
+---| 'Damage'
+---| 'DamageRadius'
+---| 'EnergyActive'
+---| 'EnergyWeapon'
+---| 'EnergyMaintenance'
+---| 'EnergyProduction'
+---| 'Health'
+---| 'MassActive'
+---| 'MassMaintenance'
+---| 'MaxHealth'
+---| 'MaxRadius'
+---| 'MoveMult'
+---| 'MassProduction'
+---| 'OmniRadius'
+---| 'RadarRadius'
+---| 'RateOfFire'
+---| 'Regen'
+---| 'Stun'
+---| 'StunAlt'
+---| 'VisionRadius'
+---| 'WeaponsEnable'
+
+-- These are only created when needed
+---@alias UniqueBuffType
+---| 'AeonACUChronoDampener'
+---| 'AeonACUT2BuildRate'
+---| 'AeonACUT3BuildRate'
+---| 'AeonSCUBuildRate'
+---| 'AeonSCURegenRate'
+---| 'CybranACUCloakBonus'
+---| 'CybranACUStealthBonus'
+---| 'CybranACUT2BuildRate'
+---| 'CybranACUT3BuildRate'
+---| 'CybranSCUBuildRate'
+---| 'CybranSCUCloakBonus'
+---| 'CybranSCURegenerateBonus'
+---| 'UEFACUDamageStabilization'
+---| 'UEFACUT2BuildRate'
+---| 'UEFACUT3BuildRate'
+---| 'SelenCloakVisionDebuff'
+---| 'SeraphimACUDamageStabilization'
+---| 'SeraphimACUDamageStabilizationAdv'
+---| 'SeraphimACUAdvancedRegenAura'
+---| 'SeraphimACUAdvancedRegenAuraSelfBuff'
+---| 'SeraphimACURegenAura'
+---| 'SeraphimACURegenAuraSelfBuff'
+---| 'SeraphimACUT2BuildRate'
+---| 'SeraphimACUT3BuildRate'
+---| 'SeraphimSCUDamageStabilization'
+---| 'SeraphimSCUBuildRate'
 
 --Function to apply a buff to a unit.
 --This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.
+---@param unit Unit
+---@param buffName string
+---@param instigator Unit
 function ApplyBuff(unit, buffName, instigator)
 
     -- do not buff dead units
@@ -395,6 +460,10 @@ BuffEffects = {
 
 local buffMissingWarnings = {}
 
+---@param unit Unit
+---@param buffName string
+---@param instigator Unit
+---@param afterRemove boolean
 function BuffAffectUnit(unit, buffName, instigator, afterRemove)
     local buffDef = Buffs[buffName]
 
@@ -507,9 +576,15 @@ end
 -- A key -> function table for buffs, uses the buffName parameter
 local UniqueBuffs = { }
 UniqueBuffs['SeraphimACURegenAura'] = BuffRegenFieldCalculate
-UniqueBuffs['SeraphimAdvancedACURegenAura'] = BuffRegenFieldCalculate
+UniqueBuffs['SeraphimACUAdvancedRegenAura'] = BuffRegenFieldCalculate
 
--- Calculates the buff from all the buffs of the same time the unit has.
+--- Calculates the buff from all the buffs of the same time the unit has.
+---@param unit Unit
+---@param buffName string
+---@param affectType string
+---@param initialVal number
+---@param initialBool? boolean
+---@return number, boolean
 function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
     -- Check if we have a separate buff calculation system

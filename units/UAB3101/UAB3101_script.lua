@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB3101/UAB3101_script.lua
-#**  Author(s):  David Tomandl
-#**
-#**  Summary  :  Aeon Radar Tower Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB3101/UAB3101_script.lua
+--**  Author(s):  David Tomandl
+--**
+--**  Summary  :  Aeon Radar Tower Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local ARadarUnit = import('/lua/aeonunits.lua').ARadarUnit
 
+---@class UAB3101 : ARadarUnit
 UAB3101 = Class(ARadarUnit) {    
     OnIntelDisabled = function(self)
         ARadarUnit.OnIntelDisabled(self)

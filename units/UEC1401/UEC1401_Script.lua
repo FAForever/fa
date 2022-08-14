@@ -1,14 +1,15 @@
-#****************************************************************************
-#** 
-#**  File     :  /cdimage/units/UEC1401/UEC1401_script.lua 
-#**  Author(s):  John Comes, David Tomandl 
-#** 
-#**  Summary  :  Earth Agricultural Center, Ver1
-#** 
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--** 
+--**  File     :  /cdimage/units/UEC1401/UEC1401_script.lua 
+--**  Author(s):  John Comes, David Tomandl 
+--** 
+--**  Summary  :  Earth Agricultural Center, Ver1
+--** 
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local TCivilianStructureUnit = import('/lua/terranunits.lua').TCivilianStructureUnit
 
+---@class UEC1401 : TCivilianStructureUnit
 UEC1401 = Class(TCivilianStructureUnit) {
 
 	OnCreate = function(self)

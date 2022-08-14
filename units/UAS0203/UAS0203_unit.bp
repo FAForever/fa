@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardReturnRadius = 130,        
+        GuardReturnRadius = 40,        
         TargetBones = {
             'UAS0203',
             'upper_target',
@@ -56,15 +56,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Sub',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
         },
     },
     BuildIconSortPriority = 30,
@@ -301,7 +292,7 @@ UnitBlueprint {
     SelectionSizeX = 0.35,
     SelectionSizeZ = 1.5,
     SelectionThickness = 0.25,
-    SizeX = 0.35,
+    SizeX = 0.6,
     SizeY = 0.5,
     SizeZ = 1.85,
     StrategicIconName = 'icon_sub1_antinavy',
@@ -360,7 +351,6 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 10,
-            TargetCheckInterval = 2,
             TargetPriorities = {
                 'SUBMERSIBLE',
                 'TECH2 LIGHTBOAT',
@@ -368,10 +358,9 @@ UnitBlueprint {
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
                 'ANTINAVY',
                 'MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
-            TrackingRadius = 1.15,
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 0,

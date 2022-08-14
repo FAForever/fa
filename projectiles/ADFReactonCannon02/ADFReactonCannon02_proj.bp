@@ -1,0 +1,28 @@
+ProjectileBlueprint {
+    Categories = {
+        'AEON',
+        'PROJECTILE',
+        'DIRECTFIRE',
+    },
+    Display = {
+        StrategicIconSize = 1,
+    },
+    General = {
+        Category = 'Direct Fire',
+        EntityCategory = {
+            'AEON',
+            'PROJECTILE',
+            'DIRECTFIRE',
+        },
+        Faction = 'Aeon',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        InitialSpeed = 14,
+        InitialSpeedRange = 5,
+        VelocityAlign = true,
+    },
+}

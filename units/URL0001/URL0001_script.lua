@@ -411,23 +411,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         end
     end,
 
-    -- Death
-    OnKilled = function(self, instigator, type, overkillRatio)
-        local bp
-        for k, v in self:GetBlueprint().Buffs do
-            if v.Add.OnDeath then
-                bp = v
-            end
-        end
-        -- If we could find a blueprint with v.Add.OnDeath, then add the buff
-        if bp ~= nil then
-            -- Apply Buff
-            self:AddBuff(bp)
-        end
-        -- Otherwise, we should finish killing the unit
-        ACUUnit.OnKilled(self, instigator, type, overkillRatio)
-    end,
-
     OnLayerChange = function(self, new, old)
         ACUUnit.OnLayerChange(self, new, old)
         if self:GetWeaponByLabel('DummyWeapon') == nil then return end

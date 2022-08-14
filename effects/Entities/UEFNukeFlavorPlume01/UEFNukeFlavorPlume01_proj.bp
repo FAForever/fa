@@ -1,0 +1,10 @@
+ProjectileBlueprint {
+    Physics = {
+        CollideEntity = false,
+        CollideSurface = false,
+        DestroyOnWater = false,
+        InitialSpeed = 2,
+        UseGravity = false,
+        Lifetime = 30,
+    },
+}

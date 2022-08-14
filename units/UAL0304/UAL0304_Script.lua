@@ -1,16 +1,17 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAL0304/UAL0304_script.lua
-#**  Author(s):  John Comes, David Tomandl
-#**
-#**  Summary  :  Aeon Heavy Mobile Artillery Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAL0304/UAL0304_script.lua
+--**  Author(s):  John Comes, David Tomandl
+--**
+--**  Summary  :  Aeon Heavy Mobile Artillery Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local ALandUnit = import('/lua/aeonunits.lua').ALandUnit
 local AIFArtillerySonanceShellWeapon = import('/lua/aeonweapons.lua').AIFArtillerySonanceShellWeapon
 
+---@class UAL0304 : ALandUnit
 UAL0304 = Class(ALandUnit) {
     Weapons = {
         MainGun = Class(AIFArtillerySonanceShellWeapon) {

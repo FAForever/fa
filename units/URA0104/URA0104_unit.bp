@@ -1,12 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'URB5102',
-        TargetBones = {
-            'Char01',
-            'Char02',
-            'Char03',
-            'Char04',
-        },
     },
     Air = {
         AutoLandTime = 1,
@@ -85,15 +79,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -114,7 +99,7 @@ UnitBlueprint {
         'CANNOTUSEAIRSTAGING',
         'SNIPEMODE',
     },
-    CollisionOffsetY = -0.4,
+    CollisionOffsetY = 0.2,
     Defense = {
         AirThreatLevel = 1.5,
         ArmorType = 'Light',
@@ -208,7 +193,7 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 1,
+        SizeX = 2,
         SizeZ = 6,
     },
     General = {
@@ -264,7 +249,7 @@ UnitBlueprint {
     SelectionSizeZ = 4.25,
     SelectionThickness = 0.22,
     SizeX = 3,
-    SizeY = 1.8,
+    SizeY = 1.7,
     SizeZ = 6,
     StrategicIconName = 'icon_gunship2_transport',
     StrategicIconSortPriority = 65,
@@ -343,12 +328,10 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Front_Down_Turret_Muzzle',
             TurretBonePitch = 'Front_Down_Turret',
             TurretBoneYaw = 'Front_Down_Turret',
@@ -409,15 +392,13 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 3,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Back_Up_Turret_Muzzle',
             TurretBonePitch = 'Back_Up_Turret',
             TurretBoneYaw = 'Back_Up_Turret',

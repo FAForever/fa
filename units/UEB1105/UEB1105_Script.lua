@@ -1,14 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEB1105/UEB1105_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  UEF Energy Storage
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UEB1105/UEB1105_script.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  UEF Energy Storage
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local TEnergyStorageUnit = import('/lua/terranunits.lua').TEnergyStorageUnit
 
+---@class UEB1105 : TEnergyStorageUnit
 UEB1105 = Class(TEnergyStorageUnit) {
 
     OnCreate = function(self)

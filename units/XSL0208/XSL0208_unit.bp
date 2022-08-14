@@ -1,9 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardScanRadius = 26, -- allows for factory reclaim bug 
-        TargetBones = {
-            'XSL0208',
-        },
     },
     Audio = {
         AmbientMove = Sound {
@@ -88,7 +85,7 @@ UnitBlueprint {
         'PATROLHELPER',
         'SHOWQUEUE',
     },
-    CollisionOffsetY = -0.25,
+    CollisionOffsetY = -0.15,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -114,8 +111,8 @@ UnitBlueprint {
                         },
                         Offset = {
                             0,
-                            0,
                             -0.4,
+                            0,
                         },
                         Scale = 0.75,
                         Type = 'SeraphimGroundFX01',
@@ -130,8 +127,8 @@ UnitBlueprint {
                         },
                         Offset = {
                             0,
-                            0,
                             -0.4,
+                            0,
                         },
                         Scale = 0.75,
                         Type = 'SeraphimGroundFX01',
@@ -172,8 +169,8 @@ UnitBlueprint {
                         },
                         Offset = {
                             0,
-                            0,
                             -0.4,
+                            0,
                         },
                         Scale = 0.75,
                         Type = 'SeraphimGroundFX01',
@@ -195,8 +192,8 @@ UnitBlueprint {
                         },
                         Offset = {
                             0,
-                            0,
                             -0.4,
+                            0,
                         },
                         Scale = 0.75,
                         Type = 'SeraphimGroundFX01',
@@ -315,9 +312,9 @@ UnitBlueprint {
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.82,
-    SizeX = 1,
-    SizeY = 0.8,
-    SizeZ = 0.8,
+    SizeX = 0.8,
+    SizeY = 0.7,
+    SizeZ = 0.7,
     StrategicIconName = 'icon_land2_engineer',
     StrategicIconSortPriority = 95,
     Transport = {

@@ -3,7 +3,7 @@ UnitBlueprint {
         'PRODUCTSC1',
         'CYBRAN',
 
-        #        'BUILTBYTIER3ENGINEER',
+        --        'BUILTBYTIER3ENGINEER',
         'STRUCTURE',
         'TECH3',
         'SIZE4',

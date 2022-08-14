@@ -6,37 +6,41 @@
 -----------------------------------------------------------------
 
 -- Imports. Localise commonly used subfunctions for speed
-local Entity = import('/lua/sim/Entity.lua').Entity
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local explosion = import('/lua/defaultexplosions.lua')
-
-local EffectUtilities = import('/lua/EffectUtilities.lua')
-local Game = import('/lua/game.lua')
-local utilities = import('/lua/utilities.lua')
-local Shield = import('/lua/shield.lua').Shield
-local PersonalBubble = import('/lua/shield.lua').PersonalBubble
-local TransportShield = import('/lua/shield.lua').TransportShield
-local PersonalShield = import('/lua/shield.lua').PersonalShield
-local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
-
-local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
-local Wreckage = import('/lua/wreckage.lua')
+local Buff = import('/lua/sim/buff.lua')
+local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectUtilities = import('/lua/EffectUtilities.lua')
+local EnhancementCommon = import('/lua/enhancementcommon.lua')
+local Explosion = import('/lua/defaultexplosions.lua')
+local Game = import('/lua/game.lua')
 local Set = import('/lua/system/setutils.lua')
-local Factions = import('/lua/factions.lua').GetFactions(true)
+local SimUtils = import('/lua/SimUtils.lua')
+local utilities = import('/lua/utilities.lua')
+local Wreckage = import('/lua/wreckage.lua')
 
-local DeprecatedWarnings = { }
+local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
+local PersonalBubble = import('/lua/shield.lua').PersonalBubble
+local PersonalShield = import('/lua/shield.lua').PersonalShield
+local Shield = import('/lua/shield.lua').Shield
+local TransportShield = import('/lua/shield.lua').TransportShield
+local Weapon = import('/lua/sim/Weapon.lua').Weapon
 
--- allows us to skip ai-specific functionality
-local GameHasAIs = ScenarioInfo.GameHasAIs
+local TrashBag = TrashBag
+local TrashAdd = TrashBag.Add
+local TrashDestroy = TrashBag.Destroy
+local TrashEmpty = TrashBag.Empty
 
--- cached categories for performance
+local armies = ListArmies()
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local CreateEmitterAtBone = CreateEmitterAtBone
+local IsAlly = IsAlly
+local rawget = rawget
+
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
 
--- upvalue for performance
-local rawget = rawget 
-local IsAlly = IsAlly
-local armies = ListArmies()
+
+
+local DeprecatedWarnings = { }
 
 -- Structures that are reused for performance reasons
 -- Maps unit.techCategory to a number so we can do math on it for naval units
@@ -58,13 +62,6 @@ local veterancyRegenBuffs = {
     {25, 50, 75, 100,125}, -- Experimental
 }
 
-local TrashBag = TrashBag
-local TrashAdd = TrashBag.Add
-local TrashDestroy = TrashBag.Destroy
-local TrashEmpty = TrashBag.Empty
-
-local AttachBeamEntityToEntity = AttachBeamEntityToEntity
-local CreateEmitterAtBone = CreateEmitterAtBone
 
 SyncMeta = {
     __index = function(t, key)
@@ -115,6 +112,12 @@ local function PopulateBlueprintCache(entity, blueprint)
 end
 
 local cUnit = moho.unit_methods
+---@class Unit : moho.unit_methods
+---@field Brain AIBrain
+---@field Buffs {Affects: BlueprintBuff.Affects, buffTable: table<string, table>}
+---@field Army Army
+---@field UnitId UnitId
+---@field EntityId EntityId
 Unit = Class(moho.unit_methods) {
 
     Cache = false,
@@ -158,6 +161,7 @@ Unit = Class(moho.unit_methods) {
     ---- INITIALIZATION
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
+
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
@@ -210,6 +214,7 @@ Unit = Class(moho.unit_methods) {
         }
     end,
 
+    ---@param self Unit
     OnCreate = function(self)
         local bp = self:GetBlueprint()
 
@@ -239,7 +244,8 @@ Unit = Class(moho.unit_methods) {
         -- the entity that produces sound, by default ourself
         self.SoundEntity = self
 
-
+        -- used to fix engine related bugs
+        self.EngineFlags = { }
 
         -- Store size information for performance
         self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
@@ -339,6 +345,13 @@ Unit = Class(moho.unit_methods) {
         end
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
+
+        
+        if self.Blueprint.Intel.JammerBlips > 0 then
+            self.Brain:TrackJammer(self)
+            self.ResetJammer = -1
+        end
+        
     end,
 
     -------------------------------------------------------------------------------------------
@@ -808,7 +821,7 @@ Unit = Class(moho.unit_methods) {
 
             -- Fix captured units not retaining their data
             self:ResetCaptors()
-            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captor.Army, true) or {}
+            local newUnits = SimUtils.TransferUnitsOwnership({self}, captor.Army, true) or {}
 
             -- The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
             -- If table would have been nil (Set to {} above), was empty, or contains more than one, kill this sequence
@@ -1019,6 +1032,75 @@ Unit = Class(moho.unit_methods) {
         return self.BuildRateOverride
     end,
 
+    --- Adds up total build costs for the unit blueprint and active enhancements
+    ---@param self Unit
+    ---@return number mass
+    ---@return number energy
+    ---@return number time
+    GetTotalResourceCosts = function(self)
+        local bp = self.Blueprint
+        local economy = bp.Economy
+        local mass = economy.BuildCostMass or 0
+        local energy = economy.BuildCostEnergy or 0
+        local time = economy.BuildTime or 0
+        local enhancements = bp.Enhancements
+        if enhancements then
+            local activeEnhancements = SimUnitEnhancements[self.EntityId]
+            if activeEnhancements then
+                local presetEnhancements = bp.EnhancementPresetAssigned.Enhancements
+                for _, enhName in activeEnhancements do
+                    -- don't add enhancement costs built into the unit cost
+                    if presetEnhancements and presetEnhancements[enhName] then
+                        continue
+                    end
+                    -- add up the enhancement AND all of its prerequisites
+                    repeat
+                        local enh = enhancements[enhName]
+                        mass = mass + (enh.BuildCostMass or 0)
+                        energy = energy + (enh.BuildCostEnergy or 0)
+                        time = time + (enh.BuildTime or 0)
+                        enhName = enh.Prerequisite
+                    until not enhName
+                end
+            end
+        end
+        if time == 0 then
+            time = 10
+        end
+        return mass, energy, time
+    end;
+
+    --- Adds up the total mass cost of this unit, including enhancements
+    ---@param self Unit
+    ---@return number
+    GetTotalMassCost = function(self)
+        return (self:GetTotalResourceCosts()) -- adjust to one return value
+    end;
+
+    --- Gets the change in progress a unit will have if it sacrifices into this one
+    ---@overload fun(self: Unit, sacrificer: Unit): number
+    --- Gets the change in progress a unit with `mass` and `energy` build costs will have, presuming
+    --- a `SacrificeMassMult` and `SacrificeEnergyMult` of `1.0`. Premultiply the mass and energy values
+    --- if this is not the case (as it usually is). 
+    ---@param self Unit
+    ---@param mass number
+    ---@param energy number
+    ---@return number
+    CalculateSacrificeBonus = function(self, mass, energy)
+        if type(mass) == "table" then
+            local unit = mass
+            local economy = unit.Blueprint.Economy
+            mass, energy = unit:GetTotalResourceCosts()
+            mass = mass * economy.SacrificeMassMult
+            energy = energy * economy.SacrificeEnergyMult
+        end
+        local economy = self.Blueprint.Economy
+        local buildMass = economy.BuildCostMass
+        local buildEnergy = economy.BuildCostEnergy
+        -- always comes within 5 ulps; probably what the underlying engine uses, with different rounding
+        return math.min(mass / buildMass, energy / buildEnergy)
+    end;
+
     -------------------------------------------------------------------------------------------
     -- DAMAGE
     -------------------------------------------------------------------------------------------
@@ -1154,6 +1236,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
+    ---@param self Unit
     OnKilled = function(self, instigator, type, overkillRatio)
         local layer = self.Layer
         self.Dead = true
@@ -1248,32 +1331,16 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetVeterancyValue = function(self)
-        local bp = self.Blueprint
-        local mass = bp.Economy.BuildCostMass
         local fractionComplete = self:GetFractionComplete()
-
-        if fractionComplete == 1 then
-            -- Add the value of any enhancements
-            local enhancements = SimUnitEnhancements[self.EntityId]
-            if enhancements then
-                for _, name in enhancements do
-                    mass = mass + bp.Enhancements[name].BuildCostMass or 0
-                end
-            end
-
-            -- Subtract the value of any enhancements from a preset because their value is included in bp.Economy.BuildCostMass
-            if bp.EnhancementPresetAssigned.Enhancements then
-                for _, name in bp.EnhancementPresetAssigned.Enhancements do
-                    mass = mass - bp.Enhancements[name].BuildCostMass or 0
-                end
-            end
-        end
-
-        -- Allow units to count for more or less than their real mass if needed.
-        return mass * fractionComplete * (bp.VeteranImportanceMult or 1) + (self.cargoMass or 0)
+        local unitMass = self:GetTotalMassCost()
+        local vetMult = self.Blueprint.VeteranImportanceMult or 1
+        local cargoMass = self.cargoMass or 0
+        -- Allow units to count for more or less than their real mass if needed
+        return fractionComplete * unitMass * vetMult + cargoMass
     end,
 
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
+    ---@param self Unit
     OnKilledUnit = function(self, unitKilled, massKilled)
         if not massKilled or massKilled == 0 then return end -- Make sure engine calls aren't passed with massKilled == 0
         if IsAlly(self.Army, unitKilled.Army) then return end -- No XP for friendly fire...
@@ -1470,20 +1537,20 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- check for exclusions from projectile perspective
-        for k = 1, other.Blueprint.DoNotCollideListCount do 
-            if self.Cache.HashedCats[other.Blueprint.DoNotCollideList[k]] then 
+        for k = 1, other.Blueprint.DoNotCollideListCount do
+            if self.Cache.HashedCats[other.Blueprint.DoNotCollideList[k]] then
                 return false 
             end
         end
 
         -- check for exclusions from unit perspective
         for k = 1, self.Cache.DoNotCollideCatsCount do 
-            if other.Blueprint.CategoriesHash[self.Cache.DoNotCollideCats[k]] then 
-                return false 
+            if other.Blueprint.CategoriesHash[self.Cache.DoNotCollideCats[k]] then
+                return false
             end
         end
 
-        return true 
+        return true
     end,
 
     --- Called when a unit collides with a collision beam to check if the collision is valid
@@ -1603,13 +1670,13 @@ Unit = Class(moho.unit_methods) {
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
-        if layer ~= 'Air' or (layer == "Air" and halfBuilt) then
+        if self.Tractored or (layer ~= 'Air' or (layer == "Air" and halfBuilt)) then
             TryCopyPose(self, prop, true)
         end
 
         -- Create some ambient wreckage smoke
         if layer == 'Land' then
-            explosion.CreateWreckageEffects(self, prop)
+            Explosion.CreateWreckageEffects(self, prop)
         end
 
         return prop
@@ -1658,7 +1725,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateDestructionEffects = function(self, overKillRatio)
-        explosion.CreateScalableUnitExplosion(self, overKillRatio)
+        Explosion.CreateScalableUnitExplosion(self)
     end,
 
     DeathWeaponDamageThread = function(self, damageRadius, damage, damageType, damageFriendly)
@@ -1691,7 +1758,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             if toSurface < 0 then
-                explosion.CreateDefaultHitExplosionAtBone(self, randBone, scale*1.5)
+                Explosion.CreateDefaultHitExplosionAtBone(self, randBone, scale*1.5)
             else
                 local lifetime = utilities.GetRandomInt(50, 200)
 
@@ -1953,7 +2020,11 @@ Unit = Class(moho.unit_methods) {
         if self.EventCallbacks then
             self.EventCallbacks = nil
         end
-
+        
+        if self.Blueprint.Intel.JammerBlips > 0 then
+            self.Brain:UntrackJammer(self)
+        end
+        
         ChangeState(self, self.DeadState)
     end,
 
@@ -2047,7 +2118,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetRotation = function(self, angle)
-        local qx, qy, qz, qw = explosion.QuatFromRotation(angle, 0, 1, 0)
+        local qx, qy, qz, qw = Explosion.QuatFromRotation(angle, 0, 1, 0)
         self:SetOrientation({qx, qy, qz, qw}, true)
     end,
 
@@ -2101,6 +2172,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    ---@param self Unit
     OnStopBeingBuilt = function(self, builder, layer)
         if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
             self:Kill()
@@ -2602,7 +2674,7 @@ Unit = Class(moho.unit_methods) {
     StopBuildingEffects = function(self, built)
         self.BuildEffectsBag:Destroy()
 
-        -- kept after #3355 for backwards compatibility with mods
+        -- kept after --3355 for backwards compatibility with mods
         if self.buildBots then
             for _, b in self.buildBots do
                 ChangeState(b, b.IdleState)
@@ -2610,12 +2682,15 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnStartSacrifice = function(self, target_unit)
-        EffectUtilities.PlaySacrificingEffects(self, target_unit)
+    OnStartSacrifice = function(self, targetUnit)
+        self:SetUnitState("Sacrificing", true)
+        EffectUtilities.PlaySacrificingEffects(self, targetUnit)
+        self.SacrificeTargetUnit = targetUnit
     end,
 
-    OnStopSacrifice = function(self, target_unit)
-        EffectUtilities.PlaySacrificeEffects(self, target_unit)
+    OnStopSacrifice = function(self, targetUnit)
+        self:SetUnitState("Sacrificing", false)
+        EffectUtilities.PlaySacrificeEffects(self, targetUnit)
         self:SetDeathWeaponEnabled(false)
         self:Destroy()
     end,
@@ -2905,14 +2980,13 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnWorkBegin = function(self, work)
-        local enhCommon = import('/lua/enhancementcommon.lua')
-        local restrictions = enhCommon.GetRestricted()
+        local restrictions = EnhancementCommon.GetRestricted()
         if restrictions[work] then
             self:OnWorkFail(work)
             return false
         end
 
-        local unitEnhancements = enhCommon.GetEnhancements(self.EntityId)
+        local unitEnhancements = EnhancementCommon.GetEnhancements(self.EntityId)
         local tempEnhanceBp = self.Blueprint.Enhancements[work]
         --LOG('ACU is ordering enhancement ['..repr(tempEnhanceBp.Name)..'] ' )
         if tempEnhanceBp.Prerequisite then
@@ -2960,6 +3034,58 @@ Unit = Class(moho.unit_methods) {
         self:StopUnitAmbientSound('EnhanceLoop')
         self:CleanupEnhancementEffects()
     end,
+
+    ---@alias DefaultWorkOrder "BeingBuilt" | "Enhancing" | "FactoryBuilding" | "None" | "Repairing" | "Upgrading"
+
+    --- Returns the current default work order, which is something that an assisting unit would be
+    --- able to directly do for the unit without inheriting work: constructing, enhancing, upgrading,
+    --- factory building, repairing, or nothing (in that order).
+    ---@param self Unit
+    ---@return DefaultWorkOrder
+    GetCurrentDefaultWorkOrder = function(self)
+        if self:IsUnitState("BeingBuilt") then
+            return "BeingBuilt"
+        end
+        if self:IsUnitState("Enhancing") then
+            return "Enhancing"
+        end
+        if self:IsUnitState("Upgrading") then
+            return "Upgrading"
+        end
+        if self:IsUnitState("Building") then
+            return "FactoryBuilding"
+        end
+        if self:GetHealth() < self:GetMaxHealth() then
+            return "Repairing"
+        end
+        return "None"
+    end;
+
+    --- Gets the amount of progress left for the current default work item--that is, something
+    --- an assisting unit can directly do for the unit without inheriting work: constructing,
+    --- enhancing, upgrading, factory building, and repairing (in that order).
+    ---@param self Unit
+    ---@return number totalProgressLeft
+    GetCurrentDefaultWorkProgress = function(self)
+        -- constructing
+        local built = self:GetFractionComplete()
+        if built < 1.0 then
+            return built
+        end
+
+        --- enhancing, upgrading, building
+        if self.WorkItem or self:IsUnitState("Upgrading") or self:IsUnitState("Building") then
+            return self:GetWorkProgress()
+        end
+
+        --- default to repairing
+        local health = self:GetHealth()
+        local maxHealth = self:GetMaxHealth()
+        if health == maxHealth then
+            return 1.0
+        end
+        return health / maxHealth
+    end;
 
     CreateEnhancement = function(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
@@ -3594,7 +3720,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetWeaponClass = function(self, label)
-        return self.Weapons[label] or import('/lua/sim/Weapon.lua').Weapon
+        return self.Weapons[label] or Weapon
     end,
 
     -- Return the total time in seconds, cost in energy, and cost in mass to build the given target type.
@@ -3858,7 +3984,7 @@ Unit = Class(moho.unit_methods) {
         elseif bt == 'MAXHEALTH' then
             self:SetMaxHealth(self:GetMaxHealth() + (buffTable.Value or 0))
         elseif bt == 'HEALTH' then
-            self:SetHealth(self, self:GetHealth() + (buffTable.Value or 0))
+            self:AdjustHealth(self, buffTable.Value or 0)
         elseif bt == 'SPEEDMULT' then
             self:SetSpeedMult(buffTable.Value or 0)
         elseif bt == 'MAXFUEL' then
@@ -4236,10 +4362,111 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param duration boolean Stun duration in seconds
     SetStunned = function(self, duration)
         if not self.ImmuneToStun then 
             cUnit.SetStunned(self, duration)
         end
+    end,
+
+    --- Determines whether or not this unit is actively consuming resources. There is an engine bug
+    --- that allows you to gain free resources by reverting the resources of the last tick to the
+    --- user when it is called with 'false' while the consumption is already set to 'false'
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param flag boolean A flag to determine whether our consumption should be active
+    SetConsumptionActive = function(self, flag)
+        if self.EngineFlags['SetConsumptionActive'] ~= flag then
+            cUnit.SetConsumptionActive(self, flag)
+            self.EngineFlags['SetConsumptionActive'] = flag 
+        end
+    end,
+
+    --- Determines the upgrade animation to use. Allows you to manage units (by hooking) that can upgrade to
+    --- more than just one unit type, as an example tech 1 factories that can become HQs or
+    --- support factories.
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param unitBeingBuilt Unit A flag to determine whether our consumption should be active
+    GetUpgradeAnimation = function(self, unitBeingBuilt)
+        return self.Blueprint.Display.AnimationUpgrade
+    end,
+
+    --- Called when a missile launched by this unit is intercepted
+    ---@param self Unit
+    ---@param target Vector
+    ---@param defense Unit Requires an `IsDestroyed` check as the defense may have been destroyed when the missile is intercepted
+    ---@param position Vector Location where the missile got intercepted
+    OnMissileIntercepted = function(self, target, defense, position)
+        -- try and run callbacks
+        if self.Callbacks['OnMissileIntercepted'] then
+            for k, callback in self.Callbacks['OnMissileIntercepted'] do
+                local ok, msg = pcall(callback, target, defense, position)
+                if not ok then
+                    WARN("OnMissileIntercepted callback triggered an error:")
+                    WARN(msg)
+                end
+            end
+        end
+    end,
+
+    --- Called when a missile launched by this unit hits a shield
+    ---@param self Unit
+    ---@param target Vector
+    ---@param shield Unit Requires an `IsDestroyed` check when using as the shield may have been destroyed when the missile impacts
+    ---@param position Vector Location where the missile hit the shield
+    OnMissileImpactShield = function(self, target, shield, position)
+        -- try and run callbacks
+        if self.Callbacks['OnMissileImpactShield'] then
+            for k, callback in self.Callbacks['OnMissileImpactShield'] do
+                local ok, msg = pcall(callback, target, shield, position)
+                if not ok then
+                    WARN("OnMissileImpactShield callback triggered an error:")
+                    WARN(msg)
+                end
+            end
+        end
+    end,
+
+    --- Called when a missile launched by this unit hits the terrain, note that this can be the same location as the target
+    ---@param self Unit
+    ---@param target Vector 
+    ---@param position Vector Location where the missile hit the terrain
+    OnMissileImpactTerrain = function(self, target, position)
+        -- try and run callbacks
+        if self.Callbacks['OnMissileImpactTerrain'] then
+            for k, callback in self.Callbacks['OnMissileImpactTerrain'] do
+                local ok, msg = pcall(callback, target, position)
+                if not ok then
+                    WARN("OnMissileImpactTerrain callback triggered an error:")
+                    WARN(msg)
+                end
+            end
+        end
+    end,
+
+    --- Add a callback when a missile launched by this unit is intercepted
+    ---@param self Unit
+    ---@param callback function<Vector, Unit, Vector>
+    AddMissileInterceptedCallback = function(self, callback)
+        self.Callbacks['OnMissileIntercepted'] = self.Callbacks['OnMissileIntercepted'] or { }
+        table.insert(self.Callbacks['OnMissileIntercepted'], callback)
+    end,
+
+    --- Add a callback when a missile launched by this unit hits a shield
+    ---@param self Unit
+    ---@param callback function<Vector, Unit, Vector>
+    AddMissileImpactShieldCallback = function(self, callback)
+        self.Callbacks['OnMissileImpactShield'] = self.Callbacks['OnMissileImpactShield'] or { }
+        table.insert(self.Callbacks['OnMissileImpactShield'], callback)
+    end,
+
+    --- Add a callback when a missile launched by this unit hits the terrain, note that this can be the same location as the target
+    ---@param self Unit
+    ---@param callback function<Vector, Vector>
+    AddMissileImpactTerrainCallback = function(self, callback)
+        self.Callbacks['OnMissileImpactTerrain'] = self.Callbacks['OnMissileImpactTerrain'] or { }
+        table.insert(self.Callbacks['OnMissileImpactTerrain'], callback)
     end,
 
     --- Various callback-like functions
@@ -4255,6 +4482,10 @@ Unit = Class(moho.unit_methods) {
     -- Called by the shield class 
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
+
+    -- Called by the brain when the unit registered itself
+    OnNoExcessEnergy = function(self) end,
+    OnExcessEnergy = function(self) end,
 
     -- Called by the weapon class, these are expensive!
     OnGotTarget = function(self, Weapon) end,
@@ -4513,6 +4744,7 @@ local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 -- upvalued categories for performance
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
+---@class DummyUnit : moho.unit_methods
 DummyUnit = Class(moho.unit_methods) {
 
     Cache = false,

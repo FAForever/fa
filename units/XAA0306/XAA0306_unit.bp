@@ -82,15 +82,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTFA',
@@ -254,7 +245,7 @@ UnitBlueprint {
     SelectionSizeX = 1.6,
     SelectionSizeZ = 1.2,
     SelectionThickness = 0.43,
-    SizeSphere = 1.6,
+    SizeSphere = 2.0,
     SizeX = 1.5,
     SizeY = 0.4,
     SizeZ = 1.5,
@@ -295,7 +286,7 @@ UnitBlueprint {
             HeadingArcCenter = 0,
             HeadingArcRange = 30,
             Label = 'Bomb',
-            MaxRadius = 32,#42
+            MaxRadius = 32,--42
             MinRadius = 4,
             MuzzleSalvoDelay = 0.4,
             MuzzleSalvoSize = 4,
@@ -319,7 +310,6 @@ UnitBlueprint {
             RackSalvoSize = 2,
             RackSlavedToTurret = false,
             RateOfFire = 0.08,
-            TargetCheckInterval = 2.5,
             TargetPriorities = {
                 'CRUISER',
                 '(NAVAL * TECH2 * SHIELD)',
@@ -332,7 +322,7 @@ UnitBlueprint {
                 'MOBILE',
                 '(STRUCTURE * DEFENSE * ANTIAIR)',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TurretDualManipulators = false,
