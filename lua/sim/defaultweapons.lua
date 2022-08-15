@@ -5,7 +5,6 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 -- upvalue globals for performance
-local IsUnit = IsUnit
 local GetSurfaceHeight = GetSurfaceHeight
 local VDist2 = VDist2
 
@@ -182,7 +181,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         local targetPos
         local targetVelX, targetVelZ
-        if target and IsUnit(target) then
+        if target then
             -- target is a unit / prop
             targetPos = EntityGetPosition(target)
             targetVelX, _, targetVelZ = UnitGetVelocity(target)
@@ -191,7 +190,6 @@ DefaultProjectileWeapon = Class(Weapon) {
             targetPos = self:GetCurrentTargetPos()
             targetVelX, targetVelZ = 0, 0
         end
-        local targetPosX, targetPosZ = targetPos[1], targetPos[3]
 
         local data = self.CurrentSalvoData
 
@@ -203,9 +201,11 @@ DefaultProjectileWeapon = Class(Weapon) {
                 -- calculate & cache a couple things only the first time
                 data = {
                     lastAccel = 4.75,
+                    targetpos = targetPos,
                 }
                 self.CurrentSalvoData = data
             else
+                local targetPosX, targetPosZ = targetPos[1], targetPos[3]
                 -- otherwise, do the same calculation but skip any cache or salvo logic
                 if target.Dead then
                     return 4.75
@@ -228,8 +228,11 @@ DefaultProjectileWeapon = Class(Weapon) {
                 local targetNewPosY = GetSurfaceHeight(targetNewPosX, targetNewPosZ)
                 return 200 * (projPosY - targetNewPosY) / (time*time)
             end
+        elseif targetPos then
+            data.targetpos = targetPos
+        else
+            targetPos = data.targetpos
         end
-        data.targetpos = targetPos
 
         -- check if we lost the target (or if we previously did; regaining a target mid-run shouldn't
         -- suddenly divert some of the bombs)
@@ -238,6 +241,8 @@ DefaultProjectileWeapon = Class(Weapon) {
             data.usestore = true
             return data.lastAccel
         end
+
+        local targetPosX, targetPosZ = targetPos[1], targetPos[3]
 
         -- calculate flat (exclude y-axis) distance and velocity between projectile and target
         -- velocity will eventually need to multiplied by 10 due to being per tick instead of per second
@@ -808,7 +813,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
             local numRackFiring = self.CurrentRackSalvoNumber
             --This is done to make sure that when racks should fire together, they do
-            if bp.RackFireTogether == true then
+            if bp.RackFireTogether then
                 numRackFiring = rackBoneCount
             end
 
