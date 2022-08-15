@@ -423,7 +423,7 @@ UnitBlueprint {
             TurretPitchRange = 30,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 140,
+            TurretYawRange = 145,
             TurretYawSpeed = 90,
             Turreted = true,
             WeaponCategory = 'Direct Fire Naval',
