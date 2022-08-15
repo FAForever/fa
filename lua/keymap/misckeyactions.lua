@@ -1,7 +1,6 @@
 -- This file contains key bindable actions that don't fit elsewhere
 
 local Prefs = import('/lua/user/prefs.lua')
-local targeting = import('/lua/keymap/targeting.lua').targetingMap
 
 local lockZoomEnable = false
 function lockZoom()
@@ -398,87 +397,63 @@ function SetWeaponPrioritiesSpecific()
         local bpId = info.blueprintId
         local text = LOC(__blueprints[bpId].General.UnitName)     
         if text then
-            text = "\n" .. text .. " — " .. LOC(__blueprints[bpId].Interface.HelpText)
+            text = "\n" .. text
         else
             text = "\n" .. LOC(__blueprints[bpId].Interface.HelpText)
         end
-
-        local target = targeting[string.upper(bpId)]
-
-        
-        if target then
-            SetWeaponPriorities(target, text, false)
-        else
-            SetWeaponPriorities(findPriority(bpId), text, false)
-        end 
-        SimCallback({Func = 'RecheckTargetsOfWeapons', Args = { }}, true)
+        SetWeaponPriorities(findPriority(bpId), text, false)
     end
 end
+
+function SetDefaultWeaponPriorities()
+    SetWeaponPriorities(0, "Default", false)
+end
+
+local categoriesToCheck = {
+    ['tech'] = {"TECH1", "TECH2", "TECH3"},
+    ['faction'] = {"CYBRAN", "UEF", "AEON", "SERAPHIM"},
+    ['type'] = {"ANTIAIR", "DIRECTFIRE"},
+    ['field'] = {"NAVAL", "AIR", "LAND", "STRUCTURE"},
+}
 
 function findPriority(bpID)
     local bp = __blueprints[bpID]
     local categories = bp.Categories
+
     local tech
     local faction
     local type
     local field
 
-
-    for _, c in categories do
-        LOG(c)
-    end
-
     for _, c in categories do 
-        if c == "TECH1" then
-            tech = "TECH1"
-        elseif c == "TECH2" then
-            tech = "TECH2"
-        elseif c == "TECH3" then
-            tech = "TECH3"
-        elseif c == "CYBRAN" then
-            faction = "CYBRAN"
-        elseif c == "UEF" then
-            faction = "UEF"
-        elseif c == "AEON" then
-            faction = "AEON"
-        elseif c == "SERAPHIM" then
-            faction = "SERAPHIM"
-        elseif c == "ANTIAIR" then
-            type = "ANTIAIR"
-        elseif c == "DIRECTFIRE" then
-            type = "DIRECTFIRE"
-        elseif c == "NAVY" then
-            field = "NAVY"
-        elseif c == "AIR" then
-            field = "AIR"
-        elseif c == "LAND" then
-            field = "LAND"
-        elseif c == "STRUCTURE" then
-            field = "STRUCTURE"
+        for _, ctc in categoriesToCheck['tech'] do
+            if c == ctc then tech = c end
+        end
+
+        for _, ctc in categoriesToCheck['faction'] do
+            if c == ctc then faction = c end
+        end
+
+        for _, ctc in categoriesToCheck['type'] do
+            if c == ctc then type = c end
+        end
+
+        for _, ctc in categoriesToCheck['field'] do
+            if c == ctc then field = c end
         end
     end
-
-    LOG(tech)
-    LOG(faction)
-    LOG(type)
 
     tech = "categories." .. tech
     faction = "categories." .. faction
     type = "categories." .. type
     field = "categories." .. field
 
-    local tp = "{" .. tech .. " + " .. faction .. " + " .. type .. " + " .. field .. "}"
-    local tp2 = "{" .. tech .. " + " .. type .. " + " .. field .."}"
-    local tp3 = "{" .. type .. " + " .. field .."}"
-    local tp4 = "{" .. field .."}"
+    local tp = tech .. " * " .. faction .. " * " .. type .. " * " .. field
+    local tp2 = tech .. " * " .. type .. " * " .. field
+    local tp3 = type .. " * " .. field
+    local tp4 = field
 
-    local masterTP = tp .. ", " .. tp2 .. ", " .. tp3 .. ", " .. tp4
-    LOG(tp)
-    LOG(tp2)
-    LOG(tp3)
-    LOG(tp4)
-    LOG(masterTP)
-
+    local masterTP = "{categories." .. bpID .. ", " .. tp .. ", " .. tp2 .. ", " .. tp3 .. ", " .. tp4 .. "}"
     return masterTP
 end
 

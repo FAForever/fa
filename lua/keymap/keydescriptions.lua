@@ -455,4 +455,6 @@ keyDescriptions = {
     ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
 
     ['recheck_targets_of_weapons'] = 'Recheck targets of weapons of selected units',
+    ['set_target_priority'] = 'Set Target Priority',
+    ['set_default_target_priority'] = 'Set to Default Target Priority',
 }

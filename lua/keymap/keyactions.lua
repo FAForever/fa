@@ -273,6 +273,8 @@ keyActions = {
         category = 'orders', order = 34,},
     ['set_target_priority'] = {action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesSpecific()',
         category = 'orders', order = 35,},
+    ['set_default_target_priority'] = {action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetDefaultWeaponPriorities()',
+        category = 'orders', order = 36,},
     ['decrease_game_speed'] = {action = 'UI_Lua import("/lua/ui/uimain.lua").DecreaseGameSpeed()',
         category = 'game', order = 1,},
     ['increase_game_speed'] = {action = 'UI_Lua import("/lua/ui/uimain.lua").IncreaseGameSpeed()',
