@@ -14,6 +14,7 @@ local TAAPhalanxWeapon = import('/lua/kirvesweapons.lua').TAAPhalanxWeapon
 local EffectUtils = import('/lua/effectutilities.lua')
 local Effects = import('/lua/effecttemplates.lua')
 
+---@class DELK002 : TLandUnit
 DELK002 = Class(TLandUnit) {
     Weapons = {
         GatlingCannon = Class(TAAPhalanxWeapon)
@@ -62,9 +63,6 @@ DELK002 = Class(TLandUnit) {
                 TAAPhalanxWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },
-
     },
-
 }
-
 TypeClass = DELK002
