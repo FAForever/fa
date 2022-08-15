@@ -146,6 +146,7 @@ AEnergyStorageUnit = Class(EnergyStorageUnit) {}
 ---------------------------------------------------------------
 --  HOVERING LAND UNITS
 ---------------------------------------------------------------
+---@class AHoverLandUnit : HoverLandUnit
 AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
     FxHoverScale = 1,
     HoverEffects = nil,
@@ -173,6 +174,7 @@ ALandFactoryUnit = Class(LandFactoryUnit) {
 ---------------------------------------------------------------
 --  LAND UNITS
 ---------------------------------------------------------------
+---@class ALandUnit : LandUnit
 ALandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 ---------------------------------------------------------------
@@ -227,6 +229,7 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
 ---------------------------------------------------------------
 --  SEA UNITS
 ---------------------------------------------------------------
+---@class ASeaUnit : SeaUnit
 ASeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
 
 ---------------------------------------------------------------
@@ -275,6 +278,7 @@ AStructureUnit = Class(StructureUnit) {}
 ---------------------------------------------------------------
 --  SUBMARINE UNITS
 ---------------------------------------------------------------
+---@class ASubUnit : SubUnit
 ASubUnit = Class(DefaultUnitsFile.SubUnit) {
     IdleSubBones = {},
     IdleSubEffects = {}
