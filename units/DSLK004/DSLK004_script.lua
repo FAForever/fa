@@ -98,6 +98,7 @@ local PhasonBeam = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffectScale = 0.2,
 }
 
+---@class DSLK004 : SLandUnit
 DSLK004 = Class(SLandUnit) {
     Weapons = {
         PhasonBeamAir = Class(PhasonBeam) {},
