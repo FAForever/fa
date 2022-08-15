@@ -843,7 +843,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                     local distance = VDist2(weaponPos[1], weaponPos[3], targetPos[1], targetPos[3])
 
                     -- This formula was obtained empirically and somehow it works :)
-                    local randomness = 12 * bp.FixedSpreadRadius / (distance*distance)
+                    local randomness = 12 * bp.FixedSpreadRadius / distance
 
                     self:SetFiringRandomness(randomness)
                 end
