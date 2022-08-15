@@ -405,13 +405,81 @@ function SetWeaponPrioritiesSpecific()
 
         local target = targeting[string.upper(bpId)]
 
+        
         if target then
             SetWeaponPriorities(target, text, false)
         else
-            SetWeaponPriorities("{categories." .. bpId .. "}", text, false)
+            SetWeaponPriorities(findPriority(bpId), text, false)
         end 
         SimCallback({Func = 'RecheckTargetsOfWeapons', Args = { }}, true)
     end
+end
+
+function findPriority(bpID)
+    local bp = __blueprints[bpID]
+    local categories = bp.Categories
+    local tech
+    local faction
+    local type
+    local field
+
+
+    for _, c in categories do
+        LOG(c)
+    end
+
+    for _, c in categories do 
+        if c == "TECH1" then
+            tech = "TECH1"
+        elseif c == "TECH2" then
+            tech = "TECH2"
+        elseif c == "TECH3" then
+            tech = "TECH3"
+        elseif c == "CYBRAN" then
+            faction = "CYBRAN"
+        elseif c == "UEF" then
+            faction = "UEF"
+        elseif c == "AEON" then
+            faction = "AEON"
+        elseif c == "SERAPHIM" then
+            faction = "SERAPHIM"
+        elseif c == "ANTIAIR" then
+            type = "ANTIAIR"
+        elseif c == "DIRECTFIRE" then
+            type = "DIRECTFIRE"
+        elseif c == "NAVY" then
+            field = "NAVY"
+        elseif c == "AIR" then
+            field = "AIR"
+        elseif c == "LAND" then
+            field = "LAND"
+        elseif c == "STRUCTURE" then
+            field = "STRUCTURE"
+        end
+    end
+
+    LOG(tech)
+    LOG(faction)
+    LOG(type)
+
+    tech = "categories." .. tech
+    faction = "categories." .. faction
+    type = "categories." .. type
+    field = "categories." .. field
+
+    local tp = "{" .. tech .. " + " .. faction .. " + " .. type .. " + " .. field .. "}"
+    local tp2 = "{" .. tech .. " + " .. type .. " + " .. field .."}"
+    local tp3 = "{" .. type .. " + " .. field .."}"
+    local tp4 = "{" .. field .."}"
+
+    local masterTP = tp .. ", " .. tp2 .. ", " .. tp3 .. ", " .. tp4
+    LOG(tp)
+    LOG(tp2)
+    LOG(tp3)
+    LOG(tp4)
+    LOG(masterTP)
+
+    return masterTP
 end
 
 function RecheckTargetsOfWeapons()
