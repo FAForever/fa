@@ -295,7 +295,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 11000,
             DamageFriendly = true,
-            DamageRadius = 20,
+            DamageRadius = 19,
             DamageType = 'OtheTacticalBomb',
             DisplayName = 'Othe Tactical Bomb',
             FireTargetLayerCapsTable = {
