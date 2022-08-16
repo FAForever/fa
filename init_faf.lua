@@ -60,12 +60,18 @@ end
 -- mods that have been integrated, based on folder name 
 local integratedMods = { }
 integratedMods["nvidia fix"] = true
+
 integratedMods = LowerHashTable(integratedMods)
 
 -- mods that are deprecated, based on folder name
 local deprecatedMods = { }
 deprecatedMods["simspeed++"] = true
 deprecatedMods["#quality of performance 2022"] = true
+
+-- as per #4119 the control groups (called selection sets in code) are completely overhauled and extended feature-wise,
+-- because of that these mods are no longer viable.
+integratedMods["group_split"] = true
+integratedMods["Control Group Zoom Mod"] = true
 deprecatedMods = LowerHashTable(deprecatedMods)
 
 -- typical FA packages
