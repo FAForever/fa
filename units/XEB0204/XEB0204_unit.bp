@@ -124,9 +124,10 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 2500,
-        BuildCostMass = 500,
+        BuildCostMass = 1050,
         BuildRate = 20,
         BuildTime = 2000,
+        DifferentialUpgradeCostCalculation = true,
         EngineeringPods = {
             {
                 CreateWithUnit = true,
