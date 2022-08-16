@@ -66,6 +66,11 @@ integratedMods = LowerHashTable(integratedMods)
 local deprecatedMods = { }
 deprecatedMods["simspeed++"] = true
 deprecatedMods["#quality of performance 2022"] = true
+
+-- as per #4119 the control groups (called selection sets in code) are completely overhauled and extended feature-wise,
+-- because of that these mods are no longer viable.
+deprecatedMods["group_split"] = true
+deprecatedMods["Control Group Zoom Mod"] = true
 deprecatedMods = LowerHashTable(deprecatedMods)
 
 -- typical FA packages
