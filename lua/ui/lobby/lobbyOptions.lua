@@ -167,6 +167,29 @@ teamOptions =
 globalOpts = {
     {
         default = 1,
+        label = "<LOC lobui_CAName>Common Army",
+        help = "<LOC lobui_CADesc>Modifies team management",
+        key = 'CommonArmy',
+        values = {
+            {
+                text = "<LOC _Off>Off",
+                help = "",
+                key = 'Off'
+            },
+            {
+                text = "<LOC lobui_CAUnion>Union control",
+                help = "<LOC lobui_CAUDesc>Union control for team",
+                key = 'Union'
+            },
+            {
+                text = "<LOC lobui_CACommon>Common army",
+                help = "<LOC lobui_CACDesc>Uses a single army for team",
+                key = 'Common'
+            }
+        }
+    },
+    {
+        default = 1,
         label = "<LOC lobui_0802>Unrate",
         help = "<LOC lobui_0803>Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated.",
         key = 'Unranked',

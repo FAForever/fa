@@ -215,7 +215,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
         if not v.civilian and v.nickname != nil then
             player_nbr=player_nbr+1
             player[player_nbr]={}
-            player[player_nbr].name=v.nickname
+            player[player_nbr].name=scoreData.history[1][player_nbr].name
             player[player_nbr].color=v.color
             player[player_nbr].index=m
             player[player_nbr].faction=v.faction
@@ -635,14 +635,14 @@ function create_graph(parent,path,x1,y1,x2,y2)
         m=m+1
         if not v.civilian and v.nickname != nil then
             player[i]={}
-            player[i].name=v.nickname
+            player[i].name=scoreData.history[1][i].name
             player[i].color=v.color
             player[i].index=m
-            player[i].title_label=UIUtil.CreateText(grp,v.nickname, 14, UIUtil.titleFont)
+            player[i].title_label=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
             player[i].title_label.Left:Set(x1+5)
             player[i].title_label.Top:Set(y1 +23*(i-1)+5)
             player[i].title_label:SetColor("black")
-            player[i].title_label2=UIUtil.CreateText(grp,v.nickname, 14, UIUtil.titleFont)
+            player[i].title_label2=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
             player[i].title_label2.Left:Set(x1+4)
             player[i].title_label2.Top:Set(y1 +23*(i-1)+4)
             player[i].title_label2:SetColor(v.color)
