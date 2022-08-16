@@ -2066,7 +2066,7 @@ local slotsData = {}
 BaseTransport = Class() {
 
     ---@param self BaseTransport
-    ---@param attachBone number|BoneObject
+    ---@param attachBone Bone
     ---@param unit Unit
     OnTransportAttach = function(self, attachBone, unit)
         self:PlayUnitSound('Load')
@@ -2083,7 +2083,7 @@ BaseTransport = Class() {
     end,
 
     ---@param self BaseTransport
-    ---@param attachBone number|BoneObject
+    ---@param attachBone Bone
     ---@param unit Unit
     OnTransportDetach = function(self, attachBone, unit)
         self:PlayUnitSound('Unload')
@@ -2147,7 +2147,7 @@ BaseTransport = Class() {
 }
 
 --- Base class for air transports.
----@class BaseTransport : AirUnit
+---@class AirTransport: AirUnit, BaseTransport
 AirTransport = Class(AirUnit, BaseTransport) {
 
     ---@param self AirTransport
