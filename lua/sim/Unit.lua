@@ -172,6 +172,10 @@ Unit = Class(moho.unit_methods) {
             self.Trash = TrashBag()
         end
 
+        for k, v in _G do 
+            LOG(k)
+        end
+
         self.IntelDisables = {
             Radar = {NotInitialized = true},
             Sonar = {NotInitialized = true},
