@@ -290,7 +290,6 @@ Unit = Class(moho.unit_methods) {
         self.OnBeingBuiltEffectsBag = TrashBag()
         self.CaptureEffectsBag = TrashBag()
         self.UpgradeEffectsBag = TrashBag()
-        self.TeleportFxBag = TrashBag()
 
         -- Set up veterancy
         self.xp = 0
@@ -4275,23 +4274,28 @@ Unit = Class(moho.unit_methods) {
         EffectUtilities.TeleportChargingProgress(self, progress)
     end,
 
-    PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
+    PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)\
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
     end,
 
     CleanupTeleportChargeEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.DestroyTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     CleanupRemainingTeleportChargeEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.DestroyRemainingTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportOutEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportOutEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportInEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportInEffects(self, self.TeleportFxBag)
     end,
 
