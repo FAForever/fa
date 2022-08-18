@@ -90,27 +90,6 @@ SyncMeta = {
     end,
 }
 
-local SharedTypeCache = { }
-local function PopulateBlueprintCache(entity, blueprint)
-
-    -- populate the cache
-    local cache = { }
-    cache.Blueprint = blueprint 
-
-    cache.Cats = blueprint.Categories
-    cache.CatsCount = table.getn(blueprint.Categories)
-    cache.HashedCats = table.hash(blueprint.Categories)
-
-    cache.DoNotCollideCats = blueprint.DoNotCollideList or false
-    cache.DoNotCollideCatsCount = table.getn(blueprint.DoNotCollideList or { })
-    cache.HashedDoNotCollideCats = table.hash(blueprint.DoNotCollideList)
-
-    cache.Audio = blueprint.Audio
-  
-    -- store the result
-    SharedTypeCache[blueprint.BlueprintId] = cache 
-end
-
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods
 ---@field Brain AIBrain
@@ -119,8 +98,6 @@ local cUnit = moho.unit_methods
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 Unit = Class(moho.unit_methods) {
-
-    Cache = false,
 
     Weapons = {},
 
@@ -217,14 +194,6 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     OnCreate = function(self)
         local bp = self:GetBlueprint()
-
-        -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[bp.BlueprintId] then 
-            PopulateBlueprintCache(self, bp)
-        end
-
-        -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[bp.BlueprintId]
 
         -- cache often accessed values into inner table
         self.Blueprint = bp
@@ -1538,14 +1507,14 @@ Unit = Class(moho.unit_methods) {
 
         -- check for exclusions from projectile perspective
         for k = 1, other.Blueprint.DoNotCollideListCount do
-            if self.Cache.HashedCats[other.Blueprint.DoNotCollideList[k]] then
+            if self.Blueprint.CategoriesHash[other.Blueprint.DoNotCollideList[k]] then
                 return false 
             end
         end
 
         -- check for exclusions from unit perspective
-        for k = 1, self.Cache.DoNotCollideCatsCount do 
-            if other.Blueprint.CategoriesHash[self.Cache.DoNotCollideCats[k]] then
+        for k = 1, self.Blueprint.DoNotCollideListCount do
+            if other.Blueprint.CategoriesHash[self.Blueprint.DoNotCollideList[k]] then
                 return false
             end
         end
@@ -4747,37 +4716,16 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@class DummyUnit : moho.unit_methods
 DummyUnit = Class(moho.unit_methods) {
 
-    Cache = false,
-
-    OnCreate = function(self) 
-
-        local blueprint = self:GetBlueprint()
-        
-        -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[blueprint.BlueprintId] then 
-            PopulateBlueprintCache(self, blueprint)
-        end
-
-        -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[blueprint.BlueprintId]
-
+    OnCreate = function(self)
         -- cache unique values into inner table
         self.EntityId = EntityGetEntityId(self)
+        self.UnitId = UnitGetUnitId(self)
         self.Army = EntityGetArmy(self)
         self.Layer = UnitGetCurrentLayer(self)
 
         -- cache often accessed values into inner table
-        self.UnitId = UnitGetUnitId(self)
-        self.Blueprint = blueprint
+        self.Blueprint = self:GetBlueprint()
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
-
-        -- basic check if this insignificant unit is truely insignificant
-        if not EntityCategoryContains(CategoriesDummyUnit, self) then 
-            WARN("Unit " .. tostring(self.UnitId) .. " is a dummy unit but doesn't have the right categories set!")
-
-            -- todo: add more info for dev
-        end
-    
     end,
 
     --- Typically called by functions
