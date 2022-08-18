@@ -555,9 +555,10 @@ DebugFunction = Class() {
                 local parameters = parameters
                 local DebugListlocal = debug.listlocals
                 for i = 1, parameterCount do
-                    -- SPEW(DebugListlocal(fn, i))
+                    -- doesn't work
+                    parameters[i] = DebugListlocal(fn, i)
                 end
-                -- KillThread(th)
+                KillThread(th)
             end, "c")
             coroutine.resume(th) -- immediately ends
             if restoreHook ~= nil then
@@ -587,7 +588,6 @@ DebugFunction = Class() {
                 if jumps[instructionCount] then
                     str = '>' .. str
                 end
-                str = instr:AddressToString() .. "  " .. str
 
                 local controlFlow = instr.opcode.controlFlow
                 if prepend then
@@ -599,6 +599,8 @@ DebugFunction = Class() {
                 if controlFlow == "skip" then
                     prepend = "        "
                 end
+
+                str = instr:AddressToString() .. "  " .. str
                 lineCount = lineCount + 1
                 lines[lineCount] = str
             end

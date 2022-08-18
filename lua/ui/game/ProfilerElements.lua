@@ -308,24 +308,46 @@ ProfilerSummary = Class(Group) {
     SetStats = function(self, stats)
         if stats then
             local n = stats.n
-            local obj = Statistics.StatObject(stats, n)
-
             local samples, mean, deviation, skewness = n, "0", "∞", "∞"
 
-            samples = n
+            ---[[ To be replaced when the statistics branch is merged
             if n > 0 then
-                mean = obj.mean
+                mean = Statistics.Mean(stats, n)
                 if n > 1 then
-                    deviation = obj.deviation
+                    deviation = Statistics.Deviation(stats, n, mean) * n / (n - 1)
                     if n > 2 then
                         if deviation > 0 then
-                            skewness = obj.sampSkewness
+                            skewness = 0
+                            for i = 1, n do
+                                local residual = (stats[i] - mean)
+                                skewness = residual*residual*residual
+                            end
+                            skewness = skewness / deviation
                         else
                             skewness = "0"
                         end
                     end
                 end
             end
+            --]]
+
+            --[[ Code for statistics merge
+            local obj = Statistics.StatObject(stats, n)
+
+            if n > 0 then
+               mean = obj.mean
+               if n > 1 then
+                   deviation = obj.deviation
+                   if n > 2 then
+                       if deviation > 0 then
+                           skewness = obj.skewness
+                       else
+                           skewness = "0"
+                       end
+                   end
+               end
+            end
+            --]]
 
             self.Samples:SetText(samples)
             self.Mean:SetText(mean)
