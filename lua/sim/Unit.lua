@@ -15,7 +15,7 @@ local Explosion = import('/lua/defaultexplosions.lua')
 local Game = import('/lua/game.lua')
 local Set = import('/lua/system/setutils.lua')
 local SimUtils = import('/lua/SimUtils.lua')
-local utilities = import('/lua/utilities.lua')
+local Utilities = import('/lua/utilities.lua')
 local Wreckage = import('/lua/wreckage.lua')
 
 local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
@@ -217,44 +217,70 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     OnCreate = function(self)
         local bp = self:GetBlueprint()
+        local bpBlueprintId = bp.BlueprintId
+        local bpDisplay = bp.Display
+        local bpEcon = bp.Economy
+        local bpFootprint = bp.Footprint
+        local bpIntel = bp.Intel
+        local bpPhysics = bp.Physics
+
+        local bpDeathAnim = bpDisplay.AnimationDeath
+        local bpFootprintSizeX = bpFootprint.SizeX
+        local bpFootprintSizeZ = bpFootprint.SizeZ
 
         -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[bp.BlueprintId] then 
+        if not SharedTypeCache[bpBlueprintId] then
             PopulateBlueprintCache(self, bp)
         end
 
         -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[bp.BlueprintId]
+        self.Cache = SharedTypeCache[bpBlueprintId]
 
         -- cache often accessed values into inner table
         self.Blueprint = bp
-        self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
+        self.FootPrintSize = math.max(bpFootprintSizeX, bpFootprintSizeZ)
         self.techCategory = bp.TechCategory
         self.layerCategory = bp.LayerCategory
         self.factionCategory = bp.FactionCategory
-        self.MovementEffects = bp.Display.MovementEffects
+        self.MovementEffects = bpDisplay.MovementEffects
         self.Audio = bp.Audio
 
         -- cache engine calls
         self.EntityId = self:GetEntityId()
-        self.Army = self:GetArmy()
+        local army = self:GetArmy()
         self.UnitId = self:GetUnitId()
-        self.Brain = self:GetAIBrain()
+        local brain = self:GetAIBrain()
+
+        self.Army = army
+        self.Brain = brain
 
         -- the entity that produces sound, by default ourself
         self.SoundEntity = self
 
         -- used to fix engine related bugs
-        self.EngineFlags = { }
+        self.EngineFlags = {}
 
         -- Store size information for performance
-        self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
-        self.SkirtOffset = { OffsetX = bp.Physics.SkirtOffsetX, OffsetZ = bp.Physics.SkirtOffsetZ }
-        self.SkirtSize = { SizeX = bp.Physics.SkirtSizeX, SizeZ = bp.Physics.SkirtSizeZ }
-        self.Size = { SizeX = bp.SizeX, SizeY = bp.SizeY, SizeZ = bp.SizeZ }
+        self.Footprint = {
+            SizeX = bpFootprintSizeX,
+            SizeZ = bpFootprintSizeZ,
+        }
+        self.SkirtOffset = {
+            OffsetX = bpPhysics.SkirtOffsetX,
+            OffsetZ = bpPhysics.SkirtOffsetZ,
+        }
+        self.SkirtSize = {
+            SizeX = bpPhysics.SkirtSizeX,
+            SizeZ = bpPhysics.SkirtSizeZ,
+        }
+        local x, y, z = bp.SizeX, bp.SizeY, bp.SizeZ
+        self.Size = {
+            SizeX = x,
+            SizeY = y,
+            SizeZ = z,
+        }
 
         -- Set number of effects per damage depending on its volume
-        local x, y, z = self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
         local vol = x * y * z
 
         self:ShowPresetEnhancementBones()
@@ -280,17 +306,17 @@ Unit = Class(moho.unit_methods) {
         }
 
         -- Set up effect emitter bags
-        self.MovementEffectsBag = TrashBag()
-        self.IdleEffectsBag = TrashBag()
-        self.TopSpeedEffectsBag = TrashBag()
         self.BeamExhaustEffectsBag = TrashBag()
-        self.TransportBeamEffectsBag = TrashBag()
         self.BuildEffectsBag = TrashBag()
-        self.ReclaimEffectsBag = TrashBag()
-        self.OnBeingBuiltEffectsBag = TrashBag()
         self.CaptureEffectsBag = TrashBag()
-        self.UpgradeEffectsBag = TrashBag()
+        self.IdleEffectsBag = TrashBag()
+        self.MovementEffectsBag = TrashBag()
+        self.OnBeingBuiltEffectsBag = TrashBag()
+        self.ReclaimEffectsBag = TrashBag()
         self.TeleportFxBag = TrashBag()
+        self.TopSpeedEffectsBag = TrashBag()
+        self.TransportBeamEffectsBag = TrashBag()
+        self.UpgradeEffectsBag = TrashBag()
 
         -- Set up veterancy
         self.xp = 0
@@ -298,16 +324,17 @@ Unit = Class(moho.unit_methods) {
         self.totalDamageTaken = 0
 
         -- Store weapon information for performance
-        self.WeaponCount = self:GetWeaponCount() or 0
-        self.WeaponInstances = { }
-        for k = 1, self.WeaponCount do 
+        local weaponCount = self:GetWeaponCount() or 0
+        local weaponInstances = {}
+        for k = 1, weaponCount do
             local weapon = self:GetWeapon(k)
-            self.WeaponInstances[weapon.Label] = weapon
-            self.WeaponInstances[k] = weapon
+            weaponInstances[weapon.Label] = weapon
+            weaponInstances[k] = weapon
         end
+        self.WeaponCount = weaponCount
+        self.WeaponInstances = weaponInstances
 
         -- Define Economic modifications
-        local bpEcon = bp.Economy
         self:SetConsumptionPerSecondEnergy(bpEcon.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetConsumptionPerSecondMass(bpEcon.MaintenanceConsumptionPerSecondMass or 0)
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -322,12 +349,11 @@ Unit = Class(moho.unit_methods) {
             Affects = {},
         }
 
-        self:SetIntelRadius('Vision', bp.Intel.VisionRadius or 0)
+        self:SetIntelRadius('Vision', bpIntel.VisionRadius or 0)
 
         self.CanTakeDamage = true
         self.CanBeKilled = true
 
-        local bpDeathAnim = bp.Display.AnimationDeath
         if bpDeathAnim and not table.empty(bpDeathAnim) then
             self.PlayDeathAnimation = true
         end
@@ -340,13 +366,20 @@ Unit = Class(moho.unit_methods) {
         self.Repairers = {}
 
         -- Cheating
-        if self.Brain.CheatEnabled then
+        if brain.CheatEnabled then
             AIUtils.ApplyCheatBuffs(self)
         end
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
-        
+        -- add support for keeping track of reclaim statistics
+        if Utilities.SelectBit(bp.General.CommandCaps, 20) then -- RULEUCC_Reclaim
+            self.ReclaimedMass = 0
+            self.ReclaimedEnergy = 0
+            self:GetStat("ReclaimedMass", 0)
+            self:GetStat("ReclaimedEnergy", 0)
+        end
+
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
             self.ResetJammer = -1
@@ -357,7 +390,7 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     ---- MISC FUNCTIONS
     -------------------------------------------------------------------------------------------
-    
+
     -- Returns 4 numbers: skirt x0, skirt z0, skirt.x1, skirt.z1
     GetSkirtRect = function(self)
         local x, y, z = self:GetPositionXYZ()
@@ -764,6 +797,33 @@ Unit = Class(moho.unit_methods) {
         if target.MaxMassReclaim then -- This is a prop
             target:UpdateReclaimLeft()
         end
+
+        -- process the amount we reclaimed to show it in the UI
+        if self.OnStartReclaimPropStartTick then
+            local ticks = (GetGameTick() - self.OnStartReclaimPropStartTick)
+
+            -- completely consumed this prop
+            if ticks >= self.OnStartReclaimPropTicksRequired then
+                self.ReclaimedMass = self.ReclaimedMass + self.OnStartReclaimPropMass
+                self.ReclaimedEnergy = self.ReclaimedEnergy + self.OnStartReclaimPropEnergy
+                
+            -- partially consumed the prop
+            else
+                local fraction = ticks / self.OnStartReclaimPropTicksRequired
+                self.ReclaimedMass = self.ReclaimedMass + fraction * self.OnStartReclaimPropMass
+                self.ReclaimedEnergy = self.ReclaimedEnergy + fraction * self.OnStartReclaimPropEnergy
+            end
+
+            -- update UI
+            self:SetStat('ReclaimedMass', self.ReclaimedMass)
+            self:SetStat('ReclaimedEnergy', self.ReclaimedEnergy)
+        end
+
+        -- reset reclaiming state
+        self.OnStartReclaimPropStartTick = nil
+        self.OnStartReclaimPropTicksRequired = nil
+        self.OnStartReclaimPropMass = nil
+        self.OnStartReclaimPropEnergy = nil
     end,
 
     StartReclaimEffects = function(self, target)
@@ -1743,13 +1803,13 @@ Unit = Class(moho.unit_methods) {
         local i = 0
 
         while i < 1 do
-            local randBone = utilities.GetRandomInt(0, numBones)
+            local randBone = Utilities.GetRandomInt(0, numBones)
             local boneHeight = self:GetPosition(randBone)[2]
             local toSurface = surfaceHeight - boneHeight
             local y = toSurface
             local rx, ry, rz = self:GetRandomOffset(0.3)
             local rs = math.max(math.min(2.5, vol / 20), 0.5)
-            local scale = utilities.GetRandomFloat(rs/2, rs)
+            local scale = Utilities.GetRandomFloat(rs/2, rs)
 
             self:DestroyAllDamageEffects()
             if toSurface < 1 then
@@ -1760,7 +1820,7 @@ Unit = Class(moho.unit_methods) {
             if toSurface < 0 then
                 Explosion.CreateDefaultHitExplosionAtBone(self, randBone, scale*1.5)
             else
-                local lifetime = utilities.GetRandomInt(50, 200)
+                local lifetime = Utilities.GetRandomInt(50, 200)
 
                 if toSurface > 1 then
                     CreateEmitterAtBone(self, randBone, self.Army, '/effects/emitters/underwater_bubbles_01_emit.bp'):OffsetEmitter(rx, ry, rz)
@@ -1772,7 +1832,7 @@ Unit = Class(moho.unit_methods) {
                 CreateEmitterAtBone(self, randBone, self.Army, '/effects/emitters/destruction_underwater_explosion_flash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
                 CreateEmitterAtBone(self, randBone, self.Army, '/effects/emitters/destruction_underwater_explosion_splash_01_emit.bp'):OffsetEmitter(rx, ry, rz):ScaleEmitter(scale)
             end
-            local rd = utilities.GetRandomFloat(0.4, 1.0)
+            local rd = Utilities.GetRandomFloat(0.4, 1.0)
             WaitSeconds(i + rd)
             i = i + 0.3
         end
@@ -1823,7 +1883,7 @@ Unit = Class(moho.unit_methods) {
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = self:ShallSink()
 
-        WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
+        WaitSeconds(Utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
 
         if not self.BagsDestroyed then
             self:DestroyAllBuildEffects()
@@ -3967,7 +4027,7 @@ Unit = Class(moho.unit_methods) {
             local targets
             if buffTable.Radius and buffTable.Radius > 0 then
                 -- If the radius is bigger than 0 then we will use the unit as the center of the stun blast
-                targets = utilities.GetTrueEnemyUnitsInSphere(self, PosEntity or self:GetPosition(), buffTable.Radius, category)
+                targets = Utilities.GetTrueEnemyUnitsInSphere(self, PosEntity or self:GetPosition(), buffTable.Radius, category)
             else
                 -- The buff will be applied to the unit only
                 if EntityCategoryContains(category, self) then

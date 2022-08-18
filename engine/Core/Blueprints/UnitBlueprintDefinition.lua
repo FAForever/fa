@@ -20,6 +20,8 @@
 ---@field Display BpDisplay
 ---@field Economy BpEconomy
 ---@field Enhancements BpEnhancements
+---@field FactionCategory string -- Automatically set from `General.FactionName`
+---@field Footprint  {SizeX: number, SizeZ: number}
 ---@field General BpGeneral
 ---@field Intel BpIntel
 ---@field Interface BpInterface
@@ -28,6 +30,7 @@
 ---@field LifeBarRender boolean -- Should render lifebar or not.
 ---@field LifeBarSize number -- Size of lifebar in OGrids.
 ---@field Physics BpPhysics
+---@field LayerCategory "AIR" | "LAND" | "NAVAL" -- Automatically set from `Categories`
 ---@field SelectionCenterOffsetX number -- X center offset of selection box
 ---@field SelectionCenterOffsetY number -- Y center offset of selection box
 ---@field SelectionCenterOffsetZ number -- Z center offset of selection box
@@ -41,6 +44,7 @@
 ---@field SizeZ number -- The collision box is used to detect hits on the unit. If you change the model size the collision box should be adapted.
 ---@field StrategicIconName string -- into here https://wiki.faforever.com/en/Blueprints#strategiciconname
 ---@field StrategicIconSortPriority integer -- describes the unit's position in the list of selected units when different unit types are selected. 0 renders on top, 255 on bottom.
+---@field TechCategory "EXPERIMENTAL" | "SUBCOMMANDER" | "COMMAND" | "TECH1" | "TECH2" | "TECH3" -- Automatically set from `Categories`
 ---@field Transport BpTransport
 ---@field UseOOBTestZoom number -- Use OOB hit test for this unit when camera is below this zoom level. Usually we use screen space to do unit selection, but occasionally we want to use the unit's oriented bounding box (OBB) instead. So we have UseOOBTestZoom.
 ---@field Veteran BpVeteran
@@ -310,7 +314,8 @@
 ---@field BuildTime number -- The needed time when producing this unit; This is only a factor of time, not the real time to produce the unit.
 ---@field InitialRallyX number -- Default rally point X for the factory.
 ---@field InitialRallyZ number -- Default rally point Z for the factory.
----@field MaintenanceConsumptionPerSecondEnergy number -- Amount that define which amount of energy the unit is consuming per second; Used for Shields.
+---@field MaintenanceConsumptionPerSecondEnergy number -- Amount that defines the amount of energy the unit is consuming per second (e.g. shields)
+---@field MaintenanceConsumptionPerSecondMass number -- Amount that defines the amount of mass the unit is consuming per second
 ---@field MaxBuildDistance number -- Maximum build range of the unit. The target must be within this range before the builder can perform operation.
 ---@field MaxEnergyUse number -- The maximum Amount of Energy the Unit can produce (see PARAGON xab1401)
 ---@field MaxMassUse number -- The maximum Amount of Mass the Unit can produce (see PARAGON xab1401)
