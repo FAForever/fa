@@ -1970,7 +1970,6 @@ Unit = Class(moho.unit_methods) {
         TrashDestroy(self.IdleEffectsBag)
         TrashDestroy(self.TopSpeedEffectsBag)
         TrashDestroy(self.BeamExhaustEffectsBag)
-        TrashDestroy(self.TransportBeamEffectsBag)
 
         if self.TransportBeamEffectsBag then 
             self.TransportBeamEffectsBag:Destroy()
@@ -4284,7 +4283,7 @@ Unit = Class(moho.unit_methods) {
         EffectUtilities.TeleportChargingProgress(self, progress)
     end,
 
-    PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)\
+    PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
         self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
     end,
