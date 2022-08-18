@@ -370,15 +370,7 @@ Unit = Class(moho.unit_methods) {
             AIUtils.ApplyCheatBuffs(self)
         end
         -- Flags for scripts
-        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
-
-        -- add support for keeping track of reclaim statistics
-        if Utilities.SelectBit(bp.General.CommandCaps, 20) then -- RULEUCC_Reclaim
-            self.ReclaimedMass = 0
-            self.ReclaimedEnergy = 0
-            self:GetStat("ReclaimedMass", 0)
-            self:GetStat("ReclaimedEnergy", 0)
-        end
+        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
 
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
@@ -797,33 +789,6 @@ Unit = Class(moho.unit_methods) {
         if target.MaxMassReclaim then -- This is a prop
             target:UpdateReclaimLeft()
         end
-
-        -- process the amount we reclaimed to show it in the UI
-        if self.OnStartReclaimPropStartTick then
-            local ticks = (GetGameTick() - self.OnStartReclaimPropStartTick)
-
-            -- completely consumed this prop
-            if ticks >= self.OnStartReclaimPropTicksRequired then
-                self.ReclaimedMass = self.ReclaimedMass + self.OnStartReclaimPropMass
-                self.ReclaimedEnergy = self.ReclaimedEnergy + self.OnStartReclaimPropEnergy
-                
-            -- partially consumed the prop
-            else
-                local fraction = ticks / self.OnStartReclaimPropTicksRequired
-                self.ReclaimedMass = self.ReclaimedMass + fraction * self.OnStartReclaimPropMass
-                self.ReclaimedEnergy = self.ReclaimedEnergy + fraction * self.OnStartReclaimPropEnergy
-            end
-
-            -- update UI
-            self:SetStat('ReclaimedMass', self.ReclaimedMass)
-            self:SetStat('ReclaimedEnergy', self.ReclaimedEnergy)
-        end
-
-        -- reset reclaiming state
-        self.OnStartReclaimPropStartTick = nil
-        self.OnStartReclaimPropTicksRequired = nil
-        self.OnStartReclaimPropMass = nil
-        self.OnStartReclaimPropEnergy = nil
     end,
 
     StartReclaimEffects = function(self, target)
