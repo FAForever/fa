@@ -6,25 +6,30 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local LazyVar = import('/lua/lazyvar.lua')
+local Prefs = import('/lua/user/prefs.lua')
+local Layouts = import('/lua/skins/layouts.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
+local LazyVar = import('/lua/lazyvar.lua')
+
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Border = import('/lua/ui/controls/border.lua').Border
 local Button = import('/lua/maui/button.lua').Button
-local Edit = import('/lua/maui/edit.lua').Edit
 local Checkbox = import('/lua/ui/controls/Checkbox.lua').Checkbox
+local Cursor = import('/lua/maui/cursor.lua').Cursor
+local Edit = import('/lua/maui/edit.lua').Edit
+local Group = import('/lua/maui/group.lua').Group
+local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
+local ItemList = import('/lua/maui/itemlist.lua').ItemList
+local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
+local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
+local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local RadioButtons = import('/lua/maui/radiobuttons.lua').RadioButtons
 local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Cursor = import('/lua/maui/cursor.lua').Cursor
-local Prefs = import('/lua/user/prefs.lua')
-local Border = import('/lua/ui/controls/border.lua').Border
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Layouts = import('/lua/skins/layouts.lua')
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
-local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
+local Text = import('/lua/maui/text.lua').Text
+
+local Layouter = LayoutHelpers.LayoutFor
+local ScrollAxis = import('/lua/maui/scrollbar.lua').ScrollAxis
+local ScrollPolicy = import('/lua/maui/scrollbar.lua').ScrollPolicy
 local skins = import('/lua/skins/skins.lua').skins
 
 
@@ -729,35 +734,30 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
     offset_bottom = offset_bottom or 0
     offset_top = offset_top or 0
     local textureName = filename or '/small-vert_scroll/'
-    local scrollbg = textureName..'back_scr_mid.dds'
-    local scrollbarmid = textureName..'bar-mid_scr_over.dds'
-    local scrollbartop = textureName..'bar-top_scr_up.dds'
-    local scrollbarbot = textureName..'bar-bot_scr_up.dds'
-    if filename then
-        scrollbg = textureName..'back_scr_mid.dds'
-        scrollbarmid = textureName..'bar-mid_scr_up.dds'
-        scrollbartop = textureName..'bar-top_scr_up.dds'
-        scrollbarbot = textureName..'bar-bot_scr_up.dds'
-    end
-    local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Vert)
-    scrollbar:SetTextures(   SkinnableFile(scrollbg)
-                            ,SkinnableFile(scrollbarmid)
-                            ,SkinnableFile(scrollbartop)
-                            ,SkinnableFile(scrollbarbot))
 
-    local scrollUpButton = Button(    scrollbar
-                                    , SkinnableFile(textureName..'arrow-up_scr_up.dds')
-                                    , SkinnableFile(textureName..'arrow-up_scr_down.dds')
-                                    , SkinnableFile(textureName..'arrow-up_scr_over.dds')
-                                    , SkinnableFile(textureName..'arrow-up_scr_dis.dds')
-                                    , "UI_Arrow_Click")
+    local scrollbar = Scrollbar(attachto, ScrollAxis.Vert)
+    scrollbar:SetTextures(
+        SkinnableFile(textureName .. 'back_scr_mid.dds'),
+        SkinnableFile(textureName .. 'bar-mid_scr_up.dds'),
+        SkinnableFile(textureName .. 'bar-top_scr_up.dds'),
+        SkinnableFile(textureName .. 'bar-bot_scr_up.dds')
+    )
 
-    local scrollDownButton = Button(  scrollbar
-                                    , SkinnableFile(textureName..'arrow-down_scr_up.dds')
-                                    , SkinnableFile(textureName..'arrow-down_scr_down.dds')
-                                    , SkinnableFile(textureName..'arrow-down_scr_over.dds')
-                                    , SkinnableFile(textureName..'arrow-down_scr_dis.dds')
-                                    , "UI_Arrow_Click")
+    local scrollUpButton = Button(scrollbar,
+        SkinnableFile(textureName .. 'arrow-up_scr_up.dds'),
+        SkinnableFile(textureName .. 'arrow-up_scr_down.dds'),
+        SkinnableFile(textureName .. 'arrow-up_scr_over.dds'),
+        SkinnableFile(textureName .. 'arrow-up_scr_dis.dds'),
+        "UI_Arrow_Click"
+    )
+
+    local scrollDownButton = Button(scrollbar,
+        SkinnableFile(textureName .. 'arrow-down_scr_up.dds'),
+        SkinnableFile(textureName .. 'arrow-down_scr_down.dds'),
+        SkinnableFile(textureName .. 'arrow-down_scr_over.dds'),
+        SkinnableFile(textureName .. 'arrow-down_scr_dis.dds'),
+        "UI_Arrow_Click"
+    )
 
     LayoutHelpers.AnchorToRight(scrollbar, attachto, offset_right)
     scrollbar.Top:Set(scrollUpButton.Bottom)
@@ -777,8 +777,217 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
     return scrollbar
 end
 
-function CreateLobbyVertScrollbar(attachto, offset_right, offset_bottom, offset_top)
-    return CreateVertScrollbarFor(attachto, offset_right, "/SCROLLBAR_VERT/", offset_bottom, offset_top)
+
+function CreateHorzScrollbarFor(attachto, offsetBottom, filename, offsetLeft, offsetRight)
+    offsetBottom = offsetBottom or 0
+    offsetLeft = offsetLeft or 0
+    offsetRight = offsetRight or 0
+    local textureName = filename or '/small-horz_scroll/'
+
+    local scrollbar = Scrollbar(attachto, ScrollAxis.Horz)
+    scrollbar:SetTextures(
+        SkinnableFile(textureName .. 'back_scr_mid.dds'),
+        SkinnableFile(textureName .. 'bar-mid_scr_over.dds'),
+        SkinnableFile(textureName .. 'bar-left_scr_up.dds'),
+        SkinnableFile(textureName .. 'bar-right_scr_up.dds')
+    )
+
+    local scrollLeftButton = Button(scrollbar,
+        SkinnableFile(textureName .. 'arrow-left_scr_up.dds'),
+        SkinnableFile(textureName .. 'arrow-left_scr_down.dds'),
+        SkinnableFile(textureName .. 'arrow-left_scr_over.dds'),
+        SkinnableFile(textureName .. 'arrow-left_scr_dis.dds'),
+        "UI_Arrow_Click"
+    )
+
+    local scrollRightButton = Button(scrollbar,
+        SkinnableFile(textureName .. 'arrow-right_scr_up.dds'),
+        SkinnableFile(textureName .. 'arrow-right_scr_down.dds'),
+        SkinnableFile(textureName .. 'arrow-right_scr_over.dds'),
+        SkinnableFile(textureName .. 'arrow-right_scr_dis.dds'),
+        "UI_Arrow_Click"
+    )
+
+    LayoutHelpers.AnchorToBottom(scrollbar, attachto, offsetBottom)
+    scrollbar.Left:Set(scrollLeftButton.Right)
+    scrollbar.Right:Set(scrollRightButton.Left)
+
+    scrollLeftButton.Top:Set(scrollbar.Top)
+    LayoutHelpers.AtLeftIn(scrollLeftButton, attachto, offsetLeft)
+
+    scrollRightButton.Top:Set(scrollbar.Top)
+    LayoutHelpers.AtRightIn(scrollRightButton, attachto, offsetRight)
+
+    scrollbar.Bottom:Set(scrollLeftButton.Bottom)
+
+    scrollbar:AddButtons(scrollRightButton, scrollLeftButton)
+    -- horizontal scrolling doesn't work
+    local phantomWidth = Layouter(Group(attachto))
+        :Fill(attachto)
+        :Height(function() return attachto.Width() end)
+        :End()
+    scrollbar:SetScrollable(phantomWidth)
+
+    return scrollbar
+end
+
+function CreateLobbyVertScrollbar(attachto, offsetRight, offsetBottom, offsetTop)
+    return CreateVertScrollbarFor(attachto, offsetRight, "/scrollbar_vert/", offsetBottom, offsetTop)
+end
+
+function CreateLobbyHorzScrollbar(attachto, offsetBottom, offsetLeft, offsetRight)
+    return CreateHorzScrollbarFor(attachto, offsetBottom, "/scrollbar_horz/", offsetLeft, offsetRight)
+end
+
+local function CreateAdaptiveVertScrollBar(scrollGroup, filename)
+    local scrollbar = CreateVertScrollbarFor(scrollGroup.Scrollable, 0, filename)
+    scrollGroup.VertScrollbar = scrollbar
+    scrollbar.Bottom:Set(function()
+        local scrollGroup = scrollGroup -- limit upvalues to 1
+        return scrollGroup.Scrollable.Bottom() - scrollGroup.HorzScrollbar.Height()
+    end)
+    return scrollbar
+end
+
+local function CreateAdaptiveHorzScrollBar(scrollGroup, filename)
+    local scrollbar = CreateHorzScrollbarFor(scrollGroup.Scrollable, 0, filename)
+    scrollGroup.HorzScrollbar = scrollbar
+    scrollbar.Right:Set(function()
+        local scrollGroup = scrollGroup -- limit upvalues to 1
+        return scrollGroup.Scrollable.Right() - scrollGroup.VertScrollbar.Width()
+    end)
+    return scrollbar
+end
+
+---
+---@param control Control
+---@param scrollGroup Control
+---@param vertScrollPolicy? ScrollPolicy defaults to `"Never"`
+---@param vertFilename? string
+---@param horzScrollPolicy? ScrollPolicy defaults to `"Never"`
+---@param horzFilename? string
+function CreateScrollBarsIn(control, scrollGroup, vertScrollPolicy, vertFilename, horzScrollPolicy, horzFilename)
+    vertScrollPolicy = vertScrollPolicy or ScrollPolicy.Never
+    horzScrollPolicy = horzScrollPolicy or ScrollPolicy.Never
+
+    scrollGroup.Scrollable = control
+
+    layouter = Layouter(control)
+        :AtLeftIn(scrollGroup, 0)
+        :AtTopIn(scrollGroup, 0)
+
+    local createVert, createHorz = false, false
+
+    if vertScrollPolicy == ScrollPolicy.Always then
+        layouter:Right(function()
+            local container = scrollGroup
+            return container.Right() - container.VertScrollbar.Width()
+        end)
+
+        createVert = true
+    elseif vertScrollPolicy == ScrollPolicy.AsNeeded then
+        layouter:Right(function()
+            local container = scrollGroup
+            local right = container.Right()
+            local scrollbar = container.VertScrollbar
+            if scrollbar then
+                return right - scrollbar.Width()
+            end
+            return right
+        end)
+        local Height = control.Height
+        local hook = Height.OnDirty
+        Height.OnDirty = function(self)
+            local container = scrollGroup
+            local control = container.Scrollable
+            if control.Height() <= container.Height() then
+                local scrollbar = container.VertScrollbar
+                if scrollbar then
+                    scrollbar:Destroy()
+                end
+                container.VertScrollbar = nil
+            elseif not container.VertScrollbar then
+                CreateAdaptiveVertScrollBar(container, vertFilename)
+            end
+            local hook = hook
+            if hook then
+                hook(self)
+            end
+        end
+
+        createVert = Height() > scrollGroup.Height()
+    elseif vertScrollPolicy == ScrollPolicy.Never then
+        layouter:AtRightIn(scrollGroup)
+    else
+        WARN("Unkown scroll policy \"" .. vertScrollPolicy .. "\" for vertical axis")
+    end
+
+    if horzScrollPolicy == ScrollPolicy.Always then
+        createHorz = true
+        layouter:Bottom(function()
+            local container = scrollGroup
+            return container.Bottom() - container.VertScrollbar.Height()
+        end)
+    elseif horzScrollPolicy == ScrollPolicy.AsNeeded then
+        layouter:Bottom(function()
+            local container = scrollGroup
+            local bottom = container.Bottom()
+            local scrollbar = container.HorzScrollbar
+            if scrollbar then
+                return bottom - scrollbar.Height()
+            end
+            return bottom
+        end)
+
+        local Width = control.Width
+        local hook = Width.OnDirty
+        Width.OnDirty = function(self)
+            local container = scrollGroup
+            local control = container.Scrollable
+            if control.Width() <= container.Width() then
+                local scrollbar = container.HorzScrollbar
+                if scrollbar then
+                    scrollbar:Destroy()
+                end
+                container.HorzScrollbar = nil
+            elseif not container.HorzScrollbar then
+                CreateAdaptiveHorzScrollBar(container, horzFilename)
+            end
+            local hook = hook
+            if hook then
+                hook(self)
+            end
+        end
+
+        createHorz = Width() > scrollGroup.Width()
+    elseif horzScrollPolicy == ScrollPolicy.Never then
+        layouter:AtBottomIn(scrollGroup)
+    else
+        WARN("Unkown scroll policy \"" .. horzScrollPolicy .. "\" for horizontal axis")
+    end
+
+    if createHorz then
+        if vertScrollPolicy ~= "Never" then
+            CreateAdaptiveHorzScrollBar(scrollGroup, horzFilename)
+        else
+            local scrollbar = CreateHorzScrollbarFor(control, 0, horzFilename)
+            scrollGroup.HorzScrollbar = scrollbar
+        end
+    end
+    if createVert then
+        if horzScrollPolicy ~= "Never" then
+            CreateAdaptiveVertScrollBar(scrollGroup, vertFilename)
+        else
+            local scrollbar = CreateVertScrollbarFor(control, 0, vertFilename)
+            scrollGroup.VertScrollbar = scrollbar
+        end
+    end
+
+    layouter:End()
+end
+
+function CreateLobbyScrollBars(control, scrollGroup, vertScrollPolicy, horzScrollPolicy)
+    return CreateScrollBarsIn(control, scrollGroup, vertScrollPolicy, "/scrollbar_vert/", horzScrollPolicy, "/scrollbar_horz/")
 end
 
 -- cause a dialog to get input focus, optional functions to perform when the user hits enter or escape
