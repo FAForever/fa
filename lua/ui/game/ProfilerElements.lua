@@ -7,7 +7,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Group = import('/lua/maui/group.lua').Group
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Layouter = LayoutHelpers.ReusedLayoutFor
-local ScrollPolicy = import('/lua/maui/scrollbar.lua').ScrollPolicy
+--local ScrollPolicy = import('/lua/maui/scrollbar.lua').ScrollPolicy
 
 ProfilerElementRow = Class(Group) {
     __init = function(self, parent, alignment, size, font, color)
@@ -410,7 +410,19 @@ ProfilerBytecodeArea = Class(Group) {
         self.Constants = constants
 
         local bytecode = ItemList(self)
+
+        ---[[
+        UIUtil.CreateLobbyVertScrollbar(bytecode, 0, groupBytecode)
+        Layouter(bytecode)
+            :Fill(groupBytecode)
+            :AtRightIn(14 + 10)
+            :End()
+        --]]
+
+        --[[ To be merged with scrollbar branch
         UIUtil.CreateLobbyScrollBars(bytecode, groupBytecode, ScrollPolicy.AsNeeded, ScrollPolicy.AsNeeded)
+        --]]
+
         bytecode:ShowMouseoverItem(true)
         bytecode:SetFont(UIUtil.fixedFont, 14)
         self.Bytecode = bytecode
