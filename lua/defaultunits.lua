@@ -686,46 +686,24 @@ StructureUnit = Class(Unit) {
         Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
 
-
-    -- Deprecated functionality
+    ---@deprecated
     ---@param self StructureUnit
     ChangeBlinkingLights = function(self)
-        if not DeprecatedWarnings.ChangeBlinkingLights then 
-            DeprecatedWarnings.ChangeBlinkingLights = true 
-            WARN("ChangeBlinkingLights is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
     end,
 
+    ---@deprecated
     ---@param self StructureUnit
     CreateBlinkingLights = function(self)
-        if not DeprecatedWarnings.CreateBlinkingLights then 
-            DeprecatedWarnings.CreateBlinkingLights = true 
-            WARN("CreateBlinkingLights is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
     end,
 
+    ---@deprecated
     ---@param self StructureUnit
     OnMassStorageStateChange = function(self, state)
-        if not DeprecatedWarnings.OnMassStorageStateChange then 
-            DeprecatedWarnings.OnMassStorageStateChange = true 
-            WARN("OnMassStorageStateChange is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
     end,
 
+    ---@deprecated
     ---@param self StructureUnit
     OnEnergyStorageStateChange = function(self, state)
-        if not DeprecatedWarnings.OnEnergyStorageStateChange then 
-            DeprecatedWarnings.OnEnergyStorageStateChange = true 
-            WARN("OnEnergyStorageStateChange is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
     end,
 }
 
@@ -738,103 +716,8 @@ FactoryUnit = Class(StructureUnit) {
         StructureUnit.OnCreate(self)
 
         -- if we're a support factory, make sure our build restrictions are correct
-        if self.Cache.HashedCats["SUPPORTFACTORY"] then 
+        if self.Blueprint.CategoriesHash["SUPPORTFACTORY"] then
             self:UpdateBuildRestrictions()
-        end
-        
-        -- if we're an HQ, enable all the additional logic
-        if self.Cache.HashedCats["RESEARCH"] then
-
-            -- is called when:
-            -- - structure is being upgraded
-            self:AddUnitCallback(
-                function(self, unitBeingBuilt)
-                    if EntityCategoryContains(categories.RESEARCH, self) then
-                        unitBeingBuilt.UpgradedHQFromTech = self.techCategory
-                    end
-                end,
-                "OnStartBuild"
-            )
-
-            -- is called when:
-            --  - unit is built
-            --  - unit is captured (for the new army)
-            --  - unit is given (for the new army)
-            self:AddUnitCallback(
-                function(self) 
-                    local brain = ArmyBrains[self.Army]
-
-                    -- if we're an upgrade then remove the HQ we came from
-                    if self.UpgradedHQFromTech then
-                        brain:RemoveHQ(self.factionCategory, self.layerCategory, self.UpgradedHQFromTech)
-                    end
-
-                    -- update internal state
-                    brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
-
-                    -- update all units affected by this
-                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
-                    for id, unit in affected do
-                        unit:UpdateBuildRestrictions()
-                    end
-                end, "OnStopBeingBuilt"
-            )
-
-            -- is called when:
-            --  - unit is killed
-            self:AddUnitCallback(
-                function(self) 
-                    local brain = ArmyBrains[self.Army]
-
-                    -- update internal state
-                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
-
-                    -- update all units affected by this
-                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
-                    for id, unit in affected do
-                        unit:UpdateBuildRestrictions()
-                    end
-                end, "OnKilled"
-            )
-
-            -- is called when:
-            --  - unit is given (used for the old army)
-            --  - unit is captured (used for the old army)
-            self:AddUnitCallback(
-                function(self, newUnit) 
-                    local brain = ArmyBrains[self.Army]
-
-                    -- update internal state
-                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
-
-                    -- update all units affected by this
-                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
-                    for id, unit in affected do
-                        unit:UpdateBuildRestrictions()
-                    end
-                end, "OnGiven"
-            )
-
-            -- is called when:
-            --  - unit is reclaimed
-            self:AddUnitCallback(
-                function(self) 
-                    local brain = ArmyBrains[self.Army]
-
-                    -- update internal state
-                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
-
-                    -- update all units affected by this
-                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
-                    for id, unit in affected do
-                        unit:UpdateBuildRestrictions()
-                    end
-                end, "OnReclaimed"
-            )
         end
 
         -- Save build effect bones for faster access when creating build effects
@@ -857,6 +740,19 @@ FactoryUnit = Class(StructureUnit) {
     ---@param self FactoryUnit
     OnDestroy = function(self)
         StructureUnit.OnDestroy(self)
+        
+        if self.Blueprint.CategoriesHash["RESEARCH"] then
+
+            -- update internal state
+            self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
+            self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+            -- update all units affected by this
+            local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+            for id, unit in affected do
+                unit:UpdateBuildRestrictions()
+            end
+        end
 
         self.DestroyUnitBeingBuilt(self)
     end,
@@ -886,6 +782,14 @@ FactoryUnit = Class(StructureUnit) {
     ---@param order boolean
     OnStartBuild = function(self, unitBeingBuilt, order)
         StructureUnit.OnStartBuild(self, unitBeingBuilt, order)
+
+        -- related to HQ systems
+        if self.Cache.HashedCats["RESEARCH"] then
+            if EntityCategoryContains(categories.RESEARCH, self) then
+                unitBeingBuilt.UpgradedHQFromTech = self.techCategory
+            end
+        end
+
         self.BuildingUnit = true
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
@@ -912,6 +816,27 @@ FactoryUnit = Class(StructureUnit) {
             self:ForkThread(self.PauseThread, bp.General.RolloffDelay, unitBeingBuilt, order)
         else
             self:DoStopBuild(unitBeingBuilt, order)
+        end
+    end,
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        StructureUnit.OnStopBeingBuilt(self, builder, layer)
+
+        if self.Cache.HashedCats["RESEARCH"] then
+            -- if we're an upgrade then remove the HQ we came from
+            if self.UpgradedHQFromTech then
+                self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.UpgradedHQFromTech)
+            end
+
+            -- update internal state
+            self.Brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
+            self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+            -- update all units affected by this
+            local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+            for _, unit in affected do
+                unit:UpdateBuildRestrictions()
+            end
         end
     end,
 
