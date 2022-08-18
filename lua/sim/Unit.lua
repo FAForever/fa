@@ -284,7 +284,6 @@ Unit = Class(moho.unit_methods) {
         self.IdleEffectsBag = TrashBag()
         self.TopSpeedEffectsBag = TrashBag()
         self.BeamExhaustEffectsBag = TrashBag()
-        self.BuildEffectsBag = TrashBag()
         self.OnBeingBuiltEffectsBag = TrashBag()
 
         -- Set up veterancy
@@ -2576,6 +2575,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBuild = function(self, built, order)
+
+        self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
+
         -- Prevent UI mods from violating game/scenario restrictions
         local id = built.UnitId
         local bp = built:GetBlueprint()
