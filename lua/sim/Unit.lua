@@ -70,6 +70,10 @@ SyncMeta = {
     end,
 
     __newindex = function(t, key, val)
+
+        LOG(key)
+        LOG(val)
+
         local id = rawget(t, 'id')
         local army = rawget(t, 'army')
         if not UnitData[id] then

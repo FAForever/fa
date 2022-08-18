@@ -18,6 +18,7 @@ local WorldViewMgr = import('/lua/ui/game/worldview.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local OverchargeCanKill = import('/lua/ui/game/unitview.lua').OverchargeCanKill
 local CommandMode = import('/lua/ui/game/commandmode.lua')
+local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -29,6 +30,7 @@ WorldViewParams = {
 
 local KeyCodeAlt = 18
 local KeyCodeCtrl = 17
+local KeyCodeShift = 16
 
 local weaponsCached = { }
 
@@ -194,30 +196,36 @@ local orderToCursorCallback = {
 ---@class WorldView : moho.UIWorldView, Control
 WorldView = Class(moho.UIWorldView, Control) {
 
-    --- Contains cursor textures
-    Cursor = { },
-
-    --- Cursor trashbag that is emptied when the cursor is reset
-    CursorTrash = TrashBag(),
-
-    --- Last cursor event
-    CursorLastEvent = nil,
-
-    --- last cursor order name
-    CursorLastIdentifier = nil,
-
-    --- Cursor related decals
-    CursorDecals = { },
-
-    --- Flag that indicates whether the cursor is over the world (instead of the UI)
-    CursorOverWorld = false,
-
-    --- Flag that indicates whether we ignore a lot of the processing and focus only on move and attack move commands
-    IgnoreMode = false,
-
     PingThreads = {},
-
     AutoBuild = false,
+
+    __post_init = function(self, spec)
+        LOG("HI")
+
+        --- Contains cursor textures
+        self.Cursor = { }
+
+        --- Cursor trashbag that is emptied when the cursor is reset
+        self.CursorTrash = TrashBag()
+
+        --- Last cursor event
+        self.CursorLastEvent = nil
+
+        --- last cursor order name
+        self.CursorLastIdentifier = nil
+
+        --- Cursor related decals
+        self.CursorDecals = { }
+
+        --- Flag that indicates whether the cursor is over the world (instead of the UI)
+        self.CursorOverWorld = false
+
+        --- Flag that indicates whether we ignore a lot of the processing and focus only on move and attack move commands
+        self.IgnoreMode = false
+
+        self.Trash = TrashBag()
+        self.Trash:Add(ForkThread(self.TerrainScanningThread, self))
+    end,
 
 
     --- Only accept move and attack move commands, ignore everything else
@@ -235,7 +243,7 @@ WorldView = Class(moho.UIWorldView, Control) {
     --- Checks and toggles the ignore mode which only processes move and attack move commands
     ---@param self WorldView
     CheckIgnoreMode = function(self)
-        return IsKeyDown(KeyCodeCtrl) and not IsKeyDown(16) -- shift key
+        return IsKeyDown(KeyCodeCtrl) and not IsKeyDown(KeyCodeShift) -- shift key
     end,
 
     --- Returns true if the reclaim command can be applied
@@ -848,6 +856,150 @@ WorldView = Class(moho.UIWorldView, Control) {
         return false
     end,
 
+    GetCursorInformation = function(self)
+
+        local cursor = { }
+        if __EngineStats and __EngineStats.Children then 
+            for _, a in __EngineStats.Children do
+                if a.Name == 'Camera' then
+                    for _, b in a.Children do
+                        if b.Name == 'Cursor' then
+                            for _, c in b.Children do
+                                cursor[c.Name] = c.Value
+                            end
+                        end
+
+                    end
+                end
+            end
+        end
+
+        return cursor
+    end,
+
+    TerrainScanningThread = function(self)
+
+        local meshSphere = '/env/Common/Props/sphere_lod0.scm'
+        local meshCircularRing = '/meshes/game/PathRing_LOD0.scm'
+        local meshSquareRing = '/meshes/game/PathSquare_LOD0.scm'
+        local meshCylinder = '/meshes/game/PathCylinder_LOD0.scm'
+
+        self.TerrainMesh = WorldMesh()
+        self.TerrainMesh:SetMesh({
+            MeshName = meshSphere,
+            TextureName = '/meshes/game/Assist_albedo.dds',
+            ShaderName = 'FakeRings',
+            UniformScale = 0.3
+        })
+        
+        self.TerrainMesh:SetFractionCompleteParameter(0.5)
+        self.TerrainMesh:SetHidden(false)
+        self.Trash:Add(self.TerrainMesh)
+
+        self.ScanningDepthBits = { }
+        for k = 1, 1000 do 
+
+            local bit = WorldMesh()
+            bit:SetFractionCompleteParameter(0.5)
+            bit:SetHidden(false)
+            bit:SetMesh({
+                MeshName = meshSphere,
+                TextureName = '/meshes/game/Assist_albedo.dds',
+                ShaderName = 'FakeRings',
+                UniformScale = 0.15
+            })
+
+            table.insert(self.ScanningDepthBits, bit)
+            self.Trash:Add(bit)
+        end
+
+        -- looping!
+        while true do 
+
+            local camera = GetCamera(self._cameraName)
+            local position = GetMouseWorldPos()
+            local cursor = self:GetCursorInformation()
+
+            -- check if everything is ready
+            if position and position[1] and cursor and cursor.Elevation then
+                if IsKeyDown(KeyCodeShift) then
+                    self:CursorScanningDepth(camera, position, cursor.Elevation)
+                end
+            end
+
+            WaitFrames(1)
+        end
+    end,
+
+    TransparencyBasedOnDepth = function(self, camera, mesh, distance)
+        local zoom = camera:GetZoom()
+        local fraction = math.max(0, 1 - (zoom / distance))
+        mesh:SetFractionCompleteParameter(fraction)
+    end,
+
+    CursorScanningDepth = function(self, camera, position, elevation)
+
+        -- check if we're over water
+        if position[2] > elevation + 0.1 then
+
+            -- show them
+            self.TerrainMesh:SetHidden(false)
+            for k = 1, 4 do
+                self.ScanningDepthBits[k]:SetHidden(false)
+            end
+
+            -- determine location on the terrain
+            local location = {
+                position[1],
+                elevation,
+                position[3]
+            }
+
+            self.TerrainMesh:SetStance(location)
+            self:TransparencyBasedOnDepth(camera, self.TerrainMesh, 200)
+
+            -- determine intermediate locations
+            for k = 1, 4 do 
+                local bit = self.ScanningDepthBits[k]
+                local bitLocation = {
+                    position[1],
+                    (k / 5) * position[2] + (1 - k / 5) * elevation,
+                    position[3]
+                }
+
+                bit:SetStance(bitLocation)
+                self:TransparencyBasedOnDepth(camera, bit, 200)
+            end
+        else 
+
+            -- hide them
+            self.TerrainMesh:SetHidden(true)
+            for k = 1, 4 do 
+                self.ScanningDepthBits[k]:SetHidden(true)
+            end
+        end
+    end,
+
+    ToggleCursorScanningDepth = function(self)
+
+    end,
+
+    CursorScanningTerrain = function(self)
+
+    end,
+
+    ToggleCursorScanningTerrain = function(self)
+
+    end,
+
+    CursorScanningBuildings = function(self)
+
+    end,
+
+    ToggleCursorScanningBuildings = function(self)
+
+    end,
+
     ResetDecals = function(self)
         for _, d in self.CursorDecals do
             d:Destroy()
@@ -857,6 +1009,7 @@ WorldView = Class(moho.UIWorldView, Control) {
 
     OnDestroy = function(self)
         self:ResetDecals()
+        self.Trash:Destroy()
 
         for i, v in self.PingThreads do
             if v then KillThread(v) end
