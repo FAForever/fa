@@ -288,7 +288,6 @@ Unit = Class(moho.unit_methods) {
         self.BuildEffectsBag = TrashBag()
         self.ReclaimEffectsBag = TrashBag()
         self.OnBeingBuiltEffectsBag = TrashBag()
-        self.CaptureEffectsBag = TrashBag()
 
         -- Set up veterancy
         self.xp = 0
