@@ -727,6 +727,48 @@ do
     end
 end
 
+do 
+    Callbacks.GroundFireManualWeapons = function(data, units)
+        units = SecureUnits(units)
+        for k, unit in units do 
+            -- unit:GroundFireManualWeapons(data.position)
+            local weapon = false
+            local weapons = unit.Blueprint.Weapon
+            for k, blueprint in weapons do
+                if blueprint.ManualFire and blueprint.CountedProjectile then
+
+                    if blueprint.EnabledByEnhancement then
+                        local enhancements = SimUnitEnhancements[unit.EntityId]
+                        if enhancements then
+                            for _, enh in enhancements do
+                                if enh == blueprint.EnabledByEnhancement then
+                                    LOG("hellooo")
+                                    weapon = unit:GetWeaponByLabel(blueprint.Label)
+                                    break
+                                end
+                            end
+                        end
+                    else 
+                        weapon = unit:GetWeaponByLabel(blueprint.Label)
+                        break
+                    end
+                end
+            end
+    
+            if weapon then
+                
+                LOG(weapon.Label)
+                LOG(weapon:CanFire())
+                LOG(unit:GetTacticalSiloAmmoCount())
+                if unit:GetTacticalSiloAmmoCount() > 0 then
+                    weapon:SetTargetGround(data.position)
+                    weapon:FireWeapon()
+                end
+            end
+        end
+    end
+end
+
 Callbacks.MapResoureCheck = function(data)
     import("/lua/sim/MapUtilities.lua").MapResourceCheck()
 end

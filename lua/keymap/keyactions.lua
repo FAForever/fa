@@ -309,6 +309,8 @@ keyActions = {
         category = 'orders', order = 7,},
     ['recheck_targets_of_weapons'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").RecheckTargetsOfWeapons()',
         category = 'orders', order = 7,},
+    ['GroundFireManualWeapons'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").GroundFireManualWeapons()',
+        category = 'orders', order = 7,},
     ['toggle_jamming'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").toggleScript("Jamming")',
         category = 'orders', order = 8,},
     ['toggle_intel'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").toggleScript("Intel")',
