@@ -289,7 +289,6 @@ Unit = Class(moho.unit_methods) {
         self.ReclaimEffectsBag = TrashBag()
         self.OnBeingBuiltEffectsBag = TrashBag()
         self.CaptureEffectsBag = TrashBag()
-        self.UpgradeEffectsBag = TrashBag()
 
         -- Set up veterancy
         self.xp = 0
@@ -623,6 +622,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StartCaptureEffects = function(self, target)
+        self.CaptureEffectsBag = self.CaptureEffectsBag or TrashBag()
         self.CaptureEffectsBag:Add(self:ForkThread(self.CreateCaptureEffects, target))
     end,
 
@@ -3123,6 +3123,8 @@ Unit = Class(moho.unit_methods) {
         local bp = self.Blueprint.Enhancements[enhancement]
         local effects = TrashBag()
         local scale = math.min(4, math.max(1, (bp.BuildCostEnergy / bp.BuildTime or 1) / 50))
+
+        self.UpgradeEffectsBag = self.UpgradeEffectsBag or TrashBag()
 
         if bp.UpgradeEffectBones then
             for _, v in bp.UpgradeEffectBones do
