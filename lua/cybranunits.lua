@@ -814,18 +814,6 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
             return false
         end
     end,
-
-    CreateReclaimEffects = function(self, target)
-        EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
-    end,
-
-    CreateReclaimEndEffects = function(self, target)
-        EffectUtil.PlayReclaimEndEffects(self, target)
-    end,
-
-    CreateCaptureEffects = function(self, target)
-        EffectUtil.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
-    end,
 }
 
 -- CCommandUnit

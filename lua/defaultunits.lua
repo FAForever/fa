@@ -1697,27 +1697,6 @@ MobileUnit = Class(Unit) {
         end
     end,
 
-    ---comment
-    ---@param self MobileUnit
-    ---@param target Unit
-    CreateReclaimEffects = function(self, target)
-        EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
-    end,
-
-    ---comment
-    ---@param self MobileUnit
-    ---@param target Unit
-    CreateReclaimEndEffects = function(self, target)
-        EffectUtil.PlayReclaimEndEffects(self, target)
-    end,
-
-    ---comment
-    ---@param self MobileUnit
-    ---@param target Unit
-    CreateCaptureEffects = function(self, target)
-        EffectUtil.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
-    end,
-
     -- Units with layer change effects (amphibious units like Megalith) need
     -- those changes applied when build ends, so we need to trigger the
     -- layer change event

@@ -623,6 +623,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateCaptureEffects = function(self, target)
+        EffectUtilities.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
 
     StopCaptureEffects = function(self, target)
@@ -767,9 +768,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateReclaimEffects = function(self, target)
+        EffectUtilities.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
     CreateReclaimEndEffects = function(self, target)
+        EffectUtilities.PlayReclaimEndEffects(self, target)
     end,
 
     StopReclaimEffects = function(self, target)
