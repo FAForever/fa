@@ -1610,7 +1610,7 @@ Unit = Class(moho.unit_methods) {
                 sinkAnim:PlayAnim(animBlock.Animation)
                 rate = rate or 1
                 if animBlock.AnimationRateMax and animBlock.AnimationRateMin then
-                    rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) / 10
+                    rate = animBlock.AnimationRateMin + Random() * (animBlock.AnimationRateMax - animBlock.AnimationRateMin)
                 end
                 sinkAnim:SetRate(rate)
                 self.Trash:Add(sinkAnim)
