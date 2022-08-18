@@ -284,9 +284,7 @@ Unit = Class(moho.unit_methods) {
         self.IdleEffectsBag = TrashBag()
         self.TopSpeedEffectsBag = TrashBag()
         self.BeamExhaustEffectsBag = TrashBag()
-        self.TransportBeamEffectsBag = TrashBag()
         self.BuildEffectsBag = TrashBag()
-        self.ReclaimEffectsBag = TrashBag()
         self.OnBeingBuiltEffectsBag = TrashBag()
 
         -- Set up veterancy
@@ -765,6 +763,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StartReclaimEffects = function(self, target)
+        self.ReclaimEffectsBag = self.ReclaimEffectsBag or TrashBag()
         self.ReclaimEffectsBag:Add(self:ForkThread(self.CreateReclaimEffects, target))
     end,
 
@@ -1970,6 +1969,10 @@ Unit = Class(moho.unit_methods) {
         TrashDestroy(self.TopSpeedEffectsBag)
         TrashDestroy(self.BeamExhaustEffectsBag)
         TrashDestroy(self.TransportBeamEffectsBag)
+
+        if self.TransportBeamEffectsBag then 
+            self.TransportBeamEffectsBag:Destroy()
+        end
 
         -- destroy remaining trash of weapon
         for k = 1, self.WeaponCount do 
@@ -4109,6 +4112,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
+        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
         TrashAdd(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
