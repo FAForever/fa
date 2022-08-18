@@ -397,22 +397,13 @@ Unit = Class(moho.unit_methods) {
             for intel, value in bpInt do
                 local info = IntelMap[intel]
                 if info and info.IsUsed(value) then
-                    intelDisables[info.Name] = {Construction = true}
+                    intelDisables[info.Name] = {}
                 end
             end
             if not table.empty(intelDisables) then
                 self.IntelDisables = intelDisables
-                -- manage the loss of intel when energy is depleted
-                if not bpInt.FreeIntel then
-                    local maint = bp.Economy.MaintenanceConsumptionPerSecondEnergy
-                    if maint and maint > 0 then
-                        self.Brain:AddEnergyDependingEntity(self)
-                    else
-                        -- we don't currently have a maintenance cost, so it must come from an enhancement
-                        -- use this field to keep track of whether we've set the dependency
-                        self.EnhanceableIntelEnergyDependency = false
-                    end
-                end
+                self.GeneralIntelDisables = {Construction = true}
+                -- we'll add the energy dependency once the unit is built
             end
         end
 
@@ -2276,7 +2267,20 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        self:EnableUnitIntel('Construction')
+        if self.IntelDisables then
+            if not bp.Intel.FreeIntel then
+                -- manage the loss of intel when energy is depleted
+                local maint = bp.Economy.MaintenanceConsumptionPerSecondEnergy
+                if maint and maint > 0 then
+                    self.Brain:AddEnergyDependingEntity(self)
+                else
+                    -- we don't currently have a maintenance cost, so it might come from an enhancement
+                    -- use this field to keep track of whether we've set the dependency
+                    self.EnhanceableIntelEnergyDependency = false
+                end
+            end
+            self:EnableUnitIntel('Construction')
+        end
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
         if self.Layer == 'Water' then
@@ -2762,7 +2766,8 @@ Unit = Class(moho.unit_methods) {
     -- As an optimisation, EnableIntel and DisableIntel are only called when going from one disabler
     -- present to zero, and when going from zero disablers to one.
 
-    --- Add a disabler for an intel field. Return if it's the first one for the intel field.
+    --- Adds a non-general disabler for an intel field. Returns if it's the first one for the
+    --- intel field.
     ---@param self Unit
     ---@param disabler string
     ---@param intel string
@@ -2772,15 +2777,14 @@ Unit = Class(moho.unit_methods) {
 
         LOG("DisableOneIntel")
 
-        if not self.IntelDisables then
-            return false
-        end
         local intelDisables = self.IntelDisables[intel]
         if not intelDisables then
             return false
         end
+        local genIntelDisables = self.GeneralIntelDisables
         local intDisabled = false
-        if Set.Empty(intelDisables) then
+        local SetEmpty = Set.Empty
+        if SetEmpty(intelDisables) and SetEmpty(genIntelDisables) then
             local bpIntel = self.Blueprint.Intel
             local active = bpIntel.ActiveIntel
             if active and active[intel] then
@@ -2797,18 +2801,27 @@ Unit = Class(moho.unit_methods) {
 
             intDisabled = true
         end
-        intelDisables[disabler] = true
+        if not genIntelDisables[disabler] then
+            intelDisables[disabler] = true
+        end
         return intDisabled
     end;
 
-    --- Add a disabler to an intel field (or all of them if absent). Call `OnIntelDisabled` if it's the
-    --- first disabler for any of the intel fields.
+    --- Adds a disabler to an intel field (or all of them if absent, or if it's a general disabler).
+    --- Calls `OnIntelDisabled` if it's the first disabler for any of the intel fields.
     ---@param self Unit
     ---@param disabler string
     ---@param intel? string
     ---@see DisableOneIntel
     DisableUnitIntel = function(self, disabler, intel)
         local intDisabled = false
+        local genIntelDisables = self.GeneralIntelDisables
+        if genIntelDisables[disabler] then
+            -- Note: this ignores the intel field. If you try to disable one intel field with a
+            -- general disabler *all* fields will get disabled
+            genIntelDisables[disabler] = true
+            intel = nil -- actually ignore the intel field
+        end
         if intel then
             intDisabled = self:DisableOneIntel(disabler, intel)
         else
@@ -2825,7 +2838,8 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    --- Remove a disabler from an intel field. Return if it was the last one for the intel field.
+    --- Removes a non-general disabler from an intel field. Returns if it was the last one for the
+    --- intel field.
     ---@param self Unit
     ---@param disabler string
     ---@param intel string
@@ -2834,8 +2848,10 @@ Unit = Class(moho.unit_methods) {
     EnableOneIntel = function(self, disabler, intel)
         LOG(string.format("EnableOneIntel - type: %s, disabler: %s", intel, disabler))
 
-        if not self.IntelDisables then
-            self.IntelDisables = {}
+        local allIntelDisables = self.IntelDisables
+        if not allIntelDisables then
+            allIntelDisables = {}
+            self.IntelDisables = allIntelDisables
             local bp = self.Blueprint
             if not bp.Intel.FreeIntel then
                 local maint = bp.Economy.MaintenanceConsumptionPerSecondEnergy
@@ -2846,36 +2862,45 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-        local intelDisables = self.IntelDisables[intel]
+        local intelDisables = allIntelDisables[intel]
+        local genIntelDisables = self.GeneralIntelDisables
         if not intelDisables then
             intelDisables = {}
-            self.IntelDisables[intel] = intelDisables
+            allIntelDisables[intel] = intelDisables
         end
-        if intelDisables[disabler] then -- Must check for explicit true contained
+        if intelDisables[disabler] then
             intelDisables[disabler] = nil
-            if Set.Empty(intelDisables) then
-                self:EnableIntel(intel)
+        end
+        local SetEmpty = Set.Empty
+        if SetEmpty(intelDisables) and SetEmpty(genIntelDisables) then
+            self:EnableIntel(intel)
 
-                -- Handle the cloak FX timing
-                if intel == 'Cloak' or intel == 'CloakField' then
-                    if disabler ~= 'Construction' and self.Blueprint.Intel[intel] then
-                        self:UpdateCloakEffect(true, intel)
-                    end
+            -- Handle the cloak FX timing
+            if intel == 'Cloak' or intel == 'CloakField' then
+                if disabler ~= 'Construction' and self.Blueprint.Intel[intel] then
+                    self:UpdateCloakEffect(true, intel)
                 end
-                return true
             end
+            return true
         end
         return false
     end;
 
-    --- Remove a disabler from an intel field (or all of them if absent). Call `OnIntelEnabled` if it's
-    --- the last disabler for any of the intel fields.
+    --- Removes a disabler from an intel field (or all of them if absent, or if it's a general disabler).
+    --- Calls `OnIntelEnabled` if it's the last disabler for any of the intel fields.
     ---@param self Unit
     ---@param disabler string
     ---@param intel? string
     ---@see EnableOneIntel
     EnableUnitIntel = function(self, disabler, intel)
         local intEnabled = false
+        local genIntelDisables = self.GeneralIntelDisables
+        if genIntelDisables[disabler] then
+            -- Note: this ignores the intel field. If you try to enable one intel field from a
+            -- general disabler *all* fields will get enabled
+            genIntelDisables[disabler] = false
+            intel = nil -- ignore the intel field
+        end
         if intel then
             intEnabled = self:EnableOneIntel(disabler, intel)
         else
@@ -2960,7 +2985,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    --- Stop the intel reactivation thread if it exists; otherwise, disable intel. Called when the player
+    --- Stops the intel reactivation thread if it exists; otherwise, disable intel. Called when the player
     --- stops power stalling by the AIBrain.
     --- This unit only gets added as an energy dependent entity to the AIBrain when the unit has intel.
     ---@param self Unit
@@ -2973,7 +2998,7 @@ Unit = Class(moho.unit_methods) {
         end
     end;
 
-    --- Create the intel reactivation thread, called when the player stops power stalling by the AIBrain.
+    --- Creates the intel reactivation thread, called when the player stops power stalling by the AIBrain.
     --- This unit only gets added as an energy dependent entity to the AIBrain when the unit has intel.
     ---@param self Unit
     OnEnergyViable = function(self)
@@ -3154,37 +3179,43 @@ Unit = Class(moho.unit_methods) {
     end;
 
     CreateEnhancement = function(self, enh)
-        local bp = self.Blueprint.Enhancements[enh]
+        local enhancements = self.Blueprint.Enhancements
+        local bp = enhancements[enh]
         if not bp then
             error('*ERROR: Got CreateEnhancement call with an enhancement that doesnt exist in the blueprint.', 2)
             return false
         end
 
-        if bp.ShowBones then
-            for _, v in bp.ShowBones do
-                if self:IsValidBone(v) then
-                    self:ShowBone(v, true)
+        local showBones = bp.ShowBones
+        if showBones then
+            for _, bone in showBones do
+                if self:IsValidBone(bone) then
+                    self:ShowBone(bone, true)
                 end
             end
         end
 
-        if bp.HideBones then
-            for _, v in bp.HideBones do
-                if self:IsValidBone(v) then
-                    self:HideBone(v, true)
+        local hideBones = bp.HideBones
+        if hideBones then
+            for _, bone in hideBones do
+                if self:IsValidBone(bone) then
+                    self:HideBone(bone, true)
                 end
             end
         end
 
-        local removeEnergyDependency = false
         AddUnitEnhancement(self, enh, bp.Slot or '')
-        if bp.RemoveEnhancements then
-            for _, remEnh in bp.RemoveEnhancements do
+
+        local removeEnhancements = bp.RemoveEnhancements
+        local enhIntelEnergyDep = self.EnhanceableIntelEnergyDependency
+        local removeEnergyDependency = false
+        if removeEnhancements then
+            for _, remEnh in removeEnhancements do
                 RemoveUnitEnhancement(self, remEnh)
             end
-            if self.EnhanceableIntelEnergyDependency then
-                for _, remEnh in bp.RemoveEnhancements do
-                    local maint = self.Blueprint.Enhancements[remEnh].MaintenanceConsumptionPerSecondEnergy
+            if enhIntelEnergyDep then
+                for _, remEnh in removeEnhancements do
+                    local maint = enhancements[remEnh].MaintenanceConsumptionPerSecondEnergy
                     if maint and maint > 0 then
                         -- the removed enhancement was responsible for the energy consumption
                         removeEnergyDependency = true
@@ -3196,7 +3227,7 @@ Unit = Class(moho.unit_methods) {
         -- check against false because this field will be `nil` when the energy dependency
         -- doesn't change with enhancements (i.e. either the dependency will always exist
         -- or never exist, regardless of any enhancement)
-        if self.EnhanceableIntelEnergyDependency == false or removeEnergyDependency then
+        if enhIntelEnergyDep == false or removeEnergyDependency then
             local maint = bp.MaintenanceConsumptionPerSecondEnergy
             if maint and maint > 0 then
                 if removeEnergyDependency then
