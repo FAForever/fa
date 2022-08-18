@@ -1,6 +1,6 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 
----@class ObjectiveArrow
+---@class ObjectiveArrow : Entity
 ObjectiveArrow = Class(Entity) {
 
     OnCreate = function(self,spec)

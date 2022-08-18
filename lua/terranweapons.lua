@@ -17,7 +17,8 @@ local GinsuCollisionBeam = CollisionBeams.GinsuCollisionBeam
 local OrbitalDeathLaserCollisionBeam = CollisionBeams.OrbitalDeathLaserCollisionBeam
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
-TDFFragmentationGrenadeLauncherWeapon= Class(DefaultProjectileWeapon) {
+---@class TDFFragmentationGrenadeLauncherWeapon : DefaultProjectileWeapon
+TDFFragmentationGrenadeLauncherWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.THeavyFragmentationGrenadeMuzzleFlash,
 }
 
