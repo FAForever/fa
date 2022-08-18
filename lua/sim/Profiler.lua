@@ -3,8 +3,9 @@
 -- - https://www.lua.org/pil/23.1.html
 
 local Statistics = import("/lua/shared/statistics.lua")
-local CollapseDebugInfo = import("/lua/shared/Profiler.lua").CollapseDebugInfo
+local CollapseDebugInfo = import("/lua/shared/DebugFunction.lua").CollapseDebugInfo
 local CreateEmptyProfilerTable = import("/lua/shared/Profiler.lua").CreateEmptyProfilerTable
+local PullDebugFunctionInfo = import("/lua/shared/DebugFunction.lua").PullDebugFunctionInfo
 local PlayerIsDev = import("/lua/shared/Profiler.lua").PlayerIsDev
 
 -- upvalue for performance
@@ -12,7 +13,6 @@ local sethook = debug.sethook
 local getinfo = debug.getinfo
 
 local SPEW = SPEW
-local WaitTicks = WaitTicks
 
 --- Keeps track of whether profiling has been toggled or not
 local isProfiling = false
@@ -226,14 +226,16 @@ BenchmarkModuleLoader = Class() {
         if self.excludeFunctions[funName] or metadata.excludeFunctions[funName] then
             return
         end
+        local info = PullDebugFunctionInfo(fn)
         return {
             name = funName,
             title = metadata.titles[funName] or "",
             description = metadata.descriptions[funName] or "",
+            info = info,
         }, {
             name = funName,
             fn = fn,
-            parameters = debug.listcode(fn).numparams
+            parameters = info.bytecode.numparams
         }
     end;
 

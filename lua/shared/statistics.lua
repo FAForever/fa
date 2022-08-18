@@ -429,6 +429,22 @@ function Mean(data, n)
     return mean / n
 end
 
+function MeanAndSampVariance(data, n)
+    n = n or TableGetn(data)
+    local rawm1, rawm2 = 0, 0
+    for k = 1, n do
+        local value = data[k]
+        rawm1 = rawm1 + value
+        rawm2 = rawm2 + value*value
+    end
+    -- E(X)
+    local mean = rawm1 / n
+    -- E((X - E(X))^2) = E(X^2) - E(X)^2; reduce degrees of freedom by one due to calculating the
+    -- center from the data, since it's an estimator and not the true population mean
+    local var = (rawm2 - rawm1*rawm1) / (n - 1)
+    return mean, var
+end
+
 function AdjustToSampVariance(popVariance, n)
     return popVariance * n / (n - 1)
 end
@@ -620,6 +636,43 @@ function AvgAbsDeviation(data, n, center)
     return variance / n
 end
 
+
+function GenerateRawMoments(data, n)
+    n = n or TableGetn(data)
+    local m1, m2, m3, m4 = 0, 0, 0, 0
+    for i = 1, n do
+        local val = data[i]
+        m1 = m1 + val
+        local valP = val * val
+        m2 = m2 + valP
+        valP = valP * val
+        m3 = m3 + valP
+        valP = valP * val
+        m4 = m4 + valP
+    end
+    return m1 / n, m2 / n, m3 / n, m4 / n
+end
+function GenerateRawMomentsUpTo(data, degree, n)
+    n = n or TableGetn(data)
+    local moments = {0}
+    for i = 2, degree do
+        moments[i] = 0
+    end
+    for i = 1, n do
+        local val = data[i]
+        moments[1] = moments[1] + val
+        local valP = val
+        for j = 2, degree do
+            valP = valP * val
+            moments[j] = moments[j] + valP
+        end
+    end
+    for i = 1, degree do
+        moments[i] = moments[i] / n
+    end
+    return moments
+end
+
 ---@param data number[]
 ---@param n? number
 ---@param center? number
@@ -661,7 +714,6 @@ function GenerateCentralMoments(data, n, center)
     end
     return 0, m2 / n, m3 / n, m4 / n
 end
-
 
 ---@param data number[]
 ---@param degree? number defaults to 4
@@ -710,469 +762,332 @@ function GenerateCentralMomentsUpTo(data, degree, n, center)
 end
 
 
----@class StatObject
----@field avgAbsDev? number
----@field center? number
+
+doscript("/lua/shared/lazycache.lua")
+
+---@class StatObject : LazyCache
+---
 ---@field data number[]
----@field deviation? number
----@field excessKurtosis? number
 ---@field iqr? number
----@field isPopulation? boolean
----@field kurtosis? number
 ---@field max? number
 ---@field mean? number
+---@field meanAbsDev? number
 ---@field median? number
+---@field medianAbsDev? number
 ---@field min? number
 ---@field mode? number | number[]
+---@field modeAbsDev? number
 ---@field n number
 ---@field q1? number
 ---@field q3? number
 ---@field quantileMode? number
 ---@field quartileMode? number
----@field skewness? number
 ---@field sorted? number[]
 ---@field sum? number
----@field variance? number
-StatObject = {
-    __aliases = {
-        -- referential aliases, for convenience
-        aad = "avgAbsDev",
-        dev = "deviation",
-        mad = "avgAbsDev",
-        med = "median",
-        q0 = "min",
-        q2 = "median",
-        q4 = "max",
-        stddev = "deviation",
-        var = "variance",
-        -- linked aliases, for field sharing
-        basicDeviation = "deviation",
-        meanAbsDev = "avgAbsDev",
-        medianAbsDev = "avgAbsDev",
-        modeAbsDev = "avgAbsDev",
-        popDeviation = "deviation",
-        popKurtosis = "kurtosis",
-        popSkewness = "skewness",
-        popVariance = "variance",
-        normalDeviation = "deviation",
-        normalExcessKurtosis = "excessKurtosis",
-        sampSkewness = "skewness",
+---
+---@field MinMax function
+---@field RemoveOutliers function
+---@field RecursivelyRemoveOutliers function
+---@field Quantile function
+---@field Quartiles function
+---@field Summary function
+StatObject = LazyCache {
+    sorted = function(self)
+        return Sort(self.data)
+    end;
 
-        -- `center` populates with "mean" | "median" | avg("mode"), depending on the first to the cache (defaulting to mean)
-    }
-}
+    sum = function(self)
+        return Sum(self.data, self.n)
+    end;
 
----@param data number[]
----@param n? number defaults to `table.getn(data)`
----@param doCopy? boolean
----@param isPop? boolean
----@param quantileMode? number
----@param quartileMode? number
----@return StatObject
-setmetatable(StatObject, {__call = function(self, data, n, doCopy, isPop, quantileMode, quartileMode)
-    n = n or TableGetn(data)
-    if doCopy then
-        data = Sort(data, n)
-    end
-    local obj = {
-        data = data,
-        n = n,
-        quantileMode = quantileMode,
-        quartileMode = quartileMode,
-    }
-    if doCopy then
-        obj.sorted = data
-    end
-    if isPop then
-        obj.isPopulation = true
-    end
-    setmetatable(obj, StatObject)
-    return obj
-end})
-function StatObject:__index(field)
-    -- metafield used to generate a field defined by the class as needed, and then cache the result
-    local fun = StatObject[field]
-    local alias = StatObject.__aliases[field]
-    if fun then
-        if alias then
-            local val = rawget(self, alias)
-            if val then
-                return val
+    -- centers
+    mean = function(self)
+        local mean = Mean(self.data, self.n)
+        return mean
+    end;
+    mode = function(self)
+        return Mode(self.data, self.n)
+    end;
+    median = function(self)
+        local q1, median, q3 = Quartiles(self.sorted, self.n, self.quartileMode)
+        self.q1 = q1
+        self.q3 = q3
+        return median
+    end;
+
+    min = function(self)
+        local sorted = rawget(self, "sorted")
+        if sorted then
+            return sorted[1]
+        end
+        local data = self.data
+        local min = data[1]
+        for i = 2, self.n do
+            local val = data[i]
+            if val < min then
+                min = val
             end
-            field = alias
         end
-        -- generate field
-        if string.byte(field, 1, 1) > 96 then
-            local val = fun(self)
-            self[field] = val
-            return val
+        return min
+    end;
+    max = function(self)
+        local sorted = rawget(self, "sorted")
+        if sorted then
+            return sorted[self.n]
         end
-        return fun -- return method for calling
-    end
-    if alias then
-        return self[alias]
-    end
-end
-function StatObject:__newindex(field, val)
-    rawset(self, StatObject.__aliases[field] or field, val)
-end
-
-
-
-function StatObject:RemoveOutliers(mult)
-    mult = mult or 1.5
-    local lower, upper = self.q1, self.q3
-    local extent = (upper - lower) * mult
-    lower = lower - extent
-    upper = upper + extent
-    local trimmed = {}
-    local size = 0
-    local data = self.data
-    for i = 1, self.n do
-        local val = data[i]
-        if lower <= val and val <= upper then
-            size = size + 1
-            trimmed[size] = val
+        local data = self.data
+        local max = data[1]
+        for i = 2, self.n do
+            local val = data[i]
+            if val > max then
+                max = val
+            end
         end
-    end
-    return trimmed, size
-end
-function StatObject:RecursivelyRemoveOutliers(mult)
-    local iteration = self
-    local pren = self.n
-    repeat
-        local lastn = pren
-        iteration = StatObject(iteration:RemoveOutliers(mult))
-        pren = iteration.n
-    until pren == lastn
-    if self.isPopulation then
-        -- retain some of the population information: we can't call it the population because
-        -- since we removed elements, and that would change how these are calculated
-        iteration.mean = self.mean
-        iteration.m2 = self.m2
-        iteration.m3 = self.m3
-        iteration.m4 = self.m4
-        iteration.variance = self.variance
-        iteration.skewness = self.skewness
-        iteration.kurtosis = self.kurtosis
-        local dev = rawget(self, "deviation")
-        if dev then
-            iteration.deviation = dev
-        end
-    end
-    iteration.quantileMode = self.quantileMode
-    iteration.quartileMode = self.quartileMode
-    return iteration
-end
+        return max
+    end;
+    range = function(self)
+        local min, max = self:MinMax()
+        return max - min
+    end;
 
-function StatObject:ClearBiasedCache()
-    self.deviation = nil
-    self.excessKurtosis = nil
-    self.kurtosis = nil
-    self.skewness = nil
-    self.variance = nil
-end
-function StatObject:ClearModeCache()
-    self.iqr = nil
-    self.max = nil
-    self.median = nil
-    self.min = nil
-    self.mode = nil
-    self.q1 = nil
-    self.q3 = nil
-    self.range = nil
-end
-function StatObject:ClearCenterCache()
-    self.avgAbsDev = nil
-    self.center = nil
-end
-function StatObject:ClearCache()
-    self:ClearBiasedCache()
-    self:ClearCenterCache()
-    self:ClearModeCache()
-    self.mean = nil
-    if self.sorted ~= self.data then
-        self.sorted = nil
-    end
-    self.sum = nil
-end
+    q1 = function(self)
+        local q1, median, q3 = Quartiles(self.sorted, self.n, self.quartileMode)
+        self.median = median
+        self.q3 = q3
+        return q1
+    end;
+    q3 = function(self)
+        local q1, median, q3 = Quartiles(self.sorted, self.n, self.quartileMode)
+        self.q1 = q1
+        self.median = median
+        return q3
+    end;
+    iqr = function(self)
+        return self.q3 - self.q1
+    end;
 
-function StatObject:Quantile(q, quantileMode)
-    local curQuantMode = self.quantileMode
-    if curQuantMode then
-        quantileMode = curQuantMode
-    elseif quantileMode then
-        self.quantileMode = quantileMode
-    end
-    return Quantile(self.sorted, q, self.n, quantileMode)
-end
-function StatObject:Quartiles(quartileMode)
-    local savedQ1 = rawget(self, "q1")
-    if savedQ1 then
-        return savedQ1, self.median, self.q3
-    end
+    -- central moments
+    m2 = function(self)
+        local _0, m2, m3, m4 = GenerateCentralMoments(self.data, self.n, self.mean)
+        self.m3 = m3
+        self.m4 = m4
+        return m2
+    end;
+    m3 = function(self)
+        local _0, m2, m3, m4 = GenerateCentralMoments(self.data, self.n, self.mean)
+        self.m2 = m2
+        self.m4 = m4
+        return m3
+    end;
+    m4 = function(self)
+        local _0, m2, m3, m4 = GenerateCentralMoments(self.data, self.n, self.mean)
+        self.m2 = m2
+        self.m3 = m3
+        return m4
+    end;
 
-    local curQuartMode = self.quartileMode
-    if curQuartMode then
-        quartileMode = curQuartMode
-    elseif quartileMode then
-        self.quartileMode = quartileMode
-    end
-    local q1, median, q3 = Quartiles(self.sorted, self.n, quartileMode)
-    self.q1, self.median, self.q3 = q1, median, q3
-    if not rawget(self, "center") then
-        self.center = median
-    end
-    return q1, median, q3
-end
-function StatObject:Summary(quartileMode)
-    local mean = self.mean -- make sure `center` still defaults to the mean
-    local q1, median, q3 = self:Quartiles(quartileMode)
-    local min, max = self:MinMax() -- min & max are most efficient when `sorted` is already present
-    return mean, min, q1, median, q3, max, self.mode
-end
-
-
-
--- field generators
-
----@type number
-function StatObject:sorted()
-    return Sort(self.data)
-end
-
----@type number
-function StatObject:center()
-    return self.mean
-end
-
----@type number
-function StatObject:sum()
-    return Sum(self.data, self.n)
-end
-
----@type number
-function StatObject:mean()
-    local mean = Mean(self.data, self.n)
-    if not rawget(self, "center") then
-        self.center = mean
-    end
-    return mean
-end
-
----@type number
-function StatObject:mode()
-    local mode = Mode(self.data, self.n)
-    if not rawget(self, "center") then
-        local center = mode
+    meanAbsDev = function(self)
+        return AvgAbsDeviation(self.data, self.n, self.mean)
+    end;
+    medianAbsDev = function(self)
+        return AvgAbsDeviation(self.data, self.n, self.median)
+    end;
+    modeAbsDev = function(self)
+        local center = self.mode
         if type(center) == "table" then
             center = Mean(center)
         end
-        self.center = center
-    end
-    return mode
-end
-
----@type number
-function StatObject:median()
-    local q1, median, q3 = Quartiles(self.sorted, self.n, self.quartileMode)
-    if not rawget(self, "center") then
-        self.center = median
-    end
-    self.q1 = q1
-    self.q3 = q3
-    return median
-end
-
----@type number
-function StatObject:min()
-    local sorted = rawget(self, "sorted")
-    if sorted then
-        return sorted[1]
-    end
-    local data = self.data
-    local min = data[1]
-    for i = 2, self.n do
-        local val = data[i]
-        if val < min then
-            min = val
+        return AvgAbsDeviation(self.data, self.n, center)
+    end;
+} {
+    __init = function(self, data, n, doCopy, quantileMode, quartileMode)
+        n = n or TableGetn(data)
+        if doCopy then
+            data = Sort(data, n)
         end
-    end
-    return min
-end
----@type number
-function StatObject:max()
-    local sorted = rawget(self, "sorted")
-    if sorted then
-        return sorted[self.n]
-    end
-    local data = self.data
-    local max = data[1]
-    for i = 2, self.n do
-        local val = data[i]
-        if val > max then
-            max = val
+        self.data = data
+        self.n = n
+        if quantileMode then
+            self.quantileMode = quantileMode
         end
-    end
-    return max
-end
-function StatObject:MinMax()
-    if not (rawget(self, "min") and rawget(self, "max")) then
-        local min, max
-        local sorted = rawget(self, "sorted")
-        if sorted then
-            min = sorted[1]
-            max = sorted[self.n]
-        else
-            local data = self.data
-            min = data[1]
-            max = data[1]
-            for i = 2, self.n do
-                local val = data[i]
-                if val < min then
-                    min = val
-                elseif val > max then
-                    max = val
+        if quartileMode then
+            self.quartileMode = quartileMode
+        end
+        if doCopy then
+            self.sorted = data
+        end
+    end;
+
+    MinMax = function(self)
+        local min, max = rawget(self, "min"), rawget(self, "max")
+        if not (min and max) then
+            local sorted = rawget(self, "sorted")
+            if sorted then
+                min = sorted[1]
+                max = sorted[self.n]
+            else
+                local data = self.data
+                min = data[1]
+                max = data[1]
+                for i = 2, self.n do
+                    local val = data[i]
+                    if val < min then
+                        min = val
+                    elseif val > max then
+                        max = val
+                    end
                 end
             end
+            self.min = min
+            self.max = max
         end
-        self.min = min
-        self.max = max
-    end
-    return self.min, self.max
-end
+        return min, max
+    end;
 
----@type number
-function StatObject:range()
-    local min, max = self:MinMax()
-    return max - min
-end
+    RemoveOutliers = function(self, mult)
+        mult = mult or 1.5
+        local lower, upper = self.q1, self.q3
+        local extent = (upper - lower) * mult
+        lower = lower - extent
+        upper = upper + extent
+        local trimmed = {}
+        local size = 0
+        local data = self.data
+        for i = 1, self.n do
+            local val = data[i]
+            if lower <= val and val <= upper then
+                size = size + 1
+                trimmed[size] = val
+            end
+        end
+        return self.Class(trimmed, size)
+    end;
+    RecursivelyRemoveOutliers = function(self, mult)
+        local iteration = self
+        local pren = self.n
+        repeat
+            local lastn = pren
+            iteration = iteration:RemoveOutliers(mult)
+            pren = iteration.n
+        until pren == lastn
+        iteration.quantileMode = self.quantileMode
+        iteration.quartileMode = self.quartileMode
+        return iteration
+    end;
 
----@type number
-function StatObject:q1()
-    local q1, median, q3 = Quartiles(self.sorted, self.n, self.quartileMode)
-    self.median = median
-    self.q3 = q3
-    return q1
-end
----@type number
-function StatObject:q3()
-    local q1, median, q3 = Quartiles(self.sorted, self.n, self.quartileMode)
-    self.q1 = q1
-    self.median = median
-    return q3
-end
----@type number
-function StatObject:iqr()
-    return self.q3 - self.q1
-end
+    Quantile = function(self, q, quantileMode)
+        local curQuantMode = self.quantileMode
+        if curQuantMode then
+            quantileMode = curQuantMode
+        elseif quantileMode then
+            self.quantileMode = quantileMode
+        end
+        return Quantile(self.sorted, q, self.n, quantileMode)
+    end;
+    Quartiles = function(self, quartileMode)
+        local savedQ1 = rawget(self, "q1")
+        if savedQ1 then
+            return savedQ1, self.median, self.q3
+        end
 
----@type number
-function StatObject:m2()
-    local _0, m2, m3, m4 = GenerateCentralMoments(self.data, self.n, self.mean)
-    self.m3 = m3
-    self.m4 = m4
-    return m2
-end
----@type number
-function StatObject:m3()
-    local _0, m2, m3, m4 = GenerateCentralMoments(self.data, self.n, self.mean)
-    self.m2 = m2
-    self.m4 = m4
-    return m3
-end
----@type number
-function StatObject:m4()
-    local _0, m2, m3, m4 = GenerateCentralMoments(self.data, self.n, self.mean)
-    self.m2 = m2
-    self.m3 = m3
-    return m4
-end
+        local curQuartMode = self.quartileMode
+        if curQuartMode then
+            quartileMode = curQuartMode
+        elseif quartileMode then
+            self.quartileMode = quartileMode
+        end
+        local q1, median, q3 = Quartiles(self.sorted, self.n, quartileMode)
+        self.q1, self.median, self.q3 = q1, median, q3
+        return q1, median, q3
+    end;
+    Summary = function(self, quartileMode)
+        local mean = self.mean
+        local q1, median, q3 = self:Quartiles(quartileMode)
+        local min, max = self:MinMax() -- min & max are most efficient when `sorted` is already present
+        return mean, min, q1, median, q3, max, self.mode
+    end;
+}
 
----@type number
-function StatObject:variance()
-    local m2 = self.m2
-    if not self.isPopulation then
+---@class StatObjectCommon
+---@field nonparametericSkewness? number
+local StatObjectCommon = LazyCache {
+    nonparametericSkewness = function(self)
+        return NonparametericSkewness(self.mean, self.median, self.deviation)
+    end;
+}
+
+---@class PopStatObject : StatObject, StatObjectCommon
+---@field variance? number
+---@field skewness? number
+local PopStatObject = LazyCache(StatObject, StatObjectCommon) {
+    variance = function(self)
+        return self.m2
+    end;
+    skewness = function(self)
+        return StandardizeSkewness(self.m3, self.deviation)
+    end;
+}
+---@class SampStatObject : StatObject, StatObjectCommon
+---@field variance? number
+---@field skewness? number
+local SampStatObject = LazyCache(StatObject, StatObjectCommon) {
+    variance = function(self)
         local n = self.n
-        m2 = m2 * n / (n - 1)
-    end
-    return m2
-end
----@type number
-function StatObject:popVariance()
-    return self.m2
-end
+        return self.m2 * n / (n - 1)
+    end;
+    skewness = function(self)
+        return AdjustToSampSkewness(StandardizeSkewness(self.m3, self.deviation), self.n)
+    end;
+}
 
----@type number
-function StatObject:skewness()
-    return StandardizeSkewness(self.m3, self.deviation)
-end
----@type number
-function StatObject:popSkewness()
-    return StandardizeSkewness(self.m3, self.popDeviation)
-end
----@type number
-function StatObject:sampSkewness()
-    return AdjustToSampSkewness(StandardizeSkewness(self.m3, self.deviation), self.n)
-end
 
----@type number
-function StatObject:nonparametericSkewness()
-    return NonparametericSkewness(self.mean, self.median, self.deviation)
-end
+---@class StatObjectNoCorrection
+---@field excessKurtosis? number
+---@field deviation? number
+local StatObjectNoCorrection = LazyCache {
+    excessKurtosis = function(self)
+        return AdjustToExcessKurtosis(self.kurtosis)
+    end;
+    deviation = function(self)
+        return MathSqrt(self.variance)
+    end;
+}
+---@class StatObjectBasicCorrection
+---@field excessKurtosis? number
+---@field deviation? number
+local StatObjectBasicCorrection = LazyCache {
+    excessKurtosis = function(self)
+        return AdjustToExcessKurtosis(self.kurtosis)
+    end;
+    deviation = function(self)
+        return AdjustToBasicCorrectedStdDeviation(MathSqrt(self.m2))
+    end;
+}
+---@class StatObjectNormalCorrection
+---@field excessKurtosis? number
+---@field deviation? number
+local StatObjectNormalCorrection = LazyCache {
+    excessKurtosis = function(self)
+        return AdjustToNormallyCorrectedExcessKurtosis(self.kurtosis, self.n)
+    end;
+    deviation = function(self)
+        return AdjustToNormallyCorrectedStdDeviation(MathSqrt(self.m2))
+    end;
+}
 
----@type number
-function StatObject:kurtosis()
-    local variance = rawget(self, "variance")
-    if variance then
-        return KurtosisFromMoments(self.m4, variance)
-    end
-    return KurtosisFromMoments(self.m4, self.m2)
-end
 
----@type number
-function StatObject:excessKurtosis()
-    return AdjustToExcessKurtosis(self.kurtosis)
-end
----@type number
-function StatObject:normalExcessKurtosis()
-    return AdjustToNormallyCorrectedExcessKurtosis(self.kurtosis, self.n)
-end
+---@class PopStatObjectNoCorrection : PopStatObject, StatObjectNoCorrection
+PopStatObjectNoCorrection = LazyCache(PopStatObject, StatObjectNoCorrection) {} {}
+---@class SampStatObjectNoCorrection : SampStatObject, StatObjectNoCorrection
+SampStatObjectNoCorrection = LazyCache(SampStatObject, StatObjectNoCorrection) {} {}
 
----@type number
-function StatObject:deviation()
-    return MathSqrt(self.variance)
-end
----@type number
-function StatObject:popDeviation()
-    return MathSqrt(self.popVariance)
-end
----@type number
-function StatObject:basicDeviation()
-    return AdjustToBasicCorrectedStdDeviation(MathSqrt(self.m2))
-end
----@type number
-function StatObject:normalDeviation()
-    return AdjustToNormallyCorrectedStdDeviation(MathSqrt(self.m2))
-end;
+---@class PopStatObjectNoCorrection : PopStatObject, StatObjectBasicCorrection
+PopStatObjectBasicCorrection = LazyCache(PopStatObject, StatObjectBasicCorrection) {} {}
+---@class SampStatObjectNoCorrection : PopStatObject, StatObjectBasicCorrection
+SampStatObjectBasicCorrection = LazyCache(SampStatObject, StatObjectBasicCorrection) {} {}
 
----@type number
-function StatObject:avgAbsDev()
-    return AvgAbsDeviation(self.data, self.n, self.center)
-end
----@type number
-function StatObject:meanAbsDev()
-    return AvgAbsDeviation(self.data, self.n, self.mean)
-end
----@type number
-function StatObject:medianAbsDev()
-    return AvgAbsDeviation(self.data, self.n, self.median)
-end
----@type number
-function StatObject:modeAbsDev()
-    local center = self.mode
-    if type(center) == "table" then
-        center = Mean(center)
-    end
-    return AvgAbsDeviation(self.data, self.n, center)
-end
+---@class PopStatObjectNoCorrection : PopStatObject, StatObjectNormalCorrection
+PopStatObjectNormalCorrection = LazyCache(PopStatObject, StatObjectNormalCorrection) {} {}
+---@class SampStatObjectNoCorrection : PopStatObject, StatObjectNormalCorrection
+SampStatObjectNormalCorrection = LazyCache(SampStatObject, StatObjectNormalCorrection) {} {}
+

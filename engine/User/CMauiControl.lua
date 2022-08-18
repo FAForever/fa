@@ -92,7 +92,7 @@ end
 
 --- Sets the alpha of a given control, if children is true, also set children's alpha
 ---@param alpha number
----@param children boolean
+---@param children? boolean
 function CMauiControl:SetAlpha(alpha, children)
 end
 

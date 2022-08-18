@@ -39,3 +39,31 @@ function BaseLineLoop2(outerLoop, innerLoop)
     local final = timer()
     return final - start
 end
+
+
+function Quick(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local start = timer()
+
+    local d = 343.28329857
+    local MathMod = math.mod
+    local MathFloor = math.floor
+
+    for _ = 1, loop do
+        local randomness = 1
+        local truncDist = MathFloor(d)
+        if truncDist < 0 then
+            randomness = randomness * 4294967296
+        else
+            if MathMod(truncDist, 4) < 2 then
+                truncDist = truncDist + 2
+            else
+                truncDist = truncDist - 2
+            end
+            randomness = randomness * truncDist
+        end
+    end
+
+    local final = timer()
+    return final - start
+end
