@@ -882,7 +882,7 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     ---@param self FactoryUnit
-    ---@param unitBeingBuilt FactoryUnit
+    ---@param unitBeingBuilt Unit
     ---@param order boolean
     OnStartBuild = function(self, unitBeingBuilt, order)
         StructureUnit.OnStartBuild(self, unitBeingBuilt, order)
@@ -977,7 +977,7 @@ FactoryUnit = Class(StructureUnit) {
 
     ---#
     ---@param self FactoryUnit
-    ---@param target_bp UnitId
+    ---@param target_bp any
     ---@return boolean
     CheckBuildRestriction = function(self, target_bp)
         -- Check basic build restrictions first (Unit.CheckBuildRestriction but we only go up one inheritance level)
@@ -1638,7 +1638,7 @@ TransportBeaconUnit = Class(StructureUnit) {
     -- Invincibility!  (the only way to kill a transport beacon is
     -- to kill the transport unit generating it)
     ---@param self TransportBeaconUnit
-    ---@param instigator TransportBeaconUnit
+    ---@param instigator Unit
     ---@param amount integer
     ---@param vector Vector
     ---@param damageType string
@@ -1674,7 +1674,7 @@ MobileUnit = Class(Unit) {
 
     ---comment
     ---@param self MobileUnit
-    ---@param instigator MobileUnit
+    ---@param instigator Unit
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -1699,21 +1699,21 @@ MobileUnit = Class(Unit) {
 
     ---comment
     ---@param self MobileUnit
-    ---@param target MobileUnit
+    ---@param target Unit
     CreateReclaimEffects = function(self, target)
         EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
     ---comment
     ---@param self MobileUnit
-    ---@param target MobileUnit
+    ---@param target Unit
     CreateReclaimEndEffects = function(self, target)
         EffectUtil.PlayReclaimEndEffects(self, target)
     end,
 
     ---comment
     ---@param self MobileUnit
-    ---@param target MobileUnit
+    ---@param target Unit
     CreateCaptureEffects = function(self, target)
         EffectUtil.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
@@ -1730,8 +1730,8 @@ MobileUnit = Class(Unit) {
     end,
 
     ---@param self MobileUnit
-    ---@param new MobileUnit
-    ---@param old MobileUnit
+    ---@param new string
+    ---@param old string
     OnLayerChange = function(self, new, old)
         Unit.OnLayerChange(self, new, old)
 
@@ -1778,8 +1778,8 @@ WalkingLandUnit = Class(MobileUnit) {
 
     ---comment
     ---@param self WalkingLandUnit
-    ---@param new any
-    ---@param old any
+    ---@param new string
+    ---@param old string
     OnMotionHorzEventChange = function(self, new, old)
         MobileUnit.OnMotionHorzEventChange(self, new, old)
 
@@ -1866,8 +1866,8 @@ AirUnit = Class(MobileUnit) {
     end,
 
     ---@param self AirUnit
-    ---@param new AirUnit
-    ---@param old AirUnit
+    ---@param new string
+    ---@param old string
     OnMotionVertEventChange = function(self, new, old)
         MobileUnit.OnMotionVertEventChange(self, new, old)
 
@@ -1989,7 +1989,7 @@ AirUnit = Class(MobileUnit) {
 
     --- Called when the unit is killed, but before it falls out of the sky and blows up.
     ---@param self AirUnit
-    ---@param instigator AirUnit
+    ---@param instigator Unit
     ---@param type string
     ---@param overkillRatio any
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -2402,7 +2402,7 @@ SeaUnit = Class(MobileUnit){
 AircraftCarrier = Class(SeaUnit, BaseTransport) {
 
     ---@param self AircraftCarrier
-    ---@param instigator AircraftCarrier
+    ---@param instigator Unit
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -2821,7 +2821,7 @@ ACUUnit = Class(CommandUnit) {
     end,
 
     ---@param self ACUUnit
-    ---@param instigator ACUUnit
+    ---@param instigator Unit
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
