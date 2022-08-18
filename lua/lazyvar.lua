@@ -206,6 +206,7 @@ function Create(initial)
     if initial == nil then
         initial = 0
     end
+    ---@diagnostic disable-next-line:miss-symbol,unknown-symbol
     local result = {&4 initial} -- preallocate table with hashsize=4, arraysize=1
     setmetatable(result, LazyVarMetaTable)
     local used_by = {}

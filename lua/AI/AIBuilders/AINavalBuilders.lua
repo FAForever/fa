@@ -22,6 +22,7 @@ local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
 local SAI = '/lua/ScenarioPlatoonAI.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
+---@alias BuilderGroupsNaval 'NavalExpansionBuilders' | 'NavalExpansionBuilders HighPri' | 'EngineerNavalFactoryBuilder'
 
 -- For everything but Naval Rush
 BuilderGroup {

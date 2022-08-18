@@ -377,6 +377,7 @@ CAirUnit = Class(AirUnit) {}
 CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 
 -- CONSTRUCTION UNITS
+---@class CConstuctionUnit : ConstructionUnit
 CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 
     OnCreate = function(self)
@@ -448,6 +449,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 }
 
 -- ENERGY CREATION UNITS
+---@class CEnergyCreationUnit : EnergyCreationUnit
 CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         DefaultUnitsFile.EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
@@ -507,21 +509,27 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
 }
 
 -- LAND UNITS
+---@class CLandUnit : LandUnit
 CLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
+---@class CMassCollectionUnit : MassCollectionUnit
 CMassCollectionUnit = Class(DefaultUnitsFile.MassCollectionUnit) {}
 
 --  MASS FABRICATION UNITS
+---@class CMassFabricationUnit : MassFabricationUnit
 CMassFabricationUnit = Class(DefaultUnitsFile.MassFabricationUnit) {}
 
 --  MASS STORAGE UNITS
+---@class CMassStorageUnit : MassStorageUnit
 CMassStorageUnit = Class(DefaultUnitsFile.MassStorageUnit) {}
 
 -- RADAR STRUCTURES
+---@class CRadarUnit : RadarUnit
 CRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
 
 -- SONAR STRUCTURES
+---@class CSonarUnit : SonarUnit
 CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
@@ -604,15 +612,19 @@ CShieldStructureUnit = Class(ShieldStructureUnit) {}
 CStructureUnit = Class(StructureUnit) {}
 
 -- SUBMARINE UNITS
+---@class CSubUnit : SubUnit
 CSubUnit = Class(DefaultUnitsFile.SubUnit) {}
 
 -- TRANSPORT BEACON UNITS
+---@class CTransportBeaconUnit : TransportBeaconUnit
 CTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 
 -- WALKING LAND UNITS
+---@class CWalkingLandUnit : WalkingLandUnit
 CWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 -- WALL STRUCTURES
+---@class CWallStructureUnit : WallStructureUnit
 CWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES
@@ -818,6 +830,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
 
 -- CCommandUnit
 -- Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
+---@class CCommandUnit : CommandUnit
 CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
 
     OnCreate = function(self)

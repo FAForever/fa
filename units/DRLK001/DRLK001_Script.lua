@@ -10,6 +10,7 @@ local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaser
 local Effects = import('/lua/effecttemplates.lua')
 
+---@class DRLK001 : CWalkingLandUnit
 DRLK001 = Class(CWalkingLandUnit) {
     Weapons = {
         TargetPainter = Class(TargetingLaser) {
@@ -41,5 +42,4 @@ DRLK001 = Class(CWalkingLandUnit) {
         GroundGun = Class(CAANanoDartWeapon) {},
     },
 }
-
 TypeClass = DRLK001

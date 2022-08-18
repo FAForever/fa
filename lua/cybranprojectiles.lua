@@ -63,8 +63,10 @@ CDFBrackmanHackPegProjectile02 = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  CYBRAN PROTON PROJECTILES
 --------------------------------------------------------------------------
+
+-- T3 strategic bomber
 ---@class CIFProtonBombProjectile : NullShell
-CIFProtonBombProjectile = Class(NullShell) { -- T3 strategic bomber
+CIFProtonBombProjectile = Class(NullShell) {
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.CProtonBombHit01,
     FxImpactProp = EffectTemplate.CProtonBombHit01,
@@ -322,8 +324,10 @@ CDFTrackerProjectile = Class(SingleCompositeEmitterProjectile) {
 --------------------------------------------------------------------------
 --  DISINTEGRATOR LASER PROJECILE
 --------------------------------------------------------------------------
+
+--loya & wailers
 ---@class CDisintegratorLaserProjectile : MultiPolyTrailProjectile
-CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) { --loya & wailers
+CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) {
     PolyTrails = {
         '/effects/emitters/disintegrator_polytrail_04_emit.bp',
         '/effects/emitters/disintegrator_polytrail_05_emit.bp',
@@ -361,8 +365,10 @@ CDisintegratorLaserProjectile02 = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  CYBRAN ELECTRON BOLTER PROJECILES
 --------------------------------------------------------------------------
+
+-- loya, wagner, monkeylord & soul ripper
 ---@class CElectronBolterProjectile : MultiPolyTrailProjectile
-CElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- loya, wagner, monkeylord & soul ripper
+CElectronBolterProjectile = Class(MultiPolyTrailProjectile) {
 
     PolyTrails = {
         '/effects/emitters/electron_bolter_trail_02_emit.bp',
@@ -377,8 +383,9 @@ CElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- loya, wagner, m
     FxImpactLand = EffectTemplate.CElectronBolterHitLand01,
 }
 
+-- SoulRipper
 ---@class CHeavyElectronBolterProjectile : MultiPolyTrailProjectile
-CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- SR
+CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) {
 
     PolyTrails = {
         '/effects/emitters/electron_bolter_trail_01_emit.bp',
@@ -406,6 +413,7 @@ CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- SR
 --------------------------------------------------------------------------
 --  TERRAN SUB-LAUNCHED CRUISE MISSILE PROJECTILES
 --------------------------------------------------------------------------
+---@class CEMPFluxWarheadProjectile : NukeProjectile
 CEMPFluxWarheadProjectile = Class(NukeProjectile, SingleBeamProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
     FxInitialAtEntityEmitter = {},
@@ -482,8 +490,10 @@ CIFMolecularResonanceShell = Class(SinglePolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  IRIDIUM ROCKET PROJECTILES
 --------------------------------------------------------------------------
+
+-- T2 gs & SR & hoplite
 ---@class CIridiumRocketProjectile : SingleCompositeEmitterProjectile
-CIridiumRocketProjectile = Class(SingleCompositeEmitterProjectile) { -- T2 gs & SR & hoplite
+CIridiumRocketProjectile = Class(SingleCompositeEmitterProjectile) {
     FxTrails = {},
     PolyTrail = '/effects/emitters/cybran_iridium_missile_polytrail_01_emit.bp',
     BeamName = '/effects/emitters/rocket_iridium_exhaust_beam_01_emit.bp',
@@ -560,8 +570,10 @@ CHeavyLaserProjectile2 = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  CYBRAN MOLECULAR CANNON PROJECTILE
 --------------------------------------------------------------------------
+
+-- ACU
 ---@class CMolecularCannonProjectile : SinglePolyTrailProjectile
-CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) { -- ACU
+CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
     PolyTrail = '/effects/emitters/default_polytrail_03_emit.bp',
     FxTrails = EffectTemplate.CMolecularCannon01,
@@ -695,8 +707,10 @@ CRailGunProjectile = Class(EmitterProjectile) {
 --------------------------------------------------------------------------
 --  CYBRAN ROCKET PROJECILES
 --------------------------------------------------------------------------
+
+-- wagner
 ---@class CRocketProjectile : SingleBeamProjectile
-CRocketProjectile = Class(SingleBeamProjectile) { -- wagner
+CRocketProjectile = Class(SingleBeamProjectile) {
     -- Emitter Values
     BeamName = '/effects/emitters/rocket_iridium_exhaust_beam_01_emit.bp',
 
@@ -921,8 +935,9 @@ CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
 --
 --------------------------------------------------------------------------
 
+-- Brick
 ---@class CHeavyDisintegratorPulseLaser : MultiPolyTrailProjectile
-CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) { -- Brick
+CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) {
     PolyTrails = {
         '/effects/emitters/disintegrator_polytrail_02_emit.bp',
         '/effects/emitters/disintegrator_polytrail_03_emit.bp',

@@ -564,10 +564,14 @@ function IsInvalidAssist(unit, target)
 end
 
 Callbacks.AttackMove = function(data, units)
+    LOG("AttackMove")
+    -- exclude structures as it makes no sense to apply a move command to them
+    local allNonStructures = EntityCategoryFilterDown(categories.ALLUNITS - categories.STRUCTURE, units)
+
     if data.Clear then
-        IssueClearCommands(units)
+        IssueClearCommands(allNonStructures)
     end
-    IssueAggressiveMove(units, data.Target)
+    IssueAggressiveMove(allNonStructures, data.Target)
 end
 
 --tells a unit to toggle its pointer
