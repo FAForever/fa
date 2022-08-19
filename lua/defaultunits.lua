@@ -784,7 +784,7 @@ FactoryUnit = Class(StructureUnit) {
         StructureUnit.OnStartBuild(self, unitBeingBuilt, order)
 
         -- related to HQ systems
-        if self.Cache.HashedCats["RESEARCH"] then
+        if self.Blueprint.CategoriesHash["RESEARCH"] then
             if EntityCategoryContains(categories.RESEARCH, self) then
                 unitBeingBuilt.UpgradedHQFromTech = self.techCategory
             end
@@ -794,7 +794,7 @@ FactoryUnit = Class(StructureUnit) {
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
-        elseif unitBeingBuilt.Blueprint.CategoriesHash.RESEARCH then
+        elseif unitBeingBuilt.Blueprint.CategoriesHash["RESEARCH"] then
             -- Removes assist command to prevent accidental cancellation when right-clicking on other factory
             self:RemoveCommandCap('RULEUCC_Guard')
             self.DisabledAssist = true
@@ -822,7 +822,7 @@ FactoryUnit = Class(StructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
 
-        if self.Cache.HashedCats["RESEARCH"] then
+        if self.Blueprint.CategoriesHash["RESEARCH"] then
             -- if we're an upgrade then remove the HQ we came from
             if self.UpgradedHQFromTech then
                 self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.UpgradedHQFromTech)
