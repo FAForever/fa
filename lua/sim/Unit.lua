@@ -347,7 +347,7 @@ Unit = Class(moho.unit_methods) {
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
         -- add support for keeping track of reclaim statistics
-        if utilities.SelectBit(bp.General.CommandCaps, 20) then -- RULEUCC_Reclaim
+        if utilities.SelectBit(tonumber(bp.General.CommandCaps), 20) then -- RULEUCC_Reclaim
             self.ReclaimedMass = 0
             self.ReclaimedEnergy = 0
             self:GetStat("ReclaimedMass", 0)
