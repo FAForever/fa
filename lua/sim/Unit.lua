@@ -792,8 +792,9 @@ Unit = Class(moho.unit_methods) {
         if self.OnStartReclaimPropStartTick then
             local ticks = (GetGameTick() - self.OnStartReclaimPropStartTick)
 
-            -- completely consumed this prop
+            -- can end up negative if another engineer finishes reclaiming the prop between us starting to reclaim, and actually reclaiming
             if ticks > 0 then
+                -- completely consumed this prop
                 if ticks >= self.OnStartReclaimPropTicksRequired then
                     self.ReclaimedMass = self.ReclaimedMass + self.OnStartReclaimPropMass
                     self.ReclaimedEnergy = self.ReclaimedEnergy + self.OnStartReclaimPropEnergy
