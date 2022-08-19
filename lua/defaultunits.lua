@@ -1590,14 +1590,12 @@ QuantumGateUnit = Class(FactoryUnit) { }
 ---@class MobileUnit : Unit
 MobileUnit = Class(Unit) {
 
-    -- Added for engymod. When created, units must re-check their build restrictions
     ---@param self MobileUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:SetFireState(FireState.GROUND_FIRE)
     end,
 
-    ---comment
     ---@param self MobileUnit
     ---@param instigator Unit
     ---@param type string
@@ -1611,7 +1609,6 @@ MobileUnit = Class(Unit) {
         end
     end,
 
-    ---comment
     ---@param self MobileUnit
     ---@param builder Unit
     ---@param layer string
