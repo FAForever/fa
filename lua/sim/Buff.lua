@@ -216,6 +216,9 @@ function ApplyBuff(unit, buffName, instigator)
 end
 
 --Function to do work on the buff.  Apply it over time and in pulses.
+---@param unit Unit
+---@param buffName string
+---@param instigator Unit
 function BuffWorkThread(unit, buffName, instigator)
     local buffTable = Buffs[buffName]
 
@@ -485,6 +488,12 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
 end
 
 --- Seraphim regen field buff computations
+---@param unit Unit
+---@param buffName string
+---@param affectType string
+---@param initialVal integer
+---@param initialBool boolean
+---@return number, boolean
 local BuffRegenFieldCalculate = function (unit, buffName, affectType, initialVal, initialBool)
 
     local adds = 0
@@ -670,6 +679,10 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 end
 
 --Removes buffs
+---@param unit Unit
+---@param buffName string
+---@param removeAllCounts any
+---@param instigator Unit
 function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     local def = Buffs[buffName]
     local unitBuff = unit.Buffs.BuffTable[def.BuffType][buffName]
@@ -720,6 +733,9 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     BuffAffectUnit(unit, buffName, unit, true)
 end
 
+---@param unit Unit
+---@param buffName string
+---@return boolean
 function HasBuff(unit, buffName)
     local def = Buffs[buffName]
     if not def then
@@ -728,6 +744,9 @@ function HasBuff(unit, buffName)
     return unit.Buffs.BuffTable[def.BuffType][buffName] ~= nil
 end
 
+---@param unit Unit
+---@param buffName string
+---@param trsh any - is this the TrashBag ?
 function PlayBuffEffect(unit, buffName, trsh)
     local def = Buffs[buffName]
     if not def.Effects then
