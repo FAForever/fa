@@ -190,6 +190,11 @@ local function PostProcessUnit(unit)
             end
         end
     end
+
+    -- # Fix being able to check for command caps
+
+    unit.General.CommandCapsHash = table.deepcopy(unit.General.CommandCaps)
+
 end
 
 --- Post-processes all units
