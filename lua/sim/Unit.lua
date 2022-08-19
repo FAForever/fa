@@ -284,13 +284,7 @@ Unit = Class(moho.unit_methods) {
         self.IdleEffectsBag = TrashBag()
         self.TopSpeedEffectsBag = TrashBag()
         self.BeamExhaustEffectsBag = TrashBag()
-        self.TransportBeamEffectsBag = TrashBag()
-        self.BuildEffectsBag = TrashBag()
-        self.ReclaimEffectsBag = TrashBag()
         self.OnBeingBuiltEffectsBag = TrashBag()
-        self.CaptureEffectsBag = TrashBag()
-        self.UpgradeEffectsBag = TrashBag()
-        self.TeleportFxBag = TrashBag()
 
         -- Set up veterancy
         self.xp = 0
@@ -624,10 +618,12 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StartCaptureEffects = function(self, target)
+        self.CaptureEffectsBag = self.CaptureEffectsBag or TrashBag()
         self.CaptureEffectsBag:Add(self:ForkThread(self.CreateCaptureEffects, target))
     end,
 
     CreateCaptureEffects = function(self, target)
+        EffectUtilities.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
 
     StopCaptureEffects = function(self, target)
@@ -767,13 +763,16 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StartReclaimEffects = function(self, target)
+        self.ReclaimEffectsBag = self.ReclaimEffectsBag or TrashBag()
         self.ReclaimEffectsBag:Add(self:ForkThread(self.CreateReclaimEffects, target))
     end,
 
     CreateReclaimEffects = function(self, target)
+        EffectUtilities.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
     CreateReclaimEndEffects = function(self, target)
+        EffectUtilities.PlayReclaimEndEffects(self, target)
     end,
 
     StopReclaimEffects = function(self, target)
@@ -1971,7 +1970,10 @@ Unit = Class(moho.unit_methods) {
         TrashDestroy(self.IdleEffectsBag)
         TrashDestroy(self.TopSpeedEffectsBag)
         TrashDestroy(self.BeamExhaustEffectsBag)
-        TrashDestroy(self.TransportBeamEffectsBag)
+
+        if self.TransportBeamEffectsBag then 
+            self.TransportBeamEffectsBag:Destroy()
+        end
 
         -- destroy remaining trash of weapon
         for k = 1, self.WeaponCount do 
@@ -2575,6 +2577,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBuild = function(self, built, order)
+
+        self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
+
         -- Prevent UI mods from violating game/scenario restrictions
         local id = built.UnitId
         local bp = built:GetBlueprint()
@@ -3124,6 +3129,8 @@ Unit = Class(moho.unit_methods) {
         local bp = self.Blueprint.Enhancements[enhancement]
         local effects = TrashBag()
         local scale = math.min(4, math.max(1, (bp.BuildCostEnergy / bp.BuildTime or 1) / 50))
+
+        self.UpgradeEffectsBag = self.UpgradeEffectsBag or TrashBag()
 
         if bp.UpgradeEffectBones then
             for _, v in bp.UpgradeEffectBones do
@@ -4109,6 +4116,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
+        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
         TrashAdd(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
@@ -4276,22 +4284,27 @@ Unit = Class(moho.unit_methods) {
     end,
 
     PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
     end,
 
     CleanupTeleportChargeEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.DestroyTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     CleanupRemainingTeleportChargeEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.DestroyRemainingTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportOutEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportOutEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportInEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportInEffects(self, self.TeleportFxBag)
     end,
 
