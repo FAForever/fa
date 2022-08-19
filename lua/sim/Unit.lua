@@ -793,15 +793,17 @@ Unit = Class(moho.unit_methods) {
             local ticks = (GetGameTick() - self.OnStartReclaimPropStartTick)
 
             -- completely consumed this prop
-            if ticks >= self.OnStartReclaimPropTicksRequired then
-                self.ReclaimedMass = self.ReclaimedMass + self.OnStartReclaimPropMass
-                self.ReclaimedEnergy = self.ReclaimedEnergy + self.OnStartReclaimPropEnergy
-                
-            -- partially consumed the prop
-            else
-                local fraction = ticks / self.OnStartReclaimPropTicksRequired
-                self.ReclaimedMass = self.ReclaimedMass + fraction * self.OnStartReclaimPropMass
-                self.ReclaimedEnergy = self.ReclaimedEnergy + fraction * self.OnStartReclaimPropEnergy
+            if ticks > 0 then
+                if ticks >= self.OnStartReclaimPropTicksRequired then
+                    self.ReclaimedMass = self.ReclaimedMass + self.OnStartReclaimPropMass
+                    self.ReclaimedEnergy = self.ReclaimedEnergy + self.OnStartReclaimPropEnergy
+                    
+                -- partially consumed the prop
+                else
+                    local fraction = ticks / self.OnStartReclaimPropTicksRequired
+                    self.ReclaimedMass = self.ReclaimedMass + fraction * self.OnStartReclaimPropMass
+                    self.ReclaimedEnergy = self.ReclaimedEnergy + fraction * self.OnStartReclaimPropEnergy
+                end
             end
 
             -- update UI
