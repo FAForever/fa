@@ -141,7 +141,7 @@ local statFuncs = {
             local armyData = GetArmiesTable().armiesTable[info.armyIndex+1]
             local icon = Factions.Factions[armyData.faction+1].Icon
             if armyData.showScore and icon then
-                return string.sub(armyData.nickname, 30), UIUtil.UIFile(icon), armyData.color
+                return string.sub(armyData.nickname, 1, 12), UIUtil.UIFile(icon), armyData.color
             else
                 return false
             end
@@ -392,19 +392,6 @@ function UpdateWindow(info)
             controls.shieldBar:SetValue(info.shieldRatio)
         else
             controls.shieldBar:Hide()
-            if info.entityId then
-                local reclaimedMass, reclaimedEnergy
-                local unit = GetUnitById(info.entityId)
-                if unit then
-                    reclaimedMass = unit:GetStat('ReclaimedMass').Value
-                    reclaimedEnergy = unit:GetStat('ReclaimedEnergy').Value
-                end
-                if reclaimedMass or reclaimedEnergy then
-                    controls.ReclaimGroup:Show()
-                    controls.ReclaimGroup.MassText:SetText(tostring(reclaimedMass or 0))
-                    controls.ReclaimGroup.EnergyText:SetText(tostring(reclaimedEnergy or 0))
-                end
-            end
         end
 
         if info.fuelRatio > 0 then
@@ -515,6 +502,20 @@ function UpdateWindow(info)
                     controls.nextVet:SetText(text)
                 else
                     controls.vetBar:Hide()
+                end
+            end
+        else
+            if info.entityId then
+                local reclaimedMass, reclaimedEnergy
+                local unit = GetUnitById(info.entityId)
+                if unit then
+                    reclaimedMass = unit:GetStat('ReclaimedMass').Value
+                    reclaimedEnergy = unit:GetStat('ReclaimedEnergy').Value
+                end
+                if reclaimedMass or reclaimedEnergy then
+                    controls.ReclaimGroup:Show()
+                    controls.ReclaimGroup.MassText:SetText(tostring(reclaimedMass or 0))
+                    controls.ReclaimGroup.EnergyText:SetText(tostring(reclaimedEnergy or 0))
                 end
             end
         end
