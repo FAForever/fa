@@ -91,11 +91,6 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
     -- do not gift insignificant units
     units = EntityCategoryFilterDown(categories.ALLUNITS - categories.INSIGNIFICANTUNIT, units)
 
-    for k, unit in units do 
-        LOG("UnitId: " .. unit.Blueprint.BlueprintId)
-        LOG("Is finished: " .. unit:GetFractionComplete())
-    end
-
     -- gift most valuable units first
     table.sort(units, TransferUnitsOwnershipComparator)
 
