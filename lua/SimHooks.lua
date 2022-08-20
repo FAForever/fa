@@ -68,3 +68,17 @@ do
         oldDrawLinePop(a, b, color)
     end 
 end
+
+do 
+
+    -- do not allow command units to be given
+    local oldChangeUnitArmy = _G.ChangeUnitArmy
+    _G.ChangeUnitArmy = function(unit, army)
+        if unit.Blueprint.CategoriesHash["COMMAND"] then 
+            return nil
+        end
+
+        return oldChangeUnitArmy(unit, army)
+    end
+
+end
