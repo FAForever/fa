@@ -91,6 +91,11 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
     -- do not gift insignificant units
     units = EntityCategoryFilterDown(categories.ALLUNITS - categories.INSIGNIFICANTUNIT, units)
 
+    for k, unit in units do 
+        LOG("UnitId: " .. unit.Blueprint.BlueprintId)
+        LOG("Is finished: " .. unit:GetFractionComplete())
+    end
+
     -- gift most valuable units first
     table.sort(units, TransferUnitsOwnershipComparator)
 
@@ -106,7 +111,8 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         -- Units currently being captured is also denied
         local disallowTransfer = owner == ToArmyIndex or
                                  v:GetParent() ~= v or (v.Parent and v.Parent ~= v) or
-                                 v.CaptureProgress > 0
+                                 v.CaptureProgress > 0 or
+                                 v:GetFractionComplete() < 1.0
 
         if disallowTransfer then
             continue
