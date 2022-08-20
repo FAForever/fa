@@ -1409,13 +1409,21 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     -- Kill the beam if hold fire is requested
     WatchForHoldFire = function(self, beam)
         local unit = self.unit
-        while true do
-            WaitSeconds(1)
-            --if we're at hold fire, stop beam
-            if self.unit and (self.unit:GetFireState() == 1) then
+        local hasTargetPrev = true
+        while not (IsDestroyed(self) or IsDestroyed(unit)) do
+
+            local hasTarget = self:GetCurrentTarget() != nil
+            if   -- check for hold fire
+                (unit:GetFireState() == 1) or
+                 -- check if we have a target still, relevant for beam weapons that work indefinitely
+                (not (hasTarget or hasTargetPrev))
+            then
                 self.BeamStarted = false
                 self:PlayFxBeamEnd(beam)
             end
+
+            hasTargetPrev = hasTarget
+            WaitSeconds(0.5)
         end
     end,
 

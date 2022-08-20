@@ -297,6 +297,14 @@ Unit = Class(moho.unit_methods) {
             AIUtils.ApplyCheatBuffs(self)
         end
 
+        -- add support for keeping track of reclaim statistics
+        if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
+            self.ReclaimedMass = 0
+            self.ReclaimedEnergy = 0
+            self:GetStat("ReclaimedMass", 0)
+            self:GetStat("ReclaimedEnergy", 0)
+        end
+        
         -- Jamming functionality
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
@@ -305,7 +313,6 @@ Unit = Class(moho.unit_methods) {
 
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
-        
     end,
 
     -------------------------------------------------------------------------------------------
@@ -587,7 +594,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopCaptureEffects = function(self, target)
-        self.CaptureEffectsBag:Destroy()
+        if self.CaptureEffectsBag then
+            self.CaptureEffectsBag:Destroy()
+        end
     end,
 
     OnFailedCapture = function(self, target)
@@ -693,6 +702,9 @@ Unit = Class(moho.unit_methods) {
     OnStopRepair = function(self, unit)
     end,
 
+    ---comment
+    ---@param self any
+    ---@param target any
     OnStartReclaim = function(self, target)
         self:SetUnitState('Reclaiming', true)
         self:SetFocusEntity(target)
@@ -709,17 +721,61 @@ Unit = Class(moho.unit_methods) {
             IssueReclaim({self}, target)
             IssueGuard({self}, guard)
         end
+
+        -- add state to be able to show the amount reclaimed in the UI
+        if target.IsProp then
+            self.OnStartReclaimPropStartTick = GetGameTick() + 2
+
+            local time, energy, mass = target:GetReclaimCosts(self)
+            self.OnStartReclaimPropTicksRequired = 10 * time
+            self.OnStartReclaimPropMass = mass
+            self.OnStartReclaimPropEnergy = energy
+        end
     end,
 
+    --- Called when the unit stops reclaiming
+    ---@param self Unit
+    ---@param target Unit | Prop | nil      # is nil when the prop or unit is completely reclaimed
     OnStopReclaim = function(self, target)
         self:DoUnitCallbacks('OnStopReclaim', target)
         self:StopReclaimEffects(target)
         self:StopUnitAmbientSound('ReclaimLoop')
         self:PlayUnitSound('StopReclaim')
         self:SetUnitState('Reclaiming', false)
-        if target.MaxMassReclaim then -- This is a prop
+
+        if target.IsProp then -- This is a prop
             target:UpdateReclaimLeft()
         end
+
+        -- process the amount we reclaimed to show it in the UI
+        if self.OnStartReclaimPropStartTick then
+            local ticks = (GetGameTick() - self.OnStartReclaimPropStartTick)
+
+            -- can end up negative if another engineer finishes reclaiming the prop between us starting to reclaim, and actually reclaiming
+            if ticks > 0 then
+                -- completely consumed this prop
+                if ticks >= self.OnStartReclaimPropTicksRequired then
+                    self.ReclaimedMass = self.ReclaimedMass + self.OnStartReclaimPropMass
+                    self.ReclaimedEnergy = self.ReclaimedEnergy + self.OnStartReclaimPropEnergy
+                    
+                -- partially consumed the prop
+                else
+                    local fraction = ticks / self.OnStartReclaimPropTicksRequired
+                    self.ReclaimedMass = self.ReclaimedMass + fraction * self.OnStartReclaimPropMass
+                    self.ReclaimedEnergy = self.ReclaimedEnergy + fraction * self.OnStartReclaimPropEnergy
+                end
+            end
+
+            -- update UI
+            self:SetStat('ReclaimedMass', self.ReclaimedMass)
+            self:SetStat('ReclaimedEnergy', self.ReclaimedEnergy)
+        end
+
+        -- reset reclaiming state
+        self.OnStartReclaimPropStartTick = nil
+        self.OnStartReclaimPropTicksRequired = nil
+        self.OnStartReclaimPropMass = nil
+        self.OnStartReclaimPropEnergy = nil
     end,
 
     StartReclaimEffects = function(self, target)
@@ -736,7 +792,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopReclaimEffects = function(self, target)
-        self.ReclaimEffectsBag:Destroy()
+        if self.ReclaimEffectsBag then
+            self.ReclaimEffectsBag:Destroy()
+        end
     end,
 
     OnDecayed = function(self)
@@ -2649,7 +2707,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopBuildingEffects = function(self, built)
-        self.BuildEffectsBag:Destroy()
+        if self.BuildEffectsBag then
+            self.BuildEffectsBag:Destroy()
+        end
 
         -- kept after --3355 for backwards compatibility with mods
         if self.buildBots then

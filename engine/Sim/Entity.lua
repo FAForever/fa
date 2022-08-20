@@ -5,6 +5,7 @@ local Entity = {}
 ---@alias Army number | string
 ---@alias EntityId number
 ---@alias EntityVisionType 'Intel' | 'Never' | 'Always' | 'Vision'
+---@alias EntityIntelTypes 'Radar' | 'Sonar' | 'Cloak' | 'CloakField' | 'Spoof' | 'RadarStealth' | 'RadarStealthField' | 'SonarStealth' | 'SonarStealthField'
 
 --- Does not appear to be used
 ---@unknown
