@@ -106,7 +106,8 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         -- Units currently being captured is also denied
         local disallowTransfer = owner == ToArmyIndex or
                                  v:GetParent() ~= v or (v.Parent and v.Parent ~= v) or
-                                 v.CaptureProgress > 0
+                                 v.CaptureProgress > 0 or
+                                 v:GetFractionComplete() < 1.0
 
         if disallowTransfer then
             continue
