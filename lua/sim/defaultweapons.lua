@@ -205,6 +205,9 @@ DefaultProjectileWeapon = Class(Weapon) {
                 }
                 self.CurrentSalvoData = data
             else
+                if not targetPos then
+                    return 4.75
+                end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
                 -- otherwise, do the same calculation but skip any cache or salvo logic
                 if target.Dead then
@@ -236,7 +239,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         -- check if we lost the target (or if we previously did; regaining a target mid-run shouldn't
         -- suddenly divert some of the bombs)
-        if target.Dead or data.usestore then
+        if target.Dead or data.usestore or not targetPos then
             -- use same acceleration as last bomb
             data.usestore = true
             return data.lastAccel
