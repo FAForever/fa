@@ -58,9 +58,9 @@ ADFTractorClaw = Class(Weapon) {
     BeamFx = { EffectTemplate.ACollossusTractorBeam01 },
 
     SliderVelocity = {
-        TECH3 = 12,
-        TECH2 = 15,
-        TECH1 = 18,
+        TECH3 = 10,
+        TECH2 = 13,
+        TECH1 = 16,
     },
 
     --- Adds logic to catch edge cases
@@ -210,7 +210,7 @@ ADFTractorClaw = Class(Weapon) {
             -- make it stop what it was doing
             IssueClearCommands({target})
 
-            local velocity = self.SliderVelocity[target.Blueprint.TechCategory] or 15
+            local velocity = self.SliderVelocity[target.Blueprint.TechCategory] or 13
 
             -- start pulling back the slider
             slider:SetSpeed(velocity)
