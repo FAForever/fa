@@ -744,8 +744,8 @@ FactoryUnit = Class(StructureUnit) {
         if self.Blueprint.CategoriesHash["RESEARCH"] then
 
             -- update internal state
-            self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-            self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+            self.Brain:RemoveHQ(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, self.Blueprint.TechCategory)
+            self.Brain:SetHQSupportFactoryRestrictions(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory)
 
             -- update all units affected by this
             local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
@@ -786,7 +786,7 @@ FactoryUnit = Class(StructureUnit) {
         -- related to HQ systems
         if self.Cache.HashedCats["RESEARCH"] then
             if EntityCategoryContains(categories.RESEARCH, self) then
-                unitBeingBuilt.UpgradedHQFromTech = self.techCategory
+                unitBeingBuilt.UpgradedHQFromTech = self.Blueprint.TechCategory
             end
         end
 
@@ -825,12 +825,12 @@ FactoryUnit = Class(StructureUnit) {
         if self.Cache.HashedCats["RESEARCH"] then
             -- if we're an upgrade then remove the HQ we came from
             if self.UpgradedHQFromTech then
-                self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.UpgradedHQFromTech)
+                self.Brain:RemoveHQ(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, self.UpgradedHQFromTech)
             end
 
             -- update internal state
-            self.Brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
-            self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+            self.Brain:AddHQ(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, self.Blueprint.TechCategory)
+            self.Brain:SetHQSupportFactoryRestrictions(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory)
 
             -- update all units affected by this
             local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
@@ -1614,7 +1614,7 @@ MobileUnit = Class(Unit) {
     ---@param layer string
     StartBeingBuiltEffects = function(self, builder, layer)
         Unit.StartBeingBuiltEffects(self, builder, layer)
-        if self.factionCategory == 'UEF' then
+        if self.Blueprint.FactionCategory == 'UEF' then
             EffectUtil.CreateUEFUnitBeingBuiltEffects(self, builder, self.OnBeingBuiltEffectsBag)
         end
     end,

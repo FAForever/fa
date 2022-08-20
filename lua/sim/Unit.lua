@@ -43,7 +43,7 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 local DeprecatedWarnings = { }
 
 -- Structures that are reused for performance reasons
--- Maps unit.techCategory to a number so we can do math on it for naval units
+-- Maps unit.Blueprint.TechCategory to a number so we can do math on it for naval units
 local veterancyTechLevels = {
     TECH1 = 1,
     TECH2 = 2,
@@ -125,7 +125,6 @@ Unit = Class(moho.unit_methods) {
     -- kept for backwards compatibility, these default to true
     CanTakeDamage = true,
     CanBeKilled = true,
-    ProductionEnabled = true,
 
     GetSync = function(self)
         if not Sync.UnitData[self.EntityId] then
@@ -202,9 +201,6 @@ Unit = Class(moho.unit_methods) {
         -- cache often accessed values into inner table
         self.Blueprint = bp
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
-        self.techCategory = bp.TechCategory
-        self.layerCategory = bp.LayerCategory
-        self.factionCategory = bp.FactionCategory
         self.MovementEffects = bp.Display.MovementEffects
         self.Audio = bp.Audio
 
@@ -382,8 +378,8 @@ Unit = Class(moho.unit_methods) {
     UpdateBuildRestrictions = function(self)
 
         -- retrieve info of factory
-        local faction = self.factionCategory
-        local layer = self.layerCategory
+        local faction = self.Blueprint.FactionCategory
+        local layer = self.Blueprint.LayerCategory
         local aiBrain = self:GetAIBrain()
 
         -- the pessimists we are, remove all the units!
@@ -1417,7 +1413,7 @@ Unit = Class(moho.unit_methods) {
 
         if not Buffs[regenBuffName] then
             -- Get techLevel as a number to do math on it
-            local techLevel = veterancyTechLevels[self.techCategory] or 1
+            local techLevel = veterancyTechLevels[self.Blueprint.TechCategory] or 1
 
             -- Treat naval units as one level higher
             if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
@@ -2190,7 +2186,7 @@ Unit = Class(moho.unit_methods) {
                     EXPERIMENTAL = 2,
                     COMMAND = 2,
                 }
-                local defaultMult = techMultipliers[self.techCategory] or 2
+                local defaultMult = techMultipliers[self.Blueprint.TechCategory] or 2
 
                 self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
             end
@@ -2291,7 +2287,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Don't try sending a Notify message from here if we're an ACU
-        if self.techCategory ~= 'COMMAND' then
+        if self.Blueprint.TechCategory ~= 'COMMAND' then
             self:SendNotifyMessage('completed')
         end
 
@@ -4316,7 +4312,7 @@ Unit = Class(moho.unit_methods) {
             if not source then
                 local bp = self.Blueprint
                 if bp.CategoriesHash.RESEARCH then
-                    unitType = string.lower('research' .. self.layerCategory .. self.techCategory)
+                    unitType = string.lower('research' .. self.Blueprint.LayerCategory .. self.Blueprint.TechCategory)
                     category = 'tech'
                 elseif EntityCategoryContains(categories.NUKE * categories.STRUCTURE - categories.EXPERIMENTAL, self) then -- Ensure to exclude Yolona Oss, which gets its own message
                     unitType = 'nuke'
@@ -4324,7 +4320,7 @@ Unit = Class(moho.unit_methods) {
                 elseif EntityCategoryContains(categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY, self) then
                     unitType = 'arty'
                     category = 'other'
-                elseif self.techCategory == 'EXPERIMENTAL' then
+                elseif self.Blueprint.TechCategory == 'EXPERIMENTAL' then
                     unitType = bp.BlueprintId
                     category = 'experimentals'
                 else
@@ -4332,7 +4328,7 @@ Unit = Class(moho.unit_methods) {
                 end
             else -- We are being called from the Enhancements chain (ACUs)
                 id = self.EntityId
-                category = string.lower(self.factionCategory)
+                category = string.lower(self.Blueprint.FactionCategory)
             end
 
             if trigger == 'transferred' then

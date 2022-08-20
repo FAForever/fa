@@ -232,7 +232,7 @@ Callbacks.CapStructure = function(data, units)
         -- make sure we're allowed to mess with this unit, if not we exclude
         if unit.Army and OkayToMessWithArmy(unit.Army) then 
             -- compute blueprint id
-            local faction = unit.factionCategory
+            local faction = unit.Blueprint.FactionCategory
             local blueprintID = ConstructBlueprintID(faction, data.id)
 
             -- check if this unit can build it
