@@ -602,7 +602,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopCaptureEffects = function(self, target)
-        self.CaptureEffectsBag:Destroy()
+        if self.CaptureEffectsBag then
+            self.CaptureEffectsBag:Destroy()
+        end
     end,
 
     OnFailedCapture = function(self, target)
@@ -798,7 +800,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopReclaimEffects = function(self, target)
-        self.ReclaimEffectsBag:Destroy()
+        if self.ReclaimEffectsBag then
+            self.ReclaimEffectsBag:Destroy()
+        end
     end,
 
     OnDecayed = function(self)
@@ -2699,7 +2703,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopBuildingEffects = function(self, built)
-        self.BuildEffectsBag:Destroy()
+        if self.BuildEffectsBag then
+            self.BuildEffectsBag:Destroy()
+        end
 
         -- kept after --3355 for backwards compatibility with mods
         if self.buildBots then
