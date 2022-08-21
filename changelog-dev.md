@@ -35,8 +35,16 @@
     Could occasionally cause a game crash
 
 - (#4078) Adjust collision hitboxes of all transports
-    Allows their cargo to receive (splash) damage more consistently and makes the transports easier to 
+    Allows their cargo to receive (splash) damage more consistently and makes the transports easier to
     hit when they are landed.
+
+- (#4082, #4083, #4084) Fix target bones - Seraphim Land units 
+    Similar to #4058 and #4063, makes these units easier and more consistent to hit when firing with
+    beam weapons.
+
+- (#4093) Add guard to check if dummy weapon of shields are de-allocated
+
+- (#4088) Fix stack overflow in UI when units are assisting each other
 
 ## Features
 
@@ -139,6 +147,9 @@
 
 - (#4033) Reduce amount of trees on fire at the start of the game  
 
+- (#4070, #4100) Add unit utilities
+    Step-up work to make sacrifice work properly again
+
 ## Campaign
 
 - (32d97d, f555cb, 5d0802, 4ad7f8) Various small improvements to the campaign AI (base managers)
@@ -173,15 +184,20 @@
 - (09a829) Improve TransportPool
     Adds MoveRoute and MoveChain to add more control over movingthe transports
 
+- (#4092) Fix the guard return radius of naval units  
+    Prevents them from wandering off, taking on quests - finding loot and end up dying because they're on their own chasing
+    their dreams.
+
 ## Contributors
 
-Hdt80bro: #3936, #3995, #4000, #3995, #4049, #4050, #4053, #4041, #4047, #4055, #4054, #4071, #4051, #4052, #4056, #4079, #4057, #4065
+Hdt80bro: #3936, #3995, #4000, #3995, #4049, #4050, #4053, #4041, #4047, #4055, #4054, #4071, #4051, #4052, #4056, #4079, #4057, #4065, #4070
 Rowey: #3932, #3971
 Maudlin: #3952, #4032, #4030, #4029, #4028, #4036
 Uveso: #3851, #4080
 speed2: 7ff888, 32d97d, f555cb, 5d0802, 4ad7f8, 439757, 26bcee, fa1448, 8e167b, 945df8, f65240, 8793ef, 09a829
-Jip: #4011, #4003, #4016, #4009, #4021, #4023, #4033, #4040, #4044, #3893, #4058, #4039, #4034, #4074
+Jip: #4011, #4003, #4016, #4009, #4021, #4023, #4033, #4040, #4044, #3893, #4058, #4039, #4034, #4074, #4082, #4083, #4084, #4093, #4100
 Ejsstiil: #4002
 hahn-kev: #3975
 hussar-mtrela: #4018
 SpikeyNoob: #3927
+4z0t: #4088
