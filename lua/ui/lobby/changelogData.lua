@@ -1,4 +1,4 @@
-last_version = 3742
+last_version = 3741
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -19,7 +19,7 @@ gamePatches = {
             "",
             "## Other changes",
             "",
-            "- (e35f16) Revert an engine patch that causes issues with loading in DLLs",
+            "- (e35f16) Revert an engine patch that tries to update the `XACT` (audio engine) version",
             "",
             "## Contributors",
             "",
