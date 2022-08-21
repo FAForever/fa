@@ -1,4 +1,4 @@
-last_version = 3740
+last_version = 3742
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -11,6 +11,22 @@ last_version = 3740
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3742,
+        name = 'Hotfix',
+        description = {
+            "# Game version 3742 (21st of August, 2022)",
+            "",
+            "## Other changes",
+            "",
+            "- (e35f16) Revert an engine patch that causes issues with loading in DLLs",
+            "",
+            "## Contributors",
+            "",
+            "Sheikah: e35f16",
+            "Jip: e35f16",
+        }
+    },
     {
         version = 3741,
         name = 'Developers patch',

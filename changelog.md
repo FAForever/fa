@@ -1,6 +1,16 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3742 (21st of August, 2022)
+
+## Other changes
+
+- (e35f16) Revert an engine patch that causes issues with loading in DLLs
+
+## Contributors
+
+Sheikah: e35f16
+Jip: e35f16
 
 # Game version 3741 (21st of August, 2022)
 
