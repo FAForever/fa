@@ -4,7 +4,7 @@ Some sections of the changelog are available in other languages such as [French]
 
 # Game version 3741 (21st of August, 2022)
 
-Another month, another patch. With pride we present the next version of the game where we slowly start
+Another month, another patch! With pride we present the next version of the game where we slowly start
 tackling long-standing issues that we've been taking for granted. Among them the tactical missile
 defenses that feel underwhelming, broken weapons such as those of the Galactic Colossus and beam
 weapons being unable to hit reliable. But soon no more - we're tackling them one by one!
@@ -106,7 +106,6 @@ Jip
 
 - Fix beam weapons not disabling themselves (#4154)
 
-
 ## Features
 
 - (#4040, #4043, #4044) Re-implement the tractor beams of the Galactic Colossus
@@ -153,7 +152,6 @@ Jip
     This is the start of a new era where we'll be introducing statistics gradually. They help players with understanding the
     value of their actions - as an example, an engineer reclaiming trees on Seton's Clutch can quickly become responsible
     for hundreds (if not thousands) of additional mass.
-
 
 ## Performance
 
@@ -268,7 +266,6 @@ Jip
 - (#4155) Improve the balance of some of the adjusted mechanics
     Such as the tactical missile defense improvements and the tractor beams of the Galactic Colossus
 
-
 ## Other changes
 
 - (#3952) Update AI-related categories for the Cybran experimentals
@@ -329,7 +326,7 @@ SpikeyNoob: #3927
 KionX: #4073, #4076, d86021, 44fd74, #8
 Penguin: #4115
 Balthazar: #3910
-Strogo: #8
+Strogo: #8, #3650
 
 Game version 3740 (23th of June, 2022)
 ======================================
