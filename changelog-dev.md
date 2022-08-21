@@ -1,5 +1,7 @@
 
-# Game version xyzw (day of month, 2022)
+# Game version 3741 (day of month, 2022)
+
+
 
 ## Bug fixes
 
@@ -38,17 +40,58 @@
     Allows their cargo to receive (splash) damage more consistently and makes the transports easier to
     hit when they are landed.
 
-- (#4082, #4083, #4084) Fix target bones - Seraphim Land units 
+- (#4082, #4083, #4084) Fix target bones - Seraphim Land units
     Similar to #4058 and #4063, makes these units easier and more consistent to hit when firing with
-    beam weapons.
+    beam weapons. We'll slowly tackle all of the units in the base game, but this is a consuming process!
 
 - (#4093) Add guard to check if dummy weapon of shields are de-allocated
 
 - (#4088) Fix stack overflow in UI when units are assisting each other
 
+- (#4102) Adjust collision box of Megalith due to build animation
+    Allows units to consistently hit the Megalith while it is being constructed
+
+- (#4110, #4109, #4160) Add guards to prevent execution when c-object is de-allocated
+
+- (#4103) Attempt at fixing a shield assist bug that could send all your resources into limbo
+    Particularly relevant for hives when they are assisting shields that are also taking damage
+
+- (#4121) Rowey fixing Jip
+    What would we be without him!
+
+- (#4112) Attempt to fix the save / load functionality of the game
+    Long story short - we tried applying some tricks to improve performance a while ago and those
+    did not work anymore after saving and then loading in the game. As a consequence, after loading
+    the game was working with the wrong data causing all sorts of issues!
+
+    We hope this fixes it, but if you still have issues with saving and loading then you can
+    contact us via Discord or the forums.
+
+- (#4113) Reduce projectile speed of air to air weapons
+    There's a collision bug that causes the game engine to pick the furthest collision if a projectile
+    collides with multiple instances at the same time. As a consequence, it was difficult for interceptors
+    to hit landed air units and in particular transports. By reducing the projectile speed (and increasing
+    the size of the hitboxes with #4078) we try and solve this issue consistently for the base game
+
+- (#4115) Prevent manual attack move (via the UI) of clearing structure queues
+
+- (#4125) Fix Solace not having the bomber category
+
+- (#4120) Fix the enhancement removal dialogue being stuck
+
+- (#4132) Fix mass of wreckage of Kennel
+
+- (#4144) Fix the death animation of the tempest
+
+- (#4140, #4152) Fix rare occasions when the statuos quo of HQs are not updated properly
+    In particular, when gifting due to full share and when directly destroying the unit
+
+- Fix beam weapons not disabling themselves (#4154)
+
+
 ## Features
 
-- (#4040, #4043, #4044)) Re-implement the tractor beams of the Galactic Colossus
+- (#4040, #4043, #4044) Re-implement the tractor beams of the Galactic Colossus
     Re-implements the tractor beams of the Galactic Colossus from the ground up. They finally work
     as intended and can no longer remain stuck on invalid targets. Includes a slight boost to the
     effects, enjoy toying with the physics!
@@ -67,10 +110,31 @@
     file, allowing you to send people to a github, gitlab, bitbucket, sourceforge page or to a topic
     on the forums.
 
-- Allow jammers to recreate their jamming blips (#3927)
+- (#3927) Allow jammers to recreate their jamming blips
     Fixes the issue of jamming blips being gone forever once they were scouted. With this implementation,
     after fifteen seconds of being in the fog of war the jamming blips should re-emerge on their own.
 
+- (#4114, 44fd74) Alternative CPU benchmark pt. 1 
+    The first of two parts on creating a new CPU benchmark. The current benchmark tries to run some computations
+    in the lobby. This has shown to be inaccurate. The new benchmark takes samples during the game and stores the highest
+    possible sim rate you can run in combination with the total amount of units. Initial data points suggest that this
+    is highly accurate and is even capable of detecting the throttling of laptops.
+
+    The next part will replace implementation of the CPU score in the lobby. That will be part of the next release. This
+    guarantees that everyone has some data to start off with.
+
+- (#3650, #4158) Improve team color mode
+    Allows players to adjust the colors used in team color mode. With it, we can finally support people with color blindness.
+
+    Players can choose their own colors by right clicking the team color mode button.
+
+- (#3916) Introduce reclaim statistics for engineers
+    The game now keeps track of the reclaim statistics of engineers. They are shown where you'd usually see the veterancy of
+    a unit. You can not see the statistics of allied units, just your own. Works for observers (and casters).
+
+    This is the start of a new era where we'll be introducing statistics gradually. They help players with understanding the
+    value of their actions - as an example, an engineer reclaiming trees on Seton's Clutch can quickly become responsible
+    for hundreds (if not thousands) of additional mass.
 
 
 ## Performance
@@ -85,6 +149,19 @@
 - (#4073, #4076, d86021) Optimize vision and range-ring shaders
     Includes an engine patch - significantly reduces the impact of vision and range rings on your FPS.
 
+- (#4064, 84f68f, 9fd987, 647bdfe) Reduce memory allocations for when bombers fire their projectiles
+    Significantly reduces the amount of table allocations when we correct the trajectory of a
+    bomber in Lua.
+
+- (#4111) Reduce memory impact of weapons
+
+- (#4141) Reduce number of pre-allocated trashbags for units
+
+- (#4140) Remove remainders of an experimental setup for caching data
+
+- (#4037) Implement alternative, less resource-hungry vision entities
+    Used for example by the lobo - the tech 1 UEF mobile artillery
+
 ## Annotation
 
 - (#3936) Annotate and refactor layouthelpers.lua
@@ -94,7 +171,7 @@
 
 - (#4021) Cleanup annotation of engine documentation
 
-- (#3975, #4023) Add annotation support for blueprints
+- (#3975, #4023, #4086) Add annotation support for blueprints
 
 - (#4049) Annotate /Engine/Sim.lua creation functions
 
@@ -117,6 +194,20 @@
 - (#4052) Annotate command functions  
 
 - (#4065) Annotate scenario framework pt. 2
+
+- (#4106) Annotate inheritance of all remaining unit classes
+
+- (#4118) Add annotation to ignore some file specific non errors
+
+- (#4116) Annotate code of all scripts in the editor folder
+
+- (#4038) Annotate cAIBrain and AI related structures / functions
+
+- (#4126) Fix annotation for classes
+
+- (#4127, #4128, #4129, #4148) Annotate missing intermediate unit classes
+
+- (#4130) Annotate defaultunits.lua
 
 ## Other changes
 
@@ -149,6 +240,15 @@
 
 - (#4070, #4100) Add unit utilities
     Step-up work to make sacrifice work properly again
+
+- (#4117) Refactor # -> -- for original performance testing scripts
+
+- (#4122) Fix duplicated functions and typo
+
+- (#3910) Refactor BuffAffectsUnit to be easier to mod
+    Previously all the functions (that apply the buff) were scoped in another function.
+
+- (#3783) Improve code style of common UI elements
 
 ## Campaign
 
@@ -188,16 +288,23 @@
     Prevents them from wandering off, taking on quests - finding loot and end up dying because they're on their own chasing
     their dreams.
 
+- Improve the balance of some of the adjusted mechanics (#4155)
+    Such as the tactical missile defense improvements and the tractor beams of the Galactic Colossus 
+
 ## Contributors
 
-Hdt80bro: #3936, #3995, #4000, #3995, #4049, #4050, #4053, #4041, #4047, #4055, #4054, #4071, #4051, #4052, #4056, #4079, #4057, #4065, #4070
-Rowey: #3932, #3971
+Hdt80bro: #3936, #3995, #4000, #3995, #4049, #4050, #4053, #4041, #4047, #4055, #4054, #4071, #4051, #4052, #4056, #4079, #4057, #4065, #4070, #4086, #4064, 84f68f, 9fd987
+Rowey: #3932, #3971, #4117, #4116, #4122, #4127, #4128, #4129, #4130, #4132, #4148
 Maudlin: #3952, #4032, #4030, #4029, #4028, #4036
 Uveso: #3851, #4080
 speed2: 7ff888, 32d97d, f555cb, 5d0802, 4ad7f8, 439757, 26bcee, fa1448, 8e167b, 945df8, f65240, 8793ef, 09a829
-Jip: #4011, #4003, #4016, #4009, #4021, #4023, #4033, #4040, #4044, #3893, #4058, #4039, #4034, #4074, #4082, #4083, #4084, #4093, #4100
+Jip: #4011, #4003, #4016, #4009, #4021, #4023, #4033, #4040, #4044, #3893, #4058, #4039, #4034, #4074, #4082, #4083, #4084, #4093, #4100, #4110, #4106, #4109, #4112, #4113, #4114, #4125, #4111, #4038, #4144, #4141, #4140, #4152, #4037, #3916, #4154, #4158, #4156, #4159, #4160
 Ejsstiil: #4002
-hahn-kev: #3975
+hahn-kev: #3975, #4118, #4126, #4128
 hussar-mtrela: #4018
 SpikeyNoob: #3927
-4z0t: #4088
+4z0t: #4088, #3783, #4120
+KionX: #4073, #4076, d86021, 44fd74, #8
+Penguin: #4115
+Balthazar: #3910
+Strogo: #8
