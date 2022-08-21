@@ -5,12 +5,65 @@
 
 - (#4002) Fix issue with single-item combo list
 
-- (#4016) Re-implement game results
+- (#4016, #4080) Re-implement game results
     A complete re-implementation of how the game results are tracked. This should fix the famous
-    draw bug (where one player wins and the other loses) and in general there should be less 
+    draw bug (where one player wins and the other loses) and in general there should be less
     unknown game results.
 
+- (#4063) Fix targeting bones of static shields
+    Should make them easier to hit with low-arc projectiles and beams
+
+- (#4058) Fix units being able to evade area damage
+    Due to how the game processes the game over several steps the area damage could be applied too
+    late, allowing really fast units to already be out of the area of damage, even though the
+    projectile had a direct impact. This is particularly noticeable for spy planes, where they
+    are able to 'sustain' a lot of SAM fire while barely receiving a scratch in damage.
+
+    All in all, this makes the game feel a lot more consistent. A hit should be a hit.
+
+- (#4058) Fix beam weapons being unable to hit all air units
+    Due to how the game processes beams there's a possibility that the beam aims 'in front' of the
+    unit, causing it to miss. This is fixed by giving the unit (air units, for this change) a collision
+    box (or sphere) that is of sufficient size. As a result, the Seraphim Lighting Tank (T3 MAA) no
+    longer requires its hack, and because of that can no longer pierce shields :).
+
+- (#4071) Remove smoke ring on underwater SACU death
+
+- (#4074) Disable blue shield bar of shields when turned off
+
+- (#4079) Remove problematic code of JSON library
+    Could occasionally cause a game crash
+
+- (#4078) Adjust collision hitboxes of all transports
+    Allows their cargo to receive (splash) damage more consistently and makes the transports easier to 
+    hit when they are landed.
+
 ## Features
+
+- (#4040, #4043, #4044)) Re-implement the tractor beams of the Galactic Colossus
+    Re-implements the tractor beams of the Galactic Colossus from the ground up. They finally work
+    as intended and can no longer remain stuck on invalid targets. Includes a slight boost to the
+    effects, enjoy toying with the physics!
+
+- (#3893) Add shooter cap to tactical missiles
+    Prevents the TMDs from overshooting their targets, as a result TMDs feel a lot more consistent
+    and are in general a lot stronger.
+
+    Fixes an issue with multiple SMDs being unable to stop multiple strategic missiles.
+
+    Adds callbacks to units when their missile is intersected by a shield, a defense or by terrain.
+
+- (#4018) Improved Mod Manager UI  
+    Improves the mod manager by introducing a search bar, being able to mark mods as favorite and being
+    able to sort mods on their type. Introduces the capability of interpreting URLs from the `mod_info.lua`
+    file, allowing you to send people to a github, gitlab, bitbucket, sourceforge page or to a topic
+    on the forums.
+
+- Allow jammers to recreate their jamming blips (#3927)
+    Fixes the issue of jamming blips being gone forever once they were scouted. With this implementation,
+    after fifteen seconds of being in the fog of war the jamming blips should re-emerge on their own.
+
+
 
 ## Performance
 
@@ -19,7 +72,10 @@
 
 - (#4003) Remove collision shape of the Cybran Build Bots
 
-- Refactor effect utilities pt. 1, 3 and 4 (#3995, #4000, #3995)
+- (#3995, #4000, #3995) Refactor effect utilities pt. 1, 3 and 4
+
+- (#4073, #4076, d86021) Optimize vision and range-ring shaders
+    Includes an engine patch - significantly reduces the impact of vision and range rings on your FPS.
 
 ## Annotation
 
@@ -30,11 +86,47 @@
 
 - (#4021) Cleanup annotation of engine documentation
 
-- (#3975, #4023)) Add annotation support for blueprints
+- (#3975, #4023) Add annotation support for blueprints
+
+- (#4049) Annotate /Engine/Sim.lua creation functions
+
+- (#4050) Annotate /engine/Sim damage functions
+
+- (#4057) Annotate engine/Sim.lua
+
+- (#4053, #4055, #4054, #4056) Annotate engine/Sim/
+
+- (#4041) Annotate categories
+
+- (#4047) Conform /Engine/Sim/ to Moho
+
+- (#4039) Annotate entity.lua
+
+- (#4034) Annotate engine/core.lua
+
+- (#4051) Annotate /engine/Sim army functions
+
+- (#4052) Annotate command functions  
+
+- (#4065) Annotate scenario framework pt. 2
 
 ## Other changes
 
 - (#3952) Update AI-related categories for the Cybran experimentals
+
+- (#4032) Update AI-related categories of Obsidian
+
+- (#4030) Update AI-related antiair and antinavy categories of Aeon Experimentals
+
+- (#4029) Update AI-related antiair and antinavy categories of Seraphim Experimentals
+
+- (#4028) Update AI-related antiair and antinavy categories of UEF Experimentals
+
+- (#4036) Update AI-related categories of engineers
+
+- (#4035) Update AI-related categories of ACUs
+
+- (#4031) Update AI-related categories of navy
 
 - (#3851) Reduce amount of unfinished buildings for the AI
     This is a difficult one to tackle, but what happens is that buildings remain unfinished because there
@@ -45,13 +137,51 @@
 
 - (7ff888) Fix name of operational AI (related to campaign)
 
+- (#4033) Reduce amount of trees on fire at the start of the game  
+
+## Campaign
+
+- (32d97d, f555cb, 5d0802, 4ad7f8) Various small improvements to the campaign AI (base managers)
+
+- (439757) Fix the protect objective breaking when given dead units
+
+- (7f6a4e) Simplify base manager engineer patrol
+    When the patrol path was generated, there was a logic to move instead of patrol if the reclaiming was disabled on
+    the base. That got removed since just moving engineers around does nothing. So it's either patrol or nothing.
+
+- (26bcee) Fix base manager rebuild counter
+    Rebuild structure counter was deecremented even for spawning units. Meaning that that AI would not rebuild at all,
+    while it was supposee to be rebuilding once.
+
+- (fa1448) Update base manager rebuild data
+    Used for counting how many times to rebuild stuff, based on difficulty. Some of the names were wrong and
+    the list was kinda incomplete.
+
+- (8e167b) Fix base manager sometimes not upgrading factories
+    Upgrade thread was checking for IdleState, but if the factory that was suppose to be upgraded was grabbed first
+    to assist other factories in the base, it would never be idle.
+
+- (945df8) Simplify T3 mobile AA builder
+    Uses faction convert isntead of separate platoons, since the AA exists for all factions.
+
+- (f65240) Fix PlayerDeath cam unlocking input too early
+    Input is always unlocked when the final popup to end the mission shows up.
+
+- (8793ef) Add game speed into objectives UI
+    Next to time, just like normal score panel
+
+- (09a829) Improve TransportPool
+    Adds MoveRoute and MoveChain to add more control over movingthe transports
+
 ## Contributors
 
-Hdt80bro: #3936, #3995, #4000, #3995
+Hdt80bro: #3936, #3995, #4000, #3995, #4049, #4050, #4053, #4041, #4047, #4055, #4054, #4071, #4051, #4052, #4056, #4079, #4057, #4065
 Rowey: #3932, #3971
-Maudlin: #3952
-Uveso: #3851
-speed2: 7ff888
-Jip: #4011, #4003, #4016, #4009, #4021, #4023
+Maudlin: #3952, #4032, #4030, #4029, #4028, #4036
+Uveso: #3851, #4080
+speed2: 7ff888, 32d97d, f555cb, 5d0802, 4ad7f8, 439757, 26bcee, fa1448, 8e167b, 945df8, f65240, 8793ef, 09a829
+Jip: #4011, #4003, #4016, #4009, #4021, #4023, #4033, #4040, #4044, #3893, #4058, #4039, #4034, #4074
 Ejsstiil: #4002
 hahn-kev: #3975
+hussar-mtrela: #4018
+SpikeyNoob: #3927
