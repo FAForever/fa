@@ -1,7 +1,22 @@
 
 # Game version 3741 (day of month, 2022)
 
+Another month, another patch. With pride we present the next version of the game where we slowly start
+tackling long-standing issues that we've been taking for granted. Among them the tactical missile
+defenses that feel underwhelming, broken weapons such as those of the Galactic Colossus and beam
+weapons being unable to hit reliable. But soon no more - we're tackling them one by one!
 
+Not only that, from a development perspective we've made great strides. The amount of annotated
+code has exploded, allowing our extension to give proper suggestions and hints. Step by step,
+pull request by pull request we slowly turn the code base into one that supports modern programming
+features such as being able to jump to a definition and we now provide sane suggestions and snippets.
+
+Let alone the improvements to the infrastructure surrounding FAF. With the cache servers of Cloudflare as
+our backbone the distribution of maps, mods and game assets have never been better.
+
+With appreciation towards all the contributors that made this patch possible,
+
+Jip
 
 ## Bug fixes
 
@@ -209,6 +224,48 @@
 
 - (#4130) Annotate defaultunits.lua
 
+## Campaign
+
+- (32d97d, f555cb, 5d0802, 4ad7f8) Various small improvements to the campaign AI (base managers)
+
+- (439757) Fix the protect objective breaking when given dead units
+
+- (7f6a4e) Simplify base manager engineer patrol
+    When the patrol path was generated, there was a logic to move instead of patrol if the reclaiming was disabled on
+    the base. That got removed since just moving engineers around does nothing. So it's either patrol or nothing.
+
+- (26bcee) Fix base manager rebuild counter
+    Rebuild structure counter was deecremented even for spawning units. Meaning that that AI would not rebuild at all,
+    while it was supposee to be rebuilding once.
+
+- (fa1448) Update base manager rebuild data
+    Used for counting how many times to rebuild stuff, based on difficulty. Some of the names were wrong and
+    the list was kinda incomplete.
+
+- (8e167b) Fix base manager sometimes not upgrading factories
+    Upgrade thread was checking for IdleState, but if the factory that was suppose to be upgraded was grabbed first
+    to assist other factories in the base, it would never be idle.
+
+- (945df8) Simplify T3 mobile AA builder
+    Uses faction convert isntead of separate platoons, since the AA exists for all factions.
+
+- (f65240) Fix PlayerDeath cam unlocking input too early
+    Input is always unlocked when the final popup to end the mission shows up.
+
+- (8793ef) Add game speed into objectives UI
+    Next to time, just like normal score panel
+
+- (09a829) Improve TransportPool
+    Adds MoveRoute and MoveChain to add more control over movingthe transports
+
+- (#4092) Fix the guard return radius of naval units  
+    Prevents them from wandering off, taking on quests - finding loot and end up dying because they're on their own chasing
+    their dreams.
+
+- (#4155) Improve the balance of some of the adjusted mechanics
+    Such as the tactical missile defense improvements and the tractor beams of the Galactic Colossus
+
+
 ## Other changes
 
 - (#3952) Update AI-related categories for the Cybran experimentals
@@ -250,55 +307,17 @@
 
 - (#3783) Improve code style of common UI elements
 
-## Campaign
-
-- (32d97d, f555cb, 5d0802, 4ad7f8) Various small improvements to the campaign AI (base managers)
-
-- (439757) Fix the protect objective breaking when given dead units
-
-- (7f6a4e) Simplify base manager engineer patrol
-    When the patrol path was generated, there was a logic to move instead of patrol if the reclaiming was disabled on
-    the base. That got removed since just moving engineers around does nothing. So it's either patrol or nothing.
-
-- (26bcee) Fix base manager rebuild counter
-    Rebuild structure counter was deecremented even for spawning units. Meaning that that AI would not rebuild at all,
-    while it was supposee to be rebuilding once.
-
-- (fa1448) Update base manager rebuild data
-    Used for counting how many times to rebuild stuff, based on difficulty. Some of the names were wrong and
-    the list was kinda incomplete.
-
-- (8e167b) Fix base manager sometimes not upgrading factories
-    Upgrade thread was checking for IdleState, but if the factory that was suppose to be upgraded was grabbed first
-    to assist other factories in the base, it would never be idle.
-
-- (945df8) Simplify T3 mobile AA builder
-    Uses faction convert isntead of separate platoons, since the AA exists for all factions.
-
-- (f65240) Fix PlayerDeath cam unlocking input too early
-    Input is always unlocked when the final popup to end the mission shows up.
-
-- (8793ef) Add game speed into objectives UI
-    Next to time, just like normal score panel
-
-- (09a829) Improve TransportPool
-    Adds MoveRoute and MoveChain to add more control over movingthe transports
-
-- (#4092) Fix the guard return radius of naval units  
-    Prevents them from wandering off, taking on quests - finding loot and end up dying because they're on their own chasing
-    their dreams.
-
-- Improve the balance of some of the adjusted mechanics (#4155)
-    Such as the tactical missile defense improvements and the tractor beams of the Galactic Colossus 
-
 ## Contributors
 
-Hdt80bro: #3936, #3995, #4000, #3995, #4049, #4050, #4053, #4041, #4047, #4055, #4054, #4071, #4051, #4052, #4056, #4079, #4057, #4065, #4070, #4086, #4064, 84f68f, 9fd987
+Hdt80bro: #3936, #3995, #4000, #3995, #4049, #4050, #4053, #4041, #4047, #4055, #4054, #4071, #4051, #4052, #4056, #4079,
+    #4057, #4065, #4070, #4086, #4064, 84f68f, 9fd987
 Rowey: #3932, #3971, #4117, #4116, #4122, #4127, #4128, #4129, #4130, #4132, #4148
 Maudlin: #3952, #4032, #4030, #4029, #4028, #4036
 Uveso: #3851, #4080
 speed2: 7ff888, 32d97d, f555cb, 5d0802, 4ad7f8, 439757, 26bcee, fa1448, 8e167b, 945df8, f65240, 8793ef, 09a829
-Jip: #4011, #4003, #4016, #4009, #4021, #4023, #4033, #4040, #4044, #3893, #4058, #4039, #4034, #4074, #4082, #4083, #4084, #4093, #4100, #4110, #4106, #4109, #4112, #4113, #4114, #4125, #4111, #4038, #4144, #4141, #4140, #4152, #4037, #3916, #4154, #4158, #4156, #4159, #4160
+Jip: #4011, #4003, #4016, #4009, #4021, #4023, #4033, #4040, #4044, #3893, #4058, #4039, #4034, #4074, #4082, #4083, 
+    #4084, #4093, #4100, #4110, #4106, #4109, #4112, #4113, #4114, #4125, #4111, #4038, #4144, #4141, #4140, #4152, #4037,
+    #3916, #4154, #4158, #4156, #4159, #4160
 Ejsstiil: #4002
 hahn-kev: #3975, #4118, #4126, #4128
 hussar-mtrela: #4018
