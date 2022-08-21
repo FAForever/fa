@@ -434,10 +434,6 @@ DefaultProjectileWeapon = Class(Weapon) {
         then
             self.unit:ShakeCamera(cameraShakeRadius, cameraShakeMax, cameraShakeMin, cameraShakeDuration)
         end
-        if bp.ShipRock == true then
-            local ix, iy, iz = self.unit:GetBoneDirection(bp.RackBones[self.CurrentRackSalvoNumber].RackBone)
-            self.unit:RecoilImpulse(-ix, -iy, -iz)
-        end
         if bp.RackRecoilDistance ~= 0 then
             self:PlayRackRecoil({bp.RackBones[self.CurrentRackSalvoNumber]})
         end
@@ -499,20 +495,17 @@ DefaultProjectileWeapon = Class(Weapon) {
     PlayRackRecoil = function(self, rackList)
         local bp = self.Blueprint
         local rackRecoilDist = bp.RackRecoilDistance
-        local count = 0
         for _, rack in rackList do
             local telescopeBone = rack.telescopeBone
             local tmpSldr = CreateSlider(self.unit, rack.RackBone)
-            count = count + 1
-            self.RecoilManipulators[count] = tmpSldr
+            table.insert(self.RecoilManipulators, tmpSldr)
             tmpSldr:SetPrecedence(11)
             tmpSldr:SetGoal(0, 0, rackRecoilDist)
             tmpSldr:SetSpeed(-1)
             self.TrashManipulators:Add(tmpSldr)
             if telescopeBone then
                 tmpSldr = CreateSlider(self.unit, telescopeBone)
-                count = count + 1
-                self.RecoilManipulators[count] = tmpSldr
+                table.insert(self.RecoilManipulators, tmpSldr)
                 tmpSldr:SetPrecedence(11)
                 tmpSldr:SetGoal(0, 0, rack.TelescopeRecoilDistance or rackRecoilDist)
                 tmpSldr:SetSpeed(-1)
