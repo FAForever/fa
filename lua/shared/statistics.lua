@@ -429,17 +429,17 @@ end
 
 function MeanAndSampVariance(data, n)
     n = n or TableGetn(data)
-    local rawm1, rawm2 = 0, 0
+    local u1, u2 = 0, 0
     for k = 1, n do
         local value = data[k]
-        rawm1 = rawm1 + value
-        rawm2 = rawm2 + value*value
+        u1 = u1 + value
+        u2 = u2 + value*value
     end
     -- E(X)
-    local mean = rawm1 / n
+    local mean = u1 / n
     -- E((X - E(X))^2) = E(X^2) - E(X)^2; reduce degrees of freedom by one due to calculating the
     -- center from the data, since it's an estimator and not the true population mean
-    local var = (rawm2 - rawm1*rawm1) / (n - 1)
+    local var = (u2 - u1*u1) / (n - 1)
     return mean, var
 end
 
@@ -637,18 +637,18 @@ end
 
 function GenerateRawMoments(data, n)
     n = n or TableGetn(data)
-    local m1, m2, m3, m4 = 0, 0, 0, 0
+    local u1, u2, u3, u4 = 0, 0, 0, 0
     for i = 1, n do
         local val = data[i]
-        m1 = m1 + val
+        u1 = u1 + val
         local valP = val * val
-        m2 = m2 + valP
+        u2 = u2 + valP
         valP = valP * val
-        m3 = m3 + valP
+        u3 = u3 + valP
         valP = valP * val
-        m4 = m4 + valP
+        u4 = u4 + valP
     end
-    return m1 / n, m2 / n, m3 / n, m4 / n
+    return u1 / n, u2 / n, u3 / n, u4 / n
 end
 function GenerateRawMomentsUpTo(data, degree, n)
     n = n or TableGetn(data)
@@ -767,6 +767,9 @@ doscript("/lua/shared/lazycache.lua")
 ---
 ---@field data number[]
 ---@field iqr? number
+---@field m2? number
+---@field m3? number
+---@field m4? number
 ---@field max? number
 ---@field mean? number
 ---@field meanAbsDev? number
@@ -782,6 +785,9 @@ doscript("/lua/shared/lazycache.lua")
 ---@field quartileMode? number
 ---@field sorted? number[]
 ---@field sum? number
+---@field u2? number
+---@field u3? number
+---@field u4? number
 ---
 ---@field MinMax function
 ---@field RemoveOutliers function
@@ -789,7 +795,7 @@ doscript("/lua/shared/lazycache.lua")
 ---@field Quantile function
 ---@field Quartiles function
 ---@field Summary function
-StatObject = LazyCache {
+StatObject = LazyCacheClass({
     sorted = function(self)
         return Sort(self.data)
     end;
@@ -799,9 +805,9 @@ StatObject = LazyCache {
     end;
 
     -- centers
+
     mean = function(self)
-        local mean = Mean(self.data, self.n)
-        return mean
+        return Mean(self.data, self.n)
     end;
     mode = function(self)
         return Mode(self.data, self.n)
@@ -812,6 +818,8 @@ StatObject = LazyCache {
         self.q3 = q3
         return median
     end;
+
+    -- extrema
 
     min = function(self)
         local sorted = rawget(self, "sorted")
@@ -848,6 +856,8 @@ StatObject = LazyCache {
         return max - min
     end;
 
+    -- quartiles
+
     q1 = function(self)
         local q1, median, q3 = Quartiles(self.sorted, self.n, self.quartileMode)
         self.median = median
@@ -864,25 +874,59 @@ StatObject = LazyCache {
         return self.q3 - self.q1
     end;
 
+    -- raw moments
+
+    u2 = function(self)
+        local u1, u2, u3, u4 = GenerateRawMoments(self.data, self.n)
+        self.mean = u1
+        self.u3 = u3
+        self.u4 = u4
+        return u2
+    end;
+    u3 = function(self)
+        local u1, u2, u3, u4 = GenerateRawMoments(self.data, self.n)
+        self.mean = u1
+        self.u2 = u2
+        self.u4 = u4
+        return u3
+    end;
+    u4 = function(self)
+        local u1, u2, u3, u4 = GenerateRawMoments(self.data, self.n)
+        self.mean = u1
+        self.u2 = u2
+        self.u3 = u3
+        return u4
+    end;
+
     -- central moments
+
     m2 = function(self)
-        local _0, m2, m3, m4 = GenerateCentralMoments(self.data, self.n, self.mean)
-        self.m3 = m3
-        self.m4 = m4
-        return m2
+        local u2, u1 = self.u2, self.mean
+        -- E((X - E(X))^2)
+        -- = E(X^2  - 2 X E(X)    + E(X)^2)
+        -- = E(X^2) - 2 E(X) E(X) + E(X)^2
+        -- = E(X^2) - E(X)^2
+        return u2 - u1*u1
     end;
     m3 = function(self)
-        local _0, m2, m3, m4 = GenerateCentralMoments(self.data, self.n, self.mean)
-        self.m2 = m2
-        self.m4 = m4
-        return m3
+        local u3, u2, u1 = self.u3, self.u2, self.mean
+        -- E((X - E(X))^3)
+        -- = E(X^3  - 3 X^2 E(X)    + 3 X E(X)^2    - E(X)^3)
+        -- = E(X^3) - 3 E(X^2) E(X) + 3 E(X) E(X)^2 - E(X)^3
+        -- = E(X^3) - 3 E(X^2) E(X) + 2 E(X)^3
+        return u3 - 3 * u2 * u1 + 2 * u1*u1*u1
     end;
     m4 = function(self)
-        local _0, m2, m3, m4 = GenerateCentralMoments(self.data, self.n, self.mean)
-        self.m2 = m2
-        self.m3 = m3
-        return m4
+        local u4, u3, u2, u1 = self.u4, self.u3, self.u2, self.mean
+        -- E((X - E(X))^4)
+        -- = E(X^4  - 4 X^3 E(X)    + 6 X^2 E(X)^2    - 4 X E(X)^3    + E(X)^4)
+        -- = E(X^4) - 4 E(X^3) E(X) + 6 E(X^2) E(X)^2 - 4 E(X) E(X)^3 + E(X)^4
+        -- = E(X^4) - 4 E(X^3) E(X) + 6 E(X^2) E(X)^2 - 3 E(X)^4
+        local u1Sqr = u1 * u1
+        return u4 - 4 * u3 * u1 + 6 * u2 * u1Sqr - 3 * u1Sqr*u1Sqr
     end;
+
+    -- absolute deviation
 
     meanAbsDev = function(self)
         return AvgAbsDeviation(self.data, self.n, self.mean)
@@ -897,7 +941,7 @@ StatObject = LazyCache {
         end
         return AvgAbsDeviation(self.data, self.n, center)
     end;
-} {
+}, {
     __init = function(self, data, n, doCopy, quantileMode, quartileMode)
         n = n or TableGetn(data)
         if doCopy then
@@ -987,7 +1031,7 @@ StatObject = LazyCache {
         if savedQ1 then
             return savedQ1, self.median, self.q3
         end
-
+         -- catch it if it sets the quartiles so we can update the qunatile mode
         local curQuartMode = self.quartileMode
         if curQuartMode then
             quartileMode = curQuartMode
@@ -1004,11 +1048,11 @@ StatObject = LazyCache {
         local min, max = self:MinMax() -- min & max are most efficient when `sorted` is already present
         return mean, min, q1, median, q3, max, self.mode
     end;
-}
+})
 
 ---@class StatObjectCommon
 ---@field nonparametericSkewness? number
-local StatObjectCommon = LazyCache {
+local StatObjectCommon = LazyCacheClass {
     nonparametericSkewness = function(self)
         return NonparametericSkewness(self.mean, self.median, self.deviation)
     end;
@@ -1017,32 +1061,31 @@ local StatObjectCommon = LazyCache {
 ---@class PopStatObject : StatObject, StatObjectCommon
 ---@field variance? number
 ---@field skewness? number
-local PopStatObject = LazyCache(StatObject, StatObjectCommon) {
+local PopStatObject = LazyCacheClass(StatObject, StatObjectCommon, {
     variance = function(self)
         return self.m2
     end;
     skewness = function(self)
         return StandardizeSkewness(self.m3, self.deviation)
     end;
-}
+})
 ---@class SampStatObject : StatObject, StatObjectCommon
 ---@field variance? number
 ---@field skewness? number
-local SampStatObject = LazyCache(StatObject, StatObjectCommon) {
+local SampStatObject = LazyCacheClass(StatObject, StatObjectCommon, {
     variance = function(self)
-        local n = self.n
-        return self.m2 * n / (n - 1)
+        return AdjustToSampVariance(self.m2, self.n)
     end;
     skewness = function(self)
         return AdjustToSampSkewness(StandardizeSkewness(self.m3, self.deviation), self.n)
     end;
-}
+})
 
 
 ---@class StatObjectNoCorrection
 ---@field excessKurtosis? number
 ---@field deviation? number
-local StatObjectNoCorrection = LazyCache {
+local StatObjectNoCorrection = LazyCacheClass {
     excessKurtosis = function(self)
         return AdjustToExcessKurtosis(self.kurtosis)
     end;
@@ -1053,7 +1096,7 @@ local StatObjectNoCorrection = LazyCache {
 ---@class StatObjectBasicCorrection
 ---@field excessKurtosis? number
 ---@field deviation? number
-local StatObjectBasicCorrection = LazyCache {
+local StatObjectBasicCorrection = LazyCacheClass {
     excessKurtosis = function(self)
         return AdjustToExcessKurtosis(self.kurtosis)
     end;
@@ -1064,7 +1107,7 @@ local StatObjectBasicCorrection = LazyCache {
 ---@class StatObjectNormalCorrection
 ---@field excessKurtosis? number
 ---@field deviation? number
-local StatObjectNormalCorrection = LazyCache {
+local StatObjectNormalCorrection = LazyCacheClass {
     excessKurtosis = function(self)
         return AdjustToNormallyCorrectedExcessKurtosis(self.kurtosis, self.n)
     end;
@@ -1075,17 +1118,17 @@ local StatObjectNormalCorrection = LazyCache {
 
 
 ---@class PopStatObjectNoCorrection : PopStatObject, StatObjectNoCorrection
-PopStatObjectNoCorrection = LazyCache(PopStatObject, StatObjectNoCorrection) {} {}
+PopStatObjectNoCorrection = LazyCacheClass(PopStatObject, StatObjectNoCorrection)
 ---@class SampStatObjectNoCorrection : SampStatObject, StatObjectNoCorrection
-SampStatObjectNoCorrection = LazyCache(SampStatObject, StatObjectNoCorrection) {} {}
+SampStatObjectNoCorrection = LazyCacheClass(SampStatObject, StatObjectNoCorrection)
 
 ---@class PopStatObjectNoCorrection : PopStatObject, StatObjectBasicCorrection
-PopStatObjectBasicCorrection = LazyCache(PopStatObject, StatObjectBasicCorrection) {} {}
+PopStatObjectBasicCorrection = LazyCacheClass(PopStatObject, StatObjectBasicCorrection)
 ---@class SampStatObjectNoCorrection : PopStatObject, StatObjectBasicCorrection
-SampStatObjectBasicCorrection = LazyCache(SampStatObject, StatObjectBasicCorrection) {} {}
+SampStatObjectBasicCorrection = LazyCacheClass(SampStatObject, StatObjectBasicCorrection)
 
 ---@class PopStatObjectNoCorrection : PopStatObject, StatObjectNormalCorrection
-PopStatObjectNormalCorrection = LazyCache(PopStatObject, StatObjectNormalCorrection) {} {}
+PopStatObjectNormalCorrection = LazyCacheClass(PopStatObject, StatObjectNormalCorrection)
 ---@class SampStatObjectNoCorrection : PopStatObject, StatObjectNormalCorrection
-SampStatObjectNormalCorrection = LazyCache(SampStatObject, StatObjectNormalCorrection) {} {}
+SampStatObjectNormalCorrection = LazyCacheClass(SampStatObject, StatObjectNormalCorrection)
 
