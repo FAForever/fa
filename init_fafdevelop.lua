@@ -71,6 +71,7 @@ deprecatedMods["#quality of performance 2022"] = true
 -- because of that these mods are no longer viable.
 deprecatedMods["group_split"] = true
 deprecatedMods["Control Group Zoom Mod"] = true
+deprecatedMods["additionalControlGroupStuff"] = true
 deprecatedMods = LowerHashTable(deprecatedMods)
 
 -- typical FA packages
