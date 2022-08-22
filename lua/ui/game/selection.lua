@@ -318,9 +318,9 @@ function FactorySelection(name)
     SelectUnits(aSelection)
 end
 
----Adds the current selected units to the selection set
+--- Appends the selection set to the selection
 ---@param name string | number
-function AppendSetToSelection(name, appendBehavior)
+function AppendSetToSelection(name)
 
     -- bug where name is an index, not a key
     name = tostring(name)
@@ -329,46 +329,65 @@ function AppendSetToSelection(name, appendBehavior)
     local aValidUnits = ProcessSelectionSet(name)
     local aSelectedUnits = GetSelectedUnits()
 
-    if aSelectedUnits then 
+    if aSelectedUnits then
 
-        ---@type SelectionSetAppendBehavior
-        local appendBehavior = appendBehavior or Prefs.GetFromCurrentProfile('options.selection-sets-append-behavior')
-
-        if appendBehavior == 'add-selection-set-to-selection' then
-
-            -- append the selection set
-            for k, unit in aValidUnits do
-                table.insert(aSelectedUnits, unit)
-            end
-
-            -- select them together
-            SelectUnits(aSelectedUnits)
-            DoubleTapBehavior(aSelectedUnits)
-
-        elseif appendBehavior == 'add-selection-to-selection-set' then
-
-            -- append the selection set
-            for k, unit in aValidUnits do
-                table.insert(aSelectedUnits, unit)
-            end
-
-            -- turn that into the new selection set
-            AddSelectionSet(name, aSelectedUnits)
-            DoubleTapBehavior(aSelectedUnits)
-
-        elseif appendBehavior == 'combine-and-select-with-selection-set' then
-
-            -- append the selection set
-            for k, unit in aValidUnits do
-                table.insert(aSelectedUnits, unit)
-            end
-
-            -- turn that into the new selection set and select it
-            AddSelectionSet(name, aSelectedUnits)
-            SelectUnits(aSelectedUnits)
-            DoubleTapBehavior(aSelectedUnits)
-
+        -- append the selection set
+        for k, unit in aValidUnits do
+            table.insert(aSelectedUnits, unit)
         end
+
+        -- select them together
+        SelectUnits(aSelectedUnits)
+        DoubleTapBehavior(aSelectedUnits)
+    end
+end
+
+--- Appends the selection to the selection set
+---@param name string | number
+function AppendSelectionToSet (name)
+
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
+    -- retrieve the two groups of units
+    local aValidUnits = ProcessSelectionSet(name)
+    local aSelectedUnits = GetSelectedUnits()
+
+    if aSelectedUnits then
+
+        -- append the selection set
+        for k, unit in aValidUnits do
+            table.insert(aSelectedUnits, unit)
+        end
+
+        -- turn that into the new selection set
+        AddSelectionSet(name, aSelectedUnits)
+        DoubleTapBehavior(aSelectedUnits)
+    end
+end
+
+--- Adds the selection to the selection set and selects the entire selection set
+---@param name string | number
+function CombineSelectionAndSet(name)
+
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
+    -- retrieve the two groups of units
+    local aValidUnits = ProcessSelectionSet(name)
+    local aSelectedUnits = GetSelectedUnits()
+
+    if aSelectedUnits then
+
+        -- append the selection set
+        for k, unit in aValidUnits do
+            table.insert(aSelectedUnits, unit)
+        end
+
+        -- turn that into the new selection set and select it
+        AddSelectionSet(name, aSelectedUnits)
+        SelectUnits(aSelectedUnits)
+        DoubleTapBehavior(aSelectedUnits)
     end
 end
 

@@ -931,20 +931,6 @@ options = {
             },
 
             {
-                title = "<LOC selectionsets0001>Append behavior",
-                key = 'selection-sets-append-behavior',
-                type = 'toggle',
-                default = 'add-selection-to-selection-set',
-                custom = {
-                    states = {
-                        {text = "<LOC selectionsets0002>Append selection to selection set" , key = 'add-selection-to-selection-set' },
-                        {text = "<LOC selectionsets0003>Append selection set to selection", key = 'add-selection-set-to-selection' },
-                        {text = "<LOC selectionsets0003>Select and append", key = 'combine-and-select-with-selection-set' },
-                    },
-                },
-            },
-
-            {
                 title = 'Spawn menu',
                 type = 'header',
 
