@@ -61,6 +61,10 @@ keyActions = {
         category = 'debug', order = 21,},
     ['toggle_reclaim_labels'] = {action = 'UI_Lua import("/lua/ui/game/reclaim.lua").ToggleReclaim()',
         category = 'ui'},
+
+    ['revert_selection_set'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").RevertSelectionSet()',
+        category = 'selection', order = 0,},
+
     ['group1'] = {action = 'UI_ApplySelectionSet 1',
         category = 'selection', order = 1,},
     ['group2'] = {action = 'UI_ApplySelectionSet 2',

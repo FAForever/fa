@@ -10,6 +10,8 @@ keyDescriptions = {
     ['cap_frame'] = '<LOC key_desc_0003>Take a screen shot',
     ['show_fps'] = "<LOC key_desc_0131>Toggle the display of frames rendered per second",
 
+    ['revert_selection_set'] = 'Restore selection to the one before recalling a control group',
+
     ['group1'] = '<LOC key_desc_0004>Recall Group 1',
     ['group2'] = '<LOC key_desc_0005>Recall Group 2',
     ['group3'] = '<LOC key_desc_0006>Recall Group 3',

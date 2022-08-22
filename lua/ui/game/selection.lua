@@ -277,6 +277,8 @@ function AddCurrentSelectionSet(name)
     AddSelectionSet(name, GetSelectedUnits())
 end
 
+local oldSelection = { }
+
 --- Selects the selection set provided
 ---@param name string | number
 function ApplySelectionSet(name)
@@ -295,6 +297,7 @@ function ApplySelectionSet(name)
         end
     end
 
+    oldSelection = GetSelectedUnits()
     SelectUnits(aSelection)
     DoubleTapBehavior(name, aSelection)
 
@@ -302,6 +305,15 @@ function ApplySelectionSet(name)
     for i, v in selectionSetCallbacks do
         v(name, aSelection, true)
     end
+end
+
+--- Reverts the selection to the one before applying (recalling) a selection set
+function RevertSelectionSet()
+    local aValidUnits = ValidateUnitsList(oldSelection)
+    SelectUnits(aValidUnits)
+
+    -- prevent accidental double tab
+    lastSelectionName = nil
 end
 
 --- Attempts to select the factories of the selection set
@@ -315,6 +327,7 @@ function FactorySelection(name)
     local aValidUnits = ProcessSelectionSet(name)
     local aSelection = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
 
+    oldSelection = GetSelectedUnits()
     SelectUnits(aSelection)
 end
 
