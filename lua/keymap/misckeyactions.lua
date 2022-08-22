@@ -410,50 +410,44 @@ function SetDefaultWeaponPriorities()
 end
 
 local categoriesToCheck = {
-    ['tech'] = {"TECH1", "TECH2", "TECH3"},
+    ['tech'] = {"TECH1", "TECH2", "TECH3", "EXPERIMENTAL", 'COMMAND'},
     ['faction'] = {"CYBRAN", "UEF", "AEON", "SERAPHIM"},
-    ['type'] = {"ANTIAIR", "DIRECTFIRE"},
+    ['type'] = {'SCOUT', "DIRECTFIRE", 'INDIRECTFIRE', 'DEFENSE', "ANTIAIR", 'TRANSPORTATION', "ENGINEER",},
     ['field'] = {"NAVAL", "AIR", "LAND", "STRUCTURE"},
 }
 
 function findPriority(bpID)
     local bp = __blueprints[bpID]
-    local categories = bp.Categories
+    local categories = bp.CategoriesHash
 
     local tech
     local faction
-    local type
+    local unitType
     local field
 
-    for _, c in categories do 
-        for _, ctc in categoriesToCheck['tech'] do
-            if c == ctc then tech = c end
-        end
-
-        for _, ctc in categoriesToCheck['faction'] do
-            if c == ctc then faction = c end
-        end
-
-        for _, ctc in categoriesToCheck['type'] do
-            if c == ctc then type = c end
-        end
-
-        for _, ctc in categoriesToCheck['field'] do
-            if c == ctc then field = c end
-        end
+    for _, c in categoriesToCheck['tech'] do
+        if categories[c] then tech = c end
+    end
+    for _, c in categoriesToCheck['faction'] do
+        if categories[c] then faction = c end
+    end
+    for _, c in categoriesToCheck['type'] do
+        if categories[c] then unitType = c end
+    end
+    for _, c in categoriesToCheck['field'] do
+        if categories[c] then field = c end
+    end
+    
+    if not (tech and faction and unitType and field) then
+        return string.format("{categories.%s}", bpID)
     end
 
-    tech = "categories." .. tech
-    faction = "categories." .. faction
-    type = "categories." .. type
-    field = "categories." .. field
+    local tp = string.format("categories.%s * categories.%s * categories.%s * categories.%s", tech, faction, unitType, field)
+    local tp2 = string.format("categories.%s * categories.%s * categories.%s", tech, unitType, field)
+    local tp3 = string.format("categories.%s * categories.%s", unitType, field)
+    local tp4 = string.format("categories.%s", field)
 
-    local tp = tech .. " * " .. faction .. " * " .. type .. " * " .. field
-    local tp2 = tech .. " * " .. type .. " * " .. field
-    local tp3 = type .. " * " .. field
-    local tp4 = field
-
-    local masterTP = "{categories." .. bpID .. ", " .. tp .. ", " .. tp2 .. ", " .. tp3 .. ", " .. tp4 .. "}"
+    local masterTP = string.format("{categories.%s, %s, %s, %s, %s}", bpID, tp, tp2, tp3, tp4)
     return masterTP
 end
 
