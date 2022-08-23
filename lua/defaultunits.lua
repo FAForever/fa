@@ -742,9 +742,7 @@ FactoryUnit = Class(StructureUnit) {
         StructureUnit.OnDestroy(self)
         
         if self.Blueprint.CategoriesHash["RESEARCH"] and self:GetFractionComplete() == 1.0 then
-
-            LOG("OnDestroy")
-
+            
             -- update internal state
             self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
             self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
