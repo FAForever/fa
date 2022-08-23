@@ -741,8 +741,8 @@ FactoryUnit = Class(StructureUnit) {
     OnDestroy = function(self)
         StructureUnit.OnDestroy(self)
         
-        if self.Blueprint.CategoriesHash["RESEARCH"] then
-
+        if self.Blueprint.CategoriesHash["RESEARCH"] and self:GetFractionComplete() == 1.0 then
+            
             -- update internal state
             self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
             self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
@@ -783,13 +783,6 @@ FactoryUnit = Class(StructureUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         StructureUnit.OnStartBuild(self, unitBeingBuilt, order)
 
-        -- related to HQ systems
-        if self.Blueprint.CategoriesHash["RESEARCH"] then
-            if EntityCategoryContains(categories.RESEARCH, self) then
-                unitBeingBuilt.UpgradedHQFromTech = self.techCategory
-            end
-        end
-
         self.BuildingUnit = true
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
@@ -823,11 +816,6 @@ FactoryUnit = Class(StructureUnit) {
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
 
         if self.Blueprint.CategoriesHash["RESEARCH"] then
-            -- if we're an upgrade then remove the HQ we came from
-            if self.UpgradedHQFromTech then
-                self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.UpgradedHQFromTech)
-            end
-
             -- update internal state
             self.Brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
             self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
