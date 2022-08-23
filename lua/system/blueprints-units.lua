@@ -193,7 +193,17 @@ local function PostProcessUnit(unit)
 
     -- # Fix being able to check for command caps
 
-    unit.General.CommandCapsHash = table.deepcopy(unit.General.CommandCaps)
+    local unitGeneral = unit.General
+    if unitGeneral then
+        local commandCaps = unitGeneral.CommandCaps
+        if commandCaps then
+            unitGeneral.CommandCapsHash = table.deepcopy(commandCaps)
+        else
+            unitGeneral.CommandCapsHash = {}
+        end
+    else
+        unit.General = {CommandCapsHash = {}}
+    end
 
 end
 
