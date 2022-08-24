@@ -8,9 +8,6 @@ local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
-
-
 
 local TableGetn = table.getn
 
@@ -889,3 +886,7 @@ function CreateEngineerManager(brain, lType, location, radius)
     em:Create(brain, lType, location, radius)
     return em
 end
+
+
+-- Moved Local Unused Imports to bottom for mod support
+local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
