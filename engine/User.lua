@@ -1111,8 +1111,7 @@ end
 -- Colors separated by commas, no spaces. Example:
 -- TeamColorMode("ffffffff,ffff32ff,ffb76518,ffa79602")
 -- colors will be applied to army according to its index. first color -> army with index 1, second color -> 2 etc.
-
-function INFO: TeamColorMode(bool/string)()
+function INFO:TeamColorMode()
 end
 
 

@@ -7,6 +7,16 @@
 ---@alias Bone string | number
 ---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
 
+-- TODO : Needs Definision
+---@alias TerrainType any
+---@alias Task any
+---@alias CSimSoundManager any
+---@alias EconomyEvent any
+---@alias AIPersonality any
+---@alias ArmyPlans any
+
+
+
 ---@alias Faction
 ---| 0 # UEF
 ---| 1 # Aeon
@@ -561,7 +571,6 @@ end
 ---
 ---@param armyName string
 function GenerateArmyStart(armyName)
-function GenerateArmyStart(army)
 end
 
 ---
@@ -961,7 +970,6 @@ end
 ---@param tblUnits Unit[]
 ---@param order Task
 ---@return ScriptTask
-
 function IssueScript(tblUnits, order)
 end
 
@@ -1246,7 +1254,6 @@ end
 function SetTerrainTypeRect(rect, type)
 end
 
----
 ---@return boolean createInitial
 function ShouldCreateInitialArmyUnits()
 end
@@ -1270,7 +1277,6 @@ end
 function SplitProp(original, blueprintId)
 end
 
----
 ---@param manager CSimSoundManager
 ---@param handle moho.sound_methods
 function StopLoop(manager, handle)
@@ -1289,7 +1295,7 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- Instantly moves an entity to a location
----@param object Entity | Projectile | Unit
+---@param entity Entity | Projectile | Unit
 ---@param location Vector
 ---@param orientation? Vector
 function Warp(entity, location, orientation)
@@ -1301,7 +1307,6 @@ end
 function _c_CreateEntity(entity, spec)
 end
 
----
 ---@param shield Shield
 ---@param spec BpDefense.Shield
 function _c_CreateShield(shield, spec)
