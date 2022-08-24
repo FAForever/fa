@@ -1,8 +1,4 @@
-
-local Entity = import('/lua/sim/Entity.lua').Entity
 local PlayReclaimEndEffects = import('/lua/EffectUtilities.lua').PlayReclaimEndEffects
-
-local DeprecatedWarnings = { }
 
 local minimumLabelMass = 10
 
@@ -35,7 +31,6 @@ local UnitGetBuildRate = UnitMethods.GetBuildRate
 
 -- upvalue trashbag functions for performance
 -- local TrashBag = TrashBag
-local TrashAdd = TrashBag.Add
 local TrashDestroy = TrashBag.Destroy
 
 -- upvalue string functions for performance
@@ -483,3 +478,9 @@ Prop = Class(moho.prop_methods) {
         return self.CanBeKilled
     end,
 }
+
+
+-- imports kept for backwards compatibility with mods
+local Entity = import('/lua/sim/Entity.lua').Entity
+local DeprecatedWarnings = { }
+local TrashAdd = TrashBag.Add

@@ -12,22 +12,27 @@ local techRestrictions = {}
 local enhanceRestriction = {}
 local campaignMode = false
 
+---@param entry any
 function SaveEntry(entry)
     table.insert(transmissions, entry)
 end
 
+---@param table table
 function SaveEnhancementRestriction(table)
     enhanceRestriction = table
 end
 
+---@param category Categories
 function SaveTechRestriction(category)
     table.insert(techRestrictions, {cats = category, type = 'restriction'})
 end
 
+---@param category Categories
 function SaveTechAllowance(category)
     table.insert(techRestrictions, {cats = category, type = 'allow'})
 end
 
+---@param state any
 function IsCampaign(state)
     campaignMode = state
 end
@@ -35,14 +40,10 @@ end
 function OnPostLoad()
     -- Restore Transmissions
     Sync.AddTransmissions = transmissions
-    
     Sync.CampaignMode = campaignMode
-    
     -- Restore restricted enhancements
     Sync.EnhanceRestrict = enhanceRestriction
-    
     Sync.UserUnitEnhancements = SimUnitEnhancements
-    
     -- Restore build restrictions
 --    for i, val in techRestrictions do
 --        if val.type == 'restriction' then

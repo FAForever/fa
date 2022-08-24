@@ -9,7 +9,7 @@
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 
----@class VizMarker
+---@class VizMarker : Entity
 ---@field X number
 ---@field Z number
 ---@field LifeTime number
@@ -21,6 +21,8 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 ---@field WaterVision boolean
 ---@deprecated
 VizMarker = Class(Entity) {
+    ---@param self VizMarker
+    ---@param spec any
     __init = function(self, spec)
         --LOG('__VizMarker')
         Entity.__init(self, spec)
@@ -35,6 +37,7 @@ VizMarker = Class(Entity) {
         self.WaterVision = spec.WaterVision
     end,
 
+    ---@param self VizMarker
     OnCreate = function(self)
         Entity.OnCreate(self)
         --LOG('VizMarker OnCreate')
@@ -60,11 +63,13 @@ VizMarker = Class(Entity) {
         end
     end,
 
+    ---@param self VizMarker
     VisibleLifeTimeThread = function(self)
         WaitSeconds(self.LifeTime)
         self:Destroy()
     end,
 
+    ---@param self VizMarker
     OnDestroy = function(self)
         Entity.OnDestroy(self)
         if self.LifeTimeThread then
