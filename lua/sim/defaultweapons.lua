@@ -18,7 +18,6 @@ local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
-local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors
 
 local MathMax = math.max
 local MathMin = math.min
@@ -1667,3 +1666,6 @@ SCUDeathWeapon = Class(BareBonesWeapon) {
         proj:PassDamageData(self:GetDamageTable())
     end,
 }
+
+-- Moved Unsused Imports To bttome for mod support
+local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors

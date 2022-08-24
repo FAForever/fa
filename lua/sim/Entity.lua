@@ -20,15 +20,21 @@ Entity = Class(moho.entity_methods) {
     -- @param self The entity itself
     -- @param spec The specifications of the entity
     -- -  if 'spec.Owner' is set to a unit then the visibility of the entity matches that of the unit
+    ---@param self Entity
+    ---@param spec any
     __init = function(self, spec)
         _c_CreateEntity(self, spec)
     end,
 
+    ---@param self Entity
+    ---@param spec any
     __post_init = function(self, spec)
         self.OnCreate(self, spec)
     end,
 
     -- kept for backwards compatibility with mods
+    ---@param self Entity
+    ---@param spec any
     OnCreate = function(self, spec) end,
     OnDestroy = function(self) end,
 }
