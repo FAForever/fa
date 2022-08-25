@@ -200,10 +200,10 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by the engine when the projectile receives damage
     ---@param self Projectile
-    ---@param instigator any
+    ---@param instigator Unit
     ---@param amount integer
     ---@param vector Vector
-    ---@param damageType string
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
         if self.Blueprint.Defense.MaxHealth then
             -- we have some health, try and survive
@@ -224,7 +224,7 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by the engine when the projectile is killed, in other words: intercepted
     ---@param self Projectile
-    ---@param instigator any
+    ---@param instigator Unit
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -517,7 +517,7 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by Lua to pass the damage data as a metatable
     ---@param self Projectile
-    ---@param data any
+    ---@param data table
     PassMetaDamage = function(self, data)
         self.DamageData = { }
         setmetatable(self.DamageData, data)
@@ -530,7 +530,7 @@ Projectile = Class(moho.projectile_methods) {
     -- @param targetEntity The entity we hit, is nil if we hit terrain
     -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     ---@param self Projectile
-    ---@param instigator any
+    ---@param instigator Unit
     ---@param DamageData table
     ---@param targetEntity Entity
     ---@param cachedPosition Vector
@@ -747,7 +747,7 @@ Projectile = Class(moho.projectile_methods) {
     --- Called by Lua to create the impact effects
     ---@param self Projectile
     ---@param army integer
-    ---@param EffectTable table 
+    ---@param EffectTable string[] 
     ---@param EffectScale number
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
@@ -767,7 +767,7 @@ Projectile = Class(moho.projectile_methods) {
     --- Called by Lua to create the terrain effects
     ---@param self  Projectile
     ---@param army integer
-    ---@param EffectTable table
+    ---@param EffectTable string[]
     ---@param EffectScale number
     CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
@@ -805,10 +805,10 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by Lua to process taking damage
     ---@param self Projectile
-    ---@param instigator any
+    ---@param instigator Unit
     ---@param amount number
     ---@param vector Vector
-    ---@param damageType string
+    ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Check for valid projectile
         if not self or self:BeenDestroyed() then
@@ -837,19 +837,19 @@ Projectile = Class(moho.projectile_methods) {
     -- Deprecated functionality
 
     ---@param self Projectile
-    ---@return any
+    ---@return Vector
     GetCachePosition = function(self)
         return self:GetPosition()
     end,
 
     ---@param self Projectile
-    ---@param data any
+    ---@param data table
     PassData = function(self, data)
         self.Data = data
     end,
 
     ---@param self Projectile
-    ---@return any
+    ---@return boolean
     GetCollideFriendly = function(self)
         return self.CollideFriendly
     end,
