@@ -9,6 +9,8 @@
 ---- DEFAULT FUNCTIONS FOR ADJACENCY
 ------------------------------------------------------------------------------------------------------------------------------------
 
+local TableGetn = table.getn
+
 ---@param buff BlueprintBuff
 ---@param unit StructureUnit
 ---@param instigator StructureUnit
@@ -29,7 +31,7 @@ end
 ---@return boolean
 EnergyBuildBuffCheck = function(buff, unit)
     local bp = unit:GetBlueprint()
-    if bp.Economy.BuildableCategory and table.getn(bp.Economy.BuildableCategory) > 0 then
+    if bp.Economy.BuildableCategory and TableGetn(bp.Economy.BuildableCategory) > 0 then
         return true
     end
     if EntityCategoryContains(categories.SILO, unit) and EntityCategoryContains(categories.STRUCTURE, unit) then
@@ -58,7 +60,7 @@ end
 ---@return boolean
 MassBuildBuffCheck = function(buff, unit)
     local bp = unit:GetBlueprint()
-    if bp.Economy.BuildableCategory and table.getn(bp.Economy.BuildableCategory) > 0 then
+    if bp.Economy.BuildableCategory and TableGetn(bp.Economy.BuildableCategory) > 0 then
         return true
     end
     if EntityCategoryContains(categories.SILO, unit) and EntityCategoryContains(categories.STRUCTURE, unit) then

@@ -746,7 +746,7 @@ end
 
 ---@param unit Unit
 ---@param buffName string
----@param trsh any - is this the TrashBag ?
+---@param trsh TrashBag
 function PlayBuffEffect(unit, buffName, trsh)
     local def = Buffs[buffName]
     if not def.Effects then
