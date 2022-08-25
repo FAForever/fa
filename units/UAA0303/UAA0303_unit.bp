@@ -287,7 +287,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             ProjectileId = '/projectiles/AAAAutocannonQuantum01/AAAAutocannonQuantum01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 1,

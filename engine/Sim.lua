@@ -7,6 +7,13 @@
 ---@alias Bone string | number
 ---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
 
+---@alias Faction
+---| 0 # UEF
+---| 1 # Aeon
+---| 2 # Cybran
+---| 3 # Seraphim
+---| 4 # (Nomads if enabled)
+
 ---@alias Object Blip | CollisionBeam | Entity | Prop | Projectile | Unit
 ---@alias ReclaimableObject Prop | Unit
 ---@alias BoneObject Projectile | Prop | Unit
@@ -34,42 +41,36 @@ end
 function ArmyIsCivilian(army)
 end
 
---- Returns if the indicated army has been defeated
+--- Returns true if the indicated army has been defeated
 ---@param army Army
 function ArmyIsOutOfGame(army)
 end
 
 --- Attaches a beam between two entities
----@param entityA Entity | Unit | Prop
----@param boneA number | string
----@param entityB Entity | Unit | Prop
----@param boneB number | string
+---@param entityA BoneObject
+---@param boneA Bone
+---@param entityB BoneObject
+---@param boneB Bone
 ---@param army number
----@param blueprint BeamBlueprint
+---@param texture string
 ---@return moho.IEffect
-function AttachBeamEntityToEntity(entityA, boneA, entityB, boneB, army, blueprint)
+function AttachBeamEntityToEntity(entityA, boneA, entityB, boneB, army, texture)
 end
 
 --- Attaches a beam to an entity
----@param emitter BeamBlueprint
----@param entity Entity | Unit | Prop
----@param bone number | string
----@param army number
+---@param emitter moho.IEffect
+---@param entity BoneObject
+---@param bone Bone
+---@param army Army
 ---@return moho.IEffect
 function AttachBeamToEntity(emitter, entity, bone, army)
 end
 
---- Sets language for playing voices.
--- Available languages are in '/gamedata/loc'.
--- Game currently defaults on 'us' language if the localized voices don't exists.
--- @param language String of the language shortcut, example: 'us'.
-
---- Sets the language for voice overs, available languages are in '/gamedata/loc'. The game defaults to 'us' language if the localized voices do not exist
----@param language Language
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function AudioSetLanguage(language)
 end
 
---- Changes the army of a unit, returning the unit
+--- Changes the army of a unit, returning a new unit
 ---@param unit Unit
 ---@param army Army
 ---@return Unit
@@ -81,7 +82,7 @@ end
 function CheatsEnabled()
 end
 
---- It is not known what this does or what its parameters are.
+--- It is not known what this does or what its parameters are
 ---@deprecated
 function CoordinateAttacks()
 end
@@ -90,13 +91,13 @@ end
 ---@param weapon Weapon
 ---@param label string
 ---@param turretBone Bone
----@param barrelBone Bone
----@param muzzleBone Bone
+---@param barrelBone? Bone
+---@param muzzleBone? Bone
 ---@return moho.AimManipulator
 function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
 end
 
---- Creates a bone manipulator for an object, allowing it to be animated
+--- Creates a bone manipulator for a unit, allowing it to be animated
 ---@param object BoneObject
 ---@return moho.manipulator_methods
 function CreateAnimator(object)
@@ -163,7 +164,8 @@ end
 function CreateBeamToEntityBone(object, bone, other, otherBone, army, thickness, texture)
 end
 
---- Creates a builder arm controller that aims for the unit that is being built, repaired or reclaimed. Similar to an aim controller for weapons
+--- Creates a builder arm controller that aims for the unit that is being built, repaired or reclaimed.
+--- Similar to an aim controller for weapons.
 ---@param unit Unit
 ---@param turretBone Bone
 ---@param barrelBone Bone
@@ -172,7 +174,8 @@ end
 function CreateBuilderArmController(unit, turretBone, barrelBone, aimBone)
 end
 
---- Creates a collision detection manipulator, calls the function `self.OnAnimTerrainCollision(self, bone, x, y, z)` when a bone that is being watched collides with the terrain
+--- Creates a collision detection manipulator, calls the function `self.OnAnimTerrainCollision(self, bone, x, y, z)`
+--- when a bone that is being watched collides with the terrain
 ---@param unit Unit
 ---@return moho.CollisionManipulator
 function CreateCollisionDetector(unit)
@@ -327,7 +330,9 @@ end
 function CreateSlaver(object, destBone, srcBone)
 end
 
---- Creates a slider similar to those used in robotics. When applied with other manipulators the slider can cause the entire sequence to 'stutter' at one update per tick, usually you should only manipulate a bone with a slider and nothing else
+--- Creates a slider similar to those used in robotics. When applied with other manipulators the
+--- slider can cause the entire sequence to 'stutter' at one update per tick, usually you should
+--- only manipulate a bone with a slider and nothing else
 ---@param object BoneObject
 ---@param bone Bone
 ---@param goalX? number
@@ -475,89 +480,92 @@ end
 function DamageRing(instigator, location, minRadius, maxRadius, damage, damageType, damageFriendly, damageSelf)
 end
 
---- Get DEBUG info for UI selection.
--- TODO.
+--- Gets the selected units for debug purposes. Note that the selection depends on the player,
+--- so it should not be used in synchronous code.
+---@return Unit[]
 function DebugGetSelection()
 end
 
---- Draw a 3d circle at a with size s and color c.
-
--- Draws a circle at a given location with a given diameter and color
--- @param position An array-based table { 0, 0, 0 } that represents a position
--- @param diameter Diameter of the circle
--- @param color Color of the circle
-function DrawCircle()
+--- Draws a 3D circle
+---@param position Vector
+---@param diameter number
+---@param color Color
+function DrawCircle(position, diameter, color)
 end
 
---- Draw a 3d line from a to b with color c.
--- TODO.
-function DrawLine()
+--- Draws a 3D line
+---@param pointA Vector
+---@param pointB Vector
+---@param color Color
+function DrawLine(pointA, pointB, color)
 end
 
---- Draw a 3d line from a to b with color c with a circle at the endof the target line.
--- TODO.
-function DrawLinePop()
+--- Draws a 3D line with a circle at the end
+---@param start Vector
+---@param finish Vector
+---@param color Color
+function DrawLinePop(start, finish, color)
 end
 
---- Checks if the economy event is finished
+--- Returns true if the economy event is finished
 ---@param event moho.EconomyEvent
 ---@return boolean
 function EconomyEventIsDone(event)
 end
 
---- Signal the end of the game.
--- Acts like a permanent pause.
+--- Signals the end of the game (acts like a permanent pause)
 function EndGame()
 end
 
---- Returns true if a unit category contains this unit.
--- @param category Unit category.
--- @unit Unit fo check for category.
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function EntityCategoryContains(category, unit)
 end
 
---- Count how many units fit the specified category.
--- @param category Unit category.
--- @tblUnits Table containing units, same as group of units.
--- @return Number.
+--- Counts how many units fit the specified category.
+---@param category EntityCategory
+---@param tblUnits Unit[]
+---@return number
 function EntityCategoryCount(category, tblUnits)
 end
 
---- Count how many units fit the specified category around a position.
--- TODO Ideas: (cytegory, position).
--- @return Number.
-function EntityCategoryCountAroundPosition()
+--- Counts how many units fit the specified category around a position.
+---@param category EntityCategory
+---@param position Vector
+---@return number
+function EntityCategoryCountAroundPosition(category, position)
 end
 
---- Filter a list of units to only those found in the category.
--- @param category Unit category.
--- @tblUnits Table containing units, same as group of units.
--- @return Filtered list of units.
+
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function EntityCategoryFilterDown(category, tblUnits)
 end
 
 --- Changes elevation of the map in the desired area.
--- Used mainly for spawning buildings, so they don't float in air.
--- @param x Starting point on x axis in game units.
--- @param z Starting point on z axis in game units.
--- @param sizex Size on x axis in game units.
--- @param sizez Size on z axis in game units.
--- @param elevation Target elevation in game units.
-function FlattenMapRect(x, z, sizex, sizez, elevation)
+--- Used mainly for spawning buildings, so they don't float in air.
+---@param x number
+---@param z number
+---@param sizeX number
+---@param sizeZ number
+---@param elevation number
+function FlattenMapRect(x, z, sizeX, sizeZ, elevation)
 end
 
---- Deletes sscouted icons from the target area.
--- If the area is in a radar range, it will switch back to default unscouted icons.
+--- Removes all recon blips from the target area, if the area is in radar range it generates unseen recon blips
+---@param minX number
+---@param minZ number
+---@param maxX number
+---@param maxZ number
 function FlushIntelInRect(minX, minZ, maxX, maxZ)
 end
 
 ---
----@param army Army
+---@param armyName string
+function GenerateArmyStart(armyName)
 function GenerateArmyStart(army)
 end
 
---- TODO.
--- INFO: rotation = GenerateRandomOrientation()
+---
+---@return Quaternion
 function GenerateRandomOrientation()
 end
 
@@ -579,8 +587,7 @@ end
 function GetArmyUnitCostTotal(army)
 end
 
---- Returns entity's blueprint.
--- Can be used as local bp = entity:GetBlueprint().
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function GetBlueprint(entity)
 end
 
@@ -589,13 +596,15 @@ end
 function GetCurrentCommandSource()
 end
 
---- Return the enitities inside the given rectangle.
--- @param rectangle Map area created by function Rect(x0, z0, x1, z1).
+--- Returns the entities inside the given rectangle
+---@param rectangle Rectangle
 function GetEntitiesInRect(rectangle)
 end
 
---- Get entity by entity id.
--- This ID is unique for each entity.
+--- Gets entity by entity id.
+--- This ID is unique for each entity.
+---@param id string
+---@return Entity
 function GetEntityById(id)
 end
 
@@ -604,85 +613,84 @@ end
 function GetFocusArmy()
 end
 
---- Get the current game time in ticks.
--- The game time is the simulation time, that stops when the game is paused.
+--- Gets the current game time in ticks.
+--- The game time is the simulation time, that stops when the game is paused.
+---@return number
 function GetGameTick()
 end
 
---- Get the current game time in seconds.
--- The game time is the simulation time, that stops when the game is paused.
+
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function GetGameTimeSeconds()
 end
 
---- Returns map size.
--- @return sizeX, sizeZ.
+--- Returns map size
+---@return number sizeX
+---@return number sizeZ
 function GetMapSize()
 end
 
---- Return the reclamable things inside the given rectangle.
--- That includes props, units, wreckages.
--- @param rectangle Map area created by function Rect(x0, z0, x1, z1).
+--- Returns the reclaimable objects inside the given rectangle.
+--- This includes props, units, wreckages.
+---@param rectangle Rectangle
+---@return ReclaimableObject[] | nil
+---@overload fun(x0: number, z0: number, x1: number, z1: number): ReclaimableObject[] | nil
 function GetReclaimablesInRect(rectangle)
 end
 
 --- Returns surface elevation at given position.
--- Takes water into count.
----@param x number Position on x axis.
----@param z number Position on z axis.
+--- Takes water into count.
+---@param x number
+---@param z number
+---@return number
 function GetSurfaceHeight(x, z)
 end
 
---- Returns System time in seconds.
--- INFO: float GetSystemTimeSecondsOnlyForProfileUse().
--- TODO.
+--- Returns System time in seconds
+---@return number
 function GetSystemTimeSecondsOnlyForProfileUse()
 end
 
 --- Returns elevation at given position.
--- Ignores water surface.
--- @param x Position on x axis.
--- @param z Position on x axis.
+--- Ignores water surface.
+---@param x number
+---@param z number
+---@return number
 function GetTerrainHeight(x, z)
 end
 
---- Returns terrain type at given position.
--- INFO: type = GetTerrainType(x,z).
--- @param x Position on x axis.
--- @param z Position on z axis.
+--- Returns terrain type at given position
+---@param x number
+---@param z number
+---@return TerrainType
 function GetTerrainType(x, z)
 end
 
---- TODO.
--- INFO: type = GetTerrainTypeOffset(x,z).
+---
+---@return number
 function GetTerrainTypeOffset(x, z)
 end
 
---- Returns unit's blueprint given the blueprint's name.
--- Example: 'ueb0101'.
--- @param bpName Unit's blueprint name.
+--- Returns unit's blueprint given the blueprint's name
+---@param bpName string
+---@return UnitBlueprint
 function GetUnitBlueprintByName(bpName)
 end
 
---- Returns unit by unique entity id.
--- This ID is unique for each entity.
+
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function GetUnitById(id)
 end
 
---- Retrieves all units in a rectangle, Excludes insignificant units, such as the Cybran Drone, by default.
--- @param rectangle The rectangle to look for units in {x0, z0, x1, z1}.
--- OR
--- @param tlx Top left x coordinate.
--- @param tlz Top left z coordinate.
--- @param brx Bottom right x coordinate.
--- @param brz Bottom right z coordinate.
--- @return nil if none found or a table.
+--- Retrieves all units in a rectangle, excludes insignificant units (such as the Cybran build bot)
+--- by default
+---@param rectangle Rectangle
+---@return Unit[] | nil
+---@overload fun(x0: number, z0: number, x1: number, z1: number): Unit[] | nil
 function GetUnitsInRect(rectangle)
 end
 
---- Returns true if the language for playing voices exists.
--- Available languages are in '/gamedata/loc'.
--- Game currently defaults on 'us' language if the localized voices don't exists.
--- @param language String of the language shortcut, example: 'us'.
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function HasLocalizedVO(language)
 end
 
@@ -695,17 +703,19 @@ end
 function IsAlly(army1, army2)
 end
 
---- TODO.
--- INFO: Blip = IsBlip(entity).
-function IsBlip(entity)
+---
+---@param object Object
+---@return boolean
+function IsBlip(object)
 end
 
---- TODO.
--- INFO: CollisionBeam = IsCollisionBeam(entity).
-function IsCollisionBeam(entity)
+---
+---@param object Object
+---@return boolean
+function IsCollisionBeam(object)
 end
 
---- Returns if the given command is finished
+--- Returns true if the given command is finished
 ---@param cmd SimCommand
 ---@return boolean
 function IsCommandDone(cmd)
@@ -715,12 +725,14 @@ end
 function IsEnemy(army1, army2)
 end
 
---- Returns true if the given object is a Entity.
+--- Returns true if the given object is an Entity
+---@param object Object
+---@return boolean
 function IsEntity(object)
 end
 
---- Return true if the game is over.
--- i.e. EndGame() has been called.
+--- Returns true if the game is over
+---@return boolean
 function IsGameOver()
 end
 
@@ -728,16 +740,22 @@ end
 function IsNeutral(army1, army2)
 end
 
---- Returns true if the target entity is a projectile.
-function IsProjectile(entity)
+--- Returns true if the target entity is a projectile
+---@param object Object
+---@return boolean
+function IsProjectile(object)
 end
 
---- Returns true if the target entity is a prop.
-function IsProp(entity)
+--- Returns true if the target entity is a prop
+---@param object Object
+---@return boolean
+function IsProp(object)
 end
 
---- Returns true if the target entity is a unit.
-function IsUnit(entity)
+--- Returns true if the target entity is a unit
+---@param object Object
+---@return boolean
+function IsUnit(object)
 end
 
 --- Orders a group of units to attack-move to a position
@@ -938,10 +956,12 @@ end
 function IssueSacrifice(tblUnits, target)
 end
 
---- Orders a group of units to run a script sequence, as an example: { TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }
+--- Orders a group of units to run a script sequence, as an example:
+--- `{ TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }`
 ---@param tblUnits Unit[]
----@param order table
----@return moho.ScriptTask_Methods
+---@param order Task
+---@return ScriptTask
+
 function IssueScript(tblUnits, order)
 end
 
@@ -963,7 +983,7 @@ function IssueStop(units)
 end
 
 --- Orders a group of units to launch a tactical missile
----@see IssueNuke() # for strategic missiles
+---@see IssueNuke() # for nuclear missiles
 ---@param units Unit[]
 ---@param target Unit | Vector
 ---@return SimCommand
@@ -1028,57 +1048,67 @@ function LUnitMoveNear(unit, target, range)
 end
 
 --- Lists all armies in the game
----@return string[]
+---@return table<Army, string> # i.e. string[] of army names
 function ListArmies()
 end
 
---- TODO.
+---
+---@param instigator Unit
+---@param location Vector
+---@param maxRadius number
+---@param amount number
+---@param affectsCategory? EntityCategory
+---@param damageFriendly? boolean
 ---@deprecated
-function MetaImpact(instigator, location, fMaxRadius, iAmount, affectsCategory, damageFriendly)
+function MetaImpact(instigator, location, maxRadius, amount, affectsCategory, damageFriendly)
 end
 
---- TODO.
+---
+---@param from Unit
+---@param to Unit
 function NotifyUpgrade(from, to)
 end
 
---- Returns if the current command source is authorized to mess with the given army, or whether cheats are enabled
+--- Returns true if the current command source is authorized to mess with the given army, or if cheats are enabled
 ---@param army Army
 ---@return boolean
 function OkayToMessWithArmy(army)
 end
 
---- Parse a string to generate a new entity category.
--- @param strCategory Example: 'ual0101'.
--- @return Returns generated category, example: categories.ual0101 .
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function ParseEntityCategory(strCategory)
 end
 
---- TODO.
--- INFO: handle = PlayLoop(self,sndParams)
-function PlayLoop(self, sndParams)
+---
+---@param manager CSimSoundManager
+---@param sound BpSoundResult
+---@return moho.sound_methods
+function PlayLoop(manager, sound)
 end
 
---- TODO.
--- INFO: Random([[min,] max])
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function Random()
 end
 
---- Unrestrict the army from building the unit category.
--- The categories can be combined using + - * (), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
--- @param army Army's index.
--- @param category Unit category.
+--- Unrestricts the army from building the unit category
+---@param army Army
+---@param category EntityCategory
 function RemoveBuildRestriction(army, category)
 end
 
---- Removes economy event created by CreateEconomyEvent function from the unit.
--- @param unit Unit to remove the event from.
--- @param event Event to remove.
+--- Removes economy event created by CreateEconomyEvent function from the unit
+---@param unit Unit
+---@param event EconomyEvent
 function RemoveEconomyEvent(unit, event)
 end
 
---- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit.
--- Example: unit = SelectedUnit().
+--- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit
+---@return Unit
 function SelectedUnit()
+end
+
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
+function SessionIsReplay()
 end
 
 --- Sets alliance type between 2 armies, note that weapons do not reset their target
@@ -1108,7 +1138,7 @@ end
 function SetArmyAIPersonality(army, personality)
 end
 
---- Sets army's color using RGB values (0 - 255)
+--- Sets army's color using RGB values, `0` - `255`
 ---@param army Army
 ---@param r number
 ---@param g number
@@ -1153,15 +1183,14 @@ end
 function SetArmyShowScore(army, show)
 end
 
---- Sets the arty starting position.
---- Position where the initial unit will be spawned.
+--- Sets the army starting position for the initial unit.
 ---@param army Army
 ---@param x number
 ---@param z number
 function SetArmyStart(army, x, z)
 end
 
---- Sets the army index for which to sync army stats
+--- Sets the army for which to sync army stats
 ---@param army Army
 function SetArmyStatsSyncArmy(army)
 end
@@ -1172,7 +1201,7 @@ end
 function SetArmyUnitCap(army, unitCap)
 end
 
---- Allows set the rights to the army
+--- Allows rights to the army
 ---@param targetArmyIndex Army
 ---@param sourceHumanIndex Army
 ---@param enable boolean
@@ -1189,27 +1218,31 @@ end
 function SetIgnoreArmyUnitCap(army, ignore)
 end
 
---- Sets army to ignore playable rectangle so that units can move outside of restricted area.
+--- Sets army to ignore playable rectangle.
 --- Used in campaign for offmap attacks.
 ---@param army Army
 ---@param ignore boolean
 function SetIgnorePlayableRect(army, ignore)
 end
 
---- Set playable rectangle.
+--- Sets playable rectangle
+---@param minX number
+---@param minZ number
+---@param maxX number
+---@param maxZ number
 function SetPlayableRect(minX, minZ, maxX, maxZ)
 end
 
---- Changes terrain type at given position.
--- @param x Position on x axis.
--- @param z Position on z axis.
--- @param type Terrain type to change to.
+--- Changes terrain type at given position
+---@param x number
+---@param z number
+---@param type TerrainType
 function SetTerrainType(x, z, type)
 end
 
---- Changes terrain type in given rectangle.
--- @paran rect Map area created by function Rect(x0, z0, x1, z1).
--- @param type Terrain type to change to.
+--- Changes terrain type in given rectangle
+---@param rect Rectangle
+---@param type TerrainType
 function SetTerrainTypeRect(rect, type)
 end
 
@@ -1218,41 +1251,48 @@ end
 function ShouldCreateInitialArmyUnits()
 end
 
---- Perform a console command.
--- SimConExecute('command string').
-function SimConExecute(commandString)
+--- Performs a console command
+---@param command string
+function SimConExecute(command)
 end
 
---- Split a prop into multiple child props, one per bone.
--- Used for breaking up tree groups at colision.
--- @param original Prop to split
--- @param blueprint_name BP name of the new props to spawn at each bone of the original prop.
--- @return Returns all the created props.
-function SplitProp(original, blueprint_name)
+--- Sinks the entity into the ground.
+--- Used for dead trees, for example.
+---@param velY number
+function SinkAway(velY)
 end
 
---- TODO.
-function StopLoop(self, handle)
+--- Splits a prop into multiple child props, spawning one prop per bone.
+--- Used for breaking up tree groups at collision.
+---@param original Prop
+---@param blueprintId string
+---@return Prop[]
+function SplitProp(original, blueprintId)
 end
 
---- Request that we submit xml army stats to gpg.net.
--- TODO.
+---
+---@param manager CSimSoundManager
+---@param handle moho.sound_methods
+function StopLoop(manager, handle)
+end
+
+--- Requests that we submit xml army stats to GPG.net
 function SubmitXMLArmyStats()
 end
 
---- Attempt to copy animation pose from the unit to the prop.
--- Only works if the mesh and skeletons are the same, but will not produce an error if not.
--- @param unitFrom Unit to copy pose from.
--- @param entityTo Entity (prop) to copy pose on.
--- @param bCopyWorldTransform true/false.
-function TryCopyPose(unitFrom, entityTo, bCopyWorldTransform)
+--- Attempts to copy animation pose from the unit to the prop.
+--- Only works if the mesh and skeletons are the same, but will not produce an error if not.
+---@param unitFrom Unit
+---@param entityTo Prop
+---@param copyWorldTransform boolean
+function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- Instantly moves an entity to a location
 ---@param object Entity | Projectile | Unit
 ---@param location Vector
 ---@param orientation? Vector
-function Warp(object, location, orientation)
+function Warp(entity, location, orientation)
 end
 
 ---
@@ -1267,35 +1307,10 @@ end
 function _c_CreateShield(shield, spec)
 end
 
---- Print a log message
--- TODO
-function print()
-end
-
----
---  derived from Entity
-function base()
-end
-
-
---- Sinks the entity into the ground.
--- Used for dead trees for example.
--- @param vy Velocity at Y axis.
-function SinkAway(vy)
-end
-
-
 ------
--- New functions from engine patch:
+---New functions from engine patch:
 ------
 
--- Returns list of deposits
--- Type: 0 - All, 1 - Mass, 2 - Energy
--- Result: {{X1,X2,Z1,Z2,Type,Dist},...}
-function GetDepositsAroundPoint(X, Z, Radius, Type)
-end
-
--- Returns true if the active session is a replay
--- Same as user SessionIsReplay.
-function SessionIsReplay()
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
+function GetDepositsAroundPoint(x, z, radius, type)
 end

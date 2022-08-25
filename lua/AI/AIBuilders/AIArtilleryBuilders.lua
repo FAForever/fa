@@ -23,6 +23,8 @@ local TBC = '/lua/editor/ThreatBuildConditions.lua'
 local IBC = '/lua/editor/InstantBuildConditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
+---@alias BuilderGroupsArtillery 'T3ArtilleryGroup' | 'ExperimentalArtillery' | 'NukeBuildersEngineerBuilders' | 'T3ArtilleryFormBuilders' | 'NukeFormBuilders'
+
 -- T3 Artillery/Rapid Fire Artillery
 BuilderGroup {
     BuilderGroupName = 'T3ArtilleryGroup',

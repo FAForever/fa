@@ -9,6 +9,7 @@
 
 local SRadarJammerUnit = import('/lua/seraphimunits.lua').SRadarJammerUnit
 
+---@class XSB4203 : SRadarJammerUnit
 XSB4203 = Class(SRadarJammerUnit) {
     IntelEffects = {
 		{

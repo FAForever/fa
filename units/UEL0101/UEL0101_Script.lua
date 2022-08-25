@@ -12,6 +12,7 @@ local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 local TDFMachineGunWeapon = import('/lua/terranweapons.lua').TDFMachineGunWeapon
 
 
+---@class UEL0101 : TConstructionUnit
 UEL0101 = Class(TConstructionUnit) {
     
     Weapons = {

@@ -10,6 +10,7 @@
 
 local AMassStorageUnit = import('/lua/aeonunits.lua').AMassStorageUnit
 
+---@class UAB1106 : AMassStorageUnit
 UAB1106 = Class(AMassStorageUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)

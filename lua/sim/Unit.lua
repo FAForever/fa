@@ -6,37 +6,41 @@
 -----------------------------------------------------------------
 
 -- Imports. Localise commonly used subfunctions for speed
-local Entity = import('/lua/sim/Entity.lua').Entity
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local explosion = import('/lua/defaultexplosions.lua')
-
-local EffectUtilities = import('/lua/EffectUtilities.lua')
-local Game = import('/lua/game.lua')
-local utilities = import('/lua/utilities.lua')
-local Shield = import('/lua/shield.lua').Shield
-local PersonalBubble = import('/lua/shield.lua').PersonalBubble
-local TransportShield = import('/lua/shield.lua').TransportShield
-local PersonalShield = import('/lua/shield.lua').PersonalShield
-local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
-
-local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
-local Wreckage = import('/lua/wreckage.lua')
+local Buff = import('/lua/sim/buff.lua')
+local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectUtilities = import('/lua/EffectUtilities.lua')
+local EnhancementCommon = import('/lua/enhancementcommon.lua')
+local Explosion = import('/lua/defaultexplosions.lua')
+local Game = import('/lua/game.lua')
 local Set = import('/lua/system/setutils.lua')
-local Factions = import('/lua/factions.lua').GetFactions(true)
+local SimUtils = import('/lua/SimUtils.lua')
+local utilities = import('/lua/utilities.lua')
+local Wreckage = import('/lua/wreckage.lua')
 
-local DeprecatedWarnings = { }
+local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
+local PersonalBubble = import('/lua/shield.lua').PersonalBubble
+local PersonalShield = import('/lua/shield.lua').PersonalShield
+local Shield = import('/lua/shield.lua').Shield
+local TransportShield = import('/lua/shield.lua').TransportShield
+local Weapon = import('/lua/sim/Weapon.lua').Weapon
 
--- allows us to skip ai-specific functionality
-local GameHasAIs = ScenarioInfo.GameHasAIs
+local TrashBag = TrashBag
+local TrashAdd = TrashBag.Add
+local TrashDestroy = TrashBag.Destroy
+local TrashEmpty = TrashBag.Empty
 
--- cached categories for performance
+local armies = ListArmies()
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local CreateEmitterAtBone = CreateEmitterAtBone
+local IsAlly = IsAlly
+local rawget = rawget
+
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
 
--- upvalue for performance
-local rawget = rawget 
-local IsAlly = IsAlly
-local armies = ListArmies()
+
+
+local DeprecatedWarnings = { }
 
 -- Structures that are reused for performance reasons
 -- Maps unit.techCategory to a number so we can do math on it for naval units
@@ -58,13 +62,6 @@ local veterancyRegenBuffs = {
     {25, 50, 75, 100,125}, -- Experimental
 }
 
-local TrashBag = TrashBag
-local TrashAdd = TrashBag.Add
-local TrashDestroy = TrashBag.Destroy
-local TrashEmpty = TrashBag.Empty
-
-local AttachBeamEntityToEntity = AttachBeamEntityToEntity
-local CreateEmitterAtBone = CreateEmitterAtBone
 
 SyncMeta = {
     __index = function(t, key)
@@ -93,27 +90,6 @@ SyncMeta = {
     end,
 }
 
-local SharedTypeCache = { }
-local function PopulateBlueprintCache(entity, blueprint)
-
-    -- populate the cache
-    local cache = { }
-    cache.Blueprint = blueprint 
-
-    cache.Cats = blueprint.Categories
-    cache.CatsCount = table.getn(blueprint.Categories)
-    cache.HashedCats = table.hash(blueprint.Categories)
-
-    cache.DoNotCollideCats = blueprint.DoNotCollideList or false
-    cache.DoNotCollideCatsCount = table.getn(blueprint.DoNotCollideList or { })
-    cache.HashedDoNotCollideCats = table.hash(blueprint.DoNotCollideList)
-
-    cache.Audio = blueprint.Audio
-  
-    -- store the result
-    SharedTypeCache[blueprint.BlueprintId] = cache 
-end
-
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods
 ---@field Brain AIBrain
@@ -122,8 +98,6 @@ local cUnit = moho.unit_methods
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 Unit = Class(moho.unit_methods) {
-
-    Cache = false,
 
     Weapons = {},
 
@@ -221,14 +195,6 @@ Unit = Class(moho.unit_methods) {
     OnCreate = function(self)
         local bp = self:GetBlueprint()
 
-        -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[bp.BlueprintId] then 
-            PopulateBlueprintCache(self, bp)
-        end
-
-        -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[bp.BlueprintId]
-
         -- cache often accessed values into inner table
         self.Blueprint = bp
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
@@ -287,13 +253,7 @@ Unit = Class(moho.unit_methods) {
         self.IdleEffectsBag = TrashBag()
         self.TopSpeedEffectsBag = TrashBag()
         self.BeamExhaustEffectsBag = TrashBag()
-        self.TransportBeamEffectsBag = TrashBag()
-        self.BuildEffectsBag = TrashBag()
-        self.ReclaimEffectsBag = TrashBag()
         self.OnBeingBuiltEffectsBag = TrashBag()
-        self.CaptureEffectsBag = TrashBag()
-        self.UpgradeEffectsBag = TrashBag()
-        self.TeleportFxBag = TrashBag()
 
         -- Set up veterancy
         self.xp = 0
@@ -349,12 +309,18 @@ Unit = Class(moho.unit_methods) {
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
-        
+        -- add support for keeping track of reclaim statistics
+        if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
+            self.ReclaimedMass = 0
+            self.ReclaimedEnergy = 0
+            self:GetStat("ReclaimedMass", 0)
+            self:GetStat("ReclaimedEnergy", 0)
+        end
+
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
             self.ResetJammer = -1
         end
-        
     end,
 
     -------------------------------------------------------------------------------------------
@@ -627,14 +593,18 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StartCaptureEffects = function(self, target)
+        self.CaptureEffectsBag = self.CaptureEffectsBag or TrashBag()
         self.CaptureEffectsBag:Add(self:ForkThread(self.CreateCaptureEffects, target))
     end,
 
     CreateCaptureEffects = function(self, target)
+        EffectUtilities.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
 
     StopCaptureEffects = function(self, target)
-        self.CaptureEffectsBag:Destroy()
+        if self.CaptureEffectsBag then
+            self.CaptureEffectsBag:Destroy()
+        end
     end,
 
     OnFailedCapture = function(self, target)
@@ -740,6 +710,9 @@ Unit = Class(moho.unit_methods) {
     OnStopRepair = function(self, unit)
     end,
 
+    ---comment
+    ---@param self any
+    ---@param target any
     OnStartReclaim = function(self, target)
         self:SetUnitState('Reclaiming', true)
         self:SetFocusEntity(target)
@@ -756,31 +729,80 @@ Unit = Class(moho.unit_methods) {
             IssueReclaim({self}, target)
             IssueGuard({self}, guard)
         end
+
+        -- add state to be able to show the amount reclaimed in the UI
+        if target.IsProp then
+            self.OnStartReclaimPropStartTick = GetGameTick() + 2
+
+            local time, energy, mass = target:GetReclaimCosts(self)
+            self.OnStartReclaimPropTicksRequired = 10 * time
+            self.OnStartReclaimPropMass = mass
+            self.OnStartReclaimPropEnergy = energy
+        end
     end,
 
+    --- Called when the unit stops reclaiming
+    ---@param self Unit
+    ---@param target Unit | Prop | nil      # is nil when the prop or unit is completely reclaimed
     OnStopReclaim = function(self, target)
         self:DoUnitCallbacks('OnStopReclaim', target)
         self:StopReclaimEffects(target)
         self:StopUnitAmbientSound('ReclaimLoop')
         self:PlayUnitSound('StopReclaim')
         self:SetUnitState('Reclaiming', false)
-        if target.MaxMassReclaim then -- This is a prop
+
+        if target.IsProp then -- This is a prop
             target:UpdateReclaimLeft()
         end
+
+        -- process the amount we reclaimed to show it in the UI
+        if self.OnStartReclaimPropStartTick then
+            local ticks = (GetGameTick() - self.OnStartReclaimPropStartTick)
+
+            -- can end up negative if another engineer finishes reclaiming the prop between us starting to reclaim, and actually reclaiming
+            if ticks > 0 then
+                -- completely consumed this prop
+                if ticks >= self.OnStartReclaimPropTicksRequired then
+                    self.ReclaimedMass = self.ReclaimedMass + self.OnStartReclaimPropMass
+                    self.ReclaimedEnergy = self.ReclaimedEnergy + self.OnStartReclaimPropEnergy
+                    
+                -- partially consumed the prop
+                else
+                    local fraction = ticks / self.OnStartReclaimPropTicksRequired
+                    self.ReclaimedMass = self.ReclaimedMass + fraction * self.OnStartReclaimPropMass
+                    self.ReclaimedEnergy = self.ReclaimedEnergy + fraction * self.OnStartReclaimPropEnergy
+                end
+            end
+
+            -- update UI
+            self:SetStat('ReclaimedMass', self.ReclaimedMass)
+            self:SetStat('ReclaimedEnergy', self.ReclaimedEnergy)
+        end
+
+        -- reset reclaiming state
+        self.OnStartReclaimPropStartTick = nil
+        self.OnStartReclaimPropTicksRequired = nil
+        self.OnStartReclaimPropMass = nil
+        self.OnStartReclaimPropEnergy = nil
     end,
 
     StartReclaimEffects = function(self, target)
+        self.ReclaimEffectsBag = self.ReclaimEffectsBag or TrashBag()
         self.ReclaimEffectsBag:Add(self:ForkThread(self.CreateReclaimEffects, target))
     end,
 
     CreateReclaimEffects = function(self, target)
+        EffectUtilities.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
     CreateReclaimEndEffects = function(self, target)
+        EffectUtilities.PlayReclaimEndEffects(self, target)
     end,
 
     StopReclaimEffects = function(self, target)
-        self.ReclaimEffectsBag:Destroy()
+        if self.ReclaimEffectsBag then
+            self.ReclaimEffectsBag:Destroy()
+        end
     end,
 
     OnDecayed = function(self)
@@ -824,7 +846,7 @@ Unit = Class(moho.unit_methods) {
 
             -- Fix captured units not retaining their data
             self:ResetCaptors()
-            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captor.Army, true) or {}
+            local newUnits = SimUtils.TransferUnitsOwnership({self}, captor.Army, true) or {}
 
             -- The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
             -- If table would have been nil (Set to {} above), was empty, or contains more than one, kill this sequence
@@ -1034,6 +1056,75 @@ Unit = Class(moho.unit_methods) {
     GetBuildRateOverride = function(self)
         return self.BuildRateOverride
     end,
+
+    --- Adds up total build costs for the unit blueprint and active enhancements
+    ---@param self Unit
+    ---@return number mass
+    ---@return number energy
+    ---@return number time
+    GetTotalResourceCosts = function(self)
+        local bp = self.Blueprint
+        local economy = bp.Economy
+        local mass = economy.BuildCostMass or 0
+        local energy = economy.BuildCostEnergy or 0
+        local time = economy.BuildTime or 0
+        local enhancements = bp.Enhancements
+        if enhancements then
+            local activeEnhancements = SimUnitEnhancements[self.EntityId]
+            if activeEnhancements then
+                local presetEnhancements = bp.EnhancementPresetAssigned.Enhancements
+                for _, enhName in activeEnhancements do
+                    -- don't add enhancement costs built into the unit cost
+                    if presetEnhancements and presetEnhancements[enhName] then
+                        continue
+                    end
+                    -- add up the enhancement AND all of its prerequisites
+                    repeat
+                        local enh = enhancements[enhName]
+                        mass = mass + (enh.BuildCostMass or 0)
+                        energy = energy + (enh.BuildCostEnergy or 0)
+                        time = time + (enh.BuildTime or 0)
+                        enhName = enh.Prerequisite
+                    until not enhName
+                end
+            end
+        end
+        if time == 0 then
+            time = 10
+        end
+        return mass, energy, time
+    end;
+
+    --- Adds up the total mass cost of this unit, including enhancements
+    ---@param self Unit
+    ---@return number
+    GetTotalMassCost = function(self)
+        return (self:GetTotalResourceCosts()) -- adjust to one return value
+    end;
+
+    --- Gets the change in progress a unit will have if it sacrifices into this one
+    ---@overload fun(self: Unit, sacrificer: Unit): number
+    --- Gets the change in progress a unit with `mass` and `energy` build costs will have, presuming
+    --- a `SacrificeMassMult` and `SacrificeEnergyMult` of `1.0`. Premultiply the mass and energy values
+    --- if this is not the case (as it usually is). 
+    ---@param self Unit
+    ---@param mass number
+    ---@param energy number
+    ---@return number
+    CalculateSacrificeBonus = function(self, mass, energy)
+        if type(mass) == "table" then
+            local unit = mass
+            local economy = unit.Blueprint.Economy
+            mass, energy = unit:GetTotalResourceCosts()
+            mass = mass * economy.SacrificeMassMult
+            energy = energy * economy.SacrificeEnergyMult
+        end
+        local economy = self.Blueprint.Economy
+        local buildMass = economy.BuildCostMass
+        local buildEnergy = economy.BuildCostEnergy
+        -- always comes within 5 ulps; probably what the underlying engine uses, with different rounding
+        return math.min(mass / buildMass, energy / buildEnergy)
+    end;
 
     -------------------------------------------------------------------------------------------
     -- DAMAGE
@@ -1265,29 +1356,12 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetVeterancyValue = function(self)
-        local bp = self.Blueprint
-        local mass = bp.Economy.BuildCostMass
         local fractionComplete = self:GetFractionComplete()
-
-        if fractionComplete == 1 then
-            -- Add the value of any enhancements
-            local enhancements = SimUnitEnhancements[self.EntityId]
-            if enhancements then
-                for _, name in enhancements do
-                    mass = mass + bp.Enhancements[name].BuildCostMass or 0
-                end
-            end
-
-            -- Subtract the value of any enhancements from a preset because their value is included in bp.Economy.BuildCostMass
-            if bp.EnhancementPresetAssigned.Enhancements then
-                for _, name in bp.EnhancementPresetAssigned.Enhancements do
-                    mass = mass - bp.Enhancements[name].BuildCostMass or 0
-                end
-            end
-        end
-
-        -- Allow units to count for more or less than their real mass if needed.
-        return mass * fractionComplete * (bp.VeteranImportanceMult or 1) + (self.cargoMass or 0)
+        local unitMass = self:GetTotalMassCost()
+        local vetMult = self.Blueprint.VeteranImportanceMult or 1
+        local cargoMass = self.cargoMass or 0
+        -- Allow units to count for more or less than their real mass if needed
+        return fractionComplete * unitMass * vetMult + cargoMass
     end,
 
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
@@ -1489,14 +1563,14 @@ Unit = Class(moho.unit_methods) {
 
         -- check for exclusions from projectile perspective
         for k = 1, other.Blueprint.DoNotCollideListCount do
-            if self.Cache.HashedCats[other.Blueprint.DoNotCollideList[k]] then
+            if self.Blueprint.CategoriesHash[other.Blueprint.DoNotCollideList[k]] then
                 return false 
             end
         end
 
         -- check for exclusions from unit perspective
-        for k = 1, self.Cache.DoNotCollideCatsCount do 
-            if other.Blueprint.CategoriesHash[self.Cache.DoNotCollideCats[k]] then
+        for k = 1, self.Blueprint.DoNotCollideListCount do
+            if other.Blueprint.CategoriesHash[self.Blueprint.DoNotCollideList[k]] then
                 return false
             end
         end
@@ -1561,7 +1635,7 @@ Unit = Class(moho.unit_methods) {
                 sinkAnim:PlayAnim(animBlock.Animation)
                 rate = rate or 1
                 if animBlock.AnimationRateMax and animBlock.AnimationRateMin then
-                    rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) / 10
+                    rate = animBlock.AnimationRateMin + Random() * (animBlock.AnimationRateMax - animBlock.AnimationRateMin)
                 end
                 sinkAnim:SetRate(rate)
                 self.Trash:Add(sinkAnim)
@@ -1627,7 +1701,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Create some ambient wreckage smoke
         if layer == 'Land' then
-            explosion.CreateWreckageEffects(self, prop)
+            Explosion.CreateWreckageEffects(self, prop)
         end
 
         return prop
@@ -1676,7 +1750,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateDestructionEffects = function(self, overKillRatio)
-        explosion.CreateScalableUnitExplosion(self)
+        Explosion.CreateScalableUnitExplosion(self)
     end,
 
     DeathWeaponDamageThread = function(self, damageRadius, damage, damageType, damageFriendly)
@@ -1709,7 +1783,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             if toSurface < 0 then
-                explosion.CreateDefaultHitExplosionAtBone(self, randBone, scale*1.5)
+                Explosion.CreateDefaultHitExplosionAtBone(self, randBone, scale*1.5)
             else
                 local lifetime = utilities.GetRandomInt(50, 200)
 
@@ -1922,7 +1996,10 @@ Unit = Class(moho.unit_methods) {
         TrashDestroy(self.IdleEffectsBag)
         TrashDestroy(self.TopSpeedEffectsBag)
         TrashDestroy(self.BeamExhaustEffectsBag)
-        TrashDestroy(self.TransportBeamEffectsBag)
+
+        if self.TransportBeamEffectsBag then 
+            self.TransportBeamEffectsBag:Destroy()
+        end
 
         -- destroy remaining trash of weapon
         for k = 1, self.WeaponCount do 
@@ -2069,7 +2146,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetRotation = function(self, angle)
-        local qx, qy, qz, qw = explosion.QuatFromRotation(angle, 0, 1, 0)
+        local qx, qy, qz, qw = Explosion.QuatFromRotation(angle, 0, 1, 0)
         self:SetOrientation({qx, qy, qz, qw}, true)
     end,
 
@@ -2526,6 +2603,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBuild = function(self, built, order)
+
+        self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
+
         -- Prevent UI mods from violating game/scenario restrictions
         local id = built.UnitId
         local bp = built:GetBlueprint()
@@ -2623,7 +2703,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopBuildingEffects = function(self, built)
-        self.BuildEffectsBag:Destroy()
+        if self.BuildEffectsBag then
+            self.BuildEffectsBag:Destroy()
+        end
 
         -- kept after --3355 for backwards compatibility with mods
         if self.buildBots then
@@ -2633,12 +2715,15 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnStartSacrifice = function(self, target_unit)
-        EffectUtilities.PlaySacrificingEffects(self, target_unit)
+    OnStartSacrifice = function(self, targetUnit)
+        self:SetUnitState("Sacrificing", true)
+        EffectUtilities.PlaySacrificingEffects(self, targetUnit)
+        self.SacrificeTargetUnit = targetUnit
     end,
 
-    OnStopSacrifice = function(self, target_unit)
-        EffectUtilities.PlaySacrificeEffects(self, target_unit)
+    OnStopSacrifice = function(self, targetUnit)
+        self:SetUnitState("Sacrificing", false)
+        EffectUtilities.PlaySacrificeEffects(self, targetUnit)
         self:SetDeathWeaponEnabled(false)
         self:Destroy()
     end,
@@ -2928,14 +3013,13 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnWorkBegin = function(self, work)
-        local enhCommon = import('/lua/enhancementcommon.lua')
-        local restrictions = enhCommon.GetRestricted()
+        local restrictions = EnhancementCommon.GetRestricted()
         if restrictions[work] then
             self:OnWorkFail(work)
             return false
         end
 
-        local unitEnhancements = enhCommon.GetEnhancements(self.EntityId)
+        local unitEnhancements = EnhancementCommon.GetEnhancements(self.EntityId)
         local tempEnhanceBp = self.Blueprint.Enhancements[work]
         --LOG('ACU is ordering enhancement ['..repr(tempEnhanceBp.Name)..'] ' )
         if tempEnhanceBp.Prerequisite then
@@ -2984,6 +3068,58 @@ Unit = Class(moho.unit_methods) {
         self:CleanupEnhancementEffects()
     end,
 
+    ---@alias DefaultWorkOrder "BeingBuilt" | "Enhancing" | "FactoryBuilding" | "None" | "Repairing" | "Upgrading"
+
+    --- Returns the current default work order, which is something that an assisting unit would be
+    --- able to directly do for the unit without inheriting work: constructing, enhancing, upgrading,
+    --- factory building, repairing, or nothing (in that order).
+    ---@param self Unit
+    ---@return DefaultWorkOrder
+    GetCurrentDefaultWorkOrder = function(self)
+        if self:IsUnitState("BeingBuilt") then
+            return "BeingBuilt"
+        end
+        if self:IsUnitState("Enhancing") then
+            return "Enhancing"
+        end
+        if self:IsUnitState("Upgrading") then
+            return "Upgrading"
+        end
+        if self:IsUnitState("Building") then
+            return "FactoryBuilding"
+        end
+        if self:GetHealth() < self:GetMaxHealth() then
+            return "Repairing"
+        end
+        return "None"
+    end;
+
+    --- Gets the amount of progress left for the current default work item--that is, something
+    --- an assisting unit can directly do for the unit without inheriting work: constructing,
+    --- enhancing, upgrading, factory building, and repairing (in that order).
+    ---@param self Unit
+    ---@return number totalProgressLeft
+    GetCurrentDefaultWorkProgress = function(self)
+        -- constructing
+        local built = self:GetFractionComplete()
+        if built < 1.0 then
+            return built
+        end
+
+        --- enhancing, upgrading, building
+        if self.WorkItem or self:IsUnitState("Upgrading") or self:IsUnitState("Building") then
+            return self:GetWorkProgress()
+        end
+
+        --- default to repairing
+        local health = self:GetHealth()
+        local maxHealth = self:GetMaxHealth()
+        if health == maxHealth then
+            return 1.0
+        end
+        return health / maxHealth
+    end;
+
     CreateEnhancement = function(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
         if not bp then
@@ -3021,6 +3157,8 @@ Unit = Class(moho.unit_methods) {
         local bp = self.Blueprint.Enhancements[enhancement]
         local effects = TrashBag()
         local scale = math.min(4, math.max(1, (bp.BuildCostEnergy / bp.BuildTime or 1) / 50))
+
+        self.UpgradeEffectsBag = self.UpgradeEffectsBag or TrashBag()
 
         if bp.UpgradeEffectBones then
             for _, v in bp.UpgradeEffectBones do
@@ -3617,7 +3755,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetWeaponClass = function(self, label)
-        return self.Weapons[label] or import('/lua/sim/Weapon.lua').Weapon
+        return self.Weapons[label] or Weapon
     end,
 
     -- Return the total time in seconds, cost in energy, and cost in mass to build the given target type.
@@ -3881,7 +4019,7 @@ Unit = Class(moho.unit_methods) {
         elseif bt == 'MAXHEALTH' then
             self:SetMaxHealth(self:GetMaxHealth() + (buffTable.Value or 0))
         elseif bt == 'HEALTH' then
-            self:SetHealth(self, self:GetHealth() + (buffTable.Value or 0))
+            self:AdjustHealth(self, buffTable.Value or 0)
         elseif bt == 'SPEEDMULT' then
             self:SetSpeedMult(buffTable.Value or 0)
         elseif bt == 'MAXFUEL' then
@@ -4006,6 +4144,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
+        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
         TrashAdd(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
@@ -4173,22 +4312,27 @@ Unit = Class(moho.unit_methods) {
     end,
 
     PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
     end,
 
     CleanupTeleportChargeEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.DestroyTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     CleanupRemainingTeleportChargeEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.DestroyRemainingTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportOutEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportOutEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportInEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportInEffects(self, self.TeleportFxBag)
     end,
 
@@ -4644,37 +4788,16 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@class DummyUnit : moho.unit_methods
 DummyUnit = Class(moho.unit_methods) {
 
-    Cache = false,
-
-    OnCreate = function(self) 
-
-        local blueprint = self:GetBlueprint()
-        
-        -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[blueprint.BlueprintId] then 
-            PopulateBlueprintCache(self, blueprint)
-        end
-
-        -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[blueprint.BlueprintId]
-
+    OnCreate = function(self)
         -- cache unique values into inner table
         self.EntityId = EntityGetEntityId(self)
+        self.UnitId = UnitGetUnitId(self)
         self.Army = EntityGetArmy(self)
         self.Layer = UnitGetCurrentLayer(self)
 
         -- cache often accessed values into inner table
-        self.UnitId = UnitGetUnitId(self)
-        self.Blueprint = blueprint
+        self.Blueprint = self:GetBlueprint()
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
-
-        -- basic check if this insignificant unit is truely insignificant
-        if not EntityCategoryContains(CategoriesDummyUnit, self) then 
-            WARN("Unit " .. tostring(self.UnitId) .. " is a dummy unit but doesn't have the right categories set!")
-
-            -- todo: add more info for dev
-        end
-    
     end,
 
     --- Typically called by functions

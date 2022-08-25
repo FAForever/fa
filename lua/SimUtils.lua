@@ -126,8 +126,9 @@ function TransferUnitsOwnership(units, toArmy, captured)
         -- children over as well, so we only want the top level units to be given.
         -- Units currently being captured are also denied
         if  owner == toArmy or
-            unit.Parent and unit.Parent ~= unit or
-            unit.CaptureProgress > 0
+            unit:GetParent() ~= unit or (unit.Parent and unit.Parent ~= unit) or
+            unit.CaptureProgress > 0 or
+            unit:GetFractionComplete() < 1.0
         then
             continue
         end

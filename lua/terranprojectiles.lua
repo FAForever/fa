@@ -26,7 +26,8 @@ local util = import('utilities.lua')
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
-TFragmentationGrenade= Class(EmitterProjectile) {
+---@class TFragmentationGrenade : EmitterProjectile
+TFragmentationGrenade = Class(EmitterProjectile) {
     FxImpactUnit = EffectTemplate.THeavyFragmentationGrenadeUnitHit,
     FxImpactLand = EffectTemplate.THeavyFragmentationGrenadeHit,
     FxImpactWater = EffectTemplate.THeavyFragmentationGrenadeHit,
@@ -37,6 +38,7 @@ TFragmentationGrenade= Class(EmitterProjectile) {
     --PolyTrail= EffectTemplate.THeavyFragmentationGrenadePolyTrail,
 }
 
+---@class TIFMissileNuke : NukeProjectile, SingleBeamProjectile
 TIFMissileNuke = Class(NukeProjectile, SingleBeamProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
     FxImpactUnit = {},

@@ -9,6 +9,7 @@
 --****************************************************************************
 local ACivilianStructureUnit = import('/lua/aeonunits.lua').ACivilianStructureUnit
 
+---@class UAC1401 : ACivilianStructureUnit
 UAC1401 = Class(ACivilianStructureUnit) {
 	
 	OnCreate = function(self)

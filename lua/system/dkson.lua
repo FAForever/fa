@@ -46,13 +46,6 @@ json = { version = "dkjson 2.5" }
 
 local _ENV = nil -- blocking globals in Lua 5.2
 
-pcall (function()
--- Enable access to blocked metatables.
--- Don't worry, this module doesn't change anything in them.
-    local debmeta = require "debug".getmetatable
-    if debmeta then getmetatable = debmeta end
-end)
-
 json.null = setmetatable ({}, {
     __tojson = function () return "null" end
 })

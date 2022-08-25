@@ -91,6 +91,7 @@ UnitBlueprint {
         'MOBILE',
         'AIR',
         'HIGHALTAIR',
+        'BOMBER',
         'TECH3',
         'ANTINAVY',
         'VISIBLETORECON',

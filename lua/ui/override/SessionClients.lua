@@ -1,6 +1,17 @@
 
+---@class Client
+---@field authorizedCommandSources number[]
+---@field connected boolean
+---@field ejectedBy number[]
+---@field local boolean
+---@field name string
+---@field ping number
+---@field quiet number
+---@field uid string
+
+
 -- keep a reference to the actual function
-local GlobalGetSessionClients = _G.GetSessionClients
+local GlobalGetSessionClients = GetSessionClients
 
 --- Allows UI elements to be updated when the cache is updated by adding a callback via Observable:AddObserver()
 local Cached = GlobalGetSessionClients()
@@ -14,9 +25,6 @@ local TickInterval = 2.0
 -- allows us to keep track of when we really want to reset it. As an example,
 -- when FastInterval() is called again before ResetInterval() is.
 local TickIntervalResetCounter = 0
-
---- Handle to the tick thread that updates the cache
-local HandleToTickThread = false 
 
 --- A simple tick thread that updates the cache
 local function TickThread()
@@ -33,18 +41,9 @@ local function TickThread()
     end
 end
 
---- Starts the tick thread to update the cache, should be called only once
-function Setup()
-    if not HandleToTickThread then 
-        HandleToTickThread = ForkThread(TickThread)
-    else 
-        WARN("Tried to start a second tick thread for updating the cache of GetSessionClients:")
-        LOG(repr(debug.getinfo(2)))
-    end
-end
-
 --- Override global function to return our cache
-_G.GetSessionClients = function()
+---@return Client[]
+GetSessionClients = function()
     return Cached
 end
 
@@ -66,3 +65,5 @@ function ResetInterval()
         TickInterval = 2.0
     end
 end
+
+ForkThread(TickThread)

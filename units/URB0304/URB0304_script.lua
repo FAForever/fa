@@ -10,6 +10,7 @@
 local CQuantumGateUnit = import('/lua/cybranunits.lua').CQuantumGateUnit
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
+---@class URB0304 : CQuantumGateUnit
 URB0304 = Class(CQuantumGateUnit) {
     GateBones = {
         {   

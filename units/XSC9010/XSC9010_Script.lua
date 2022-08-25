@@ -10,6 +10,7 @@ local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
 local SSJammerCrystalAmbient = import('/lua/EffectTemplates.lua').SJammerCrystalAmbient
 
 
+---@class XSC9010 : SLandUnit
 XSC9010 = Class(SLandUnit) {
 
     OnCreate = function(self, builder, layer)

@@ -13,6 +13,7 @@ local TDFHeavyPlasmaCannonWeapon = import('/lua/terranweapons.lua').TDFHeavyPlas
 local EffectUtils = import('/lua/effectutilities.lua')
 local Effects = import('/lua/effecttemplates.lua')
 
+---@class XEB2306 : TStructureUnit
 XEB2306 = Class(TStructureUnit) {
     Weapons = {
         MainGun = Class(TDFHeavyPlasmaCannonWeapon) 

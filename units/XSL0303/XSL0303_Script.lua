@@ -15,6 +15,7 @@ local SDFAireauBolter = WeaponsFile.SDFAireauBolterWeapon
 local SANUallCavitationTorpedo = WeaponsFile.SANUallCavitationTorpedo
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
+---@class XSL0303 : SLandUnit
 XSL0303 = Class(SLandUnit) {
     Weapons = {
         MainTurret = Class(SDFThauCannon) {},
