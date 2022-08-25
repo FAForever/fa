@@ -89,7 +89,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@param builderManager BuilderManager This is an Unused Parameter
+    ---@param builderManager BuilderManager parameter is not used in the base game
     ---@return boolean
     CalculatePriority = function(self, builderManager)
         self.PriorityAltered = false

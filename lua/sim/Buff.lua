@@ -681,7 +681,7 @@ end
 --Removes buffs
 ---@param unit Unit
 ---@param buffName string
----@param removeAllCounts any
+---@param removeAllCounts boolean
 ---@param instigator Unit
 function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     local def = Buffs[buffName]

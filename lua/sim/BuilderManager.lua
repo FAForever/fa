@@ -378,6 +378,6 @@ BuilderManager = ClassSimple {
 }
 
 
--- Moved Unused Imports for mod support
+-- kept for mod backwards compatibility
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
