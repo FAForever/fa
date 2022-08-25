@@ -548,7 +548,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     -- The opposite function to PlayRackRecoil, returns the rack to default position
     ---@param self DefaultProjectileWeapon
-    ---@param rackList string[]
+    ---@param rackList RackBoneBlueprint[]
     PlayRackRecoilReturn = function(self, rackList)
         WaitTicks(1)
         local speed = self.RackRecoilReturnSpeed
