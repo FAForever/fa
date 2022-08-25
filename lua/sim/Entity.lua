@@ -13,6 +13,10 @@
 -- This file gets imported by UI mods sometimes, not sure why. But it prevents
 -- us from scoping this as an upvalue
 -- local _c_CreateEntity = _c_CreateEntity
+
+--- TODO
+---@alias EntitySpec number
+
 ---@class Entity : moho.entity_methods
 Entity = Class(moho.entity_methods) {
 
@@ -21,20 +25,22 @@ Entity = Class(moho.entity_methods) {
     -- @param spec The specifications of the entity
     -- -  if 'spec.Owner' is set to a unit then the visibility of the entity matches that of the unit
     ---@param self Entity
-    ---@param spec any
+    ---@param spec EntitySpec
     __init = function(self, spec)
         _c_CreateEntity(self, spec)
     end,
 
     ---@param self Entity
-    ---@param spec any
+    ---@param spec EntitySpec
     __post_init = function(self, spec)
         self.OnCreate(self, spec)
     end,
 
     -- kept for backwards compatibility with mods
     ---@param self Entity
-    ---@param spec any
+    ---@param spec EntitySpec
     OnCreate = function(self, spec) end,
+
+    ---@param self Entity
     OnDestroy = function(self) end,
 }

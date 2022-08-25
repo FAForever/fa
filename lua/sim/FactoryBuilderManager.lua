@@ -108,7 +108,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@return any
+    ---@return Platoon
     HasPlatoonList = function(self)
         return self.PlatoonListEmpty
     end,
@@ -123,7 +123,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param category Categories
+    ---@param category EntityCategory
     ---@return number
     GetNumCategoryFactories = function(self, category)
         if self.FactoryList then
@@ -133,16 +133,16 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param category string
-    ---@param facCategory string
+    ---@param category EntityCategory
+    ---@param facCategory EntityCategory
     ---@return integer
     GetNumCategoryBeingBuilt = function(self, category, facCategory)
         return TableGetn(self:GetFactoriesBuildingCategory(category, facCategory))
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param category Categories
-    ---@param facCategory string
+    ---@param category EntityCategory
+    ---@param facCategory EntityCategory
     ---@return table
     GetFactoriesBuildingCategory = function(self, category, facCategory)
         local units = {}
@@ -170,8 +170,8 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param category Categories
-    ---@param facCatgory string
+    ---@param category EntityCategory
+    ---@param facCatgory EntityCategory
     ---@return table
     GetFactoriesWantingAssistance = function(self, category, facCatgory)
         local testUnits = self:GetFactoriesBuildingCategory(category, facCatgory)
@@ -192,7 +192,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param category Categories
+    ---@param category EntityCategory
     ---@return UserUnit[]|nil
     GetFactories = function(self, category)
         local retUnits = EntityCategoryFilterDown(category, self.FactoryList)

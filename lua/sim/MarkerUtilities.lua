@@ -151,7 +151,7 @@ local ChainCache = { }
 -- reference is copied but the values are not. If you need a
 -- copy with unique values use GetMarkerByTypeDeep instead.
 -- returns A table with markers and its length.
----@param name string The type of marker to retrieve.
+---@param name MarkerChain The type of marker to retrieve.
 ---@return MarkerData
 ---@return number
 function GetMarkersInChain(name)
@@ -193,7 +193,7 @@ end
 -- a lot of additional allocations. Do not use this unless
 -- you strictly need to.
 -- returns A table with markers and its length.
----@param type string The type of marker to retrieve.
+---@param type MarkerChain The type of marker to retrieve.
 ---@return table
 ---@return MarkerData
 function GetMarkersInChainDeep(type)
@@ -203,7 +203,7 @@ end
 
 --- Flushes the chain cache of a certain type. Does not 
 -- remove existing references.
----@param name string The type to flush.
+---@param name MarkerChain The type to flush.
 function FlushChainCacheByName(name)
     ChainCache[name] = false
 end
@@ -241,7 +241,7 @@ local DebugMarkerSuspend = { }
 
 --- Debugs the marker cache of a given type by drawing it on-screen. Useful
 -- to check for errors. Can be toggled on and off by calling it again.
----@param type string The type of markers you wish to debug.
+---@param type MarkerChain The type of markers you wish to debug.
 function ToggleDebugMarkersByType(type)
 
     SPEW("Toggled type to debug: " .. type)
@@ -323,7 +323,7 @@ local DebugChainSuspend = { }
 
 --- Debugs the chain cache of a given type by drawing it on-screen. Useful
 -- to check for errors. Can be toggled on and off by calling it again.
----@param name string The name of the chain you wish to debug.
+---@param name MarkerChain The name of the chain you wish to debug.
 function ToggleDebugChainByName(name)
 
     SPEW("Toggled chain to debug: " .. name)
