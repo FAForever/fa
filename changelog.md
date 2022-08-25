@@ -3,6 +3,10 @@ Some sections of the changelog are available in other languages such as [French]
 
 # Game version 3744 (23rd of August, 2022)
 
+The maintainers of Nomads have resolved the issues with tactical and strategical defenses!
+
+Jip
+
 ## Bug fixes
 
 - (#4178) Do not allow regular projectiles to collide with missiles
