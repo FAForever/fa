@@ -17,11 +17,11 @@ local GetRandomOffset = util.GetRandomOffset
 local GetRandomOffset2 = util.GetRandomOffset2
 
 -- upvalue for performance
-local EfctUtil = import('EffectUtilities.lua')
-local ApplyWindDirection = EfctUtil.ApplyWindDirection
-local CreateEffectsOpti = EfctUtil.CreateEffectsOpti
-local CreateBoneEffectsOpti = EfctUtil.CreateBoneEffectsOpti
-local CreateBoneEffectsOffsetOpti = EfctUtil.CreateBoneEffectsOffsetOpti
+local EffectUtilities = import('EffectUtilities.lua')
+local ApplyWindDirection = EffectUtilities.ApplyWindDirection
+local CreateEffectsOpti = EffectUtilities.CreateEffectsOpti
+local CreateBoneEffectsOpti = EffectUtilities.CreateBoneEffectsOpti
+local CreateBoneEffectsOffsetOpti = EffectUtilities.CreateBoneEffectsOffsetOpti
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local ExplosionSmall = EffectTemplate.ExplosionSmall
@@ -654,7 +654,6 @@ local IEffectSetEmitterCurveParam = _G.moho.IEffect.SetEmitterCurveParam
 local DefaultWreckageEffects = EffectTemplate.DefaultWreckageEffectsLrg01
 local DefaultWreckageEffectsCount = EffectTemplate.DefaultWreckageEffectsLrg01Count
 
-local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01
 local TechMultiplier = {
     TECH1 = 1.0,
     TECH2 = 1.5,
@@ -705,6 +704,7 @@ function CreateWreckageEffects(unit, prop)
 
             Warp(entity, position)
             
+            local FireEffects = EffectUtilities.GetRandomBurningEffect()
             -- create fire at that bone
             for _, effect in FireEffects do 
                 -- larger smoke tends to live longer

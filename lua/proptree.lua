@@ -7,10 +7,10 @@
 --**  Copyright 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local Prop = import('/lua/sim/Prop.lua').Prop
-local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01
+
+local EffectUtilities = import('/lua/EffectUtilities.lua')
 local ApplyWindDirection = import('/lua/EffectUtilities.lua').ApplyWindDirection
 local CreateScorchMarkSplat = import('/lua/defaultexplosions.lua').CreateScorchMarkSplat
-local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 local BurningTrees = 0
 local MaximumBurningTrees = 150
@@ -162,6 +162,7 @@ Tree = Class(Prop) {
         local fireSize = 0.75 * Random() + 0.25
 
         -- fire effect
+        local FireEffects = EffectUtilities.GetRandomBurningEffect()
         for k, v in FireEffects do
 
             effect = CreateEmitterAtEntity(self, -1, v )
@@ -270,3 +271,7 @@ TreeGroup = Class(Prop) {
         end
     end,
 }
+
+-- kept for mod backwards compatibility
+local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01

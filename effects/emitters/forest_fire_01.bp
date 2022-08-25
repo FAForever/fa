@@ -1,6 +1,6 @@
 -- used by trees
 EmitterBlueprint {
-	BlueprintId = 'destruction_damaged_fire_01',
+	BlueprintId = 'forest_fire_01',
 	Lifetime = -1.00,
 	Repeattime = 15.00,
 	TextureFramecount = 1.00,
@@ -19,12 +19,12 @@ EmitterBlueprint {
 	OnlyEmitOnWater = false,
 	ParticleResistance = false,
 	InterpolateEmission = false,
-	TextureStripcount = 4.00,
+	TextureStripcount = 8.00,
 	SortOrder = 10.00,
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = '/textures/particles/fire_flame_add_05.dds',
+	Texture = '/textures/particles/fire_final_01.dds',
 	RampTexture = '/textures/particles/ramp_white_premod_01.dds',
 	XDirectionCurve = {
 		XRange = 15.00,
@@ -47,13 +47,13 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 15.00,
 		Keys = {
-			{ x=4.930,y=10.000,z=0.000 },
+			{ x=4.930,y=5.000,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
 		XRange = 15.00,
 		Keys = {
-			{ x=7.580,y=3.000,z=1.000 },
+			{ x=7.580,y=6.000,z=1.000 },
 		},
 	},
 	VelocityCurve = {

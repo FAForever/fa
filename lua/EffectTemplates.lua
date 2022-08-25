@@ -290,10 +290,33 @@ TreeBurning01 = {
 }
 
 TreeBurning02 = {
-    EmtBpPath .. 'forest_fire_01.bp',
+    EmtBpPath .. 'forest_fire_02.bp',
     EmtBpPath .. 'forest_distortion_01.bp',
     EmtBpPath .. 'forest_smoke_01.bp',
 }
+
+TreeBurning03 = {
+    EmtBpPath .. 'forest_fire_03.bp',
+    EmtBpPath .. 'forest_distortion_01.bp',
+    EmtBpPath .. 'forest_smoke_01.bp',
+}
+
+TreeBurning04 = {
+    EmtBpPath .. 'forest_fire_04.bp',
+    EmtBpPath .. 'forest_distortion_01.bp',
+    EmtBpPath .. 'forest_smoke_01.bp',
+}
+
+TreeBurning05 = {
+    EmtBpPath .. 'forest_fire_05.bp',
+    EmtBpPath .. 'forest_distortion_01.bp',
+    EmtBpPath .. 'forest_smoke_01.bp',
+}
+
+TreeBurningEmitters = {
+    TreeBurning01, TreeBurning02, TreeBurning03, TreeBurning04, TreeBurning05
+}
+TreeBurningEmittersCount = table.getn(TreeBurningEmitters)
 
 -- ---------------------------------------------------------------
 -- Shield Impact effects

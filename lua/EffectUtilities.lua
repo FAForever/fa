@@ -1479,6 +1479,7 @@ CreateRandomEffectsInTrashbag = EffectUtilitiesGeneric.CreateRandomEffectsInTras
 PlayReclaimEffects = EffectUtilitiesGeneric.PlayReclaimEffects
 PlayReclaimEndEffects = EffectUtilitiesGeneric.PlayReclaimEndEffects
 ApplyWindDirection = EffectUtilitiesGeneric.ApplyWindDirection
+GetRandomBurningEffect = EffectUtilitiesGeneric.GetRandomBurningEffect
 
 CreateDefaultBuildBeams = EffectUtilitiesUEF.CreateDefaultBuildBeams
 CreateUEFBuildSliceBeams = EffectUtilitiesUEF.CreateUEFBuildSliceBeams
