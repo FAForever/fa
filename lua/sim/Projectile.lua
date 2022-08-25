@@ -8,6 +8,7 @@
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
+local TableGetn = table.getn
 -- scorch mark interaction
 local ScorchSplatTextures = {
     'scorch_001_albedo',
@@ -24,7 +25,7 @@ local ScorchSplatTextures = {
 
 -- various information surrounding the scorch marks that allows us to quickly access scorch marks
 -- and prevents scorch marks at the same location
-local ScorchSplatTexturesCount = table.getn(ScorchSplatTextures)
+local ScorchSplatTexturesCount = TableGetn(ScorchSplatTextures)
 local ScorchSplatTexturesLookup = { }
 local ScorchSplatTexturesLookupCount = 100
 local ScorchSplatTexturesLookupIndex = 1
@@ -109,8 +110,8 @@ Projectile = Class(moho.projectile_methods) {
     -- Engine functionality
 
     --- Called by the engine when the projectile is created
-    -- @param self The projectile that we're creating
-    -- @param other Flag to indicate the projectile is in water or not
+    ---@param self Projectile The projectile that we're creating
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
 
         -- store information 
@@ -135,7 +136,9 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by the engine when a projectile collides with another projectile to check if the collision is valid. An example is a tactical missile defense
-    -- @param other The projectile we're checking the collision with
+    ---@param self Projectile
+    ---@param other Projectile The projectile we're checking the collision with
+    ---@return boolean
     OnCollisionCheck = function(self, other)
 
         -- we can't hit our own
@@ -169,6 +172,9 @@ Projectile = Class(moho.projectile_methods) {
     --- Called by the engine when a projectile collides with a collision beam to check if the collision is valid
     -- @param self The projectile we're checking the collision for
     -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
+    ---@param self Projectile
+    ---@param firingWeapon Weapon
+    ---@return boolean
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
         -- we can't hit our own
@@ -193,6 +199,11 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by the engine when the projectile receives damage
+    ---@param self Projectile
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
         if self.Blueprint.Defense.MaxHealth then
             -- we have some health, try and survive
@@ -204,6 +215,7 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by the engine when the projectile is destroyed
+    ---@param self Projectile
     OnDestroy = function(self)
         if self.Trash then
             self.Trash:Destroy()
@@ -211,6 +223,10 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by the engine when the projectile is killed, in other words: intercepted
+    ---@param self Projectile
+    ---@param instigator Projectile
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
 
         -- callbacks for launcher to have an idea what is going on for AIs
@@ -228,8 +244,9 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by the engine when the projectile impacts something 
-    -- @param targetType 
-    -- @param targetEntity 
+    ---@param self Projectile
+    ---@param targetType string
+    ---@param targetEntity Entity
     OnImpact = function(self, targetType, targetEntity)
 
         -- in case the OnImpact crashes it guarantees that it gets destroyed at some point, useful for mods
@@ -451,6 +468,7 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by the engine when the projectile exits the water
+    ---@param self Projectile
     OnExitWater = function(self)
         -- try and do a splash
         if self.FxExitWaterEmitter then 
@@ -466,6 +484,7 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by the engine when the projectile enters the water
+    ---@param self Projectile
     OnEnterWater = function(self)
         -- try and do a splash
         if self.FxEnterWater then 
@@ -482,6 +501,7 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by the engine when the target of the projectile is lost, typically due to 
     -- the target being destroyed before arrival.
+    ---@param self Projectile
     OnLostTarget = function(self)
         local bp = self.Blueprint.Physics
         if bp.TrackTarget and bp.TrackTarget == true then
@@ -496,6 +516,8 @@ Projectile = Class(moho.projectile_methods) {
     -- Lua functionality
 
     --- Called by Lua to pass the damage data as a metatable
+    ---@param self Projectile
+    ---@param data table
     PassMetaDamage = function(self, data)
         self.DamageData = { }
         setmetatable(self.DamageData, data)
@@ -507,6 +529,11 @@ Projectile = Class(moho.projectile_methods) {
     -- @param DamageData The damage data passed by the weapon
     -- @param targetEntity The entity we hit, is nil if we hit terrain
     -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
+    ---@param self Projectile
+    ---@param instigator Unit
+    ---@param DamageData WeaponBlueprint
+    ---@param targetEntity Entity
+    ---@param cachedPosition Vector
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
         -- this may be a cached vector, we can not send this to threads or use after waiting statements!
@@ -635,6 +662,8 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by Lua to process buffs on impact
+    ---@param self Projectile
+    ---@param target Unit
     DoUnitImpactBuffs = function(self, target)
         local data = self.DamageData
 
@@ -664,6 +693,9 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by Lua to determine whether the projectile should be destroyed
+    ---@param self Projectile
+    ---@param targetType string
+    ---@param targetEntity Entity
     OnImpactDestroy = function(self, targetType, targetEntity)
         if  self.DestroyOnImpact or 
             (not targetEntity) or
@@ -674,12 +706,16 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by Lua for a delayed destruction
+    ---@param self Projectile
+    ---@param seconds integer
     ImpactTimeoutThread = function(self, seconds)
         WaitSeconds(seconds)
         self:Destroy()
     end,
 
     --- Called by Lua to add a flare
+    ---@param self Projectile
+    ---@param tbl table
     AddFlare = function(self, tbl)
         if not tbl then return end
         if not tbl.Radius then return end
@@ -709,6 +745,10 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by Lua to create the impact effects
+    ---@param self Projectile
+    ---@param army Army
+    ---@param EffectTable string[]
+    ---@param EffectScale number
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for _, v in EffectTable do
@@ -725,6 +765,10 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by Lua to create the terrain effects
+    ---@param self Projectile
+    ---@param army Army
+    ---@param EffectTable string[]
+    ---@param EffectScale number
     CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for _, v in EffectTable do
@@ -736,6 +780,11 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by Lua to retrieve the terrain effects
+    ---@param self Projectile
+    ---@param TargetType string
+    ---@param ImpactEffectType string
+    ---@param position Vector
+    ---@return boolean
     GetTerrainEffects = function(self, TargetType, ImpactEffectType, position)
 
         local position = position or self:GetPosition()
@@ -755,6 +804,11 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     --- Called by Lua to process taking damage
+    ---@param self Projectile
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Check for valid projectile
         if not self or self:BeenDestroyed() then
@@ -782,18 +836,26 @@ Projectile = Class(moho.projectile_methods) {
 
     -- Deprecated functionality
 
+    ---@param self Projectile
+    ---@return Vector
     GetCachePosition = function(self)
         return self:GetPosition()
     end,
 
+    ---@param self Projectile
+    ---@param data table
     PassData = function(self, data)
         self.Data = data
     end,
 
+    ---@param self Projectile
+    ---@return boolean
     GetCollideFriendly = function(self)
         return self.CollideFriendly
     end,
 
+    ---@param self Projectile
+    ---@param DamageData table
     PassDamageData = function(self, DamageData)
         self.DamageData = { }
         self.DamageData.DamageRadius = DamageData.DamageRadius
@@ -810,6 +872,10 @@ Projectile = Class(moho.projectile_methods) {
     end,
 
     -- root of all performance evil
+    ---@param self Projectile
+    ---@param fn function
+    ---@param ... any
+    ---@return thread
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -827,12 +893,17 @@ Projectile = Class(moho.projectile_methods) {
 ---@class DummyProjectile : moho.projectile_methods
 DummyProjectile = Class(moho.projectile_methods) {
 
+    ---@param self DummyProjectile
+    ---@param inWater any
     OnCreate = function(self, inWater)
         -- expected to be cached by all projectiles
         self.Blueprint = EntityGetBlueprint(self) 
         self.Army = EntityGetArmy(self)
     end,
 
+    ---@param self DummyProjectile
+    ---@param targetType string
+    ---@param targetEntity Entity
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,

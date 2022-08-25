@@ -7,18 +7,25 @@ local ScriptTask = import('/lua/sim/ScriptTask.lua').ScriptTask
 local TASKSTATUS = import('/lua/sim/ScriptTask.lua').TASKSTATUS
 local AIRESULT = import('/lua/sim/ScriptTask.lua').AIRESULT
 
+---@class TargetLocation : ScriptTask
 TargetLocation = Class(ScriptTask) {
-    
+
+    ---@param self TargetLocation
+    ---@param commandData any
     OnCreate = function(self,commandData)
         ScriptTask.OnCreate(self,commandData)
         local unit = self:GetUnit():OnTargetLocation(commandData.Location)
     end,
-    
+
+    ---@param self TargetLocation
+    ---@return integer
     TaskTick = function(self)
         self:SetAIResult(AIRESULT.Success)
         return TASKSTATUS.Done
     end,
 
+    ---@param self TargetLocation
+    ---@return boolean
     IsInRange = function(self)
         return true
     end,
