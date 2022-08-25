@@ -428,7 +428,7 @@ local EmitterMethods = _G.moho.IEffect
 local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
 
 ---@class BaseGenericDebris : DummyProjectile
-BaseGenericDebris = Class(DummyProjectile){
+BaseGenericDebris = Class(DummyProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
 

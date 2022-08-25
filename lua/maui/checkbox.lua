@@ -1,9 +1,9 @@
 
-local Bitmap = import('bitmap.lua').Bitmap
-local Dragger = import('dragger.lua').Dragger
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Dragger = import('/lua/maui/dragger.lua').Dragger
 
-Checkbox = Class(Bitmap)
-{
+---@class Checkbox : Bitmap
+Checkbox = Class(Bitmap) {
     __init = function(self, parent, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked, clickCue, rolloverCue, debugname)
         Bitmap.__init(self, parent, normalUnchecked, debugname or "checkbox")
         self._states =  {}

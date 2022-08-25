@@ -14,7 +14,7 @@ Class methods:
             [2] = ...
         }
 --]]
-local Control = import('control.lua').Control
+local Control = import('/lua/maui/control.lua').Control
 
 ---@class Histogram : moho.histogram_methods, Control
 Histogram = Class(moho.histogram_methods, Control) {

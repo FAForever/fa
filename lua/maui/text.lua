@@ -8,8 +8,8 @@
 -- SetCenteredVertically(bool)
 -- SetCenteredHorizontally(bool)
 
-local Control = import('control.lua').Control
-local ScaleNumber = import('layouthelpers.lua').ScaleNumber
+local Control = import('/lua/maui/control.lua').Control
+local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 
 ---@class Text : moho.text_methods, Control
 Text = Class(moho.text_methods, Control) {

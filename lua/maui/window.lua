@@ -69,7 +69,7 @@ styles = {
     cursorFunc = UIUtil.GetCursor,
 }
 
----@class Window
+---@class Window : Group
 Window = Class(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
         Group.__init(self, parent, tostring(title) .. "-window")
