@@ -522,7 +522,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     -- Create the visual side of rack recoil
     ---@param self DefaultProjectileWeapon
-    ---@param rackList string
+    ---@param rackList RackBoneBlueprint[]
     PlayRackRecoil = function(self, rackList)
         local bp = self.Blueprint
         local rackRecoilDist = bp.RackRecoilDistance
@@ -1168,7 +1168,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 
     -- Can we use the OC weapon?
     ---@param self OverchargeWeapon
-    ---@return false
+    ---@return boolean
     CanOvercharge = function(self)
         local unit = self.unit
         return not unit:IsOverchargePaused() and self:HasEnergy() and not
@@ -1183,7 +1183,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 
     -- Returns true if the unit is doing something that shouldn't allow any weapon fire
     ---@param self OverchargeWeapon
-    ---@return true
+    ---@return boolean
     UnitOccupied = function(self)
         local unit = self.unit
         return (unit:IsUnitState('Upgrading') and not unit:IsUnitState('Enhancing')) or -- Don't let us shoot if we're upgrading, unless it's an enhancement task
