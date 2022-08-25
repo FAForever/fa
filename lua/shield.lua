@@ -254,7 +254,7 @@ Shield = Class(moho.shield_methods, Entity) {
         local EntityGetMaxHealth = EntityGetMaxHealth
         local EntityAdjustHealth = EntityAdjustHealth
 
-        while true do
+        while not IsDestroyed(self) do
 
             -- gather some information
             local fromSuspension = false
@@ -573,6 +573,10 @@ Shield = Class(moho.shield_methods, Entity) {
 
     CreateImpactEffect = function(self, vector)
 
+        if IsDestroyed(self) then
+            return
+        end
+
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
@@ -659,7 +663,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         -- special behavior for projectiles that represent strategic missiles
-        local otherHashedCats = other.Cache.HashedCats
+        local otherHashedCats = other.Blueprint.CategoriesHash
         if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
             return false
         end
@@ -816,7 +820,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- remove the shield and the shield bar
             self:RemoveShield()
-            self:UpdateShieldRatio(-1)
+            self:UpdateShieldRatio(0)
 
             -- inform the owner that the shield is disabled
             self.Owner:OnShieldDisabled()
@@ -1202,6 +1206,10 @@ PersonalShield = Class(Shield){
 
     CreateImpactEffect = function(self, vector)
 
+        if IsDestroyed(self) then
+            return
+        end
+
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
@@ -1318,6 +1326,10 @@ CzarShield = Class(PersonalShield) {
 
 
     CreateImpactEffect = function(self, vector)
+
+        if IsDestroyed(self) then
+            return
+        end
 
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 

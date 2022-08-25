@@ -10,6 +10,7 @@
 
 local TMassFabricationUnit = import('/lua/terranunits.lua').TMassFabricationUnit
 
+---@class UEB1303 : TMassFabricationUnit
 UEB1303 = Class(TMassFabricationUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)

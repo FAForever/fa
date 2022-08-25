@@ -25,6 +25,8 @@ local PlatoonFile = '/lua/platoon.lua'
 
 local ExtractorToFactoryRatio = 2.2
 
+---@alias BuilderGroupsFactoryConstruction 'LandInitialFactoryConstruction' | 'AirInitialFactoryConstruction' | 'EngineerFactoryConstructionAirHigherPriority' | 'EngineerFactoryConstructionLandHigherPriority' | 'EngineerFactoryConstruction Balance' | 'EngineerFactoryConstruction'
+
 BuilderGroup {
     BuilderGroupName = 'LandInitialFactoryConstruction',
     BuildersType = 'EngineerBuilder',

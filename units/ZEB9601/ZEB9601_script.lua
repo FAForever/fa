@@ -10,6 +10,7 @@
 
 local TLandFactoryUnit = import('/lua/terranunits.lua').TLandFactoryUnit
 
+---@class ZEB9601 : TLandFactoryUnit
 ZEB9601 = Class(TLandFactoryUnit) {}
 
 TypeClass = ZEB9601

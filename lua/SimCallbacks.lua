@@ -8,6 +8,10 @@
 ---- We store the callbacks in a sub-table (instead of directly in the
 ---- module) so that we don't include any
 
+---@class SimCallback
+---@field Func string
+---@field Args table
+
 local SimUtils = import('/lua/SimUtils.lua')
 local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
@@ -45,6 +49,7 @@ local CategoriesEngineer = categories.ENGINEER - categories.INSIGNIFICANTUNIT
 local Warnings = { }
 
 --- List of callbacks that is being populated throughout this file
+---@type table<string, function>
 local Callbacks = {}
 
 function DoCallback(name, data, units)
@@ -162,8 +167,8 @@ local skirtSizes = {
 }
 
 --- Computes the n'th layer of a previous layer.
--- @param skirtSize The skirt size of the unit.
--- @param layers The nth layer we'd like to have for this unit.
+---@param skirtSize number skirt size of the unit
+---@param nthLayer number nth layer we'd like to have for this unit
 local function RetrieveNthStructureLayer (skirtSize, nthLayer)
 
     -- attempt to retrieve the right set of layers for this skirtSize
@@ -559,10 +564,13 @@ function IsInvalidAssist(unit, target)
 end
 
 Callbacks.AttackMove = function(data, units)
+    -- exclude structures as it makes no sense to apply a move command to them
+    local allNonStructures = EntityCategoryFilterDown(categories.ALLUNITS - categories.STRUCTURE, units)
+
     if data.Clear then
-        IssueClearCommands(units)
+        IssueClearCommands(allNonStructures)
     end
-    IssueAggressiveMove(units, data.Target)
+    IssueAggressiveMove(allNonStructures, data.Target)
 end
 
 --tells a unit to toggle its pointer
@@ -614,8 +622,8 @@ do
     local cxrb0204 = categories.xrb0204
 
     --- Forces hives in the selection to upgrade immediately
-    -- @param data A table { UpgradeTo :: String } that tells us what we want to upgrade to, should be 'xrb0204' or 'xrb0304'
-    -- @param units A table of the selected units
+    ---@param data {UpgradeTo: string} what we want to upgrade to, should be 'xrb0204' or 'xrb0304'
+    ---@param units Unit[] selected units
     Callbacks.ImmediateHiveUpgrade = function(data, units)
 
         -- make sure we have valid units
@@ -678,8 +686,8 @@ end
 
 do
     --- Allows the player to force a target recheck on the selected units
-    ---@param data table            # an empty table
-    ---@param units table<Unit>     # table of units
+    ---@param data table   an empty table
+    ---@param units Unit[] table of units
     Callbacks.RecheckTargetsOfWeapons = function(data, units)
 
         -- make sure we have valid units with the correct command source

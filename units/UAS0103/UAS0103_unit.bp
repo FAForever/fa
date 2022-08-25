@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 60,
+        GuardScanRadius = 40,
     },
     Audio = {
         AmbientMove = Sound {

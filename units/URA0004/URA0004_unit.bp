@@ -112,6 +112,7 @@ UnitBlueprint {
         TurnRadius = 360,
         TurnRate = 180,
     },
+    SizeSphere = 0.8,
     SizeX = 0.01,
     SizeY = 0.01,
     SizeZ = 0.01,

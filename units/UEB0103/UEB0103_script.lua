@@ -10,6 +10,7 @@
 
 local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
 
+---@class UEB0103 : TSeaFactoryUnit
 UEB0103 = Class(TSeaFactoryUnit) {
     StartArmsMoving = function(self)
         TSeaFactoryUnit.StartArmsMoving(self)

@@ -229,13 +229,16 @@ local commands = {
 
 local Strings = LobbyComm.Strings
 
+---@type LobbyComm
 local lobbyComm = false
 local localPlayerName = ""
 local gameName = ""
 local hostID = false
 local singlePlayer = false
+---@type Group
 local GUI = false
 local localPlayerID = false
+---@type GameData | WatchedGameData
 local gameInfo = false
 local pmDialog = false
 local lastKickMessage = UTF.UnescapeString(Prefs.GetFromCurrentProfile('lastKickMessage') or "")
@@ -2190,6 +2193,8 @@ local function TryLaunch(skipNoObserversCheck)
 
         -- launch the game
         lobbyComm:LaunchGame(gameInfo)
+
+        
     end
 
     LaunchGame()
@@ -3280,6 +3285,7 @@ function CreateUI(maxPlayers)
         local modsManagerCallback = function(active_sim_mods, active_ui_mods)
             import('/lua/mods.lua').SetSelectedMods(SetUtils.Union(active_sim_mods, active_ui_mods))
             RefreshOptionDisplayData()
+            GUI.chatEdit:AcquireFocus()
         end
         GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', LOC("<LOC _Mod_Manager>"))
         GUI.gameoptionsButton.OnClick = function(self, modifiers)

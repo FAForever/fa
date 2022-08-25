@@ -13,6 +13,7 @@ local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local WeaponFile = import('/lua/sim/defaultweapons.lua')
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 
+---@class UXL0021 : TLandUnit
 UXL0021 = Class(TLandUnit) {
     Weapons = {
         MainGun = Class(DefaultProjectileWeapon) {

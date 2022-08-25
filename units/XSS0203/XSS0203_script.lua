@@ -13,6 +13,7 @@ local SANUallCavitationTorpedo = SWeapons.SANUallCavitationTorpedo
 local SDFOhCannon = SWeapons.SDFOhCannon02
 local SDFAjelluAntiTorpedoDefense = SWeapons.SDFAjelluAntiTorpedoDefense
 
+---@class XSS0203 : SSubUnit
 XSS0203 = Class(SSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {

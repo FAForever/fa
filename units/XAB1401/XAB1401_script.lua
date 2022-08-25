@@ -13,6 +13,7 @@ local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 
 local CreateAeonParagonBuildingEffects = import("/lua/effectutilities.lua").CreateAeonParagonBuildingEffects
 
+---@class XAB1401 : AStructureUnit
 XAB1401 = Class(AStructureUnit) {
 
     Weapons = {

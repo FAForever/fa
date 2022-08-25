@@ -14,6 +14,7 @@ local SAAOlarisCannonWeapon = WeaponsFile.SAAOlarisCannonWeapon
 local CreateSeraphimExperimentalBuildBaseThread = import('/lua/EffectUtilitiesSeraphim.lua').CreateSeraphimExperimentalBuildBaseThread
 local explosion = import('/lua/defaultexplosions.lua')
 
+---@class XSL0401 : SWalkingLandUnit
 XSL0401 = Class(SWalkingLandUnit) {
     SpawnEffects = {
         '/effects/emitters/seraphim_othuy_spawn_01_emit.bp',

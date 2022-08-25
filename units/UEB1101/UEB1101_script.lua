@@ -9,6 +9,7 @@
 ----****************************************************************************
 local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
 
+---@class UEB1101 : TEnergyCreationUnit
 UEB1101 = Class(TEnergyCreationUnit) {
     OnCreate = function(self)
         TEnergyCreationUnit.OnCreate(self)

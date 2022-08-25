@@ -5,14 +5,15 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TriggerFile = import('scenariotriggers.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
-local SimCamera = import('/lua/SimCamera.lua').SimCamera
+local CategoryToString = import('/lua/sim/CategoryUtils.lua').ToString
 local Cinematics = import('/lua/cinematics.lua')
+local Game = import('/lua/game.lua')
+local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local SimCamera = import('/lua/SimCamera.lua').SimCamera
 local SimUIVars = import('/lua/sim/SimUIState.lua')
+local TriggerFile = import('scenariotriggers.lua')
+local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
 PingGroups = import('/lua/SimPingGroup.lua')
 Objectives = import('/lua/SimObjectives.lua')
@@ -37,7 +38,7 @@ function EndOperation(_success, _allPrimary, _allSecondary, _allBonus)
         _opData = import(opFile)
     end
 
-    import('/lua/victory.lua').CallEndGame() -- We need this here to populate the score screen
+    import('/lua/sim/matchstate.lua').CallEndGame() -- We need this here to populate the score screen
 
     ForkThread(function()
         WaitSeconds(3) -- Wait for the stats to be synced
@@ -884,7 +885,16 @@ function CheckObjectives(list)
     return true
 end
 
-function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, enhancements)
+---
+---@param brain string
+---@param unit Unit
+---@param effect string
+---@param name? string | true # if `true`, uses the brain's nickname
+---@param pauseAtDeath? boolean
+---@param deathTrigger? fun(self: Unit)
+---@param enhancements? string[]
+---@return CommandUnit
+function SpawnCommander(brain, unit, effect, name, pauseAtDeath, deathTrigger, enhancements)
     local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
     local bp = ACU:GetBlueprint()
     local bonesToHide = bp.WarpInEffect.HideBones
@@ -931,26 +941,27 @@ function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, e
         GateInEffect(ACU, effect)
     end
 
-    -- If true is passed as parameter then it uses default name.
+    -- If true is passed as argument then use default name
     if name == true then
         ACU:SetCustomName(GetArmyBrain(brain).Nickname)
     elseif type(name) == 'string' then
         ACU:SetCustomName(name)
     end
 
-    if PauseAtDeath then
+    if pauseAtDeath then
         PauseUnitDeath(ACU)
     end
 
-    if DeathTrigger then
-        CreateUnitDeathTrigger(DeathTrigger, ACU)
+    if deathTrigger then
+        CreateUnitDeathTrigger(deathTrigger, ACU)
     end
 
     return ACU
 end
 
--- FakeTeleportUnitThread
--- Run teleport effect then delete unit
+--- Run teleport effect then delete unit if told to do so
+---@param unit Unit
+---@param killUnit boolean
 function FakeTeleportUnit(unit, killUnit)
     IssueStop({unit})
     IssueClearCommands({unit})
@@ -970,7 +981,11 @@ function FakeTeleportUnit(unit, killUnit)
     end
 end
 
-function FakeGateInUnit(unit, callbackFunction, bonesToHide)
+---
+---@param unit Unit
+---@param callback fun()
+---@param bonesToHide Bone[]
+function FakeGateInUnit(unit, callback, bonesToHide)
     local bp = unit:GetBlueprint()
 
     if EntityCategoryContains(categories.COMMAND + categories.SUBCOMMANDER, unit) then
@@ -981,15 +996,15 @@ function FakeGateInUnit(unit, callbackFunction, bonesToHide)
         unit:CreateProjectile('/effects/entities/UnitTeleport03/UnitTeleport03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
         WaitSeconds(0.75)
 
-        local psm = bp.Display.WarpInEffect.PhaseShieldMesh
-        if psm then
-            unit:SetMesh(psm, true)
+        local shieldMesh = bp.Display.WarpInEffect.PhaseShieldMesh
+        if shieldMesh then
+            unit:SetMesh(shieldMesh, true)
         end
 
         unit:ShowBone(0, true)
 
-        for _, v in bonesToHide or bp.Display.WarpInEffect.HideBones do
-            unit:HideBone(v, true)
+        for _, bone in bonesToHide or bp.Display.WarpInEffect.HideBones do
+            unit:HideBone(bone, true)
         end
 
         unit:SetUnSelectable(false)
@@ -1002,7 +1017,7 @@ function FakeGateInUnit(unit, callbackFunction, bonesToHide)
             end
         end
 
-        if psm then
+        if shieldMesh then
             WaitSeconds(2)
             unit:SetMesh(bp.Display.MeshBlueprint, true)
         end
@@ -1014,13 +1029,14 @@ function FakeGateInUnit(unit, callbackFunction, bonesToHide)
         unit:CleanupTeleportChargeEffects()
     end
 
-    if callbackFunction then
-        callbackFunction()
+    if callback then
+        callback()
     end
 end
 
--- Upgrades unit - for use with engineers, factories, radar, and other single upgrade path units.
--- Commander upgrades are too complicated for this
+--- Upgrades unit--for use with engineers, factories, radars, and other single upgrade path units.
+--- Commander enhancements are too complicated for this.
+---@param unit Unit
 function UpgradeUnit(unit)
     local upgradeBP = unit:GetBlueprint().General.UpgradesTo
     IssueStop({unit})
@@ -1028,25 +1044,21 @@ function UpgradeUnit(unit)
     IssueUpgrade({unit}, upgradeBP)
 end
 
--- Triggers a help text prompt to appear in the UI
--- See /modules/ui/help/helpstrings.lua for a list of valid Help Prompt IDs
+--- Triggers a help text prompt to appear in the UI.
+--- See `/modules/ui/help/helpstrings.lua` for a list of valid Help Prompt IDs.
+---@param show string
 function HelpPrompt(show)
     if not Sync.HelpPrompt then
         Sync.HelpPrompt = show
     end
 end
 
--- Function for converting categories to string
-local ToString = import('/lua/sim/CategoryUtils.lua').ToString
-local Game = import('/lua/game.lua')
-
--- Adds scenario restriction for specified army and notify the UI/sim
--- e.g. AddRestriction(1, categories.TECH2) -> restricts all T2 units for army 1
--- e.g. AddRestriction('ARMY_1', categories.TECH2) -> restricts all T2 units for army 1
+-- Adds a scenario restriction for specified army and notify the UI/sim
+---@param army Army
+---@param categories EntityCategory
 function AddRestriction(army, categories)
-
     if type(categories) ~= 'userdata' then
-        WARN('ScenarioFramework.AddRestriction() called with invalid category expression "' .. ToString(categories) .. '" '
+        WARN('ScenarioFramework.AddRestriction() called with invalid category expression "' .. CategoryToString(categories) .. '" '
           .. 'instead of category expression, e.g. categories.LAND ')
     else
         SimUIVars.SaveTechRestriction(categories)
@@ -1057,12 +1069,14 @@ function AddRestriction(army, categories)
         Sync.Restrictions = Game.GetRestrictions()
     end
 end
--- Removes scenario restriction for specified army and notify the UI/sim
--- e.g. RemoveRestriction('ARMY_1', categories.TECH2) -> removes T2 units restriction for army 1
-function RemoveRestriction(army, categories, isSilent)
 
+-- Removes a scenario restriction for specified army and notify the UI/sim
+---@param army Army
+---@param categories EntityCategory
+---@param isSilent? boolean
+function RemoveRestriction(army, categories, isSilent)
     if type(categories) ~= 'userdata' then
-        WARN('ScenarioFramework.RemoveRestriction() called with invalid category expression "' .. ToString(categories) .. '" '
+        WARN('ScenarioFramework.RemoveRestriction() called with invalid category expression "' .. CategoryToString(categories) .. '" '
           .. 'instead of category expression, e.g. categories.LAND ')
     else
         SimUIVars.SaveTechAllowance(categories)
@@ -1078,22 +1092,36 @@ function RemoveRestriction(army, categories, isSilent)
     end
 end
 
--- Toggles whether or not to ignore all restrictions
--- this function is useful when trying to transfer restricted units between armies
---[[ e.g.
---  ScenarioFramework.IgnoreRestrictions(true)
---  ScenarioFramework.GiveUnitToArmy(unit, armyIndex)
---  ScenarioFramework.IgnoreRestrictions(false)
---]]
+--- Toggles whether or not to ignore all restrictions.
+--- This function is useful when trying to transfer restricted units between armies, e.g.  
+--- ```
+--- ScenarioFramework.IgnoreRestrictions(true)
+--- ScenarioFramework.GiveUnitToArmy(unit, army)
+--- ScenarioFramework.IgnoreRestrictions(false)
+--- ```
+---@param isIgnored boolean
 function IgnoreRestrictions(isIgnored)
     Game.IgnoreRestrictions(isIgnored)
     Sync.Restrictions = Game.GetRestrictions()
 end
 
--- Returns lists of factories by category
--- <point> and <radius> are optional
--- this allows you to know which factories can build and which can't
--- useful if you want to track what factories can do what
+---@class FactoriesAvailable
+---@field T1Air FactoryUnit[]
+---@field T2Air FactoryUnit[]
+---@field T3Air FactoryUnit[]
+---@field T1Land FactoryUnit[]
+---@field T2Land FactoryUnit[]
+---@field T3Land FactoryUnit[]
+---@field T1Naval FactoryUnit[]
+---@field T2Naval FactoryUnit[]
+---@field T3Naval FactoryUnit[]
+
+-- Returns lists of idle factories by category, optionally in a radius around a point.
+-- This allows you to know which factories can build and which can't.
+---@param brain AIBrain
+---@param point? Marker | Vector
+---@param radius? number
+---@return FactoriesAvailable
 function GetFactories(brain, point, radius)
     if type(point) == 'string' then
         point = ScenarioUtils.MarkerToPosition(point)
@@ -1138,59 +1166,75 @@ function GetFactories(brain, point, radius)
     return retTable
 end
 
--- Creates a visible area for <vizArmy> at <vizLocation> of <vizRadius> size.
--- If vizLifetime is 0, the entity lasts forever.  Otherwise for <vizLifetime> seconds.
--- Function returns an entity so you can destroy it later if you want
-function CreateVisibleAreaLocation(vizRadius, vizLocation, vizLifetime, vizArmy)
-    if type(vizLocation) == 'string' then
-        vizLocation = ScenarioUtils.MarkerToPosition(vizLocation)
+--- Creates a visible area for `army` at `location` of `radius` size.
+--- If `lifetime` is 0, the entity lasts forever, otherwise, for `lifetime` seconds.
+--- Returns a `VizMarker` so you can destroy it later if you want.
+---@param radius number
+---@param location Marker | Vector
+---@param lifetime number
+---@param army AIBrain
+---@return VizMarker
+function CreateVisibleAreaLocation(radius, location, lifetime, army)
+    if type(location) == 'string' then
+        location = ScenarioUtils.MarkerToPosition(location)
     end
     local spec = {
-        X = vizLocation[1],
-        Z = vizLocation[3],
-        Radius = vizRadius,
-        LifeTime = vizLifetime,
-        Army = vizArmy:GetArmyIndex(),
+        X = location[1],
+        Z = location[3],
+        Radius = radius,
+        LifeTime = lifetime,
+        Army = army:GetArmyIndex(),
     }
-    local vizEntity = VizMarker(spec)
-
-    return vizEntity
+    return VizMarker(spec)
 end
 
-function CreateVisibleAreaAtUnit(vizRadius, vizUnit, vizLifetime, vizArmy)
-    local pos = vizUnit:GetPosition()
+--- Creates a visible area for `army` at `atUnit` of `radius` size.
+--- If `lifetime` is 0, the entity lasts forever, otherwise, for `lifetime` seconds.
+--- Returns a `VizMarker` so you can destroy it later if you want.
+---@param radius number
+---@param atUnit Unit
+---@param lifetime number
+---@param army AIBrain
+---@return VizMarker
+function CreateVisibleAreaAtUnit(radius, atUnit, lifetime, army)
+    local pos = atUnit:GetPosition()
     local spec = {
         X = pos[1],
         Z = pos[3],
-        Radius = vizRadius,
-        LifeTime = vizLifetime,
-        Army = vizArmy:GetArmyIndex(),
+        Radius = radius,
+        LifeTime = lifetime,
+        Army = army:GetArmyIndex(),
     }
-    local vizEntity = VizMarker(spec)
-
-    return vizEntity
+    return VizMarker(spec)
 end
 
--- Similar to the above function except it takes in an {X, Z} location rather
--- Than an {X, Y, Z} position
-function CreateVisibleArea(vizRadius, vizX, vizZ, vizLifetime, vizArmy)
+
+--- Creates a visible area for `army` at `x`,`z` of `radius` size.
+--- If `lifetime` is 0, the entity lasts forever, otherwise, for `lifetime` seconds.
+--- Returns a `VizMarker` so you can destroy it later if you want.
+---@param radius number
+---@param x number
+---@param z number
+---@param lifetime number
+---@param army number
+---@return VizMarker
+function CreateVisibleArea(radius, x, z, lifetime, army)
     local spec = {
-        X = vizX,
-        Z = vizZ,
-        Radius = vizRadius,
-        LifeTime = vizLifetime,
-        Army = vizArmy,
+        X = x,
+        Z = z,
+        Radius = radius,
+        LifeTime = lifetime,
+        Army = army,
     }
-    local vizEntity = VizMarker(spec)
-
-    return vizEntity
+    return VizMarker(spec)
 end
 
--- Sets the playable area for an operation to rect size.
--- this function allows you to use ScenarioUtilities function AreaToRect for the rectangle.
+-- Sets the playable area for an operation to `rect`. Can be an area name or rectangle.
+---@param rect Area | Rectangle
+---@param voFlag? boolean # defaults to `true`
 function SetPlayableArea(rect, voFlag)
-     if voFlag == nil then
-         voFlag = true
+    if voFlag == nil then
+        voFlag = true
     end
 
     if type(rect) == 'string' then
@@ -1222,6 +1266,7 @@ function SetPlayableArea(rect, voFlag)
     ForkThread(GenerateOffMapAreas)
 end
 
+--- unused
 function PlayableRectCameraThread(rect)
 --    local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
 --    LockInput()
@@ -1232,23 +1277,27 @@ function PlayableRectCameraThread(rect)
 --    UnLockInput()
 end
 
--- Sets platoon to only be built once
+--- Sets platoon to only be built once
+---@param platoon Platoon
 function BuildOnce(platoon)
     local aiBrain = platoon:GetBrain()
     aiBrain:PBMSetPriority(platoon, 0)
 end
 
--- TODO: Stop mission scripts from using this function, then remove it.
-function AddObjective(Type, Complete, Title, Description, Image, Progress, Target)
-    Objectives.AddObjective(Type, Complete, Title, Description, Image, Progress, Target)
+--- TODO: Stop mission scripts from using this function, then remove it.
+---@deprecated
+function AddObjective(type, complete, title, description, image, progress, target)
+    Objectives.AddObjective(type, complete, title, description, image, progress, target)
 end
 
--- TODO: Stop mission scripts from using this function, then remove it.
-function UpdateObjective(Title, UpdateField, NewData, objTag)
-    Objectives.UpdateObjective(Title, UpdateField, NewData, objTag)
+--- TODO: Stop mission scripts from using this function, then remove it.
+---@deprecated
+function UpdateObjective(title, updateField, newData, objTag)
+    Objectives.UpdateObjective(title, updateField, newData, objTag)
 end
 
--- Moves the camera to the specified area in 1 second
+--- Moves the camera to the specified area in 1 second
+---@param area Rectangle
 function StartCamera(area)
     local cam = SimCamera('WorldCamera')
 
@@ -1258,105 +1307,142 @@ function StartCamera(area)
     UnlockInput()
 end
 
--- Sets an army color to a factional, or factional-ally, color given by art
--- Aeon
-function SetAeonColor(number)
-    SetArmyColor(number, 41, 191, 41)
+--- Sets an army color to Aeon
+---@param army number
+function SetAeonColor(army)
+    SetArmyColor(army, 41, 191, 41)
 end
 
-function SetAeonAllyColor(number)
-    SetArmyColor(number, 165, 200, 102)
+--- Sets an army color to Aeon ally
+---@param army number
+function SetAeonAllyColor(army)
+    SetArmyColor(army, 165, 200, 102)
 end
 
-function SetAeonNeutralColor(number)
-    SetArmyColor(number, 16, 86, 16)
+--- Sets an army color to Aeon neutral
+---@param army number
+function SetAeonNeutralColor(army)
+    SetArmyColor(army, 16, 86, 16)
 end
 
--- Cybran
-function SetCybranColor(number)
-    SetArmyColor(number, 128, 39, 37)
+--- Sets an army color to Cybran
+---@param army number
+function SetCybranColor(army)
+    SetArmyColor(army, 128, 39, 37)
 end
 
-function SetCybranAllyColor(number)
-    SetArmyColor(number, 219, 74, 58)
+--- Sets an army color to Cybran ally
+---@param army number
+function SetCybranAllyColor(army)
+    SetArmyColor(army, 219, 74, 58)
 end
 
-function SetCybranNeutralColor(number)
-    SetArmyColor(number, 165, 9, 1) -- 84, 13, 13
-end
--- UEF
-function SetUEFColor(number)
-    SetArmyColor(number, 41, 40, 140)
-end;
-
-function SetUEFAllyColor(number)
-    SetArmyColor(number, 71, 114, 148)
+--- Sets an army color to Cybran neutral
+---@param army number
+function SetCybranNeutralColor(army)
+    SetArmyColor(army, 165, 9, 1) -- 84, 13, 13
 end
 
-function SetUEFNeutralColor(number)
-    SetArmyColor(number, 16, 16, 86)
+--- Sets an army color to UEF
+---@param army number
+function SetUEFColor(army)
+    SetArmyColor(army, 41, 40, 140)
 end
 
-function SetCoalitionColor(number)
-    SetArmyColor(number, 80, 80, 240)
+--- Sets an army color to UEF ally
+---@param army number
+function SetUEFAllyColor(army)
+    SetArmyColor(army, 71, 114, 148)
 end
 
--- Neutral
-function SetNeutralColor(number)
-    SetArmyColor(number, 211, 211, 180)
+--- Sets an army color to UEF neutral
+---@param army number
+function SetUEFNeutralColor(army)
+    SetArmyColor(army, 16, 16, 86)
 end
 
--- SC:FA colors
--- Aeon
-function SetAeonPlayerColor(number)
-    SetArmyColor(number, 36, 182, 36)
+--- Sets an army color to Coalition
+---@param army number
+function SetCoalitionColor(army)
+    SetArmyColor(army, 80, 80, 240)
 end
 
-function SetAeonEvilColor(number)
-    SetArmyColor(number, 159, 216, 2)
+--- Sets an army color to neutral
+---@param army number
+function SetNeutralColor(army)
+    SetArmyColor(army, 211, 211, 180)
 end
 
-function SetAeonAlly1Color(number)
-    SetArmyColor(number, 16, 86, 16)
+--- Sets an army color to Aeon player
+---@param army number
+function SetAeonPlayerColor(army)
+    SetArmyColor(army, 36, 182, 36)
 end
 
-function SetAeonAlly2Color(number)
-    SetArmyColor(number, 123, 255, 125)
-end
--- Cybran
-function SetCybranPlayerColor(number)
-    SetArmyColor(number, 231, 3, 3)
+--- Sets an army color to evil Aeon
+---@param army number
+function SetAeonEvilColor(army)
+    SetArmyColor(army, 159, 216, 2)
 end
 
-function SetCybranEvilColor(number)
-    SetArmyColor(number, 225, 70, 0)
+--- Sets an army color to Aeon ally 1
+---@param army number
+function SetAeonAlly1Color(army)
+    SetArmyColor(army, 16, 86, 16)
 end
 
-function SetCybranAllyColor(number)
-    SetArmyColor(number, 130, 33, 30)
+--- Sets an army color to Aeon ally 2
+---@param army number
+function SetAeonAlly2Color(army)
+    SetArmyColor(army, 123, 255, 125)
 end
 
--- UEF
-function SetUEFPlayerColor(number)
-    SetArmyColor(number, 41, 41, 225)
+--- Sets an army color to Cybran player
+---@param army number
+function SetCybranPlayerColor(army)
+    SetArmyColor(army, 231, 3, 3)
 end
 
-function SetUEFAlly1Color(number)
-    SetArmyColor(number, 81, 82, 241)
+--- Sets an army color to evil Cybran
+---@param army number
+function SetCybranEvilColor(army)
+    SetArmyColor(army, 225, 70, 0)
 end
 
-function SetUEFAlly2Color(number)
-    SetArmyColor(number, 133, 148, 255)
+--- Sets an army color to Cybran ally
+---@param army number
+function SetCybranAllyColor(army)
+    SetArmyColor(army, 130, 33, 30)
 end
 
--- Seraphim
-function SetSeraphimColor(number)
-    SetArmyColor(number, 167, 150, 2)
+--- Sets an army color to UEF player
+---@param army number
+function SetUEFPlayerColor(army)
+    SetArmyColor(army, 41, 41, 225)
 end
 
--- Loyalist
-function SetLoyalistColor(number)
-    SetArmyColor(number, 0, 100, 0)
+--- Sets an army color to UEF ally 1
+---@param army number
+function SetUEFAlly1Color(army)
+    SetArmyColor(army, 81, 82, 241)
+end
+
+--- Sets an army color to UEF ally 2
+---@param army number
+function SetUEFAlly2Color(army)
+    SetArmyColor(army, 133, 148, 255)
+end
+
+--- Sets an army color to Seraphim
+---@param army number
+function SetSeraphimColor(army)
+    SetArmyColor(army, 167, 150, 2)
+end
+
+--- Sets army color to Loyalist
+---@param army number
+function SetLoyalistColor(army)
+    SetArmyColor(army, 0, 100, 0)
 end
 
 function AMPlatoonCounter(aiBrain, name)
@@ -1930,9 +2016,6 @@ function OperationNISCameraThread(unitInfo, camInfo)
             Sync.NISMode = 'off'
 
             ScenarioInfo.NIS = false
-        -- Otherwise just unlock input, allowing them to click on the "Ok" button on the "Operation ended" box
-        else
-            UnlockInput()
         end
 
         -- cleanup

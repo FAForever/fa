@@ -119,10 +119,6 @@ Button = Class(Bitmap) {
 -- doing this. For now this at least gets this bollocks out of the Button class.
 ---@class FixableButton : Button
 FixableButton = Class(Button) {
-    __init = function(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
-        Button.__init(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
-    end,
-
     SetOverrideTexture = function(self, texture)
         self.textureOverride = texture
     end,

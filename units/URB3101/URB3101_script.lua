@@ -10,6 +10,7 @@
 
 local CRadarUnit = import('/lua/cybranunits.lua').CRadarUnit
 
+---@class URB3101 : CRadarUnit
 URB3101 = Class(CRadarUnit) {
     OnIntelDisabled = function(self)
         CRadarUnit.OnIntelDisabled(self)

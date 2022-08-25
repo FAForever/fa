@@ -9,6 +9,7 @@
 ----****************************************************************************
 local CEnergyCreationUnit = import('/lua/cybranunits.lua').CEnergyCreationUnit
 
+---@class URB1301 : CEnergyCreationUnit
 URB1301 = Class(CEnergyCreationUnit) {
     AmbientEffects = 'CT3PowerAmbient',
 

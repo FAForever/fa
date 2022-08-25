@@ -71,7 +71,6 @@ AIFBallisticMortarProjectile02 = Class(MultiPolyTrailProjectile) {
     FxImpactUnderWater = {},
 }
 
-
 --------------------------------------------------------------------------
 --  AEON ARTILLERY PROJECTILES
 --------------------------------------------------------------------------
@@ -577,6 +576,7 @@ AAAQuantumDisplacementCannonProjectile = Class(NullShell) {
 --------------------------------------------------------------------------
 --  AEON QUANTUM DISTORTION NUCLEAR WARHEAD PROJECTILES
 --------------------------------------------------------------------------
+---@class AQuantumWarheadProjectile : NukeProjectile
 AQuantumWarheadProjectile = Class(NukeProjectile, MultiCompositeEmitterProjectile) {
 
     Beams = {'/effects/emitters/aeon_nuke_exhaust_beam_01_emit.bp',},
