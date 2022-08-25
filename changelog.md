@@ -1,6 +1,44 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3744 (23rd of August, 2022)
+
+## Bug fixes
+
+- (#4178) Do not allow regular projectiles to collide with missiles
+
+  Reverts the behavior to before game patch 3741.
+
+- (#4173) Fix minor issue with recoil of weapons
+
+## Contributors 
+
+- Jip: #4178
+- Hdt80bro: #4173
+
+# Game version 3743 (23rd of August, 2022)
+
+## Bug fixes
+
+- (#4169) Fix internal state of HQs
+
+  There was an issue with the internal state of the HQs, causing it to get corrupt. This was caused by a refactoring of
+  patch 3741. If there are more issues with HQs then do report them on the forums or via Discord.
+
+- (#4167) Fix text focus of mods manager after exiting
+
+  You can now type again after exiting the mods manager as a non-host user :)!
+
+- (#4165) Add guard for Blueprint.General for command caps
+
+  Not having the guard broke a few mods, among one of them being SCTA.
+
+## Contributors
+
+- 4z0t: #4167
+- Jip: #4169
+- Hdt80bro: #4165
+
 # Game version 3743 (23rd of August, 2022)
 
 There's an issue with tactical and strategic defenses not working when Nomads is enabled. This is due to

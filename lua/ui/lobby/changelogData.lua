@@ -1,4 +1,4 @@
-last_version = 3743
+last_version = 3744
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -11,6 +11,23 @@ last_version = 3743
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3744,
+        name = 'Hotfix',
+        description = {
+            "## Bug fixes",
+            "",
+            "- (#4178) Do not allow regular projectiles to collide with missiles",
+            "  Reverts the behavior to before game patch 3741",
+            "",
+            "- (#4173) Fix minor issue with recoil of weapons",
+            "",
+            "## Contributors ",
+            "",
+            "- Jip: #4178",
+            "- Hdt80bro: #4173",
+        },
+    },
     {
         version = 3743,
         name = 'Hotfix',
