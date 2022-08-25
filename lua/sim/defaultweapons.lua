@@ -496,7 +496,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         local bp = self.Blueprint
         local rackRecoilDist = bp.RackRecoilDistance
         for _, rack in rackList do
-            local telescopeBone = rack.telescopeBone
+            local telescopeBone = rack.TelescopeBone
             local tmpSldr = CreateSlider(self.unit, rack.RackBone)
             table.insert(self.RecoilManipulators, tmpSldr)
             tmpSldr:SetPrecedence(11)
