@@ -15,6 +15,11 @@ gamePatches = {
         version = 3744,
         name = 'Hotfix',
         description = {
+            "The maintainers of Nomads have resolved the issues with tactical and strategical defenses! They should",
+            "now work as intended again.",
+            "",
+            "Jip",
+            "",
             "## Bug fixes",
             "",
             "- (#4178) Do not allow regular projectiles to collide with missiles",
