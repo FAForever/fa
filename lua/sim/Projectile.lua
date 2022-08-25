@@ -10,7 +10,6 @@ local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
 local TableGetn = table.getn
 
-
 -- scorch mark interaction
 local ScorchSplatTextures = {
     'scorch_001_albedo',
@@ -783,7 +782,7 @@ Projectile = Class(moho.projectile_methods) {
     ---@param self Projectile
     ---@param TargetType string
     ---@param ImpactEffectType string
-    ---@param position number
+    ---@param position Vector
     ---@return boolean
     GetTerrainEffects = function(self, TargetType, ImpactEffectType, position)
 
@@ -836,24 +835,28 @@ Projectile = Class(moho.projectile_methods) {
 
     -- Deprecated functionality
 
+    ---@deprecated
     ---@param self Projectile
     ---@return Vector
     GetCachePosition = function(self)
         return self:GetPosition()
     end,
 
+    ---@deprecated
     ---@param self Projectile
     ---@param data table
     PassData = function(self, data)
         self.Data = data
     end,
 
+    ---@deprecated
     ---@param self Projectile
     ---@return boolean
     GetCollideFriendly = function(self)
         return self.CollideFriendly
     end,
 
+    ---@deprecated
     ---@param self Projectile
     ---@param DamageData any
     PassDamageData = function(self, DamageData)
@@ -871,6 +874,7 @@ Projectile = Class(moho.projectile_methods) {
         self.CollideFriendly = self.DamageData.CollideFriendly
     end,
 
+    ---@deprecated
     -- root of all performance evil
     ---@param self Projectile
     ---@param fn any

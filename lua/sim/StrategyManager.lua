@@ -15,9 +15,9 @@ StrategyManager = Class(BuilderManager) {
     ---@param self StrategyManager
     ---@param brain AIBrain
     ---@param lType any
-    ---@param location number
+    ---@param location Vector
     ---@param radius number
-    ---@param useCenterPoint any
+    ---@param useCenterPoint boolean
     Create = function(self, brain, lType, location, radius, useCenterPoint)
         BuilderManager.Create(self,brain)
 
@@ -116,17 +116,17 @@ StrategyManager = Class(BuilderManager) {
 
 ---@param brain AIBrain
 ---@param lType any
----@param location number
+---@param location Vector
 ---@param radius number
----@param useCenterPoint any
----@return any
+---@param useCenterPoint boolean
+---@return StrategyManager
 function CreateStrategyManager(brain, lType, location, radius, useCenterPoint)
     local stratman = StrategyManager()
     stratman:Create(brain, lType, location, radius, useCenterPoint)
     return stratman
 end
 
--- imports kept for backwards compatibility with mods
+-- kept for mod backwards compatibility
 
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 --local StrategyList = import('/lua/ai/SkirmishStrategyList.lua').StrategyList

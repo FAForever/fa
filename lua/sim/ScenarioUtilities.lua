@@ -9,7 +9,6 @@
 
 local TableGetn = table.getn
 
-
 --distributeTime
 ---@param enabled boolean
 ---@param unitThreshold any
@@ -66,7 +65,7 @@ function GetMarker(name)
 end
 
 ---@param chainName string
----@return table
+---@return Vector[]
 function ChainToPositions(chainName)
     local chain = Scenario.Chains[chainName]
     if not chain then
@@ -106,8 +105,8 @@ end
 
 ---MarkerToPosition
 ---Converts a marker as specified in *_save.lua file to a position.
----@param strMarker any
----@return any
+---@param strMarker string
+---@return Vector
 function MarkerToPosition(strMarker)
     local marker = GetMarker(strMarker)
         if not marker then
@@ -118,7 +117,7 @@ end
 
 ---AreaToRect
 ---Converts an area as specified in *_save.lua file to a rectangle.
----@param strArea any
+---@param strArea string
 ---@return Rectangle
 function AreaToRect(strArea)
     local area = Scenario.Areas[strArea]
@@ -187,7 +186,7 @@ end
 
 ---FindUnit
 ---Finds the unit with the specified name.
----@param strUnit Unit
+---@param strUnit string
 ---@param tblNode any
 ---@return nil
 function FindUnit(strUnit,tblNode)
@@ -214,8 +213,8 @@ end
 
 ---CreateArmyUnit
 ---Creates a named unit in an army.
----@param strArmy any
----@param strUnit Unit
+---@param strArmy string
+---@param strUnit string
 ---@return Unit
 ---@return any
 ---@return any
@@ -265,8 +264,8 @@ end
 
 ---FindUnitGroup
 ---Finds the unit group with the specified name.
----@param strGroup any
----@param tblNode any
+---@param strGroup string
+---@param tblNode table
 ---@return nil
 function FindUnitGroup(strGroup,tblNode)
     if nil == tblNode then
@@ -293,8 +292,8 @@ end
 
 ---AssembleArmyGroup
 ---Returns a table of units in the group owned by the specified army.
----@param strArmy any
----@param strGroup any
+---@param strArmy string
+---@param strGroup string
 ---@return any
 function AssembleArmyGroup(strArmy,strGroup)
     return AssembleUnitGroup(FindUnitGroup(strGroup,Scenario.Armies[strArmy].Units))
@@ -302,10 +301,10 @@ end
 
 ---CreateArmySubGroup                                                                                        ]--
 ---Creates Army groups from a number of groups specified in order from the Units Hierarchy
----@param strArmy any
----@param strGroup any
+---@param strArmy string
+---@param strGroup string
 ---@param ... any
----@return table
+---@return Unit[]
 ---@return table
 ---@return table
 function CreateArmySubGroup(strArmy,strGroup,...)
@@ -340,12 +339,12 @@ end
 ---CreateSubGroup
 ---Used by CreateArmySubGroup
 ---@param tblNode any
----@param strArmy any
----@param strGroup any
+---@param strArmy string
+---@param strGroup string
 ---@param ... any
----@return table|any
----@return table|any
----@return table|any
+---@return Unit[]
+---@return table
+---@return table
 function CreateSubGroup(tblNode, strArmy, strGroup, ...)
     local tblResult = {}
     local treeResult = {}
@@ -365,9 +364,9 @@ function CreateSubGroup(tblNode, strArmy, strGroup, ...)
 end
 
 ---CreateInitialArmyGroup
----@param strArmy any
+---@param strArmy string
 ---@param createCommander Unit
----@return unknown|nil
+---@return Unit[]|nil
 ---@return boolean|Unit
 function CreateInitialArmyGroup(strArmy, createCommander)
     local tblGroup = CreateArmyGroup(strArmy, 'INITIAL')
@@ -728,7 +727,7 @@ function InitializeScenarioArmies()
 end
 
 ---AssignOrders
----@param strQueue any
+---@param strQueue string
 ---@param tblUnit table
 ---@param target Unit
 function AssignOrders(strQueue, tblUnit, target)
@@ -740,12 +739,12 @@ end
 
 ---SpawnPlatoon
 ---Spawns unit group and assigns to platoon it is a part of
----@param strArmy any
----@param strGroup any
----@return boolean
----@return any
----@return any
----@return any
+---@param strArmy string
+---@param strGroup string
+---@return Platoon
+---@return Unit[]
+---@return table
+---@return table
 function SpawnPlatoon(strArmy, strGroup)
     local tblNode = FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units)
     if nil == tblNode then
@@ -772,11 +771,11 @@ function SpawnPlatoon(strArmy, strGroup)
     return platoonList[platoonName], platoonList, tblResult, treeResult
 end
 
----@param strArmy any
----@param strGroup any
----@return any
----@return any
----@return any
+---@param strArmy string
+---@param strGroup string
+---@return Platoon
+---@return Unit[]
+---@return table
 function SpawnTableOfPlatoons(strArmy, strGroup)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
@@ -811,16 +810,16 @@ function CountChildUnits(tblNode)
     return count
 end
 
----@param strArmy integer
+---@param strArmy string
 ---@param tblNode any
 ---@param tblResult any
 ---@param platoonList any
 ---@param currPlatoon Platoon
 ---@param treeResult any
 ---@param balance number
----@return nil
----@return any
----@return any
+---@return Platoon
+---@return Unit[]
+---@return table
 function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, treeResult, balance)
     tblResult = tblResult or {}
     platoonList = platoonList or {}
@@ -948,13 +947,13 @@ end
 
 ---CreateArmyGroup
 ---Creates the specified group in game.
----@param strArmy any
----@param strGroup any
+---@param strArmy string
+---@param strGroup string
 ---@param wreckage Prop
 ---@param balance number
----@return any
----@return any
----@return nil
+---@return Unit[]
+---@return table
+---@return Platoon
 function CreateArmyGroup(strArmy,strGroup,wreckage, balance)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
@@ -980,11 +979,11 @@ end
 
 -- CreateArmyTree
 -- Returns tree of units created by the editor. 2nd return is table of units
----@param strArmy any
----@param strGroup any
----@return any
----@return any
----@return nil
+---@param strArmy string
+---@param strGroup string
+---@return Unit
+---@return table
+---@return Platoon
 function CreateArmyTree(strArmy, strGroup)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
@@ -1000,8 +999,8 @@ function CreateArmyTree(strArmy, strGroup)
     return treeResult, tblResult, platoonList
 end
 
----@param strArmy any
----@param strGroup any
+---@param strArmy string
+---@param strGroup string
 ---@param formation any
 ---@param OnFinishedCallback any
 function CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, OnFinishedCallback)
@@ -1013,13 +1012,13 @@ end
 
 -- CreateArmyGroupAsPlatoon
 -- Returns a platoon that is created out of all units in a group and its sub groups.
----@param strArmy any
----@param strGroup any
+---@param strArmy string
+---@param strGroup string
 ---@param formation any
 ---@param tblNode any
 ---@param platoon Platoon
 ---@param balance any
----@return any
+---@return Platoon
 function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon, balance)
     if ScenarioInfo.LoadBalance.Enabled then
         --note that tblNode in this case is actually the callback function
@@ -1080,11 +1079,11 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
 end
 
 -- Creates an army group at a certain veteran level
----@param strArmy any
----@param strGroup any
+---@param strArmy string
+---@param strGroup string
 ---@param formation any
 ---@param veteranLevel integer
----@return any
+---@return Platoon
 function CreateArmyGroupAsPlatoonVeteran(strArmy, strGroup, formation, veteranLevel)
     local plat = CreateArmyGroupAsPlatoon(strArmy, strGroup, formation)
     veteranLevel = veteranLevel or 5
@@ -1094,8 +1093,8 @@ function CreateArmyGroupAsPlatoonVeteran(strArmy, strGroup, formation, veteranLe
     return plat
 end
 
----@param strArmy any
----@param strGroup any
+---@param strArmy string
+---@param strGroup string
 ---@param tblData table
 ---@param unitGroup any
 ---@return any
@@ -1114,7 +1113,7 @@ end
 
 -- LoadArmyPBMBuilders
 -- Loads an Army Brain's PBM Builders from the save file
----@param strArmy any
+---@param strArmy string
 function LoadArmyPBMBuilders(strArmy)
     local aiBrain = GetArmyBrain(strArmy)
     if Scenario.Armies[strArmy].PlatoonBuilders.Builders then
@@ -1213,7 +1212,7 @@ function RebuildDataTable(table)
     return newTable
 end
 
----@param strArmy any
+---@param strArmy string
 function InitializeStartLocation(strArmy)
     local start = GetMarker(strArmy)
     if start then
@@ -1223,7 +1222,7 @@ function InitializeStartLocation(strArmy)
     end
 end
 
----@param strArmy any
+---@param strArmy string
 function SetPlans(strArmy)
     if Scenario.Armies[strArmy] then
         SetArmyPlans(strArmy, Scenario.Armies[strArmy].plans)
@@ -1231,8 +1230,8 @@ function SetPlans(strArmy)
 end
 
 ---@param buildName string
----@param strArmy any
----@param builderData any
+---@param strArmy string
+---@param builderData table
 function UpdateOSB(buildName, strArmy, builderData)
 --    local buildNameNew, location, globalName, childPart = SplitUpdateOSBName(buildName)
     local aiBrain = GetArmyBrain(strArmy)
@@ -1260,7 +1259,7 @@ function UpdateOSB(buildName, strArmy, builderData)
 end
 
 ---@param builderEdit any
----@param builderData any
+---@param builderData table
 function UpdateGivenOSB(builderEdit, builderData)
     -- Update data in builder in brain
     for dName, data in builderData.PlatoonData do
@@ -1323,8 +1322,8 @@ function UpdateGivenOSB(builderEdit, builderData)
 end
 
 ---@param buildName string
----@param strArmy any
----@param builderData any
+---@param strArmy string
+---@param builderData table
 function LoadOSB(buildName, strArmy, builderData)
     local buildNameNew, location, globalName, childPart
     local saveFile
@@ -1665,7 +1664,7 @@ function FactionConvert(template, factionIndex)
 end
 
 ---@param buildName string
----@return any
+---@return string
 ---@return boolean|string
 ---@return string
 ---@return boolean|string
@@ -1705,7 +1704,7 @@ function SplitUpdateOSBName(buildName)
 end
 
 ---@param buildName string
----@return any
+---@return string
 ---@return boolean|string
 ---@return string
 ---@return boolean|string
@@ -1746,7 +1745,7 @@ end
 
 ---@param tableOne table
 ---@param tableTwo table
----@return any
+---@return table
 function FilterFunctions(tableOne, tableTwo)
     for t2Num, t2Data in tableTwo do
         if t2Data[3][1] == 'Remove' then
@@ -1762,5 +1761,5 @@ function FilterFunctions(tableOne, tableTwo)
     return tableOne
 end
 
--- imports kept for backwards compatibility with mods
+-- kept for mod backwards compatibility
 local Entity = import('/lua/sim/Entity.lua').Entity

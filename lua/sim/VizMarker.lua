@@ -9,7 +9,7 @@
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 
----@class VizMarker : Entity
+---@class VizMarkerSpec
 ---@field X number
 ---@field Z number
 ---@field LifeTime number
@@ -19,10 +19,12 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 ---@field Radar boolean
 ---@field Vision boolean
 ---@field WaterVision boolean
+
+---@class VizMarker : Entity
 ---@deprecated
 VizMarker = Class(Entity) {
     ---@param self VizMarker
-    ---@param spec any
+    ---@param spec VizMarkerSpec
     __init = function(self, spec)
         --LOG('__VizMarker')
         Entity.__init(self, spec)

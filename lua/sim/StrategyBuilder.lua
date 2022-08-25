@@ -21,7 +21,7 @@ local Builder = import('/lua/sim/Builder.lua').Builder
 StrategyBuilder = Class(Builder) {
     ---@param self StrategyBuilder
     ---@param brain AIBrain
-    ---@param data any
+    ---@param data table
     ---@param locationType string
     ---@return boolean
     Create = function(self,brain,data,locationType)
@@ -47,7 +47,7 @@ StrategyBuilder = Class(Builder) {
     end,
 
     ---@param self StrategyBuilder
-    ---@return any
+    ---@return boolean
     IsStrategyActive = function(self)
         return self.Active
     end,
