@@ -16,7 +16,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param self EngineerManager
     ---@param brain AIBrain
     ---@param lType any
-    ---@param location string
+    ---@param location Vector
     ---@param radius number
     ---@return boolean
     Create = function(self, brain, lType, location, radius)
@@ -57,9 +57,9 @@ EngineerManager = Class(BuilderManager) {
 
     -- Check to see if the unit is buildings something in the category given
     ---@param unit Unit
-    ---@param econ any 
+    ---@param econ any unused
     ---@param pauseVal number
-    ---@param category string
+    ---@param category Categories
     ---@return boolean
     ProductionCheck = function(unit, econ, pauseVal, category)
         local beingBuilt = false
@@ -84,9 +84,9 @@ EngineerManager = Class(BuilderManager) {
 
     -- only pause the assisters of experimentals
     ---@param unit Unit
-    ---@param econ any
+    ---@param econ any unused
     ---@param pauseVal number
-    ---@param category string
+    ---@param category Categories
     ---@return boolean
     ExperimentalCheck = function(unit, econ, pauseVal, category)
         local beingBuilt = false
@@ -107,9 +107,9 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     ---@param unit Unit
-    ---@param econ any
+    ---@param econ any unused
     ---@param pauseVal number
-    ---@param category string
+    ---@param category Categories
     AssistCheck = function(unit, econ, pauseVal, category)
     end,
 
@@ -172,7 +172,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     ---@param self EngineerManager
-    ---@param econ any
+    ---@param econ any unused
     ---@param pauseVal number
     ---@return boolean
     MassCheck = function(self, econ, pauseVal)
@@ -186,10 +186,10 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param group string
-    ---@param econ any
+    ---@param econ any unused
     ---@param pauseVal number
     ---@param unitCheckFunc any
-    ---@param category string
+    ---@param category Categories
     ---@return boolean
     DisableMassGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
@@ -208,7 +208,7 @@ EngineerManager = Class(BuilderManager) {
 
     -- Functions for when an AI Brain's energy runs dry
     ---@param self EngineerManager
-    ---@param econ any
+    ---@param econ any unused
     ---@param pauseVal number
     ---@return boolean
     EnergyCheck = function(self, econ, pauseVal)
@@ -222,10 +222,10 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param group string
-    ---@param econ any
+    ---@param econ any unused
     ---@param pauseVal number
     ---@param unitCheckFunc any
-    ---@param category string
+    ---@param category Categories
     ---@return boolean
     DisableEnergyGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
@@ -311,7 +311,7 @@ EngineerManager = Class(BuilderManager) {
 
     -- Check if turning off this fabricator would destroy the mass income
     ---@param unit Unit
-    ---@param econ any
+    ---@param econ any unused
     ---@param pauseVal number
     ---@return boolean
     MassDrainCheck = function(unit, econ, pauseVal)
@@ -322,7 +322,7 @@ EngineerManager = Class(BuilderManager) {
 
     -- Builder based functions
     ---@param self EngineerManager
-    ---@param builderData any
+    ---@param builderData table
     ---@param locationType string
     ---@param builderType string
     ---@return any
@@ -334,7 +334,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param unit Unit
-    ---@param dontAssign any
+    ---@param dontAssign boolean
     AddUnit = function(self, unit, dontAssign)
         --LOG('+ AddUnit')
         for k,v in self.ConsumptionUnits do
@@ -396,7 +396,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param unitType string
-    ---@return any
+    ---@return number
     GetNumUnits = function(self, unitType)
         if self.ConsumptionUnits[unitType] then
             return self.ConsumptionUnits[unitType].Count
@@ -406,7 +406,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param unitType string
-    ---@param category string
+    ---@param category Categories
     ---@return number
     GetNumCategoryUnits = function(self, unitType, category)
         if self.ConsumptionUnits[unitType] then
@@ -416,16 +416,16 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     ---@param self EngineerManager
-    ---@param category string
-    ---@param engCategory string
+    ---@param category Categories
+    ---@param engCategory Categories
     ---@return integer
     GetNumCategoryBeingBuilt = function(self, category, engCategory)
         return TableGetn(self:GetEngineersBuildingCategory(category, engCategory))
     end,
 
     ---@param self EngineerManager
-    ---@param category string
-    ---@param engCategory string
+    ---@param category Categories
+    ---@param engCategory Categories
     ---@return table
     GetEngineersBuildingCategory = function(self, category, engCategory)
         local engs = self:GetUnits('Engineers', engCategory)
@@ -570,8 +570,8 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     ---@param self EngineerManager
-    ---@param category string
-    ---@param engCategory string
+    ---@param category Categories
+    ---@param engCategory Categories
     ---@return table
     GetEngineersWantingAssistance = function(self, category, engCategory)
         local testUnits = self:GetEngineersBuildingCategory(category, engCategory)
@@ -593,7 +593,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param unitType string
-    ---@param category string
+    ---@param category Categories
     ---@return UserUnit[]|nil
     GetUnits = function(self, unitType, category)
         if self.ConsumptionUnits[unitType] then
@@ -747,7 +747,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param unit Unit
     ---@param manager EngineerManager
-    ---@param ticks any
+    ---@param ticks integer
     Wait = function(unit, manager, ticks)
         coroutine.yield(ticks)
         if not unit.Dead then
@@ -878,9 +878,9 @@ EngineerManager = Class(BuilderManager) {
 
 ---@param brain AIBrain
 ---@param lType any
----@param location number
+---@param location Vector
 ---@param radius number
----@return any
+---@return EngineerManager
 function CreateEngineerManager(brain, lType, location, radius)
     local em = EngineerManager()
     em:Create(brain, lType, location, radius)

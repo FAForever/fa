@@ -1,4 +1,3 @@
-
 -----------------------------------------------------------------
 -- File     : /lua/sim/MarkerUtilities.lua
 -- Summary  : Aim of this file is to work with markers without
@@ -23,8 +22,8 @@
 local StringSplit = import('/lua/system/utils.lua').StringSplit
 local TableDeepCopy = table.deepcopy
 
----@alias MarkerList string[]
-
+--- TODO
+---@class MarkerData 
 
 -- MARKERS --
 
@@ -41,7 +40,7 @@ end
 -- @param name The name or key of the marker.
 -- returns A marker of the map or nil.
 ---@param name string
----@return MarkerList
+---@return MarkerData
 function GetMarker(name)
     return AllMarkers[name]
 end
@@ -65,7 +64,7 @@ MarkerCache["Hydrocarbon"] = { Count = 0, Markers = { } }
 -- can be cached. You can find them in the <map>_save.lua file.
 -- returns A table with markers and its length.
 ---@param type string The type of marker to retrieve.
----@return MarkerList
+---@return MarkerData
 ---@return number
 function GetMarkersByType(type)
 
@@ -108,7 +107,7 @@ end
 -- returns A table with markers and its length.
 ---@param type string
 ---@return table
----@return MarkerList
+---@return MarkerData
 function GetMarkersByTypeDeep(type)
     local cache = GetMarkersByType(type)
     return TableDeepCopy(cache.Markers), cache.Count
@@ -153,7 +152,7 @@ local ChainCache = { }
 -- copy with unique values use GetMarkerByTypeDeep instead.
 -- returns A table with markers and its length.
 ---@param name string The type of marker to retrieve.
----@return MarkerList
+---@return MarkerData
 ---@return number
 function GetMarkersInChain(name)
     -- check if it is cached and return that
@@ -196,7 +195,7 @@ end
 -- returns A table with markers and its length.
 ---@param type string The type of marker to retrieve.
 ---@return table
----@return any
+---@return MarkerData
 function GetMarkersInChainDeep(type)
     local cache = GetMarkersInChain(type)
     return TableDeepCopy(cache.Markers), cache.Count
