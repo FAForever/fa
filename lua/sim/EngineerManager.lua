@@ -59,7 +59,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param econ any unused
     ---@param pauseVal number
-    ---@param category Categories
+    ---@param category EntityCategory
     ---@return boolean
     ProductionCheck = function(unit, econ, pauseVal, category)
         local beingBuilt = false
@@ -86,7 +86,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param econ any unused
     ---@param pauseVal number
-    ---@param category Categories
+    ---@param category EntityCategory
     ---@return boolean
     ExperimentalCheck = function(unit, econ, pauseVal, category)
         local beingBuilt = false
@@ -109,7 +109,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param econ any unused
     ---@param pauseVal number
-    ---@param category Categories
+    ---@param category EntityCategory
     AssistCheck = function(unit, econ, pauseVal, category)
     end,
 
@@ -189,7 +189,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param econ any unused
     ---@param pauseVal number
     ---@param unitCheckFunc any
-    ---@param category Categories
+    ---@param category EntityCategory
     ---@return boolean
     DisableMassGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
@@ -225,7 +225,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param econ any unused
     ---@param pauseVal number
     ---@param unitCheckFunc any
-    ---@param category Categories
+    ---@param category EntityCategory
     ---@return boolean
     DisableEnergyGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
@@ -406,7 +406,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param unitType string
-    ---@param category Categories
+    ---@param category EntityCategory
     ---@return number
     GetNumCategoryUnits = function(self, unitType, category)
         if self.ConsumptionUnits[unitType] then
@@ -416,16 +416,16 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     ---@param self EngineerManager
-    ---@param category Categories
-    ---@param engCategory Categories
+    ---@param category EntityCategory
+    ---@param engCategory EntityCategory
     ---@return integer
     GetNumCategoryBeingBuilt = function(self, category, engCategory)
         return TableGetn(self:GetEngineersBuildingCategory(category, engCategory))
     end,
 
     ---@param self EngineerManager
-    ---@param category Categories
-    ---@param engCategory Categories
+    ---@param category EntityCategory
+    ---@param engCategory EntityCategory
     ---@return table
     GetEngineersBuildingCategory = function(self, category, engCategory)
         local engs = self:GetUnits('Engineers', engCategory)
@@ -570,8 +570,8 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     ---@param self EngineerManager
-    ---@param category Categories
-    ---@param engCategory Categories
+    ---@param category EntityCategory
+    ---@param engCategory EntityCategory
     ---@return table
     GetEngineersWantingAssistance = function(self, category, engCategory)
         local testUnits = self:GetEngineersBuildingCategory(category, engCategory)
@@ -593,7 +593,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param unitType string
-    ---@param category Categories
+    ---@param category EntityCategory
     ---@return UserUnit[]|nil
     GetUnits = function(self, unitType, category)
         if self.ConsumptionUnits[unitType] then
