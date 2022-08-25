@@ -70,6 +70,8 @@ Weapon = Class(moho.weapon_methods) {
     DamageMod = 0,
     DamageRadiusMod = 0,
 
+    ---@param self Weapon
+    ---@param unit Unit
     __init = function(self, unit)
         self.unit = unit
     end,
@@ -116,6 +118,8 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
+    ---@param nuke NukeProjectile
+    ---@param amount number
     AmmoThread = function(self, nuke, amount)
         WaitSeconds(0.1)
         if nuke then
@@ -236,6 +240,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
+    ---@param enabled boolean
     AimManipulatorSetEnabled = function(self, enabled)
         local aimControl = self.AimControl
         if aimControl then
@@ -249,6 +254,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
+    ---@param speed number
     SetTurretYawSpeed = function(self, speed)
         local aimControl = self.AimControl
         if aimControl then
@@ -260,6 +266,8 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
+    ---@param speed number
+    ---@param bp WeaponBlueprint
     SetTurretPitchSpeed = function(self, speed, bp)
         local aimControl = self.AimControl
         if aimControl then
@@ -338,12 +346,14 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
+    ---@param label string
     OnStartTracking = function(self, label)
         self:PlayWeaponSound('BarrelStart')
         self:PlayWeaponAmbientSound('BarrelLoop')
     end,
 
     ---@param self Weapon
+    ---@param label string
     OnStopTracking = function(self, label)
         self:PlayWeaponSound('BarrelStop')
         self:StopWeaponAmbientSound('BarrelLoop')
@@ -353,6 +363,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
+    ---@param sound BpSoundResult
     PlayWeaponSound = function(self, sound)
         local weaponSound = self.Audio[sound]
         if not weaponSound then return end
@@ -360,6 +371,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
+    ---@param sound BpSoundResult
     PlayWeaponAmbientSound = function(self, sound)
         local audio = self.Audio[sound]
         if not audio then return end
@@ -379,6 +391,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
+    ---@param sound BpSoundResult
     StopWeaponAmbientSound = function(self, sound)
         local ambientSounds = self.AmbientSounds
         if not ambientSounds then return end
@@ -390,6 +403,8 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
+    ---@param new any
+    ---@param old any
     OnMotionHorzEventChange = function(self, new, old)
     end,
 
@@ -435,6 +450,9 @@ Weapon = Class(moho.weapon_methods) {
         return self.damageTableCache
     end,
 
+    ---@param self Weapon
+    ---@param bone Bone
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
 
@@ -465,6 +483,8 @@ Weapon = Class(moho.weapon_methods) {
         return proj
     end,
 
+    ---@param self Weapon
+    ---@param newLayer string
     SetValidTargetsForCurrentLayer = function(self, newLayer)
         -- LOG('SetValidTargetsForCurrentLayer, layer = ', newLayer)
         local weaponBlueprint = self.Blueprint
@@ -479,20 +499,24 @@ Weapon = Class(moho.weapon_methods) {
         end
     end,
 
-
+    ---@param self Weapon
     OnDestroy = function(self)
     end,
 
     --- Clears out the trash of projectiles, such as beams. Called by the owning unit
+    ---@param self Weapon
     ClearProjectileTrash = function(self)
         self.TrashProjectiles:Destroy()
     end,
 
     --- Clears out the manipulators. Called by the owning unit
+    ---@param self Weapon
     ClearManipulatorTrash = function(self)
         self.TrashManipulators:Destroy()
     end,
 
+    ---@param self Weapon
+    ---@param priorities number
     SetWeaponPriorities = function(self, priorities)
         if priorities then
             if type(priorities[1]) == 'string' then
@@ -541,10 +565,15 @@ Weapon = Class(moho.weapon_methods) {
         end
     end,
 
+    ---@param self Weapon
     WeaponUsesEnergy = function(self)
         return self.EnergyRequired and self.EnergyRequired > 0
     end,
 
+    ---@param self Weapon
+    ---@param fn function
+    ---@param ... any
+    ---@return thread|nil
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -555,6 +584,9 @@ Weapon = Class(moho.weapon_methods) {
         end
     end,
 
+    ---@param self Weapon
+    ---@param old number
+    ---@param new number
     OnVeteranLevel = function(self, old, new)
         local bp = self.Blueprint.Buffs
         if not bp then return end
@@ -567,15 +599,21 @@ Weapon = Class(moho.weapon_methods) {
         end
     end,
 
+    ---@param self Weapon
+    ---@param buffTbl BlueprintBuff
     AddBuff = function(self, buffTbl)
         self.unit:AddWeaponBuff(buffTbl, self)
     end,
 
+    ---@param self Weapon
+    ---@param dmgMod any
     AddDamageMod = function(self, dmgMod)
         self.DamageMod = self.DamageMod + dmgMod
         self.damageTableCache = false
     end,
 
+    ---@param self Weapon
+    ---@param dmgRadMod any
     AddDamageRadiusMod = function(self, dmgRadMod)
         if dmgRadMod then
             self.DamageRadiusMod = self.DamageRadiusMod + dmgRadMod
@@ -583,6 +621,7 @@ Weapon = Class(moho.weapon_methods) {
         self.damageTableCache = false
     end,
 
+    ---@param self Weapon
     DoOnFireBuffs = function(self)
         local data = self.Blueprint
         if data.Buffs then
@@ -594,6 +633,8 @@ Weapon = Class(moho.weapon_methods) {
         end
     end,
 
+    ---@param self Weapon
+    ---@param buffname string
     DisableBuff = function(self, buffname)
         if buffname then
             self.DisabledBuffs[buffname] = true
@@ -604,6 +645,8 @@ Weapon = Class(moho.weapon_methods) {
         self.damageTableCache = false
     end,
 
+    ---@param self Weapon
+    ---@param buffname string
     ReEnableBuff = function(self, buffname)
         if buffname then
             self.DisabledBuffs[buffname] = nil
@@ -615,6 +658,8 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     --- Method to mark weapon when parent unit gets loaded on to a transport unit
+    ---@param self Weapon
+    ---@param transportstate boolean
     SetOnTransport = function(self, transportstate)
         self.onTransport = transportstate
         if not transportstate then
@@ -634,6 +679,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     --- Method to retreive onTransport information. True if the parent unit has been loaded on to a transport unit.
+    ---@param self Weapon
     GetOnTransport = function(self)
         return self.onTransport
     end,
@@ -641,6 +687,8 @@ Weapon = Class(moho.weapon_methods) {
     --- This is the function to set a weapon enabled.
     --- If the weapon is enhabled by an enhancement, this will check to see if the unit has the
     --- enhancement before allowing it to try to be enabled or disabled.
+    ---@param self Weapon
+    ---@param enable boolean
     SetWeaponEnabled = function(self, enable)
         if not enable then
             self:SetEnabled(enable)

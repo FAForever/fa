@@ -353,7 +353,7 @@ end
 --- Computes the distance between the vectors `a` and `b`
 ---@param a Vector
 ---@param b Vector
-function VDist3()
+function VDist3(a,b)
 end
 
 --- Computes the squared distance between the vectors `a` and `b`
