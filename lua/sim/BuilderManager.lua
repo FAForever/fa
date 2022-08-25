@@ -7,9 +7,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 
 ---@class BuilderManager
 BuilderManager = ClassSimple {
@@ -40,7 +38,7 @@ BuilderManager = ClassSimple {
 
     -- forking and storing a thread on the monitor
     ---@param self BuilderManager
-    ---@param fn any
+    ---@param fn function
     ---@param ... any
     ---@return thread
     ForkThread = function(self, fn, ...)
@@ -153,7 +151,7 @@ BuilderManager = ClassSimple {
 
     ---@param self BuilderManager
     ---@param builderName string
-    ---@return any
+    ---@return number|false
     GetBuilderPriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -167,7 +165,7 @@ BuilderManager = ClassSimple {
 
     ---@param self BuilderManager
     ---@param builderName string
-    ---@return any
+    ---@return number|false
     GetActivePriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -182,8 +180,8 @@ BuilderManager = ClassSimple {
     ---@param self BuilderManager
     ---@param builderName string
     ---@param priority integer
-    ---@param temporary any
-    ---@param setbystrat any
+    ---@param temporary number
+    ---@param setbystrat number
     SetBuilderPriority = function(self,builderName,priority,temporary,setbystrat)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -378,3 +376,8 @@ BuilderManager = ClassSimple {
         end
     end,
 }
+
+
+-- Moved Unused Imports for mod support
+local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIBuildUnits = import('/lua/ai/aibuildunits.lua')

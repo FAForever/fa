@@ -7,8 +7,6 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-
 ---- Root builder class
 -- Builder Sped
 -- {
@@ -23,7 +21,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 Builder = ClassSimple {
     ---@param self Builder
     ---@param brain AIBrain
-    ---@param data number
+    ---@param data table
     ---@param locationType string
     ---@return boolean
     Create = function(self, brain, data, locationType)
@@ -52,13 +50,13 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@return any
+    ---@return number
     GetPriority = function(self)
         return self.Priority
     end,
 
     ---@param self Builder
-    ---@return any
+    ---@return boolean
     GetActivePriority = function(self)
         if Builders[self.BuilderName].ActivePriority then
             return Builders[self.BuilderName].ActivePriority
@@ -68,8 +66,8 @@ Builder = ClassSimple {
 
     ---@param self Builder
     ---@param val number
-    ---@param temporary any
-    ---@param setbystrat any
+    ---@param temporary? boolean
+    ---@param setbystrat? boolean
     SetPriority = function(self, val, temporary, setbystrat)
         if temporary then
             self.OldPriority = self.Priority
@@ -91,7 +89,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@param builderManager BuilderManager
+    ---@param builderManager BuilderManager This is an Unused Parameter
     ---@return boolean
     CalculatePriority = function(self, builderManager)
         self.PriorityAltered = false
@@ -115,7 +113,7 @@ Builder = ClassSimple {
 
     ---@param self Builder
     ---@param locationType string
-    ---@param builderData table
+    ---@param builderData? table
     ---@return table
     GetBuilderData = function(self, locationType, builderData)
         -- Get builder data out of the globals and convert data here
@@ -142,13 +140,13 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@return any
+    ---@return string
     GetBuilderName = function(self)
         return self.BuilderName
     end,
 
     ---@param self Builder
-    ---@return any
+    ---@return boolean
     GetBuilderStatus = function(self)
         if self.GetStatusFunction then
             self.GetStatusFunction()
@@ -158,7 +156,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@return string
+    ---@return string|false
     GetPlatoonTemplate = function(self)
         if Builders[self.BuilderName].PlatoonTemplate then
             return Builders[self.BuilderName].PlatoonTemplate
@@ -167,7 +165,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@return any
+    ---@return {[1]: FileName, [2]: string} | false
     GetPlatoonAIFunction = function(self)
         if Builders[self.BuilderName].PlatoonAIFunction then
             return Builders[self.BuilderName].PlatoonAIFunction
@@ -176,7 +174,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@return any
+    ---@return string[]|false
     GetPlatoonAIPlan = function(self)
         if Builders[self.BuilderName].PlatoonAIPlan then
             return Builders[self.BuilderName].PlatoonAIPlan
@@ -185,7 +183,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@return any
+    ---@return string[]|false
     GetPlatoonAddPlans = function(self)
         if Builders[self.BuilderName].PlatoonAddPlans then
             return Builders[self.BuilderName].PlatoonAddPlans
@@ -194,7 +192,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@return any
+    ---@return {[1]: FileName, [2]: string}[] | false
     GetPlatoonAddFunctions = function(self)
         if Builders[self.BuilderName].PlatoonAddFunctions then
             return Builders[self.BuilderName].PlatoonAddFunctions
@@ -203,7 +201,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@return any
+    ---@return string[] | false
     GetPlatoonAddBehaviors = function(self)
         if Builders[self.BuilderName].PlatoonAddBehaviors then
             return Builders[self.BuilderName].PlatoonAddBehaviors
@@ -228,7 +226,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@param data number
+    ---@param data table
     ---@param locationType string
     SetupBuilderConditions = function(self, data, locationType)
         local tempConditions = {}
@@ -262,7 +260,7 @@ Builder = ClassSimple {
 
     ---@param self Builder
     ---@param valueName string
-    ---@param data any
+    ---@param data table
     ---@return boolean
     VerifyDataName = function(self, valueName, data)
         if not data[valueName] and not data.BuilderName then
@@ -277,9 +275,9 @@ Builder = ClassSimple {
 }
 
 ---@param brain AIBrain
----@param data number
+---@param data table
 ---@param locationType string
----@return any
+---@return any|false
 function CreateBuilder(brain, data, locationType)
     local builder = Builder()
     if builder:Create(brain, data, locationType) then
@@ -300,7 +298,7 @@ end
 FactoryBuilder = Class(Builder) {
     ---@param self FactoryBuilder
     ---@param brain AIBrain
-    ---@param data number
+    ---@param data table
     ---@param locationType string
     ---@return boolean
     Create = function(self,brain,data,locationType)
@@ -315,9 +313,9 @@ FactoryBuilder = Class(Builder) {
 }
 
 ---@param brain AIBrain
----@param data number
+---@param data table
 ---@param locationType string
----@return any
+---@return any|false
 function CreateFactoryBuilder(brain, data, locationType)
     local builder = FactoryBuilder()
     if builder:Create(brain, data, locationType) then
@@ -339,7 +337,7 @@ end
 PlatoonBuilder = Class(Builder) {
     ---@param self PlatoonBuilder
     ---@param brain AIBrain
-    ---@param data number
+    ---@param data table
     ---@param locationType string
     ---@return boolean
     Create = function(self,brain,data,locationType)
@@ -416,9 +414,9 @@ PlatoonBuilder = Class(Builder) {
 }
 
 ---@param brain AIBrain
----@param data number
+---@param data table
 ---@param locationType string
----@return any
+---@return PlatoonBuilder|false
 function CreatePlatoonBuilder(brain, data, locationType)
     local builder = PlatoonBuilder()
     if builder:Create(brain, data, locationType) then
@@ -446,7 +444,7 @@ end
 EngineerBuilder = Class(PlatoonBuilder) {
     ---@param self EngineerBuilder
     ---@param brain AIBrain
-    ---@param data number
+    ---@param data table
     ---@param locationType string
     ---@return boolean
     Create = function(self,brain,data, locationType)
@@ -467,9 +465,9 @@ EngineerBuilder = Class(PlatoonBuilder) {
 
 
 ---@param brain AIBrain
----@param data number
+---@param data table
 ---@param locationType string
----@return any
+---@return EngineerBuilder|false
 function CreateEngineerBuilder(brain, data, locationType)
     local builder = EngineerBuilder()
     if builder:Create(brain, data, locationType) then
@@ -477,3 +475,7 @@ function CreateEngineerBuilder(brain, data, locationType)
     end
     return false
 end
+
+-- Unsused Imports move for mod support
+
+local AIUtils = import('/lua/ai/aiutilities.lua')

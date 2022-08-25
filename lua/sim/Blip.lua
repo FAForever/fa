@@ -12,7 +12,7 @@
 Blip = Class(moho.blip_methods) {
 
     ---@param self Blip
-    ---@param hook any
+    ---@param hook fun(blip: Blip)
     AddDestroyHook = function(self,hook)
         if not self.DestroyHooks then
             self.DestroyHooks = {}
