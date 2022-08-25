@@ -11,8 +11,8 @@
 ---@alias TerrainType any
 ---@alias Task any
 ---@alias CSimSoundManager any
----@alias EconomyEvent any
----@alias AIPersonality any
+---@alias EconomyEvent moho.EconomyEvent
+---@alias AIPersonality string
 ---@alias ArmyPlans any
 
 
@@ -1295,7 +1295,7 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- Instantly moves an entity to a location
----@param entity Entity | Projectile | Unit
+---@param entity Object
 ---@param location Vector
 ---@param orientation? Vector
 function Warp(entity, location, orientation)

@@ -443,6 +443,8 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     damageTableCache = false,
+    ---@param self Weapon
+    ---@return table
     GetDamageTable = function(self)
         if not self.damageTableCache then
             self.damageTableCache = self:GetDamageTableInternal()
@@ -484,7 +486,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
-    ---@param newLayer string
+    ---@param newLayer Layer
     SetValidTargetsForCurrentLayer = function(self, newLayer)
         -- LOG('SetValidTargetsForCurrentLayer, layer = ', newLayer)
         local weaponBlueprint = self.Blueprint
@@ -606,14 +608,14 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
-    ---@param dmgMod any
+    ---@param dmgMod number 
     AddDamageMod = function(self, dmgMod)
         self.DamageMod = self.DamageMod + dmgMod
         self.damageTableCache = false
     end,
 
     ---@param self Weapon
-    ---@param dmgRadMod any
+    ---@param dmgRadMod? number This is optional
     AddDamageRadiusMod = function(self, dmgRadMod)
         if dmgRadMod then
             self.DamageRadiusMod = self.DamageRadiusMod + dmgRadMod

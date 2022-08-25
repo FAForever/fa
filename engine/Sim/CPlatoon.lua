@@ -2,34 +2,38 @@
 ---@class moho.platoon_methods
 local CPlatoon = {}
 
+---@alias PlatoonSquadType 'Attack' | 'Artillery' | 'Guard' | 'None' | 'Scout' | 'Support'
+---@alias PlatoonAlliance 'Ally' | 'Enemy' | 'Neutral'
+
+
 --- Orders platoon to attack target unit.
 -- If squad is specified, attacks only with the squad.
 ---@param target Unit Unit to attack.
----@param squad? string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:AttackTarget(target, squad)
 end
 
 --- Orders platoon to attack mote to target position..
 -- If squad is specified, attack moves only with the squad.
----@param position table Table with position {x, y, z}.
----@param squad? string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param position Vector Table with position {x, y, z}.
+---@param squad PlatoonSquadType
 function CPlatoon:AggressiveMoveToLocation(position, squad)
 end
 
 ---@param threatType string
----@param category string
+---@param category EntityCategory
 function CPlatoon:CalculatePlatoonThreat(threatType, category)
 end
 
 ---@param threatType string Examples: 'AntiSurface', 'AntiAir', 'Overall'.
----@param category string Unit's category, example: categories.TECH2 .
----@param position table Table with position {x, y, z}.
+---@param category EntityCategory Unit's category, example: categories.TECH2 .
+---@param position Vector Table with position {x, y, z}.
 ---@param radius number Radius in game units.
 function CPlatoon:CalculatePlatoonThreatAroundPosition(threatType, category, position, radius)
 end
 
 --- Returns true if squad can attack target unit.
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 ---@param target Unit Unit to check.
 function CPlatoon:CanAttackTarget(squad, target)
 end
@@ -55,16 +59,16 @@ end
 
 --- Orders platoon to create ferry route to target location.
 -- Can be called several times to create a non linear route.
----@param position table Table with position {x, y, z}.
+---@param position Vector Table with position {x, y, z}.
 function CPlatoon:FerryToLocation(position)
 end
 
 --- Returns closest unit to the platoon's squad.
 -- Example: FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL).
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
----@param alliance string Target alliance, types: 'Ally, 'Enemy', 'Neutral'.
+---@param squad PlatoonSquadType
+---@param alliance PlatoonAlliance
 ---@param canAttack boolean true/false if the squad has to be able to attack the unit.
----@param category string Target unit category, example: categories.TECH2 .
+---@param category EntityCategory Target unit category, example: categories.TECH2 .
 function CPlatoon:FindClosestUnit(squad, alliance, canAttack, category)
 end
 
@@ -75,10 +79,10 @@ end
 
 --- Returns furthest unit to the platoon's squad.
 -- Example: FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL).
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
----@param alliance string Target alliance, types: 'Ally, 'Enemy', 'Neutral'.
+---@param squad PlatoonSquadType
+---@param alliance PlatoonAlliance
 ---@param canAttack boolean true/false if the squad has to be able to attack the unit.
----@param category string Target unit category, example: categories.TECH2
+---@param category EntityCategory Target unit category, example: categories.TECH2
 function CPlatoon:FindFurthestUnit(squad, alliance, canAttack, category)
 end
 
@@ -90,10 +94,10 @@ end
 --- Finds prioritized unit to attack for squad.
 -- Uses priorities set by SetPrioritizedTargetList function.
 -- Used for TMLs to find a pick a target in their range
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
----@param alliance string Target alliance, types: 'Ally, 'Enemy', 'Neutral'.
+---@param squad PlatoonSquadType
+---@param alliance PlatoonAlliance
 ---@param canAttack boolean true/false if the squad has to be able to attack the unit.
----@param position table Table with position {x, y, z}.
+---@param position Vector Table with position {x, y, z}.
 ---@param radius number Radius in game units.
 function CPlatoon:FindPrioritizedUnit(squad, alliance, canAttack, position, radius)
 end
@@ -147,12 +151,12 @@ function CPlatoon:GetPlatoonUnits()
 end
 
 --- Returns list of platoon's squad units.
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:GetSquadPosition(squad)
 end
 
 --- Returns units table of <squad>
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:GetSquadUnits(squad)
 end
 
@@ -161,12 +165,12 @@ end
 -- @param [squad] Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
 -- @return command
 ---@param target Unit
----@param squad? string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:GuardTarget(target, squad)
 end
 
 --- Returns true if platoon's squad is on attack command.
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:IsAttacking(squad)
 end
 
@@ -176,12 +180,12 @@ function CPlatoon:IsCommandsActive(command)
 end
 
 --- Returns true if platoon's squad is on ferry command.
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:IsFerrying(squad)
 end
 
 --- Returns true if platoon's squad is on move command.
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:IsMoving(squad)
 end
 
@@ -191,20 +195,20 @@ function CPlatoon:IsOpponentAIRunning()
 end
 
 --- Returns true if platoon's squad is on patrol command.
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:IsPatrolling(squad)
 end
 
 --- Loads <category> units into transports of the platoon.
----@param category Categories Unit's category to laod.
+---@param category EntityCategory
 function CPlatoon:LoadUnits(category)
 end
 
 --- Orders platoon to move to target position.
 -- If squad is specified, moves only the squad.
----@param position table Table with position {x, y, z}.
+---@param position Vector Table with position {x, y, z}.
 ---@param useTransports boolean true/false
----@param squad? string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:MoveToLocation(position, useTransports, squad)
 end
 
@@ -212,25 +216,25 @@ end
 -- If squad is specified, move only with the squad.
 ---@param target Unit Unit to move to.
 ---@param useTransports boolean true/false
----@param squad? string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:MoveToTarget(target, useTransports, squad)
 end
 
 --- Orders platoon to patrol at target position.
 -- If squad is specified, patrols only with the squad.
----@param position table Table with position {x, y, z}.
----@param squad? string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param position Vector Table with position {x, y, z}.
+---@param squad PlatoonSquadType
 function CPlatoon:Patrol(position, squad)
 end
 
 --- Count how many units fit the specified category.
----@param category Categories Unit's category. Example: categories.TECH3 .
+---@param category EntityCategory Unit's category. Example: categories.TECH3 .
 function CPlatoon:PlatoonCategoryCount(category)
 end
 
 --- Count how many units fit the specified category around target position.
----@param category Categories Unit's category. Example: categories.TECH3 .
----@param position table Table with position {x, y, z}.
+---@param category EntityCategory Unit's category. Example: categories.TECH3 .
+---@param position Vector Table with position {x, y, z}.
 ---@param radius number
 function CPlatoon:PlatoonCategoryCountAroundPosition(category, position, radius)
 end
@@ -241,7 +245,7 @@ function CPlatoon:SetPlatoonFormationOverride(formation)
 end
 
 --- Sets target priorities for platoon's squad.
----@param squad string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 ---@param tblCategory table List of categories, highest to lowerst priority, example: {categories.COMMAND, categories.EXPERIMENTAL, categories.ALLUNITS}
 function CPlatoon:SetPrioritizedTargetList(squad, tblCategory)
 end
@@ -249,7 +253,7 @@ end
 --- Orders platoon to stop, cancels all commands.
 -- If squad is specified, stops only the squad.
 -- Cancels all commands.
----@param squad? string Types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:Stop(squad)
 end
 
@@ -264,26 +268,26 @@ function CPlatoon:UniquelyNamePlatoon(name)
 end
 
 --- Orders platoon to drop all units at target position.
----@param position table Table with position {x, y, z}.
+---@param position Vector Table with position {x, y, z}.
 function CPlatoon:UnloadAllAtLocation(position)
 end
 
 --- Unloads specific units from transports (carriers).
 -- This seems to work only with carriers and not with air transports.
----@param category Categories Unit category (categories.BOMBER).
----@param position table Table with position {x, y, z}.
+---@param category EntityCategory Unit category (categories.BOMBER).
+---@param position Vector Table with position {x, y, z}.
 function CPlatoon:UnloadUnitsAtLocation(category, position)
 end
 
 --- TODO.
----@param category Categories categories.ALLUNITS, ScenarioInfo.VarTable[data.MoveBeacon]
+---@param category EntityCategory categories.ALLUNITS, ScenarioInfo.VarTable[data.MoveBeacon]
 ---@param beacon any
 function CPlatoon:UseFerryBeacon(category, beacon)
 end
 
 --- TODO.
 ---@param gameObject any TODO.
----@param squad? string Types: ' Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support'.
+---@param squad PlatoonSquadType
 function CPlatoon:UseTeleporter(gameObject, squad)
 end
 
