@@ -82,8 +82,10 @@ local buttons = {
             tooltip = 'mfd_defense',
             bitmap = 'team-color',
             id = 'teamcolor',
+            disableInReplay = true,
             OnClick = function(self, modifiers)
                 TeamColorHandler(self, modifiers)
+                self:ToggleCheck()
             end,
         },
         {
@@ -238,6 +240,10 @@ function Create(parent)
             Tooltip.AddCheckboxTooltip(btn.dropout, buttonData.dropout_tooltip)
         end
 
+        if btn and buttonData.disableInReplay and SessionIsReplay() then
+            btn:Disable()
+        end
+
         return btn
     end
 
@@ -255,6 +261,7 @@ function Create(parent)
 
     for index, buttonData in buttons.overlays do
         controls.overlayBtns[index] = CreateOverlayBtn(buttonData)
+        
     end
 
     for index, buttonData in buttons.pings do
@@ -343,7 +350,9 @@ function ToggleMilitary()
 end
 
 function ToggleDefense()
-    GetButton('teamcolor'):ToggleCheck()
+    local btn = GetButton('teamcolor')
+    TeamColorHandler(btn, { })
+    btn:ToggleCheck()
 end
 
 function ToggleEconomy()
@@ -1384,7 +1393,6 @@ function TeamColorHandler(self, modifiers)
             TeamColorMode(calculateTeamColors())
             TeamColorMode(true)
         end    
-        self:ToggleCheck()
     end
 end
 

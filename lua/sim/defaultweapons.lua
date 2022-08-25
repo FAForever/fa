@@ -214,6 +214,9 @@ DefaultProjectileWeapon = Class(Weapon) {
                 }
                 self.CurrentSalvoData = data
             else
+                if not targetPos then
+                    return 4.75
+                end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
                 -- otherwise, do the same calculation but skip any cache or salvo logic
                 if target.Dead then
@@ -245,7 +248,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         -- check if we lost the target (or if we previously did; regaining a target mid-run shouldn't
         -- suddenly divert some of the bombs)
-        if target.Dead or data.usestore then
+        if target.Dead or data.usestore or not targetPos then
             -- use same acceleration as last bomb
             data.usestore = true
             return data.lastAccel
@@ -458,10 +461,6 @@ DefaultProjectileWeapon = Class(Weapon) {
         then
             self.unit:ShakeCamera(cameraShakeRadius, cameraShakeMax, cameraShakeMin, cameraShakeDuration)
         end
-        if bp.ShipRock == true then
-            local ix, iy, iz = self.unit:GetBoneDirection(bp.RackBones[self.CurrentRackSalvoNumber].RackBone)
-            self.unit:RecoilImpulse(-ix, -iy, -iz)
-        end
         if bp.RackRecoilDistance ~= 0 then
             self:PlayRackRecoil({bp.RackBones[self.CurrentRackSalvoNumber]})
         end
@@ -527,20 +526,17 @@ DefaultProjectileWeapon = Class(Weapon) {
     PlayRackRecoil = function(self, rackList)
         local bp = self.Blueprint
         local rackRecoilDist = bp.RackRecoilDistance
-        local count = 0
         for _, rack in rackList do
-            local telescopeBone = rack.telescopeBone
+            local telescopeBone = rack.TelescopeBone
             local tmpSldr = CreateSlider(self.unit, rack.RackBone)
-            count = count + 1
-            self.RecoilManipulators[count] = tmpSldr
+            table.insert(self.RecoilManipulators, tmpSldr)
             tmpSldr:SetPrecedence(11)
             tmpSldr:SetGoal(0, 0, rackRecoilDist)
             tmpSldr:SetSpeed(-1)
             self.TrashManipulators:Add(tmpSldr)
             if telescopeBone then
                 tmpSldr = CreateSlider(self.unit, telescopeBone)
-                count = count + 1
-                self.RecoilManipulators[count] = tmpSldr
+                table.insert(self.RecoilManipulators, tmpSldr)
                 tmpSldr:SetPrecedence(11)
                 tmpSldr:SetGoal(0, 0, rack.TelescopeRecoilDistance or rackRecoilDist)
                 tmpSldr:SetSpeed(-1)
@@ -1477,13 +1473,21 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     ---@param beam any
     WatchForHoldFire = function(self, beam)
         local unit = self.unit
-        while true do
-            WaitSeconds(1)
-            --if we're at hold fire, stop beam
-            if self.unit and (self.unit:GetFireState() == 1) then
+        local hasTargetPrev = true
+        while not (IsDestroyed(self) or IsDestroyed(unit)) do
+
+            local hasTarget = self:GetCurrentTarget() != nil
+            if   -- check for hold fire
+                (unit:GetFireState() == 1) or
+                 -- check if we have a target still, relevant for beam weapons that work indefinitely
+                (not (hasTarget or hasTargetPrev))
+            then
                 self.BeamStarted = false
                 self:PlayFxBeamEnd(beam)
             end
+
+            hasTargetPrev = hasTarget
+            WaitSeconds(0.5)
         end
     end,
 
