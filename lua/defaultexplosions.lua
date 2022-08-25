@@ -654,48 +654,79 @@ local IEffectSetEmitterCurveParam = _G.moho.IEffect.SetEmitterCurveParam
 local DefaultWreckageEffects = EffectTemplate.DefaultWreckageEffectsLrg01
 local DefaultWreckageEffectsCount = EffectTemplate.DefaultWreckageEffectsLrg01Count
 
+local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01
+local TechMultiplier = {
+    TECH1 = 1.0,
+    TECH2 = 1.5,
+    TECH3 = 2.0,
+    SUBCOMMANDER = 2.5,
+    EXPERIMENTAL = 10.0,
+}
+
 -- remove all wreckage effects, but keep for compatibility
 ---@param unit Unit
 ---@param prop Prop
 function CreateWreckageEffects(unit, prop)
 
     -- determine number of effects
-    local blueprint = unit.Blueprint or EntityGetBlueprint(unit)
-
-    -- we can't make an animation for these based on bones: they spawn at the unanimated locations
-    if blueprint.Display.AnimationDeath then
-        return
-    end
+    local position = unit:GetPosition(0)
+    local blueprint = unit.Blueprint or unit:GetBlueprint()
+    local entity = Entity({Owner = unit})
 
     -- determine number of effects
     local bones = unit:GetBoneCount()
-    local size = MathFloor(0.2 * (blueprint.SizeX + blueprint.SizeY + blueprint.SizeZ)) + 1
+    local size = math.max(blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ)
     if size > bones - 1 then
         size = bones - 1
     end
 
+    -- knock over some trees if possible
+    if not blueprint.Display.AnimationDeath then 
+        DamageArea(nil, position, size, 1, 'TreeFire', true)
+        DamageArea(nil, position, 0.75 * size, 1, 'TreeForce', true)
+    end
+
+    local techMultiplier = TechMultiplier[blueprint.TechCategory] or 1.0
+    LOG(techMultiplier)
+
     -- localize for performance
     local Random = Random
-    local bone, effect, emitter, r1
+    local bone, emitter, r1
 
-    -- spawn the effects
-    for k = 1, size do 
-        -- create an emitter at a bone
+    for k = 1, math.floor(size) + 1 do
+
+        -- warp entity to a bone
         bone = Random(1, bones - 1) - 1
-        effect = Random(1, DefaultWreckageEffectsCount)
-        emitter = CreateEmitterAtBone(prop, bone, unit.Army, DefaultWreckageEffects[effect])
+        position = unit:GetPosition(bone)
+        local surface = GetSurfaceHeight(position[1], position[3])
 
-        -- larger smoke tends to live longer
-        r1 = Random()
-        IEffectScaleEmitter(emitter, 0.5 + 0.75 * r1)
-        IEffectSetEmitterParam(emitter, 'LIFETIME', 40 + 75 * r1)
+        -- above water
+        if position[2] > surface then
 
-        -- apply wind direction
-        ApplyWindDirection(emitter, 1.0)
+            Warp(entity, position)
+            
+            -- create fire at that bone
+            for _, effect in FireEffects do 
+                -- larger smoke tends to live longer
+                emitter = CreateEmitterAtEntity(entity, unit.Army, effect)
+                r1 = Random()
+                IEffectScaleEmitter(emitter, 2)
+                IEffectSetEmitterParam(emitter, 'LIFETIME', techMultiplier * (160 + 300 * r1))
 
-        prop.Trash:Add(emitter)
+                -- apply wind direction
+                ApplyWindDirection(emitter, 1.0)
+
+                prop.Trash:Add(emitter)
+            end
+
+        -- below water
+        else
+
+        end
     end
 end
+
+
 
 --------------------------------
 -- DEBRIS PROJECTILES EFFECTS --

@@ -289,6 +289,12 @@ TreeBurning01 = {
     EmtBpPath .. 'forest_smoke_01.bp',
 }
 
+TreeBurning02 = {
+    EmtBpPath .. 'forest_fire_01.bp',
+    EmtBpPath .. 'forest_distortion_01.bp',
+    EmtBpPath .. 'forest_smoke_01.bp',
+}
+
 -- ---------------------------------------------------------------
 -- Shield Impact effects
 -- ---------------------------------------------------------------

@@ -18,7 +18,7 @@ EmitterBlueprint {
 	SnapToWaterline = false,
 	OnlyEmitOnWater = false,
 	ParticleResistance = false,
-	InterpolateEmission = true,
+	InterpolateEmission = false,
 	TextureStripcount = 4.00,
 	SortOrder = 10.00,
 	LowFidelity = true,
@@ -47,7 +47,7 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 15.00,
 		Keys = {
-			{ x=4.930,y=20.000,z=0.000 },
+			{ x=4.930,y=10.000,z=0.000 },
 		},
 	},
 	LifetimeCurve = {

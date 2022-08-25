@@ -164,16 +164,22 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         view.Right:Set(viewRight.Right)
         view:DisableHitTest()
     else
+        reprsl(parent)
+        reprsl(mapGroup)
+        
+        mapGroup.Right:Set(500)
         parentForFrame = parent
         viewLeft = import('/lua/ui/controls/worldview.lua').WorldView(mapGroup, 'WorldCamera', 1, false) -- depth value should be below minimap
         viewLeft:Register('WorldCamera', nil, '<LOC map_view_0006>Main View', 2)
         viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
         LayoutHelpers.FillParent(viewLeft, mapGroup)
+
         viewLeft:GetsGlobalCameraCommands(true)
 
         view = Group(viewLeft)
         view:DisableHitTest()
         LayoutHelpers.FillParent(view, viewLeft)
+
     end
     import('/lua/ui/game/multifunction.lua').RefreshMapDialog()
 end

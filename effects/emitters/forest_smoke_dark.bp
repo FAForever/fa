@@ -1,6 +1,7 @@
+-- used by trees
 EmitterBlueprint {
 	BlueprintId = 'forest_fire_smoke_01',
-	Lifetime = 150.00,
+	Lifetime = -1,
 	Repeattime = 150.00,
 	TextureFramecount = 1.00,
 	Blendmode = 0.00,
@@ -10,17 +11,20 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 150.00,
+	LODCutoff = 300.00,
 	EmitIfVisible = true,
-	CatchupEmit = true,
+	CatchupEmit = false,
 	CreateIfVisible = false,
 	SnapToWaterline = true,
 	OnlyEmitOnWater = false,
-	InterpolateEmission = false,
+	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 10.00,
+	LowFidelity = false,
+	MedFidelity = true,
+	HighFidelity = true,
 	Texture = '/textures/particles/cloud_smoke_alpha_10.dds',
-	RampTexture = '/textures/particles/ramp_fire_smoke_03.dds',
+	RampTexture = '/textures/particles/ramp_black_grey_01.dds',
 	XDirectionCurve = {
 		XRange = 150.00,
 		Keys = {
@@ -40,10 +44,10 @@ EmitterBlueprint {
 		},
 	},
 	EmitRateCurve = {
-		XRange = 150.00,
+		XRange = 40.00,
 		Keys = {
 			{ x=0.210,y=0.250,z=0.000 },
-			{ x=150.000,y=0.2500,z=0.000 },
+			{ x=150.000,y=0.500,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
@@ -143,4 +147,3 @@ EmitterBlueprint {
 		},
 	},
 }
-
