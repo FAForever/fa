@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Helper functions for cinematics
 --**
---**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 --
 -- One cautionary note: don't change the playable area during an in-game cinematic.

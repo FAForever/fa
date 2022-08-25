@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Various utility functions that will assist UI creation
 --*
---* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
