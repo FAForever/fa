@@ -254,7 +254,7 @@ Shield = Class(moho.shield_methods, Entity) {
         local EntityGetMaxHealth = EntityGetMaxHealth
         local EntityAdjustHealth = EntityAdjustHealth
 
-        while true do
+        while not IsDestroyed(self) do
 
             -- gather some information
             local fromSuspension = false
