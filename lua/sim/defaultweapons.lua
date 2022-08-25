@@ -132,7 +132,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Called from inside RackSalvoFiringState
     ---@param self DefaultProjectileWeapon
     ---@param muzzle string
-    ---@return any
+    ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = self:CreateProjectileForWeapon(muzzle)
         if not proj or proj:BeenDestroyed() then
@@ -618,7 +618,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     -- Checks to see if the weapon is allowed to fire
     ---@param self DefaultProjectileWeapon
-    ---@return any
+    ---@return boolean
     CanWeaponFire = function(self)
         return self.WeaponCanFire
     end,
@@ -1470,7 +1470,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     -- Kill the beam if hold fire is requested
     ---@param self DefaultBeamWeapon
-    ---@param beam any
+    ---@param beam CollisionBeam
     WatchForHoldFire = function(self, beam)
         local unit = self.unit
         local hasTargetPrev = true
@@ -1671,5 +1671,5 @@ SCUDeathWeapon = Class(BareBonesWeapon) {
     end,
 }
 
--- Moved Unsused Imports To bttome for mod support
+-- kept for mod backwards compatibility
 local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors

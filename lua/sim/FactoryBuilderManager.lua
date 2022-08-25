@@ -18,9 +18,9 @@ FactoryBuilderManager = Class(BuilderManager) {
     ---@param self FactoryBuilderManager
     ---@param brain AIBrain
     ---@param lType any
-    ---@param location number
+    ---@param location Vector
     ---@param radius number
-    ---@param useCenterPoint any
+    ---@param useCenterPoint boolean
     ---@return boolean
     Create = function(self, brain, lType, location, radius, useCenterPoint)
         BuilderManager.Create(self,brain)
@@ -123,7 +123,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param category string
+    ---@param category Categories
     ---@return number
     GetNumCategoryFactories = function(self, category)
         if self.FactoryList then
@@ -141,7 +141,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param category string
+    ---@param category Categories
     ---@param facCategory string
     ---@return table
     GetFactoriesBuildingCategory = function(self, category, facCategory)
@@ -170,7 +170,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param category string
+    ---@param category Categories
     ---@param facCatgory string
     ---@return table
     GetFactoriesWantingAssistance = function(self, category, facCatgory)
@@ -192,7 +192,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param category string
+    ---@param category Categories
     ---@return UserUnit[]|nil
     GetFactories = function(self, category)
         local retUnits = EntityCategoryFilterDown(category, self.FactoryList)
@@ -239,7 +239,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param factories any
+    ---@param factories string[]
     ---@param bType string
     SetupFactoryCallbacks = function(self,factories,bType)
         for k,v in factories do
@@ -275,7 +275,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param factory any
+    ---@param factory Unit
     FactoryDestroyed = function(self, factory)
         local guards = factory:GetGuards()
         for k,v in guards do
@@ -301,7 +301,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param factory any
+    ---@param factory Unit
     ---@param bType string
     ---@param time number
     DelayBuildOrder = function(self,factory,bType,time)
@@ -325,8 +325,8 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param factory any
-    ---@return string
+    ---@param factory Unit
+    ---@return string|false
     GetFactoryFaction = function(self, factory)
         if EntityCategoryContains(categories.UEF, factory) then
             return 'UEF'
@@ -343,8 +343,8 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param factory any
-    ---@return any
+    ---@param factory FactoryBuilderManager
+    ---@return Categories|nil
     UnitFromCustomFaction = function(self, factory)
         local customFactions = self.Brain.CustomFactions
         for k,v in customFactions do
@@ -356,7 +356,7 @@ FactoryBuilderManager = Class(BuilderManager) {
 
     ---@param self FactoryBuilderManager
     ---@param templateName string
-    ---@param factory any
+    ---@param factory Unit
     ---@return boolean
     GetFactoryTemplate = function(self, templateName, factory)
         local templateData = PlatoonTemplates[templateName]
@@ -419,7 +419,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     ---@param self FactoryBuilderManager
     ---@param template any
     ---@param templateName string
-    ---@param faction any
+    ---@param faction Unit
     ---@return boolean|table
     GetCustomReplacement = function(self, template, templateName, faction)
         local retTemplate = false
@@ -445,7 +445,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param factory any
+    ---@param factory Unit
     ---@param bType string
     AssignBuildOrder = function(self,factory,bType)
         -- Find a builder the factory can build
@@ -464,8 +464,8 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param factory any
-    ---@param finishedUnit any
+    ---@param factory Unit
+    ---@param finishedUnit boolean
     FactoryFinishBuilding = function(self,factory,finishedUnit)
         if EntityCategoryContains(categories.ENGINEER, finishedUnit) then
             self.Brain.BuilderManagers[self.LocationType].EngineerManager:AddUnit(finishedUnit)
@@ -501,7 +501,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param factory any
+    ---@param factory Unit
     DelayRallyPoint = function(self, factory)
         WaitSeconds(1)
         if not factory.Dead then
@@ -510,7 +510,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param factory any
+    ---@param factory Unit
     ---@return boolean
     SetRallyPoint = function(self, factory)
         local position = factory:GetPosition()
@@ -561,10 +561,10 @@ FactoryBuilderManager = Class(BuilderManager) {
 
 ---@param brain AIBrain
 ---@param lType string
----@param location number
+---@param location Vector
 ---@param radius number
----@param useCenterPoint any
----@return any
+---@param useCenterPoint boolean
+---@return FactoryBuilderManager
 function CreateFactoryBuilderManager(brain, lType, location, radius, useCenterPoint)
     local fbm = FactoryBuilderManager()
     fbm:Create(brain, lType, location, radius, useCenterPoint)

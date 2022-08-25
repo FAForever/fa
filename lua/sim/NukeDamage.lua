@@ -5,7 +5,7 @@ NukeAOE = Class() {
     Ticks = false,
     TotalTime = false,
 
-    ---@param self any
+    ---@param self NukeAOE
     ---@param damage number
     ---@param radius number
     ---@param ticks integer
@@ -17,11 +17,11 @@ NukeAOE = Class() {
         self.TotalTime = totalTime
     end,
 
-    ---@param self any
-    ---@param instigator any
+    ---@param self NukeAOE
+    ---@param instigator Unit
     ---@param pos Vector
     ---@param army AIBrain
-    ---@param damageType string
+    ---@param damageType DamageType
     DoNukeDamage = function(self, instigator, pos, brain, army, damageType)
         if self.TotalTime == 0 then
             import('/lua/sim/DamageArea.lua').DamageArea(instigator, pos, self.Radius, self.Damage, (damageType or 'Nuke'), true, true, brain, army)
@@ -30,8 +30,8 @@ NukeAOE = Class() {
         end
     end,
 
-    ---@param self any
-    ---@param instigator any
+    ---@param self NukeAOE
+    ---@param instigator Unit
     ---@param pos Vector
     SlowNuke = function(self, instigator, pos)
         local ringWidth = (self.Radius / self.Ticks)

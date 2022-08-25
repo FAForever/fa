@@ -16,7 +16,7 @@ PlatoonFormManager = Class(BuilderManager) {
     ---@param self PlatoonFormManager
     ---@param brain AIBrain
     ---@param lType any
-    ---@param location number
+    ---@param location Vector
     ---@param radius number
     ---@return boolean
     Create = function(self, brain, lType, location, radius)
@@ -37,8 +37,8 @@ PlatoonFormManager = Class(BuilderManager) {
     end,
 
     ---@param self PlatoonFormManager
-    ---@param builderData any
-    ---@param locationType string
+    ---@param builderData table
+    ---@param locationType Vector
     ---@param builderType string
     ---@return boolean
     AddBuilder = function(self, builderData, locationType, builderType)
@@ -195,9 +195,9 @@ PlatoonFormManager = Class(BuilderManager) {
 
 ---@param brain AIBrain
 ---@param lType any
----@param location number
+---@param location Vector
 ---@param radius number
----@return any
+---@return PlatoonFormManager
 function CreatePlatoonFormManager(brain, lType, location, radius)
     local pfm = PlatoonFormManager()
     pfm:Create(brain, lType, location, radius)

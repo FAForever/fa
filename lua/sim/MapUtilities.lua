@@ -1,10 +1,8 @@
-
 local MarkerUtilities = import("/lua/sim/MarkerUtilities.lua")
 local MapResourceCheckApplied = false
 
 --- Attempts to spawn in extractors and hydrocarbons on each marker that is enabled in the game. Attempts 
--- to ring each extractor with storages and fabricators, similar to how the ringing feature works.
-
+--- to ring each extractor with storages and fabricators, similar to how the ringing feature works.
 function MapResourceCheck()
 
     -- perform UI checks on sim to prevent cheating
@@ -51,7 +49,7 @@ function MapResourceCheck()
     local mass = MarkerUtilities.GetMarkersByType("Mass")
     local hydro = MarkerUtilities.GetMarkersByType("Hydrocarbon")
 
-    -- helper function that attempts to build a unit there
+    ---Helper function that attempts to build a unit there
     ---@param x number
     ---@param y number
     ---@param z number

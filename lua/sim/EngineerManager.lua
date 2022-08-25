@@ -57,7 +57,7 @@ EngineerManager = Class(BuilderManager) {
 
     -- Check to see if the unit is buildings something in the category given
     ---@param unit Unit
-    ---@param econ any
+    ---@param econ any 
     ---@param pauseVal number
     ---@param category string
     ---@return boolean
@@ -888,5 +888,5 @@ function CreateEngineerManager(brain, lType, location, radius)
 end
 
 
--- Moved Local Unused Imports to bottom for mod support
+-- kept for mod backwards compatibility
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
