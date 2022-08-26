@@ -50,16 +50,13 @@ local TrashBagAdd = TrashBag.Add
 
 -- local DeprecatedWarnings = { }
 
----@alias Position {[1]: number, [2]: number, [3]: number} table of {x, y, z}
 ---@alias AdjacencyBeam {Unit: Unit, Trash: TrashBag}
----@alias Bone string | number
----@alias Object Entity | Unit
 
 ---@deprecated
 --- Creates all effects in a table at an entity
----@param obj Object
----@param army number
----@param effectTable string[] Emitter blueprint names
+---@param obj BoneObject
+---@param army Army
+---@param effectTable FileName[] Emitter blueprint names
 ---@return moho.IEffect[] emitters
 function CreateEffects(obj, army, effectTable)
     local emitters = {}
@@ -71,9 +68,9 @@ end
 
 ---@deprecated
 --- Creates all effects in a table, with an offset from an entity
----@param obj Object
+---@param obj BoneObject
 ---@param army number
----@param effectTable string[] Emitter blueprint names
+---@param effectTable FileName[] Emitter blueprint names
 ---@param x number
 ---@param y number
 ---@param z number
@@ -88,9 +85,9 @@ end
 
 ---@deprecated
 --- Creates all effects in a table, with random offsets from an entity
----@param obj Object
+---@param obj BoneObject
 ---@param army number
----@param effectTable string[] Emitter blueprint names
+---@param effectTable FileName[] Emitter blueprint names
 ---@param xRange number
 ---@param yRange number
 ---@param zRange number
@@ -105,10 +102,10 @@ end
 
 ---@deprecated
 --- Creates all effects in a table at an entity's bone
----@param obj Object
+---@param obj BoneObject
 ---@param bone Bone
 ---@param army number
----@param effectTable string[] Emitter blueprint names
+---@param effectTable FileName[] Emitter blueprint names
 ---@return moho.IEffect[] emitters
 function CreateBoneEffects(obj, bone, army, effectTable)
     local emitters = {}
@@ -120,10 +117,10 @@ end
 
 ---@deprecated
 --- Creates all effects in a table at an entity's bone, with offset
----@param obj Object
+---@param obj BoneObject
 ---@param bone Bone
 ---@param army number
----@param effectTable string[] Emitter blueprint names
+---@param effectTable FileName[] Emitter blueprint names
 ---@param x number
 ---@param y number
 ---@param z number
@@ -137,10 +134,10 @@ function CreateBoneEffectsOffset(obj, bone, army, effectTable, x, y, z)
 end
 
 --- Creates all effects in a table at each bone in a table for an entity
----@param obj Object
+---@param obj BoneObject
 ---@param boneTable Bone[]
 ---@param army number
----@param effectTable string[] Emitter blueprint names
+---@param effectTable FileName[] Emitter blueprint names
 function CreateBoneTableEffects(obj, boneTable, army, effectTable)
     for _, bone in boneTable do
         for _, effect in effectTable do
@@ -150,9 +147,9 @@ function CreateBoneTableEffects(obj, boneTable, army, effectTable)
 end
 
 --- Creates all effects in a table at each bone in a table for an entity
----@param obj Object
+---@param obj BoneObject
 ---@param boneTable Bone[]
----@param effectTable string[] Emitter blueprint names
+---@param effectTable FileName[] Emitter blueprint names
 ---@param army number
 ---@param min number
 ---@param max number
@@ -166,9 +163,9 @@ end
 
 ---@deprecated
 --- Creates a number of random effects out of a table at an entity
----@param obj Object
+---@param obj BoneObject
 ---@param army number
----@param effectTable string[] Emitter blueprint names
+---@param effectTable FileName[] Emitter blueprint names
 ---@param numEffects integer
 ---@return moho.IEffect[] emitters
 function CreateRandomEffects(obj, army, effectTable, numEffects)
@@ -192,7 +189,7 @@ function ScaleEmittersParam(emitters, param, minRange, maxRange)
 end
 
 ---@deprecated
---- You can use CreateCybranBuildBeamsOpti instead
+--- You can use `CreateCybranBuildBeamsOpti` instead
 ---@param builder Unit
 ---@param unitBeingBuilt Unit
 ---@param buildEffectBones Bone[]
@@ -229,7 +226,7 @@ function CreateCybranBuildBeams(builder, unitBeingBuilt, buildEffectBones, build
 end
 
 ---@deprecated
---- You can use SpawnBuildBotsOpti instead
+--- You can use `SpawnBuildBotsOpti` instead
 ---@param builder Unit
 ---@param unitBeingBuilt Unit
 ---@param buildEffectsBag any unused
@@ -294,7 +291,7 @@ function SpawnBuildBots(builder, unitBeingBuilt, buildEffectsBag)
 end
 
 ---@deprecated
---- You can use CreateCybranEngineerBuildEffectsOpti instead
+--- You can use `CreateCybranEngineerBuildEffectsOpti` instead
 ---@param builder Unit
 ---@param buildBones Bone[]
 ---@param buildBots Unit[]
@@ -341,7 +338,7 @@ local UnitBuildEffects = {
 ---@param buildBones Bone[]
 ---@param buildEffectsBag TrashBag
 function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, buildBones, buildEffectsBag)
-    CreateCybranBuildBeamsOpti(builder, nil, unitBeingBuilt, BuildEffectsBag, false)
+    CreateCybranBuildBeamsOpti(builder, nil, unitBeingBuilt, buildEffectsBag, false)
 
     local builderArmy = builder.Army
     for _, bone in buildBones.BuildEffectBones do
@@ -777,7 +774,7 @@ end
 ---@param unit Unit
 ---@param bone1 Bone
 ---@param bone2 Bone
----@param trashBag TrashBag
+---@param trashbag TrashBag
 ---@param startwaitSeed number
 function CreateCybranQuantumGateEffect(unit, bone1, bone2, trashbag, startwaitSeed)
     -- Adding a quick wait here so that unit bone positions are correct
@@ -816,7 +813,7 @@ end
 --- Creates an enhancement effect at an unit's bone
 ---@param unit Unit
 ---@param bone Bone
----@param trashBag TrashBag
+---@param trashbag TrashBag
 function CreateEnhancementEffectAtBone(unit, bone, trashbag)
     for _, effect in EffectTemplate.UpgradeBoneAmbient do
         TrashBagAdd(trashbag, CreateAttachedEmitter(unit, bone, unit.Army, effect))
@@ -827,7 +824,7 @@ end
 --- Creates an enhancement ambient at an unit
 ---@param unit Unit
 ---@param bone Bone
----@param TrashBag TrashBag
+---@param trashbag TrashBag
 function CreateEnhancementUnitAmbient(unit, bone, trashbag)
     local unitArmy = unit.Army
     for _, effect in EffectTemplate.UpgradeUnitAmbient do
@@ -835,7 +832,6 @@ function CreateEnhancementUnitAmbient(unit, bone, trashbag)
     end
 end
 
-local TableEmpty = table.empty 
 --- Cleans up a trash bag (whether an old-style table or new-style TrashBag)
 ---@param self Entity
 ---@param identifier string
@@ -857,7 +853,7 @@ end
 
 --- Plays rift-in effects
 ---@param unit Unit
----@param effects string[]
+---@param effects FileName[]
 ---@param flashEffects string[]
 ---@param size number
 function PlayRiftInEffects(unit, effects, flashEffects, size)
@@ -934,7 +930,7 @@ end
 
 --- Creates the teleport charging effects
 ---@param unit Unit
----@param teleDest Position
+---@param teleDest Vector
 ---@param effectsBag TrashBag
 ---@param teleDelay number
 function PlayTeleportChargingEffects(unit, teleDest, effectsBag, teleDelay)
@@ -1080,7 +1076,7 @@ end
 function TeleportGetUnitYOffset(unit)
     -- Returns how high to create effects to make the effects appear in the center of the unit
     local bp = unit.Blueprint
-    return bp.Display.TeleportEffects.FxChargeAtDestOffsetY or ((bp.Physics.MeshExtentsY or bp.SizeY or 2) / 2)
+    return bp.Display.TeleportEffects.FxChargeAtDestOffsetY or ((bp.Physics.MeshExtentsY or bp.SizeY or 2) * 0.5)
 end
 
 --- Gets the teleport sizes of a unit
@@ -1104,8 +1100,8 @@ function TeleportGetUnitSizes(unit)
 end
 
 --- Gets the teleport location, based on the terrain height and terrain type offset
----@param loc Position
----@return Position
+---@param loc Vector
+---@return Vector
 function TeleportLocationToSurface(loc)
     -- Takes the given location, adjust the Y value to the surface height on that location
     local pos = TableCopy(loc)
@@ -1142,7 +1138,7 @@ end
 
 --- Creates the Cybran teleport effect
 ---@param unit Unit
----@param location Position
+---@param location Vector
 ---@param initialScale number
 ---@return Entity sphere
 function TeleportCreateCybranSphere(unit, location, initialScale)
@@ -1215,8 +1211,8 @@ end
 
 --- Creates the final teleport out effects
 ---@param unit Unit
----@param EffectsBag TrashBag
-function PlayTeleportOutEffects(unit, EffectsBag)
+---@param effectsBag TrashBag
+function PlayTeleportOutEffects(unit, effectsBag)
     -- Fired when the unit is being teleported, just before the unit is taken from its original location
     local bp = unit.Blueprint
     local faction = bp.General.FactionName
@@ -1230,7 +1226,7 @@ function PlayTeleportOutEffects(unit, EffectsBag)
             local scaleX, scaleY, scaleZ = TeleportGetUnitSizes(unit)
             local cfx = unit:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', 0, 0, 0)
             cfx:SetScale(scaleX, scaleY, scaleZ)
-            EffectsBag:Add(cfx)
+            effectsBag:Add(cfx)
 
             CreateLightParticle(unit, -1, unitArmy, 3, 7, 'glow_03', 'ramp_blue_02')
             templ = unit.TeleportOutFxOverride or EffectTemplate.UEFTeleportOut01
@@ -1310,7 +1306,7 @@ end
 
 --- Creates the teleport-in effects
 ---@param unit Unit
----@param EffectsBag TrashBag unused
+---@param effectsBag TrashBag unused
 function PlayTeleportInEffects(unit, effectsBag)
     -- Fired when the unit is being teleported, just after the unit is taken from its original location
     local bp = unit.Blueprint
@@ -1466,9 +1462,9 @@ end
 
 --- Destroys the remaining teleport charge-up effects
 ---@param unit Unit
----@param EffectsBag TrashBag unused
+---@param effectsBag TrashBag unused
 function DestroyRemainingTeleportChargingEffects(unit, effectsBag)
-    -- Called when we're done teleporting (because succesfull or cancelled)
+    -- Called when we're done teleporting (because successful or cancelled)
     if unit.TeleportCybranSphere then
         unit.TeleportCybranSphere:Destroy()
     end
