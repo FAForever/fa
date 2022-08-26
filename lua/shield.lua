@@ -254,7 +254,7 @@ Shield = Class(moho.shield_methods, Entity) {
         local EntityGetMaxHealth = EntityGetMaxHealth
         local EntityAdjustHealth = EntityAdjustHealth
 
-        while true do
+        while not IsDestroyed(self) do
 
             -- gather some information
             local fromSuspension = false
@@ -663,7 +663,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         -- special behavior for projectiles that represent strategic missiles
-        local otherHashedCats = other.Cache.HashedCats
+        local otherHashedCats = other.Blueprint.CategoriesHash
         if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
             return false
         end

@@ -70,46 +70,34 @@ SyncMeta = {
     end,
 
     __newindex = function(t, key, val)
+         -- globals to locals
+        local rawget = rawget
+        local UnitData = UnitData
+
         local id = rawget(t, 'id')
         local army = rawget(t, 'army')
-        if not UnitData[id] then
-            UnitData[id] = {
-                OwnerArmy = rawget(t, 'army'),
-                Data = {}
+        local unitData = UnitData[id]
+        if not unitData then
+            unitData = {
+                OwnerArmy = army,
+                Data = {},
             }
+            UnitData[id] = unitData
         end
-        UnitData[id].Data[key] = val
+        unitData.Data[key] = val
 
         local focus = GetFocusArmy()
         if army == focus or focus == -1 then -- Let observers get unit data
-            if not Sync.UnitData[id] then
-                Sync.UnitData[id] = {}
+            local SyncUnitData = Sync.UnitData
+            unitData = SyncUnitData[id]
+            if not unitData then
+                unitData = {}
+                SyncUnitData[id] = unitData
             end
-            Sync.UnitData[id][key] = val
+            unitData[key] = val
         end
     end,
 }
-
-local SharedTypeCache = { }
-local function PopulateBlueprintCache(entity, blueprint)
-
-    -- populate the cache
-    local cache = { }
-    cache.Blueprint = blueprint 
-
-    cache.Cats = blueprint.Categories
-    cache.CatsCount = table.getn(blueprint.Categories)
-    cache.HashedCats = table.hash(blueprint.Categories)
-
-    cache.DoNotCollideCats = blueprint.DoNotCollideList or false
-    cache.DoNotCollideCatsCount = table.getn(blueprint.DoNotCollideList or { })
-    cache.HashedDoNotCollideCats = table.hash(blueprint.DoNotCollideList)
-
-    cache.Audio = blueprint.Audio
-  
-    -- store the result
-    SharedTypeCache[blueprint.BlueprintId] = cache 
-end
 
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods
@@ -119,8 +107,6 @@ local cUnit = moho.unit_methods
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 Unit = Class(moho.unit_methods) {
-
-    Cache = false,
 
     Weapons = {},
 
@@ -218,14 +204,6 @@ Unit = Class(moho.unit_methods) {
     OnCreate = function(self)
         local bp = self:GetBlueprint()
 
-        -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[bp.BlueprintId] then 
-            PopulateBlueprintCache(self, bp)
-        end
-
-        -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[bp.BlueprintId]
-
         -- cache often accessed values into inner table
         self.Blueprint = bp
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
@@ -284,13 +262,7 @@ Unit = Class(moho.unit_methods) {
         self.IdleEffectsBag = TrashBag()
         self.TopSpeedEffectsBag = TrashBag()
         self.BeamExhaustEffectsBag = TrashBag()
-        self.TransportBeamEffectsBag = TrashBag()
-        self.BuildEffectsBag = TrashBag()
-        self.ReclaimEffectsBag = TrashBag()
         self.OnBeingBuiltEffectsBag = TrashBag()
-        self.CaptureEffectsBag = TrashBag()
-        self.UpgradeEffectsBag = TrashBag()
-        self.TeleportFxBag = TrashBag()
 
         -- Set up veterancy
         self.xp = 0
@@ -346,12 +318,18 @@ Unit = Class(moho.unit_methods) {
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
-        
+        -- add support for keeping track of reclaim statistics
+        if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
+            self.ReclaimedMass = 0
+            self.ReclaimedEnergy = 0
+            self:GetStat("ReclaimedMass", 0)
+            self:GetStat("ReclaimedEnergy", 0)
+        end
+
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
             self.ResetJammer = -1
         end
-        
     end,
 
     -------------------------------------------------------------------------------------------
@@ -624,14 +602,18 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StartCaptureEffects = function(self, target)
+        self.CaptureEffectsBag = self.CaptureEffectsBag or TrashBag()
         self.CaptureEffectsBag:Add(self:ForkThread(self.CreateCaptureEffects, target))
     end,
 
     CreateCaptureEffects = function(self, target)
+        EffectUtilities.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
 
     StopCaptureEffects = function(self, target)
-        self.CaptureEffectsBag:Destroy()
+        if self.CaptureEffectsBag then
+            self.CaptureEffectsBag:Destroy()
+        end
     end,
 
     OnFailedCapture = function(self, target)
@@ -737,6 +719,9 @@ Unit = Class(moho.unit_methods) {
     OnStopRepair = function(self, unit)
     end,
 
+    ---comment
+    ---@param self any
+    ---@param target any
     OnStartReclaim = function(self, target)
         self:SetUnitState('Reclaiming', true)
         self:SetFocusEntity(target)
@@ -753,31 +738,80 @@ Unit = Class(moho.unit_methods) {
             IssueReclaim({self}, target)
             IssueGuard({self}, guard)
         end
+
+        -- add state to be able to show the amount reclaimed in the UI
+        if target.IsProp then
+            self.OnStartReclaimPropStartTick = GetGameTick() + 2
+
+            local time, energy, mass = target:GetReclaimCosts(self)
+            self.OnStartReclaimPropTicksRequired = 10 * time
+            self.OnStartReclaimPropMass = mass
+            self.OnStartReclaimPropEnergy = energy
+        end
     end,
 
+    --- Called when the unit stops reclaiming
+    ---@param self Unit
+    ---@param target Unit | Prop | nil      # is nil when the prop or unit is completely reclaimed
     OnStopReclaim = function(self, target)
         self:DoUnitCallbacks('OnStopReclaim', target)
         self:StopReclaimEffects(target)
         self:StopUnitAmbientSound('ReclaimLoop')
         self:PlayUnitSound('StopReclaim')
         self:SetUnitState('Reclaiming', false)
-        if target.MaxMassReclaim then -- This is a prop
+
+        if target.IsProp then -- This is a prop
             target:UpdateReclaimLeft()
         end
+
+        -- process the amount we reclaimed to show it in the UI
+        if self.OnStartReclaimPropStartTick then
+            local ticks = (GetGameTick() - self.OnStartReclaimPropStartTick)
+
+            -- can end up negative if another engineer finishes reclaiming the prop between us starting to reclaim, and actually reclaiming
+            if ticks > 0 then
+                -- completely consumed this prop
+                if ticks >= self.OnStartReclaimPropTicksRequired then
+                    self.ReclaimedMass = self.ReclaimedMass + self.OnStartReclaimPropMass
+                    self.ReclaimedEnergy = self.ReclaimedEnergy + self.OnStartReclaimPropEnergy
+                    
+                -- partially consumed the prop
+                else
+                    local fraction = ticks / self.OnStartReclaimPropTicksRequired
+                    self.ReclaimedMass = self.ReclaimedMass + fraction * self.OnStartReclaimPropMass
+                    self.ReclaimedEnergy = self.ReclaimedEnergy + fraction * self.OnStartReclaimPropEnergy
+                end
+            end
+
+            -- update UI
+            self:SetStat('ReclaimedMass', self.ReclaimedMass)
+            self:SetStat('ReclaimedEnergy', self.ReclaimedEnergy)
+        end
+
+        -- reset reclaiming state
+        self.OnStartReclaimPropStartTick = nil
+        self.OnStartReclaimPropTicksRequired = nil
+        self.OnStartReclaimPropMass = nil
+        self.OnStartReclaimPropEnergy = nil
     end,
 
     StartReclaimEffects = function(self, target)
+        self.ReclaimEffectsBag = self.ReclaimEffectsBag or TrashBag()
         self.ReclaimEffectsBag:Add(self:ForkThread(self.CreateReclaimEffects, target))
     end,
 
     CreateReclaimEffects = function(self, target)
+        EffectUtilities.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
     CreateReclaimEndEffects = function(self, target)
+        EffectUtilities.PlayReclaimEndEffects(self, target)
     end,
 
     StopReclaimEffects = function(self, target)
-        self.ReclaimEffectsBag:Destroy()
+        if self.ReclaimEffectsBag then
+            self.ReclaimEffectsBag:Destroy()
+        end
     end,
 
     OnDecayed = function(self)
@@ -1538,14 +1572,14 @@ Unit = Class(moho.unit_methods) {
 
         -- check for exclusions from projectile perspective
         for k = 1, other.Blueprint.DoNotCollideListCount do
-            if self.Cache.HashedCats[other.Blueprint.DoNotCollideList[k]] then
+            if self.Blueprint.CategoriesHash[other.Blueprint.DoNotCollideList[k]] then
                 return false 
             end
         end
 
         -- check for exclusions from unit perspective
-        for k = 1, self.Cache.DoNotCollideCatsCount do 
-            if other.Blueprint.CategoriesHash[self.Cache.DoNotCollideCats[k]] then
+        for k = 1, self.Blueprint.DoNotCollideListCount do
+            if other.Blueprint.CategoriesHash[self.Blueprint.DoNotCollideList[k]] then
                 return false
             end
         end
@@ -1610,7 +1644,7 @@ Unit = Class(moho.unit_methods) {
                 sinkAnim:PlayAnim(animBlock.Animation)
                 rate = rate or 1
                 if animBlock.AnimationRateMax and animBlock.AnimationRateMin then
-                    rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) / 10
+                    rate = animBlock.AnimationRateMin + Random() * (animBlock.AnimationRateMax - animBlock.AnimationRateMin)
                 end
                 sinkAnim:SetRate(rate)
                 self.Trash:Add(sinkAnim)
@@ -1971,7 +2005,10 @@ Unit = Class(moho.unit_methods) {
         TrashDestroy(self.IdleEffectsBag)
         TrashDestroy(self.TopSpeedEffectsBag)
         TrashDestroy(self.BeamExhaustEffectsBag)
-        TrashDestroy(self.TransportBeamEffectsBag)
+
+        if self.TransportBeamEffectsBag then 
+            self.TransportBeamEffectsBag:Destroy()
+        end
 
         -- destroy remaining trash of weapon
         for k = 1, self.WeaponCount do 
@@ -2575,6 +2612,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartBuild = function(self, built, order)
+
+        self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
+
         -- Prevent UI mods from violating game/scenario restrictions
         local id = built.UnitId
         local bp = built:GetBlueprint()
@@ -2672,7 +2712,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopBuildingEffects = function(self, built)
-        self.BuildEffectsBag:Destroy()
+        if self.BuildEffectsBag then
+            self.BuildEffectsBag:Destroy()
+        end
 
         -- kept after --3355 for backwards compatibility with mods
         if self.buildBots then
@@ -3124,6 +3166,8 @@ Unit = Class(moho.unit_methods) {
         local bp = self.Blueprint.Enhancements[enhancement]
         local effects = TrashBag()
         local scale = math.min(4, math.max(1, (bp.BuildCostEnergy / bp.BuildTime or 1) / 50))
+
+        self.UpgradeEffectsBag = self.UpgradeEffectsBag or TrashBag()
 
         if bp.UpgradeEffectBones then
             for _, v in bp.UpgradeEffectBones do
@@ -4109,6 +4153,7 @@ Unit = Class(moho.unit_methods) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
+        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
         TrashAdd(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
@@ -4276,22 +4321,27 @@ Unit = Class(moho.unit_methods) {
     end,
 
     PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
     end,
 
     CleanupTeleportChargeEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.DestroyTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     CleanupRemainingTeleportChargeEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.DestroyRemainingTeleportChargingEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportOutEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportOutEffects(self, self.TeleportFxBag)
     end,
 
     PlayTeleportInEffects = function(self)
+        self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportInEffects(self, self.TeleportFxBag)
     end,
 
@@ -4747,37 +4797,16 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@class DummyUnit : moho.unit_methods
 DummyUnit = Class(moho.unit_methods) {
 
-    Cache = false,
-
-    OnCreate = function(self) 
-
-        local blueprint = self:GetBlueprint()
-        
-        -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[blueprint.BlueprintId] then 
-            PopulateBlueprintCache(self, blueprint)
-        end
-
-        -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[blueprint.BlueprintId]
-
+    OnCreate = function(self)
         -- cache unique values into inner table
         self.EntityId = EntityGetEntityId(self)
+        self.UnitId = UnitGetUnitId(self)
         self.Army = EntityGetArmy(self)
         self.Layer = UnitGetCurrentLayer(self)
 
         -- cache often accessed values into inner table
-        self.UnitId = UnitGetUnitId(self)
-        self.Blueprint = blueprint
+        self.Blueprint = self:GetBlueprint()
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
-
-        -- basic check if this insignificant unit is truely insignificant
-        if not EntityCategoryContains(CategoriesDummyUnit, self) then 
-            WARN("Unit " .. tostring(self.UnitId) .. " is a dummy unit but doesn't have the right categories set!")
-
-            -- todo: add more info for dev
-        end
-    
     end,
 
     --- Typically called by functions

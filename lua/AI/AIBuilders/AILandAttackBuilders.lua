@@ -23,6 +23,8 @@ local TBC = '/lua/editor/ThreatBuildConditions.lua'
 local SAI = '/lua/ScenarioPlatoonAI.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
+---@alias BuilderGroupsLandAttack 'T1LandFactoryBuilders' | 'T1LandAA' | 'T1ReactionDF' | 'T2LandFactoryBuilders' | 'T2LandFactoryAmphibiousBuilders' | 'T2ReactionDF' | 'T2LandAA' | 'T3LandFactoryBuilders' | 'T3LandResponseBuilders' | 'T3ReactionDF' | 'UnitCapLandAttackFormBuilders' | 'FrequentLandAttackFormBuilders' | 'Artillery Attack' | 'FearlessFrequentLandAttackFormBuilders' | 'BigLandAttackFormBuilders' | 'MassHunterLandFormBuilders' | 'MiscLandFormBuilders'
+
 function LandAttackCondition(aiBrain, locationType, targetNumber)
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager

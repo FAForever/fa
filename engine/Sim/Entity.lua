@@ -5,6 +5,7 @@ local Entity = {}
 ---@alias Army number | string
 ---@alias EntityId number
 ---@alias EntityVisionType 'Intel' | 'Never' | 'Always' | 'Vision'
+---@alias EntityIntelTypes 'Radar' | 'Sonar' | 'Cloak' | 'CloakField' | 'Spoof' | 'RadarStealth' | 'RadarStealthField' | 'SonarStealth' | 'SonarStealthField'
 
 --- Does not appear to be used
 ---@unknown
@@ -77,7 +78,7 @@ function Entity:CreateProjectile(projectileid, ox, oy, oz, dx, dy, dz)
 end
 
 --- Creates a projectile at a bone matching the orientation of the bone such that `projectile:GetLauncher()` returns the entity
----@param projectile string
+---@param projectile_blueprint string
 ---@param bone number | string
 ---@return Projectile
 function Entity:CreateProjectileAtBone(projectile_blueprint,  bone)

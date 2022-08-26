@@ -1,4 +1,4 @@
-﻿
+﻿---@diagnostic disable:local-limit
 --*****************************************************************************
 --* File: C:\work\rts\main\data\lua\modules\ui\game\vo_computer.lua
 --* Author: (BOT)Sam Demulling & (BOT)Marshall Macy II

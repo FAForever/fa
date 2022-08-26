@@ -474,13 +474,7 @@ function CreateFilters()
     modSearch.Input:SetFont(UIUtil.titleFont, 17)
     modSearch.Input:SetMaxChars(30)
     modSearch.Input.OnTextChanged = function(self, newText, oldText)
-        mods.searchKeyword = string.lower(newText)
-        mods.searchKeyword = string.gsub(mods.searchKeyword, '  ', ' ')
-        -- excluding any invalid search characters:
-        mods.searchKeyword = StringReplace(mods.searchKeyword, '[', '')
-        mods.searchKeyword = StringReplace(mods.searchKeyword, ']', '')
-        mods.searchKeyword = StringReplace(mods.searchKeyword, '(', '')
-        mods.searchKeyword = StringReplace(mods.searchKeyword, ')', '')
+        mods.searchKeyword = newText:lower():gsub("[%[%]%(%)]",""):gsub(" +"," ")
         if mods.searchKeyword == ' ' or string.len(mods.searchKeyword) == 0 then
            mods.searchKeyword = false
         end

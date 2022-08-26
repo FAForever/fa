@@ -9,7 +9,8 @@ local setmetatable = setmetatable
 
 local EvalContext = nil
 
-local LazyVarMetaTable = { }
+---@class LazyVar
+local LazyVarMetaTable = {}
 
 LazyVarMetaTable.__index = LazyVarMetaTable
 
@@ -109,6 +110,7 @@ function LazyVarMetaTable:Destroy()
 end
 
 function Create(initial)
+    ---@diagnostic disable-next-line:miss-symbol,unknown-symbol
     local result = {&1&4}
     setmetatable(result, LazyVarMetaTable)
     if initial == nil then 
