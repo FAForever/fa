@@ -36,7 +36,6 @@ local optionKeyToControlMap = false
 local controlTypeCreate = {
 
     header = function(parent, optionItemData)
-        LOG("Making a header!")
         local group = Group(parent)
         LayoutHelpers.SetDimensions(group, 10, 10)
         return group
