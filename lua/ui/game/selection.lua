@@ -1,22 +1,11 @@
 
 local Prefs = import('/lua/user/prefs.lua')
 
--- reprsl(Prefs.GetFromCurrentProfile('options.selection-sets-append-behavior'))
--- reprsl(Prefs.GetFromCurrentProfile('options.selection-sets-double-tap-decay'))
--- reprsl(Prefs.GetFromCurrentProfile('options.selection-sets-double-tap-behavior'))
--- reprsl(Prefs.GetFromCurrentProfile('options.selection-sets-production-behavior'))
--- reprsl(Prefs.GetFromCurrentProfile('options.selection-sets-add-behavior'))
-
 ---@alias SelectionSetDoubleTapBehavior
 --- | 'none'                        # When you double tap it will have no effect
 --- | 'translate-zoom'              # When you double tap the camera translates and zooms to the units, default behavior
 --- | 'translate-zoom-out-only'     # When you double tap the camera translates and zooms to the units, but it won't zoom in
 --- | 'translate'                   # When you double tap the camera only translates
-
----@alias SelectionSetAppendBehavior
---- | 'add-selection-set-to-selection'          # Adds the selection set to the current selection
---- | 'add-selection-to-selection-set'          # Adds the current selection to the selection set
---- | 'combine-and-select-with-selection-set'   # Adds the current selection to the selection set and selects the new selection set
 
 -- used to re-use memory where possible
 local cache = { }
