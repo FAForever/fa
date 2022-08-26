@@ -200,7 +200,6 @@ WorldView = Class(moho.UIWorldView, Control) {
     AutoBuild = false,
 
     __post_init = function(self, spec)
-        LOG("HI")
 
         --- Contains cursor textures
         self.Cursor = { }
@@ -359,6 +358,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                         decal:SetTexture(instance.texture)
                         decal:SetScale({ instance.scale, 1, instance.scale })
                         self.CursorDecals[k] = decal
+                        self.Trash:Add(decal)
                     end
                 end
             end
@@ -803,7 +803,6 @@ WorldView = Class(moho.UIWorldView, Control) {
             self.CursorOverWorld = false
             GetCursor():Reset()
             self.LastCursor = nil
-            self:ResetDecals()
         elseif event.Type == 'WheelRotation' then
             self.zoomed = true
         end
@@ -855,20 +854,17 @@ WorldView = Class(moho.UIWorldView, Control) {
         return false
     end,
 
-    ResetDecals = function(self)
-        for _, d in self.CursorDecals do
-            d:Destroy()
-        end
-        self.CursorDecals = {}
-    end,
-
     OnDestroy = function(self)
-        self:ResetDecals()
+
+        -- take out the trash
         self.Trash:Destroy()
 
+        -- take out all ping threads
         for i, v in self.PingThreads do
             if v then KillThread(v) end
         end
+
+        -- unregister ourselves
         if self._registered then
             WorldViewMgr.UnregisterWorldView(self)
         end
@@ -876,13 +872,14 @@ WorldView = Class(moho.UIWorldView, Control) {
     end,
 
     OnCommandDragBegin = function(self)
-
     end,
 
     OnCommandDragEnd = function(self)
         self:OnUpdateCursor()
     end,
 
+    --- Attempts to apply the current cursor textures
+    ---@param self any
     ApplyCursor = function(self)
         if self.Cursor and self.CursorOverWorld then
             GetCursor():SetTexture(unpack(self.Cursor))
