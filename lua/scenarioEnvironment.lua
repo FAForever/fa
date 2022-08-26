@@ -12,9 +12,11 @@
 -- with stuff.
 --===================================================================================
 
+---@param scen ScenarioOption
 function OnPopulate(scen)
     --import('/lua/sim/ScenarioUtilities.lua').InitializeArmies()
 end
 
+---@param scen ScenarioOption
 function OnStart(scen)
 end

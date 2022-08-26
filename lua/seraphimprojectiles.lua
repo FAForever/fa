@@ -51,7 +51,6 @@ SIFKhuAntiNukeTendril = Class(EmitterProjectile) {
     FxImpactUnderWater = {},
 }
 
-
 ---@class SIFKhuAntiNukeSmallTendril : EmitterProjectile
 SIFKhuAntiNukeSmallTendril = Class(EmitterProjectile) {
     FxImpactTrajectoryAligned = false,
@@ -63,7 +62,6 @@ SIFKhuAntiNukeSmallTendril = Class(EmitterProjectile) {
     FxImpactProjectile = {},
     FxImpactUnderWater = {},
 }
-
 
 --------------------------------------------------------------------------
 --  TEMPORARY BASE SERAPHIM PROJECTILE
@@ -83,7 +81,8 @@ SBaseTempProjectile = Class(EmitterProjectile) {
 --  SERAPHIM CHRONATRON CANNONS
 --------------------------------------------------------------------------
 ---@class SChronatronCannon : MultiPolyTrailProjectile
-SChronatronCannon = Class(MultiPolyTrailProjectile) { -- ACU
+SChronatronCannon = Class(MultiPolyTrailProjectile) { 
+    -- ACU
     FxImpactTrajectoryAligned = false,
     FxImpactLand = EffectTemplate.SChronotronCannonLandHit,
     FxImpactNone = EffectTemplate.SChronotronCannonHit,
@@ -97,7 +96,8 @@ SChronatronCannon = Class(MultiPolyTrailProjectile) { -- ACU
 }
 
 ---@class SChronatronCannonOverCharge : MultiPolyTrailProjectile
-SChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) { -- ACU
+SChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) { 
+    -- ACU
     FxImpactTrajectoryAligned = false,
     FxImpactLand = EffectTemplate.SChronotronCannonOverChargeLandHit,
     FxImpactNone = EffectTemplate.SChronotronCannonOverChargeLandHit,
@@ -109,7 +109,8 @@ SChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) { -- ACU
 }
 
 ---@class SLightChronatronCannon : MultiPolyTrailProjectile
-SLightChronatronCannon = Class(MultiPolyTrailProjectile) { -- SACU
+SLightChronatronCannon = Class(MultiPolyTrailProjectile) { 
+    -- SACU
     FxImpactTrajectoryAligned = false,
     FxImpactLand = EffectTemplate.SLightChronotronCannonLandHit,
     FxImpactNone = EffectTemplate.SLightChronotronCannonLandHit,
@@ -123,7 +124,8 @@ SLightChronatronCannon = Class(MultiPolyTrailProjectile) { -- SACU
 }
 
 ---@class SLightChronatronCannonOverCharge : MultiPolyTrailProjectile
-SLightChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) { -- SACU
+SLightChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) { 
+    -- SACU
     FxImpactTrajectoryAligned = false,
     FxImpactLand = EffectTemplate.SLightChronotronCannonOverChargeHit,
     FxImpactNone = EffectTemplate.SLightChronotronCannonOverChargeHit,
@@ -148,7 +150,8 @@ SPhasicAutogun = Class(MultiPolyTrailProjectile) {
 }
 
 ---@class SHeavyPhasicAutogun : MultiPolyTrailProjectile
-SHeavyPhasicAutogun = Class(MultiPolyTrailProjectile) { -- T2 gunship and T2 transport
+SHeavyPhasicAutogun = Class(MultiPolyTrailProjectile) { 
+    -- T2 gunship and T2 transport
     FxImpactLand = EffectTemplate.HeavyPhasicAutoGunHit,
     FxImpactNone = EffectTemplate.HeavyPhasicAutoGunHit,
     FxImpactProp = EffectTemplate.HeavyPhasicAutoGunHitUnit,
@@ -212,7 +215,8 @@ SShriekerAutoCannon = Class(MultiPolyTrailProjectile) {
 --  SERAPHIM AIRE-AU BOLTER
 --------------------------------------------------------------------------
 ---@class SAireauBolter : MultiPolyTrailProjectile
-SAireauBolter = Class(MultiPolyTrailProjectile) { -- T2 bot (Ilshavoh) and T3 tank (Othuum)
+SAireauBolter = Class(MultiPolyTrailProjectile) { 
+    -- T2 bot (Ilshavoh) and T3 tank (Othuum)
     FxImpactLand = EffectTemplate.SAireauBolterHit,
     FxImpactNone = EffectTemplate.SAireauBolterHit,
     FxImpactProp = EffectTemplate.SAireauBolterHit,
@@ -226,7 +230,8 @@ SAireauBolter = Class(MultiPolyTrailProjectile) { -- T2 bot (Ilshavoh) and T3 ta
 --  SERAPHIM TAU CANNON
 --------------------------------------------------------------------------
 ---@class STauCannon : MultiPolyTrailProjectile
-STauCannon = Class(MultiPolyTrailProjectile) { -- sera T2 hover tank and T3 tank (othuum)
+STauCannon = Class(MultiPolyTrailProjectile) { 
+    -- sera T2 hover tank and T3 tank (othuum)
     FxImpactLand = EffectTemplate.STauCannonHit,
     FxImpactNone = EffectTemplate.STauCannonHit,
     FxImpactProp = EffectTemplate.STauCannonHit,
@@ -240,7 +245,8 @@ STauCannon = Class(MultiPolyTrailProjectile) { -- sera T2 hover tank and T3 tank
 --  SERAPHIM HEAVY QUARNON CANNON
 --------------------------------------------------------------------------
 ---@class SHeavyQuarnonCannon : MultiPolyTrailProjectile
-SHeavyQuarnonCannon = Class(MultiPolyTrailProjectile) { -- Battleship
+SHeavyQuarnonCannon = Class(MultiPolyTrailProjectile) { 
+    -- Battleship
     FxImpactLand = EffectTemplate.SHeavyQuarnonCannonLandHit,
     FxImpactNone = EffectTemplate.SHeavyQuarnonCannonHit,
     FxImpactProp = EffectTemplate.SHeavyQuarnonCannonHit,
@@ -255,7 +261,8 @@ SHeavyQuarnonCannon = Class(MultiPolyTrailProjectile) { -- Battleship
 --  SERAPHIM LAANSE TACTICAL MISSILE
 --------------------------------------------------------------------------
 ---@class SLaanseTacticalMissile : SinglePolyTrailProjectile
-SLaanseTacticalMissile = Class(SinglePolyTrailProjectile) { -- ACU / SACU / TML /MML
+SLaanseTacticalMissile = Class(SinglePolyTrailProjectile) { 
+    -- ACU / SACU / TML /MML
     FxImpactLand = EffectTemplate.SLaanseMissleHit,
     FxImpactProp = EffectTemplate.SLaanseMissleHitUnit,
     FxImpactUnderWater = {},
@@ -263,6 +270,7 @@ SLaanseTacticalMissile = Class(SinglePolyTrailProjectile) { -- ACU / SACU / TML 
     FxTrails = EffectTemplate.SLaanseMissleExhaust02,
     PolyTrail = EffectTemplate.SLaanseMissleExhaust01,
 
+    ---@param self SLaanseMissileWeapon
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
@@ -338,7 +346,6 @@ SThunthoArtilleryShell = Class(MultiPolyTrailProjectile) {
     PolyTrailOffset = {0,0},
 }
 
-
 ---@class SThunthoArtilleryShell2 : MultiPolyTrailProjectile
 SThunthoArtilleryShell2 = Class(MultiPolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
@@ -370,6 +377,7 @@ SShleoAACannon = Class(EmitterProjectile) {
     FxTrails = {},
     PolyTrails = EffectTemplate.SShleoCannonProjectilePolyTrails,
 
+    ---@param self SShleoAACannon
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
         local PolytrailGroup = self.PolyTrails[RandomInt(1,table.getn(self.PolyTrails))]
@@ -447,6 +455,8 @@ SAnaitTorpedo = Class(MultiPolyTrailProjectile) {
     PolyTrails =			EffectTemplate.SAnaitTorpedoPolyTrails,
     PolyTrailOffset =		{0,0},
 
+    ---@param self SAnaitTorpedo
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         MultiPolyTrailProjectile.OnCreate(self, inWater)
@@ -468,6 +478,8 @@ SHeavyCavitationTorpedo = Class(MultiPolyTrailProjectile) {
     PolyTrails =			EffectTemplate.SHeavyCavitationTorpedoPolyTrails,
     PolyTrailOffset =		{0,0},
 
+    ---@param self SAnaitTorpedo
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         MultiPolyTrailProjectile.OnCreate(self, inWater)
@@ -490,6 +502,8 @@ SUallCavitationTorpedo = Class(SinglePolyTrailProjectile) {
     FxTrails =				EffectTemplate.SUallTorpedoFxTrails,
     PolyTrail =				EffectTemplate.SUallTorpedoPolyTrail,
 
+    ---@param self SAnaitTorpedo
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         SinglePolyTrailProjectile.OnCreate(self, inWater)
@@ -589,7 +603,6 @@ SIFNukeSpiralTendril = Class(EmitterProjectile) {
 SEnergyLaser = Class(SBaseTempProjectile) {
 }
 
-
 --------------------------------------------------------------------------
 --  T3 BOMBER BOMB WEAPON
 --------------------------------------------------------------------------
@@ -625,7 +638,10 @@ SAAHotheFlareProjectile = Class(EmitterProjectile) {
     FxImpactUnderWater = {},
     DestroyOnImpact = false,
 
-    -- We only destroy when we hit the ground/water.
+    --- We only destroy when we hit the ground/water.
+    ---@param self SAAHotheFlareProjectile
+    ---@param TargetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, TargetType, targetEntity)
         if type == 'Terrain' or type == 'Water' then
             EmitterProjectile.OnImpact(self, TargetType, targetEntity)
@@ -698,7 +714,8 @@ SDFSniperShot = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 
 ---@class SDFExperimentalPhasonProjectile : EmitterProjectile
-SDFExperimentalPhasonProjectile = Class(EmitterProjectile) { -- ythotha
+SDFExperimentalPhasonProjectile = Class(EmitterProjectile) { 
+    -- ythotha
     FxImpactTrajectoryAligned = false,
     FxTrails = EffectTemplate.SDFExperimentalPhasonProjFXTrails01,
     FxImpactUnit = EffectTemplate.SDFExperimentalPhasonProjHitUnit,
@@ -708,7 +725,8 @@ SDFExperimentalPhasonProjectile = Class(EmitterProjectile) { -- ythotha
 }
 
 ---@class SDFSinnuntheWeaponProjectile : EmitterProjectile
-SDFSinnuntheWeaponProjectile = Class(EmitterProjectile) { -- ythotha
+SDFSinnuntheWeaponProjectile = Class(EmitterProjectile) { 
+    -- ythotha
     FxTrails = EffectTemplate.SDFSinnutheWeaponFXTrails01,
     FxImpactUnit = EffectTemplate.SDFSinnutheWeaponHitUnit,
     FxImpactProp = EffectTemplate.SDFSinnutheWeaponHit,
@@ -717,7 +735,8 @@ SDFSinnuntheWeaponProjectile = Class(EmitterProjectile) { -- ythotha
 }
 
 ---@class SDFAireauProjectile : MultiPolyTrailProjectile
-SDFAireauProjectile = Class(MultiPolyTrailProjectile) { -- ythotha
+SDFAireauProjectile = Class(MultiPolyTrailProjectile) { 
+    -- ythotha
     FxImpactNone = EffectTemplate.SDFAireauWeaponHit01,
     FxImpactUnit = EffectTemplate.SDFAireauWeaponHitUnit,
     FxImpactProp = EffectTemplate.SDFAireauWeaponHit01,

@@ -49,6 +49,7 @@ function LazyVarMetaTable:__call()
     return self[1]
 end
 
+---@param onDirtyList table
 function LazyVarMetaTable:SetDirty(onDirtyList)
     if self[1]~=nil then
         if self.OnDirty then
@@ -61,6 +62,7 @@ function LazyVarMetaTable:SetDirty(onDirtyList)
     end
 end 
 
+---@param func function
 function LazyVarMetaTable:SetFunction(func)
     local dirtyList = {}
     self:SetDirty(dirtyList)
@@ -76,6 +78,7 @@ function LazyVarMetaTable:SetFunction(func)
     end
 end
 
+---@param value number
 function LazyVarMetaTable:SetValue(value)
     local dirtyList = {}
     self:SetDirty(dirtyList)
@@ -92,6 +95,7 @@ function LazyVarMetaTable:SetValue(value)
     end
 end
 
+---@param v boolean
 function LazyVarMetaTable:Set(v)
     if v == nil then
         error("You are attempting to set a LazyVar's evaluation function to nil, don't do that!")    
@@ -109,6 +113,8 @@ function LazyVarMetaTable:Destroy()
     self.value = nil
 end
 
+---@param initial number
+---@return boolean
 function Create(initial)
     ---@diagnostic disable-next-line:miss-symbol,unknown-symbol
     local result = {&1&4}
