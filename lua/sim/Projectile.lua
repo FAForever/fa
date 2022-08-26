@@ -112,7 +112,7 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by the engine when the projectile is created
     ---@param self Projectile The projectile that we're creating
-    ---@param inWater boolean Flag to indicate the projectile is in water or not
+    ---@param inWater? boolean Flag to indicate the projectile is in water or not
     OnCreate = function(self, inWater)
 
         -- store information 
@@ -200,7 +200,7 @@ Projectile = Class(moho.projectile_methods) {
     --- Called by the engine when the projectile receives damage
     ---@param self Projectile
     ---@param instigator Unit
-    ---@param amount integer
+    ---@param amount number
     ---@param vector Vector
     ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
@@ -245,7 +245,7 @@ Projectile = Class(moho.projectile_methods) {
     --- Called by the engine when the projectile impacts something 
     ---@param self Projectile
     ---@param targetType string
-    ---@param targetEntity Entity
+    ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
 
         -- in case the OnImpact crashes it guarantees that it gets destroyed at some point, useful for mods
@@ -531,7 +531,7 @@ Projectile = Class(moho.projectile_methods) {
     ---@param self Projectile
     ---@param instigator Unit
     ---@param DamageData table
-    ---@param targetEntity Entity
+    ---@param targetEntity Unit | Prop
     ---@param cachedPosition Vector
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
@@ -694,7 +694,7 @@ Projectile = Class(moho.projectile_methods) {
     --- Called by Lua to determine whether the projectile should be destroyed
     ---@param self Projectile
     ---@param targetType string
-    ---@param targetEntity Entity
+    ---@param targetEntity Unit | Prop
     OnImpactDestroy = function(self, targetType, targetEntity)
         if  self.DestroyOnImpact or 
             (not targetEntity) or
@@ -706,7 +706,7 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by Lua for a delayed destruction
     ---@param self Projectile
-    ---@param seconds integer
+    ---@param seconds number
     ImpactTimeoutThread = function(self, seconds)
         WaitSeconds(seconds)
         self:Destroy()
@@ -714,7 +714,7 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by Lua to add a flare
     ---@param self Projectile
-    ---@param tbl table
+    ---@param tbl? table
     AddFlare = function(self, tbl)
         if not tbl then return end
         if not tbl.Radius then return end
@@ -747,7 +747,7 @@ Projectile = Class(moho.projectile_methods) {
     ---@param self Projectile
     ---@param army integer
     ---@param EffectTable string[] 
-    ---@param EffectScale number
+    ---@param EffectScale? number
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for _, v in EffectTable do
@@ -767,7 +767,7 @@ Projectile = Class(moho.projectile_methods) {
     ---@param self  Projectile
     ---@param army integer
     ---@param EffectTable string[]
-    ---@param EffectScale number
+    ---@param EffectScale? number
     CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for _, v in EffectTable do
@@ -874,10 +874,10 @@ Projectile = Class(moho.projectile_methods) {
         self.CollideFriendly = self.DamageData.CollideFriendly
     end,
 
+    ---root of all performance evil
     ---@deprecated
-    -- root of all performance evil
     ---@param self Projectile
-    ---@param fn any
+    ---@param fn function
     ---@param ... any
     ---@return thread
     ForkThread = function(self, fn, ...)
@@ -889,7 +889,6 @@ Projectile = Class(moho.projectile_methods) {
             return nil
         end
     end,
-
 }
 
 --- A dummy projectile that solely inherits what it needs. Useful for 
@@ -898,7 +897,7 @@ Projectile = Class(moho.projectile_methods) {
 DummyProjectile = Class(moho.projectile_methods) {
 
     ---@param self DummyProjectile
-    ---@param inWater boolean
+    ---@param inWater? boolean
     OnCreate = function(self, inWater)
         -- expected to be cached by all projectiles
         self.Blueprint = EntityGetBlueprint(self) 
@@ -907,7 +906,7 @@ DummyProjectile = Class(moho.projectile_methods) {
 
     ---@param self DummyProjectile
     ---@param targetType string
-    ---@param targetEntity any
+    ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,

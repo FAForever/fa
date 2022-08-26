@@ -53,7 +53,7 @@ StrategyBuilder = Class(Builder) {
     end,
 
     ---@param self StrategyBuilder
-    ---@return any
+    ---@return Builder|false
     GetActivateBuilders = function(self)
         if Builders[self.BuilderName].AddBuilders then
             return Builders[self.BuilderName].AddBuilders
@@ -62,7 +62,7 @@ StrategyBuilder = Class(Builder) {
     end,
 
     ---@param self StrategyBuilder
-    ---@return any
+    ---@return Builder|false
     GetRemoveBuilders = function(self)
         if Builders[self.BuilderName].RemoveBuilders then
             return Builders[self.BuilderName].RemoveBuilders
@@ -71,7 +71,7 @@ StrategyBuilder = Class(Builder) {
     end,
 
     ---@param self StrategyBuilder
-    ---@return any
+    ---@return Builder|false
     GetStrategyTime = function(self)
         if Builders[self.BuilderName].StrategyTime then
             return Builders[self.BuilderName].StrategyTime
@@ -89,7 +89,7 @@ StrategyBuilder = Class(Builder) {
     end,
 
     ---@param self StrategyBuilder
-    ---@return any
+    ---@return Builder|false
     GetStrategyType = function(self)
         if Builders[self.BuilderName].StrategyType then
             return Builders[self.BuilderName].StrategyType
@@ -98,7 +98,7 @@ StrategyBuilder = Class(Builder) {
     end,
 
     ---@param self StrategyBuilder
-    ---@param builderManager any
+    ---@param builderManager BuilderManager
     ---@return boolean
     CalculatePriority = function(self, builderManager)
         self.PriorityAltered = false
@@ -124,9 +124,9 @@ StrategyBuilder = Class(Builder) {
 }
 
 ---@param brain AIBrain
----@param data any
+---@param data table
 ---@param locationType string
----@return string
+---@return string|false
 function CreateStrategy(brain, data, locationType)
     local builder = StrategyBuilder()
     if builder:Create(brain, data, locationType) then

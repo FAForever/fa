@@ -24,7 +24,7 @@ local categoriesToCollect = {
 }
 
 ---@param brain AIBrain
----@return integer
+---@return number
 function CalculateBrainScore(brain)
     local commanderKills = brain:GetArmyStat("Enemies_Commanders_Destroyed", 0).Value
     local massSpent = brain:GetArmyStat("Economy_TotalConsumed_Mass", 0).Value

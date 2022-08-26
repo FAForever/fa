@@ -39,10 +39,10 @@ StrategyManager = Class(BuilderManager) {
     end,
 
     ---@param self StrategyManager
-    ---@param builderData any
+    ---@param builderData table
     ---@param locationType string
     ---@param builderType string
-    ---@return string
+    ---@return string|false
     AddBuilder = function(self, builderData, locationType, builderType)
         local newBuilder = StrategyBuilder.CreateStrategy(self.Brain, builderData, locationType)
         self:AddInstancedBuilder(newBuilder, builderType)

@@ -79,7 +79,6 @@ VizMarker = Class(Entity) {
         end
     end
 }
-
 local PositionCache = { 0, 0, 0 }
 
 --- Performance-wise a better alternative to the regular vision marker. 

@@ -1,15 +1,12 @@
-----                                                                             
 ----  File     : PrefetchUtilities.lua                                           
 ----  Author(s): Robert Oates                                                    
-----                                                                             
 ----  Summary  : Functions to simplify prefetching by base, unit, etc...                  
-----                                                                             
 ----  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.          
 
 local TableGetn = table.getn
 
 ---@param armyName string
----@return any
+---@return table
 function CreatePrefetchSetFromArmy(armyName)
     local BPList = {}
 

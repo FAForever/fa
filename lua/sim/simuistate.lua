@@ -12,7 +12,7 @@ local techRestrictions = {}
 local enhanceRestriction = {}
 local campaignMode = false
 
----@param entry any
+---@param entry table
 function SaveEntry(entry)
     table.insert(transmissions, entry)
 end
@@ -22,17 +22,17 @@ function SaveEnhancementRestriction(table)
     enhanceRestriction = table
 end
 
----@param category Categories
+---@param category EntityCategory
 function SaveTechRestriction(category)
     table.insert(techRestrictions, {cats = category, type = 'restriction'})
 end
 
----@param category Categories
+---@param category EntityCategory
 function SaveTechAllowance(category)
     table.insert(techRestrictions, {cats = category, type = 'allow'})
 end
 
----@param state any
+---@param state boolean
 function IsCampaign(state)
     campaignMode = state
 end
