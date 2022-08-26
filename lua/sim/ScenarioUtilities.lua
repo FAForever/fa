@@ -58,13 +58,13 @@ function GetMarkers()
     return Scenario.MasterChain._MASTERCHAIN_.Markers
 end
 
----@param name string
----@return any
+---@param name MarkerChain
+---@return MarkerChain[]
 function GetMarker(name)
     return Scenario.MasterChain._MASTERCHAIN_.Markers[name]
 end
 
----@param chainName string
+---@param chainName MarkerChain
 ---@return Vector[]
 function ChainToPositions(chainName)
     local chain = Scenario.Chains[chainName]
@@ -81,7 +81,7 @@ end
 
 ---FindParentChain
 ---Gets the parent chain that the supplied marker belongs to
----@param markerName string
+---@param markerName Marker
 ---@return MarkerChain|nil
 function FindParentChain(markerName)
     for cName,chain in Scenario.Chains do
@@ -94,7 +94,7 @@ function FindParentChain(markerName)
     return nil
 end
 
----@param name string
+---@param name MarkerChain
 ---@return MarkerChain
 function GetMarkerChain(name)
     local chain = Scenario.Chains[name]
@@ -106,7 +106,7 @@ end
 
 ---MarkerToPosition
 ---Converts a marker as specified in *_save.lua file to a position.
----@param strMarker string
+---@param strMarker Marker
 ---@return Vector
 function MarkerToPosition(strMarker)
     local marker = GetMarker(strMarker)
@@ -118,7 +118,7 @@ end
 
 ---AreaToRect
 ---Converts an area as specified in *_save.lua file to a rectangle.
----@param strArea Area
+---@param areaName Area
 ---@return Rectangle
 function AreaToRect(areaName)
     local area = Scenario.Areas[areaName]
@@ -130,7 +130,7 @@ function AreaToRect(areaName)
 end
 
 --- Converts a marker as specified in `*_save.lua` file to a position
----@param markerName string
+---@param markerName Marker
 ---@return Vector
 function MarkerToPosition(markerName)
     local marker = GetMarker(markerName)
@@ -179,7 +179,7 @@ end
 
 ---AssembleUnitGroup
 ---Returns all units (leaf nodes) under the specified group.
----@param tblNode any
+---@param tblNode table
 ---@param tblResult table
 ---@return table
 function AssembleUnitGroup(tblNode,tblResult)
@@ -202,7 +202,7 @@ end
 
 ---AssemblePlatoons
 ---Returns all platoon template names specified under group.
----@param tblNode any
+---@param tblNode table
 ---@param tblResult table
 ---@return table
 function AssemblePlatoons(tblNode,tblResult)
@@ -228,7 +228,7 @@ end
 ---FindUnit
 ---Finds the unit with the specified name.
 ---@param strUnit string
----@param tblNode any
+---@param tblNode table
 ---@return table|nil
 function FindUnit(strUnit,tblNode)
     if nil == tblNode then
@@ -379,7 +379,7 @@ end
 
 ---CreateSubGroup
 ---Used by CreateArmySubGroup
----@param tblNode any
+---@param tblNode table
 ---@param strArmy string
 ---@param strGroup string
 ---@param ... any
