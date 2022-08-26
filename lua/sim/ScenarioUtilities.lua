@@ -120,8 +120,14 @@ end
 ---Converts an area as specified in *_save.lua file to a rectangle.
 ---@param strArea Area
 ---@return Rectangle
-function AreaToRect(strArea)
-    local area = Scenario.Areas[strArea]
+function AreaToRect(areaName)
+    local area = Scenario.Areas[areaName]
+    if not area then
+        error('ERROR: Invalid area name')
+    end
+    local rectangle = area.rectangle
+    return Rect(rectangle[1], rectangle[2], rectangle[3], rectangle[4])
+end
 
 --- Converts a marker as specified in `*_save.lua` file to a position
 ---@param markerName string
@@ -776,10 +782,10 @@ end
 ---Spawns unit group and assigns to platoon it is a part of
 ---@param strArmy string
 ---@param strGroup string
----@return boolean|Platoon[]
----@return boolean|Unit[]
----@return boolean|table
----@return boolean|table
+---@return false|Platoon[]
+---@return false|Unit[]
+---@return false|table
+---@return false|table
 function SpawnPlatoon(strArmy, strGroup)
     local tblNode = FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units)
     if nil == tblNode then
@@ -1795,9 +1801,6 @@ function FilterFunctions(tableOne, tableTwo)
     end
     return tableOne
 end
-
--- kept for mod backwards compatibility
-local Entity = import('/lua/sim/Entity.lua').Entity
 
 --- Gets the units in `rectangles` that belong to a category and how many. The units can
 --- optionally be required to belong to a brain or be fully built. If there are no units,
