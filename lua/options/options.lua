@@ -878,7 +878,7 @@ options = {
             },
 
             {
-                title = "<LOC selectionsets0001>Add behavior",
+                title = "<LOC selectionsets0001>Set behavior",
                 key = 'selection-sets-add-behavior',
                 type = 'toggle',
                 default = true,
@@ -891,29 +891,29 @@ options = {
             },
 
             {
-                title = "<LOC selectionsets0001>Production behavior",
+                title = "<LOC selectionsets0004>Factory behavior",
                 key = 'selection-sets-production-behavior',
                 type = 'toggle',
                 default = true,
                 custom = {
                     states = {
-                        {text = "<LOC selectionsets0002>Add to control group of factory", key = true },
-                        {text = "<LOC selectionsets0003>Do nothing", key = false },
+                        {text = "<LOC selectionsets0005>Add to control group of factory", key = true },
+                        {text = "<LOC selectionsets0006>Do nothing", key = false },
                     },
                 },
             },
 
             {
-                title = "<LOC selectionsets0001>Double tap behavior",
+                title = "<LOC selectionsets0007>Double tap behavior",
                 key = 'selection-sets-double-tap-behavior',
                 type = 'toggle',
                 default = 'translate-zoom',
                 custom = {
                     states = {
-                        {text = "<LOC selectionsets0002>Do nothing", key = 'none' },
-                        {text = "<LOC selectionsets0003>Only translate", key = 'translate' },
-                        {text = "<LOC selectionsets0003>Translate, zoom only out", key = 'translate-zoom-out-only' },
-                        {text = "<LOC selectionsets0003>Translate and zoom", key = 'translate-zoom' },
+                        {text = "<LOC selectionsets0008>Do nothing", key = 'none' },
+                        {text = "<LOC selectionsets0009>Only translate", key = 'translate' },
+                        {text = "<LOC selectionsets00010>Translate, zoom only out", key = 'translate-zoom-out-only' },
+                        {text = "<LOC selectionsets00011>Translate and zoom", key = 'translate-zoom' },
                     },
                 },
             },
