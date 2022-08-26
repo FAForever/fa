@@ -24,18 +24,23 @@ VeteranDefault = {
     Level5 = 1000,
 }
 
--- Return the total time (in seconds), energy, and mass it will take for the given
--- builder to create a unit of type target_bp.
-
--- targetData may also be an "Enhancement" section of a units blueprint rather than
--- a full blueprint.
-
--- Modified to calculate the cost of an upgrade. The third argument is the economy section of
--- the unit that is currently upgrading into the new unit. We subtract that cost from the cost
--- of the unit that is being built
-
--- In order to keep backwards compatibility, there is a new option in the blueprint economy section.
--- if DifferentialUpgradeCostCalculation is set to true, the base upgrade cost will be subtracted
+--- Return the total time (in seconds), energy, and mass it will take for the given
+--- builder to create a unit of type target_bp.
+--- targetData may also be an "Enhancement" section of a units blueprint rather than
+--- a full blueprint.
+---
+--- Modified to calculate the cost of an upgrade. The third argument is the economy section of
+--- the unit that is currently upgrading into the new unit. We subtract that cost from the cost
+--- of the unit that is being built
+---
+--- In order to keep backwards compatibility, there is a new option in the blueprint economy section.
+--- if DifferentialUpgradeCostCalculation is set to true, the base upgrade cost will be subtracted
+---@param builder Builder
+---@param targetData table
+---@param upgradeBaseData table
+---@return number buildtimerate
+---@return number energy
+---@return number mass
 function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
     -- 'rate' here is how fast we build relative to a unit with build rate of 1
     local rate = builder:GetBuildRate()
@@ -82,8 +87,10 @@ local bps = {
 -- Function for converting categories to string
 local ToString = import('/lua/sim/CategoryUtils.lua').ToString
 
--- Gets army index for specified army name
--- e.g. GetArmyIndex('ARMY_1') -> 1
+--- Gets army index for specified army name
+--- e.g. GetArmyIndex('ARMY_1') -> 1
+---@param armyName string
+---@return number|unknown
 function GetArmyIndex(armyName)
     local index = nil
     if type(armyName) == 'number' then
@@ -101,9 +108,11 @@ function GetArmyIndex(armyName)
     return index
 end
 
--- Adds restriction of units with specified Entity categories, e.g. 'categories.TECH2 * categories.AIR'
--- e.g. AddRestriction(categories.TECH2, 1) -> restricts all T2 units for army 1
--- e.g. AddRestriction(categories.TECH2) -> restricts all T2 units for all armies
+--- Adds restriction of units with specified Entity categories, e.g. 'categories.TECH2 * categories.AIR'
+--- e.g. AddRestriction(categories.TECH2, 1) -> restricts all T2 units for army 1
+--- e.g. AddRestriction(categories.TECH2) -> restricts all T2 units for all armies
+---@param cats EntityCategory
+---@param army number
 function AddRestriction(cats, army)
     if type(cats) ~= 'userdata' then
         WARN('Game.AddRestriction() called with invalid categories "' .. ToString(cats) .. '" '
@@ -118,9 +127,11 @@ function AddRestriction(cats, army)
     ResolveRestrictions(true, cats, army)
 end
 
--- Removes restriction of units with specified Entity categories, e.g. 'categories.TECH1 * categories.UEF'
--- e.g. RemoveRestriction(categories.TECH2, 1) -> removes all T2 units restriction for army 1
--- e.g. RemoveRestriction(categories.TECH2) -> removes all T2 units restriction for all armies
+--- Removes restriction of units with specified Entity categories, e.g. 'categories.TECH1 * categories.UEF'
+--- e.g. RemoveRestriction(categories.TECH2, 1) -> removes all T2 units restriction for army 1
+--- e.g. RemoveRestriction(categories.TECH2) -> removes all T2 units restriction for all armies
+---@param cats EntityCategory
+---@param army number
 function RemoveRestriction(cats, army)
     if type(cats) ~= 'userdata' then
         WARN('Game.RemoveRestriction() called with invalid categories "' .. ToString(cats) .. '" '
@@ -135,17 +146,21 @@ function RemoveRestriction(cats, army)
     ResolveRestrictions(false, cats, army)
 end
 
--- Noggles whether or not to ignore all restrictions
--- Note, this function is useful when trying to transfer restricted units between armies
+--- Noggles whether or not to ignore all restrictions
+--- Note, this function is useful when trying to transfer restricted units between armies
+---@param isIgnored boolean
 function IgnoreRestrictions(isIgnored)
     bps.Ignored = isIgnored
 end
 
--- Checks whether or not a given blueprint ID is restricted by
--- global restrictions (set in UnitsManager) or by
--- army restrictions (set in Scenario Script)
--- e.g. IsRestricted('xab1401', 1) -> checks if Aeon Paragon is restricted for army with index 1
--- Note that global restrictions take precedence over restrictions set on specific armies
+--- Checks whether or not a given blueprint ID is restricted by
+--- global restrictions (set in UnitsManager) or by
+--- army restrictions (set in Scenario Script)
+--- e.g. IsRestricted('xab1401', 1) -> checks if Aeon Paragon is restricted for army with index 1
+--- Note that global restrictions take precedence over restrictions set on specific armies
+---@param unitId UnitId
+---@param army string
+---@return boolean
 function IsRestricted(unitId, army)
     if bps.Ignored then
         return false
@@ -162,17 +177,21 @@ function IsRestricted(unitId, army)
     return false
 end
 
--- Gets a table with ids of restricted units {Global = {}, PerArmy = {}}
+--- Gets a table with ids of restricted units {Global = {}, PerArmy = {}}
 function GetRestrictions()
     return restrictions
 end
 
--- Sets a table with ids of restricted units {Global = {}, PerArmy = {}}
+--- Sets a table with ids of restricted units {Global = {}, PerArmy = {}}
+---@param blueprintIDs BlueprintBase
 function SetRestrictions(blueprintIDs)
     restrictions = blueprintIDs
 end
 
--- Sorts unit blueprints based on build priority
+--- Sorts unit blueprints based on build priority
+---@param bp1 UnitId
+---@param bp2 UnitId
+---@return boolean
 local function SortUnits(bp1, bp2)
     local v1 = bp1.BuildIconSortPriority or bp1.StrategicIconSortPriority
     local v2 = bp2.BuildIconSortPriority or bp2.StrategicIconSortPriority
@@ -186,7 +205,7 @@ end
 -- Checks for valid unit blueprints (not projectiles/effects)
 local IsValidUnit = import('/lua/ui/lobby/UnitsAnalyzer.lua').IsValidUnit
 
--- Gets blueprints that can be upgraded, e.g. MEX, Shield, Radar structures
+--- Gets blueprints that can be upgraded, e.g. MEX, Shield, Radar structures
 local function GetUnitsUpgradable()
     local units = {}
 
@@ -232,8 +251,11 @@ local function GetUnitsIds()
     return units
 end
 
--- Resolves category restrictions to a table with ids of restricted units
--- e.g. restrictions = {categories.TECH1} ->
+--- Resolves category restrictions to a table with ids of restricted units
+--- e.g. restrictions = {categories.TECH1} ->
+---@param toggle boolean
+---@param cats EntityCategory
+---@param army string
 function ResolveRestrictions(toggle, cats, army)
     -- Initialize blueprints info only once
     if table.empty(bps.ids) or table.empty(bps.upgradeable) then
