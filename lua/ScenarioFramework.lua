@@ -5,6 +5,25 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@class Dialogue : BpSound
+---@field duration number
+---@field text string
+---@field vid string
+---@field delay number
+---@field faction string
+
+---@class DialogueTable : table<Dialogue>
+---@field Callback? fun()
+---@field Critical? boolean
+---@field Flushed boolean
+
+---@class MovieTable
+---@field [1] string path/name
+---@field [2] string bank
+---@field [3] string cue
+---@field [4] string faction
+
+
 local CategoryToString = import('/lua/sim/CategoryUtils.lua').ToString
 local Cinematics = import('/lua/cinematics.lua')
 local Game = import('/lua/game.lua')
@@ -12,30 +31,30 @@ local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local SimCamera = import('/lua/SimCamera.lua').SimCamera
 local SimUIVars = import('/lua/sim/SimUIState.lua')
-local TriggerFile = import('scenariotriggers.lua')
+local TriggerFile = import('/lua/scenariotriggers.lua')
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
-PingGroups = import('/lua/SimPingGroup.lua')
 Objectives = import('/lua/SimObjectives.lua')
+PingGroups = import('/lua/SimPingGroup.lua')
+
 
 local PauseUnitDeathActive = false
 
--- Cause the game to exit immediately
+--- Causes the game to exit immediately
 function ExitGame()
     Sync.RequestingExit = true
 end
 
--- Call to end an operation
---   bool _success - instructs UI which dialog to show
---   bool _allPrimary - true if all primary objectives completed, otherwise, false
---   bool _allSecondary - true if all secondary objectives completed, otherwise, false
---   bool _allBonus - true if all bonus objectives completed, otherwise, false
-function EndOperation(_success, _allPrimary, _allSecondary, _allBonus)
+--- Ends an operation
+---@param success boolean instructs UI which dialog to show
+---@param allPrimary boolean
+---@param allSecondary boolean
+---@param allBonus boolean
+function EndOperation(success, allPrimary, allSecondary, allBonus)
     local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')
-    local _opData = {}
-
+    local opData
     if DiskGetFileInfo(opFile) then
-        _opData = import(opFile)
+        opData = import(opFile)
     end
 
     import('/lua/sim/matchstate.lua').CallEndGame() -- We need this here to populate the score screen
@@ -43,20 +62,23 @@ function EndOperation(_success, _allPrimary, _allSecondary, _allBonus)
     ForkThread(function()
         WaitSeconds(3) -- Wait for the stats to be synced
         UnlockInput()
-        Sync.OperationComplete = {
-            success = _success,
+        EndOperationT {
+            success = success,
             difficulty = ScenarioInfo.Options.Difficulty,
-            allPrimary = _allPrimary,
-            allSecondary = _allSecondary,
-            allBonus = _allBonus,
+            allPrimary = allPrimary,
+            allSecondary = allSecondary,
+            allBonus = allBonus,
             faction = ScenarioInfo.LocalFaction,
-            opData = _opData.operationData
+            opData = opData.operationData
         }
     end)
 end
 
--- Pop up a dialog to ask the user what faction they want to play
+---@alias FactionSelectData {Faction: "aeon" | "cybran" | "uef"}
+
 local factionCallbacks = {}
+--- Pops up a dialog to ask the user what faction they want to play
+---@param callback fun(data: FactionSelectData)
 function RequestPlayerFaction(callback)
     Sync.RequestPlayerFaction = true
     if callback then
@@ -64,52 +86,49 @@ function RequestPlayerFaction(callback)
     end
 end
 
--- Hook for player requested faction
--- "data" is a table containing field "Faction" which can be "cybran", "uef", or "aeon"
+--- Hook for player requested faction
+---@param data FactionSelectData
 function OnFactionSelect(data)
     if ScenarioInfo.campaignInfo then
         ScenarioInfo.campaignInfo.campaignID = data.Faction
     end
     if not table.empty(factionCallbacks) then
-        for index, callbackFunc in factionCallbacks do
-            if callbackFunc then callbackFunc(data) end
+        for _, callback in factionCallbacks do
+            if callback then
+                callback(data)
+            end
         end
     else
         WARN('I chose ', data.Faction, ' but I dont have a callback set!')
     end
 end
 
--- Call to end an operation where the data is already provided in table form (just a wrapper for sync
+--- Ends an operation where the data is already provided in table form (just a wrapper for sync)
+---@param opData table
 function EndOperationT(opData)
     Sync.OperationComplete = opData
 end
 
--- Single Area Trigger Creation
--- This will create an area trigger around <rectangle>.  It will fire when <categoy> is met of <aiBrain>.
--- onceOnly means it will not continue to run after the first time it fires.
--- invert means it will fire when units are NOT in the area.  Useful for testing if someone has defeated a base.
--- number refers to the number of units it will take to fire.  If not inverted.  It will fire when that many are in the area-- If inverted, it will fire when less than that many are in the area
-function CreateAreaTrigger(callbackFunction, rectangle, category, onceOnly, invert, aiBrain, number, requireBuilt)
-    return TriggerFile.CreateAreaTrigger(callbackFunction, rectangle, category, onceOnly, invert, aiBrain, number, requireBuilt)
-end
+CreateAreaTrigger = TriggerFile.CreateAreaTrigger
+CreateMultipleAreaTrigger = TriggerFile.CreateMultipleAreaTrigger
 
--- Table of Areas Trigger Creations
--- same as above except you can supply the function with a table of Rects.
--- If you have an odd shaped area for an area trigger
-function CreateMultipleAreaTrigger(callbackFunction, rectangleTable, category, onceOnly, invert, aiBrain, number, requireBuilt)
-    return TriggerFile.CreateMultipleAreaTrigger(callbackFunction, rectangleTable, category, onceOnly, invert, aiBrain, number, requireBuilt)
-end
-
--- Single Line timer Trigger creation
--- Fire the <cb> function after <seconds> number of seconds.
--- you can have the function repeat <repeatNum> times which will fire every <seconds>
--- until <repeatNum> is met
 local timerThread = nil
-function CreateTimerTrigger(cb, seconds, displayBool)
-    timerThread = TriggerFile.CreateTimerTrigger(cb, seconds, displayBool)
+--- Creates a timer that runs `callback` after `seconds` have passed, calling `onTickSecond` with
+--- the current number of seconds left on the timer if `doOnTickSecond` is set. This includes the
+--- starting duration, but also 0--note that this adds an extra second.
+--- If `name` is supplied, the callback is called with TriggerManager and the name as arguments.
+---@param callback function
+---@param seconds number
+---@param name? string
+---@param doOnTickSecond? boolean
+---@param onTickSecond? fun(seconds: number)
+---@return thread
+function CreateTimerTrigger(callback, seconds, name, doOnTickSecond, onTickSecond)
+    timerThread = TriggerFile.CreateTimerTrigger(callback, seconds, name, doOnTickSecond, onTickSecond)
     return timerThread
 end
 
+--- Stops the last timer set by `CreateTimerTrigger` and resets the objective timer
 function ResetUITimer()
     if timerThread then
         Sync.ObjectiveTimer = 0
@@ -117,24 +136,22 @@ function ResetUITimer()
     end
 end
 
--- Single Line unit damaged trigger creation
--- When <unit> is damaged it will call the <callbackFunction> provided
--- If <percent> provided, will check if damaged percent EXCEEDS number provided before callback
--- function repeats up to repeatNum ... or once if not declared
-function CreateUnitDamagedTrigger(callbackFunction, unit, amount, repeatNum)
-    TriggerFile.CreateUnitDamagedTrigger(callbackFunction, unit, amount, repeatNum)
+CreateUnitDamagedTrigger = TriggerFile.CreateUnitDamagedTrigger
+
+---
+---@param callback any
+---@param aiBrain AIBrain
+---@param category EntityCategory
+---@param percent number
+function CreateUnitPercentageBuiltTrigger(callback, aiBrain, category, percent)
+    aiBrain:AddUnitBuiltPercentageCallback(callback, category, percent)
 end
 
-function CreateUnitPercentageBuiltTrigger(callbackFunction, aiBrain, category, percent)
-    aiBrain:AddUnitBuiltPercentageCallback(callbackFunction, category, percent)
-end
+CreateUnitDeathTrigger = TriggerFile.CreateUnitDeathTrigger
 
--- Single Line unit death trigger creation
--- When <unit> dies it will call the <cb> function provided
-function CreateUnitDeathTrigger(cb, unit, camera)
-    TriggerFile.CreateUnitDeathTrigger(cb, unit)
-end
-
+--- Sets a unit's death to be paused. It is unpaused globally, since this usually only
+--- happens to one unit at a time (e.g. the camera zooms in an ACU before it explodes)
+---@param unit Unit
 function PauseUnitDeath(unit)
     if unit and not unit.Dead then
         unit.OnKilled = OverrideKilled
@@ -143,11 +160,18 @@ function PauseUnitDeath(unit)
     end
 end
 
+--- An override for `Unit.DoTakeDamage` to hold on to the final blow and then release it
+--- on the unit once its death is unpaused
+---@param self Unit
+---@param instigator Unit
+---@param amount number
+---@param vector any
+---@param damageType DamageType
 function OverrideDoDamage(self, instigator, amount, vector, damageType)
     local preAdjHealth = self:GetHealth()
     self:AdjustHealth(instigator, -amount)
     local health = self:GetHealth()
-    if ((health <= 0) or (amount > preAdjHealth)) and not self.KilledFlag then
+    if (health <= 0 or amount > preAdjHealth) and not self.KilledFlag then
         self.KilledFlag = true
         if damageType == 'Reclaimed' then
             self:Destroy()
@@ -164,7 +188,6 @@ function OverrideDoDamage(self, instigator, amount, vector, damageType)
         end
     end
 end
-
 function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio)
     self:DoUnitCallbacks('OnKilled')
     while PauseUnitDeathActive do
@@ -174,6 +197,11 @@ function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio
     self:Kill(instigator, damageType, excessDamageRatio)
 end
 
+--- An override for `Unit.OnKilled` to make unit death pausing work
+---@param self Unit
+---@param instigator Unit
+---@param type any
+---@param overkillRatio number
 function OverrideKilled(self, instigator, type, overkillRatio)
     if not self.CanBeKilled then
         self:DoTakeDamage(instigator, 1000000, nil, 'Normal')
@@ -221,25 +249,30 @@ function OverrideKilled(self, instigator, type, overkillRatio)
 
     self:DisableShield()
     self:DisableUnitIntel('Killed')
-    self:ForkThread(self.DeathThread, overkillRatio , instigator)
+    self:ForkThread(self.DeathThread, overkillRatio, instigator)
 end
 
-function GiveUnitToArmy(unit, newArmyIndex, triggerOnGiven)
-    -- Shared army mod will result in different players having the same army number.
-    if unit.Army == newArmyIndex then
+---
+---@param unit Unit
+---@param army number
+---@param triggerOnGiven boolean
+---@return Unit
+function GiveUnitToArmy(unit, army, triggerOnGiven)
+    -- Shared army mod will result in different players having the same army number
+    if unit.Army == army then
         return unit
     end
     -- We need the brain to ignore army cap when transferring the unit
     -- do all necessary steps to set brain to ignore, then un-ignore if necessary the unit cap
     unit.IsBeingTransferred = true
 
-    SetIgnoreArmyUnitCap(newArmyIndex, true)
+    SetIgnoreArmyUnitCap(army, true)
     IgnoreRestrictions(true)
 
-    local newUnit = ChangeUnitArmy(unit, newArmyIndex)
-    local newBrain = ArmyBrains[newArmyIndex]
+    local newUnit = ChangeUnitArmy(unit, army)
+    local newBrain = ArmyBrains[army]
     if not newBrain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(newArmyIndex, false)
+        SetIgnoreArmyUnitCap(army, false)
     end
     IgnoreRestrictions(false)
 
@@ -250,131 +283,64 @@ function GiveUnitToArmy(unit, newArmyIndex, triggerOnGiven)
     return newUnit
 end
 
--- Single Line unit death trigger creation
--- When <unit> is killed, reclaimed, or captured it will call the <cb> function provided
-function CreateUnitDestroyedTrigger(cb, unit)
-    CreateUnitReclaimedTrigger(cb, unit)
-    CreateUnitCapturedTrigger(cb, nil, unit)
-    CreateUnitDeathTrigger(cb, unit, true)
+-- When `unit` is killed, reclaimed, or captured it will call the `callback` function provided
+---@param callback fun(self: Unit, source: Unit)
+---@param unit Unit
+function CreateUnitDestroyedTrigger(callback, unit)
+    CreateUnitReclaimedTrigger(callback, unit)
+    CreateUnitCapturedTrigger(callback, nil, unit)
+    CreateUnitDeathTrigger(callback, unit)
 end
 
--- Single Line unit given trigger creation
--- When <unit> is given it will call the <cb> function provided
-function CreateUnitGivenTrigger(cb, unit)
-    TriggerFile.CreateUnitGivenTrigger(cb, unit)
+CreateUnitGivenTrigger = TriggerFile.CreateUnitGivenTrigger
+CreateUnitBuiltTrigger = TriggerFile.CreateUnitBuiltTrigger
+CreateUnitCapturedTrigger = TriggerFile.CreateUnitCapturedTrigger
+CreateUnitStartBeingCapturedTrigger = TriggerFile.CreateUnitStartBeingCapturedTrigger
+CreateUnitStopBeingCapturedTrigger = TriggerFile.CreateUnitStopBeingCapturedTrigger
+CreateUnitFailedBeingCapturedTrigger = TriggerFile.CreateUnitFailedBeingCapturedTrigger
+CreateUnitStartCaptureTrigger = TriggerFile.CreateUnitStartCaptureTrigger
+CreateUnitStopCaptureTrigger = TriggerFile.CreateUnitStopCaptureTrigger
+CreateUnitFailedCaptureTrigger = TriggerFile.CreateUnitFailedCaptureTrigger
+CreateUnitReclaimedTrigger = TriggerFile.CreateUnitReclaimedTrigger
+CreateUnitStartReclaimTrigger = TriggerFile.CreateUnitStartReclaimTrigger
+CreateUnitStopReclaimTrigger = TriggerFile.CreateUnitStopReclaimTrigger
+CreateUnitVeterancyTrigger = TriggerFile.CreateUnitVeterancyTrigger
+CreateGroupDeathTrigger = TriggerFile.CreateGroupDeathTrigger
+
+-- When all units in `platoon` are destroyed, `callback` will be called
+---@param callback fun(brain: AIBrain, platoon: Platoon)
+---@param platoon Platoon
+function CreatePlatoonDeathTrigger(callback, platoon)
+    platoon:AddDestroyCallback(callback)
 end
 
--- Single Line Unit built trigger
--- Tests when <unit> builds a unit of type <category> calls <cb>
-function CreateUnitBuiltTrigger(cb, unit, category)
-    TriggerFile.CreateUnitBuiltTrigger(cb, unit, category)
-end
+CreateSubGroupDeathTrigger = TriggerFile.CreateSubGroupDeathTrigger
 
--- Single line unit captured trigger creation
--- When <unit> is captured cbOldUnit is called passing the old unit BEFORE it has switched armies,
--- cbNewUnit is called passing in the unit AFTER it has switched armies
-function CreateUnitCapturedTrigger(cbOldUnit, cbNewUnit, unit)
-    TriggerFile.CreateUnitCapturedTrigger(cbOldUnit, cbNewUnit, unit)
-end
-
--- Single line unit start being captured trigger
--- when <unit> begins to be captured function is called
-function CreateUnitStartBeingCapturedTrigger(cb, unit)
-    TriggerFile.CreateUnitStartBeingCapturedTrigger(cb, unit)
-end
-
--- Single line unit stop being captured trigger
--- when <unit> stops being captured, the function is called
-function CreateUnitStopBeingCapturedTrigger(cb, unit)
-    TriggerFile.CreateUnitStopBeingCapturedTrigger(cb, unit)
-end
-
--- Single line unit failed being captured trigger
--- when capture of <unit> fails, the function is called
-function CreateUnitFailedBeingCapturedTrigger(cb, unit)
-    TriggerFile.CreateUnitFailedBeingCapturedTrigger(cb, unit)
-end
-
--- Single line unit started capturing trigger creation
--- When <unit> starts capturing the <cb> function provided is called
-function CreateUnitStartCaptureTrigger(cb, unit)
-    TriggerFile.CreateUnitStartCaptureTrigger(cb, unit)
-end
-
--- Single line unit finished capturing trigger creation
--- When <unit> finishes capturing the <cb> function provided is called
-function CreateUnitStopCaptureTrigger(cb, unit)
-    TriggerFile.CreateUnitStopCaptureTrigger(cb, unit)
-end
-
--- Single line failed capturing trigger creation
--- When <unit> fails to capture a unit, the <cb> function is called
-function CreateUnitFailedCaptureTrigger(cb, unit)
-    TriggerFile.CreateUnitFailedCaptureTrigger(cb, unit)
-end
-
--- Single line unit has been reclaimed trigger creation
--- When <unit> has been reclaimed the <cb> function provided is called
-function CreateUnitReclaimedTrigger(cb, unit)
-    TriggerFile.CreateUnitReclaimedTrigger(cb, unit)
-end
-
--- Single line unit started reclaiming trigger creation
--- When <unit> starts reclaiming the <cb> function provided is called
-function CreateUnitStartReclaimTrigger(cb, unit)
-    TriggerFile.CreateUnitStartReclaimTrigger(cb, unit)
-end
-
--- Single line unit finished reclaiming trigger creation
--- When <unit> finishes reclaiming the <cb> function provided is called
-function CreateUnitStopReclaimTrigger(cb, unit)
-    TriggerFile.CreateUnitStopReclaimTrigger(cb, unit)
-end
-
--- Single line unit veterancy trigger creation
--- When <unit> achieves veterancy, <cb> is called with parameters of the unit then level achieved
-function CreateUnitVeterancyTrigger(cb, unit)
-    TriggerFile.CreateUnitVeterancyTrigger(cb, unit)
-end
-
--- Single line Group Death Trigger creation
--- When all units in <group> are destroyed, <cb> function will be called
-function CreateGroupDeathTrigger(cb, group)
-   return TriggerFile.CreateGroupDeathTrigger(cb, group)
-end
-
--- Single line Platoon Death Trigger creation
--- When all units in <platoon> are destroyed, <cb> function will be called
-function CreatePlatoonDeathTrigger(cb, platoon)
-    platoon:AddDestroyCallback(cb)
-end
-
--- Single line Sub Group Death Trigger creation
--- When <num> <cat> units in <group> are destroyed, <cb> function will be called
-function CreateSubGroupDeathTrigger(cb, group, num)
-    return TriggerFile.CreateSubGroupDeathTrigger(cb, group, num)
-end
-
--- Checks if units of Cat are within the provided rectangle
--- Checks the <Rectangle> to see if any units of <Cat> category are in it
-function UnitsInAreaCheck(Cat, Rectangle)
-    if type(Rectangle) == 'string' then
-        Rectangle = ScenarioUtils.AreaToRect(Rectangle)
+-- Checks if units of `cat` are within the provided rectangle
+---@param cat EntityCategory
+---@param area Area | Rectangle
+---@return boolean
+function UnitsInAreaCheck(cat, area)
+    if type(area) == 'string' then
+        area = ScenarioUtils.AreaToRect(area)
     end
-    local entities = GetUnitsInRect(Rectangle)
+    local entities = GetUnitsInRect(area)
     if not entities then
         return false
     end
-    for _, v in entities do
-        if EntityCategoryContains(Cat, v) then
+    for _, entity in entities do
+        if EntityCategoryContains(cat, entity) then
             return true
         end
     end
-
     return false
 end
 
--- Returns the number of <cat> units in <area> belonging to <brain>
+-- Returns the number of `cat` units in `area` belonging to `brain`
+---@param cat EntityCategory
+---@param area Area | Rectangle
+---@param brain AIBrain
+---@return number
 function NumCatUnitsInArea(cat, area, brain)
     if type(area) == 'string' then
         area = ScenarioUtils.AreaToRect(area)
@@ -385,8 +351,8 @@ function NumCatUnitsInArea(cat, area, brain)
     if entities then
         local filteredList = EntityCategoryFilterDown(cat, entities)
 
-        for _, v in filteredList do
-            if v:GetAIBrain() == brain then
+        for _, entity in filteredList do
+            if entity:GetAIBrain() == brain then
                 result = result + 1
             end
         end
@@ -395,7 +361,11 @@ function NumCatUnitsInArea(cat, area, brain)
     return result
 end
 
--- Returns the units in <area> of <cat> belonging to <brain>
+-- Returns the units in `area` of `cat` belonging to `brain`
+---@param cat EntityCategory
+---@param area Area | Rectangle
+---@param brain AIBrain
+---@return Unit[]
 function GetCatUnitsInArea(cat, area, brain)
     if type(area) == 'string' then
         area = ScenarioUtils.AreaToRect(area)
@@ -406,9 +376,9 @@ function GetCatUnitsInArea(cat, area, brain)
     if entities then
         local filteredList = EntityCategoryFilterDown(cat, entities)
 
-        for _, v in filteredList do
-            if v:GetAIBrain() == brain then
-                table.insert(result, v)
+        for _, entity in filteredList do
+            if entity:GetAIBrain() == brain then
+                table.insert(result, entity)
             end
         end
     end
@@ -416,232 +386,189 @@ function GetCatUnitsInArea(cat, area, brain)
     return result
 end
 
--- Destroys a group
--- Goes through every unit in <group> and destroys them without explosions
-function DestroyGroup(group)
-    for _, v in group do
-        v:Destroy()
+--- Goes through every unit in `group` and destroys them without explosions
+---@param units Unit[]
+function DestroyGroup(units)
+    for _, unit in units do
+        unit:Destroy()
     end
 end
 
--- Checks if <unitOne> and <unitTwo> are less than <distance> from each other
--- if true calls <callbackFunction>
-function CreateUnitDistanceTrigger(callbackFunction, unitOne, unitTwo, distance)
-    TriggerFile.CreateUnitDistanceTrigger(callbackFunction, unitOne, unitTwo, distance)
-end
+CreateUnitDistanceTrigger = TriggerFile.CreateUnitDistanceTrigger
+CreateArmyStatTrigger = TriggerFile.CreateArmyStatTrigger
+CreateThreatTriggerAroundPosition = TriggerFile.CreateThreatTriggerAroundPosition
+CreateThreatTriggerAroundUnit = TriggerFile.CreateThreatTriggerAroundUnit
+CreateArmyIntelTrigger = TriggerFile.CreateArmyIntelTrigger
+CreateArmyUnitCategoryVeterancyTrigger = TriggerFile.CreateArmyUnitCategoryVeterancyTrigger
+CreateUnitToPositionDistanceTrigger = TriggerFile.CreateUnitToPositionDistanceTrigger
+CreateUnitToMarkerDistanceTrigger = CreateUnitToPositionDistanceTrigger -- got renamed for some reason
+CreateUnitNearTypeTrigger = TriggerFile.CreateUnitNearTypeTrigger
 
--- Stat trigger creation
--- triggerTable spec
--- {
--- {StatType = string, -- Examples: Units_Active, Units_Killed, Enemies_Killed, Economy_Trend_Mass, Economy_TotalConsumed_Energy
---   CompareType = string, -- GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual
---   Value = integer,
---   Category = category, -- Only used with "Units" triggers
--- },
--- }
+-- platoon functions REQUIRE `squad` to be non-nil when present
 
--- COMPLETE LIST OF STAT TYPES
--- "Units_Active",
--- "Units_Killed",
--- "Units_History",
--- "Enemies_Killed",
--- "Economy_TotalProduced_Energy",
--- "Economy_TotalConsumed_Energy",
--- "Economy_Income_Energy",
--- "Economy_Output_Energy",
--- "Economy_Stored_Energy",
--- "Economy_Reclaimed_Energy",
--- "Economy_MaxStorage_Energy",
--- "Economy_PeakStorage_Energy",
--- "Economy_TotalProduced_Mass",
--- "Economy_TotalConsumed_Mass",
--- "Economy_Income_Mass",
--- "Economy_Output_Mass",
--- "Economy_Stored_Mass",
--- "Economy_Reclaimed_Mass",
--- "Economy_MaxStorage_Mass",
--- "Economy_PeakStorage_Mass",
-
-function CreateArmyStatTrigger(callbackFunction, aiBrain, name, triggerTable)
-    TriggerFile.CreateArmyStatTrigger(callbackFunction, aiBrain, name, triggerTable)
-end
-
--- Fires when the threat level of <position> of size <rings> is related to <value>
--- if <greater> is true it will fire if the threat is greater than <value>
-function CreateThreatTriggerAroundPosition(callbackFunction, aiBrain, posVector, rings, onceOnly, value, greater)
-    TriggerFile.CreateThreatTriggerAroundPosition(callbackFunction, aiBrain, posVector, rings, onceOnly, value, greater)
-end
-
--- Fires when the threat level of <unit> of size <rings> is related to <value>
-function CreateThreatTriggerAroundUnit(callbackFunction, aiBrain, unit, rings, onceOnly, value, greater)
-    TriggerFile.CreateThreatTriggerAroundUnit(callbackFunction, aiBrain, unit, rings, onceOnly, value, greater)
-end
-
--- Type = 'LOSNow'/'Radar'/'Sonar'/'Omni',
---    Blip = blip handle or false if you don't care,
--- Category = category of unit to trigger off of
--- OnceOnly = run it once
---    Value = true/false, true = when you get it, false = when you first don't have it
--- <aiBrain> refers to the intelligence you are monitoring.
--- <targetAIBrain> requires that the intelligence fires on seeing a specific brain's units
-function CreateArmyIntelTrigger(callbackFunction, aiBrain, reconType, blip, value, category, onceOnly, targetAIBrain)
-    TriggerFile.CreateArmyIntelTrigger(callbackFunction, aiBrain, reconType, blip, value, category, onceOnly, targetAIBrain)
-end
-
-function CreateArmyUnitCategoryVeterancyTrigger(callbackFunction, aiBrain, category, level)
-    TriggerFile.CreateArmyUnitCategoryVeterancyTrigger(callbackFunction, aiBrain, category, level)
-end
-
--- Fires when <unit> and <marker> are less than or equal to <distance> apart
-function CreateUnitToMarkerDistanceTrigger(callbackFunction, unit, marker, distance)
-    TriggerFile.CreateUnitToPositionDistanceTrigger(callbackFunction, unit, marker, distance)
-end
-
--- Function that fires when <unit> is near any unit of type <category> belonging to <brain> withing <distance>
-function CreateUnitNearTypeTrigger(callbackFunction, unit, brain, category, distance)
-    return TriggerFile.CreateUnitNearTypeTrigger(callbackFunction, unit, brain, category, distance)
-end
-
--- tells platoon to move along table of coordinates
+-- Orders a platoon to move along a route
+---@param platoon Platoon
+---@param route (Marker | Vector)[]
+---@param squad? string
 function PlatoonMoveRoute(platoon, route, squad)
-    for _, v in route do
-        if type(v) == 'string' then
-            if squad then
-                platoon:MoveToLocation(ScenarioUtils.MarkerToPosition(v), false, squad)
-            else
-                platoon:MoveToLocation(ScenarioUtils.MarkerToPosition(v), false)
-            end
+    for _, node in route do
+        if type(node) == 'string' then
+            node = ScenarioUtils.MarkerToPosition(node)
+        end
+        if squad then
+            platoon:MoveToLocation(node, false, squad)
         else
-            if squad then
-                platoon:MoveToLocation(v, false, squad)
-            else
-                platoon:MoveToLocation(v, false)
-            end
+            platoon:MoveToLocation(node, false)
         end
     end
 end
 
--- commands platoon to patrol a route
+--- Orders platoon to patrol a route
+---@param platoon Platoon
+---@param route (Marker | Vector)[]
+---@param squad? string
 function PlatoonPatrolRoute(platoon, route, squad)
-    for _, v in route do
-        if type(v) == 'string' then
-            if squad then
-                platoon:Patrol(ScenarioUtils.MarkerToPosition(v), squad)
-            else
-                platoon:Patrol(ScenarioUtils.MarkerToPosition(v))
-            end
+    for _, node in route do
+        if type(node) == 'string' then
+            node = ScenarioUtils.MarkerToPosition(node)
+        end
+        if squad then
+            platoon:Patrol(node, squad)
         else
-            if squad then
-                platoon:Patrol(v, squad)
-            else
-                platoon:Patrol(v)
-            end
+            platoon:Patrol(node)
         end
     end
 end
 
--- commands platoon to attack a route
+--- Orders a platoon to attack-move along a route
+---@param platoon Platoon
+---@param route (Marker | Vector)[]
+---@param squad? string
 function PlatoonAttackRoute(platoon, route, squad)
-    for _, v in route do
-        if type(v) == 'string' then
-            if squad then
-                platoon:AggressiveMoveToLocation(ScenarioUtils.MarkerToPosition(v), squad)
-            else
-                platoon:AggressiveMoveToLocation(ScenarioUtils.MarkerToPosition(v))
-            end
+    for _, node in route do
+        if type(node) == 'string' then
+            node = ScenarioUtils.MarkerToPosition(node)
+        end
+        if squad then
+            platoon:AggressiveMoveToLocation(node, squad)
         else
-            if squad then
-                platoon:AggressiveMoveToLocation(v, squad)
-            else
-                platoon:AggressiveMoveToLocation(v)
-            end
+            platoon:AggressiveMoveToLocation(node)
         end
     end
 end
 
+--- Orders a platoon to move along a chain
+---@param platoon Platoon
+---@param chain MarkerChain
+---@param squad? string
 function PlatoonMoveChain(platoon, chain, squad)
-    for _, v in ScenarioUtils.ChainToPositions(chain) do
+    for _, pos in ScenarioUtils.ChainToPositions(chain) do
         if squad then
-            platoon:MoveToLocation(v, false, squad)
+            platoon:MoveToLocation(pos, false, squad)
         else
-            platoon:MoveToLocation(v, false)
+            platoon:MoveToLocation(pos, false)
         end
     end
 end
 
--- orders a platoon to patrol all the points in a chain
+--- Orders a platoon to patrol along a chain
+---@param platoon Platoon
+---@param chain MarkerChain
+---@param squad? string
 function PlatoonPatrolChain(platoon, chain, squad)
-    for _, v in ScenarioUtils.ChainToPositions(chain) do
+    for _, pos in ScenarioUtils.ChainToPositions(chain) do
         if squad then
-            platoon:Patrol(v, squad)
+            platoon:Patrol(pos, squad)
         else
-            platoon:Patrol(v)
+            platoon:Patrol(pos)
         end
     end
 end
 
--- Orders a platoon to attack move through a chain
+--- Orders a platoon to attack-move through a chain
+---@param platoon Platoon
+---@param chain MarkerChain
+---@param squad? string
+---@return SimCommand # the last attack-move command
 function PlatoonAttackChain(platoon, chain, squad)
     local cmd = false
-    for _, v in ScenarioUtils.ChainToPositions(chain) do
+    for _, pos in ScenarioUtils.ChainToPositions(chain) do
         if squad then
-            cmd = platoon:AggressiveMoveToLocation(v, squad)
+            cmd = platoon:AggressiveMoveToLocation(pos, squad)
         else
-            cmd = platoon:AggressiveMoveToLocation(v)
+            cmd = platoon:AggressiveMoveToLocation(pos)
         end
     end
 
     return cmd
 end
 
--- orders group to patrol a chain
-function GroupPatrolChain(group, chain)
-    for _, v in ScenarioUtils.ChainToPositions(chain) do
-        IssuePatrol(group, v)
+--- Orders a group to patrol along a chain
+---@param units Unit[]
+---@param chain MarkerChain
+function GroupPatrolChain(units, chain)
+    for _, pos in ScenarioUtils.ChainToPositions(chain) do
+        IssuePatrol(units, pos)
     end
 end
 
--- orders group to patrol a route
-function GroupPatrolRoute(group, route)
-    for _, v in route do
-        if type(v) == 'string' then
-            IssuePatrol(group, ScenarioUtils.MarkerToPosition(v))
-        else
-            IssuePatrol(group, v)
+--- Orders a group to patrol a route
+---@param units Unit[]
+---@param route (Marker | Vector)[]
+function GroupPatrolRoute(units, route)
+    for _, node in route do
+        if type(node) == 'string' then
+            node = ScenarioUtils.MarkerToPosition(node)
         end
+        IssuePatrol(units, node)
     end
 end
 
--- orders group to patrol a route in formation
-function GroupFormPatrolChain(group, chain, formation)
-    for _, v in ScenarioUtils.ChainToPositions(chain) do
-        IssueFormPatrol(group, v, formation, 0)
+--- Orders a group to patrol a route in formation
+---@param units Unit[]
+---@param chain MarkerChain
+---@param formation string
+function GroupFormPatrolChain(units, chain, formation)
+    for _, pos in ScenarioUtils.ChainToPositions(chain) do
+        IssueFormPatrol(units, pos, formation, 0)
     end
 end
 
--- order group to attack a chain
-function GroupAttackChain(group, chain)
-    for _, v in ScenarioUtils.ChainToPositions(chain) do
-        IssueAggressiveMove(group, v)
+--- Orders a group to attack-move a along a chain
+---@param units Unit[]
+---@param chain MarkerChain
+function GroupAttackChain(units, chain)
+    for _, pos in ScenarioUtils.ChainToPositions(chain) do
+        IssueAggressiveMove(units, pos)
     end
 end
 
-function GroupMoveChain(group, chain)
-    for _, v in ScenarioUtils.ChainToPositions(chain) do
-        IssueMove(group, v)
+--- Orders a group to move along a chain
+---@param units Unit[]
+---@param chain MarkerChain
+function GroupMoveChain(units, chain)
+    for _, pos in ScenarioUtils.ChainToPositions(chain) do
+        IssueMove(units, pos)
     end
 end
 
-function GroupProgressTimer(group, time)
-    ForkThread(GroupProgressTimerThread, group, time)
+--- Makes `units` to have their work progress start at `0.0` and scale to `1.0` over `time`
+---@param units Unit[]
+---@param time number
+function GroupProgressTimer(units, time)
+    ForkThread(GroupProgressTimerThread, units, time)
 end
 
-function GroupProgressTimerThread(group, time)
+---
+---@param units Unit[]
+---@param time number
+function GroupProgressTimerThread(units, time)
     local currTime = 0
     while currTime < time do
-        for _, v in group do
-            if not v.Dead then
-                v:SetWorkProgress(currTime/time)
+        local prog = currTime / time
+        for _, unit in units do
+            if not unit.Dead then
+                unit:SetWorkProgress(prog)
             end
         end
         WaitSeconds(1)
@@ -649,24 +576,13 @@ function GroupProgressTimerThread(group, time)
     end
 end
 
--- dialogueTable format
--- it's a table of 4 variables - vid, cue, text, and duration
--- ex. Hello = {
---   {vid=video, cue=false, bank=false, text='Hello World', duration = 5 },
--- }
---
---   - bank = audio bank
---   - cue = audio cue
---   - vid = video cue
---   - text:     text to be displayed on the screen
---   - delay: time before begin next dialogue in table in second
+---
+---@param dialogueTable DialogueTable
+---@param callback? fun()
+---@param critical? boolean
+---@param speaker? Unit
 function Dialogue(dialogueTable, callback, critical, speaker)
-    local canSpeak = true
-    if speaker and speaker.Dead then
-        canSpeak = false
-    end
-
-    if canSpeak then
+    if not (speaker and speaker.Dead) then
         local dTable = table.deepcopy(dialogueTable)
         if callback then
             dTable.Callback = callback
@@ -688,18 +604,21 @@ function Dialogue(dialogueTable, callback, critical, speaker)
     end
 end
 
+---
 function FlushDialogueQueue()
     if ScenarioInfo.DialogueQueue then
-        for _, v in ScenarioInfo.DialogueQueue do
-            v.Flushed = true
+        for _, dialogue in ScenarioInfo.DialogueQueue do
+            dialogue.Flushed = true
         end
     end
 end
 
--- This function sends movie data to the sync table and saves it off for reloading in save games
+--- This function sends movie data to the sync table and saves it off for reloading in save games
+---@param movieTable MovieTable
+---@param text string
 function SetupMFDSync(movieTable, text)
     DisplayVideoText(text)
-    Sync.PlayMFDMovie = {movieTable[1], movieTable[2], movieTable[3], movieTable[4] }
+    Sync.PlayMFDMovie = {movieTable[1], movieTable[2], movieTable[3], movieTable[4]}
     ScenarioInfo.DialogueFinished[movieTable[1]] = false
 
     local tempText = LOC(text)
@@ -713,81 +632,93 @@ function SetupMFDSync(movieTable, text)
         tempData.text = tempText
         LOG("ERROR: Unable to find name in string: " .. text .. " (" .. tempText .. ")")
     end
-
-    local timeSecs = GetGameTimeSeconds()
-    tempData.time = string.format("%02d:%02d:%02d", math.floor(timeSecs/360), math.floor(timeSecs/60), math.mod(timeSecs, 60))
-    tempData.color = 'ffffffff'
+    -- `GetGameTime()` would be the perfect thing to use here--unfortunately, that's sim-side only
+    local time = GetGameTimeSeconds()
+    local hours = math.floor(time / 3600)
+    local minutes = math.mod(time, math.floor(time / 60), 60)
+    local seconds = math.mod(time, 60)
+    tempData.time = string.format("%02d:%02d:%02d", hours, minutes, seconds)
     if movieTable[4] == 'UEF' then
         tempData.color = 'ff00c1ff'
     elseif movieTable[4] == 'Cybran' then
         tempData.color = 'ffff0000'
     elseif movieTable[4] == 'Aeon' then
         tempData.color = 'ff89d300'
+    else
+        tempData.color = 'ffffffff'
     end
 
     AddTransmissionData(tempData)
     WaitForDialogue(movieTable[1])
 end
 
+---
+---@param entryData Transmission
 function AddTransmissionData(entryData)
     SimUIVars.SaveEntry(entryData)
 end
 
--- The actual thread used by Dialogue
+--- The actual thread used by `Dialogue`
 function PlayDialogue()
     while not table.empty(ScenarioInfo.DialogueQueue) do
-        local dTable = table.remove(ScenarioInfo.DialogueQueue, 1)
-        if not dTable then WARN('dTable is nil, ScenarioInfo.DialogueQueue len is '..repr(table.getn(ScenarioInfo.DialogueQueue))) end
-        if not dTable.Flushed and (not ScenarioInfo.OpEnded or dTable.Critical) then
-            for _, v in dTable do
-                if v ~= nil and not dTable.Flushed and (not ScenarioInfo.OpEnded or dTable.Critical) then
-                    if not v.vid and v.bank and v.cue then
-                        table.insert(Sync.Voice, {Cue = v.cue, Bank = v.bank})
-                        if not v.delay then
+        local dialogueTable = table.remove(ScenarioInfo.DialogueQueue, 1)
+        if not dialogueTable then
+            WARN('dialogueTable is nil, ScenarioInfo.DialogueQueue len is ' .. table.getn(ScenarioInfo.DialogueQueue))
+        end
+        if not dialogueTable.Flushed and (not ScenarioInfo.OpEnded or dialogueTable.Critical) then
+            for _, dialogue in dialogueTable do
+                if dialogue ~= nil and not dialogueTable.Flushed and (not ScenarioInfo.OpEnded or dialogueTable.Critical) then
+                    local bank = dialogue.bank
+                    local cue =  dialogue.cue
+                    local delay = dialogue.delay
+                    local duration = dialogue.duration
+                    local text = dialogue.text
+                    local vid = dialogue.vid
+                    if not vid and bank and cue then
+                        table.insert(Sync.Voice, {Cue = cue, Bank = bank})
+                        if not delay then
                             WaitSeconds(5)
                         end
                     end
-                    if v.text and not v.vid then
-                        if not v.vid then
-                            DisplayMissionText(v.text)
-                        end
+                    if text and not vid then
+                        DisplayMissionText(text)
                     end
-                    if v.vid then
-                        local vidText = ''
+                    if vid then
+                        text = text or ""
                         local movieData = {}
-                        if v.text then
-                            vidText = v.text
-                        end
-                        if GetMovieDuration('/movies/' .. v.vid) == 0 then
-                            movieData = {'/movies/AllyCom.sfd', v.bank, v.cue, v.faction }
+                        if GetMovieDuration('/movies/' .. vid) == 0 then
+                            movieData = {'/movies/AllyCom.sfd', bank, cue, dialogue.faction}
                         else
-                            movieData = {'/movies/' .. v.vid, v.bank, v.cue, v.faction}
+                            movieData = {'/movies/' .. vid, bank, cue, dialogue.faction}
                         end
-                        SetupMFDSync(movieData, vidText)
+                        SetupMFDSync(movieData, text)
                     end
-                    if v.delay and v.delay > 0 then
-                        WaitSeconds(v.delay)
+                    if delay and delay > 0 then
+                        WaitSeconds(delay)
                     end
-                    if v.duration and v.duration > 0 then
-                        WaitSeconds(v.duration)
+                    if duration and duration > 0 then
+                        WaitSeconds(duration)
                     end
                 end
             end
         end
-        if dTable.Callback then
-            ForkThread(dTable.Callback)
+        if dialogueTable.Callback then
+            ForkThread(dialogueTable.Callback)
         end
         WaitTicks(1)
     end
     ScenarioInfo.DialogueLock = false
 end
 
+---
+---@param name string
 function WaitForDialogue(name)
     while not ScenarioInfo.DialogueFinished[name] do
         WaitTicks(1)
     end
 end
 
+---
 function PlayUnlockDialogue()
     if Random(1, 2) == 1 then
         table.insert(Sync.Voice, {Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01370'})
@@ -796,34 +727,42 @@ function PlayUnlockDialogue()
     end
 end
 
--- Given a head and taunt number, tells the UI to play the relating taunt
+--- Given a head and taunt number, tells the UI to play the related taunt
+---@param head number
+---@param taunt number
 function PlayTaunt(head, taunt)
     Sync.MPTaunt = {head, taunt}
 end
 
--- Mission Text
-function DisplayMissionText(string)
+---
+---@param text string
+function DisplayMissionText(text)
     if not Sync.MissionText then
         Sync.MissionText = {}
     end
-    table.insert(Sync.MissionText, string)
+    table.insert(Sync.MissionText, text)
 end
 
--- Video Text
-function DisplayVideoText(string)
+---
+---@param text string
+function DisplayVideoText(text)
     if not Sync.VideoText then
         Sync.VideoText = {}
     end
-    table.insert(Sync.VideoText, string)
+    table.insert(Sync.VideoText, text)
 end
 
--- Play an NIS
+--- Plays an NIS
+---@param pathToMovie string
 function PlayNIS(pathToMovie)
     if not Sync.NISVideo then
         Sync.NISVideo = pathToMovie
     end
 end
 
+---
+---@param faction string
+---@param callback fun()
 function PlayEndGameMovie(faction, callback)
     if not Sync.EndGameMovie then
         Sync.EndGameMovie = faction
@@ -837,6 +776,8 @@ function PlayEndGameMovie(faction, callback)
     end
 end
 
+---
+---@param callback fun()
 function EndGameWaitThread(callback)
     while not ScenarioInfo.DialogueFinished['EndGameMovie'] do
         WaitTicks(1)
@@ -845,40 +786,43 @@ function EndGameWaitThread(callback)
     ScenarioInfo.DialogueFinished['EndGameMovie'] = false
 end
 
--- Plays an XACT sound if needed - currently all VOs are videos
+--- Plays an XACT sound if needed--currently all VOs are videos
+---@param voSound BpSound
 function PlayVoiceOver(voSound)
     table.insert(Sync.Voice, voSound)
-    local pauseHere = nil
 end
 
--- Set enhancement restrictions
--- Supply a table of  the names of enhancements you do not want the player to build
--- Example: {"Teleport", "ResourceAllocation"}
-function RestrictEnhancements(table)
-    local rest = {}
-    for _, e in table do
-        rest[e] = true
+--- Sets enhancement restrictions from the names of the enhancements you do not want the player to build
+---@param enhancements string[]
+function RestrictEnhancements(enhancements)
+    local restrict = {}
+    for _, enh in enhancements do
+        restrict[enh] = true
     end
 
-    SimUIVars.SaveEnhancementRestriction(rest)
-    import('/lua/enhancementcommon.lua').RestrictList(rest)
-    Sync.EnhanceRestrict = rest
+    SimUIVars.SaveEnhancementRestriction(restrict)
+    import('/lua/enhancementcommon.lua').RestrictList(restrict)
+    Sync.EnhanceRestrict = restrict
 end
 
--- Returns true if all units in group are dead
-function GroupDeathCheck(group)
-    for _, v in group do
-        if not v.Dead then
+--- Returns if all units in the group are dead
+---@param units Unit[]
+---@return boolean
+function GroupDeathCheck(units)
+    for _, unit in units do
+        if not unit.Dead then
             return false
         end
     end
     return true
 end
 
--- Iterates through objects in list.  if any in list are not true ... returns false
+--- Returns if the list is entirely truthy
+---@param list unknown
+---@return boolean
 function CheckObjectives(list)
-    for _, v in list do
-        if not v then
+    for _, val in list do
+        if not val then
             return false
         end
     end
