@@ -224,7 +224,6 @@ WorldView = Class(moho.UIWorldView, Control) {
         self.IgnoreMode = false
 
         self.Trash = TrashBag()
-        self.Trash:Add(ForkThread(self.TerrainScanningThread, self))
     end,
 
 
