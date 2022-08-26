@@ -42,15 +42,15 @@
 -- function: 1DE7E1C0 (BuilderParamCheck, id = 1) = { base instance }
 
 -- It allows us to track a function back to the base instance.
-local Hierarchy = {}
+Hierarchy = {}
 
 --- Debug utilities
 
 local enableDebugging = false
 
-local HierarchyDebugLookup = {}
-local HierarchyDebugLookupCFunctions = {}
-local HierarchyDebugLookupCount = {}
+HierarchyDebugLookup = {}
+HierarchyDebugLookupCFunctions = {}
+HierarchyDebugLookupCount = {}
 
 local function PrintHierarchy()
     -- cache for performance
@@ -157,12 +157,12 @@ function State(...)
     end
 end
 
----@overload fun(specs: fa-class): fa-class
 --- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
 ---construct a class
 ---@generic T: fa-class
----@param ... fa-class
----@return fun(specs: T): T
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
 function Class(...)
     -- arg = { 
     --     { 
@@ -176,10 +176,9 @@ function Class(...)
 
     -- Class ({ field=value, field=value, ... })
     if IsSimpleClass(arg) then
-        ---@type fa-class
-        local class = arg[1]
+        local class = arg[1] --[[@as fa-class]]
         setmetatable(class, ClassFactory)
-        return ConstructClass(nil, class)
+        return ConstructClass(nil, class) --[[@as unknown]]
     -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
     else
         local bases = { unpack (arg) }

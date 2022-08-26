@@ -25,6 +25,8 @@ local PlatoonFile = '/lua/platoon.lua'
 
 local AIAddBuilderTable = import('/lua/ai/AIAddBuilderTable.lua')
 
+---@alias BuildergroupsExperimentals 'MobileLandExperimentalEngineers' | 'MobileLandExperimentalForm' | 'MobileAirExperimentalEngineers' | 'MobileAirExperimentalForm' | 'SatelliteExperimentalEngineers' | 'SatelliteExperimentalForm' | 'MobileNavalExperimentalEngineers' | 'MobileNavalExperimentalForm' | 'EconomicExperimentalEngineers'
+
 BuilderGroup {
     BuilderGroupName = 'MobileLandExperimentalEngineers',
     BuildersType = 'EngineerBuilder',

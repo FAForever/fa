@@ -400,7 +400,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 0.5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             ProjectileId = '/projectiles/SDFSniperShot02/SDFSniperShot02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 1,

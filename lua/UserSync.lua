@@ -244,7 +244,7 @@ function OnSync()
     end
 
     if Sync.Cheaters then
-        # Ted, this is where you would hook in better cheater reporting.
+        --Ted, this is where you would hook in better cheater reporting.
         local names = ''
         local isare = LOC('<LOC cheating_fragment_0000>is')
         local srcs = SessionGetCommandSourceNames()

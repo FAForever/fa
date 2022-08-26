@@ -80,7 +80,42 @@ Useful extensions if you intent to work with shaders:
  - [HLSL Tools](https://marketplace.visualstudio.com/items?itemName=TimGJones.hlsltools)
  - [Hex editor](https://marketplace.visualstudio.com/items?itemName=ms-vscode.hexeditor)
 
-Note that we do not recommend the Lua language server. The game uses a slightly adjusted version of Lua. The syntax doesn't match. We also have a different import system. The Lua language server generates dozens of errors. And it is not equipped to work with our import system.
+Setup the FA Lua Extension
+----------------
+Releases can be found [here](https://github.com/FAForever/fa-lua-vscode-extension/releases). 
+
+To setup you will want to download the `.vsix` file and install it in VS Code. Follow the steps in the image and you will be able to select the extension file downloaded.  
+![Extension install](/images/setup/extension-install.png)
+> Note: Whenever there is a new version of the extension you will have to download it and install it again
+
+Once you have it installed you're good to go for the FAF repo. For mod/map folders will be a different setup process (TODO, write guide for maps/mods).
+
+Using the in game debugger
+----------------------
+[Thanks to Ejsstiil](https://github.com/FAForever/fa/pull/3938) the in-game debugger is working again.
+
+### To invoke the Lua debugger, you can use:
+
+* <kbd>Alt</kbd> + <kbd>F9</kbd> - the default keybind (this sometimes works only after you invoked binds menu (<kbd>F1</kbd>) first)
+* in game console `SC_LuaDebugger`
+* on cmdline `/debug` (most convenient for dev)
+
+### Controls
+* <kbd>double</kbd> <kbd>click</kbd> on the line sets the breakpoint
+* <kbd>F5</kbd> resume execution
+* <kbd>F10</kbd> step-in (can't find any way how to do step-over)
+* <kbd>Ctrl</kbd> + <kbd>G</kbd> goto line
+* <kbd>Ctrl</kbd> + <kbd>R</kbd> reloads the file
+
+Tips:
+
+* If you have a breakpoint set in the frequently used includes, it can significantly slow the game in general, even when your breakpoint is not being hit, better you disable or delete all breakpoints, then set it just before you need it
+* due to the above, sometimes game seems froze-up, but you can just wait (or kill game) and clear all breakpoints right after
+
+![preview](https://github.com/assets/36369441/8ab2b65c-d208-48d7-87d0-2676093e8ebd)
+
+
+
 
 Attaching the debugger
 ----------------------
@@ -140,6 +175,17 @@ Then what happens is:
  - `lua/sim/unit.lua` = `lua/sim/unit.lua` + `schook/lua/unit.lua` + `mods/my-mod/hook/lua/unit.lua`
 
 Where the addition operator should be interpreted as appending one text (source) file to the other text (source) file. this extents the unit file. This hooking is done when a file is imported for the first time. The directory that is used for hooks can be configured in the initialization files.
+
+Tips
+----
+
+Helpful hotkeys and resource you can use in game
+
+* <kbd>Alt</kbd> + <kbd>F2</kbd> to invoke the unit spawning page, great for making units for free or taking control of an AI.
+* <kbd>F9</kbd> to open the log window if you close it or it's not open for whatever reason.
+* <kbd>~</kbd> to Open the Console
+* In the Console run `ren_ShowNetworkStats` for the sim rate / package drops, on the top right
+* In the Console run `ShowStats` for engine stats, on the left
 
 Frequently asked Questions (FAQ)
 --------------------------------
