@@ -72,8 +72,9 @@ function ChainToPositions(chainName)
         error('ERROR: Invalid Chain Named- ' .. chainName, 2)
     end
     local positionTable = {}
-    for num, marker in chain.Markers do
-        table.insert(positionTable, Scenario.MasterChain._MASTERCHAIN_.Markers[marker]['position'])
+    local markers = Scenario.MasterChain._MASTERCHAIN_.Markers
+    for i, marker in chain.Markers do
+        positionTable[i] = markers[marker]['position']
     end
     return positionTable
 end
@@ -121,11 +122,45 @@ end
 ---@return Rectangle
 function AreaToRect(strArea)
     local area = Scenario.Areas[strArea]
+
+--- Converts a marker as specified in `*_save.lua` file to a position
+---@param markerName string
+---@return Vector
+function MarkerToPosition(markerName)
+    local marker = GetMarker(markerName)
+    if not marker then
+        error('ERROR: Invalid marker name- ' .. markerName)
+    end
+    return marker.position
+end
+
+--- Converts an area as specified in `*_save.lua` file to a rectangle
+---@param areaName Area
+---@return Rectangle
+function AreaToRect(areaName)
+    local area = Scenario.Areas[areaName]
+
     if not area then
         error('ERROR: Invalid area name')
     end
     local rectangle = area.rectangle
-    return Rect(rectangle[1],rectangle[2],rectangle[3],rectangle[4])
+    return Rect(rectangle[1], rectangle[2], rectangle[3], rectangle[4])
+end
+
+--- Converts an array of areas to a new array of rectangles, also transfering already well-formed
+--- rectangles
+---@param areas (Area | Rectangle)[]
+---@return Rectangle[]
+function MultiAreaToMultiRect(areas)
+    local rects = {}
+    for i, area in areas do
+        if type(area) == 'string' then
+            rects[i] = AreaToRect(area)
+        else
+            rects[i] = area
+        end
+    end
+    return rects
 end
 
 ---@param vectorPos Vector
@@ -1759,6 +1794,63 @@ function FilterFunctions(tableOne, tableTwo)
         end
     end
     return tableOne
+end
+
+-- kept for mod backwards compatibility
+local Entity = import('/lua/sim/Entity.lua').Entity
+
+--- Gets the units in `rectangles` that belong to a category and how many. The units can
+--- optionally be required to belong to a brain or be fully built. If there are no units,
+--- it does not return `nil`; compare the second return value to 0 as needed. `rectangles`
+--- doesn't name accept named areas; use `MultiAreaToMultiRect` if you need.
+---@param rectangles Rectangle[]
+---@param category EntityCategory
+---@param aiBrain? AIBrain
+---@param requireBuilt? boolean
+---@return Unit[] units
+---@return number count
+function GetUnitsInMultiRect(category, rectangles, aiBrain, requireBuilt)
+    local entitiesInArea = {}
+    local entitiesInAreaCount = 0
+    for _, rect in rectangles do
+        local units = GetUnitsInRect(rect)
+        if units then
+            units = EntityCategoryFilterDown(category, units)
+            for _, unit in units do
+                if (aiBrain and unit:GetAIBrain() == aiBrain) and
+                    not (requireBuilt and unit:IsBeingBuilt())
+                then
+                    entitiesInAreaCount = entitiesInAreaCount + 1
+                    entitiesInArea[entitiesInAreaCount] = unit
+                end
+            end
+        end
+    end
+    return entitiesInArea, entitiesInAreaCount
+end
+
+--- Finds the first unit in `rectangles` that belongs to a category. The unit can optionally
+--- be required to belong to a brain or be fully built. `rectangles` doesn't name accept named
+--- areas; use `MultiAreaToMultiRect` if you need.
+---@param rectangles Rectangle[]
+---@param category EntityCategory
+---@param aiBrain? AIBrain
+---@param requireBuilt? boolean
+---@return Unit | nil unit
+function FindUnitInMultiRect(rectangles, category, aiBrain, requireBuilt)
+    for _, rect in rectangles do
+        local units = GetUnitsInRect(rect)
+        if units then
+            units = EntityCategoryFilterDown(category, units)
+            for _, unit in units do
+                if  (aiBrain and unit:GetAIBrain() == aiBrain) and
+                    not (requireBuilt and unit:IsBeingBuilt())
+                then
+                    return unit
+                end
+            end
+        end
+    end
 end
 
 -- kept for mod backwards compatibility

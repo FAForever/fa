@@ -11,6 +11,7 @@ local TriggerFile = import('/lua/scenariotriggers.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
+---@class TriggerManager
 Manager = {
 
     TriggerList = {},
