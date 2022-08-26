@@ -4,7 +4,7 @@
 -- ScrollBar:ScrollLines(float lines)
 -- ScrollBar:ScrollPages(float pages)
 
-local Control = import('control.lua').Control
+local Control = import('/lua/maui/control.lua').Control
 
 ScrollAxis = {
     Vert = "Vert",

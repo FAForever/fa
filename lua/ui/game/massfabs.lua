@@ -21,6 +21,7 @@ function Update(data)
     end
 end
 
+---@class MassFabPanel : Group
 MassFabPanel = Class(Group) {
 
     DefaultHeight = 72,

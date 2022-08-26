@@ -64,7 +64,7 @@ local TrashBagAdd = TrashBag.Add
 
 --- A class to managing the build bots. Make sure to call all the relevant functions.
 ---@class CConstructionTemplate : 
-CConstructionTemplate = Class() {
+CConstructionTemplate = ClassSimple {
 
     --- Prepares the values required to support bots
     OnCreate = function(self)

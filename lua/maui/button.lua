@@ -1,5 +1,5 @@
-local Bitmap = import('bitmap.lua').Bitmap
-local Dragger = import('dragger.lua').Dragger
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Dragger = import('/lua/maui/dragger.lua').Dragger
 local UIUtil = import('/lua/ui/uiutil.lua')
 
 ---@class Button : Bitmap

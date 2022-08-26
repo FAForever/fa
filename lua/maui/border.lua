@@ -12,8 +12,9 @@
 -- vars.  You can change 'em afterwards if you want to streatch your
 -- border textures.
 
-local Control = import('control.lua').Control
+local Control = import('/lua/maui/control.lua').Control
 
+---@class Border : moho.border_methods, Control
 Border = Class(moho.border_methods, Control) {
 
     __init = function(self, parent, debugname)

@@ -1,5 +1,5 @@
 ---@class NukeAOE
-NukeAOE = Class() {
+NukeAOE = ClassSimple {
     Damage = false,
     Radius = false,
     Ticks = false,
