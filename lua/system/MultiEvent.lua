@@ -4,7 +4,7 @@
 --
 -- You can't remove a callback once you've added it.
 ---@class MultiEvent
-MultiEvent = Class() {
+MultiEvent = ClassSimple {
     __init = function(self)
         self.EventCallbacks = {n=0}
         self.EventIsSet = false

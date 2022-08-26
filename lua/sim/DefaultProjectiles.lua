@@ -490,7 +490,7 @@ BaseGenericDebris = Class(DummyProjectile) {
 -----------------------------------------------------------
 
 ---@class OverchargeProjectile
-OverchargeProjectile = Class() {
+OverchargeProjectile = ClassSimple {
     OnImpact = function(self, targetType, targetEntity)
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
         self.DamageData.DamageAmount = 0
