@@ -23,6 +23,8 @@ local SAI = '/lua/ScenarioPlatoonAI.lua'
 local TBC = '/lua/editor/ThreatBuildConditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
+---@alias BuilderGroupsEconomic 'EngineerFactoryBuilders' | 'Engineer Transfers' | 'Land Rush Initial ACU Builders' | 'Balanced Rush Initial ACU Builders' | 'Air Rush Initial ACU Builders' | 'Naval Rush Initial ACU Builders' | 'Default Initial ACU Builders' | 'ACUBuilders' | 'ACUUpgrades - Gun improvements' | 'ACUUpgrades - Tech 2 Engineering' | 'ACUUpgrades - Shields' | 'ACUUpgrades' | 'T1EngineerBuilders' | 'T2EngineerBuilders' | 'T3EngineerBuilders' | 'EngineerMassBuildersHighPri' | 'EngineerMassBuilders - Naval' | 'EngineerMassBuildersLowerPri' | 'EngineerMassBuildersMidPriSingle' | 'EngineerEnergyBuilders' | 'EngineerEnergyBuildersExpansions' | 'EngineeringSupportBuilder'
+
 BuilderGroup {
     BuilderGroupName = 'EngineerFactoryBuilders',
     BuildersType = 'FactoryBuilder',

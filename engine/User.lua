@@ -1105,6 +1105,17 @@ end
 function TeamColorMode(mode)
 end
 
+---
+-- TeamColorMode
+-- Now also supports string with hex colors
+-- Colors separated by commas, no spaces. Example:
+-- TeamColorMode("ffffffff,ffff32ff,ffb76518,ffa79602")
+-- colors will be applied to army according to its index. first color -> army with index 1, second color -> 2 etc.
+
+function INFO: TeamColorMode(bool/string)()
+end
+
+
 -- TODO: do these kinds of functions (that duplicate in `Unit.lua`) also accept single units
 -- like some of the other functions alude to?
 

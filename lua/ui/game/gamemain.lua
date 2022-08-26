@@ -145,32 +145,17 @@ end
 
 function CreateUI(isReplay)
 
-    ForkThread(
-        function()
-    
-            local thread = false
-            local trash = TrashBag()
-    
-            local curr = import('/lua/ui/game/rangeRings.lua')
-            local prev = false
-    
-            while true do
-    
-                curr = import('/lua/ui/game/rangeRings.lua')
-                if curr ~= prev then
-                    trash:Destroy()
-                    thread = curr.CreateTestRings(trash)
-                    prev = curr
-                end
-    
-                WaitFrames(1)
-            end
-        end
-    )
+    -- # Overwrite some globals for performance / safety
 
-    -- override some UI globals
-    import("/lua/ui/override/ArmiesTable.lua").Setup()
-    import("/lua/ui/override/SessionClients.lua").Setup()
+    import('/lua/ui/override/Exit.lua')
+    import('/lua/ui/override/ArmiesTable.lua')
+    import('/lua/ui/override/SessionClients.lua')
+
+    -- # Track performance
+
+    import('/lua/system/performance.lua')
+
+    -- # Overwrite some globals for performance / safety
 
     -- ensure logger is turned off for the average user
     if not GetPreference('debug.enable_debug_facilities') then

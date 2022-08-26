@@ -137,10 +137,6 @@ end
 function Unit:GetBlueprint()
 end
 
----@return UnitBlueprint
-function Unit:GetBlueprint()
-end
-
 --- Returns the build rate of a unit
 --- @return rate
 function Unit:GetBuildRate()
@@ -291,7 +287,9 @@ function Unit:GetUnitId()
 end
 
 ---
----@return Vector
+---@return number x
+---@return number y
+---@return number z
 function Unit:GetVelocity()
 end
 

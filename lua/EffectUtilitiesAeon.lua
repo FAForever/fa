@@ -181,7 +181,7 @@ local function SharedBuildThread(pool, unitBeingBuilt, trash, onStopBeingBuiltTr
     -- -- Determine offset for hover units
     local offset = 0
     local slider = nil
-    if unitBeingBuilt.Cache.HashedCats["HOVER"] then
+    if unitBeingBuilt.Blueprint.CategoriesHash["HOVER"] then
         -- set elevation offset
         offset = unitBeingBuilt.Blueprint.Elevation or 0
         -- create a slider

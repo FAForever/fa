@@ -911,8 +911,80 @@ options = {
                     },
                 },
             },
+
             {
-                title = "<LOC spawnmenu001>Spawn Menu: Team Columns",
+                title = 'Control groups',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC selectionsets0001>Set behavior",
+                key = 'selection-sets-add-behavior',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC selectionsets0002>Default", key = false },
+                        {text = "<LOC selectionsets0003>Steal from other control groups", key = true },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC selectionsets0004>Factory behavior",
+                key = 'selection-sets-production-behavior',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC selectionsets0005>Add to control group of factory", key = true },
+                        {text = "<LOC selectionsets0006>Do nothing", key = false },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC selectionsets0007>Double tap behavior",
+                key = 'selection-sets-double-tap-behavior',
+                type = 'toggle',
+                default = 'translate-zoom',
+                custom = {
+                    states = {
+                        {text = "<LOC selectionsets0008>Do nothing", key = 'none' },
+                        {text = "<LOC selectionsets0009>Only translate", key = 'translate' },
+                        {text = "<LOC selectionsets00010>Translate, zoom only out", key = 'translate-zoom-out-only' },
+                        {text = "<LOC selectionsets00011>Translate and zoom", key = 'translate-zoom' },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC selectionsets0001>Double tap decay (in ms)",
+                key = 'selection-sets-double-tap-decay',
+                type = 'slider',
+                default = 1000,
+                custom = {
+                    min = 50,
+                    max = 2000,
+                    inc = 10,
+                },
+            },
+
+            {
+                title = 'Spawn menu',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC spawnmenu001>Team Columns",
                 key = 'spawn_menu_team_columns',
                 type = 'slider',
                 default = 4,
@@ -923,7 +995,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu002>Spawn Menu: Filter Columns",
+                title = "<LOC spawnmenu002>Filter Columns",
                 key = 'spawn_menu_filter_columns',
                 type = 'slider',
                 default = 6,
@@ -934,7 +1006,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu003>Spawn Menu: Split Sources",
+                title = "<LOC spawnmenu003>Split Sources",
                 key = 'spawn_menu_split_sources',
                 type = 'toggle',
                 default = 0,
@@ -946,7 +1018,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu004>Spawn Menu: Type Filter Mode",
+                title = "<LOC spawnmenu004>Type Filter Mode",
                 key = 'spawn_menu_type_filter_mode',
                 type = 'toggle',
                 default = 0,
@@ -958,7 +1030,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu005>Spawn Menu: Include No-tech Filter",
+                title = "<LOC spawnmenu005>Include No-tech Filter",
                 key = 'spawn_menu_notech_filter',
                 type = 'toggle',
                 default = 1,
@@ -970,7 +1042,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu006>Spawn Menu: Include ACU/Paragon Filter",
+                title = "<LOC spawnmenu006>Include ACU/Paragon Filter",
                 key = 'spawn_menu_paragon_filter',
                 type = 'toggle',
                 default = 0,
@@ -982,7 +1054,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu007>Spawn Menu: Filter By Menu Sort",
+                title = "<LOC spawnmenu007>Filter By Menu Sort",
                 key = 'spawn_menu_filter_menu_sort',
                 type = 'toggle',
                 default = 1,

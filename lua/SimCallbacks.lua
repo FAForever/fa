@@ -522,10 +522,6 @@ Callbacks.OnControlGroupAssign = function(units)
     end
 end
 
-Callbacks.OnControlGroupApply = function(units)
-    --LOG(repr(units))
-end
-
 local SimCamera = import('/lua/SimCamera.lua')
 
 Callbacks.OnCameraFinish = SimCamera.OnCameraFinish
@@ -564,10 +560,13 @@ function IsInvalidAssist(unit, target)
 end
 
 Callbacks.AttackMove = function(data, units)
+    -- exclude structures as it makes no sense to apply a move command to them
+    local allNonStructures = EntityCategoryFilterDown(categories.ALLUNITS - categories.STRUCTURE, units)
+
     if data.Clear then
-        IssueClearCommands(units)
+        IssueClearCommands(allNonStructures)
     end
-    IssueAggressiveMove(units, data.Target)
+    IssueAggressiveMove(allNonStructures, data.Target)
 end
 
 --tells a unit to toggle its pointer

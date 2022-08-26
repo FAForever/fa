@@ -19,6 +19,7 @@ local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
 local MIBC = '/lua/editor/MiscBuildConditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
 
+---@class NavalOpAI : OpAI
 NavalOpAI = Class(OpAI) {
     Create = function(self, brain, location, name, data)
         local bManager = brain.BaseManagers[location]

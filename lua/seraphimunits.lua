@@ -335,6 +335,7 @@ SEnergyCreationUnit = Class(EnergyCreationUnit) {
 SEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
 -- HOVERING LAND UNITS
+---@class SHoverLandUnit : HoverLandUnit
 SHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
     FxHoverScale = 1,
     HoverEffects = nil,
@@ -422,6 +423,7 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
 }
 
 -- LAND UNITS
+---@class SLandUnit : LandUnit
 SLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
@@ -525,6 +527,7 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
 }
 
 -- SEA UNITS
+---@class SSeaUnit : SeaUnit
 SSeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
 
 -- SHIELD LAND UNITS
@@ -562,18 +565,22 @@ SShieldStructureUnit = Class(ShieldStructureUnit) {
 SStructureUnit = Class(StructureUnit) {}
 
 -- SUBMARINE UNITS
+---@class SSubUnit : SubUnit
 SSubUnit = Class(DefaultUnitsFile.SubUnit) {
     IdleSubBones = {},
     IdleSubEffects = {}
 }
 
 -- TRANSPORT BEACON UNITS
+---@class STransportBeaconUnit : TransportBeaconUnit
 STransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 
 -- WALKING LAND UNITS
+---@class SWalkingLandUnit : WalkingLandUnit
 SWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 -- WALL  STRUCTURES
+---@class SWallStrutureUnit : WallStructureUnit
 SWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES

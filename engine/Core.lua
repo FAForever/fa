@@ -93,7 +93,7 @@ function EntityCategoryEmpty(categories)
 end
 
 --- Computes a list of unit blueprint names that match the categories
----@param categories Categories
+---@param categories EntityCategory
 ---@return string[]
 function EntityCategoryGetUnitList(categories)
 end
@@ -237,7 +237,7 @@ function RegisterProjectileBlueprint(spec)
 end
 
 --- Define a prop, only works in `blueprints.lua`
-v
+---@param spec any
 function RegisterPropBlueprint(spec)
 end
 

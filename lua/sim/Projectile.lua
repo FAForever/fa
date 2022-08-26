@@ -159,6 +159,8 @@ Projectile = Class(moho.projectile_methods) {
         if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then
             if other.Blueprint.CategoriesHash["ANTIMISSILE"] then
                 return other.OriginalTarget == self
+            else
+                return false
             end
         end
 
