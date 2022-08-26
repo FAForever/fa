@@ -344,8 +344,13 @@ options = {
             },
 
             {
-                
-            }
+                title = 'Selection threshold',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
 
             {
                 title = "Regular selection threshold",
@@ -356,7 +361,7 @@ options = {
                 custom = {
                     min = 10,
                     max = 200,
-                    inc = 2,
+                    inc = 10,
                 },
             },
 
@@ -369,7 +374,7 @@ options = {
                 custom = {
                     min = 10,
                     max = 200,
-                    inc = 2,
+                    inc = 10,
                 },
             },
 

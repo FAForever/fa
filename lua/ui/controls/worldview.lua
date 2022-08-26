@@ -18,7 +18,6 @@ local WorldViewMgr = import('/lua/ui/game/worldview.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local OverchargeCanKill = import('/lua/ui/game/unitview.lua').OverchargeCanKill
 local CommandMode = import('/lua/ui/game/commandmode.lua')
-local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -225,6 +224,22 @@ WorldView = Class(moho.UIWorldView, Control) {
         self.Trash = TrashBag()
     end,
 
+    SetDefaultSelectTolerance = function(self)
+        local tolerance
+        if SessionIsReplay() then
+            tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_replay')
+        else 
+            tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_regular')
+        end
+
+        ConExecute(string.format("ui_SelectTolerance %i", tolerance))
+    end,
+
+    SetReclaimSelectTolerance = function(self)
+        local tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_reclaim')
+        ConExecute(string.format("ui_SelectTolerance %i", tolerance))
+    end,
+
 
     --- Only accept move and attack move commands, ignore everything else
     ---@param self any
@@ -234,7 +249,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             ConExecute("ui_SelectTolerance -1000")
         else
             ConExecute("ui_CommandClickScale 1")
-            ConExecute("ui_SelectTolerance 7")
+            self:SetDefaultSelectTolerance()
         end
     end,
 
@@ -328,10 +343,7 @@ WorldView = Class(moho.UIWorldView, Control) {
         -- attempt to create a new cursor
         if event and self[event] then
             self[event](self, identifier, true, event ~= self.CursorLastEvent)
-            if event ~= self.CursorLastEvent then 
-                LOG(event)
-            end
-        else 
+        else
             self:OnCursorReset(identifier, true, event ~= self.CursorLastEvent)
         end
 
@@ -606,7 +618,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             if changed then
 
                 if viaCommandMode then
-                    ConExecute("ui_SelectTolerance 100")
+                    self:SetReclaimSelectTolerance()
                 end
 
                 self.ViaCommandModeOld = viaCommandMode
@@ -623,9 +635,9 @@ WorldView = Class(moho.UIWorldView, Control) {
 
                 if viaCommandMode ~= self.ViaCommandModeOld then
                     if not viaCommandMode then
-                        ConExecute("ui_SelectTolerance 7")
+                        self:SetDefaultSelectTolerance()
                     else
-                        ConExecute("ui_SelectTolerance 50")
+                        self:SetReclaimSelectTolerance()
                     end
 
                     self.ViaCommandModeOld = viaCommandMode
@@ -633,7 +645,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             end
         else
             if not self.IgnoreMode then
-                ConExecute("ui_SelectTolerance 7")
+                self:SetDefaultSelectTolerance()
             end
         end
     end,
