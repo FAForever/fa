@@ -14,6 +14,7 @@ local GetEconomyStoredRatio = moho.aibrain_methods.GetEconomyStoredRatio
 local GetEconomyIncome = moho.aibrain_methods.GetEconomyIncome
 local GetEconomyRequested = moho.aibrain_methods.GetEconomyRequested
 local GetEconomyStored = moho.aibrain_methods.GetEconomyStored
+local ParagonCat = categories.ENERGYPRODUCTION * categories.EXPERIMENTAL * categories.STRUCTURE
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
@@ -165,7 +166,7 @@ end
 ---@param EnergyIncome integer
 ---@return boolean
 function GreaterThanEconIncome(aiBrain, MassIncome, EnergyIncome)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, categories.ENERGYPRODUCTION * categories.EXPERIMENTAL * categories.STRUCTURE) then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return true
     end
@@ -181,7 +182,7 @@ end
 ---@param EnergyIncome integer
 ---@return boolean
 function LessThanEconIncome(aiBrain, MassIncome, EnergyIncome)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, categories.ENERGYPRODUCTION * categories.EXPERIMENTAL * categories.STRUCTURE) then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return false
     end
@@ -197,7 +198,7 @@ end
 ---@param EnergyEfficiency integer
 ---@return boolean
 function GreaterThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, categories.ENERGYPRODUCTION * categories.EXPERIMENTAL * categories.STRUCTURE) then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return true
     end
@@ -215,7 +216,7 @@ end
 ---@param EnergyEfficiency integer
 ---@return boolean
 function LessThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, categories.ENERGYPRODUCTION * categories.EXPERIMENTAL * categories.STRUCTURE) then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return false
     end
@@ -233,7 +234,7 @@ end
 ---@param EnergyEfficiency integer
 ---@return boolean
 function GreaterThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficiency)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, categories.ENERGYPRODUCTION * categories.EXPERIMENTAL * categories.STRUCTURE) then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return true
     end
@@ -250,7 +251,7 @@ end
 ---@param EnergyEfficiency integer
 ---@return boolean
 function LessThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficiency)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, categories.ENERGYPRODUCTION * categories.EXPERIMENTAL * categories.STRUCTURE) then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return false
     end
