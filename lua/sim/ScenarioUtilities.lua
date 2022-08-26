@@ -104,31 +104,6 @@ function GetMarkerChain(name)
     return chain
 end
 
----MarkerToPosition
----Converts a marker as specified in *_save.lua file to a position.
----@param strMarker Marker
----@return Vector
-function MarkerToPosition(strMarker)
-    local marker = GetMarker(strMarker)
-        if not marker then
-            error('ERROR: Invalid marker name- '..strMarker)
-        end
-    return marker.position
-end
-
----AreaToRect
----Converts an area as specified in *_save.lua file to a rectangle.
----@param areaName Area
----@return Rectangle
-function AreaToRect(areaName)
-    local area = Scenario.Areas[areaName]
-    if not area then
-        error('ERROR: Invalid area name')
-    end
-    local rectangle = area.rectangle
-    return Rect(rectangle[1], rectangle[2], rectangle[3], rectangle[4])
-end
-
 --- Converts a marker as specified in `*_save.lua` file to a position
 ---@param markerName Marker
 ---@return Vector
