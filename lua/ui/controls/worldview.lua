@@ -607,8 +607,8 @@ WorldView = Class(moho.UIWorldView, Control) {
             reference = reference .. 'Disabled'
 
         -- this won't trigger because `GetRightMouseButtonOrder` always returns nil once we're in command mode
-        elseif viaCommandMode and (not viaRightMouseButton) then
-            reference = reference .. 'Invalid'
+        -- elseif viaCommandMode and (not viaRightMouseButton) then
+        --     reference = reference .. 'Invalid'
         end
 
         local cursor = self.Cursor
