@@ -362,7 +362,7 @@
 ---@field MinSpeedPercent number
 ---@field MotionType UnitMotionType  Method of locomotion.
 ---@field OccupyRects string         Set up the occupy rectangles of the unit that will override the footprint.
----@field RaisedPlatforms string     Raised platform definition for ground units to move on.
+---@field RaisedPlatforms table<number> Raised platform definition for ground units to move on.
 ---@field RollDamping number         How much damping there is against rolling motion (1 = no motion at all).
 ---@field RollStability number       How stable the unit is against rolling (0 to 1).
 ---@field RollOffPoints UnitRollOffPoint[]

@@ -36,7 +36,7 @@
 ---@field TurnRateRange number            Random variation around TurnRate
 ---@field Lifetime number                 Numbers of seconds I'm alive
 ---@field LifetimeRange number            Random variation around Lifetime
----@field InitialSpeed boolean            Initial speed for the projectile.
+---@field InitialSpeed number             Initial speed for the projectile.
 ---@field InitialSpeedRange number        Random variation around InitialSpeed
 ---@field MaxSpeed number                 Maximum speed for the Projectile
 ---@field MaxSpeedRange number            Random variation around MaxSpeed

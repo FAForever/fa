@@ -188,6 +188,7 @@ end
 ---@param language Language
 function HasLocalizedVO(language)
 end
+
 ---
 ---@param army1 number
 ---@param army2 number
@@ -259,7 +260,7 @@ function OrientFromDir(vector)
 end
 
 --- Parse a string to generate a new entity category
----@param cat string
+---@param cat UnparsedCategory
 ---@return EntityCategory
 function ParseEntityCategory(cat)
 end
@@ -286,8 +287,9 @@ end
 function Random(min, max)
 end
 
---- RPCSound({cue,bank,cutoff}) - Make a sound parameters object
----@param sound { cue:string, bank:string, cutoff:number }
+--- Make a sound parameters object. Note that this does not
+--- take the same parameter that `Sound` does, this requires lowercase fields.
+---@param sound {cue: string, bank: string, cutoff: number}
 function RPCSound(sound)
 end
 
