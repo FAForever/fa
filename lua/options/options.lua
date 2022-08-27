@@ -344,6 +344,28 @@ options = {
             },
 
             {
+                title = 'Commands',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "Ignore mode via CTRL",
+                key = 'commands_ignore_mode',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _On>", key = 'on'},
+                    },
+                },
+            },
+
+            {
                 title = 'Selection threshold',
                 type = 'header',
 

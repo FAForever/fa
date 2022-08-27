@@ -193,6 +193,14 @@ local orderToCursorCallback = {
 }
 
 ---@class WorldView : moho.UIWorldView, Control
+---@field Cursor table
+---@field CursorTrash TrashBag
+---@field CursorLastEvent any
+---@field CursorLastIdentifier CommandCap
+---@field CursorDecals UserDecal[]
+---@field CursorOverWorld boolean
+---@field IgnoreMode boolean
+---@field Trash TrashBag
 WorldView = Class(moho.UIWorldView, Control) {
 
     PingThreads = {},
@@ -224,6 +232,8 @@ WorldView = Class(moho.UIWorldView, Control) {
         self.Trash = TrashBag()
     end,
 
+    --- Sets the selection tolerance to ignore everything
+    ---@param self any
     SetIgnoreSelectTolerance = function(self)
         local tolerance = -1000
         if tolerance != self.SelectionTolerance then
@@ -232,6 +242,8 @@ WorldView = Class(moho.UIWorldView, Control) {
         end
     end,
 
+    --- Reverts the selection tolerance back to the default
+    ---@param self any
     SetDefaultSelectTolerance = function(self)
         local tolerance
         if SessionIsReplay() then
@@ -246,6 +258,8 @@ WorldView = Class(moho.UIWorldView, Control) {
         end
     end,
 
+    --- Sets the selection tolerance to make it easier to reclaim
+    ---@param self any
     SetReclaimSelectTolerance = function(self)
         local tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_reclaim')
 
@@ -271,7 +285,7 @@ WorldView = Class(moho.UIWorldView, Control) {
     --- Checks and toggles the ignore mode which only processes move and attack move commands
     ---@param self WorldView
     CheckIgnoreMode = function(self)
-        return IsKeyDown(KeyCodeCtrl) and not IsKeyDown(KeyCodeShift) -- shift key
+        return IsKeyDown(KeyCodeCtrl) and not IsKeyDown(KeyCodeShift) and Prefs.GetFromCurrentProfile('options.commands_ignore_mode') == 'on' -- shift key
     end,
 
     --- Returns true if the reclaim command can be applied
