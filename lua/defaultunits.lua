@@ -1955,7 +1955,7 @@ AirUnit = Class(MobileUnit) {
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
 local slotsData = {}
 ---@class BaseTransport 
-BaseTransport = Class() {
+BaseTransport = ClassSimple {
 
     ---@param self BaseTransport
     ---@param attachBone Bone

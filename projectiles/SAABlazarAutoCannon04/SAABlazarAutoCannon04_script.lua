@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Blazar AA AutoCannon Projectile script, XSB2304
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 SAABlazarAutoCannon04 = Class(import('/lua/seraphimprojectiles.lua').SBlazarAAAutoCannon) {

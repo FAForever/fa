@@ -9,7 +9,8 @@ local setmetatable = setmetatable
 
 local EvalContext = nil
 
-local LazyVarMetaTable = { }
+---@class LazyVar
+local LazyVarMetaTable = {}
 
 LazyVarMetaTable.__index = LazyVarMetaTable
 
