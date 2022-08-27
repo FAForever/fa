@@ -259,7 +259,7 @@ local function InitOriginalBlueprints()
         Prop = {},
         ---@type ProjectileBlueprint[]
         Projectile = {},
-        ---@type TrailEmitterBlueprint[]
+        ---@type TrailBlueprint[]
         TrailEmitter = {},
         ---@type EmitterBlueprint[]
         Emitter = {},
@@ -497,7 +497,7 @@ function ProjectileBlueprint(bp)
     StoreBlueprint('Projectile', bp)
 end
 
----@param bp TrailEmitterBlueprint
+---@param bp TrailBlueprint
 function TrailEmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('TrailEmitter', bp)

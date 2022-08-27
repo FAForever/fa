@@ -4,7 +4,7 @@
 local ReconBlip = {}
 
 ---
----@return Blueprint
+---@return UnitBlueprint
 function ReconBlip:GetBlueprint()
 end
 

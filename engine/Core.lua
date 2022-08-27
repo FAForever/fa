@@ -144,8 +144,9 @@ function ForkThread(callback, ...)
 end
 
 --- Get the blueprint of an object
+---@overload fun(weapon: Entity): EntityBlueprint
 ---@overload fun(mesh: Mesh): MeshBlueprint
----@overload fun(effect: moho.IEffect): TrailEmitterBlueprint | BeamBlueprint
+---@overload fun(effect: moho.IEffect): EffectBlueprint
 ---@overload fun(projectile: Projectile): ProjectileBlueprint
 ---@overload fun(prop: Prop): PropBlueprint
 ---@overload fun(unit: UserUnit | Unit): UnitBlueprint
@@ -324,7 +325,7 @@ function RegisterPropBlueprint(spec)
 end
 
 --- Defile a poly trail emitter, only works in `blueprints.lua`
----@param spec TrailEmitterBlueprint
+---@param spec TrailBlueprint
 function RegisterTrailEmitterBlueprint(spec)
 end
 
