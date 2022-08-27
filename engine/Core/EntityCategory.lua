@@ -1,7 +1,9 @@
 ---@meta
 
 ---@class moho.EntityCategory
----@operator add(a, b)
+---@operator add(moho.EntityCategory): moho.EntityCategory
+---@operator mul(moho.EntityCategory): moho.EntityCategory
+---@operator sub(moho.EntityCategory): moho.EntityCategory
 local EntityCategory = {}
 
 ---@alias UnparsedCategory string
