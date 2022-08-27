@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.blip_methods : moho.entity_methods
 local ReconBlip = {}
 

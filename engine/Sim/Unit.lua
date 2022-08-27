@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.unit_methods : moho.entity_methods
 local Unit = {}
 

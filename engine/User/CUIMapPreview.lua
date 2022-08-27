@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.ui_map_preview_methods : moho.control_methods
 local CUIMapPreview = {}
 

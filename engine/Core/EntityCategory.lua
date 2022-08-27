@@ -1,6 +1,9 @@
----@declare-global
+---@meta
+
 ---@class moho.EntityCategory
 local EntityCategory = {}
+
+---@alias UnparsedCategory string
 
 --- Return the union between two categories
 ---@param augend moho.EntityCategory

@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.world_mesh_methods
 local CUIWorldMesh = {}
 

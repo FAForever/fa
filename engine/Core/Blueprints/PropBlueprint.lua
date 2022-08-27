@@ -1,7 +1,6 @@
 ---@meta
----@declare-global
 
----@class PropBlueprint: Blueprint
+---@class PropBlueprint: EntityBlueprint
 ---@field Display PropBlueprintDisplay Display information for the unit
 ---@field Defense PropBlueprintDefense Defense information for the unit
 

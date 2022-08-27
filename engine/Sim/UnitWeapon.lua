@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 

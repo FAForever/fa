@@ -1,7 +1,6 @@
 ---@meta
----@declare-global
 
----@class ProjectileBlueprint: Blueprint
+---@class ProjectileBlueprint: EntityBlueprint
 ---@field DevStatus unknown                Development status 
 ---@field Display ProjectileBlueprintDisplay Display information for the Projectile
 ---@field Economy ProjectileBlueprintEconomy Economy information for the unit

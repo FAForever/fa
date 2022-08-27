@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.CDamage This particular class is not made approachable in Lua, and it appears to be unfinished implementation-wise. This is therefore merely a dummy class
 ---@deprecated
 local CDamage = {}

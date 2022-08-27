@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.navigator_methods This particular class is not made approachable in Lua, and it appears to be unfinished implementation-wise. This is therefore merely a dummy class
 local CNavigator = {}
 

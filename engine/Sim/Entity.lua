@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.entity_methods
 local Entity = {}
 
@@ -288,11 +289,8 @@ end
 function Entity:SetAmbientSound(paramTableDetail, paramTableRumble)
 end
 
----
---  Entity:SetCollisionShape(['Box'|'Sphere'|'None'], centerX, Y, Z, size) -- size is radius for sphere, x,y,z extent for box
-
 --- Defines the collision shape of the entity. Should not be used excessively due to its performance impact
----@param type 'Box' | 'Sphere' | 'None'
+---@param type CollisionShape
 ---@param centerX number
 ---@param Y number
 ---@param Z number

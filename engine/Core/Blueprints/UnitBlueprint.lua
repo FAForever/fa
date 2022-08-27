@@ -1,75 +1,26 @@
 ---@meta
----@declare-global
 
 --- read more here: https://wiki.faforever.com/en/Blueprints
----@class UnitBlueprint: Blueprint
+---@class UnitBlueprint: EntityBlueprint
 ---@field AI UnitBlueprintAI
 ---@field Air UnitBlueprintAir
 ---@field Adjacency UnitBlueprintAdjacency|string
 ---@field Audio UnitBlueprintAudio
----@field AverageDensity number -- Unit average density in tons / m^3 (Default is 0.49).
 ---@field Buffs BpBuff[]
 ---@field BuildIconSortPriority integer -- set to an integer that describes the unit's position in the list of build icons.
----@field Categories CategoryName[] -- a list of capitalized strings that describe categories to which the unit belongs. Many other parts of the game refer to these categories to affect how units interact.
----@field CollisionOffsetX number -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
----@field CollisionOffsetY number -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
----@field CollisionOffsetZ number -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
----@field CollisionShape CollisionShape -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
----@field Defense BpDefense -- Defense information for the unit.
+---@field Defense UnitBlueprintDefense -- Defense information for the unit.
 ---@field Description string -- description of the unit. For example the description for the UEF tech 1 Tank MA12 Striker is '<LOC uel0201_desc>Medium Tank'. <LOC xxx_desc> is used for localisation which is defined in the strings_db.lua (in the file loc_XX.scd in the subdirectory \loc\XX; XX is the shortcut for the localised language). If the localisation part is not set, the description in tags will be used for any language, which would be "Medium Tank" for this example.
----@field Display BpDisplay
----@field Economy BpEconomy
+---@field Display UnitBlueprintDisplay
+---@field Economy UnitBlueprintEconomy
 ---@field Enhancements BpEnhancements
----@field General BpGeneral
+---@field General UnitBlueprintGeneral
 ---@field Intel BpIntel
 ---@field Interface BpInterface
----@field LifeBarHeight number -- Height of lifebar in OGrids.
----@field LifeBarOffset number -- Vertical offset from unit for lifebar.
----@field LifeBarRender boolean -- Should render lifebar or not.
----@field LifeBarSize number -- Size of lifebar in OGrids.
----@field Physics BpPhysics
----@field SelectionCenterOffsetX number -- X center offset of selection box
----@field SelectionCenterOffsetY number -- Y center offset of selection box
----@field SelectionCenterOffsetZ number -- Z center offset of selection box
----@field SelectionSizeX number -- define the frame around the selected unit.
----@field SelectionSizeY number -- adjusts the height of the selection box.
----@field SelectionSizeZ number -- define the frame around the selected unit.
----@field SelectionThickness number -- Use this to modify the thickness of the rendered selection indicator for the unit.
----@field SelectionYOffset number -- How far to reduce top of collision box for selection (default 0.5)
----@field SizeX number -- The collision box is used to detect hits on the unit. If you change the model size the collision box should be adapted.
----@field SizeY number -- The collision box is used to detect hits on the unit. If you change the model size the collision box should be adapted.
----@field SizeZ number -- The collision box is used to detect hits on the unit. If you change the model size the collision box should be adapted.
----@field StrategicIconName string -- into here https://wiki.faforever.com/en/Blueprints#strategiciconname
----@field StrategicIconSortPriority integer -- describes the unit's position in the list of selected units when different unit types are selected. 0 renders on top, 255 on bottom.
----@field Transport BpTransport
----@field UseOOBTestZoom number -- Use OOB hit test for this unit when camera is below this zoom level. Usually we use screen space to do unit selection, but occasionally we want to use the unit's oriented bounding box (OBB) instead. So we have UseOOBTestZoom.
+---@field Physics UnitBlueprintPhysics
+---@field Transport UnitBlueprintTransport
 ---@field Veteran BpVeteran
----@field Weapon WeaponBlueprint[] -- See https://wiki.faforever.com/en/Blueprints/Weapon
+---@field Weapon WeaponBlueprint[]
 ---@field Wreckage BpWreckage
-
----@class UnitBlueprint  General General information for the unit    Physics information for the unit    Air control information for the unit    Transport   Transport related information for the unit  AI  AI information for the unit Intel   Intel information for the unit  Weapons Weapon  Weapon information for the unit
-
----@class UnitBlueprintGeneral   CommandCaps Command capability flags for this unit  ToggleCaps  UpgradesTo  What unit, if any, does this unit upgrade to.   UpgradesFrom    What unit, if any, was this unit upgrade from.  UpgradesFromBase    What unit, if any, was this unit upgrade from base. SeedUnit    What unit, if any, was this unit seeded from.   QuickSelectPriority     Indicates unit has it's own avatar button in the quick select interface, and it's sorting priority  CapCost Cost of unit towards unit cap   SelectionPriority   Determines if a unit will be selected in a drag selection, only the highest priority units will get selected (1 is highest)
-
----@class UnitBlueprintDisplay   DisplayName Displayed name of unit  Mesh blueprint we use for display   PlaceholderMeshName Name of placeholder mesh to use for the unit when normal mesh isn't available   IconName    Name of icon to use for the unit    Uniform scale to be applied to mesh SpawnRandomRotation Spawn with a small random rotation  HideLifebars    Hide lifebars if true
-
----@class UnitBlueprintPhysics   FlattenSkirt    If true, terrain under building's skirt will be flattened.  SkirtOffsetX    Offset of left edge of skirt from left edge of footprint. Should be <= 0.   SkirtOffsetZ        Offset of top edge of skirt from top edge of footprint. Should be <= 0. SkirtSizeX  Unit construction pad Size X for building   SkirtSizeZ  Unit construction pad Size Z for building   MaxGroundVariation  Maximum elevation difference across skirt for build site    MotionType  Method of locomotion    AltMotionType   Alternate method of locomotion  StandUpright    Stands upright regardless of terrain    SinkLower   RotateBodyWhileMoving   Ability to rotate body to aim weapon slaved to body while in still in motion    DiveSurfaceSpeed    Dive/surface speed for the sub units    Maximum speed for the unit  MaxSpeedReverse Maximum speed for the unit in reverse   MaxAcceleration Maximum acceleration for the unit   MaxBrake    Maximum braking acceleration for the unit   MaxSteerForce       Maximum steer force magnitude that can be applied to acceleration   BankingSlope    How much the unit banks in corners (negative to lean outwards)  RollStability   How stable the unit is against rolling (0 to 1) RollDamping How much damping there is against rolling motion (1 = no motion at all) WobbleFactor    How much wobbling for the unit while hovering   WobbleSpeed How fast is the wobble. The faster the less stable looking  TurnRadius  Turn radius for the unit, in world units    Turn rate for the unit, in degrees per second   TurnFacingRate  Turn facing damping for the unit, usually used for hover units only RotateOnSpot    This unit can tries to rotate on the spot.  RotateOnSpotThreshold   Threshold for rotate on spot to take effect when moving.    Elevation   Preferred height above (-below) land or water surface   AttackElevation Preferred attack height when attacking ground targets... used by dive bombers   BuildOnLayerCaps    Unit may be built on these layers (only applies to structures   BuildRestriction    Special build restrictions (mass deposit, thermal vent, etc)    CatchUpAcc      Acceleration to allow unit to catch up to the target when it starts to drift    BackUpDistance  Distance that the unit will just back up if it's easier to do so    LayerChangeOffsetHeight     An offset to the layer change height used during the transition between seabed/water and land   LayerTransitionDuration Transition time in seconds when going from water/land and land/water    FuelUseTime Unit has fuel for this number of seconds    FuelRechargeRate    Unit fuels up at this rate per second   GroundCollisionOffset   Collision with ground offset    RaisedPlatforms Raised platoform definition for ground units to move on OccupyRects Set up the occupy rectangles of the unit that will override the footprint.
-
----@class UnitBlueprintAir   CanFly  Is the unit capable of flight?  Winged  Does the unit use wings for forward flight? FlyInWater  Can this unit fly under water?  AutoLandTime    Timer to automatically initate landing on ground if idle    MaxAirspeed Maximum airspeed    MinAirspeed Minimum combat airspeed TurnSpeed   Regular turn speed of the unit  CombatTurnSpeed Maximum combat turn speed of the unit for special manuvers  StartTurnDistance       Distance from target at which to start turning to align with it TightTurnMultiplier     Additional turning multiplier ability during a tight turn manuver   SustainedTurnThreshold      Length of time allowed for sustained turn before we re-try a different approach LiftFactor  How much altitude the unit can gain/loose per second    BankFactor  How much aircraft banks in turns; negative to lean out  BankForward True if aircraft banks forward/back as well as sideways EngageDistance  Distance to being engaging enemy target in attack task  BreakOffTrigger Distance to target to trigger the breaking off attack   BreakOffDistance    Distnace to break off before turning around for another attack run  BreakOffIfNearNewTarget     If our new target is close by then perform break off first to increase distance between the 2   KMove   Controller proportional parameter for horizontal motion KMoveDamping    Controller damping parameter for horizontal motion  KLift   Controller proportional parameter for vertical motion   KLiftDamping    Controller damping parameter for vertical motion    KTurn   Controller proportional parameter for heading changes   KTurnDamping    Controller damping parameter for heading changes    KRoll   Controller proportional parameter for roll changes  KRollDamping    Controller damping parameter for roll changes   CirclingTurnMult    Adjust turning ability when in circling mode    CirclingRadiusChangeMinRatio    Min circling radius ratio for unit  CirclingRadiusChangeMaxRatio    Max circling radius ratio for unit  CirclingRadiusVsAirMult     Multiplier to the circling radius when targetting another air unit  CirclingElevationChangeRatio    Elevation change ratio of unit when circling    CirclingFlightChangeFrequency   Frequency of flight pattern change for unit CirclingDirChange       Whether unit should ever change flight direction while circling HoverOverAttack Whether unit should hover over the target directly to attack... used for cases like the C.Z.A.R RandomBreakOffDistanceMult      Random multiplier applied to the break off distance for winged aircrafts    RandomMinChangeCombatStateTime      Random min time to switch combat state in seconds for winged aircrafts  RandomMaxChangeCombatStateTime  Random max time to switch combat state in seconds for winged aircrafts  TransportHoverHeight    This transport will stay at this height when picking up and dropping off units  PredictAheadForBombDrop Time to predict ahead for moving targets?
-
----@class UnitBlueprintTransport TransportClass  Type of attach points required on transports    ClassGenericUpTo    Generic slots up to the specified class Class2AttachSize    Number of class 1 attach points this affects    Class3AttachSize    Class4AttachSize    ClassSAttachSize    AirClass        These define that the unit can only land on air staging platforms   StorageSlots        How many internal storage slots available for the transport on top of the attach points DockingSlots    How many external docking slots available for air staging platforms RepairRate  Repairs units attached to me at this % of max health per second
-
----@class UnitBlueprintAI    GuardScanRadius Guard range for the unit    GuardReturnRadius   Maximum range from the guarded unit before initiating return    StagingPlatformScanRadius   Range for staging platforms to look for planes to repair and refuel when they are on patrol ShowAssistRangeOnSelect Show assist range for the unit if selected  GuardFormationName  The formation name used for guarding this unit  NeedUnpack  Unit should unpack before firing weapon InitialAutoMode Initial auto mode behavior for the unit BeaconName      Thie is the beacon that this unit will create under some circumstances  TargetBones     Some target bones setup for other units to aim at instead of the default center pos RefuelingMultiplier This multiplier is applied when a staging platform is refueling an air unit RefuelingRepairAmount       This amount of repair per second offered to refueling air units RepairConsumeEnergy This amount of energy per second required to repair air unit    RepairConsumeMass   This amount of mass per second require to repair air unit   AutoSurfaceToAttack Automatically surface to attack ground targets  AttackAngle     Desired angle to face target to maximize the number of guns able to hit the targets
-
----@class UnitBlueprintDefenseShield ShieldSize  Shield diameter RegenAssistMult Regen assist multiplier
-
----@class UnitBlueprintDefense   Max health value for the unit   Starting health value for the unit  RegenRate   Amount of health to regenerate per second   AirThreatLevel  Amount of threat this poses to the enemy air units  SurfaceThreatLevel  SubThreatLevel  EconomyThreatLevel  ArmorType   The Armor type name Shield  Shield information
-
----@class UnitBlueprintIntel VisionRadius    How far we can see above water  WaterVisionRadius   How far we can see underwater   RadarRadius How far our radar coverage goes SonarRadius OmniRadius  RadarStealth    Single unit radar stealth   SonarStealth    Single unit sonar stealth   Cloak   Single unit cloaking    ShowIntelOnSelect   Show intel radius of unit if selected   RadarStealthFieldRadius How far our radar stealth goes  SonarStealthFieldRadius How far our sonar stealth goes  CloakFieldRadius    How far our cloaking goes   JamRadius   How far we create fake blips    SpoofRadius How far off to displace blip    JammerBlips How many blips does a jammer produce?
-
----@class UnitBlueprintEconomy   Energy cost to build this unit  Mass cost to build this unit    BuildRate   How efficient a unit is at building How long it takes to build this unit (in seconds)   StorageEnergy   Energy storage capacity provided by this unit   StorageMass Mass storage capacity provided by this unit NaturalProducer Produces resouce naturally and does not consume anything    BuildableCategories BuildableCategory   One of the unit categories that can be built by this unit   RebuildBonusIds You will get bonus if you rebuild this unit over the wreckage of these wreckages    InitialRallyX   default rally point Xfor the factory    InitialRallyZ   default rally point Z for the factory   NeedToFaceTargetToBuild builder needs to face target before it can build/repair SacrificeMassMult   builder will kill self but provide this amount of mass based on builder's mass cost to the unit it is helping   SacrificeEnergyMult     builder will kill self but provide this amount of energy based on the builder's energy cost to the unit it is helping   MaxBuildDistance        Maximum build range of the unit. The target must be within this range before the builder can perform operation
-
----@alias UnitWeaponRangeCategory "UWRC_Undefined" | "UWRC_DirectFire" | "UWRC_IndirectFire" | "UWRC_AntiAir" | "UWRC_AntiNavy" | "UWRC_Countermeasure"
 
 ---@class UnitBlueprintAI
 ---@field AttackAngle number -- Under what angle the unit attacks its target after getting an attack order
@@ -221,15 +172,15 @@
 ---@field TargetAllow UnparsedCategory
 ---@field TargetDisallow UnparsedCategory
 
----@class BpDefense
+---@class UnitBlueprintDefense
 ---@field ArmorType ArmorType -- The armor type name.
 ---@field Health number -- Starting health value for the unit.
 ---@field MaxHealth number -- Max health value for the unit. (It just could get higher through veteran buff or an enhancement)
 ---@field RegenRate number -- Amount of health to regenerate per second.
----@field Shield BpDefense.Shield -- When a unit has a shield here are settings defined; Shield attributes are:
+---@field Shield UnitBlueprintDefenseShield -- When a unit has a shield here are settings defined; Shield attributes are:
 ---@field ThreatLevel number -- Amount of threat this poses to the enemy.
 
----@class BpDefense.Shield
+---@class UnitBlueprintDefenseShield
 ---@field OwnerShieldMesh string -- Define the PersonalShield_mesh when PersonalShield = true
 ---@field PassOverkillDamage boolean
 ---@field PersonalShield boolean -- Define a personal shield.
@@ -243,12 +194,12 @@
 ---@field StartsOff boolean -- Appears to do nothing but seems to be meant to make the shield turned off by default
 ---@field StartOn boolean -- (?)
 
----@class BpDisplay
+---@class UnitBlueprintDisplay
 ---@field Abilities string[] -- Shows the abilities of the unit. Multiple abilities could be added like 'string1', 'string2', etc.
 ---@field AINames string[] -- Names that the AI can use to name the unit, provided the AI is programmed to do this.
 ---@field AnimationActivate string -- The animation that is played when the unit is completed (seen in experimentals, e.g. Megalith - XRL0403)
 ---@field AnimationBuild string -- Animation that is played when the unit is building
----@field AnimationDeath BpDisplay.AnimationDeath[] -- Multiple animations could be added
+---@field AnimationDeath UnitBlueprintDisplay.AnimationDeath[] -- Multiple animations could be added
 ---@field AnimationOpen string -- Animation open file is linked here: '/units/UnitID/UnitID_aopen.sca'
 ---@field AnimationPermOpen unknown -- The animation that is played when the unit is done building
 ---@field AnimationSurface unknown -- The animation that is played when the unit surfaces.
@@ -260,41 +211,41 @@
 ---@field BuildAttachBone unknown -- ?
 ---@field DamageEffects unknown -- ?
 ---@field ForcedBuildSpin unknown -- ?
----@field IdleEffects table<string, BpDisplay.Effects>  -- Effects displayed when the unit is idle (e.g. glow beneath hovering units), multiple layers can be used. The key should be the name of the layer where effects should be displayed.
----@field LayerChangeEffects table<string, BpDisplay.Effects> BpDisplay.LayerChangeEffects -- Effects displayed when the unit changes layers (e.g. when an aircraft lands or takes off). Defines for what transition the effects are created. 'string' is composed of 2 names of layers, first one is the old layer and the second is the new one. E.g.effects are needed for an aircraft landing, so the old layer is Air and the new one is Land, then the 'string' will be AirLand (LandAir would be the opposite - take off). Note: there is NO space between layer names.
+---@field IdleEffects table<string, UnitBlueprintDisplay.Effects>  -- Effects displayed when the unit is idle (e.g. glow beneath hovering units), multiple layers can be used. The key should be the name of the layer where effects should be displayed.
+---@field LayerChangeEffects table<string, UnitBlueprintDisplay.Effects> UnitBlueprintDisplay.LayerChangeEffects -- Effects displayed when the unit changes layers (e.g. when an aircraft lands or takes off). Defines for what transition the effects are created. 'string' is composed of 2 names of layers, first one is the old layer and the second is the new one. E.g.effects are needed for an aircraft landing, so the old layer is Air and the new one is Land, then the 'string' will be AirLand (LandAir would be the opposite - take off). Note: there is NO space between layer names.
 ---@field Mesh MeshBlueprint
 ---@field MeshBlueprint string
----@field MotionChangeEffects table<string, BpDisplay.Effects>
----@field MovementEffects table<string, BpDisplay.MovementEffects> -- Effects displayed during movement of the unit. Key should be Name of the layer for which the effects are displayed.
+---@field MotionChangeEffects table<string, UnitBlueprintDisplay.Effects>
+---@field MovementEffects table<string, UnitBlueprintDisplay.MovementEffects> -- Effects displayed during movement of the unit. Key should be Name of the layer for which the effects are displayed.
 ---@field PlaceholderMeshName string -- ?
 ---@field SpawnRandomRotation boolean -- ?
 ---@field Tarmacs unknown -- ?
 ---@field UniformScale number -- This is the scale of the unit size. This will only change the visual size, when changing this the collision hitbox should be adapted under SizeX, SizeY and SizeZ as well.
 
----@class BpDisplay.AnimationDeath
+---@class UnitBlueprintDisplay.AnimationDeath
 ---@field Animation string -- animation death file is linked here: '/units/UnitID/UnitID_??.sca'
 ---@field AnimationRateMax number -- the maximum speed this animation is played at
 ---@field AnimationRateMin number -- the minimum speed this animation is played at
 ---@field Weight number -- This number affects how often a death animation is used when there are more than one. This value is relative rather than absolute.
 
----@class BpDisplay.Effects
----@field Effects BpDisplay.Effect[]
+---@class UnitBlueprintDisplay.Effects
+---@field Effects UnitBlueprintDisplay.Effect[]
 
----@class BpDisplay.Effect
+---@class UnitBlueprintDisplay.Effect
 ---@field Bones string[] -- Names of bones to which the effect will be attached.
 ---@field Offset Vector -- Controls position of the effect relatively to the bone it's attached to. n1, n2 and n3 are respectively x, y and z coordinates (0, 0, 0 by default).
 ---@field Scale number -- Controls scale of the effect (1 by default).
 ---@field Type string -- Defines what effect will be used.
 
----@class BpDisplay.MovementEffects: BpDisplay.Effects
+---@class UnitBlueprintDisplay.MovementEffects: UnitBlueprintDisplay.Effects
 ---@field Contrails { Bones: string[] } -- Contrails shown behind aircraft (in SupCom usually behind tips of wings). --Bones are Names of the bones which will have the contrails attached.
----@field Treads BpDisplay.MovementEffects.Treads -- For units with treads or wheels, e.g. tanks, UEF engineers.
+---@field Treads UnitBlueprintDisplay.MovementEffects.Treads -- For units with treads or wheels, e.g. tanks, UEF engineers.
 
----@class BpDisplay.MovementEffects.Treads
+---@class UnitBlueprintDisplay.MovementEffects.Treads
 ---@field ScrollTreads boolean -- Should the treads be scrolled when unit is moving?
----@field TreadMarks BpDisplay.MovementEffects.Treads.TreadMarks
+---@field TreadMarks UnitBlueprintDisplay.MovementEffects.Treads.TreadMarks
 
----@class BpDisplay.MovementEffects.Treads.TreadMarks
+---@class UnitBlueprintDisplay.MovementEffects.Treads.TreadMarks
 ---@field BoneName string -- Name of the bone to which the tread marks will be attached.
 ---@field TreadMarks string -- Name of the tread marks to be used (e.g. light tank might have different than a heavier one).
 ---@field TreadMarksInterval number -- Defines how often should they be created on the ground.
@@ -302,7 +253,7 @@
 ---@field TreadMarksSizeZ number -- Defines how big/stretched should the tread marks be on the Z axis.
 ---@field TreadOffset {[1]:number, [2]:number, [3]:number} -- Defines the offset of tread marks to bone defined in BoneName. 'n1', 'n2', 'n3' are respectively x, y and z coordinates.
 
----@class BpEconomy
+---@class UnitBlueprintEconomy
 ---@field AdjacentEnergyProductionMod number -- ?
 ---@field AdjacentMassProductionMod number -- ?
 ---@field AdjacentStructureEnergyMod number -- ?
@@ -334,11 +285,11 @@
 --- TODO setup definitions
 ---@class BpEnhancements
 
----@class BpGeneral
+---@class UnitBlueprintGeneral
 ---@field CapCost integer -- Cost of the unit towards unit cap (default is 1.0)
 ---@field Category string
 ---@field Classification string
----@field CommandCaps BpGeneral.CommandCaps -- Command capability flags for this unit;
+---@field CommandCaps UnitBlueprintGeneral.CommandCaps -- Command capability flags for this unit;
 ---@field FactionName string -- Faction the unit belongs to. Factions are 'Aeon', 'Cybran' and 'UEF'.
 ---@field QuickSelectPriority integer -- Indicates unit has it's own avatar button in the quick select interface, and it's sorting priority.
 ---@field TarmacDecal unknown
@@ -349,8 +300,7 @@
 ---@field UpgradesFrom string -- What unit, if any, was this unit upgrade from.
 ---@field UpgradesTo string -- What unit, if any, does this unit upgrade to.
 
----@alias BpGeneral.CommandCaps table<CommandCap, boolean>
-
+---@class UnitBlueprintGeneral.CommandCaps
 ---@field RULEUCC_Attack boolean -- Whether the unit has an attack command.
 ---@field RULEUCC_CallTransport boolean -- Whether the unit can ask to be transported by a transport unit.
 ---@field RULEUCC_Capture boolean -- Whether the unit has a capture command.
@@ -406,11 +356,11 @@
 ---@class BpInterface
 ---@field HelpText string
 
----@class BpPhysics
+---@class UnitBlueprintPhysics
 ---@field AttackElevation number -- Preferred attack height when attacking ground targets. (used by dive bombers)>
 ---@field BackUpDistance number -- Distance that the unit will just back up if it is easier to do so.
 ---@field BankingSlope number -- How much the unit banks in corners (negative to lean outwards).
----@field BuildOnLayerCaps BpPhysics.BuildOnLayerCaps -- Unit may be built on these layers (only applies to structures); Subcategories are:
+---@field BuildOnLayerCaps UnitBlueprintPhysics.BuildOnLayerCaps -- Unit may be built on these layers (only applies to structures); Subcategories are:
 ---@field BuildRestriction UnitBuildRestriction -- Special build restrictions (mass deposit, thermal vent, etc).
 ---@field CatchUpAcc number, -- Acceleration to allow unit to catch up to the target when it starts to drift.
 ---@field DragCoefficient number
@@ -435,7 +385,7 @@
 ---@field RaisedPlatforms string -- Raised platform definition for ground units to move on.
 ---@field RollDamping number -- How much damping there is against rolling motion (1 = no motion at all).
 ---@field RollStability number -- How stable the unit is against rolling (0 to 1).
----@field RollOffPoints BpPhysics.RollOffPoints[]
+---@field RollOffPoints UnitBlueprintPhysics.RollOffPoints[]
 ---@field RotateBodyWhileMoving boolean -- Ability to rotate body to aim weapon slaved to body while in still in motion.
 ---@field RotateOnSpot boolean -- This unit can tries to rotate on the spot.
 ---@field SkirtOffsetX number -- Offset of left edge of skirt from left edge of footprint. (Should be -- = 0)
@@ -449,7 +399,7 @@
 ---@field WobbleFactor number -- How much wobbling for the unit while hovering.
 ---@field WobbleSpeed number -- How fast is the wobble, The faster the less stable looking.
 
----@class BpPhysics.BuildOnLayerCaps
+---@class UnitBlueprintPhysics.BuildOnLayerCaps
 ---@field LAYER_Air boolean -- If true, unit will leave factory flying.
 ---@field LAYER_Land boolean -- If true, unit will be built standing or hovering on land.
 ---@field LAYER_Orbit boolean -- if true, unit will be build in orbit (Like the Novax Sattelite pops out of its launching box in Orbit)
@@ -457,13 +407,13 @@
 ---@field LAYER_Sub boolean -- If true, unit will leave factory completely submerged underwater (floating or standing on the floor of the water body).
 ---@field LAYER_Water boolean -- If true, unit will leave factory partly above the water floating.
 
----@class BpPhysics.RollOffPoints
+---@class UnitBlueprintPhysics.RollOffPoints
 ---@field UnitSpin integer
 ---@field X number
 ---@field Y number
 ---@field Z number
 
----@class BpTransport
+---@class UnitBlueprintTransport
 ---@field AirClass boolean -- These define that the unit can only land on air staging platforms.
 ---@field CanFireFromTransport boolean -- Define if the unit can fire out of a transport.
 ---@field Class2AttachSize integer -- Number of class 1 attach points this affects.

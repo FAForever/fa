@@ -1239,6 +1239,6 @@ end
 
 ---
 ---@param shield Shield
----@param spec BpDefense.Shield
+---@param spec UnitBlueprintDefenseShield
 function _c_CreateShield(shield, spec)
 end

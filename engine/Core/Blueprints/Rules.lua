@@ -1,3 +1,4 @@
+---@meta
 
 ---@alias CommandCap
 ---| "RULEUCC_Move"

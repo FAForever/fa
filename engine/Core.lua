@@ -154,9 +154,9 @@ function GetBlueprint(object)
 end
 
 --- Retrieves the cue and bank of a sound table
----@param sound BpAudio
----@return string The cue identifier within the bank
----@return string The bank identifier
+---@param sound SoundHandle
+---@return string cue
+---@return string bank
 function GetCueBank(sound)
 end
 

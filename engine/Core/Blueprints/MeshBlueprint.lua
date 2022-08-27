@@ -1,3 +1,5 @@
+---@meta
+
 ---@class MeshBlueprint : Blueprint
 ---@field LODs MeshBlueprintLod[] List of LOD info
 ---@field IconFadeInZoom number   Zoom level at which to start fading in the strategic icon. Higher values increase how zoomed out you must be for the icon to appear.
