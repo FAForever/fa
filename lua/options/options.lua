@@ -375,7 +375,7 @@ options = {
             },
 
             {
-                title = "Regular selection threshold",
+                title = "Default selection threshold",
                 tip = "this is a tip",
                 key = 'selection_threshold_regular',
                 type = 'slider',
