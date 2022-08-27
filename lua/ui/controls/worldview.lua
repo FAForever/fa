@@ -285,7 +285,7 @@ WorldView = Class(moho.UIWorldView, Control) {
     --- Checks and toggles the ignore mode which only processes move and attack move commands
     ---@param self WorldView
     CheckIgnoreMode = function(self)
-        return IsKeyDown(KeyCodeCtrl) and not IsKeyDown(KeyCodeShift) and Prefs.GetFromCurrentProfile('options.commands_ignore_mode') == 'on' -- shift key
+        return IsKeyDown(KeyCodeCtrl) and (not IsKeyDown(KeyCodeShift)) and Prefs.GetFromCurrentProfile('options.commands_ignore_mode') == 'on' -- shift key
     end,
 
     --- Returns true if the reclaim command can be applied
