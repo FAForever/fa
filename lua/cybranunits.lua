@@ -98,7 +98,7 @@ CConstructionTemplate = Class() {
 
     --- When stopping to build, send the bots back after a bit.
     ---@param self CConstructionTemplate
-    ---@param built boolean
+    ---@param built Unit
     StopBuildingEffects = function(self, built)
         -- make sure we're not dead (then bots are destroyed by trashbag)
         if self.Dead then 
@@ -185,7 +185,7 @@ CConstructionTemplate = Class() {
 
     --- Destroys all the bots of a builder. Assumes the bots exist
     ---@param self CConstructionTemplate
-    ---@param bots Unit
+    ---@param bots Unit[]
     ---@param count number
     DestroyBotsThread = function(self, bots, count)
 
@@ -350,7 +350,7 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
 
     ---@param self CAirFactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitTicks(2)
@@ -458,8 +458,8 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
     end,
 
     ---@param self CConstructionUnit
-    ---@param new string
-    ---@param old string
+    ---@param new Layer
+    ---@param old Layer
     LayerChangeTrigger = function(self, new, old)
         if self.Blueprint.Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
@@ -751,7 +751,7 @@ CConstructionEggUnit = Class(CStructureUnit) {
 
     ---@param self CConstructionEggUnit
     ---@param instigator Unit
-    ---@param type string
+    ---@param type DamageType
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         if self.Spawn then overkillRatio = 1.1 end
@@ -829,7 +829,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
 
     ---@param self CConstructionStructureUnit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         CConstructionTemplate.CreateBuildEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder, true)
     end,
@@ -842,7 +842,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
 
     ---@param self CConstructionStructureUnit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         CStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
 
@@ -953,7 +953,7 @@ CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
 
     ---@param self CCommandUnit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order)
     end,

@@ -11,7 +11,6 @@
 -- One cautionary note: don't change the playable area during an in-game cinematic.
 -- If you do, and you move the camera to a marker in the new area, the engine
 -- may not handle it well.
---
 
 SimCamera = import('/lua/simcamera.lua').SimCamera
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -132,7 +131,7 @@ end
 -- The "seconds" field is how long it will take to get in place.
 -- After that the camera will follow that unit until told to do something else.
 -- Zoom is measured in LOD units. It's the value of the width of the view frustum at the focus point
----@param units Unit
+---@param units Unit[]
 ---@param zoom number
 ---@param seconds number
 function CameraTrackEntities(units, zoom, seconds)

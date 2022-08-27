@@ -125,7 +125,7 @@ AConstructionUnit = Class(ConstructionUnit) {
 
     ---@param self AConstructionUnit
     ---@param unitBeingBuilt Unit
-    ---@param order integer
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, self.BuildEffectsBag)
     end,

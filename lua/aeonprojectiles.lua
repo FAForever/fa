@@ -104,9 +104,9 @@ ABeamProjectile = Class(NullShell) {
 --------------------------------------------------------------------------
 --  AEON GRAVITON BOMB
 --------------------------------------------------------------------------
+--- used by T1 bomber
 ---@class AGravitonBombProjectile : SinglePolyTrailProjectile
 AGravitonBombProjectile = Class(SinglePolyTrailProjectile) { 
-    -- T1 bomber
     PolyTrail = '/effects/emitters/default_polytrail_03_emit.bp',
     FxTrails = {'/effects/emitters/torpedo_munition_trail_01_emit.bp',},
 
@@ -285,8 +285,6 @@ AQuadLightLaserProjectile = Class(MultiPolyTrailProjectile) {
     -- FxImpactUnderWater = EffectTemplate.Aeon_QuadLightLaserCannonLandHit,
 }
 
-
-
 ---@class ALightLaserProjectile : MultiPolyTrailProjectile
 ALightLaserProjectile = Class(MultiPolyTrailProjectile) {
 
@@ -307,7 +305,6 @@ ALightLaserProjectile = Class(MultiPolyTrailProjectile) {
 ASonicPulsarProjectile = Class(EmitterProjectile){
     FxTrails = EffectTemplate.ASonicPulsarMunition01,
 }
-
 
 --------------------------------------------------------------------------
 --  AEON ARTILLERY PROJECTILES
@@ -601,9 +598,9 @@ AQuantumWarheadProjectile = Class(NukeProjectile, MultiCompositeEmitterProjectil
 --------------------------------------------------------------------------
 --  AEON QUARK BOMB
 --------------------------------------------------------------------------
+--- Strategic bomber
 ---@class AQuarkBombProjectile : EmitterProjectile
 AQuarkBombProjectile = Class(EmitterProjectile) { 
-    -- Strategic bomber
     FxTrails = EffectTemplate.AQuarkBomb01,
     FxTrailScale = 1,
 

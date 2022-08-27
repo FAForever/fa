@@ -45,7 +45,17 @@ local CoroutineYield = coroutine.yield
 ---@alias PlatoonType 'Air' | 'Land' | 'Sea'
 ---@alias AllianceStatus 'Ally' | 'Enemy' | 'Neutral'
 
+---@class TriggerSpec
+---@field Callback function
+---@field ReconTypes ReconTypes
+---@field Blip boolean
+---@field Value boolean
+---@field Category EntityCategory
+---@field OnceOnly boolean
+---@field TargetAIBrain AIBrain
 
+--TODO
+---@class PlatoonTable
 
 
 ---@class AIBrain: moho.aibrain_methods
@@ -689,7 +699,7 @@ AIBrain = Class(moho.aibrain_methods) {
     --    TargetAIBrain: AI Brain of the army you want it to trigger off of.
     -- },
     ---@param self AIBrain
-    ---@param triggerSpec unknown
+    ---@param triggerSpec TriggerSpec
     SetupArmyIntelTrigger = function(self, triggerSpec)
         table.insert(self.IntelTriggerList, triggerSpec)
     end,
@@ -724,7 +734,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@param callback any
+    ---@param callback fun(unit:Unit)
     ---@param category EntityCategory
     ---@param percent number
     AddUnitBuiltPercentageCallback = function(self, callback, category, percent)
@@ -735,7 +745,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@param triggerSpec any
+    ---@param triggerSpec TriggerSpec
     SetupBrainVeterancyTrigger = function(self, triggerSpec)
         if not triggerSpec.CallCount then
             triggerSpec.CallCount = 1
@@ -756,7 +766,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@param callback any
+    ---@param callback function
     ---@param pingType string
     AddPingCallback = function(self, callback, pingType)
         if callback and pingType then
@@ -1961,7 +1971,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---},
     --- ```
     ---@param self AIBrain
-    ---@param pltnTable table
+    ---@param pltnTable PlatoonTable
     PBMAddPlatoon = function(self, pltnTable)
         if not pltnTable.PlatoonTemplate then
             local stng = '*AI ERROR: INVALID PLATOON LIST IN '.. self.CurrentPlan.. ' - MISSING TEMPLATE.  '
@@ -2273,7 +2283,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     ---@param factories Unit
-    ---@param primary number
+    ---@param primary Unit[]
     ---@return boolean
     PBMCheckHighestTechFactory = function(self, factories, primary)
         local catTable = {categories.TECH1, categories.TECH2, categories.TECH3}
@@ -2299,7 +2309,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---Picks the first tech 3, tech 2 or tech 1 factory to make primary
     ---@param self AIBrain
     ---@param factories Unit
-    ---@return any
+    ---@return Unit
     PBMGetPrimaryFactory = function(self, factories)
         local categoryTable = {categories.TECH3, categories.TECH2, categories.TECH1}
         for kc, vc in categoryTable do
@@ -3750,7 +3760,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@return table
+    ---@return Vector[]
     GetBaseVectors = function(self)
         local enemy = self:GetCurrentEnemy()
         local index = self:GetArmyIndex()

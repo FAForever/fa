@@ -10,7 +10,7 @@ local Chat = import('/lua/ui/game/chat.lua')
 local ChatTo = import('/lua/lazyvar.lua').Create()
 
 ---@param group any
----@param text any
+---@param text string
 ---@param sender any
 function AIChat(group, text, sender)
     if text then
@@ -35,7 +35,7 @@ function AIChat(group, text, sender)
 end
 
 ---@param army number
----@return table
+---@return number[]
 function FindAllies(army)
     local t = GetArmiesTable()
     local result = {}
@@ -48,7 +48,7 @@ function FindAllies(army)
 end
 
 ---@param army number
----@return table
+---@return number[]
 function FindEnemies(army)
     local t = GetArmiesTable()
     local result = {}
