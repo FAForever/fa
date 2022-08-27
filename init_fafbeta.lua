@@ -72,6 +72,11 @@ deprecatedMods["#quality of performance 2022"] = true
 deprecatedMods["group_split"] = true
 deprecatedMods["Control Group Zoom Mod"] = true
 deprecatedMods["additionalControlGroupStuff"] = true
+
+-- as per #4124 the cursor and command interactions are complete overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["additionalCameraStuff"] = true
+deprecatedMods["RUI"] = true
 deprecatedMods = LowerHashTable(deprecatedMods)
 
 -- typical FA packages
