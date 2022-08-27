@@ -464,7 +464,7 @@ end
 -- lot of overhead that is not necessary.
 ---@param unit Unit
 ---@param overKillRatio number
----@return Unit
+---@return Entity
 function CreateUnitExplosionEntity(unit, overKillRatio)
     local localentity = Entity(MakeExplosionEntitySpec(unit, overKillRatio))
     Warp(localentity, unit:GetPosition())

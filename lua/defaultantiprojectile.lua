@@ -10,11 +10,30 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
+---@class FlareSpec
+---@field Army Army
+---@field Owner string
+---@field Radius number
+---@field OffsetMult number
+---@field RedirectCat EntityCategory
+
+---@class DepthChargeSpec
+---@field Army Army
+---@field Owner string
+---@field Radius number
+
+---@class MissileRedirectSpec
+---@field Army Army
+---@field Owner string
+---@field Radius number
+---@field RedirectRateOfFire number
+---@field AttachBone Bone
+
 ---@class Flare : Entity
 Flare = Class(Entity){
 
     ---@param self Flare
-    ---@param spec any
+    ---@param spec FlareSpec
     OnCreate = function(self, spec)
         self.Army = self:GetArmy()
         self.Owner = spec.Owner
@@ -29,7 +48,7 @@ Flare = Class(Entity){
     --- We only divert projectiles. The flare-projectile itself will be responsible for
     --- accepting the collision and causing the hostile projectile to impact.
     ---@param self Flare
-    ---@param other any
+    ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self,other)
         if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and self.Army ~= other.Army and IsAlly(self.Army, other.Army) == false then
@@ -43,7 +62,7 @@ Flare = Class(Entity){
 DepthCharge = Class(Entity) {
 
     ---@param self DepthCharge
-    ---@param spec any
+    ---@param spec DepthChargeSpec
     OnCreate = function(self, spec)
         self.Army = self:GetArmy()
         self.Owner = spec.Owner
@@ -56,7 +75,7 @@ DepthCharge = Class(Entity) {
     --- We only divert projectiles. The flare-projectile itself will be responsible for
     --- accepting the collision and causing the hostile projectile to impact.
     ---@param self DepthCharge
-    ---@param other any
+    ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self,other)
         if EntityCategoryContains(categories.TORPEDO, other) and self.Army ~= other.Army and IsAlly(self.Army, other.Army) == false then
@@ -72,7 +91,7 @@ MissileRedirect = Class(Entity) {
         EndPointEffects = {'/effects/emitters/particle_cannon_end_01_emit.bp' },
 
         ---@param self MissileRedirect
-        ---@param spec any
+        ---@param spec MissileRedirectSpec
         OnCreate = function(self, spec)
             self.Army = self:GetArmy()
             self.Owner = spec.Owner
