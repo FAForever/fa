@@ -14,7 +14,7 @@ local GetEconomyStoredRatio = moho.aibrain_methods.GetEconomyStoredRatio
 local GetEconomyIncome = moho.aibrain_methods.GetEconomyIncome
 local GetEconomyRequested = moho.aibrain_methods.GetEconomyRequested
 local GetEconomyStored = moho.aibrain_methods.GetEconomyStored
-local ParagonCat = categories.ENERGYPRODUCTION * categories.EXPERIMENTAL * categories.STRUCTURE
+local ParagonCat = categories.STRUCTURE * categories.EXPERIMENTAL * categories.ECONOMIC * categories.ENERGYPRODUCTION * categories.MASSPRODUCTION
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
