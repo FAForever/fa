@@ -224,6 +224,14 @@ WorldView = Class(moho.UIWorldView, Control) {
         self.Trash = TrashBag()
     end,
 
+    SetIgnoreSelectTolerance = function(self)
+        local tolerance = -1000
+        if tolerance != self.SelectionTolerance then
+            ConExecute(string.format("ui_SelectTolerance %i", tolerance))
+            self.SelectionTolerance = tolerance
+        end
+    end,
+
     SetDefaultSelectTolerance = function(self)
         local tolerance
         if SessionIsReplay() then
@@ -232,12 +240,19 @@ WorldView = Class(moho.UIWorldView, Control) {
             tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_regular')
         end
 
-        ConExecute(string.format("ui_SelectTolerance %i", tolerance))
+        if tolerance != self.SelectionTolerance then
+            ConExecute(string.format("ui_SelectTolerance %i", tolerance))
+            self.SelectionTolerance = tolerance
+        end
     end,
 
     SetReclaimSelectTolerance = function(self)
         local tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_reclaim')
-        ConExecute(string.format("ui_SelectTolerance %i", tolerance))
+
+        if tolerance != self.SelectionTolerance then
+            ConExecute(string.format("ui_SelectTolerance %i", tolerance))
+            self.SelectionTolerance = tolerance
+        end
     end,
 
 
@@ -246,7 +261,7 @@ WorldView = Class(moho.UIWorldView, Control) {
     EnableIgnoreMode = function(self, enabled)
         if enabled then
             ConExecute("ui_CommandClickScale 0")
-            ConExecute("ui_SelectTolerance -1000")
+            self:SetIgnoreSelectTolerance()
         else
             ConExecute("ui_CommandClickScale 1")
             self:SetDefaultSelectTolerance()
