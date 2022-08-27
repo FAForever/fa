@@ -576,22 +576,22 @@ Tooltips = {
 
     options_commands_ignore_mode = {
         title = "Ignore mode",
-        description = "When enabled, ignore any other command but move commands when you hold left-ctrl. This can help to guarantee that you issue a move command, over (accidentally) starting a reclaim or attack command. \r\n\r\nIs disabled when holding shift.",
+        description = "When enabled, ignore any other command but move commands when you hold left-ctrl. This can help to guarantee that you issue a move command, over (accidentally) starting a reclaim or attack command. \r\n\r\nThis is disabled when holding shift.",
     },
 
     options_selection_threshold_regular = {
         title = "Default selection threshold",
-        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This can help you select individual units or props, especially on displays with higher resolutions. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities can be selected, the one nearest to the mouse location is selected.",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This can help you select individual units or props, especially on displays with higher resolutions. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
 
     options_selection_threshold_reclaim = {
         title = "Default selection threshold",
-        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when you are in reclaim mode. It makes it easier to hit all of your clicks, reducing the amount of fake reclaim orders. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities can be selected, the one nearest to the mouse location is selected.",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when you are in reclaim mode. It makes it easier to hit all of your clicks, reducing the amount of fake reclaim orders. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
 
     options_selection_threshold_replay = {
         title = "Default selection threshold",
-        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities can be selected, the one nearest to the mouse location is selected.",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
 
     options_wheel_sensitivity = {
