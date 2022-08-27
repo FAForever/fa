@@ -1,6 +1,7 @@
 ---@meta
 
 ---@class moho.EntityCategory
+---@operator add(a, b)
 local EntityCategory = {}
 
 ---@alias UnparsedCategory string

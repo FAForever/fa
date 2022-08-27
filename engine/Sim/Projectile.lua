@@ -35,7 +35,7 @@ function Projectile:GetCurrentSpeed()
 end
 
 ---
----@return Position
+---@return Vector
 function Projectile:GetCurrentTargetPosition()
 end
 
@@ -114,7 +114,7 @@ function Projectile:SetNewTarget(object)
 end
 
 ---
----@param location Position
+---@param location Vector
 function Projectile:SetNewTargetGround(location)
 end
 

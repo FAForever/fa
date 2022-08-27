@@ -142,7 +142,7 @@ VisionMarkerOpti = Class(Entity) {
     ---@param self VisionMarkerOpti
     ---@param army number
     ---@param radius number
-    ---@param type EntityIntelTypes
+    ---@param type EntityIntelType
     ---@param enable boolean Intel type is enabled when true and disabled otherwise
     UpdateIntel = function(self, army, radius, type, enable)
         if enable then

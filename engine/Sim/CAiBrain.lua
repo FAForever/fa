@@ -3,12 +3,11 @@
 ---@class moho.aibrain_methods
 local CAiBrain = {}
 
----@alias AllianceType 'Enemy' | 'Ally' | 'Neutral'
 ---@alias BrainArcType 'high' | 'low' | 'none'
 ---@alias BrainThreatType 'Overall' | 'OverallNotAssigned' | 'StructuresNotMex' | 'Structures' | 'Naval' | 'Air' | 'Land' | 'Experimental' | 'Commander' | 'Artillery' | 'AntiAir' | 'AntiSurface' | 'AntiSub' | 'Economy' | 'Unknown'
 
 --- Assigns a threat value to a given position, which is applied to the iMAP threat grid
----@param position Position
+---@param position Vector
 ---@param threat number
 ---@param decay number
 ---@param threatType BrainThreatType
@@ -33,7 +32,7 @@ end
 --- Order a unit to build a structure
 ---@param builder Unit
 ---@param blueprintID string
----@param buildLocation Position
+---@param buildLocation Vector
 ---@param buildRelative boolean if true, the location is used as an offset to the builders current location
 function CAiBrain:BuildStructure(builder, blueprintID, buildLocation, buildRelative)
 end
@@ -55,13 +54,13 @@ end
 
 --- Returns true if the structure can be built at the given location
 ---@param blueprintID string As an example: `ueb0101`
----@param location Position
+---@param location Vector
 function CAiBrain:CanBuildStructureAt(blueprintID, location)
 end
 
 --- Returns true if the terrain is blocking weapon fire with the given arc from the attack position to the target position
----@param attackPosition Position
----@param targetPosition Position
+---@param attackPosition Vector
+---@param targetPosition Vector
 ---@param arcType BrainArcType
 function CAiBrain:CheckBlockingTerrain(attackPosition, targetPosition, arcType)
 end
