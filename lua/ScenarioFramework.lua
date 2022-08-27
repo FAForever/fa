@@ -5,7 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
----@class Dialogue : BpSound
+---@class Dialogue : SoundBlueprint
 ---@field duration number
 ---@field text string
 ---@field vid string
@@ -787,7 +787,7 @@ function EndGameWaitThread(callback)
 end
 
 --- Plays an XACT sound if needed--currently all VOs are videos
----@param voSound BpSound
+---@param voSound SoundBlueprint
 function PlayVoiceOver(voSound)
     table.insert(Sync.Voice, voSound)
 end

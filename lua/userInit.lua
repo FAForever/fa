@@ -3,6 +3,7 @@
 -- This is the user-specific top-level lua initialization file. It is run at initialization time
 -- to set up all lua state for the user layer.
 
+SPEW("  " .. (string.byte(string.lualex("\\11"), 1, 1)))
 -- Init our language from prefs. This applies to both front-end and session init; for
 -- the Sim init, the engine sets __language for us.
 __language = GetPreference('options_overrides.language', '')

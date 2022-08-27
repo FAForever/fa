@@ -2,11 +2,11 @@
 ---@declare-global
 
 --- read more here: https://wiki.faforever.com/en/Blueprints
----@class UnitBlueprint: BlueprintBase
----@field AI BpAI
----@field Air BpAir
----@field Adjacency BpAdjacency|string
----@field Audio BpAudio
+---@class UnitBlueprint: Blueprint
+---@field AI UnitBlueprintAI
+---@field Air UnitBlueprintAir
+---@field Adjacency UnitBlueprintAdjacency|string
+---@field Audio UnitBlueprintAudio
 ---@field AverageDensity number -- Unit average density in tons / m^3 (Default is 0.49).
 ---@field Buffs BpBuff[]
 ---@field BuildIconSortPriority integer -- set to an integer that describes the unit's position in the list of build icons.
@@ -47,7 +47,31 @@
 ---@field Weapon WeaponBlueprint[] -- See https://wiki.faforever.com/en/Blueprints/Weapon
 ---@field Wreckage BpWreckage
 
----@class BpAI
+---@class UnitBlueprint  General General information for the unit    Physics information for the unit    Air control information for the unit    Transport   Transport related information for the unit  AI  AI information for the unit Intel   Intel information for the unit  Weapons Weapon  Weapon information for the unit
+
+---@class UnitBlueprintGeneral   CommandCaps Command capability flags for this unit  ToggleCaps  UpgradesTo  What unit, if any, does this unit upgrade to.   UpgradesFrom    What unit, if any, was this unit upgrade from.  UpgradesFromBase    What unit, if any, was this unit upgrade from base. SeedUnit    What unit, if any, was this unit seeded from.   QuickSelectPriority     Indicates unit has it's own avatar button in the quick select interface, and it's sorting priority  CapCost Cost of unit towards unit cap   SelectionPriority   Determines if a unit will be selected in a drag selection, only the highest priority units will get selected (1 is highest)
+
+---@class UnitBlueprintDisplay   DisplayName Displayed name of unit  Mesh blueprint we use for display   PlaceholderMeshName Name of placeholder mesh to use for the unit when normal mesh isn't available   IconName    Name of icon to use for the unit    Uniform scale to be applied to mesh SpawnRandomRotation Spawn with a small random rotation  HideLifebars    Hide lifebars if true
+
+---@class UnitBlueprintPhysics   FlattenSkirt    If true, terrain under building's skirt will be flattened.  SkirtOffsetX    Offset of left edge of skirt from left edge of footprint. Should be <= 0.   SkirtOffsetZ        Offset of top edge of skirt from top edge of footprint. Should be <= 0. SkirtSizeX  Unit construction pad Size X for building   SkirtSizeZ  Unit construction pad Size Z for building   MaxGroundVariation  Maximum elevation difference across skirt for build site    MotionType  Method of locomotion    AltMotionType   Alternate method of locomotion  StandUpright    Stands upright regardless of terrain    SinkLower   RotateBodyWhileMoving   Ability to rotate body to aim weapon slaved to body while in still in motion    DiveSurfaceSpeed    Dive/surface speed for the sub units    Maximum speed for the unit  MaxSpeedReverse Maximum speed for the unit in reverse   MaxAcceleration Maximum acceleration for the unit   MaxBrake    Maximum braking acceleration for the unit   MaxSteerForce       Maximum steer force magnitude that can be applied to acceleration   BankingSlope    How much the unit banks in corners (negative to lean outwards)  RollStability   How stable the unit is against rolling (0 to 1) RollDamping How much damping there is against rolling motion (1 = no motion at all) WobbleFactor    How much wobbling for the unit while hovering   WobbleSpeed How fast is the wobble. The faster the less stable looking  TurnRadius  Turn radius for the unit, in world units    Turn rate for the unit, in degrees per second   TurnFacingRate  Turn facing damping for the unit, usually used for hover units only RotateOnSpot    This unit can tries to rotate on the spot.  RotateOnSpotThreshold   Threshold for rotate on spot to take effect when moving.    Elevation   Preferred height above (-below) land or water surface   AttackElevation Preferred attack height when attacking ground targets... used by dive bombers   BuildOnLayerCaps    Unit may be built on these layers (only applies to structures   BuildRestriction    Special build restrictions (mass deposit, thermal vent, etc)    CatchUpAcc      Acceleration to allow unit to catch up to the target when it starts to drift    BackUpDistance  Distance that the unit will just back up if it's easier to do so    LayerChangeOffsetHeight     An offset to the layer change height used during the transition between seabed/water and land   LayerTransitionDuration Transition time in seconds when going from water/land and land/water    FuelUseTime Unit has fuel for this number of seconds    FuelRechargeRate    Unit fuels up at this rate per second   GroundCollisionOffset   Collision with ground offset    RaisedPlatforms Raised platoform definition for ground units to move on OccupyRects Set up the occupy rectangles of the unit that will override the footprint.
+
+---@class UnitBlueprintAir   CanFly  Is the unit capable of flight?  Winged  Does the unit use wings for forward flight? FlyInWater  Can this unit fly under water?  AutoLandTime    Timer to automatically initate landing on ground if idle    MaxAirspeed Maximum airspeed    MinAirspeed Minimum combat airspeed TurnSpeed   Regular turn speed of the unit  CombatTurnSpeed Maximum combat turn speed of the unit for special manuvers  StartTurnDistance       Distance from target at which to start turning to align with it TightTurnMultiplier     Additional turning multiplier ability during a tight turn manuver   SustainedTurnThreshold      Length of time allowed for sustained turn before we re-try a different approach LiftFactor  How much altitude the unit can gain/loose per second    BankFactor  How much aircraft banks in turns; negative to lean out  BankForward True if aircraft banks forward/back as well as sideways EngageDistance  Distance to being engaging enemy target in attack task  BreakOffTrigger Distance to target to trigger the breaking off attack   BreakOffDistance    Distnace to break off before turning around for another attack run  BreakOffIfNearNewTarget     If our new target is close by then perform break off first to increase distance between the 2   KMove   Controller proportional parameter for horizontal motion KMoveDamping    Controller damping parameter for horizontal motion  KLift   Controller proportional parameter for vertical motion   KLiftDamping    Controller damping parameter for vertical motion    KTurn   Controller proportional parameter for heading changes   KTurnDamping    Controller damping parameter for heading changes    KRoll   Controller proportional parameter for roll changes  KRollDamping    Controller damping parameter for roll changes   CirclingTurnMult    Adjust turning ability when in circling mode    CirclingRadiusChangeMinRatio    Min circling radius ratio for unit  CirclingRadiusChangeMaxRatio    Max circling radius ratio for unit  CirclingRadiusVsAirMult     Multiplier to the circling radius when targetting another air unit  CirclingElevationChangeRatio    Elevation change ratio of unit when circling    CirclingFlightChangeFrequency   Frequency of flight pattern change for unit CirclingDirChange       Whether unit should ever change flight direction while circling HoverOverAttack Whether unit should hover over the target directly to attack... used for cases like the C.Z.A.R RandomBreakOffDistanceMult      Random multiplier applied to the break off distance for winged aircrafts    RandomMinChangeCombatStateTime      Random min time to switch combat state in seconds for winged aircrafts  RandomMaxChangeCombatStateTime  Random max time to switch combat state in seconds for winged aircrafts  TransportHoverHeight    This transport will stay at this height when picking up and dropping off units  PredictAheadForBombDrop Time to predict ahead for moving targets?
+
+---@class UnitBlueprintTransport TransportClass  Type of attach points required on transports    ClassGenericUpTo    Generic slots up to the specified class Class2AttachSize    Number of class 1 attach points this affects    Class3AttachSize    Class4AttachSize    ClassSAttachSize    AirClass        These define that the unit can only land on air staging platforms   StorageSlots        How many internal storage slots available for the transport on top of the attach points DockingSlots    How many external docking slots available for air staging platforms RepairRate  Repairs units attached to me at this % of max health per second
+
+---@class UnitBlueprintAI    GuardScanRadius Guard range for the unit    GuardReturnRadius   Maximum range from the guarded unit before initiating return    StagingPlatformScanRadius   Range for staging platforms to look for planes to repair and refuel when they are on patrol ShowAssistRangeOnSelect Show assist range for the unit if selected  GuardFormationName  The formation name used for guarding this unit  NeedUnpack  Unit should unpack before firing weapon InitialAutoMode Initial auto mode behavior for the unit BeaconName      Thie is the beacon that this unit will create under some circumstances  TargetBones     Some target bones setup for other units to aim at instead of the default center pos RefuelingMultiplier This multiplier is applied when a staging platform is refueling an air unit RefuelingRepairAmount       This amount of repair per second offered to refueling air units RepairConsumeEnergy This amount of energy per second required to repair air unit    RepairConsumeMass   This amount of mass per second require to repair air unit   AutoSurfaceToAttack Automatically surface to attack ground targets  AttackAngle     Desired angle to face target to maximize the number of guns able to hit the targets
+
+---@class UnitBlueprintDefenseShield ShieldSize  Shield diameter RegenAssistMult Regen assist multiplier
+
+---@class UnitBlueprintDefense   Max health value for the unit   Starting health value for the unit  RegenRate   Amount of health to regenerate per second   AirThreatLevel  Amount of threat this poses to the enemy air units  SurfaceThreatLevel  SubThreatLevel  EconomyThreatLevel  ArmorType   The Armor type name Shield  Shield information
+
+---@class UnitBlueprintIntel VisionRadius    How far we can see above water  WaterVisionRadius   How far we can see underwater   RadarRadius How far our radar coverage goes SonarRadius OmniRadius  RadarStealth    Single unit radar stealth   SonarStealth    Single unit sonar stealth   Cloak   Single unit cloaking    ShowIntelOnSelect   Show intel radius of unit if selected   RadarStealthFieldRadius How far our radar stealth goes  SonarStealthFieldRadius How far our sonar stealth goes  CloakFieldRadius    How far our cloaking goes   JamRadius   How far we create fake blips    SpoofRadius How far off to displace blip    JammerBlips How many blips does a jammer produce?
+
+---@class UnitBlueprintEconomy   Energy cost to build this unit  Mass cost to build this unit    BuildRate   How efficient a unit is at building How long it takes to build this unit (in seconds)   StorageEnergy   Energy storage capacity provided by this unit   StorageMass Mass storage capacity provided by this unit NaturalProducer Produces resouce naturally and does not consume anything    BuildableCategories BuildableCategory   One of the unit categories that can be built by this unit   RebuildBonusIds You will get bonus if you rebuild this unit over the wreckage of these wreckages    InitialRallyX   default rally point Xfor the factory    InitialRallyZ   default rally point Z for the factory   NeedToFaceTargetToBuild builder needs to face target before it can build/repair SacrificeMassMult   builder will kill self but provide this amount of mass based on builder's mass cost to the unit it is helping   SacrificeEnergyMult     builder will kill self but provide this amount of energy based on the builder's energy cost to the unit it is helping   MaxBuildDistance        Maximum build range of the unit. The target must be within this range before the builder can perform operation
+
+---@alias UnitWeaponRangeCategory "UWRC_Undefined" | "UWRC_DirectFire" | "UWRC_IndirectFire" | "UWRC_AntiAir" | "UWRC_AntiNavy" | "UWRC_Countermeasure"
+
+---@class UnitBlueprintAI
 ---@field AttackAngle number -- Under what angle the unit attacks its target after getting an attack order
 ---@field AutoSurfaceToAttack boolean -- Automatically surface to attack ground targets.
 ---@field BeaconName string -- This is the beacon that this unit will create under some circumstances.
@@ -61,7 +85,7 @@
 ---@field RefuelingRepairAmount number -- This amount of repair per second offered to refueling air units.
 ---@field TargetBones string[] -- Some target bones setup for other units to aim at instead of the default center pos.
 
----@class BpAir
+---@class UnitBlueprintAir
 ---@field AutoLandTime number -- Timer to automatically initiate landing on ground if idle.
 ---@field BankFactor number -- How much aircraft banks in turns; negative to lean out.
 ---@field BankForward boolean -- True if aircraft banks forward/back as well as sideways.
@@ -105,98 +129,89 @@
 ---@field TurnSpeed number -- Regular turn speed of the unit.
 ---@field Winged boolean -- Does the unit use wings for forward flight?
 
----@class BpAdjacency
----@field EnergyBuildBonus BpAdjacencyBonus[] - Energy consumption reduction bestowed by energy production facilities.
----@field EnergyMaintenanceBonus BpAdjacencyBonus[] - Energy consumption (for maintenance i.e. shields intel etc.?) reduction bestowed by energy production facilities.
----@field EnergyProductionBonus BpAdjacencyBonus[] - Energy production increase bestowed by energy storage facilities.
----@field EnergyWeaponBonus BpAdjacencyBonus[] - Energy consumption (for weapons esp artilleries) reduction bestowed by energy production facilities.
----@field MassBuildBonus BpAdjacencyBonus[] - Mass consumption reduction bestowed by mass production facilities.
----@field MassProductionBonus BpAdjacencyBonus[] - Mass production increase bestowed by mass storage facilities.
+---@class UnitBlueprintAdjacency
+---@field EnergyBuildBonus UnitBlueprintAdjacencyBonus[] - Energy consumption reduction bestowed by energy production facilities.
+---@field EnergyMaintenanceBonus UnitBlueprintAdjacencyBonus[] - Energy consumption (for maintenance i.e. shields intel etc.?) reduction bestowed by energy production facilities.
+---@field EnergyProductionBonus UnitBlueprintAdjacencyBonus[] - Energy production increase bestowed by energy storage facilities.
+---@field EnergyWeaponBonus UnitBlueprintAdjacencyBonus[] - Energy consumption (for weapons esp artilleries) reduction bestowed by energy production facilities.
+---@field MassBuildBonus UnitBlueprintAdjacencyBonus[] - Mass consumption reduction bestowed by mass production facilities.
+---@field MassProductionBonus UnitBlueprintAdjacencyBonus[] - Mass production increase bestowed by mass storage facilities.
 
----@class BpAdjacencyBonus
+---@class UnitBlueprintAdjacencyBonus
 ---@field Category string|CategoryName
 ---@field Modifier number
 
----@class BpAudio
----@field Activate BpSoundResult
----@field ActiveLoop BpSoundResult
----@field AirUnitWaterImpact BpSoundResult
----@field AmbientMove BpSoundResult
----@field AmbientMoveLand BpSoundResult
----@field AmbientMoveWater BpSoundResult
----@field BarrelLoop BpSoundResult
----@field BarrelStart BpSoundResult
----@field BarrelStop BpSoundResult
----@field BeamLoop BpSoundResult
----@field BeamStart BpSoundResult
----@field BeamStop BpSoundResult
----@field CaptureLoop BpSoundResult
----@field ChargeStart BpSoundResult
----@field Close BpSoundResult
----@field CommanderArrival BpSoundResult
----@field Construct BpSoundResult
----@field ConstructLoop BpSoundResult
----@field ConstructStart BpSoundResult
----@field ConstructStop BpSoundResult
----@field DeathExplosion BpSoundResult
----@field Destroyed BpSoundResult
----@field DoneBeingBuilt BpSoundResult
----@field EnhanceEnd BpSoundResult
----@field EnhanceFail BpSoundResult
----@field EnhanceLoop BpSoundResult
----@field EnhanceStart BpSoundResult
----@field EnterWater BpSoundResult
----@field Fire BpSoundResult
----@field FireUnderWater BpSoundResult
----@field FootFallGeneric BpSoundResult
----@field FootFallGenericSeabed BpSoundResult
----@field HoverKilledOnWater BpSoundResult
----@field Killed BpSoundResult
----@field Landed BpSoundResult
----@field Landing BpSoundResult
----@field Load BpSoundResult
----@field MoveSharpTurn BpSoundResult
----@field MuzzleChargeStart BpSoundResult
----@field NuclearLaunchDetectedAeon BpSoundResult
----@field NuclearLaunchDetectedCybran BpSoundResult
----@field NuclearLaunchDetectedUEF BpSoundResult
----@field NuclearMissileInterceptedAeon BpSoundResult
----@field NuclearMissileInterceptedCybran BpSoundResult
----@field NuclearMissileInterceptedUEF BpSoundResult
----@field Open BpSoundResult
----@field Pack BpSoundResult
----@field ReclaimLoop BpSoundResult
----@field Refueling BpSoundResult
----@field ShieldOff BpSoundResult
----@field ShieldOn BpSoundResult
----@field StartCapture BpSoundResult
----@field StartMove BpSoundResult
----@field StartMoveAir BpSoundResult
----@field StartMoveLand BpSoundResult
----@field StartMoveWater BpSoundResult
----@field StartReclaim BpSoundResult
----@field StopMove BpSoundResult
----@field StopMoveLand BpSoundResult
----@field StopMoveWater BpSoundResult
----@field SubmergeStart BpSoundResult
----@field SurfaceStart BpSoundResult
----@field TakeOff BpSoundResult
----@field Thruster BpSoundResult
----@field TransitionLand BpSoundResult
----@field TransitionWater BpSoundResult
----@field UISelection BpSoundResult
----@field Unload BpSoundResult
----@field Unpack BpSoundResult
+---@class UnitBlueprintAudio
+---@field Activate SoundHandle
+---@field ActiveLoop SoundHandle
+---@field AirUnitWaterImpact SoundHandle
+---@field AmbientMove SoundHandle
+---@field AmbientMoveLand SoundHandle
+---@field AmbientMoveWater SoundHandle
+---@field BarrelLoop SoundHandle
+---@field BarrelStart SoundHandle
+---@field BarrelStop SoundHandle
+---@field BeamLoop SoundHandle
+---@field BeamStart SoundHandle
+---@field BeamStop SoundHandle
+---@field CaptureLoop SoundHandle
+---@field ChargeStart SoundHandle
+---@field Close SoundHandle
+---@field CommanderArrival SoundHandle
+---@field Construct SoundHandle
+---@field ConstructLoop SoundHandle
+---@field ConstructStart SoundHandle
+---@field ConstructStop SoundHandle
+---@field DeathExplosion SoundHandle
+---@field Destroyed SoundHandle
+---@field DoneBeingBuilt SoundHandle
+---@field EnhanceEnd SoundHandle
+---@field EnhanceFail SoundHandle
+---@field EnhanceLoop SoundHandle
+---@field EnhanceStart SoundHandle
+---@field EnterWater SoundHandle
+---@field Fire SoundHandle
+---@field FireUnderWater SoundHandle
+---@field FootFallGeneric SoundHandle
+---@field FootFallGenericSeabed SoundHandle
+---@field HoverKilledOnWater SoundHandle
+---@field Killed SoundHandle
+---@field Landed SoundHandle
+---@field Landing SoundHandle
+---@field Load SoundHandle
+---@field MoveSharpTurn SoundHandle
+---@field MuzzleChargeStart SoundHandle
+---@field NuclearLaunchDetectedAeon SoundHandle
+---@field NuclearLaunchDetectedCybran SoundHandle
+---@field NuclearLaunchDetectedUEF SoundHandle
+---@field NuclearMissileInterceptedAeon SoundHandle
+---@field NuclearMissileInterceptedCybran SoundHandle
+---@field NuclearMissileInterceptedUEF SoundHandle
+---@field Open SoundHandle
+---@field Pack SoundHandle
+---@field ReclaimLoop SoundHandle
+---@field Refueling SoundHandle
+---@field ShieldOff SoundHandle
+---@field ShieldOn SoundHandle
+---@field StartCapture SoundHandle
+---@field StartMove SoundHandle
+---@field StartMoveAir SoundHandle
+---@field StartMoveLand SoundHandle
+---@field StartMoveWater SoundHandle
+---@field StartReclaim SoundHandle
+---@field StopMove SoundHandle
+---@field StopMoveLand SoundHandle
+---@field StopMoveWater SoundHandle
+---@field SubmergeStart SoundHandle
+---@field SurfaceStart SoundHandle
+---@field TakeOff SoundHandle
+---@field Thruster SoundHandle
+---@field TransitionLand SoundHandle
+---@field TransitionWater SoundHandle
+---@field UISelection SoundHandle
+---@field Unload SoundHandle
+---@field Unpack SoundHandle
 
----@class BpSound
----@field Bank string
----@field Cue string
----@field LodCutoff string
-
----@alias UnparsedCategory string
-
---- TODO bp sound result?
----@class BpSoundResult
 
 ---@class BpBuff {Regen: {Level1: number, Level2: number, Level3: number, Level4: number, Level5: number}}
 ---@field Add  { OnImpact: boolean }
@@ -247,7 +262,8 @@
 ---@field ForcedBuildSpin unknown -- ?
 ---@field IdleEffects table<string, BpDisplay.Effects>  -- Effects displayed when the unit is idle (e.g. glow beneath hovering units), multiple layers can be used. The key should be the name of the layer where effects should be displayed.
 ---@field LayerChangeEffects table<string, BpDisplay.Effects> BpDisplay.LayerChangeEffects -- Effects displayed when the unit changes layers (e.g. when an aircraft lands or takes off). Defines for what transition the effects are created. 'string' is composed of 2 names of layers, first one is the old layer and the second is the new one. E.g.effects are needed for an aircraft landing, so the old layer is Air and the new one is Land, then the 'string' will be AirLand (LandAir would be the opposite - take off). Note: there is NO space between layer names.
----@field Mesh BpDisplay.Mesh
+---@field Mesh MeshBlueprint
+---@field MeshBlueprint string
 ---@field MotionChangeEffects table<string, BpDisplay.Effects>
 ---@field MovementEffects table<string, BpDisplay.MovementEffects> -- Effects displayed during movement of the unit. Key should be Name of the layer for which the effects are displayed.
 ---@field PlaceholderMeshName string -- ?
@@ -269,19 +285,6 @@
 ---@field Offset Vector -- Controls position of the effect relatively to the bone it's attached to. n1, n2 and n3 are respectively x, y and z coordinates (0, 0, 0 by default).
 ---@field Scale number -- Controls scale of the effect (1 by default).
 ---@field Type string -- Defines what effect will be used.
-
----@class BpDisplay.Mesh
----@field IconFadeInZoom number -- The zoom level at which the strategic icon begins showing. Higher values increase how zoomed out you must be for the icon to appear.
----@field LODs BpDisplay.Mesh.Lod[] -- Defines different Levels Of Detail, so that units become less detailed when player zooms out (to improve performance)
-
----@class BpDisplay.Mesh.Lod
----@field MeshName string -- lod0 file is linked here: '/units/UnitID/UnitID_LOD0.scm' where 0 is the index in the LODs list
----@field AlbedoName string -- lod0 albedo file is linked here: '/units/UnitID/UnitID_Albedo.dds' where 0 is the index in the LODs list
----@field NormalsName string -- lod0 normalsts file is linked here: '/units/UnitID/UnitID_NormalsTS.dds' where 0 is the index in the LODs list
----@field SpecularName string -- lod0 specteam file is linked here: '/units/UnitID/UnitID_SpecTeam.dds' where 0 is the index in the LODs list
----@field LODCutoff number -- Defines zoom level when this LOD is no longer used (higher value increases how zoomed out you must be).
----@field Scrolling boolean -- ?
----@field ShaderName string -- ? known ShaderName's: 'Unit', 'Insect', 'Seraphim'
 
 ---@class BpDisplay.MovementEffects: BpDisplay.Effects
 ---@field Contrails { Bones: string[] } -- Contrails shown behind aircraft (in SupCom usually behind tips of wings). --Bones are Names of the bones which will have the contrails attached.

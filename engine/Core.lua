@@ -1,6 +1,4 @@
----@declare-global
----Module: Core
--- @module Core
+---@meta
 
 ---@class Quaternion
 ---@field [1] number
@@ -23,10 +21,18 @@
 ---@field x1 number
 ---@field y1 number
 
----@alias Color string # `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
+---@alias Color string `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
+---@alias Bone string | number
+---@alias Army string | number
+---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
 
 ---@unknown
 function AITarget()
+end
+
+--- Set the audio language
+---@param language Language
+function AudioSetLanguage(language)
 end
 
 --- Returns the last component of a path
@@ -80,16 +86,29 @@ end
 function DiskToLocal(SysOrLocalPath)
 end
 
-
 ---End logging stats and optionally exit app
 ---@param exit boolean
 function EndLoggingStats(exit)
+end
+
+--- Return true if a unit category contains this unit
+---@param category moho.EntityCategory
+---@param unit UserUnit
+function EntityCategoryContains(category, unit)
 end
 
 --- Checks for the empty category
 ---@param categories Color
 ---@return boolean
 function EntityCategoryEmpty(categories)
+end
+
+---@overload fun(units: UserUnit[]): UserUnit[]
+--- Filter a list of units to only those found in the category
+---@param category moho.EntityCategory
+---@param units Unit[]
+---@return Unit[]
+function EntityCategoryFilterDown(category, units)
 end
 
 --- Computes a list of unit blueprint names that match the categories
@@ -119,9 +138,19 @@ end
 
 --- Creates a new thread, passing all additional arguments to the callback
 ---@param callback function
----@vararg any
+---@param ... any
 ---@return thread
-function ForkThread(callback,  ...)
+function ForkThread(callback, ...)
+end
+
+--- Get the blueprint of an object
+---@overload fun(mesh: Mesh): MeshBlueprint
+---@overload fun(effect: moho.IEffect): TrailEmitterBlueprint | BeamBlueprint
+---@overload fun(projectile: Projectile): ProjectileBlueprint
+---@overload fun(prop: Prop): PropBlueprint
+---@overload fun(unit: UserUnit | Unit): UnitBlueprint
+---@overload fun(weapon: Weapon): WeaponBlueprint
+function GetBlueprint(object)
 end
 
 --- Retrieves the cue and bank of a sound table
@@ -131,15 +160,37 @@ end
 function GetCueBank(sound)
 end
 
+--- Return game time in seconds
+---@return number
+function GetGameTimeSeconds()
+end
+
 --- Retrieves the movie duration
 ---@param localFileName string
 ---@return number
 function GetMovieDuration(localFileName)
 end
 
+---
+---@param id string
+---@return UserUnit
+function GetUnitById(id)
+end
+
 --- Retrieves the game version, as set by `version.lua`
 ---@return string
 function GetVersion()
+end
+
+---
+---@param language Language
+function HasLocalizedVO(language)
+end
+---
+---@param army1 number
+---@param army2 number
+---@return boolean
+function IsAlly(army1, army2)
 end
 
 --- Checks if the C-side of an object is destroyed / de-allocated
@@ -148,19 +199,30 @@ end
 function IsDestroyed(entity)
 end
 
+---
+---@param army1 number
+---@param army2 number
+---@return boolean
+function IsEnemy(army1, army2)
+end
+
+---
+---@param army1 number
+---@param army2 number
+---@return boolean
+function IsNeutral(army1, army2)
+end
+
 --- Destroys the c-side of a thread
 ---@param thread thread
 function KillThread(thread)
 end
 
---- Print a message to the moho logger, this shouldn't be used in production code
----@param TextOne string
----@param TextTwo? string
-function LOG(TextOne, TextTwo)
-end
-
 --- Rounds a number to the nearest integer using the half-round-even rounding (banker's rules)
+--- This means that it returns the closest integer and tie-breaks towards even numbers
+--- (since a bias towards even numbers is less detrimental than an upward bias).
 ---@param number number
+---@return integer
 function MATH_IRound(number)
 end
 
@@ -168,6 +230,7 @@ end
 ---@param s number Usually between 0 (returns `a`) and 1 (returns `b`)
 ---@param a number
 ---@param b number
+---@return number
 function MATH_Lerp(s,  a,  b)
 end
 
@@ -175,6 +238,7 @@ end
 ---@param alpha number
 ---@param L Quaternion
 ---@param R Quaternion
+---@return Quaternion
 function MinLerp(alpha, L, R)
 end
 
@@ -182,6 +246,7 @@ end
 ---@param alpha number
 ---@param L Quaternion
 ---@param R Quaternion
+---@return Quaternion
 function MinSlerp(alpha, L, R)
 end
 
@@ -189,6 +254,12 @@ end
 ---@param vector Vector
 ---@return Quaternion
 function OrientFromDir(vector)
+end
+
+--- Parse a string to generate a new entity category
+---@param cat string
+---@return EntityCategory
+function ParseEntityCategory(cat)
 end
 
 --- Creates a point vector
@@ -199,7 +270,18 @@ end
 ---@param vx number
 ---@param vy number
 ---@param vz number
+---@return Vector position
+---@return Vector velocity
 function PointVector(px, py, pz, vx, vy, vz)
+end
+
+--- Generate a random number between `min` and `max`
+---@param min number defaults to 0
+---@param max number defaults to 1
+---@return number
+---@overload fun(max: number): number
+---@overload fun(): number
+function Random(min, max)
 end
 
 --- RPCSound({cue,bank,cutoff}) - Make a sound parameters object
@@ -217,37 +299,37 @@ function Rect(x0, y0, x1, y1)
 end
 
 --- Define a beam effect, only works in `blueprints.lua`
----@param spec any
+---@param spec BeamBlueprint
 function RegisterBeamBlueprint(spec)
 end
 
 --- Define a particle emitter, only works in `blueprints.lua`
----@param spec any
+---@param spec EmitterBlueprint
 function RegisterEmitterBlueprint(spec)
 end
 
 --- Define mesh properties, only works in `blueprints.lua`
----@param spec any
+---@param spec MeshBlueprint
 function RegisterMeshBlueprint(spec)
 end
 
 --- Define a projectile, only works in `blueprints.lua`
----@param spec any
+---@param spec ProjectileBlueprint
 function RegisterProjectileBlueprint(spec)
 end
 
 --- Define a prop, only works in `blueprints.lua`
----@param spec any
+---@param spec PropBlueprint
 function RegisterPropBlueprint(spec)
 end
 
 --- Defile a poly trail emitter, only works in `blueprints.lua`
----@param spec any
+---@param spec TrailEmitterBlueprint
 function RegisterTrailEmitterBlueprint(spec)
 end
 
 --- Define a unit, only works in `blueprints.lua`
----@param spec any
+---@param spec UnitBlueprint
 function RegisterUnitBlueprint(spec)
 end
 
@@ -257,11 +339,25 @@ end
 function ResumeThread(thread)
 end
 
---- Print a debug message to the moholog, this shouldn't be used in production code
----@param TextOne string Debug message
----@param TextTwo string? Optional text
--- Output: "DEBUG: TextOne\000TextTwo"
-function SPEW(TextOne,TextTwo)
+--- Returns how many seconds in a tick
+---@return number
+function SecondsPerTick()
+end
+
+--- Return true iff the active session is a replay session
+---@return boolean
+function SessionIsReplay()
+end
+
+---
+---@param armyIndex number index or -1
+function SetFocusArmy(armyIndex)
+end
+
+--- Prints a debug message to the moholog, this shouldn't be used in production code
+---@param out any
+---@param ... any
+function SPEW(out, ...)
 end
 
 --- Splits the string on the delimiter, returning several smaller strings
@@ -281,6 +377,7 @@ end
 ---@param string string
 ---@param start number
 ---@param count number
+---@return string
 function STR_Utf8SubString(string,  start,  count)
 end
 
@@ -296,23 +393,18 @@ end
 function STR_xtoi(string)
 end
 
---- Returns how many seconds in a tick
----@return number
-function SecondsPerTick()
-end
-
 --- Sound({cue,bank,cutoff}) - Make a sound parameters object
----@param sound BpSound
----@return BpSoundResult
+---@param sound SoundBlueprint
+---@return SoundHandle
 function Sound(sound)
 end
 
 --- Define the footprint types for pathfinding, only works in `blueprints.lua`
----@param spec any
-function SpecFootprints(spec)
+---@param specs FootprintSpec[]
+function SpecFootprints(specs)
 end
 
---- Suspends the current thread indefinitely. Only a call to `ResumeThread(thread)` can resume it
+--- Suspends the current thread indefinitely; only a call to `ResumeThread(thread)` can resume it
 ---@see ResumeThread
 function SuspendCurrentThread()
 end
@@ -325,12 +417,14 @@ end
 --- Adds vector `b` to vector `a`
 ---@param a Vector
 ---@param b Vector
+---@return Vector
 function VAdd(a, b)
 end
 
 --- Subtracts vector `b` from vector `a`
 ---@param a Vector
 ---@param b Vector
+---@return Vector
 function VDiff(a, b)
 end
 
@@ -339,6 +433,7 @@ end
 ---@param y1 number
 ---@param x2 number
 ---@param y2 number
+---@return number
 function VDist2(x1, y1, x2, y2)
 end
 
@@ -353,30 +448,36 @@ end
 --- Computes the distance between the vectors `a` and `b`
 ---@param a Vector
 ---@param b Vector
-function VDist3()
+---@return number
+function VDist3(a, b)
 end
 
 --- Computes the squared distance between the vectors `a` and `b`
 ---@deprecated It is faster to compute it in Lua
 ---@param a Vector
 ---@param b Vector
+---@return number
 function VDist3Sq(a, b)
 end
 
 --- Computes the dot product between the vectors `a` and `b`
 ---@param a Vector
 ---@param b Vector
+---@return number
 function VDot(a, b)
 end
 
 --- Scales the vector `v` with the scalar `s`
 ---@param v Vector
 ---@param s number
+---@return Vector
 function VMult(v, s)
 end
+
 --- Computes the vector perpendicular to the plane described by the vectors `a` and `b`
 ---@param a Vector
 ---@param b Vector
+---@return Vector
 function VPerpDot(a, b)
 end
 
@@ -384,20 +485,21 @@ end
 ---@param x number
 ---@param y number
 ---@param z number
+---@return Vector
 function Vector(x, y, z)
 end
 
 --- Populates a new table with the corresponding meta table
 ---@param x number
 ---@param y number
+---@return Vector2
 function Vector2(x, y)
 end
 
 --- Print a warning message to the moholog, this shouldn't be used in production code
----@param TextOne string Warning message
----@param TextTwo string? Optional text
--- Output: "WARNING: TextOne\000TextTwo"
-function WARN(TextOne, TextTwo)
+---@param out any
+---@param ... any
+function WARN(out, ...)
 end
 
 --- Suspends the thread until the manipulator reaches its goal
@@ -416,6 +518,33 @@ end
 ---@param name string
 ---@diagnostic disable-next-line: lowercase-global
 function exists(name)
+end
+
+
+------
+-- New functions from engine patch:
+------
+
+---@alias PatchedDepositType
+---| 0 #all
+---| 1 #mass
+---| 2 #hydrocarbon
+
+---@class PatchedDepositResult
+---@field X1 number
+---@field X2 number
+---@field Z1 number
+---@field Z2 number
+---@field Type PatchedDepositType
+---@field Dist number
+
+--- Return list of deposits around a point of type
+---@param x number
+---@param z number
+---@param radius number
+---@param type PatchedDepositType
+---@return PatchedDepositResult[]
+function GetDepositsAroundPoint(x, z, radius, type)
 end
 
 

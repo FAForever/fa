@@ -3,7 +3,7 @@
 local ReconBlip = {}
 
 ---
----@return BlueprintBase
+---@return Blueprint
 function ReconBlip:GetBlueprint()
 end
 

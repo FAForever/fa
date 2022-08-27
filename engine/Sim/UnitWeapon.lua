@@ -116,7 +116,7 @@ function UnitWeapon:IsFireControl(label)
 end
 
 ---
----@param params BpSoundResult
+---@param params SoundHandle
 function UnitWeapon:PlaySound(params)
 end
 
