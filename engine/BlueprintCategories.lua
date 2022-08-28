@@ -6,7 +6,6 @@
 ---@type EntityCategory
 local categoryValue
 
----@class Categories : table<string, EntityCategory>
 categories = {
     ABILITYBUTTON = categoryValue,
     ADVANCEDCOMBATPRESET = categoryValue,

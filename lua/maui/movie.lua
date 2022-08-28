@@ -6,7 +6,7 @@
 -- number GetFrameRate()
 -- int GetNumFrames()
 
-local Control = import('control.lua').Control
+local Control = import('/lua/maui/control.lua').Control
 
 ---@class Movie : moho.movie_methods, Control
 Movie = Class(moho.movie_methods, Control) {

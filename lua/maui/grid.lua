@@ -1,6 +1,6 @@
-local Control = import('control.lua').Control
-local Group = import('group.lua').Group
-local ScaleNumber = import('layouthelpers.lua').ScaleNumber
+local Control = import('/lua/maui/control.lua').Control
+local Group = import('/lua/maui/group.lua').Group
+local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 local LazyVar = import('/lua/lazyvar.lua')
 
 ---@class Grid : Group

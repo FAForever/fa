@@ -1,6 +1,26 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3744 (25th of August, 2022)
+
+The maintainers of Nomads have resolved the issues with tactical and strategical defenses! They should
+now work as intended again.
+
+Jip
+
+## Bug fixes
+
+- (#4178) Do not allow regular projectiles to collide with missiles
+
+  Reverts the behavior to before game patch 3741.
+
+- (#4173) Fix minor issue with recoil of weapons
+
+## Contributors
+
+- Jip: #4178
+- Hdt80bro: #4173
+
 # Game version 3743 (23rd of August, 2022)
 
 There's an issue with tactical and strategic defenses not working when Nomads is enabled. This is due to

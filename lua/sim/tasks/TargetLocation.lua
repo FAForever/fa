@@ -11,14 +11,14 @@ local AIRESULT = import('/lua/sim/ScriptTask.lua').AIRESULT
 TargetLocation = Class(ScriptTask) {
 
     ---@param self TargetLocation
-    ---@param commandData any
+    ---@param commandData table
     OnCreate = function(self,commandData)
         ScriptTask.OnCreate(self,commandData)
         local unit = self:GetUnit():OnTargetLocation(commandData.Location)
     end,
 
     ---@param self TargetLocation
-    ---@return integer
+    ---@return number
     TaskTick = function(self)
         self:SetAIResult(AIRESULT.Success)
         return TASKSTATUS.Done
