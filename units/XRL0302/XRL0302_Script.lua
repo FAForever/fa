@@ -61,6 +61,7 @@ local DeathWeaponEMP = Class(Weapon) {
     end,
 }
 
+---@class XRL0302 : CWalkingLandUnit
 XRL0302 = Class(CWalkingLandUnit) {
 
     IntelEffects = {

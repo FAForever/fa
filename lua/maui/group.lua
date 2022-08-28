@@ -1,8 +1,8 @@
 
 
-local Control = import('control.lua').Control
+local Control = import('/lua/maui/control.lua').Control
 
----@class Group
+---@class Group : moho.group_methods, Control
 Group = Class(moho.group_methods, Control) {
 
     __init = function(self, parent, debugname)

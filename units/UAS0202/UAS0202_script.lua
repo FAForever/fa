@@ -14,6 +14,7 @@ local AAAZealotMissileWeapon = AeonWeapons.AAAZealotMissileWeapon
 local ADFCannonQuantumWeapon = AeonWeapons.ADFCannonQuantumWeapon
 local AAMWillOWisp = AeonWeapons.AAMWillOWisp
 
+---@class UAS0202 : ASeaUnit
 UAS0202 = Class(ASeaUnit) {
     Weapons = {
         FrontTurret = Class(ADFCannonQuantumWeapon) {},

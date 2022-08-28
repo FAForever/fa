@@ -118,6 +118,7 @@ UnitBlueprint {
         'SELECTABLE',
         'AEON',
         'MOBILE',
+        'AMPHIBIOUS',
         'ECONOMIC',
         'COMMAND',
         'MASSPRODUCTION',

@@ -11,6 +11,7 @@ local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local TAirToAirLinkedRailgun = TWeapons.TAirToAirLinkedRailgun
 
 
+---@class UEA0305 : TAirUnit
 UEA0305 = Class(TAirUnit) {
     
     EngineRotateBones = {'Jet_Front', 'Jet_Back',},

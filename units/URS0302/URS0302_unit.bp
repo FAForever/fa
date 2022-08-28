@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 60,
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 15,
         TargetBones = {
             'URS0302',
             'Back_Wake',
@@ -46,7 +46,6 @@ UnitBlueprint {
         'NAVAL',
         'TECH3',
         'DIRECTFIRE',
-        'ANTINAVY',
         'ANTIMISSILE',
         'VISIBLETORECON',
         'RECLAIMABLE',
@@ -54,6 +53,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYDEFENSE',
         'OVERLAYANTIAIR',
+        'OVERLAYANTINAVY',
         'OVERLAYSONAR',
         'OVERLAYRADAR',
         'SNIPEMODE',

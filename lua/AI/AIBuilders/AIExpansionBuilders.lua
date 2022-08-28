@@ -24,6 +24,8 @@ local PlatoonFile = '/lua/platoon.lua'
 
 local ExtractorToFactoryRatio = 3
 
+---@alias BuilderGroupsExpansion 'EngineerExpansionBuildersFull' | 'EngineerExpansionBuildersFull - Naval' | 'EngineerExpansionBuildersSmall' | 'EngineerFirebaseBuilders' 
+
 BuilderGroup {
     BuilderGroupName = 'EngineerExpansionBuildersFull',
     BuildersType = 'EngineerBuilder',

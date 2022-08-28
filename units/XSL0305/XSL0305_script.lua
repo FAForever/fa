@@ -14,6 +14,7 @@ local SDFSihEnergyRifleNormalMode = SeraphimWeapons.SDFSniperShotNormalMode
 local SDFSihEnergyRifleSniperMode = SeraphimWeapons.SDFSniperShotSniperMode
 
 
+---@class XSL0305 : SLandUnit
 XSL0305 = Class(SLandUnit) {
 
     Weapons = {

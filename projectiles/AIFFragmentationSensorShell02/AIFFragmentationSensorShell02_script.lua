@@ -6,7 +6,7 @@
 --**  Summary  :  Aeon Quantic Cluster Fragmentation Sensor shell script,XAB2307
 --**				 Child Projectile after 1st split	
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local AArtilleryFragmentationSensorShellProjectile = import('/lua/aeonprojectiles.lua').AArtilleryFragmentationSensorShellProjectile02

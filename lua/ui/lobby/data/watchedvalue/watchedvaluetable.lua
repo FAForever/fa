@@ -23,9 +23,9 @@ end
 LoggingEnabled = false
 LoggedChanges = {}
 
--- A flat, fixed-keyset table eagerly populated with WatchedValues.
----@class WatchedValueTable : 
-WatchedValueTable = Class() {
+--- A flat, fixed-keyset table eagerly populated with WatchedValues
+---@class WatchedValueTable
+WatchedValueTable = ClassSimple {
     __init = function(self, initialMapping)
         -- Where the values are really stored (__index and friends only apply if the keys are absent)
         -- We hide this away in the closure of the metatable.

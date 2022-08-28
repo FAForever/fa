@@ -1,5 +1,5 @@
-local Bitmap = import('bitmap.lua').Bitmap
-local Dragger = import('dragger.lua').Dragger
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Dragger = import('/lua/maui/dragger.lua').Dragger
 local UIUtil = import('/lua/ui/uiutil.lua')
 
 ---@class Button : Bitmap
@@ -119,10 +119,6 @@ Button = Class(Bitmap) {
 -- doing this. For now this at least gets this bollocks out of the Button class.
 ---@class FixableButton : Button
 FixableButton = Class(Button) {
-    __init = function(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
-        Button.__init(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
-    end,
-
     SetOverrideTexture = function(self, texture)
         self.textureOverride = texture
     end,

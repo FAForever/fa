@@ -10,6 +10,7 @@
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
 local SDFOhCannon = import('/lua/seraphimweapons.lua').SDFOhCannon
 
+---@class XSB2101 : SStructureUnit
 XSB2101 = Class(SStructureUnit) {
     Weapons = {
         MainGun = Class(SDFOhCannon) {},

@@ -188,6 +188,9 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+            
             AboveWaterTargetsOnly = true,
             Audio = {
                 BeamLoop = Sound {
@@ -207,10 +210,10 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_LowArc',
-            BeamCollisionDelay = 0,				-- 0.3
-            BeamLifetime = 1,					-- 0.9
+            BeamCollisionDelay = 0,
+            BeamLifetime = 1,
             CollideFriendly = false,
-            Damage = 55,					-- 220
+            Damage = 55,
             DamageRadius = 0,
             DamageType = 'Normal',
             DisplayName = 'Ultrachromatic Beam Generator',

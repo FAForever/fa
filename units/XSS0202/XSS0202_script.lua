@@ -15,6 +15,7 @@ local SAAOlarisCannonWeapon = SeraphimWeapons.SAAOlarisCannonWeapon
 local SAAShleoCannonWeapon = SeraphimWeapons.SAAShleoCannonWeapon
 local SAMElectrumMissileDefense = SeraphimWeapons.SAMElectrumMissileDefense
 
+---@class XSS0202 : SSeaUnit
 XSS0202 = Class(SSeaUnit) {
     Weapons = {
         Missile = Class(SLaanseMissileWeapon) {},

@@ -23,6 +23,8 @@ local SAI = '/lua/ScenarioPlatoonAI.lua'
 local TBC = '/lua/editor/ThreatBuildConditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
+---@alias BuilderGroupsEconomicUpgrade 'ExtractorUpgrades' | 'Time Exempt Extractor Upgrades Expansion' | 'Time Exempt Extractor Upgrades' | 'SpeedExtractorUpgrades' | 'T1BalancedUpgradeBuilders' | 'T2BalancedUpgradeBuilders' | 'T1BalancedUpgradeBuildersExpansion' | 'T2BalancedUpgradeBuildersExpansion' | 'T1SpeedUpgradeBuilders' | 'T2SpeedUpgradeBuilders' | 'T1SpeedUpgradeBuildersExpansions' | 'T2SpeedUpgradeBuildersExpansions' | 'T1SlowUpgradeBuilders' | 'T2SlowUpgradeBuilders' | 'T1NavalUpgradeBuilders' | 'T2NavalUpgradeBuilders'
+
 BuilderGroup {
     BuilderGroupName = 'ExtractorUpgrades',
     BuildersType = 'PlatoonFormBuilder',

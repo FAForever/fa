@@ -9,6 +9,7 @@
 ----****************************************************************************
 local CEnergyCreationUnit = import('/lua/cybranunits.lua').CEnergyCreationUnit
 
+---@class URB1102 : CEnergyCreationUnit
 URB1102 = Class(CEnergyCreationUnit) {
     AirEffects = {'/effects/emitters/hydrocarbon_smoke_01_emit.bp',},
     AirEffectsBones = {'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04',},

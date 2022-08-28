@@ -9,6 +9,7 @@
 --****************************************************************************
 local TPodTowerUnit = import('/lua/terranunits.lua').TPodTowerUnit
 
+---@class XEB0104 : TPodTowerUnit
 XEB0104 = Class(TPodTowerUnit) {}
 
 TypeClass = XEB0104

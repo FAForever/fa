@@ -7,6 +7,8 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
+---@class DRL0204 : CWalkingLandUnit
 DRL0204 = Class(import('/lua/cybranunits.lua').CWalkingLandUnit) {
     Weapons = {
         RocketBackpack = Class(import('/lua/cybranweapons.lua').CDFRocketIridiumWeapon02) {},

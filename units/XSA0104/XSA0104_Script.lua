@@ -16,6 +16,7 @@ local SDFHeavyPhasicAutoGunWeapon = SeraphimWeapons.SDFHeavyPhasicAutoGunWeapon
 
 local AirTransport = import('/lua/defaultunits.lua').AirTransport
 
+---@class XSA0104 : AirTransport
 XSA0104 = Class(AirTransport) {
 
     ContrailEffects = {'/effects/emitters/contrail_ser_polytrail_01_emit.bp',},

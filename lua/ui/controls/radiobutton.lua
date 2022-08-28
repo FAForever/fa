@@ -103,9 +103,9 @@ RadioButton = Class(Group) {
         -- the group should be sized so we can click on the control if desired
         self.Height:Set(function() return height + 12 end)
         self.Width:Set(maxWidth + 12)
-        self.Right:Set(function() return self.Left() + self.Width() end)
-        self.Bottom:Set(function() return self.Top() + self.Height() end)
-
+        LayoutHelpers.ResetBottom(self)
+        LayoutHelpers.ResetRight(self)
+        
         -- add the buttons to the layout
         local isFirst = true
         local lastButton

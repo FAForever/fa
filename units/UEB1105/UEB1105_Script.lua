@@ -9,6 +9,7 @@
 --****************************************************************************
 local TEnergyStorageUnit = import('/lua/terranunits.lua').TEnergyStorageUnit
 
+---@class UEB1105 : TEnergyStorageUnit
 UEB1105 = Class(TEnergyStorageUnit) {
 
     OnCreate = function(self)

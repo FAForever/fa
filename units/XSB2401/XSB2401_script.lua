@@ -11,6 +11,7 @@ local CreateSeraphimExperimentalBuildBaseThread = import('/lua/EffectUtilitiesSe
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 
+---@class XSB2401 : SStructureUnit
 XSB2401 = Class(SStructureUnit) {
     Weapons = {
         ExperimentalNuke = Class(SIFExperimentalStrategicMissile) {

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local ATorpedoCluster = import('/lua/aeonprojectiles.lua').ATorpedoCluster

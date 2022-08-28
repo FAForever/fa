@@ -21,6 +21,7 @@ function OnCameraFinish(name)
     Cameras[name]:EventSet()
 end
 
+---@class SimCamera : SingleEvent
 SimCamera = Class(SingleEvent) {
     __init = function(self,name)
         self.CameraName = name

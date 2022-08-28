@@ -6,9 +6,15 @@
 -- **  Summary  : Generic AI Platoon Build Conditions
 -- **             Build conditions always return true or false
 -- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param threatValue integer
+---@param threatType string
+---@param rings integer
+---@return boolean
 function EnemyThreatGreaterThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
     local testRings = rings or 10
     local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
@@ -22,6 +28,12 @@ function EnemyThreatGreaterThanValueAtBase(aiBrain, locationType, threatValue, t
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param threatValue integer
+---@param threatType string
+---@param rings integer
+---@return boolean
 function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
     local testRings = rings or 10
     local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
@@ -35,6 +47,12 @@ function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, thre
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param poolType string
+---@param enemyType string
+---@param rings integer
+---@return boolean
 function HaveLessThreatThanNearby( aiBrain, locationType, poolType, enemyType, rings )
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local poolThreat = pool:GetPlatoonThreat( poolType, categories.ALLUNITS )

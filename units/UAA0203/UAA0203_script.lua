@@ -10,6 +10,7 @@
 local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
 local ADFLaserLightWeapon = import('/lua/aeonweapons.lua').ADFLaserLightWeapon
 
+---@class UAA0203 : AAirUnit
 UAA0203 = Class(AAirUnit) {
     Weapons = {
         Turret = Class(ADFLaserLightWeapon) {

@@ -105,28 +105,6 @@ function Expand()
     controls.bg:Show()
 end
 
---INFO:   blueprintId="uel0001",
---INFO:   energyConsumed=0,
---INFO:   energyProduced=10,
---INFO:   energyRequested=0,
---INFO:   entityId="0",
---INFO:   fuelRatio=-1,
---INFO:   health=12000,
---INFO:   kills=0,
---INFO:   massConsumed=0,
---INFO:   massProduced=1,
---INFO:   massRequested=0,
---INFO:   maxHealth=12000,
---INFO:   nukeSiloBuildCount=0,
---INFO:   nukeSiloMaxStorageCount=1,
---INFO:   nukeSiloStorageCount=0,
---INFO:   shieldRatio=0,
---INFO:   tacticalSiloBuildCount=0,
---INFO:   tacticalSiloMaxStorageCount=1,
---INFO:   tacticalSiloStorageCount=0,
---INFO:   teamColor="ffe80a0a",
---INFO:   workProgress=0
-
 local queueTextures = {
     Move = {texture = UIUtil.UIFile('/game/orders/move_btn_up.dds'), text = '<LOC order_0000>Moving'},
     FormMove = {texture = UIUtil.UIFile('/game/orders/move_btn_up.dds'), text = '<LOC order_0000>Moving'},
@@ -163,7 +141,7 @@ local statFuncs = {
             local armyData = GetArmiesTable().armiesTable[info.armyIndex+1]
             local icon = Factions.Factions[armyData.faction+1].Icon
             if armyData.showScore and icon then
-                return armyData.nickname, UIUtil.UIFile(icon), armyData.color
+                return string.sub(armyData.nickname, 1, 12), UIUtil.UIFile(icon), armyData.color
             else
                 return false
             end
@@ -329,6 +307,7 @@ function UpdateWindow(info)
         controls.actionIcon:Hide()
         controls.actionText:Hide()
         controls.abilities:Hide()
+        controls.ReclaimGroup:Hide()
     else
         local bp = __blueprints[info.blueprintId]
         if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.blueprintId .. '_icon.dds', true)) then
@@ -404,13 +383,15 @@ function UpdateWindow(info)
             end
         end
 
-        controls.shieldBar:Hide()
         controls.fuelBar:Hide()
         controls.vetBar:Hide()
+        controls.ReclaimGroup:Hide()
 
         if info.shieldRatio > 0 then
             controls.shieldBar:Show()
             controls.shieldBar:SetValue(info.shieldRatio)
+        else
+            controls.shieldBar:Hide()
         end
 
         if info.fuelRatio > 0 then
@@ -521,6 +502,20 @@ function UpdateWindow(info)
                     controls.nextVet:SetText(text)
                 else
                     controls.vetBar:Hide()
+                end
+            end
+        else
+            if info.entityId then
+                local reclaimedMass, reclaimedEnergy
+                local unit = GetUnitById(info.entityId)
+                if unit then
+                    reclaimedMass = unit:GetStat('ReclaimedMass').Value
+                    reclaimedEnergy = unit:GetStat('ReclaimedEnergy').Value
+                end
+                if reclaimedMass or reclaimedEnergy then
+                    controls.ReclaimGroup:Show()
+                    controls.ReclaimGroup.MassText:SetText(tostring(reclaimedMass or 0))
+                    controls.ReclaimGroup.EnergyText:SetText(tostring(reclaimedEnergy or 0))
                 end
             end
         end
@@ -763,6 +758,17 @@ function CreateUI()
     controls.vetBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
     controls.nextVet = UIUtil.CreateText(controls.vetBar, '', 10, UIUtil.bodyFont)
     controls.vetTitle = UIUtil.CreateText(controls.vetBar, 'Veterancy', 10, UIUtil.bodyFont)
+
+    controls.ReclaimGroup = Group(controls.bg)
+    -- controls.ReclaimGroup.Title = UIUtil.CreateText(controls.ReclaimGroup, 'Reclaimed', 10, UIUtil.bodyFont)
+    controls.ReclaimGroup.Debug = Bitmap(controls.ReclaimGroup)
+    controls.ReclaimGroup.MassIcon = Bitmap(controls.ReclaimGroup)
+    controls.ReclaimGroup.EnergyIcon = Bitmap(controls.ReclaimGroup)
+    controls.ReclaimGroup.MassText = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
+    controls.ReclaimGroup.EnergyText = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
+    -- controls.ReclaimGroup.MassReclaimed = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
+    -- controls.ReclaimGroup.MassIcon = Bitmap(controls.ReclaimGroup)
+    -- controls.ReclaimGroup.MassReclaimed = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
 
     controls.statGroups = {}
     for i = 1, table.getn(statFuncs) do
