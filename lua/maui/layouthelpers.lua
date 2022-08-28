@@ -837,10 +837,10 @@ end
 
 --- Sets the alpha of the control
 ---@param alpha number
----@param forChildren boolean
+---@param forChildren? boolean
 ---@return Layouter
 function LayouterMetaTable:Alpha(alpha, forChildren)
-    self.c:SetAlpha(alpha, forChildren)
+    self.c:SetAlpha(alpha, forChildren or false)
     return self
 end
 

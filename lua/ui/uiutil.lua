@@ -392,6 +392,10 @@ function RotateLayout(direction)
 end
 
 --* given a path and name relative to the skin path, returns the full path based on the current skin
+---comment
+---@param filespec any
+---@param checkMods any
+---@return string
 function UIFile(filespec, checkMods)
     if UIFileBlacklist[filespec] then return filespec end
     local skins = import('/lua/skins/skins.lua').skins

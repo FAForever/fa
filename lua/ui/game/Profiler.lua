@@ -151,7 +151,7 @@ function OpenWindow()
 
     -- DEBUG CODE TO REMOVE
 
-    import('/lua/ui/game/score-alt.lua').CreateScoreUI()
+    import('/lua/ui/game/scoreboard/scoreboard.lua').CreateScoreUI()
 
     if true then 
         return 

@@ -806,6 +806,9 @@ function ChatPageDown(mod)
 end
 
 function ReceiveChat(sender, msg)
+
+    reprsl(debug.traceback())
+
     if not msg.ConsoleOutput then
         SimCallback({Func="GiveResourcesToPlayer", Args={ From=GetFocusArmy(), To=GetFocusArmy(), Mass=0, Energy=0, Sender=sender, Msg=msg},} , true)
     end

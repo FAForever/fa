@@ -959,6 +959,10 @@ function RegisterChatFunc(func, dataTag)
 end
 
 function ReceiveChat(sender, data)
+
+    reprsl(sender)
+    reprsl(data)
+
     for i, chatFuncEntry in chatFuncs do
         if data[chatFuncEntry.id] then
             chatFuncEntry.func(sender, data)
