@@ -67,8 +67,8 @@ function CUIWorldMesh:SetLifetimeParameter(param)
 end
 
 ---
----@param meshDesc string
-function CUIWorldMesh:SetMesh(meshDesc)
+---@param spec table
+function CUIWorldMesh:SetMesh(spec)
 end
 
 ---

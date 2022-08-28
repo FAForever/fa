@@ -966,7 +966,7 @@ end
  
 ---
 ---@param client? number | number[] client or clients
----@param message string
+---@param message table | number | string
 function SessionSendChatMessage(client, message)
 end
 
