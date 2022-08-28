@@ -54,7 +54,7 @@ end
 
 function CreateScoreUI(parent)
     created = true
-    savedParent = GetFrame(0)
+    savedParent = parent
 
     controls.bg = Group(savedParent)
     controls.bg.Depth:Set(10)
