@@ -446,7 +446,7 @@ Unit = Class(moho.unit_methods) {
     ---- TOGGLES
     -------------------------------------------------------------------------------------------
     ---@param self Unit
-    ---@param bit integer
+    ---@param bit number
     OnScriptBitSet = function(self, bit)
         if bit == 0 then -- Shield toggle
             self:PlayUnitAmbientSound('ActiveLoop')
@@ -496,7 +496,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param bit integer
+    ---@param bit number
     OnScriptBitClear = function(self, bit)
         if bit == 0 then -- Shield toggle
             self:StopUnitAmbientSound('ActiveLoop')
@@ -779,7 +779,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param target Unit
+    ---@param target Unit | Prop
     OnStartReclaim = function(self, target)
         self:SetUnitState('Reclaiming', true)
         self:SetFocusEntity(target)
@@ -854,26 +854,26 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param target Unit
+    ---@param target Unit | Prop
     StartReclaimEffects = function(self, target)
         self.ReclaimEffectsBag = self.ReclaimEffectsBag or TrashBag()
         self.ReclaimEffectsBag:Add(self:ForkThread(self.CreateReclaimEffects, target))
     end,
 
     ---@param self Unit
-    ---@param target Unit
+    ---@param target Unit | Prop
     CreateReclaimEffects = function(self, target)
         EffectUtilities.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
 
     ---@param self Unit
-    ---@param target Unit
+    ---@param target Unit | Prop
     CreateReclaimEndEffects = function(self, target)
         EffectUtilities.PlayReclaimEndEffects(self, target)
     end,
 
     ---@param self Unit
-    ---@param target Unit
+    ---@param target Unit | Prop
     StopReclaimEffects = function(self, target)
         if self.ReclaimEffectsBag then
             self.ReclaimEffectsBag:Destroy()
@@ -1574,7 +1574,7 @@ Unit = Class(moho.unit_methods) {
 
     -- Use this to set a veterancy level directly, usually used by a scenario
     ---@param self Unit
-    ---@param veteranLevel integer
+    ---@param veteranLevel number
     SetVeterancy = function(self, veteranLevel)
         if veteranLevel <= 0 or veteranLevel > 5 then return end
         if not self.gainsVeterancy then return end
@@ -1588,7 +1588,7 @@ Unit = Class(moho.unit_methods) {
 
     -- Set the veteran level to the level specified
     ---@param self Unit
-    ---@param level integer
+    ---@param level number
     SetVeteranLevel = function(self, level)
         local regenBuff, hpBuff = self:CreateVeterancyBuffs(level)
 
@@ -1608,7 +1608,7 @@ Unit = Class(moho.unit_methods) {
 
     -- Veterancy can't be 'Undone', so we heal the unit directly, one-off, rather than using a buff. Much more flexible.
     ---@param self Unit
-    ---@param level integer
+    ---@param level number
     DoVeterancyHealing = function(self, level)
         local bp = self.Blueprint
         local maxHealth = bp.Defense.MaxHealth
@@ -1618,7 +1618,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param level integer
+    ---@param level number
     ---@return string regenBuffName
     ---@return string healthBuffName
     CreateVeterancyBuffs = function(self, level)
@@ -1873,8 +1873,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param high integer
-    ---@param low integer
+    ---@param high number
+    ---@param low number
     ---@param chassis any
     CreateUnitDestructionDebris = function(self, high, low, chassis)
         local HighDestructionParts = table.getn(self.DestructionPartsHighToss)
@@ -2753,7 +2753,7 @@ Unit = Class(moho.unit_methods) {
 
     ---@param self Unit
     ---@param bp any unused
-    ---@return integer 
+    ---@return number 
     GetRebuildBonus = function(self, bp)
         -- The engine intends to delete a wreck when our next build job starts. Remember this so we
         -- can regenerate the wreck if it's got the wrong one.
@@ -4125,7 +4125,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param footfall any
+    ---@param footfall boolean
     ---@return boolean
     CreateFootFallManipulators = function(self, footfall)
         if not footfall.Bones or (footfall.Bones and (table.empty(footfall.Bones))) then
@@ -4236,7 +4236,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param target_bp any
+    ---@param target_bp UnitBlueprint
     ---@return boolean
     CheckBuildRestriction = function(self, target_bp)
         if self:CanBuild(target_bp.BlueprintId) then
