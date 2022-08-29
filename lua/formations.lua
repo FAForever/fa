@@ -704,7 +704,7 @@ end
 -- ============ Formation Functions =============
 -- ==============================================
 ---@param formationUnits Unit
----@return true
+---@return table
 function AttackFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'AttackFormation')
     if cachedResults then
@@ -762,7 +762,7 @@ function AttackFormation(formationUnits)
 end
 
 ---@param formationUnits Unit
----@return true
+---@return table
 function GrowthFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'GrowthFormation')
     if cachedResults then
@@ -1076,7 +1076,7 @@ function GetLandRowModifer(unitsList, categoryTable, currRowLen)
     end
 end
 
----@param occupiedSpaces any
+---@param occupiedSpaces boolean[][]
 ---@param size number
 ---@param rowNum number
 ---@param whichCol number
@@ -1115,7 +1115,7 @@ function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen,
     return false
 end
 
----@param occupiedSpaces any
+---@param occupiedSpaces boolean[][]
 ---@param size number
 ---@param rowNum number
 ---@param whichCol number
@@ -1477,7 +1477,7 @@ end
 
 -- ========= UNIT SORTING ==========
 ---@param unitsList Unit[]
----@return Unit[]
+---@return any
 function CalculateSizes(unitsList)
     local largestFootprint = 1
     local smallestFootprints = {}

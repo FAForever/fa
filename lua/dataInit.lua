@@ -20,7 +20,7 @@ end
 
 ---@param x number
 ---@param y number
----@return table
+---@return Vector2
 function VECTOR2(x,y)
 	return { x, y, type = 'VECTOR2' }
 end
@@ -49,7 +49,7 @@ function STRING(s)
 end
 
 ---@param group Group
----@return Group
+---@return table
 function GROUP(group)
 	group.type = 'GROUP'
 	return group

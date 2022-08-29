@@ -42,7 +42,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     ---@param self UnstablePhasonLaserCollisionBeam
-    ---@param impactType string
+    ---@param impactType ImpactType
     ---@param targetEntity Projectile
     OnImpact = function(self, impactType, targetEntity)
         CollisionBeam.OnImpact(self, impactType, targetEntity)
@@ -69,7 +69,7 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     ---@param self UnstablePhasonLaserCollisionBeam
-    ---@param impactType string
+    ---@param impactType ImpactType
     ---@param targetEntity Projectile
     OnImpact = function(self, impactType, targetEntity)
         if impactType == 'Terrain' then

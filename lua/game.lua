@@ -5,6 +5,12 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@class UnitRestrictions
+---@field Global table<UnitId, boolean>
+---@field PerArmy table<UnitId, boolean>[]
+
+
+
 -- This file is used by both sim and UI code. It should therefore at
 -- no moment use logic that is not available in both. Any pull request that 
 -- introduces logic that is not functional in both the ui and the sim will 
@@ -37,7 +43,7 @@ VeteranDefault = {
 --- if DifferentialUpgradeCostCalculation is set to true, the base upgrade cost will be subtracted
 ---@param builder Builder
 ---@param targetData table
----@param upgradeBaseData table
+---@param upgradeBaseData UnitBlueprintEconomy
 ---@return number buildtimerate
 ---@return number energy
 ---@return number mass
@@ -90,7 +96,7 @@ local ToString = import('/lua/sim/CategoryUtils.lua').ToString
 --- Gets army index for specified army name
 --- e.g. GetArmyIndex('ARMY_1') -> 1
 ---@param armyName string
----@return number|unknown
+---@return Army|number
 function GetArmyIndex(armyName)
     local index = nil
     if type(armyName) == 'number' then
@@ -112,7 +118,7 @@ end
 --- e.g. AddRestriction(categories.TECH2, 1) -> restricts all T2 units for army 1
 --- e.g. AddRestriction(categories.TECH2) -> restricts all T2 units for all armies
 ---@param cats EntityCategory
----@param army number
+---@param army Army
 function AddRestriction(cats, army)
     if type(cats) ~= 'userdata' then
         WARN('Game.AddRestriction() called with invalid categories "' .. ToString(cats) .. '" '
@@ -131,7 +137,7 @@ end
 --- e.g. RemoveRestriction(categories.TECH2, 1) -> removes all T2 units restriction for army 1
 --- e.g. RemoveRestriction(categories.TECH2) -> removes all T2 units restriction for all armies
 ---@param cats EntityCategory
----@param army number
+---@param army Army
 function RemoveRestriction(cats, army)
     if type(cats) ~= 'userdata' then
         WARN('Game.RemoveRestriction() called with invalid categories "' .. ToString(cats) .. '" '
@@ -159,7 +165,7 @@ end
 --- e.g. IsRestricted('xab1401', 1) -> checks if Aeon Paragon is restricted for army with index 1
 --- Note that global restrictions take precedence over restrictions set on specific armies
 ---@param unitId UnitId
----@param army string
+---@param army number
 ---@return boolean
 function IsRestricted(unitId, army)
     if bps.Ignored then
@@ -178,19 +184,20 @@ function IsRestricted(unitId, army)
 end
 
 --- Gets a table with ids of restricted units {Global = {}, PerArmy = {}}
+---@return UnitRestrictions
 function GetRestrictions()
     return restrictions
 end
 
 --- Sets a table with ids of restricted units {Global = {}, PerArmy = {}}
----@param blueprintIDs BlueprintBase
+---@param blueprintIDs UnitRestrictions
 function SetRestrictions(blueprintIDs)
     restrictions = blueprintIDs
 end
 
 --- Sorts unit blueprints based on build priority
----@param bp1 UnitId
----@param bp2 UnitId
+---@param bp1 UnitBlueprint
+---@param bp2 UnitBlueprint
 ---@return boolean
 local function SortUnits(bp1, bp2)
     local v1 = bp1.BuildIconSortPriority or bp1.StrategicIconSortPriority
@@ -206,6 +213,7 @@ end
 local IsValidUnit = import('/lua/ui/lobby/UnitsAnalyzer.lua').IsValidUnit
 
 --- Gets blueprints that can be upgraded, e.g. MEX, Shield, Radar structures
+---@return UnitBlueprint[]
 local function GetUnitsUpgradable()
     local units = {}
 
@@ -255,7 +263,7 @@ end
 --- e.g. restrictions = {categories.TECH1} ->
 ---@param toggle boolean
 ---@param cats EntityCategory
----@param army string
+---@param army number
 function ResolveRestrictions(toggle, cats, army)
     -- Initialize blueprints info only once
     if table.empty(bps.ids) or table.empty(bps.upgradeable) then
