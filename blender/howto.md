@@ -1,5 +1,6 @@
 # How to Import Units & add PBR Texture
 
+[Youtube Video](https://youtu.be/pq9os0NhfB4)
 ## Pre requisites 
 - [Blender 3.0+](https://www.blender.org/download/)
 - [Supcom Importer](https://github.com/Solstice245/scstudio) This neend to be enabled in blender. Download the repository as a zip file, don't unpack it, and then install it from the blender addons interface.
