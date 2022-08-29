@@ -156,6 +156,13 @@ local function FindCustomStrategicIcons(all_bps)
     local preGameData = LoadPreGameData()
     if preGameData and preGameData.IconReplacements then
         for _, info in preGameData.IconReplacements do
+            -- data that is set in the lobby
+            -- info.Name = mod.name 
+            -- info.Author = mod.author 
+            -- info.Location = mod.location
+            -- info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+            -- info.UID = uid
+
             local safemath = table.copy(math)
             safemath.random = nil
 
