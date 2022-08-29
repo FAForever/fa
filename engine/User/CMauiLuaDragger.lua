@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.dragger_methods
 local CMauiLuaDragger = {}
 

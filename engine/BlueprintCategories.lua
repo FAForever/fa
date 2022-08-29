@@ -1,5 +1,4 @@
 ---@meta
----@declare-global
 
 ---@class EntityCategory : userdata, moho.EntityCategory
 

@@ -24,6 +24,7 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 WaitTicks = coroutine.yield
 
+---@param n number
 function WaitSeconds(n)
     local ticks = math.max(1, n * 10)
     if ticks > 1 then

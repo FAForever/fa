@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.platoon_methods
 local CPlatoon = {}
 
