@@ -2,16 +2,16 @@
 
 ## Pre requisites 
 - [Blender 3.0+](https://www.blender.org/download/)
-- [Supcom Importer](https://github.com/Solstice245/scstudio) This neend to be added to your addons folder
-- [Download Repository as Zip](https://github.com/FAForever/fa)
+- [Supcom Importer](https://github.com/Solstice245/scstudio) This neend to be enabled in blender. Download the repository as a zip file, don't unpack it, and then install it from the blender addons interface.
+- The actual unit files. Unpack the units.scd from your original Forged Alliance installation as if it was a normal zip file.
 
 
 ### Importing Unit
-Import the unit you want through `file > import > supreme commander model`. The unit will have a material already attached, but we don't need that one.
+Open `PBR Shaders.blend` then import the unit you want through `file > import > supreme commander model`. The unit will have a material already attached, but we don't need that one. If you want multiple models to have the right relative scale to each other, you can scale the object according to the unit's `UniformScale` in its blueprint.
 
 ![Adding Unit](/blender/step%201.png)
 
-### Chaning the material
+### Changing the material
 Change the material that the importer assigned to one of the PBR materials. It's named after the corresponding faction. In a shader editor you can change it by clicking the ball.
 
 ![Applying PBR material](/blender/step2.png)
@@ -28,12 +28,12 @@ You can now change the textures to the ones appropriate for your new model. Pres
 
 Then you can open a new texture. Browse to the correct folder and select the right texture(unit_Albedo.dds).
 
-### Seting Colour Space
+### Setting Color Space
 As a last step you need to make sure that the SpecTeam and Normal map use Non-Color colorspace. 
 
 ![set to no-color](/blender/step%205.png)
 
-Otherwise the unit will look kind of odd and blender likes to reset it to sRGB colorspace when changing the image.
+Otherwise the unit will look kind of odd and blender likes to reset that to sRGB colorspace when changing the image.
 
 
 If you want to look inside the node group you can select it and open it with "tab".
