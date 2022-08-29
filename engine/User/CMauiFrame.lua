@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.frame_methods : moho.control_methods
 local CMauiFrame = {}
 

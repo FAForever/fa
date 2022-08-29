@@ -1,7 +1,7 @@
 -- Class methods:
 -- number GetTopmostDepth() - returns the topmost depth value regardless of hiding
 
-local Control = import('control.lua').Control
+local Control = import('/lua/maui/control.lua').Control
 
 ---@class Frame : moho.frame_methods, Control
 Frame = Class(moho.frame_methods, Control) {

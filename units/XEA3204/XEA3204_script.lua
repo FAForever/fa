@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/XEA3204/XEA3204_script.lua
 -- Author(s):  Dru Staltman
 -- Summary  :  UEF CDR Pod Script
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit

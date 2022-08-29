@@ -47,7 +47,7 @@ function GetDefaultPlayerOptions(playerName)
     }
 end
 
----@class DiscoveryService
+---@class DiscoveryService : moho.discovery_service_methods
 DiscoveryService = Class(moho.discovery_service_methods) {
     RemoveGame = function(self, index)
         LOG('DiscoveryService.RemoveGame(' .. tostring(index) .. ')')

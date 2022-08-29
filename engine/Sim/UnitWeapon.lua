@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 
@@ -116,7 +117,7 @@ function UnitWeapon:IsFireControl(label)
 end
 
 ---
----@param params BpSoundResult
+---@param params SoundHandle
 function UnitWeapon:PlaySound(params)
 end
 

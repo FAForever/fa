@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Phasic Autogun Projectile script, XSL0101
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 SDFPhasicAutogun01 = Class(import('/lua/seraphimprojectiles.lua').SPhasicAutogun) {

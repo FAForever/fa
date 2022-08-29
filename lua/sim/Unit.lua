@@ -67,22 +67,31 @@ SyncMeta = {
     end,
 
     __newindex = function(t, key, val)
+         -- globals to locals
+        local rawget = rawget
+        local UnitData = UnitData
+
         local id = rawget(t, 'id')
         local army = rawget(t, 'army')
-        if not UnitData[id] then
-            UnitData[id] = {
-                OwnerArmy = rawget(t, 'army'),
-                Data = {}
+        local unitData = UnitData[id]
+        if not unitData then
+            unitData = {
+                OwnerArmy = army,
+                Data = {},
             }
+            UnitData[id] = unitData
         end
-        UnitData[id].Data[key] = val
+        unitData.Data[key] = val
 
         local focus = GetFocusArmy()
         if army == focus or focus == -1 then -- Let observers get unit data
-            if not Sync.UnitData[id] then
-                Sync.UnitData[id] = {}
+            local SyncUnitData = Sync.UnitData
+            unitData = SyncUnitData[id]
+            if not unitData then
+                unitData = {}
+                SyncUnitData[id] = unitData
             end
-            Sync.UnitData[id][key] = val
+            unitData[key] = val
         end
     end,
 }

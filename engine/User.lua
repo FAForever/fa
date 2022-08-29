@@ -39,11 +39,6 @@ end
 function AnyInputCapture()
 end
 
---- Set the audio language
----@param language Language
-function AudioSetLanguage(language)
-end
-
 --- Clear and disable the build templates
 function ClearBuildTemplates()
 end
@@ -136,19 +131,6 @@ end
 function EngineStartSplashScreens()
 end
 
---- Return true if a unit category contains this unit
----@param category moho.EntityCategory
----@param unit UserUnit
-function EntityCategoryContains(category, unit)
-end
-
---- Filter a list of units to only those found in the category
----@param category moho.EntityCategory
----@param units UserUnit[]
----@return UserUnit[]
-function EntityCategoryFilterDown(category, units)
-end
-
 --- Filter a list of units to exclude those found in the category
 ---@param category moho.EntityCategory
 ---@param units UserUnit[]
@@ -236,15 +218,6 @@ end
 function GetAttachedUnitsList(units)
 end
 
---- Get the blueprint of an object
----@overload fun(effect: moho.IEffect): TrailEmitterBlueprint | BeamBlueprint
----@overload fun(projectile: Projectile): ProjectileBlueprint
----@overload fun(prop: Prop): PropBlueprint
----@overload fun(unit: UserUnit | Unit): UnitBlueprint
----@overload fun(weapon: Weapon): WeaponBlueprint
-function GetBlueprint(object)
-end
-
 ---
 ---@param name string
 ---@return Camera
@@ -313,11 +286,6 @@ end
 --- Return a formatted string displaying the time the game has been played
 ---@return string
 function GetGameTime()
-end
-
---- Return game time in seconds
----@return number
-function GetGameTimeSeconds()
 end
 
 --- Return a table of idle engineer units for the army
@@ -488,12 +456,6 @@ end
 function GetUIControlsAlpha()
 end
 
----
----@param id string
----@return UserUnit
-function GetUnitById(id)
-end
-
 --- Given a set of units, get the union of orders and unit categories (for determining builds)
 ---@param unitSet any
 ---@return string[] orders
@@ -531,11 +493,6 @@ end
 ---
 ---@return boolean
 function HasCommandLineArg(option)
-end
-
----
----@param language Language
-function HasLocalizedVO(language)
 end
 
 --- Add a set of key mappings
@@ -671,30 +628,9 @@ function InternalSaveGame(filename, friendlyname, oncompletion)
 end
 
 ---
----@param army1 number
----@param army2 number
----@return boolean
-function IsAlly(army1, army2)
-end
-
----
----@param army1 number
----@param army2 number
----@return boolean
-function IsEnemy(army1, army2)
-end
-
----
 ---@param keyCode string
 ---@return boolean
 function IsKeyDown(keyCode)
-end
-
----
----@param army1 number
----@param army2 number
----@return boolean
-function IsNeutral(army1, army2)
 end
 
 ---
@@ -779,12 +715,6 @@ end
 function OpenURL(url)
 end
 
---- Parse a string to generate a new entity category
----@param cat string
----@return moho.EntityCategory
-function ParseEntityCategory(cat)
-end
-
 ---
 ---@param category string
 ---@param pause boolean
@@ -798,7 +728,7 @@ function PauseVoice(category, pause)
 end
 
 ---
----@param sound BpSoundResult
+---@param sound SoundHandle
 ---@param prepareOnly? boolean
 ---@return moho.sound_methods
 function PlaySound(sound, prepareOnly)
@@ -810,7 +740,7 @@ function PlayTutorialVO(params)
 end
 
 ---
----@param sound BpSoundResult
+---@param sound SoundHandle
 ---@param duck? boolean
 ---@return moho.sound_methods
 function PlayVoice(sound, duck)
@@ -830,15 +760,6 @@ end
 ---@param mods ModInfo[]
 ---@param hipri? boolean
 function PrefetchSession(mapname, mods, hipri)
-end
-
---- Generate a random number between `min` and `max`
----@param min number defaults to 0
----@param max number defaults to 1
----@return number
----@overload fun(max: number): number
----@overload fun(): number
-function Random(min, max)
 end
 
 ---
@@ -951,11 +872,6 @@ end
 function SessionIsPaused()
 end
 
---- Return true iff the active session is a replay session
----@return boolean
-function SessionIsReplay()
-end
-
 --- Pause the world simulation
 function SessionRequestPause()
 end
@@ -1002,11 +918,6 @@ end
 ---@param units UserUnit[]
 ---@param fireState FireState
 function SetFireState(units, fireState)
-end
-
----
----@param armyIndex number index or -1
-function SetFocusArmy(armyIndex)
 end
 
 ---
@@ -1100,18 +1011,12 @@ end
 function SyncPlayableRect(region)
 end
 
----
----@param mode boolean
+---Now also supports string with hex colors
+---Colors separated by commas, no spaces. Example:
+---TeamColorMode("ffffffff,ffff32ff,ffb76518,ffa79602")
+---colors will be applied to army according to its index. first color -> army with index 1, second color -> 2 etc.
+---@param mode boolean | string
 function TeamColorMode(mode)
-end
-
----
--- TeamColorMode
--- Now also supports string with hex colors
--- Colors separated by commas, no spaces. Example:
--- TeamColorMode("ffffffff,ffff32ff,ffb76518,ffa79602")
--- colors will be applied to army according to its index. first color -> army with index 1, second color -> 2 etc.
-function INFO:TeamColorMode()
 end
 
 
@@ -1197,30 +1102,4 @@ end
 ---@param pathDebugger PathDebugger
 ---@param spec fa-class
 function _c_CreatePathDebugger(pathDebugger, spec)
-end
-
-------
--- New functions from engine patch:
-------
-
----@alias PatchedDepositType
----| 0 #all
----| 1 #mass
----| 2 #hydrocarbon
-
----@class PatchedDepositResult
----@field X1 number
----@field X2 number
----@field Z1 number
----@field Z2 number
----@field Type PatchedDepositType
----@field Dist number
-
---- Return list of deposits around a point of type
----@param x number
----@param z number
----@param radius number
----@param type PatchedDepositType
----@return PatchedDepositResult[]
-function GetDepositsAroundPoint(x, z, radius, type)
 end
