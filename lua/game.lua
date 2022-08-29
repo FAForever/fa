@@ -44,7 +44,7 @@ VeteranDefault = {
 ---@param builder Builder
 ---@param targetData table
 ---@param upgradeBaseData UnitBlueprintEconomy
----@return number buildtimerate
+---@return number time
 ---@return number energy
 ---@return number mass
 function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
@@ -95,8 +95,8 @@ local ToString = import('/lua/sim/CategoryUtils.lua').ToString
 
 --- Gets army index for specified army name
 --- e.g. GetArmyIndex('ARMY_1') -> 1
----@param armyName string
----@return Army|number
+---@param armyName Army
+---@return number
 function GetArmyIndex(armyName)
     local index = nil
     if type(armyName) == 'number' then

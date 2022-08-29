@@ -2551,7 +2551,7 @@ CommandUnit = Class(WalkingLandUnit) {
     ---@param self CommandUnit
     ---@param teleporter any
     ---@param location Vector
-    ---@param orientation number
+    ---@param orientation Quaternion
     InitiateTeleportThread = function(self, teleporter, location, orientation)
         self.UnitBeingTeleported = self
         self:SetImmobile(true)

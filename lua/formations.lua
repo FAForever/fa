@@ -929,7 +929,7 @@ end
 ---@param unitsList Unit[]
 ---@param formationBlock any
 ---@param categoryTable EntityCategory[]
----@param spacing any
+---@param spacing? number defaults to 1
 ---@return table
 function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
     spacing = (spacing or 1) * unitsList.Scale
@@ -1165,7 +1165,7 @@ end
 -- ============ AIR BLOCK BUILDING =============
 ---@param unitsList Unit[]
 ---@param airBlock any
----@param spacing any
+---@param spacing? number defaults to 1
 ---@return table
 function BlockBuilderAir(unitsList, airBlock, spacing)
     spacing = (spacing or 1) * unitsList.Scale
@@ -1273,7 +1273,7 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
 end
 
 ---@param unitsList Unit[]
----@param spacing any
+---@param spacing spacing? number defaults to 1
 ---@return table
 function BlockBuilderAirT3Bombers(unitsList, spacing)
     --This is modified copy of BlockBuilderAir(). This function is used only for t3 bombers.
