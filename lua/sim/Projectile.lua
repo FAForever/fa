@@ -225,7 +225,7 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by the engine when the projectile is killed, in other words: intercepted
     ---@param self Projectile
-    ---@param instigator Projectile
+    ---@param instigator Unit
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
