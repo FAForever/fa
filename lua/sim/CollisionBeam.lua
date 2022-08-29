@@ -97,7 +97,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     ---@param self CollisionBeam
     ---@param instigator Unit
     ---@param damageData table
-    ---@param targetEntity Entity
+    ---@param targetEntity? Unit | Prop
     DoDamage = function(self, instigator, damageData, targetEntity)
         local damage = damageData.DamageAmount or 0
         if damage <= 0 then return end
@@ -213,7 +213,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     end,
 
     ---@param self CollisionBeam
-    ---@param TargetType string
+    ---@param TargetType ImpactType
     UpdateTerrainCollisionEffects = function(self, TargetType)
         local pos = self:GetPosition(1)
         local TerrainType = nil
@@ -267,8 +267,8 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     -- thing it is touching changes. Expect Impacts with non-physical things like
     -- 'Air' (hitting nothing) and 'Underwater' (hitting nothing underwater).
     ---@param self CollisionBeam
-    ---@param impactType string
-    ---@param targetEntity Entity
+    ---@param impactType ImpactType
+    ---@param targetEntity? Unit | Prop
     OnImpact = function(self, impactType, targetEntity)
         -- LOG('*DEBUG: COLLISION BEAM ONIMPACT ', repr(self))
         -- LOG('*DEBUG: COLLISION BEAM ONIMPACT, WEAPON =  ', repr(self.Weapon), 'Type = ', impactType)

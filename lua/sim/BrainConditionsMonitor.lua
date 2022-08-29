@@ -56,7 +56,7 @@ BrainConditionsMonitor = ClassSimple {
     ---@param self BrainConditionsMonitor
     ---@param conditionKey any
     ---@param reportFailure any
-    ---@return table|false
+    ---@return boolean
     CheckKeyedCondition = function(self, conditionKey, reportFailure)
         if self.ResultTable[conditionKey] != nil then
             return self.ResultTable[conditionKey]:GetStatus(reportFailure)
@@ -69,7 +69,7 @@ BrainConditionsMonitor = ClassSimple {
     ---@param self BrainConditionsMonitor
     ---@param cFilename FileName
     ---@param cFunctionName FunctionName
-    ---@param cData table
+    ---@param cData any[]
     ---@return boolean
     CheckConditionTable = function(self, cFilename, cFunctionName, cData)
         if not cData or not type(cData) == 'table' then
@@ -82,7 +82,7 @@ BrainConditionsMonitor = ClassSimple {
     -- Runs the function and retuns the result
     ---@param self BrainConditionsMonitor
     ---@param func function
-    ---@param params any
+    ---@param params any[]
     ---@return any
     CheckConditionFunction = function(self, func, params)
         return func(unpack(params))
@@ -92,8 +92,8 @@ BrainConditionsMonitor = ClassSimple {
     ---@param self BrainConditionsMonitor
     ---@param cFilename FileName
     ---@param cFunctionName FunctionName
-    ---@param cData table
-    ---@return any
+    ---@param cData any[]
+    ---@return string
     GetConditionKey = function(self, cFilename, cFunctionName, cData)
         if not cFunctionName then
             error('*BUILD CONDITION MONITOR: Invalid BuilderCondition - Missing function name')
@@ -221,7 +221,7 @@ BrainConditionsMonitor = ClassSimple {
     ---@param self BrainConditionsMonitor
     ---@param cFilename FileName
     ---@param cFunctionName FunctionName
-    ---@param cData table
+    ---@param cData any[]
     ---@return any
     AddCondition = function(self, cFilename, cFunctionName, cData)
         if not self.Active then
@@ -264,7 +264,7 @@ Condition = ClassSimple {
 
     ---@param self Condition
     ---@param brain AIBrain
-    ---@param key number|string
+    ---@param key string
     Create = function(self,brain,key)
         self.Status = false
         self.Brain = brain
@@ -280,13 +280,13 @@ Condition = ClassSimple {
 
     ---@param self Condition
     ---@param reportFailure boolean
-    ---@return string
+    ---@return boolean
     GetStatus = function(self, reportFailure)
         return self.Status
     end,
 
     ---@param self Condition
-    ---@return number
+    ---@return string
     GetKey = function(self)
         return self.Key
     end
@@ -297,10 +297,10 @@ ImportCondition = Class(Condition) {
 
     ---@param self ImportCondition
     ---@param brain AIBrain
-    ---@param key number
+    ---@param key string
     ---@param filename FileName
     ---@param funcName FunctionName
-    ---@param funcData table
+    ---@param funcData any[]
     Create = function(self,brain,key,filename,funcName,funcData)
         Condition.Create(self,brain,key)
         self.Filename = filename
@@ -310,7 +310,7 @@ ImportCondition = Class(Condition) {
     end,
 
     ---@param self ImportCondition
-    ---@return string
+    ---@return boolean
     CheckCondition = function(self)
         if self.CheckTime != GetGameTimeSeconds() then
             self.Status = import(self.Filename)[self.FunctionName](self.Brain, unpack(self.FunctionData))
@@ -354,10 +354,10 @@ InstantImportCondition = Class(Condition) {
 
     ---@param self InstantImportCondition
     ---@param brain AIBrain
-    ---@param key number
+    ---@param key string
     ---@param filename FileName
     ---@param funcName FunctionName
-    ---@param funcData table
+    ---@param funcData any[]
     Create = function(self,brain,key,filename,funcName,funcData)
         Condition.Create(self,brain,key)
         self.Filename = filename

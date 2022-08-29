@@ -1011,10 +1011,10 @@ end
 function SyncPlayableRect(region)
 end
 
----Now also supports string with hex colors
----Colors separated by commas, no spaces. Example:
----TeamColorMode("ffffffff,ffff32ff,ffb76518,ffa79602")
----colors will be applied to army according to its index. first color -> army with index 1, second color -> 2 etc.
+--- Now also supports string with hex colors
+--- Colors separated by commas, no spaces. Example:
+--- TeamColorMode("ffffffff,ffff32ff,ffb76518,ffa79602")
+--- colors will be applied to army according to its index. first color -> army with index 1, second color -> 2 etc.
 ---@param mode boolean | string
 function TeamColorMode(mode)
 end

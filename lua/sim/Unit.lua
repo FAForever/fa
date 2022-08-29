@@ -390,7 +390,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param priTable EntityCategory[]
+    ---@param priTable? UnparsedCategory[] | EntityCategory[]
     SetTargetPriorities = function(self, priTable)
         for i = 1, self.WeaponCount do
             self.WeaponInstances[i]:SetWeaponPriorities(priTable)
@@ -398,7 +398,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param priTable EntityCategory[]
+    ---@param priTable? UnparsedCategory[] | EntityCategory[]
     SetLandTargetPriorities = function(self, priTable)
         for i = 1, self.WeaponCount do
             local wep = self.WeaponInstances[i]
@@ -1145,19 +1145,19 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param override boolean
+    ---@param override number
     SetEnergyMaintenanceConsumptionOverride = function(self, override)
         self.EnergyMaintenanceConsumptionOverride = override or 0
     end,
 
     ---@param self Unit
-    ---@param overRide boolean
+    ---@param overRide number
     SetBuildRateOverride = function(self, overRide)
         self.BuildRateOverride = overRide
     end,
 
     ---@param self Unit
-    ---@return boolean
+    ---@return number
     GetBuildRateOverride = function(self)
         return self.BuildRateOverride
     end,
@@ -1750,8 +1750,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param bp any
-    ---@return any
+    ---@param bp UnitBlueprintAnimationDeath[]
+    ---@return UnitBlueprintAnimationDeath
     ChooseAnimBlock = function(self, bp)
         local totWeight = 0
         for _, v in bp do
@@ -2856,7 +2856,7 @@ Unit = Class(moho.unit_methods) {
 
     ---@param self Unit
     ---@param built boolean
-    ---@param order integer
+    ---@param order string
     ---@return boolean
     OnStartBuild = function(self, built, order)
 
@@ -2963,14 +2963,14 @@ Unit = Class(moho.unit_methods) {
 
     ---@param self Unit
     ---@param built boolean
-    ---@param order integer
+    ---@param order string
     StartBuildingEffects = function(self, built, order)
         self.BuildEffectsBag:Add(self:ForkThread(self.CreateBuildEffects, built, order))
     end,
 
     ---@param self Unit
     ---@param built boolean
-    ---@param order integer
+    ---@param order string
     CreateBuildEffects = function(self, built, order)
     end,
 
@@ -3833,7 +3833,7 @@ Unit = Class(moho.unit_methods) {
     ---@param layer Layer
     ---@param pos Vector
     ---@param type string
-    ---@param typesuffix any
+    ---@param typesuffix string
     ---@return table
     GetTerrainTypeEffects = function(FxType, layer, pos, type, typesuffix)
         local TerrainType
@@ -3864,7 +3864,7 @@ Unit = Class(moho.unit_methods) {
     ---@param FxBlockType string
     ---@param FxBlockKey string
     ---@param TypeSuffix string
-    ---@param EffectsBag any
+    ---@param EffectsBag TrashBag
     ---@param TerrainType string
     CreateTerrainTypeEffects = function(self, effectTypeGroups, FxBlockType, FxBlockKey, TypeSuffix, EffectsBag, TerrainType)
         local pos = self:GetPosition()
@@ -3906,8 +3906,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param EffectsBag any
-    ---@param TypeSuffix any
+    ---@param EffectsBag TrashBag
+    ---@param TypeSuffix string
     ---@param TerrainType string
     ---@return boolean
     CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
@@ -4004,7 +4004,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param motionState boolean
+    ---@param motionState string
     ---@return boolean
     UpdateBeamExhaust = function(self, motionState)
         local beamExhaust = self.MovementEffects.BeamExhaust
@@ -4087,7 +4087,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param treads any
+    ---@param treads UnitBlueprintTreads
     CreateTreads = function(self, treads)
         if treads.ScrollTreads then
             self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
@@ -4105,7 +4105,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param treads any
+    ---@param treads UnitBlueprintTreads
     ---@param type string
     CreateTreadsThread = function(self, treads, type)
         local sizeX = treads.TreadMarksSizeX
@@ -4154,7 +4154,7 @@ Unit = Class(moho.unit_methods) {
 
     -- Return the total time in seconds, cost in energy, and cost in mass to build the given target type.
     ---@param self Unit
-    ---@param target_bp UnitId
+    ---@param target_bp UnitBlueprint
     ---@return number
     GetBuildCosts = function(self, target_bp)
         return Game.GetConstructEconomyModel(self, target_bp.Economy)
@@ -4252,7 +4252,7 @@ Unit = Class(moho.unit_methods) {
 
     --- Plays a sound using the unit as a source. Returns true if successful, false otherwise
     ---@param self Unit A unit
-    ---@param sound BpSound A string identifier that represents the sound to be played.
+    ---@param sound SoundBlueprint A string identifier that represents the sound to be played.
     ---@return boolean
     PlayUnitSound = function(self, sound)
         local audio = self.Audio[sound]
@@ -4266,7 +4266,7 @@ Unit = Class(moho.unit_methods) {
 
     --- Plays an ambient sound using the unit as a source. Returns true if successful, false otherwise
     ---@param self Unit
-    ---@param sound BpSound
+    ---@param sound SoundBlueprint
     ---@return boolean
     PlayUnitAmbientSound = function(self, sound)
         local audio = self.Audio[sound]
@@ -4523,7 +4523,7 @@ Unit = Class(moho.unit_methods) {
     -- SHIELDS
     -------------------------------------------------------------------------------------------
     ---@param self Unit
-    ---@param bpShield BpDefense.Shield
+    ---@param bpShield UnitBlueprintDefenseShield 
     CreateShield = function(self, bpShield)
         -- Copy the shield template so we don't alter the blueprint table.
         local bpShield = table.deepcopy(bpShield)
@@ -4609,7 +4609,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param transport BpTransport
+    ---@param transport BaseTransport
     ---@param bone Bone
     OnStartTransportBeamUp = function(self, transport, bone)
         local slot = transport.slots[bone]
@@ -4722,7 +4722,7 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     ---@param teleporter any
     ---@param location Vector
-    ---@param orientation number
+    ---@param orientation Quaternion
     OnTeleportUnit = function(self, teleporter, location, orientation)
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)
@@ -4761,7 +4761,7 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     ---@param teleporter any
     ---@param location Vector
-    ---@param orientation number
+    ---@param orientation Quaternion
     InitiateTeleportThread = function(self, teleporter, location, orientation)
         self.UnitBeingTeleported = self
         self:SetImmobile(true)
@@ -4815,7 +4815,7 @@ Unit = Class(moho.unit_methods) {
 
     ---@param self Unit
     ---@param location Vector
-    ---@param orientation number
+    ---@param orientation Quaternion
     ---@param teleDelay number
     PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
         self.TeleportFxBag = self.TeleportFxBag or TrashBag()
@@ -4974,7 +4974,7 @@ Unit = Class(moho.unit_methods) {
     --- Called when a missile launched by this unit hits a shield
     ---@param self Unit
     ---@param target Unit
-    ---@param shield BpDefense.Shield Requires an `IsDestroyed` check when using as the shield may have been destroyed when the missile impacts
+    ---@param shield UnitBlueprintDefenseShield  Requires an `IsDestroyed` check when using as the shield may have been destroyed when the missile impacts
     ---@param position Vector Location where the missile hit the shield
     OnMissileImpactShield = function(self, target, shield, position)
         -- try and run callbacks

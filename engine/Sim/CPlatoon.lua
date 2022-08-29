@@ -1,16 +1,19 @@
 ---@meta
 
+
+---@class PlatoonCommand : userdata
+
 ---@class moho.platoon_methods
 local CPlatoon = {}
 
 ---@alias PlatoonSquadType 'Attack' | 'Artillery' | 'Guard' | 'None' | 'Scout' | 'Support'
----@alias PlatoonAlliance 'Ally' | 'Enemy' | 'Neutral'
 
 
 --- Orders platoon to attack target unit.
 -- If squad is specified, attacks only with the squad.
 ---@param target Unit Unit to attack.
 ---@param squad PlatoonSquadType
+---@return PlatoonCommand
 function CPlatoon:AttackTarget(target, squad)
 end
 
@@ -18,35 +21,39 @@ end
 -- If squad is specified, attack moves only with the squad.
 ---@param position Vector Table with position {x, y, z}.
 ---@param squad PlatoonSquadType
+---@return PlatoonCommand
 function CPlatoon:AggressiveMoveToLocation(position, squad)
 end
 
----@param threatType string
+---@param threatType BrainThreatType
 ---@param category EntityCategory
+---@return number
 function CPlatoon:CalculatePlatoonThreat(threatType, category)
 end
 
----@param threatType string Examples: 'AntiSurface', 'AntiAir', 'Overall'.
+---@param threatType BrainThreatType Examples: 'AntiSurface', 'AntiAir', 'Overall'.
 ---@param category EntityCategory Unit's category, example: categories.TECH2 .
 ---@param position Vector Table with position {x, y, z}.
 ---@param radius number Radius in game units.
+---@return number
 function CPlatoon:CalculatePlatoonThreatAroundPosition(threatType, category, position, radius)
 end
 
 --- Returns true if squad can attack target unit.
 ---@param squad PlatoonSquadType
 ---@param target Unit Unit to check.
+---@return boolean
 function CPlatoon:CanAttackTarget(squad, target)
 end
 
 --- TODO.
--- @return true/false
+---@return true/false
 function CPlatoon:CanConsiderFormingPlatoon()
 end
 
 --- TODO.
 -- Example: local formIt = poolPlatoon:CanFormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
--- @return true/false
+---@return true/false
 function CPlatoon:CanFormPlatoon()
 end
 
@@ -67,7 +74,7 @@ end
 --- Returns closest unit to the platoon's squad.
 -- Example: FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL).
 ---@param squad PlatoonSquadType
----@param alliance PlatoonAlliance
+---@param alliance AllianceType
 ---@param canAttack boolean true/false if the squad has to be able to attack the unit.
 ---@param category EntityCategory Target unit category, example: categories.TECH2 .
 function CPlatoon:FindClosestUnit(squad, alliance, canAttack, category)
@@ -81,7 +88,7 @@ end
 --- Returns furthest unit to the platoon's squad.
 -- Example: FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL).
 ---@param squad PlatoonSquadType
----@param alliance PlatoonAlliance
+---@param alliance AllianceType
 ---@param canAttack boolean true/false if the squad has to be able to attack the unit.
 ---@param category EntityCategory Target unit category, example: categories.TECH2
 function CPlatoon:FindFurthestUnit(squad, alliance, canAttack, category)
@@ -96,7 +103,7 @@ end
 -- Uses priorities set by SetPrioritizedTargetList function.
 -- Used for TMLs to find a pick a target in their range
 ---@param squad PlatoonSquadType
----@param alliance PlatoonAlliance
+---@param alliance AllianceType
 ---@param canAttack boolean true/false if the squad has to be able to attack the unit.
 ---@param position Vector Table with position {x, y, z}.
 ---@param radius number Radius in game units.
@@ -153,11 +160,13 @@ end
 
 --- Returns list of platoon's squad units.
 ---@param squad PlatoonSquadType
+---@return Vector
 function CPlatoon:GetSquadPosition(squad)
 end
 
 --- Returns units table of <squad>
 ---@param squad PlatoonSquadType
+---@return Unit[]
 function CPlatoon:GetSquadUnits(squad)
 end
 
@@ -176,7 +185,7 @@ function CPlatoon:IsAttacking(squad)
 end
 
 --- Returns true if <command> is active.
----@param command boolean
+---@param command PlatoonCommand
 function CPlatoon:IsCommandsActive(command)
 end
 
@@ -247,7 +256,7 @@ end
 
 --- Sets target priorities for platoon's squad.
 ---@param squad PlatoonSquadType
----@param tblCategory table List of categories, highest to lowerst priority, example: {categories.COMMAND, categories.EXPERIMENTAL, categories.ALLUNITS}
+---@param tblCategory EntityCategory[] List of categories, highest to lowerst priority, example: {categories.COMMAND, categories.EXPERIMENTAL, categories.ALLUNITS}
 function CPlatoon:SetPrioritizedTargetList(squad, tblCategory)
 end
 
