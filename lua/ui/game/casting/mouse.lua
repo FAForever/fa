@@ -49,7 +49,7 @@ end
 ---@return number[]
 local function GetObserverClients()
 
-    local observers = { 0 }
+    local observers = { }
     for k, client in clients do
         local isPlayer = false
         for l, army in armies do
