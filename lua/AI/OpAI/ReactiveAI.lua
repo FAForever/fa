@@ -49,7 +49,7 @@ TrackingCategories = {
     MassedAir = { categories.AIR * categories.MOBILE * ( categories.TECH2 + categories.TECH3 ), },
 }
 
-
+---@class ReactiveAI : OpAI
 ReactiveAI = Class(OpAI) {
     Create = function(self, brain, location, triggeringEventType, reactionType, name, data)
         -- With the actionType and responseType, we must create a builderType with proper builderData to create

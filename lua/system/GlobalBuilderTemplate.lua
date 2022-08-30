@@ -5,7 +5,7 @@
 --
 --  Summary  :  Global builder table and template methods
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
 ---@alias BuilderNamesBase ''

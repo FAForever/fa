@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.userDecal_methods
 local ScriptedDecal = {}
 

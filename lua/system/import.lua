@@ -3,9 +3,6 @@
 -- Implement import()
 
 -- note that actual modules cannot upvalued because upvalues are not reset when we load a save file
-local StringLower = string.lower
-local StringSub = string.sub
-
 local FileCollapsePath = FileCollapsePath
 local doscript = doscript
 local pcall = pcall
@@ -20,18 +17,25 @@ local error = error
 __modules = {}
 
 --- Common metatable used by all modules, which forwards global references to _G
+---@class Module
+---@field __moduleinfo ModuleInfo
 __module_metatable = {
     __index = _G
 }
+
+---@class ModuleInfo
+---@field name string
+---@field used_by table<string, true>
+---@field track_imports boolean
 
 -- these values can be adjusted by hooking into this file
 local informDevOfLoad = false
 
 --- The global import function used to keep track of modules
----@param name string path to the module to load
----@return table
+---@param name FileName path to the module to load
+---@return Module
 function import(name)
-    local modules = __modules
+    local modules = __modules -- global to local
 
     -- attempt to find the module without lowering the string
     local existing = modules[name]
@@ -40,7 +44,7 @@ function import(name)
     end
 
     -- caching: if it exists then we return the previous version
-    name = StringLower(name)
+    name = name:lower()
     existing = modules[name]
     if existing then
         return existing
@@ -51,6 +55,7 @@ function import(name)
         SPEW("Loading module '", name, "'")
     end
 
+    ---@type ModuleInfo
     local moduleinfo = {
         name = name,
         used_by = {},
@@ -58,13 +63,14 @@ function import(name)
     }
 
     -- set up an environment for the new module
+    ---@type Module
     local module
     module = {
         __moduleinfo = moduleinfo,
 
         -- Define a new 'import' function customized for the module, to track import dependencies
         import = function(name2)
-            if StringSub(name2, 1, 1) != '/' then
+            if name2:sub(1, 1) != '/' then
                 name2 = FileCollapsePath(name .. '/../' .. name2)
             end
             local module2 = import(name2) -- this will use the global import

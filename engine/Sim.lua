@@ -1,11 +1,15 @@
----@declare-global
+---@meta
 ---@diagnostic disable: lowercase-global
 
 ---@class SimCommand
 
---- TODO move to `'/engine/Core.lua'`
----@alias Bone string | number
----@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
+-- TODO : Needs Definision
+---@alias TerrainType any
+---@alias Task any
+---@alias CSimSoundManager any
+---@alias EconomyEvent moho.EconomyEvent
+---@alias AIPersonality string
+---@alias ArmyPlans any
 
 ---@alias Faction
 ---| 0 # UEF
@@ -64,10 +68,6 @@ end
 ---@param army Army
 ---@return moho.IEffect
 function AttachBeamToEntity(emitter, entity, bone, army)
-end
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function AudioSetLanguage(language)
 end
 
 --- Changes the army of a unit, returning a new unit
@@ -517,10 +517,6 @@ end
 function EndGame()
 end
 
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function EntityCategoryContains(category, unit)
-end
-
 --- Counts how many units fit the specified category.
 ---@param category EntityCategory
 ---@param tblUnits Unit[]
@@ -533,11 +529,6 @@ end
 ---@param position Vector
 ---@return number
 function EntityCategoryCountAroundPosition(category, position)
-end
-
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function EntityCategoryFilterDown(category, tblUnits)
 end
 
 --- Changes elevation of the map in the desired area.
@@ -561,7 +552,6 @@ end
 ---
 ---@param armyName string
 function GenerateArmyStart(armyName)
-function GenerateArmyStart(army)
 end
 
 ---
@@ -585,10 +575,6 @@ end
 ---@param army Army
 ---@return number
 function GetArmyUnitCostTotal(army)
-end
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function GetBlueprint(entity)
 end
 
 ---
@@ -617,11 +603,6 @@ end
 --- The game time is the simulation time, that stops when the game is paused.
 ---@return number
 function GetGameTick()
-end
-
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function GetGameTimeSeconds()
 end
 
 --- Returns map size
@@ -677,11 +658,6 @@ end
 function GetUnitBlueprintByName(bpName)
 end
 
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function GetUnitById(id)
-end
-
 --- Retrieves all units in a rectangle, excludes insignificant units (such as the Cybran build bot)
 --- by default
 ---@param rectangle Rectangle
@@ -690,17 +666,9 @@ end
 function GetUnitsInRect(rectangle)
 end
 
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function HasLocalizedVO(language)
-end
-
 --- Starts the AI on given army
 ---@param army string
 function InitializeArmyAI(army)
-end
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function IsAlly(army1, army2)
 end
 
 ---
@@ -721,10 +689,6 @@ end
 function IsCommandDone(cmd)
 end
 
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function IsEnemy(army1, army2)
-end
-
 --- Returns true if the given object is an Entity
 ---@param object Object
 ---@return boolean
@@ -734,10 +698,6 @@ end
 --- Returns true if the game is over
 ---@return boolean
 function IsGameOver()
-end
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function IsNeutral(army1, army2)
 end
 
 --- Returns true if the target entity is a projectile
@@ -961,7 +921,6 @@ end
 ---@param tblUnits Unit[]
 ---@param order Task
 ---@return ScriptTask
-
 function IssueScript(tblUnits, order)
 end
 
@@ -1075,19 +1034,11 @@ end
 function OkayToMessWithArmy(army)
 end
 
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function ParseEntityCategory(strCategory)
-end
-
 ---
 ---@param manager CSimSoundManager
----@param sound BpSoundResult
+---@param sound SoundHandle
 ---@return moho.sound_methods
 function PlayLoop(manager, sound)
-end
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function Random()
 end
 
 --- Unrestricts the army from building the unit category
@@ -1105,10 +1056,6 @@ end
 --- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit
 ---@return Unit
 function SelectedUnit()
-end
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function SessionIsReplay()
 end
 
 --- Sets alliance type between 2 armies, note that weapons do not reset their target
@@ -1208,10 +1155,6 @@ end
 function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
 end
 
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function SetFocusArmy(armyIndex)
-end
-
 --- Sets army to ignore unit cap
 ---@param army Army
 ---@param ignore boolean
@@ -1246,7 +1189,6 @@ end
 function SetTerrainTypeRect(rect, type)
 end
 
----
 ---@return boolean createInitial
 function ShouldCreateInitialArmyUnits()
 end
@@ -1270,7 +1212,6 @@ end
 function SplitProp(original, blueprintId)
 end
 
----
 ---@param manager CSimSoundManager
 ---@param handle moho.sound_methods
 function StopLoop(manager, handle)
@@ -1289,10 +1230,10 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- Instantly moves an entity to a location
----@param object Entity | Projectile | Unit
+---@param entity Object
 ---@param location Vector
 ---@param orientation? Vector
-function Warp(entity, location, orientation)
+function Warp(object, location, orientation)
 end
 
 ---
@@ -1301,16 +1242,7 @@ end
 function _c_CreateEntity(entity, spec)
 end
 
----
 ---@param shield Shield
----@param spec BpDefense.Shield
+---@param spec UnitBlueprintDefenseShield
 function _c_CreateShield(shield, spec)
-end
-
-------
----New functions from engine patch:
-------
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function GetDepositsAroundPoint(x, z, radius, type)
 end

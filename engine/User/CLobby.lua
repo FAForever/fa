@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.lobby_methods
 local CLobby = {}
 

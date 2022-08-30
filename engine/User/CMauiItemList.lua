@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.item_list_methods : moho.control_methods
 local CMauiItemList = {}
 

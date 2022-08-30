@@ -26,6 +26,12 @@
     -- Dump()
 
 ---@class Control : moho.control_methods
+---@field Left LazyVar
+---@field Top LazyVar
+---@field Right LazyVar
+---@field Bottom LazyVar
+---@field Width LazyVar
+---@field Height LazyVar
 Control = Class(moho.control_methods) {
 
     -- reset the control's layout to the defaults, in this case

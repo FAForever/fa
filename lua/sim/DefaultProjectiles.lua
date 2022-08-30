@@ -441,7 +441,7 @@ local EmitterMethods = _G.moho.IEffect
 local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
 
 ---@class BaseGenericDebris : DummyProjectile
-BaseGenericDebris = Class(DummyProjectile){
+BaseGenericDebris = Class(DummyProjectile) {
 
     ---@param self BaseGenericDebris
     ---@param targetType string
@@ -506,10 +506,11 @@ BaseGenericDebris = Class(DummyProjectile){
 -----------------------------------------------------------
 
 ---@class OverchargeProjectile
-OverchargeProjectile = Class() {
+OverchargeProjectile = ClassSimple {
     ---@param self OverchargeProjectile
     ---@param targetType string
     ---@param targetEntity Unit
+
     OnImpact = function(self, targetType, targetEntity)
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
         self.DamageData.DamageAmount = 0

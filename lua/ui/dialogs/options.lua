@@ -34,6 +34,13 @@ local optionKeyToControlMap = false
 -- note that each control should create a change function that allows the control to have its value changed
 -- not that each control should create a SetCustomData(newCustomData, newDefault) function that will initialize the control with new custom data
 local controlTypeCreate = {
+
+    header = function(parent, optionItemData)
+        local group = Group(parent)
+        LayoutHelpers.SetDimensions(group, 10, 10)
+        return group
+    end,
+
     toggle = function(parent, optionItemData)
         local combo = Combo(parent, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
         LayoutHelpers.SetWidth(combo, 250)
@@ -184,7 +191,11 @@ local controlTypeCreate = {
         end
 
         -- set initial value
-        sliderGroup._slider:SetValue(currentOptionsSet[optionItemData.key])
+        if currentOptionsSet[optionItemData.key] then 
+            sliderGroup._slider:SetValue(currentOptionsSet[optionItemData.key])
+        else
+            sliderGroup._slider:SetValue(optionItemData.default)
+        end
 
         sliderGroup.SetCustomData = function(newCustomData, newDefault)
             -- this isn't really correct as it should check the indent, and recreate the control if needed
@@ -202,20 +213,21 @@ local controlTypeCreate = {
 local function CreateOption(parent, optionItemData)
     local bg = Bitmap(parent, UIUtil.SkinnableFile('/dialogs/options-02/content-box_bmp.dds'))
 
+
     bg._label = UIUtil.CreateText(bg, optionItemData.title, 16, UIUtil.bodyFont)
     LayoutHelpers.AtLeftTopIn(bg._label, bg, 9, 6)
     bg._label._tipText = optionItemData.key
 
     bg._label.HandleEvent = function(self, event)
-        if event.Type == 'MouseEnter' then
-            Tooltip.CreateMouseoverDisplay(self, "options_" .. bg._label._tipText, .5, true)
-        elseif event.Type == 'MouseExit' then
-            Tooltip.DestroyMouseoverDisplay()
+        if bg._label._tipText then
+            if event.Type == 'MouseEnter' then
+                Tooltip.CreateMouseoverDisplay(self, "options_" .. bg._label._tipText, .5, true)
+            elseif event.Type == 'MouseExit' then
+                Tooltip.DestroyMouseoverDisplay()
+            end
         end
     end
 
-    -- this is here to help position the control
-    --TODO get this data from layout!
     local controlGroup = Group(bg)
     LayoutHelpers.AtLeftTopIn(controlGroup, bg, 338, 5)
     LayoutHelpers.SetDimensions(controlGroup, 252, 24)
@@ -233,7 +245,13 @@ local function CreateOption(parent, optionItemData)
         LayoutHelpers.AtCenterIn(bg._control, controlGroup)
     end
 
-    optionKeyToControlMap[optionItemData.key] = bg._control
+    if not (optionItemData.type == 'header') then 
+        optionKeyToControlMap[optionItemData.key] = bg._control
+    end
+
+    if optionItemData.type == 'header' then
+        bg:SetAlpha(0.0)
+    end
 
     return bg
 end

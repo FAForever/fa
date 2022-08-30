@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Kril Torpedo Projectile script, XRB2308
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local CKrilTorpedo = import('/lua/cybranprojectiles.lua').CKrilTorpedo
 
