@@ -126,6 +126,8 @@ local function ProcessData(sender, info)
     table.insert(Locations[sender], info)
 end
 
+--- Cleans up previous received mouse data
+---@param Sync any
 local function CleanupData(Sync)
 
     local tick = GameTick()

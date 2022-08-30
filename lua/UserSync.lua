@@ -1,4 +1,4 @@
----@meta
+---@declare-global
 
 
 -- The global sync table is copied from the sim layer every time the main and sim threads are
