@@ -77,7 +77,7 @@ function CUIWorldMesh:SetScale(scale)
 end
 
 ---
----@param position Position
+---@param position Vector
 ---@param orientation? Quaternion
 function CUIWorldMesh:SetStance(position, orientation)
 end

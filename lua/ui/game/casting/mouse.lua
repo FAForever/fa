@@ -2,15 +2,10 @@
 local clients = GetSessionClients()
 local armies = GetArmiesTable().armiesTable
 
----@class CastingMouseData
----@field [1] number # x coordinate
----@field [2] number # y coordinate
----@field [3] number # z coordinate
----@field [4] number # elevation
-
 ---@class CastingMouseMessage
 ---@field CastingMouse boolean 
----@field data  CastingMouseData
+---@field Position Vector
+---@field Tick number
 
 -- determine if there are observers
 local clientCount = table.getn(clients)
@@ -94,6 +89,7 @@ local Locations = { }
 
 --- Processes the mouse position send by players
 ---@param sender string
+---@param info CastingMouseMessage
 local function ProcessData(sender, info)
 
     -- prepare first time data is send
