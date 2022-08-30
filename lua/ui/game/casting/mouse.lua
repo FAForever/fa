@@ -160,7 +160,6 @@ local function SendData(Sync)
     -- retrieve position and elevation
     local position = GetMouseWorldPos()
     local clients = GetObserverClients()
-    reprsl(clients)
 
     -- TODO: add check if we've actually moved the mouse
 
