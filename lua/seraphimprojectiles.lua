@@ -14,13 +14,11 @@
 local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
 local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectile
 local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
-local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
 local util = import('utilities.lua')
 local RandomInt = util.GetRandomInt
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 --------------------------------------------------------------------------
 --  SERAPHIM ANTI-NUKE PROJECTILES
@@ -640,8 +638,8 @@ SAAHotheFlareProjectile = Class(EmitterProjectile) {
 
     --- We only destroy when we hit the ground/water.
     ---@param self SAAHotheFlareProjectile
-    ---@param TargetType string
-    ---@param targetEntity Unit
+    ---@param TargetType ImpactType
+    ---@param targetEntity Unit | Prop
     OnImpact = function(self, TargetType, targetEntity)
         if type == 'Terrain' or type == 'Water' then
             EmitterProjectile.OnImpact(self, TargetType, targetEntity)
@@ -747,3 +745,9 @@ SDFAireauProjectile = Class(MultiPolyTrailProjectile) {
     PolyTrails = EffectTemplate.SDFAireauWeaponPolytrails01,
     PolyTrailOffset = {0,0,0},
 }
+
+
+-- kept for mod backwards compatibility
+
+local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
+local RandomFloat = import('/lua/utilities.lua').GetRandomFloat

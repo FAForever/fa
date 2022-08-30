@@ -5,14 +5,13 @@
 --- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------
 
-local Utilities = import('/lua/utilities.lua')
 local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 --- Retrieves all human brains that are hostile to the given army index
----@param armyIndex number|string   # Army index to check alliance with
+---@param armyIndex number Army index to check alliance with
 ---@return table AIBrain[]
 function GetHumanEnemies(armyIndex)
     humans = {}
@@ -26,8 +25,6 @@ function GetHumanEnemies(armyIndex)
     return humans
 end
 
----  function: BuildOnce = AddFunction
---- parameter 0: string: platoon = "default_platoon"
 ---@param platoon Platoon
 function BuildOnce(platoon)
     local aiBrain = platoon:GetBrain()
@@ -38,8 +35,6 @@ function BuildOnce(platoon)
     end
 end
 
---- function: DefaultOSBasePatrol = AddFunction
----   parameter 0: string: platoon = "default_platoon"
 ---@param platoon Platoon
 function DefaultOSBasePatrol(platoon)
     local aiBrain = platoon:GetBrain()
@@ -58,14 +53,9 @@ function DefaultOSBasePatrol(platoon)
     end
 end
 
----  PlatoonAssignOrders
----      Assigns orders from the editor to a platoon
----  PlatoonData
----      OrderName - Name of the Order from the editor
----      Target - Handle to Unit used in orders that require a target (OPTIONAL)
----  function: PlatoonAssignOrders = AddFunction
----      parameter 0: string: platoon = "default_platoon"
----@param platoon PlatoonData
+
+--- Uses OrderName - Name of the Order from the editor & Target - Handle to Unit used in orders that require a target (OPTIONAL)
+---@param platoon Platoon
 ---@return boolean
 function PlatoonAssignOrders(platoon)
     platoon:Stop()
@@ -78,10 +68,7 @@ function PlatoonAssignOrders(platoon)
 end
 
 --- Attacks the closest unit the AIBrain is aware of, based on intel
---- | Platoon data value    | Description   |
---- | --------------------- | ------------- |
---- | (no platoon data)     |               |
----@param platoon PlatoonData
+---@param platoon Platoon
 function PlatoonAttackClosestUnit(platoon)
     local aiBrain = platoon:GetBrain()
     local target
@@ -110,10 +97,7 @@ function PlatoonAttackClosestUnit(platoon)
 end
 
 --- Attacks the closest unit the AIBrain is aware of, based on intel
---- | Platoon data value    | Description   |
---- | --------------------- | ------------- |
---- | (no platoon data)     |               |
----@param platoon PlatoonData
+---@param platoon Platoon
 function PlatoonAttackHighestThreat(platoon)
     local patrol = false
     local aiBrain = platoon:GetBrain()
@@ -133,10 +117,7 @@ function PlatoonAttackHighestThreat(platoon)
 end
 
 --- Attack moves to a specific location on the map, once arrived it will attack the highest threat
---- | Platoon data value    | Description |
---- | --------------------- | ----------- |
---- | Location              | (REQUIRED) location on the map to attack move to
----@param platoon PlatoonData
+---@param platoon Platoon
 function PlatoonAttackLocation(platoon)
     platoon:Stop()
     local data = platoon.PlatoonData
@@ -160,17 +141,14 @@ function PlatoonAttackLocation(platoon)
     end
 end
 
----  PlatoonAttackLocationList
----      Attack moves to a location chosen from a list
----      Location can be the highest threat or the lowest non-negative threat
----      After reaching location will attack next location from the list
----  PlatoonData -
----      LocationList - (REQUIRED) location on the map to attack move to
----      LocationChain - (REQUIRED) Chain on the map to attack move to
----      High - true will attack highest threats first, false lowest - defaults to false/lowest
----  function: PlatoonAttackLocationList = AddFunction doc = "Please work function docs."
----      parameter 0: string: platoon = "default_platoon"
----@param platoon PlatoonData
+--- # PlatoonAttackLocationList
+--- Attack moves to a location chosen from a list. Location can be the highest threat or the lowest non-negative threat.
+--- After reaching location will attack next location from the list.
+--- ## PlatoonData:
+--- - LocationList - (REQUIRED) location on the map to attack move to
+--- - LocationChain - (REQUIRED) Chain on the map to attack move to
+--- - High - true will attack highest threats first, false lowest - defaults to false/lowest
+---@param platoon Platoon
 function PlatoonAttackLocationList(platoon)
     platoon:Stop()
     local location = nil
@@ -221,11 +199,9 @@ function PlatoonAttackLocationList(platoon)
 end
 
 --- Assigns units in platoon to TransportPool platoon for other platoons to use and moves to to specified location if specified.
---- | Platoon data value    | Description |
---- | --------------------- | ----------- |
---  | TransportMoveLocation | Location to move transport to before assigning to transport pool
---- | MoveRoute    | List of locations to move to
---- | MoveChain    | Chain of locations to move
+--- - TransportMoveLocation - Location to move transport to before assigning to transport pool
+--- - MoveRoute - List of locations to move to
+--- - MoveChain - Chain of locations to move
 ---@param platoon Platoon
 function TransportPool(platoon)
     local aiBrain = platoon:GetBrain()
@@ -253,18 +229,16 @@ function TransportPool(platoon)
 end
 
 --- Grabs a specific number of transports from the transports pool and loads units into the transport. Once ready a scenario variable can be set. Can wait on another scenario variable. Attempts to land at the location with the least threat and uses the accompanying attack chain for the units that have landed.
---- | Platoon data value | Description |
---- | ------------------ | ----------- |
---- | ReadyVariable      | `ScenarioInfo.VarTable[ReadyVariable]` Variable set when units are on transports
---- | WaitVariable       | `ScenarioInfo.VarTable[WaitVariable]` Variable checked before transports leave
---- | LandingList        | (REQUIRED or LandingChain) List of possible locations for transports to unload units
---- | LandingChain       | (REQUIRED or LandingList) Chain of possible landing locations
---- | TransportReturn    | Location for transports to return to (they will attack with land units if this isn't set)
---- | TransportChain     | (or TransportRoute) Route to move along the transports before dropping the units.
---- | AttackPoints       | (REQUIRED or AttackChain or PatrolChain) List of locations to attack. The platoon attacks the highest threat first
---- | AttackChain        | (REQUIRED or AttackPoints or PatrolChain) Marker Chain of postitions to attack
---- | PatrolChain        | (REQUIRED or AttackChain or AttackPoints) Chain of patrolling
---- | RandomPatrol       | Bool if you want the patrol things to be random rather than in order
+--- - ReadyVariable   - `ScenarioInfo.VarTable[ReadyVariable]` Variable set when units are on transports
+--- - WaitVariable    - `ScenarioInfo.VarTable[WaitVariable]` Variable checked before transports leave
+--- - LandingList     - (REQUIRED or LandingChain) List of possible locations for transports to unload units
+--- - LandingChain    - (REQUIRED or LandingList) Chain of possible landing locations
+--- - TransportReturn - Location for transports to return to (they will attack with land units if this isn't set)
+--- - TransportChain  - (or TransportRoute) Route to move along the transports before dropping the units.
+--- - AttackPoints    - (REQUIRED or AttackChain or PatrolChain) List of locations to attack. The platoon attacks the highest threat first
+--- - AttackChain     - (REQUIRED or AttackPoints or PatrolChain) Marker Chain of postitions to attack
+--- - PatrolChain     - (REQUIRED or AttackChain or AttackPoints) Chain of patrolling
+--- - RandomPatrol    - Bool if you want the patrol things to be random rather than in order
 ---@param platoon Platoon
 function LandAssaultWithTransports(platoon)
     local aiBrain = platoon:GetBrain()
@@ -393,11 +367,9 @@ function LandAssaultWithTransports(platoon)
 end
 
 --- Platoon moves to a set of locations
---- | Platoon data value    | Description   |
---- | --------------------- | ------------- |
---- | MoveRoute             | List of locations to move to |
---- | MoveChain             | Chain of locations to move |
---- | UseTransports         | Boolean, if true, use transports to move |
+--- - MoveRoute     - List of locations to move to |
+--- - MoveChain     - Chain of locations to move |
+--- - UseTransports - Boolean, if true, use transports to move |
 ---@param platoon Platoon
 function MoveToThread(platoon)
     local data = platoon.PlatoonData
@@ -434,10 +406,8 @@ function MoveToThread(platoon)
 end
 
 --- Platoon patrols a set of locations
---- | Platoon data value    | Description   |
---- | --------------------- | ------------- |
---- | PatrolRoute           | List of locations to patrol |
---- | PatrolChain           | Chain of locations to patrol |
+--- - PatrolRoute - List of locations to patrol
+--- - PatrolChain - Chain of locations to patrol
 ---@param platoon Platoon
 function PatrolThread(platoon)
     local data = platoon.PlatoonData
@@ -464,10 +434,8 @@ function PatrolThread(platoon)
 end
 
 --- Platoon patrols a random set of locations
---- | Platoon data value    | Description   |
---- | --------------------- | ------------- |
---- | PatrolRoutes          | List of locations to patrol
---- | PatrolChains          | Chain of locations to patrol
+--- - PatrolRoutes - List of locations to patrol
+--- - PatrolChains - Chain of locations to patrol
 ---@param platoon Platoon
 function RandomPatrolThread(platoon)
     local data = platoon.PlatoonData
@@ -497,9 +465,7 @@ function RandomPatrolThread(platoon)
 end
 
 --- Gives a platoon a random patrol path from a set of locations
---- | Platoon data value    | Description   |
---- | --------------------- | ------------- |
---- | PatrolChain           | Chain of locations to patrol
+--- - PatrolChain - Chain of locations to patrol
 ---@param platoon Platoon
 function RandomDefensePatrolThread(platoon)
     local data = platoon.PlatoonData
@@ -518,9 +484,7 @@ function RandomDefensePatrolThread(platoon)
 end
 
 --- Gives a platoon a random patrol path from a set of chains
---- | Platoon data value    | Description   |
---- | --------------------- | ------------- |
---- | PatrolChains          | Chains of locations to patrol
+--- - PatrolChains - Chains of locations to patrol
 ---@param platoon Platoon
 function PatrolChainPickerThread(platoon)
     local data = platoon.PlatoonData
@@ -538,9 +502,7 @@ function PatrolChainPickerThread(platoon)
 end
 
 --- Gives a random patrol chain form the list to each unit of the platoon
---- | Platoon data value    | Description   |
---- | --------------------- | ------------- |
---- | PatrolChains          | List of chains to choose from
+--- - PatrolChains - List of chains to choose from
 ---@param platoon Platoon
 function SplitPatrolThread(platoon)
     local data = platoon.PlatoonData
@@ -561,9 +523,6 @@ function SplitPatrolThread(platoon)
 end
 
 --- The default engineer build platoon
---- | Platoon data value    | Description   |
---- | --------------------- | ------------- |
---- | (no platoon data)     |
 ---@param platoon Platoon
 function EngineersBuildPlatoon(platoon)
     local aiBrain = platoon:GetBrain()
@@ -721,9 +680,7 @@ function EngineersBuildPlatoon(platoon)
 end
 
 --- Sends out units to hunt and attack Experimental Air units (Soul Ripper, Czar, etc). It cheats to find the air units.  This should *NOT* ever be used in skirmish. This platoon only seeks out PLAYER experimentals. It won't register experimentals from other AIs
---- | Platoon data value    | Description   |
---- | --------------------- | ------------- |
---- | CategoryList          | The categories we are going to find and attack
+--- - CategoryList - The categories we are going to find and attack
 ---@param platoon Platoon
 function CategoryHunterPlatoonAI(platoon)
     local aiBrain = platoon:GetBrain()
@@ -1338,7 +1295,6 @@ end
 ---@param eng EngineerManager
 ---@param engTable table
 ---@param data table
----@param aiBrain AIBrain
 ---@return boolean
 function EngPatrol(eng, engTable, data)
     table.insert(engTable, eng)
@@ -1374,7 +1330,7 @@ end
 ---@param eng EngineerManager
 ---@param engTable table
 ---@param unitBeingBuilt Unit
----@return EngineerManager|boolean
+---@return EngineerManager|false
 ---@return table
 function AssistOtherEngineer(eng, engTable, unitBeingBuilt)
     if engTable and not table.empty(engTable) then
@@ -1889,11 +1845,12 @@ end
 
 --- Utility function
 --- Sorts units onto transports distributing equally
----@param transportTable table
----@param unitTable Unit
----@param numSlots number
----@return table
----@return table
+---@generic T : table
+---@param transportTable T
+---@param unitTable Unit[]
+---@param numSlots? number defaults to 1
+---@return T transportTable
+---@return Unit[] unitsLeft
 function SortUnitsOnTransports(transportTable, unitTable, numSlots)
     local leftoverUnits = {}
     numSlots = numSlots or -1
@@ -1973,10 +1930,10 @@ end
 --- Utility Function
 --- Returns location with lowest non-negative threat
 ---@param aiBrain AIBrain
----@param locationList string[]
+---@param locationList Vector[]
 ---@param ringSize number
 ---@param location Vector
----@return string|table
+---@return Vector
 function PlatoonChooseLowestNonNegative(aiBrain, locationList, ringSize, location)
     local bestLocation = {}
     local bestThreat = 0
@@ -2004,10 +1961,10 @@ end
 --- Utility Function
 --- Returns location with lowest threat (including negative)
 ---@param aiBrain AIBrain
----@param locationList string
+---@param locationList Vector[]
 ---@param ringSize number
 ---@param location Vector
----@return table
+---@return Vector
 function PlatoonChooseLowest(aiBrain, locationList, ringSize, location)
     local bestLocation = {}
     local locationSet = false
@@ -2037,8 +1994,8 @@ end
 ---@param aiBrain AIBrain
 ---@param locationList string[]
 ---@param ringSize number
----@param location Vector
----@return string
+---@param location Vector[]
+---@return Vector
 function PlatoonChooseHighest(aiBrain, locationList, ringSize, location)
     local bestLocation = locationList[1]
     local highestThreat = 0
@@ -2059,9 +2016,9 @@ end
 --- Utility Function
 --- Returns location randomly with threat > 0
 ---@param aiBrain AIBrain
----@param locationList string[]
+---@param locationList Vector[]
 ---@param ringSize number
----@return string
+---@return Vector
 function PlatoonChooseRandomNonNegative(aiBrain, locationList, ringSize)
     local landingList = {}
     for _, v in locationList do
@@ -2080,9 +2037,9 @@ end
 --- Utility Function
 --- Arranges a route from highest to lowest based on threat
 ---@param aiBrain AIBrain
----@param locationList string[]
+---@param locationList Vector[]
 ---@param ringSize number
----@return table
+---@return Vector
 function PlatoonChooseHighestAttackRoute(aiBrain, locationList, ringSize)
     local attackRoute = {}
     local tempRoute = {}
@@ -2108,9 +2065,9 @@ end
 --- Utility Function
 --- Arranges a route from lowest to highest on threat
 ---@param aiBrain AIBrain
----@param locationList string[]
+---@param locationList Vector[]
 ---@param ringSize number
----@return table
+---@return Vector
 function PlatoonChooseLowestAttackRoute(aiBrain, locationList, ringSize)
     local attackRoute = {}
     local tempRoute = {}
@@ -2453,3 +2410,8 @@ function PlatoonEnableStealth(platoon)
         end
     end
 end
+
+
+-- kept for mod backwards compatibility
+
+local Utilities = import('/lua/utilities.lua')

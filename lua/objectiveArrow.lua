@@ -4,7 +4,7 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 ObjectiveArrow = Class(Entity) {
 
     ---@param self ObjectiveArrow
-    ---@param spec Entity
+    ---@param spec table
     OnCreate = function(self,spec)
         self.BounceTime = 0.0
         self.Size = spec.Size or 1.0

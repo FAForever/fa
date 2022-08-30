@@ -52,7 +52,7 @@ Tree = Class(Prop) {
 
     --- Collision check with projectiles
     ---@param self Tree
-    ---@param other string
+    ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self, other)
         return not self.Dead
@@ -60,7 +60,7 @@ Tree = Class(Prop) {
 
     --- Collision check with units
     ---@param self Tree
-    ---@param other string
+    ---@param other Unit
     ---@param nx number
     ---@param ny number
     ---@param nz number
@@ -79,10 +79,10 @@ Tree = Class(Prop) {
     --- When damaged in some fashion - note that the tree can only be destroyed by disintegrating 
     --- damage and that the base class is not called accordingly.
     ---@param self Tree
-    ---@param instigator string
+    ---@param instigator Unit
     ---@param amount number
     ---@param direction number
-    ---@param type string
+    ---@param type DamageType
     OnDamage = function(self, instigator, amount, direction, type)
         if not self.Dead then 
 
@@ -273,7 +273,7 @@ TreeGroup = Class(Prop) {
 
     --- Break when colliding with something / someone
     ---@param self TreeGroup
-    ---@param other string
+    ---@param other Projectile
     ---@param vec Vector
     OnCollision = function(self, other, vec)
         self:Breakup()
@@ -284,7 +284,7 @@ TreeGroup = Class(Prop) {
     ---@param instigator Unit
     ---@param amount number
     ---@param direction number
-    ---@param type string
+    ---@param type DamageType
     OnDamage = function(self, instigator, amount, direction, type)
         self:Breakup()
     end,
@@ -294,8 +294,8 @@ TreeGroup = Class(Prop) {
     ---@param instigator Unit
     ---@param amount number
     ---@param direction Vector
-    ---@param type string
-    ---@return table
+    ---@param type DamageType
+    ---@return Tree[]
     Breakup = function(self, instigator, amount, direction, type)
         -- can't do much when we're destroyed
         if EntityBeenDestroyed(self) then
