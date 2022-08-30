@@ -1,3 +1,5 @@
+---@declare-global
+
 
 -- The global sync table is copied from the sim layer every time the main and sim threads are
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
@@ -22,8 +24,28 @@ local SetPlayableArea = reclaim.SetPlayableArea
 -- this value with mods is forbidden.
 local hasSeenResult = false
 
+local SyncCallbacks = { }
+
+function AddOnSyncCallback(cb, identifier)
+    SyncCallbacks[identifier] = cb
+end
+
+function RemoveOnSyncCallback(identifier)
+    SyncCallbacks[identifier] = nil
+end
+
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
+
+    for k, callback in SyncCallbacks do 
+        local ok, msg = pcall(callback, Sync)
+
+        -- if it fails, kick it out
+        if not ok then
+            SyncCallbacks[k] = nil
+            WARN(msg)
+        end
+    end
 
     if Sync.ArmyTransfer then 
         local army = GetFocusArmy()
