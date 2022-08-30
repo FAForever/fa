@@ -159,6 +159,8 @@ function ParseEntityCategoryProperly(categoryExpression)
 end
 -- converts specified category expression to a string
 -- representing it in global categories or returns repr(categoryExpression)
+---@param categoryExpression EntityCategory
+---@return string
 function ToString(categoryExpression)
     for key, value in categories or {} do
         if categoryExpression == value then
