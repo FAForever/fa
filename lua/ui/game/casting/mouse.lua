@@ -78,15 +78,17 @@ local Labels = { }
 ---@type number
 local LastUpdate = 0
 
----@type table<string, Vector>
-local LocationsNext = { }
+local PrevLocation = { }
+local NextLocation = { }
 
 ---@type table<string, Vector>
-local LocationsCurr = { }
+local Locations = { }
 
 --- Processes the mouse position send by players
 ---@param sender string
 local function ProcessMouse(sender, info)
+
+
 
     -- prepare first time data is send
     if not Entities[sender] then
@@ -105,24 +107,54 @@ local function ProcessMouse(sender, info)
         Labels[sender].Left:Set(-100)
         Labels[sender].Top:Set(-100)
 
-        LocationsNext[sender] = info.Position
-        LocationsCurr[sender] = info.Position
+        PrevLocation[sender] = info
+        NextLocation[sender] = info
+        Locations[sender] = { }
     end
 
-    LastUpdate = GetGameTimeSeconds()
-    LocationsCurr[sender] = LocationsNext[sender]
-    LocationsNext[sender] = info.Position
+    -- keep track of it
+    table.insert(Locations[sender], info)
+end
 
-    -- local label = labels[sender]
-    -- local screen = UnProject({data[1], data[2], data[3]})
+local function ShiftMouseData(Sync)
+
+    local tick = GameTick()
+
+    -- cull old data
+    local newLocations = { }
+    for sender, data in Locations do
+        newLocations[sender] = { }
+        
+        for k, info in data do 
+            if tick - info.Tick < 10 then
+                table.insert(newLocations[sender], info)
+            end
+        end
+    end
+
+    -- find sample of five ticks ago
+    local tick = GameTick()
+    for sender, data in newLocations do
+        for k, info in data do
+            if tick - info.Tick == 5 then
+                NextLocation[sender] = info
+            end
+        end
+    end
+
+    Locations = newLocations
+    LastUpdate = GetGameTimeSeconds()
 end
 
 --- Sends the mouse position to observers
-local function SendMouse()
+local function SendMouse(Sync)
+
+    if GetFocusArmy() == -1 then
+        return
+    end
 
     -- retrieve position and elevation
     local position = GetMouseWorldPos()
-    local elevation = GetMouseElevation()
 
     -- do not send nils
     if position and position[1] then
@@ -134,7 +166,7 @@ local function SendMouse()
 
             -- mouse information
             Position = position,
-            Time = GetGameTime()
+            Tick = GameTick()
         }
 
         SessionSendChatMessage(GetObserverClients(), msg)
@@ -143,7 +175,7 @@ end
 
 --- Interpolates the mouse position between updates
 local function DisplayMouseThread()
-    while true do 
+    while true do
 
         local time = GetGameTimeSeconds()
         for id, entity in Entities do
@@ -153,14 +185,17 @@ local function DisplayMouseThread()
             if diff > 1 then
                 diff = 1
             end
-            local curr = LocationsCurr[id]
-            local next = LocationsNext[id]
 
-            local x = next[1] * diff + curr[1] * (1 - diff)
-            local y = next[2] * diff + curr[2] * (1 - diff)
-            local z = next[3] * diff + curr[3] * (1 - diff)
+            local next = NextLocation[id].Position
+            local curr = PrevLocation[id].Position
+
+            local x = next[1] * 0.1 + curr[1] * 0.9
+            local y = next[2] * 0.1 + curr[2] * 0.9
+            local z = next[3] * 0.1 + curr[3] * 0.9
 
             local position = {x, y, z}
+
+            PrevLocation[id].Position = position
 
             -- update everything
 
@@ -179,7 +214,8 @@ local function DisplayMouseThread()
 end
 
 if clientCount > playerCount or true then
-    AddOnSyncCallback(SendMouse, 'CastingMouse')
+    AddOnSyncCallback(SendMouse, 'SendingCastingMouse')
+    AddOnSyncCallback(ShiftMouseData, 'ProcessingCastingMouse')
     import('/lua/ui/game/gamemain.lua').RegisterChatFunc(ProcessMouse, 'CastingMouse')
     ForkThread(DisplayMouseThread)
 end
