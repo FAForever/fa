@@ -164,6 +164,8 @@ local function SendData(Sync)
     -- retrieve position and elevation
     local position = GetMouseWorldPos()
 
+    -- TODO: add check if we've actually moved the mouse
+
     -- do not send nils
     if position and position[1] then
 
