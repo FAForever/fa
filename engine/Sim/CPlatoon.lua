@@ -170,7 +170,7 @@ end
 
 --- Returns units table of <squad>
 ---@param squad PlatoonSquadType
----@return PlatoonCommand
+---@return Unit[]
 function CPlatoon:GetSquadUnits(squad)
 end
 
