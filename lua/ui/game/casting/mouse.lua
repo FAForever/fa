@@ -17,8 +17,8 @@ for k, data in armies do
 end
 
 local localName = ''
-for k, client in clients do 
-    if client['local'] then 
+for k, client in clients do
+    if client['local'] then
         localName = client.name
     end
 end
@@ -59,7 +59,7 @@ local function GetObserverClients()
         end
 
         -- do not send to ourself or to players
-        if not isPlayer and (not client.name == localName) then
+        if not isPlayer and client.name != localName then
             table.insert(observers, k)
         end
     end
@@ -159,6 +159,7 @@ local function SendData(Sync)
 
     -- retrieve position and elevation
     local position = GetMouseWorldPos()
+    local clients = GetObserverClients()
 
     -- TODO: add check if we've actually moved the mouse
 
@@ -175,7 +176,7 @@ local function SendData(Sync)
             Tick = GameTick()
         }
 
-        SessionSendChatMessage(GetObserverClients(), msg)
+        SessionSendChatMessage(clients, msg)
     end
 end
 
@@ -211,6 +212,7 @@ end
 
 -- check conditions for sharing
 if clientCount > playerCount then
+    LOG("Sharing is caring!")
     AddOnSyncCallback(SendData, 'SendingCastingMouse')
     AddOnSyncCallback(CleanupData, 'ProcessingCastingMouse')
     import('/lua/ui/game/gamemain.lua').RegisterChatFunc(ProcessData, 'CastingMouse')
