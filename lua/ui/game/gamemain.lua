@@ -127,7 +127,8 @@ function OnFirstUpdate()
     end
 
     if not import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
-        import('/lua/ui/game/score.lua').CreateScoreUI()
+        reprsl(controls.cluster)
+        import('/lua/ui/game/score.lua').CreateScoreUI(controls.status)
     end
 
     if Prefs.GetOption('skin_change_on_start') ~= 'no' then
@@ -231,7 +232,7 @@ function CreateUI(isReplay)
         OnFirstUpdate()
     end
 
-    import('/lua/ui/game/worldview.lua').CreateMainWorldView(gameParent, mapGroup)
+    import('/lua/ui/game/worldview.lua').CreateMainWorldView(gameParent, gameParent)
     import('/lua/ui/game/worldview.lua').LockInput()
 
     local massGroup, energyGroup = import('/lua/ui/game/economy.lua').CreateEconomyBar(statusClusterGroup)

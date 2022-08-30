@@ -26,6 +26,12 @@
     -- Dump()
 
 ---@class Control : moho.control_methods
+---@field Left any
+---@field Top any
+---@field Right any
+---@field Bottom any
+---@field Width any
+---@field Height any
 Control = Class(moho.control_methods) {
 
     -- reset the control's layout to the defaults, in this case

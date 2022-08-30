@@ -14,14 +14,205 @@ local Factions = import('/lua/factions.lua').Factions
 
 MapControls = {}
 
+-- main views used
+---@type WorldView | boolean
 view = false
+---@type WorldView | boolean
 viewLeft = false
+---@type WorldView | boolean
 viewRight = false
+---@type WorldView | boolean
+viewStrategic1 = false
+---@type WorldView | boolean
+viewStrategic2 = false
+
+-- likely used by secondary monitors, not sure?
 secondaryView = false
 tertiaryView = false
+
+--- cached for later use
+---@type Control | boolean
 local parentForFrame = false
 
+--- Destroys the world views
+function Destroy()
+    if viewLeft then
+        viewLeft:Destroy()
+        viewLeft = false
+    end
+    if viewRight then
+        viewRight:Destroy()
+        viewRight = false
+    end
+    if view then
+        view:Destroy()
+        view = false
+    end
+end
+
+--- Creates a single view
+---@param parent Control
+---@param mapGroup Control
+local function CreateSingleView (parent, mapGroup)
+
+    -- keep a reference for later use
+    parentForFrame = parent
+
+    -- populate main view (left side)
+    viewLeft = import('/lua/ui/controls/worldview.lua').WorldView(mapGroup, 'WorldCamera', 1, false)
+    viewLeft:Register('WorldCamera', nil, '<LOC map_view_0006>Main View', 2)
+    viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
+    LayoutHelpers.FillParent(viewLeft, mapGroup)
+    viewLeft:GetsGlobalCameraCommands(true)
+
+    -- expands the entire view, used by various other modules to know the size of the screen
+    view = Group(parent)
+    view:DisableHitTest()
+    LayoutHelpers.FillParent(view, mapGroup)
+
+    ForkThread(
+        function()
+            LOG("Running!")
+            WaitSeconds(5.0)
+
+            viewLeft.Right:Set(
+                function() return mapGroup.Right() - (0.5 * mapGroup.Height()) end
+            )
+            
+            viewStrategic1 = import('/lua/ui/controls/worldview.lua').WorldView(mapGroup, 'CameraStrategic2', 1, false)
+            viewStrategic1:Register('CameraStrategic1', nil, '<CameraStrategic1', 2)
+            viewStrategic1:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow)
+            viewStrategic1.Left:Set(viewLeft.Right)
+            viewStrategic1.Right:Set(mapGroup.Right)
+            viewStrategic1.Top:Set(mapGroup.Top)
+            viewStrategic1.Bottom:Set(function() return mapGroup.Top() + (0.5 * mapGroup.Height()) end)
+
+            -- strategic view
+            viewStrategic2 = import('/lua/ui/controls/worldview.lua').WorldView(mapGroup, 'CameraStrategic2', 2, false)
+            viewStrategic2:Register('CameraStrategic2', nil, 'CameraStrategic2', 2)
+            viewStrategic2:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
+            viewStrategic2.Left:Set(viewLeft.Right)
+            viewStrategic2.Right:Set(mapGroup.Right)
+            viewStrategic2.Top:Set(function() return mapGroup.Top() + (0.5 * mapGroup.Height()) end)
+            viewStrategic2.Bottom:Set(mapGroup.Bottom)
+
+        end
+    )
+end
+
+--- Creates a dual view
+---@param parent Control
+---@param mapGroupLeft Control
+---@param mapGroupRight Control
+local function CreateDualView (parent, mapGroupLeft, mapGroupRight)
+
+    -- keep a reference for later use
+    parentForFrame = parent
+
+    -- populate left side
+    viewLeft = import('/lua/ui/controls/worldview.lua').WorldView(mapGroupLeft, 'WorldCamera', 1, false) -- depth value should be below minimap
+    viewLeft:Register('WorldCamera', nil, '<LOC map_view_0004>Split View Left', 2)
+    -- Note: UIRP values need to be a bitwise OR of flags. The lines below originally used the | operator but Travis CI doesn't like it. In these cases + works instead as long as the values never change.
+    viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
+    LayoutHelpers.FillParent(viewLeft, mapGroupLeft)
+    viewLeft:GetsGlobalCameraCommands(true)
+
+    -- populate right side
+    viewRight = import('/lua/ui/controls/worldview.lua').WorldView(mapGroupRight, 'WorldCamera2', 1, false) -- depth value should be below minimap
+    viewRight:Register('WorldCamera2', nil, '<LOC map_view_0005>Split View Right', 2)
+    viewRight:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
+    LayoutHelpers.FillParent(viewRight, mapGroupRight)
+
+    -- expands the entire view, used by various other modules to know the size of the screen
+    view = Group(parent)
+    view.Left:Set(mapGroupLeft.Left)
+    view.Top:Set(mapGroupLeft.Top)
+    view.Bottom:Set(mapGroupLeft.Bottom)
+    view.Right:Set(mapGroupRight.Right)
+    view:DisableHitTest()
+end
+
+local function CreateSingleStategicView (parent, mapGroup)
+
+end
+
+--- Called by the engine to populate the main view
+---@param parent any
+---@param mapGroup any
+---@param mapGroupRight any
+function CreateMainWorldView(parent, mapGroup, mapGroupRight)
+
+    -- clean up previous views
+    Destroy()
+
+    -- keep a reference for later use
+    parentForFrame = parent
+
+
+    if not mapGroupRight then
+        CreateSingleView(parent, mapGroup)
+    else
+        CreateDualView(parent, mapGroup, mapGroupRight)
+    end
+
+    import('/lua/ui/game/multifunction.lua').RefreshMapDialog()
+end
+
+-- these two functions will cause the world view to fill the screen or go back to its original settings
+local origLeft = false
+local origRight = false
+local origTop = false
+local origBottom = false
+
+function Expand()
+    if viewRight then
+        origRightLeft = viewRight.Left.compute
+        origRightRight = viewRight.Right.compute
+        origRightTop = viewRight.Top.compute
+        origRightBottom = viewRight.Bottom.compute
+        origLeft = viewLeft.Left.compute
+        origRight = viewLeft.Right.compute
+        origTop = viewLeft.Top.compute
+        origBottom = viewLeft.Bottom.compute
+
+        local gameViewTemp = GetFrame(parentForFrame:GetRootFrame():GetTargetHead())
+
+        viewLeft.Top:Set(gameViewTemp.Top)
+        viewLeft.Left:Set(gameViewTemp.Left)
+        viewLeft.Right:Set(function() return (gameViewTemp.Left() - 2) + ((gameViewTemp.Right() - gameViewTemp.Left()) / 2) end)
+        viewLeft.Bottom:Set(gameViewTemp.Bottom)
+
+        viewRight.Top:Set(gameViewTemp.Top)
+        viewRight.Left:Set(function() return (gameViewTemp.Left() + 2) + ((gameViewTemp.Right() - gameViewTemp.Left()) / 2) end)
+        viewRight.Right:Set(gameViewTemp.Right)
+        viewRight.Bottom:Set(gameViewTemp.Bottom)
+    else
+        origLeft = viewLeft.Left.compute
+        origRight = viewLeft.Right.compute
+        origTop = viewLeft.Top.compute
+        origBottom = viewLeft.Bottom.compute
+        LayoutHelpers.FillParent(viewLeft, GetFrame(parentForFrame:GetRootFrame():GetTargetHead()))
+    end
+end
+
+function Contract()
+    if viewRight then
+        viewRight.Left:Set(origRightLeft)
+        viewRight.Right:Set(origRightRight)
+        viewRight.Top:Set(origRightTop)
+        viewRight.Bottom:Set(origRightBottom)
+    end
+
+    viewLeft.Left:Set(origLeft)
+    viewLeft.Right:Set(origRight)
+    viewLeft.Top:Set(origTop)
+    viewLeft.Bottom:Set(origBottom)
+end
+
+-- TODO: move these to a separate file
+
 positionMarkers = {}
+
 
 local function CreatePositionMarker(army, worldView)
     local data = positionMarkers[army]
@@ -103,141 +294,6 @@ local function CreatePositionMarker(army, worldView)
         end
     end
 
-end
-
-function MarkStartPositions(startPositions)
-    if not startPositions then return end
-
-    local armyInfo = GetArmiesTable()
-    local armiesTable = armyInfo.armiesTable
-    local focusArmy = armyInfo.focusArmy
-
-    for armyId, armyData in armiesTable do
-        if not armyData.civilian and startPositions[armyData.name] and (focusArmy == -1 or IsEnemy(armyId, focusArmy)) then
-            local pos = startPositions[armyData.name]
-            local name = armyData.nickname
-            local faction = armyData.faction + 1
-            local color = armyData.color
-
-            positionMarkers[armyId] = {army = armyId, pos = pos, name = name, faction = faction, color = color, views = 0}
-
-            for viewName, view in MapControls do
-                if viewName ~= 'MiniMap' then
-                    CreatePositionMarker(armyId, view)
-                end
-            end
-        end
-    end
-end
-
-function CreateMainWorldView(parent, mapGroup, mapGroupRight)
-    if viewLeft then
-        viewLeft:Destroy()
-        viewLeft = false
-    end
-    if viewRight then
-        viewRight:Destroy()
-        viewRight = false
-    end
-    if view then
-        view:Destroy()
-        view = false
-    end
-    if mapGroupRight then
-        parentForFrame = parent
-        viewLeft = import('/lua/ui/controls/worldview.lua').WorldView(mapGroup, 'WorldCamera', 1, false) -- depth value should be below minimap
-        viewLeft:Register('WorldCamera', nil, '<LOC map_view_0004>Split View Left', 2)
-        -- Note: UIRP values need to be a bitwise OR of flags. The lines below originally used the | operator but Travis CI doesn't like it. In these cases + works instead as long as the values never change.
-        viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
-        LayoutHelpers.FillParent(viewLeft, mapGroup)
-        viewLeft:GetsGlobalCameraCommands(true)
-
-        viewRight = import('/lua/ui/controls/worldview.lua').WorldView(mapGroupRight, 'WorldCamera2', 1, false) -- depth value should be below minimap
-        viewRight:Register('WorldCamera2', nil, '<LOC map_view_0005>Split View Right', 2)
-        viewRight:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
-        LayoutHelpers.FillParent(viewRight, mapGroupRight)
-
-        view = Group(viewLeft)
-        view.Left:Set(viewLeft.Left)
-        view.Top:Set(viewLeft.Top)
-        view.Bottom:Set(viewLeft.Bottom)
-        view.Right:Set(viewRight.Right)
-        view:DisableHitTest()
-    else
-        parentForFrame = parent
-        viewLeft = import('/lua/ui/controls/worldview.lua').WorldView(mapGroup, 'WorldCamera', 1, false) -- depth value should be below minimap
-        viewLeft:Register('WorldCamera', nil, '<LOC map_view_0006>Main View', 2)
-        viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
-        LayoutHelpers.FillParent(viewLeft, mapGroup)
-        viewLeft:GetsGlobalCameraCommands(true)
-
-        view = Group(viewLeft)
-        view:DisableHitTest()
-        LayoutHelpers.FillParent(view, viewLeft)
-    end
-    import('/lua/ui/game/multifunction.lua').RefreshMapDialog()
-end
-
--- these two functions will cause the world view to fill the screen or go back to its original settings
-local origLeft = false
-local origRight = false
-local origTop = false
-local origBottom = false
-
-function Expand()
-    if viewRight then
-        origRightLeft = viewRight.Left.compute
-        origRightRight = viewRight.Right.compute
-        origRightTop = viewRight.Top.compute
-        origRightBottom = viewRight.Bottom.compute
-        origLeft = viewLeft.Left.compute
-        origRight = viewLeft.Right.compute
-        origTop = viewLeft.Top.compute
-        origBottom = viewLeft.Bottom.compute
-
-        local gameViewTemp = GetFrame(parentForFrame:GetRootFrame():GetTargetHead())
-
-        viewLeft.Top:Set(gameViewTemp.Top)
-        viewLeft.Left:Set(gameViewTemp.Left)
-        viewLeft.Right:Set(function() return (gameViewTemp.Left() - 2) + ((gameViewTemp.Right() - gameViewTemp.Left()) / 2) end)
-        viewLeft.Bottom:Set(gameViewTemp.Bottom)
-
-        viewRight.Top:Set(gameViewTemp.Top)
-        viewRight.Left:Set(function() return (gameViewTemp.Left() + 2) + ((gameViewTemp.Right() - gameViewTemp.Left()) / 2) end)
-        viewRight.Right:Set(gameViewTemp.Right)
-        viewRight.Bottom:Set(gameViewTemp.Bottom)
-    else
-        origLeft = viewLeft.Left.compute
-        origRight = viewLeft.Right.compute
-        origTop = viewLeft.Top.compute
-        origBottom = viewLeft.Bottom.compute
-        LayoutHelpers.FillParent(viewLeft, GetFrame(parentForFrame:GetRootFrame():GetTargetHead()))
-    end
-end
-
-function Contract()
-    if viewRight then
-        viewRight.Left:Set(origRightLeft)
-        viewRight.Right:Set(origRightRight)
-        viewRight.Top:Set(origRightTop)
-        viewRight.Bottom:Set(origRightBottom)
-    end
-
-    viewLeft.Left:Set(origLeft)
-    viewLeft.Right:Set(origRight)
-    viewLeft.Top:Set(origTop)
-    viewLeft.Bottom:Set(origBottom)
-end
-
-function Destroy()
-    if viewLeft then
-        viewLeft:Destroy()
-        viewLeft = false
-    end
-    if viewRight then
-        viewRight:Destroy()
-        viewRight = false
-    end
 end
 
 local worldBlock = false
@@ -325,4 +381,31 @@ end
 
 function GetWorldViews()
     return MapControls
+end
+
+
+
+function MarkStartPositions(startPositions)
+    if not startPositions then return end
+
+    local armyInfo = GetArmiesTable()
+    local armiesTable = armyInfo.armiesTable
+    local focusArmy = armyInfo.focusArmy
+
+    for armyId, armyData in armiesTable do
+        if not armyData.civilian and startPositions[armyData.name] and (focusArmy == -1 or IsEnemy(armyId, focusArmy)) then
+            local pos = startPositions[armyData.name]
+            local name = armyData.nickname
+            local faction = armyData.faction + 1
+            local color = armyData.color
+
+            positionMarkers[armyId] = {army = armyId, pos = pos, name = name, faction = faction, color = color, views = 0}
+
+            for viewName, view in MapControls do
+                if viewName ~= 'MiniMap' then
+                    CreatePositionMarker(armyId, view)
+                end
+            end
+        end
+    end
 end
