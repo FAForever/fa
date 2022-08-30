@@ -3,10 +3,6 @@
 
 ---@class SimCommand
 
---- TODO move to `'/engine/Core.lua'`
----@alias Bone string | number
----@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
-
 -- TODO : Needs Definision
 ---@alias TerrainType any
 ---@alias Task any
@@ -1249,11 +1245,4 @@ end
 ---@param shield Shield
 ---@param spec UnitBlueprintDefenseShield
 function _c_CreateShield(shield, spec)
-end
-------
----New functions from engine patch:
-------
-
---- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
-function GetDepositsAroundPoint(x, z, radius, type)
 end
