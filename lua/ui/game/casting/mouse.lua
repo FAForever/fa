@@ -161,10 +161,6 @@ end
 ---@param Sync any
 local function SendData(Sync)
 
-    if GetFocusArmy() == -1 then
-        return
-    end
-
     -- retrieve position and elevation
     local position = GetMouseWorldPos()
 
