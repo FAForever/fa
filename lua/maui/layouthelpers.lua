@@ -785,7 +785,7 @@ end
 --*********  Layouter  *************
 --**********************************
 
----@class Layouter : moho.aibrain_methods
+---@class Layouter
 ---@field c Control
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable

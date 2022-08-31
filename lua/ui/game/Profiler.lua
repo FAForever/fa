@@ -3,6 +3,8 @@
 -- https://github.com/FAForever/fa/blob/deploy/fafdevelop/lua/ui/game/Profiler.lua
 -- so that the contribution is available to everyone
 
+---@alias ProfilerTab "Overview" | "Timers" | "Stamps" | "Benchmarks" | "Options"
+
 local GameMain = import('/lua/ui/game/gamemain.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Observable = import("/lua/shared/observable.lua")
@@ -58,10 +60,12 @@ local State = {
         BenchmarkProgress = 0,
         BenchmarkRunning = false,
         BenchmarkRuns = 0,
+        ---@type UserBenchmarkModule[]
         Modules = false,
         Parameters = {10000, 45},
         SelectedBenchmark = 0,
         SelectedModule = 1,
+        ---@type table<string, number[]>
         StatCache = {},
     },
     Options = {},
@@ -71,10 +75,12 @@ local BenchmarkModuleSelected = Observable.Create()
 local BenchmarkSelected = Observable.Create()
 local BenchmarkProgressReceived = Observable.Create()
 local BenchmarkModulesReceived = Observable.Create()
+local BenchmarkInfoReceived = Observable.Create()
 local BenchmarkOutputReceived = Observable.Create()
 
 
 --- Received data from the sim about function calls
+---@param info ProfilerData
 function ReceiveData(info)
     -- Lua, C or main
     for source, sourceinfo in info do
@@ -116,15 +122,23 @@ function ReceiveData(info)
     end
 end
 
+---@param data UserBenchmarkModule[]
 function ReceiveBenchmarkModules(data)
     BenchmarkModulesReceived:Set(data)
 end
 
+---@param data RawFunctionDebugInfo
+function ReceiveBenchmarkInfo(data)
+    BenchmarkInfoReceived:Set(data)
+end
+
+---@param data {samples?: number, data?: number[], success: boolean}
 function ReceiveBenchmarkOutput(data)
     SPEW("Received benchmark output")
     BenchmarkOutputReceived:Set(data)
 end
 
+---@param data {complete: number, runs?: number}
 function ReceiveBenchmarkProgress(data)
     SPEW("Receiving progress")
     BenchmarkProgressReceived:Set(data)
@@ -141,21 +155,19 @@ function ToggleProfiler()
     })
 end
 
-local function CanUseProfiler(army)
-    if GameMain.GameHasAIs then
-        return true
-    end
-    if sessionInfo.Options.CheatsEnabled then
-        return true
-    end
-    if SessionIsReplay() then
-        return true
-    end
-    if PlayerIsDev(army) then
-        return true
-    end
-    return false
+-- note: this function can be hooked by UI mods to access the window, but the sim still
+-- locks the player out
+
+---@param player Army | AIBrain | string
+---@return boolean
+local function CanUseProfiler(player)
+    return
+        GameMain.GameHasAIs or
+        sessionInfo.Options.CheatsEnabled == "true" or
+        SessionIsReplay() or
+        PlayerIsDev(player)
 end
+
 
 --- Opens up the window
 function OpenWindow()
@@ -188,6 +200,7 @@ function OpenWindow()
         SwitchHeader(State.Header)
     else
         GUI = ProfilerWindow(GetFrame(0))
+        SwitchHeader(State.Header)
         -- retrieve benchmarks
         SimCallback({
             Func = "FindBenchmarks",
@@ -216,38 +229,102 @@ function CloseWindow()
     end
 end
 
-
-
+---@param target ProfilerTab
 function SwitchHeader(target)
     local tabs = GUI.Tabs
-    State.Header = target
+    if tabs then
+        State.Header = target
 
-    -- hide all tabs
-    tabs:Hide()
+        -- hide all tabs
+        for _, tab in tabs do
+            tab:Hide()
+        end
 
-    -- show the tab we're interested in
-    local tab = tabs[target]
-    if tab then
-        tab:Show()
-        local onFocus = tab.OnFocus
-        if onFocus then
-            onFocus(tab)
+        -- show the tab we're interested in
+        local tab = tabs[target]
+        if tab then
+            tab:Show()
+            local onFocus = tab.OnFocus
+            if onFocus then
+                onFocus(tab)
+            end
         end
     end
 end
 
-function GetBenchmarkCacheKey(modIndex, benIndex)
+local function GetBenchmarkCacheKey(modIndex, benIndex)
+    local state = State.Benchmarks
+    modIndex = modIndex or state.SelectedModule
+    benIndex = benIndex or state.SelectedBenchmark
     return tostring(modIndex) .. "," .. tostring(benIndex)
 end
 
+---@param modIndex? number
+---@param benIndex? number
+---@return number[] | nil
+local function GetBenchmarkStatCache(modIndex, benIndex)
+    return State.Benchmarks.StatCache[GetBenchmarkCacheKey(modIndex, benIndex)]
+end
 
+---@param data number[] | nil
+---@param modIndex? number
+---@param benIndex? number
+local function SetBenchmarkStatCache(data, modIndex, benIndex)
+    State.Benchmarks.StatCache[GetBenchmarkCacheKey(modIndex, benIndex)] = data
+end
+
+---@param data number[] | nil
+---@param modIndex? number
+---@param benIndex? number
+---@return number[] | nil
+local function AddBenchmarkStatCache(data, modIndex, benIndex)
+    local key = GetBenchmarkCacheKey(modIndex, benIndex)
+    local statCaches = State.Benchmarks.StatCache
+    local cache = statCaches[key]
+    if not cache then
+        if data then
+            local n = data.n
+            cache = {n = n}
+            for i = 1, n do
+                cache[i] = data[i]
+            end
+            statCaches[key] = cache
+        end
+    elseif data then
+        local n = data.n
+        local offset = cache.n
+        for i = 1, n do
+            cache[offset + i] = data[i]
+        end
+        data.n = offset + n
+    else
+        statCaches[key] = nil
+        return nil
+    end
+    return cache
+end
+
+---@param module number
+---@param benchmark number
+function LoadBenchmark(module, benchmark)
+    SimCallback({
+        Func = "LoadBenchmark",
+        Args = {
+            Module = module,
+            Benchmark = benchmark,
+        },
+    })
+end
+
+---@param module number
+---@param benchmark number
 function StartBenchmark(module, benchmark)
     -- We asymetrically update the `benchmarkRunning` state to true on start, but wait for results
     -- from the sim on stop to set to false. This is so that we can't send benchmark requests
     -- to the sim while one is running.
     local benchmarkState = State.Benchmarks
     benchmarkState.BenchmarkRunning = true
-    local params = State.Benchmarks.BenchmarkParameterCount
+    local params = benchmarkState.ParameterCount
     if not params then
         WARN("Missing debug function to start benchmark")
         return
@@ -266,20 +343,23 @@ function StartBenchmark(module, benchmark)
             Parameters = parameters,
         },
     })
-    GUI:UpdateRunButtonState()
+    GUI.Tabs.Benchmarks:UpdateRunButtonState()
 end
 
 function StopBenchmark()
     SimCallback({
         Func = "StopBenchmark",
-        Args = {}
+        Args = {},
     })
 end
 
 
 
 ---@class ProfilerWindow : Window
+---@field Tabs {Overview: ProfilerOverview, Timers: ProfilerTimers, Stamps: ProfilerStamps, Benchmarks: ProfilerBenchmarks, Options: ProfilerOptions}
 ProfilerWindow = Class(Window) {
+    ---@param self ProfilerWindow
+    ---@param parent Control
     __init = function(self, parent)
         Window.__init(self, parent, LOC("<LOC profiler_{auto}>Profiler"), false, false, false, true, false, "profiler2", {
             Left = 10,
@@ -292,22 +372,36 @@ ProfilerWindow = Class(Window) {
 
         self:InitHeaders()
         self:InitTabs()
-
-        SwitchHeader(State.Header)
     end,
 
+    ---@param self ProfilerWindow
     InitHeaders = function(self)
-        local titleGroup = self.TitleGroup
-        self:InitHeaderButton(titleGroup, "Overview", "<LOC profiler_{auto}>Overview", 0.0)
-        self:InitHeaderButton(titleGroup, "Timers", "<LOC profiler_{auto}>Timers", 0.2)
-        self:InitHeaderButton(titleGroup, "Stamps", "<LOC profiler_{auto}>Stamps", 0.4)
-        self:InitHeaderButton(titleGroup, "Benchmarks", "<LOC profiler_{auto}>Benchmarks", 0.6)
-        self:InitHeaderButton(titleGroup, "Options", "<LOC profiler_{auto}>Options", 0.8)
+        local clientGroup = self.ClientGroup
+        local _, height = GetTextureDimensions(UIUtil.UIFile('/widgets02/small_btn_up.dds'))
+        local header = Layouter(Group(clientGroup))
+            :AtLeftIn(clientGroup)
+            :AtRightIn(clientGroup)
+            :AtTopIn(clientGroup)
+            :Height(height + 8)
+            :End()
+        clientGroup.Header = header
+
+        self:InitHeaderButton(header, "Overview", "<LOC profiler_{auto}>Overview", 0.0)
+        self:InitHeaderButton(header, "Timers", "<LOC profiler_{auto}>Timers", 0.2):Disable()
+        self:InitHeaderButton(header, "Stamps", "<LOC profiler_{auto}>Stamps", 0.4):Disable()
+        self:InitHeaderButton(header, "Benchmarks", "<LOC profiler_{auto}>Benchmarks", 0.6)
+        self:InitHeaderButton(header, "Options", "<LOC profiler_{auto}>Options", 0.8):Disable()
     end,
 
+    ---@param self ProfilerWindow
+    ---@param parent Group
+    ---@param name string
+    ---@param text string
+    ---@param pos number
+    ---@return Button
     InitHeaderButton = function(self, parent, name, text, pos)
         local button = Layouter(UIUtil.CreateButtonStd(parent, '/widgets02/small', LOC(text), 16, 2))
-            :Below(parent, 4)
+            :AtTopIn(parent, 4)
             :FromLeftIn(parent, pos + 0.010)
             :Over(self, 10)
             :End()
@@ -318,153 +412,53 @@ ProfilerWindow = Class(Window) {
         return button
     end,
 
+    ---@param self ProfilerWindow
     InitTabs = function(self)
-        local Tabs = Layouter(Group(self, "window content pane"))
-            :Below(self.TitleGroup)
-            :Right(self.Right)
-            :Bottom(self.Bottom)
+        local clientGroup = self.ClientGroup
+        local tabGroup = Layouter(Group(clientGroup))
+            :AtLeftIn(clientGroup)
+            :AtRightIn(clientGroup)
+            :AtBottomIn(clientGroup)
+            :AnchorToBottom(clientGroup.Header)
             :End()
-        Tabs.Overview = self:CreateOverviewTab(Tabs)
-        --Tabs.Timers = self:CreateTimersTab(Tabs)
-        --Tabs.Stamps = self:CreateStampsTab(Tabs)
-        Tabs.Benchmarks = self:CreateBenchmarksTab(Tabs)
-        --Tabs.Options = self:CreateOptionsTab(Tabs)
-        Tabs:Hide()
-        self.Tabs = Tabs
+        self.Tabs = {}
+
+        self:InitOverviewTab(tabGroup)
+        --self:InitTimersTab(tabGroup)
+        --self:InitStampsTab(tabGroup)
+        self:InitBenchmarksTab(tabGroup)
+        --self:InitOptionsTab(tabGroup)
     end;
 
-    CreateOverviewTab = function(self, parent)
-        local tab = Layouter(Group(parent, "overview tab"))
-            :Fill(parent)
-            :End()
-
-        -- search bar
-
-        local searchText = Layouter(UIUtil.CreateText(tab, LOC("<LOC profiler_{auto}>Search"), 18, UIUtil.bodyFont, true))
-            :Under(tab)
-            :AtLeftTopIn(tab, 10, 8)
-            :End()
-
-        local searchClearButton = Layouter(UIUtil.CreateButtonStd(tab, '/widgets02/small', LOC("<LOC profiler_{auto}>Clear"), 14, 2))
-            :AtVerticalCenterIn(searchText)
-            :AtRightIn(tab, 10)
-            :Over(self, 10)
-            :End()
-
-        local searchEdit = Edit(tab); Layouter(searchEdit)
-            :Under(tab)
-            :CenteredRightOf(searchText, 10)
-            :AnchorToLeft(searchClearButton, 10)
-            :Over(self, 10)
-            :Height(function()
-                return searchEdit:GetFontHeight()
-            end)
-            :End()
-
-        UIUtil.SetupEditStd(
-            searchEdit, -- edit control
-            UIUtil.fontColor, -- foreground color
-            "ff060606", -- background color
-            UIUtil.highlightColor, -- highlight foreground color
-            "880085EF", -- highlight background color
-            UIUtil.bodyFont, -- font
-            14, -- size
-            30 -- maximum characters
-        )
-
-        -- Sorting options
-
-        local sortGroup = Layouter(Group(tab))
-        -- better to set height for control
-            :AnchorToBottom(searchEdit, 13)
-            :Height(LayoutHelpers.ScaleNumber(30))
-            :Left(self.Left)
-            :Right(self.Right)
-            :End()
-
-        local buttonName = Layouter(UIUtil.CreateButtonStd(sortGroup, '/widgets02/small', LOC("<LOC profiler_{auto}>Name"), 16, 2))
-            :FromLeftIn(sortGroup, 0.410)
-            :FromTopIn(sortGroup, 0)
-            :Over(self, 10)
-            :End()
-
-        local buttonCount = Layouter(UIUtil.CreateButtonStd(sortGroup, '/widgets02/small', LOC("<LOC profiler_{auto}>Count"), 16, 2))
-            :FromLeftIn(sortGroup, 0.610)
-            :FromTopIn(sortGroup, 0)
-            :Over(self, 10)
-            :End()
-
-        local buttonGrowth = Layouter(UIUtil.CreateButtonStd(sortGroup, '/widgets02/small', LOC("<LOC profiler_{auto}>Growth"), 16, 2))
-            :FromLeftIn(sortGroup, 0.810)
-            :FromTopIn(sortGroup, 0)
-            :Over(self, 10)
-            :End()
-
-        -- list of functions
-        -- make as a class
-        -- ScrollArea
-        local area = Layouter(ProfilerElements.ProfilerScrollArea(tab))
-            :AnchorToBottom(sortGroup, 16)
-            :AtBottomIn(self, 2)
-            :Left(self.Left)
-            :AtRightIn(self, 16)
-            :End()
-        area:InitScrollableContent()
-        -- dirty hack :)
-        SPEW(" applied dirty hack")
-        self.List = area
-
-        searchEdit.OnTextChanged = function(edit_self, new, old)
-            State.Overview.Search = new
-            GUI.Tabs.Overview.Controls.List:ScrollLines(false, 0)
-        end
-        searchClearButton.OnClick = function(edit_self)
-            searchEdit:ClearText()
-            State.Overview.Search = false
-        end
-        buttonName.OnClick = function(button_self)
-            State.Overview.SortOn = "name"
-        end
-        buttonCount.OnClick = function(button_self)
-            State.Overview.SortOn = "value"
-        end
-        buttonGrowth.OnClick = function(button_self)
-            State.Overview.SortOn = "growth"
-        end
-
-        return tab
+    ---@param self ProfilerWindow
+    ---@param tabs Group
+    InitOverviewTab = function(self, tabs)
+        self.Tabs.Overview = ProfilerOverview(tabs)
     end,
 
-    CreateTimersTab = function(self, parent)
-        local tab = Layouter(Group(parent, "timers tab"))
-            :Fill(parent)
-            :End()
-
-        -- TODO
-
-        return tab
+    ---@param self ProfilerWindow
+    ---@param tabs Group
+    InitTimersTab = function(self, tabs)
+        self.Tabs.Timers = ProfilerTimers(tabs)
     end;
 
-    CreateStampsTab = function(self, parent)
-        local tab = Layouter(Group(parent, "stamps tab"))
-            :Fill(parent)
-            :End()
-
-        -- TODO
-
-        return tab
+    ---@param self ProfilerWindow
+    ---@param tabs Group
+    InitStampsTab = function(self, tabs)
+        self.Tabs.Stamps = ProfilerStamps(tabs)
     end;
 
-    CreateBenchmarksTab = function(self, parent)
-        local tab = ProfilerBenchmarks(parent)
-
-        tab.OnFocus = function(self)
-            self:UpdateBenchmarkStats() -- rehide the summary when the tab is shown
-        end
+    ---@param self ProfilerWindow
+    ---@param tabs Group
+    InitBenchmarksTab = function(self, tabs)
+        self.Tabs.Benchmarks = ProfilerBenchmarks(tabs)
 
         -- allows us to act on changes
         BenchmarkModulesReceived:AddObserver(function(modules)
             self:ReceiveBenchmarkModules(modules)
+        end)
+        BenchmarkInfoReceived:AddObserver(function(info)
+            self:ReceiveBenchmarkInfo(info)
         end)
         BenchmarkProgressReceived:AddObserver(function(progress)
             self:ReceiveBenchmarkProgress(progress)
@@ -478,25 +472,22 @@ ProfilerWindow = Class(Window) {
         BenchmarkSelected:AddObserver(function(index)
             self:ReceiveBenchmarkSelected(index)
         end)
-
-        return tab
     end,
 
-    CreateOptionsTab = function(self, parent)
-        local tab = Layouter(Group(parent, "options tab"))
-            :Fill(parent)
-            :End()
-
-        -- TODO
-
-        return tab
+    ---@param self ProfilerWindow
+    ---@param tabs Group
+    InitOptionsTab = function(self, tabs)
+        self.Tabs.Options = ProfilerOptions(tabs)
     end;
 
 
+    ---@param self ProfilerWindow
     OnClose = function(self)
         CloseWindow()
     end;
 
+    ---@param self ProfilerWindow
+    ---@param index number
     ReceiveModuleSelected = function(self, index)
         local benchmarkState = State.Benchmarks
         local moduleData = benchmarkState.Modules[index]
@@ -505,6 +496,8 @@ ProfilerWindow = Class(Window) {
         BenchmarkSelected:Set(moduleData.LastBenchmarkSelected)
     end;
 
+    ---@param self ProfilerWindow
+    ---@param index number
     ReceiveBenchmarkSelected = function(self, index)
         local benchmarkState = State.Benchmarks
         local moduleData = benchmarkState.Modules[benchmarkState.SelectedModule]
@@ -512,40 +505,212 @@ ProfilerWindow = Class(Window) {
         moduleData.LastBenchmarkSelected = index
     end;
 
+    ---@param self ProfilerWindow
+    ---@param modules Module
     ReceiveBenchmarkModules = function(self, modules)
-        for _, module in modules do
-            module.LastBenchmarkSelected = 0
-            for _, benchmark in module do
-                benchmark.info = DebugFunction(benchmark.info)
-            end
-        end
         State.Benchmarks.Modules = modules
         self.Tabs.Benchmarks:PopulateModulePicker(modules)
         BenchmarkModuleSelected:Set(1)
     end;
 
+    ---@param self ProfilerWindow
+    ---@param progress table
     ReceiveBenchmarkProgress = function(self, progress)
         local benchmarkState = State.Benchmarks
+        local benchmarksTab = self.Tabs.Benchmarks
         if progress.runs then
             benchmarkState.BenchmarkRuns = progress.runs
-            self:UpdateRunButtonState()
+            benchmarksTab:UpdateRunButtonState()
             benchmarkState.BenchmarkProgress = progress.complete
         else
             benchmarkState.BenchmarkProgress = benchmarkState.BenchmarkProgress + progress.complete
         end
-        self:UpdateBenchmarkProgress()
+        benchmarksTab:UpdateBenchmarkProgress()
     end;
 
+    ---@param self ProfilerWindow
+    ---@param info RawFunctionDebugInfo
+    ReceiveBenchmarkInfo = function(self, info)
+        local benchmarkState = State.Benchmarks
+        benchmarkState.ParameterCount = info.bytecode.numparams
+        self.Tabs.Benchmarks:UpdateBenchmarkInfo(info)
+    end;
+
+    ---@param self ProfilerWindow
+    ---@param output Module
     ReceiveBenchmarkOutput = function(self, output)
         State.Benchmarks.BenchmarkRunning = false
-        self:AddBenchmarkStats(output)
-        self:UpdateBenchmarkProgress()
-        self:UpdateRunButtonState()
+        local benchmarksTab = self.Tabs.Benchmarks
+        benchmarksTab:AddBenchmarkStats(output)
+        benchmarksTab:UpdateBenchmarkProgress()
+        benchmarksTab:UpdateRunButtonState()
     end;
 }
 
 
+----------
+-- Tabs
+----------
+
+---@param searchbar Group
+---@param tab string
+---@return Button
+---@return Edit
+local function CreateSearchBar(searchbar, tab)
+    local text = Layouter(UIUtil.CreateText(searchbar, LOC("<LOC profiler_{auto}>Search"), 18, UIUtil.bodyFont, true))
+        :AtLeftTopIn(searchbar)
+        :End()
+
+    local clearButton = Layouter(UIUtil.CreateButtonStd(searchbar, '/widgets02/small', LOC("<LOC profiler_{auto}>Clear"), 14, 2))
+        :AtVerticalCenterIn(text)
+        :AtRightIn(searchbar)
+        :Over(searchbar, 10)
+        :End()
+
+    local edit = Edit(searchbar); Layouter(edit)
+        :CenteredRightOf(text, 6)
+        :AnchorToLeft(clearButton, 6)
+        :Over(searchbar, 10)
+        :Height(function()
+            return edit:GetFontHeight()
+        end)
+        :End()
+
+    UIUtil.SetupEditStd(edit,
+        UIUtil.fontColor,      -- foreground color
+        "ff060606",          -- background color
+        UIUtil.highlightColor, -- highlight foreground color
+        "880085EF",          -- highlight background color
+        UIUtil.bodyFont,       -- font
+        14, -- size
+        30  -- maximum characters
+    )
+
+    edit.OnTextChanged = function(edit_self, new, old)
+        State[tab].Search = new
+        GUI.Tabs[tab].List:ScrollLines(false, 0)
+    end
+    clearButton.OnClick = function()
+        edit:ClearText()
+        State[tab].Search = false
+    end
+
+    searchbar.Height:Set(clearButton.Height())
+    return clearButton, edit
+end
+
+---@param sortbar Group
+---@param tab string
+local function CreateSortBar(sortbar, tab)
+    local buttonName = Layouter(UIUtil.CreateButtonStd(sortbar, '/widgets02/small', LOC("<LOC profiler_{auto}>Name"), 16, 2))
+        :FromLeftIn(sortbar, 0.010)
+        :FromTopIn(sortbar)
+        :Over(sortbar, 10)
+        :End()
+
+    local buttonCount = Layouter(UIUtil.CreateButtonStd(sortbar, '/widgets02/small', LOC("<LOC profiler_{auto}>Count"), 16, 2))
+        :FromLeftIn(sortbar, 0.620)
+        :FromTopIn(sortbar)
+        :Over(sortbar, 10)
+        :End()
+
+    local buttonGrowth = Layouter(UIUtil.CreateButtonStd(sortbar, '/widgets02/small', LOC("<LOC profiler_{auto}>Growth"), 16, 2))
+        :FromLeftIn(sortbar, 0.810)
+        :FromTopIn(sortbar)
+        :Over(sortbar, 10)
+        :End()
+
+    buttonName.SortOn = "name"
+    buttonCount.SortOn = "value"
+    buttonGrowth.SortOn = "growth"
+
+    local function onClick(self)
+        State[tab].SortOn = self.SortOn
+    end
+    buttonName.OnClick = onClick
+    buttonCount.OnClick = onClick
+    buttonGrowth.OnClick = onClick
+end
+
+
+---@class ProfilerOverview : Group
+---@field List ProfilerScrollArea
+ProfilerOverview = Class(Group) {
+    ---@param self ProfilerOverview
+    ---@param parent Group
+    __init = function(self, parent)
+        Group.__init(self, parent)
+        LayoutHelpers.FillParent(self, parent)
+
+        -- search bar
+
+        local searchBar = Layouter(Group(self))
+            :AtLeftTopIn(parent, 10, 10)
+            :AtRightIn(parent, 10)
+            :Height(10) -- placeholder
+            :End()
+
+        CreateSearchBar(searchBar, "Overview")
+
+        -- Sorting options
+
+        local sortGroup = Layouter(Group(self))
+        -- better to set height for control
+            :AnchorToBottom(searchBar, 10)
+            :Height(30)
+            :Left(self.Left)
+            :Right(self.Right)
+            :End()
+
+        CreateSortBar(sortGroup, "Overview")
+
+        -- list of functions
+        -- make as a class
+        local area = Layouter(ProfilerElements.ProfilerScrollArea(self))
+            :AnchorToBottom(sortGroup, 8)
+            :AtBottomIn(self, 2)
+            :AtLeftIn(self, 2)
+            :AtRightIn(self, 2 + 14)
+            :End()
+        area:InitScrollableContent()
+        -- dirty hack :)
+        SPEW(" applied dirty hack")
+        self.List = area
+    end;
+}
+
+---@class ProfilerTimers : Group
+ProfilerTimers = Class(Group) {
+    ---@param self ProfilerTimers
+    ---@param parent Group
+    __init = function(self, parent)
+        Group.__init(self, parent)
+        LayoutHelpers.FillParent(self, parent)
+    end
+}
+
+---@class ProfilerStamps : Group
+ProfilerStamps = Class(Group) {
+    ---@param self ProfilerStamps
+    ---@param parent Group
+    __init = function(self, parent)
+        Group.__init(self, parent)
+        LayoutHelpers.FillParent(self, parent)
+    end
+}
+
+---@class ProfilerBenchmarks : Group
+---@field BenchmarksLabel Text
+---@field BenchmarkList ItemList
+---@field Bytecode BytecodeArea
+---@field ModulePicker Combo
+---@field ParametersLabel ItemList
+---@field ProgressLabel Text
+---@field RunButton Button
+---@field Summary StatisticSummary
 ProfilerBenchmarks = Class(Group) {
+    ---@param self ProfilerBenchmarks
+    ---@param parent Group
     __init = function(self, parent)
         Group.__init(self, parent)
         LayoutHelpers.FillParent(self, parent)
@@ -630,12 +795,10 @@ ProfilerBenchmarks = Class(Group) {
 
         -- Output
 
-        local summary = Layouter(ProfilerElements.ProfilerSummary(groupOutput))
-            :FillFixedBorder(groupOutput, 5)
-            :End()
+        local summary = ProfilerElements.StatisticSummary(groupOutput)
         self.Summary = summary
 
-        local bytecode = ProfilerElements.ProfilerBytecodeArea(groupOutput)
+        local bytecode = ProfilerElements.BytecodeArea(groupOutput)
         bytecode.Top:Set(summary.Bottom)
         self.Bytecode = bytecode
 
@@ -674,21 +837,25 @@ ProfilerBenchmarks = Class(Group) {
         local hook = summary.OnClickClearSummary
         summary.OnClickClearSummary = function()
             hook()
-            local benchmarkState = State.Benchmarks
-            local mod = benchmarkState.SelectedModule
-            local ben = benchmarkState.SelectedBenchmark
-            local key = GetBenchmarkCacheKey(mod, ben)
-            benchmarkState.StatCache[key] = nil
+            SetBenchmarkStatCache(nil)
         end;
 
-        BenchmarkModuleSelected:Add(function(index)
+        BenchmarkModuleSelected:AddObserver(function(index)
             self:SelectModule(index)
         end)
-        BenchmarkSelected:Add(function(index)
+        BenchmarkSelected:AddObserver(function(index)
             self:SelectBenchmark(index)
         end)
-    end,
+    end;
 
+    ---@param self ProfilerBenchmarks
+    OnFocus = function(self)
+        -- rehide components
+        self:UpdateBenchmarkStats()
+        self.ProgressLabel:Hide()
+    end;
+
+    ---@param self ProfilerBenchmarks
     OnClickRunButton = function(self)
         local benchmarkState = State.Benchmarks
         if benchmarkState.BenchmarkRunning then
@@ -702,20 +869,31 @@ ProfilerBenchmarks = Class(Group) {
         end
     end;
 
+    ---@param self ProfilerBenchmarks
+    ---@param index number
     SelectModule = function(self, index)
-        self:PopulateBenchmarkList(index)
+        local module = State.Benchmarks.Modules[index]
+        self:PopulateBenchmarkList(module)
+        self:UpdateBenchmarkDetails(module)
     end;
 
+    ---@param self ProfilerBenchmarks
+    ---@param index number
     SelectBenchmark = function(self, index)
-        local benchmarkState = State.Benchmarks
-        local benchmark = benchmarkState.Modules[benchmarkState.SelectedModule].Benchmarks[index]
         self.BenchmarkList:SetSelection(index - 1) -- to zero-index list
-        self.Bytecode:SetBenchmark(benchmark.Info)
         self:UpdateParametersLabel()
         self:UpdateBenchmarkStats()
         self:UpdateRunButtonState()
+        LoadBenchmark(State.Benchmarks.SelectedModule, index)
+        if index ~= 0 then
+            self:UpdateBenchmarkInfo(LOC("<LOC profiler_{auto}>waiting for benchmark data..."))
+        else
+            self:UpdateBenchmarkInfo()
+        end
     end;
 
+    ---@param self ProfilerBenchmarks
+    ---@param modules UserBenchmarkModule
     PopulateModulePicker = function(self, modules)
         -- find keys
         local keys = {}
@@ -763,6 +941,8 @@ ProfilerBenchmarks = Class(Group) {
         end
     end;
 
+    ---@param self ProfilerBenchmarks
+    ---@param moduleData UserBenchmarkModule
     PopulateBenchmarkList = function(self, moduleData)
         local benchmarkList = self.BenchmarkList
         benchmarkList:DeleteAllItems()
@@ -798,80 +978,81 @@ ProfilerBenchmarks = Class(Group) {
         end
     end;
 
+    ---@param self ProfilerBenchmarks
+    ---@param data table
     AddBenchmarkStats = function(self, data)
-        local benchmarkState = State.Benchmarks
-        local key = GetBenchmarkCacheKey(benchmarkState.SelectedModule, benchmarkState.SelectedBenchmark)
-        local benchmarkStatCache = benchmarkState.StatCache
-        local cache = benchmarkStatCache[key]
-        local n = data.samples
-        data = data.data
-        if cache then
-            local offset = cache.n
-            for i = 1, n do
-                cache[offset + i] = data[i]
-            end
-            cache.n = offset + n
-        else
-            cache = {n = n}
-            benchmarkStatCache[key] = cache
-            for i = 1, n do
-                cache[i] = data[i]
-            end
+        if data.success then
+            local toAdd = data.data
+            toAdd.n = data.samples
+            local stats = AddBenchmarkStatCache(toAdd)
+            self.Summary:SetStats(stats)
+            SPEW(stats.n)
         end
-        self.Tabs.Benchmarks:SetBenchmarkStats(cache)
     end;
 
+    ---@param self ProfilerBenchmarks
+    ---@param info RawFunctionDebugInfo | nil
+    UpdateBenchmarkInfo = function(self, info)
+        local bytecodeArea = self.Bytecode
+        if type(info) == "table" then
+            info = DebugFunction(info)
+        end
+        bytecodeArea:SetFunction(info)
+        self:UpdateParametersLabel()
+        self:UpdateBenchmarkStats()
+        self:UpdateRunButtonState()
+    end;
+
+    ---@param self ProfilerBenchmarks
+    ---@param moduleData UserBenchmarkModule
     UpdateBenchmarkDetails = function(self, moduleData)
-        local num
-        if moduleData.faulty then
-            num = "<LOC lobui_0458>Unknown"
-        else
-            num = table.getn(moduleData.benchmarks)
-        end
-        self.BenchmarksLabel:SetText(LOCF("<LOC profiler_{auto}>Benchmarks in module: %s", num))
+        local n = moduleData.faulty and "<LOC lobui_0458>Unknown" or table.getn(moduleData.benchmarks)
+        self.BenchmarksLabel:SetText(LOCF("<LOC profiler_{auto}>Benchmarks in module: %s", n))
     end;
 
+    ---@param self ProfilerBenchmarks
     UpdateParametersLabel = function(self)
         local benchmarkState = State.Benchmarks
-        local params = State.Benchmarks.BenchmarkParameterCount
+        local params = benchmarkState.ParameterCount
         if params then
             local label = self.ParametersLabel
+            label:Hide()
             label:DeleteAllItems()
             if params > 0 then
-                local paramFormater = LOC("<LOC profiler_{auto}>Parameter %d: %s")
+                local paramFormatter = LOC("<LOC profiler_{auto}>Parameter %d: %s")
                 local parameters = benchmarkState.Parameters
                 for i = 1, params do
-                    label:AddItem(paramFormater:format(i, tostring(parameters[i])))
+                    label:AddItem(paramFormatter:format(i, tostring(parameters[i])))
                 end
             end
             label:Show()
-            for i = 1, label:GetItemCount() do
-                SPEW(label:GetItem(i - 1))
-            end
         end
     end;
 
+    ---@param self ProfilerBenchmarks
     UpdateBenchmarkStats = function(self)
-        local benchmarkState = State.Benchmarks
-        local key = GetBenchmarkCacheKey(benchmarkState.SelectedModule, benchmarkState.SelectedBenchmark)
-        local cache = benchmarkState.StatCache[key]
-        self.Tabs.Benchmarks:SetBenchmarkStats(cache)
+        self.Summary:SetStats(GetBenchmarkStatCache())
     end;
 
+    ---@param self ProfilerBenchmarks
     UpdateRunButtonState = function(self)
         local benchmarkState = State.Benchmarks
         local disabled = benchmarkState.SelectedBenchmark == 0
         local running = benchmarkState.BenchmarkRunning
-        self.Tabs.Benchmarks:SetRunButtonState(disabled, running)
+        self:SetRunButtonState(disabled, running)
     end;
 
+    ---@param self ProfilerBenchmarks
     UpdateBenchmarkProgress = function(self)
         local benchmarkState = State.Benchmarks
         local prog = benchmarkState.BenchmarkProgress
         local runs = benchmarkState.BenchmarkRuns
-        self.Tabs.Benchmarks:SetBenchmarkProgress(prog, runs)
+        self:SetBenchmarkProgress(prog, runs)
     end;
 
+    ---@param self ProfilerBenchmarks
+    ---@param disabled? boolean
+    ---@param running? boolean
     SetRunButtonState = function(self, disabled, running)
         local runButton = self.RunButton
         if disabled then
@@ -886,6 +1067,9 @@ ProfilerBenchmarks = Class(Group) {
         end
     end;
 
+    ---@param self ProfilerBenchmarks
+    ---@param prog number
+    ---@param runs number
     SetBenchmarkProgress = function(self, prog, runs)
         local progressLabel = self.ProgressLabel
         if prog < runs then
@@ -895,4 +1079,14 @@ ProfilerBenchmarks = Class(Group) {
             progressLabel:Hide()
         end
     end;
+}
+
+---@class ProfilerOptions : Group
+ProfilerOptions = Class(Group) {
+    ---@param self ProfilerOptions
+    ---@param parent Group
+    __init = function(self, parent)
+        Group.__init(self, parent)
+        LayoutHelpers.FillParent(self, parent)
+    end
 }

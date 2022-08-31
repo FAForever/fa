@@ -68,6 +68,10 @@ function OnSync()
         import("/lua/ui/game/Profiler.lua").ReceiveBenchmarkModules(Sync.BenchmarkModules)
     end
 
+    if Sync.BenchmarkInfo then
+        import("/lua/ui/game/Profiler.lua").ReceiveBenchmarkInfo(Sync.BenchmarkInfo)
+    end
+
     if Sync.BenchmarkOutput then
         import("/lua/ui/game/Profiler.lua").ReceiveBenchmarkOutput(Sync.BenchmarkOutput)
     end

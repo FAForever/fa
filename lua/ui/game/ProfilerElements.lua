@@ -9,6 +9,13 @@ local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Layouter = LayoutHelpers.ReusedLayoutFor
 --local ScrollPolicy = import('/lua/maui/scrollbar.lua').ScrollPolicy
 
+---@class ProfilerElementRow : Group
+---@field name Text
+---@field source Text
+---@field scope Text
+---@field value Text
+---@field growth Text
+---@field is_group boolean
 ProfilerElementRow = Class(Group) {
     __init = function(self, parent, alignment, size, font, color)
         Group.__init(self, parent)
@@ -63,16 +70,22 @@ ProfilerElementRow = Class(Group) {
     end;
 }
 
+---@param control ProfilerElementRow
 local function SetToHighlightColor(control)
     if not control.is_group then
         control:SetColor('ffff00')
     end
 end
+---@param control ProfilerElementRow
 local function SetToBodyColor(control)
     if not control.is_group then
         control:SetColor(UIUtil.fontColor)
     end
 end
+
+---@param parent Group
+---@param alignment? Control optional control to align to the bottom of
+---@return ProfilerElementRow
 function CreateDefaultElement(parent, alignment)
     local group = ProfilerElementRow(parent, alignment, 14, UIUtil.bodyFont)
     group.is_group = true
@@ -88,10 +101,14 @@ function CreateDefaultElement(parent, alignment)
     return group
 end
 
-function CreateTitle(parent, alignment)
+---@param parent Group
+---@return ProfilerElementRow
+function CreateTitle(parent)
     return ProfilerElementRow(parent, nil, 16, UIUtil.titleFont, 'F1F382')
 end
 
+---@param element ProfilerElementRow
+---@param entry ProfilerFunctionData
 function PopulateDefaultElement(element, entry)
     element.name:SetText(entry.name)
     element.source:SetText(entry.source)
@@ -100,6 +117,7 @@ function PopulateDefaultElement(element, entry)
     element.growth:SetText(tostring(entry.growth))
 end
 
+---@param element ProfilerElementRow
 function DepopulateDefaultElement(element)
     element.name:SetText("")
     element.source:SetText("")
@@ -109,7 +127,16 @@ function DepopulateDefaultElement(element)
 end
 
 ---@class ProfilerScrollArea : Group
+---@field NumberOfUIElements number
+---@field NumberOfElements number
+---@field UIElements ProfilerElementRow[]
+---@field Elements ProfilerData
+---@field First number
+---
+---@field _scrollable boolean
 ProfilerScrollArea = Class(Group) {
+    ---@param self ProfilerScrollArea
+    ---@param parent Group
     __init = function(self, parent)
         Group.__init(self, parent)
         self.bg = Bitmap(self); LayoutHelpers.ReusedLayoutFor(self.bg)
@@ -121,11 +148,12 @@ ProfilerScrollArea = Class(Group) {
         self._scrollable = false
     end,
 
+    ---@param self ProfilerScrollArea
     InitScrollableContent = function(self)
         local elements = {}
 
         -- compute size of an element
-        local title = CreateTitle(self, self)
+        local title = CreateTitle(self)
         local dummy = CreateDefaultElement(self, self)
         local height = dummy.Height()
         dummy:Destroy()
@@ -154,28 +182,43 @@ ProfilerScrollArea = Class(Group) {
         self._scrollable = true
     end,
 
+    ---@param self ProfilerScrollArea
+    ---@param elements ProfilerData
+    ---@param count number
     ProvideElements = function(self, elements, count)
         self.Elements = elements
         self.NumberOfElements = count
     end,
 
-    -- rangeMin, rangeMax, visibleMin, visibleMax
-    GetScrollValues = function(self, axis)
+    ---@return number rangeMin
+    ---@return number rangeMax
+    ---@return number visibleMin
+    ---@return number visibleMax
+    GetScrollValues = function(self)
         return 0, self.NumberOfElements,
             self.First, math.min(self.First + self.NumberOfUIElements, self.NumberOfElements)
     end,
 
-    -- called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
+    --- Called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
+    ---@param self ProfilerScrollArea
+    ---@param axis string
+    ---@param delta number
     ScrollLines = function(self, axis, delta)
         self:ScrollSetTop(axis, self.First + math.floor(delta))
     end,
 
-    -- called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
+    --- Called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
+    ---@param self ProfilerScrollArea
+    ---@param axis string
+    ---@param delta number
     ScrollPages = function(self, axis, delta)
         self:ScrollSetTop(axis, self.First + math.floor(delta) * self.NumberOfUIElements)
     end,
 
-    -- called when the scrollbar wants to set a new visible top line
+    --- called when the scrollbar wants to set a new visible top line
+    ---@param self ProfilerScrollArea
+    ---@param axis string
+    ---@param top number
     ScrollSetTop = function(self, axis, top)
         -- compute where we end up
         local size = self.NumberOfElements
@@ -192,10 +235,13 @@ ProfilerScrollArea = Class(Group) {
     end,
 
     -- called to determine if the control is scrollable on a particular access. Must return true or false.
+    ---@param self ProfilerScrollArea
+    ---@param axis string
     IsScrollable = function(self, axis)
         return self._scrollable
     end,
 
+    ---@param self ProfilerScrollArea
     CalcVisible = function(self)
         for k = 1, self.NumberOfUIElements do
             local index = k + self.First
@@ -207,6 +253,8 @@ ProfilerScrollArea = Class(Group) {
         end
     end,
 
+    ---@param self ProfilerScrollArea
+    ---@param event string
     HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' and self:IsScrollable() then
             if event.WheelRotation < 0 then
@@ -218,16 +266,22 @@ ProfilerScrollArea = Class(Group) {
     end,
 }
 
-
-
-
-ProfilerSummary = Class(Group) {
+---@class StatisticSummary : Group
+---@field ClearButton Button
+---@field Deviation Text
+---@field Mean Text
+---@field Samples Text
+---@field Skewness Text
+---@field Summary Group
+StatisticSummary = Class(Group) {
+    ---@param self StatisticSummary
+    ---@param parent Group
     __init = function(self, parent)
         Group.__init(self, parent)
         LayoutHelpers.FillParent(self, parent)
 
         local groupSummary = Layouter(Group(self))
-            :Fill(self)
+            :FillFixedBorder(self, 5)
             :End()
         self.Summary = groupSummary
 
@@ -290,21 +344,27 @@ ProfilerSummary = Class(Group) {
         Tooltip.AddButtonTooltip(clearButton, "pls replace me")
         self.ClearButton = clearButton
 
+        LayoutHelpers.AtBottomIn(self, skewnessLabel, -10)
+
         Layouter(Bitmap(parent))
             :FillFixedBorder(groupSummary)
             :Under(groupSummary, 5)
             :Color("7f000000")
             :End()
 
-        clearButton.OnClick = function(button_self)
-            self:OnClickClearSummary()
+        clearButton.OnClick = function()
+            self.OnClickClearSummary(self)
         end
-    end,
+    end;
 
+    ---@param self StatisticSummary
     OnClickClearSummary = function(self)
+        SPEW("I should not be nil: " .. tostring(self))
         self:SetStats(nil)
     end;
 
+    ---@param self StatisticSummary
+    ---@param stats? number[]
     SetStats = function(self, stats)
         if stats then
             local n = stats.n
@@ -314,7 +374,8 @@ ProfilerSummary = Class(Group) {
             if n > 0 then
                 mean = Statistics.Mean(stats, n)
                 if n > 1 then
-                    deviation = Statistics.Deviation(stats, n, mean) * n / (n - 1)
+                    -- from population variance to sample standard deviation
+                    deviation = math.sqrt(Statistics.Deviation(stats, n, mean) * n / (n - 1))
                     if n > 2 then
                         if deviation > 0 then
                             skewness = 0
@@ -361,28 +422,39 @@ ProfilerSummary = Class(Group) {
 }
 
 ---@class BytecodeArea : Group
-ProfilerBytecodeArea = Class(Group) {
+---@field Bytecode ItemList
+---@field Details Group
+---@field LogButton Button
+---@field Parameters Text
+---@field Upvalues Text
+---@field Constants Text
+---@field MaxStack Text
+---@field Error? string
+---@field DebugFunction? DebugFunction
+BytecodeArea = Class(Group) {
+    ---@param self BytecodeArea
+    ---@param parent Group
     __init = function(self, parent)
         Group.__init(self, parent)
         LayoutHelpers.FillParent(self, parent)
 
         local groupDetails = Layouter(Group(self))
-            :Fill(self) -- will edit to the log button height once we create that
+            :FillFixedBorder(self, 5) -- will edit to the log button height once we create that
             :End()
         self.Details = groupDetails
 
         local groupBytecode = Layouter(Group(self))
-            :Fill(self)
+            :FillFixedBorder(self, 5)
             :AnchorToBottom(groupDetails)
             :End()
 
         -- bytecode
 
         local logButton = Layouter(UIUtil.CreateButtonStd(self, "/BUTTON/log/"))
-            :AtRightTopIn(self, 5, 5)
+            :AtRightTopIn(self)
             :Over(self, 1)
             :End()
-        Tooltip.AddButtonTooltip(self, "profiler_print_to_log")
+        Tooltip.AddButtonTooltip(logButton, "profiler_print_to_log")
         self.LogButton = logButton
 
         local params = Layouter(UIUtil.CreateText(groupDetails, "", 14, UIUtil.bodyFont, true))
@@ -412,10 +484,11 @@ ProfilerBytecodeArea = Class(Group) {
         local bytecode = ItemList(self)
 
         ---[[
-        UIUtil.CreateLobbyVertScrollbar(bytecode, 0, groupBytecode)
+        UIUtil.CreateLobbyVertScrollbar(bytecode)
         Layouter(bytecode)
             :Fill(groupBytecode)
-            :AtRightIn(14 + 10)
+            :Over(self, 10)
+            :AtRightIn(groupBytecode, 14)
             :End()
         --]]
 
@@ -459,14 +532,17 @@ ProfilerBytecodeArea = Class(Group) {
         end
     end,
 
+    ---@param self BytecodeArea
     OnLog = function(self)
         local area = self.Bytecode
         for i = 1, area:GetItemCount() do
             LOG(area:GetItem(i - 1)) -- list is 0-indexed
         end
-        -- import("/lua/debug/DevUtils.lua").SpewDebugFunction(self.benchmarkDebugFunction.func)
+        -- import("/lua/debug/UtilsDev.lua").SpewDebugFunction(self.benchmarkDebugFunction.func)
     end;
 
+    ---@param self BytecodeArea
+    ---@param index number
     GetBytecodeTooltip = function(self, index)
         local text = self.Bytecode:GetItem(index)
         local jumpTooltipFormater = LOC("<LOC profiler_{auto}>Jump from %s")
@@ -494,7 +570,7 @@ ProfilerBytecodeArea = Class(Group) {
 
     ---@param self any
     ---@param data string | DebugFunction | nil
-    SetBenchmark = function(self, data)
+    SetFunction = function(self, data)
         local error = nil
         if type(data) == "string" then
             error = data
@@ -511,6 +587,7 @@ ProfilerBytecodeArea = Class(Group) {
         self:UpdateBytecode()
     end;
 
+    ---@param self BytecodeArea
     UpdateDetails = function(self)
         local fn = self.DebugFunction
         local details = self.Details
@@ -525,6 +602,7 @@ ProfilerBytecodeArea = Class(Group) {
         end
     end;
 
+    ---@param self BytecodeArea
     UpdateBytecode = function(self)
         local bytecode = self.Bytecode
         bytecode:DeleteAllItems()

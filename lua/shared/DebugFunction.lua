@@ -16,17 +16,87 @@ function CollapseDebugInfo(info)
     return source, scope, name
 end
 
-function GetAllDebugInfo(f)
+
+--- Broken, can only get the first parameter
+---@param fn function
+---@param numparams number
+---@return string[]
+function GetParameterNames(fn, numparams)
+    local parameters = {}
+    if numparams == 1 then
+        -- it appears that we can still pull out the first parameter name, regardless of if
+        -- we're inside it
+        parameters[1] = debug.listlocals(fn, 1)
+    elseif numparams ~= 1 then
+        -- the else case crashes the game, so this is the solution
+        parameters[1] = debug.listlocals(fn, 1)
+        for i = 2, numparams do
+            parameters[i] = "unknown"
+        end
+    else
+        -- little bit of a hack to pull out the parameter names, since the function needs to be
+        -- running to get able to get more than the first parameter
+        local th = coroutine.create(fn)
+        -- save the currently debug hook (use of this file probably means that the profiler is on)
+        local restoreHook, restoreMask, restoreCount = debug.gethook()
+        local ignore = true
+        debug.sethook(function()
+            -- ignore initial `coroutine.resume` call
+            if ignore then
+                ignore = false
+                return
+            end
+            local fun = debug.getinfo(2, "f").func -- `debug.listlocals` doesn't accept a function level
+            local parameters = parameters
+            local DebugListlocal = debug.listlocals
+            for i = 1, numparams do
+                -- doesn't work
+                parameters[i] = DebugListlocal(fun, i)
+            end
+            KillThread(th)
+            ignore = true -- ignore debug.sethook too?
+        end, "c")
+        coroutine.resume(th) -- immediately ends
+        if restoreHook ~= nil then
+            debug.sethook(restoreHook, restoreMask, restoreCount)
+        else
+            debug.sethook()
+        end
+    end
+    return parameters
+end
+
+---@class RawFunctionDebugInfo
+---@field bytecode Bytecode
+---@field constants any[]
+---@field info debuginfo
+---@field parameters string[]
+-- @field prototypes nil -- we don't have access to these!
+---@field upvalueNames string[]
+---@field upvalues any[]
+
+
+---@param f function | integer
+---@return RawFunctionDebugInfo
+function GetDebugFunctionInfo(f)
     local info = debug.getinfo(f)
     local fn = info.func -- the rest of the functions don't like thread traces
     local upvalues = {}
+    local upvalueNames = {}
     for i = 1, info.nups do
-        -- also returns the current value, but we don't care about that right now
-        upvalues[i] = (debug.getupvalue(fn, i))
+        upvalueNames[i], upvalues[i] = debug.getupvalue(fn, i)
     end
     local constants = debug.listk(fn)
     local bytecode = debug.listcode(fn)
-    return info, upvalues, constants, bytecode
+    local parameters = GetParameterNames(fn, bytecode.numparams)
+    return {
+        bytecode = bytecode,
+        constants = constants,
+        info = info,
+        parameters = parameters,
+        upvalueNames = upvalueNames,
+        upvalues = upvalues,
+    }
 end
 
 function Representation(val)
@@ -54,59 +124,126 @@ local addressZero = "0x" .. string.rep("0", hexWidth)
 ---@alias DebugOpControlFlow "call" | "jump" | "return" | "skip" | "tailcall"
 ---@alias DebugOpFormat "A" | "AB" | "ABC" | "ABx" | "AsBx"
 
+---@param arg DebugOpArgKind
+---@return boolean
+local function ArgKindIsDouble(arg)
+    return arg == "double" or arg == "global" or arg == "offset" or arg == "prototype"
+end
+
+---@type table<DebugOpArgKind, fun(intr: DebugInstruction, arg: number, fn?: DebugFunction): string>
+DebugOpcodeArgFormatters = {
+    ["default"] = function(instr, arg, fn)
+        return tostring(arg)
+    end,
+
+    ["const"] = function(instr, arg, fn)
+        if fn then
+            return Representation(fn:GetConstant(arg + 1))
+        end
+        return "K(" .. arg .. ")"
+    end,
+    ["global"] = function(instr, arg, fn)
+        if fn then
+            return Representation(fn:GetConstant(arg + 1))
+        end
+        return "G(K(" .. arg .. "))"
+    end,
+    ["offset"] = function(instr, arg, fn)
+        -- adjust address offsets to absolute addresses
+        arg = instr:ResolveAbsoluteAddress(arg)
+        if arg == 0 then
+            -- the formatter just returns "00000" for 0
+            return addressZero
+        end
+        return addressPattern:format(arg)
+    end,
+    ["prototype"] = function(instr, arg, fn)
+        return "P(" .. arg .. ")"
+    end,
+    ["register"] = function(instr, arg, fn)
+        return "R" .. arg
+    end,
+    ["register|const"] = function(instr, arg, fn)
+        if arg < MAXSTACK then
+            return "R" .. arg
+        else
+            arg = arg - MAXSTACK
+            if fn then
+                return Representation(fn:GetConstant(arg + 1))
+            end
+            return "K(" .. arg .. ")"
+        end
+    end,
+    ["upvalue"] = function(instr, arg, fn)
+        if fn then
+            return Representation(fn:GetUpvalueName(arg + 1))
+        end
+        return "U(" .. arg .. ")"
+    end,
+
+    -- SETLIST is mangled to shove two numbers into one argument asymmetrically in Lua 5.0
+    ["double"] = function(instr, arg, fn)
+        local len = math.mod(arg, FIELDS_PER_FLUSH) + 1
+        local start = arg - len + 2
+        return start .. "," .. len
+    end,
+}
+setmetatable(DebugOpcodeArgFormatters, {
+    __index = function(tbl, key)
+        if key ~= nil then
+            return tbl.default
+        end
+    end
+})
+
 ---@class DebugOpcode
 ---@field args number
----@field A?  DebugOpArgKind
----@field B?  DebugOpArgKind
----@field C?  DebugOpArgKind
+---@field A? function
+---@field B? function
+---@field C? function
 ---@field format DebugOpFormat
 ---@field controlFlow? DebugOpControlFlow
 ---@field name string
 DebugOpcode = Class() {
+    ---@param self DebugOpcode
     ---@param a DebugOpArgKind
     ---@param b? DebugOpArgKind
     ---@param c? DebugOpArgKind
     ---@param controlFlow? DebugOpControlFlow
-    ---@return DebugOpcode
     __init = function(self, a, b, c, controlFlow)
-        self.A = a
-        if controlFlow then
-            self.controlFlow = controlFlow
-        end
-        if b then
-            self.B = b
-            if b == "register" or b == "register|const" or b == "upvalue" or b == "value" then
-                if c then
-                    self.args = 3
-                    self.C = c
-                    self.format = "ABC"
-                else
-                    self.args = 2
-                    self.format = "AB"
-                end
-            else
-                self.args = 2
+        self.A = DebugOpcodeArgFormatters[a]
+        self.B = DebugOpcodeArgFormatters[b]
+        self.C = DebugOpcodeArgFormatters[c]
+        self.controlFlow = controlFlow
+        if c then
+            self.args = 3
+            self.format = "ABC"
+        elseif b then
+            self.args = 2
+            if ArgKindIsDouble(b) then
                 if b == "offset" then
                     self.format = "AsBx"
                 else
                     self.format = "ABx"
                 end
+            else
+                self.format = "AB"
             end
-        elseif c then
-            self.args = 3
-            self.C = c
-            self.format = "ABC"
         else
             self.args = 1
             self.format = "A"
         end
-        return self
     end;
 
+    ---@param self DebugOpcode
+    ---@return string
     __tostring = function(self)
         return self.name
     end;
 
+    ---@param self DebugOpcode
+    ---@param instr DebugInstruction
+    ---@return string
     InstructionName = function(self, instr)
         return self.name
     end;
@@ -115,6 +252,7 @@ DebugOpcode = Class() {
     ---@param instr DebugInstruction
     ---@param arg number | string
     ---@param fn? DebugFunction optional function to resolve constants from
+    ---@return string | nil
     InstructionArgToString = function(self, instr, arg, fn)
         if type(arg) == "number" then
             arg = string.char(64 + arg)
@@ -123,45 +261,7 @@ DebugOpcode = Class() {
         if not type then
             return nil
         end
-        local value = instr[arg]
-        if type == "register|const" then
-            if value < MAXSTACK then
-                type = "register"
-            else
-                type = "const"
-                value = value - MAXSTACK
-            end
-        end
-        if type == "register" then
-            return "R" .. value
-        elseif type == "const" then
-            if fn then
-                return Representation(fn:GetConstant(value + 1))
-            end
-            return "K(" .. value .. ")"
-        elseif type == "global" then
-            if fn then
-                return Representation(fn:GetConstant(value + 1))
-            end
-            return "G(K(" .. value .. "))"
-        elseif type == "prototype" then
-            return "P(" .. value .. ")"
-        elseif type == "offset" then
-            -- adjust address offsets to absolute addresses
-            value = instr:ResolveAbsoluteAddress(value)
-            if value == 0 then
-                -- the formatter just returns "00000" for 0
-                return addressZero
-            end
-            return addressPattern:format(value)
-        elseif type == "upvalue" then
-            if fn then
-                return Representation(fn:GetUpvalueName(value + 1))
-            end
-            return "U(" .. value .. ")"
-        else -- value or double
-            return tostring(value)
-        end
+        return type(instr, instr[arg], fn)
     end;
 }
 
@@ -169,6 +269,9 @@ DebugOpcode = Class() {
 ---@field notName string
 ---@field argName string
 DebugVarNameOpcode = Class(DebugOpcode) {
+    ---@param self DebugVarNameOpcode
+    ---@param instr DebugInstruction
+    ---@return string
     InstructionName = function(self, instr)
         if instr[self.argName] == 0 then
             return self.name
@@ -177,14 +280,19 @@ DebugVarNameOpcode = Class(DebugOpcode) {
         end
     end;
 
-    InstructionArgToString = function(self, arg, fn)
+    ---@param self DebugVarNameOpcode
+    ---@param instr DebugInstruction
+    ---@param arg number | string
+    ---@param fn? DebugFunction optional function to resolve constants from
+    ---@return string | nil
+    InstructionArgToString = function(self, instr, arg, fn)
         if type(arg) == "number" then
             arg = string.char(64 + arg)
         end
         if arg == self.argName then
             return nil
         end
-        return DebugOpcode.InstructionArgToString(self, arg, fn)
+        return DebugOpcode.InstructionArgToString(self, instr, arg, fn)
     end;
 }
 
@@ -245,18 +353,6 @@ do
     OPCODE.CLOSE     = DebugOpcode(REG)                 -- close all variables in the stack up to (>=) R(A)
     OPCODE.CLOSURE   = DebugOpcode(REG, PRO)            -- R(A) := closure(KPROTO[Bx], R(A), ... ,R(A+n))
 
-    -- this opcode is mangled to shove two numbers into one argument asymmetrically in Lua 5.0; override its
-    -- representation to get both to appear nicely
-    function OPCODE.SETLIST:InstructionArgToString(arg)
-        if arg == 1 or arg == "A" then
-            return "R" .. self.A
-        elseif arg == 2 or arg == "B" then
-            local Bx = self.B
-            local len = math.mod(Bx, FIELDS_PER_FLUSH) + 1
-            local start = Bx - len + 2
-            return start .. "," .. len
-        end
-    end
     -- we could have included the redundant opcode name information in the constructor, but...
     --          ...it looks better to omit it above
     for name, opcode in OPCODE do
@@ -282,17 +378,29 @@ end
 ---@field opcode DebugOpcode
 ---@field address number
 DebugInstruction = Class() {
+    ---@param self DebugInstruction
+    ---@return string
     GetName = function(self)
         return self.opcode:InstructionName(self)
     end;
+    ---@param self DebugInstruction
+    ---@param arg string | number
+    ---@param fn DebugFunction
+    ---@return string | nil
     ArgToString = function(self, arg, fn)
         return self.opcode:InstructionArgToString(self, arg, fn)
     end;
 
+    ---@param self DebugInstruction
+    ---@param relAddr number
+    ---@return number
     ResolveAbsoluteAddress = function(self, relAddr)
         return self.address + relAddr + 1 -- add one because the PC automatically increments
     end;
 
+    ---@param self DebugInstruction
+    ---@param address? number defaults to the instruction address
+    ---@return string
     AddressToString = function(self, address)
         address = address or self.address
         if address == 0 then
@@ -303,6 +411,9 @@ DebugInstruction = Class() {
         end
     end;
 
+    ---@param self DebugInstruction
+    ---@param fn DebugFunction
+    ---@return string
     OperationToString = function(self, fn)
         local str = self:GetName()
         for i = 1, self.opcode.args do
@@ -314,6 +425,9 @@ DebugInstruction = Class() {
         return str
     end;
 
+    ---@param self DebugInstruction
+    ---@param fn DebugFunction
+    ---@return string
     InstructionToString = function(self, fn)
         return self:AddressToString() .. "  " .. self:OperationToString(fn)
     end;
@@ -323,10 +437,14 @@ DebugInstruction = Class() {
 ---@field lineNumber number
 ---@field instructionCount number
 DebugLine = Class() {
+    ---@param self DebugLine
+    ---@param lineNum number
     __init = function(self, lineNum)
         self.lineNumber = lineNum
     end;
 
+    ---@param self DebugLine
+    ---@return number
     GetSize = function(self)
         return self.instructionCount * 4 -- all instructions are aligned to a 32 bit int
     end;
@@ -334,8 +452,10 @@ DebugLine = Class() {
 
 ---@class DebugFunction
 ---@field bytecode         string[]
+---@field constants        any[]
+---@field constantCount    number
 ---@field currentline?     number
----@field from             number | function
+---@field from             integer | function | RawFunctionDebugInfo
 ---@field func             function
 ---@field knownPrototypes  number
 ---@field lineCount        number
@@ -351,13 +471,16 @@ DebugLine = Class() {
 ---@field variableCount?   number
 ---@field variables?       string[]
 DebugFunction = Class() {
+    ---@param self DebugFunction
+    ---@param f integer | function | RawFunctionDebugInfo
     __init = function(self, f)
-        local info, upvalues, constants, bytecode = f.info, f.upvalues, f.constants, f.bytecode
+        local info, parameters, upvalues, constants, bytecode = f.info, f.parameters, f.upvalueNames, f.constants, f.bytecode
         if info and upvalues and constants and bytecode then
             self.from = info.func
         else
             self.from = f
-            info, upvalues, constants, bytecode = GetAllDebugInfo(f)
+            f = GetDebugFunctionInfo(f)
+            info, parameters, upvalues, constants, bytecode = f.info, f.parameters, f.upvalueNames, f.constants, f.bytecode
         end
 
         self.source, self.scope, self.name = CollapseDebugInfo(info)
@@ -375,6 +498,7 @@ DebugFunction = Class() {
         end
 
         self.upvalues = upvalues
+        self.parameters = parameters
         self.constants = constants
         self.constantCount = table.getn(constants)
 
@@ -398,7 +522,7 @@ DebugFunction = Class() {
                 continue
             end
             -- each line is in a format like `(<lineNumber>) <instrNumber> - <OPCODE> <A> [<B> [<C>]]`
-            -- e.g. `( 35)  58 - JUMP 0 -4`
+            -- e.g. `(  35)   58 - JUMP 0 -4`
             local chunker = line:gmatch("-?[%w]+")
             local lineNum, addr = tonumber(chunker()), tonumber(chunker())
             local opcode, argA, argB = OPCODE[chunker()], tonumber(chunker()), chunker()
@@ -443,6 +567,7 @@ DebugFunction = Class() {
         if debugLine ~= nil then
             debugLine.instructionCount = instructionCount
         end
+
         -- the bytecode table reports two numbers: maxstack and numparams--transfer them here
         -- (excluding these two values is entirely why we recreated the bytecode table)
         self.maxstack = bytecode.maxstack
@@ -453,25 +578,16 @@ DebugFunction = Class() {
 
         -- only works/is useful while inside a function call
         if type(f) == "number" then
-            local parameters = {}
-            local parameterCount = self.numparams
-            for i = 1, parameterCount do
-                parameters[i] = debug.listlocals(fn, i)
-            end
-            self.parameters = parameters
-
             local variables = {}
             local variableCount = 0
-            local var = debug.listlocals(fn, parameterCount)
+            local var = debug.listlocals(fn, self.numparams)
             while var ~= parameters[1] do
                 variableCount = variableCount + 1
                 variables[variableCount] = var
-                var = debug.listlocals(fn, variableCount + parameterCount)
+                var = debug.listlocals(fn, variableCount + self.numparams)
             end
             self.variables = variables
             self.variableCount = variableCount
-        else
-            self.parameters = self:GetParameterNames()
         end
         -- let them call the debug function directly, I guess?
         setmetatable(self, {
@@ -480,34 +596,53 @@ DebugFunction = Class() {
         })
     end;
 
+    ---@param self DebugFunction
+    ---@return number
     GetSize = function(self)
         return self.instructionCount * 4
     end;
 
+    ---@param self DebugFunction
+    ---@param k number
+    ---@return any
     GetConstant = function(self, k)
         return self.constants[k]
     end;
 
+    ---@param self DebugFunction
+    ---@param k number
+    ---@return any
     GetGlobal = function(self, k)
         local key = self:GetConstant(k)
         return _G[key]
     end;
 
+    ---@param self DebugFunction
+    ---@param k number
+    ---@return string | nil
     GetLocalName = function(self, k)
         if self.variables then
             return self.variables[k]
         end
     end;
 
+    ---@param self DebugFunction
+    ---@param k number
+    ---@return string
     GetUpvalueName = function(self, k)
         return self.upvalues[k]
     end;
 
+    ---@param self DebugFunction
+    ---@param k number
+    ---@return any
     GetUpvalue = function(self, k)
         local _, val = debug.getupvalue(self.from, k)
         return val
     end;
 
+    ---@param self DebugFunction
+    ---@return number[][]
     ResolveJumps = function(self)
         local jumps = self.jumps
         if jumps then
@@ -532,48 +667,19 @@ DebugFunction = Class() {
         return jumps
     end;
 
-    GetParameterNames = function(self)
-        local parameters = {}
-        local parameterCount = self.numparams
-        if parameterCount == 1 then
-            -- it appears that we can still pull out the first parameter name, regardless of if
-            -- we're inside it
-            parameters[1] = debug.listlocals(self.func, 1)
-        else
-            -- little bit of a hack to pull out the parameter names, since the function needs to be
-            -- running to get able to get more than the first parameter
-            local th = coroutine.create(self.func)
-            local restoreHook, restoreMask, restoreCount = debug.gethook()
-            local ignore = true
-            debug.sethook(function()
-                -- ignore initial `coroutine.resume` call
-                if ignore then
-                    ignore = false
-                    return
-                end
-                local fn = debug.getinfo(2, "f").func -- `debug.listlocals` doesn't accept a function level
-                local parameters = parameters
-                local DebugListlocal = debug.listlocals
-                for i = 1, parameterCount do
-                    -- doesn't work
-                    parameters[i] = DebugListlocal(fn, i)
-                end
-                KillThread(th)
-            end, "c")
-            coroutine.resume(th) -- immediately ends
-            if restoreHook ~= nil then
-                debug.sethook(restoreHook, restoreMask, restoreCount)
-            else
-                debug.sethook(nil)
-            end
-        end
-        return parameters
-    end;
-
+    ---@param self DebugFunction
+    ---@return string[]
     PrettyPrint = function(self)
         local lines = {}
         local lineLocalizer = LOC("<LOC debug_0000>Line %d:")
         local jumps = self:ResolveJumps()
+        for k,v in jumps do
+            local str = "line " .. k
+            for k,v in v do
+                str = str .. "  " .. v
+            end
+            SPEW(str)
+        end
         local instructionCount = 0
         local lineCount = 0
         for _, line in self.lines do
@@ -593,14 +699,12 @@ DebugFunction = Class() {
                 if prepend then
                     str = prepend .. str
                     prepend = nil
-                else
-                    str = "    " .. str
                 end
                 if controlFlow == "skip" then
-                    prepend = "        "
+                    prepend = "    "
                 end
 
-                str = instr:AddressToString() .. "  " .. str
+                str = "    " .. instr:AddressToString() .. "  " .. str
                 lineCount = lineCount + 1
                 lines[lineCount] = str
             end
@@ -608,8 +712,3 @@ DebugFunction = Class() {
         return lines
     end;
 }
-
-function PullDebugFunctionInfo(f)
-    local info, upvalues, constants, bytecode = GetAllDebugInfo(f)
-    return {info = info, upvalues = upvalues, constants = constants, bytecode = bytecode}
-end

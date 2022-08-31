@@ -98,7 +98,8 @@ function CMauiControl:SetAlpha(alpha, children)
 end
 
 --- Sets the hidden state of the control
-function CMauiControl:SetHidden()
+---@param hidden? boolean
+function CMauiControl:SetHidden(hidden)
 end
 
 ---
