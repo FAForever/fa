@@ -200,7 +200,6 @@ UnitBlueprint {
             'BUILTBYTIER2ENGINEER INDIRECTFIRE UEF',
             'BUILTBYTIER2ENGINEER RADAR UEF',
             'BUILTBYTIER2ENGINEER MASSEXTRACTION UEF',
-            'BUILTBYTIER2ENGINEER MASSEXTRACTION UEF',
         },
         MaintenanceConsumptionPerSecondEnergy = 15,
         StorageEnergy = 200,
