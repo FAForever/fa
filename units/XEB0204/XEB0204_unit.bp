@@ -124,7 +124,7 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 5250,
-        BuildCostMass = 1050,
+        BuildCostMass = 840,
         BuildRate = 20,
         BuildTime = 2000,
         DifferentialUpgradeCostCalculation = true,
