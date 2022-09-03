@@ -586,11 +586,6 @@ end
 function GetEntityById(id)
 end
 
---- Returns the index of local army
----@return Army
-function GetFocusArmy()
-end
-
 --- Gets the current game time in ticks.
 --- The game time is the simulation time, that stops when the game is paused.
 ---@return number

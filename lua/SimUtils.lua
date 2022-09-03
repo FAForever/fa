@@ -2,29 +2,14 @@
 --
 -- General Sim scripts
 
+---@type Team[] | false
+Teams = false
+
 -- ==============================================================================
 -- Diplomacy
 -- ==============================================================================
 
 local sharedUnits = {}
-
-function BreakAlliance(data)
-
-    -- You cannot change alliances in a team game
-    if ScenarioInfo.TeamGame then
-        return
-    end
-
-    if OkayToMessWithArmy(data.From) then
-        SetAlliance(data.From,data.To,"Enemy")
-
-        if Sync.BrokenAlliances == nil then
-            Sync.BrokenAlliances = {}
-        end
-        table.insert(Sync.BrokenAlliances, { From = data.From, To = data.To })
-    end
-    import('/lua/SimPing.lua').OnAllianceChange()
-end
 
 function OnAllianceResult(resultData)
     -- You cannot change alliances in a team game
@@ -609,6 +594,25 @@ function SetOfferDraw(data)
     brain.OfferingDraw = data.Value
 end
 
+function BreakAlliance(data)
+
+    -- You cannot change alliances in a team game
+    if ScenarioInfo.TeamGame then
+        return
+    end
+
+    if OkayToMessWithArmy(data.From) then
+        SetAlliance(data.From,data.To,"Enemy")
+
+        if Sync.BrokenAlliances == nil then
+            Sync.BrokenAlliances = {}
+        end
+        table.insert(Sync.BrokenAlliances, { From = data.From, To = data.To })
+    end
+    import('/lua/SimPing.lua').OnAllianceChange()
+end
+
+
 
 -- ==============================================================================
 -- UNIT CAP
@@ -669,5 +673,195 @@ function GiveResourcesToPlayer(data)
         local energyTaken = fromBrain:TakeResource('Energy',data.Energy * fromBrain:GetEconomyStored('Energy'))
         toBrain:GiveResource('Mass',massTaken)
         toBrain:GiveResource('Energy',energyTaken)
+    end
+end
+
+
+-- ==============================================================================
+-- RECALL
+-- ==============================================================================
+
+-- ticks before a team can start the first recall vote (5 minutes)
+local startingRecallStart = 5 * 60 * 10
+-- ticks before a player can request another recall (3 minutes)
+local playerRecallRequestCooldown = 3 * 60 * 10
+-- ticks before a team can have another recall vote (1 minute)
+local teamRecallVoteCooldown = 1 * 60 * 10
+-- ticks that the recall request is active (30 seconds)
+local recallVoteTime = 30 * 10
+
+
+function RecallRequestAccepted(acceptance, teammates)
+    return acceptance == teammates
+end
+
+function StartingTeamRecallCooldown()
+    return GetGameTick() + startingRecallStart - teamRecallVoteCooldown
+end
+
+function RecallRequestCooldown(lastTeamVote, lastPlayerRequest)
+    local gametime = GetGameTick()
+    return math.max(
+        lastPlayerRequest + playerRecallRequestCooldown - gametime,
+        lastTeamVote + teamRecallVoteCooldown - gametime,
+        0
+    )
+end
+
+--- Returns the recall request cooldown for an army
+---@param army Army
+---@return number
+function ArmyRecallRequestCooldown(army)
+    local brain = GetArmyBrain(army)
+    if ScenarioInfo.RecallDisabled then
+        local lastPlayerRequest = brain.LastRecallRequestTime
+        local lastTeamVote
+        if ScenarioInfo.TeamGame then
+            -- if it's a team game, it's pretty simple: we need consider only the last time the
+            -- player's team voted
+            lastTeamVote = Teams[brain.Team].LastRecallVoteTime
+        else
+            -- however, if teams are unlocked, it's a little more complicated: since each player is
+            -- on their own team, each ally's team needs to be considered as well
+            army = brain.Army
+            lastTeamVote = lastPlayerRequest
+            for index, ally in ArmyBrains do
+                if not ally:IsDefeated() and IsAlly(army, index) then
+                    local allyTeamVote = Teams[ally.Team].LastRecallVoteTime
+                    if allyTeamVote < lastTeamVote then
+                        lastTeamVote = allyTeamVote
+                    end
+                end
+            end
+        end
+        return RecallRequestCooldown(lastTeamVote, lastPlayerRequest)
+    end
+    return 36000
+end
+
+local recallVotingThread
+function RecallVotingThread(requestingArmy)
+    WaitTicks(recallVoteTime + 1)
+    local recallAcceptance = 0
+    local team = {}
+    local teammates = 0
+    for _, brain in ArmyBrains do
+        if not brain:IsDestroyed() and IsAlly(requestingArmy, brain.Army) then
+            teammates = teammates + 1
+            team[teammates] = brain
+            if brain.RecallVote then
+                recallAcceptance = recallAcceptance + 1
+            end
+            brain.RecallVote = nil
+        end
+    end
+    local recallAccepted = RecallRequestAccepted(recallAcceptance, teammates)
+    Sync.RecallRequest = {
+        Close = recallAccepted,
+    }
+    if recallAccepted then
+        for _, brain in team do
+            brain:RecallAllCommanders()
+        end
+    else
+        local gametick = GetGameTick()
+        local brain = GetArmyBrain(requestingArmy)
+        brain.LastRecallRequestTime = gametick
+        team = Teams[brain.Team]
+        team.RecallVoting = false
+        team.LastRecallVoteTime = gametick
+        -- update UI once the cooldown dissipates
+        local army = GetFocusArmy()
+        local cooldown = ArmyRecallRequestCooldown(army)
+        repeat
+            WaitTicks(math.max(playerRecallRequestCooldown, teamRecallVoteCooldown) + 1)
+            cooldown = ArmyRecallRequestCooldown(army)
+        until cooldown <= 0
+        Sync.RecallRequest = {
+            CanRequest = true,
+        }
+    end
+    recallVotingThread = nil
+end
+
+function ArmyVoteRecall(army, vote, lastVote)
+    local recallSync = Sync.RecallRequest
+    if not recallSync then
+        recallSync = {}
+        Sync.RecallRequest = recallSync
+    end
+    if vote then
+        local accept = recallSync.Accept or 0
+        recallSync.Accept = accept + 1
+    else
+        local veto = recallSync.Veto or 0
+        recallSync.Veto = veto + 1
+    end
+    if army == GetFocusArmy() then
+        recallSync.CanRequest = false
+    end
+    if lastVote and recallVotingThread then
+        coroutine.resume(recallVotingThread)
+    end
+end
+
+function ArmyRequestRecall(army, lastVote)
+    ArmyVoteRecall(army, true, lastVote)
+    if not lastVote then
+        local recallSync = Sync.RecallRequest
+        recallSync.Open = recallVoteTime * 0.1
+        recallSync.CanVote = army ~= GetFocusArmy()
+        recallVotingThread = ForkThread(RecallVotingThread, army)
+    end
+end
+
+function SetRecallVote(data)
+    local army = data.From
+    --if not OkayToMessWithArmy(army) then return end
+    local brain = GetArmyBrain(army)
+    local vote = data.Vote
+
+    local team = Teams[brain.Team]
+    local isRequest = false
+    local lastVote = true
+    if ScenarioInfo.TeamGame then
+        for index, ally in ArmyBrains do
+            if not ally:IsDefeated() and IsAlly(army, index) then
+                -- AI teams can't recall
+                if not ally.Human then
+                    return
+                end
+                if army ~= index then
+                    lastVote = lastVote and ally.RecallVote ~= nil
+                end
+            end
+        end
+        isRequest = team.RecallVoting
+    else
+        -- search through for allies
+        for index, ally in ArmyBrains do
+            if not ally:IsDefeated() and IsAlly(army, index) then
+                if not ally.Human then
+                    return
+                end
+                if army ~= index then
+                    lastVote = lastVote and ally.RecallVote ~= nil
+                end
+                isRequest = isRequest or Teams[ally.Team].RecallVoting
+            end
+        end
+    end
+
+    brain.RecallVote = vote
+    if isRequest then
+        local cooldown = ArmyRecallRequestCooldown(army)
+        if cooldown >= 0 then return end
+        -- the player is making a recall request; this will reset their recall request cooldown
+        team.RecallVoting = true
+        ArmyRequestRecall(army, lastVote)
+    else
+        -- the player is responding to a recall request; we don't count this against their
+        -- individual recall request cooldown
+        ArmyVoteRecall(army, vote, lastVote)
     end
 end

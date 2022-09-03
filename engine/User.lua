@@ -261,11 +261,6 @@ end
 function GetFireState(units)
 end
 
---- The current army number that the player has focused, or `-1` for none (i.e. observer)
----@return number
-function GetFocusArmy()
-end
-
 --- Return the root UI frame for a given head
 ---@param head number
 ---@return Frame

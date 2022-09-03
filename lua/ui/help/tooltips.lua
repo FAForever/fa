@@ -1595,6 +1595,18 @@ Tooltips = {
         title = "<LOC tooltipui0463>Propose Draw",
         description = "<LOC tooltipui0464>Propose ending the game in a draw.  All players must click this to accept.",
     },
+    dip_recall_request = {
+        title = "<LOC tooltipui0722>Activate Recall Beacon",
+        description = "<LOC tooltipui0723>Signal to allies that you are ready to recall from battle.",
+    },
+    dip_recall_request_accept = {
+        title = "<LOC tooltipui0724>Accept Recall Request",
+        description = "<LOC tooltipui0725>Accept the request for your team to recall from battle.",
+    },
+    dip_recall_request_veto = {
+        title = "<LOC tooltipui0726>Veto Recall Request",
+        description = "<LOC tooltipui0727>Veto the request for your team to recall from battle.",
+    },
     dip_give_units = {
         title = "<LOC tooltipui0465>Give Units",
         description = "<LOC tooltipui0466>Give currently selected units to specified player",

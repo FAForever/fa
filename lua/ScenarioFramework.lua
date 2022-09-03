@@ -24,21 +24,27 @@
 ---@field [4] string faction
 
 
-local CategoryToString = import('/lua/sim/CategoryUtils.lua').ToString
+local CategoryToString = import('/lua/sim/categoryutils.lua').ToString
 local Cinematics = import('/lua/cinematics.lua')
 local Game = import('/lua/game.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local SimCamera = import('/lua/SimCamera.lua').SimCamera
-local SimUIVars = import('/lua/sim/SimUIState.lua')
+local ScenarioPlatoonAI = import('/lua/scenarioplatoonai.lua')
+local ScenarioUtils = import('/lua/sim/scenarioutilities.lua')
+local SimCamera = import('/lua/simcamera.lua').SimCamera
+local SimUIVars = import('/lua/sim/simuistate.lua')
 local TriggerFile = import('/lua/scenariotriggers.lua')
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local VizMarker = import('/lua/sim/vizmarker.lua').VizMarker
 
-Objectives = import('/lua/SimObjectives.lua')
-PingGroups = import('/lua/SimPingGroup.lua')
+Objectives = import('/lua/simobjectives.lua')
+PingGroups = import('/lua/simpinggroup.lua')
+
+---@class Team
+---@field ArmyCount number
+---@field Armies string[] names of armies in team
+---@field LastRecallVoteTime number game tick of last recall vote
 
 
 local PauseUnitDeathActive = false
+
 
 --- Causes the game to exit immediately
 function ExitGame()
@@ -831,7 +837,7 @@ end
 
 ---
 ---@param brain string
----@param unit Unit
+---@param unit string
 ---@param effect string
 ---@param name? string | true # if `true`, uses the brain's nickname
 ---@param pauseAtDeath? boolean
@@ -922,6 +928,33 @@ function FakeTeleportUnit(unit, killUnit)
 
     if killUnit then
         unit:Destroy()
+    end
+end
+
+--- Run teleport effect then delete unit if told to do so
+---@param units Unit
+---@param killUnits boolean
+function FakeTeleportUnits(units, killUnits)
+    IssueStop(units)
+    IssueClearCommands(units)
+    for _, unit in units do
+        unit.CanBeKilled = false
+        unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
+        unit:PlayUnitSound('GateCharge')
+    end
+    WaitSeconds(2)
+
+    for _, unit in units do
+        unit:CleanupTeleportChargeEffects()
+        unit:PlayTeleportOutEffects()
+        unit:PlayUnitSound('GateOut')
+    end
+    WaitSeconds(1)
+
+    if killUnits then
+        for _, unit in units do
+            unit:Destroy()
+        end
     end
 end
 
@@ -1751,15 +1784,15 @@ end
 
 ---
 ---@param unit Unit
----@param track Unit
----@param time number
+---@param track? boolean
+---@param time? number
 function MidOperationCamera(unit, track, time)
     ForkThread(OperationCameraThread, unit:GetPosition(), unit:GetHeading(), false, track, unit, true, time)
 end
 
 ---
 ---@param unit Unit
----@param track Unit
+---@param track? boolean
 function EndOperationCamera(unit, track)
     local faction
     if EntityCategoryContains(categories.COMMAND, unit) then
