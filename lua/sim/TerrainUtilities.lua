@@ -15,8 +15,8 @@ local MinWaterDepthNaval = 2.0
 ---@param z number z coordinate of a terrain cell, starting at 1 - should be an integer
 function CanPathSlope(x, z) 
 
-    local a = GetTerrainHeight(x - 1,z - 1)
-    local b = GetTerrainHeight(x - 1,z    )
+    local a = GetTerrainHeight(x - 0.5,z - 1)
+    local b = GetTerrainHeight(x - 0.5,z    )
     local c = GetTerrainHeight(x,    z    )
     local d = GetTerrainHeight(x,    z - 1)
     
@@ -55,19 +55,43 @@ local terrainScanningThread = nil
 ---@type boolean
 local enableTerrainScanning = nil
 
+---@class TerrainScanningData
+---@field Center Vector
+---@field Size number
+---@field SlopeCheck boolean[][]
+---@field TypeCheck boolean[][]
+---@field NavalCheck boolean[][]
+---@field AmphCheck boolean[][]
+
+local function ScanBlock(ix, iz)
+    
+end
+
 function TerrainScanningThread()
 
-    local size = 6
+    local size = 20
 
-    local data = { }
+    ---@type TerrainScanningData
+    local data = { 
+        -- data surrounding the
+        Center = { },
+        Size = size,
+
+        SlopeCheck = { },
+        TypeCheck = { },
+        NavalCheck = { },
+        AmphCheck = { },
+    }
+
     for z = -size, size do
-        data[z] = { }
-        for x = -size, size do
-            data[z][x] = { }
-        end
+        data.SlopeCheck[z] = data.SlopeCheck[z] or { }
+        data.TypeCheck[z] = data.TypeCheck[z] or { }
+        data.NavalCheck[z] = data.NavalCheck[z] or { }
+        data.AmphCheck[z] = data.AmphCheck[z] or { }
     end
 
     while true do
+
         while enableTerrainScanning do
 
             -- with thanks to: https://github.com/FAForever/FA-Binary-Patches/commit/88dc4ddaffbc06ff2bcff051dfe20d1dbaf18727
@@ -77,34 +101,39 @@ function TerrainScanningThread()
             center[1] = (center[1] ^ 0) + 0.5
             center[3] = (center[3] ^ 0) + 0.5
 
-            -- gather data
-            local location = { }
-            for z = -size, size do
-                for x = -size, size do
-                    location[1] = center[1] + x
-                    location[3] = center[3] + z
+            -- check if we have moved
+            if not (data.Center[1] == center[1] and data.Center[3] == center[3]) or true then
+                LOG("Doing a scan!")
+                data.Center = center
 
-                    local surfaceHeight = GetSurfaceHeight(location[1], location[3])
-                    local terrainHeight = GetTerrainHeight(location[1], location[3])
+                local lxs1 = 0
+                local lxt1 = 0
+                local lxs2 = 0
+                local lxt2 = 0
 
-                    local land = CanPathSlope(location[1], location[3]) and CanPathTerrain(location[1], location[3]) and surfaceHeight == terrainHeight
-                    local naval = CanNavalPathWater(surfaceHeight, terrainHeight)
-                    local amph = CanPathSlope(location[1], location[3]) and CanPathTerrain(location[1], location[3]) and CanAmphPathWater(surfaceHeight, terrainHeight)
+                -- gather data
+                local location = { }
+                for z = -size, size do
+                    for x = -size, size do
 
-                    if land then
-                        location[2] = GetTerrainHeight(location[1], location[3])
-                        DrawCircle(location, 0.4, '32cd32')
-                    elseif amph then
-                        location[2] = GetTerrainHeight(location[1], location[3])
-                        DrawCircle(location, 0.4, 'ffa500')
-                    end
+                        location[1] = center[1] + x
+                        location[3] = center[3] + z
 
-                    if naval then
-                        location[2] = GetSurfaceHeight(location[1], location[3])
-                        DrawCircle(location, 0.4, '3333ff')
+                        local surfaceHeight = GetSurfaceHeight(location[1], location[3])
+                        local terrainHeight = GetTerrainHeight(location[1], location[3])
+
+                        data.SlopeCheck[z][x] = CanPathSlope(location[1], location[3])
+                        data.TypeCheck[z][x] = CanPathTerrain(location[1], location[3])
+                        data.NavalCheck[z][x] = CanNavalPathWater(surfaceHeight, terrainHeight)
+                        data.AmphCheck[z][x] = CanAmphPathWater(surfaceHeight, terrainHeight)
                     end
                 end
+
+                -- pass it to the UI
+                Sync.TerrainScanningData = data
             end
+
+
 
             WaitTicks(1)
         end
