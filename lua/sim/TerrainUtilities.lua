@@ -63,8 +63,53 @@ local enableTerrainScanning = nil
 ---@field NavalCheck boolean[][]
 ---@field AmphCheck boolean[][]
 
+local samplesPerBlock = 16
+local numberOfBlocks = math.max(ScenarioInfo.size[1] / samplesPerBlock, ScenarioInfo.size[2] / samplesPerBlock)
+
+---@type number[][]
+local BlockCacheTerrain = { }
+
+---@type number[][]
+local BlockCacheSurface = { }
+
+local function MouseToBlock(position)
+    local ix = (position[1] / numberOfBlocks) ^ 0
+    local iz = (position[3] / numberOfBlocks) ^ 0
+    return ix, iz
+end
+
+local function PopulateCache(ix, iz)
+
+    -- store as locals for optimal access
+    local GetTerrainHeight = GetTerrainHeight
+    local GetSurfaceHeight = GetSurfaceHeight
+
+    -- offset for taking samples
+    local ox = ix * samplesPerBlock
+    local oz = iz * samplesPerBlock
+
+    -- sample the block
+    for lz = 0, samplesPerBlock do
+        
+        BlockCacheTerrain[lz + 1] = BlockCacheTerrain[lz + 1] or { }
+        BlockCacheSurface[lz + 1] = BlockCacheSurface[lz + 1] or { }
+
+        for lx = 0, samplesPerBlock do
+            BlockCacheTerrain[lz + 1][lx + 1] = GetTerrainHeight(ox + lx, oz + lz)
+            BlockCacheSurface[lz + 1][lx + 1] = GetSurfaceHeight(ox + lx, oz + lz)
+        end
+    end
+end
+
 local function ScanBlock(ix, iz)
-    
+    PopulateCache(ix, iz)
+
+    -- loop over cache, determine pathability
+    for lz = 1, iz do
+        for lx = 1, ix do
+            
+        end
+    end
 end
 
 function TerrainScanningThread()
@@ -97,41 +142,53 @@ function TerrainScanningThread()
             -- with thanks to: https://github.com/FAForever/FA-Binary-Patches/commit/88dc4ddaffbc06ff2bcff051dfe20d1dbaf18727
             local center = GetMouseWorldPos()
 
-            -- average them using bankers rule
-            center[1] = (center[1] ^ 0) + 0.5
-            center[3] = (center[3] ^ 0) + 0.5
+            -- check if cursor location is valid
+            if center and center[1] and center[3] then
 
-            -- check if we have moved
-            if not (data.Center[1] == center[1] and data.Center[3] == center[3]) or true then
-                LOG("Doing a scan!")
-                data.Center = center
+                -- clamp center to map
+                center[1] = math.clamp(center[1], 0, ScenarioInfo.size[1])
+                center[3] = math.clamp(center[3], 0, ScenarioInfo.size[2])
 
-                local lxs1 = 0
-                local lxt1 = 0
-                local lxs2 = 0
-                local lxt2 = 0
-
-                -- gather data
-                local location = { }
-                for z = -size, size do
-                    for x = -size, size do
-
-                        location[1] = center[1] + x
-                        location[3] = center[3] + z
-
-                        local surfaceHeight = GetSurfaceHeight(location[1], location[3])
-                        local terrainHeight = GetTerrainHeight(location[1], location[3])
-
-                        data.SlopeCheck[z][x] = CanPathSlope(location[1], location[3])
-                        data.TypeCheck[z][x] = CanPathTerrain(location[1], location[3])
-                        data.NavalCheck[z][x] = CanNavalPathWater(surfaceHeight, terrainHeight)
-                        data.AmphCheck[z][x] = CanAmphPathWater(surfaceHeight, terrainHeight)
-                    end
-                end
-
-                -- pass it to the UI
-                Sync.TerrainScanningData = data
+                -- determine block to scan
+                local ix, iz = MouseToBlock(center)
+                ScanBlock(ix, iz)
             end
+
+            -- -- average them using bankers rule
+            -- center[1] = (center[1] ^ 0) + 0.5
+            -- center[3] = (center[3] ^ 0) + 0.5
+
+            -- -- check if we have moved
+            -- if not (data.Center[1] == center[1] and data.Center[3] == center[3]) or true then
+            --     LOG("Doing a scan!")
+            --     data.Center = center
+
+            --     local lxs1 = 0
+            --     local lxt1 = 0
+            --     local lxs2 = 0
+            --     local lxt2 = 0
+
+            --     -- gather data
+            --     local location = { }
+            --     for z = -size, size do
+            --         for x = -size, size do
+
+            --             location[1] = center[1] + x
+            --             location[3] = center[3] + z
+
+            --             local surfaceHeight = GetSurfaceHeight(location[1], location[3])
+            --             local terrainHeight = GetTerrainHeight(location[1], location[3])
+
+            --             data.SlopeCheck[z][x] = CanPathSlope(location[1], location[3])
+            --             data.TypeCheck[z][x] = CanPathTerrain(location[1], location[3])
+            --             data.NavalCheck[z][x] = CanNavalPathWater(surfaceHeight, terrainHeight)
+            --             data.AmphCheck[z][x] = CanAmphPathWater(surfaceHeight, terrainHeight)
+            --         end
+            --     end
+
+            --     -- pass it to the UI
+            --     Sync.TerrainScanningData = data
+            -- end
 
 
 
