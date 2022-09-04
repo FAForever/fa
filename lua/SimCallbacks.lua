@@ -738,6 +738,9 @@ Callbacks.iMapToggleThreat = function(data)
     import("/lua/sim/MapUtilities.lua").iMapToggleThreat(data.Identifier)
 end
 
-Callbacks.ScanTerrain = function(data)
-    import("/lua/sim/TerrainUtilities.lua").ScanTerrain()
+Callbacks.ToggleTerrainScanning = function(data)
+    reprsl(data)
+    if OkayToMessWithArmy(data.Identifier) then
+        import("/lua/sim/TerrainUtilities.lua").ToggleTerrainScanning(data.Enabled)
+    end
 end

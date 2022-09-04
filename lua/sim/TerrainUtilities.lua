@@ -53,16 +53,64 @@ end
 local terrainScanningThread = nil
 
 ---@type boolean
-local pauseTerrainScanning = nil
+local enableTerrainScanning = nil
 
 function TerrainScanningThread()
-    while true do 
 
-        while not pauseTerrainScanning do
+    local size = 6
 
+    local data = { }
+    for z = -size, size do
+        data[z] = { }
+        for x = -size, size do
+            data[z][x] = { }
+        end
+    end
+
+    while true do
+        while enableTerrainScanning do
+
+            -- with thanks to: https://github.com/FAForever/FA-Binary-Patches/commit/88dc4ddaffbc06ff2bcff051dfe20d1dbaf18727
+            local center = GetMouseWorldPos()
+
+            -- average them using bankers rule
+            center[1] = (center[1] ^ 0) + 0.5
+            center[3] = (center[3] ^ 0) + 0.5
+
+            -- gather data
+            local location = { }
+            for z = -size, size do
+                for x = -size, size do
+                    location[1] = center[1] + x
+                    location[3] = center[3] + z
+
+                    local surfaceHeight = GetSurfaceHeight(location[1], location[3])
+                    local terrainHeight = GetTerrainHeight(location[1], location[3])
+
+                    local land = CanPathSlope(location[1], location[3]) and CanPathTerrain(location[1], location[3]) and surfaceHeight == terrainHeight
+                    local naval = CanNavalPathWater(surfaceHeight, terrainHeight)
+                    local amph = CanPathSlope(location[1], location[3]) and CanPathTerrain(location[1], location[3]) and CanAmphPathWater(surfaceHeight, terrainHeight)
+
+                    if land then
+                        location[2] = GetTerrainHeight(location[1], location[3])
+                        DrawCircle(location, 0.4, '32cd32')
+                    elseif amph then
+                        location[2] = GetTerrainHeight(location[1], location[3])
+                        DrawCircle(location, 0.4, 'ffa500')
+                    end
+
+                    if naval then
+                        location[2] = GetSurfaceHeight(location[1], location[3])
+                        DrawCircle(location, 0.4, '3333ff')
+                    end
+                end
+            end
+
+            WaitTicks(1)
         end
 
-        -- 
+        -- lie idle, waiting in the dark forest until we are required again
+        WaitTicks(1)
         SuspendCurrentThread()
     end
 end
@@ -70,11 +118,13 @@ end
 
 --- 
 ---@param enable any
-function ToggleTerrainScanning(enable)
+function ToggleTerrainScanning(enabled)
 
-    pauseTerrainScanning = enable
+    -- switch it up
+    enableTerrainScanning = enabled
 
-    if enable then
+    -- allocate or resume the thread
+    if enabled then
         if not terrainScanningThread then
             terrainScanningThread = ForkThread(TerrainScanningThread)
         else
