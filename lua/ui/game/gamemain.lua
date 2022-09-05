@@ -154,7 +154,7 @@ function CreateUI(isReplay)
     -- # Start long-running threads
 
     import('/lua/system/performance.lua')
-    import('/lua/ui/game/accessibility/depth.lua')
+    import('/lua/ui/game/cursor/depth.lua')
 
     -- # Casting tools 
 
