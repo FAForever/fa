@@ -151,9 +151,10 @@ function CreateUI(isReplay)
     import('/lua/ui/override/ArmiesTable.lua')
     import('/lua/ui/override/SessionClients.lua')
 
-    -- # Track performance
+    -- # Start long-running threads
 
     import('/lua/system/performance.lua')
+    import('/lua/ui/game/accessibility/depth.lua')
 
     -- # Casting tools 
 
@@ -173,11 +174,11 @@ function CreateUI(isReplay)
     end
 
     -- prevents the nvidia stuttering bug with their more recent drivers
-    ConExecute('d3d_WindowsCursor on')  
+    ConExecute('d3d_WindowsCursor on')
 
     -- enable experimental graphics
-    if      Prefs.GetFromCurrentProfile('options.fidelity') >= 2 
-        and Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1 then 
+    if      Prefs.GetFromCurrentProfile('options.fidelity') >= 2
+        and Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1 then
 
         ForkThread(
             function() 
