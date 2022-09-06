@@ -101,6 +101,17 @@ function GetUnitSizes(unit)
     return bp.SizeX or 0, bp.SizeY or 0, bp.SizeZ or 0
 end
 
+--- Retrieves the mesh extents of the unit as defined in the blueprint. Do not use in critical code, instead
+-- copy the body into your code for performance reasons.
+---@param unit any
+---@return number
+---@return number
+---@return number
+function GetUnitMeshExtents(unit)
+    local bp = unit.Blueprint or unit:GetBlueprint()
+    return bp.Physics.MeshExtentsX or bp.SizeX or 0, bp.Physics.MeshExtentsY or bp.SizeY or 0, bp.Physics.MeshExtentsZ or bp.SizeZ or 0
+end
+
 --- Retrieves the voume of the unit as defined in the blueprint. Do not use in critical code, instead
 -- copy the body into your code for performance reasons.
 ---@param unit Unit The unit to get the volume of.
@@ -137,8 +148,8 @@ end
 ---@param unit Unit The unit to get the diameter of.
 ---@return number
 function GetAverageBoundingXYZRadius(unit)
-    local bp = unit:GetBlueprint()
-    return ((bp.SizeX or 0) + (bp.SizeY or 0) + (bp.SizeZ or 0)) * 0.333
+    local x, y, z = GetUnitMeshExtents(unit)
+    return (x + y + z) * 0.333
 end
 
 --- Retrieves bounding radius over all axis. Do not use in critical code, instead
@@ -432,14 +443,26 @@ function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
 end
 
 ---@param obj Unit
-function CreateTimedStuctureUnitExplosion(obj)
-    local numExplosions = math.floor(GetAverageBoundingXYZRadius(obj) * GetRandomInt(2,5))
-    local x,y,z = GetUnitSizes(obj)
+function CreateTimedStuctureUnitExplosion(obj, deathAnimation)
+
+    local numExplosions = math.floor(0.75 * GetAverageBoundingXYZRadius(obj) * GetRandomInt(2,4))
+    local x,y,z = GetUnitMeshExtents(obj)
     obj:ShakeCamera(30, 1, 0, 0.45 * numExplosions)
-    for i = 0, numExplosions do
-        CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 1.2)}))
-        obj:PlayUnitSound('DeathExplosion')
-        WaitSeconds(GetRandomFloat(0.2, 0.7))
+
+    -- if there is a death animation, roll with that
+    if deathAnimation then
+        while deathAnimation:GetAnimationFraction() < 1 do
+            CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
+            obj:PlayUnitSound('DeathExplosion')
+            WaitSeconds(GetRandomFloat(0.2, 0.5))
+        end
+    -- do generic destruction effect
+    else
+        for i = 0, numExplosions do
+            CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
+            obj:PlayUnitSound('DeathExplosion')
+            WaitSeconds(GetRandomFloat(0.2, 0.5))
+        end
     end
 end
 
