@@ -271,7 +271,7 @@ keyActions = {
         category = 'orders', order = 33,},
     ['shift_spreadattack'] = {action = 'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
         category = 'orders', order = 34,},
-    ['set_target_priority'] = {action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesSpecific()',
+    ['set_target_priority'] = {action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'orders', order = 35,},
     ['set_default_target_priority'] = {action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetDefaultWeaponPriorities()',
         category = 'orders', order = 36,},
