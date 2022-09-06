@@ -454,7 +454,7 @@ function CreateTimedStuctureUnitExplosion(obj, deathAnimation)
         while deathAnimation:GetAnimationFraction() < 1 do
             CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
             obj:PlayUnitSound('DeathExplosion')
-            WaitSeconds(GetRandomFloat(0.2, 0.4))
+            WaitSeconds(GetRandomFloat(0.2, 0.5))
         end
     -- do generic destruction effect
     else
