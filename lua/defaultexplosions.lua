@@ -443,14 +443,26 @@ function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
 end
 
 ---@param obj Unit
-function CreateTimedStuctureUnitExplosion(obj)
+function CreateTimedStuctureUnitExplosion(obj, deathAnimation)
+
     local numExplosions = math.floor(0.75 * GetAverageBoundingXYZRadius(obj) * GetRandomInt(2,4))
     local x,y,z = GetUnitMeshExtents(obj)
     obj:ShakeCamera(30, 1, 0, 0.45 * numExplosions)
-    for i = 0, numExplosions do
-        CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
-        obj:PlayUnitSound('DeathExplosion')
-        WaitSeconds(GetRandomFloat(0.2, 0.5))
+
+    -- if there is a death animation, roll with that
+    if deathAnimation then
+        while deathAnimation:GetAnimationFraction() < 1 do
+            CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
+            obj:PlayUnitSound('DeathExplosion')
+            WaitSeconds(GetRandomFloat(0.2, 0.4))
+        end
+    -- do generic destruction effect
+    else
+        for i = 0, numExplosions do
+            CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
+            obj:PlayUnitSound('DeathExplosion')
+            WaitSeconds(GetRandomFloat(0.2, 0.5))
+        end
     end
 end
 
