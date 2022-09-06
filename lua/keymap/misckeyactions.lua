@@ -413,7 +413,7 @@ end
 local categoriesToCheck = {
     ['tech'] = {"TECH1", "TECH2", "TECH3", "EXPERIMENTAL", 'COMMAND'},
     ['faction'] = {"CYBRAN", "UEF", "AEON", "SERAPHIM"},
-    ['type'] = {'SCOUT', "DIRECTFIRE", 'INDIRECTFIRE', 'DEFENSE', "ANTIAIR", 'TRANSPORTATION', "ENGINEER",},
+    ['type'] = {"FACTORY", 'SCOUT', "DIRECTFIRE", 'INDIRECTFIRE', 'DEFENSE', "ANTIAIR", 'TRANSPORTATION', "ENGINEER",},
     ['field'] = {"NAVAL", "AIR", "LAND", "STRUCTURE"},
 }
 
