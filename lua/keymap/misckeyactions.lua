@@ -390,6 +390,7 @@ function SetWeaponPriorities(prioritiesString, name, exclusive)
     SimCallback({Func = 'WeaponPriorities', Args = {SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }})
 end
 
+--- Sets selected units to target the unit (and similar units) that is hovered over
 function SetWeaponPrioritiesSpecific()
     local info = GetRolloverInfo()
     if info and info.blueprintId ~= "unknown" then
@@ -404,7 +405,7 @@ function SetWeaponPrioritiesSpecific()
         SetWeaponPriorities(findPriority(bpId), text, false)
     end
 end
-
+--- Sets selected units to their default target priority
 function SetDefaultWeaponPriorities()
     SetWeaponPriorities(0, "Default", false)
 end
@@ -416,6 +417,8 @@ local categoriesToCheck = {
     ['field'] = {"NAVAL", "AIR", "LAND", "STRUCTURE"},
 }
 
+--- Creates a target priority that includes the tech, faction, type, and field of a unit
+    ---@param bpId The ID of the unit which is to be targetted
 function findPriority(bpID)
     local bp = __blueprints[bpID]
     local categories = bp.CategoriesHash
