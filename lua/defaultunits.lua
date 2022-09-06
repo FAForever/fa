@@ -306,7 +306,7 @@ StructureUnit = Class(Unit) {
             explosion.CreateScalableUnitExplosion(self)
         else
             explosion.CreateTimedStuctureUnitExplosion(self)
-            WaitSeconds(0.5)
+            WaitSeconds(0.2)
             explosion.CreateScalableUnitExplosion(self)
         end
     end,
