@@ -297,8 +297,8 @@ StructureUnit = Class(Unit) {
         if explosion.GetAverageBoundingXZRadius(self) < 1.0 then
             explosion.CreateScalableUnitExplosion(self)
         else
-            explosion.CreateTimedStuctureUnitExplosion(self)
-            WaitSeconds(0.5)
+            explosion.CreateTimedStuctureUnitExplosion(self, self.DeathAnimManip)
+            WaitSeconds(0.3)
             explosion.CreateScalableUnitExplosion(self)
         end
     end,
