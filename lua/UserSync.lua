@@ -290,6 +290,10 @@ function OnSync()
         import('/lua/ui/game/diplomacy.lua').AnnouncementHandler(Sync.DiplomacyAnnouncement)
     end
 
+    if Sync.RecallRequest then
+        import('/lua/ui/game/recall.lua').RequestHandler(Sync.RecallRequest)
+    end
+
     if Sync.LockInput then
         import('/lua/ui/game/worldview.lua').LockInput()
     end

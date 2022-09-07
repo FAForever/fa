@@ -11,7 +11,7 @@
 
 
 -- keep a reference to the actual function
-local GlobalGetSessionClients = GetSessionClients
+local GlobalGetSessionClients = _G.GetSessionClients
 
 --- Allows UI elements to be updated when the cache is updated by adding a callback via Observable:AddObserver()
 local Cached = GlobalGetSessionClients()
@@ -43,7 +43,7 @@ end
 
 --- Override global function to return our cache
 ---@return Client[]
-GetSessionClients = function()
+_G.GetSessionClients = function()
     return Cached
 end
 
