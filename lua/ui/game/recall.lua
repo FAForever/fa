@@ -72,10 +72,10 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 if self.canVote() then
                     height = height + Scale(5) + voteHeight
                     if self.startTime() > 0 then
-                        height = height + progHeight
+                        height = height + Scale(2) + progHeight
                     end
                 elseif self.startTime() > 0 then
-                    height = height + Scale(8) + progHeight
+                    height = height + Scale(10) + progHeight
                 end
                 return height + Scale(-2)
             end)
