@@ -575,16 +575,6 @@ function CreateWreckageUnit(unit)
 	end
 end
 
----@param firstArmy string
----@return Team
-local function InitializeTeam(firstArmy)
-    return {
-        LastRecallRequestTime = import("/lua/simutils.lua").StartingTeamRecallCooldown(),
-        ArmyCount = 1,
-        Armies = {firstArmy},
-    }
-end
-
 ---InitializeArmies
 function InitializeArmies()
     -- globals to locals
@@ -602,15 +592,10 @@ function InitializeArmies()
     local civOpt = ScenarioInfo.Options.CivilianAlliance
     local revealCivilians = ScenarioInfo.Options['RevealCivilians'] == 'Yes'
     local scenarioArmies = Scenario.Armies
-    local teamsLocked = ScenarioInfo.TeamGame
     local tblArmy = ListArmies()
-    local time = GetGameTick()
     local shouldCreateInitial = ShouldCreateInitialArmyUnits()
 
     local tblGroups = {}
-    local teams = {}
-    local ffa = {}
-    local ffaIndex = 0
 
     for iArmy, strArmy in tblArmy do
         local tblData = scenarioArmies[strArmy]
@@ -622,26 +607,6 @@ function InitializeArmies()
             local brain = GetArmyBrain(strArmy)
 
             --LOG('*DEBUG: InitializeArmies, army = ', strArmy)
-
-            local team = setup.Team
-            local teamData = teams[team]
-            if teamData then
-                if teamsLocked then
-                    local n = teamData.ArmyCount + 1
-                    teamData.Armies[n] = strArmy
-                    teamData.ArmyCount = n
-                else -- we'll make teams for these at the end
-                    ffaIndex = ffaIndex + 1
-                    ffa[ffaIndex] = strArmy
-                end
-            else
-                teams[team] = InitializeTeam(strArmy)
-            end
-            brain.Team = team
-
-            if teamData.Human then
-                brain.LastRecallRequestTime = time + startingRecallStart - playerRecallRequestCooldown
-            end
 
             local econ = tblData.Economy
             SetArmyEconomy(strArmy, econ.mass, econ.energy)
@@ -669,7 +634,7 @@ function InitializeArmies()
                 end
             end
 
-            local wreckageGroup = FindUnitGroup('WRECKAGE', Scenario.Armies[strArmy].Units)
+            local wreckageGroup = FindUnitGroup('WRECKAGE', setup.Units)
             if wreckageGroup then
 			    local _, tblResult, _ = CreatePlatoons(strArmy, wreckageGroup)
 				for _, unit in tblResult do
@@ -719,24 +684,6 @@ function InitializeArmies()
         end
     end
 
-    -- fit remaining armies into whatever team slot they can
-    local ffaArmies = ffaIndex
-    ffaIndex = 1
-    local team = 1
-    while ffaIndex < ffaArmies do
-        if not teams[team] then
-            local strArmy = ffa[ffaIndex]
-            ffaIndex = ffaIndex + 1
-            teams[team] = InitializeTeam(strArmy)
-            GetArmyBrain(strArmy).Team = team
-        end
-        team = team + 1
-    end
-
-    import("/lua/simutils.lua").Teams = teams
-
-    reprsl(teams)
-
     return tblGroups
 end
 
@@ -759,9 +706,7 @@ function InitializeScenarioArmies()
 
     local armySetups = ScenarioInfo.ArmySetup
     local scenarioArmies = Scenario.Armies
-    local teamsLocked = ScenarioInfo.TeamGame
     local tblArmy = ListArmies()
-    local time = GetGameTick()
     local shouldCreateInitial = ShouldCreateInitialArmyUnits()
     local factionCount = table.getsize(import('/lua/factions.lua').Factions)
 
@@ -775,9 +720,6 @@ function InitializeScenarioArmies()
     end
 
     local tblGroups = {}
-    local teams = {}
-    local ffa = {}
-    local ffaIndex = 0
 
     for _, strArmy in tblArmy do
         local tblData = scenarioArmies[strArmy]
@@ -790,25 +732,6 @@ function InitializeScenarioArmies()
 
             LOG('*DEBUG: InitializeScenarioArmies, army = ', strArmy)
 
-            local team = setup.Team
-            local teamData = teams[team]
-            if teamData then
-                if teamsLocked then
-                    local n = teamData.ArmyCount + 1
-                    teamData.Armies[n] = strArmy
-                    teamData.ArmyCount = n
-                else -- we'll make teams for these at the end
-                    ffaIndex = ffaIndex + 1
-                    ffa[ffaIndex] = strArmy
-                end
-            else
-                teams[team] = InitializeTeam(strArmy)
-            end
-            brain.Team = team
-
-            if teamData.Human then
-                brain.LastRecallRequestTime = time + startingRecallStart - playerRecallRequestCooldown
-            end
 
             local econ = tblData.Economy
             SetArmyEconomy(strArmy, econ.mass, econ.energy)
@@ -864,22 +787,6 @@ function InitializeScenarioArmies()
             LoadArmyPBMBuilders(strArmy)
         end
     end
-
-    -- fit remaining armies into whatever team slot they can
-    local ffaArmies = ffaIndex
-    ffaIndex = 1
-    local team = 1
-    while ffaIndex < ffaArmies do
-        if not teams[team] then
-            local strArmy = ffa[ffaIndex]
-            ffaIndex = ffaIndex + 1
-            teams[team] = InitializeTeam(strArmy)
-            GetArmyBrain(strArmy).Team = team
-        end
-        team = team + 1
-    end
-
-    import("/lua/simutils.lua").Teams = teams
 
     return tblGroups
 end

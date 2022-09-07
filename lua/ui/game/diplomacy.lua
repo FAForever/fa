@@ -28,14 +28,18 @@ local dialogue = false
 local offerQueue = {}
 local drawOffered = false
 
-local canRequestRecall = false
+---@type CannotRecallReason
+local cannotRequestRecall = false
 
-function CanRequestRecall()
-    return canRequestRecall
+function CannotRequestRecall()
+    return cannotRequestRecall
 end
 
-function UpdateCanRequestCall(canRequest)
-    canRequestRecall = canRequest
+function UpdateCannotRequestRecall(canRequest)
+    cannotRequestRecall = canRequest
+    if parent then
+        BuildPlayerLines()
+    end
 end
 
 function ActionHandler(actions)
@@ -199,14 +203,6 @@ local function LayoutAlliedEntry(entry, armyIndex, isHuman, outOfGame, teamsLock
     end
 
     if teamsLocked then
-        if isHuman then
-            local recallIcon = CreateBitmapStd(entry, "/game/recall-panel/icon-recall")
-            Layouter(recallIcon)
-                :AtVerticalCenterIn(entry)
-                :AtRightIn(entry, 8)
-                :DisableHitTest()
-            entry.recall = recallIcon
-        end
     else
         if not outOfGame then
             local breakBtn = UIUtil.CreateButtonStd(entry,
@@ -265,7 +261,7 @@ end
 
 local function CreateDiplomacyEntry(parent, data, isAlly)
     local sessionOptions = SessionGetScenarioInfo().Options
-    local isHuman = data.human or math.random(2) == 2
+    local isHuman = data.human
     local outOfGame = data.outOfGame
     local teamsLocked = sessionOptions and sessionOptions.TeamLock == "locked"
     local manualShare = sessionOptions.ManualUnitShare
@@ -332,6 +328,46 @@ local function CreateDiplomacyEntry(parent, data, isAlly)
     return entry
 end
 
+local function CreatePlayerGroup(parent, panelFilename, titleLoc, titleColor, controls, controlCount, isAlly)
+    local lineFilename = panelFilename .. "-line"
+    local group = UIUtil.CreateVertFillGroup(parent, panelFilename)
+
+    local title = UIUtil.CreateText(group, titleLoc, 18, UIUtil.bodyFont)
+    Layouter(title)
+        :Color(titleColor)
+        :DropShadow(true)
+        :Over(group, 10)
+    title.Left:Set(function() return group.Left() + 8 end)
+    title.Top:Set(function() return group.Top() + 8 end)
+    title.Right:Set(function() return group.Right() - 8 end)
+
+    local entry = CreateDiplomacyEntry(group, controls[1], isAlly)
+    LayoutHelpers.Below(entry, title, 4)
+    local belowEntry = entry
+    local lines = {entry}
+
+    for index = 2, controlCount do
+        local entry = CreateDiplomacyEntry(group, controls[index], isAlly)
+        LayoutHelpers.Below(entry, belowEntry, 4)
+        lines[index] = entry
+
+        local separator = CreateBitmapStd(entry, lineFilename)
+        separator.Left:Set(function() return group.Left() + 6 end)
+        separator.Top:Set(function() return entry.Top() - 4 end)
+        entry.Separator = separator
+
+        belowEntry = entry
+    end
+
+    group.Height:Set(function()
+        return lines[controlCount].Bottom() - title.Top() + 20
+    end)
+    group.title = title
+    group.lines = lines
+
+    return group
+end
+
 
 function BuildPlayerLines()
     local sessionOptions = SessionGetScenarioInfo().Options
@@ -354,7 +390,7 @@ function BuildPlayerLines()
     local allyCount = 0
     local enemyControls = {}
     local enemyCount = 0
-    local gameAllHuman = true
+    local allHumanGame = true
 
     for index, playerInfo in GetArmiesTable().armiesTable do
         if playerInfo.civilian or index == focusArmy then continue end
@@ -366,73 +402,85 @@ function BuildPlayerLines()
             enemyCount = enemyCount + 1
             enemyControls[enemyCount] = playerInfo
         end
-        if gameAllHuman and not (playerInfo.human or playerInfo.outOfGame) then
-            gameAllHuman = false
+        if allHumanGame and not (playerInfo.human or playerInfo.outOfGame) then
+            allHumanGame = false
         end
     end
 
-    local personalGroup = CreateBitmapStd(parent, "/game/options-diplomacy-panel/panel-recall")
-    Layouter(personalGroup)
-        :AtLeftTopIn(parent, 0, 2)
-    parent.personalGroup = personalGroup
+    local belowEntry = parent
 
-    local recallButton = UIUtil.CreateButtonStd(personalGroup, "/widgets02/small")
-    Layouter(recallButton)
-        :AtCenterIn(personalGroup)
-        :Over(personalGroup, 5)
-    Tooltip.AddButtonTooltip(recallButton, "dip_recall_request")
-    personalGroup.button = recallButton
-
-    if CanRequestRecall() then
-        recallButton:Disable()
-    else
-        recallButton.OnClick = function(self, modifiers)
-            UIUtil.QuickDialog(GetFrame(0),
-                "<LOC diplomacy_0019>Are you sure you're ready to recall from battle? This will send a request to your team.",
-                "<LOC _Yes>",
-                function()
-                    SimCallback({
-                        Func = "SetRecallVote",
-                        Args = {
-                            From = GetFocusArmy(),
-                            Vote = true,
-                        },
-                    })
-                    recallButton:Disable()
-                    canRequestRecall = false
-                end,
-                "<LOC _No>", nil, nil, nil, nil,
-                {worldCover = false, enterButton = 1, escapeButton = 2}
-            )
+    if not import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+        local personalGroup = CreateBitmapStd(parent, "/game/options-diplomacy-panel/panel-recall")
+        if belowEntry == parent then
+            LayoutHelpers.AtLeftTopIn(personalGroup, belowEntry, 0, 8)
+        else
+            LayoutHelpers.Below(personalGroup, belowEntry, 8)
         end
+        parent.personalGroup = personalGroup
+
+        local recallButton = UIUtil.CreateButtonStd(personalGroup, "/widgets02/small")
+        Layouter(recallButton)
+            :AtCenterIn(personalGroup)
+            :Over(personalGroup, 5)
+        personalGroup.button = recallButton
+
+        local reason = CannotRequestRecall()
+        if reason then
+            recallButton:Disable()
+            Tooltip.AddButtonTooltip(recallButton, "dip_recall_request_dis_" .. reason)
+        else
+            recallButton.OnClick = function(self, modifiers)
+                UIUtil.QuickDialog(GetFrame(0),
+                    "<LOC diplomacy_0019>Are you sure you're ready to recall from battle? This will send a request to your team.",
+                    "<LOC _Yes>",
+                    function()
+                        SimCallback({
+                            Func = "SetRecallVote",
+                            Args = {
+                                From = GetFocusArmy(),
+                                Vote = true,
+                            },
+                        })
+                        recallButton:Disable()
+                        cannotRequestRecall = "active"
+                        Tooltip.AddButtonTooltip(recallButton, "dip_recall_request_dis_active")
+                        import("/lua/ui/game/tabs.lua").CollapseWindow()
+                    end,
+                    "<LOC _No>", nil, nil, nil, nil,
+                    {worldCover = false, enterButton = 1, escapeButton = 2}
+                )
+            end
+            Tooltip.AddButtonTooltip(recallButton, "dip_recall_request")
+        end
+
+        local recallIcon = CreateBitmapStd(recallButton, "/game/recall-panel/icon-recall")
+        Layouter(recallIcon)
+            :AtCenterIn(recallButton)
+            :Over(recallButton, 5)
+        recallButton.label = recallIcon
+
+        belowEntry = personalGroup
     end
-
-    local recallIcon = CreateBitmapStd(recallButton, "/game/recall-panel/icon-recall")
-    Layouter(recallIcon)
-        :AtCenterIn(recallButton)
-        :Over(recallButton, 5)
-    recallButton.label = recallIcon
-
-    local belowEntry = personalGroup
 
     if allyCount > 0 then
-        local alliedGroup = UIUtil.CreateVertFillGroup(parent, "/game/options-diplomacy-panel/panel-allies")
-        LayoutHelpers.Below(alliedGroup, belowEntry, 4)
-        parent.alliedGroup = alliedGroup
+        local allyGroup = CreatePlayerGroup(parent,
+            "/game/options-diplomacy-panel/panel-allies",
+            "<LOC diplomacy_0002>Allies", "ff00ff72",
+            allyControls, allyCount, true
+        )
+        if belowEntry == parent then
+            LayoutHelpers.AtLeftTopIn(allyGroup, belowEntry, 0, 8)
+        else
+            LayoutHelpers.Below(allyGroup, belowEntry, 8)
+        end
+        parent.alliedGroup = allyGroup
 
-        local allyTitle = UIUtil.CreateText(alliedGroup, "<LOC diplomacy_0002>Allies", 18, UIUtil.bodyFont)
-        Layouter(allyTitle)
-            :Color("ff00ff72")
-            :DropShadow(true)
-            :Over(alliedGroup, 10)
-        allyTitle.Left:Set(function() return alliedGroup.Left() + 8 end)
-        allyTitle.Top:Set(function() return alliedGroup.Top() + 8 end)
-        allyTitle.Right:Set(function() return alliedGroup.Right() - 8 end)
+        local allyTitle = allyGroup.title
 
         local srCheck = UIUtil.CreateCheckboxStd(allyTitle, '/game/toggle_btn/toggle')
         srCheck:SetCheck(shareResources, true)
         LayoutHelpers.AtRightIn(srCheck, allyTitle)
-        LayoutHelpers.AtTopIn(srCheck, alliedGroup, 4)
+        srCheck.Top:Set(function() return allyGroup.Top() + 4 end)
         Tooltip.AddCheckboxTooltip(srCheck, 'dip_share_resources')
         allyTitle.srCheck = srCheck
 
@@ -465,32 +513,7 @@ function BuildPlayerLines()
             end
         end
 
-        belowEntry = allyTitle
-
-        local entry = CreateDiplomacyEntry(alliedGroup, allyControls[1], true)
-        LayoutHelpers.Below(entry, belowEntry, 4)
-        belowEntry = entry
-        local lines = {entry}
-
-        for index = 2, allyCount do
-            local entry = CreateDiplomacyEntry(alliedGroup, allyControls[index], true)
-            LayoutHelpers.Below(entry, belowEntry, 4)
-            lines[index] = entry
-
-            local separator = CreateBitmapStd(entry, "/game/options-diplomacy-panel/line-allies")
-            separator.Left:Set(function() return alliedGroup.Left() + 4 end)
-            separator.Top:Set(function() return entry.Top() - 4 end)
-            entry.Separator = separator
-
-            belowEntry = entry
-        end
-
-        alliedGroup.Height:Set(function()
-            return lines[allyCount].Bottom() - allyTitle.Top() + 18
-        end)
-        alliedGroup.lines = lines
-
-        belowEntry = alliedGroup._bottom
+        belowEntry = allyGroup._bottom
 
         srCheck.OnCheck = function(self, checked)
             shareResources = checked
@@ -505,25 +528,25 @@ function BuildPlayerLines()
     end
 
     if enemyCount > 0 then
-        local enemyGroup = UIUtil.CreateVertFillGroup(parent, "/game/options-diplomacy-panel/panel-enemy")
-        LayoutHelpers.Below(enemyGroup, belowEntry, 4)
+        local enemyGroup = CreatePlayerGroup(parent,
+            "/game/options-diplomacy-panel/panel-enemy",
+            "<LOC diplomacy_0003>Enemies", "ffff3c00",
+            enemyControls, enemyCount, false
+        )
+        if belowEntry == parent then
+            LayoutHelpers.AtLeftTopIn(enemyGroup, belowEntry, 0, 8)
+        else
+            LayoutHelpers.Below(enemyGroup, belowEntry, 8)
+        end
         parent.enemyGroup = enemyGroup
 
-        local enemyTitle = UIUtil.CreateText(enemyGroup, "<LOC diplomacy_0003>Enemies", 18, UIUtil.bodyFont)
-        Layouter(enemyTitle)
-            :DropShadow(true)
-            :Color('ffff3c00')
-            :Over(enemyGroup, 10)
-        enemyTitle.Left:Set(function() return enemyGroup.Left() + 8 end)
-        enemyTitle.Top:Set(function() return enemyGroup.Top() + 8 end)
-        enemyTitle.Right:Set(function() return enemyGroup.Right() - 8 end)
+        local enemyTitle = enemyGroup.title
 
-        belowEntry = enemyTitle
-
-        if gameAllHuman then
+        if allHumanGame then
             local odCheck = UIUtil.CreateCheckboxStd(enemyTitle, "/dialogs/toggle_btn/toggle")
             odCheck:SetCheck(drawOffered, true)
-            LayoutHelpers.AtRightCenterIn(odCheck, enemyGroup)
+            odCheck.Top:Set(function() return enemyGroup.Top() + 4 end)
+            LayoutHelpers.AtRightIn(odCheck, enemyTitle)
             Tooltip.AddCheckboxTooltip(odCheck, 'dip_offer_draw')
             enemyTitle.odCheck = odCheck
 
@@ -547,32 +570,10 @@ function BuildPlayerLines()
             end
         end
 
-        local entry = CreateDiplomacyEntry(enemyGroup, allyControls[1], false)
-        LayoutHelpers.Below(entry, belowEntry, 4)
-        belowEntry = entry
-        local lines = {entry}
-
-        for index = 2, enemyCount do
-            local entry = CreateDiplomacyEntry(enemyGroup, enemyControls[index], false)
-            LayoutHelpers.Below(entry, belowEntry, 4)
-            lines[index] = entry
-
-            local separator = CreateBitmapStd(entry, "/game/options-diplomacy-panel/line-enemies")
-            separator.Left:Set(function() return enemyGroup.Left() + 4 end)
-            separator.Top:Set(function() return entry.Top() - 4 end)
-            entry.Separator = separator
-
-            belowEntry = entry
-        end
-        enemyGroup.Height:Set(function()
-            return lines[enemyCount].Bottom() - enemyTitle.Top() + 18
-        end)
-        enemyGroup.lines = lines
-
         belowEntry = enemyGroup._bottom
     end
 
-    LayoutHelpers.AtBottomIn(parent, belowEntry, 16)
+    LayoutHelpers.AtBottomIn(parent, belowEntry, 14)
 end
 
 function CreateShareResourcesDialog(control)

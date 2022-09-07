@@ -743,6 +743,22 @@ function CreateCheckbox(parent, texturePath, label, labelRight, labelSize, click
     return checkbox
 end
 
+---@param parent Control
+---@param position "l" | "t" | "r"
+---@return Checkbox
+function CreateCollapseArrow(parent, position)
+    local prefix = "/game/tab-" .. position .. "-btn/tab-"
+    local collapseArrow = Checkbox(parent,
+        SkinnableFile(prefix .. "close_btn_up.dds"),
+        SkinnableFile(prefix .. "open_btn_up.dds"),
+        SkinnableFile(prefix .. "close_btn_over.dds"),
+        SkinnableFile(prefix .. "open_btn_over.dds"),
+        SkinnableFile(prefix .. "close_btn_dis.dds"),
+        SkinnableFile(prefix .. "open_btn_dis.dds")
+    )
+    return collapseArrow
+end
+
 function CreateRadioButtonsStd(parent, texturePath, title, buttons, default)
     local radioButton = RadioButtons(parent, title, buttons, default, "Arial", 14, fontColor,
         SkinnableFile(texturePath .. 'd_up.dds'),
@@ -1270,7 +1286,7 @@ function CreateVertFillGroup(parent, filename)
     Layouter(middle)
         :Over(group, 0)
         :AtLeftIn(group)
-        :AnchorToBottom(top)
+        :Top(function() return top.Bottom() - 2 end)
         :AnchorToTop(bottom)
 
     group.Width:Set(top.Width)
@@ -1301,7 +1317,7 @@ function CreateHorzFillGroup(parent, filename)
     Layouter(middle)
         :Over(group, 0)
         :AtTopIn(group)
-        :AnchorToRight(left)
+        :Left(function() return left.Right() - 2 end)
         :AnchorToLeft(right)
 
     group.Height:Set(right.Height)

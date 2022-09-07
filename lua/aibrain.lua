@@ -1134,48 +1134,14 @@ AIBrain = Class(moho.aibrain_methods) {
             self.PathCache = nil
         end
 
-        local shareOption = ScenarioInfo.Options.Share
-
-        if shareOption == "ShareUntilDeath" then
-            local tokill = self:GetListOfUnits(categories.WALL, false)
-            if tokill and tokill[1] then
-                for _, unit in tokill do
-                    unit:Kill()
-                end
-            end
-        end
-
-        local victoryOption = ScenarioInfo.Options.Victory
-        local BrainCategories = {Enemies = {}, Civilians = {}, Allies = {}}
-
-        -- Used to have units which were transferred to allies noted permanently as belonging to the new player
-        local function TransferOwnershipOfBorrowedUnits(brains)
-            for _, brain in brains do
-                local units = brain:GetListOfUnits(categories.ALLUNITS, false)
-                if units and units[1] then
-                    for _, unit in units do
-                        if unit.oldowner == army then
-                            unit.oldowner = nil
-                        end
-                    end
-                end
-            end
-        end
+        local enemies, civilians = {}, {}
 
         -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
         local function TransferUnitsToBrain(brains)
             if brains[1] then
-                if shareOption == "FullShare" then
-                    local indices = {}
-                    for k, brain in brains do
-                        indices[k] = brain.index
-                    end
-                    local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                    TransferUnfinishedUnitsAfterDeath(units, indices)
-                end
-
+                local cat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
                 for _, brain in brains do
-                    local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                    local units = self:GetListOfUnits(cat, false)
                     if units and units[1] then
                         local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
 
@@ -1212,60 +1178,6 @@ AIBrain = Class(moho.aibrain_methods) {
             end
         end
 
-        -- Transfer units to the player who killed me
-        local function TransferUnitsToKiller()
-            local KillerIndex = 0
-            local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-            if units and not table.empty(units) then
-                if victoryOption == 'demoralization' then
-                    KillerIndex = self.CommanderKilledBy or army
-                else
-                    KillerIndex = self.LastUnitKilledBy or army
-                end
-                TransferUnitsOwnership(units, KillerIndex)
-            end
-            WaitSeconds(1)
-        end
-
-        -- Return units transferred during the game to me
-        local function ReturnBorrowedUnits()
-            local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-            local borrowed = {}
-            for _, unit in units do
-                local oldowner = unit.oldowner
-                if oldowner and oldowner ~= army and not GetArmyBrain(oldowner):IsDefeated() then
-                    if not borrowed[oldowner] then
-                        borrowed[oldowner] = {}
-                    end
-                    table.insert(borrowed[oldowner], unit)
-                end
-            end
-
-            for owner, units in borrowed do
-                TransferUnitsOwnership(units, owner)
-            end
-
-            WaitSeconds(1)
-        end
-
-        -- Return units I gave away to my control. Mainly needed to stop EcoManager mods bypassing all this stuff with auto-give
-        local function GetBackUnits(brains)
-            local given = {}
-            for _, brain in brains do
-                local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-                if units and units[1] then
-                    for _, unit in units do
-                        if unit.oldowner == army then -- The unit was built by me
-                            table.insert(given, unit)
-                            unit.oldowner = nil
-                        end
-                    end
-                end
-            end
-
-            TransferUnitsOwnership(given, army)
-        end
-
         -- Sort brains out into mutually exclusive categories
         for index, brain in ArmyBrains do
             brain.index = index
@@ -1273,37 +1185,20 @@ AIBrain = Class(moho.aibrain_methods) {
 
             if not brain:IsDefeated() and army ~= index then
                 if ArmyIsCivilian(index) then
-                    table.insert(BrainCategories.Civilians, brain)
+                    table.insert(civilians, brain)
                 elseif IsEnemy(army, brain:GetArmyIndex()) then
-                    table.insert(BrainCategories.Enemies, brain)
-                else
-                    table.insert(BrainCategories.Allies, brain)
+                    table.insert(enemies, brain)
                 end
             end
         end
 
-        local KillSharedUnits = import('/lua/SimUtils.lua').KillSharedUnits
-
         -- This part determines the share condition
-        if shareOption == 'ShareUntilDeath' then
-            KillSharedUnits(self:GetArmyIndex()) -- Kill things I gave away
-            ReturnBorrowedUnits() -- Give back things I was given by others
-        elseif shareOption == 'FullShare' then
-            TransferUnitsToHighestBrain(BrainCategories.Allies) -- Transfer things to allies, highest score first
-            TransferOwnershipOfBorrowedUnits(BrainCategories.Allies) -- Give stuff away permanently
-        else
-            GetBackUnits(BrainCategories.Allies) -- Get back units I gave away
-            if shareOption == 'CivilianDeserter' then
-                TransferUnitsToBrain(BrainCategories.Civilians)
-            elseif shareOption == 'TransferToKiller' then
-                TransferUnitsToKiller()
-            elseif shareOption == 'Defectors' then
-                TransferUnitsToHighestBrain(BrainCategories.Enemies)
-            else -- Something went wrong in settings. Act like share until death to avoid abuse
-                WARN('Invalid share condition was used for this game. Defaulting to killing all units')
-                KillSharedUnits(self:GetArmyIndex()) -- Kill things I gave away
-                ReturnBorrowedUnits() -- Give back things I was given by other
-            end
+
+        local shareOption = ScenarioInfo.Options.Share
+        if shareOption == 'CivilianDeserter' then
+            TransferUnitsToBrain(civilians)
+        elseif shareOption == 'Defectors' then
+            TransferUnitsToHighestBrain(enemies)
         end
 
         -- Kill all units left over
@@ -1322,23 +1217,26 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     IsDefeated = function(self)
-        return self.Status == "Defeat" or self.Status == "Recalled"
+        local status = self.Status
+        return status == "Defeat" or status == "Recalled"
     end,
 
     ---@param self AIBrain
-    RecallAllCommanders = function(self)
+    RecallAllCommanders = function(self, camera)
         local commandCat = categories.COMMAND + categories.SUBCOMMANDER
-        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false))
+        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false), camera)
     end;
 
     ---@param self AIBrain
     ---@param recallingUnits Unit[]
-    RecallArmyThread = function(self, recallingUnits)
+    RecallArmyThread = function(self, recallingUnits, camera)
         if recallingUnits then
             local ScenarioFramework = import("/lua/scenarioframework.lua")
-            local cdr = self:GetCommander()
-            if cdr then
-                ScenarioFramework.EndOperationCamera(cdr, true)
+            if camera then
+                local cdr = self:GetCommander()
+                if cdr then
+                    ScenarioFramework.EndOperationCamera(cdr, true, 3.5)
+                end
             end
             ScenarioFramework.FakeTeleportUnits(recallingUnits, true)
         end
@@ -4808,14 +4706,14 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@return CommandUnit | nil
     GetCommander = function(self)
         local cdr = self.CDR
-        if cdr and cdr:IsDestroyed() then
+        if cdr and cdr:IsDead() then
             cdr = nil
         end
         if not cdr then
             local commanders = self:GetListOfUnits(categories.COMMANDER, false)
             table.shuffle(commanders)
             for _, commander in commanders do
-                if not commander:IsDestroyed() then
+                if not commander:IsDead() then
                     cdr = commander
                     break
                 end

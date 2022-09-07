@@ -454,7 +454,7 @@ Callbacks.RequestAlliedVictory = SimUtils.RequestAlliedVictory
 
 Callbacks.SetOfferDraw = SimUtils.SetOfferDraw
 
-Callbacks.SetRecallVote = SimUtils.SetRecallVote
+Callbacks.SetRecallVote = import("/lua/sim/recall.lua").SetRecallVote
 
 Callbacks.SpawnPing = SimPing.SpawnPing
 

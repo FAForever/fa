@@ -353,6 +353,7 @@ function BeginSession()
     end
 
     import('/lua/sim/score.lua').init()
+    import('/lua/sim/recall.lua').init()
 
     --start watching for victory conditions
     import('/lua/sim/matchstate.lua')

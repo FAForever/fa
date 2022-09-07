@@ -1456,29 +1456,19 @@ end
 -- -----------------------------------------------------
 --    Function: TimeConvert
 --    Args:
---        temptime      - Time in seconds
+--        seconds      - Time in seconds
 --    Description:
 --        Converts seconds into eaier to read time.
 --    Returns:
 --        Converted time
 -- -----------------------------------------------------
-function TimeConvert(temptime)
-    hours = math.floor(temptime / 3600)
-    minutes = math.floor(temptime/60)
-    seconds = math.floor(math.mod(temptime, 60))
-    hours = tostring(hours)
-    if minutes < 10 then
-        minutes = '0'..tostring(minutes)
-    else
-        minutes = tostring(minutes)
-    end
-    if seconds < 10 then
-        seconds = '0'..tostring(seconds)
-    else
-        seconds = tostring(seconds)
-    end
-    returntext = hours..':'..minutes..':'..seconds
-    return returntext
+function TimeConvert(seconds)
+    local MathFloor = math.floor
+    local hours = MathFloor(seconds / 3600)
+    seconds = seconds - hours * 3600
+    local minutes = MathFloor(seconds / 60)
+    seconds = seconds - minutes * 60
+    return ("%02d:%02d:%02d"):format(hours, minutes, seconds)
 end
 
 -- Small function the draw intel points on the map for debugging
