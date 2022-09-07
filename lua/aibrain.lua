@@ -1240,7 +1240,7 @@ AIBrain = Class(moho.aibrain_methods) {
             end
             ScenarioFramework.FakeTeleportUnits(recallingUnits, true)
         end
-
+        --SPEW("Recalling army brain " .. self.Nickname .. " (" .. (camera and "with camera)" or "no camera)"))
         self:OnRecalled()
     end;
 

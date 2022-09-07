@@ -114,11 +114,23 @@ local function RecallVotingThread(requestingArmy)
         end
     end
     local recallAccepted = RecallRequestAccepted(recallAcceptance, teammates)
-    Sync.RecallRequest = {
-        Close = recallAccepted,
-    }
     local focus = GetFocusArmy()
     local brain = GetArmyBrain(requestingArmy)
+    if IsAlly(focus, requestingArmy) then
+        Sync.RecallRequest = {
+            Close = recallAccepted,
+        }
+    elseif recallAccepted then
+        local dip = Sync.DiplomacyAnnouncement
+        if not dip then
+            dip = {}
+            Sync.DiplomacyAnnouncement = dip
+        end
+        table.insert(dip, {
+            Action = "recall",
+            Team = brain.Nickname,
+        })
+    end
     if recallAccepted then
         SPEW("Vote passed; recalling!")
         for army, brain in team do
@@ -141,6 +153,19 @@ local function RecallVotingThread(requestingArmy)
 end
 
 local function ArmyVoteRecall(army, vote, lastVote)
+    if lastVote then
+        for index, ally in ArmyBrains do
+            if army ~= index and not ally:IsDefeated() and IsAlly(army, index) then
+                local thread = ally.recallVotingThread
+                if thread then
+                    -- end voting period
+                    coroutine.resume(thread)
+                    break
+                end
+            end
+        end
+    end
+
     local focus = GetFocusArmy()
     -- don't update the recall panel for votes we aren't a part of
     if not IsAlly(focus, army) then
@@ -160,18 +185,6 @@ local function ArmyVoteRecall(army, vote, lastVote)
     end
     if army == focus then
         recallSync.CannotRequest = "active"
-    end
-    if lastVote then
-        for index, ally in ArmyBrains do
-            if army ~= index and not ally:IsDefeated() and IsAlly(army, index) then
-                local thread = ally.recallVotingThread
-                if thread then
-                    -- end voting period
-                    coroutine.resume(thread)
-                    break
-                end
-            end
-        end
     end
     return true
 end

@@ -396,6 +396,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 collapse:Hide()
             else
                 collapse:Show()
+                SPEW("SHOWING")
             end
         end
         return supress
