@@ -1232,12 +1232,12 @@ AIBrain = Class(moho.aibrain_methods) {
     RecallArmyThread = function(self, recallingUnits, camera)
         if recallingUnits then
             local ScenarioFramework = import("/lua/scenarioframework.lua")
-            if camera then
-                local cdr = self:GetCommander()
-                if cdr then
-                    ScenarioFramework.EndOperationCamera(cdr, true, 3.5)
-                end
-            end
+            -- if camera then
+            --     local cdr = self:GetCommander()
+            --     if cdr then
+            --         ScenarioFramework.EndOperationCamera(cdr, true, 3.5)
+            --     end
+            -- end
             ScenarioFramework.FakeTeleportUnits(recallingUnits, true)
         end
         --SPEW("Recalling army brain " .. self.Nickname .. " (" .. (camera and "with camera)" or "no camera)"))
