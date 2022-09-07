@@ -155,6 +155,10 @@ function CreateUI(isReplay)
 
     import('/lua/system/performance.lua')
 
+    -- # Casting tools 
+
+    import('/lua/ui/game/casting/mouse.lua')
+
     -- # Overwrite some globals for performance / safety
 
     -- ensure logger is turned off for the average user
