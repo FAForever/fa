@@ -21,7 +21,8 @@ function init()
                 if brain ~= brainWith then
                     if  not brain:IsDefeated() and
                         IsAlly(focus, index) and
-                        brainWith.BrainType ~= "Human"
+                        brainWith.BrainType ~= "Human" and
+                        not ArmyIsCivilian(index)
                     then
                         Sync.RecallRequest = {CannotRequest = "ai"}
                         return
@@ -75,7 +76,7 @@ function ArmyRecallRequestCooldown(army)
     army = brain.Army
     lastTeamVote = lastPlayerRequest
     for index, ally in ArmyBrains do
-        if not ally:IsDefeated() and IsAlly(army, index) then
+        if not ally:IsDefeated() and IsAlly(army, index) and not ArmyIsCivilian(index) then
             local allyTeamVote = ally.LastRecallVoteTime
             if allyTeamVote < lastTeamVote then
                 lastTeamVote = allyTeamVote
@@ -102,8 +103,8 @@ local function RecallVotingThread(requestingArmy)
     local recallAcceptance = 0
     local team = {}
     local teammates = 0
-    for _, brain in ArmyBrains do
-        if not brain:IsDefeated() and IsAlly(requestingArmy, brain.Army) then
+    for index, brain in ArmyBrains do
+        if not brain:IsDefeated() and IsAlly(requestingArmy, brain.Army) and not ArmyIsCivilian(index) then
             teammates = teammates + 1
             team[teammates] = brain
             if brain.RecallVote then
@@ -221,7 +222,7 @@ function SetRecallVote(data)
     local lastVote = true
     local teammates = 0
     for index, ally in ArmyBrains do
-        if army ~= index and not ally:IsDefeated() and IsAlly(army, index) then
+        if army ~= index and not ally:IsDefeated() and IsAlly(army, index) and not ArmyIsCivilian(index) then
             if ally.BrainType ~= "Human" then
                 if army == focus then
                     SetCannotRequestRecall("ai")
