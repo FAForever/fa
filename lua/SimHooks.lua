@@ -41,7 +41,7 @@ do
     local oldDrawCircle = _G.DrawCircle
     _G.DrawCircle = function(position, diameter, color)
 
-        -- cause a desync when during non-ai games try and call this function separate from other players
+        -- cause a desync when players during non-ai games try and call this function separate from other players
         if not ScenarioInfo.GameHasAIs then
             Random()
         end
@@ -52,7 +52,7 @@ do
     local oldDrawLine = _G.DrawLine
     _G.DrawLine = function(a, b, color)
 
-        -- cause a desync when during non-ai games try and call this function separate from other players
+        -- cause a desync when players during non-ai games try and call this function separate from other players
         if not ScenarioInfo.GameHasAIs then
             Random()
         end
@@ -63,7 +63,7 @@ do
     local oldDrawLinePop = _G.DrawLinePop
     _G.DrawLinePop = function(a, b, color)
 
-        -- cause a desync when during non-ai games try and call this function separate from other players
+        -- cause a desync when players during non-ai games try and call this function separate from other players
         if not ScenarioInfo.GameHasAIs then
             Random()
         end
