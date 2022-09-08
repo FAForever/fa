@@ -266,7 +266,7 @@ Projectile = Class(moho.projectile_methods) {
 
         -- callbacks for launcher to have an idea what is going on for AIs
         local categoriesHash = self.Blueprint.CategoriesHash
-        if categoriesHash['TACTICAL'] or categoriesHash['STRATEGICAL'] then
+        if categoriesHash['TACTICAL'] or categoriesHash['STRATEGIC'] then
             -- we have a target, but got caught by terrain
             if targetType == 'Terrain' then
                 if not IsDestroyed(self.Launcher) then

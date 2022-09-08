@@ -225,6 +225,9 @@ Unit = Class(moho.unit_methods) {
         -- used to fix engine related bugs
         self.EngineFlags = { }
 
+        -- Initialize callbacks table
+        self.Callbacks = { }
+
         -- Store size information for performance
         self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
         self.SkirtOffset = { OffsetX = bp.Physics.SkirtOffsetX, OffsetZ = bp.Physics.SkirtOffsetZ }
@@ -4997,7 +5000,7 @@ Unit = Class(moho.unit_methods) {
         -- try and run callbacks
         if self.Callbacks['OnMissileImpactTerrain'] then
             for k, callback in self.Callbacks['OnMissileImpactTerrain'] do
-                local ok, msg = pcall(callback, target, position)
+                local ok, msg = pcall(callback, self, target, position)
                 if not ok then
                     WARN("OnMissileImpactTerrain callback triggered an error:")
                     WARN(msg)
