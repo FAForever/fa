@@ -260,8 +260,9 @@ DefaultProjectileWeapon = Class(Weapon) {
                     targetPos = EntityGetPosition(target)
                     data.targetpos = targetPos
                 end
-        else
-            targetPos = data.targetpos
+            else
+                targetPos = data.targetpos
+            end
         end
         if not targetPos then
             -- put the bomb cluster in free-fall
