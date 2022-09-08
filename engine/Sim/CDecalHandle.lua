@@ -1,6 +1,6 @@
 ---@meta
 
----@class moho.CDecalHandle
+---@class moho.CDecalHandle : Destroyable
 local CDecalHandle = {}
 
 function CDecalHandle:Destroy()

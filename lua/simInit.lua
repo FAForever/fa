@@ -17,6 +17,269 @@
 --     3b. The saved lua state is deserialized
 -- ==========================================================================================
 
+local timer = GetSystemTimeSecondsOnlyForProfileUse
+
+local tbl = {
+    key = function(self) end
+}
+
+local start = timer()
+for i = 1, 10000 do
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+    if tbl.key then
+        tbl:key()
+    end
+end
+LOG(timer() - start)
+
+start = timer()
+for i = 1, 10000 do
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+end
+LOG(timer() - start)
+
+for _, line in debug.listcode(function(tbl)
+    if tbl.key then
+        tbl:key()
+    end
+end) do
+    LOG(line)
+end
+LOG()
+for _, line in debug.listcode(function(tbl)
+    local key = tbl.key
+    if key then
+        key(tbl)
+    end
+end) do
+    LOG(line)
+end
+
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
@@ -26,11 +289,11 @@ WaitTicks = coroutine.yield
 
 ---@param n number
 function WaitSeconds(n)
-    local ticks = math.max(1, n * 10)
-    if ticks > 1 then
-        ticks = ticks + 1
+    if n <= 0.1 then
+        WaitTicks(1)
+        return
     end
-    WaitTicks(ticks)
+    WaitTicks(n * 10 + 1)
 end
 
 -- Hook some globals

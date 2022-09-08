@@ -3,7 +3,7 @@
 
 local Control = import('/lua/maui/control.lua').Control
 
----@class Frame : moho.frame_methods, Control
+---@class Frame : moho.frame_methods, Control, InternalObject
 Frame = Class(moho.frame_methods, Control) {
 
     __init = function(self, debugname)

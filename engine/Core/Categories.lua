@@ -1,9 +1,5 @@
 ---@meta
-
----@class EntityCategory : userdata, moho.EntityCategory
----@operator add(EntityCategory): EntityCategory
----@operator mul(EntityCategory): EntityCategory
----@operator sub(EntityCategory): EntityCategory
+---@declare-global
 
 ---@type EntityCategory
 local categoryValue

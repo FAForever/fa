@@ -982,7 +982,7 @@ end
 --- initialStateFunc is a function that gets called once the control is created and allows you to set the initial state of the button
 ---      the function should have this declaration: function(checkbox, unitList)
 --- extraInfo is used for storing any extra information required in setting up the button
----@type table<string, OrderInfo>
+
 local defaultOrdersTable = {
     -- Common rules
     AttackMove = {                  helpText = "attack_move",       bitmapId = 'attack_move',           preferredSlot = 1,  behavior = AttackMoveBehavior},
@@ -1023,6 +1023,7 @@ local defaultOrdersTable = {
     RULEUTC_SpecialToggle = {       helpText = "toggle_special",    bitmapId = 'activate-weapon',       preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 7},
     RULEUTC_CloakToggle = {         helpText = "toggle_cloak",      bitmapId = 'intel-counter',         preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 8},
 }
+
 
 local standardOrdersTable = nil
 

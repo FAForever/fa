@@ -1,6 +1,6 @@
 ---@meta
 
----@class moho.world_mesh_methods
+---@class moho.world_mesh_methods : Destroyable
 local CUIWorldMesh = {}
 
 ---

@@ -148,7 +148,10 @@ list = false
 
 --- Opens up the window
 function OpenWindow()
-
+    local t = import("/lua/maui/group.lua").Group(GetFrame(0))
+    LOG(t._c_object)
+    LOG(moho.control_methods.Destroy)
+    LOG(moho.userDecal_methods.Destroy)
     local gameHasAIs = GameMain.GameHasAIs
     local cheatsOn = sessionInfo.Options.CheatsEnabled
     local isThisJip = "jip" == GetArmiesTable()[GameMain.OriginalFocusArmy].nickname
