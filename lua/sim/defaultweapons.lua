@@ -1397,10 +1397,6 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     }
 }
 
-for _, line in debug.listcode(DefaultProjectileWeapon.CalculateBallisticAcceleration) do
-    LOG(line)
-end
-
 ---@class DefaultBeamWeapon : DefaultProjectileWeapon
 DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,

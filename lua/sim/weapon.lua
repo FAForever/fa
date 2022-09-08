@@ -522,7 +522,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
-    ---@param priorities? number
+    ---@param priorities number
     SetWeaponPriorities = function(self, priorities)
         if priorities then
             if type(priorities[1]) == 'string' then
