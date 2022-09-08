@@ -98,11 +98,13 @@ SyncMeta = {
 
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods
+---@field Animator? moho.AnimationManipulator
+---@field Army Army
 ---@field Brain AIBrain
 ---@field Buffs {Affects: table<BuffEffectName, BlueprintBuff.Effect>, buffTable: table<string, table>}
----@field Army Army
----@field UnitId UnitId
 ---@field EntityId EntityId
+---@field Layer Layer
+---@field UnitId UnitId
 Unit = Class(moho.unit_methods) {
 
     Weapons = {},

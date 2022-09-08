@@ -124,7 +124,7 @@ function Entity:FallDown(dx, dy, dz, force)
 end
 
 ---
---  GetAIBrain(self)
+---@return AIBrain
 function Entity:GetAIBrain()
 end
 
@@ -134,7 +134,7 @@ function Entity:GetArmy()
 end
 
 ---
---  blueprint = Entity:GetBlueprint()
+---@return EntityBlueprint
 function Entity:GetBlueprint()
 end
 

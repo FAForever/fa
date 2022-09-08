@@ -92,21 +92,23 @@ end
 function EndLoggingStats(exit)
 end
 
+---@overload fun(category: EntityCategory, unit: UserUnit): boolean
 --- Return true if a unit category contains this unit
----@param category moho.EntityCategory
----@param unit UserUnit
+---@param category EntityCategory
+---@param unit Unit
+---@return boolean
 function EntityCategoryContains(category, unit)
 end
 
 --- Checks for the empty category
----@param categories Color
+---@param categories EntityCategory
 ---@return boolean
 function EntityCategoryEmpty(categories)
 end
 
 ---@overload fun(units: UserUnit[]): UserUnit[]
 --- Filter a list of units to only those found in the category
----@param category moho.EntityCategory
+---@param category EntityCategory
 ---@param units Unit[]
 ---@return Unit[]
 function EntityCategoryFilterDown(category, units)

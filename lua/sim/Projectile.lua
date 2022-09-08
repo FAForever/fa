@@ -716,7 +716,7 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by Lua to add a flare
     ---@param self Projectile
-    ---@param tbl? table
+    ---@param tbl? WeaponBlueprintFlare
     AddFlare = function(self, tbl)
         if not tbl then return end
         if not tbl.Radius then return end

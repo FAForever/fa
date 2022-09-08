@@ -226,12 +226,12 @@
 ---@field BuildAttachBone any
 ---@field DamageEffects any
 ---@field ForcedBuildSpin any
----@field IdleEffects table<LayerName, UnitBlueprintEffects>         Effects displayed when the unit is idle (e.g. glow beneath hovering units), multiple layers can be used. The key should be the name of the layer where effects should be displayed.
----@field LayerChangeEffects table<LayerName, UnitBlueprintEffects>  Effects displayed when the unit changes layers (e.g. when an aircraft lands or takes off). Defines for what transition the effects are created. 'string' is composed of 2 names of layers, first one is the old layer and the second is the new one. E.g.effects are needed for an aircraft landing, so the old layer is Air and the new one is Land, then the 'string' will be AirLand (LandAir would be the opposite - take off). Note: there is NO space between layer names.
+---@field IdleEffects table<Layer, UnitBlueprintEffects>         Effects displayed when the unit is idle (e.g. glow beneath hovering units), multiple layers can be used. The key should be the name of the layer where effects should be displayed.
+---@field LayerChangeEffects table<Layer, UnitBlueprintEffects>  Effects displayed when the unit changes layers (e.g. when an aircraft lands or takes off). Defines for what transition the effects are created. 'string' is composed of 2 names of layers, first one is the old layer and the second is the new one. E.g.effects are needed for an aircraft landing, so the old layer is Air and the new one is Land, then the 'string' will be AirLand (LandAir would be the opposite - take off). Note: there is NO space between layer names.
 ---@field Mesh MeshBlueprint
 ---@field MeshBlueprint string
----@field MotionChangeEffects table<LayerName, UnitBlueprintEffects>
----@field MovementEffects table<LayerName, UnitBlueprintMovementEffects>   Effects displayed during movement of the unit. Key should be Name of the layer for which the effects are displayed.
+---@field MotionChangeEffects table<Layer, UnitBlueprintEffects>
+---@field MovementEffects table<Layer, UnitBlueprintMovementEffects>   Effects displayed during movement of the unit. Key should be Name of the layer for which the effects are displayed.
 ---@field PlaceholderMeshName string
 ---@field SpawnRandomRotation boolean
 ---@field Tarmacs any
@@ -410,4 +410,4 @@
 ---@field HealthMult number  the amount of health this wreck has so it can take damage from weapons that do area damage>
 ---@field MassMult number    the amount of mass you get when reclaiming expressed as a multiplier of the mass cost when it was alive>
 ---@field ReclaimTimeMultiplier number  the time it takes to reclaim this wreck expressed as a multiplier of the build time>
----@field WreckageLayers table<LayerName, boolean>
+---@field WreckageLayers table<Layer, boolean>

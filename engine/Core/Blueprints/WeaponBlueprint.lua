@@ -6,7 +6,9 @@
 -- according to the wiki, `WeaponBlueprint` might inherit `BpRackBone`
 
 ---@class WeaponBlueprint: Blueprint
----@field Audio SoundBlueprint               Informations about the audio files used by the weapon
+---@field AimControlPrecedence number        Priority of the weapon's aim controller (e.g. for determining unit facing)
+---@field ArtilleryShieldBlocks boolean      If the projectile is blocked by `AntiArtilleryShield`s
+---@field Audio table<string, SoundHandle>   Informations about the audio files used by the weapon
 ---@field AutoInitiateAttackCommand boolean  If the unit has no issued commands and has a weapon that has AutoInitiateAttackCommand set, then if it finds a suitable target it will issue an attack command to go after the target.
 ---@field BallisticArc WeaponBallisticArc    Ballistic arcs that should be used on the projectile
 ---@field BeamCollisionDelay number    Every X +.1 seconds, this beam will collide and do damage - use 0 so that beams will cause their damage every .1 second
@@ -21,18 +23,27 @@
 ---@field Damage number                Damage value
 ---@field DamageFriendly boolean       Should we damage friendly units
 ---@field DamageRadius number          Blast Radius
+---@field DamageToShields number       Damage to shields
 ---@field DamageType string            The type of damage the unit will do. 'Normal' will affect all units
+---@field DetonatesAtTargetHeight boolean If the projectile explodes when it reaches the height its target is at
 ---@field DisplayName string           Just for debugging. "dbg weapons" on the console shows the weapon names. Also some errors that we detect in script code will print the name of the weapon to help track down the issue.
+---@field DropBombShort number         Ratio of distance from the target that the bomb drops short (used for torpedo bombers)
 ---@field DoTPulses number             The number of times the damage will be dealt
 ---@field DoTTime number               Length of Time the Damage over Time (DoT) will last in seconds.
 ---@field DummyWeapon boolean          This instructs the engine not to create a C++ weapon object that is usually linked with the script object. This is for purely script driven weapons (like death weapons).
+---@field EnabledByEnhancement boolean If this weapon is enabled by an enhancement
+---@field EnergyChargeForFirstShot boolean If this weapon's first shot is free
 ---@field EnergyDrainPerSecond number  How much energy this weapon will drain per second
 ---@field EnergyRequired number        How much energy is required to fire this weapon
----@field FireTargetLayerCapsTable table<LayerName, FireTargetCategory>  FireTargetLayerCapsTable allows you to pick which layers you can target in relation to the layer that you are currently at
+---@field FireTargetLayerCapsTable table<Layer, FireTargetCategory>  FireTargetLayerCapsTable allows you to pick which layers you can target in relation to the layer that you are currently at
 ---@field FiringRandomness number    How much random inaccuracy should we be from the target
 ---@field FiringTolerance number     How much misalignment can the barrel be before starting to fire. Used when you are trying to target ammo that does not require lots of accuracy due to the size of their damage radius or because the ammo does automatic targetting
+---@field FixBombTrajectory boolean  Requests that the weapon projectiles' ballistic acceleration be corrected to hit the target
+---@field Flare WeaponBlueprintFlare Flare for the weapon 
 ---@field HeadingArcCenter number    Controls what the weapon is allowed to target in reference to the heading of the unit
 ---@field HeadingArcRange number     Controls what the weapon is allowed to target in reference to the arc center, this is degrees on either side
+---@field InitialDamage number       Damage the projectile impact does for DoT types
+---@field InitialProjectileStorage number Number of counted projectiles this weapon starts with
 ---@field Label string  Label is linking the blueprints (unitid_unit.bp) weapon information with the script (unitid_script.lua) weapon information. For example: blueprint: Weapon { Label = 'FrontTurret01', } script: Weapons = { FrontTurret01 = Class(TDFGaussCannonWeapon) {} }. If the Label doeas not match the weapon will not be workable.
 ---@field MaxRadius number           How far does the target need to be before we start firing
 ---@field MetaImpactAmount unknown   Deprecated attribute (Changing these will do nothing to the weapon)
@@ -43,12 +54,21 @@
 ---@field MuzzleVelocity number      Speed in which the projectile comes out of the muzzle. This speed is used in the ballistics calculations. If you weapon doesn't fire at its max radius, this may be too low
 ---@field MuzzleVelocityReduceDistance number  MuzzleVelocityReduceDistance was put there so weapons that have a high muzzle velocity because they have a huge range, like an artillery piece, wouldn't point right at something that's close, it'll slow down it's shot and still have a nice arc to it
 ---@field NeedPrep boolean             If NeedProp is true then whenever the unit aquires a new target and is ready to attack it it will first run the OnGotTarget script on the weapon.
+---@field NukeInnerRingDamage number   
+---@field NukeInnerRingRadius number
+---@field NukeInnerRingTicks number
+---@field NukeInnerRingTotalTime number
+---@field NukeOuterRingDamage number   
+---@field NukeOuterRingRadius number
+---@field NukeOuterRingTicks number
+---@field NukeOuterRingTotalTime number
 ---@field ProjectileId string          Blueprint of the projectile to fire
 ---@field ProjectileLifetime number    How long the projectile lives
 ---@field ProjectilesPerOnFire number  Deprecated attribute (Changing these will do nothing to the weapon)
 ---@field RackBones RackBoneBlueprint  Bone Used for Rack Recoil
 ---@field RackFireTogether boolean     Do all racks fire simultaneously?
 ---@field RackRecoilDistance number    Distance racks will recoil, Z axis, local coords
+---@field RackRecoilReturnSpeed number How fast the recoiled rack returns to it's position 
 ---@field RackReloadTimeout number     Seconds before the weapon will reload when it didn't go through all its racks
 ---@field RackSalvoChargeTime number   Time before the racks start firing
 ---@field RackSalvoFiresAfterCharge boolean     Does the racks immediately fire when charge is done or wait until next OnFire event?
@@ -56,6 +76,7 @@
 ---@field RackSalvoSize number        Number of times the racks will fire before its reload period
 ---@field RackSlavedToTurret boolean  All rack bones are slaved to the turret pitch bone?
 ---@field RateOfFire number           Rack firings per second. You can use decimals for fire rates that are longer than a second
+---@field RenderFireClock boolean     If the unit uses its progess bar to display the reload time
 ---@field TargetCheckInterval number                Interval of time between looking for a target
 ---@field TargetPriorities UnparsedCategory[]       Table of category strings that define the targetting order of this weapon.
 ---@field TargetRestrictDisallow UnparsedCategory   The categories that we will not allow to target
@@ -104,3 +125,9 @@
 ---@field TelescopeBone? string
 ---@field TelescopeRecoilDistance? number
 ---@field HideMuzzle? boolean
+
+---@class WeaponBlueprintFlare
+---@field Category? UnparsedCategory
+---@field OffsetMult? number
+---@field Radius number
+---@field Stack? boolean

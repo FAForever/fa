@@ -60,6 +60,7 @@ end
 
 ---
 ---@param muzzlebone Bone
+---@return Projectile
 function UnitWeapon:CreateProjectile(muzzlebone)
 end
 

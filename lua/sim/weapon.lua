@@ -49,13 +49,17 @@ end
 ---@field AimControl? moho.AimManipulator
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
+---@field AmbientSounds table<string, SoundHandle>
 ---@field Army Army
+---@field Audio table<string, SoundHandle>
 ---@field Blueprint WeaponBlueprint
 ---@field Brain AIBrain
 ---@field CollideFriendly boolean
 ---@field DamageMod number
 ---@field DamageRadiusMod number
+---@field damageTableCache? table cache of GetDamageTableInternal
 ---@field DisabledBuffs table
+---@field DisabledFiringBones? boolean
 ---@field EnergyRequired? number
 ---@field EnergyDrainPerSecond? number
 ---@field Label string
@@ -363,7 +367,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
-    ---@param sound SoundBlueprint
+    ---@param sound string
     PlayWeaponSound = function(self, sound)
         local weaponSound = self.Audio[sound]
         if not weaponSound then return end
@@ -371,7 +375,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
-    ---@param sound SoundBlueprint
+    ---@param sound string
     PlayWeaponAmbientSound = function(self, sound)
         local audio = self.Audio[sound]
         if not audio then return end
@@ -391,7 +395,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
-    ---@param sound SoundBlueprint
+    ---@param sound string
     StopWeaponAmbientSound = function(self, sound)
         local ambientSounds = self.AmbientSounds
         if not ambientSounds then return end
@@ -518,7 +522,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
-    ---@param priorities number
+    ---@param priorities? number
     SetWeaponPriorities = function(self, priorities)
         if priorities then
             if type(priorities[1]) == 'string' then
