@@ -132,10 +132,11 @@ UnitBlueprint {
         UniformScale = 0.25,
     },
     Economy = {
-        BuildCostEnergy = 30000,
-        BuildCostMass = 2400,
+        BuildCostEnergy = 3432,
+        BuildCostMass = 2660,
         BuildTime = 2575,
         MaintenanceConsumptionPerSecondEnergy = 2000,
+        DifferentialUpgradeCostCalculationCost = true;
         RebuildBonusIds = {
             'uab3104',
         },
