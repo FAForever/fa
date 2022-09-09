@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.PathDebugger_methods
 local CPathDebugger = {}
 

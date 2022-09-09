@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class UserUnit
 local UserUnit = {}
 

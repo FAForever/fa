@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.edit_methods : moho.control_methods
 local CMauiEdit = {}
 

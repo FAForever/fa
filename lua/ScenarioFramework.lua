@@ -5,7 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
----@class Dialogue : BpSound
+---@class Dialogue : SoundBlueprint
 ---@field duration number
 ---@field text string
 ---@field vid string
@@ -24,21 +24,27 @@
 ---@field [4] string faction
 
 
-local CategoryToString = import('/lua/sim/CategoryUtils.lua').ToString
+local CategoryToString = import('/lua/sim/categoryutils.lua').ToString
 local Cinematics = import('/lua/cinematics.lua')
 local Game = import('/lua/game.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local SimCamera = import('/lua/SimCamera.lua').SimCamera
-local SimUIVars = import('/lua/sim/SimUIState.lua')
+local ScenarioPlatoonAI = import('/lua/scenarioplatoonai.lua')
+local ScenarioUtils = import('/lua/sim/scenarioutilities.lua')
+local SimCamera = import('/lua/simcamera.lua').SimCamera
+local SimUIVars = import('/lua/sim/simuistate.lua')
 local TriggerFile = import('/lua/scenariotriggers.lua')
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local VizMarker = import('/lua/sim/vizmarker.lua').VizMarker
 
-Objectives = import('/lua/SimObjectives.lua')
-PingGroups = import('/lua/SimPingGroup.lua')
+Objectives = import('/lua/simobjectives.lua')
+PingGroups = import('/lua/simpinggroup.lua')
+
+---@class Team
+---@field ArmyCount number
+---@field Armies string[] names of armies in team
+---@field LastRecallVoteTime number game tick of last recall vote
 
 
 local PauseUnitDeathActive = false
+
 
 --- Causes the game to exit immediately
 function ExitGame()
@@ -623,21 +629,23 @@ function SetupMFDSync(movieTable, text)
 
     local tempText = LOC(text)
     local tempData = {}
-    local nameStart = string.find(tempText, ']')
+    local nameStart = tempText:find(']')
     if nameStart ~= nil then
-        tempData.name = LOC("<LOC "..string.sub(tempText, 2, nameStart - 1)..">")
-        tempData.text = string.sub(tempText, nameStart + 2)
+        tempData.name = LOC("<LOC " .. tempText:sub(2, nameStart - 1) .. ">")
+        tempData.text = tempText:sub(nameStart + 2)
     else
         tempData.name = "INVALID NAME"
         tempData.text = tempText
         LOG("ERROR: Unable to find name in string: " .. text .. " (" .. tempText .. ")")
     end
     -- `GetGameTime()` would be the perfect thing to use here--unfortunately, that's sim-side only
-    local time = GetGameTimeSeconds()
-    local hours = math.floor(time / 3600)
-    local minutes = math.mod(time, math.floor(time / 60), 60)
-    local seconds = math.mod(time, 60)
-    tempData.time = string.format("%02d:%02d:%02d", hours, minutes, seconds)
+    local seconds = GetGameTimeSeconds()
+    local MathFloor = math.floor
+    local hours = MathFloor(seconds / 3600)
+    seconds = seconds - hours * 3600
+    local minutes = MathFloor(seconds / 60)
+    seconds = seconds - minutes * 60
+    tempData.time = ("%02d:%02d:%02d"):format(hours, minutes, seconds)
     if movieTable[4] == 'UEF' then
         tempData.color = 'ff00c1ff'
     elseif movieTable[4] == 'Cybran' then
@@ -787,7 +795,7 @@ function EndGameWaitThread(callback)
 end
 
 --- Plays an XACT sound if needed--currently all VOs are videos
----@param voSound BpSound
+---@param voSound SoundBlueprint
 function PlayVoiceOver(voSound)
     table.insert(Sync.Voice, voSound)
 end
@@ -831,7 +839,7 @@ end
 
 ---
 ---@param brain string
----@param unit Unit
+---@param unit string
 ---@param effect string
 ---@param name? string | true # if `true`, uses the brain's nickname
 ---@param pauseAtDeath? boolean
@@ -922,6 +930,33 @@ function FakeTeleportUnit(unit, killUnit)
 
     if killUnit then
         unit:Destroy()
+    end
+end
+
+--- Run teleport effect then delete unit if told to do so
+---@param units Unit
+---@param killUnits boolean
+function FakeTeleportUnits(units, killUnits)
+    IssueStop(units)
+    IssueClearCommands(units)
+    for _, unit in units do
+        unit.CanBeKilled = false
+        unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
+        unit:PlayUnitSound('GateCharge')
+    end
+    WaitSeconds(2)
+
+    for _, unit in units do
+        unit:CleanupTeleportChargeEffects()
+        unit:PlayTeleportOutEffects()
+        unit:PlayUnitSound('GateOut')
+    end
+    WaitSeconds(1)
+
+    if killUnits then
+        for _, unit in units do
+            unit:Destroy()
+        end
     end
 end
 
@@ -1751,16 +1786,17 @@ end
 
 ---
 ---@param unit Unit
----@param track Unit
----@param time number
+---@param track? boolean
+---@param time? number
 function MidOperationCamera(unit, track, time)
-    ForkThread(OperationCameraThread, unit:GetPosition(), unit:GetHeading(), false, track, unit, true, time)
+    ForkThread(OperationCameraThread, unit:GetPosition(), unit:GetHeading(), false, track, unit, time, time)
 end
 
 ---
 ---@param unit Unit
----@param track Unit
-function EndOperationCamera(unit, track)
+---@param track? boolean
+---@param time? number
+function EndOperationCamera(unit, track, time)
     local faction
     if EntityCategoryContains(categories.COMMAND, unit) then
         local categories = unit.Blueprint.CategoriesHash
@@ -1774,7 +1810,7 @@ function EndOperationCamera(unit, track)
             faction = 4
         end
     end
-    ForkThread(OperationCameraThread, unit:GetPosition(), unit:GetHeading(), faction, track, unit)
+    ForkThread(OperationCameraThread, unit:GetPosition(), unit:GetHeading(), faction, track, unit, time, time)
 end
 
 ---

@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.WldUIProvider_methods
 local CLuaWldUIProvider = {}
 

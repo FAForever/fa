@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.control_methods
 local CMauiControl = {}
 

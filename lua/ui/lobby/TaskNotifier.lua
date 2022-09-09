@@ -33,6 +33,7 @@
 -- end
 
 function Create()
+    ---@class TaskNotifier
     return {
         tasks = {},
         currentUpdate = 0,
