@@ -4549,11 +4549,12 @@ CSGTestSpinner3 = {
     EmtBpPath .. '_test_gatecloud_07_emit.bp',
 }
 
--- SACU effects
-
+-- ------------------------------------------------------------------------------
+-- SACU effects --
+-- ------------------------------------------------------------------------------
 SCUEdge = {
-    EmtBpPath .. 'Aeon_GlowingShockwaveEdgeThin.bp',
-    EmtBpPath .. 'Aeon_SCU_Smoke_Ring.bp',
+    EmtBpPath .. 'aeon_glowingshockwaveedgethin.bp',
+    EmtBpPath .. 'aeon_scu_smoke_ring.bp',
 }
 
 SCUEdgeC = {

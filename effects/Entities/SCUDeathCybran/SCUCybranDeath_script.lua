@@ -1,12 +1,6 @@
---****************************************************************************
---**
---**  File     :  /effects/Entities/SCUDeath01/SCUDeath01_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  SCU Death Explosion
---**
---**  Copyright � 2005,2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------
+--  Summary  : Cybran SCU Death Explosion
+------------------------------------------------------------------------------
 
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -19,16 +13,16 @@ SCUDeath01 = Class(NullShell) {
     OnCreate = function(self)
         NullShell.OnCreate(self)
         local myBlueprint = self:GetBlueprint()
-            
+
         -- Play the "NukeExplosion" sound
         if myBlueprint.Audio.NukeExplosion then
             self:PlaySound(myBlueprint.Audio.NukeExplosion)
         end
-		
+
 		-- Create thread that spawns and controls effects
         self:ForkThread(self.EffectThread)
     end,
-     
+
     PassDamageData = function(self, damageData)
         NullShell.PassDamageData(self, damageData)
         local instigator = self:GetLauncher()
@@ -39,7 +33,7 @@ SCUDeath01 = Class(NullShell) {
         -- Do Damage
         self:DoDamage( instigator, self.DamageData, nil )  
     end,
-    
+
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,
@@ -82,14 +76,14 @@ SCUDeath01 = Class(NullShell) {
         WaitSeconds(0.1)
         DamageRing(self, position, 0.1, 15, 1, 'Force', true)
     end,
-	
+
     -- Effects attached to moving nuke projectile plume
     PlumeEffects = {'/effects/emitters/empfluxwarhead_concussion_ring_02_emit.bp',
                     '/effects/emitters/empfluxwarhead_01_emit.bp',
                     '/effects/emitters/empfluxwarhead_02_emit.bp',
                     '/effects/emitters/empfluxwarhead_03_emit.bp'},
 
-    -- Effects not attached but created at the position of CIFEMPFluxWarhead02
+        -- Effects not attached but created at the position of CIFEMPFluxWarhead02
     NormalEffects = {'/effects/emitters/empfluxwarhead_concussion_ring_01_emit.bp',
                      '/effects/emitters/empfluxwarhead_fallout_01_emit.bp'},
 
@@ -123,7 +117,7 @@ SCUDeath01 = Class(NullShell) {
                 :SetVelocity(velocity):SetAcceleration(Deceleration)
         end
     end,
-	
+
     StarCloudDispersal = function(self)
         local numProjectiles = 3
         local angle = (2*math.pi) / numProjectiles
@@ -203,8 +197,6 @@ SCUDeath01 = Class(NullShell) {
         plume:SetScaleVelocity(0.077 * scale,0.077 * scale,0.077 * scale)
         WaitSeconds(1)
     end,
-    
 }
 
 TypeClass = SCUDeath01
-

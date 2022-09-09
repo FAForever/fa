@@ -1,12 +1,6 @@
---****************************************************************************
---**
---**  File     :  /effects/Entities/SCUDeath01/SCUDeath01_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  SCU Death Explosion
---**
---**  Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------
+--  Summary  : UEF SCU Death Explosion
+------------------------------------------------------------------------------
 
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -18,16 +12,16 @@ SCUDeath01 = Class(NullShell) {
     OnCreate = function(self)
         NullShell.OnCreate(self)
         local myBlueprint = self:GetBlueprint()
-            
+
         -- Play the "NukeExplosion" sound
         if myBlueprint.Audio.NukeExplosion then
             self:PlaySound(myBlueprint.Audio.NukeExplosion)
         end
-		
+
 		-- Create thread that spawns and controls effects
         self:ForkThread(self.EffectThread)
     end,
-     
+
     PassDamageData = function(self, damageData)
         NullShell.PassDamageData(self, damageData)
         local instigator = self:GetLauncher()
@@ -38,7 +32,7 @@ SCUDeath01 = Class(NullShell) {
         -- Do Damage
         self:DoDamage( instigator, self.DamageData, nil )  
     end,
-    
+
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,
@@ -69,7 +63,7 @@ SCUDeath01 = Class(NullShell) {
         WaitSeconds(0.1)
         DamageRing(self, position, 0.1, 15, 1, 'Force', true)
     end,
-    
+
     CreateOuterRingWaveSmokeRing = function(self)
         local sides = 10
         local angle = (2*math.pi) / sides
@@ -91,8 +85,7 @@ SCUDeath01 = Class(NullShell) {
         for k, v in projectiles do
             v:SetAcceleration(-0.45)
         end         
-    end,    
+    end,
 }
 
 TypeClass = SCUDeath01
-

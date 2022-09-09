@@ -839,7 +839,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 0,
-            ProjectileId = '/effects/entities/SCUDeathA/SCUDeathA_proj.bp',
+            ProjectileId = '/effects/entities/SCUDeathAeon/SCUDeathAeon_proj.bp',
             RackBones = {
                 {
                     MuzzleBones = {

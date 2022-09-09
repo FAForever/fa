@@ -1,12 +1,6 @@
---****************************************************************************
---**
---**  File     :  /effects/Entities/SCUDeath01/SCUDeath01_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  SCU Death Explosion
---**
---**  Copyright � 2005,2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------
+--  Summary  :  Seraphim SCU Death Explosion
+------------------------------------------------------------------------------
 
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -32,7 +26,7 @@ SCUDeath01 = Class(NullShell) {
 		-- Create thread that spawns and controls effects
         self:ForkThread(self.EffectThread)
     end,
-     
+
     PassDamageData = function(self, damageData)
         NullShell.PassDamageData(self, damageData)
         local instigator = self:GetLauncher()
@@ -43,7 +37,7 @@ SCUDeath01 = Class(NullShell) {
         -- Do Damage
         self:DoDamage( instigator, self.DamageData, nil )  
     end,
-    
+
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,
@@ -67,20 +61,20 @@ SCUDeath01 = Class(NullShell) {
         WaitSeconds(0.1)
         DamageRing(self, position, 0.1, 15, 1, 'Force', true)
     end,
-    
+
     CreateInitialHit = function( self, army )
         for k, v in EffectTemplate.SIFSerSCUHit01 do
             emit = CreateEmitterAtEntity(self,army,v)
         end
     end,
-    
+
     CreateInitialBuildup = function( self, army )
 		WaitSeconds(2.0)
         for k, v in EffectTemplate.SIFSerSCUHit02 do
             emit = CreateEmitterAtEntity(self,army,v)
         end
     end,
-	
+
     MainBlast = function( self, army )
 		WaitSeconds(5.00)
 		
@@ -137,7 +131,7 @@ SCUDeath01 = Class(NullShell) {
             proj:SetAcceleration(-0.35)
         end
     end,
-    
+
     CreateGroundFingers = function(self)
 		WaitSeconds(1.0)
         -- outward rushing fingers that spawn the upward fingers
@@ -156,7 +150,7 @@ SCUDeath01 = Class(NullShell) {
             proj:SetVelocity(5.0)
         end
     end,
-    
+
     CreateInitialFingers = function(self)
 		WaitSeconds(3.0)
         -- upward rising fingers that join to form explosion
@@ -177,7 +171,7 @@ SCUDeath01 = Class(NullShell) {
             proj:SetBallisticAcceleration(-5.0)
         end
     end,
-    
+
     CreatePlumes = function(self)
         -- Create fireball plumes to accentuate the explosive detonation
         local num_projectiles = 5
@@ -203,4 +197,3 @@ SCUDeath01 = Class(NullShell) {
 }
 
 TypeClass = SCUDeath01
-

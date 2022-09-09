@@ -881,7 +881,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 0,
-            ProjectileId = '/effects/Entities/SACUCybranDeath/SACUCybranDeath_proj.bp',
+            ProjectileId = '/effects/Entities/SCUDeathCybran/SCUCybranDeath_proj.bp',
             RackBones = {
                 {
                     MuzzleBones = {
