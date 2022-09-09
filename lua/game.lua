@@ -93,25 +93,24 @@ local bps = {
 -- Function for converting categories to string
 local ToString = import('/lua/sim/CategoryUtils.lua').ToString
 
---- Gets army index for specified army name
---- e.g. GetArmyIndex('ARMY_1') -> 1
----@param armyName Army
+-- Gets army index for specified army name
+-- e.g. GetArmyIndex('ARMY_1') -> 1
+---@param army Army
 ---@return number
-function GetArmyIndex(armyName)
-    local index = nil
-    if type(armyName) == 'number' then
-        index = armyName
-    elseif type(armyName) == 'string' then
-        if ScenarioInfo.ArmySetup[armyName] then
-            index = ScenarioInfo.ArmySetup[armyName].ArmyIndex
+function GetArmyIndex(army)
+    local armyType = type(army)
+    if armyType == 'number' then
+        return army
+    elseif armyType == 'string' then
+        local armySetup = ScenarioInfo.ArmySetup[army]
+        if armySetup then
+            army = armySetup.ArmyIndex
+            if army then
+                return army
+            end
         end
     end
-
-    if index == nil then
-        error('ERROR cannot find army index for army name: "' .. tostring(armyName) ..'"')
-    end
-
-    return index
+    error('ERROR cannot find army index for army name: "' .. tostring(army) ..'"')
 end
 
 --- Adds restriction of units with specified Entity categories, e.g. 'categories.TECH2 * categories.AIR'

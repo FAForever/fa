@@ -28,67 +28,65 @@ local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnershi
 local TransferUnfinishedUnitsAfterDeath = import('/lua/SimUtils.lua').TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
-local Factions = import('/lua/factions.lua').GetFactions(true)
-
 -- upvalue for performance
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
-
-
 local CoroutineYield = coroutine.yield
 
----@alias AIResult "defeat"|"draw"|"victor"
----@alias HqTech "TECH2"|"TECH3"
----@alias HqLayer "LAND"|"AIR"|"NAVY"
----@alias HqFaction "AEON"|"UEF"|"SERAPHIM"|"CYBRAN"|"NOMADS"
----@alias BrainState "Defeat" | "Victory" | "InProgress" | "Draw"
+local Factions = import('/lua/factions.lua').GetFactions(true)
 
+---@alias AIResult "defeat" | "draw" | "victor"
+---@alias HqTech "TECH2" | "TECH3"
+---@alias HqLayer "AIR" | "LAND" | "NAVY"
+---@alias HqFaction "UEF" | "AEON" | "CYBRAN" | "SERAPHIM" | "NOMADS"
+---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
+---@alias BrainType "AI" | "Human"
 ---@class AIBrain: moho.aibrain_methods
----@field Trash TrashBag
----@field Result AIResult|nil
----@field UnitStats table<UnitId, table<string, number>>
----@field Name string
----@field AIPlansList table<number,table<number, string>>
----@field HQs table<HqFaction, table<HqLayer, table<HqTech, number>>>
+---@field AIPlansList string[][]
+---@field AirAttackPoints? table
+---@field AttackData AttackManager
+---@field AttackManager AttackManager
+---@field AttackPoints? table
+---@field BaseMonitor AiBaseMonitor
+---@field BrainType BrainType
+---@field BuilderManagers table<string, table>
+---@field ConditionsMonitor BrainConditionsMonitor
+---@field ConstantEval boolean
+---@field CurrentPlan string lua file which contains plan
+---@field CurrentPlanScript table
+---@field EconomyCurrentTick number
+---@field EconomyData {EnergyIncome: number, EnergyRequested: number, MassIncome: number, MassRequested: number}[]
+---@field EnergyExcessThread thread
 ---@field EnergyExcessUnitsEnabled table<EntityId, MassFabricationUnit>
 ---@field EnergyExcessUnitsDisabled table<EntityId, MassFabricationUnit>
 ---@field EnergyDependingUnits Shield[]
 ---@field EnergyDependingUnitsHead number
----@field TriggerList table
----@field IntelTriggerList table
----@field UnitBuiltTriggerList table
----@field VeterancyTriggerList table
----@field PingCallbackList table
----@field BuilderManagers table<string, table>
----@field ConditionsMonitor BrainConditionsMonitor
----@field BrainType "AI"|"Human"
----@field LayerPref "LAND"|"AIR"
----@field ConstantEval boolean
----@field CurrentPlan string lua file which contains plan
----@field RepeatExecution boolean
----@field CurrentPlanScript table
----@field BaseMonitor AiBaseMonitor
----@field SelfMonitor AiSelfMonitor
 ---@field EconomyTicksMonitor number
----@field EconomyCurrentTick number
----@field Sorian boolean
----@field EconomyData table<number, {EnergyIncome:number, EnergyRequested:number, MassIncome:number, MassRequested:number}>
----@field AttackManager AttackManager
----@field AttackData AttackManager
----@field PBM AiPlatoonBuildManager
 ---@field HasPlatoonList boolean
----@field PlatoonNameCounter table<string, number>|nil
----@field T4ThreatFound table|nil
----@field AttackPoints table|nil
----@field AirAttackPoints table|nil
----@field TacticalBases table|nil
----@field EnergyExcessThread thread
----@field IntelData table<string, number>|nil
----@field targetoveride boolean
+---@field HQs table<HqFaction, table<HqLayer, table<HqTech, number>>>
+---@field IntelData? table<string, number>
+---@field IntelTriggerList table
+---@field LayerPref "LAND" | "AIR"
+---@field Name string
+---@field PBM AiPlatoonBuildManager
+---@field PingCallbackList table
+---@field PlatoonNameCounter? table<string, number>
+---@field RepeatExecution boolean
+---@field Result? AIResult
+---@field SelfMonitor AiSelfMonitor
+---@field Sorian boolean
 ---@field Status BrainState
+---@field T4ThreatFound? table
+---@field TacticalBases? table
+---@field targetoveride boolean
+---@field Team number The team this brain's army belongs to. Note that games with unlocked teams behave like free-for-alls.
+---@field Trash TrashBag
+---@field TriggerList table
+---@field UnitBuiltTriggerList table
+---@field UnitStats table<UnitId, table<string, number>>
+---@field VeterancyTriggerList table
 AIBrain = Class(moho.aibrain_methods) {
-
     -- The state of the brain in the match
     Status = 'InProgress',
 
@@ -1068,9 +1066,183 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    OnRecalled = function(self)
+        self.Status = "Recalled"
+
+        local army = self.Army
+        import("/lua/simutils.lua").UpdateUnitCap(army)
+        import("/lua/simping.lua").OnArmyDefeat(army)
+
+        -- AI
+        if self.BrainType == "AI" then
+            -- print AI "ilost" text to chat
+            SUtils.AISendChat("enemies", ArmyBrains[army].Nickname, "ilost")
+            -- remove PlatoonHandle from all AI units before we kill / transfer the army
+            local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+            if units and units[1] then
+                local halt = 0
+                local haltUnits = {}
+                for _, unit in units do
+                    if not unit.Dead then
+                        local handle = unit.PlatoonHandle
+                        if handle and self:PlatoonExists(handle) then
+                            handle:Stop()
+                            handle:PlatoonDisbandNoAssign()
+                        end
+                        halt = halt + 1
+                        haltUnits[halt] = unit
+                    end
+                end
+                IssueStop(haltUnits)
+                IssueClearCommands(haltUnits)
+            end
+
+            -- Stop the AI from executing AI plans
+            self.RepeatExecution = false
+
+            -- removing AI BrainConditionsMonitor
+            if self.ConditionsMonitor then
+                self.ConditionsMonitor:Destroy()
+            end
+
+            -- removing AI BuilderManagers
+            if self.BuilderManagers then
+                for _, v in self.BuilderManagers do
+                    local manager = v.EngineerManager
+                    manager:SetEnabled(false)
+                    manager:Destroy()
+                    manager = v.FactoryManager
+                    manager:SetEnabled(false)
+                    manager:Destroy()
+                    manager = v.PlatoonFormManager
+                    manager:SetEnabled(false)
+                    manager:Destroy()
+                    manager = v.StrategyManager
+                    if manager then
+                        manager:SetEnabled(false)
+                        manager:Destroy()
+                    end
+                    v.EngineerManager = nil
+                    v.FactoryManager = nil
+                    v.PlatoonFormManager = nil
+                    v.BaseSettings = nil
+                    v.BuilderHandles = nil
+                    v.Position = nil
+                end
+            end
+            -- delete the AI pathcache
+            self.PathCache = nil
+        end
+
+        local enemies, civilians = {}, {}
+
+        -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
+        local function TransferUnitsToBrain(brains)
+            if brains[1] then
+                local cat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
+                for _, brain in brains do
+                    local units = self:GetListOfUnits(cat, false)
+                    if units and units[1] then
+                        local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
+
+                        -- only show message when we actually gift that player some units
+                        if givenUnitCount > 0 then
+                            Sync.ArmyTransfer = { {
+                                from = army,
+                                to = brain.index,
+                                reason = "fullshare",
+                            } }
+                        end
+
+                        WaitSeconds(1)
+                    end
+                end
+            end
+        end
+
+        -- Sort the destiniation brains (armies/players) by rating (and if rating does not exist (such as with regular AI's), by score, after players with positive rating)
+        local function TransferUnitsToHighestBrain(brains)
+            if not table.empty(brains) then
+                local ratings = ScenarioInfo.Options.Ratings
+                for _, brain in brains do
+                    if ratings[brain.Nickname] then
+                        brain.rating = ratings[brain.Nickname]
+                    else
+                        -- if there is no rating, create a fake negative rating based on score
+                        brain.rating = -1 / brain.score
+                    end
+                end
+                -- sort brains by rating
+                table.sort(brains, function(a, b) return a.rating > b.rating end)
+                TransferUnitsToBrain(brains)
+            end
+        end
+
+        -- Sort brains out into mutually exclusive categories
+        for index, brain in ArmyBrains do
+            brain.index = index
+            brain.score = CalculateBrainScore(brain)
+
+            if not brain:IsDefeated() and army ~= index then
+                if ArmyIsCivilian(index) then
+                    table.insert(civilians, brain)
+                elseif IsEnemy(army, brain:GetArmyIndex()) then
+                    table.insert(enemies, brain)
+                end
+            end
+        end
+
+        -- This part determines the share condition
+
+        local shareOption = ScenarioInfo.Options.Share
+        if shareOption == 'CivilianDeserter' then
+            TransferUnitsToBrain(civilians)
+        elseif shareOption == 'Defectors' then
+            TransferUnitsToHighestBrain(enemies)
+        end
+
+        -- Kill all units left over
+        local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+        if tokill then
+            for _, unit in tokill do
+                unit:Kill()
+            end
+        end
+
+        local trash = self.Trash
+        if trash then
+            trash:Destroy()
+        end
+    end;
+
+    ---@param self AIBrain
     IsDefeated = function(self)
-        return self.Status == "Defeat"
+        local status = self.Status
+        return status == "Defeat" or status == "Recalled"
     end,
+
+    ---@param self AIBrain
+    RecallAllCommanders = function(self, camera)
+        local commandCat = categories.COMMAND + categories.SUBCOMMANDER
+        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false), camera)
+    end;
+
+    ---@param self AIBrain
+    ---@param recallingUnits Unit[]
+    RecallArmyThread = function(self, recallingUnits, camera)
+        if recallingUnits then
+            local ScenarioFramework = import("/lua/scenarioframework.lua")
+            -- if camera then
+            --     local cdr = self:GetCommander()
+            --     if cdr then
+            --         ScenarioFramework.EndOperationCamera(cdr, true, 3.5)
+            --     end
+            -- end
+            ScenarioFramework.FakeTeleportUnits(recallingUnits, true)
+        end
+        --SPEW("Recalling army brain " .. self.Nickname .. " (" .. (camera and "with camera)" or "no camera)"))
+        self:OnRecalled()
+    end;
 
     ---@param self AIBrain
     ---@param bestPlan string
@@ -4529,4 +4701,24 @@ AIBrain = Class(moho.aibrain_methods) {
         -- retrieve units, excluding insignificant units
         return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
     end,
+
+    ---@param self AIBrain
+    ---@return CommandUnit | nil
+    GetCommander = function(self)
+        local cdr = self.CDR
+        if cdr and cdr:IsDead() then
+            cdr = nil
+        end
+        if not cdr then
+            local commanders = self:GetListOfUnits(categories.COMMANDER, false)
+            table.shuffle(commanders)
+            for _, commander in commanders do
+                if not commander:IsDead() then
+                    cdr = commander
+                    break
+                end
+            end
+        end
+        return cdr
+    end;
 }

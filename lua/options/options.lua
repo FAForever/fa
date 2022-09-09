@@ -342,6 +342,77 @@ options = {
                     },
                 },
             },
+
+            {
+                title = 'Commands',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "Ignore mode via CTRL",
+                key = 'commands_ignore_mode',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _On>", key = 'on'},
+                    },
+                },
+            },
+
+            {
+                title = 'Selection threshold',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "Default selection threshold",
+                tip = "this is a tip",
+                key = 'selection_threshold_regular',
+                type = 'slider',
+                default = 10,
+                custom = {
+                    min = 10,
+                    max = 200,
+                    inc = 10,
+                },
+            },
+
+            {
+                title = "Reclaim selection threshold",
+                tip = "this is a tip",
+                key = 'selection_threshold_reclaim',
+                type = 'slider',
+                default = 10,
+                custom = {
+                    min = 10,
+                    max = 200,
+                    inc = 10,
+                },
+            },
+
+            {
+                title = "Replay selection threshold",
+                tip = "this is a tip",
+                key = 'selection_threshold_replay',
+                type = 'slider',
+                default = 7,
+                custom = {
+                    min = 10,
+                    max = 400,
+                    inc = 10,
+                },
+            },
+
             {
                 title = "<LOC OPTIONS_0273>Automated Structure Ringing",
                 key = 'structure_capping_feature_01',

@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.text_methods : moho.control_methods
 local CMauiText = {}
 
