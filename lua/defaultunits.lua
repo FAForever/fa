@@ -2510,7 +2510,7 @@ CommandUnit = Class(WalkingLandUnit) {
     end,
 
     ---@param self CommandUnit
-    ---@param bones Bone
+    ---@param bones Bone[]
     WarpInEffectThread = function(self, bones)
         self:PlayUnitSound('CommanderArrival')
         self:CreateProjectile('/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)

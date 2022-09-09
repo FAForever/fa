@@ -32,7 +32,7 @@ local FormationPos = {} -- list to be returned
 local FormationCache = {}
 local MaxCacheSize = 30
 
----@param formationUnits Unit
+---@param formationUnits Unit[]
 ---@param formationType UnitFormations
 ---@return boolean
 function GetCachedResults(formationUnits, formationType)
@@ -61,7 +61,7 @@ function GetCachedResults(formationUnits, formationType)
 end
 
 ---@param results TLaserBotProjectile
----@param formationUnits Unit
+---@param formationUnits Unit[]
 ---@param formationType UnitFormations
 function CacheResults(results, formationUnits, formationType)
     if not FormationCache[formationType] then
@@ -703,7 +703,7 @@ end
 -- ================ THE GUTS ====================
 -- ============ Formation Functions =============
 -- ==============================================
----@param formationUnits Unit
+---@param formationUnits Unit[]
 ---@return table
 function AttackFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'AttackFormation')
@@ -761,7 +761,7 @@ function AttackFormation(formationUnits)
     return FormationPos
 end
 
----@param formationUnits Unit
+---@param formationUnits Unit[]
 ---@return table
 function GrowthFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'GrowthFormation')
@@ -837,7 +837,7 @@ function GrowthFormation(formationUnits)
     return FormationPos
 end
 
----@param formationUnits Unit
+---@param formationUnits Unit[]
 ---@return table
 function GuardFormation(formationUnits)
     -- Not worth caching GuardFormation because it's almost never called repeatedly with the same units.
@@ -926,7 +926,7 @@ function GuardFormation(formationUnits)
 end
 
 -- =========== LAND BLOCK BUILDING =================
----@param unitsList Unit[]
+---@param unitsList table
 ---@param formationBlock any
 ---@param categoryTable EntityCategory[]
 ---@param spacing? number defaults to 1
@@ -1054,7 +1054,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
     return FormationPos
 end
 
----@param unitsList Unit[]
+---@param unitsList table
 ---@param categoryTable EntityCategory[]
 ---@param currRowLen number
 ---@return number
@@ -1163,7 +1163,7 @@ function GetColSpot(rowLen, col)
 end
 
 -- ============ AIR BLOCK BUILDING =============
----@param unitsList Unit[]
+---@param unitsList table
 ---@param airBlock any
 ---@param spacing? number defaults to 1
 ---@return table
@@ -1272,8 +1272,8 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
     return FormationPos
 end
 
----@param unitsList Unit[]
----@param spacing spacing? number defaults to 1
+---@param unitsList table
+---@param spacing number? number defaults to 1
 ---@return table
 function BlockBuilderAirT3Bombers(unitsList, spacing)
     --This is modified copy of BlockBuilderAir(). This function is used only for t3 bombers.
@@ -1379,7 +1379,7 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
     return FormationPos
 end
 
----@param unitsList Unit[]
+---@param unitsList table
 ---@param airBlock any
 ---@return table
 function GetLargeAirPositions(unitsList, airBlock)
@@ -1476,7 +1476,7 @@ function GetChevronPosition(chevronPos, currCol, formationLen)
 end
 
 -- ========= UNIT SORTING ==========
----@param unitsList Unit[]
+---@param unitsList table
 ---@return any
 function CalculateSizes(unitsList)
     local largestFootprint = 1
@@ -1555,7 +1555,7 @@ function CalculateSizes(unitsList)
     return unitsList
 end
 
----@param formationUnits Unit
+---@param formationUnits Unit[]
 ---@return table
 function CategorizeUnits(formationUnits)
     local unitsList = {
