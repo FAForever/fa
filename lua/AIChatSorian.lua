@@ -34,7 +34,7 @@ function AIChat(group, text, sender)
     end
 end
 
----@param army number
+---@param army Army
 ---@return number[]
 function FindAllies(army)
     local t = GetArmiesTable()
@@ -47,7 +47,7 @@ function FindAllies(army)
     return result
 end
 
----@param army number
+---@param army Army
 ---@return number[]
 function FindEnemies(army)
     local t = GetArmiesTable()
@@ -80,8 +80,8 @@ function AISendChatMessage(towho, msg)
     end
 end
 
----@param army number
----@return table
+---@param army string
+---@return number|nil
 function GetArmyData(army)
     local armies = GetArmiesTable()
     local result
