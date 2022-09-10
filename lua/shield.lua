@@ -1390,3 +1390,6 @@ CzarShield = Class(PersonalShield) {
         self:SetCollisionShape('None')
     end,
 }
+
+-- kept for mod backwards compatibility
+UnitShield = PersonalShield

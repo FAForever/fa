@@ -129,6 +129,9 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
 
+    EnergyModifier = 0,
+    MassModifier = 0,
+
     ---@param self Unit
     ---@return any
     GetSync = function(self)
