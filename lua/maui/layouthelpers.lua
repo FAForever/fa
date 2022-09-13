@@ -414,7 +414,18 @@ function CenteredBelow(control, parent, padding)
     AnchorToBottom(control, parent, padding)
 end
 
--- Set to a corner inside the parent
+-- Set to a position inside the parent
+
+--- Places left edge of the control vertically centered inside of a parent's, with optional offsets.
+--- This sets the control's left and top edges.
+---@param control Control
+---@param parent Control
+---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
+function AtLeftCenterIn(control, parent, leftOffset, topOffset)
+    AtLeftIn(control, parent, leftOffset)
+    AtVerticalCenterIn(control, parent, topOffset)
+end
 
 --- Places top left corner of a control inside of a parent's, with optional offsets
 ---@param control Control
@@ -424,6 +435,18 @@ end
 function AtLeftTopIn(control, parent, leftOffset, topOffset)
     AtLeftIn(control, parent, leftOffset)
     AtTopIn(control, parent, topOffset)
+end
+
+--- Places top edge of the control horizontally centered inside of a parent's, with optional offsets.
+--- Sets the control's left and top edges.  
+--- Note the argument order.
+---@param control Control
+---@param parent Control
+---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
+---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+function AtTopCenterIn(control, parent, topOffset, leftOffset)
+    AtTopIn(control, parent, topOffset)
+    AtHorizontalCenterIn(control, parent, leftOffset)
 end
 
 --- Places top right corner of a control inside of a parent's, with optional offsets
@@ -436,6 +459,39 @@ function AtRightTopIn(control, parent, rightOffset, topOffset)
     AtTopIn(control, parent, topOffset)
 end
 
+--- Places right edge of the control vertically centered inside of a parent's, with optional offsets.
+--- Sets the control's right and top edges.
+---@param control Control
+---@param parent Control
+---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
+---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
+function AtRightCenterIn(control, parent, rightOffset, topOffset)
+    AtRightIn(control, parent, rightOffset)
+    AtVerticalCenterIn(control, parent, topOffset)
+end
+
+--- Places bottom right corner of a control inside of a parent's, with optional offsets
+---@param control Control
+---@param parent Control
+---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
+---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
+function AtRightBottomIn(control, parent, rightOffset, bottomOffset)
+    AtRightIn(control, parent, rightOffset)
+    AtBottomIn(control, parent, bottomOffset)
+end
+
+--- Places bottom edge of the control horizontally centered inside of a parent's, with optional offsets.
+--- Sets the control's left and bottom edges.  
+--- Note the argument order.
+---@param control Control
+---@param parent Control
+---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
+function AtBottomCenterIn(control, parent, bottomOffset, leftOffset)
+    AtBottomIn(control, parent, bottomOffset)
+    AtHorizontalCenterIn(control, parent, leftOffset)
+end
+
 --- Places bottom left corner of a control inside of a parent's, with optional offsets
 ---@param control Control
 ---@param parent Control
@@ -443,16 +499,6 @@ end
 ---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
 function AtLeftBottomIn(control, parent, leftOffset, bottomOffset)
     AtLeftIn(control, parent, leftOffset)
-    AtBottomIn(control, parent, bottomOffset)
-end
-
---- Places bottom right corner of a control inside of its parent's, with optional offsets
----@param control Control
----@param parent Control
----@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
----@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
-function AtRightBottomIn(control, parent, rightOffset, bottomOffset)
-    AtRightIn(control, parent, rightOffset)
     AtBottomIn(control, parent, bottomOffset)
 end
 
@@ -853,7 +899,7 @@ function LayouterMetaTable:Texture(texture, border)
 end
 
 --- Enables the control's hit test
----@param isRecursive boolean
+---@param isRecursive? boolean
 ---@return Layouter
 function LayouterMetaTable:EnableHitTest(isRecursive)
     self.c:EnableHitTest(isRecursive)
@@ -861,7 +907,7 @@ function LayouterMetaTable:EnableHitTest(isRecursive)
 end
 
 --- Disables the control's hit test
----@param isRecursive boolean
+---@param isRecursive? boolean
 ---@return Layouter
 function LayouterMetaTable:DisableHitTest(isRecursive)
     self.c:DisableHitTest(isRecursive)
@@ -921,7 +967,7 @@ function LayouterMetaTable:Bottom(bottom)
 end
 
 --- Sets the width of the control
----@param width lazyvarType #if a number, width will be scaled by the pixel factor
+---@param width lazyvarType if a number, width will be scaled by the pixel factor
 ---@return Layouter
 function LayouterMetaTable:Width(width)
     if iscallable(width) then
@@ -1022,7 +1068,6 @@ end
 
 --- Centers the control vertically on a parent, with optional downward offset.
 --- This sets the control's top edge.
----@param control Control
 ---@param parent Control
 ---@param topOffset? number Offset of the control's top edge in the downward direction, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
@@ -1224,8 +1269,7 @@ end
 ---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtLeftCenterIn(parent, leftOffset, topOffset)
-    AtLeftIn(self.c, parent, leftOffset)
-    AtVerticalCenterIn(self.c, parent, topOffset)
+    AtLeftCenterIn(self.c, parent, leftOffset, topOffset)
     return self
 end
 
@@ -1247,12 +1291,11 @@ end
 ---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtTopCenterIn(parent, topOffset, leftOffset)
-    AtTopIn(self.c, parent, topOffset)
-    AtHorizontalCenterIn(self.c, parent, leftOffset)
+    AtTopCenterIn(self.c, parent, topOffset, leftOffset)
     return self
 end
 
---- Places top right corner of the control inside of its parent's, with optional offsets
+--- Places top right corner of the control inside of a parent's, with optional offsets
 ---@param parent Control
 ---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
 ---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
@@ -1269,8 +1312,7 @@ end
 ---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtRightCenterIn(parent, rightOffset, topOffset)
-    AtRightIn(self.c, parent, rightOffset)
-    AtVerticalCenterIn(self.c, parent, topOffset)
+    AtRightCenterIn(self.c, parent, rightOffset, topOffset)
     return self
 end
 
@@ -1292,8 +1334,7 @@ end
 ---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtBottomCenterIn(parent, bottomOffset, leftOffset)
-    AtBottomIn(self.c, parent, bottomOffset)
-    AtHorizontalCenterIn(self.c, parent, leftOffset)
+    AtBottomCenterIn(self.c, parent, bottomOffset, leftOffset)
     return self
 end
 
@@ -1419,12 +1460,12 @@ function LayouterMetaTable:End()
         WARN(string.format("Incorrect layout for \"%s\" Top-Height-Bottom", self.c:GetName()))
         WARN(debug.traceback())
     end
-    
+
     if not pcall(self.c.Left) or not pcall(self.c.Right) or not pcall(self.c.Width)  then
         WARN(string.format("Incorrect layout for \"%s\" Left-Width-Right", self.c:GetName()))
         WARN(debug.traceback())
     end
-    
+
     return self.c
 end
 

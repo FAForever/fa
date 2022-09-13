@@ -57,6 +57,13 @@ NinePatch = Class(Group) {
         self:DisableHitTest(true)
     end,
 
+    TotalWidth = function(self)
+        return self.l.Width() + self.Width() + self.r.Width()
+    end;
+    TotalHeight = function(self)
+        return self.t.Height() + self.Height() + self.b.Height()
+    end;
+
     -- Lay this NinePatch out around the given control
     Surround = function(self, control, horizontalPadding, verticalPadding)
         horizontalPadding = ScaleNumber(horizontalPadding)
@@ -65,5 +72,20 @@ NinePatch = Class(Group) {
         self.Right:Set(function() return control.Right() - horizontalPadding end)
         self.Top:Set(function() return control.Top() + verticalPadding end)
         self.Bottom:Set(function() return control.Bottom() - verticalPadding end)
-    end
+    end;
 }
+
+InitStd = function(self, parent, path)
+    local SkinnableFile = import("/lua/ui/uiutil.lua").SkinnableFile
+    NinePatch.__init(self, parent,
+        SkinnableFile(path .. "_brd_m.dds"),
+        SkinnableFile(path .. "_brd_ul.dds"),
+        SkinnableFile(path .. "_brd_ur.dds"),
+        SkinnableFile(path .. "_brd_ll.dds"),
+        SkinnableFile(path .. "_brd_lr.dds"),
+        SkinnableFile(path .. "_brd_vert_l.dds"),
+        SkinnableFile(path .. "_brd_vert_r.dds"),
+        SkinnableFile(path .. "_brd_horz_um.dds"),
+        SkinnableFile(path .. "_brd_lm.dds") -- yes, the suffix doesn't include `horz`
+    )
+end

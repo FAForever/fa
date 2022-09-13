@@ -162,6 +162,11 @@ end
 function GetCueBank(sound)
 end
 
+--- The current army number that the player has focused, or `-1` for none (i.e. observer)
+---@return number
+function GetFocusArmy()
+end
+
 --- Return game time in seconds
 ---@return number
 function GetGameTimeSeconds()
@@ -507,7 +512,7 @@ function WARN(out, ...)
 end
 
 --- Suspends the thread until the manipulator reaches its goal
----@param manipulator moho.manipulator_methods
+---@param manipulator moho.manipulator_methods | moho.EconomyEvent
 function WaitFor(manipulator)
 end
 
