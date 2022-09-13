@@ -61,7 +61,7 @@ end
 --- Creates an Aeon mercury pool build effect
 ---@param unitBeingBuilt Unit Unit to attach mercury pool to
 ---@param army integer
----@param bone string Bone to place pool at
+---@param bone Bone Bone to place pool at
 ---@param sx number Size x of the pool
 ---@param sy number Size y of the pool
 ---@param sz number Size z of the pool

@@ -229,7 +229,7 @@ end
 --- You can use `SpawnBuildBotsOpti` instead
 ---@param builder Unit
 ---@param unitBeingBuilt Unit
----@param buildEffectsBag any unused
+---@param buildEffectsBag TrashBag unused
 ---@return Unit[]?
 function SpawnBuildBots(builder, unitBeingBuilt, buildEffectsBag)
     -- Buildbots are scaled: ~ 1 pr 15 units of BP
