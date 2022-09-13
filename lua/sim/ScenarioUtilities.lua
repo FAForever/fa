@@ -610,10 +610,8 @@ function InitializeArmies()
 
             local econ = tblData.Economy
             SetArmyEconomy(strArmy, econ.mass, econ.energy)
-            -- If an actual starting position is defined, overwrite the randomly generated one
 
-            --brain:InitializePlatoonBuildManager()
-            --LoadArmyPBMBuilders(strArmy)
+            -- If an actual starting position is defined, overwrite the randomly generated one
             if brain.SkirmishSystems then
                 brain:InitializeSkirmishSystems()
             end
@@ -634,7 +632,7 @@ function InitializeArmies()
                 end
             end
 
-            local wreckageGroup = FindUnitGroup('WRECKAGE', setup.Units)
+            local wreckageGroup = FindUnitGroup('WRECKAGE', tblData.Units)
             if wreckageGroup then
 			    local _, tblResult, _ = CreatePlatoons(strArmy, wreckageGroup)
 				for _, unit in tblResult do
