@@ -135,8 +135,8 @@ UnitBlueprint {
         UniformScale = 0.011,
     },
     Economy = {
-        BuildCostEnergy = 2500,
-        BuildCostMass = 250,
+        BuildCostEnergy = 250,
+        BuildCostMass = 25,
         BuildRate = 25,
         BuildTime = 750,
     },
