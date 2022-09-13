@@ -30,6 +30,8 @@ local modifiersKeys = {}
 local worldview = import('/lua/ui/game/worldview.lua').viewLeft
 local oldHandleEvent = worldview.HandleEvent
 
+local sim = import('/engine/Sim.lua')
+local GetUnitBlueprintByName = sim.GetUnitBlueprintByName
 
 function initCycleButtons(values)
     local buttonH = 48
@@ -579,12 +581,45 @@ function buildActionUpgrade()
 
     for index, unit in selectedUnits do
         local bp = unit:GetBlueprint()
+        WARN(bp)
+        WARN(bp.BlueprintId)
+        WARN(upgradeTab[bp.BlueprintId])
+        WARN(bp.General.UpgradesTo)
         local cmd = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
+        -- local cmd2 = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
 
         SelectUnits({unit})
         local success = false
         if type(cmd) == "table" then -- Issue the first upgrade command that we may build
+            WARN("upgrade1")
             for k,v in cmd do
+                WARN(v)
+                WARN(GetUnitBlueprintByName(v))
+                local meh = GetUnitBlueprintByName(v)
+                WARN(meh)
+                WARN(meh.BlueprintId)
+                -- -- upgrade_of_upgrade = v.General.UpgradesTo
+                -- -- WARN(v.General.UpgradesTo)
+                -- -- WARN(upgradeTab[v.BlueprintId])
+                -- -- WARN(upgradeTab[v.BlueprintId][0])
+                -- -- WARN(upgradeTab[v.BlueprintId][1])
+                -- -- WARN(upgradeTab[v])
+                -- -- WARN(upgradeTab[v][0])
+                -- -- WARN(upgradeTab[v][1])
+                -- -- upgraded_unit = GetUnitById(v)
+                -- -- upgraded_bp = upgraded_unit:GetBlueprint()
+                -- -- WARN(v:GetUnitById())
+                -- WARN(upgraded_unit)
+                -- WARN(upgraded_bp)
+                -- WARN(upgraded_bp.General.UpgradesTo)
+                -- WARN(upgradeTab[upgraded_bp.BlueprintId])
+                -- WARN(upgradeTab[upgraded_bp.BlueprintId][0])
+                -- WARN(upgradeTab[upgraded_bp.BlueprintId][1])
+                -- -- if EntityCategoryContains(buildableCategories, upgrade_of_upgrade) then
+                -- --     IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgrade_of_upgrade, 1, false)
+                -- --     success = true
+                -- --     break
+                -- -- elseif EntityCategoryContains(buildableCategories, v) then
                 if EntityCategoryContains(buildableCategories, v) then
                     IssueBlueprintCommand("UNITCOMMAND_Upgrade", v, 1, false)
                     success = true
@@ -592,6 +627,8 @@ function buildActionUpgrade()
                 end
             end
         elseif type(cmd) == "string" then -- Direct upgrade path
+            WARN("upgrade2")
+            WARN(cmd)
             if EntityCategoryContains(buildableCategories, cmd) then
                 IssueBlueprintCommand("UNITCOMMAND_Upgrade", cmd, 1, false)
                 success = true
