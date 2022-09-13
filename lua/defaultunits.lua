@@ -39,7 +39,6 @@ StructureUnit = Class(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:HideLandBones()
-        self.AdjacentUnits = {}
         self.FxBlinkingLightsBag = {}
         if self.Layer == 'Land' and self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
@@ -612,6 +611,7 @@ StructureUnit = Class(Unit) {
         if not adjBuffs then return end
 
         -- There won't be any adjacentUnit if this is a producer just built...
+        reprsl(self.AdjacentUnits)
         if self.AdjacentUnits then
             for k, adjacentUnit in self.AdjacentUnits do
                 for k, v in AdjacencyBuffs[adjBuffs] do
