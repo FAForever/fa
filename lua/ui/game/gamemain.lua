@@ -155,6 +155,10 @@ function CreateUI(isReplay)
 
     import('/lua/system/performance.lua')
 
+    -- # Casting tools 
+
+    import('/lua/ui/game/casting/mouse.lua')
+
     -- # Overwrite some globals for performance / safety
 
     -- ensure logger is turned off for the average user
@@ -241,6 +245,7 @@ function CreateUI(isReplay)
     controls.mfd = mfdControl
 
     controls.mfp = import('/lua/ui/game/massfabs.lua').Create(statusClusterGroup)
+    controls.recall = import('/lua/ui/game/recall.lua').Create(statusClusterGroup)
 
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)

@@ -7,6 +7,7 @@
 ----[                                                                             ]--
 ----[  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.             ]--
 
+
 local TableGetn = table.getn
 
 --distributeTime
@@ -205,7 +206,7 @@ end
 ---@param strUnit string
 ---@param tblNode table
 ---@return table|nil
-function FindUnit(strUnit,tblNode)
+function FindUnit(strUnit, tblNode)
     if nil == tblNode then
         return nil
     end
@@ -214,7 +215,7 @@ function FindUnit(strUnit,tblNode)
 
     for strName, tblData in pairs(tblNode.Units) do
         if 'GROUP' == tblData.type then
-            tblResult = FindUnit(strUnit,tblData)
+            tblResult = FindUnit(strUnit, tblData)
         elseif strName == strUnit then
             tblResult = tblData
         end
@@ -234,8 +235,8 @@ end
 ---@return Unit|nil
 ---@return Platoon|nil
 ---@return table|nil
-function CreateArmyUnit(strArmy,strUnit)
-    local tblUnit = FindUnit(strUnit,Scenario.Armies[strArmy].Units)
+function CreateArmyUnit(strArmy, strUnit)
+    local tblUnit = FindUnit(strUnit, Scenario.Armies[strArmy].Units)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
@@ -381,7 +382,7 @@ end
 
 ---CreateInitialArmyGroup
 ---@param strArmy string
----@param createCommander Unit
+---@param createCommander? boolean
 ---@return Unit[]|nil
 ---@return boolean|Unit
 function CreateInitialArmyGroup(strArmy, createCommander)
@@ -532,7 +533,7 @@ function AnimateDeathThread(unit, deathAnim)
     local rate = unit.rate or 1
 
     if animBlock.AnimationRateMax and animBlock.AnimationRateMin then
-        rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) / 10
+        rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) * 0.1
     end
 
     animator:SetRate(rate)
@@ -576,52 +577,65 @@ end
 
 ---InitializeArmies
 function InitializeArmies()
-    local tblGroups = {}
-    local tblArmy = ListArmies()
+    -- globals to locals
+    local import = import
+    local GetArmyBrain = GetArmyBrain
+    local SetArmyEconomy = SetArmyEconomy
+    local SetArmyColor = SetArmyColor
+    local CreateInitialArmyGroup = CreateInitialArmyGroup
+    local FindUnitGroup = FindUnitGroup
+    local CreatePlatoons = CreatePlatoons
+    local CreateWreckageUnit = CreateWreckageUnit
+    local LocalSetAlliance = SetAlliance
 
+    local armySetups = ScenarioInfo.ArmySetup
     local civOpt = ScenarioInfo.Options.CivilianAlliance
+    local revealCivilians = ScenarioInfo.Options['RevealCivilians'] == 'Yes'
+    local scenarioArmies = Scenario.Armies
+    local tblArmy = ListArmies()
+    local shouldCreateInitial = ShouldCreateInitialArmyUnits()
 
-    local bCreateInitial = ShouldCreateInitialArmyUnits()
+    local tblGroups = {}
 
-    for iArmy, strArmy in pairs(tblArmy) do
-        local tblData = Scenario.Armies[strArmy]
+    for iArmy, strArmy in tblArmy do
+        local tblData = scenarioArmies[strArmy]
 
-        tblGroups[ strArmy ] = {}
+        tblGroups[strArmy] = {}
 
         if tblData then
-
-            ----[ If an actual starting position is defined, overwrite the        ]--
-            ----[ randomly generated one.                                         ]--
+            local setup = armySetups[strArmy]
+            local brain = GetArmyBrain(strArmy)
 
             --LOG('*DEBUG: InitializeArmies, army = ', strArmy)
 
-            SetArmyEconomy(strArmy, tblData.Economy.mass, tblData.Economy.energy)
+            local econ = tblData.Economy
+            SetArmyEconomy(strArmy, econ.mass, econ.energy)
 
-            --GetArmyBrain(strArmy):InitializePlatoonBuildManager()
-            --LoadArmyPBMBuilders(strArmy)
-            if GetArmyBrain(strArmy).SkirmishSystems then
-                GetArmyBrain(strArmy):InitializeSkirmishSystems()
+            -- If an actual starting position is defined, overwrite the randomly generated one
+            if brain.SkirmishSystems then
+                brain:InitializeSkirmishSystems()
             end
 
-            local armyIsCiv = ScenarioInfo.ArmySetup[strArmy].Civilian
+            local armyIsCiv = setup.Civilian
 
             if armyIsCiv and civOpt ~= 'neutral' and strArmy ~= 'NEUTRAL_CIVILIAN' then -- give enemy civilians darker color
                 SetArmyColor(strArmy, 255, 48, 48) -- non-player red color for enemy civs
             end
 
-            if (not armyIsCiv and bCreateInitial) or (armyIsCiv and civOpt ~= 'removed') then
-                local commander = (not ScenarioInfo.ArmySetup[strArmy].Civilian)
+            if (not armyIsCiv and shouldCreateInitial) or (armyIsCiv and civOpt ~= 'removed') then
+                local commander = not armyIsCiv
                 local cdrUnit
                 tblGroups[strArmy], cdrUnit = CreateInitialArmyGroup(strArmy, commander)
-                if commander and cdrUnit and ArmyBrains[iArmy].Nickname then
-                    cdrUnit:SetCustomName(ArmyBrains[iArmy].Nickname)
+                brain.CDR = cdrUnit
+                if commander and cdrUnit and brain.Nickname then
+                    cdrUnit:SetCustomName(brain.Nickname)
                 end
             end
 
-            local wreckageGroup = FindUnitGroup('WRECKAGE', Scenario.Armies[strArmy].Units)
+            local wreckageGroup = FindUnitGroup('WRECKAGE', tblData.Units)
             if wreckageGroup then
-			    local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup)
-				for num, unit in tblResult do
+			    local _, tblResult, _ = CreatePlatoons(strArmy, wreckageGroup)
+				for _, unit in tblResult do
 					CreateWreckageUnit(unit)
 				end
             end
@@ -629,7 +643,8 @@ function InitializeArmies()
             ----[ irumsey                                                         ]--
             ----[ Temporary defaults.  Make sure some fighting will break out.    ]--
             for iEnemy, strEnemy in tblArmy do
-                local enemyIsCiv = ScenarioInfo.ArmySetup[strEnemy].Civilian
+                local enemySetup = armySetups[strEnemy]
+                local enemyIsCiv = enemySetup.Civilian
                 local a, e = iArmy, iEnemy
                 local state = 'Enemy'
 
@@ -639,18 +654,18 @@ function InitializeArmies()
                             state = 'Neutral'
                         end
 
-                        if ScenarioInfo.Options['RevealCivilians'] == 'Yes' and ScenarioInfo.ArmySetup[strEnemy].Human then
+                        if revealCivilians and enemySetup.Human then
                             ForkThread(function()
-                                WaitSeconds(.1)
+                                WaitSeconds(0.1)
                                 local real_state = IsAlly(a, e) and 'Ally' or IsEnemy(a, e) and 'Enemy' or 'Neutral'
 
-                                GetArmyBrain(e):SetupArmyIntelTrigger({
-                                    Category=categories.ALLUNITS,
-                                    Type='LOSNow',
-                                    Value=true,
-                                    OnceOnly=true,
-                                    TargetAIBrain=GetArmyBrain(a),
-                                    CallbackFunction=function()
+                                brain:SetupArmyIntelTrigger({
+                                    Category = categories.ALLUNITS,
+                                    Type = 'LOSNow',
+                                    Value = true,
+                                    OnceOnly = true,
+                                    TargetAIBrain = brain,
+                                    CallbackFunction = function()
                                         SetAlliance(a, e, real_state)
                                     end,
                                 })
@@ -660,7 +675,7 @@ function InitializeArmies()
                     end
 
                     if state then
-                        SetAlliance(a, e, state)
+                        LocalSetAlliance(a, e, state)
                     end
                 end
             end
@@ -672,69 +687,101 @@ end
 
 ---InitializeScenarioArmies
 function InitializeScenarioArmies()
-    local tblGroups = {}
+    -- globals to locals
+    local import = import
+    local GetArmyBrain = GetArmyBrain
+    local SetArmyEconomy = SetArmyEconomy
+    local StringStartsWith = StringStartsWith
+    local SetArmyFactionIndex = SetArmyFactionIndex
+    local SetArmyColorIndex = SetArmyColorIndex
+    local SetArmyAIPersonality = SetArmyAIPersonality
+    local CreateInitialArmyGroup = CreateInitialArmyGroup
+    local CreatePlatoons = CreatePlatoons
+    local CreateWreckageUnit = CreateWreckageUnit
+    local SetAllianceOneWay = SetAllianceOneWay
+    local MathClamp = math.clamp
+    local LoadArmyPBMBuilders = LoadArmyPBMBuilders
+
+    local armySetups = ScenarioInfo.ArmySetup
+    local scenarioArmies = Scenario.Armies
     local tblArmy = ListArmies()
-    local factions = import('/lua/factions.lua')
-    local bCreateInitial = ShouldCreateInitialArmyUnits()
-    local armies = {}
-    for i, name in tblArmy do
-        armies[name] = i
-    end
+    local shouldCreateInitial = ShouldCreateInitialArmyUnits()
+    local factionCount = table.getsize(import('/lua/factions.lua').Factions)
 
     ScenarioInfo.CampaignMode = true
     Sync.CampaignMode = true
     import('/lua/sim/simuistate.lua').IsCampaign(true)
 
-    for iArmy, strArmy in tblArmy do
-        local tblData = Scenario.Armies[strArmy]
+    local armies = {}
+    for i, name in tblArmy do
+        armies[name] = i
+    end
 
-        tblGroups[ strArmy ] = {}
+    local tblGroups = {}
+
+    for _, strArmy in tblArmy do
+        local tblData = scenarioArmies[strArmy]
+
+        tblGroups[strArmy] = {}
 
         if tblData then
+            local setup = armySetups[strArmy]
+            local brain = GetArmyBrain(strArmy)
+
             LOG('*DEBUG: InitializeScenarioArmies, army = ', strArmy)
-            SetArmyEconomy(strArmy, tblData.Economy.mass, tblData.Economy.energy)
-            if tblData.faction ~= nil then
-                if ScenarioInfo.ArmySetup[strArmy].Human or StringStartsWith(strArmy, "Player") then
-                    local factionIndex = math.min(math.max(ScenarioInfo.ArmySetup[strArmy].Faction, 1), table.getsize(factions.Factions))
+
+
+            local econ = tblData.Economy
+            SetArmyEconomy(strArmy, econ.mass, econ.energy)
+
+            local faction = tblData.faction
+            if faction ~= nil then
+                if setup.Human or StringStartsWith(strArmy, "Player") then
+                    local factionIndex = MathClamp(setup.Faction, 1, factionCount)
                     SetArmyFactionIndex(strArmy, factionIndex - 1)
                 else
-                    local factionIndex = math.min(math.max(tblData.faction, 0), table.getsize(factions.Factions))
+                    local factionIndex = MathClamp(faction, 0, factionCount)
                     SetArmyFactionIndex(strArmy, factionIndex)
-                    GetArmyBrain(strArmy):SetCurrentPlan()
+                    brain:SetCurrentPlan()
                 end
             end
 
-            if tblData.color ~= nil then
-                SetArmyColorIndex(strArmy, tblData.color)
+            local color = tblData.color
+            if color ~= nil then
+                SetArmyColorIndex(strArmy, color)
             end
 
-            if tblData.personality ~= nil then
-                SetArmyAIPersonality(strArmy, tblData.personality)
+            local personality = tblData.personality
+            if personality ~= nil then
+                SetArmyAIPersonality(strArmy, personality)
             end
 
-            if bCreateInitial then
-                tblGroups[strArmy] = CreateInitialArmyGroup(strArmy)
+            local cdr
+            if shouldCreateInitial then
+                tblGroups[strArmy], cdr = CreateInitialArmyGroup(strArmy)
             end
 
-            local wreckageGroup = FindUnitGroup('WRECKAGE', Scenario.Armies[strArmy].Units)
+            local wreckageGroup = FindUnitGroup('WRECKAGE', tblData.Units)
             if wreckageGroup then
-			    local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup)
-				for num, unit in tblResult do
+			    local _, tblResult, _ = CreatePlatoons(strArmy, wreckageGroup)
+				for _, unit in tblResult do
 					CreateWreckageUnit(unit)
 				end
             end
 
             ----[ eemerson                                                         ]--
             ----[ Override alliances with custom alliance settings                 ]--
-            if tblData.Alliances ~= nil then
-               for army_name, state in tblData.Alliances do
-                    if armies[army_name] and strArmy ~= army_name then
-                        SetAllianceOneWay(strArmy, army_name, state)
+            local alliances = tblData.Alliances
+            if alliances ~= nil then
+               for with, state in alliances do
+                    if armies[with] and strArmy ~= with then
+                        SetAllianceOneWay(strArmy, with, state)
                     end
                end
             end
 
-            GetArmyBrain(strArmy):InitializePlatoonBuildManager()
+            brain:InitializePlatoonBuildManager()
+            brain.CDR = cdr
             LoadArmyPBMBuilders(strArmy)
         end
     end
@@ -1353,7 +1400,7 @@ function LoadOSB(buildName, strArmy, builderData)
         childPart = false
     else
         buildNameNew, location, globalName, childPart = SplitOSBName(buildName)
-        local fileName = '/lua/ai/OpAI/' .. globalName .. '_save.lua'
+        local fileName = '/lua/ai/opai/' .. globalName .. '_save.lua'
         saveFile = import(fileName)
     end
 
@@ -1831,5 +1878,6 @@ function FindUnitInMultiRect(rectangles, category, aiBrain, requireBuilt)
     end
 end
 
+
 -- kept for mod backwards compatibility
-local Entity = import('/lua/sim/Entity.lua').Entity
+local Entity = import('/lua/sim/entity.lua').Entity

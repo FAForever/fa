@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.discovery_service_methods
 local CDiscoveryService = {}
 

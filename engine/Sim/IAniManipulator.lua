@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.manipulator_methods
 local IAniManipulator = {}
 

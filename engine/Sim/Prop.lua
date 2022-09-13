@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.prop_methods : moho.entity_methods
 local Prop = {}
 

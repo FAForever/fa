@@ -747,7 +747,7 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by Lua to create the impact effects
     ---@param self Projectile
-    ---@param army integer
+    ---@param army number
     ---@param EffectTable string[] 
     ---@param EffectScale? number
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
@@ -767,7 +767,7 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by Lua to create the terrain effects
     ---@param self  Projectile
-    ---@param army integer
+    ---@param army number
     ---@param EffectTable string[]
     ---@param EffectScale? number
     CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
@@ -860,7 +860,7 @@ Projectile = Class(moho.projectile_methods) {
 
     ---@deprecated
     ---@param self Projectile
-    ---@param DamageData any
+    ---@param DamageData table
     PassDamageData = function(self, DamageData)
         self.DamageData = { }
         self.DamageData.DamageRadius = DamageData.DamageRadius

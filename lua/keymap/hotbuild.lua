@@ -386,8 +386,7 @@ function buildActionFactoryTemplate(modifier)
     local selection = GetSelectedUnits()
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
     local buildable = EntityCategoryGetUnitList(buildableCategories)
-
-    effectiveTemplates, effectiveIcons = availableTemplate(allFactoryTemplates, buildable)
+    local effectiveTemplates, effectiveIcons = availableTemplate(allFactoryTemplates, buildable)
 
     local maxPos = table.getsize(effectiveTemplates)
     if maxPos == 0 then
