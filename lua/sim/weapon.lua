@@ -22,9 +22,6 @@ local function ParsePriorities()
     local ParseEntityCategory = ParseEntityCategory
 
     for _, id in idlist do
-        WARN(id)
-        WARN(GetUnitBlueprintByName(id))
-        WARN(GetUnitBlueprintByName(id).BlueprintId)
         local weapons = GetUnitBlueprintByName(id).Weapon
         if not weapons then
             continue

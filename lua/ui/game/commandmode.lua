@@ -241,8 +241,6 @@ function CapStructure(command)
     if not units[1] then return end
 
     -- check if we have a building that we target
-    WARN(command.Target.EntityId)
-    WARN(GetUnitById(command.Target.EntityId))
     local structure = GetUnitById(command.Target.EntityId)
     if not structure or IsDestroyed(structure) then return end
 
