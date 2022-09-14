@@ -55,6 +55,10 @@ UnitBlueprint {
         'BOT',
         'OVERLAYDIRECTFIRE',
         'PERSONALSHIELD',
+
+        -- this is technically incorrect, but it is for now the only way to let them ignore
+        -- reclaim. Sadly - the pile of issues is so large that we can't have that either
+        -- 'SUBCOMMANDER',
     },
     CollisionOffsetY = 0,
     Defense = {
