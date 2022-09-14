@@ -82,10 +82,8 @@ Combo = Class(Group) {
         self._btnRight:DisableHitTest()
         self._btnMid:DisableHitTest()
 
-        LayoutHelpers.AtLeftIn(self._btnLeft, self)
-        LayoutHelpers.AtTopIn(self._btnLeft, self)
-        LayoutHelpers.AtRightIn(self._btnRight, self)
-        LayoutHelpers.AtTopIn(self._btnRight, self)
+        LayoutHelpers.AtLeftTopIn(self._btnLeft, self)
+        LayoutHelpers.AtRightTopIn(self._btnRight, self)
         LayoutHelpers.AtTopIn(self._btnMid, self)
         LayoutHelpers.AnchorToRight(self._btnMid, self._btnLeft, -1)
         self._btnMid.Right:Set(self._btnRight.Left)
@@ -103,7 +101,7 @@ Combo = Class(Group) {
 
         self._dropdown = Group(self._text)
         self._dropdown.Top:Set(self.Bottom)
-        self._dropdown.Right:Set(function() return self.Right() end)
+        self._dropdown.Right:Set(self.Right)
         self._dropdown.Width:Set(function() return self.Width() - LayoutHelpers.ScaleNumber(5) end)
 
         local ddul = Bitmap(self._dropdown, bitmaps.list.ul)
@@ -117,10 +115,8 @@ Combo = Class(Group) {
         local ddlr = Bitmap(self._dropdown, bitmaps.list.lr)
 
         -- top part is fixed under self
-        LayoutHelpers.AtLeftIn(ddul, self._dropdown)
-        LayoutHelpers.AtTopIn(ddul, self._dropdown)
-        LayoutHelpers.AtRightIn(ddur, self._dropdown)
-        LayoutHelpers.AtTopIn(ddur, self._dropdown)
+        LayoutHelpers.AtLeftTopIn(ddul, self._dropdown)
+        LayoutHelpers.AtRightTopIn(ddur, self._dropdown)
         LayoutHelpers.AtTopIn(ddum, self._dropdown)
         ddum.Left:Set(ddul.Right)
         ddum.Right:Set(ddur.Left)
@@ -206,7 +202,6 @@ Combo = Class(Group) {
         self._visibleItems = LazyVar.Create()
         self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading()) + 1 end)
         self._dropdown.Height:Set(function() return self._list.Height() + ddum.Height() + ddlm.Height() end)
-        self._visibleItems:Set(1)
 
         -- set up button logic
         self.HandleEvent = function(ctrl, event)

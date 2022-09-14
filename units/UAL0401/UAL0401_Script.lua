@@ -24,6 +24,7 @@ local MathSin = math.sin
 local ZeroDegrees = Vector(0, 0, 1)
 local SignCheck = Vector(1, 0, 0)
 
+---@class UAL0401 : AWalkingLandUnit
 UAL0401 = Class(AWalkingLandUnit) {
     Weapons = {
         EyeWeapon = Class(ADFPhasonLaser) {},

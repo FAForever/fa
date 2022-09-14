@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.IEffect
 local IEffect = {}
 
@@ -30,7 +31,7 @@ local IEffect = {}
 --- | 'LODCUTOFF' # number
 --- | 'LASTPARAM' # ?
 
----@alias iEffectCurveParameters
+---@alias IEffectCurveParameters
 --- | 'XDIR_CURVE'
 --- | 'YDIR_CURVE'
 --- | 'ZDIR_CURVE'
@@ -107,8 +108,8 @@ function IEffect:OffsetEmitter(x, y, z)
 end
 
 --- Resize the emitter curve to the number of ticks passed in. This is so if we change the lifetime of the emitter we can rescale some of the curves to match if needed. Arguably this should happen automatically to all curves but the original design was screwed up
----@param param iEffectCurveParameters
----@param timeInTicks
+---@param param IEffectCurveParameters
+---@param timeInTicks number
 ---@return moho.IEffect
 function IEffect:ResizeEmitterCurve(param, timeInTicks)
 end
@@ -127,7 +128,7 @@ function IEffect:SetBeamParam(name, value)
 end
 
 --- Defines a curve parameter, allowing you to tweak effects on an individual basis
----@param param iEffectCurveParameters
+---@param param IEffectCurveParameters
 ---@param height number
 ---@param size number
 function IEffect:SetEmitterCurveParam(param, height, size)

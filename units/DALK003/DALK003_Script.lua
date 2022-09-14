@@ -11,11 +11,10 @@ local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
 local AAAZealotMissileWeapon = import('/lua/aeonweapons.lua').AAAZealotMissileWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
+---@class DALK003 : AWalkingLandUnit
 DALK003 = Class(AWalkingLandUnit) {
     Weapons = {
         Missile = Class(AAAZealotMissileWeapon) {},
     },
-
 }
-
 TypeClass = DALK003

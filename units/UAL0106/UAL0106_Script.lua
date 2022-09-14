@@ -11,6 +11,7 @@
 local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
 local ADFSonicPulsarWeapon = import('/lua/aeonweapons.lua').ADFSonicPulsarWeapon
 
+---@class UAL0106 : AWalkingLandUnit
 UAL0106 = Class(AWalkingLandUnit) {
     Weapons = {
         ArmLaserTurret = Class(ADFSonicPulsarWeapon) {}

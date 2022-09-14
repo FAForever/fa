@@ -2655,6 +2655,12 @@ float4 CommandFeedbackPS0( VERTEXNORMAL_VERTEX vertex, uniform bool fade ) : COL
     return float4(color.rgb, fade ? saturate(color.a * vertex.material.x) : color.a );
 }
 
+float4 FakeRingsPS( VERTEXNORMAL_VERTEX vertex, uniform float alpha) : COLOR0
+{
+    float4 color = tex2D( albedoSampler, vertex.texcoord0.xy);
+    return float4(color.rgb, vertex.material.y );
+}
+
 float4 CommandFeedbackPS1( VERTEXNORMAL_VERTEX vertex, uniform float glow) : COLOR0
 {
     return float4(0,0,0,glow);
@@ -5274,12 +5280,60 @@ technique RallyPoint
     }
 }
 
+technique FakeRingsNoDepth
+<
+    string cartographicTechnique = "CartographicFeedback";
+
+    int renderStage = STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )    // if RGBA is written, then you get glow, just RGB is no glow
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Disable )
+
+#ifndef DIRECT3D10
+        AlphaTestEnable = true;
+        AlphaRef = 0x23;
+        AlphaFunc = Greater;
+        ZEnable = false;
+#endif
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 FakeRingsPS(false);
+    }
+}
+
+technique FakeRings
+<
+    string cartographicTechnique = "CartographicFeedback";
+
+    int renderStage = STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )    // if RGBA is written, then you get glow, just RGB is no glow
+        RasterizerState( Rasterizer_Cull_CW )
+
+#ifndef DIRECT3D10
+        AlphaTestEnable = true;
+        AlphaRef = 0x23;
+#endif
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 FakeRingsPS(false);
+    }
+}
+
 technique CommandFeedback2
 <
     string cartographicTechnique = "CartographicFeedback";
 
     int renderStage = STAGE_POSTWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_LIFETIME;
 >
 {
     pass P0

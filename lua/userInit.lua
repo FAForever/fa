@@ -14,7 +14,7 @@ for index, language in __installedlanguages do
 end
 
 
--- Do global init
+-- # Global (and shared) init
 doscript '/lua/globalInit.lua'
 
 -- Do we have an custom language set inside user-options ?

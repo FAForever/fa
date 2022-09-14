@@ -8,6 +8,7 @@
 ----****************************************************************************
 local SShieldStructureUnit = import('/lua/seraphimunits.lua').SShieldStructureUnit
 
+---@class XSB4202 : SShieldStructureUnit
 XSB4202 = Class(SShieldStructureUnit) {
     ShieldEffects = {
         '/effects/emitters/seraphim_shield_generator_t2_01_emit.bp',

@@ -12,20 +12,21 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtils = import('/lua/effectutilities.lua')
 
+---@class DAA0206 : AAirUnit
 DAA0206 = Class(AAirUnit) {
     Weapons = {
         Suicide = Class(DefaultProjectileWeapon) {}
     },
-    
+
     OnRunOutOfFuel = function(self)
         self:Kill()
     end,
-    
+
     ProjectileFired = function(self)
         self:GetWeapon(1).IdleState.Main = function(self) end
         self:PlayUnitSound('Killed')
 		self:PlayUnitSound('Destroyed')
-        self:Destroy()  			
+        self:Destroy()
     end,
 }
 TypeClass = DAA0206

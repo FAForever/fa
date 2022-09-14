@@ -9,6 +9,7 @@ local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CKrilTorpedoLauncherWeapon = import('/lua/cybranweapons.lua').CKrilTorpedoLauncherWeapon
 local utilities = import('/lua/utilities.lua')
 
+---@class XRB2308 : CStructureUnit
 XRB2308 = Class(CStructureUnit) {
     Weapons = {
         Turret01 = Class(CKrilTorpedoLauncherWeapon) {},

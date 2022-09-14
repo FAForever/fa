@@ -11,6 +11,7 @@ local CAirFactoryUnit = import('/lua/cybranunits.lua').CAirFactoryUnit
 
 --Change by IceDreamer: Increased platform animation speed so roll-off time is the same as UEF Air Factory
 
+---@class URB0102 : CAirFactoryUnit
 URB0102 = Class(CAirFactoryUnit) {
     PlatformBone = 'B01',
     LandUnitBuilt = false,

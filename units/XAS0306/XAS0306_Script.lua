@@ -11,6 +11,7 @@ local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
 local AIFMissileTacticalSerpentine02Weapon = import('/lua/aeonweapons.lua').AIFMissileTacticalSerpentine02Weapon
 local AIFQuasarAntiTorpedoWeapon = import('/lua/aeonweapons.lua').AIFQuasarAntiTorpedoWeapon
 
+---@class XAS0306 : ASeaUnit
 XAS0306 = Class(ASeaUnit) {
     FxDamageScale = 2,
     DestructionTicks = 400,

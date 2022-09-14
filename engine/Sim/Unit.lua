@@ -1,46 +1,9 @@
----@declare-global
+---@meta
+
 ---@class moho.unit_methods : moho.entity_methods
 local Unit = {}
 
 ---@class UnitId: string
-
----@alias CommandCap
----| "RULEUCC_Move"
----| "RULEUCC_Stop"
----| "RULEUCC_Attack"
----| "RULEUCC_Guard"
----| "RULEUCC_Patrol"
----| "RULEUCC_RetaliateToggle"
----| "RULEUCC_Repair"
----| "RULEUCC_Capture"
----| "RULEUCC_Transport"
----| "RULEUCC_CallTransport"
----| "RULEUCC_Nuke"
----| "RULEUCC_Tactical"
----| "RULEUCC_Teleport"
----| "RULEUCC_Ferry"
----| "RULEUCC_SiloBuildTactical"
----| "RULEUCC_SiloBuildNuke"
----| "RULEUCC_Sacrifice"
----| "RULEUCC_Pause"
----| "RULEUCC_Overcharge"
----| "RULEUCC_Dive"
----| "RULEUCC_Reclaim"
----| "RULEUCC_SpecialAction"
----| "RULEUCC_Dock"
----| "RULEUCC_Script"
----| "RULEUCC_Invalid"
-
----@alias ToggleCap
----| "RULEUTC_ShieldToggle"
----| "RULEUTC_WeaponToggle"
----| "RULEUTC_JammingToggle"
----| "RULEUTC_IntelToggle"
----| "RULEUTC_ProductionToggle"
----| "RULEUTC_StealthToggle"
----| "RULEUTC_GenericToggle"
----| "RULEUTC_SpecialToggle"
----| "RULEUTC_CloakToggle"
 
 ---@alias UnitState
 ---| "Immobile"
@@ -88,8 +51,6 @@ local Unit = {}
 ---| "MakingAttackRun"
 ---| "HoldingPattern"
 ---| "SiloBuildingAmmo"
-
----@alias LayerName "Air" | "Land" | "Orbital" | "Seabed" | "Sub" | "Water"
 
 --- Adds a command cap to the unit
 ---@param category moho.EntityCategory
@@ -169,10 +130,6 @@ end
 --- Returns the blip (if any) that the given army has for the unit
 ---@return Blip?
 function Unit:GetBlip(armyIndex)
-end
-
----@return UnitBlueprint
-function Unit:GetBlueprint()
 end
 
 ---@return UnitBlueprint
@@ -329,7 +286,9 @@ function Unit:GetUnitId()
 end
 
 ---
----@return Vector
+---@return number x
+---@return number y
+---@return number z
 function Unit:GetVelocity()
 end
 

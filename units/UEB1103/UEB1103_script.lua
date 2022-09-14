@@ -10,6 +10,7 @@
 
 local TMassCollectionUnit = import('/lua/terranunits.lua').TMassCollectionUnit
 
+---@class UEB1103 : TMassCollectionUnit
 UEB1103 = Class(TMassCollectionUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)

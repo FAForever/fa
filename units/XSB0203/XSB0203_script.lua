@@ -9,6 +9,7 @@
 --****************************************************************************
 
 local SSeaFactoryUnit = import('/lua/seraphimunits.lua').SSeaFactoryUnit
+---@class XSB0203 : SSeaFactoryUnit
 XSB0203 = Class(SSeaFactoryUnit) {
     OnCreate = function(self)
         SSeaFactoryUnit.OnCreate(self)

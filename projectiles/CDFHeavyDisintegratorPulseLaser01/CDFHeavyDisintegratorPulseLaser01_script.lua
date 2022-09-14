@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Heavy Disintegrator Pulse Laser Projectile script, XRL0305
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 CDFHeavyDisintegratorPulseLaser01 = Class(import('/lua/cybranprojectiles.lua').CHeavyDisintegratorPulseLaser) {

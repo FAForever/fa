@@ -672,7 +672,9 @@ end
 
 --- Clamps numeric value to specified Min and Max range
 function math.clamp(v, min, max)
-    return math.max(min, math.min(max, v))
+    if v <= min then return min end
+    if v >= max then return max end
+    return v
 end
 
 -- Return a table parsed from key:value pairs passed on the command line

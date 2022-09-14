@@ -9,6 +9,7 @@
 --****************************************************************************
 local CWallStructureUnit = import('/lua/cybranunits.lua').CWallStructureUnit
 
+---@class URB5101 : CWallStructureUnit
 URB5101 = Class(CWallStructureUnit) {
 }
 

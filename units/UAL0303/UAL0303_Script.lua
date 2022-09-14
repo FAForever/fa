@@ -9,6 +9,7 @@ local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
 local ADFLaserHighIntensityWeapon = import('/lua/aeonweapons.lua').ADFLaserHighIntensityWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
+---@class UAL0303 : AWalkingLandUnit
 UAL0303 = Class(AWalkingLandUnit) {
     Weapons = {
         FrontTurret01 = Class(ADFLaserHighIntensityWeapon) {}

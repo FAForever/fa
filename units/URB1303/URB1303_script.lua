@@ -10,6 +10,7 @@
 
 local CMassFabricationUnit = import('/lua/cybranunits.lua').CMassFabricationUnit
 
+---@class URB1303 : CMassFabricationUnit
 URB1303 = Class(CMassFabricationUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)

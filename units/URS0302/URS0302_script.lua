@@ -14,6 +14,7 @@ local CDFProtonCannonWeapon = CybranWeaponsFile.CDFProtonCannonWeapon
 local CANNaniteTorpedoWeapon = CybranWeaponsFile.CANNaniteTorpedoWeapon
 local CAMZapperWeapon03 = CybranWeaponsFile.CAMZapperWeapon03
        
+---@class URS0302 : CSeaUnit
 URS0302 = Class(CSeaUnit) {
     Weapons = {
         FrontCannon01 = Class(CDFProtonCannonWeapon) {},

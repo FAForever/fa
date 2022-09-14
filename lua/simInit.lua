@@ -24,6 +24,7 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 WaitTicks = coroutine.yield
 
+---@param n number
 function WaitSeconds(n)
     local ticks = math.max(1, n * 10)
     if ticks > 1 then
@@ -101,7 +102,7 @@ function SetupSession()
     end
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
-    ---@type table<Army, AIBrain>
+    ---@type AIBrain[]
     ArmyBrains = {}
 
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
@@ -352,6 +353,7 @@ function BeginSession()
     end
 
     import('/lua/sim/score.lua').init()
+    import('/lua/sim/recall.lua').init()
 
     --start watching for victory conditions
     import('/lua/sim/matchstate.lua')

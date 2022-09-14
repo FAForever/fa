@@ -9,6 +9,7 @@
 
 local STransportBeaconUnit = import('/lua/seraphimunits.lua').STransportBeaconUnit
 
+---@class XSB5102 : STransportBeaconUnit
 XSB5102 = Class(STransportBeaconUnit) {
 }
 

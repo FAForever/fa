@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.mesh_methods : moho.control_methods
 local CMauiMesh = {}
 

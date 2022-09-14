@@ -9,6 +9,9 @@ local AIRESULT = import('/lua/sim/ScriptTask.lua').AIRESULT
 
 ---@class AttackMove : ScriptTask
 AttackMove = Class(ScriptTask) {
+
+    ---@param self AttackMove
+    ---@return integer
     TaskTick = function(self)
         self:SetAIResult(AIRESULT.Success)
         return TASKSTATUS.Done

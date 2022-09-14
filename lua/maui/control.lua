@@ -26,8 +26,14 @@
     -- Dump()
 
 ---@class Control : moho.control_methods
+---@field Left LazyVar
+---@field Width LazyVar
+---@field Right LazyVar
+---@field Top LazyVar
+---@field Height LazyVar
+---@field Bottom LazyVar
+---@field Depth LazyVar
 Control = Class(moho.control_methods) {
-
     -- reset the control's layout to the defaults, in this case
     -- makes a circular dependency where you must have at least 4 defined
     -- Overload this in your own classes to make it behave differently

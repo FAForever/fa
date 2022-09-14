@@ -12,6 +12,7 @@ local Unit = import('/lua/sim/Unit.lua').Unit
 local TDFMachineGunWeapon = import('/lua/terranweapons.lua').TDFMachineGunWeapon
 
 
+---@class UEL0106 : TWalkingLandUnit
 UEL0106 = Class(TWalkingLandUnit) {
     Weapons = {
         ArmCannonTurret = Class(TDFMachineGunWeapon) {

@@ -10,6 +10,7 @@
 
 local CSonarUnit = import('/lua/cybranunits.lua').CSonarUnit
 
+---@class URB3102 : CSonarUnit
 URB3102 = Class(CSonarUnit) {
     TimedSonarTTIdleEffects = {
         {

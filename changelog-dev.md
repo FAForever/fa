@@ -1,5 +1,5 @@
 
-# Game version xyzw (day of month, 2022)
+# Game version xyzw (day of month, year)
 
 ## Bug fixes
 
@@ -7,4 +7,10 @@
 
 ## Performance
 
+## Annotation
+
+## Campaign
+
 ## Other changes
+
+## Contributors

@@ -12,6 +12,7 @@ local WeaponFile = import('/lua/terranweapons.lua')
 local TANTorpedoAngler = WeaponFile.TANTorpedoAngler
 local TIFSmartCharge = WeaponFile.TIFSmartCharge
 
+---@class XES0102 : TSeaUnit
 XES0102 = Class(TSeaUnit) {
 
     Weapons = {

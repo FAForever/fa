@@ -9,7 +9,6 @@
 local AIDefaultPlansList = import('/lua/aibrainplans.lua').AIPlansList
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
-local PCBC = import('/lua/editor/platooncountbuildconditions.lua')
 local Utilities = import('/lua/utilities.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Behaviors = import('/lua/ai/aibehaviors.lua')
@@ -20,7 +19,6 @@ local PlatoonFormManager = import('/lua/sim/PlatoonFormManager.lua')
 local BrainConditionsMonitor = import('/lua/sim/BrainConditionsMonitor.lua')
 local EngineerManager = import('/lua/sim/EngineerManager.lua')
 
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local StratManager = import('/lua/sim/StrategyManager.lua')
 
@@ -28,67 +26,86 @@ local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnershi
 local TransferUnfinishedUnitsAfterDeath = import('/lua/SimUtils.lua').TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
-local Factions = import('/lua/factions.lua').GetFactions(true)
-
 -- upvalue for performance
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
-
-
 local CoroutineYield = coroutine.yield
+
+local Factions = import('/lua/factions.lua').GetFactions(true)
 
 ---@alias AIResult "defeat"|"draw"|"victor"
 ---@alias HqTech "TECH2"|"TECH3"
 ---@alias HqLayer "LAND"|"AIR"|"NAVY"
 ---@alias HqFaction "AEON"|"UEF"|"SERAPHIM"|"CYBRAN"|"NOMADS"
 ---@alias BrainState "Defeat" | "Victory" | "InProgress" | "Draw"
+---@alias ReconTypes 'Radar' | 'Sonar' | 'Omni' | 'LOSNow'
+---@alias PlatoonType 'Air' | 'Land' | 'Sea'
+---@alias AllianceStatus 'Ally' | 'Enemy' | 'Neutral'
 
+---@class TriggerSpec
+---@field Callback function
+---@field ReconTypes ReconTypes
+---@field Blip boolean
+---@field Value boolean
+---@field Category EntityCategory
+---@field OnceOnly boolean
+---@field TargetAIBrain AIBrain
+
+--TODO
+---@class PlatoonTable
+
+---@alias AIResult "defeat" | "draw" | "victor"
+---@alias HqTech "TECH2" | "TECH3"
+---@alias HqLayer "AIR" | "LAND" | "NAVY"
+---@alias HqFaction "UEF" | "AEON" | "CYBRAN" | "SERAPHIM" | "NOMADS"
+---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
+---@alias BrainType "AI" | "Human"
 ---@class AIBrain: moho.aibrain_methods
----@field Trash TrashBag
----@field Result AIResult|nil
----@field UnitStats table<UnitId, table<string, number>>
----@field Name string
----@field AIPlansList table<number,table<number, string>>
----@field HQs table<HqFaction, table<HqLayer, table<HqTech, number>>>
+---@field AIPlansList string[][]
+---@field AirAttackPoints? table
+---@field AttackData AttackManager
+---@field AttackManager AttackManager
+---@field AttackPoints? table
+---@field BaseMonitor AiBaseMonitor
+---@field BrainType BrainType
+---@field BuilderManagers table<string, table>
+---@field ConditionsMonitor BrainConditionsMonitor
+---@field ConstantEval boolean
+---@field CurrentPlan string lua file which contains plan
+---@field CurrentPlanScript table
+---@field EconomyCurrentTick number
+---@field EconomyData {EnergyIncome: number, EnergyRequested: number, MassIncome: number, MassRequested: number}[]
+---@field EnergyExcessThread thread
 ---@field EnergyExcessUnitsEnabled table<EntityId, MassFabricationUnit>
 ---@field EnergyExcessUnitsDisabled table<EntityId, MassFabricationUnit>
 ---@field EnergyDependingUnits Shield[]
 ---@field EnergyDependingUnitsHead number
----@field TriggerList table
----@field IntelTriggerList table
----@field UnitBuiltTriggerList table
----@field VeterancyTriggerList table
----@field PingCallbackList table
----@field BuilderManagers table<string, table>
----@field ConditionsMonitor BrainConditionsMonitor
----@field BrainType "AI"|"Human"
----@field LayerPref "LAND"|"AIR"
----@field ConstantEval boolean
----@field CurrentPlan string lua file which contains plan
----@field RepeatExecution boolean
----@field CurrentPlanScript table
----@field BaseMonitor AiBaseMonitor
----@field SelfMonitor AiSelfMonitor
 ---@field EconomyTicksMonitor number
----@field EconomyCurrentTick number
----@field Sorian boolean
----@field EconomyData table<number, {EnergyIncome:number, EnergyRequested:number, MassIncome:number, MassRequested:number}>
----@field AttackManager AttackManager
----@field AttackData AttackManager
----@field PBM AiPlatoonBuildManager
 ---@field HasPlatoonList boolean
----@field PlatoonNameCounter table<string, number>|nil
----@field T4ThreatFound table|nil
----@field AttackPoints table|nil
----@field AirAttackPoints table|nil
----@field TacticalBases table|nil
----@field EnergyExcessThread thread
----@field IntelData table<string, number>|nil
----@field targetoveride boolean
+---@field HQs table<HqFaction, table<HqLayer, table<HqTech, number>>>
+---@field IntelData? table<string, number>
+---@field IntelTriggerList table
+---@field LayerPref "LAND" | "AIR"
+---@field Name string
+---@field PBM AiPlatoonBuildManager
+---@field PingCallbackList table
+---@field PlatoonNameCounter? table<string, number>
+---@field RepeatExecution boolean
+---@field Result? AIResult
+---@field SelfMonitor AiSelfMonitor
+---@field Sorian boolean
 ---@field Status BrainState
+---@field T4ThreatFound? table
+---@field TacticalBases? table
+---@field targetoveride boolean
+---@field Team number The team this brain's army belongs to. Note that games with unlocked teams behave like free-for-alls.
+---@field Trash TrashBag
+---@field TriggerList table
+---@field UnitBuiltTriggerList table
+---@field UnitStats table<UnitId, table<string, number>>
+---@field VeterancyTriggerList table
 AIBrain = Class(moho.aibrain_methods) {
-
     -- The state of the brain in the match
     Status = 'InProgress',
 
@@ -203,26 +220,26 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Adds a HQ so that the engi mod knows we have it
     ---@param self AIBrain
-    ---@param faction HqFaction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
-    ---@param layer HqLayer The layer (LAND / AIR / NAVY) as a string
-    ---@param tech HqTech The tech (TECH2 / TECH3) as a string
+    ---@param faction HqFaction 
+    ---@param layer HqLayer 
+    ---@param tech HqTech 
     AddHQ = function (self, faction, layer, tech)
         self.HQs[faction][layer][tech] = self.HQs[faction][layer][tech] + 1
     end,
 
     --- Removes an HQ so that the engi mod knows we lost it for the engi mod.
     ---@param self AIBrain
-    ---@param faction HqFaction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
-    ---@param layer HqLayer The layer (LAND / AIR / NAVY) as a string
-    ---@param tech HqTech The tech (TECH2 / TECH3) as a string
+    ---@param faction HqFaction
+    ---@param layer HqLayer 
+    ---@param tech HqTech 
     RemoveHQ = function (self, faction, layer, tech)
         self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
     end,
 
     --- Manages the support factory restrictions of the engi mod
     ---@param self AIBrain
-    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
-    -- @param layer The layer (LAND / AIR / NAVY) as a string
+    ---@param faction HqFaction
+    ---@param layer HqLayer
     SetHQSupportFactoryRestrictions = function (self, faction, layer)
 
         -- localize for performance
@@ -246,17 +263,19 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Counts all HQs of specific faction, layer and tech for the engi mod.
     ---@param self AIBrain
-    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
-    -- @param layer The layer (LAND / AIR / NAVY) as a string
-    -- @param tech The tech (TECH2 / TECH3) as a string
+    ---@param faction HqFaction 
+    ---@param layer HqLayer 
+    ---@param tech HqTech 
+    ---@return number
     CountHQs = function (self, faction, layer, tech)
         return self.HQs[faction][layer][tech]
     end,
 
     --- Counts all HQs of faction and tech, regardless of layer
     ---@param self AIBrain
-    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
-    -- @param tech The tech (TECH2 / TECH3) as a string
+    ---@param faction HqFaction 
+    ---@param tech HqTech
+    ---@return number
     CountHQsAllLayers = function (self, faction, tech)
         local count = self.HQs[faction]["LAND"][tech]
         count = count + self.HQs[faction]["AIR"][tech]
@@ -595,13 +614,14 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
     ---@param self AIBrain
-    ---@param entity Shield to be updated according to the 
+    ---@param entity Shield
     AddEnergyDependingEntity = function(self, entity)
         self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity 
         self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
     end,
 
     ---@param self AIBrain
+    ---@param triggerName string
     OnEnergyTrigger = function(self, triggerName)
         if triggerName == "EnergyDepleted" then 
             -- add trigger when we can recover units
@@ -640,6 +660,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- TRIGGERS BASED ON AN AI BRAIN
     ---@param self AIBrain
+    ---@param triggerName string
     OnStatsTrigger = function(self, triggerName)
 
         if triggerName == "EnergyDepleted" or triggerName == "EnergyViable" then 
@@ -661,6 +682,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param triggerName string
     RemoveEconomyTrigger = function(self, triggerName)
         for k, v in self.TriggerList do
             if v.Name == triggerName then
@@ -669,7 +691,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- INTEL TRIGGER SPEC
+    --INTEL TRIGGER SPEC
     -- {
     --    CallbackFunction = <function>,
     --    Type = 'LOS'/'Radar'/'Sonar'/'Omni',
@@ -680,18 +702,16 @@ AIBrain = Class(moho.aibrain_methods) {
     --    TargetAIBrain: AI Brain of the army you want it to trigger off of.
     -- },
     ---@param self AIBrain
-    ---@param triggerSpec unknown
+    ---@param triggerSpec TriggerSpec
     SetupArmyIntelTrigger = function(self, triggerSpec)
         table.insert(self.IntelTriggerList, triggerSpec)
     end,
 
-    -- Called when recon data changes for enemy units (e.g. A unit comes into line of sight)
-    -- Params
-    --  blip: the unit (could be fake) in question
-    --  type: 'LOSNow', 'Radar', 'Sonar', or 'Omni'
-    --  val: true or false
-    -- calls callback function with blip it saw.
+    ---Called when recon data changes for enemy units (e.g. A unit comes into line of sight)
     ---@param self AIBrain
+    ---@param blip any the unit (could be fake) in question
+    ---@param reconType ReconTypes
+    ---@param val boolean
     OnIntelChange = function(self, blip, reconType, val)
         if reconType == 'LOSNow' or reconType == 'Omni' then
             if not val then
@@ -717,6 +737,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param callback fun(unit:Unit)
+    ---@param category EntityCategory
+    ---@param percent number
     AddUnitBuiltPercentageCallback = function(self, callback, category, percent)
         if not callback or not category or not percent then
             error('*ERROR: Attempt to add UnitBuiltPercentageCallback but invalid data given', 2)
@@ -725,6 +748,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param triggerSpec TriggerSpec
     SetupBrainVeterancyTrigger = function(self, triggerSpec)
         if not triggerSpec.CallCount then
             triggerSpec.CallCount = 1
@@ -733,6 +757,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param unit Unit
+    ---@param level number
     OnBrainUnitVeterancyLevel = function(self, unit, level)
         for _, v in self.VeterancyTriggerList do
             if EntityCategoryContains(v.Category, unit) and level == v.Level and v.CallCount > 0 then
@@ -743,6 +769,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param callback function
+    ---@param pingType string
     AddPingCallback = function(self, callback, pingType)
         if callback and pingType then
             table.insert(self.PingCallbackList, {CallbackFunction = callback, PingType = pingType})
@@ -750,6 +778,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param pingData table
     DoPingCallbacks = function(self, pingData)
         for _, v in self.PingCallbackList do
             v.CallbackFunction(self, pingData)
@@ -758,6 +787,8 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- AI BRAIN FUNCTIONS HANDLED HERE
     ---@param self AIBrain
+    ---@param planName string
+    ---@return string[]|nil
     ImportScenarioArmyPlans = function(self, planName)
         if planName and planName ~= '' then
             return import(planName).AIPlansList
@@ -767,6 +798,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param fn function
+    ---@param ... any
+    ---@return thread|nil
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -1080,9 +1114,183 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    OnRecalled = function(self)
+        self.Status = "Recalled"
+
+        local army = self.Army
+        import("/lua/simutils.lua").UpdateUnitCap(army)
+        import("/lua/simping.lua").OnArmyDefeat(army)
+
+        -- AI
+        if self.BrainType == "AI" then
+            -- print AI "ilost" text to chat
+            SUtils.AISendChat("enemies", ArmyBrains[army].Nickname, "ilost")
+            -- remove PlatoonHandle from all AI units before we kill / transfer the army
+            local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+            if units and units[1] then
+                local halt = 0
+                local haltUnits = {}
+                for _, unit in units do
+                    if not unit.Dead then
+                        local handle = unit.PlatoonHandle
+                        if handle and self:PlatoonExists(handle) then
+                            handle:Stop()
+                            handle:PlatoonDisbandNoAssign()
+                        end
+                        halt = halt + 1
+                        haltUnits[halt] = unit
+                    end
+                end
+                IssueStop(haltUnits)
+                IssueClearCommands(haltUnits)
+            end
+
+            -- Stop the AI from executing AI plans
+            self.RepeatExecution = false
+
+            -- removing AI BrainConditionsMonitor
+            if self.ConditionsMonitor then
+                self.ConditionsMonitor:Destroy()
+            end
+
+            -- removing AI BuilderManagers
+            if self.BuilderManagers then
+                for _, v in self.BuilderManagers do
+                    local manager = v.EngineerManager
+                    manager:SetEnabled(false)
+                    manager:Destroy()
+                    manager = v.FactoryManager
+                    manager:SetEnabled(false)
+                    manager:Destroy()
+                    manager = v.PlatoonFormManager
+                    manager:SetEnabled(false)
+                    manager:Destroy()
+                    manager = v.StrategyManager
+                    if manager then
+                        manager:SetEnabled(false)
+                        manager:Destroy()
+                    end
+                    v.EngineerManager = nil
+                    v.FactoryManager = nil
+                    v.PlatoonFormManager = nil
+                    v.BaseSettings = nil
+                    v.BuilderHandles = nil
+                    v.Position = nil
+                end
+            end
+            -- delete the AI pathcache
+            self.PathCache = nil
+        end
+
+        local enemies, civilians = {}, {}
+
+        -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
+        local function TransferUnitsToBrain(brains)
+            if brains[1] then
+                local cat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
+                for _, brain in brains do
+                    local units = self:GetListOfUnits(cat, false)
+                    if units and units[1] then
+                        local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
+
+                        -- only show message when we actually gift that player some units
+                        if givenUnitCount > 0 then
+                            Sync.ArmyTransfer = { {
+                                from = army,
+                                to = brain.index,
+                                reason = "fullshare",
+                            } }
+                        end
+
+                        WaitSeconds(1)
+                    end
+                end
+            end
+        end
+
+        -- Sort the destiniation brains (armies/players) by rating (and if rating does not exist (such as with regular AI's), by score, after players with positive rating)
+        local function TransferUnitsToHighestBrain(brains)
+            if not table.empty(brains) then
+                local ratings = ScenarioInfo.Options.Ratings
+                for _, brain in brains do
+                    if ratings[brain.Nickname] then
+                        brain.rating = ratings[brain.Nickname]
+                    else
+                        -- if there is no rating, create a fake negative rating based on score
+                        brain.rating = -1 / brain.score
+                    end
+                end
+                -- sort brains by rating
+                table.sort(brains, function(a, b) return a.rating > b.rating end)
+                TransferUnitsToBrain(brains)
+            end
+        end
+
+        -- Sort brains out into mutually exclusive categories
+        for index, brain in ArmyBrains do
+            brain.index = index
+            brain.score = CalculateBrainScore(brain)
+
+            if not brain:IsDefeated() and army ~= index then
+                if ArmyIsCivilian(index) then
+                    table.insert(civilians, brain)
+                elseif IsEnemy(army, brain:GetArmyIndex()) then
+                    table.insert(enemies, brain)
+                end
+            end
+        end
+
+        -- This part determines the share condition
+
+        local shareOption = ScenarioInfo.Options.Share
+        if shareOption == 'CivilianDeserter' then
+            TransferUnitsToBrain(civilians)
+        elseif shareOption == 'Defectors' then
+            TransferUnitsToHighestBrain(enemies)
+        end
+
+        -- Kill all units left over
+        local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+        if tokill then
+            for _, unit in tokill do
+                unit:Kill()
+            end
+        end
+
+        local trash = self.Trash
+        if trash then
+            trash:Destroy()
+        end
+    end;
+
+    ---@param self AIBrain
     IsDefeated = function(self)
-        return self.Status == "Defeat"
+        local status = self.Status
+        return status == "Defeat" or status == "Recalled"
     end,
+
+    ---@param self AIBrain
+    RecallAllCommanders = function(self, camera)
+        local commandCat = categories.COMMAND + categories.SUBCOMMANDER
+        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false), camera)
+    end;
+
+    ---@param self AIBrain
+    ---@param recallingUnits Unit[]
+    RecallArmyThread = function(self, recallingUnits, camera)
+        if recallingUnits then
+            local ScenarioFramework = import("/lua/scenarioframework.lua")
+            -- if camera then
+            --     local cdr = self:GetCommander()
+            --     if cdr then
+            --         ScenarioFramework.EndOperationCamera(cdr, true, 3.5)
+            --     end
+            -- end
+            ScenarioFramework.FakeTeleportUnits(recallingUnits, true)
+        end
+        --SPEW("Recalling army brain " .. self.Nickname .. " (" .. (camera and "with camera)" or "no camera)"))
+        self:OnRecalled()
+    end;
 
     ---@param self AIBrain
     ---@param bestPlan string
@@ -1098,6 +1306,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param eval boolean
     SetConstantEvaluate = function(self, eval)
         if eval == true and self.ConstantEval == false then
             self.ConstantEval = eval
@@ -1168,6 +1377,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     ---@param planName string
+    ---@return number
     EvaluatePlan = function(self, planName)
         local plan = import(planName)
         if plan then
@@ -1194,6 +1404,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param val number
     IgnoreArmyUnitCap = function(self, val)
         self.IgnoreArmyCaps = val
         SetIgnoreArmyCap(self, val)
@@ -1211,6 +1422,8 @@ AIBrain = Class(moho.aibrain_methods) {
     },
 
     ---@param self AIBrain
+    ---@param string string
+    ---@param sound BpAudio
     PlayVOSound = function(self, string, sound)
         if not self.VOTable then self.VOTable = {} end
 
@@ -1291,11 +1504,12 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param sound BpAudio
     NuclearLaunchDetected = function(self, sound)
         self:PlayVOSound('NuclearLaunchDetected', sound)
     end,
 
-    -- SKIRMISH AI HELPER SYSTEMS
+    ---SKIRMISH AI HELPER SYSTEMS
     ---@param self AIBrain
     InitializeSkirmishSystems = function(self)
         -- Make sure we don't do anything for the human player!!!
@@ -1356,6 +1570,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param amount number
+    ---@param decay number
+    ---@param threatType string
     AddInitialEnemyThreatSorian = function(self, amount, decay, threatType)
         local aiBrain = self
         local myArmy = ScenarioInfo.ArmySetup[self.Name]
@@ -1378,8 +1595,8 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- Removes bases that have no engineers or factories.  This is a sorian AI function
-    -- Helps reduce the load on the game.
+    ---Removes bases that have no engineers or factories.  This is a sorian AI function
+    ---Helps reduce the load on the game.
     ---@param self AIBrain
     DeadBaseMonitor = function(self)
         while true do
@@ -1408,8 +1625,10 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- Used to get rid of nil table entries  --sorian ai function
+    ---Used to get rid of nil table entries. Sorian ai function
     ---@param self AIBrain
+    ---@param oldtable table
+    ---@return table
     RebuildTable = function(self, oldtable)
         local temptable = {}
         for k, v in oldtable do
@@ -1425,6 +1644,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param locationType string
+    ---@return boolean
     GetLocationPosition = function(self, locationType)
         if not self.BuilderManagers[locationType] then
             WARN('*AI ERROR: Invalid location type - ' .. locationType)
@@ -1434,6 +1655,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param position Vector
+    ---@return Vector
     FindClosestBuilderManagerPosition = function(self, position)
         local distance, closest
         for k, v in self.BuilderManagers do
@@ -1468,6 +1691,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param type string
+    ---@return integer
     GetManagerCount = function(self, type)
         local count = 0
         for k, v in self.BuilderManagers do
@@ -1494,6 +1719,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param spec any
     BaseMonitorInitializationSorian = function(self, spec)
         ---@class AiBaseMonitor
         self.BaseMonitor = {
@@ -1613,6 +1839,10 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param position Vector
+    ---@param radius number
+    ---@param baseName string
+    ---@param useCenter boolean
     AddBuilderManagers = function(self, position, radius, baseName, useCenter)
         self.BuilderManagers[baseName] = {
             FactoryManager = FactoryManager.CreateFactoryBuilderManager(self, baseName, position, radius, useCenter),
@@ -1627,6 +1857,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param category EntityCategory
+    ---@return integer
     GetEngineerManagerUnitsBeingBuilt = function(self, category)
         local unitCount = 0
         for k, v in self.BuilderManagers do
@@ -1679,6 +1911,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param threshold number
     SetupUnderEnergyStatTrigger = function(self, threshold)
         import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderEnergyThreshold, self, 'SkirmishUnderEnergyThreshold',
             {
@@ -1692,6 +1925,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param threshold number
     SetupOverEnergyStatTrigger = function(self, threshold)
         import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverEnergyThreshold, self, 'SkirmishOverEnergyThreshold',
             {
@@ -1705,6 +1939,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param threshold number
     SetupUnderMassStatTrigger = function(self, threshold)
         import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderMassThreshold, self, 'SkirmishUnderMassThreshold',
             {
@@ -1718,6 +1953,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param threshold number
     SetupOverMassStatTrigger = function(self, threshold)
         import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverMassThreshold, self, 'SkirmishOverMassThreshold',
             {
@@ -1769,8 +2005,8 @@ AIBrain = Class(moho.aibrain_methods) {
         return self.LayerPref
     end,
 
-    -- ECONOMY MONITOR
-    -- Monitors the economy over time for skirmish; allows better trend analysis
+    ---ECONOMY MONITOR
+    ---Monitors the economy over time for skirmish; allows better trend analysis
     ---@param self AIBrain
     EconomyMonitor = function(self)
         -- build "eco trend over time" table
@@ -1820,12 +2056,14 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param attackDataTable table
     InitializeAttackManager = function(self, attackDataTable)
         self.AttackManager = import('/lua/AI/attackmanager.lua').AttackManager(self, attackDataTable)
         self.AttackData = self.AttackManager
     end,
 
     ---@param self AIBrain
+    ---@param spec any
     AMAddPlatoon = function(self, spec)
         self.AttackManager:AddPlatoon(spec)
     end,
@@ -1835,10 +2073,10 @@ AIBrain = Class(moho.aibrain_methods) {
         self.AttackManager:PauseAttackManager()
     end,
 
-    -- AI PLATOON MANAGEMENT
-    -- New PlatoonBuildManager
-    -- This system is meant to be able to give some data about the platoon you want and have them
-    -- built and formed into platoons at will.
+    ---AI PLATOON MANAGEMENT
+    ---New PlatoonBuildManager
+    ---This system is meant to be able to give some data about the platoon you want and have them
+    ---built and formed into platoons at will.
     ---@param self AIBrain
     InitializePlatoonBuildManager = function(self)
         if not self.PBM then
@@ -1885,6 +2123,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param enable boolean
     PBMSetEnabled = function(self, enable)
         if not self.PBMThread and enable then
             self.PBMThread = self:ForkThread(self.PlatoonBuildManagerThread)
@@ -1894,30 +2133,34 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- Platoon Spec
-    -- {
-    --       PlatoonTemplate = platoon template,
-    --       InstanceCount = number of duplicates to place in the platoon list
-    --       Priority = integer,
-    --       BuildConditions = list of functions that return true/false, list of args, {< function>, {<args>}}
-    --       LocationType = string for type of location, setup via addnewlocation function,
-    --       BuildTimeOut = how long it'll try to form this platoon after it's been told to build.,
-    --       PlatoonType = 'Air'/'Land'/'Sea' basic type of unit, used for finding what type of factory to build from,
-    --       RequiresConstruction = true/false do I need to build this from a factory or should I just try to form it?,
-    --       PlatoonBuildCallbacks = {FunctionsToCallBack when the platoon starts to build}
-    --       PlatoonAIFunction = if nil uses function in platoon.lua, function for the main AI thread
-    --       PlatoonAddFunctions = {<other threads to be forked on this platoon>}
-    --       PlatoonData = {
-    --           Construction = {
-    --               BaseTemplate = basetemplates, must contain templates for all 3 factions it will be viewed by faction index,
-    --               BuildingTemplate = building templates, contain templates for all 3 factions it will be viewed by faction index,
-    --               BuildClose = true/false do I follow the table order or do build the best spot near me?
-    --               BuildRelative = true/false are the build coordinates relative to the starting location or absolute coords?,
-    --               BuildStructures = {List of structure types and the order to build them.}
-    --          }
-    --      }
-    --  },
+    --- # Platoon Spec
+    ---```lua 
+    ---{
+    ---PlatoonTemplate = platoon template,
+    ---InstanceCount = number of duplicates to place in the platoon list
+    ---Priority = integer,
+    ---BuildConditions = list of functions that return true/false, list of args, {< function>, {<args>}}
+    ---LocationType = string for type of location, setup via addnewlocation function,
+    ---BuildTimeOut = how long it'll try to form this platoon after it's been told to build.,
+    ---PlatoonType = 'Air'/'Land'/'Sea' basic type of unit, used for finding what type of factory to build from,
+    ---RequiresConstruction = true/false do I need to build this from a factory or should I just try to form it?,
+    ---PlatoonBuildCallbacks = {FunctionsToCallBack when the platoon starts to build}
+    ---PlatoonAIFunction = if nil uses function in platoon.lua, function for the main AI thread
+    ---PlatoonAddFunctions = {<other threads to be forked on this platoon>}
+    ---
+    ---PlatoonData = {
+    ---    Construction = {
+    ---        BaseTemplate = basetemplates, must contain templates for all 3 factions it will be viewed by faction index,
+    ---        BuildingTemplate = building templates, contain templates for all 3 factions it will be viewed by faction index,
+    ---        BuildClose = true/false do I follow the table order or do build the best spot near me?
+    ---        BuildRelative = true/false are the build coordinates relative to the starting location or absolute coords?,
+    ---        BuildStructures = {List of structure types and the order to build them.}
+    ---     }
+    ---}
+    ---},
+    --- ```
     ---@param self AIBrain
+    ---@param pltnTable PlatoonTable
     PBMAddPlatoon = function(self, pltnTable)
         if not pltnTable.PlatoonTemplate then
             local stng = '*AI ERROR: INVALID PLATOON LIST IN '.. self.CurrentPlan.. ' - MISSING TEMPLATE.  '
@@ -1986,6 +2229,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param builderName string
     PBMRemoveBuilder = function(self, builderName)
         for pType, builders in self.PBM.Platoons do
             for num, data in builders do
@@ -1998,10 +2242,11 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- Function to clear all the platoon lists so you can feed it a bunch more.
-    -- formPlatoons - Gives you the option to form all the platoons in the list before its cleaned up so that
-    -- you don't have units hanging around.
+    ---Function to clear all the platoon lists so you can feed it a bunch more.
+    ---formPlatoons - Gives you the option to form all the platoons in the list before its cleaned up so that
+    ---you don't have units hanging around.
     ---@param self AIBrain
+    ---@param formPlatoons? Platoon
     PBMClearPlatoonList = function(self, formPlatoons)
         if formPlatoons then
             for _, v in self.PBM.PlatoonTypes do
@@ -2022,6 +2267,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param location Vector
+    ---@return boolean
     PBMFormAllPlatoons = function(self, location)
         local locData = self:PBMGetLocation(location)
         if not locData then
@@ -2033,6 +2280,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@return boolean
     PBMHasPlatoonList = function(self)
         return self.HasPlatoonList
     end,
@@ -2047,7 +2295,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- Goes through the location areas, finds the factories, sets a primary then tells all the others to guard.
+    ---Goes through the location areas, finds the factories, sets a primary then tells all the others to guard.
     ---@param self AIBrain
     PBMSetPrimaryFactories = function(self)
         for _, v in self.PBM.Locations do
@@ -2117,6 +2365,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param factories Unit
+    ---@param primary number
     PBMAssistGivenFactory = function(self, factories, primary)
         for _, v in factories do
             if not v.Dead and not (v:IsUnitState('Building') or v:IsUnitState('Upgrading')) then
@@ -2130,6 +2380,11 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param factories Unit
+    ---@param location Vector
+    ---@param rallyLoc Vector
+    ---@param markerType string
+    ---@return boolean
     PBMSetRallyPoint = function(self, factories, location, rallyLoc, markerType)
         if not table.empty(factories) then
             local rally
@@ -2173,6 +2428,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param factory Unit
+    ---@param location Vector
+    ---@return boolean
     PBMFactoryLocationCheck = function(self, factory, location)
         -- If passed in a PBM Location table or location type name
         local locationName = location
@@ -2213,6 +2471,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param factories Unit
+    ---@param primary Unit[]
+    ---@return boolean
     PBMCheckHighestTechFactory = function(self, factories, primary)
         local catTable = {categories.TECH1, categories.TECH2, categories.TECH3}
         local catLevel = 1
@@ -2234,8 +2495,10 @@ AIBrain = Class(moho.aibrain_methods) {
         return false
     end,
 
-    -- Picks the first tech 3, tech 2 or tech 1 factory to make primary
+    ---Picks the first tech 3, tech 2 or tech 1 factory to make primary
     ---@param self AIBrain
+    ---@param factories Unit
+    ---@return Unit
     PBMGetPrimaryFactory = function(self, factories)
         local categoryTable = {categories.TECH3, categories.TECH2, categories.TECH1}
         for kc, vc in categoryTable do
@@ -2248,6 +2511,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoon Platoon
+    ---@return number
     PBMGetPriority = function(self, platoon)
         for typek, typev in self.PBM.PlatoonTypes do
             for k, v in self.PBM.Platoons[typev] do
@@ -2263,6 +2528,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoon Platoon
+    ---@param amount number
+    ---@return boolean
     PBMAdjustPriority = function(self, platoon, amount)
         for typek, typev in self.PBM.PlatoonTypes do
             for k, v in self.PBM.Platoons[typev] do
@@ -2287,6 +2555,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoon Platoon
+    ---@param amount number
+    ---@return boolean
     PBMSetPriority = function(self, platoon, amount)
         for typek, typev in self.PBM.PlatoonTypes do
             for k, v in self.PBM.Platoons[typev] do
@@ -2310,8 +2581,13 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- Adds a new build location
+    ---Adds a new build location
     ---@param self AIBrain
+    ---@param loc Vector
+    ---@param radius number
+    ---@param locType string
+    ---@param useCenterPoint boolean
+    ---@return boolean
     PBMAddBuildLocation = function(self, loc, radius, locType, useCenterPoint)
         if not radius or not loc or not locType then
             error('*AI ERROR: INVALID BUILD LOCATION FOR PBM', 2)
@@ -2347,6 +2623,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param locationName string
+    ---@return boolean
     PBMGetLocation = function(self, locationName)
         if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
@@ -2359,6 +2637,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param loc Vector
+    ---@return boolean
     PBMGetLocationCoords = function(self, loc)
         if not loc then
             return false
@@ -2380,6 +2660,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param loc Vector
+    ---@return boolean
     PBMGetLocationRadius = function(self, loc)
         if not loc then
             return false
@@ -2397,6 +2679,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param location Vector
+    ---@return boolean
     PBMGetLocationFactories = function(self, location)
         if not location then
             return false
@@ -2410,6 +2694,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param location Vector
+    ---@return boolean
     PBMGetAllFactories = function(self, location)
         if not location then
             return false
@@ -2433,10 +2719,12 @@ AIBrain = Class(moho.aibrain_methods) {
         return false
     end,
 
-    -- Removes a build location based on it area
-    -- IF either is nil, then it will do the other.
-    -- This way you can remove all of one type or all of one rectangle
+    --- Removes a build location based on it area
+    --- IF either is nil, then it will do the other.
+    --- This way you can remove all of one type or all of one rectangle
     ---@param self AIBrain
+    ---@param loc Vector
+    ---@param locType string
     PBMRemoveBuildLocation = function(self, loc, locType)
         for k, v in self.PBM.Locations do
             if (loc and v.Location == loc) or (locType and v.LocationType == locType) then
@@ -2445,9 +2733,10 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- Sort platoon list
-    -- PlatoonType = 'Air', 'Land' or 'Sea'
+    --- Sort platoon list
     ---@param self AIBrain
+    ---@param platoonType PlatoonType
+    ---@return boolean
     PBMSortPlatoonsViaPriority = function(self, platoonType)
          if platoonType ~= 'Air' and platoonType ~= 'Land' and platoonType ~= 'Sea' and platoonType ~= 'Gate' then
             local strng = '*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (', repr(platoonType), ') WAS PASSED IN.'
@@ -2474,6 +2763,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param interval number
     PBMSetCheckInterval = function(self, interval)
         self.PBM.BuildCheckInterval = interval
     end,
@@ -2535,6 +2825,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param builderData table
+    ---@return boolean
     PBMHandleAvailable = function(self, builderData)
         if not builderData.PlatoonHandles then
             return false
@@ -2548,6 +2840,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoon Platoon
+    ---@param builderData table
+    ---@return boolean
     PBMStoreHandle = function(self, platoon, builderData)
         if not builderData.PlatoonHandles then
             return false
@@ -2570,6 +2865,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoon Platoon
+    ---@return boolean
     PBMRemoveHandle = function(self, platoon)
         for typek, typev in self.PBM.PlatoonTypes do
             for k, v in self.PBM.Platoons[typev] do
@@ -2587,6 +2884,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param builder Unit
+    ---@return boolean
     PBMSetHandleBuilding = function(self, builder)
         if not builder.PlatoonHandles then
             error('*AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
@@ -2604,6 +2903,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param builder Unit
+    ---@return boolean
     PBMCheckHandleBuilding = function(self, builder)
         if not builder.PlatoonHandles then
             error('*AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
@@ -2618,6 +2919,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param builder Unit
+    ---@return boolean
     PBMSetBuildingHandleFalse = function(self, builder)
         if not builder.PlatoonHandles then
             error('*AI DEBUG: No PlatoonHandles for builder - ' .. builder.BuilderName)
@@ -2633,6 +2936,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param builder Unit
+    ---@return integer
     PBMNumHandlesAvailable = function(self, builder)
         local numAvail = 0
         for k, v in builder.PlatoonHandles do
@@ -2763,12 +3068,15 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- Form platoons
-    -- Extracted as it's own function so you can call this to try and form platoons to clean up the pool
-    -- requireBuilding: true = platoon must have 'BUILDING' has its handle, false = it'll form any platoon it can
-    -- Platoontype is just 'Air'/'Land'/'Sea', those are found in the platoon build manager table template.
-    -- Location/Radius are where to do this.  If they aren't specified they will grab from anywhere.
+    ---# Form platoons
+    --- Extracted as it's own function so you can call this to try and form platoons to clean up the pool
+    --- requireBuilding: true = platoon must have 'BUILDING' has its handle, false = it'll form any platoon it can
+    --- Platoontype is just 'Air'/'Land'/'Sea', those are found in the platoon build manager table template.
+    --- Location/Radius are where to do this.  If they aren't specified they will grab from anywhere.
     ---@param self AIBrain
+    ---@param requireBuilding boolean
+    ---@param platoonType PlatoonType
+    ---@param location Vector
     PBMFormPlatoons = function(self, requireBuilding, platoonType, location)
         local platoonList = self.PBM.Platoons
         local personality = self:GetPersonality()
@@ -2903,9 +3211,11 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- Get the primary factory with the lowest order count
-    -- This is used for the 'Any' platoon type so we can find any primary factory to build from.
+    --- Get the primary factory with the lowest order count
+    --- This is used for the 'Any' platoon type so we can find any primary factory to build from.
     ---@param self AIBrain
+    ---@param location Vector
+    ---@return Vector
     GetLowestOrderPrimaryFactory = function(self, location)
         local num
         local fac
@@ -2922,8 +3232,13 @@ AIBrain = Class(moho.aibrain_methods) {
         return fac
     end,
 
-    -- Set number of units to be built as the number of factories in a location
+    ---Set number of units to be built as the number of factories in a location
     ---@param self AIBrain
+    ---@param template any
+    ---@param location Vector
+    ---@param pType PlatoonType
+    ---@param factory Unit
+    ---@return table
     PBMBuildNumFactories = function (self, template, location, pType, factory)
         local retTemplate = table.deepcopy(template)
         local assistFacs = factory[1]:GetGuards()
@@ -3002,6 +3317,11 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoon Platoon
+    ---@param factories Unit
+    ---@param location Vector
+    ---@param pType PlatoonType
+    ---@return integer
     PBMGenerateTimeOut = function(self, platoon, factories, location, pType)
         local retBuildTime = 0
         local i = 3
@@ -3036,6 +3356,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param location Vector
+    ---@param pType PlatoonType
+    ---@return integer
     PBMGetNumFactoriesAtLocation = function(self, location, pType)
         local airFactories = {}
         local landFactories = {}
@@ -3070,6 +3393,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoon Platoon
     PBMPlatoonTimeOutThread = function(self, platoon)
         local minWait = 5 -- 240 CAMPAIGNS
         if platoon.BuildTimeOut and platoon.BuildTimeOut < minWait then
@@ -3081,6 +3405,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoonTemplate any
+    ---@param factory Unit
+    ---@return boolean
     PBMFactoryCanBuildPlatoon = function(self, platoonTemplate, factory)
         for i = 3, table.getn(platoonTemplate) do
             if not factory:CanBuild(platoonTemplate[i][1]) then
@@ -3091,6 +3418,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoon Platoon
     PBMPlatoonDestroyed = function(self, platoon)
         self:PBMRemoveHandle(platoon)
         if platoon.PlatoonData.BuilderName then
@@ -3099,6 +3427,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param bCs table
+    ---@param index number
+    ---@return boolean
     PBMCheckBuildConditions = function(self, bCs, index)
         for _, v in bCs do
             if not v.LookupNumber[index] then
@@ -3167,6 +3498,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoonList Platoon[]
+    ---@param ai AIBrain
+    ---@return nil|Platoon
     CombinePlatoons = function(self, platoonList, ai)
         local squadTypes = {'Unassigned', 'Attack', 'Artillery', 'Support', 'Scout', 'Guard'}
         local returnPlatoon
@@ -3189,8 +3523,9 @@ AIBrain = Class(moho.aibrain_methods) {
         return returnPlatoon
     end,
 
-    -- BASE MONITORING SYSTEM
+    ---# BASE MONITORING SYSTEM
     ---@param self AIBrain
+    ---@param spec any
     BaseMonitorInitialization = function(self, spec)
         ---@class AiBaseMonitor
         self.BaseMonitor = {
@@ -3232,6 +3567,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param platoon Platoon
+    ---@param threat number
     BaseMonitorPlatoonDistress = function(self, platoon, threat)
         if not self.BaseMonitor then
             return
@@ -3289,6 +3626,10 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param position Vector
+    ---@param radius number
+    ---@param threshold number
+    ---@return boolean|table
     BaseMonitorDistressLocation = function(self, position, radius, threshold)
         local returnPos = false
         local highThreat = false
@@ -3371,6 +3712,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param pos Vector
+    ---@param threattype string
     BaseMonitorAlertTimeout = function(self, pos, threattype)
         local timeout = self.BaseMonitor.DefaultAlertTimeout
         local threat
@@ -3597,6 +3940,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param threattypes string
     T4ThreatMonitorTimeout = function(self, threattypes)
         WaitSeconds(180)
         for _, v in threattypes do
@@ -3605,6 +3949,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@return Vector[]
     GetBaseVectors = function(self)
         local enemy = self:GetCurrentEnemy()
         local index = self:GetArmyIndex()
@@ -3636,6 +3981,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@return table
     GetStructureVectors = function(self)
         local structures = self:GetListOfUnits(categories.STRUCTURE - categories.WALL, false)
         -- Add all points around location
@@ -3670,6 +4016,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param strengthTable table
+    ---@return boolean
     GetAllianceEnemy = function(self, strengthTable)
         local returnEnemy = false
 
@@ -3792,11 +4140,15 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Skirmish expansion help
     ---@param self AIBrain
+    ---@param eng Unit
+    ---@param reference string
     ExpansionHelp = function(self, eng, reference)
         self:ForkThread(self.ExpansionHelpThread, eng, reference)
     end,
 
     ---@param self AIBrain
+    ---@param eng Unit
+    ---@param reference string
     ExpansionHelpThread = function(self, eng, reference)
         local pool = self:GetPlatoonUniquelyNamed('ArmyPool')
         local landHelp = {}
@@ -3815,6 +4167,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param units Unit
+    ---@param reference string
     GroupHelpThread = function(self, units, reference)
         local plat = self:MakePlatoon('', '')
         self:AssignUnitsToPlatoon(plat, units, 'Attack', 'GrowthFormation')
@@ -3872,17 +4226,12 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -- Scouting help...
-    --  Function: AddInitialEnemyThreat
-    --  Args:
-    --      brain - brain to run the function for
-    --      amount - amount of threat to add to each enemy start area
-    --      decay - rate that the threat should decay
-    --  Description:
-    --      Creates an influence map threat at enemy bases so the AI will start sending attacks before scouting gets up.
-    --  Returns:
-    --      nil
+    ---## Scouting help...
+    --- Creates an influence map threat at enemy bases so the AI will start sending attacks before scouting gets up.
     ---@param self AIBrain
+    ---@param amount number amount of threat to add to each enemy start area
+    ---@param decay number rate that the threat should decay
+    ---@return nil
     AddInitialEnemyThreat = function(self, amount, decay)
         local aiBrain = self
         local myArmy = ScenarioInfo.ArmySetup[self.Name]
@@ -3905,16 +4254,10 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --  Function: ParseIntelThread
-    --  Args:
-    --      brain - brain to run the function for
-    --  Description:
-    --      Once per second, checks imap for enemy expansion bases.
-    --  Returns:
-    --      nil (loops forever)
-    -------------------------------------------------------
+    ---##  Function: ParseIntelThread
+    ---Once per second, checks imap for enemy expansion bases.
     ---@param self AIBrain
+    ---@return nil  #loops forever
     ParseIntelThread = function(self)
         if not self.InterestList or not self.InterestList.MustScout then
             error('Scouting areas must be initialized before calling AIBrain:ParseIntelThread.', 2)
@@ -3970,16 +4313,11 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --  Function: GetUntaggedMustScoutArea
-    --  Args:
-    --      brain - the brain to run the function for
-    --  Description:
-    --      Gets an area that has been flagged with the AddScoutArea function that does not have a unit heading to scout it already.
-    --  Returns:
-    --      location, index
-    -------------------------------------------------------
+    ---## Function: GetUntaggedMustScoutArea
+    --- Gets an area that has been flagged with the AddScoutArea function that does not have a unit heading to scout it already.
     ---@param self AIBrain
+    ---@return Vector location
+    ---@return number index
     GetUntaggedMustScoutArea = function(self)
         -- If any locations have been specifically tagged for scouting
         if not self.InterestList or not self.InterestList.MustScout then
@@ -3993,17 +4331,11 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --  Function: AddScoutArea
-    --  Args:
-    --      brain - the brain to run the function for
-    --      vec3 - the area to flag for scouting
-    --  Description:
-    --      Sets an area to be scouted once by air scouts at the next opportunity.
-    --  Returns:
-    --      nil
-    -------------------------------------------------------
+    ---## Function: AddScoutArea
+    --- Sets an area to be scouted once by air scouts at the next opportunity.
     ---@param self AIBrain
+    ---@param location Vector
+    ---@return nil
     AddScoutArea = function(self, location)
         if not self.InterestList or not self.InterestList.MustScout then
             error('Scouting areas must be initialized before calling AIBrain:AddScoutArea.', 2)
@@ -4024,18 +4356,12 @@ AIBrain = Class(moho.aibrain_methods) {
         )
     end,
 
-    -------------------------------------------------------
-    --  Function: BuildScoutLocations
-    --  Args:
-    --      brain - the brain to run the function for
-    --  Description:
-    --      Sets up the initial low-priority scouting areas. If playing with fixed starting locations,
-    --      also sets up high-priority scouting areas. This function may be called multiple times, but only
-    --      has an effect the first time it is called per brain.
-    --  Returns:
-    --      nil
-    -------------------------------------------------------
+    ---##  Function: BuildScoutLocations
+    ---  Sets up the initial low-priority scouting areas. If playing with fixed starting locations,
+    ---  also sets up high-priority scouting areas. This function may be called multiple times, but only
+    ---  has an effect the first time it is called per brain.
     ---@param self AIBrain
+    ---@return nil
     BuildScoutLocations = function(self)
         local aiBrain = self
         local opponentStarts = {}
@@ -4153,17 +4479,11 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --  Function: SortScoutingAreas
-    --  Args:
-    --      brain - the brain to run the function for
-    --      table - high priority or low priority scouting list to be sorted
-    --  Description:
-    --      Sorts the brain's list of scouting areas by time since scouted, and then distance from main base.
-    --  Returns:
-    --      nil
-    -------------------------------------------------------
+    ---## Function: SortScoutingAreas
+    --- Sorts the brain's list of scouting areas by time since scouted, and then distance from main base.
     ---@param self AIBrain
+    ---@param list table
+    ---@return nil
     SortScoutingAreas = function(self, list)
         table.sort(list, function(a, b)
             if a.LastScouted == b.LastScouted then
@@ -4315,6 +4635,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param brainbool boolean
     PickEnemyLogicSorian = function(self, brainbool)
         local armyStrengthTable = {}
         local selfIndex = self:GetArmyIndex()
@@ -4416,6 +4737,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param threshold number
     SetupUnderEnergyStatTriggerSorian = function(self, threshold)
         import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderEnergyThresholdSorian, self, 'SkirmishUnderEnergyThresholdSorian',
             {
@@ -4429,6 +4751,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param threshold number
     SetupOverEnergyStatTriggerSorian = function(self, threshold)
         import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverEnergyThresholdSorian, self, 'SkirmishOverEnergyThresholdSorian',
             {
@@ -4442,6 +4765,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param threshold number
     SetupUnderMassStatTriggerSorian = function(self, threshold)
         import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderMassThresholdSorian, self, 'SkirmishUnderMassThresholdSorian',
             {
@@ -4455,6 +4779,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param threshold number
     SetupOverMassStatTriggerSorian = function(self, threshold)
         import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverMassThresholdSorian, self, 'SkirmishOverMassThresholdSorian',
             {
@@ -4468,6 +4793,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param pingData table
     DoAIPing = function(self, pingData)
         if self.Sorian then
             if pingData.Type then
@@ -4477,6 +4803,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param pos Vector
     AttackPointsTimeout = function(self, pos)
         WaitSeconds(300)
         for k, v in self.AttackPoints do
@@ -4488,6 +4815,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param pos Vector
+    ---@param enemy Army
     AirAttackPointsTimeout = function(self, pos, enemy)
         local threat
         local myThreat
@@ -4513,11 +4842,11 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Retrieves all units that fit the criteria around some point. Excludes dummy units.
     ---@param self AIBrain
-    -- @param category The categories the units should fit.
-    -- @param position The center point to start looking for units.
-    -- @param radius The radius of the circle we look for units in.
-    -- @param alliance The alliance status ('Ally', 'Enemy', 'Neutral') to those units.
-    -- @return nil if none found or a table.
+    ---@param category EntityCategory The categories the units should fit.
+    ---@param position Vector The center point to start looking for units.
+    ---@param radius number The radius of the circle we look for units in.
+    ---@param alliance AllianceStatus 
+    ---@return nil 
     GetUnitsAroundPoint = function(self, category, position, radius, alliance)
         if alliance then 
             -- call where we do care about alliance
@@ -4530,10 +4859,10 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Returns list of units by category. Excludes dummy units.
     ---@param self AIBrain
-    -- @param category Unit's category, example: categories.TECH2 .
-    -- @param needToBeIdle true/false Unit has to be idle (appears to be not functional).
-    -- @param requireBuilt true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
-    -- @return tblUnits Table containing units.
+    ---@param cats EntityCategory Unit's category, example: categories.TECH2 .
+    ---@param needToBeIdle boolean true/false Unit has to be idle (appears to be not functional).
+    ---@param requireBuilt boolean true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
+    ---@return table 
     GetListOfUnits = function(self, cats, needToBeIdle, requireBuilt)
         -- defaults to false, prevent sending nil
         requireBuilt = requireBuilt or false
@@ -4541,4 +4870,28 @@ AIBrain = Class(moho.aibrain_methods) {
         -- retrieve units, excluding insignificant units
         return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
     end,
+
+    ---@param self AIBrain
+    ---@return CommandUnit | nil
+    GetCommander = function(self)
+        local cdr = self.CDR
+        if cdr and cdr:IsDead() then
+            cdr = nil
+        end
+        if not cdr then
+            local commanders = self:GetListOfUnits(categories.COMMANDER, false)
+            table.shuffle(commanders)
+            for _, commander in commanders do
+                if not commander:IsDead() then
+                    cdr = commander
+                    break
+                end
+            end
+        end
+        return cdr
+    end;
 }
+
+-- kept for mod backwards compatibility
+local PCBC = import('/lua/editor/platooncountbuildconditions.lua')
+local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
