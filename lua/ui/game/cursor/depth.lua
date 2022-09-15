@@ -5,9 +5,6 @@ local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
 local Exit = import('/lua/ui/override/Exit.lua')
 
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
-local meshCircularRing = '/meshes/game/PathRing_LOD0.scm'
-local meshSquareRing = '/meshes/game/PathSquare_LOD0.scm'
-local meshCylinder = '/meshes/game/PathCylinder_LOD0.scm'
 
 local MeshOnTerrain = nil
 local MeshesInBetween = { }
@@ -28,8 +25,8 @@ local function GetCursorInformation()
                         for _, c in b.Children do
                             cursor[c.Name] = c.Value
                         end
+                        break
                     end
-
                 end
             end
         end
@@ -86,6 +83,8 @@ end
 --- really is (when it is on top of water)
 local function DepthScanningThread()
 
+    local scenario = SessionGetScenarioInfo()
+
     -- allocate mesh that is on the terrain
     MeshOnTerrain = WorldMesh()
     MeshOnTerrain:SetMesh({
@@ -127,6 +126,9 @@ local function DepthScanningThread()
         -- check if we have all the data required
         if position and position[1] and cursor and cursor.Elevation and CheckConditions() then
             
+            position[1] = math.clamp(position[1], 0, scenario.size[1])
+            position[3] = math.clamp(position[3], 0, scenario.size[2])
+
             -- move with the grid when building
             info = CommandMode.GetCommandMode()
             if info[1] == 'build' then
@@ -152,7 +154,7 @@ local function DepthScanningThread()
             -- update visiblity intermediate dots
             for k = 1, MeshesInbetweenCount do
                 local bit = MeshesInBetween[k]
-                location[2] = (k / 5) * position[2] + (1 - k / 5) * elevation
+                location[2] = (0.2 * k) * position[2] + (1 - 0.2 * k) * elevation
 
                 transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
                 if transparency > 0.05 then
@@ -174,6 +176,8 @@ local function DepthScanningThread()
         WaitFrames(1)
     end
 end
+
+reprsl(debug.listcode(DepthScanningThread))
 
 Trash:Add(ForkThread(DepthScanningThread))
 
