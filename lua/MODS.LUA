@@ -202,7 +202,7 @@ Mod initialization issues
 -- we should really stick `optiondir` in here, so it isn't hardcoded to `mapname .. 'options.lua'`
 
 ---@class ModInfo
----@field location string    defaults to `Dirname(filename)`
+---@field location FileName  defaults to `Dirname(filename)`
 ---@field name string        defaults to `filename`
 ---@field description string defaults to `"<LOC uimod_0006>(No description)"`
 ---@field author string      defaults to `''`

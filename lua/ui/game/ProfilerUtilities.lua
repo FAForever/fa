@@ -1,8 +1,4 @@
-local CreateEmptyProfilerTable = import("/lua/shared/Profiler.lua").CreateEmptyProfilerTable
-
--- upvalue for performance
-local StringFind = string.find
-local StringLower = string.lower
+local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 
 local cache = {}
 --- Flattens the profiler data in a single list, can be tweaked using filter parameters
@@ -16,7 +12,7 @@ local cache = {}
 function Format(data, growth, filterSource, filterScope, filterName)
     growth = growth or {}
     if filterName then
-        filterName = StringLower(filterName)
+        filterName = filterName:lower()
     end
 
     -- reset cache
@@ -41,7 +37,7 @@ function Format(data, growth, filterSource, filterScope, filterName)
             -- name of function and value
             for name, value in scopeData do
                 -- skip content that we're not interested in
-                if filterName and not StringFind(StringLower(name), filterName) then
+                if filterName and not name:lower():find(filterName) then
                     continue
                 end
 
@@ -59,7 +55,7 @@ function Format(data, growth, filterSource, filterScope, filterName)
                     -- populate element
                     element.growth = scopeGrowth[name] or 0
                     element.name = name
-                    element.nameLower = StringLower(name)
+                    element.nameLower = name:lower()
                     element.scope = scope
                     element.source = source
                     element.value = value
@@ -122,7 +118,7 @@ end
 
 local lookupCache = {}
 ---@param data ProfilerData
----@return ProfilerSourceData
+---@return ProfilerGrowth
 function LookUp(data)
     -- reset the cache
     for key, _ in lookupCache do

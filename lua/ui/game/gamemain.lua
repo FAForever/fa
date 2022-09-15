@@ -92,6 +92,7 @@ function SetLayout(layout)
     import('/lua/ui/game/controlgroups.lua').SetLayout()
     import('/lua/ui/game/chat.lua').SetLayout()
     import('/lua/ui/game/minimap.lua').SetLayout()
+    import('/lua/ui/game/recall.lua').SetLayout()
 end
 
 function OnFirstUpdate()
@@ -137,6 +138,7 @@ function OnFirstUpdate()
             local factions = import('/lua/factions.lua').Factions
             if factions[armyInfo.armiesTable[focusarmy].faction+1].DefaultSkin then
                 UIUtil.SetCurrentSkin(factions[armyInfo.armiesTable[focusarmy].faction+1].DefaultSkin)
+                return
             end
         end
     end
@@ -314,6 +316,7 @@ function CreateUI(isReplay)
     hotkeyLabelsInit()
 
     import('/lua/ui/notify/customiser.lua').init(isReplay, import('/lua/ui/game/borders.lua').GetMapGroup())
+
 end
 
 -- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)

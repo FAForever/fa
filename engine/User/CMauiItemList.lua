@@ -4,7 +4,8 @@
 local CMauiItemList = {}
 
 ---
-function CMauiItemList:AddItem()
+---@param item string
+function CMauiItemList:AddItem(item)
 end
 
 ---

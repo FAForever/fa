@@ -70,6 +70,8 @@ styles = {
 }
 
 ---@class Window : Group
+---@field TitleGroup Group
+---@field ClientGroup Group
 Window = Class(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
         Group.__init(self, parent, tostring(title) .. "-window")
@@ -280,7 +282,7 @@ Window = Class(Group) {
         end
 
         self.ClientGroup = Group(self, 'window client group')
-        LayoutHelpers.ReusedLayoutFor(self.ClientGroup)
+        LayoutHelpers.LayoutFor(self.ClientGroup)
             :Top(self.TitleGroup.Bottom)
             :Left(self.ml.Right)
             :Height(function() return self.bm.Top() - self.TitleGroup.Bottom() end)

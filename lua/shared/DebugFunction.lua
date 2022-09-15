@@ -99,9 +99,11 @@ function GetDebugFunctionInfo(f)
     }
 end
 
+---@param val any
+---@return string
 function Representation(val)
     if type(val) == "string" then
-        return string.format("%q", val)
+        return ("%q"):format(val)
     end
     return tostring(val)
 end
@@ -116,11 +118,11 @@ local MAXSTACK = 250
 local MAXUPVALUE = 32
 local FIELDS_PER_FLUSH = 32
 
-local hexWidth = math.ceil(Bx_SIZE / 4)
+local hexWidth = math.ceil(Bx_SIZE * 0.25)
 local addressPattern = "%0#" .. (hexWidth + 2) .. "x"
 local addressZero = "0x" .. string.rep("0", hexWidth)
 
----@alias DebugOpArgKind "const" | "double" | "global" | "offset" | "prototype" | "register" | "register|const" | "upvalue" | "value"
+---@alias DebugOpArgKind "const" | "double" | "global" | "offset" | "prototype" | "register" | "register_or_const" | "upvalue" | "value"
 ---@alias DebugOpControlFlow "call" | "jump" | "return" | "skip" | "tailcall"
 ---@alias DebugOpFormat "A" | "AB" | "ABC" | "ABx" | "AsBx"
 
@@ -132,23 +134,23 @@ end
 
 ---@type table<DebugOpArgKind, fun(intr: DebugInstruction, arg: number, fn?: DebugFunction): string>
 DebugOpcodeArgFormatters = {
-    ["default"] = function(instr, arg, fn)
+    default = function(instr, arg, fn)
         return tostring(arg)
     end,
 
-    ["const"] = function(instr, arg, fn)
+    const = function(instr, arg, fn)
         if fn then
             return Representation(fn:GetConstant(arg + 1))
         end
-        return "K(" .. arg .. ")"
+        return "K(" .. arg .. ')'
     end,
-    ["global"] = function(instr, arg, fn)
+    global = function(instr, arg, fn)
         if fn then
             return Representation(fn:GetConstant(arg + 1))
         end
         return "G(K(" .. arg .. "))"
     end,
-    ["offset"] = function(instr, arg, fn)
+    offset = function(instr, arg, fn)
         -- adjust address offsets to absolute addresses
         arg = instr:ResolveAbsoluteAddress(arg)
         if arg == 0 then
@@ -157,35 +159,35 @@ DebugOpcodeArgFormatters = {
         end
         return addressPattern:format(arg)
     end,
-    ["prototype"] = function(instr, arg, fn)
-        return "P(" .. arg .. ")"
+    prototype = function(instr, arg, fn)
+        return "P(" .. arg .. ')'
     end,
-    ["register"] = function(instr, arg, fn)
-        return "R" .. arg
+    register = function(instr, arg, fn)
+        return 'R' .. arg
     end,
-    ["register|const"] = function(instr, arg, fn)
+    register_or_const = function(instr, arg, fn)
         if arg < MAXSTACK then
-            return "R" .. arg
+            return 'R' .. arg
         else
             arg = arg - MAXSTACK
             if fn then
                 return Representation(fn:GetConstant(arg + 1))
             end
-            return "K(" .. arg .. ")"
+            return "K(" .. arg .. ')'
         end
     end,
-    ["upvalue"] = function(instr, arg, fn)
+    upvalue = function(instr, arg, fn)
         if fn then
             return Representation(fn:GetUpvalueName(arg + 1))
         end
-        return "U(" .. arg .. ")"
+        return "U(" .. arg .. ')'
     end,
 
     -- SETLIST is mangled to shove two numbers into one argument asymmetrically in Lua 5.0
-    ["double"] = function(instr, arg, fn)
+    double = function(instr, arg, fn)
         local len = math.mod(arg, FIELDS_PER_FLUSH) + 1
         local start = arg - len + 2
-        return start .. "," .. len
+        return start .. ',' .. len
     end,
 }
 setmetatable(DebugOpcodeArgFormatters, {
@@ -198,22 +200,22 @@ setmetatable(DebugOpcodeArgFormatters, {
 
 ---@class DebugOpcode
 ---@field args number
----@field A? function
----@field B? function
----@field C? function
+---@field A? DebugOpArgKind
+---@field B? DebugOpArgKind
+---@field C? DebugOpArgKind
 ---@field format DebugOpFormat
 ---@field controlFlow? DebugOpControlFlow
 ---@field name string
-DebugOpcode = Class() {
+DebugOpcode = ClassSimple {
     ---@param self DebugOpcode
     ---@param a DebugOpArgKind
     ---@param b? DebugOpArgKind
     ---@param c? DebugOpArgKind
     ---@param controlFlow? DebugOpControlFlow
     __init = function(self, a, b, c, controlFlow)
-        self.A = DebugOpcodeArgFormatters[a]
-        self.B = DebugOpcodeArgFormatters[b]
-        self.C = DebugOpcodeArgFormatters[c]
+        self.A = a
+        self.B = b
+        self.C = c
         self.controlFlow = controlFlow
         if c then
             self.args = 3
@@ -250,18 +252,15 @@ DebugOpcode = Class() {
 
     ---@param self DebugOpcode
     ---@param instr DebugInstruction
-    ---@param arg number | string
+    ---@param arg string
     ---@param fn? DebugFunction optional function to resolve constants from
     ---@return string | nil
     InstructionArgToString = function(self, instr, arg, fn)
-        if type(arg) == "number" then
-            arg = string.char(64 + arg)
-        end
         local type = self[arg]
         if not type then
             return nil
         end
-        return type(instr, instr[arg], fn)
+        return DebugOpcodeArgFormatters[type](instr, instr[arg], fn)
     end;
 }
 
@@ -282,13 +281,10 @@ DebugVarNameOpcode = Class(DebugOpcode) {
 
     ---@param self DebugVarNameOpcode
     ---@param instr DebugInstruction
-    ---@param arg number | string
+    ---@param arg string
     ---@param fn? DebugFunction optional function to resolve constants from
     ---@return string | nil
     InstructionArgToString = function(self, instr, arg, fn)
-        if type(arg) == "number" then
-            arg = string.char(64 + arg)
-        end
         if arg == self.argName then
             return nil
         end
@@ -306,7 +302,7 @@ do
     local OFF = "offset"
     local PRO = "prototype"
     local REG = "register"
-    local RK  = "register|const" -- if x < MAXSTACK then REG(x) else CON(x-MAXSTACK)
+    local RK  = "register_or_const" -- if x < MAXSTACK then REG(x) else CON(x-MAXSTACK)
     local UPV = "upvalue"
     local VAL = "value"
     local CALL = "call"
@@ -377,14 +373,15 @@ end
 ---@field C? number
 ---@field opcode DebugOpcode
 ---@field address number
-DebugInstruction = Class() {
+DebugInstruction = ClassSimple {
     ---@param self DebugInstruction
     ---@return string
     GetName = function(self)
         return self.opcode:InstructionName(self)
     end;
+
     ---@param self DebugInstruction
-    ---@param arg string | number
+    ---@param arg string
     ---@param fn DebugFunction
     ---@return string | nil
     ArgToString = function(self, arg, fn)
@@ -416,10 +413,11 @@ DebugInstruction = Class() {
     ---@return string
     OperationToString = function(self, fn)
         local str = self:GetName()
+        local StringChar = string.char
         for i = 1, self.opcode.args do
-            local arg = self:ArgToString(i, fn)
+            local arg = self:ArgToString(StringChar(64 + i), fn)
             if arg then
-                str = str .. " " .. arg
+                str = str .. ' ' .. arg
             end
         end
         return str
@@ -436,17 +434,11 @@ DebugInstruction = Class() {
 ---@class DebugLine : DebugInstruction[]
 ---@field lineNumber number
 ---@field instructionCount number
-DebugLine = Class() {
+DebugLine = ClassSimple {
     ---@param self DebugLine
     ---@param lineNum number
     __init = function(self, lineNum)
         self.lineNumber = lineNum
-    end;
-
-    ---@param self DebugLine
-    ---@return number
-    GetSize = function(self)
-        return self.instructionCount * 4 -- all instructions are aligned to a 32 bit int
     end;
 }
 
@@ -455,7 +447,6 @@ DebugLine = Class() {
 ---@field constants        any[]
 ---@field constantCount    number
 ---@field currentline?     number
----@field from             integer | function | RawFunctionDebugInfo
 ---@field func             function
 ---@field knownPrototypes  number
 ---@field lineCount        number
@@ -464,21 +455,18 @@ DebugLine = Class() {
 ---@field instructions     DebugInstruction[]
 ---@field location         string
 ---@field maxstack         number
+---@field numparams        number
 ---@field nups             number
 ---@field short_loc        string
 ---@field source           ProfilerSource
 ---@field upvalues         string[]
----@field variableCount?   number
----@field variables?       string[]
-DebugFunction = Class() {
+DebugFunction = ClassSimple {
     ---@param self DebugFunction
     ---@param f integer | function | RawFunctionDebugInfo
     __init = function(self, f)
         local info, parameters, upvalues, constants, bytecode = f.info, f.parameters, f.upvalueNames, f.constants, f.bytecode
-        if info and upvalues and constants and bytecode then
-            self.from = info.func
+        if info and parameters and upvalues and constants and bytecode then
         else
-            self.from = f
             f = GetDebugFunctionInfo(f)
             info, parameters, upvalues, constants, bytecode = f.info, f.parameters, f.upvalueNames, f.constants, f.bytecode
         end
@@ -486,7 +474,7 @@ DebugFunction = Class() {
         self.source, self.scope, self.name = CollapseDebugInfo(info)
         self.nups = info.nups
         self.short_loc = info.short_src
-        if "@" .. info.short_src ~= info.source then
+        if '@' .. info.short_src ~= info.source then
             self.location = info.source
         end
         local fn = info.func
@@ -576,30 +564,11 @@ DebugFunction = Class() {
         self.instructionCount = totalInstrCount
         self.knownPrototypes = knownPrototypes
 
-        -- only works/is useful while inside a function call
-        if type(f) == "number" then
-            local variables = {}
-            local variableCount = 0
-            local var = debug.listlocals(fn, self.numparams)
-            while var ~= parameters[1] do
-                variableCount = variableCount + 1
-                variables[variableCount] = var
-                var = debug.listlocals(fn, variableCount + self.numparams)
-            end
-            self.variables = variables
-            self.variableCount = variableCount
-        end
         -- let them call the debug function directly, I guess?
         setmetatable(self, {
             __index = DebugFunction,
             __call = self.func
         })
-    end;
-
-    ---@param self DebugFunction
-    ---@return number
-    GetSize = function(self)
-        return self.instructionCount * 4
     end;
 
     ---@param self DebugFunction
@@ -619,15 +588,6 @@ DebugFunction = Class() {
 
     ---@param self DebugFunction
     ---@param k number
-    ---@return string | nil
-    GetLocalName = function(self, k)
-        if self.variables then
-            return self.variables[k]
-        end
-    end;
-
-    ---@param self DebugFunction
-    ---@param k number
     ---@return string
     GetUpvalueName = function(self, k)
         return self.upvalues[k]
@@ -637,12 +597,14 @@ DebugFunction = Class() {
     ---@param k number
     ---@return any
     GetUpvalue = function(self, k)
-        local _, val = debug.getupvalue(self.from, k)
+        local _, val = debug.getupvalue(self.func, k)
         return val
     end;
 
+    --- Returns a table with keys being line numbers and values being an array of lines that jump to
+    --- those lines
     ---@param self DebugFunction
-    ---@return number[][]
+    ---@return table<number[]>
     ResolveJumps = function(self)
         local jumps = self.jumps
         if jumps then
@@ -673,13 +635,6 @@ DebugFunction = Class() {
         local lines = {}
         local lineLocalizer = LOC("<LOC debug_0000>Line %d:")
         local jumps = self:ResolveJumps()
-        for k,v in jumps do
-            local str = "line " .. k
-            for k,v in v do
-                str = str .. "  " .. v
-            end
-            SPEW(str)
-        end
         local instructionCount = 0
         local lineCount = 0
         for _, line in self.lines do

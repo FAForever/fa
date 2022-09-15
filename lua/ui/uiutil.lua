@@ -27,7 +27,7 @@ local Text = import('/lua/maui/text.lua').Text
 
 local skins = import('/lua/skins/skins.lua').skins
 
-local Layouter = LayoutHelpers.ReusedLayoutFor
+local Layouter = LayoutHelpers.LayoutFor
 
 
 --* Handy global variables to assist skinning
@@ -394,6 +394,9 @@ function RotateLayout(direction)
 end
 
 --* given a path and name relative to the skin path, returns the full path based on the current skin
+---@param filespec FileName
+---@param checkMods? boolean
+---@return FileName
 function UIFile(filespec, checkMods)
     if UIFileBlacklist[filespec] then return filespec end
     local skins = import('/lua/skins/skins.lua').skins
@@ -459,6 +462,9 @@ function UIFile(filespec, checkMods)
 end
 
 --* return the filename as a lazy var function to allow triggering of OnDirty
+---@param filespec FileName
+---@param checkMods? boolean
+---@return fun(): FileName
 function SkinnableFile(filespec, checkMods)
     return function()
         return UIFile(filespec, checkMods)
@@ -566,10 +572,11 @@ function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBac
         if charcode == VK_TAB then
             return true
         end
-        local charLim = self:GetMaxChars()
-        if STR_Utf8Len(self:GetText()) >= charLim then
-            local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
-            PlaySound(sound)
+        if STR_Utf8Len(self:GetText()) >= self:GetMaxChars() then
+            PlaySound(Sound {
+                Cue = 'UI_Menu_Error_01',
+                Bank = 'Interface',
+            })
         end
     end
 end
@@ -1264,60 +1271,6 @@ function CreateAnnouncementStd(primary, secondary, control)
         secondary
     )
 end
-
-
----@param parent Control
----@param percentage number
----@param sep? number
----@return Group top
----@return Group bottom
-function CreateVertSplitGroups(parent, percentage, sep)
-    local top = LayoutHelpers.LayoutFor(Group(parent))
-        :Top(parent.Top)
-        :Left(parent.Left)
-        :Bottom(function()
-            return parent.Top() + percentage * parent.Height() - sep
-        end)
-        :Right(parent.Right)
-        :End()
-
-    local bottom = LayoutHelpers.LayoutFor(Group(parent))
-        :Top(function()
-            return parent.Top() + percentage * parent.Height() + sep
-        end)
-        :Left(parent.Left)
-        :Bottom(parent.Bottom)
-        :Right(parent.Right)
-        :End()
-
-    return top, bottom
-end
-
----@param parent Control
----@param percentage number
----@param sep? number
----@return Group left
----@return Group right
-function CreateHorzSplitGroups(parent, percentage, sep)
-    local left = LayoutHelpers.LayoutFor(Group(parent))
-        :Top(parent.Top)
-        :Left(parent.Left)
-        :Bottom(parent.Bottom)
-        :Right(function()
-            return parent.Left() + percentage * parent.Width() - sep
-        end)
-        :End()
-
-    local right = LayoutHelpers.LayoutFor(Group(parent))
-        :Top(parent.Top)
-        :Left(function()
-            return parent.Left() + percentage * parent.Width() + sep
-        end)
-        :Bottom(parent.Bottom)
-        :Right(parent.Right)
-        :End()
-
-    return left, right
 
 ---@param filename string
 ---@return Group

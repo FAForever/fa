@@ -3,10 +3,10 @@
 -- - https://www.lua.org/pil/23.1.html
 
 local Statistics = import("/lua/shared/statistics.lua")
-local CollapseDebugInfo = import("/lua/shared/DebugFunction.lua").CollapseDebugInfo
-local CreateEmptyProfilerTable = import("/lua/shared/Profiler.lua").CreateEmptyProfilerTable
-local GetDebugFunctionInfo = import("/lua/shared/DebugFunction.lua").GetDebugFunctionInfo
-local PlayerIsDev = import("/lua/shared/Profiler.lua").PlayerIsDev
+local CollapseDebugInfo = import("/lua/shared/debugfunction.lua").CollapseDebugInfo
+local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
+local GetDebugFunctionInfo = import("/lua/shared/debugfunction.lua").GetDebugFunctionInfo
+local PlayerIsDev = import("/lua/shared/profiler.lua").PlayerIsDev
 
 -- upvalue for performance
 local sethook = debug.sethook
@@ -202,9 +202,14 @@ end
 ---@param benchmarkIndex number
 ---@param parameters any[]
 function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
-    local unpack = unpack
     -- the threshold time for a benchmark to start running more than once a tick
     local tickThreshold = 0.09
+    -- how many times longer the benchmark needs to take than the baseline to not get its adjustment
+    -- cancelled 
+    local cancelAdjustThres = 3
+
+
+    local unpack = unpack
 
     local benchmark = benchmarkModules[moduleIndex].benchmarks[benchmarkIndex]
     if benchmark == nil then
@@ -220,7 +225,7 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     -- baseline loop adjustment
     local baselineLoop = benchmarkBaselines[parameterCount]
-    if baselineLoop == test then -- don't test ourself!
+    if baselineLoop == test or parameters.rawtime then -- don't test ourself!
         baselineLoop = nil
     end
 
@@ -231,7 +236,12 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
     local adjust = 0
     if baselineLoop then
         adjust = baselineLoop(unpack(parameters))
-        output = output - adjust
+        -- test the cancel-adjustment condition
+        if output <= adjust * cancelAdjustThres then
+            baselineLoop = nil
+        else
+            output = output - adjust
+        end
     end
 
     -- calculate how many at a time and for how many ticks we should sample the benchmark
@@ -332,7 +342,12 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
     --]]
 
     -- sync to UI
-    Sync.BenchmarkOutput = { samples = size, data = trimmed, success = true }
+    Sync.BenchmarkOutput = {
+        samples = size,
+        data = trimmed,
+        rawtime = not baselineLoop,
+        success = true,
+    }
     benchmarkThread = false
     SPEW("Done with benchmark: " .. size)
 end

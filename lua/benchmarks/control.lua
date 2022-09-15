@@ -67,3 +67,38 @@ function Quick(loop)
     local final = timer()
     return final - start
 end
+
+
+
+function IfNot(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+
+    local obj = {}
+    local start = timer()
+
+    for _ = 1, loop do
+        if not obj then
+            
+        end
+    end
+
+    local final = timer()
+    return final - start
+end
+
+
+function IfUneq(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+
+    local obj = {}
+    local start = timer()
+
+    for _ = 1, loop do
+        if obj ~= nil then
+            
+        end
+    end
+
+    local final = timer()
+    return final - start
+end

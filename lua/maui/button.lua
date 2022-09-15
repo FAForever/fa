@@ -3,8 +3,8 @@ local Dragger = import('/lua/maui/dragger.lua').Dragger
 local UIUtil = import('/lua/ui/uiutil.lua')
 
 ---@class Button : Bitmap
+---@field label? Text
 Button = Class(Bitmap) {
-
     __init = function(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
         Bitmap.__init(self, parent, normal)
         self.mNormal = normal

@@ -69,21 +69,21 @@ function Dirname(fullPath)
 end
 
 --- Returns all files in the directory that matches the pattern
----@param directory any
----@param pattern any
----@return string[]
+---@param directory FileName
+---@param pattern string
+---@return FileName[]
 function DiskFindFiles(directory,  pattern)
 end
 
 --- Returns a table of information for the given file, or false if the file doesn't exist 
----@param filename string
+---@param filename FileName
 ---@return any | boolean
 function DiskGetFileInfo(filename)
 end
 
 --- Converts a system path to a local path (based on the init file directories), returns the path if it is already local
----@param SysOrLocalPath string
----@return string
+---@param SysOrLocalPath FileName
+---@return FileName
 function DiskToLocal(SysOrLocalPath)
 end
 
@@ -93,7 +93,7 @@ function EndLoggingStats(exit)
 end
 
 --- Return true if a unit category contains this unit
----@param category moho.EntityCategory
+---@param category EntityCategory
 ---@param unit UserUnit
 function EntityCategoryContains(category, unit)
 end
@@ -106,7 +106,7 @@ end
 
 ---@overload fun(units: UserUnit[]): UserUnit[]
 --- Filter a list of units to only those found in the category
----@param category moho.EntityCategory
+---@param category EntityCategory
 ---@param units Unit[]
 ---@return Unit[]
 function EntityCategoryFilterDown(category, units)
@@ -517,13 +517,13 @@ function WaitFor(manipulator)
 end
 
 --- Run another script. The environment table, if given, will be used for the script's global variables.
----@param script string
+---@param script FileName
 ---@param env? table
 function doscript(script,  env)
 end
 
 --- Returns if the given resource file exists
----@param name string
+---@param name FileName
 function exists(name)
 end
 

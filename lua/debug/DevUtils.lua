@@ -141,7 +141,7 @@ function PullMissingLoc(source, lang)
     for key, def in sourceEntries do
         if not loc_table[key] then
             ind = ind + 1
-            missing[ind] = key .. " = \"" .. def .. "\""
+            missing[ind] = key .. "=\"" .. def .. '"'
         end
     end
 
@@ -161,7 +161,7 @@ end
 function SimilarLocText(search, lang)
     lang = lang or "us"
     local loc_table = {}
-    doscript('/loc/' .. lang .. '/strings_db.lua', loc_table)
+    doscript("/loc/" .. lang .. "/strings_db.lua", loc_table)
 
     if type(search) == "string" then
         local textLower = search:lower()
@@ -190,7 +190,7 @@ function SpewDebugFunction(fn)
 
     local debugFun = DebugFunction.DebugFunction(fn)
 
-    SPEW("Function " .. debugFun.name .. " (" .. tostring(fn) ..  ") from " .. debugFun.source .. " in scope \"" .. debugFun.scope .. "\"")
+    SPEW("Function " .. debugFun.name .. " (" .. tostring(fn) ..  ") from " .. debugFun.source .. " in scope \"" .. debugFun.scope .. '"')
     local location = "Location: " .. debugFun.short_loc
     local loc = debugFun.location
     if loc then
@@ -235,7 +235,7 @@ function SpewDebugFunction(fn)
         end
     end
 
-    SPEW(" ")
+    SPEW("Bytecode: " .. debugFun.instructionCount .. " instructions")
     for _, line in debugFun:PrettyPrint() do
         SPEW(line)
     end

@@ -17,63 +17,49 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 ---@field growth Text
 ---@field is_group boolean
 ProfilerElementRow = Class(Group) {
-    __init = function(self, parent, alignment, size, font, color)
+    __init = function(self, parent, size, font)
         Group.__init(self, parent)
 
-        if alignment then
-            Layouter(self)
-                :Left(parent.Left)
-                :Right(parent.Right)
-                :Top(alignment.Bottom)
-                :Height(20)
-                :End()
-        else
-            Layouter(self)
-                :Left(parent.Left)
-                :Right(parent.Right)
-                :Top(parent.Top)
-                :Height(20)
-                :End()
-        end
+        self.name = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Function"), size, font, false)
+        self.source = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Source"), size, font, false)
+        self.scope = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Scope"), size, font, false)
+        self.value = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Value"), size, font, false)
+        self.growth = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Growth"), size, font, false)
+    end;
 
-        self.name = Layouter(UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Function"), size, font, false))
+    ---@param self ProfilerElementRow
+    Layout = function(self)
+        Layouter(self.name)
             :AtLeftTopIn(self, 10, 0)
             :End()
 
-        self.source = Layouter(UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Source"), size, font, false))
+        Layouter(self.source)
             :FromLeftIn(self, 0.45)
             :AtTopIn(self, 0)
             :End()
 
-        self.scope = Layouter(UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Scope"), size, font, false))
+        Layouter(self.scope)
             :FromLeftIn(self, 0.60)
             :AtTopIn(self, 0)
             :End()
 
-        self.value = Layouter(UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Value"), size, font, false))
+        Layouter(self.value)
             :FromLeftIn(self, 0.75)
             :AtTopIn(self, 0)
             :End()
 
-        self.growth = Layouter(UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Growth"), size, font, false))
+        Layouter(self.growth)
             :FromLeftIn(self, 0.9)
             :AtTopIn(self, 0)
             :End()
-
-        if color then
-            self.name:SetColor(color)
-            self.source:SetColor(color)
-            self.scope:SetColor(color)
-            self.value:SetColor(color)
-            self.growth:SetColor(color)
-        end
+        return self
     end;
 }
 
 ---@param control ProfilerElementRow
 local function SetToHighlightColor(control)
     if not control.is_group then
-        control:SetColor('ffff00')
+        control:SetColor("FFFF00")
     end
 end
 ---@param control ProfilerElementRow
@@ -84,12 +70,11 @@ local function SetToBodyColor(control)
 end
 
 ---@param parent Group
----@param alignment? Control optional control to align to the bottom of
 ---@return ProfilerElementRow
-function CreateDefaultElement(parent, alignment)
-    local group = ProfilerElementRow(parent, alignment, 14, UIUtil.bodyFont)
-    group.is_group = true
-    group.HandleEvent = function(self, event)
+function CreateDefaultElement(parent)
+    local row = ProfilerElementRow(parent, 14, UIUtil.bodyFont)
+    row.is_group = true
+    row.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
             self:ApplyFunction(SetToHighlightColor)
             return true
@@ -98,13 +83,20 @@ function CreateDefaultElement(parent, alignment)
             return true
         end
     end
-    return group
+    return row
 end
 
 ---@param parent Group
 ---@return ProfilerElementRow
 function CreateTitle(parent)
-    return ProfilerElementRow(parent, nil, 16, UIUtil.titleFont, 'F1F382')
+    local title = ProfilerElementRow(parent, 16, UIUtil.titleFont)
+    local color = "F1F382"
+    title.name:SetColor(color)
+    title.source:SetColor(color)
+    title.scope:SetColor(color)
+    title.value:SetColor(color)
+    title.growth:SetColor(color)
+    return title
 end
 
 ---@param element ProfilerElementRow
@@ -127,58 +119,76 @@ function DepopulateDefaultElement(element)
 end
 
 ---@class ProfilerScrollArea : Group
----@field NumberOfUIElements number
----@field NumberOfElements number
----@field UIElements ProfilerElementRow[]
+---@field bg Bitmap
+---@field title ProfilerElementRow
+---@field rowCount number
+---@field rows ProfilerElementRow[]
+---@field _scrollable boolean
+---
+---@field ElementCount number
 ---@field Elements ProfilerData
 ---@field First number
----
----@field _scrollable boolean
 ProfilerScrollArea = Class(Group) {
     ---@param self ProfilerScrollArea
     ---@param parent Group
     __init = function(self, parent)
         Group.__init(self, parent)
-        self.bg = Bitmap(self); LayoutHelpers.ReusedLayoutFor(self.bg)
-            :Under(parent)
-            :Color("000000")
-            :Fill(self)
-            :Alpha(0.5)
-            --:End() -- haven't laidout ourselves yet, so this will error
+        self.bg = Bitmap(self)
+        self.title = CreateTitle(self)
+        self.rows = {}
+        self.rowCount = 0
         self._scrollable = false
+        self.Elements = {}
+        self.ElementCount = 0
+        self.First = 0
     end,
 
     ---@param self ProfilerScrollArea
-    InitScrollableContent = function(self)
-        local elements = {}
-
-        -- compute size of an element
-        local title = CreateTitle(self)
-        local dummy = CreateDefaultElement(self, self)
-        local height = dummy.Height()
-        dummy:Destroy()
-        local n = math.floor((self.Height() - title.Height()) / height)
-
-        -- make list of elements
-
-        local previous = title
-        for k = 1, n do
-            elements[k] = CreateDefaultElement(self, previous)
-            previous = elements[k]
+    Layout = function(self)
+        local rows = self.rows
+        for i = 1, self.rowCount do
+            rows[i]:Destroy()
         end
 
-        UIUtil.CreateLobbyVertScrollbar(self, -- calls functions on this
-            0, -- offset right
-            0, -- offset bottom
-            0 -- offset top
-        )
+        local previous = Layouter(self.title)
+            :Height(20)
+            :AtLeftIn(self)
+            :AtTopIn(self)
+            :AtRightIn(self)
+            :End()
 
-        -- populate it a bit
-        self.UIElements = elements
-        self.NumberOfUIElements = n
-        self.Elements = {}
-        self.NumberOfElements = 0
-        self.First = 0
+        -- make as many elements as will fit 
+        local element = CreateDefaultElement(self)
+        Layouter(element)
+            :Height(20)
+            :AtLeftIn(self)
+            :AnchorToBottom(previous)
+            :AtRightIn(self)
+            :End()
+
+        local n = math.floor((self.Height() - self.title.Height()) / element.Height())
+        rows[1] = element
+        for k = 2, n do
+            rows[k] = CreateDefaultElement(self)
+        end
+        self.rowCount = n
+        UIUtil.CreateLobbyVertScrollbar(self)
+
+        Layouter(self.bg)
+            :Fill(self)
+            :Under(self)
+            :Color("000000")
+            :Alpha(0.5)
+            :End()
+
+        for i = 2, self.rowCount do
+            previous = Layouter(rows[i])
+                :Height(20)
+                :AtLeftIn(self)
+                :AnchorToBottom(previous)
+                :AtRightIn(self)
+                :End()
+        end
         self._scrollable = true
     end,
 
@@ -187,7 +197,7 @@ ProfilerScrollArea = Class(Group) {
     ---@param count number
     ProvideElements = function(self, elements, count)
         self.Elements = elements
-        self.NumberOfElements = count
+        self.ElementCount = count
     end,
 
     ---@return number rangeMin
@@ -195,8 +205,8 @@ ProfilerScrollArea = Class(Group) {
     ---@return number visibleMin
     ---@return number visibleMax
     GetScrollValues = function(self)
-        return 0, self.NumberOfElements,
-            self.First, math.min(self.First + self.NumberOfUIElements, self.NumberOfElements)
+        return 0, self.ElementCount,
+            self.First, math.min(self.First + self.rowCount, self.ElementCount)
     end,
 
     --- Called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
@@ -212,7 +222,7 @@ ProfilerScrollArea = Class(Group) {
     ---@param axis string
     ---@param delta number
     ScrollPages = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.First + math.floor(delta) * self.NumberOfUIElements)
+        self:ScrollSetTop(axis, self.First + math.floor(delta) * self.rowCount)
     end,
 
     --- called when the scrollbar wants to set a new visible top line
@@ -221,8 +231,8 @@ ProfilerScrollArea = Class(Group) {
     ---@param top number
     ScrollSetTop = function(self, axis, top)
         -- compute where we end up
-        local size = self.NumberOfElements
-        local first = math.max(math.min(size - self.NumberOfUIElements, math.floor(top)), 0)
+        local size = self.ElementCount
+        local first = math.max(math.min(size - self.ElementCount, math.floor(top)), 0)
 
         -- check if it is different
         if first == self.First then
@@ -243,18 +253,18 @@ ProfilerScrollArea = Class(Group) {
 
     ---@param self ProfilerScrollArea
     CalcVisible = function(self)
-        for k = 1, self.NumberOfUIElements do
+        for k = 1, self.rowCount do
             local index = k + self.First
-            if index <= self.NumberOfElements then
-                PopulateDefaultElement(self.UIElements[k], self.Elements[index])
+            if index <= self.ElementCount then
+                PopulateDefaultElement(self.rows[k], self.Elements[index])
             else
-                DepopulateDefaultElement(self.UIElements[k])
+                DepopulateDefaultElement(self.rows[k])
             end
         end
     end,
 
     ---@param self ProfilerScrollArea
-    ---@param event string
+    ---@param event KeyEvent
     HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' and self:IsScrollable() then
             if event.WheelRotation < 0 then
@@ -267,44 +277,77 @@ ProfilerScrollArea = Class(Group) {
 }
 
 ---@class StatisticSummary : Group
----@field ClearButton Button
----@field Deviation Text
----@field Mean Text
----@field Samples Text
----@field Skewness Text
----@field Summary Group
+---@field bg Bitmap
+---@field clearButton Button
+---@field deviation Text
+---@field deviationLabel Text
+---@field mean Text
+---@field meanLabel Text
+---@field samples Text
+---@field samplesLabel Text
+---@field skewness Text
+---@field skewnessLabel Text
+---@field summary Group
 StatisticSummary = Class(Group) {
     ---@param self StatisticSummary
     ---@param parent Group
     __init = function(self, parent)
         Group.__init(self, parent)
-        LayoutHelpers.FillParent(self, parent)
+        self.bg = Bitmap(self)
 
-        local groupSummary = Layouter(Group(self))
-            :FillFixedBorder(self, 5)
-            :End()
-        self.Summary = groupSummary
+        local groupSummary = Group(self)
+        self.summary = groupSummary
 
         -- Summary details
+        self.summaryLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Summary"), 16, UIUtil.bodyFont, true)
+        self.samplesLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Samples"), 14, UIUtil.bodyFont, true)
+        self.meanLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Mean"), 14, UIUtil.bodyFont, true)
+        self.deviationLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Deviation"), 14, UIUtil.bodyFont, true)
+        self.skewnessLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Skewness"), 14, UIUtil.bodyFont, true)
 
-        local summaryLabel = Layouter(UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Summary"), 16, UIUtil.bodyFont, true))
+        -- next column
+        self.samples = UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true)
+        self.mean = UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true)
+        self.deviation = UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true)
+        self.skewness = UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true)
+        -- THIS MUST CHANGE IT'S AWFUL
+        self.clearButton = UIUtil.CreateButtonStd(groupSummary, '/widgets02/small', "<LOC profiler_{auto}>Clear Stats", 12, 2)
+
+        self.clearButton.OnClick = function()
+            self.OnClickClearSummary(self)
+        end
+    end;
+
+    Layout = function(self)
+        local groupSummary = Layouter(self.summary)
+            :FillFixedBorder(self, 5)
+            :End()
+
+        Layouter(self.bg)
+            :FillFixedBorder(groupSummary)
+            :Under(groupSummary, 5)
+            :Color("7f000000")
+            :End()
+        -- Summary details
+
+        local summaryLabel = Layouter(self.summaryLabel)
             :AtTopCenterIn(groupSummary, 5)
             :End()
 
-        local samplesLabel = Layouter(UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Samples"), 14, UIUtil.bodyFont, true))
+        local samplesLabel = Layouter(self.samplesLabel)
             :Below(summaryLabel, 5)
             :AtLeftIn(groupSummary, 6)
             :End()
 
-        local meanLabel = Layouter(UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Mean"), 14, UIUtil.bodyFont, true))
+        local meanLabel = Layouter(self.meanLabel)
             :Below(samplesLabel, 3)
             :End()
 
-        local deviationLabel = Layouter(UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Deviation"), 14, UIUtil.bodyFont, true))
+        local deviationLabel = Layouter(self.deviationLabel)
             :Below(meanLabel, 3)
             :End()
 
-        local skewnessLabel = Layouter(UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Skewness"), 14, UIUtil.bodyFont, true))
+        local skewnessLabel = Layouter(self.skewnessLabel)
             :Below(deviationLabel, 3)
             :End()
 
@@ -313,48 +356,34 @@ StatisticSummary = Class(Group) {
 
         -- next column
 
-        local samples = Layouter(UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true))
+        Layouter(self.samples)
             :Top(samplesLabel.Top)
             :AtLeftIn(samplesLabel, width)
             :End()
-        self.Samples = samples
 
-        local mean = Layouter(UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true))
+        Layouter(self.mean)
             :Top(meanLabel.Top)
             :AtLeftIn(meanLabel, width)
             :End()
-        self.Mean = mean
 
-        local deviation = Layouter(UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true))
+        Layouter(self.deviation)
             :Top(deviationLabel.Top)
             :AtLeftIn(deviationLabel, width)
             :End()
-        self.Deviation = deviation
 
-        local skewness = Layouter(UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true))
+        Layouter(self.skewness)
             :Top(skewnessLabel.Top)
             :AtLeftIn(skewnessLabel, width)
             :End()
-        self.Skewness = skewness
 
         -- THIS MUST CHANGE IT'S AWFUL
-        local clearButton = Layouter(UIUtil.CreateButtonStd(groupSummary, '/widgets02/small', "<LOC profiler_{auto}>Clear Stats", 12, 2))
+        local clearButton = Layouter(self.clearButton)
             :AtLeftTopIn(groupSummary)
             :End()
         Tooltip.AddButtonTooltip(clearButton, "pls replace me")
         self.ClearButton = clearButton
 
         LayoutHelpers.AtBottomIn(self, skewnessLabel, -10)
-
-        Layouter(Bitmap(parent))
-            :FillFixedBorder(groupSummary)
-            :Under(groupSummary, 5)
-            :Color("7f000000")
-            :End()
-
-        clearButton.OnClick = function()
-            self.OnClickClearSummary(self)
-        end
     end;
 
     ---@param self StatisticSummary
@@ -410,25 +439,28 @@ StatisticSummary = Class(Group) {
             end
             --]]
 
-            self.Samples:SetText(samples)
-            self.Mean:SetText(mean)
-            self.Deviation:SetText(deviation)
-            self.Skewness:SetText(skewness)
-            self.Summary:Show()
+            self.samples:SetText(samples)
+            self.mean:SetText(mean)
+            self.deviation:SetText(deviation)
+            self.skewness:SetText(skewness)
+            self.summary:Show()
         else
-            self.Summary:Hide()
+            SPEW("HUDING")
+            self.summary:Hide()
         end
     end;
 }
 
 ---@class BytecodeArea : Group
----@field Bytecode ItemList
----@field Details Group
----@field LogButton Button
----@field Parameters Text
----@field Upvalues Text
----@field Constants Text
----@field MaxStack Text
+---@field logButton Button
+---@field bytecodeGroup Group
+---@field details Group
+---@field detailsBg Bitmap
+---@field bytecode ItemList
+---@field parameters Text
+---@field upvalues Text
+---@field constants Text
+---@field maxStack Text
 ---@field Error? string
 ---@field DebugFunction? DebugFunction
 BytecodeArea = Class(Group) {
@@ -436,94 +468,31 @@ BytecodeArea = Class(Group) {
     ---@param parent Group
     __init = function(self, parent)
         Group.__init(self, parent)
-        LayoutHelpers.FillParent(self, parent)
 
-        local groupDetails = Layouter(Group(self))
-            :FillFixedBorder(self, 5) -- will edit to the log button height once we create that
-            :End()
-        self.Details = groupDetails
+        local groupDetails = Group(self)
+        local groupBytecode = Group(self)
 
-        local groupBytecode = Layouter(Group(self))
-            :FillFixedBorder(self, 5)
-            :AnchorToBottom(groupDetails)
-            :End()
+        self.logButton = UIUtil.CreateButtonStd(self, "/BUTTON/log/")
+        self.details = groupDetails
+        self.groupBytecode = groupBytecode
+        self.detailsBg = Bitmap(self) -- parent it to ourself so it still shows when the group is hidden
+        self.parameters = UIUtil.CreateText(groupDetails, "", 14, UIUtil.bodyFont, true)
+        self.maxStack = UIUtil.CreateText(groupDetails, "", 14, UIUtil.bodyFont, true)
+        self.upvalues = UIUtil.CreateText(groupDetails, "", 14, UIUtil.bodyFont, true)
+        self.constants = UIUtil.CreateText(groupDetails, "", 14, UIUtil.bodyFont, true)
+        self.bytecode = ItemList(groupBytecode)
 
-        -- bytecode
-
-        local logButton = Layouter(UIUtil.CreateButtonStd(self, "/BUTTON/log/"))
-            :AtRightTopIn(self)
-            :Over(self, 1)
-            :End()
-        Tooltip.AddButtonTooltip(logButton, "profiler_print_to_log")
-        self.LogButton = logButton
-
-        local params = Layouter(UIUtil.CreateText(groupDetails, "", 14, UIUtil.bodyFont, true))
-            :AtLeftCenterIn(groupDetails, 10)
-            :Over(groupDetails, 10)
-            :End()
-        self.Parameters = params
-
-        local maxstack = Layouter(UIUtil.CreateText(groupDetails, "", 14, UIUtil.bodyFont, true))
-            :CenteredRightOf(params, 10)
-            :Over(groupDetails, 10)
-            :End()
-        self.MaxStack = maxstack
-
-        local upvalues = Layouter(UIUtil.CreateText(groupDetails, "", 14, UIUtil.bodyFont, true))
-            :CenteredRightOf(maxstack, 10)
-            :Over(groupDetails, 10)
-            :End()
-        self.Upvalues = upvalues
-
-        local constants = Layouter(UIUtil.CreateText(groupDetails, "", 14, UIUtil.bodyFont, true))
-            :CenteredRightOf(upvalues, 10)
-            :Over(groupDetails, 10)
-            :End()
-        self.Constants = constants
-
-        local bytecode = ItemList(self)
-
-        ---[[
-        UIUtil.CreateLobbyVertScrollbar(bytecode)
-        Layouter(bytecode)
-            :Fill(groupBytecode)
-            :Over(self, 10)
-            :AtRightIn(groupBytecode, 14)
-            :End()
-        --]]
-
-        --[[ To be merged with scrollbar branch
-        UIUtil.CreateLobbyScrollBars(bytecode, groupBytecode, ScrollPolicy.AsNeeded, ScrollPolicy.AsNeeded)
-        --]]
-
-        bytecode:ShowMouseoverItem(true)
-        bytecode:SetFont(UIUtil.fixedFont, 14)
-        self.Bytecode = bytecode
-
-
-        -- layout 'editing'
-        groupDetails.Right:Set(logButton.Left)
-        groupDetails.Top:Set(logButton.Top)
-        groupDetails.Bottom:Set(logButton.Bottom)
-
-        Layouter(Bitmap(self))
-            :Fill(groupDetails)
-            :Under(groupDetails, 5)
-            :Color("7f000000")
-            :End()
-
-
-        logButton.OnClick = function(button_self)
+        self.logButton.OnClick = function(button_self)
             if self.DebugFunction then
                 self:OnLog()
             end
         end
-        bytecode.OnMouseoverItem = function(list_self, index)
+        self.bytecode.OnMouseoverItem = function(list_self, index)
             if self.DebugFunction then
                 if index ~= -1 then
                     local tooltip = self:GetBytecodeTooltip(index)
                     if tooltip then
-                        Tooltip.CreateMouseoverDisplay(bytecode, tooltip)
+                        Tooltip.CreateMouseoverDisplay(list_self, tooltip)
                         return
                     end
                 end
@@ -532,9 +501,74 @@ BytecodeArea = Class(Group) {
         end
     end,
 
+    Layout = function(self)
+        local logButton = Layouter(self.logButton)
+            :AtRightTopIn(self)
+            :Over(self, 1)
+            :End()
+        Tooltip.AddButtonTooltip(logButton, "profiler_print_to_log")
+
+        local groupDetails = Layouter(self.details)
+            :AtLeftIn(self, 5)
+            :LeftOf(logButton)
+            :AtTopIn(logButton)
+            :AtBottomIn(logButton)
+            :End()
+
+        local groupBytecode = Layouter(self.groupBytecode)
+            :FillFixedBorder(self, 5)
+            :AnchorToBottom(groupDetails)
+            :End()
+
+        Layouter(self.detailsBg)
+            :Fill(groupDetails)
+            :Under(groupDetails, 5)
+            :Color("7f000000")
+            :End()
+
+        -- bytecode
+
+        local parameters = Layouter(self.parameters)
+            :AtLeftCenterIn(groupDetails, 10)
+            :Over(groupDetails, 10)
+            :End()
+
+        local maxstack = Layouter(self.maxStack)
+            :CenteredRightOf(parameters, 10)
+            :Over(groupDetails, 10)
+            :End()
+
+        local upvalues = Layouter(self.upvalues)
+            :CenteredRightOf(maxstack, 10)
+            :Over(groupDetails, 10)
+            :End()
+
+        Layouter(self.constants)
+            :CenteredRightOf(upvalues, 10)
+            :Over(groupDetails, 10)
+            :End()
+
+        local bytecode = Layouter(self.bytecode)
+            :Fill(groupBytecode)
+            :Over(self, 10)
+            :AtRightIn(groupBytecode, 14)
+            :Font(UIUtil.fixedFont, 14)
+            :End()
+
+        ---[[
+        UIUtil.CreateLobbyVertScrollbar(bytecode)
+        --]]
+
+        --[[ To be merged with scrollbar branch
+        UIUtil.CreateLobbyScrollBars(bytecode, groupBytecode, ScrollPolicy.AsNeeded, ScrollPolicy.AsNeeded)
+        --]]
+
+        bytecode:ShowMouseoverItem(true)
+    end;
+
     ---@param self BytecodeArea
     OnLog = function(self)
-        local area = self.Bytecode
+        local area = self.bytecode
         for i = 1, area:GetItemCount() do
             LOG(area:GetItem(i - 1)) -- list is 0-indexed
         end
@@ -544,7 +578,7 @@ BytecodeArea = Class(Group) {
     ---@param self BytecodeArea
     ---@param index number
     GetBytecodeTooltip = function(self, index)
-        local text = self.Bytecode:GetItem(index)
+        local text = self.bytecode:GetItem(index)
         local jumpTooltipFormater = LOC("<LOC profiler_{auto}>Jump from %s")
         local jumpInd = text:find('>', nil, true)
         if jumpInd and jumpInd < 20 then
@@ -579,9 +613,9 @@ BytecodeArea = Class(Group) {
         self.Error = error
         self.DebugFunction = data
         if data then
-            self.LogButton:Enable()
+            self.logButton:Enable()
         else
-            self.LogButton:Disable()
+            self.logButton:Disable()
         end
         self:UpdateDetails()
         self:UpdateBytecode()
@@ -590,12 +624,12 @@ BytecodeArea = Class(Group) {
     ---@param self BytecodeArea
     UpdateDetails = function(self)
         local fn = self.DebugFunction
-        local details = self.Details
+        local details = self.details
         if fn then
-            self.Parameters:SetText(LOC("<LOC profiler_{auto}>Parameters: %d"):format(fn.numparams))
-            self.MaxStack:SetText(LOC("<LOC profiler_{auto}>Max Stack: %d"):format(fn.maxstack))
-            self.Upvalues:SetText(LOC("<LOC profiler_{auto}>Upvalues: %d"):format(fn.nups))
-            self.Constants:SetText(LOC("<LOC profiler_{auto}>Constants: %d"):format(fn.constantCount))
+            self.parameters:SetText(LOC("<LOC profiler_{auto}>Parameters: %d"):format(fn.numparams))
+            self.maxStack:SetText(LOC("<LOC profiler_{auto}>Max Stack: %d"):format(fn.maxstack))
+            self.upvalues:SetText(LOC("<LOC profiler_{auto}>Upvalues: %d"):format(fn.nups))
+            self.constants:SetText(LOC("<LOC profiler_{auto}>Constants: %d"):format(fn.constantCount))
             details:Show()
         else
             details:Hide()
@@ -604,7 +638,7 @@ BytecodeArea = Class(Group) {
 
     ---@param self BytecodeArea
     UpdateBytecode = function(self)
-        local bytecode = self.Bytecode
+        local bytecode = self.bytecode
         bytecode:DeleteAllItems()
         local error = self.Error
         if error then
