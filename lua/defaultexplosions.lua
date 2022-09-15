@@ -464,7 +464,7 @@ end
 -- lot of overhead that is not necessary.
 ---@param unit Unit
 ---@param overKillRatio number
----@return unknown
+---@return Entity
 function CreateUnitExplosionEntity(unit, overKillRatio)
     local localentity = Entity(MakeExplosionEntitySpec(unit, overKillRatio))
     Warp(localentity, unit:GetPosition())
@@ -799,7 +799,7 @@ end
 ---@param projectile string
 ---@param minnumber integer
 ---@param maxnumber integer
----@param effect unknown
+---@param effect string
 ---@param fxscalemin number
 ---@param fxscalemax number
 ---@param gravitymin number
@@ -826,7 +826,7 @@ end
 
 
 ---@param object Unit
----@param bone string
+---@param bone Bone
 function CreateUnitDebrisEffects(object, bone)
     local Effects = {'/effects/emitters/destruction_explosion_smoke_09_emit.bp'}
 
@@ -853,7 +853,7 @@ end
 ---@param orientX number
 ---@param orientY number
 ---@param orientZ number
----@return unknown
+---@return Projectile
 function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVelocity, Lifetime, velX, velY, VelZ, orientRot, orientX, orientY, orientZ)
 
     proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)

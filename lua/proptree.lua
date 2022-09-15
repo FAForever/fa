@@ -40,6 +40,7 @@ local EffectSetEmitterCurveParam = EffectMethods.SetEmitterCurveParam
 ---@class Tree : Prop
 Tree = Class(Prop) {
 
+    ---@param self Tree
     OnDestroy = function(self)
         Prop.OnDestroy(self)
 
@@ -50,11 +51,20 @@ Tree = Class(Prop) {
     end,
 
     --- Collision check with projectiles
+    ---@param self Tree
+    ---@param other Projectile
+    ---@return boolean
     OnCollisionCheck = function(self, other)
         return not self.Dead
     end,
 
     --- Collision check with units
+    ---@param self Tree
+    ---@param other Unit
+    ---@param nx number
+    ---@param ny number
+    ---@param nz number
+    ---@param depth number
     OnCollision = function(self, other, nx, ny, nz, depth)
         if not self.Dead then 
             if not self.Fallen then 
@@ -67,7 +77,12 @@ Tree = Class(Prop) {
     end,
 
     --- When damaged in some fashion - note that the tree can only be destroyed by disintegrating 
-    -- damage and that the base class is not called accordingly.
+    --- damage and that the base class is not called accordingly.
+    ---@param self Tree
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param direction number
+    ---@param type DamageType
     OnDamage = function(self, instigator, amount, direction, type)
         if not self.Dead then 
 
@@ -113,12 +128,19 @@ Tree = Class(Prop) {
     end,
 
     --- Uprooting effect when the tree falls over
+    ---@param self Tree
+    ---@param instigator Unit
     PlayUprootingEffect = function(self, instigator)
         CreateEmitterAtEntity( self, -1, '/effects/emitters/tree_uproot_01_emit.bp' )
         self:PlayPropSound('TreeFall')
     end,
 
     --- Contains all the falling logic
+    ---@param self Tree
+    ---@param dx number
+    ---@param dy number
+    ---@param dz number
+    ---@param depth number
     FallThread = function(self, dx, dy, dz, depth)
 
         -- make it fall down
@@ -138,6 +160,7 @@ Tree = Class(Prop) {
         EntityDestroy(self)
     end,
 
+    ---@param self Tree
     Burn = function(self)
         -- limit maximum number of burning trees on the map
         if Random(1, MaximumBurningTrees) > BurningTrees then 
@@ -149,6 +172,7 @@ Tree = Class(Prop) {
     end,
 
     --- Contains all the burning logic
+    ---@param self Tree
     BurnThread = function(self)
 
         -- used throughout this function
@@ -239,22 +263,39 @@ Tree = Class(Prop) {
 TreeGroup = Class(Prop) {
 
     --- Break when colliding with a projectile of some sort
+    ---@param self TreeGroup
+    ---@param other string
+    ---@return boolean
     OnCollisionCheck = function(self, other)
         self:Breakup()
         return false
     end,
 
     --- Break when colliding with something / someone
+    ---@param self TreeGroup
+    ---@param other Projectile
+    ---@param vec Vector
     OnCollision = function(self, other, vec)
         self:Breakup()
     end,
 
     --- Break when receiving damage
+    ---@param self TreeGroup
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param direction number
+    ---@param type DamageType
     OnDamage = function(self, instigator, amount, direction, type)
         self:Breakup()
     end,
 
     --- Breaks up the tree group into smaller trees
+    ---@param self TreeGroup
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param direction Vector
+    ---@param type DamageType
+    ---@return Tree[]
     Breakup = function(self, instigator, amount, direction, type)
         -- can't do much when we're destroyed
         if EntityBeenDestroyed(self) then

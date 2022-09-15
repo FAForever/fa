@@ -366,6 +366,30 @@ options = {
             },
 
             {
+                title = 'Cursor features',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "Depth scanning",
+                key = 'cursor_depth_scanning',
+                type = 'toggle',
+                default = 'commands',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _OnlyWhenBuilding>Only when building", key = 'building' },
+                        {text = "<LOC _CommandMode>When you issue commands", key = 'commands' },
+                        {text = "<LOC _Always>Always", key = 'always' },
+                    },
+                },
+            },
+
+            {
                 title = 'Selection threshold',
                 type = 'header',
 

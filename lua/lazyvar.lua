@@ -83,7 +83,6 @@ function LazyVarMetaTable:__call()
     return value
 end
 
-
 --- Resets this lazyvar's value and adds its `OnDirtyListener`s to the list
 ---@param onDirtyList OnDirtyListener[]
 function LazyVarMetaTable:SetDirty(onDirtyList)
