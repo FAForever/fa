@@ -288,7 +288,6 @@ UnitBlueprint {
     VeteranMassMult = 0.5,
     Weapon = {
         {
-            AboveWaterTargetsOnly = true,
             Audio = {
                 BeamLoop = Sound {
                     Bank = 'UAAWeapon',
@@ -316,7 +315,7 @@ UnitBlueprint {
             DamageType = 'CzarBeam',
             DisplayName = 'Quantum Beam Generator',
             FireTargetLayerCapsTable = {
-                Air = 'Land|Water|Seabed',
+                Air = 'Land|Water|Sub|Seabed',
             },
             FiringTolerance = 30,
             Label = 'QuantumBeamGeneratorWeapon',
