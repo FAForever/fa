@@ -7854,6 +7854,7 @@ loadingtip_0095="If you are stalling mass, it might be a good idea to have more 
 loadingtip_0096="It's generally a good idea to expand around the map early on to get Mass Extractors, reclaim and map control"
 loadingtip_0097="If all players agree to a draw, you can end a slow or unfair game with a tie"
 loadingtip_0098="If you can't spend your resources, build more build power; Engineers, Factories, Engineering Stations, or SACUs"
+loadingtip_0099="If you don't think your team can win anymore, you can request that they use the Recall feature to end the battle"
 
 notify_0000="Notify Management"
 notify_0001="Closes this dialog and confirms assignments of messages"
