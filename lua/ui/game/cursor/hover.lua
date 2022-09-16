@@ -57,7 +57,6 @@ local function HoverScanningThread()
     Exit.AddOnExitCallback(
         'HoverScanning',
         function(event)
-            LOG("Destroyed!")
             Trash:Destroy()
         end
     )
