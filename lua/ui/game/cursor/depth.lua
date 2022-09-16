@@ -1,8 +1,6 @@
 
 local Prefs = import('/lua/user/prefs.lua')
-local CommandMode = import('/lua/ui/game/commandmode.lua')
 local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
-local Exit = import('/lua/ui/override/Exit.lua')
 
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
@@ -36,7 +34,7 @@ local function GetCursorInformation()
 end
 
 --- Checks conditions for scanning
-local function CheckConditions()
+local function CheckConditions(CommandMode)
     local option = Prefs.GetFromCurrentProfile('options.cursor_depth_scanning')
 
     -- easy picking
@@ -84,6 +82,16 @@ end
 local function DepthScanningThread()
 
     local scenario = SessionGetScenarioInfo()
+    local Exit = import('/lua/ui/override/Exit.lua')
+    local CommandMode = import('/lua/ui/game/commandmode.lua')
+    
+    -- clear out all entities before we exit
+    Exit.AddOnExitCallback(
+        'HoverScanning',
+        function(event)
+            Trash:Destroy()
+        end
+    )
 
     -- allocate mesh that is on the terrain
     MeshOnTerrain = WorldMesh()
@@ -124,7 +132,7 @@ local function DepthScanningThread()
         elevation = cursor.Elevation
 
         -- check if we have all the data required
-        if position and position[1] and cursor and cursor.Elevation and CheckConditions() then
+        if position and position[1] and cursor and cursor.Elevation and CheckConditions(CommandMode) then
             
             position[1] = math.clamp(position[1], 0, scenario.size[1])
             position[3] = math.clamp(position[3], 0, scenario.size[2])
@@ -177,14 +185,4 @@ local function DepthScanningThread()
     end
 end
 
-reprsl(debug.listcode(DepthScanningThread))
-
 Trash:Add(ForkThread(DepthScanningThread))
-
--- clear out all entities before we exit
-Exit.AddOnExitCallback(
-    'DepthScanning',
-    function(event)
-        Trash:Destroy()
-    end
-)
