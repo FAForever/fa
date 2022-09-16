@@ -7,6 +7,8 @@ local Group = import('/lua/maui/group.lua').Group
 ---@class MapFilters : Group
 MapFilters = Class(Group) {
 
+    ---@param self MapFilters
+    ---@param mapDialog MapDialog
     __init = function(self, mapDialog)
 
     end,

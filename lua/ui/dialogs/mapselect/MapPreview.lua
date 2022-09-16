@@ -7,8 +7,12 @@ local Group = import('/lua/maui/group.lua').Group
 ---@class MapPreview : Group
 MapPreview = Class(Group) {
 
+    ---@param self MapPreview
+    ---@param mapDialog MapDialog
     __init = function(self, mapDialog)
 
+        -- register for events
+        mapDialog:OnEvent(self, 'EventMapSelected')
     end,
 
     EventMapSelected = function(self, scenario)

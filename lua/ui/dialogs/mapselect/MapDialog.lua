@@ -3,23 +3,15 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 
 local Group = import('/lua/maui/group.lua').Group
+local EventEmitter = import('/lua/ui/common/EventEmitter.lua').EventEmitter
 
----@class MapDialog : Group
-MapDialog = Class(Group) {
+---@class MapDialog : Group, EventEmitter
+MapDialog = Class(Group, EventEmitter) {
 
     __init = function(self, parent)
 
     end,
-
-    RegisterEvent = function(self, identifier)
-
-    end,
-
-    EmitEvent = function(self, identifier, data)
-
-    end,
 }
-
 
 ---@param parent Control
 ---@param callbackOk function<string, table<string, string>, any>   -- called when ok                       -> acquires focus back to lobby text box, updates the lobby
@@ -32,4 +24,3 @@ MapDialog = Class(Group) {
 function OpenDialog(parent, callbackOk, callbackCancel, callbackModsChanged, singlePlayer, defaultScenarioName, curOptions, availableMods)
 
 end
-
