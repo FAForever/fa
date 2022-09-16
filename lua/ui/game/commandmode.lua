@@ -112,7 +112,7 @@ end
 function EndCommandMode(isCancel)
 
     --- ???
-    if ignoreSelection then
+    if ignoreSelection or not modeData then
         return
     end
 

@@ -117,10 +117,10 @@ local function IsSimpleClass(arg)
     return arg.n == 1 and getmetatable(arg[1]) == emptyMetaTable
 end
 
----@class fa-class: table
+---@class fa-class
+---@operator call: fun(...): table
 ---@field __init? fun(self, ...)
 ---@field __post_init? fun(self, ...)
----@field __static_init? fun(self)
 
 --- Prepares the construction of a state, , referring to the paragraphs of text at the top of this file.
 local StateIdentifier = 0
