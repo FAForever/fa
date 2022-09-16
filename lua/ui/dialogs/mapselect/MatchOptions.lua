@@ -7,7 +7,11 @@ local Group = import('/lua/maui/group.lua').Group
 ---@class MapOptions : Group
 MapOptions = Class(Group) {
 
-    __init = function(self, parent)
+    __init = function(self, mapDialog)
+
+    end,
+
+    EventMapSelected = function(self, scenario)
 
     end,
 

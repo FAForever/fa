@@ -7,8 +7,11 @@ local Group = import('/lua/maui/group.lua').Group
 ---@class MapList : Group
 MapList = Class(Group) {
 
-    __init = function(self, parent)
+    __init = function(self, mapDialog)
 
     end,
 
+    EventFiltersChanged = function(self, filters)
+
+    end,
 }
