@@ -164,10 +164,6 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         view.Right:Set(viewRight.Right)
         view:DisableHitTest()
     else
-        reprsl(parent)
-        reprsl(mapGroup)
-        
-        mapGroup.Right:Set(500)
         parentForFrame = parent
         viewLeft = import('/lua/ui/controls/worldview.lua').WorldView(mapGroup, 'WorldCamera', 1, false) -- depth value should be below minimap
         viewLeft:Register('WorldCamera', nil, '<LOC map_view_0006>Main View', 2)

@@ -686,7 +686,6 @@ function CreateWreckageEffects(unit, prop)
     end
 
     local techMultiplier = TechMultiplier[blueprint.TechCategory] or 1.0
-    LOG(techMultiplier)
 
     -- localize for performance
     local Random = Random

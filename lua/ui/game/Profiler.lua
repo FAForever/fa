@@ -298,24 +298,6 @@ ProfilerWindow = Class(Window) {
     -- TODO
     InitOverviewTab = function(self, parent)
 
-        self:DisableHitTest()
-        local identifier = 'test1'
-        local element = import('/lua/ui/controls/worldview.lua').WorldView(parent, identifier, 0, false, identifier)    -- depth value is above minimap
-        element:SetName(identifier)
-        element:Register(identifier, nil, identifier, 3)
-        element:SetCartographic(false)
-        element:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
-        element.Depth:Set(2)
-        element:SetNeedsFrameUpdate(true)
-        element:EnableResourceRendering(true)
-
-        LayoutHelpers.FillParent(element, self)
-        LayoutHelpers.DepthOverParent(element, self, 10)
-
-        if true then 
-            return 
-        end
-
         local tab = Group(parent)
         LayoutHelpers.Below(tab, parent, 40)
         tab.Width:Set(self.Width)
