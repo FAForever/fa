@@ -8,7 +8,15 @@ local EventEmitter = import('/lua/ui/common/EventEmitter.lua').EventEmitter
 ---@class MapDialog : Group, EventEmitter
 MapDialog = Class(Group, EventEmitter) {
 
+    ---@param self MapDialog
+    ---@param parent Control
     __init = function(self, parent)
+
+        self.MapDescription = import('/lua/ui/dialogs/mapselect/MapDescription.lua').MapDescription(self)
+        self.MapFilters = import('/lua/ui/dialogs/mapselect/MapFilters.lua').MapFilters(self)
+        self.MapList = import('/lua/ui/dialogs/mapselect/MapList.lua').MapList(self)
+        self.MapPreview = import('/lua/ui/dialogs/mapselect/MapPreview.lua').MapPreview(self)
+        self.MatchOptions = import('/lua/ui/dialogs/mapselect/MatchOptions.lua').MatchOptions(self)
 
     end,
 }
