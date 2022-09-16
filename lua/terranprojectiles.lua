@@ -360,7 +360,11 @@ TMissileAAProjectile = Class(EmitterProjectile) {
     FxImpactAirUnit = EffectTemplate.TMissileHit02,
     FxImpactProp = EffectTemplate.TMissileHit02,
     FxImpactLand = EffectTemplate.TMissileHit02,
-    FxImpactUnderWater = {},
+
+    FxEnterWater = EffectTemplate.WaterSplash01,
+    FxExitWaterEmitter = EffectTemplate.WaterSplash01,
+    FxImpactUnderWater = EffectTemplate.TTorpedoHitUnitUnderwater01,
+
 }
 
 ---@class TAntiNukeInterceptorProjectile : SingleBeamProjectile

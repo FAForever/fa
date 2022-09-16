@@ -14,7 +14,7 @@ EmitterBlueprint {
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
-	SnapToWaterline = true,
+	SnapToWaterline = false,
 	OnlyEmitOnWater = false,
 	InterpolateEmission = true,
 	TextureStripcount = 4.00,
