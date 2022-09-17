@@ -29,6 +29,14 @@ MapDialog = Class(Group, EventEmitter) {
 ---@param defaultScenarioName string                                -- name of the selected scenario
 ---@param curOptions table<string, string>                          -- for each option, the key / value pair
 ---@param availableMods table<number, table<string, boolean>>       -- for each player, list of mod identifiers that are available
-function OpenDialog(parent, callbackOk, callbackCancel, callbackModsChanged, singlePlayer, defaultScenarioName, curOptions, availableMods)
+function Open(parent, callbackOk, callbackCancel, callbackModsChanged, singlePlayer, defaultScenarioName, curOptions, availableMods)
 
+end
+
+function Close()
+
+end
+
+function Prepare() 
+    
 end
