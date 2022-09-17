@@ -25,7 +25,7 @@ local SkinnableFile = import("/lua/ui/uiutil.lua").SkinnableFile
 UIBorder = ClassSimple {
 
     ---@param self Control
-    ---@param path UIBorderTypes
+    ---@param path UIBorderTypes?
     __init = function(self, path)
 
         path = path or "/game/filter-ping-list-panel/panel"
