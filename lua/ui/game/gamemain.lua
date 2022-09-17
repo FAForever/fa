@@ -92,6 +92,7 @@ function SetLayout(layout)
     import('/lua/ui/game/controlgroups.lua').SetLayout()
     import('/lua/ui/game/chat.lua').SetLayout()
     import('/lua/ui/game/minimap.lua').SetLayout()
+    import("/lua/ui/game/recall.lua").SetLayout()
 end
 
 function OnFirstUpdate()
@@ -100,19 +101,25 @@ function OnFirstUpdate()
     import('/lua/UserMusic.lua').StartPeaceMusic()
 
     local avatars = GetArmyAvatars()
+    local armiesInfo = GetArmiesTable()
+    local focusArmy = armiesInfo.focusArmy
+    local playerArmy = armiesInfo.armiesTable[focusArmy]
     if avatars and avatars[1]:IsInCategory("COMMAND") then
-        local armiesInfo = GetArmiesTable()
-        local focusArmy = armiesInfo.focusArmy
-        local playerName = armiesInfo.armiesTable[focusArmy].nickname
-        avatars[1]:SetCustomName(playerName)
-        PlaySound(Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'})
+        avatars[1]:SetCustomName(playerArmy.nickname)
+        PlaySound(Sound {
+            Bank = 'AmbientTest',
+            Cue = 'AMB_Planet_Rumble_zoom'
+        })
         ForkThread(function()
             WaitSeconds(1)
+
             UIZoomTo(avatars, 1)
             WaitSeconds(1.5)
+
             local selected = false
             repeat
                 WaitSeconds(0.1)
+
                 if not gameUIHidden then
                     SelectUnits(avatars)
                     selected = GetSelectedUnits()
@@ -131,12 +138,11 @@ function OnFirstUpdate()
     end
 
     if Prefs.GetOption('skin_change_on_start') ~= 'no' then
-        local focusarmy = GetFocusArmy()
-        local armyInfo = GetArmiesTable()
-        if focusarmy >= 1 then
-            local factions = import('/lua/factions.lua').Factions
-            if factions[armyInfo.armiesTable[focusarmy].faction+1].DefaultSkin then
-                UIUtil.SetCurrentSkin(factions[armyInfo.armiesTable[focusarmy].faction+1].DefaultSkin)
+        if focusArmy >= 1 then
+            local factionSkin = import("/lua/factions.lua").Factions[playerArmy.faction + 1].DefaultSkin
+            if factionSkin then
+                UIUtil.SetCurrentSkin(factionSkin)
+                return
             end
         end
     end
@@ -144,24 +150,23 @@ function OnFirstUpdate()
 end
 
 function CreateUI(isReplay)
-
-    -- # Overwrite some globals for performance / safety
+    -- overwrite some globals for performance / safety
 
     import('/lua/ui/override/Exit.lua')
     import('/lua/ui/override/ArmiesTable.lua')
     import('/lua/ui/override/SessionClients.lua')
 
-    -- # Start long-running threads
+    -- start long-running threads
 
     import('/lua/system/performance.lua')
     import('/lua/ui/game/cursor/depth.lua')
     import('/lua/ui/game/cursor/hover.lua')
 
-    -- # Casting tools 
+    -- casting tools 
 
     import('/lua/ui/game/casting/mouse.lua')
 
-    -- # Overwrite some globals for performance / safety
+    -- overwrite some globals for performance / safety
 
     -- ensure logger is turned off for the average user
     if not GetPreference('debug.enable_debug_facilities') then
@@ -171,41 +176,39 @@ function CreateUI(isReplay)
             Warn = false,
             Error = false,
             Custom = false,
-            Filter = '*debug:'})
+            Filter = '*debug:',
+        })
     end
 
     -- prevents the nvidia stuttering bug with their more recent drivers
     ConExecute('d3d_WindowsCursor on')
 
     -- enable experimental graphics
-    if      Prefs.GetFromCurrentProfile('options.fidelity') >= 2
-        and Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1 then
+    if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
+        Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1
+    then
+        ForkThread(function()
+            WaitSeconds(1.0)
 
-        ForkThread(
-            function() 
+            LOG("Experimental graphics enabled, use at your own risk: ")
 
-                WaitSeconds(1.0)
-
-                LOG("Experimental graphics enabled, use at your own risk: ")
-
-                if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
-                    -- allow meshes and effects to be seen from further away
-                    ConExecute("cam_SetLOD WorldCamera 0.65")
-                end
-
-                if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
-
-                    -- improve shadow LOD and resolution
-                    ConExecute("ren_ShadowLOD 1024")
-                    ConExecute("ren_ShadowSize 2048")
-                end
+            if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
+                -- allow meshes and effects to be seen from further away
+                ConExecute("cam_SetLOD WorldCamera 0.65")
             end
-        )
+
+            if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
+                -- improve shadow LOD and resolution
+                ConExecute("ren_ShadowLOD 1024")
+                ConExecute("ren_ShadowSize 2048")
+            end
+        end)
     end
+    local focusArmy = GetFocusArmy()
 
     -- keep track of the original focus army
-    import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
-    OriginalFocusArmy = GetFocusArmy()
+    import("/lua/ui/game/ping.lua").OriginalFocusArmy = focusArmy
+    OriginalFocusArmy = focusArmy
 
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
@@ -214,9 +217,8 @@ function CreateUI(isReplay)
     UIUtil.changeLayoutFunction = SetLayout
 
     -- Update loc table with player's name
-    local focusarmy = GetFocusArmy()
-    if focusarmy >= 1 then
-        LocGlobals.PlayerName = GetArmiesTable().armiesTable[focusarmy].nickname
+    if focusArmy >= 1 then
+        LocGlobals.PlayerName = GetArmiesTable().armiesTable[focusArmy].nickname
     end
 
     GameCommon.InitializeUnitIconBitmaps(prefetchTable.batch_textures)
@@ -240,7 +242,7 @@ function CreateUI(isReplay)
     import('/lua/ui/game/worldview.lua').CreateMainWorldView(gameParent, mapGroup)
     import('/lua/ui/game/worldview.lua').LockInput()
 
-    local massGroup, energyGroup = import('/lua/ui/game/economy.lua').CreateEconomyBar(statusClusterGroup)
+    import('/lua/ui/game/economy.lua').CreateEconomyBar(statusClusterGroup)
     import('/lua/ui/game/tabs.lua').Create(mapGroup)
 
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
@@ -312,9 +314,7 @@ function CreateUI(isReplay)
 
     RegisterChatFunc(SendResumedBy, 'SendResumedBy')
 
-    local hotkeyLabelsInit = import('/lua/keymap/hotkeylabels.lua').init
-    hotkeyLabelsInit()
-
+    import("/lua/keymap/hotkeylabels.lua").init()
     import('/lua/ui/notify/customiser.lua').init(isReplay, import('/lua/ui/game/borders.lua').GetMapGroup())
 end
 

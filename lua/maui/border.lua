@@ -14,7 +14,7 @@
 
 local Control = import('/lua/maui/control.lua').Control
 
----@class Border : moho.border_methods, Control, InternalObject
+---@class MauiBorder : moho.border_methods, Control, InternalObject
 ---@field BorderWidth LazyVar
 ---@field BorderHeight LazyVar
 Border = Class(moho.border_methods, Control) {

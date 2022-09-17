@@ -27,7 +27,7 @@ local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 local skins = import('/lua/skins/skins.lua').skins
 
-local Layouter = LayoutHelpers.ReusedLayoutFor
+local Layouter = LayoutHelpers.Layouter
 
 
 --* Handy global variables to assist skinning
@@ -1267,22 +1267,22 @@ end
 
 
 ---@param parent Control
----@param filename string
+---@param filename FileName
 ---@return Group
 function CreateVertFillGroup(parent, filename)
     local group = Group(parent)
-
     local top = CreateBitmap(group, filename .. "_bmp_t.dds")
+    local bottom = CreateBitmap(group, filename .. "_bmp_b.dds")
+    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
+
     Layouter(top)
         :Over(group, 0)
         :AtLeftTopIn(group)
 
-    local bottom = CreateBitmap(group, filename .. "_bmp_b.dds")
     Layouter(bottom)
         :Over(group, 0)
         :AtLeftBottomIn(group)
 
-    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
     Layouter(middle)
         :Over(group, 0)
         :AtLeftIn(group)
@@ -1298,22 +1298,22 @@ end
 
 
 ---@param parent Control
----@param filename string
+---@param filename FileName
 ---@return Group
 function CreateHorzFillGroup(parent, filename)
     local group = Group(parent)
-
     local left = CreateBitmap(group, filename .. "_bmp_l.dds")
+    local right = CreateBitmap(group, filename .. "_bmp_r.dds")
+    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
+
     Layouter(left)
         :Over(group, 0)
         :AtLeftTopIn(group)
 
-    local right = CreateBitmap(group, filename .. "_bmp_r.dds")
     Layouter(right)
         :Over(group, 0)
         :AtRightTopIn(group)
 
-    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
     Layouter(middle)
         :Over(group, 0)
         :AtTopIn(group)

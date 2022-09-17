@@ -2,6 +2,8 @@
 -- LazyVar module
 --
 
+---@alias Lazy<T> T | LazyVar<T> | fun(): T
+
 local TableInsert = table.insert
 
 local iscallable = iscallable
@@ -16,11 +18,9 @@ ExtendedErrorMessages = false
 local EvalContext = nil
 local WeakKeyMeta = { __mode = 'k' }
 
----@class LazyVar : Destroyable, OnDirtyListener
+---@class LazyVar<T> : {[1]?: T, compute?: fun(): T}, Destroyable, OnDirtyListener
 ---@operator call: fun(): any
----@field [1]? any
 ---@field busy? boolean
----@field compute function
 ---@field trace? string
 ---@field used_by table<LazyVar, boolean>
 ---@field uses table<LazyVar, boolean>
@@ -28,7 +28,9 @@ local WeakKeyMeta = { __mode = 'k' }
 local LazyVarMetaTable = {}
 LazyVarMetaTable.__index = LazyVarMetaTable
 
----@return any
+---@generic T
+---@param self LazyVar<T>
+---@return T
 function LazyVarMetaTable:__call()
     local value = self[1]
     if value == nil then
@@ -62,7 +64,7 @@ function LazyVarMetaTable:__call()
             self[1] = value
         else
             local trace = self.trace
-            if self.compute then
+            if iscallable(self.compute) then
                 trace = trace or "[Set lazyvar.ExtendedErrorMessages for extra trace info]"
             else
                 trace = trace or ""
@@ -97,7 +99,9 @@ function LazyVarMetaTable:SetDirty(onDirtyList)
     end
 end
 
----@param func function
+---@generic T
+---@param self LazyVar<T> 
+---@param func LazyVar<T> | fun(): T
 function LazyVarMetaTable:SetFunction(func)
     if func == nil then
         error("You are attempting to set a LazyVar's evaluation function to nil, don't do that!")
@@ -132,6 +136,9 @@ function LazyVarMetaTable:SetFunction(func)
 end
 
 --- Sets the value
+---@generic T
+---@param self LazyVar<T>
+---@param value T
 function LazyVarMetaTable:SetValue(value)
     if value == nil then
         error("You are attempting to set a LazyVar's value to nil, don't do that!")
@@ -174,6 +181,9 @@ function LazyVarMetaTable:SetValue(value)
     end
 end
 
+---@generic T
+---@param self LazyVar<T>
+---@param value T | LazyVar<T> | fun(): T
 function LazyVarMetaTable:Set(value)
     if value == nil then
         error("You are attempting to set a LazyVar to nil, don't do that!")
