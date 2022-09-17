@@ -393,3 +393,7 @@ end
 function RecheckTargetsOfWeapons()
     SimCallback({Func = 'RecheckTargetsOfWeapons', Args = { }}, true)
 end
+
+function GroundFireManualWeapons()
+    SimCallback({Func = 'GroundFireManualWeapons', Args = { position = GetMouseWorldPos() }}, true)
+end
