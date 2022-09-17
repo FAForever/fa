@@ -103,7 +103,7 @@ local cUnit = moho.unit_methods
 ---@field Army Army
 ---@field UnitId UnitId
 ---@field EntityId EntityId
----@field EventCallbacks function[]
+---@field EventCallbacks table<string, function[]>
 Unit = Class(moho.unit_methods) {
 
     Weapons = {},
