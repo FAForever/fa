@@ -158,7 +158,8 @@ local UIFileBlacklist = {
     ['/icons/units/ueb5208_icon.dds'] = true
 }
 
---* layout control, sets current layout preference
+--- Layout control, sets current layout preference
+---@param layout string
 function SetCurrentLayout(layout)
     if not layout then return end
     -- make sure this skin contains the layout, otherwise do nothing
@@ -172,11 +173,13 @@ function SetCurrentLayout(layout)
     if not foundLayout then return end
 
     currentLayout = layout
-    Prefs.SetToCurrentProfile("layout", currentLayout)
+    Prefs.SetToCurrentProfile("layout", layout)
     SelectUnits(nil)
     if changeLayoutFunction then changeLayoutFunction(layout) end
 end
 
+---@return boolean network
+---@return boolean session
 function GetNetworkBool()
     local sessionClientsTable = GetSessionClients()
     local networkBool = false
@@ -189,10 +192,13 @@ function GetNetworkBool()
     return networkBool, sessionBool
 end
 
+---@return true
 function GetAnimationPrefs()
     return true
 end
 
+---@param key string
+---@return FileName | false
 function GetLayoutFilename(key)
     if Layouts[currentLayout][key] then
         return Layouts[currentLayout][key]
@@ -202,6 +208,8 @@ function GetLayoutFilename(key)
     end
 end
 
+---@param skin Skin
+---@param isOn? boolean defaults to user preference `"world_border"`
 function UpdateWorldBorderState(skin, isOn)
     if skin == nil then
         skin = currentSkin()
@@ -244,21 +252,34 @@ function UpdateWorldBorderState(skin, isOn)
             MapBorderClear()
         end
     end
-
 end
 
-local currentSkinName = 'random'
---- gets name of current skin that changes when calling SetCurrentSkin()
---- returns 'random', 'uef', 'cybran', 'aeon', or 'seraphim'
+---@alias Skin "random" | "uef" | "cybran" | "aeon" | "seraphim"
+
+local currentSkinName = "random"
+--- Gets name of current skin that changes when calling SetCurrentSkin()
+---@return Skin
 function GetCurrentSkinName()
     return currentSkinName
 end
 
---* skin control, sets the current skin table
+--- Sets the current skin table
+---@param skin Skin
+---@param overrideTable table
 function SetCurrentSkin(skin, overrideTable)
     local skinTable = skins[skin]
     if not skinTable then
-        skin = 'uef'
+        if skin == "random" then
+            local randomSkin = {}
+            local count = 0
+            for skinName in skins do
+                count = count + 1
+                randomSkin[count] = skinName
+            end
+            skin = randomSkin[Random(1, count)]
+        else
+            skin = "uef"
+        end
         skinTable = skins[skin]
     end
 
@@ -324,7 +345,8 @@ function UpdateCurrentSkin(overrideTable)
     SetCurrentSkin(currentSkin(), overrideTable)
 end
 
---* cycle through all available skins
+--- Cycles through all available skins
+---@param direction? "+" | "-"
 function RotateSkin(direction)
     if not SessionIsActive() or import('/lua/ui/game/gamemain.lua').IsNISMode() then
         return
@@ -366,9 +388,9 @@ function RotateSkin(direction)
     end
 end
 
---* cycle through all available layouts
+--- Cycles through all available layouts
+---@param direction? "+" | "-"
 function RotateLayout(direction)
-
     -- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
@@ -531,16 +553,20 @@ end
 
 ---@param parent Control
 ---@param filename FileName
+---@param border? number
 ---@return Bitmap
-function CreateBitmap(parent, filename)
-    return Bitmap(parent, UIFile(filename))
+function CreateBitmap(parent, filename, border)
+    local bitmap = Bitmap(parent)
+    bitmap:SetTexture(UIFile(filename), border)
+    return bitmap
 end
 
 ---@param parent Control
 ---@param filename FileName
+---@param border? number
 ---@return Bitmap
-function CreateBitmapStd(parent, filename)
-    return CreateBitmap(parent, filename .. "_bmp.dds")
+function CreateBitmapStd(parent, filename, border)
+    return CreateBitmap(parent, filename .. "_bmp.dds", border)
 end
 
 ---@param parent Control
@@ -554,16 +580,20 @@ end
 
 ---@param parent Control
 ---@param filename FileName
+---@param border? number
 ---@return Bitmap
-function CreateSkinnableBitmap(parent, filename)
-    return Bitmap(parent, SkinnableFile(filename))
+function CreateSkinnableBitmap(parent, filename, border)
+    local bitmap = Bitmap(parent)
+    bitmap:SetTexture(SkinnableFile(filename), border)
+    return bitmap
 end
 
 ---@param parent Control
 ---@param filename FileName
+---@param border? number
 ---@return Bitmap
-function CreateSkinnableBitmapStd(parent, filename)
-    return CreateSkinnableBitmap(parent, filename .. "_bmp.dds")
+function CreateSkinnableBitmapStd(parent, filename, border)
+    return CreateSkinnableBitmap(parent, filename .. "_bmp.dds", border)
 end
 
 
@@ -991,6 +1021,7 @@ end
 ---@param button3Callback fun() | nil callback function for the first button
 ---@param destroyOnCallback? boolean if true, the popup is closed when a button with a callback is pressed (if false, you must destroy); defaults to `true` when all three callback functions are supplied and `false` otherwise
 ---@param modalInfo ModalityInfo Sets up modality info for dialog
+---@return Popup
 function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Text, button2Callback, button3Text, button3Callback, destroyOnCallback, modalInfo)
     -- if there is a callback and destroy not specified, assume destroy
     if destroyOnCallback == nil and (button1Callback or button2Callback or button3Callback) then
@@ -1138,58 +1169,81 @@ end
 ---@param parent Control
 ---@param colorOverride? Color defaults to black
 function CreateWorldCover(parent, colorOverride)
+    colorOverride = colorOverride or "ff000000"
     local NumFrame = GetNumRootFrames() - 1
     local worldCovers = {}
-    colorOverride = colorOverride or "ff000000"
-    for index = 0, NumFrame do
-        if GetFrame(index) == parent:GetRootFrame() then
-            worldCovers[index] = Bitmap(parent)
-            worldCovers[index].ID = index
-            worldCovers[index].OnDestroy = function(self)
-                for h, x in worldCovers do
-                    if x and h ~= self.ID then
-                        x:Destroy()
-                    end
-                end
+    local parentFrame = parent:GetRootFrame()
+
+    local function OnHide(self, hidden)
+        for id, cover in worldCovers do
+            if cover and id ~= self.ID then
+                cover:SetHidden(hidden)
             end
-            worldCovers[index].OnHide = function(self, hidden)
-                for h, x in worldCovers do
-                    if x and h ~= self.ID then
-                        x:SetHidden(hidden)
-                    end
-                end
+        end
+    end
+    local function OnDestroy(self)
+        for id, cover in worldCovers do
+            if cover and id ~= self.ID then
+                cover:Destroy()
             end
+        end
+    end
+    local function OnFrame(self, delta)
+        local targetAlpha = self:GetAlpha() + (delta * 1.5)
+        if targetAlpha < 0.8 then
+            self:SetAlpha(targetAlpha)
         else
-            worldCovers[index] = Bitmap(GetFrame(index))
+            self:SetAlpha(0.8)
+            self:SetNeedsFrameUpdate(false)
         end
-        worldCovers[index]:SetSolidColor(colorOverride)
-        LayoutHelpers.FillParent(worldCovers[index], GetFrame(index))
-        worldCovers[index].Depth:Set(function() return parent.Depth() - 2 end)
-        worldCovers[index]:SetAlpha(0)
-        worldCovers[index]:SetNeedsFrameUpdate(true)
-        worldCovers[index].OnFrame = function(self, delta)
-            local targetAlpha = self:GetAlpha() + (delta * 1.5)
-            if targetAlpha < .8 then
-                self:SetAlpha(targetAlpha)
-            else
-                self:SetAlpha(.8)
-                self:SetNeedsFrameUpdate(false)
-            end
+    end
+
+    for index = 0, NumFrame do
+        local worldCover
+        local frame = GetFrame(index)
+        if frame == parentFrame then
+            worldCover = Bitmap(parent)
+            worldCover.ID = index
+            worldCover.OnDestroy = OnDestroy
+            worldCover.OnHide = OnHide
+        else
+            worldCover = Bitmap(frame)
         end
+        worldCover.OnFrame = OnFrame
+        worldCovers[index] = LayoutHelpers.ReusedLayoutFor(worldCover)
+            :Color(colorOverride)
+            :Fill(frame)
+            :Under(parent, 2)
+            :Alpha(0)
+            :NeedsFrameUpdate(true)
+            :End()
     end
 
     return worldCovers
 end
 
+---@param parent Control
+---@param dialogText UnlocalizedString
+---@param buttonText? UnlocalizedString
+---@param buttonCallback fun() | nil
+---@param destroyOnCallback? boolean
+---@return Popup
 function ShowInfoDialog(parent, dialogText, buttonText, buttonCallback, destroyOnCallback)
-    local dlg = QuickDialog(parent, dialogText, buttonText, buttonCallback, nil, nil, nil, nil, destroyOnCallback, {worldCover = false, enterButton = 1, escapeButton = 1})
-    return dlg
+    return QuickDialog(parent, dialogText, buttonText, buttonCallback, nil, nil, nil, nil, destroyOnCallback, {worldCover = false, enterButton = 1, escapeButton = 1})
 end
 
+---@param factionIndex number
+---@return FileName
 function GetFactionIcon(factionIndex)
     return import('/lua/factions.lua').Factions[factionIndex + 1].Icon
 end
 
+---@param parent Control
+---@param leftOffset number
+---@param topOffset number
+---@param rightOffset number
+---@param bottomOffset number
+---@param altTextures? boolean if it uses small brackets
 function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottomOffset, altTextures)
     local ret = Group(parent)
 
@@ -1231,24 +1285,29 @@ function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottom
     return ret
 end
 
--- Enable or disable a control based on a boolean.
+--- Enable or disable a control based on a boolean
+---@param control Control
+---@param enabled boolean
 function setEnabled(control, enabled)
-    if (enabled) then
+    if enabled then
         control:Enable()
     else
         control:Disable()
     end
 end
 
--- Show or hide a control based on a boolean.
+--- Show or hide a control based on a boolean
+---@param control Control
+---@param visible boolean
 function setVisible(control, visible)
-    if (visible) then
+    if visible then
         control:Show()
     else
         control:Hide()
     end
 end
 
+---@return string
 function GetReplayId()
     local id = nil
 
@@ -1268,7 +1327,13 @@ function GetReplayId()
     return id
 end
 
--- Create an input dialog with the given title and listener function.
+--- Create an input dialog with the given title and listener function
+---@param parent Control
+---@param title UnlocalizedString
+---@param listener fun()
+---@param fallbackBox? Control
+---@param str? string
+---@return InputDialog
 function CreateInputDialog(parent, title, listener, fallbackBox, str)
     local dialog = InputDialog(parent, title, fallbackBox, str)
     dialog.OnInput = listener
@@ -1276,6 +1341,9 @@ function CreateInputDialog(parent, title, listener, fallbackBox, str)
     return dialog
 end
 
+
+---@param parent Control
+---@return ItemList
 function CreateTextBox(parent)
     local box = ItemList(parent)
     box:SetFont(bodyFont, 14)
@@ -1284,6 +1352,8 @@ function CreateTextBox(parent)
     return box
 end
 
+---@param textBox ItemList
+---@param text UnlocalizedString
 function SetTextBoxText(textBox, text)
     textBox:DeleteAllItems()
     local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), textBox.Width(), function(curText) return textBox:GetStringAdvance(curText) end)
@@ -1307,46 +1377,41 @@ local windowTextures = {
 }
 
 --- Constructs a default window.
--- @param parent Parent of the window, defaults to GetFrame(0)
--- @param title Title of the window
--- @param icon Path to the icon to use for the window, defaults to false (in other words: no icon) 
--- @param pin Toggle for the pin button, override window.OnPinCheck(self, checked) to set the behavior
--- @param config Toggle for configuration button, override window.OnConfigClick(self) to set the behavior
--- @Param lockSize Toggle to allow the user to adjust the size of the window.
--- @param lockPosition Toggle to allow the user to adjust the position of the window.
--- @param preferenceID Identifier used in the preference file to remember where this window was located last
--- @param defaultLeft The default left boundary of the window, defaults to 10
--- @param defaultTop The default top boundary of the window, defaults to 300
--- @param defaultBottom The default bottom boundary of the window, defaults to 600
--- @param defaultRight The default right boundary of the window, defaults to 210
+---@param parent? Control Parent of the window, defaults to GetFrame(0)
+---@param title? UnlocalizedString Title of the window
+---@param icon? FileName Path to the icon to use for the window, defaults to false (in other words: no icon) 
+---@param pin? boolean Toggle for the pin button, override window.OnPinCheck(self, checked) to set the behavior
+---@param config? boolean Toggle for configuration button, override window.OnConfigClick(self) to set the behavior
+---@param lockSize? boolean Toggle to allow the user to adjust the size of the window.
+---@param lockPosition? boolean Toggle to allow the user to adjust the position of the window.
+---@param preferenceID? string Identifier used in the preference file to remember where this window was located last
+---@param defaultLeft? Lazy<number> The default left boundary of the window, defaults to 10
+---@param defaultTop? Lazy<number> The default top boundary of the window, defaults to 300
+---@param defaultBottom? Lazy<number> The default bottom boundary of the window, defaults to 600
+---@param defaultRight? Lazy<number> The default right boundary of the window, defaults to 210
+---@return Window
 function CreateWindowStd(parent, title, icon, pin, config, lockSize, lockPosition, preferenceID, defaultLeft, defaultTop, defaultBottom, defaultRight)
-
-    -- allow for optionals
     parent = parent or GetFrame(0)
-
     defaultLeft = defaultLeft or 10
     defaultTop = defaultTop or 300
     defaultBottom = defaultBottom or 600
     defaultRight = defaultRight or 210
-
-    -- setup data
-    local defaults = { Left = defaultLeft, Top = defaultTop, Bottom = defaultBottom, Right = defaultRight }
-
-    -- create and return window
+    local defaultPos = {
+        Left = defaultLeft,
+        Top = defaultTop,
+        Bottom = defaultBottom,
+        Right = defaultRight,
+    }
     return Window(
-        parent,          -- parent
-        title,           -- title
-        icon,            -- icon
-        pin,             -- pin
-        config,          -- config
-        lockSize,        -- lockSize
-        lockPosition,    -- lockPosition
-        preferenceID,    -- prefID
-        defaults,        -- default position
-        windowTextures   -- textureTable
+        parent, title, icon,
+        pin, config, lockSize, lockPosition,
+        preferenceID, defaultPos, windowTextures
     )
 end
 
+---@param primary UnlocalizedString
+---@param secondary UnlocalizedString
+---@param control? Control defaults to duumy control at center of screen 
 function CreateAnnouncementStd(primary, secondary, control)
     -- make it originate from the top
     if not control then
@@ -1372,9 +1437,9 @@ end
 ---@return Group
 function CreateVertFillGroup(parent, filename)
     local group = Group(parent)
-    local top = CreateBitmap(group, filename .. "_bmp_t.dds")
-    local bottom = CreateBitmap(group, filename .. "_bmp_b.dds")
-    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
+    local top = CreateBitmap(group, filename .. "_bmp_t.dds", 0)
+    local bottom = CreateBitmap(group, filename .. "_bmp_b.dds", 0)
+    local middle = CreateBitmap(group, filename .. "_bmp_m.dds", 1)
 
     Layouter(top)
         :Over(group, 0)
@@ -1387,7 +1452,8 @@ function CreateVertFillGroup(parent, filename)
     Layouter(middle)
         :Over(group, 0)
         :AtLeftIn(group)
-        :Top(function() return top.Bottom() - 2 end)
+        :AnchorToBottom(top)
+        --:Top(function() return top.Bottom() - 2 end)
         :AnchorToTop(bottom)
 
     group.Width:Set(top.Width)
@@ -1403,22 +1469,23 @@ end
 ---@return Group
 function CreateHorzFillGroup(parent, filename)
     local group = Group(parent)
-    local left = CreateBitmap(group, filename .. "_bmp_l.dds")
-    local right = CreateBitmap(group, filename .. "_bmp_r.dds")
-    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
+    local left = CreateBitmap(group, filename .. "_bmp_l.dds", 0)
+    local right = CreateBitmap(group, filename .. "_bmp_r.dds", 0)
+    local middle = CreateBitmap(group, filename .. "_bmp_m.dds", 1)
 
-    BitmapLayouter(left)
+    Layouter(left)
         :Over(group, 0)
         :AtLeftTopIn(group)
 
-    BitmapLayouter(right)
+    Layouter(right)
         :Over(group, 0)
         :AtRightTopIn(group)
 
-    BitmapLayouter(middle)
+    Layouter(middle)
         :Over(group, 0)
         :AtTopIn(group)
-        :Left(function() return left.Right() - 2 end)
+        :AnchorToRight(left)
+        --:Left(function() return left.Right() - 2 end)
         :AnchorToLeft(right)
 
     group.Height:Set(right.Height)
