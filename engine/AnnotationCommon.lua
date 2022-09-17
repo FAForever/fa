@@ -5,7 +5,7 @@
 ---@class cfunction : function
 ---@class CScriptObject : userdata
 
----@class InternalObject
+---@class InternalObject : Destroyable
 ---@field _c_object CScriptObject
 
 ---@class Destroyable
