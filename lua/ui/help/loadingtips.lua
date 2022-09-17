@@ -100,4 +100,5 @@ Tips = {
     "<LOC loadingtip_0098>If you can't spend your resources, build more build power; Engineers, Factories, Engineering Stations, or SACUs",
     "<LOC loadingtip_0099>If you don't think your team can win anymore, you can request that they use the Recall feature to end the battle",
     "<LOC loadingtip_0100>You can find other players to talk about FAF and or team up with on the FAF Discord",
+    "<LOC loadingtip_0101>Drive save, be a Bob!",
 }
