@@ -473,7 +473,6 @@ float ComputeShadowStandard( float4 shadowCoords)
 #endif
 }
 
-
 // *** Percentage Closer Filtering Shadow Mapping ***
 float ComputeShadowPCF( float4 shadowCoords)
 {
@@ -2391,38 +2390,31 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
-  float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-  float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-  float dotLightNormal = dot(sunDirection,normal);
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float dotLightNormal = sqrt (dot(sunDirection,normal));
 
-  float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
-  float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-  if ( maskAlbedo )
-    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
-  else
-    albedo.rgb = albedo.rgb * vertex.color.rgb;
-  float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
-  //light = light * (0.9 - (light * 0.125));
-  //float3 lightpow = (light.r + light.g + light.b) / 3;
-  //light = light * lightpow;
-    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-    float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 12) * specular.g * light * 1.4;
-    float3 phongMultiplicative = environment * specular.r * light * 0.5;
+    // if ( maskAlbedo )
+    //     albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    // else
+    //     albedo.rgb = albedo.rgb * vertex.color.rgb;
+    // float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
 
-    float emissive = glowMultiplier * specular.b * 0.02;
+    // float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+    // float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 12) * specular.g * light * 1.4;
+    // float3 phongMultiplicative = environment * specular.r * light * 0.5;
 
-  float3 color = (albedo.rgb * 0.125) + ( emissive.r + (light * albedo.rgb) ) + phongMultiplicative + (phongAdditive);
-  float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a )) + (phongAdditive * 0.13);
-    //float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
-  //color = phongMultiplicative;
+    // float emissive = glowMultiplier * specular.b * 0.02;
 
-    #ifdef DIRECT3D10
-    if( alphaTestEnable )
-        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
-  #endif
-    return float4( color.rgb, alpha );
+    // float3 color = (albedo.rgb * 0.125) + ( emissive.r + (light * albedo.rgb) ) + phongMultiplicative + (phongAdditive);
+    // float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a )) + (phongAdditive * 0.13);
+
+
+    return float4(dotLightNormal * albedo.rgb, asin(time));
 }
 
 /// MapImagerPS0
@@ -3937,6 +3929,182 @@ float4 GlassAlphaLoFiPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
     return float4(color.rgb,alpha);
 }
 
+
+///////////////////////////////////////
+///
+/// BRDF
+///
+///////////////////////////////////////
+
+float u_roughnessMaterial = 1.0;
+float u_R0Material = 1.0;
+
+// see Physically Based Rendering Chapter 13.6.1 and 13.6.3
+float3 cosineWeightedSampling(float2 e)
+{
+	float x = sqrt(1.0 - e.x) * cos(2.0*3.14*e.y);
+	float y = sqrt(1.0 - e.x) * sin(2.0*3.14*e.y);
+	float z = sqrt(e.x);
+	
+	return float3(x, y, z);
+}
+
+// see http://www.scratchapixel.com/lessons/3d-advanced-lessons/things-to-know-about-the-cg-lighting-pipeline/what-is-a-brdf/
+// see Physically Based Rendering Chapter 5.6.1, 13.2 and 13.6.3
+// see Fundamentals of Computer Graphics Chapter 14.2 and 24.2
+float3 brdfLambert(float3 color, float2 randomPoint, float3x3 basis)
+{
+	float3 LtangentSpace = cosineWeightedSampling(randomPoint);
+	
+	// Transform light ray to world space.
+	float3 L = mul(basis, LtangentSpace);  
+
+	//
+	// Lo = BRDF * L * NdotL / PDF
+	//
+	// BRDF is color / PI.
+	// PDF is NdotL  /PI.
+	// NdotL and PI are canceled out, which results in this formula: Lo = color * L
+	return color * texCUBE(environmentSampler, L);
+}
+
+// see http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
+// see http://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v2.pdf
+// see Physically Based Rendering Chapter 13.6.1
+float3 microfacetWeightedSampling(float2 e)
+{
+	float alpha = u_roughnessMaterial * u_roughnessMaterial;
+	
+	// Note: Polar Coordinates
+	// x = sin(theta)*cos(phi)
+	// y = sin(theta)*sin(phi)
+	// z = cos(theta)
+	
+	float phi = 2.0 * 3.14 * e.y; 	
+	float cosTheta = sqrt((1.0 - e.x) / (1.0 + (alpha*alpha - 1.0) * e.x));
+	float sinTheta = sqrt(1.0 - cosTheta*cosTheta); 
+
+	float x = sinTheta * cos(phi);
+	float y = sinTheta * sin(phi);
+	float z = cosTheta;
+
+	return float3(x, y, z);
+}
+
+// see http://en.wikipedia.org/wiki/Schlick%27s_approximation
+float fresnelSchlick(float VdotH)
+{
+	return u_R0Material + (1.0 - u_R0Material) * pow(1.0 - VdotH, 5.0);
+}
+
+// see http://graphicrants.blogspot.de/2013/08/specular-brdf-reference.html
+// see http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
+float geometricShadowingSchlickBeckmann(float NdotV, float k)
+{
+	return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+// see http://graphicrants.blogspot.de/2013/08/specular-brdf-reference.html
+// see http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
+float geometricShadowingSmith(float NdotL, float NdotV, float k)
+{
+	return geometricShadowingSchlickBeckmann(NdotL, k) * geometricShadowingSchlickBeckmann(NdotV, k);
+}
+
+// see http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
+// see http://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v2.pdf 
+// see http://sirkan.iit.bme.hu/~szirmay/scook.pdf
+float3 brdfCookTorrance(float2 randomPoint, float3x3 basis, float3 N, float3 V, float k)
+{
+    float3 output = float3(0, 0, 0);
+	float3 noColor = float3(0.0, 0.0, 0.0);
+
+	float3 HtangentSpace = microfacetWeightedSampling(randomPoint);
+	
+	// Transform H to world space.
+	float3 H = mul(basis, HtangentSpace);
+	
+	// Note: reflect takes incident vector.
+	float3 L = reflect(-V, H);
+	
+	float NdotL = dot(N, L);
+	float NdotV = dot(N, V);
+	float NdotH = dot(N, H);
+	
+	// Lighted and visible
+	if (NdotL > 0.0 && NdotV > 0.0)
+	{
+		float VdotH = dot(V, H);
+
+		// Fresnel		
+		float F = fresnelSchlick(VdotH);
+		
+		// Geometric Shadowing
+		float G = geometricShadowingSmith(NdotL, NdotV, k);
+	
+		//
+		// Lo = BRDF * L * NdotL / PDF
+		//
+		// BRDF is D * F * G / (4 * NdotL * NdotV).
+		// PDF is D * NdotH / (4 * VdotH).
+		// D and 4 * NdotL are canceled out, which results in this formula: Lo = color * L * F * G * VdotH / (NdotV * NdotH)		
+		float colorFactor = F * G * VdotH / (NdotV * NdotH);
+		
+		// Note: Needed for robustness. With specific parameters, a NaN can be the result.
+        float3 output = texCUBE( environmentSampler, L).rgb * colorFactor;
+		if (isnan(colorFactor))
+		{
+			output = noColor;
+		}
+	}
+	
+	return output;
+}
+
+float4 BRDFPS( NORMALMAPPED_VERTEX vertex,
+                       uniform bool maskAlbedo,
+                       uniform bool glow,
+                       uniform bool hiDefShadows,
+                       uniform bool alphaTestEnable,
+                       uniform int alphaFunc,
+                       uniform int alphaRef ) : COLOR0
+{
+    // prevents reflections leaking through
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+	float3 color = float3(0.0, 0.0, 0.0);
+	
+	float3 eye = normalize(vertex.viewDirection);
+
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+
+
+	// Tangent, Bitangent and Normal are in world space.
+	float3 tangent = normalize(vertex.tangent);
+	float3 bitangent = normalize(vertex.binormal);
+	float3 normal = normalize(vertex.normal);
+
+	float3x3 basis = float3x3(bitangent, tangent, normal);
+	
+	float2 randomPoint;
+	
+	// see http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf Section Specular G
+	float k = (u_roughnessMaterial + 1.0) * (u_roughnessMaterial + 1.0) / 8.0;
+
+    randomPoint = float2(0, 0);
+
+    // Diffuse
+    color += brdfLambert(albedo.rgb, randomPoint, basis);
+    
+    // Specular
+    color += brdfCookTorrance(randomPoint, basis, normal, eye, k);
+	
+    return float4(color, 1);
+	// fragColor = vec4(color / float(u_numberSamples), 1.0);
+}
+
+
 ///////////////////////////////////////
 ///
 /// Techniques
@@ -5103,7 +5271,7 @@ technique Unit_HighFidelity
 
         VertexShader = compile vs_1_1 NormalMappedVS();
         //PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
-        PixelShader = compile ps_2_a NormalMappedPS_02(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a BRDFPS(true,true,true, false,0,0 );
     }
 }
 
