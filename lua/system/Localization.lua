@@ -1,6 +1,9 @@
 ---@declare-global
 local loc_table
 
+---@alias LocalizedString string
+---@alias UnlocalizedString string
+
 -- Special tokens that can be included in a loc string via {g Player} etc. The
 -- Player name gets replaced with the current selected player name.
 LocGlobals = {
