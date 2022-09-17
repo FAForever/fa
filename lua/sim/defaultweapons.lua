@@ -211,7 +211,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                 if not targetPos then
                     return 4.75
                 end
-                if not target.IsProp then
+                if target and not target.IsProp then
                     targetVelX, _, targetVelZ = UnitGetVelocity(target)
                 end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
