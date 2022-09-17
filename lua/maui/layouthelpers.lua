@@ -1097,7 +1097,7 @@ end
 -- To use it, start by making sure these lines are at the top of your UI file
 --[[
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-local Layouter = LayouterHelper.ReusedLayouter
+local Layouter = LayoutHelpers.ReusedLayoutFor
 --]]
 -- (This is mostly for readability, but there's also efficiency reasons)
 --
@@ -2257,6 +2257,17 @@ Layouter = Class(LayouterAttributeControl, LayouterAttributeDropShadow, Layouter
 }
 
 
+--- Returns a layouter for a control--you usually want to use `ReusedLayoutFor()` unless
+--- you're doing some advanced interlacing of the layout. This calls `OnLayout()` from the control
+--- if it exists. Make sure to call `End()` when you're done laying out the control (which calls
+--- `Layout()` from the control if it exists).
+---@param control Control
+---@return Layouter
+function LayoutFor(control)
+    return Layouter(control)
+end
+
+
 local reusedLayouter = Layouter()
 --- Returns the cached layouter applied to a control--this is usually what you want to use unless
 --- you're doing some advanced interlacing of the layout. This calls `OnLayout()` from the control
@@ -2264,7 +2275,7 @@ local reusedLayouter = Layouter()
 --- `Layout()` from the control if it exists).
 ---@param control Control
 ---@return Layouter #cached layouter
-function ReusedLayouter(control)
+function ReusedLayoutFor(control)
     local reusedLayouter = reusedLayouter
     local cur = reusedLayouter.c
     if cur then

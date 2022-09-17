@@ -27,7 +27,7 @@ local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 local skins = import('/lua/skins/skins.lua').skins
 
-local Layouter = LayoutHelpers.Layouter
+local Layouter = LayoutHelpers.LayoutFor
 
 
 --* Handy global variables to assist skinning

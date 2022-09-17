@@ -15,7 +15,7 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
 local Tabs = import('/lua/ui/game/tabs.lua')
 
 local ScaleNumber = LayoutHelpers.ScaleNumber
-local Layouter = LayoutHelpers.Layouter
+local Layouter = LayoutHelpers.LayoutFor
 local CreateBitmap = UIUtil.CreateBitmap
 local CreateBitmapStd = UIUtil.CreateBitmapStd
 

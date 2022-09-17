@@ -7,7 +7,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local UIUtil = import("/lua/ui/uiutil.lua")
 
-local Layouter = LayoutHelpers.ReusedLayouter
+local Layouter = LayoutHelpers.ReusedLayoutFor
 
 -- seconds to see recall voting results
 local reviewResultsDuration = 5
