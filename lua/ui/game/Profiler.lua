@@ -148,6 +148,15 @@ list = false
 
 --- Opens up the window
 function OpenWindow()
+
+
+    local dialog = import('/lua/ui/dialogs/mapselect/MapDialog.lua').Open(GetFrame(0), nil, nil, nil, nil, nil, nil, nil)
+
+    if true then
+        return
+    end
+
+
     local gameHasAIs = GameMain.GameHasAIs
     local cheatsOn = sessionInfo.Options.CheatsEnabled
     local isThisJip = "jip" == GetArmiesTable()[GameMain.OriginalFocusArmy].nickname

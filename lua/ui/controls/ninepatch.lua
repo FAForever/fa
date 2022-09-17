@@ -75,6 +75,7 @@ NinePatch = Class(Group) {
     end;
 }
 
+-- TODO: this is one weird function
 InitStd = function(self, parent, path)
     local SkinnableFile = import("/lua/ui/uiutil.lua").SkinnableFile
     NinePatch.__init(self, parent,
