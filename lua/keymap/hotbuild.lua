@@ -607,7 +607,6 @@ function buildActionUpgrade()
                 -- upgrade is already queued.
                 IssueBlueprintCommand("UNITCOMMAND_Upgrade", second_upgrade, 1, false)
                 success = true
-                break
             elseif EntityCategoryContains(buildableCategories, cmd) then
                 -- Queue the upgrade of the selected structure
                 IssueBlueprintCommand("UNITCOMMAND_Upgrade", cmd, 1, false)
