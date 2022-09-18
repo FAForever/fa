@@ -571,6 +571,34 @@ function buildActionUnit(name, modifier)
     end
 end
 
+-- Helper function for the buildActionUpgrade() function below. 
+-- Recursively finds and tries to order possible upgrades from highest tech to lowest tech. This allows queuing upgrades
+-- successively using keybinds, even if the previous upgrade isn't finished yet.
+-- Doing this fully recursively is probably overkill as the support fac / HQ is the only time when there are more than
+-- two possible upgrade paths, and the cybran shield is the only building with more than two successive upgrades, but
+-- hacking it together didn't feel right, hence the 'better' recursive solution.
+function issueUpgradeCommand(upgrades, buildableCategories)
+    local success = false
+    for _,upgr in upgrades do
+        local bp = __blueprints[upgr]
+        successive_upgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
+        if successive_upgrades then
+            success = issueUpgradeCommand(successive_upgrades, buildableCategories)
+            if success then
+                break
+            end
+        end
+        if not success then
+            if EntityCategoryContains(buildableCategories, upgr) then
+                -- Queue the upgrade of the selected structure, if possible
+                IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgr, 1, false)
+                success = true
+                break
+            end
+        end
+    end
+end
+
 -- Does support upgrading T1 structures (facs, radars, etc.) that are currently upgrading to T2 to T3 when issued
 function buildActionUpgrade()
     local selectedUnits = GetSelectedUnits()
@@ -579,40 +607,13 @@ function buildActionUpgrade()
 
     for index, unit in selectedUnits do
         local bp = unit:GetBlueprint()
-        local cmd = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
+        -- If upgradeTab[bp.BlueprintId] returns a table, there are two or more possible upgrades, e.g. HQ and 
+        -- support factory. If instead bp.General.UpgradesTo returns a string, then there is only one possible 
+        -- upgrade, e.g. for a radar. For our helper function issueUpgradeCommand we want a table, hence the { } 
+        -- brackets
+        local upgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
         SelectUnits({unit})
-        local success = false
-        if type(cmd) == "table" then -- Issue the first upgrade command that we may build
-            for k,v in cmd do
-                -- v, being an upgraded structure, always has at most one further possible upgrade which, if it exists, 
-                -- is unique for every unit in the game. 
-                second_upgrade = __blueprints[v].General.UpgradesTo 
-                if EntityCategoryContains(buildableCategories, second_upgrade) then
-                    -- Queue the upgrade of the upgrade of the structure selected. This is only possible if the first 
-                    -- upgrade is already queued.
-                    IssueBlueprintCommand("UNITCOMMAND_Upgrade", second_upgrade, 1, false)
-                    success = true
-                    break
-                elseif EntityCategoryContains(buildableCategories, v) then
-                    -- Queue the upgrade of the selected structure
-                    IssueBlueprintCommand("UNITCOMMAND_Upgrade", v, 1, false)
-                    success = true
-                    break
-                end
-            end
-        elseif type(cmd) == "string" then -- Direct upgrade path
-            second_upgrade = __blueprints[cmd].General.UpgradesTo 
-            if EntityCategoryContains(buildableCategories, second_upgrade) then
-                -- Queue the upgrade of the upgrade of the structure selected. This is only possible if the first 
-                -- upgrade is already queued.
-                IssueBlueprintCommand("UNITCOMMAND_Upgrade", second_upgrade, 1, false)
-                success = true
-            elseif EntityCategoryContains(buildableCategories, cmd) then
-                -- Queue the upgrade of the selected structure
-                IssueBlueprintCommand("UNITCOMMAND_Upgrade", cmd, 1, false)
-                success = true
-            end
-        end
+        local success = issueUpgradeCommand(upgrades, buildableCategories)
         if not success then
             result = false
         end
