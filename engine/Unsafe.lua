@@ -1,7 +1,6 @@
 ---@meta
 
---- Interface to Win32 SHGetFolderPath api
----@param name 
+---@alias Win32SHFolderPath
 ---| "COMMON_VIDEO" 
 ---| "COMMON_PICTURES"
 ---| "COMMON_MUSIC"
@@ -36,7 +35,10 @@
 ---| "CSIDL_FAVORITES"
 ---| "PERSONAL"
 ---| "DESKTOP"
+
+--- Interface to Win32 SHGetFolderPath api
+---@param name Win32SHFolderPath
 ---@param create? boolean
----@return string
+---@return FileName
 function SHGetFolderPath(name, create)
 end

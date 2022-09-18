@@ -1,131 +1,228 @@
 --
 -- LazyVar module
 --
-local pcall = pcall
+
 local TableInsert = table.insert
+
 local iscallable = iscallable
-local ipairs = ipairs
+local pcall = pcall
 local setmetatable = setmetatable
 
-local EvalContext = nil
-
----@class LazyVar
-local LazyVarMetaTable = {}
-
-LazyVarMetaTable.__index = LazyVarMetaTable
-
-local WeakKeyMeta = { __mode = 'k' }
 
 -- Set this true to get tracebacks in error messages. It slows down lazyvars a lot,
 -- so don't use except when debugging.
 ExtendedErrorMessages = false
 
+local EvalContext = nil
+local WeakKeyMeta = { __mode = 'k' }
+
+---@class LazyVar : Destroyable, OnDirtyListener
+---@operator call: fun(): any
+---@field [1]? any
+---@field busy? boolean
+---@field compute function
+---@field trace? string
+---@field used_by table<LazyVar, boolean>
+---@field uses table<LazyVar, boolean>
+---@field OnDirty? function
+local LazyVarMetaTable = {}
+LazyVarMetaTable.__index = LazyVarMetaTable
+
+---@return any
 function LazyVarMetaTable:__call()
-    if self[1]==nil then
+    local value = self[1]
+    if value == nil then
         if self.busy then
-            error("circular dependency in lazy evaluation for variable " .. (self.trace or ''), 2)
+            local trace = self.trace
+            if self.compute then
+                trace = trace or "[Set lazyvar.ExtendedErrorMessages for extra trace info]"
+            else
+                trace = trace or ""
+            end
+            error("circular dependency in lazy evaluation for variable " .. trace, 2)
         end
+        do
+            local uses = self.uses
+            if next(uses) then
+                for use in self.uses do
+                    use.used_by[self] = nil
+                end
+                self.uses = {}
+            end
+        end
+
+        local currentContext = EvalContext
         self.busy = true
-        local u
-        for u in self.uses do
-            u.used_by[self] = nil
-        end
-        self.uses = {}
-        local oldContext = EvalContext
         EvalContext = self
         local okay, value = pcall(self.compute)
-        EvalContext = oldContext
+        EvalContext = currentContext
         self.busy = nil
+
         if okay then
             self[1] = value
         else
-            error("error evaluating lazy variable: " .. value .. "\nStack trace from definition: " .. (self.trace or '') .. '\n', 2)
+            local trace = self.trace
+            if self.compute then
+                trace = trace or "[Set lazyvar.ExtendedErrorMessages for extra trace info]"
+            else
+                trace = trace or ""
+            end
+            error("error evaluating lazy variable: " .. value .. "\nStack trace from definition: " .. trace .. '\n', 2)
         end
+        if currentContext then
+            currentContext.uses[self] = true
+            self.used_by[currentContext] = true
+        end
+        return value
     end
-    if EvalContext then
-        EvalContext.uses[self] = true
-        self.used_by[EvalContext] = true
+    local currentContext = EvalContext
+    if currentContext then
+        currentContext.uses[self] = true
+        self.used_by[currentContext] = true
     end
-    return self[1]
+    return value
 end
 
----@param onDirtyList table
+--- Resets this lazyvar's value and adds its `OnDirtyListener`s to the list
+---@param onDirtyList OnDirtyListener[]
 function LazyVarMetaTable:SetDirty(onDirtyList)
-    if self[1]~=nil then
+    if self[1] ~= nil then
         if self.OnDirty then
             TableInsert(onDirtyList, self)
         end
         self[1] = nil
-        local u for u in self.used_by do 
-            u:SetDirty(onDirtyList)
+        for use in self.used_by do
+            use:SetDirty(onDirtyList)
         end
     end
-end 
+end
 
 ---@param func function
 function LazyVarMetaTable:SetFunction(func)
-    local dirtyList = {}
-    self:SetDirty(dirtyList)
+    if func == nil then
+        error("You are attempting to set a LazyVar's evaluation function to nil, don't do that!")
+        return
+    end
+
+    local onDirtyList
+    if self[1] ~= nil then
+        onDirtyList = {}
+        self[1] = nil
+        for use in self.used_by do
+            use:SetDirty(onDirtyList)
+        end
+    end
+
     self.compute = func
     if ExtendedErrorMessages then
         self.trace = debug.traceback('set from:')
-    else
-        self.trace = '[Set lazyvar.ExtendedErrorMessages for extra trace info]'
     end
 
-    for i,v in ipairs(dirtyList) do
-        v:OnDirty()
+    if onDirtyList then
+        do
+            local onDirty = self.OnDirty
+            if onDirty then
+                onDirty(self)
+            end
+        end
+        for _, listener in onDirtyList do
+            listener:OnDirty()
+        end
     end
 end
 
----@param value number
+--- Sets the value
 function LazyVarMetaTable:SetValue(value)
-    local dirtyList = {}
-    self:SetDirty(dirtyList)
+    if value == nil then
+        error("You are attempting to set a LazyVar's value to nil, don't do that!")
+        value = 0
+    end
+
+    local onDirtyList
+    if self[1] ~= nil then
+        onDirtyList = {}
+        self[1] = nil
+        for use in self.used_by do
+            use:SetDirty(onDirtyList)
+        end
+    end
+
     self.compute = nil
     self.trace = nil
     self[1] = value
-    -- Now remove us from the used_by lists for any lazy vars we used to use.
-    for u in self.uses do
-        u.used_by[self] = nil
+    -- now remove us from the `used_by` lists for any lazy vars we used to compute our value
+    do
+        local uses = self.uses
+        if next(uses) then
+            for use in uses do
+                use.used_by[self] = nil
+            end
+            self.uses = {}
+        end
     end
-    self.uses = {}
-    for i,v in ipairs(dirtyList) do
-        v:OnDirty()
+
+    if onDirtyList then
+        do
+            local onDirty = self.OnDirty
+            if onDirty then
+                onDirty(self)
+            end
+        end
+        for _, listener in onDirtyList do
+            listener:OnDirty()
+        end
     end
 end
 
----@param v boolean
-function LazyVarMetaTable:Set(v)
-    if v == nil then
-        error("You are attempting to set a LazyVar's evaluation function to nil, don't do that!")    
+function LazyVarMetaTable:Set(value)
+    if value == nil then
+        error("You are attempting to set a LazyVar to nil, don't do that!")
+        return
     end
-    if iscallable(v) then
-        self:SetFunction(v)
+    if iscallable(value) then
+        self:SetFunction(value)
     else
-        self:SetValue(v)
+        self:SetValue(value)
     end
 end
 
 function LazyVarMetaTable:Destroy()
     self.OnDirty = nil
     self.compute = nil
-    self.value = nil
+    local val = self[1]
+    self[1] = nil
+    if val then
+        local destroy = val.Destroy
+        if destroy then
+            destroy(val)
+        end
+    end
+    local onDestroy = self.OnDestroy
+    if onDestroy then
+        onDestroy(self)
+        self.OnDestroy = nil
+    end
 end
 
----@param initial number
----@return boolean
+---@param initial? any defaults to `0`
+---@return LazyVar
 function Create(initial)
-    ---@diagnostic disable-next-line:miss-symbol,unknown-symbol
-    local result = {&1&4}
-    setmetatable(result, LazyVarMetaTable)
-    if initial == nil then 
-        result[1] = 0
-    else
-        result[1] = initial
+    if initial == nil then
+        initial = 0
     end
-    result.used_by = {}
-    setmetatable(result.used_by, WeakKeyMeta)
-    result.uses = {}
+    local setmetatable = setmetatable
+    ---@type LazyVar
+    ---@diagnostic disable-next-line:assign-type-mismatch,miss-symbol,exp-in-action,unknown-symbol
+    local result = {&4 initial} -- preallocate table with hashsize=4, arraysize=1
+    setmetatable(result, LazyVarMetaTable)
+    local WeakKeyMeta = WeakKeyMeta
+    do
+        local used_by = {}
+        setmetatable(used_by, WeakKeyMeta)
+        result.used_by = used_by
+    end
+    local uses = {}
+    setmetatable(uses, WeakKeyMeta)
+    result.uses = uses
     return result
 end

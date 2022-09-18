@@ -1,6 +1,6 @@
 ---@meta
 
----@class moho.entity_methods
+---@class moho.entity_methods : Destroyable
 local Entity = {}
 
 ---@alias EntityId number

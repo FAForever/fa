@@ -44,17 +44,17 @@ function CMauiEdit:GetFontHeight()
 end
 
 ---
----@return string
+---@return Color
 function CMauiEdit:GetForegroundColor()
 end
 
 ---
----@return string
+---@return Color
 function CMauiEdit:GetHighlightBackgroundColor()
 end
 
 ---
----@return string
+---@return Color
 function CMauiEdit:GetHighlightForegroundColor()
 end
 

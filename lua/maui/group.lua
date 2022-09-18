@@ -2,7 +2,7 @@
 
 local Control = import('/lua/maui/control.lua').Control
 
----@class Group : moho.group_methods, Control
+---@class Group : moho.group_methods, Control, InternalObject
 Group = Class(moho.group_methods, Control) {
 
     __init = function(self, parent, debugname)

@@ -137,7 +137,7 @@ function Unit:GetBlueprint()
 end
 
 --- Returns the build rate of a unit
---- @return rate
+--- @return number
 function Unit:GetBuildRate()
 end
 
@@ -558,7 +558,7 @@ function Unit:SetFireState(fireState)
 end
 
 ---
----@param focus moho.entity_methods
+---@param focus Entity | Unit | Prop | Projectile
 function Unit:SetFocusEntity(focus)
 end
 

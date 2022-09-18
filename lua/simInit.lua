@@ -26,11 +26,11 @@ WaitTicks = coroutine.yield
 
 ---@param n number
 function WaitSeconds(n)
-    local ticks = math.max(1, n * 10)
-    if ticks > 1 then
-        ticks = ticks + 1
+    if n <= 0.1 then
+        WaitTicks(1)
+        return
     end
-    WaitTicks(ticks)
+    WaitTicks(n * 10 + 1)
 end
 
 -- Hook some globals
