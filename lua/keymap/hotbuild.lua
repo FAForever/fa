@@ -579,11 +579,11 @@ end
 -- hacking it together didn't feel right, hence the 'better' recursive solution.
 function issueUpgradeCommand(upgrades, buildableCategories)
     local success = false
-    for _,upgr in upgrades do
+    for _, upgr in upgrades do
         local bp = __blueprints[upgr]
-        successive_upgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
-        if successive_upgrades then
-            success = issueUpgradeCommand(successive_upgrades, buildableCategories)
+        successiveUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
+        if successiveUpgrades then
+            success = issueUpgradeCommand(successiveUpgrades, buildableCategories)
             if success then
                 break
             end
@@ -597,6 +597,7 @@ function issueUpgradeCommand(upgrades, buildableCategories)
             end
         end
     end
+    return success 
 end
 
 -- Does support upgrading T1 structures (facs, radars, etc.) that are currently upgrading to T2 to T3 when issued
