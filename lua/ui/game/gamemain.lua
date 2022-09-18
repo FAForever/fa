@@ -603,8 +603,12 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             elseif type(potentialUpgrades) == "table" then
                 local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
                 for _, v in potentialUpgrades do
+                    upgradeUpgradesTo = __blueprints[v].General.UpgradesTo
                     if EntityCategoryContains(buildableCategories, v) then
                         upgradesTo = v
+                        break
+                    elseif EntityCategoryContains(buildableCategories, upgradeUpgradesTo) then
+                        upgradesTo = upgradeUpgradesTo
                         break
                     end
                 end
