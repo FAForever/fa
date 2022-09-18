@@ -1,3 +1,9 @@
+local MathMax = math.max
+local MathMin = math.min
+
+
+
+
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -15,6 +21,24 @@ local OldPosition
 local ReclaimChanged = true
 local PlayableArea
 local OutsidePlayableAreaReclaim = {}
+
+
+
+local mapWidth = 0
+local mapHeight = 0
+function SetMapSize()
+    mapWidth = SessionGetScenarioInfo().size[1]
+    mapHeight = SessionGetScenarioInfo().size[2]
+end
+
+local function IsInMapArea(pos)
+    if PlayableArea then
+        return pos[1] > PlayableArea[1] and pos[1] < PlayableArea[3] or
+            pos[3] > PlayableArea[2] and pos[3] < PlayableArea[4]
+    else
+        return pos[1] > 0 and pos[1] < mapWidth or pos[3] > 0 and pos[3] < mapHeight
+    end
+end
 
 -- Stores/updates a reclaim entity's data using EntityId as key
 -- called from /lua/UserSync.lua
@@ -70,11 +94,6 @@ function updateMaxLabels(value)
         LabelPool[index]:Destroy()
         LabelPool[index] = nil
     end
-end
-
-function OnScreen(view, pos)
-    local proj = view:Project(Vector(pos[1], pos[2], pos[3]))
-    return not (proj.x < 0 or proj.y < 0 or proj.x > view.Width() or proj.y > view:Height())
 end
 
 function InPlayableArea(pos)
@@ -155,26 +174,145 @@ function CreateReclaimLabel(view)
     return label
 end
 
+local function SumReclaim(r1, r2)
+    local massSum = r1.mass + r2.mass
+    r1.count = r1.count + (r2.count or 1)
+    r1.position[1] = (r1.mass * r1.position[1] + r2.mass * r2.position[1]) / massSum
+    r1.position[3] = (r1.mass * r1.position[3] + r2.mass * r2.position[3]) / massSum
+    r1.max = MathMax(r1.max or r1.mass, r2.mass)
+    r1.mass = massSum
+    return r1
+end
+
+local function CompareMass(a, b)
+    return a.mass > b.mass
+end
+
+local HEIGHT_RATIO = 0.012
+local ZOOM_THRESHOLD = 60
+
+local function CombineReclaim(reclaim)
+    local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
+
+    if zoom < ZOOM_THRESHOLD then
+        return reclaim
+    end
+
+    local minDist = zoom * HEIGHT_RATIO
+    local minDistSq = minDist * minDist
+    local index = 1
+    local combinedReclaim = {}
+
+    local added
+
+    local x1
+    local x2
+    local y1
+    local y2
+    local dx
+    local dy
+
+    for _, r in reclaim do
+        added = false
+        x1 = r.position[1]
+        y1 = r.position[3]
+        for _, cr in combinedReclaim do
+            x2 = cr.position[1]
+            y2 = cr.position[3]
+            dx = x1 - x2
+            dy = y1 - y2
+            if dx * dx + dy * dy < minDistSq then
+                added = true
+                SumReclaim(cr, r)
+                break
+            end
+        end
+        if not added then
+            combinedReclaim[index] = {
+                mass = r.mass,
+                position = Vector(x1, r.position[2],y1),
+                count = 1
+            }
+            index = index + 1
+        end
+    end
+    return combinedReclaim
+end
+
 function UpdateLabels()
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
-
     local onScreenReclaimIndex = 1
     local onScreenReclaims = {}
 
-    -- One might be tempted to use a binary insert; however, tests have shown that it takes about 140x more time
+    local tl = UnProject(view, Vector2(view.Left(), view.Top()))
+    local tr = UnProject(view, Vector2(view.Right(), view.Top()))
+    local br = UnProject(view, Vector2(view.Right(), view.Bottom()))
+    local bl = UnProject(view, Vector2(view.Left(), view.Bottom()))
+
+
+    local checkForContainment = IsInMapArea(tl) or IsInMapArea(tr) or IsInMapArea(bl) or IsInMapArea(br)
+
+
+    local x0
+    local y0
+    local x1 = tl[1]
+    local y1 = tl[3]
+    local x2 = tr[1]
+    local y2 = tr[3]
+    local x3 = br[1]
+    local y3 = br[3]
+    local x4 = bl[1]
+    local y4 = bl[3]
+
+    local minX = MathMin(x1, x2, x3, x4)
+    local maxX = MathMax(x1, x2, x3, x4)
+    local minY = MathMin(y1, y2, y3, y4)
+    local maxY = MathMax(y1, y2, y3, y4)
+
+
+    local y21 = (y2 - y1)
+    local y32 = (y3 - y2)
+    local y43 = (y4 - y3)
+    local y14 = (y1 - y4)
+    local x21 = (x2 - x1)
+    local x32 = (x3 - x2)
+    local x43 = (x4 - x3)
+    local x14 = (x1 - x4)
+
+    local s1
+    local s2
+    local s3
+    local s4
+
+    local function Contains(point)
+        x0 = point[1]
+        y0 = point[3]
+        if x0 < minX or x0 > maxX or y0 < minY or y0 > maxY then
+            return false
+        end
+        s1 = (x1 - x0) * y21 - x21 * (y1 - y0)
+        s2 = (x2 - x0) * y32 - x32 * (y2 - y0)
+        s3 = (x3 - x0) * y43 - x43 * (y3 - y0)
+        s4 = (x4 - x0) * y14 - x14 * (y4 - y0)
+        return (s1 > 0 and s2 > 0 and s3 > 0 and s4 > 0)
+    end
+
     for _, r in Reclaim do
-        r.onScreen = OnScreen(view, r.position)
-        if r.onScreen and r.mass >= MinAmount then
+        if r.mass >= MinAmount and (not checkForContainment or Contains(r.position)) then
             onScreenReclaims[onScreenReclaimIndex] = r
             onScreenReclaimIndex = onScreenReclaimIndex + 1
         end
     end
 
-    table.sort(onScreenReclaims, function(a, b) return a.mass > b.mass end)
 
-    -- Create/Update as many reclaim labels as we need
+    onScreenReclaims = CombineReclaim(onScreenReclaims)
+
+
+    table.sort(onScreenReclaims, CompareMass)
+
     local labelIndex = 1
-    for _, r in onScreenReclaims do
+
+    for _, recl in onScreenReclaims do
         if labelIndex > MaxLabels then
             break
         end
@@ -183,11 +321,11 @@ function UpdateLabels()
             label = nil
         end
         if not label then
-            label = CreateReclaimLabel(view.ReclaimGroup, r)
+            label = CreateReclaimLabel(view.ReclaimGroup)
             LabelPool[labelIndex] = label
         end
 
-        label:DisplayReclaim(r)
+        label:DisplayReclaim(recl)
         labelIndex = labelIndex + 1
     end
 
