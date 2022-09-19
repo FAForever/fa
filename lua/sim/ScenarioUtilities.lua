@@ -645,37 +645,38 @@ function InitializeArmies()
             for iEnemy, strEnemy in tblArmy do
                 local enemySetup = armySetups[strEnemy]
                 local enemyIsCiv = enemySetup.Civilian
-                local a, e = iArmy, iEnemy
                 local state = 'Enemy'
 
-                if a ~= e then
+                if iArmy ~= iEnemy then
                     if armyIsCiv or enemyIsCiv then
                         if civOpt == 'neutral' or strArmy == 'NEUTRAL_CIVILIAN' or strEnemy == 'NEUTRAL_CIVILIAN' then
                             state = 'Neutral'
                         end
 
                         if revealCivilians and enemySetup.Human then
+                            -- make sure the upvalues don't change in the thread 
+                            local iArmy, iEnemy = iArmy, iEnemy
                             ForkThread(function()
                                 WaitSeconds(0.1)
-                                local real_state = IsAlly(a, e) and 'Ally' or IsEnemy(a, e) and 'Enemy' or 'Neutral'
+                                local real_state = IsAlly(iArmy, iEnemy) and 'Ally' or IsEnemy(iArmy, iEnemy) and 'Enemy' or 'Neutral'
 
                                 brain:SetupArmyIntelTrigger({
                                     Category = categories.ALLUNITS,
                                     Type = 'LOSNow',
                                     Value = true,
                                     OnceOnly = true,
-                                    TargetAIBrain = brain,
+                                    TargetAIBrain = GetArmyBrain(iEnemy),
                                     CallbackFunction = function()
-                                        SetAlliance(a, e, real_state)
+                                        SetAlliance(iArmy, iEnemy, real_state)
                                     end,
                                 })
-                                SetAlliance(a, e, 'Ally')
+                                SetAlliance(iArmy, iEnemy, 'Ally')
                             end)
                         end
                     end
 
                     if state then
-                        LocalSetAlliance(a, e, state)
+                        LocalSetAlliance(iArmy, iEnemy, state)
                     end
                 end
             end
