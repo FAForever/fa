@@ -1,6 +1,6 @@
 local MathMax = math.max
 local MathMin = math.min
-
+local TableGetn = table.getn
 
 
 
@@ -185,11 +185,15 @@ local function SumReclaim(r1, r2)
 end
 
 local function CompareMass(a, b)
-    return a.mass > b.mass
+    return a.mass < b.mass
 end
 
 local HEIGHT_RATIO = 0.012
 local ZOOM_THRESHOLD = 60
+
+local reclaimDataPool = {}
+local totalReclaimData = 0
+
 
 local function CombineReclaim(reclaim)
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
@@ -200,8 +204,7 @@ local function CombineReclaim(reclaim)
 
     local minDist = zoom * HEIGHT_RATIO
     local minDistSq = minDist * minDist
-    local index = 1
-    local combinedReclaim = {}
+    local index = 0
 
     local added
 
@@ -216,7 +219,8 @@ local function CombineReclaim(reclaim)
         added = false
         x1 = r.position[1]
         y1 = r.position[3]
-        for _, cr in combinedReclaim do
+        for i = 1, index do
+            cr = reclaimDataPool[i]
             x2 = cr.position[1]
             y2 = cr.position[3]
             dx = x1 - x2
@@ -228,18 +232,39 @@ local function CombineReclaim(reclaim)
             end
         end
         if not added then
-            combinedReclaim[index] = {
-                mass = r.mass,
-                position = Vector(x1, r.position[2],y1),
-                count = 1
-            }
             index = index + 1
+            if index > totalReclaimData then
+                reclaimDataPool[index] = {
+                    mass = r.mass,
+                    position = Vector(0, 0, 0),
+                    count = 1
+                }
+                totalReclaimData = totalReclaimData + 1
+            end
+            local rd = reclaimDataPool[index]
+            rd.mass = r.mass
+            rd.max = r.mass
+            rd.count = 1
+            local v = rd.position
+            v[1] = x1
+            v[2] = r.position[2]
+            v[3] = y1
         end
     end
-    return combinedReclaim
+    for i = index + 1, totalReclaimData do
+        reclaimDataPool[i].mass = 0
+    end
+
+    return index
 end
 
 function UpdateLabels()
+
+    if TableGetn(Reclaim) < totalReclaimData then
+        totalReclaimData = 0
+        reclaimDataPool = {}
+    end
+
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
     local onScreenReclaimIndex = 1
     local onScreenReclaims = {}
@@ -305,14 +330,15 @@ function UpdateLabels()
     end
 
 
-    onScreenReclaims = CombineReclaim(onScreenReclaims)
+    local size = CombineReclaim(onScreenReclaims)
 
 
-    table.sort(onScreenReclaims, CompareMass)
+    table.sort(reclaimDataPool, CompareMass)
 
     local labelIndex = 1
 
-    for _, recl in onScreenReclaims do
+    for i = 1, size do
+        recl = reclaimDataPool[i]
         if labelIndex > MaxLabels then
             break
         end
