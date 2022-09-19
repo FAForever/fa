@@ -67,9 +67,9 @@ function SetPlayableArea(rect)
 
     local newReclaim = {}
     local newOutsidePlayableAreaReclaim = {}
-    local ReclaimLists = {Reclaim, OutsidePlayableAreaReclaim}
-    for _,reclaimList in ReclaimLists do
-        for id,r in reclaimList do
+    local ReclaimLists = { Reclaim, OutsidePlayableAreaReclaim }
+    for _, reclaimList in ReclaimLists do
+        for id, r in reclaimList do
             r.inPlayableArea = InPlayableArea(r.position)
             if r.inPlayableArea then
                 newReclaim[id] = r
@@ -98,10 +98,14 @@ end
 
 function InPlayableArea(pos)
     if PlayableArea then
-        return not (pos[1] < PlayableArea[1] or pos[3] < PlayableArea[2] or pos[1] > PlayableArea[3] or pos[3] > PlayableArea[4])
+        return not
+            (
+            pos[1] < PlayableArea[1] or pos[3] < PlayableArea[2] or pos[1] > PlayableArea[3] or pos[3] > PlayableArea[4]
+            )
     end
     return true
 end
+
 ---@class WorldLabel : Group
 local WorldLabel = Class(Group) {
     __init = function(self, parent, position)
@@ -152,8 +156,9 @@ function CreateReclaimLabel(view)
     label.Update = function(self)
         local view = self.parent.view
         local proj = view:Project(self.position)
-        LayoutHelpers.AtLeftTopIn(self, self.parent, (proj.x - self.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(), (proj.y - self.Height() / 2 + 1) / LayoutHelpers.GetPixelScaleFactor())
-        self.proj = {x=proj.x, y=proj.y }
+        LayoutHelpers.AtLeftTopIn(self, self.parent, (proj.x - self.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(),
+            (proj.y - self.Height() / 2 + 1) / LayoutHelpers.GetPixelScaleFactor())
+        self.proj = { x = proj.x, y = proj.y }
 
     end
 
@@ -195,11 +200,11 @@ local reclaimDataPool = {}
 local totalReclaimData = 0
 
 
-local function CombineReclaim(reclaim)
+local function _CombineReclaim(reclaim)
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
 
     if zoom < ZOOM_THRESHOLD then
-        return reclaim
+        return false
     end
 
     local minDist = zoom * HEIGHT_RATIO
@@ -254,7 +259,6 @@ local function CombineReclaim(reclaim)
     for i = index + 1, totalReclaimData do
         reclaimDataPool[i].mass = 0
     end
-
     return index
 end
 
@@ -330,31 +334,48 @@ function UpdateLabels()
     end
 
 
-    local size = CombineReclaim(onScreenReclaims)
-
+    local size = _CombineReclaim(onScreenReclaims)
 
     table.sort(reclaimDataPool, CompareMass)
 
     local labelIndex = 1
+    if size then
+        for i = 1, size do
+            recl = reclaimDataPool[i]
+            if labelIndex > MaxLabels then
+                break
+            end
+            local label = LabelPool[labelIndex]
+            if label and IsDestroyed(label) then
+                label = nil
+            end
+            if not label then
+                label = CreateReclaimLabel(view.ReclaimGroup)
+                LabelPool[labelIndex] = label
+            end
 
-    for i = 1, size do
-        recl = reclaimDataPool[i]
-        if labelIndex > MaxLabels then
-            break
-        end
-        local label = LabelPool[labelIndex]
-        if label and IsDestroyed(label) then
-            label = nil
-        end
-        if not label then
-            label = CreateReclaimLabel(view.ReclaimGroup)
-            LabelPool[labelIndex] = label
+            label:DisplayReclaim(recl)
+            labelIndex = labelIndex + 1
         end
 
-        label:DisplayReclaim(recl)
-        labelIndex = labelIndex + 1
+    else
+        for _, recl in onScreenReclaims do
+            if labelIndex > MaxLabels then
+                break
+            end
+            local label = LabelPool[labelIndex]
+            if label and IsDestroyed(label) then
+                label = nil
+            end
+            if not label then
+                label = CreateReclaimLabel(view.ReclaimGroup)
+                LabelPool[labelIndex] = label
+            end
+
+            label:DisplayReclaim(recl)
+            labelIndex = labelIndex + 1
+        end
     end
-
     -- Hide labels we didn't use
     for index = labelIndex, MaxLabels do
         local label = LabelPool[index]
@@ -411,10 +432,10 @@ function ShowReclaimThread(watch_key)
                 or OldPosition[1] ~= position[1]
                 or OldPosition[2] ~= position[2]
                 or OldPosition[3] ~= position[3] then
-                    UpdateLabels()
-                    OldZoom = zoom
-                    OldPosition = position
-                    ReclaimChanged = false
+                UpdateLabels()
+                OldZoom = zoom
+                OldPosition = position
+                ReclaimChanged = false
             end
 
             view.NewViewing = false
