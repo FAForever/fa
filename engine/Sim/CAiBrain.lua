@@ -116,7 +116,7 @@ end
 function CAiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, optIgnoreAlliance, BuildLocationX, BuildLocationZ, optIgnoreThreatUnder)
 end
 --- Returns a unit that matches the categories, if available
----@param category CategorieType
+---@param category EntityCategory
 ---@param needToBeIdle boolean
 ---@return Unit?
 function CAiBrain:FindUnit(category, needToBeIdle)
@@ -194,7 +194,7 @@ end
 -- @return Number.
 
 --- Returns the number of units of the given categories
----@param category categories
+---@param category EntityCategory
 ---@return number
 function CAiBrain:GetCurrentUnits(category)
 end
@@ -267,7 +267,7 @@ end
 -- @return tblUnits Table containing units.
 
 --- Returns a list of units that match the categories
----@param category CategorieType
+---@param category EntityCategory
 ---@param needToBeIdle boolean
 ---@param requireBuilt boolean Appears to be not functional
 ---@return Unit[]
@@ -296,8 +296,8 @@ function CAiBrain:GetNumPlatoonsWithAI()
 end
 
 --- Returns the number of units around a position that match the categories
----@param category CategorieType
----@param position Position
+---@param category EntityCategory
+---@param position Vector
 ---@param radius number
 ---@param alliance 'Ally' | 'Enemy' | 'Neutral'
 ---@return number
@@ -364,8 +364,8 @@ end
 -- @return tblUnits Table containing units.
 
 --- Returns the units around a position that match the categories
----@param category CategorieType
----@param position Position
+---@param category EntityCategory
+---@param position Vector
 ---@param radius number
 ---@param alliance AllianceType
 function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
