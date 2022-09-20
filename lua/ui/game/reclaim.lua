@@ -2,8 +2,6 @@ local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
 
-
-
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -11,67 +9,186 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 
-local MaxLabels = options.maximum_reclaim_count or 1000 -- The maximum number of labels created in a game session
+---@class UIReclaimDataPoint
+---@field mass number
+---@field position Vector
+
+---@class UIReclaimDataCombined
+---@field mass number
+---@field position Vector 
+---@field count number
+---@field max number
+
+---@type number
+local HEIGHT_RATIO = 0.012
+
+--- Reclaim is no longer combined once this threshold is met, the value (150) is the same
+--- camera distance that allows for the reclaim command to work. Guarantees that that the
+--- labels represent where you can reclaim.
+---@type number
+local ZOOM_THRESHOLD = 150
+
+--- TODO: remove the options
+---@type number
+local MaxLabels = options.maximum_reclaim_count or 1000
+
+--- TODO: remove the options
+---@type number
 local MinAmount = options.minimum_reclaim_amount or 10
 
-local Reclaim = {} -- int indexed list, sorted by mass, of all props that can show a label currently in the sim
-local LabelPool = {} -- Stores labels up too MaxLabels
-local OldZoom
-local OldPosition
-local ReclaimChanged = true
-local PlayableArea
+---@type table<EntityId, UIReclaimDataPoint>
+local Reclaim = {}
+
+---@type table<EntityId, UIReclaimDataPoint>
 local OutsidePlayableAreaReclaim = {}
 
+---@type UIReclaimDataCombined[]
+local reclaimDataPool = {}
 
+---@type number
+local totalReclaimData = 0
 
+---@type WorldLabel[]
+local LabelPool = {}
+
+---@type number
+local OldZoom
+
+---@type Vector
+local OldPosition
+
+---@type boolean
+local ReclaimChanged = true
+local PlayableArea
+
+---@class WorldLabel : Group
+---@field parent WorldView
+---@field position Vector
+---@field mass Bitmap
+---@field text Text
+local WorldLabel = Class(Group) {
+    __init = function(self, parent, position)
+        Group.__init(self, parent)
+        self.parent = parent
+        self.position = position
+
+        self.Top:Set(0)
+        self.Left:Set(0)
+        LayoutHelpers.SetDimensions(self, 25, 25)
+
+        self.mass = Bitmap(self)
+        self.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
+        LayoutHelpers.AtLeftIn(self.mass, self)
+        LayoutHelpers.AtVerticalCenterIn(self.mass, self)
+        LayoutHelpers.SetDimensions(self.mass, 14, 14)
+
+        self.text = UIUtil.CreateText(self, "", 10, UIUtil.bodyFont)
+        self.text:SetColor('ffc7ff8f')
+        self.text:SetDropShadow(true)
+        LayoutHelpers.AtLeftIn(self.text, self, 16)
+        LayoutHelpers.AtVerticalCenterIn(self.text, self)
+
+        self:DisableHitTest(true)
+        self:SetNeedsFrameUpdate(true)
+    end,
+
+    --- Updates the reclaim that this label displays
+    ---@param self WorldLabel
+    ---@param r any
+    DisplayReclaim = function(self, r)
+        if self:IsHidden() then
+            self:Show()
+        end
+        
+        self.position = r.position
+        if r.mass ~= self.oldMass then
+            local mass = tostring(math.floor(0.5 + r.mass))
+            self.text:SetText(mass)
+            self.oldMass = r.mass
+        end
+    end,
+
+    --- Called each frame by the engine
+    ---@param self WorldLabel
+    ---@param delta number
+    OnFrame = function(self, delta)
+        local view = self.parent.view
+        local proj = view:Project(self.position)
+        self.Left:SetValue((proj.x - 0.5 * self.Width()) / LayoutHelpers.GetPixelScaleFactor())
+        self.Top:SetValue((proj.y - 0.5 * self.Height() + 1) / LayoutHelpers.GetPixelScaleFactor())
+    end,
+
+    --- Called when the control is hidden or shown, used to start updating
+    ---@param self WorldLabel
+    ---@param hidden boolean
+    OnHide = function(self, hidden)
+        self:SetNeedsFrameUpdate(not hidden)
+    end,
+}
+
+---
+---@param a UIReclaimDataPoint
+---@param b UIReclaimDataPoint
+---@return boolean
+local function CompareMass(a, b)
+    return a.mass < b.mass
+end
+
+---@type number
 local mapWidth = 0
+
+---@type number
 local mapHeight = 0
+
+--- Retrieves the map size, storing it in `mapHeight` and `mapWidth`
 function SetMapSize()
     mapWidth = SessionGetScenarioInfo().size[1]
     mapHeight = SessionGetScenarioInfo().size[2]
 end
 
+--- Determines if the point is in the map, taking into account the playable area if available
+---@param pos Vector
+---@return boolean
 local function IsInMapArea(pos)
     if PlayableArea then
-        return pos[1] > PlayableArea[1] and pos[1] < PlayableArea[3] or
-            pos[3] > PlayableArea[2] and pos[3] < PlayableArea[4]
+        return  pos[1] > PlayableArea[1] and
+                pos[1] < PlayableArea[3] and
+                pos[3] > PlayableArea[2] and
+                pos[3] < PlayableArea[4]
     else
-        return pos[1] > 0 and pos[1] < mapWidth or pos[3] > 0 and pos[3] < mapHeight
+        return  pos[1] > 0 and
+                pos[1] < mapWidth and
+                pos[3] > 0 and
+                pos[3] < mapHeight
     end
 end
 
--- Stores/updates a reclaim entity's data using EntityId as key
--- called from /lua/UserSync.lua
-function UpdateReclaim(syncTable)
-    ReclaimChanged = true
-    for id, data in syncTable do
-        if not data.mass then
-            Reclaim[id] = nil
-            OutsidePlayableAreaReclaim[id] = nil
-        else
-            data.inPlayableArea = InPlayableArea(data.position)
-            if data.inPlayableArea then
-                Reclaim[id] = data
-                OutsidePlayableAreaReclaim[id] = nil
-            else
-                Reclaim[id] = nil
-                OutsidePlayableAreaReclaim[id] = data
-            end
-        end
+--- Determines if the point is in the playable area, if available. 
+---@param pos Vector
+---@return boolean
+function InPlayableArea(pos)
+    if PlayableArea then
+        return  pos[1] > PlayableArea[1] and
+                pos[1] < PlayableArea[3] and
+                pos[3] > PlayableArea[2] and
+                pos[3] < PlayableArea[4]
     end
+    return true
 end
 
+--- Called when the playable area is changed
+---@param rect table<number>
 function SetPlayableArea(rect)
     ReclaimChanged = true
     PlayableArea = rect
 
+    -- TODO: performs a deep copy, that is not strictly required
     local newReclaim = {}
     local newOutsidePlayableAreaReclaim = {}
     local ReclaimLists = { Reclaim, OutsidePlayableAreaReclaim }
     for _, reclaimList in ReclaimLists do
         for id, r in reclaimList do
-            r.inPlayableArea = InPlayableArea(r.position)
-            if r.inPlayableArea then
+            if InPlayableArea(r.position) then
                 newReclaim[id] = r
             else
                 newOutsidePlayableAreaReclaim[id] = r
@@ -82,11 +199,19 @@ function SetPlayableArea(rect)
     OutsidePlayableAreaReclaim = newOutsidePlayableAreaReclaim
 end
 
+--- Called when the minimum amount is changed
+--- TODO: Remove it, and the options along with it
+---@deprecated
+---@param value number
 function updateMinAmount(value)
     MinAmount = value
     ReclaimChanged = true
 end
 
+--- Called when the maximum amount of labels is changed
+--- TODO: Remove it, and the options along with it
+---@deprecated
+---@param value number
 function updateMaxLabels(value)
     MaxLabels = value
     ReclaimChanged = true
@@ -96,89 +221,36 @@ function updateMaxLabels(value)
     end
 end
 
-function InPlayableArea(pos)
-    if PlayableArea then
-        return not
-            (
-            pos[1] < PlayableArea[1] or pos[3] < PlayableArea[2] or pos[1] > PlayableArea[3] or pos[3] > PlayableArea[4]
-            )
+--- Adds to and updates the set of reclaim labels
+---@param reclaimPoints UIReclaimDataPoint[]
+function UpdateReclaim(reclaimPoints)
+    ReclaimChanged = true
+    for id, reclaimPoint in reclaimPoints do
+        if not reclaimPoint.mass then
+            Reclaim[id] = nil
+            OutsidePlayableAreaReclaim[id] = nil
+        else
+            if InPlayableArea(reclaimPoint.position) then
+                Reclaim[id] = reclaimPoint
+                OutsidePlayableAreaReclaim[id] = nil
+            else
+                Reclaim[id] = nil
+                OutsidePlayableAreaReclaim[id] = reclaimPoint
+            end
+        end
     end
-    return true
 end
-
----@class WorldLabel : Group
-local WorldLabel = Class(Group) {
-    __init = function(self, parent, position)
-        Group.__init(self, parent)
-        self.parent = parent
-        self.proj = nil
-        self:SetPosition(position)
-
-        self.Top:Set(0)
-        self.Left:Set(0)
-        LayoutHelpers.SetDimensions(self, 25, 25)
-        self:SetNeedsFrameUpdate(true)
-    end,
-
-    Update = function(self)
-    end,
-
-    SetPosition = function(self, position)
-        self.position = position or {}
-    end,
-
-    OnFrame = function(self, delta)
-        self:Update()
-    end
-}
 
 -- Creates an empty reclaim label
 function CreateReclaimLabel(view)
     local label = WorldLabel(view, Vector(0, 0, 0))
-
-    label.mass = Bitmap(label)
-    label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-    LayoutHelpers.AtLeftIn(label.mass, label)
-    LayoutHelpers.AtVerticalCenterIn(label.mass, label)
-    LayoutHelpers.SetDimensions(label.mass, 14, 14)
-
-    label.text = UIUtil.CreateText(label, "", 10, UIUtil.bodyFont)
-    label.text:SetColor('ffc7ff8f')
-    label.text:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(label.text, label, 16)
-    LayoutHelpers.AtVerticalCenterIn(label.text, label)
-
-    label:DisableHitTest(true)
-    label.OnHide = function(self, hidden)
-        self:SetNeedsFrameUpdate(not hidden)
-    end
-
-    label.Update = function(self)
-        local view = self.parent.view
-        local proj = view:Project(self.position)
-        LayoutHelpers.AtLeftTopIn(self, self.parent, (proj.x - self.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(),
-            (proj.y - self.Height() / 2 + 1) / LayoutHelpers.GetPixelScaleFactor())
-        self.proj = { x = proj.x, y = proj.y }
-
-    end
-
-    label.DisplayReclaim = function(self, r)
-        if self:IsHidden() then
-            self:Show()
-        end
-        self:SetPosition(r.position)
-        if r.mass ~= self.oldMass then
-            local mass = tostring(math.floor(0.5 + r.mass))
-            self.text:SetText(mass)
-            self.oldMass = r.mass
-        end
-    end
-
-    label:Update()
-
     return label
 end
 
+--- Combines the reclaim by summing them up together, averages position based on mass value
+---@param r1 UIReclaimDataCombined
+---@param r2 UIReclaimDataPoint
+---@return any
 local function SumReclaim(r1, r2)
     local massSum = r1.mass + r2.mass
     r1.count = r1.count + (r2.count or 1)
@@ -189,18 +261,10 @@ local function SumReclaim(r1, r2)
     return r1
 end
 
-local function CompareMass(a, b)
-    return a.mass < b.mass
-end
-
-local HEIGHT_RATIO = 0.012
-local ZOOM_THRESHOLD = 60
-
-local reclaimDataPool = {}
-local totalReclaimData = 0
-
-
+---@param reclaim UIReclaimDataPoint
+---@return boolean | number         # Returns the number of labels, or false if the zoom threshold is
 local function _CombineReclaim(reclaim)
+
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
 
     if zoom < ZOOM_THRESHOLD then
@@ -220,10 +284,15 @@ local function _CombineReclaim(reclaim)
     local dx
     local dy
 
+    --- O(n)
     for _, r in reclaim do
+
         added = false
         x1 = r.position[1]
         y1 = r.position[3]
+
+        --- TODO: use a basic grid query (quad tree overcomplicates it) -> O(k), where k is strictly smaller than n
+        --- O(n)
         for i = 1, index do
             cr = reclaimDataPool[i]
             x2 = cr.position[1]
@@ -236,6 +305,7 @@ local function _CombineReclaim(reclaim)
                 break
             end
         end
+
         if not added then
             index = index + 1
             if index > totalReclaimData then
@@ -256,15 +326,17 @@ local function _CombineReclaim(reclaim)
             v[3] = y1
         end
     end
+
     for i = index + 1, totalReclaimData do
         reclaimDataPool[i].mass = 0
     end
+
     return index
 end
 
 function UpdateLabels()
 
-    if TableGetn(Reclaim) < totalReclaimData then
+    if table.getn(Reclaim) < totalReclaimData then
         totalReclaimData = 0
         reclaimDataPool = {}
     end
@@ -454,7 +526,6 @@ function ToggleReclaim()
     ShowReclaim(not view.ShowingReclaim)
 end
 
--- Called from commandgraph.lua:OnCommandGraphShow()
 local CommandGraphActive = false
 function OnCommandGraphShow(bool)
     local view = import('/lua/ui/game/worldview.lua').viewLeft
