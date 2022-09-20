@@ -7,7 +7,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('/lua/utilities.lua')
 local RandomFloat = Util.GetRandomFloat
 
-SCUDeath01 = Class(NullShell) {
+SCUAeonDeath = Class(NullShell) {
 
     CloudFlareEffects = {
     '/effects/emitters/quantum_warhead_02_emit.bp',
@@ -95,7 +95,7 @@ SCUDeath01 = Class(NullShell) {
     Shockwave = function( self )
         local army = self:GetArmy()
         for i = 0, 2 do
-			CreateEmitterAtEntity( self, army, '/effects/emitters/quantum_warhead_01_emit.bp'):ScaleEmitter(0.40)
+			CreateEmitterAtEntity( self, army, '/effects/emitters/quantum_warhead_01_emit.bp'):ScaleEmitter(0.30)
         end
     end,
 
@@ -130,4 +130,4 @@ SCUDeath01 = Class(NullShell) {
     end,
 }
 
-TypeClass = SCUDeath01
+TypeClass = SCUAeonDeath
