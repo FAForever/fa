@@ -641,19 +641,18 @@ function InitializeArmies()
 
             ----[ irumsey                                                         ]--
             ----[ Temporary defaults.  Make sure some fighting will break out.    ]--
-            for iEnemy, strEnemy in tblArmy do
+            for iEnemy, _ in tblArmy do
                 -- only do it once for each pair
                 if iEnemy >= iArmy then
                     continue
                 end
-                local enemySetup = armySetups[strEnemy]
                 local state = "Enemy"
                 if armyIsCiv then
                     if civOpt == "neutral" or strArmy == "NEUTRAL_CIVILIAN" then
                         state = "Neutral"
                     end
 
-                    if revealCivilians and enemySetup.Human then
+                    if revealCivilians then
                         ForkThread(function(civ, army)
                             WaitSeconds(0.1)
 
