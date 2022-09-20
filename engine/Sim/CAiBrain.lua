@@ -6,6 +6,12 @@ local CAiBrain = {}
 ---@alias BrainArcType 'high' | 'low' | 'none'
 ---@alias BrainThreatType 'Overall' | 'OverallNotAssigned' | 'StructuresNotMex' | 'Structures' | 'Naval' | 'Air' | 'Land' | 'Experimental' | 'Commander' | 'Artillery' | 'AntiAir' | 'AntiSurface' | 'AntiSub' | 'Economy' | 'Unknown'
 
+---@class BrainPositionThreat
+---@field [1] number x
+---@field [2] number z
+---@field [3] number threat value
+
+
 --- Assigns a threat value to a given position, which is applied to the iMAP threat grid
 ---@param position Vector
 ---@param threat number
@@ -232,8 +238,8 @@ end
 
 --- Returns current resource usage.
 -- When stalling, this number is same as the current income.
--- @param resource 'ENERGY' or 'MASS'.
--- @return Number.
+---@param resource 'ENERGY' | 'MASS'
+---@return number
 function CAiBrain:GetEconomyUsage(resource)
 end
 
@@ -244,54 +250,49 @@ function CAiBrain:GetFactionIndex()
 end
 
 --- Returns a position with highest threat and the threat value.
--- Always reports a threatvalue of zero for Allies or self.
--- threatType and armyIndex are not required.
--- @param ring Number 1 or 2
--- 1 = Single, 2 = With surrounding IMPA blocks 
--- ..........   ..........
--- ..........   ....xxx...
--- .....X....   ....xXx...
--- ..........   ....xxx...
--- ..........   ..........
--- @param restriction true/false TODO.
--- @param threatType see AssignThreatAtPosition
--- @param armyIndex Army's number, if not specified, uses all enemy armies.
--- @return position, value Position table {x, y, z}, value Number.
+--- Always reports a threatvalue of zero for Allies or self.
+--- threatType and armyIndex are not required.
+--- @param ring number 1 or 2
+--- 1 = Single, 2 = With surrounding IMPA blocks 
+--- ..........   ..........
+--- ..........   ....xxx...
+--- .....X....   ....xXx...
+--- ..........   ....xxx...
+--- ..........   ..........
+---@param restriction boolean
+---@param threatType BrainThreatType
+---@param armyIndex number defaults to use all enemy armies.
+---@return Vector
+---@return number
 function CAiBrain:GetHighestThreatPosition(ring, restriction, threatType, armyIndex)
 end
-
---- Returns list of units by category.
--- @param category Unit's category, example: categories.TECH2 .
--- @param needToBeIdle true/false Unit has to be idle (appears to be not functional).
--- @param requireBuilt true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
--- @return tblUnits Table containing units.
 
 --- Returns a list of units that match the categories
 ---@param category EntityCategory
 ---@param needToBeIdle boolean
 ---@param requireBuilt boolean Appears to be not functional
 ---@return Unit[]
-function CAiBrain:GetListOfUnits(category,  needToBeIdle,  requireBuilt)
+function CAiBrain:GetListOfUnits(category, needToBeIdle, requireBuilt)
 end
 
 --- Returns a ratio between water and land.
--- @return Float number 0.0 - 1.
+---@return number 0.0 - 1.0
 function CAiBrain:GetMapWaterRatio()
 end
 
 --- TODO. Number of no rush ticks left
--- @return Number.
+---@return number
 function CAiBrain:GetNoRushTicks()
 end
 
 --- TODO.
 -- Probably has to do something with first param of MakePlatoon().
--- @return Number.
+---@return number
 function CAiBrain:GetNumPlatoonsTemplateNamed()
 end
 
 --- TODO.
--- @return Number.
+---@return Number
 function CAiBrain:GetNumPlatoonsWithAI()
 end
 
@@ -299,7 +300,7 @@ end
 ---@param category EntityCategory
 ---@param position Vector
 ---@param radius number
----@param alliance 'Ally' | 'Enemy' | 'Neutral'
+---@param alliance AllianceStatus
 ---@return number
 function CAiBrain:GetNumUnitsAroundPoint(category, position, radius, alliance)
 end
@@ -310,49 +311,49 @@ function CAiBrain:GetPersonality()
 end
 
 --- Returns platoon by unique name.
--- @param name String, unique platoon's name set by platoon:UniquelyNamePlatoon(name) function.
--- @return platoon
+---@param name string unique platoon's name set by platoon:UniquelyNamePlatoon(name) function.
+---@return Platoon
 function CAiBrain:GetPlatoonUniquelyNamed(name)
 end
 
---- Returns brain's platoons.
+--- Returns brain's platoons
 -- @return tblPlatoons Table containing platoons.
 function CAiBrain:GetPlatoonsList()
 end
 
---- Returns threat at given position.
--- @param position Table with position {x, y, z}.
--- @param radius Number in game units.
--- @param restriction TODO.
--- @param threatType see AssignThreatAtPosition
--- @param armyIndex Army's number, if specified uses, only this brain.
--- @return Number.
+--- Returns threat at given position
+---@param position Vector
+---@param radius number in game units
+---@param restriction boolean
+---@param threatType BrainThreatType
+---@param armyIndex? number defaults to this brain's index
+---@return number
 function CAiBrain:GetThreatAtPosition(position, radius, restriction, threatType, armyIndex)
 end
 
---- Returns threat between two positions.
--- @param position Table with position {x, y, z}.
--- @param position2 Table with position {x, y, z}.
--- @param restriction
--- @param threatType see AssignThreatAtPosition
--- @param armyIndex Army's number, if specified uses, only this brain.
--- @return Number.
+--- Returns threat between two positions
+---@param position Vector
+---@param position2 Vector
+---@param restriction boolean
+---@param threatType BrainThreatType
+---@param armyIndex? number defaults to this brain's index
+---@return number
 function CAiBrain:GetThreatBetweenPositions(position, position2, restriction, threatType, armyIndex)
 end
 
---- Return threats around position.
--- @param position Table with position {x, y, z}.
--- @param radius Number in game units.
--- @param restriction
--- @param threatType see AssignThreatAtPosition
--- @param armyIndex
--- @return Table {{x, z, threatValue}, {...}, ...}.
+--- Returns threats around position
+---@param position Vector
+---@param radius number in game units
+---@param restriction boolean
+---@param threatType BrainThreatType
+---@param armyIndex number
+---@return BrainPositionThreat[]
 function CAiBrain:GetThreatsAroundPosition(position, radius, restriction, threatType, armyIndex)
 end
 
---- Returns unit blueprint if given blueprint name.
--- @param bpName Example 'ual0201'.
--- @return Blueprint.
+--- Returns unit blueprint if given blueprint name
+---@param bpName string Example 'ual0201'.
+---@return UnitBlueprint
 function CAiBrain:GetUnitBlueprint(bpName)
 end
 
