@@ -209,7 +209,7 @@ function Unit:GetHealth()
 end
 
 --- Returns the navigator object of this unit
----@return Nagivator
+---@return Navigator
 function Unit:GetNavigator()
 end
 
