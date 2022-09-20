@@ -7,16 +7,17 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
----- Root builder class
--- Builder Sped
--- {
---        Priority = integer,
---        BuilderName = string,
---        BuilderType = string,
---        BuilderData = table,
---        BuilderConditions = list of functions that return true/false, list of args,  { < function>, {<args>}}
--- }
-
+---# Root builder class
+--- ```lua
+--- Builder Sped
+--- {
+---   Priority = integer,
+---   BuilderName = string,
+---   BuilderType = string,
+---   BuilderData = table,
+---   BuilderConditions = list of functions that return true/false, list of args,  { < function>, {<args>}}
+--- }
+--- ```
 ---@class Builder
 Builder = ClassSimple {
     ---@param self Builder
