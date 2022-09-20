@@ -93,7 +93,7 @@ end
 
 --- Return true if a unit category contains this unit
 ---@param category EntityCategory
----@param unit UserUnit
+---@param unit Unit | UserUnit
 function EntityCategoryContains(category, unit)
 end
 
