@@ -15,7 +15,7 @@ local options = Prefs.GetFromCurrentProfile('options')
 
 ---@class UIReclaimDataCombined
 ---@field mass number
----@field position Vector 
+---@field position Vector
 ---@field count number
 ---@field max number
 
@@ -23,7 +23,7 @@ local options = Prefs.GetFromCurrentProfile('options')
 local HEIGHT_RATIO = 0.012
 
 --- Reclaim is no longer combined once this threshold is met, the value (150) is the same
---- camera distance that allows for the reclaim command to work. Guarantees that that the
+--- camera distance that allows for the reclaim command to work. Guarantees that the
 --- labels represent where you can reclaim.
 ---@type number
 local ZOOM_THRESHOLD = 150
@@ -71,6 +71,7 @@ local WorldLabel = Class(Group) {
         Group.__init(self, parent)
         self.parent = parent
         self.position = position
+        self._project = true
 
         self.Top:Set(0)
         self.Left:Set(0)
@@ -99,7 +100,7 @@ local WorldLabel = Class(Group) {
         if self:IsHidden() then
             self:Show()
         end
-        
+
         self.position = r.position
         if r.mass ~= self.oldMass then
             local mass = tostring(math.floor(0.5 + r.mass))
@@ -112,10 +113,13 @@ local WorldLabel = Class(Group) {
     ---@param self WorldLabel
     ---@param delta number
     OnFrame = function(self, delta)
-        local view = self.parent.view
-        local proj = view:Project(self.position)
-        self.Left:SetValue((proj.x - 0.5 * self.Width()) / LayoutHelpers.GetPixelScaleFactor())
-        self.Top:SetValue((proj.y - 0.5 * self.Height() + 1) / LayoutHelpers.GetPixelScaleFactor())
+        if self._project then
+            local view = self.parent.view
+            local proj = view:Project(self.position)
+            self.Left:SetValue(proj.x - 0.5 * self.Width())
+            self.Top:SetValue(proj.y - 0.5 * self.Height() + 1)
+        end
+        self._project = self.parent.isMoving
     end,
 
     --- Called when the control is hidden or shown, used to start updating
@@ -146,32 +150,32 @@ function SetMapSize()
     mapHeight = SessionGetScenarioInfo().size[2]
 end
 
---- Determines if the point is in the map, taking into account the playable area if available
+--- Used to determine if the whole map is in view, taking into account the playable area if available
 ---@param pos Vector
 ---@return boolean
 local function IsInMapArea(pos)
     if PlayableArea then
-        return  pos[1] > PlayableArea[1] and
-                pos[1] < PlayableArea[3] and
-                pos[3] > PlayableArea[2] and
-                pos[3] < PlayableArea[4]
+        return pos[1] > PlayableArea[1] and
+            pos[1] < PlayableArea[3] or
+            pos[3] > PlayableArea[2] and
+            pos[3] < PlayableArea[4]
     else
-        return  pos[1] > 0 and
-                pos[1] < mapWidth and
-                pos[3] > 0 and
-                pos[3] < mapHeight
+        return pos[1] > 0 and
+            pos[1] < mapWidth or
+            pos[3] > 0 and
+            pos[3] < mapHeight
     end
 end
 
---- Determines if the point is in the playable area, if available. 
+--- Determines if the point is in the playable area, if available.
 ---@param pos Vector
 ---@return boolean
 function InPlayableArea(pos)
     if PlayableArea then
-        return  pos[1] > PlayableArea[1] and
-                pos[1] < PlayableArea[3] and
-                pos[3] > PlayableArea[2] and
-                pos[3] < PlayableArea[4]
+        return pos[1] > PlayableArea[1] and
+            pos[1] < PlayableArea[3] and
+            pos[3] > PlayableArea[2] and
+            pos[3] < PlayableArea[4]
     end
     return true
 end
@@ -334,6 +338,20 @@ local function _CombineReclaim(reclaim)
     return index
 end
 
+local function ContainsWholeMap(minX, minY, maxX, maxY)
+    if PlayableArea then
+        return minX < PlayableArea[1] and
+            maxX > PlayableArea[3] and
+            minY < PlayableArea[2] and
+            maxY > PlayableArea[4]
+    else
+        return minX < 0 and
+            maxX > mapWidth and
+            minY < 0 and
+            maxY > mapHeight
+    end
+end
+
 function UpdateLabels()
 
     if table.getn(Reclaim) < totalReclaimData then
@@ -351,7 +369,6 @@ function UpdateLabels()
     local bl = UnProject(view, Vector2(view.Left(), view.Bottom()))
 
 
-    local checkForContainment = IsInMapArea(tl) or IsInMapArea(tr) or IsInMapArea(bl) or IsInMapArea(br)
 
 
     local x0
@@ -370,6 +387,7 @@ function UpdateLabels()
     local minY = MathMin(y1, y2, y3, y4)
     local maxY = MathMax(y1, y2, y3, y4)
 
+    local checkForContainment = not ContainsWholeMap(minX, minY, maxX, maxY)
 
     local y21 = (y2 - y1)
     local y32 = (y3 - y2)
@@ -473,6 +491,7 @@ end
 
 function InitReclaimGroup(view)
     if not view.ReclaimGroup or IsDestroyed(view.ReclaimGroup) then
+        local camera = GetCamera("WorldCamera")
         local rgroup = Group(view)
         rgroup.view = view
         rgroup:DisableHitTest()
@@ -481,6 +500,13 @@ function InitReclaimGroup(view)
 
         view.ReclaimGroup = rgroup
         rgroup:SetNeedsFrameUpdate(true)
+        rgroup._prevPos = camera:GetFocusPosition()
+        rgroup.OnFrame = function(self, delta)
+            local curPos = camera:GetFocusPosition()
+            local prevPos = self._prevPos
+            self.isMoving = curPos[1] ~= prevPos[1] or curPos[2] ~= prevPos[2] or curPos[3] ~= prevPos[3]
+            self._prevPos = curPos
+        end
     else
         view.ReclaimGroup:Show()
     end
