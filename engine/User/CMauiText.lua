@@ -35,7 +35,7 @@ function CMauiText:SetNewClipToWidth(clip)
 end
 
 ---
----@param color string
+---@param color Color
 function CMauiText:SetNewColor(color)
 end
 
@@ -46,7 +46,7 @@ function CMauiText:SetNewFont(family, pointsize)
 end
 
 ---
----@param text string
+---@param text LocalizedString | number
 function CMauiText:SetText(text)
 end
 

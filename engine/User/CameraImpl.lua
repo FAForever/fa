@@ -1,6 +1,6 @@
 ---@meta
 
----@class Camera
+---@class Camera : InternalObject
 local CameraImpl = {}
 
 

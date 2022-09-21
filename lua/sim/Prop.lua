@@ -1,6 +1,11 @@
 local PlayReclaimEndEffects = import('/lua/EffectUtilities.lua').PlayReclaimEndEffects
 
-local minimumLabelMass = 10
+local minimumLabelMass, minimumLabelEnergy = 10, 10
+
+---@class PropSyncData
+---@field mass number
+---@field energy number
+---@field position Vector
 
 -- upvalue globals for performance
 local type = type
@@ -40,6 +45,7 @@ local StringGsub = string.gsub
 local TableInsert = table.insert
 
 ---@class Prop : moho.prop_methods
+---@field SyncData PropSyncData
 Prop = Class(moho.prop_methods) {
 
     IsProp = true,
@@ -64,7 +70,7 @@ Prop = Class(moho.prop_methods) {
             -- set by some adaptive maps to influence how much a prop is worth
             local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1
 
-            self.SetMaxReclaimValues(self,
+            self:SetMaxReclaimValues(
                 economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
                 (economy.ReclaimMassMax * modifier) or 0,
                 (economy.ReclaimEnergyMax * modifier) or 0
@@ -146,15 +152,15 @@ Prop = Class(moho.prop_methods) {
             return 
         end
 
-        self.DoPropCallbacks(self, 'OnKilled')
+        self:DoPropCallbacks('OnKilled')
         EntityDestroy(self)
     end,
 
     --- Called by the engine when the prop is reclaimed.
     -- @param entity The entity that reclaimed the prop.
     OnReclaimed = function(self, entity)
-        self.DoPropCallbacks(self, 'OnReclaimed', entity)
-        self.CreateReclaimEndEffects(self, entity)
+        self:DoPropCallbacks('OnReclaimed', entity)
+        self:CreateReclaimEndEffects(entity)
         EntityDestroy(self)
     end,
 
@@ -166,15 +172,21 @@ Prop = Class(moho.prop_methods) {
 
     --- Syncs the mass label to the UI.
     SyncMassLabel = function(self)
+        local mass, energy = self.MaxMassReclaim, self.MaxEnergyReclaim
 
         -- check if prop has sufficient amount of reclaim to begin with
-        if self.MaxMassReclaim < minimumLabelMass then
+        if mass < minimumLabelMass and energy < minimumLabelEnergy then
             return
         end
 
         -- check if prop has sufficient amount of reclaim left
-        local mass = self.MaxMassReclaim * self.ReclaimLeft
-        if mass < minimumLabelMass and not self.hasLabel then
+        do
+            local left = self.ReclaimLeft
+            mass = mass * left
+            energy = energy * left
+        end
+        local unworthy = mass < minimumLabelMass and energy < minimumLabelEnergy
+        if unworthy and not self.hasLabel then
             return
         end
 
@@ -184,16 +196,17 @@ Prop = Class(moho.prop_methods) {
         local data = self.SyncData
 
         -- check if prop should receive sync data
-        if not EntityBeenDestroyed(self) and mass >= minimumLabelMass then
+        if not (EntityBeenDestroyed(self) or unworthy) then
             -- set the data
             data.mass = mass
+            data.energy = energy
             data.position = self.CachePosition
             self.hasLabel = true
-        else
-            -- prop is not worthy anymore
+        else -- prop is not worthy anymore
             data.mass = nil
+            data.energy = nil
             data.position = nil
-            self.hasLabel = false
+            self.hasLabel = nil
         end
 
         -- update the sync
@@ -203,7 +216,7 @@ Prop = Class(moho.prop_methods) {
     --- Called by the engine when the prop is destroyed.
     OnDestroy = function(self)
         self.Dead = true
-        self.UpdateReclaimLeft(self)
+        self:UpdateReclaimLeft()
         TrashDestroy(self.Trash)
     end,
 
@@ -241,13 +254,13 @@ Prop = Class(moho.prop_methods) {
                 local excess = preHealth
                 local maxHealth = EntityGetMaxHealth(self)
                 if excess < 0 and maxHealth > 0 then
-                    self.Kill(self, instigator, damageType, -excess / maxHealth)
+                    self:Kill(instigator, damageType, -excess / maxHealth)
                 else 
-                    self.Kill(self, instigator, damageType, 0.0)
+                    self:Kill(instigator, damageType, 0.0)
                 end
             end
         else
-            self.UpdateReclaimLeft(self)
+            self:UpdateReclaimLeft()
         end
     end,
 
@@ -266,7 +279,7 @@ Prop = Class(moho.prop_methods) {
         self.MaxEnergyReclaim = energy
         self.TimeReclaim = time
 
-        self.UpdateReclaimLeft(self)
+        self:UpdateReclaimLeft()
     end,
 
     --- Mimics the engine behavior when calculating the reclaim value of a prop.
@@ -281,7 +294,7 @@ Prop = Class(moho.prop_methods) {
         end
 
         -- Notify UI about the mass change
-        self.SyncMassLabel(self)
+        self:SyncMassLabel()
     end,
 
     --- Sets the collision box of the prop.

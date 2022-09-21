@@ -7,12 +7,17 @@
 ---@field [3] number
 ---@field [4] number
 
----@class Vector
+---@class BaseVector
+---@field x number maps to index [1]
+---@field y number maps to index [2]
+---@field z number maps to index [3]
+
+---@class Vector : BaseVector
 ---@field [1] number
 ---@field [2] number
 ---@field [3] number
 
----@class Vector2
+---@class Vector2 : BaseVector
 ---@field [1] number
 ---@field [2] number
 
@@ -21,6 +26,13 @@
 ---@field y0 number
 ---@field x1 number
 ---@field y1 number
+
+---@class UserRect
+---@field [1] number x0
+---@field [2] number y0
+---@field [3] number x1
+---@field [4] number y1
+
 
 ---@alias Color string `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
 ---@alias Bone string | number
