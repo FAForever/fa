@@ -70,20 +70,22 @@ doscript("/lua/system/blueprints-units.lua")
 doscript("/lua/system/blueprints-weapons.lua")
 
 ---@class PreGameData
+---@field CurrentMapDir string          ## is obsolete, set for removal
 ---@field IconReplacements ModInfo[]
 
 --- Load in the pre game data that is defined in the lobby through the preference file.
----@return boolean | nil
+---@return PreGameData?
 local function LoadPreGameData()
     -- load in the prefs file
     local file = DiskFindFiles("/preferences", "Game.prefs")[1]
     if not file then
         WARN('Blueprints.lua - Preferences file is not found. Skipping pre game data.')
-        return
+        return nil
     end
 
     -- try and load the pre game data of prefs file
-    local preGameData = false
+    ---@type PreGameData
+    local preGameData
     local ok, msg = pcall(
         function()
             local data = {}
