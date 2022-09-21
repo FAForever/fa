@@ -178,7 +178,7 @@ CMauiEdit.OnEnterPressed = nil
 
 --- Called when non-text keys are pressed. If the key already affected the text, such as with `Backspace`
 --- or `Delete`, then the event has already been handled and won't propagate down.
----@param keycode number Windows VK keycode
+-- @param keycode number Windows VK keycode
 ---@type fun(self: Edit, keycode: number, event: KeyEvent)
 CMauiEdit.OnNonTextKeyPressed = nil
 
