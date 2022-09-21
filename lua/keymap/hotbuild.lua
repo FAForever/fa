@@ -579,8 +579,8 @@ end
 -- hacking it together didn't feel right, hence the 'better' recursive solution.
 function IssueUpgradeCommand(upgrades, buildableCategories)
     local success = false
-    for _, upgr in upgrades do
-        local bp = __blueprints[upgr]
+    for _, u in upgrades do
+        local bp = __blueprints[u]
         local successiveUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
         if successiveUpgrades then
             success = IssueUpgradeCommand(successiveUpgrades, buildableCategories)
@@ -589,9 +589,9 @@ function IssueUpgradeCommand(upgrades, buildableCategories)
             end
         end
         if not success then
-            if EntityCategoryContains(buildableCategories, upgr) then
+            if EntityCategoryContains(buildableCategories, u) then
                 -- Queue the upgrade of the selected structure, if possible
-                IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgr, 1, false)
+                IssueBlueprintCommand("UNITCOMMAND_Upgrade", u, 1, false)
                 success = true
                 break
             end
