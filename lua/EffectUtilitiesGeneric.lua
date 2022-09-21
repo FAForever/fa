@@ -2,6 +2,7 @@
 -- cache for performance
 local util = import('utilities.lua')
 local Entity = import('/lua/sim/Entity.lua').Entity
+local EffectTemplates = import('/lua/EffectTemplates.lua')
 local ReclaimObjectAOE = import('/lua/EffectTemplates.lua').ReclaimObjectAOE
 local ReclaimBeams = import('/lua/EffectTemplates.lua').ReclaimBeams
 local ReclaimObjectEnd = import('/lua/EffectTemplates.lua').ReclaimObjectEnd
@@ -246,6 +247,13 @@ function PlayReclaimEndEffects(reclaimer, reclaimed)
 
     -- create light effect
     CreateLightParticleIntel(reclaimed, -1, army, 4, 6, 'glow_02', 'ramp_flare_02')
+end
+
+--- Returns one of the burning emitter collections
+---@return string[]
+function GetRandomBurningEffect()
+    local r = 1 + (Random() * EffectTemplates.TreeBurningEmittersCount) ^ 0
+    return EffectTemplates.TreeBurningEmitters[r]
 end
 
 --- Applies the wind direction to an emitter.

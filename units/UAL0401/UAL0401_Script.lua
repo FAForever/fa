@@ -102,11 +102,16 @@ UAL0401 = Class(AWalkingLandUnit) {
     end,
 
     DeathThread = function(self, overkillRatio , instigator)
+        local position = self:GetPosition()
         local size = self.Size
         self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
         WaitSeconds(2)
+
+        position = self:GetPosition('Left_Leg_B02')
+        DamageArea(nil, position, 2, 1, 'TreeFire', true)
+        DamageArea(nil, position, 2, 1, 'TreeForce', true)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         WaitSeconds(0.1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
@@ -116,7 +121,12 @@ UAL0401 = Class(AWalkingLandUnit) {
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
 
-        WaitSeconds(3.5)
+        WaitSeconds(3.0)
+        position = self:GetPosition('Torso')
+        DamageArea(nil, position, 2.5, 1, 'TreeFire', true)
+        DamageArea(nil, position, 2.5, 1, 'TreeForce', true)
+
+        WaitSeconds(0.5)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
 
         if self.DeathAnimManip then

@@ -37,24 +37,19 @@ local EntitySetMesh = EntityMethods.SetMesh
 ---@class Wreckage : Prop
 Wreckage = Class(Prop) {
 
+    IsWreckage = true,
+    CanTakeDamage = true,
+
     OnCreate = function(self)
-
-        -- -- Caching
-
         self.Trash = TrashBag()
         self.EntityId = EntityGetEntityId(self)
         self.Blueprint = EntityGetBlueprint(self)
         self.CachePosition = EntityGetPosition(self)
         self.SyncData = { }
-
-        -- -- Set state
-
-        self.IsWreckage = true
-        self.CanTakeDamage = true 
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if self.CanTakeDamage then 
+        if self.CanTakeDamage then
             self.DoTakeDamage(self, instigator, amount, vector, damageType)
         end
     end,
@@ -126,7 +121,6 @@ Wreckage = Class(Prop) {
 
 --- Create a wreckage prop.
 function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitBox)
-    local wreck = bp.Wreckage
     local bpWreck = bp.Wreckage.Blueprint
 
     local prop = CreateProp(position, bpWreck)

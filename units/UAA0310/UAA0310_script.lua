@@ -68,6 +68,9 @@ UAA0310 = Class(AirTransport) {
         DamageArea(self, {x,y,z}, 5, 1000, 'Default', true, false)
         explosion.CreateDefaultHitExplosionAtBone(self, bone, 5.0)
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
+        DamageArea(nil, {x, y, z}, 5, 1, 'TreeFire', true)
+        DamageArea(nil, {x, y, z}, 5, 1, 'TreeForce', true)
+
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)

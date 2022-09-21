@@ -1,6 +1,6 @@
 -- used by trees
 EmitterBlueprint {
-	BlueprintId = 'forest_fire_smoke_01',
+	BlueprintId = 'forest_smoke_01',
 	Lifetime = -1,
 	Repeattime = 150.00,
 	TextureFramecount = 1.00,

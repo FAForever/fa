@@ -296,6 +296,7 @@ ProfilerWindow = Class(Window) {
 
     -- TODO
     InitOverviewTab = function(self, parent)
+
         local tab = Group(parent)
         LayoutHelpers.Below(tab, parent, 40)
         tab.Width:Set(self.Width)
