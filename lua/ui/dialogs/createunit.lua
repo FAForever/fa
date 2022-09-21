@@ -1,11 +1,6 @@
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local Border = import('/lua/maui/border.lua').Border
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Edit = import('/lua/maui/edit.lua').Edit
@@ -18,10 +13,13 @@ local dialog, nameDialog, defaultEditField
 local EscThread, SpawnThread
 local activeFilters, activeFilterTypes, specialFilterControls, filterSet = {}, {}, {}, {}
 local UnitList, CreationList = {}, {}
-local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
-local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')
 
 local NumArmies = GetArmiesTable().numArmies
+local __blueprints
+local __active_mods
+local options = nil
+
+local TableGetN = table.getn
 
 local ChoiceColumns = options.spawn_menu_filter_columns or 5
 local TeamColumns = mmin(options.spawn_menu_team_columns or 3, NumArmies)
@@ -455,15 +453,15 @@ local function getItems() return EntityCategoryGetUnitList(categories.ALLUNITS) 
 local function CreateNameFilter(data)
     local group = Group(dialog)
     group.Width:Set(dialog.Width)
-    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
-        LayoutHelpers.SetHeight(group, 30 + floor((table.getn(data.choices)-1)/ChoiceColumns) * 25)
+    if data.choices and data.choices[1] and TableGetN(data.choices) > ChoiceColumns then
+        LayoutHelpers.SetHeight(group, 30 + floor((TableGetN(data.choices)-1)/ChoiceColumns) * 25)
     else
         LayoutHelpers.SetHeight(group, 30)
     end
 
     group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
     LayoutHelpers.AtLeftIn(group.check, group)
-    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
+    if data.choices and data.choices[1] and TableGetN(data.choices) > ChoiceColumns then
         LayoutHelpers.AtTopIn(group.check, group, 2)
     else
         LayoutHelpers.AtVerticalCenterIn(group.check, group)
@@ -479,7 +477,7 @@ local function CreateNameFilter(data)
 
     group.label = UIUtil.CreateText(group, data.title, 14, UIUtil.bodyFont)
     LayoutHelpers.RightOf(group.label, group.check)
-    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
+    if data.choices and data.choices[1] and TableGetN(data.choices) > ChoiceColumns then
         LayoutHelpers.AtTopIn(group.label, group, 7)
     else
         LayoutHelpers.AtVerticalCenterIn(group.label, group)
@@ -687,7 +685,7 @@ function CreateDialog(x, y)
 
     local function spreadSpawn(ids, count, vet)
 
-        if table.getn(ids) > 0 then 
+        if TableGetN(ids) > 0 then 
 
             -- store selection so that units do not go of and try to build the unit we're 
             -- cheating in, is reset in EndCommandMode of '/lua/ui/game/commandmode.lua'
@@ -958,9 +956,9 @@ function CreateDialog(x, y)
     end
 
     dialog.unitList = Group(dialog)
-    dialog.unitList.Height:Set(function() return createBtn.Top() - filterGroups[table.getn(filterGroups)].Bottom() - LayoutHelpers.ScaleNumber(5) end)
+    dialog.unitList.Height:Set(function() return createBtn.Top() - filterGroups[TableGetN(filterGroups)].Bottom() - LayoutHelpers.ScaleNumber(5) end)
     dialog.unitList.Width:Set(function() return dialog.Width() - LayoutHelpers.ScaleNumber(40) end)
-    LayoutHelpers.Below(dialog.unitList, filterGroups[table.getn(filterGroups)])
+    LayoutHelpers.Below(dialog.unitList, filterGroups[TableGetN(filterGroups)])
     dialog.unitList.top = 0
 
     dialog.unitEntries = {}
@@ -1077,7 +1075,7 @@ function CreateDialog(x, y)
     local numLines = function() return table.getsize(dialog.unitEntries) end
 
     local function DataSize()
-        return table.getn(UnitList)
+        return TableGetN(UnitList)
     end
 
     -- called when the scrollbar for the control requires data to size itself
@@ -1225,3 +1223,12 @@ function NameSet(callback)
         okButton.OnClick()
     end
 end
+
+-- kept for mod backwards compatibility
+local ItemList = import('/lua/maui/itemlist.lua').ItemList
+local Text = import('/lua/maui/text.lua').Text
+local Border = import('/lua/maui/border.lua').Border
+local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
+local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
+local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
+local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')

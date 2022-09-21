@@ -73,7 +73,7 @@ doscript("/lua/system/blueprints-weapons.lua")
 ---@field IconReplacements ModInfo[]
 
 --- Load in the pre game data that is defined in the lobby through the preference file.
----@return PreGameData | nil
+---@return boolean | nil
 local function LoadPreGameData()
     -- load in the prefs file
     local file = DiskFindFiles("/preferences", "Game.prefs")[1]

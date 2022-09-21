@@ -446,7 +446,7 @@ ClassFactory = {
 --- Switches up the sate of a class instance by inserting the new state between the instance and its class
 ---@param instance table The current instance we want to switch states for
 ---@param newState State the state we want to insert between the instance and its base class
-function ChangeState(instance, newstate)
+function ChangeState(instance, newState)
 
     -- call on-exit function
     if instance.OnExitState then
@@ -461,7 +461,7 @@ function ChangeState(instance, newstate)
     -- - entity
     -- - state      <-- introduced as an intermediate, prevents a lot of duplicated values and tables
     -- - class
-    setmetatable(instance, newstate)
+    setmetatable(instance, newState)
 
     -- call on-enter function
     if instance.OnEnterState then
