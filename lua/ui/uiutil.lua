@@ -1417,8 +1417,8 @@ function CreateAnnouncementStd(primary, secondary, control)
     if not control then
         local frame = GetFrame(0)
         control = Group(frame)
-        control.Left = function() return frame.Left() + 0.49 * frame.Right() end
-        control.Right = function() return frame.Left() + 0.51 * frame.Right() end
+        control.Left:Set(function() return frame.Left() + 0.49 * frame.Right() end)
+        control.Right:Set(function() return frame.Left() + 0.51 * frame.Right() end)
         control.Top = frame.Top
         control.Bottom = frame.Top
     end
