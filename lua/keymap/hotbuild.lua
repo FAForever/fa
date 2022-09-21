@@ -581,7 +581,7 @@ function IssueUpgradeCommand(upgrades, buildableCategories)
     local success = false
     for _, upgr in upgrades do
         local bp = __blueprints[upgr]
-        successiveUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
+        local successiveUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
         if successiveUpgrades then
             success = IssueUpgradeCommand(successiveUpgrades, buildableCategories)
             if success then
