@@ -55,7 +55,7 @@ Wreckage = Class(Prop) {
 
     OnDamage = function(self, instigator, amount, vector, damageType)
         if self.CanTakeDamage then 
-            self.DoTakeDamage(self, instigator, amount, vector, damageType)
+            self:DoTakeDamage(instigator, amount, vector, damageType)
         end
     end,
 
@@ -64,10 +64,10 @@ Wreckage = Class(Prop) {
         local health = EntityGetHealth(self)
 
         if health <= 0 then
-            self.DoPropCallbacks(self, 'OnKilled')
+            self:DoPropCallbacks('OnKilled')
             EntityDestroy(self)
         else
-            self.UpdateReclaimLeft(self)
+            self:UpdateReclaimLeft()
         end
     end,
 

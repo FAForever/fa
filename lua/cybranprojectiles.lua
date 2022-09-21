@@ -472,7 +472,7 @@ CIFMolecularResonanceShell = Class(SinglePolyTrailProjectile) {
     ---@param self CIFMolecularResonanceShell
     DelayedDestroyThread = function(self)
         WaitSeconds(0.3)
-        self.CreateImpactEffects(self, self.Army, self.FxImpactUnit, self.FxUnitHitScale)
+        self:CreateImpactEffects(self.Army, self.FxImpactUnit, self.FxUnitHitScale)
         self:Destroy()
     end,
 
