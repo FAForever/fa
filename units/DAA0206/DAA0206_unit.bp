@@ -210,7 +210,7 @@ UnitBlueprint {
         Elevation = 18,
         FuelRechargeRate = 0,
         FuelUseTime = 110,
-        GroundCollisionOffset = -.25,
+        GroundCollisionOffset = -0.25,
         MaxSpeed = 10,
         MeshExtentsX = 1.5,
         MeshExtentsY = 0.25,
