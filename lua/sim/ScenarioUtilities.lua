@@ -605,8 +605,6 @@ function InitializeArmies()
             local setup = armySetups[strArmy]
             local brain = GetArmyBrain(strArmy)
 
-            --LOG("*DEBUG: InitializeArmies, army = ", strArmy)
-
             local econ = tblData.Economy
             SetArmyEconomy(strArmy, econ.mass, econ.energy)
 
@@ -721,9 +719,6 @@ function InitializeScenarioArmies()
         if tblData then
             local setup = armySetups[strArmy]
             local brain = GetArmyBrain(strArmy)
-
-            LOG("*DEBUG: InitializeScenarioArmies, army = ", strArmy)
-
 
             local econ = tblData.Economy
             SetArmyEconomy(strArmy, econ.mass, econ.energy)
