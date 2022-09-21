@@ -577,13 +577,13 @@ end
 -- Doing this fully recursively is probably overkill as the support fac / HQ is the only time when there are more than
 -- two possible upgrade paths, and the cybran shield is the only building with more than two successive upgrades, but
 -- hacking it together didn't feel right, hence the 'better' recursive solution.
-function issueUpgradeCommand(upgrades, buildableCategories)
+function IssueUpgradeCommand(upgrades, buildableCategories)
     local success = false
     for _, upgr in upgrades do
         local bp = __blueprints[upgr]
         successiveUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
         if successiveUpgrades then
-            success = issueUpgradeCommand(successiveUpgrades, buildableCategories)
+            success = IssueUpgradeCommand(successiveUpgrades, buildableCategories)
             if success then
                 break
             end
@@ -610,11 +610,11 @@ function buildActionUpgrade()
         local bp = unit:GetBlueprint()
         -- If upgradeTab[bp.BlueprintId] returns a table, there are two or more possible upgrades, e.g. HQ and 
         -- support factory. If instead bp.General.UpgradesTo returns a string, then there is only one possible 
-        -- upgrade, e.g. for a radar. For our helper function issueUpgradeCommand we want a table, hence the { } 
+        -- upgrade, e.g. for a radar. For our helper function IssueUpgradeCommand we want a table, hence the { } 
         -- brackets
         local upgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
         SelectUnits({unit})
-        local success = issueUpgradeCommand(upgrades, buildableCategories)
+        local success = IssueUpgradeCommand(upgrades, buildableCategories)
         if not success then
             result = false
         end
