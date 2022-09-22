@@ -18,13 +18,14 @@ ExtendedErrorMessages = false
 local EvalContext = nil
 local WeakKeyMeta = { __mode = 'k' }
 
----@class LazyVar<T> : {[1]?: T, compute?: fun(): T}, Destroyable, OnDirtyListener
----@operator call: fun(): any
----@field busy? boolean
----@field trace? string
----@field used_by table<LazyVar, boolean>
----@field uses table<LazyVar, boolean>
----@field OnDirty? function
+-- note: generic classes don't have full support yet, so we need to add all fields and methods to
+-- the parent table--otherwise, generic instances won't have *anything*
+-- yes, it's truly awful, and only partially works since generic instances see methods as fields
+-- and don't get the call operator
+
+--- A class supporting lazy computation of a value through a system of dependencies
+---@class LazyVar<T> : Destroyable, OnDirtyListener, function, {[1]: T?, busy: true?, trace: string?, used_by: table<LazyVar<any>, boolean>, uses: table<LazyVar<any>, boolean>, OnDirty: function?, compute: (fun(): T), __call: (fun(): T), SetDirty: (fun(self: LazyVar<T>, onDirtyList: OnDirtyListener[])), SetFunction: (fun(self: LazyVar<T>, func: LazyVar<T> | fun(): T)), SetValue: (fun(self: LazyVar<T>, value: T)), Set: (fun(self: LazyVar<T>, value: T | LazyVar<T> | fun(): T): T), Destroy: (fun(self: LazyVar<T>))}
+---@operator call: any
 local LazyVarMetaTable = {}
 LazyVarMetaTable.__index = LazyVarMetaTable
 
@@ -86,6 +87,8 @@ function LazyVarMetaTable:__call()
 end
 
 --- Resets this lazyvar's value and adds its `OnDirtyListener`s to the list
+---@generic T
+---@param self LazyVar<T>
 ---@param onDirtyList OnDirtyListener[]
 function LazyVarMetaTable:SetDirty(onDirtyList)
     if self[1] ~= nil then
@@ -196,6 +199,8 @@ function LazyVarMetaTable:Set(value)
     end
 end
 
+---@generic T
+---@param self LazyVar<T>
 function LazyVarMetaTable:Destroy()
     self.OnDirty = nil
     self.compute = nil
@@ -214,8 +219,9 @@ function LazyVarMetaTable:Destroy()
     end
 end
 
----@param initial? any defaults to `0`
----@return LazyVar
+---@generic T
+---@param initial? T defaults to `0`
+---@return LazyVar<T>
 function Create(initial)
     if initial == nil then
         initial = 0

@@ -1146,8 +1146,8 @@ UIComponent = Class(Group) {
 }
 --]]
 -- This means that the only thing that needs to happen is either for another UI class to use this
--- component in their layout, or to create a top-level creation functions for singleton classes
--- like this:
+-- component in their layout, or, if it's a top-level singleton class, to create an interface using
+-- the following idiom:
 --[[
 local GUI = false
 
@@ -1170,16 +1170,22 @@ function SetLayout()
 end
 --]]
 -- Do not try to layout more than control at a time; it is confusing and will break the default
--- layouter. However, should it be absolutely necessary (e.g. for UIUtils that may not create a
--- control with a valid hierarchy), you can use a new layouter object from the class
--- (`LayoutHelpers.Layouter(control)`) instead of the reused layouter.
+-- layouter. However, should it be absolutely necessary (e.g. for UI utilities that may not create a
+-- control with a valid hierarchy or in legacy code), you can construct a new layouter using
+-- `LayoutHelpers.LayoutFor(control)` that won't interrupt the default one.
 
+
+-- Set this to true to validate a control's layout on `End()`
+ValidateLayouter = false
+
+
+---@alias Layoutable Layoutable
 
 --- Returns the control a layout represents, whether a layouter or an actual control
----@param layout Layouter | Control
+---@param layout Layoutable
 ---@return Control
-function GetControl(layout)
-    return layout.c or layout
+function GetLayoutControl(layout)
+    return layout.layoutControl or layout
 end
 
 --------------------------------------------------
@@ -1194,7 +1200,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param debugName string
     ---@return T
     Name = function(self, debugName)
-        self.c:SetName(debugName)
+        self.layoutControl:SetName(debugName)
         return self
     end;
 
@@ -1203,7 +1209,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param self T
     ---@return T
     Disable = function(self)
-        self.c:Disable()
+        self.layoutControl:Disable()
         return self
     end;
 
@@ -1212,7 +1218,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param self T
     ---@return T
     Hide = function(self)
-        self.c:Hide()
+        self.layoutControl:Hide()
         return self
     end;
 
@@ -1222,7 +1228,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param isRecursive? boolean
     ---@return T
     EnableHitTest = function(self, isRecursive)
-        self.c:EnableHitTest(isRecursive)
+        self.layoutControl:EnableHitTest(isRecursive)
         return self
     end;
 
@@ -1232,7 +1238,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param isRecursive? boolean
     ---@return T
     DisableHitTest = function(self, isRecursive)
-        self.c:DisableHitTest(isRecursive)
+        self.layoutControl:DisableHitTest(isRecursive)
         return self
     end;
 
@@ -1242,7 +1248,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param needsUpdate boolean
     ---@return T
     NeedsFrameUpdate = function(self, needsUpdate)
-        self.c:SetNeedsFrameUpdate(needsUpdate)
+        self.layoutControl:SetNeedsFrameUpdate(needsUpdate)
         return self
     end;
 
@@ -1253,7 +1259,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param forChildren? boolean
     ---@return T
     Alpha = function(self, alpha, forChildren)
-        self.c:SetAlpha(alpha, forChildren)
+        self.layoutControl:SetAlpha(alpha, forChildren)
         return self
     end;
 
@@ -1273,7 +1279,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param left Lazy<number>
     ---@return T
     Left = function(self, left)
-        self.c.Left:Set(left)
+        self.layoutControl.Left:Set(left)
         return self
     end;
 
@@ -1283,7 +1289,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param top Lazy<number>
     ---@return T
     Top = function(self, top)
-        self.c.Top:Set(top)
+        self.layoutControl.Top:Set(top)
         return self
     end;
 
@@ -1293,7 +1299,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param right Lazy<number>
     ---@return T
     Right = function(self, right)
-        self.c.Right:Set(right)
+        self.layoutControl.Right:Set(right)
         return self
     end;
 
@@ -1303,7 +1309,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param bottom Lazy<number>
     ---@return T
     Bottom = function(self, bottom)
-        self.c.Bottom:Set(bottom)
+        self.layoutControl.Bottom:Set(bottom)
         return self
     end;
 
@@ -1318,7 +1324,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param width Lazy<number> if a number, width will be scaled by the pixel factor
     ---@return T
     Width = function(self, width)
-        local controlWidth = self.c.Width
+        local controlWidth = self.layoutControl.Width
         if iscallable(width) then
             controlWidth:SetFunction(width)
         else
@@ -1333,7 +1339,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param height Lazy<number> if a number, height will be scaled by the pixel factor
     ---@return T
     Height = function(self, height)
-        local controlHeight = self.c.Height
+        local controlHeight = self.layoutControl.Height
         if iscallable(height) then
             controlHeight:SetFunction(height)
         else
@@ -1349,7 +1355,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param padding? number defaults to 0, not 1
     ---@return T
     WidthFromTexture = function(self, filename, padding)
-        SetWidthFromTexture(self.c, filename, padding)
+        SetWidthFromTexture(self.layoutControl, filename, padding)
         return self
     end;
 
@@ -1360,7 +1366,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param padding? number defaults to 0, not 1
     ---@return T
     HeightFromTexture = function(self, filename, padding)
-        SetHeightFromTexture(self.c, filename, padding)
+        SetHeightFromTexture(self.layoutControl, filename, padding)
         return self
     end;
 
@@ -1371,7 +1377,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param padding? number defaults to 0, not 1
     ---@return T
     DimensionsFromTexture = function(self, filename, padding)
-        SetDimensionsFromTexture(self.c, filename, padding)
+        SetDimensionsFromTexture(self.layoutControl, filename, padding)
         return self
     end;
 
@@ -1383,11 +1389,11 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets depth of the control to be above a parent
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param depth? integer defaults to 1
     ---@return T
     Over = function(self, parent, depth)
-        DepthOverParent(self.c, GetControl(parent), depth)
+        DepthOverParent(self.layoutControl, GetLayoutControl(parent), depth)
         return self
     end;
 
@@ -1395,11 +1401,11 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets depth of the control to be below a parent
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param depth? integer defaults to 1
     ---@return T
     Under = function(self, parent, depth)
-        DepthUnderParent(self.c, GetControl(parent), depth)
+        DepthUnderParent(self.layoutControl, GetLayoutControl(parent), depth)
         return self
     end;
 
@@ -1419,7 +1425,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param self T
     ---@return T
     ResetLeft = function(self)
-        ResetLeft(self.c)
+        ResetLeft(self.layoutControl)
         return self
     end;
 
@@ -1429,7 +1435,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param self T
     ---@return T
     ResetTop = function(self)
-        ResetTop(self.c)
+        ResetTop(self.layoutControl)
         return self
     end;
 
@@ -1439,7 +1445,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param self T
     ---@return T
     ResetRight = function(self)
-        ResetRight(self.c)
+        ResetRight(self.layoutControl)
         return self
     end;
 
@@ -1449,7 +1455,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param self T
     ---@return T
     ResetBottom = function(self)
-        ResetBottom(self.c)
+        ResetBottom(self.layoutControl)
         return self
     end;
 
@@ -1459,7 +1465,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param self T
     ---@return T
     ResetWidth = function(self)
-        ResetWidth(self.c)
+        ResetWidth(self.layoutControl)
         return self
     end;
 
@@ -1469,7 +1475,7 @@ local LayouterAttributeControl = ClassSimple {
     ---@param self T
     ---@return T
     ResetHeight = function(self)
-        ResetHeight(self.c)
+        ResetHeight(self.layoutControl)
         return self
     end;
 
@@ -1481,44 +1487,44 @@ local LayouterAttributeControl = ClassSimple {
     --- Anchors the control's right edge to the left edge of a parent, with optional padding
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
     ---@return T
     AnchorToLeft = function(self, parent, padding)
-        AnchorToLeft(self.c, GetControl(parent), padding)
+        AnchorToLeft(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
     --- Anchors the control's bottom edge to the top edge of a parent, with optional padding
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
     ---@return T
     AnchorToTop = function(self, parent, padding)
-        AnchorToTop(self.c, GetControl(parent), padding)
+        AnchorToTop(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
     --- Anchors the control's left edge to the right edge of a parent, with optional padding
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
     ---@return T
     AnchorToRight = function(self, parent, padding)
-        AnchorToRight(self.c, GetControl(parent), padding)
+        AnchorToRight(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
     --- Anchors the control's top edge to the bottom edge of a parent, with optional padding
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
     ---@return T
     AnchorToBottom = function(self, parent, padding)
-        AnchorToBottom(self.c, GetControl(parent), padding)
+        AnchorToBottom(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
@@ -1531,11 +1537,11 @@ local LayouterAttributeControl = ClassSimple {
     --- This sets the control's left edge.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param leftOffset? number Offset of control's left edge in the rightward direction, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     AtHorizontalCenterIn = function(self, parent, leftOffset)
-        AtHorizontalCenterIn(self.c, GetControl(parent), leftOffset)
+        AtHorizontalCenterIn(self.layoutControl, GetLayoutControl(parent), leftOffset)
         return self
     end;
 
@@ -1543,55 +1549,55 @@ local LayouterAttributeControl = ClassSimple {
     --- This sets the control's top edge.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param topOffset? number Offset of the control's top edge in the downward direction, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     AtVerticalCenterIn = function(self, parent, topOffset)
-        AtVerticalCenterIn(self.c, GetControl(parent), topOffset)
+        AtVerticalCenterIn(self.layoutControl, GetLayoutControl(parent), topOffset)
         return self
     end;
 
     --- Places the control's left edge inside of a parent's, with optional rightward offset
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param leftOffset? number Offset of the control's left edge in the rightward direction, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     AtLeftIn = function(self, parent, leftOffset)
-        AtLeftIn(self.c, GetControl(parent), leftOffset)
+        AtLeftIn(self.layoutControl, GetLayoutControl(parent), leftOffset)
         return self
     end;
 
     --- Places the control's top edge inside of a parent's, with optional downward offset
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param topOffset? number Offset of the control's top edge in the downward direction, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     AtTopIn = function(self, parent, topOffset)
-        AtTopIn(self.c, GetControl(parent), topOffset)
+        AtTopIn(self.layoutControl, GetLayoutControl(parent), topOffset)
         return self
     end;
 
     --- Places the control's right edge inside of a parent's, with optional leftward offset
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param rightOffset? number Offset of the control's right edge in the leftward direction, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     AtRightIn = function(self, parent, rightOffset)
-        AtRightIn(self.c, GetControl(parent), rightOffset)
+        AtRightIn(self.layoutControl, GetLayoutControl(parent), rightOffset)
         return self
     end;
 
     --- Places the control's bottom edge inside of a parent's, with optional upward offset
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param bottomOffset? number Offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     AtBottomIn = function(self, parent, bottomOffset)
-        AtBottomIn(self.c, GetControl(parent), bottomOffset)
+        AtBottomIn(self.layoutControl, GetLayoutControl(parent), bottomOffset)
         return self
     end;
 
@@ -1604,10 +1610,10 @@ local LayouterAttributeControl = ClassSimple {
     --- with 0.00 at the parent's left edge
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param leftPercent? number defaults to 0.00 (all the way to left)
     FromLeftIn = function(self, parent, leftPercent)
-        FromLeftIn(self.c, GetControl(parent), leftPercent)
+        FromLeftIn(self.layoutControl, GetLayoutControl(parent), leftPercent)
         return self
     end;
 
@@ -1615,10 +1621,10 @@ local LayouterAttributeControl = ClassSimple {
     --- with 0.00 at the parent's top edge
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param topPercent? number defaults to 0.00 (all the way at the top)
     FromTopIn = function(self, parent, topPercent)
-        FromTopIn(self.c, GetControl(parent), topPercent)
+        FromTopIn(self.layoutControl, GetLayoutControl(parent), topPercent)
         return self
     end;
 
@@ -1626,10 +1632,10 @@ local LayouterAttributeControl = ClassSimple {
     --- with 0.00 at the parent's right edge
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param rightPercent? number defaults to 0.00 (all the way right)
     FromRightIn = function(self, parent, rightPercent)
-        FromRightIn(self.c, GetControl(parent), rightPercent)
+        FromRightIn(self.layoutControl, GetLayoutControl(parent), rightPercent)
         return self
     end;
 
@@ -1637,10 +1643,10 @@ local LayouterAttributeControl = ClassSimple {
     --- with 0.00 at the parent's bottom edge
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param bottomPercent? number defaults to 0.00 (all the way at the bottom)
     FromBottomIn = function(self, parent, bottomPercent)
-        FromBottomIn(self.c, GetControl(parent), bottomPercent)
+        FromBottomIn(self.layoutControl, GetLayoutControl(parent), bottomPercent)
         return self
     end;
 
@@ -1653,11 +1659,11 @@ local LayouterAttributeControl = ClassSimple {
     --- with 0.00 at the parent's left edge (this requires the control's width to be set)
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param leftPercent? number
     ---@return T
     FromLeftWith = function(self, parent, leftPercent)
-        FromLeftWith(self.c, GetControl(parent), leftPercent)
+        FromLeftWith(self.layoutControl, GetLayoutControl(parent), leftPercent)
         return self
     end;
 
@@ -1665,11 +1671,11 @@ local LayouterAttributeControl = ClassSimple {
     --- with 0.00 at the parent's top edge (this requires the control's height to be set)
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param topPercent? number
     ---@return T
     FromTopWith = function(self, parent, topPercent)
-        FromTopWith(self.c, GetControl(parent), topPercent)
+        FromTopWith(self.layoutControl, GetLayoutControl(parent), topPercent)
         return self
     end;
 
@@ -1677,11 +1683,11 @@ local LayouterAttributeControl = ClassSimple {
     --- with 0.00 at the parent's right edge (this requires the control's width to be set)
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param rightPercent? number
     ---@return T
     FromRightWith = function(self, parent, rightPercent)
-        FromRightWith(self.c, GetControl(parent), rightPercent)
+        FromRightWith(self.layoutControl, GetLayoutControl(parent), rightPercent)
         return self
     end;
 
@@ -1689,11 +1695,11 @@ local LayouterAttributeControl = ClassSimple {
     --- with 0.00 at the parent's bottom edge (this requires the control's height to be set)
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param bottomPercent? number
     ---@return T
     FromBottomWith = function(self, parent, bottomPercent)
-        FromBottomWith(self.c, GetControl(parent), bottomPercent)
+        FromBottomWith(self.layoutControl, GetLayoutControl(parent), bottomPercent)
         return self
     end;
 
@@ -1708,12 +1714,12 @@ local LayouterAttributeControl = ClassSimple {
     --- Note the argument order.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param topOffset? number offset of top edge in downward direction, scaled by the pixel scale factor
     ---@param leftOffset? number offset of left edge in rightward direction, scaled by the pixel scale factor
     ---@return T
     AtCenterIn = function(self, parent, topOffset, leftOffset)
-        AtCenterIn(self.c, GetControl(parent), topOffset, leftOffset)
+        AtCenterIn(self.layoutControl, GetLayoutControl(parent), topOffset, leftOffset)
         return self
     end;
 
@@ -1726,11 +1732,11 @@ local LayouterAttributeControl = ClassSimple {
     --- This sets the control's right and top edges.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     CenteredLeftOf = function(self, parent, padding)
-        CenteredLeftOf(self.c, GetControl(parent), padding)
+        CenteredLeftOf(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
@@ -1738,11 +1744,11 @@ local LayouterAttributeControl = ClassSimple {
     --- This sets the control's left and bottom edges.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     CenteredAbove = function(self, parent, padding)
-        CenteredAbove(self.c, GetControl(parent), padding)
+        CenteredAbove(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
@@ -1750,11 +1756,11 @@ local LayouterAttributeControl = ClassSimple {
     --- This sets the control's left and top edges.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     CenteredRightOf = function(self, parent, padding)
-        CenteredRightOf(self.c, GetControl(parent), padding)
+        CenteredRightOf(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
@@ -1762,11 +1768,11 @@ local LayouterAttributeControl = ClassSimple {
     --- This sets the controls's left and top edges.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     CenteredBelow = function(self, parent, padding)
-        CenteredBelow(self.c, GetControl(parent), padding)
+        CenteredBelow(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
@@ -1779,24 +1785,24 @@ local LayouterAttributeControl = ClassSimple {
     --- This sets the control's left and top edges.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
     ---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
     ---@return T
     AtLeftCenterIn = function(self, parent, leftOffset, topOffset)
-        AtLeftCenterIn(self.c, GetControl(parent), leftOffset, topOffset)
+        AtLeftCenterIn(self.layoutControl, GetLayoutControl(parent), leftOffset, topOffset)
         return self
     end;
 
     --- Places top left corner of the control inside of a parent's, with optional offsets
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
     ---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
     ---@return T
     AtLeftTopIn = function(self, parent, leftOffset, topOffset)
-        AtLeftTopIn(self.c, GetControl(parent), leftOffset, topOffset)
+        AtLeftTopIn(self.layoutControl, GetLayoutControl(parent), leftOffset, topOffset)
         return self
     end;
 
@@ -1805,24 +1811,24 @@ local LayouterAttributeControl = ClassSimple {
     --- Note the argument order.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
     ---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
     ---@return T
     AtTopCenterIn = function(self, parent, topOffset, leftOffset)
-        AtTopCenterIn(self.c, GetControl(parent), topOffset, leftOffset)
+        AtTopCenterIn(self.layoutControl, GetLayoutControl(parent), topOffset, leftOffset)
         return self
     end;
 
     --- Places top right corner of the control inside of a parent's, with optional offsets
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
     ---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
     ---@return T
     AtRightTopIn = function(self, parent, rightOffset, topOffset)
-        AtRightTopIn(self.c, GetControl(parent), rightOffset, topOffset)
+        AtRightTopIn(self.layoutControl, GetLayoutControl(parent), rightOffset, topOffset)
         return self
     end;
 
@@ -1830,24 +1836,24 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets the control's right and top edges.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
     ---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
     ---@return T
     AtRightCenterIn = function(self, parent, rightOffset, topOffset)
-        AtRightCenterIn(self.c, GetControl(parent), rightOffset, topOffset)
+        AtRightCenterIn(self.layoutControl, GetLayoutControl(parent), rightOffset, topOffset)
         return self
     end;
 
     --- Places bottom right corner of the control inside of a parent's, with optional offsets
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
     ---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
     ---@return T
     AtRightBottomIn = function(self, parent, rightOffset, bottomOffset)
-        AtRightBottomIn(self.c, GetControl(parent), rightOffset, bottomOffset)
+        AtRightBottomIn(self.layoutControl, GetLayoutControl(parent), rightOffset, bottomOffset)
         return self
     end;
 
@@ -1856,24 +1862,24 @@ local LayouterAttributeControl = ClassSimple {
     --- Note the argument order.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
     ---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
     ---@return T
     AtBottomCenterIn = function(self, parent, bottomOffset, leftOffset)
-        AtBottomCenterIn(self.c, GetControl(parent), bottomOffset, leftOffset)
+        AtBottomCenterIn(self.layoutControl, GetLayoutControl(parent), bottomOffset, leftOffset)
         return self
     end;
 
     --- Places bottom left corner of the control inside of a parent's, with optional offsets
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
     ---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
     ---@return T
     AtLeftBottomIn = function(self, parent, leftOffset, bottomOffset)
-        AtLeftBottomIn(self.c, GetControl(parent), leftOffset, bottomOffset)
+        AtLeftBottomIn(self.layoutControl, GetLayoutControl(parent), leftOffset, bottomOffset)
         return self
     end;
 
@@ -1885,44 +1891,44 @@ local LayouterAttributeControl = ClassSimple {
     --- Lock top right of the control to the top left of a parent
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     LeftOf = function(self, parent, padding)
-        LeftOf(self.c, GetControl(parent), padding)
+        LeftOf(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
     --- Lock top left of the control to the top right of a parent
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     RightOf = function(self, parent, padding)
-        RightOf(self.c, GetControl(parent), padding)
+        RightOf(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
     --- Lock bottom left of the control to the top left of a parent
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     Above = function(self, parent, padding)
-        Above(self.c, GetControl(parent), padding)
+        Above(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
     --- Lock top left of the control to the bottom left of a parent
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
     ---@return T
     Below = function(self, parent, padding)
-        Below(self.c, GetControl(parent), padding)
+        Below(self.layoutControl, GetLayoutControl(parent), padding)
         return self
     end;
 
@@ -1935,20 +1941,20 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets a control to fill the horizontal space of a parent
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@return T
     FillHorizontally = function(self, parent)
-        FillHorizontally(self.c, GetControl(parent))
+        FillHorizontally(self.layoutControl, GetLayoutControl(parent))
         return self
     end;
 
     --- Sets a control to fill the vertical space of a parent
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@return T
     FillVertically = function(self, parent)
-        FillVertically(self.c, GetControl(parent))
+        FillVertically(self.layoutControl, GetLayoutControl(parent))
         return self
     end;
 
@@ -1962,14 +1968,14 @@ local LayouterAttributeControl = ClassSimple {
     --- Offsets are optional and scaled by the pixel scale factor.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param left? number
     ---@param top? number
     ---@param right? number
     ---@param bottom? number
     ---@return T
     OffsetIn = function(self, parent, left, top, right, bottom)
-        OffsetIn(self.c, GetControl(parent), left, top, right, bottom)
+        OffsetIn(self.layoutControl, GetLayoutControl(parent), left, top, right, bottom)
         return self
     end;
 
@@ -1977,14 +1983,14 @@ local LayouterAttributeControl = ClassSimple {
     --- Percentages are optional.
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param left? number
     ---@param top? number
     ---@param right? number
     ---@param bottom? number
     ---@return T
     PercentIn = function(self, parent, left, top, right, bottom)
-        PercentIn(self.c, GetControl(parent), left, top, right, bottom)
+        PercentIn(self.layoutControl, GetLayoutControl(parent), left, top, right, bottom)
         return self
     end;
 
@@ -1996,21 +2002,21 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets the control to fill a parent
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@return T
     Fill = function(self, parent)
-        FillParent(self.c, GetControl(parent))
+        FillParent(self.layoutControl, GetLayoutControl(parent))
         return self
     end;
 
     --- Sets the control to fill a parent's with fixed padding
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param parent Layouter | Control
+    ---@param parent Layoutable
     ---@param offset? number
     ---@return T
     FillFixedBorder = function(self, parent, offset)
-        FillParentFixedBorder(self.c, GetControl(parent), offset)
+        FillParentFixedBorder(self.layoutControl, GetLayoutControl(parent), offset)
         return self
     end;
 }
@@ -2027,7 +2033,7 @@ local LayouterAttributeDropShadow = ClassSimple {
     ---@param hasShadow boolean
     ---@return T
     DropShadow = function(self, hasShadow)
-        local control = self.c
+        local control = self.layoutControl
         local setDropShadow = control.SetDropShadow
         if setDropShadow then
             setDropShadow(control, hasShadow)
@@ -2051,7 +2057,7 @@ local LayouterAttributeFont = ClassSimple {
     ---@param size number
     ---@return T
     Font = function(self, font, size)
-        local control = self.c
+        local control = self.layoutControl
         local setFont = control.SetFont
         if setFont then
             setFont(control, font, size)
@@ -2080,7 +2086,7 @@ local LayouterAttributeEditor = Class(LayouterAttributeFont) {
     ---@param charLimit? number
     ---@return T
     Setup = function(self, foreColor, backColor, highlightFore, highlightBack, fontFace, fontSize, charLimit)
-        import("/lua/ui/uiutil.lua").SetupEditStd(self.c,
+        import("/lua/ui/uiutil.lua").SetupEditStd(self.layoutControl,
                 foreColor, backColor, highlightFore, highlightBack, fontFace, fontSize, charLimit)
         return self
     end;
@@ -2098,7 +2104,7 @@ local LayouterAttributeColor = ClassSimple {
     ---@param color Lazy<Color> color as a hexcode
     ---@return T
     Color = function(self, color)
-        local control = self.c
+        local control = self.layoutControl
         local setColor = control.SetColor or control.SetSolidColor
         if setColor then
             setColor(control, color)
@@ -2122,7 +2128,7 @@ local LayouterAttributeTexture = Class(LayouterAttributeColor) {
     ---@param border? Border
     ---@return T
     Texture = function(self, texture, border)
-        local control = self.c
+        local control = self.layoutControl
         local setTexture = control.SetTexture
         if setTexture then
             setTexture(control, texture, border)
@@ -2150,7 +2156,7 @@ local LayouterAttributeSelection = ClassSimple {
     ---@param mouseoverBack? Lazy<Color>
     ---@return T
     Colors = function(self, fore, back, selectedFore, selectedBack, mouseoverFore, mouseoverBack)
-        local control = self.c
+        local control = self.layoutControl
         local setColors = control.SetColors
         if setColors then
             setColors(control, fore, back, selectedFore, selectedBack, mouseoverFore, mouseoverBack)
@@ -2166,7 +2172,7 @@ local LayouterAttributeSelection = ClassSimple {
     ---@param show boolean
     ---@return T
     MouseoverItem = function(self, show)
-        local control = self.c
+        local control = self.layoutControl
         local showMouseoverItem = control.ShowMouseoverItem
         if showMouseoverItem then
             showMouseoverItem(control, show)
@@ -2187,41 +2193,43 @@ local LayouterAttributeSelection = ClassSimple {
 -- class is the most versatile
 
 ---@class Layouter : LayouterAttributeControl, LayouterAttributeDropShadow, LayouterAttributeEditor, LayouterAttributeTexture, LayouterAttributeSelection
----@operator call(Control): Layouter
----@field c Control
+---@field layoutControl Control
 Layouter = Class(LayouterAttributeControl, LayouterAttributeDropShadow, LayouterAttributeEditor, LayouterAttributeTexture, LayouterAttributeSelection) {
     ---@param self Layouter
     ---@param control Control
     __init = function(self, control)
-        if control == nil then
-            control = false -- field needs to exist to not trigger the `__newindex` error
-        else
-            control = GetControl(control)
-            local onLayout = control.OnLayout
-            if onLayout then
-                onLayout(control)
-            end
-        end
-        if self.c ~= nil then
-            self.c = control
+        if not control then
+            self.layoutControl = false
             return
         end
-        rawset(self, "c", control)
+        self.layoutControl = GetLayoutControl(control)
+        local onLayout = control.OnLayout
+        if onLayout then
+            onLayout(control)
+        end
     end;
 
-    __newindex = function(key, value)
-        error("attempt to set new index for a Layouter object")
+    OnLayout = function(self)
+        local control = self.layoutControl
+        local onLayout = control.OnLayout
+        if onLayout then
+            onLayout(control)
+        end
     end;
 
-    OnInit = function(self)
-        SPEW("LAYOUTERING")
+    Layout = function(self)
+        local control = self.layoutControl
+        local layout = control.Layout
+        if layout then
+            layout(control)
+        end
     end;
 
     -- Gets the control
     ---@param self Layouter
-    ---@return Control c
+    ---@return Control layoutControl
     Get = function(self)
-        return self.c
+        return self.layoutControl
     end;
 
     --- Computes the control's properties and returns it.
@@ -2230,27 +2238,30 @@ Layouter = Class(LayouterAttributeControl, LayouterAttributeDropShadow, Layouter
     ---@param self Layouter
     ---@return Control
     End = function(self)
-        local control = self.c
+        local control = self.layoutControl
 
-        local ok, error = pcall(control.Top)
-        if ok then ok, error = pcall(control.Bottom) end
-        if ok then ok, error = pcall(control.Height) end
-        if not ok then
-            WARN("Incorrect layout for \"" .. control:GetName() .. "\" Top-Height-Bottom: " .. error)
+        if ValidateLayouter then
+            local pcall = pcall
+            local ok, error = pcall(control.Top)
+            if ok then ok, error = pcall(control.Bottom) end
+            if ok then ok, error = pcall(control.Height) end
+            if not ok then
+                WARN("Incorrect layout for \"" .. control:GetName() .. "\" Top-Height-Bottom: " .. error)
+            end
+
+            ok, error = pcall(control.Left)
+            if ok then ok, error = pcall(control.Right) end
+            if ok then ok, error = pcall(control.Width) end
+            if not ok then
+                WARN("Incorrect layout for \"" .. control:GetName() .. "\" Left-Width-Right: " .. error)
+            end
         end
 
-        ok, error = pcall(control.Left)
-        if ok then ok, error = pcall(control.Right) end
-        if ok then ok, error = pcall(control.Width) end
-        if not ok then
-            WARN("Incorrect layout for \"" .. control:GetName() .. "\" Left-Width-Right: " .. error)
-        end
-
-        self.c = false
-        local layout = control.Layout
+        local layout = control.Layout or self.L
         if layout then
             layout(control)
         end
+        self.layoutControl = false
 
         return control
     end;
@@ -2276,8 +2287,9 @@ local reusedLayouter = Layouter()
 ---@param control Control
 ---@return Layouter #cached layouter
 function ReusedLayoutFor(control)
+    control = GetLayoutControl(control)
     local reusedLayouter = reusedLayouter
-    local cur = reusedLayouter.c
+    local cur = reusedLayouter.layoutControl
     if cur then
         if cur == control then
             -- same object, probably some inherited laying out, let it go
@@ -2288,6 +2300,6 @@ function ReusedLayoutFor(control)
             return Layouter(control)
         end
     end
-    Layouter.__init(reusedLayouter, control)
+    reusedLayouter:__init(control)
     return reusedLayouter
 end
