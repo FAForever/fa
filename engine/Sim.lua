@@ -1225,7 +1225,7 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- Instantly moves an entity to a location
----@param entity Object
+---@param object Object
 ---@param location Vector
 ---@param orientation? Vector
 function Warp(object, location, orientation)
