@@ -117,7 +117,7 @@ function FitText(text, lineWidth, advanceFunction)
             return lineWidth
         end
     else
-        lineWidthFunc = linWidth
+        lineWidthFunc = lineWidth
     end
 
     local result = {}

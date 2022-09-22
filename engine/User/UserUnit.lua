@@ -101,7 +101,7 @@ function UserUnit:GetMissileInfo()
 end
 
 --- Returns the current world position of the unit
----@return Position
+---@return Vector
 function UserUnit:GetPosition()
 end
 
