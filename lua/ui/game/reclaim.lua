@@ -98,6 +98,13 @@ local WorldLabel = Class(Group) {
         end
     end,
 
+    ---@param self WorldLabel
+    ProjectToScreen = function(self)
+        local view = self.parent.view
+        local proj = view:Project(self.position)
+        self.Left:SetValue(proj.x - 0.5 * self.Width())
+        self.Top:SetValue(proj.y - 0.5 * self.Height() + 1)
+    end,
     --- Updates the reclaim that this label displays
     ---@param self WorldLabel
     ---@param r UIReclaimDataCombined
@@ -107,32 +114,22 @@ local WorldLabel = Class(Group) {
         end
 
         self.position = r.position
+        self:ProjectToScreen()
         if r.mass ~= self.oldMass then
             local mass = tostring(math.floor(0.5 + r.mass))
             self.text:SetText(mass)
             self.oldMass = r.mass
             self:AdjustToValue(r.mass)
-            self:OnFrame(0)
         end
-
-        -- always reproject
-        local view = self.parent.view
-        local proj = view:Project(self.position)
-        self.Left:SetValue(proj.x - 0.5 * self.Width())
-        self.Top:SetValue(proj.y - 0.5 * self.Height() + 1)
     end,
 
     --- Called each frame by the engine
     ---@param self WorldLabel
     ---@param delta number
     OnFrame = function(self, delta)
-        if self._project then
-            local view = self.parent.view
-            local proj = view:Project(self.position)
-            self.Left:SetValue(proj.x - 0.5 * self.Width())
-            self.Top:SetValue(proj.y - 0.5 * self.Height() + 1)
+        if self.parent.isMoving then
+            self:ProjectToScreen()
         end
-        self._project = self.parent.isMoving
     end,
 
     --- Called when the control is hidden or shown, used to start updating
