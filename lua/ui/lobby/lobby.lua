@@ -2688,7 +2688,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.HandleEvent = defaultHandler
 
         -- Slot number
-        local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
+        local slotNumber = UIUtil.CreateText(newSlot, tostring(i), 14, 'Arial')
         newSlot.slotNumber = slotNumber
         LayoutHelpers.SetWidth(slotNumber, COLUMN_WIDTHS[1])
         slotNumber.Height:Set(newSlot.Height)
@@ -3204,7 +3204,7 @@ function CreateUI(maxPlayers)
     cbox_ShowChangedOption.OnCheck = function(self, checked)
         HideDefaultOptions = checked
         RefreshOptionDisplayData()
-        GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
+        GUI.OptionContainer:ScrollSetTop('Vert', 0)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 

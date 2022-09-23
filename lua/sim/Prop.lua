@@ -190,8 +190,6 @@ Prop = Class(moho.prop_methods) {
             return
         end
 
-        -- todo: add check if prop is in playable area
-
         -- construct sync data
         local data = self.SyncData
 
@@ -399,7 +397,7 @@ Prop = Class(moho.prop_methods) {
             -- attempt to make the prop
             ok, out = pcall(self.CreatePropAtBone, self, ibone, blueprint)
             if ok then 
-                out.SetMaxReclaimValues(out, time, mass, energy)
+                out:SetMaxReclaimValues(time, mass, energy)
                 props[ibone] = out 
             else 
                 WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)

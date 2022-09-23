@@ -338,6 +338,10 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- Returns 4 numbers: skirt x0, skirt z0, skirt.x1, skirt.z1
     ---@param self Unit
+    ---@return number x0
+    ---@return number z0
+    ---@return number x1
+    ---@return number z1
     GetSkirtRect = function(self)
         local x, y, z = self:GetPositionXYZ()
         local fx = x - self.Footprint.SizeX * .5
@@ -379,7 +383,7 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     ---@param fn function
     ---@param ... any
-    ---@return thread
+    ---@return thread | nil
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -2052,7 +2056,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Flying bits of metal and whatnot. More bits for more overkill.
         if self.ShowUnitDestructionDebris and overkillRatio then
-            self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
+            self:CreateUnitDestructionDebris(true, true, overkillRatio > 2)
         end
 
         if shallSink then
@@ -2324,7 +2328,7 @@ Unit = Class(moho.unit_methods) {
     GetWeaponByLabel = function(self, label)
 
         -- if we're sinking then all death weapons should already have been applied
-        if self.Sinking or self.BeenDestroyed(self) then 
+        if self.Sinking or self:BeenDestroyed() then 
             return nil
         end
 
@@ -5219,7 +5223,7 @@ Unit = Class(moho.unit_methods) {
         -- end
 
         -- call the old function
-        self.UpdateBuildRestrictions(self)
+        self:UpdateBuildRestrictions()
     end,
 
     ---@param aiBrain AIBrain

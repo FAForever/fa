@@ -132,13 +132,13 @@ URS0201 = Class(CSeaUnit) {
             -- Create Initial explosion effects
             if self.ShowUnitDestructionDebris and overkillRatio then
                 if overkillRatio <= 1 then
-                    self.CreateUnitDestructionDebris(self, true, true, false)
+                    self:CreateUnitDestructionDebris(true, true, false)
                 elseif overkillRatio <= 2 then
-                    self.CreateUnitDestructionDebris(self, true, true, false)
+                    self:CreateUnitDestructionDebris(true, true, false)
                 elseif overkillRatio <= 3 then
-                    self.CreateUnitDestructionDebris(self, true, true, true)
+                    self:CreateUnitDestructionDebris(true, true, true)
                 else -- VAPORIZED
-                    self.CreateUnitDestructionDebris(self, true, true, true)
+                    self:CreateUnitDestructionDebris(true, true, true)
                 end
             end
             WaitSeconds(2)

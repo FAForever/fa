@@ -30,9 +30,18 @@
 local Control = import('/lua/maui/control.lua').Control
 local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 
----@class Bitmap : moho.bitmap_methods, Control, InternalObject
-Bitmap = Class(moho.bitmap_methods, Control) {
+---@class BitmapTexture
+---@field _texture LazyVar<FileName>
+---@field _border number
 
+---@class Bitmap : moho.bitmap_methods, Control, InternalObject
+---@field _filename BitmapTexture
+---@field _color LazyVar<Color>
+Bitmap = Class(moho.bitmap_methods, Control) {
+    ---@param self Bitmap
+    ---@param parent Control
+    ---@param filename Lazy<FileName>
+    ---@param debugname? string
     __init = function(self, parent, filename, debugname)
         InternalCreateBitmap(self, parent)
         if debugname then
@@ -54,6 +63,9 @@ Bitmap = Class(moho.bitmap_methods, Control) {
         end
     end,
 
+    ---@param self Bitmap
+    ---@param texture Lazy<FileName>
+    ---@param border? number defaults to 1
     SetTexture = function(self, texture, border)
         if self._filename then
             border = border or 1
@@ -62,16 +74,20 @@ Bitmap = Class(moho.bitmap_methods, Control) {
         end
     end,
 
+    ---@param self Bitmap
+    ---@param color Lazy<Color>
     SetSolidColor = function(self, color)
         self._color:Set(color)
     end,
 
+    ---@param self Bitmap
     ResetLayout = function(self)
         Control.ResetLayout(self)
         self.Width:SetFunction(function() return ScaleNumber(self.BitmapWidth()) end)
         self.Height:SetFunction(function() return ScaleNumber(self.BitmapHeight()) end)
     end,
 
+    ---@param self Bitmap
     OnDestroy = function(self)
         if self._filename and self._filename._texture then
             self._filename._texture:Destroy()
@@ -83,8 +99,12 @@ Bitmap = Class(moho.bitmap_methods, Control) {
     end,
 
     -- callback scripts
+    ---@param self Bitmap
     OnAnimationFinished = function(self) end,
+    ---@param self Bitmap
     OnAnimationStopped = function(self) end,
+    ---@param self Bitmap
+    ---@param frameNumber number
     OnAnimationFrame = function(self, frameNumber) end,
 }
 

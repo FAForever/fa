@@ -274,6 +274,11 @@ end
 local function CompareMass(a, b)
     return a.mass < b.mass
 end
+    else
+        local x21, z21 = x2 - x1, z2 - z1
+        local x32, z32 = x3 - x2, z3 - z2
+        local x43, z43 = x4 - x3, z4 - z3
+        local x14, z14 = x1 - x4, z1 - z4
 
 --- Combines the reclaim by summing them up and setting the position to the weighted average
 ---@param r1 UserReclaimData

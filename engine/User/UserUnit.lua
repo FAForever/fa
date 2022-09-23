@@ -101,7 +101,7 @@ function UserUnit:GetMissileInfo()
 end
 
 --- Returns the current world position of the unit
----@return Position
+---@return Vector
 function UserUnit:GetPosition()
 end
 
@@ -167,7 +167,7 @@ function UserUnit:IsIdle()
 end
 
 ---
----@param category moho.EntityCategory
+---@param category CategoryName
 ---@return boolean
 function UserUnit:IsInCategory(category)
 end
