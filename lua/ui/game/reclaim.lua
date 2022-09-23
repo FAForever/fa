@@ -20,21 +20,17 @@ local options = Prefs.GetFromCurrentProfile('options')
 ---@field max number
 
 ---@type number
-local HEIGHT_RATIO = 0.012
+local HeightRatio = 0.012
 
 --- Reclaim is no longer combined once this threshold is met, the value (150) is the same
 --- camera distance that allows for the reclaim command to work. Guarantees that the
 --- labels represent where you can reclaim.
 ---@type number
-local ZOOM_THRESHOLD = 150
+local ZoomThreshold = 150
 
 --- TODO: remove the options
 ---@type number
-local MaxLabels = options.maximum_reclaim_count or 1000
-
---- TODO: remove the options
----@type number
-local MinAmount = options.minimum_reclaim_amount or 10
+local MaxLabels = 500
 
 ---@type table<EntityId, UIReclaimDataPoint>
 local Reclaim = {}
@@ -116,6 +112,12 @@ local WorldLabel = Class(Group) {
             self.text:SetText(mass)
             self.oldMass = r.mass
             self:AdjustToValue(r.mass)
+            self:OnFrame(0)
+
+            local view = self.parent.view
+            local proj = view:Project(self.position)
+            self.Left:SetValue(proj.x - 0.5 * self.Width())
+            self.Top:SetValue(proj.y - 0.5 * self.Height() + 1)
         end
     end,
 
@@ -213,28 +215,6 @@ function SetPlayableArea(rect)
     OutsidePlayableAreaReclaim = newOutsidePlayableAreaReclaim
 end
 
---- Called when the minimum amount is changed
---- TODO: Remove it, and the options along with it
----@deprecated
----@param value number
-function updateMinAmount(value)
-    MinAmount = value
-    ReclaimChanged = true
-end
-
---- Called when the maximum amount of labels is changed
---- TODO: Remove it, and the options along with it
----@deprecated
----@param value number
-function updateMaxLabels(value)
-    MaxLabels = value
-    ReclaimChanged = true
-    for index = MaxLabels + 1, table.getn(LabelPool) do
-        LabelPool[index]:Destroy()
-        LabelPool[index] = nil
-    end
-end
-
 --- Adds to and updates the set of reclaim labels
 ---@param reclaimPoints UIReclaimDataPoint[]
 function UpdateReclaim(reclaimPoints)
@@ -281,11 +261,11 @@ local function _CombineReclaim(reclaim)
 
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
 
-    if zoom < ZOOM_THRESHOLD then
+    if zoom < ZoomThreshold then
         return false
     end
 
-    local minDist = zoom * HEIGHT_RATIO
+    local minDist = zoom * HeightRatio
     local minDistSq = minDist * minDist
     local index = 0
 
@@ -427,7 +407,7 @@ function UpdateLabels()
     end
 
     for _, r in Reclaim do
-        if r.mass >= MinAmount and (not checkForContainment or Contains(r.position)) then
+        if (not checkForContainment or Contains(r.position)) then
             onScreenReclaims[onScreenReclaimIndex] = r
             onScreenReclaimIndex = onScreenReclaimIndex + 1
         end
@@ -553,6 +533,9 @@ function ShowReclaimThread(watch_key)
                 OldZoom = zoom
                 OldPosition = position
                 ReclaimChanged = false
+                if view.ReclaimGroup then
+                    view.ReclaimGroup.isMoving = true
+                end
             end
 
             view.NewViewing = false
