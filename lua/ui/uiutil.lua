@@ -1385,10 +1385,10 @@ local windowTextures = {
 ---@param lockSize? boolean Toggle to allow the user to adjust the size of the window.
 ---@param lockPosition? boolean Toggle to allow the user to adjust the position of the window.
 ---@param preferenceID? string Identifier used in the preference file to remember where this window was located last
----@param defaultLeft? number The default left boundary of the window, defaults to 10
----@param defaultTop? number The default top boundary of the window, defaults to 300
----@param defaultBottom? number The default bottom boundary of the window, defaults to 600
----@param defaultRight? number The default right boundary of the window, defaults to 210
+---@param defaultLeft? Lazy<number> The default left boundary of the window, defaults to 10
+---@param defaultTop? Lazy<number> The default top boundary of the window, defaults to 300
+---@param defaultBottom? Lazy<number> The default bottom boundary of the window, defaults to 600
+---@param defaultRight? Lazy<number> The default right boundary of the window, defaults to 210
 ---@return Window
 function CreateWindowStd(parent, title, icon, pin, config, lockSize, lockPosition, preferenceID, defaultLeft, defaultTop, defaultBottom, defaultRight)
     parent = parent or GetFrame(0)
