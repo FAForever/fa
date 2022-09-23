@@ -6,10 +6,8 @@ local LazyVar = import('/lua/lazyvar.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Dragger = import('/lua/maui/dragger.lua').Dragger
 local UIMain = import('/lua/ui/uimain.lua')
 
 local activeCombo = nil
@@ -707,5 +705,8 @@ BitmapCombo = Class(Group) {
     -- overload to get rolled over item index
     OnOverItem = function(self, index, name)
     end,
-
 }
+
+-- kept for mod backwards compatibility
+local Text = import('/lua/maui/text.lua').Text
+local Dragger = import('/lua/maui/dragger.lua').Dragger

@@ -1,9 +1,11 @@
 ---@meta
 
+---@class EntityCategory : userdata, moho.EntityCategory
+---@operator add(EntityCategory): EntityCategory
+---@operator mul(EntityCategory): EntityCategory
+---@operator sub(EntityCategory): EntityCategory
+
 ---@class moho.EntityCategory
----@operator add(moho.EntityCategory): moho.EntityCategory
----@operator mul(moho.EntityCategory): moho.EntityCategory
----@operator sub(moho.EntityCategory): moho.EntityCategory
 local EntityCategory = {}
 
 ---@alias UnparsedCategory string

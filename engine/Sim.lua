@@ -5,7 +5,7 @@
 
 -- TODO : Needs Definision
 ---@alias TerrainType any
----@alias Task any
+---@alias Task table
 ---@alias CSimSoundManager any
 ---@alias EconomyEvent moho.EconomyEvent
 ---@alias AIPersonality string
@@ -174,7 +174,7 @@ end
 function CreateBuilderArmController(unit, turretBone, barrelBone, aimBone)
 end
 
---- Creates a collision detection manipulator, calls the function `self.OnAnimTerrainCollision(self, bone, x, y, z)`
+--- Creates a collision detection manipulator, calls the function `self:OnAnimTerrainCollision(bone, x, y, z)`
 --- when a bone that is being watched collides with the terrain
 ---@param unit Unit
 ---@return moho.CollisionManipulator
@@ -203,7 +203,7 @@ end
 ---@param totalEnergy number
 ---@param totalMass number
 ---@param timeInSeconds number
----@return moho.EconomyEvent
+---@return EconomyEvent
 function CreateEconomyEvent(unit, totalEnergy, totalMass, timeInSeconds)
 end
 
@@ -508,7 +508,7 @@ function DrawLinePop(start, finish, color)
 end
 
 --- Returns true if the economy event is finished
----@param event moho.EconomyEvent
+---@param event EconomyEvent
 ---@return boolean
 function EconomyEventIsDone(event)
 end
@@ -1032,7 +1032,7 @@ end
 ---
 ---@param manager CSimSoundManager
 ---@param sound SoundHandle
----@return moho.sound_methods
+---@return SoundHandle
 function PlayLoop(manager, sound)
 end
 
@@ -1208,7 +1208,7 @@ function SplitProp(original, blueprintId)
 end
 
 ---@param manager CSimSoundManager
----@param handle moho.sound_methods
+---@param handle SoundHandle
 function StopLoop(manager, handle)
 end
 
@@ -1225,7 +1225,7 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- Instantly moves an entity to a location
----@param entity Object
+---@param object Object
 ---@param location Vector
 ---@param orientation? Vector
 function Warp(object, location, orientation)

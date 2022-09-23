@@ -42,6 +42,9 @@ string.rep, string.gsub, string.sub, string.byte, string.char,
 string.find, string.len, string.format
 local concat = table.concat
 
+local TableGetN = table.getn
+
+
 json = { version = "dkjson 2.5" }
 
 local _ENV = nil -- blocking globals in Lua 5.2
@@ -180,7 +183,7 @@ end
 function json.addnewline (state)
     if state.indent then
         state.bufferlen = addnewline2 (state.level or 0,
-            state.buffer, state.bufferlen or table.getn(state.buffer))
+            state.buffer, state.bufferlen or TableGetN(state.buffer))
     end
 end
 
@@ -287,7 +290,7 @@ encode2 = function (value, indent, level, buffer, buflen, tables, globalorder, s
             local order = valmeta and valmeta.__jsonorder or globalorder
             if order then
                 local used = {}
-                n = table.getn(order)
+                n = TableGetN(order)
                 for i = 1, n do
                     local k = order[i]
                     local v = value[k]

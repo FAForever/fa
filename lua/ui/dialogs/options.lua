@@ -9,7 +9,6 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import('/lua/maui/text.lua').Text
 local Button = import('/lua/maui/button.lua').Button
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local Group = import('/lua/maui/group.lua').Group
@@ -21,12 +20,12 @@ local OptionsLogic = import('/lua/options/optionslogic.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 -- this will hold the working set of options, which won't be valid until applied
-local currentOptionsSet = false
-local currentTabButton = false
-local currentTabBitmap = false
+local currentOptionsSet = nil
+local currentTabButton = nil
+local currentTabBitmap = nil
 
 -- contains a map of current option controls keyed by their option keys
-local optionKeyToControlMap = false
+local optionKeyToControlMap = nil
 
 -- this table is keyed with the different types of controls that can be created
 -- each key's value is the function that actually creates the type
@@ -256,12 +255,12 @@ local function CreateOption(parent, optionItemData)
     return bg
 end
 
-local dialog = false
+local dialog = nil
 
 function CreateDialog(over, exitBehavior)
     currentOptionsSet = OptionsLogic.GetCurrent()
 
-    local parent = false
+    local parent = nil
 
     -- lots of state
     local function KillDialog()
@@ -397,7 +396,7 @@ function CreateDialog(over, exitBehavior)
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
 
-    UIUtil.MakeInputModal(dialog, function() okBtn.OnClick(okBtn) end, function() dialog.cancelBtn.OnClick(dialog.cancelBtn) end)
+    UIUtil.MakeInputModal(dialog, function() okBtn:OnClick() end, function() dialog.cancelBtn:OnClick() end)
 
     -- set up option grid
     local elementWidth, elementHeight = GetTextureDimensions(UIUtil.UIFile('/dialogs/options-02/content-box_bmp.dds'))
@@ -543,3 +542,6 @@ function OnNISBegin()
         dialog.cancelBtn:OnClick()
     end
 end
+
+-- kept for mod backwards compatibility
+local Text = import('/lua/maui/text.lua').Text

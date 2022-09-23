@@ -64,7 +64,7 @@ Prop = Class(moho.prop_methods) {
             -- set by some adaptive maps to influence how much a prop is worth
             local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1
 
-            self.SetMaxReclaimValues(self,
+            self:SetMaxReclaimValues(
                 economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
                 (economy.ReclaimMassMax * modifier) or 0,
                 (economy.ReclaimEnergyMax * modifier) or 0
@@ -146,15 +146,15 @@ Prop = Class(moho.prop_methods) {
             return 
         end
 
-        self.DoPropCallbacks(self, 'OnKilled')
+        self:DoPropCallbacks('OnKilled')
         EntityDestroy(self)
     end,
 
     --- Called by the engine when the prop is reclaimed.
     -- @param entity The entity that reclaimed the prop.
     OnReclaimed = function(self, entity)
-        self.DoPropCallbacks(self, 'OnReclaimed', entity)
-        self.CreateReclaimEndEffects(self, entity)
+        self:DoPropCallbacks('OnReclaimed', entity)
+        self:CreateReclaimEndEffects(entity)
         EntityDestroy(self)
     end,
 
@@ -203,7 +203,7 @@ Prop = Class(moho.prop_methods) {
     --- Called by the engine when the prop is destroyed.
     OnDestroy = function(self)
         self.Dead = true
-        self.UpdateReclaimLeft(self)
+        self:UpdateReclaimLeft()
         TrashDestroy(self.Trash)
     end,
 
@@ -241,13 +241,13 @@ Prop = Class(moho.prop_methods) {
                 local excess = preHealth
                 local maxHealth = EntityGetMaxHealth(self)
                 if excess < 0 and maxHealth > 0 then
-                    self.Kill(self, instigator, damageType, -excess / maxHealth)
+                    self:Kill(instigator, damageType, -excess / maxHealth)
                 else 
-                    self.Kill(self, instigator, damageType, 0.0)
+                    self:Kill(instigator, damageType, 0.0)
                 end
             end
         else
-            self.UpdateReclaimLeft(self)
+            self:UpdateReclaimLeft()
         end
     end,
 
@@ -266,7 +266,7 @@ Prop = Class(moho.prop_methods) {
         self.MaxEnergyReclaim = energy
         self.TimeReclaim = time
 
-        self.UpdateReclaimLeft(self)
+        self:UpdateReclaimLeft()
     end,
 
     --- Mimics the engine behavior when calculating the reclaim value of a prop.
@@ -281,7 +281,7 @@ Prop = Class(moho.prop_methods) {
         end
 
         -- Notify UI about the mass change
-        self.SyncMassLabel(self)
+        self:SyncMassLabel()
     end,
 
     --- Sets the collision box of the prop.
@@ -386,7 +386,7 @@ Prop = Class(moho.prop_methods) {
             -- attempt to make the prop
             ok, out = pcall(self.CreatePropAtBone, self, ibone, blueprint)
             if ok then 
-                out.SetMaxReclaimValues(out, time, mass, energy)
+                out:SetMaxReclaimValues(time, mass, energy)
                 props[ibone] = out 
             else 
                 WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)

@@ -476,9 +476,9 @@ function printField(k, v, tblName, printer)
 end
 
 --- Prints keys and values of a table and sub-tables if present
---- @param tbl specifies a table to print
---- @param tblPrefix specifies optional table prefix/name
---- @param printer specifies optional message printer: LOG, WARN, error, etc.
+--- @param tbl? table specifies a table to print
+--- @param tblPrefix? string specifies optional table prefix/name
+--- @param printer? function specifies optional message printer: LOG, WARN, error, etc.
 --- e.g. table.print(categories)
 ---      table.print(categories, 'categories')
 ---      table.print(categories, 'categories', 'WARN')
