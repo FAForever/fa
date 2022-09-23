@@ -178,8 +178,6 @@ Prop = Class(moho.prop_methods) {
             return
         end
 
-        -- todo: add check if prop is in playable area
-
         -- construct sync data
         local data = self.SyncData
 
