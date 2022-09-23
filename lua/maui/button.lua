@@ -3,8 +3,23 @@ local Dragger = import('/lua/maui/dragger.lua').Dragger
 local UIUtil = import('/lua/ui/uiutil.lua')
 
 ---@class Button : Bitmap
+---@field mNormal FileName
+---@field mActive FileName
+---@field mHighlight FileName
+---@field mDisabled FileName
+---@field mMouseOver boolean
+---@field mClickCue string
+---@field mRolloverCue string
 Button = Class(Bitmap) {
-
+    ---@param self Button
+    ---@param parent Control
+    ---@param normal FileName
+    ---@param active FileName
+    ---@param highlight FileName
+    ---@param disabled FileName
+    ---@param clickCue FileName
+    ---@param rolloverCue any
+    ---@param frameRate any
     __init = function(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
         Bitmap.__init(self, parent, normal)
         self.mNormal = normal
