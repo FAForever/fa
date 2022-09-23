@@ -578,7 +578,6 @@ end
 ---InitializeArmies
 function InitializeArmies()
     -- globals to locals
-    local import = import
     local GetArmyBrain = GetArmyBrain
     local SetArmyEconomy = SetArmyEconomy
     local SetArmyColor = SetArmyColor
@@ -590,7 +589,7 @@ function InitializeArmies()
 
     local armySetups = ScenarioInfo.ArmySetup
     local civOpt = ScenarioInfo.Options.CivilianAlliance
-    local revealCivilians = ScenarioInfo.Options['RevealCivilians'] == 'Yes'
+    local revealCivilians = ScenarioInfo.Options.RevealCivilians == "Yes"
     local scenarioArmies = Scenario.Armies
     local tblArmy = ListArmies()
     local shouldCreateInitial = ShouldCreateInitialArmyUnits()
@@ -606,8 +605,6 @@ function InitializeArmies()
             local setup = armySetups[strArmy]
             local brain = GetArmyBrain(strArmy)
 
-            --LOG('*DEBUG: InitializeArmies, army = ', strArmy)
-
             local econ = tblData.Economy
             SetArmyEconomy(strArmy, econ.mass, econ.energy)
 
@@ -618,11 +615,11 @@ function InitializeArmies()
 
             local armyIsCiv = setup.Civilian
 
-            if armyIsCiv and civOpt ~= 'neutral' and strArmy ~= 'NEUTRAL_CIVILIAN' then -- give enemy civilians darker color
+            if armyIsCiv and civOpt ~= "neutral" and strArmy ~= "NEUTRAL_CIVILIAN" then -- give enemy civilians darker color
                 SetArmyColor(strArmy, 255, 48, 48) -- non-player red color for enemy civs
             end
 
-            if (not armyIsCiv and shouldCreateInitial) or (armyIsCiv and civOpt ~= 'removed') then
+            if (not armyIsCiv and shouldCreateInitial) or (armyIsCiv and civOpt ~= "removed") then
                 local commander = not armyIsCiv
                 local cdrUnit
                 tblGroups[strArmy], cdrUnit = CreateInitialArmyGroup(strArmy, commander)
@@ -632,52 +629,47 @@ function InitializeArmies()
                 end
             end
 
-            local wreckageGroup = FindUnitGroup('WRECKAGE', tblData.Units)
+            local wreckageGroup = FindUnitGroup("WRECKAGE", tblData.Units)
             if wreckageGroup then
-			    local _, tblResult, _ = CreatePlatoons(strArmy, wreckageGroup)
-				for _, unit in tblResult do
-					CreateWreckageUnit(unit)
-				end
+			    local _, tblResult = CreatePlatoons(strArmy, wreckageGroup)
+                for _, unit in tblResult do
+                    CreateWreckageUnit(unit)
+                end
             end
 
             ----[ irumsey                                                         ]--
             ----[ Temporary defaults.  Make sure some fighting will break out.    ]--
-            for iEnemy, strEnemy in tblArmy do
-                local enemySetup = armySetups[strEnemy]
-                local enemyIsCiv = enemySetup.Civilian
-                local a, e = iArmy, iEnemy
-                local state = 'Enemy'
-
-                if a ~= e then
-                    if armyIsCiv or enemyIsCiv then
-                        if civOpt == 'neutral' or strArmy == 'NEUTRAL_CIVILIAN' or strEnemy == 'NEUTRAL_CIVILIAN' then
-                            state = 'Neutral'
-                        end
-
-                        if revealCivilians and enemySetup.Human then
-                            ForkThread(function()
-                                WaitSeconds(0.1)
-                                local real_state = IsAlly(a, e) and 'Ally' or IsEnemy(a, e) and 'Enemy' or 'Neutral'
-
-                                brain:SetupArmyIntelTrigger({
-                                    Category = categories.ALLUNITS,
-                                    Type = 'LOSNow',
-                                    Value = true,
-                                    OnceOnly = true,
-                                    TargetAIBrain = brain,
-                                    CallbackFunction = function()
-                                        SetAlliance(a, e, real_state)
-                                    end,
-                                })
-                                SetAlliance(a, e, 'Ally')
-                            end)
-                        end
+            for iEnemy, _ in tblArmy do
+                -- only do it once for each pair
+                if iEnemy >= iArmy then
+                    continue
+                end
+                local state = "Enemy"
+                if armyIsCiv then
+                    if civOpt == "neutral" or strArmy == "NEUTRAL_CIVILIAN" then
+                        state = "Neutral"
                     end
 
-                    if state then
-                        LocalSetAlliance(a, e, state)
+                    if revealCivilians then
+                        ForkThread(function(civ, army)
+                            WaitSeconds(0.1)
+
+                            local real_state = IsAlly(civ, army) and "Ally" or IsEnemy(civ, army) and "Enemy" or "Neutral"
+                            GetArmyBrain(army):SetupArmyIntelTrigger({
+                                Category = categories.ALLUNITS,
+                                Type = "LOSNow",
+                                Value = true,
+                                OnceOnly = true,
+                                TargetAIBrain = GetArmyBrain(civ),
+                                CallbackFunction = function()
+                                    SetAlliance(civ, army, real_state)
+                                end,
+                            })
+                            SetAlliance(civ, army, "Ally")
+                        end, iArmy, iEnemy)
                     end
                 end
+                LocalSetAlliance(iArmy, iEnemy, state)
             end
         end
     end
@@ -728,9 +720,6 @@ function InitializeScenarioArmies()
             local setup = armySetups[strArmy]
             local brain = GetArmyBrain(strArmy)
 
-            LOG('*DEBUG: InitializeScenarioArmies, army = ', strArmy)
-
-
             local econ = tblData.Economy
             SetArmyEconomy(strArmy, econ.mass, econ.energy)
 
@@ -761,11 +750,11 @@ function InitializeScenarioArmies()
                 tblGroups[strArmy], cdr = CreateInitialArmyGroup(strArmy)
             end
 
-            local wreckageGroup = FindUnitGroup('WRECKAGE', tblData.Units)
+            local wreckageGroup = FindUnitGroup("WRECKAGE", tblData.Units)
             if wreckageGroup then
-			    local _, tblResult, _ = CreatePlatoons(strArmy, wreckageGroup)
-				for _, unit in tblResult do
-					CreateWreckageUnit(unit)
+                local _, tblResult = CreatePlatoons(strArmy, wreckageGroup)
+                for _, unit in tblResult do
+                    CreateWreckageUnit(unit)
 				end
             end
 

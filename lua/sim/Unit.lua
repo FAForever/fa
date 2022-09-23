@@ -338,6 +338,10 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- Returns 4 numbers: skirt x0, skirt z0, skirt.x1, skirt.z1
     ---@param self Unit
+    ---@return number x0
+    ---@return number z0
+    ---@return number x1
+    ---@return number z1
     GetSkirtRect = function(self)
         local x, y, z = self:GetPositionXYZ()
         local fx = x - self.Footprint.SizeX * .5
@@ -379,7 +383,7 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     ---@param fn function
     ---@param ... any
-    ---@return thread
+    ---@return thread | nil
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))

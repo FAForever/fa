@@ -117,14 +117,20 @@ local function IsSimpleClass(arg)
     return arg.n == 1 and getmetatable(arg[1]) == emptyMetaTable
 end
 
----@class fa-class
----@operator call: fun(...): table
+---@class fa-class : function
+---@operator call(...): table
 ---@field __init? fun(self, ...)
 ---@field __post_init? fun(self, ...)
 
+---@class State
+
+---@class fa-class-state : fa-class
+---@field __State true
+---@field __StateIdentifier number
+
 --- Prepares the construction of a state, , referring to the paragraphs of text at the top of this file.
 local StateIdentifier = 0
----@generic T: fa-class
+---@generic T: fa-class-state
 ---@param ... T
 ---@return T
 function State(...)
@@ -428,15 +434,12 @@ ClassFactory = {
 
         -- call class initialisation functions, if they exist
         local initfn = self.__init
+        if initfn then
+            initfn(instance, unpack(arg))
+        end
         local postinitfn = self.__post_init
-        if initfn or postinitfn then
-            if initfn then
-                initfn(instance, unpack(arg))
-            end
-
-            if postinitfn then
-                postinitfn(instance, unpack(arg))
-            end
+        if postinitfn then
+            postinitfn(instance, unpack(arg))
         end
 
         return instance
@@ -445,7 +448,7 @@ ClassFactory = {
 
 --- Switches up the sate of a class instance by inserting the new state between the instance and its class
 ---@param instance table The current instance we want to switch states for
----@param newState State the state we want to insert between the instance and its base class
+---@param newstate State the state we want to insert between the instance and its base class
 function ChangeState(instance, newstate)
 
     -- call on-exit function
