@@ -145,7 +145,7 @@ local WorldLabel = Class(Group) {
 ---@param b UIReclaimDataPoint
 ---@return boolean
 local function CompareMass(a, b)
-    return a.mass < b.mass
+    return a.mass > b.mass
 end
 
 ---@type number
