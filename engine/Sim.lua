@@ -174,7 +174,7 @@ end
 function CreateBuilderArmController(unit, turretBone, barrelBone, aimBone)
 end
 
---- Creates a collision detection manipulator, calls the function `self.OnAnimTerrainCollision(self, bone, x, y, z)`
+--- Creates a collision detection manipulator, calls the function `self:OnAnimTerrainCollision(bone, x, y, z)`
 --- when a bone that is being watched collides with the terrain
 ---@param unit Unit
 ---@return moho.CollisionManipulator
@@ -1225,7 +1225,7 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- Instantly moves an entity to a location
----@param entity Object
+---@param object Object
 ---@param location Vector
 ---@param orientation? Vector
 function Warp(object, location, orientation)

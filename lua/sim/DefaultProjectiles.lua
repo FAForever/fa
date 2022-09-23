@@ -106,13 +106,13 @@ NukeProjectile = Class(NullShell) {
     MovementThread = function(self)
         local launcher = self:GetLauncher()
 		self.Nuke = true
-        self.CreateEffects(self, self.InitialEffects, self.Army, 1)
+        self:CreateEffects(self.InitialEffects, self.Army, 1)
         self:TrackTarget(false)
         WaitSeconds(2.5) -- Height
         self:SetCollision(true)
-        self.CreateEffects(self, self.LaunchEffects, self.Army, 1)
+        self:CreateEffects(self.LaunchEffects, self.Army, 1)
         WaitSeconds(2.5)
-        self.CreateEffects(self, self.ThrustEffects, self.Army, 3)
+        self:CreateEffects(self.ThrustEffects, self.Army, 3)
         WaitSeconds(2.5)
         self:TrackTarget(true) -- Turn ~90 degrees towards target
         self:SetDestroyOnWater(true)

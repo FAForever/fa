@@ -365,7 +365,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
         return mods.activated
     end
-    UIUtil.MakeInputModal(dialogContent, function() SaveButton.OnClick(SaveButton) end, function() SaveButton.OnClick(SaveButton) end)
+    UIUtil.MakeInputModal(dialogContent, function() SaveButton:OnClick() end, function() SaveButton:OnClick() end)
 
     RefreshModsList()
     
