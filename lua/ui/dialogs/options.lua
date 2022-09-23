@@ -397,7 +397,7 @@ function CreateDialog(over, exitBehavior)
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
 
-    UIUtil.MakeInputModal(dialog, function() okBtn.OnClick(okBtn) end, function() dialog.cancelBtn.OnClick(dialog.cancelBtn) end)
+    UIUtil.MakeInputModal(dialog, function() okBtn:OnClick() end, function() dialog.cancelBtn:OnClick() end)
 
     -- set up option grid
     local elementWidth, elementHeight = GetTextureDimensions(UIUtil.UIFile('/dialogs/options-02/content-box_bmp.dds'))

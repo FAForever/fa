@@ -2056,7 +2056,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Flying bits of metal and whatnot. More bits for more overkill.
         if self.ShowUnitDestructionDebris and overkillRatio then
-            self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
+            self:CreateUnitDestructionDebris(true, true, overkillRatio > 2)
         end
 
         if shallSink then
@@ -2328,7 +2328,7 @@ Unit = Class(moho.unit_methods) {
     GetWeaponByLabel = function(self, label)
 
         -- if we're sinking then all death weapons should already have been applied
-        if self.Sinking or self.BeenDestroyed(self) then 
+        if self.Sinking or self:BeenDestroyed() then 
             return nil
         end
 
@@ -5223,7 +5223,7 @@ Unit = Class(moho.unit_methods) {
         -- end
 
         -- call the old function
-        self.UpdateBuildRestrictions(self)
+        self:UpdateBuildRestrictions()
     end,
 
     ---@param aiBrain AIBrain

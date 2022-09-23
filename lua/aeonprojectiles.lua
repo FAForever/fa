@@ -502,7 +502,7 @@ AAAQuantumDisplacementCannonProjectile = Class(NullShell) {
         NullShell.OnCreate(self)
 
         self.TrailEmitters = {}
-        self.CreateTrailFX(self)
+        self:CreateTrailFX()
         self:ForkThread(self.UpdateThread)
     end,
 
@@ -537,13 +537,13 @@ AAAQuantumDisplacementCannonProjectile = Class(NullShell) {
     ---@param self AAAQuantumDisplacementCannonProjectile
     UpdateThread = function(self)
         WaitSeconds(0.3)
-        self.DestroyTrailFX(self)
-        self.CreateTeleportFX(self, self.Army)
+        self:DestroyTrailFX()
+        self:CreateTeleportFX(self.Army)
         local emit = CreateEmitterOnEntity(self, self.Army, self.FxInvisible)
         WaitSeconds(0.45)
         emit:Destroy()
-        self.CreateTeleportFX(self)
-        self.CreateTrailFX(self)
+        self:CreateTeleportFX()
+        self:CreateTrailFX()
     end,
 }
 
