@@ -113,12 +113,13 @@ local WorldLabel = Class(Group) {
             self.oldMass = r.mass
             self:AdjustToValue(r.mass)
             self:OnFrame(0)
-
-            local view = self.parent.view
-            local proj = view:Project(self.position)
-            self.Left:SetValue(proj.x - 0.5 * self.Width())
-            self.Top:SetValue(proj.y - 0.5 * self.Height() + 1)
         end
+
+        -- always reproject
+        local view = self.parent.view
+        local proj = view:Project(self.position)
+        self.Left:SetValue(proj.x - 0.5 * self.Width())
+        self.Top:SetValue(proj.y - 0.5 * self.Height() + 1)
     end,
 
     --- Called each frame by the engine
