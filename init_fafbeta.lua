@@ -88,7 +88,6 @@ deprecatedMods["DynamicReclaimGrouping"] = true
 deprecatedMods["EzReclaim"] = true
 deprecatedMods["OnScreenReclaimCounter"] = true
 deprecatedMods["ORV"] = true
-deprecatedMods["ReclaimFix"] = true
 deprecatedMods["SmartReclaimSupport"] = true
 
 -- typical FA packages
