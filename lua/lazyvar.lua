@@ -2,6 +2,8 @@
 -- LazyVar module
 --
 
+---@alias Lazy<T> T | LazyVar<T> | fun(): T
+
 local TableInsert = table.insert
 
 local iscallable = iscallable
@@ -16,19 +18,20 @@ ExtendedErrorMessages = false
 local EvalContext = nil
 local WeakKeyMeta = { __mode = 'k' }
 
----@class LazyVar : Destroyable, OnDirtyListener
----@operator call: fun(): any
----@field [1]? any
----@field busy? boolean
----@field compute function
----@field trace? string
----@field used_by table<LazyVar, boolean>
----@field uses table<LazyVar, boolean>
----@field OnDirty? function
+-- note: generic classes don't have full support yet, so we need to add all fields and methods to
+-- the parent table--otherwise, generic instances won't have *anything*
+-- yes, it's truly awful, and only partially works since generic instances see methods as fields
+-- and don't get the call operator
+
+--- A class supporting lazy computation of a value through a system of dependencies
+---@class LazyVar<T> : Destroyable, OnDirtyListener, function, {[1]: T?, busy: true?, trace: string?, used_by: table<LazyVar<any>, boolean>, uses: table<LazyVar<any>, boolean>, OnDirty: function?, compute: (fun(): T), __call: (fun(): T), SetDirty: (fun(self: LazyVar<T>, onDirtyList: OnDirtyListener[])), SetFunction: (fun(self: LazyVar<T>, func: LazyVar<T> | fun(): T)), SetValue: (fun(self: LazyVar<T>, value: T)), Set: (fun(self: LazyVar<T>, value: T | LazyVar<T> | fun(): T): T), Destroy: (fun(self: LazyVar<T>))}
+---@operator call: any
 local LazyVarMetaTable = {}
 LazyVarMetaTable.__index = LazyVarMetaTable
 
----@return any
+---@generic T
+---@param self LazyVar<T>
+---@return T
 function LazyVarMetaTable:__call()
     local value = self[1]
     if value == nil then
@@ -62,7 +65,7 @@ function LazyVarMetaTable:__call()
             self[1] = value
         else
             local trace = self.trace
-            if self.compute then
+            if iscallable(self.compute) then
                 trace = trace or "[Set lazyvar.ExtendedErrorMessages for extra trace info]"
             else
                 trace = trace or ""
@@ -84,6 +87,8 @@ function LazyVarMetaTable:__call()
 end
 
 --- Resets this lazyvar's value and adds its `OnDirtyListener`s to the list
+---@generic T
+---@param self LazyVar<T>
 ---@param onDirtyList OnDirtyListener[]
 function LazyVarMetaTable:SetDirty(onDirtyList)
     if self[1] ~= nil then
@@ -97,7 +102,9 @@ function LazyVarMetaTable:SetDirty(onDirtyList)
     end
 end
 
----@param func function
+---@generic T
+---@param self LazyVar<T> 
+---@param func LazyVar<T> | fun(): T
 function LazyVarMetaTable:SetFunction(func)
     if func == nil then
         error("You are attempting to set a LazyVar's evaluation function to nil, don't do that!")
@@ -132,6 +139,9 @@ function LazyVarMetaTable:SetFunction(func)
 end
 
 --- Sets the value
+---@generic T
+---@param self LazyVar<T>
+---@param value T
 function LazyVarMetaTable:SetValue(value)
     if value == nil then
         error("You are attempting to set a LazyVar's value to nil, don't do that!")
@@ -174,6 +184,9 @@ function LazyVarMetaTable:SetValue(value)
     end
 end
 
+---@generic T
+---@param self LazyVar<T>
+---@param value T | LazyVar<T> | fun(): T
 function LazyVarMetaTable:Set(value)
     if value == nil then
         error("You are attempting to set a LazyVar to nil, don't do that!")
@@ -186,6 +199,8 @@ function LazyVarMetaTable:Set(value)
     end
 end
 
+---@generic T
+---@param self LazyVar<T>
 function LazyVarMetaTable:Destroy()
     self.OnDirty = nil
     self.compute = nil
@@ -204,8 +219,9 @@ function LazyVarMetaTable:Destroy()
     end
 end
 
----@param initial? any defaults to `0`
----@return LazyVar
+---@generic T
+---@param initial? T defaults to `0`
+---@return LazyVar<T>
 function Create(initial)
     if initial == nil then
         initial = 0

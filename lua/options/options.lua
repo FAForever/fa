@@ -73,12 +73,12 @@ optionsOrder = {
 
 local Prefs = import('/lua/user/prefs.lua')
 local SetMusicVolume = import('/lua/UserMusic.lua').SetMusicVolume
-local savedMasterVol = false
-local savedFXVol = false
-local savedMusicVol = false
-local savedVOVol = false
+local savedMasterVol = nil
+local savedFXVol = nil
+local savedMusicVol = nil
+local savedVOVol = nil
 local nomusicSwitchSet = HasCommandLineArg("/nomusic")
-local savedBgMovie = false
+local savedBgMovie = nil
 local noMovieSwitchSet = HasCommandLineArg("/nomovie")
 
 function PlayTestSound()
@@ -86,7 +86,7 @@ function PlayTestSound()
     PlaySound(sound)
 end
 
-local voiceHandle = false
+local voiceHandle = nil
 function PlayTestVoice()
     if not voiceHandle then
         local sound = Sound{ Bank = 'XGG', Cue = 'Computer_Computer_MissileLaunch_01351' }
@@ -1195,7 +1195,7 @@ options = {
 
                     aaoptions = GetAntiAliasingOptions()
 
-                    aamax = 0
+                    aahigh = 0
                     aamed = 0
                     if 0 < table.getn(aaoptions) then
                         aahigh = aaoptions[table.getn(aaoptions)]

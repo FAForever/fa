@@ -77,7 +77,7 @@ ChatArea = Class(Group) {
 
         local chatText = authorName .. messageText
         local customAdvanceFunction = function(chatText)
-            return self.AdvanceFunction(self, chatText, messageStyle)
+            return self:AdvanceFunction(chatText, messageStyle)
         end
 
         local wrapLines = Text.WrapText(chatText, self.Width() - self.Style.padding.left - self.Style.padding.right,

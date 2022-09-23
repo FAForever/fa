@@ -40,7 +40,7 @@ BuilderManager = ClassSimple {
     ---@param self BuilderManager
     ---@param fn function
     ---@param ... any
-    ---@return thread
+    ---@return thread|nil
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))

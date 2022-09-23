@@ -19,6 +19,35 @@ function Create(parent)
     return panel
 end
 
+function SetLayout()
+    Layouter(panel)
+        :AtLeftIn(panel.parent, panel:LoadPosition().left)
+        -- set to uncollapsed position; lets us layout the collapse button and setup the height
+        -- so we know where the panel's actual inital position is
+        :Top(panel.parent.Top() + LayoutHelpers.ScaleNumber(4) + panel.t.Height())
+        :Width(panel.DefaultWidth)
+        :Height(function()
+            local panel = panel
+            local Scale = LayoutHelpers.ScaleNumber
+            local height = Scale(-4) + panel.label.Height() + Scale(5) + panel.votes.Height()
+            -- make sure these register as a dependency
+            local voteHeight = panel.buttonAccept.Height()
+            local progHeight = panel.progressBarBG.Height()
+            if panel.canVote() then
+                height = height + Scale(5) + voteHeight
+                if panel.startTime() > 0 then
+                    height = height + Scale(2) + progHeight
+                end
+            elseif panel.startTime() > 0 then
+                height = height + Scale(10) + progHeight
+            end
+            return height + Scale(-2)
+        end)
+        :Hide()
+        :End()
+    panel.Top:Set(panel.parent.Top() - panel:TotalHeight())
+end
+
 function RequestHandler(data)
     if data.CannotRequest ~= nil then
         import('/lua/ui/game/diplomacy.lua').UpdateCannotRequestRecall(data.CannotRequest)
@@ -51,48 +80,31 @@ RecallPanel = Class(NinePatch.NinePatch) {
         self.progressBarBG = UIUtil.CreateBitmapColor(self, "Gray")
         self.progressBar = UIUtil.CreateBitmapColor(self.progressBarBG, "Yellow")
 
+        self.progressBarBG.Height:Set(LayoutHelpers.ScaleNumber(4))
+        self.votes.Height:Set(LayoutHelpers.ScaleNumber(1))
+
         self.votes.blocks = 0
         self.canVote = Lazyvar(true)
         self.startTime = Lazyvar(-9999)
-        self:Layout()
+
         self:Logic()
     end;
 
     Layout = function(self)
-        Layouter(self)
-            :AtLeftIn(self.parent, self:LoadPosition().left)
-            :Top(self.parent.Top() + LayoutHelpers.ScaleNumber(4) + self.t.Height())
-            :Width(self.DefaultWidth)
-            :Height(function()
-                local Scale = LayoutHelpers.ScaleNumber
-                local height = Scale(-4) + self.label.Height() + Scale(5) + self.votes.Height()
-                -- make sure these register as a dependency
-                local voteHeight = self.buttonAccept.Height()
-                local progHeight = self.progressBarBG.Height()
-                if self.canVote() then
-                    height = height + Scale(5) + voteHeight
-                    if self.startTime() > 0 then
-                        height = height + Scale(2) + progHeight
-                    end
-                elseif self.startTime() > 0 then
-                    height = height + Scale(10) + progHeight
-                end
-                return height + Scale(-2)
-            end)
-            :Hide()
-
         Layouter(self.collapseArrow)
             :Top(self.t.Top() - 7)
             :AtHorizontalCenterIn(self)
             :Over(self, 10)
             :Disable()
             :Hide()
+            :End()
 
-        Layouter(self.label)
+        local label = Layouter(self.label)
             :AtTopCenterIn(self, -4)
+            :End()
 
-        Layouter(self.votes)
-            :AnchorToBottom(self.label, 5)
+        local votes = Layouter(self.votes)
+            :AnchorToBottom(label, 5)
             :AtHorizontalCenterIn(self)
             :Width(function() return self.Width() - LayoutHelpers.ScaleNumber(16) end)
             :Height(function()
@@ -100,31 +112,34 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 if vote then return vote.Height() end
                 return 1
             end)
+            :End()
 
-        Layouter(self.buttonAccept)
+        local buttonAccept = Layouter(self.buttonAccept)
             :AtLeftIn(self, 8)
-            :AnchorToBottom(self.votes, 5)
+            :AnchorToBottom(votes, 5)
+            :End()
 
-        Layouter(self.buttonVeto)
+        local buttonVeto = Layouter(self.buttonVeto)
             :AtRightIn(self, 8)
-            :AnchorToBottom(self.votes, 5)
+            :AnchorToBottom(votes, 5)
+            :End()
 
-        Layouter(self.progressBarBG)
-            :AtBottomCenterIn(self, -2)
+        local progressBarBG = Layouter(self.progressBarBG)
             :Width(function() return self.Width() - LayoutHelpers.ScaleNumber(16) end)
             :Height(4)
+            :AtBottomCenterIn(self, -2)
+            :End()
 
         Layouter(self.progressBar)
-            :AtHorizontalCenterIn(self.progressBarBG)
-            :Top(self.progressBarBG.Top)
-            :Bottom(self.progressBarBG.Bottom)
-            :Width(function() return (self.Width() - LayoutHelpers.ScaleNumber(16)) * 0.42 end)
-            :Over(self.progressBarBG, 10)
+            :AtHorizontalCenterIn(progressBarBG)
+            :Top(progressBarBG.Top)
+            :Bottom(progressBarBG.Bottom)
+            :Width(function() return (self.Width() - LayoutHelpers.ScaleNumber(16)) end)
+            :Over(progressBarBG, 10)
+            :End()
 
-        self.Top:Set(self.parent.Top() - self:TotalHeight())
-
-        Tooltip.AddButtonTooltip(self.buttonAccept, "dip_recall_request_accept")
-        Tooltip.AddButtonTooltip(self.buttonVeto, "dip_recall_request_veto")
+        Tooltip.AddButtonTooltip(buttonAccept, "dip_recall_request_accept")
+        Tooltip.AddButtonTooltip(buttonVeto, "dip_recall_request_veto")
     end;
 
     LayoutBlocks = function(self, blocks)
@@ -396,7 +411,6 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 collapse:Hide()
             else
                 collapse:Show()
-                SPEW("SHOWING")
             end
         end
         return supress

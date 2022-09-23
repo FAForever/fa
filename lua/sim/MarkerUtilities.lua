@@ -75,8 +75,8 @@ function GetMarkersByType(type)
     end
 
     -- prepare cache population
-    ms = { }
-    n = 1
+    local ms = { }
+    local n = 1
 
     -- find all the relevant markers
     for k, marker in AllMarkers do
@@ -168,8 +168,8 @@ function GetMarkersInChain(name)
     end
 
     -- prepare cache population
-    ms = { }
-    n = 1
+    local ms = { }
+    local n = 1
 
     -- find all the relevant markers
     for k, elem in chain.Markers do 
@@ -394,7 +394,7 @@ do
         OldCreateResourceDeposit(type, x, y, z, size)
 
         -- commented values are used by the editor and not by the game
-        local marker = false
+        local marker = nil
         if type == 'Mass' then
             marker = {
                 size = size,

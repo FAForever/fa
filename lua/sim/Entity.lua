@@ -33,7 +33,7 @@ Entity = Class(moho.entity_methods) {
     ---@param self Entity
     ---@param spec EntitySpec
     __post_init = function(self, spec)
-        self.OnCreate(self, spec)
+        self:OnCreate(spec)
     end,
 
     -- kept for backwards compatibility with mods
