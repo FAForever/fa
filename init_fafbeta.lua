@@ -79,6 +79,18 @@ deprecatedMods["additionalCameraStuff"] = true
 deprecatedMods["RUI"] = true
 deprecatedMods = LowerHashTable(deprecatedMods)
 
+-- as per #4232 the reclaim view is completely overhauled
+deprecatedMods["Advanced Reclaim&Selection Info"] = true
+deprecatedMods["AdvancedReclaimInfo"] = true
+deprecatedMods["BetterReclaimView"] = true
+deprecatedMods["disableReclaimUI"] = true
+deprecatedMods["DynamicReclaimGrouping"] = true
+deprecatedMods["EzReclaim"] = true
+deprecatedMods["OnScreenReclaimCounter"] = true
+deprecatedMods["ORV"] = true
+deprecatedMods["ReclaimFix"] = true
+deprecatedMods["SmartReclaimSupport"] = true
+
 -- typical FA packages
 local allowedAssetsScd = { }
 allowedAssetsScd["units.scd"] = true
