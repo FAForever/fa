@@ -450,7 +450,7 @@ function ChangeState(instance, newstate)
 
     -- call on-exit function
     if instance.OnExitState then
-        instance.OnExitState(instance)
+        instance:OnExitState()
     end
 
     -- keep track of the original thread and forget about it inside the object
@@ -465,7 +465,7 @@ function ChangeState(instance, newstate)
 
     -- call on-enter function
     if instance.OnEnterState then
-        instance.OnEnterState(instance)
+        instance:OnEnterState()
     end
 
     -- start the new main thread if it wasn't already created during an OnEnterState
