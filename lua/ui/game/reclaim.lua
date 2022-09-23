@@ -51,12 +51,6 @@ local totalReclaimData = 0
 ---@type WorldLabel[]
 local LabelPool = {}
 
----@type number
-local OldZoom
-
----@type Vector
-local OldPosition
-
 ---@type boolean
 local ReclaimChanged = true
 local PlayableArea
@@ -93,9 +87,24 @@ local WorldLabel = Class(Group) {
         self:SetNeedsFrameUpdate(true)
     end,
 
+    --- Adjusts the world label based on the value it represents
+    ---@param self WorldLabel
+    ---@param value any
+    AdjustToValue = function(self, value)
+        if value < 100 then
+            self.text:SetColor('ffc7ff8f')
+        elseif value < 300 then
+            self.text:SetColor('FFFFEE8F')
+        elseif value < 1000 then
+            self.text:SetColor('FFFFBA8F')
+        else
+            self.text:SetColor('FFFF6F6F')
+        end
+    end,
+
     --- Updates the reclaim that this label displays
     ---@param self WorldLabel
-    ---@param r any
+    ---@param r UIReclaimDataCombined
     DisplayReclaim = function(self, r)
         if self:IsHidden() then
             self:Show()
@@ -106,6 +115,7 @@ local WorldLabel = Class(Group) {
             local mass = tostring(math.floor(0.5 + r.mass))
             self.text:SetText(mass)
             self.oldMass = r.mass
+            self:AdjustToValue(r.mass)
         end
     end,
 
@@ -502,10 +512,12 @@ function InitReclaimGroup(view)
         rgroup:SetNeedsFrameUpdate(true)
         rgroup._prevPos = camera:GetFocusPosition()
         rgroup.OnFrame = function(self, delta)
+            local zoom = camera:GetZoom()
             local curPos = camera:GetFocusPosition()
-            local prevPos = self._prevPos
-            self.isMoving = curPos[1] ~= prevPos[1] or curPos[2] ~= prevPos[2] or curPos[3] ~= prevPos[3]
+            self.isMoving = curPos[1] ~= self._prevPos[1] or curPos[2] ~= self._prevPos[2] or
+                curPos[3] ~= self._prevPos[3] or zoom ~= self._prevZoom
             self._prevPos = curPos
+            self._prevZoom = zoom
         end
     else
         view.ReclaimGroup:Show()
@@ -520,6 +532,12 @@ function ShowReclaimThread(watch_key)
 
     InitReclaimGroup(view)
 
+    ---@type number
+    local OldZoom = 0
+
+    ---@type Vector
+    local OldPosition = {}
+
     while view.ShowingReclaim and (not watch_key or IsKeyDown(watch_key)) do
         if not IsDestroyed(camera) then
             local zoom = camera:GetZoom()
@@ -529,7 +547,8 @@ function ShowReclaimThread(watch_key)
                 or OldZoom ~= zoom
                 or OldPosition[1] ~= position[1]
                 or OldPosition[2] ~= position[2]
-                or OldPosition[3] ~= position[3] then
+                or OldPosition[3] ~= position[3]
+            then
                 UpdateLabels()
                 OldZoom = zoom
                 OldPosition = position
