@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell, Evan Pongress
 --* Summary: campaign operations view
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -13,7 +13,6 @@ local Movie = import('/lua/maui/movie.lua').Movie
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Group = import('/lua/maui/group.lua').Group
-local WrapText = import('/lua/maui/text.lua').WrapText
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Button = import('/lua/maui/button.lua').Button
 local Prefs = import('/lua/user/prefs.lua')
@@ -22,13 +21,12 @@ local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
 local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
-local mapErrorDialog = false
-local activePopupButton = false
-local streamThread = false
-local faction = false
-local difficulty = false
-
-local backgrounds = false
+local mapErrorDialog = nil
+local activePopupButton = nil
+local streamThread = nil
+local faction = nil
+local difficulty = nil
+local backgrounds = nil
 
 function CreateBackground(parent)
     local table = {}
@@ -612,3 +610,6 @@ function CreatePopupBackground(parent)
 
     return bg
 end
+
+-- kept for mod backwards compatibility
+local WrapText = import('/lua/maui/text.lua').WrapText
