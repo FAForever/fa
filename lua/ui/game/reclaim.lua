@@ -142,9 +142,6 @@ end
 
 ---@param show boolean
 function OnCommandGraphShow(show)
-    for _, recl in Reclaim do
-        SPEW(recl.mass)
-    end
     do return end
     local view = GetView()
     if view.ShowingReclaim and not CommandGraphActive then return end -- if on by toggle key
@@ -532,20 +529,7 @@ local function DisplayReclaim(parent, reclaimData, reclaimDataSize, labelPool, l
     end
     t = GetSystemTimeSeconds() - timer
 end
-for _, line in debug.listcode(function(a, b)
-    if a == nil or IsDestroyed(a) then
-        b = b + 1
-    else
-        b = b - 1
-    end
-    if not a or IsDestroyed(a) then
-        b = b + 1
-    else
-        b = b - 1
-    end
-end) do
-    SPEW(line)
-end
+
 function UpdateLabels()
     local timer = GetSystemTimeSeconds()
     local dataPool, dataPoolSize, maxLabels = DataPool, DataPoolSize, MaxLabels
@@ -553,7 +537,6 @@ function UpdateLabels()
     local view = GetView()
 
     local reclaim, count = GetInViewReclaim(view, Reclaim, MinAmount)
-    SPEW(count .. " reclaimables out of " .. (table.getsize(Reclaim)))
 
     if DoCombineLabels() then
         local size = CombineReclaim(reclaim, dataPool, LastDataSize)
@@ -573,7 +556,6 @@ function UpdateLabels()
     if count > LabelPoolSize then
         LabelPoolSize = count
     end
-    SPEW((t / (GetSystemTimeSeconds() - timer) * 100) .. "% time used to display")
 end
 
 ---@param view WorldView
