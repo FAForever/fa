@@ -114,9 +114,9 @@ io = nil
 os = nil
 
 --- Returns if the table is empty
----@param table table
+---@param tbl table
 ---@return boolean
-function table.empty2(table)
+function table.empty2(tbl)
 end
 
 --- Returns the size of a list
@@ -128,9 +128,9 @@ end
 table.getsize = nil
 
 --- Returns the total number of keys in a table
----@param table table
+---@param tbl table
 ---@return integer
-function table.getsize2(table)
+function table.getsize2(tbl)
 end
 
 serialize = {}

@@ -70,28 +70,36 @@ end
 -- Dimensional functions
 ----------
 
---- Sets fixed width of a control, scaled by the pixel scale factor
+--- Sets fixed width of a control, scaled by the pixel scale factor if not a function
 ---@param control Control
----@param width? number no change if nil
+---@param width? number | fun(): number no change if nil
 function SetWidth(control, width)
     if width then
-        control.Width:SetValue(MathFloor(width * pixelScaleFactor))
+        if iscallable(width) then
+            control.Width:SetFunction(width)
+        else
+            control.Width:SetValue(MathFloor(width * pixelScaleFactor))
+        end
     end
 end
 
---- Sets fixed height of a control, scaled by the pixel scale factor
+--- Sets fixed height of a control, scaled by the pixel scale factor if not a function
 ---@param control Control
----@param height? number no change if nil
+---@param height? number | fun(): number no change if nil
 function SetHeight(control, height)
     if height then
-        control.Height:SetValue(MathFloor(height * pixelScaleFactor))
+        if iscallable(height) then
+            control.Height:SetFunction(height)
+        else
+            control.Height:SetValue(MathFloor(height * pixelScaleFactor))
+        end
     end
 end
 
---- Sets fixed dimensions of a control, scaled by the pixel scale factor
+--- Sets fixed dimensions of a control, scaled by the pixel scale factor if functcions
 ---@param control Control
----@param width? number no change if nil
----@param height? number no change if nil
+---@param width? number | fun(): number no change if nil
+---@param height? number | fun(): number  no change if nil
 function SetDimensions(control, width, height)
     SetWidth(control, width)
     SetHeight(control, height)
@@ -1348,6 +1356,10 @@ local LayouterAttributeControl = ClassSimple {
         return self
     end;
 
+    Dimensions = function(self, width, height)
+
+    end;
+
     --- Sets the width of the control to a texture
     ---@generic T : LayouterAttributeControl
     ---@param self T
@@ -2194,18 +2206,22 @@ local LayouterAttributeSelection = ClassSimple {
 
 ---@class Layouter : LayouterAttributeControl, LayouterAttributeDropShadow, LayouterAttributeEditor, LayouterAttributeTexture, LayouterAttributeSelection
 ---@field layoutControl Control
+---@field transparentControl? Layoutable the layoutable object that will recieve the callbacks; present if different from the layout control
 Layouter = Class(LayouterAttributeControl, LayouterAttributeDropShadow, LayouterAttributeEditor, LayouterAttributeTexture, LayouterAttributeSelection) {
     ---@param self Layouter
     ---@param control Control
     __init = function(self, control)
         if not control then
-            self.layoutControl = false
             return
         end
-        self.layoutControl = GetLayoutControl(control)
         local onLayout = control.OnLayout
         if onLayout then
             onLayout(control)
+        end
+        local layoutControl = GetLayoutControl(control)
+        self.layoutControl = layoutControl
+        if control ~= layoutControl then
+            self.transparentControl = control
         end
     end;
 
@@ -2257,11 +2273,17 @@ Layouter = Class(LayouterAttributeControl, LayouterAttributeDropShadow, Layouter
             end
         end
 
-        local layout = control.Layout or self.L
-        if layout then
-            layout(control)
+        local notifyControl = self.transparentControl
+        if notifyControl then
+            self.transparentControl = nil
+        else
+            notifyControl = control
         end
-        self.layoutControl = false
+        self.layoutControl = nil
+        local layout = notifyControl.Layout
+        if layout then
+            layout(notifyControl)
+        end
 
         return control
     end;
@@ -2296,7 +2318,7 @@ function ReusedLayoutFor(control)
             return reusedLayouter
         else
             -- uh-oh, someone is interlacing the default layouter!
-            WARN(_TRACEBACK(1, "Reused layouter is already in use! (did you forget to call `End()` or use the non-reused version?)"))
+            WARN(_TRACEBACK(1, "Reused layouter is already in use by " .. tostring(control) .. "! (did you forget to call `End()` or use the non-reused version?)"))
             return Layouter(control)
         end
     end

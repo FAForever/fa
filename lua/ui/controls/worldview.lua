@@ -5,19 +5,25 @@
 --* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
+local CommandMode = import('/lua/ui/game/commandmode.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Control = import('/lua/maui/control.lua').Control
+local Ping = import('/lua/ui/game/ping.lua')
+local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import('/lua/ui/uiutil.lua')
+local WorldViewMgr = import('/lua/ui/game/worldview.lua')
+
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Button = import('/lua/maui/button.lua').Button
-local Group = import('/lua/maui/group.lua').Group
+local Control = import('/lua/maui/control.lua').Control
 local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Ping = import('/lua/ui/game/ping.lua')
+local Group = import('/lua/maui/group.lua').Group
 local UserDecal = import('/lua/user/UserDecal.lua').UserDecal
-local WorldViewMgr = import('/lua/ui/game/worldview.lua')
-local Prefs = import('/lua/user/prefs.lua')
+
 local OverchargeCanKill = import('/lua/ui/game/unitview.lua').OverchargeCanKill
-local CommandMode = import('/lua/ui/game/commandmode.lua')
+
+local UnProject = UnProject
+local Vector2 = Vector2
+
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -231,6 +237,28 @@ WorldView = Class(moho.UIWorldView, Control) {
 
         self.Trash = TrashBag()
     end,
+
+    --- Returns the four in-world points at each corner of this view.
+    --- This is an expensive function call, so take care.
+    ---@param self WorldView
+    ---@return Vector topLeft
+    ---@return Vector topRight
+    ---@return Vector bottomRight
+    ---@return Vector bottomLeft
+    UnProjectCorners = function(self)
+        local UnProject = UnProject
+
+        local viewLeft = self.Left()
+        local point = Vector2(viewLeft, self.Top())
+
+        local tl = UnProject(self, point)
+        point[1] = self.Right()
+        local tr = UnProject(self, point)
+        point[2] = self.Bottom()
+        local br = UnProject(self, point)
+        point[1] = viewLeft
+        return tl, tr, br, UnProject(self, point)
+    end;
 
     --- Sets the selection tolerance to ignore everything
     ---@param self any

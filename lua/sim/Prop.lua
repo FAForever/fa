@@ -2,10 +2,13 @@ local PlayReclaimEndEffects = import('/lua/EffectUtilities.lua').PlayReclaimEndE
 
 local minimumLabelMass, minimumLabelEnergy = 10, 10
 
----@class PropSyncData
+
+---@class BaseReclaimData
 ---@field mass number
----@field energy number
 ---@field position Vector
+
+---@class PropSyncData : BaseReclaimData
+---@field energy number
 
 -- upvalue globals for performance
 local type = type

@@ -1267,22 +1267,22 @@ end
 
 
 ---@param parent Control
----@param filename FileName
+---@param filename string
 ---@return Group
 function CreateVertFillGroup(parent, filename)
     local group = Group(parent)
-    local top = CreateBitmap(group, filename .. "_bmp_t.dds")
-    local bottom = CreateBitmap(group, filename .. "_bmp_b.dds")
-    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
 
+    local top = CreateBitmap(group, filename .. "_bmp_t.dds")
     Layouter(top)
         :Over(group, 0)
         :AtLeftTopIn(group)
 
+    local bottom = CreateBitmap(group, filename .. "_bmp_b.dds")
     Layouter(bottom)
         :Over(group, 0)
         :AtLeftBottomIn(group)
 
+    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
     Layouter(middle)
         :Over(group, 0)
         :AtLeftIn(group)
@@ -1298,22 +1298,22 @@ end
 
 
 ---@param parent Control
----@param filename FileName
+---@param filename string
 ---@return Group
 function CreateHorzFillGroup(parent, filename)
     local group = Group(parent)
-    local left = CreateBitmap(group, filename .. "_bmp_l.dds")
-    local right = CreateBitmap(group, filename .. "_bmp_r.dds")
-    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
 
+    local left = CreateBitmap(group, filename .. "_bmp_l.dds")
     Layouter(left)
         :Over(group, 0)
         :AtLeftTopIn(group)
 
+    local right = CreateBitmap(group, filename .. "_bmp_r.dds")
     Layouter(right)
         :Over(group, 0)
         :AtRightTopIn(group)
 
+    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
     Layouter(middle)
         :Over(group, 0)
         :AtTopIn(group)

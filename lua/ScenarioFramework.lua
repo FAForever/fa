@@ -1677,10 +1677,10 @@ end
 
 --- Returns a random entry from a table
 ---@generic T
----@param table table<T>
+---@param tbl table<T>
 ---@return T
-function GetRandomEntry(table)
-    return table[Random(1, table.getn(table))]
+function GetRandomEntry(tbl)
+    return table[Random(1, table.getn(tbl))]
 end
 
 ---

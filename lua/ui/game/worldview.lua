@@ -6,22 +6,34 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
 local Factions = import('/lua/factions.lua').Factions
+local Group = import('/lua/maui/group.lua').Group
+local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import('/lua/ui/uiutil.lua')
 
+
+---@class WorldViewPositionMarker
+---@field army number
+---@field pos Vector
+---@field name string
+---@field faction Faction
+---@field color Color
+---@field views number
+
+---@type table<string, WorldView>
 MapControls = {}
 
-view = false
-viewLeft = false
-viewRight = false
-secondaryView = false
-tertiaryView = false
-local parentForFrame = false
+---@type WorldView, WorldView, WorldView
+view, viewLeft, viewRight = false, false, false
+---@type WorldView, WorldView
+secondaryView, tertiaryView = false, false
 
+---@type WorldViewPositionMarker[]
 positionMarkers = {}
+
+
+local parentForFrame = false
 
 local function CreatePositionMarker(army, worldView)
     local data = positionMarkers[army]
