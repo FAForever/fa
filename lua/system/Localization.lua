@@ -157,13 +157,16 @@ end
 ---@overload fun(str: nil): nil
 --- If `str` is a string with a localization tag, like "<LOC HW1234>Hello World",
 --- returns a localized version of it
----@param str UnlocalizedString
+---@param str UnlocalizedString | number
 ---@return LocalizedString
 function LOC(str)
     -- Note - we use [[foo]] string syntax here instead of "foo", so the localizing
     -- script won't try to mess with *our* strings.
     if str == nil then
         return str
+    end
+    if type(str) == "number" then
+        return tostring(str)
     end
 
     if str:sub(1, 5) ~= [[<LOC ]] then
