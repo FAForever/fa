@@ -1,11 +1,24 @@
 ---@declare-global
+---@diagnostic disable:lowercase-global
 
+-- upvalue globals for performance
+local AudioSetLanguage = AudioSetLanguage
+local DiskFindFiles = DiskFindFiles
+local doscript = doscript
+local exists = exists
+local type = type
+local unpack = unpack
+
+local StringFormat = string.format
+local StringGsub = string.gsub
 local StringSub = string.sub
 
-local loc_table
 
 ---@alias LocalizedString string
 ---@alias UnlocalizedString string | number
+
+---@type table<string, UnlocalizedString>
+local loc_table
 
 -- Special tokens that can be included in a loc string via {g Player} etc. The
 -- Player name gets replaced with the current selected player name.
@@ -17,17 +30,6 @@ local UpLocGlobals = {
     GT = ">"
 }
 LocGlobals = UpLocGlobals
-
--- upvalue globals for performance
-local type = type
-local unpack = unpack
-local exists = exists
-local doscript = doscript
-local DiskFindFiles = DiskFindFiles
-local AudioSetLanguage = AudioSetLanguage
-
--- upvalue string operations for performance
-local StringFormat = string.format
 
 ---@param la Language
 ---@return FileName
@@ -64,7 +66,6 @@ local function loadLanguage(la)
 
     -- reload strings file...
 
-    ---@type table<string, string>
     loc_table = {}
     doscript(dbFilename(la), loc_table)
 
@@ -150,15 +151,15 @@ local function LocSubFn(op, ident)
 end
 
 --- Given some text from the loc DB, recursively apply formatting directives
----@param s string
+---@param s string | number
 ---@return LocalizedString
 function LocExpand(s)
     -- Look for braces {} in text
-    return (s:gsub("{(%w+) ([^{}]*)}", LocSubFn))
+    return (StringGsub(s --[[@as string]], "{(%w+) ([^{}]*)}", LocSubFn))
 end
 
 ---@overload fun(str: nil): nil
---- If `str` is a string with a localization tag, like "<LOC HW1234>Hello World",
+--- If `str` is a string with a localization tag, like `<LOC HW1234>Hello World`,
 --- returns a localized version of it
 ---@param str UnlocalizedString
 ---@return LocalizedString
@@ -169,7 +170,7 @@ function LOC(str)
         return str
     end
 
-    if StringSub(str, 1, 5) ~= [[<LOC ]] then
+    if StringSub(str --[[@as string]], 1, 5) ~= [[<LOC ]] then
         return LocExpand(str)
     end
 
@@ -177,7 +178,7 @@ function LOC(str)
     if not pos then
         -- Missing the closing angle bracket of <LOC> tag
         WARN(_TRACEBACK(2, "String has malformed loc tag: " .. str))
-        return str
+        return str --[[@as string]]
     end
 
     local key = str:sub(6, pos - 1)
@@ -192,19 +193,20 @@ function LOC(str)
     return LocExpand(result)
 end
 
---- Like `string.format`, but applies LOC() to all string args first.
+--- Like `string.format`, but applies LOC() to all string args first
 ---@param ... any
 ---@return LocalizedString
 function LOCF(...)
     for k, v in arg do
-        if type(v) == "string" then
+        local tt = type(v)
+        if tt == "string" or tt == "number" then
             arg[k] = LOC(v)
         end
     end
     return StringFormat(unpack(arg))
 end
 
---- Call `LOC()` on all elements of a table
+--- Calls `LOC()` on all elements of a table
 ---@param tbl table<UnlocalizedString>
 ---@return table<LocalizedString>
 function LOC_ALL(tbl)
@@ -215,7 +217,7 @@ function LOC_ALL(tbl)
     return r
 end
 
---- Change the current language
+--- Changes the current language
 ---@param la Language
 function language(la)
     loadLanguage(la)
