@@ -5,7 +5,7 @@ local StringSub = string.sub
 local loc_table
 
 ---@alias LocalizedString string
----@alias UnlocalizedString string
+---@alias UnlocalizedString string | number
 
 -- Special tokens that can be included in a loc string via {g Player} etc. The
 -- Player name gets replaced with the current selected player name.
@@ -160,7 +160,7 @@ end
 ---@overload fun(str: nil): nil
 --- If `str` is a string with a localization tag, like "<LOC HW1234>Hello World",
 --- returns a localized version of it
----@param str UnlocalizedString | number
+---@param str UnlocalizedString
 ---@return LocalizedString
 function LOC(str)
     -- Note - we use [[foo]] string syntax here instead of "foo", so the localizing
