@@ -1,4 +1,7 @@
 ---@declare-global
+
+local StringSub = string.sub
+
 local loc_table
 
 ---@alias LocalizedString string
@@ -165,11 +168,8 @@ function LOC(str)
     if str == nil then
         return str
     end
-    if type(str) == "number" then
-        return tostring(str)
-    end
 
-    if str:sub(1, 5) ~= [[<LOC ]] then
+    if StringSub(str, 1, 5) ~= [[<LOC ]] then
         return LocExpand(str)
     end
 
