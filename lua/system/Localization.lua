@@ -19,8 +19,10 @@ local StringSub = string.sub
 
 ---@type table<string, UnlocalizedString>
 local loc_table
+---@type table<string, UnlocalizedString>
+local usdb = {}
 
--- Special tokens that can be included in a loc string via {g Player} etc. The
+-- Special tokens that can be included in a loc string via `{g Player}` etc. The
 -- Player name gets replaced with the current selected player name.
 local UpLocGlobals = {
     PlayerName = "Player",
@@ -38,7 +40,7 @@ local function dbFilename(la)
 end
 
 -- Check whether the given language is installed; if so, return it;
--- otherwise return some language that is installed.
+-- otherwise, return some language that is installed.
 ---@param la Language
 ---@return Language
 local function okLanguage(la)
@@ -53,11 +55,6 @@ local function okLanguage(la)
     local dbfiles = DiskFindFiles("/loc", "*strings_db.lua")
     la = dbfiles[1]:gsub(".*/(.*)/.*", "%1")
     return la
-end
-
-local usdb = {}
-if okLanguage("us") then
-    doscript(dbFilename("us"), usdb)
 end
 
 ---@param la Language
@@ -111,7 +108,7 @@ function LocalisationAILobby()
     end
 end
 
---- Called from `string.gsub` in `LocExpand()` to expand a single `{op ident}` element
+--- Called from `string.gsub` in `LocExpand()` to expand a single `{op ident}` directive
 ---@param op string
 ---@param ident string
 ---@return string
@@ -198,8 +195,7 @@ end
 ---@return LocalizedString
 function LOCF(...)
     for k, v in arg do
-        local tt = type(v)
-        if tt == "string" or tt == "number" then
+        if type(v) == "string" then
             arg[k] = LOC(v)
         end
     end
@@ -224,4 +220,11 @@ function language(la)
     SetPreference("options_overrides.language", __language)
 end
 
-loadLanguage(__language)
+
+do
+    local us = dbFilename "us"
+    if exists(us) then
+        doscript(us, usdb)
+    end
+    loadLanguage(__language)
+end
