@@ -8,15 +8,7 @@
 
 local optionsLogic = import('/lua/options/optionsLogic.lua')
 
-if not GetPreference('debug.enable_debug_facilities') then
-    SetPreference('Options.Log', {
-        Debug = false,
-        Info = false,
-        Warn = false,
-        Error = false,
-        Custom = false,
-        Filter = '*debug:'})
-end
+-- do not run any code in the scope of the file for mod compatibility with Alliance of Heroes and others
 
 -- check if there are any profiles defined
 function ProfilesExist()

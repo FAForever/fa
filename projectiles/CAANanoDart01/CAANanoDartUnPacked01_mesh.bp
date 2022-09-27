@@ -1,0 +1,10 @@
+MeshBlueprint {
+    LODs = {
+        {
+            MeshName = '/projectiles/CAANanoDart01/CAANanoDartUnPacked01_lod0.scm',
+            AlbedoName = '/projectiles/CAANanoDart01/CAANanoDartUnPacked01_albedo.dds',
+            ShaderName = 'TMeshAlpha',
+            LODCutoff = 150,
+        },
+    },
+}

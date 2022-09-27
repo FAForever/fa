@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB0301/UAB0301_script.lua
-#**  Author(s):  David Tomandl
-#**
-#**  Summary  :  Aeon Land Factory Tier 3 Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB0301/UAB0301_script.lua
+--**  Author(s):  David Tomandl
+--**
+--**  Summary  :  Aeon Land Factory Tier 3 Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SLandFactoryUnit = import('/lua/seraphimunits.lua').SLandFactoryUnit
 
+---@class ZSB9601 : SLandFactoryUnit
 ZSB9601 = Class(SLandFactoryUnit) {
 
     OnCreate = function(self)

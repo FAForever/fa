@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'aeon_quantic_cluster_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 12,
+    Size = 0.4,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = .025,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_aeon_01.dds',
+	RampTexture = '/textures/particles/ramp_trail_aeon_01.dds',
+}
+

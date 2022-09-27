@@ -1,0 +1,146 @@
+-- used by UnitTeleport01, which is used to teleport units
+EmitterBlueprint {
+	BlueprintId = 'teleport_phosphor_01',
+	Lifetime = 90.00,
+	Repeattime = 90.00,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = true,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = 800, -- teleport effect hence it is quite high
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = true,
+	OnlyEmitOnWater = false,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 25.00,
+	Texture = '/textures/particles/glow.dds',
+	RampTexture = '/textures/particles/ramp_blue_05.dds',
+	XDirectionCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=0.000,z=0.000 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=0.000,z=0.000 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=0.000,z=0.000 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=43.456,y=12.571,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=41.557,y=5.079,z=5.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=1.000,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=0.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=46.069,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=46.306,y=0.000,z=2.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.238,y=0.250,z=2.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=0.000,z=2.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.356,y=0.000,z=0.000 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=43.931,y=2.429,z=0.100 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=180.000,z=0.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=0.000,z=0.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 90.00,
+		Keys = {
+			{ x=45.000,y=0.000,z=0.000 },
+		},
+	},
+}
+

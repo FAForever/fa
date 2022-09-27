@@ -7,6 +7,7 @@ local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 --- Base class for popups. A popup appears on top of other UI content, darkens the content behind it,
 -- and draws a standard background behind its content. You'll probably want to extend it to do
 -- something more involved, or use it as-is if you want to manually assemble your popup UI Group.
+---@class Popup : Group
 Popup = Class(Group) {
     --- Create a new popup
     --
@@ -38,20 +39,18 @@ Popup = Class(Group) {
         -- Plant the dialog in the middle of the screen.
         LayoutHelpers.AtCenterIn(self, GUI)
 
-        -- Closure copy.
-        local this = self
-
+        
         -- Dismiss dialog when shadow is clicked.
         shadow.HandleEvent = function(shadow, event)
             if event.Type == 'ButtonPress' then
-                this:OnShadowClicked()
+                self:OnShadowClicked()
             end
         end
 
         ---- Close when the escape key is pressed.
         EscapeHandler.PushEscapeHandler(function()
             EscapeHandler.PopEscapeHandler()
-            this:OnEscapePressed()
+            self:OnEscapePressed()
         end)
     end,
 

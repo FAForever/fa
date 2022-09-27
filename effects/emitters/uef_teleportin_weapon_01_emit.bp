@@ -10,7 +10,7 @@ EmitterBlueprint {
     AlignRotation = false,
     AlignToBone = false,
     Flat = true,
-    LODCutoff = 1000.00,
+    LODCutoff = 800, -- teleport effect
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,
@@ -23,8 +23,8 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/ring_13.dds]],
-    RampTexture = [[/textures/particles/ramp_blue_01.dds]],
+    Texture = '/textures/particles/ring_13.dds',
+    RampTexture = '/textures/particles/ramp_blue_01.dds',
     XDirectionCurve = {
         XRange = 2.00,
         Keys = {

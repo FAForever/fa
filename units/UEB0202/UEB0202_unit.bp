@@ -77,20 +77,6 @@ UnitBlueprint {
         },
         AnimationFinishBuildLand = '/units/ueb0202/ueb0202_aplatform.sca',
         AnimationUpgrade = '/units/ueb0202/ueb0202_aupgrade.sca',
-        BlinkingLights = {
-            {
-                BLBone = 'Tower04',
-                BLOffsetX = 0.25,
-                BLOffsetY = 0.07,
-                BLOffsetZ = 0.6,
-                BLScale = 2,
-            },
-        },
-        BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
-        },
         BuildAttachBone = 'Attachpoint',
         Mesh = {
             IconFadeInZoom = 130,
@@ -210,126 +196,126 @@ UnitBlueprint {
         MotionType = 'RULEUMT_None',
         RaisedPlatforms = {
 
-            # Platform 1
-            # TopLeft Offset From Center
+            -- Platform 1
+            -- TopLeft Offset From Center
             -1.6,
 
-            # x
+            -- x
             -2,
 
-            # z
+            -- z
             0.18,
 
-            # height
-            # TopRight Offset From Center
+            -- height
+            -- TopRight Offset From Center
             2,
 
-            # x
+            -- x
             -2,
 
-            # z
+            -- z
             0.18,
 
-            # height
-            # BottomLeft Offset From Center
+            -- height
+            -- BottomLeft Offset From Center
             -1.6,
 
-            # x
+            -- x
             1.6,
 
-            # z
+            -- z
             0.18,
 
-            # height
-            # BottomRight Offset From Center
+            -- height
+            -- BottomRight Offset From Center
             2,
 
-            # x
+            -- x
             1.6,
 
-            # z
+            -- z
             0.18,
 
-            # height
-            # Platform 2
-            # TopLeft Offset From Center
+            -- height
+            -- Platform 2
+            -- TopLeft Offset From Center
             -1.75,
 
-            # x
+            -- x
             -2,
 
-            # z
+            -- z
             0,
 
-            # height
-            # TopRight Offset From Center
+            -- height
+            -- TopRight Offset From Center
             -1.6,
 
-            # x
+            -- x
             -2,
 
-            # z
+            -- z
             0.18,
 
-            # height
-            # BottomLeft Offset From Center
+            -- height
+            -- BottomLeft Offset From Center
             -1.75,
 
-            # x
+            -- x
             1.6,
 
-            # z
+            -- z
             0,
 
-            # height
-            # BottomRight Offset From Center
+            -- height
+            -- BottomRight Offset From Center
             -1.6,
 
-            # x
+            -- x
             1.6,
 
-            # z
+            -- z
             0.18,
 
-            # height
-            # Platform 3
-            # TopLeft Offset From Center
+            -- height
+            -- Platform 3
+            -- TopLeft Offset From Center
             -2,
 
-            # x
+            -- x
             1.6,
 
-            # z
+            -- z
             0.18,
 
-            # height
-            # TopRight Offset From Center
+            -- height
+            -- TopRight Offset From Center
             2,
 
-            # x
+            -- x
             1.6,
 
-            # z
+            -- z
             0.18,
 
-            # height
-            # BottomLeft Offset From Center
+            -- height
+            -- BottomLeft Offset From Center
             -2,
 
-            # x
+            -- x
             1.75,
 
-            # z
+            -- z
             0,
 
-            # height
-            # BottomRight Offset From Center
+            -- height
+            -- BottomRight Offset From Center
             2,
 
-            # x
+            -- x
             1.75,
 
-            # z
+            -- z
             0,
         },
         RollOffPoints = {
@@ -356,7 +342,7 @@ UnitBlueprint {
     SelectionSizeZ = 3.1,
     SelectionThickness = 0.3,
 
-    # height
+    -- height
     SizeX = 3.5,
     SizeY = 0.75,
     SizeZ = 3.5,

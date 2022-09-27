@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'aeon_dualquantum_cannon_projectile_trail',
+	Lifetime = -1.00,
+    TrailLength = 7,
+    Size = 0.05,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/air_contrail_02.dds',
+	RampTexture = '/textures/particles/ramp_white_03.dds',
+}
+

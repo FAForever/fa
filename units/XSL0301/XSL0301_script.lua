@@ -14,6 +14,7 @@ local SDFLightChronotronCannonWeapon = SWeapons.SDFLightChronotronCannonWeapon
 local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 
+---@class XSL0301 : CommandUnit
 XSL0301 = Class(CommandUnit) {
     Weapons = {
         LightChronatronCannon = Class(SDFLightChronotronCannonWeapon) {},
@@ -39,6 +40,11 @@ XSL0301 = Class(CommandUnit) {
         self:SetupBuildBones()
         self:GetWeaponByLabel('OverCharge').NeedsUpgrade = true
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true
+    end,
+
+    StartBeingBuiltEffects = function(self, builder, layer)
+        CommandUnit.StartBeingBuiltEffects(self, builder, layer)
+        self:ForkThread( EffectUtil.CreateSeraphimBuildThread, builder, self.OnBeingBuiltEffectsBag, 2 )
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)

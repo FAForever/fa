@@ -1,23 +1,26 @@
---- Class CBuilderArmManipulator
--- @classmod Sim.CBuilderArmManipulator
+---@meta
+
+---@class moho.BuilderArmManipulator : moho.manipulator_methods
+local CBuilderArmManipulator = {}
 
 ---
---  BuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
-function CBuilderArmManipulator:SetAimingArc(minHeading,  maxHeading,  headingMaxSlew,  minPitch,  maxPitch,  pitchMaxSlew)
+---@return number
+function CBuilderArmManipulator:GetHeadingPitch()
+end
+
+---@param minHeading number
+---@param maxHeading number
+---@param headingMaxSlew number
+---@param minPitch number
+---@param maxPitch number
+---@param pitchMaxSlew number
+function CBuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
 end
 
 ---
---  CBuilderArmManipulator:SetHeadingPitch(heading, pitch)
-function CBuilderArmManipulator:SetHeadingPitch(heading,  pitch)
+---@param heading number
+---@param pitch number
+function CBuilderArmManipulator:SetHeadingPitch(heading, pitch)
 end
 
----
---  derived from IAniManipulator
-function CBuilderArmManipulator:base()
-end
-
----
---
-function CBuilderArmManipulator:moho.BuilderArmManipulator()
-end
-
+return CBuilderArmManipulator

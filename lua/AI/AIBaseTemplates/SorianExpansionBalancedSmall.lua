@@ -1,22 +1,22 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/SorianExpansionBalancedSmall.lua
-#**  Author(s): Michael Robbins aka Sorian
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/SorianExpansionBalancedSmall.lua
+--**  Author(s): Michael Robbins aka Sorian
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'SorianExpansionBalancedSmall',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'SorianT1BalancedUpgradeBuildersExpansion',
         'SorianT2BalancedUpgradeBuildersExpansion',
 
-        # Engineer Builders
+        -- Engineer Builders
         'SorianEngineerFactoryBuilders',
         'SorianT1EngineerBuilders',
         'SorianT2EngineerBuilders',
@@ -24,29 +24,29 @@ BaseBuilderTemplate {
         'SorianEngineerFactoryConstruction',
         'SorianLandInitialFactoryConstruction',
 
-        # SCU Upgrades
+        -- SCU Upgrades
         'SorianSCUUpgrades',
 
-        # Extractor building
+        -- Extractor building
         'SorianEngineerMassBuildersLowerPri - Rush',
 
-        # Build some power, but not much
+        -- Build some power, but not much
         'SorianEngineerEnergyBuildersExpansions',
 
-        # ==== DEFENSES ==== #
+        -- ==== DEFENSES ==== --
         'SorianT1LightDefenses',
         'SorianT2LightDefenses',
         'SorianT3LightDefenses',
 
         'SorianT2ArtilleryFormBuilders',
-        #'SorianT3ArtilleryFormBuilders',
-        #'SorianT4ArtilleryFormBuilders',
+        --'SorianT3ArtilleryFormBuilders',
+        --'SorianT4ArtilleryFormBuilders',
         'SorianAirStagingExpansion',
         'SorianT2MissileDefenses',
 
         'SorianMassAdjacencyDefenses',
 
-        # ==== LAND UNIT BUILDERS ==== #
+        -- ==== LAND UNIT BUILDERS ==== --
         'SorianT1LandFactoryBuilders',
         'SorianT2LandFactoryBuilders',
         'SorianT3LandFactoryBuilders',
@@ -59,7 +59,7 @@ BaseBuilderTemplate {
         'SorianT2ReactionDF',
         'SorianT3ReactionDF',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'SorianT1AirFactoryBuilders',
         'SorianT2AirFactoryBuilders',
         'SorianT3AirFactoryBuilders',
@@ -69,7 +69,7 @@ BaseBuilderTemplate {
         'SorianUnitCapAirAttackFormBuilders',
         'SorianACUHunterAirFormBuilders',
 
-        #'SorianTransportFactoryBuilders',
+        --'SorianTransportFactoryBuilders',
 
         'SorianExpResponseFormBuilders',
 
@@ -78,12 +78,12 @@ BaseBuilderTemplate {
         'SorianT3AntiAirBuilders',
         'SorianBaseGuardAirFormBuilders',
 
-        # ===== STRATEGIES ====== #
+        -- ===== STRATEGIES ====== --
 
         'SorianParagonStrategyExp',
         'SorianWaterMapLowLand',
 
-        # == STRATEGY PLATOONS == #
+        -- == STRATEGY PLATOONS == --
 
         'SorianBalancedUpgradeBuildersExpansionStrategy',
     },
@@ -128,7 +128,7 @@ BaseBuilderTemplate {
             return 0
         end
 
-        local threatCutoff = 10 # value of overall threat that determines where enemy bases are
+        local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
         local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 500
@@ -136,7 +136,7 @@ BaseBuilderTemplate {
             return 750
         elseif distance > 250 then
             return 1000
-        else # within 250
+        else -- within 250
             return 250
         end
 

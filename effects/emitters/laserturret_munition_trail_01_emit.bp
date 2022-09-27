@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'laserturret_munition_trail',
+	Lifetime = -1.00,
+    TrailLength = 0.5,
+    Size = 0.06,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 0.045,
+    LODCutoff = 160,
+	RampTexture = '/textures/particles/trail_white_02.dds',
+    RepeatTexture = '/textures/particles/beam_cyan_03.dds',
+}
+

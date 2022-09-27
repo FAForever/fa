@@ -8,24 +8,6 @@
 
 local sharedUnits = {}
 
-function BreakAlliance(data)
-
-    -- You cannot change alliances in a team game
-    if ScenarioInfo.TeamGame then
-        return
-    end
-
-    if OkayToMessWithArmy(data.From) then
-        SetAlliance(data.From,data.To,"Enemy")
-
-        if Sync.BrokenAlliances == nil then
-            Sync.BrokenAlliances = {}
-        end
-        table.insert(Sync.BrokenAlliances, { From = data.From, To = data.To })
-    end
-    import('/lua/SimPing.lua').OnAllianceChange()
-end
-
 function OnAllianceResult(resultData)
     -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
@@ -41,9 +23,9 @@ function OnAllianceResult(resultData)
             table.insert(Sync.FormedAlliances, { From = resultData.From, To = resultData.To })
         end
     end
-    import('/lua/SimPing.lua').OnAllianceChange()
+    import('/lua/simping.lua').OnAllianceChange()
 end
-import('/lua/SimPlayerQuery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
+import('/lua/simplayerquery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
 
 function KillSharedUnits(owner)
     if sharedUnits[owner] and not table.empty(sharedUnits[owner]) then
@@ -53,6 +35,26 @@ function KillSharedUnits(owner)
             end
         end
         sharedUnits[owner] = {}
+    end
+end
+
+local function TransferUnitsOwnershipComparator (a, b) 
+    a = a.Blueprint or a:GetBlueprint()
+    b = b.Blueprint or b:GetBlueprint()
+    return a.Economy.BuildCostMass > b.Economy.BuildCostMass 
+end
+
+local function TransferUnitsOwnershipDelayedWeapons (weapon)
+    if not weapon:BeenDestroyed() then 
+        -- compute delay
+        local bp = weapon:GetBlueprint()
+        local delay = 1 / bp.RateOfFire
+        WaitSeconds(delay)
+
+        -- enable the weapon again if it still exists
+        if not weapon:BeenDestroyed() then 
+            weapon:SetEnabled(true)
+        end
     end
 end
 
@@ -68,7 +70,11 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         shareUpgrades = true
     end
 
-    table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
+    -- do not gift insignificant units
+    units = EntityCategoryFilterDown(categories.ALLUNITS - categories.INSIGNIFICANTUNIT, units)
+
+    -- gift most valuable units first
+    table.sort(units, TransferUnitsOwnershipComparator)
 
     local newUnits = {}
     local upUnits = {}
@@ -82,7 +88,8 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         -- Units currently being captured is also denied
         local disallowTransfer = owner == ToArmyIndex or
                                  v:GetParent() ~= v or (v.Parent and v.Parent ~= v) or
-                                 v.CaptureProgress > 0
+                                 v.CaptureProgress > 0 or
+                                 v:GetFractionComplete() < 1.0
 
         if disallowTransfer then
             continue
@@ -229,7 +236,9 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
 
         unit.IsBeingTransferred = false
 
-        v:OnGiven(unit)
+        if v.OnGiven then 
+            v:OnGiven(unit)
+        end
     end
 
     if not captured then
@@ -243,6 +252,16 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
 
         if upgradeKennels[1] then
             ForkThread(UpgradeTransferredKennels, upgradeKennels)
+        end
+    end
+
+    -- add delay on turning on each weapon 
+    for k, unit in newUnits do
+        -- disable all weapons, enable with a delay
+        for k = 1, unit.WeaponCount do
+            local weapon = unit:GetWeapon(k)
+            weapon:SetEnabled(false)
+            weapon:ForkThread(TransferUnitsOwnershipDelayedWeapons)
         end
     end
 
@@ -380,8 +399,8 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
 
                 -- wrecks can prevent drone from starting construction
                 local wrecks = GetReclaimablesInRect(unit:GetSkirtRect()) -- returns nil instead of empty table when empty
-                if wrecks then 
-                    for _, reclaim in wrecks do 
+                if wrecks then
+                    for _, reclaim in wrecks do
                         if reclaim.IsWreckage then
                             -- collision shape to none to prevent it from blocking, keep track to revert later
                             reclaim:SetCollisionShape('None')
@@ -392,7 +411,7 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
 
                 -- units can prevent drone from starting construction
                 local units = GetUnitsInRect(unit:GetSkirtRect()) -- returns nil instead of empty table when empty
-                if units then 
+                if units then
                     for _,u in units do
                         -- collision shape to none to prevent it from blocking, keep track to revert later
                         u:SetCollisionShape('None')
@@ -523,9 +542,23 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
 end
 
 function GiveUnitsToPlayer(data, units)
+    local manualShare = ScenarioInfo.Options.ManualUnitShare
+    if manualShare == 'none' then return end
+
     if units then
         local owner = units[1].Army
         if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then
+            if manualShare == 'no_builders' then
+                local unitsBefore = table.getsize(units)
+                units = EntityCategoryFilterDown(categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER, units)
+                local unitsAfter = table.getsize(units)
+
+                if unitsAfter ~= unitsBefore then
+                    -- Maybe spawn an UI dialog instead?
+                    print((unitsBefore - unitsAfter) .. " engineers/factories could not be transferred due to manual share rules")
+                end
+            end
+
             TransferUnitsOwnership(units, data.To)
         end
     end
@@ -539,7 +572,6 @@ end
 
 function RequestAlliedVictory(data)
     -- You cannot change this in a team game
-
     if ScenarioInfo.TeamGame then
         return
     end
@@ -556,6 +588,24 @@ function SetOfferDraw(data)
     local brain = GetArmyBrain(data.Army)
     brain.OfferingDraw = data.Value
 end
+
+function BreakAlliance(data)
+    -- You cannot change alliances in a team game
+    if ScenarioInfo.TeamGame then
+        return
+    end
+
+    if OkayToMessWithArmy(data.From) then
+        SetAlliance(data.From, data.To, "Enemy")
+
+        if Sync.BrokenAlliances == nil then
+            Sync.BrokenAlliances = {}
+        end
+        table.insert(Sync.BrokenAlliances, { From = data.From, To = data.To })
+    end
+    import('/lua/simping.lua').OnAllianceChange()
+end
+
 
 
 -- ==============================================================================
@@ -613,9 +663,9 @@ function GiveResourcesToPlayer(data)
         if fromBrain:IsDefeated() or toBrain:IsDefeated() or data.Mass < 0 or data.Energy < 0 then
             return
         end
-        local massTaken = fromBrain:TakeResource('Mass',data.Mass * fromBrain:GetEconomyStored('Mass'))
-        local energyTaken = fromBrain:TakeResource('Energy',data.Energy * fromBrain:GetEconomyStored('Energy'))
-        toBrain:GiveResource('Mass',massTaken)
-        toBrain:GiveResource('Energy',energyTaken)
+        local massTaken = fromBrain:TakeResource('Mass', data.Mass * fromBrain:GetEconomyStored('Mass'))
+        local energyTaken = fromBrain:TakeResource('Energy', data.Energy * fromBrain:GetEconomyStored('Energy'))
+        toBrain:GiveResource('Mass', massTaken)
+        toBrain:GiveResource('Energy', energyTaken)
     end
 end

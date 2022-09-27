@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 75,
-        GuardScanRadius = 60,
+        GuardScanRadius = 45,       -- 150% of range
     },
     Air = {
         AutoLandTime = 1,
@@ -78,15 +78,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Air',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
         },
     },
     BuildIconSortPriority = 30,
@@ -275,6 +266,11 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.3, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'UAAWeapon',
@@ -298,7 +294,7 @@ UnitBlueprint {
             MaxRadius = 25,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 3,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             NeedPrep = true,
             ProjectileId = '/projectiles/AAASonicPulse02/AAASonicPulse02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
@@ -322,15 +318,11 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Turret_Muzzle_Right',
             TurretBonePitch = 'Turret_Muzzle_Right',
             TurretBoneYaw = 'Turret_Muzzle_Right',
@@ -346,6 +338,11 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.3, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'UAAWeapon',
@@ -369,7 +366,7 @@ UnitBlueprint {
             MaxRadius = 25,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 3,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/AAASonicPulse02/AAASonicPulse02_proj.bp',
             ProjectileLifetime = 0.3,
@@ -393,15 +390,11 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Turret_Muzzle_Left',
             TurretBonePitch = 'Turret_Muzzle_Left',
             TurretBoneYaw = 'Turret_Muzzle_Left',

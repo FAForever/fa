@@ -18,13 +18,10 @@ local GetRandomOffset2 = util.GetRandomOffset2
 
 -- upvalue for performance
 local EfctUtil = import('EffectUtilities.lua')
-local CreateEffects = EfctUtil.CreateEffects
-local CreateEffectsWithOffset = EfctUtil.CreateEffectsWithOffset
-local CreateEffectsWithRandomOffset = EfctUtil.CreateEffectsWithRandomOffset
-local CreateBoneEffects = EfctUtil.CreateBoneEffects
-local CreateBoneEffectsOffset = EfctUtil.CreateBoneEffectsOffset
-local CreateRandomEffects = EfctUtil.CreateRandomEffects
-local ScaleEmittersParam = EfctUtil.ScaleEmittersParam
+local ApplyWindDirection = EfctUtil.ApplyWindDirection
+local CreateEffectsOpti = EfctUtil.CreateEffectsOpti
+local CreateBoneEffectsOpti = EfctUtil.CreateBoneEffectsOpti
+local CreateBoneEffectsOffsetOpti = EfctUtil.CreateBoneEffectsOffsetOpti
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local ExplosionSmall = EffectTemplate.ExplosionSmall
@@ -95,7 +92,10 @@ local ScorchDecalTexturesN = TableGetn(ScorchDecalTextures)
 
 --- Retrieves the size of the unit as defined in the blueprint. Do not use in critical code, instead
 -- copy the body into your code for performance reasons.
--- @param unit The unit to get the size of.
+---@param unit Unit The unit to get the size of.
+---@return number 
+---@return number
+---@return number
 function GetUnitSizes(unit)
     local bp = unit:GetBlueprint()
     return bp.SizeX or 0, bp.SizeY or 0, bp.SizeZ or 0
@@ -103,7 +103,8 @@ end
 
 --- Retrieves the voume of the unit as defined in the blueprint. Do not use in critical code, instead
 -- copy the body into your code for performance reasons.
--- @param unit The unit to get the volume of.
+---@param unit Unit The unit to get the volume of.
+---@return number
 function GetUnitVolume(unit)
     local x, y, z = GetUnitSizes(unit)
     return x * y * z
@@ -113,15 +114,17 @@ end
 -- copy the body into your code for performance reasons. This function is 
 -- legacy code and is full of errors. Use GetAverageBoundingXZRadiusCorrect 
 -- if you're interested in the actual average bounding radius.
--- @param unit The unit to get the diameter of.
+---@param unit Unit The unit to get the diameter of.
+---@return number
 function GetAverageBoundingXZRadius(unit)
     local bp = unit:GetBlueprint()
-    return ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
+    return ((bp.SizeX or 0) + (bp.SizeZ or 0)) * 0.5
 end
 
 --- Retrieves bounding radius over x/z axis. Do not use in critical code, instead
 -- copy the body into your code for performance reasons. This function is 
--- @param unit The unit to get the radius of.
+---@param unit Unit The unit to get the radius of.
+---@return number
 function GetAverageBoundingXZRadiusCorrect(unit)
     local bp = unit:GetBlueprint()
     return ((bp.SizeX or 1) + (bp.SizeZ or 1)) * 0.25
@@ -131,21 +134,31 @@ end
 -- copy the body into your code for performance reasons. This function is 
 -- legacy code and is full of errors. Use GetAverageBoundingXYZRadiusCorrect 
 -- if you're interested in the actual average bounding radius.
--- @param unit The unit to get the diameter of.
+---@param unit Unit The unit to get the diameter of.
+---@return number
 function GetAverageBoundingXYZRadius(unit)
     local bp = unit:GetBlueprint()
-    return ((bp.SizeX or 0 + bp.SizeY or 0 + bp.SizeZ or 0) * 0.333)
+    return ((bp.SizeX or 0) + (bp.SizeY or 0) + (bp.SizeZ or 0)) * 0.333
 end
 
 --- Retrieves bounding radius over all axis. Do not use in critical code, instead
 -- copy the body into your code for performance reasons.
--- @param unit The unit to get the radius of.
+---@param unit Unit The unit to get the radius of.
+---@return number
 function GetAverageBoundingXYZRadiusCorrect(unit)
     local bp = unit:GetBlueprint()
     return ((bp.SizeX or 1) + (bp.SizeZ or 1) + (bp.SizeY or 1)) * 0.166
 end
 
 --- ??, what is the mathematics here exactly?
+---@param rotation number
+---@param x number
+---@param y number
+---@param z number
+---@return number qx
+---@return number qy
+---@return number qz
+---@return number qw
 function QuatFromRotation(rotation, x, y, z)
     local angleRot, qw, qx, qy, qz, angle
     angle = 0.00872664625 * rotation
@@ -181,8 +194,15 @@ local ProjectileDebrisBpsN = TableGetn(ProjectileDebrisBps)
 --- Creates the default unit explosion used by almost all units in the game.
 -- @unit The Unit to create the explosion for.
 -- @overKillRatio Has an impact on how strong the explosion is.
-function CreateScalableUnitExplosion(unit, overKillRatio)
-    if unit then
+---@param unit Unit
+---@param debrisMultiplier integer
+---@param circularDebris boolean
+function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
+
+    debrisMultiplier = debrisMultiplier or 1
+    circularDebris = circularDebris or false
+
+    if unit and (not IsDestroyed(unit)) then
         if IsUnit(unit) then
 
             -- cache blueprint values
@@ -281,11 +301,11 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
 
             -- create the emitters  
             if baseEffects then 
-                CreateEffects(unit, army, baseEffects)
+                CreateEffectsOpti(unit, army, baseEffects)
             end
 
             if environmentEffects then 
-                CreateEffects(unit, army, environmentEffects)       
+                CreateEffectsOpti(unit, army, environmentEffects)       
             end    
 
             -- create the flash
@@ -300,7 +320,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             )
 
             -- determine debris amount
-            local amount = MathMin(Random(1 + (boundingXYZRadius * 6), (boundingXYZRadius * 15)) , 100)
+            local amount = debrisMultiplier * MathMin(Random(1 + (boundingXYZRadius * 6), (boundingXYZRadius * 15)) , 100)
 
             -- determine debris velocity range
             local velocity = 2 * boundingXYZRadius
@@ -328,9 +348,16 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 local zpos = r3 * sz - (sz * 0.5)
 
                 -- launch them into space
-                local xdir = velocity * r1 - (hVelocity)
-                local ydir = boundingXYZRadius + velocity * r2
-                local zdir = velocity * r3 - (hVelocity)
+                local xdir, ydir, zdir 
+                if circularDebris then 
+                    xdir = velocity * r1 - (hVelocity)
+                    ydir = velocity * r2 - (hVelocity)
+                    zdir = velocity * r3 - (hVelocity)
+                else 
+                    xdir = velocity * r1 - (hVelocity)
+                    ydir = boundingXYZRadius + velocity * r2
+                    zdir = velocity * r3 - (hVelocity)
+                end
 
                 -- choose a random blueprint
                 local bp = ProjectileDebrisBps[MathMin(ProjectileDebrisBpsN, Random(1, i))]
@@ -356,53 +383,55 @@ end
 --- Creates a flash and fire emitters that represents an explosion on hit.
 -- @param obj The entity to create the flash at.
 -- @param scale The scale of the flash.
+---@param obj Unit
+---@param scale number
 function CreateDefaultHitExplosion(obj, scale)
     if obj and not obj:BeenDestroyed() then
-
-        local army = obj.Army 
+        local army = obj.Army
 
         -- create the flash
         CreateLightParticle(
-            obj, 
-            -1, 
-            army, 
+            obj,
+            -1,
+            army,
             0.5 * scale * (6 + 4 * Random()),   -- (6, 10)
             10.5 + 4 * Random(),                -- (10.5, 14.5)
-            'glow_03', 
+            'glow_03',
             'ramp_flare_02'
         )
-        
+
         -- create the fire cloud
-        CreateEffects(obj, army, FireCloudMed01)
+        CreateEffectsOpti(obj, army, FireCloudMed01)
     end
 end
 
 --- Creates explosion emitters that represent a hit. Do not use in critical code, instead
 -- copy the body.
 -- @param obj The entity to create the emitters for.
--- @param scale Unused parameter.
--- @param xOffset Offset on the x-axis.
--- @param yOffset Offset on the y-axis.
--- @param zOffset Offset on the z-axis.
+---@param obj Unit
+---@param scale number Unused parameter.
+---@param xOffset number Offset on the x-axis.
+---@param yOffset number Offset on the y-axis.
+---@param zOffset number Offset on the z-axis.
 function CreateDefaultHitExplosionOffset(obj, scale, xOffset, yOffset, zOffset)
     if obj:BeenDestroyed() then
         return
     end
 
-    CreateBoneEffectsOffset(obj, -1, obj.Army, DefaultHitExplosion01, xOffset, yOffset, zOffset)
+    CreateBoneEffectsOffsetOpti(obj, -1, obj.Army, DefaultHitExplosion01, xOffset, yOffset, zOffset)
 end
 
-
 --- Creates a flash and fire emitters that represents an explosion on hit.
--- @param obj The entity to create the flash at.
--- @param boneName The bone to attach the effect to.
--- @param scale The scale of the flash.
+---@param obj Unit The entity to create the flash at.
+---@param boneName string The bone to attach the effect to.
+---@param scale number The scale of the flash.
 function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
     local army = obj.Army
     CreateFlash(obj, boneName, scale * 0.5, army)
-    CreateBoneEffects(obj, boneName, army, FireCloudMed01)
+    CreateBoneEffectsOpti(obj, boneName, army, FireCloudMed01)
 end
 
+---@param obj Unit
 function CreateTimedStuctureUnitExplosion(obj)
     local numExplosions = math.floor(GetAverageBoundingXYZRadius(obj) * GetRandomInt(2,5))
     local x,y,z = GetUnitSizes(obj)
@@ -416,6 +445,9 @@ end
 
 --- Old function that is no longer in use. Do not use this function - it creates a whole
 -- lot of overhead that is not necessary.
+---@param unit Unit
+---@param overKillRatio number
+---@return table
 function MakeExplosionEntitySpec(unit, overKillRatio)
     return {
         Army = unit.Army,
@@ -430,6 +462,9 @@ end
 
 --- Old function that is no longer in use. Do not use this function - it creates a whole
 -- lot of overhead that is not necessary.
+---@param unit Unit
+---@param overKillRatio number
+---@return Entity
 function CreateUnitExplosionEntity(unit, overKillRatio)
     local localentity = Entity(MakeExplosionEntitySpec(unit, overKillRatio))
     Warp(localentity, unit:GetPosition())
@@ -438,6 +473,7 @@ end
 
 --- Old function that is no longer in use. Do not use this function - it creates a whole
 -- lot of overhead that is not necessary.
+---@param obj Unit
 function _CreateScalableUnitExplosion(obj)
     local army = obj.Spec.Army
     local scale = obj.Spec.BoundingXZRadius
@@ -496,7 +532,7 @@ function _CreateScalableUnitExplosion(obj)
     end
 
     -- Create Generic emitter effects
-    CreateEffects(obj, army, EffectTable)
+    CreateEffectsOpti(obj, army, EffectTable)
 
     -- Create Light particle flash
     CreateFlash(obj, -1, scale, army)
@@ -520,6 +556,9 @@ end
 
 --- Old function that is no longer in use. Do not use this function - it creates a whole
 -- lot of overhead that is not necessary.
+---@param layer string
+---@param scale number
+---@return table
 function GetUnitEnvironmentalExplosionEffects(layer, scale)
     local EffectTable = {}
     if layer == 'Water' then
@@ -539,6 +578,10 @@ end
 -------------------------------
 
 --- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
+---@param obj Unit
+---@param bone string
+---@param scale number
+---@param army string
 function CreateFlash(obj, bone, scale, army)
     CreateLightParticle(obj, bone, army, scale * (6 + 4 * Random()) , 10.5 + 4 * Random(), 'glow_03', 'ramp_flare_02')
 end
@@ -548,19 +591,25 @@ end
 ------------------------
 
 --- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
+---@param obj Unit
+---@param scale number
+---@param army string
 function CreateScorchMarkSplat(obj, scale, army)
     CreateSplat(
-        EntityGetPosition(obj), 
-        6.28 * Random(), 
+        EntityGetPosition(obj),
+        6.28 * Random(),
         UpvaluedScorchSplatTextures[Random(1, ScorchSplatTexturesN)],
-        scale * 4, scale * 4, 
-        200 + 150 * Random(), 
-        300 * 300 * Random(), 
+        scale * 4, scale * 4,
+        200 + 150 * Random(),
+        300 * 300 * Random(),
         army
     )
 end
 
 --- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
+---@param obj Unit
+---@param scale number
+---@param army string
 function CreateScorchMarkDecal(obj, scale, army)
     CreateDecal(
         EntityGetPosition(obj), 
@@ -575,6 +624,11 @@ function CreateScorchMarkDecal(obj, scale, army)
 end
 
 --- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
+---@param obj Unit
+---@param scale number
+---@param LOD integer
+---@param lifetime integer
+---@param army string
 function CreateRandomScorchSplatAtObject(obj, scale, LOD, lifetime, army)
     CreateSplat(
         EntityGetPosition(obj), 
@@ -588,27 +642,58 @@ end
 -- WRECKAGE EFFECTS --
 ----------------------
 
-function CreateWreckageEffects(obj, prop)
-    if IsUnit(obj) then
-        local scale = GetAverageBoundingXYZRadius(obj)
-        local emitters = {}
-        local layer = obj.Layer
+local MathFloor = math.floor
 
-        if scale < 0.5 then -- SMALL UNITS
-            emitters = CreateRandomEffects(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsSml01, 1)
-        elseif scale > 1.5 then -- LARGE UNITS
-            local x,y,z = GetUnitSizes(obj)
-            emitters = CreateEffectsWithRandomOffset(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsLrg01, x, 0, z)
-        else -- MEDIUM UNITS
-            emitters = CreateRandomEffects(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsMed01, 2)
-        end
+-- upvalue for performance
+local IEffectSetEmitterParam = _G.moho.IEffect.SetEmitterParam
+local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
+local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
+local IEffectSetEmitterCurveParam = _G.moho.IEffect.SetEmitterCurveParam
 
-        -- Give the emitters created some random lifetimes
-        ScaleEmittersParam(emitters, 'LIFETIME', 100, 1000)
+-- direct access for performance
+local DefaultWreckageEffects = EffectTemplate.DefaultWreckageEffectsLrg01
+local DefaultWreckageEffectsCount = EffectTemplate.DefaultWreckageEffectsLrg01Count
 
-        for k, v in emitters do
-            v:ScaleEmitter(GetRandomFloat(0.25, 1))
-        end
+-- remove all wreckage effects, but keep for compatibility
+---@param unit Unit
+---@param prop Prop
+function CreateWreckageEffects(unit, prop)
+
+    -- determine number of effects
+    local blueprint = unit.Blueprint or EntityGetBlueprint(unit)
+
+    -- we can't make an animation for these based on bones: they spawn at the unanimated locations
+    if blueprint.Display.AnimationDeath then
+        return
+    end
+
+    -- determine number of effects
+    local bones = unit:GetBoneCount()
+    local size = MathFloor(0.2 * (blueprint.SizeX + blueprint.SizeY + blueprint.SizeZ)) + 1
+    if size > bones - 1 then
+        size = bones - 1
+    end
+
+    -- localize for performance
+    local Random = Random
+    local bone, effect, emitter, r1
+
+    -- spawn the effects
+    for k = 1, size do 
+        -- create an emitter at a bone
+        bone = Random(1, bones - 1) - 1
+        effect = Random(1, DefaultWreckageEffectsCount)
+        emitter = CreateEmitterAtBone(prop, bone, unit.Army, DefaultWreckageEffects[effect])
+
+        -- larger smoke tends to live longer
+        r1 = Random()
+        IEffectScaleEmitter(emitter, 0.5 + 0.75 * r1)
+        IEffectSetEmitterParam(emitter, 'LIFETIME', 40 + 75 * r1)
+
+        -- apply wind direction
+        ApplyWindDirection(emitter, 1.0)
+
+        prop.Trash:Add(emitter)
     end
 end
 
@@ -616,13 +701,16 @@ end
 -- DEBRIS PROJECTILES EFFECTS --
 --------------------------------
 
+---@param obj Unit
+---@param volume number
+---@param dimensions Vector
 function CreateDebrisProjectiles(obj, volume, dimensions)
 
     -- for backwards compatibility
     local sx, sy, sz = unpack(dimensions)
 
     -- determine blueprint value
-    local bp = false 
+    local bp = false
     if volume < 0.2 then
         bp = '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp'
     elseif volume < 2.0 then
@@ -657,6 +745,9 @@ end
 -- OLD EXPLOSION TECH --
 ------------------------
 
+---@param unit Unit
+---@param scale number
+---@param overKillRatio number
 function CreateDefaultExplosion(unit, scale, overKillRatio)
 
     local spec = {
@@ -670,12 +761,16 @@ function CreateDefaultExplosion(unit, scale, overKillRatio)
     CreateConcussionRing(Explosion, scale)
 end
 
+---@param object Unit
+---@param scale number
 function CreateDestructionFire(object, scale)
     local proj = object:CreateProjectile('/effects/entities/DestructionFire01/DestructionFire01_proj.bp', 0, 0, 0, nil, nil, nil)
     proj:SetBallisticAcceleration(GetRandomFloat(-2, -3)):SetCollision(false)
     CreateEmitterOnEntity(proj, proj.Army, '/effects/emitters/destruction_explosion_fire_01_emit.bp'):ScaleEmitter(scale)
 end
 
+---@param object Unit
+---@param scale number
 function CreateDestructionSparks(object, scale)
     local proj
     for i = 1, GetRandomInt(5, 10) do
@@ -685,6 +780,8 @@ function CreateDestructionSparks(object, scale)
     end
 end
 
+---@param object Unit
+---@param scale number
 function CreateFirePlume(object, scale)
     local proj
     for i = 1, GetRandomInt(4, 8) do
@@ -698,7 +795,19 @@ function CreateFirePlume(object, scale)
     end
 end
 
-
+---@param object Unit
+---@param projectile string
+---@param minnumber integer
+---@param maxnumber integer
+---@param effect string
+---@param fxscalemin number
+---@param fxscalemax number
+---@param gravitymin number
+---@param gravitymax number
+---@param xpos number
+---@param ypos number
+---@param zpos number
+---@param emitterparam string
 function CreateExplosionProjectile(object, projectile, minnumber, maxnumber, effect, fxscalemin, fxscalemax, gravitymin, gravitymax, xpos, ypos, zpos, emitterparam)
     local fxscale = (Random() * (fxscalemax - fxscalemin) + fxscalemin)
     local yaccel = (Random() * (gravitymax - gravitymin) + gravitymin) * fxscale
@@ -715,6 +824,9 @@ function CreateExplosionProjectile(object, projectile, minnumber, maxnumber, eff
     end
 end
 
+
+---@param object Unit
+---@param bone Bone
 function CreateUnitDebrisEffects(object, bone)
     local Effects = {'/effects/emitters/destruction_explosion_smoke_09_emit.bp'}
 
@@ -723,10 +835,25 @@ function CreateUnitDebrisEffects(object, bone)
     end
 end
 
-
-
 -- Composite effects
 -- *****************
+
+---@param object Unit
+---@param projBP string
+---@param posX number
+---@param posY number
+---@param posZ number
+---@param scale number
+---@param scaleVelocity number
+---@param Lifetime number
+---@param velX number
+---@param velY number
+---@param VelZ number
+---@param orientRot number
+---@param orientX number
+---@param orientY number
+---@param orientZ number
+---@return Projectile
 function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVelocity, Lifetime, velX, velY, VelZ, orientRot, orientX, orientY, orientZ)
 
     proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
@@ -740,6 +867,7 @@ function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVeloc
     return proj
 end
 
+---@param object Unit
 function CreateCompositeExplosionMeshes(object)
     local lifetime = 6.0
     local explosionMeshProjectiles = {}
@@ -758,6 +886,9 @@ end
 -----------------------------------------------------------------
 --  Replaced by new effect structure (see EffectTemplates.lua) --
 -----------------------------------------------------------------
+
+---@param object Unit
+---@param scale number
 function CreateSmoke(object, scale)
     local SmokeEffects = {'/effects/emitters/destruction_explosion_smoke_03_emit.bp',
                           '/effects/emitters/destruction_explosion_smoke_07_emit.bp'}
@@ -767,15 +898,19 @@ function CreateSmoke(object, scale)
     end
 end
 
+---@param object Unit
+---@param scale number
 function CreateConcussionRing(object, scale)
     CreateEmitterAtEntity(object, object.Army, '/effects/emitters/destruction_explosion_concussion_ring_01_emit.bp'):ScaleEmitter(scale)
 end
 
+---@param object Unit
+---@param scale number
 function CreateFireShadow(object, scale)
     CreateEmitterAtEntity(object ,object.Army, '/effects/emitters/destruction_explosion_fire_shadow_01_emit.bp'):ScaleEmitter(scale)
 end
 
-
+---@param object Unit
 function OldCreateWreckageEffects(object)
     local Effects = {'/effects/emitters/destruction_explosion_smoke_08_emit.bp'}
 

@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'aeon_cannon_trail',
+	Lifetime = -1.00,
+    TrailLength = 10,
+    Size = 0.12,
+    SortOrder = 0,
+    BlendMode = 0,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_white_01.dds',
+	RampTexture = '/textures/particles/ramp_trail_01.dds',
+}
+

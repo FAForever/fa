@@ -1,0 +1,14 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'aeon_light_displacement_missile_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 3.95,
+    Size = 1.0,
+    SortOrder = 0.00,
+    BlendMode = 3,
+    TextureRepeatRate = 0.06,
+    LODCutoff = 300,
+    UShift = 0.0,
+    VShift = -0.5,
+	RepeatTexture = '/textures/particles/heavy_quarnoncannon_trail_03.dds',
+	RampTexture = '/textures/particles/ramp_blue_23.dds',
+}

@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_khamaseen_bombhitspiral_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 2.5,
+    Size = 0.3,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 0.08,
+    LODCutoff = 300,
+	RepeatTexture = '/textures/particles/trail_aeon_01.dds',
+	RampTexture = '/textures/particles/ramp_trail_aeon_01.dds',
+}
+

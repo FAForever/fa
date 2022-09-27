@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'aeon_heavydisruptor_cannon_projectile_trail',
+	Lifetime = -1.00,
+    TrailLength = 1.5,
+    Size = 0.075,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/railgun_trail_01.dds',
+	RampTexture = '/textures/particles/ramp_white_04.dds',
+}
+

@@ -4,8 +4,8 @@ UnitBlueprint {
             'pelvis',
             'Torso',
             'Head',
-            'Left_Leg_B15',
-            'Right_Leg_B03',
+            'Left_Leg_B17',
+            'Right_Leg_B01',
         },
     },
     Audio = {
@@ -40,15 +40,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 15,
-            Level2 = 60,
-            Level3 = 100,
-            Level4 = 145,
-            Level5 = 185,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTFA',
@@ -61,7 +52,6 @@ UnitBlueprint {
         'DIRECTFIRE',
         'EXPERIMENTAL',
         'BOT',
-        'ANTIAIR',
         'AMPHIBIOUS',
         'NEEDMOBILEBUILD',
         'VISIBLETORECON',
@@ -74,8 +64,8 @@ UnitBlueprint {
         'SNIPEMODE',
         'LOWSELECTPRIO',
     },
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0.6,
+    CollisionOffsetY = 3.25,
+    CollisionOffsetZ = 0.5,
     Defense = {
         AirThreatLevel = 16,
         ArmorType = 'Experimental',
@@ -288,9 +278,9 @@ UnitBlueprint {
     SelectionSizeX = 2.2,
     SelectionSizeZ = 1.6,
     SelectionThickness = 0.32,
-    SizeX = 3.2,
-    SizeY = 7.5,
-    SizeZ = 2.5,
+    SizeX = 2.0,
+    SizeY = 4.0,
+    SizeZ = 2.0,
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 115,
     Transport = {
@@ -363,7 +353,6 @@ UnitBlueprint {
             RateOfFire = 0.2,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'COMMAND',
                 'EXPERIMENTAL',
@@ -372,7 +361,7 @@ UnitBlueprint {
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Head',
@@ -442,7 +431,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
-            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
@@ -450,7 +438,7 @@ UnitBlueprint {
                 'TECH2 MOBILE',
                 'TECH3 MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'LeftHand_Muzzle',
@@ -526,7 +514,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.3,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
@@ -534,7 +521,7 @@ UnitBlueprint {
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'RightHand_Muzzle',
@@ -553,7 +540,6 @@ UnitBlueprint {
         },
         {
             AboveWaterFireOnly = true,
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XSL_Weapon',
@@ -605,18 +591,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 3,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Left_AA_Muzzle',
             TurretBonePitch = 'Left_AA_Turret03',
             TurretBoneYaw = 'Left_AA_Turret03',
@@ -633,7 +616,6 @@ UnitBlueprint {
         },
         {
             AboveWaterFireOnly = true,
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XSL_Weapon',
@@ -686,18 +668,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 3,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Right_AA_Muzzle',
             TurretBonePitch = 'Right_AA_Turret02',
             TurretBoneYaw = 'Right_AA_Turret02',
@@ -718,7 +697,7 @@ UnitBlueprint {
             DamageFriendly = true,
             DamageRadius = 6,
             DamageType = 'DeathExplosion',
-            DisplayName = 'Collossus Death',
+            DisplayName = 'Ythotha Death',
             DummyWeapon = true,
             Label = 'CollossusDeath',
             WeaponCategory = 'Death',

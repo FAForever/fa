@@ -194,6 +194,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
         -- T2 Engineering
         elseif enh =='AdvancedEngineering' then
+            self.BuildBotTotal = 3
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then return end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
@@ -223,6 +224,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
             Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
         elseif enh =='AdvancedEngineeringRemove' then
+            self.BuildBotTotal = 2
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
@@ -232,6 +234,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
         -- T3 Engineering
         elseif enh =='T3Engineering' then
+            self.BuildBotTotal = 4
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then return end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
@@ -261,6 +264,12 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
             Buff.ApplyBuff(self, 'CybranACUT3BuildRate')
         elseif enh =='T3EngineeringRemove' then
+
+            -- we do not know the order for sure when both build enhancements are removed at once
+            if self.BuildBotTotal == 4 then 
+                self.BuildBotTotal = 3
+            end
+
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
@@ -377,14 +386,14 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self:CreateTerrainTypeEffects(self.IntelEffects.Field, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
         end
     end,
@@ -400,23 +409,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         elseif self.StealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
             self:SetMaintenanceConsumptionInactive()
         end
-    end,
-
-    -- Death
-    OnKilled = function(self, instigator, type, overkillRatio)
-        local bp
-        for k, v in self:GetBlueprint().Buffs do
-            if v.Add.OnDeath then
-                bp = v
-            end
-        end
-        -- If we could find a blueprint with v.Add.OnDeath, then add the buff
-        if bp ~= nil then
-            -- Apply Buff
-            self:AddBuff(bp)
-        end
-        -- Otherwise, we should finish killing the unit
-        ACUUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     OnLayerChange = function(self, new, old)

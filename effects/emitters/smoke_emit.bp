@@ -1,0 +1,106 @@
+EmitterBlueprint {
+	BlueprintId = 'smoke',
+	Lifetime = 100.00,
+	Repeattime = 100.00,
+	TextureFramecount = 1.00,
+	Blendmode = 0.00,
+	Texture = '/textures/particles/smoke.dds',
+	RampTexture = '/textures/particles/smokeramp.dds',
+	SizeCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.00,y=0.00,z=0.00 },
+		},
+	},
+	XDirectionCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.00,y=0.00,z=0.00 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.40,y=0.16,z=0.10 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.00,y=0.00,z=0.00 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.00,y=1.00,z=0.00 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=48.79,y=13.44,z=5.61 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.00,y=1.00,z=0.00 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.00,y=0.00,z=0.00 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=41.21,y=0.02,z=0.00 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.00,y=0.00,z=0.00 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=38.79,y=1.43,z=0.51 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=46.36,y=2.28,z=0.64 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.00,y=180.00,z=360.00 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.10,y=0.00,z=10.00 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.00,y=1.00,z=0.00 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 100.00,
+		Keys = {
+			{ x=50.00,y=0.00,z=0.00 },
+		},
+	},
+}
+

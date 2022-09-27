@@ -21,6 +21,9 @@ local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
 local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
 local unitviewDetail = import('/lua/ui/game/unitviewDetail.lua')
+local Grid = import('/lua/maui/grid.lua').Grid
+local Construction = import('/lua/ui/game/construction.lua')
+local GameMain = import('/lua/ui/game/gamemain.lua')
 
 local selectedUnit = nil
 local updateThread = nil
@@ -29,6 +32,8 @@ controls = import('/lua/ui/controls.lua').Get()
 
 -- shared between sim and ui
 local OverchargeShared = import('/lua/shared/overcharge.lua')
+
+local UpdateWindowShowQueueOfUnit = (categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY
 
 function OverchargeCanKill()
     if unitHP[1] and unitHP.blueprintId then
@@ -100,28 +105,6 @@ function Expand()
     controls.bg:Show()
 end
 
---INFO:   blueprintId="uel0001",
---INFO:   energyConsumed=0,
---INFO:   energyProduced=10,
---INFO:   energyRequested=0,
---INFO:   entityId="0",
---INFO:   fuelRatio=-1,
---INFO:   health=12000,
---INFO:   kills=0,
---INFO:   massConsumed=0,
---INFO:   massProduced=1,
---INFO:   massRequested=0,
---INFO:   maxHealth=12000,
---INFO:   nukeSiloBuildCount=0,
---INFO:   nukeSiloMaxStorageCount=1,
---INFO:   nukeSiloStorageCount=0,
---INFO:   shieldRatio=0,
---INFO:   tacticalSiloBuildCount=0,
---INFO:   tacticalSiloMaxStorageCount=1,
---INFO:   tacticalSiloStorageCount=0,
---INFO:   teamColor="ffe80a0a",
---INFO:   workProgress=0
-
 local queueTextures = {
     Move = {texture = UIUtil.UIFile('/game/orders/move_btn_up.dds'), text = '<LOC order_0000>Moving'},
     FormMove = {texture = UIUtil.UIFile('/game/orders/move_btn_up.dds'), text = '<LOC order_0000>Moving'},
@@ -158,7 +141,7 @@ local statFuncs = {
             local armyData = GetArmiesTable().armiesTable[info.armyIndex+1]
             local icon = Factions.Factions[armyData.faction+1].Icon
             if armyData.showScore and icon then
-                return armyData.nickname, UIUtil.UIFile(icon), armyData.color
+                return string.sub(armyData.nickname, 1, 12), UIUtil.UIFile(icon), armyData.color
             else
                 return false
             end
@@ -254,6 +237,54 @@ local statFuncs = {
     end,
 }
 
+
+function CreateQueueGrid(parent)
+	controls.queue = Bitmap(parent)
+    controls.queue.grid = Bitmap(controls.queue)
+	controls.queue.grid.items = {}	
+	controls.queue.bg = Bitmap(controls.queue)	
+    controls.queue:DisableHitTest()
+	
+	controls.queue.bg.leftBracket = Bitmap(controls.queue.bg)
+	
+	controls.queue.bg.rightGlowTop = Bitmap(controls.queue.bg)
+    controls.queue.bg.rightGlowMiddle = Bitmap(controls.queue.bg)
+    controls.queue.bg.rightGlowBottom = Bitmap(controls.queue.bg)
+	
+	controls.queue.bg.leftGlowTop = Bitmap(controls.queue.bg)
+    controls.queue.bg.leftGlowMiddle = Bitmap(controls.queue.bg)
+    controls.queue.bg.leftGlowBottom = Bitmap(controls.queue.bg)
+	
+	local function CreateGridUnitIcon(parent)
+        local item =  Bitmap(parent)
+        item.icon = Bitmap(item)
+        item.text = UIUtil.CreateText(item, "", 16, 'Arial Black', true)
+        return item
+    end
+	
+	for id = 1, 7 do
+		controls.queue.grid.items[id] = CreateGridUnitIcon(controls.queue.grid)
+	end
+	
+    controls.queue.grid.UpdateQueue = function (self, queue)
+		if not queue then
+			controls.queue:Hide()
+		else
+            controls.queue:Show()
+			for id, item in self.items do
+				if queue[id] then
+					item:Show()
+					item.icon:SetTexture( UIUtil.UIFile('/icons/units/' ..  queue[id].id .. '_icon.dds', true))
+					item.text:SetText(tostring(queue[id].count))
+				else
+					item:Hide()
+				end
+			end
+		end
+    end	
+    controls.queue:Hide()
+end
+
 function UpdateWindow(info)
     if info.blueprintId == 'unknown' then
         controls.name:SetText(LOC('<LOC rollover_0000>Unknown Unit'))
@@ -276,6 +307,7 @@ function UpdateWindow(info)
         controls.actionIcon:Hide()
         controls.actionText:Hide()
         controls.abilities:Hide()
+        controls.ReclaimGroup:Hide()
     else
         local bp = __blueprints[info.blueprintId]
         if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.blueprintId .. '_icon.dds', true)) then
@@ -351,13 +383,15 @@ function UpdateWindow(info)
             end
         end
 
-        controls.shieldBar:Hide()
         controls.fuelBar:Hide()
         controls.vetBar:Hide()
+        controls.ReclaimGroup:Hide()
 
         if info.shieldRatio > 0 then
             controls.shieldBar:Show()
             controls.shieldBar:SetValue(info.shieldRatio)
+        else
+            controls.shieldBar:Hide()
         end
 
         if info.fuelRatio > 0 then
@@ -464,10 +498,24 @@ function UpdateWindow(info)
                     else
                         text = massKilledTrue
                     end
-
+					
                     controls.nextVet:SetText(text)
                 else
                     controls.vetBar:Hide()
+                end
+            end
+        else
+            if info.entityId then
+                local reclaimedMass, reclaimedEnergy
+                local unit = GetUnitById(info.entityId)
+                if unit then
+                    reclaimedMass = unit:GetStat('ReclaimedMass').Value
+                    reclaimedEnergy = unit:GetStat('ReclaimedEnergy').Value
+                end
+                if reclaimedMass or reclaimedEnergy then
+                    controls.ReclaimGroup:Show()
+                    controls.ReclaimGroup.MassText:SetText(tostring(reclaimedMass or 0))
+                    controls.ReclaimGroup.EnergyText:SetText(tostring(reclaimedEnergy or 0))
                 end
             end
         end
@@ -476,6 +524,37 @@ function UpdateWindow(info)
         if info.userUnit then
             unitQueue = info.userUnit:GetCommandQueue()
         end
+
+        -- -- Build queue upon hovering of unit
+
+        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'always'
+        local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1
+        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'only-obs'
+
+        if always or (whenObserving and isObserver) then 
+            if (info.userUnit ~= nil) and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and (info.userUnit ~= selectedUnit) then
+
+                -- find the main factory we're using the queue of
+                local mainFactory
+                local factory = info.userUnit
+                while true do 
+                    mainFactory = factory:GetGuardedEntity()
+                    if mainFactory == nil then 
+                        break
+                    end
+                    factory = mainFactory
+                end
+                
+                -- show that queue
+                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(factory))
+                ClearCurrentFactoryForQueueDisplay()
+            else 
+                controls.queue:Hide()
+            end
+        else 
+            controls.queue:Hide()
+        end
+
         if info.focus then
             if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true)) then
                 controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true))
@@ -680,6 +759,17 @@ function CreateUI()
     controls.nextVet = UIUtil.CreateText(controls.vetBar, '', 10, UIUtil.bodyFont)
     controls.vetTitle = UIUtil.CreateText(controls.vetBar, 'Veterancy', 10, UIUtil.bodyFont)
 
+    controls.ReclaimGroup = Group(controls.bg)
+    -- controls.ReclaimGroup.Title = UIUtil.CreateText(controls.ReclaimGroup, 'Reclaimed', 10, UIUtil.bodyFont)
+    controls.ReclaimGroup.Debug = Bitmap(controls.ReclaimGroup)
+    controls.ReclaimGroup.MassIcon = Bitmap(controls.ReclaimGroup)
+    controls.ReclaimGroup.EnergyIcon = Bitmap(controls.ReclaimGroup)
+    controls.ReclaimGroup.MassText = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
+    controls.ReclaimGroup.EnergyText = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
+    -- controls.ReclaimGroup.MassReclaimed = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
+    -- controls.ReclaimGroup.MassIcon = Bitmap(controls.ReclaimGroup)
+    -- controls.ReclaimGroup.MassReclaimed = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
+
     controls.statGroups = {}
     for i = 1, table.getn(statFuncs) do
         controls.statGroups[i] = {}
@@ -707,7 +797,7 @@ function CreateUI()
 
     controls.bg.OnFrame = function(self, delta)
         local info = GetRolloverInfo()
-        if not info and selectedUnit then
+        if not info and selectedUnit and options.gui_enhanced_unitview ~= 0 then
             info = GetUnitRolloverInfo(selectedUnit)
         end
 
@@ -732,13 +822,11 @@ function CreateUI()
     LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
     LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
     LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
+	CreateQueueGrid(controls.bg)
 end
 
 function OnSelection(units)
-    if options.gui_enhanced_unitview == 0 then
-        return
-    end
-
+    -- set if we have one unit selected, useful for state management for information to show
     if units and table.getn(units) == 1 then
         selectedUnit = units[1]
     else

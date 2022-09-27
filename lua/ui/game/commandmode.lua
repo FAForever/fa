@@ -6,10 +6,6 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Construction = import('/lua/ui/game/construction.lua')
-local UIMain = import('/lua/ui/uimain.lua')
-local Orders = import('/lua/ui/game/orders.lua')
 local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMeshResources
 local Prefs = import('/lua/user/prefs.lua')
 
@@ -30,46 +26,57 @@ local EntityCategoryFilterDown = EntityCategoryFilterDown
 local AddCommandFeedbackBlip = AddCommandFeedbackBlip
 
 -- upvalue table operations for performance
-local TableInsert = table.insert 
-local TableEmpty = table.empty 
+local TableInsert = table.insert
+local TableEmpty = table.empty
 local TableGetN = table.getn 
 local MathPi = math.pi
 local MathAtan = math.atan
 
+---@class MeshInfo
+---@field Position Vector
+---@field Blueprint string
+---@field TextureName string
+---@field ShaderName string
+---@field UniformScale number
 
 -- When this file is reloaded (using /EnableDiskWatch) the cursor no longer changes
 -- during command mode (e.g., when you do a move order it turns your cursor into
 -- the blue move marker). This is fixed by reloading the game.
 
---- Can be one of three values:
--- - order (called when performing an order)
--- - build (called when trying to build something)
--- - buildanchored (called when ... ?)
+---@alias CommandMode 'order' | 'build' | 'buildanchored' | false
+
+---@class CommandModeDataBase
+---@field cursor? string
+
+---@class CommandModeDataOrder : CommandModeDataBase
+---@field name CommandCap
+
+---@class CommandModeDataBuild : CommandModeDataBase
+---@field name string # blueprint id of the unit being built
+
+---@class CommandModeDataBuildAnchored : CommandModeDataBase
+
+---@alias CommandModeData CommandModeDataOrder | CommandModeDataBuild | CommandModeDataBuildAnchored | false
+
+---@type CommandMode
 local commandMode = false
 
---- Contains additional information for the current command mode:
--- - order -> name (order type, e.g., RULEUCC_Move)
--- - build -> name (blueprint type, e.g., xsb1101)
--- - buildanchored -> ?
+---@type CommandModeData
 local modeData = false
 
 --- Auto-disable command mode right after one command - used when shift is not pressed down.
 local issuedOneCommand = false
-
---- Behavior to run when entering command mode. If f is a function, it is called as f(commandMode, modeData).
 local startBehaviors = {}
-
---- Behavior to run when exiting command mode. If f is a function, it is called as f(commandMode, modeData).
 local endBehaviors = {}
 
---- Adds a starting behavior.
--- @param behavior The behavior to add, called as behavior(commandMode, modeData).
+--- Callback triggers when command mode starts
+--- @param behavior function<CommandMode, CommandModeData>
 function AddStartBehavior(behavior)
     TableInsert(startBehaviors, behavior)
 end
 
---- Adds a starting behavior.
--- @param behavior The behavior to add, called as behavior(commandMode, modeData).
+--- Callback triggers when command mode ends
+--- @param behavior function<CommandMode, CommandModeData>
 function AddEndBehavior(behavior)
     TableInsert(endBehaviors, behavior)
 end
@@ -81,8 +88,8 @@ function SetIgnoreSelection(ignore)
 end
 
 --- Called when the command mode starts and initialises all the data.
--- @param newCommandMode The new command mode.
--- @param data The new mode data.
+---@param newCommandMode CommandMode
+---@param data CommandModeData
 function StartCommandMode(newCommandMode, data)
 
     -- clean up previous command mode
@@ -98,9 +105,6 @@ function StartCommandMode(newCommandMode, data)
     for i,v in startBehaviors do
         v(commandMode, modeData)
     end
-
-    -- update cursor
-    WorldView.OnStartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
@@ -108,8 +112,30 @@ end
 function EndCommandMode(isCancel)
 
     --- ???
-    if ignoreSelection then
+    if ignoreSelection or not modeData then
         return
+    end
+
+    -- regain selection if we were cheating in units
+    if modeData.cheat then 
+        if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
+            local modeData = table.deepcopy(modeData)
+            ForkThread(
+                function()
+                    WaitSeconds(0.0001)
+
+                    modeData.name = modeData.ids[modeData.index]
+                    modeData.bpId = modeData.ids[modeData.index]
+                    modeData.index = modeData.index + 1
+        
+                    StartCommandMode("build", modeData)
+                end
+            )
+        else 
+            if modeData.selection then
+                SelectUnits(modeData.selection)
+            end
+        end
     end
 
     -- add information to modeData for end behavior
@@ -135,10 +161,17 @@ end
 local commandModeTable = { }
 
 --- Retrieves the current command mode information.
+---@return { [1]: CommandModeDataOrder, [2]: CommandModeData }
 function GetCommandMode()
     commandModeTable[1] = commandMode
     commandModeTable[2] = modeData
     return commandModeTable
+end
+
+--- Returns true if we are in command mode
+---@return boolean
+function InCommandMode()
+    return commandMode ~= false
 end
 
 --- A helper function to add the correct feedback animation.
@@ -195,6 +228,14 @@ local pStructure1 = nil
 local pStructure2 = nil
 function CapStructure(command)
 
+    -- retrieve the option in question, can have values: 'off', 'only-storages-extractors' and 'full-suite'
+    local option = Prefs.GetFromCurrentProfile('options.structure_capping_feature_01')
+    
+    -- bail out - we're not interested
+    if option == 'off' then 
+        return 
+    end
+
     -- check if we have engineers
     local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
     if not units[1] then return end
@@ -215,17 +256,40 @@ function CapStructure(command)
     local isTech2 = structure:IsInCategory('TECH2')
     local isTech3 = structure:IsInCategory('TECH3')
 
-    -- are we a structure and are we holding shift?
-    if structure:IsInCategory('STRUCTURE') and IsKeyDown('Shift') and isDoubleTapped then 
+    -- only run logic for structures
+    if structure:IsInCategory('STRUCTURE') then 
 
         -- try and create storages and / or fabricators around it
         if structure:IsInCategory('MASSEXTRACTION') then 
 
             -- check what type of buildings we'd like to make
-            local buildStorages = (isTech1 and isUpgrading) or isTech2 or isTech3
-            local buildFabs = (isTech2 and isUpgrading and isTripleTapped) or (isTech3 and isTripleTapped)
+            local buildFabs = 
+                option == 'full-suite'
+                and (
+                    (isTech2 and isUpgrading and isTripleTapped and isShiftDown) 
+                    or (isTech3 and isDoubleTapped and isShiftDown)
+                )  
+
+            local buildStorages = 
+                (
+                    (isTech1 and isUpgrading and isDoubleTapped and isShiftDown) 
+                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
+                    or (isTech2 and not isUpgrading)
+                    or isTech3
+                ) and not buildFabs
 
             if buildStorages then 
+
+                -- prevent consecutive calls 
+                local gametime = GetGameTimeSeconds()
+                if structure.RingStoragesStamp then 
+                    if structure.RingStoragesStamp + 0.75 > gametime then
+                        return 
+                    end
+                end
+
+                structure.RingStoragesStamp = gametime
+
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
 
                 -- only clear state if we can't make fabricators 
@@ -237,6 +301,17 @@ function CapStructure(command)
             end
 
             if buildFabs then 
+
+                -- prevent consecutive calls 
+                local gametime = GetGameTimeSeconds()
+                if structure.RingFabsStamp then 
+                    if structure.RingFabsStamp + 0.75 > gametime then
+                        return 
+                    end
+                end
+
+                structure.RingFabsStamp = gametime
+
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 2, id = "b1104" }}, true)
                 
                 -- reset state
@@ -245,47 +320,98 @@ function CapStructure(command)
                 pStructure2 = nil
             end
 
-        -- if we have a t3 fabricator, create storages around it
-        elseif structure:IsInCategory('MASSFABRICATION') and isTech3 then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
+        -- only apply these if we're interested in them
+        elseif option == 'full-suite' then 
 
-            -- reset state
-            structure = nil
-            pStructure1 = nil
-            pStructure2 = nil
+                -- prevent consecutive calls 
+                local gametime = GetGameTimeSeconds()
+                if structure.RingStamp then 
+                    if structure.RingStamp + 0.75 > gametime then
+                        return 
+                    end
+                end
 
-        -- if we have a t2 artillery, create t1 pgens around it
-        elseif structure:IsInCategory('ARTILLERY') and isTech2 then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
+                structure.RingStamp = gametime
 
-            -- reset state
-            structure = nil
-            pStructure1 = nil
-            pStructure2 = nil
+            -- if we have a t3 fabricator, create storages around it
+            if structure:IsInCategory('MASSFABRICATION') and isTech3 then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
 
-        -- if we have a radar, create t1 pgens around it
-        elseif ((structure:IsInCategory('RADAR') and (isTech2 or (isTech1 and isUpgrading))) or structure:IsInCategory('OMNI')) then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
 
-            -- reset state
-            structure = nil
-            pStructure1 = nil
-            pStructure2 = nil
+            -- if we have a t2 artillery, create t1 pgens around it
+            elseif structure:IsInCategory('ARTILLERY') and isTech2 then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
-        -- if we have a t1 point defense, create walls around it
-        elseif structure:IsInCategory('DIRECTFIRE') and isTech1 then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b5101" }}, true)
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
 
-            -- reset state
-            structure = nil
-            pStructure1 = nil
-            pStructure2 = nil
+            -- if we have a radar, create t1 pgens around it
+            elseif 
+                structure:IsInCategory('RADAR')  
+                and (
+                       (isTech1 and isUpgrading and isDoubleTapped and isShiftDown) 
+                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown) 
+                    or (isTech2 and not isUpgrading)
+                    )
+                or structure:IsInCategory('OMNI') 
+                then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
+
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
+
+            -- if we have a t1 point defense, create walls around it
+            elseif structure:IsInCategory('DIRECTFIRE') and isTech1 then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b5101" }}, true)
+
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
+            end
         end
     end
 
     -- keep track of previous structure to identify a 2nd / 3rd click
     pStructure2 = pStructure1
     pStructure1 = structure
+
+    -- prevent building up state when upgrading but shift isn't pressed
+    if isUpgrading and not isShiftDown then 
+        structure = nil
+        pStructure1 = nil
+        pStructure2 = nil
+    end
+end
+
+--- Creates a callback to spawn a unit triggered by the cheat menu.
+-- @param command Command that contains the position of the click
+-- @param data A shallow copy of the modeData to make the function pure data-wise
+local function CheatSpawn(command, data)
+    SimCallback({
+        Func = 'BoxFormationSpawn',
+        Args = {
+            bpId = data.bpId,
+            count = data.count,
+            army = data.army,
+            pos = command.Target.Position,
+            veterancy = data.vet,
+            yaw = data.yaw,
+        }
+    }, true)
+
+    -- if we hold shift then we get to place another unit!
+    if not IsKeyDown('Shift') then 
+        EndCommandMode(true)
+    end
 end
 
 -- cached category strings for performance
@@ -296,8 +422,21 @@ local categoriesStructure = categories.STRUCTURE
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
+    -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
+    if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then 
+        if not IsKeyDown('Shift') then 
+            SimCallback({ Func = 'ImmediateHiveUpgrade', Args = { UpgradeTo = command.Blueprint } }, true )
+        end
+    end
+        
+    -- part of the cheat menu
+    if modeData.cheat and command.CommandType == "BuildMobile" and (not command.Units[1]) then
+        CheatSpawn(command, modeData)
+        command.Units = { }
+        return false
+    end
 
-    -- ???
+    -- unknown when set, do not understand when this applies yet. In other words: ???
     if not command.Clear then
         issuedOneCommand = true
     else
@@ -326,8 +465,7 @@ function OnCommandIssued(command)
 
         -- see if we can cap a structure
         if EntityCategoryContains(categoriesStructure, command.Blueprint) then
-            local options = Prefs.GetFromCurrentProfile('options')
-            if options['assist_mex'] then CapStructure(command) end
+            CapStructure(command)
         end
 
     -- called when:
@@ -416,59 +554,8 @@ end
 
 GameMain.AddBeatFunction(OnCommandModeBeat)
 
--- The follow tables are just for reference and are not used:
-
--- -- All possible values for commandMode
--- local commandModes = {
---      "order",
---      "build",
---      "buildanchored",
---  }
-
--- -- A subset of possible values for the 'name' value of modeData
--- local orderModes = {
-
---     -- unit general rules
---     RULEUCC_Move                = (1 << 0),
---     RULEUCC_Stop                = (1 << 1),
---     RULEUCC_Attack              = (1 << 2),
---     RULEUCC_Guard               = (1 << 3),
---     RULEUCC_Patrol              = (1 << 4),
---     RULEUCC_RetaliateToggle     = (1 << 5),
-
---     -- unit specific rules
---     RULEUCC_Repair              = (1 << 6),
---     RULEUCC_Capture             = (1 << 7),
---     RULEUCC_Transport           = (1 << 8),
---     RULEUCC_CallTransport       = (1 << 9),
---     RULEUCC_Nuke                = (1 << 10),
---     RULEUCC_Tactical            = (1 << 11),
---     RULEUCC_Teleport            = (1 << 12),
---     RULEUCC_Ferry               = (1 << 13),
---     RULEUCC_SiloBuildTactical   = (1 << 14),
---     RULEUCC_SiloBuildNuke       = (1 << 15),
---     RULEUCC_Sacrifice           = (1 << 16),
---     RULEUCC_Pause               = (1 << 17),
---     RULEUCC_Overcharge          = (1 << 18),
---     RULEUCC_Dive                = (1 << 19),
---     RULEUCC_Reclaim             = (1 << 20),
---     RULEUCC_SpecialAction       = (1 << 21),
---     RULEUCC_Dock                = (1 << 22),
-
---     -- unit general
---     RULEUCC_Script              = (1 << 23),
---  }
-
--- -- ???
--- local toggleModes = {
---     -- unit toggle rules
---     RULEUTC_ShieldToggle        = (1 << 0),
---     RULEUTC_WeaponToggle        = (1 << 1),
---     RULEUTC_JammingToggle       = (1 << 2),
---     RULEUTC_IntelToggle         = (1 << 3),
---     RULEUTC_ProductionToggle    = (1 << 4),
---     RULEUTC_StealthToggle       = (1 << 5),
---     RULEUTC_GenericToggle       = (1 << 6),
---     RULEUTC_SpecialToggle       = (1 << 7),
---     RULEUTC_CloakToggle         = (1 << 8),
--- }
+-- kept for mod backwards compatibility
+local Dragger = import('/lua/maui/dragger.lua').Dragger
+local Construction = import('/lua/ui/game/construction.lua')
+local UIMain = import('/lua/ui/uimain.lua')
+local Orders = import('/lua/ui/game/orders.lua')

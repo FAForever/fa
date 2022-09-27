@@ -8,6 +8,10 @@
 -- imports fa_path to determine where it is installed
 dofile(InitFileDir .. '/../fa_path.lua')
 
+LOG("Client version: " .. tostring(ClientVersion))
+LOG("Game version: " .. tostring(GameVersion))
+LOG("Game type: " .. tostring(GameType))
+
 -- upvalued performance
 local dofile = dofile
 
@@ -56,37 +60,51 @@ end
 -- mods that have been integrated, based on folder name 
 local integratedMods = { }
 integratedMods["nvidia fix"] = true
+
 integratedMods = LowerHashTable(integratedMods)
 
--- typical FAF packages
-local allowedAssetsNx2 = { }
-allowedAssetsNx2["effects.nx2"] = true
-allowedAssetsNx2["env.nx2"] = true
-allowedAssetsNx2["etc.nx2"] = true
-allowedAssetsNx2["loc.nx2"] = true
-allowedAssetsNx2["lua.nx2"] = true
-allowedAssetsNx2["meshes.nx2"] = true
-allowedAssetsNx2["mods.nx2"] = true
-allowedAssetsNx2["projectiles.nx2"] = true
-allowedAssetsNx2["schook.nx2"] = true
-allowedAssetsNx2["textures.nx2"] = true
-allowedAssetsNx2["units.nx2"] = true
-allowedAssetsNx2 = LowerHashTable(allowedAssetsNx2)
+-- mods that are deprecated, based on folder name
+local deprecatedMods = { }
+deprecatedMods["simspeed++"] = true
+deprecatedMods["#quality of performance 2022"] = true
+
+-- as per #4119 the control groups (called selection sets in code) are completely overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["group_split"] = true
+deprecatedMods["Control Group Zoom Mod"] = true
+deprecatedMods["additionalControlGroupStuff"] = true
+
+-- as per #4124 the cursor and command interactions are complete overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["additionalCameraStuff"] = true
+deprecatedMods["RUI"] = true
+deprecatedMods = LowerHashTable(deprecatedMods)
+
+-- as per #4232 the reclaim view is completely overhauled
+deprecatedMods["Advanced Reclaim&Selection Info"] = true
+deprecatedMods["AdvancedReclaimInfo"] = true
+deprecatedMods["BetterReclaimView"] = true
+deprecatedMods["disableReclaimUI"] = true
+deprecatedMods["DynamicReclaimGrouping"] = true
+deprecatedMods["EzReclaim"] = true
+deprecatedMods["OnScreenReclaimCounter"] = true
+deprecatedMods["ORV"] = true
+deprecatedMods["SmartReclaimSupport"] = true
 
 -- typical FA packages
 local allowedAssetsScd = { }
 allowedAssetsScd["units.scd"] = true
 allowedAssetsScd["textures.scd"] = true
 allowedAssetsScd["skins.scd"] = true
-allowedAssetsScd["schook.scd"] = true
+allowedAssetsScd["schook.scd"] = false      -- completely embedded in the repository
 allowedAssetsScd["props.scd"] = true
 allowedAssetsScd["projectiles.scd"] = true
 allowedAssetsScd["objects.scd"] = true
-allowedAssetsScd["moholua.scd"] = true
-allowedAssetsScd["mohodata.scd"] = true
+allowedAssetsScd["moholua.scd"] = false     -- completely embedded in the repository
+allowedAssetsScd["mohodata.scd"] = false    -- completely embedded in the repository
 allowedAssetsScd["mods.scd"] = true
 allowedAssetsScd["meshes.scd"] = true
-allowedAssetsScd["lua.scd"] = true
+allowedAssetsScd["lua.scd"] = false         -- completely embedded in the repository
 allowedAssetsScd["loc_us.scd"] = true
 allowedAssetsScd["loc_es.scd"] = true
 allowedAssetsScd["loc_fr.scd"] = true
@@ -95,16 +113,16 @@ allowedAssetsScd["loc_de.scd"] = true
 allowedAssetsScd["loc_ru.scd"] = true
 allowedAssetsScd["env.scd"] = true
 allowedAssetsScd["effects.scd"] = true
-allowedAssetsScd["editor.scd"] = true
-allowedAssetsScd["ambience.scd"] = true
-allowedAssetsScd["lobbymanager_v105.scd"] = true
+allowedAssetsScd["editor.scd"] = false      -- Unused
+allowedAssetsScd["ambience.scd"] = false    -- Empty 
 allowedAssetsScd["sc_music.scd"] = true
 allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 
 -- typical backwards compatible packages
 local allowedAssetsNxt = { }
-allowedAssetsNxt["texturepack.nxt"] = true
+allowedAssetsNxt["kyros.nxt"] = true
 allowedAssetsNxt["advanced strategic icons.nxt"] = true
+allowedAssetsNxt["advanced_strategic_icons.nxt"] = true
 allowedAssetsNxt = LowerHashTable(allowedAssetsNxt)
 
 -- default wave banks to prevent collisions
@@ -114,7 +132,7 @@ for k, v in faSounds do
     if v == '.' or v == '..' then 
         continue 
     end
-    soundsBlocked[StringLower(v)] = true
+    soundsBlocked[StringLower(v)] = "FA installation"
 end
 
 -- default movie files to prevent collisions
@@ -124,7 +142,7 @@ for k, v in faMovies do
     if v == '.' or v == '..' then 
         continue 
     end
-    moviesBlocked[StringLower(v)] = true
+    moviesBlocked[StringLower(v)] = "FA installation"
 end
 
 --- Mounts a directory or scd / zip file.
@@ -139,33 +157,16 @@ local function MountDirectory(dir, mountpoint)
     UpvaluedPathNext = UpvaluedPathNext + 1
 end
 
---- Mounts all allowed content in a directory, including scd and zip files, to the mountpoint.
--- @param dir The absolute path to the directory
--- @param mountpoint The path to use in the game (e.g., /maps/...)
-local function MountContent(dir, mountpoint, allowedAssets)
-    for _,entry in IoDir(dir .. '/*') do
-        if entry != '.' and entry != '..' then
-            local mp = StringLower(entry)
-            if allowedAssets[mp] then 
-                MountDirectory(dir .. '/' .. entry, mountpoint .. '/' .. mp)
-            else 
-                LOG("Prevented loading content that is not allowed: " .. entry)
-            end
-        end
-    end
-end
-
 --- Mounts all allowed content in a directory, including scd and zip files, directly.
 -- @param dir The absolute path to the directory
 -- @param mountpoint The path to use in the game (e.g., /maps/...)
-local function MountAllowedContent(dir, allowedAssets)
-    for _,entry in IoDir(dir .. '/*') do
+local function MountAllowedContent(dir, pattern, allowedAssets)
+    for _,entry in IoDir(dir .. pattern) do
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
             if allowedAssets[mp] then 
+                LOG("mounting content: " .. entry)
                 MountDirectory(dir .. "/" .. entry, '/')
-            else 
-                LOG("Prevented loading content that is not allowed: " .. entry)
             end
         end
     end
@@ -189,7 +190,9 @@ local function MountMapContent(dir)
         end
 
         -- do not load archives as maps
-        if StringSub(map, -4) == ".zip" or StringSub(map, -4) == ".scd"  or StringSub(map, -4) == ".rar" then
+        local extension = StringSub(map, -4)
+        if extension == ".zip" or extension == ".scd" or extension == ".rar" then
+            LOG("Prevented loading a map inside a zip / scd / rar file: " .. dir .. "/" .. map)
             continue 
         end
 
@@ -212,22 +215,22 @@ local function MountMapContent(dir)
 
         -- check if it has a scenario file
         if not scenarioFile then 
-            LOG("Map doesn't have a scenario file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no scenario file: " .. dir .. "/" .. map)
             continue 
         end
 
         if not scmapFile then 
-            LOG("Map doesn't have a scmap file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no scmap file: " .. dir .. "/" .. map)
             continue 
         end
 
         if not saveFile then 
-            LOG("Map doesn't have a save file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no save file: " .. dir .. "/" .. map)
             continue 
         end
 
         if not scriptFile then 
-            LOG("Map doesn't have a script file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no script file: " .. dir .. "/" .. map)
             continue 
         end
 
@@ -258,42 +261,52 @@ local function MountMapContent(dir)
                 -- find conflicting files
                 local conflictingFiles = { }
                 for _, file in IoDir(dir .. '/' .. map .. '/movies/*') do
-                    if moviesBlocked[StringLower(file)] then 
-                        TableInsert(conflictingFiles, file)
+                    if not (file == '.' or file == '..') then 
+                        local identifier = StringLower(file) 
+                        if moviesBlocked[identifier] then 
+                            TableInsert(conflictingFiles, { file = file, conflict = moviesBlocked[identifier] })
+                        else 
+                            moviesBlocked[identifier] = StringLower(map)
+                        end
                     end
                 end
                     
                 -- report them if they exist and do not mount
                 if TableGetn(conflictingFiles) > 0 then 
-                    LOG('Found conflicting movies with the base game for map, cannot mount movies for: ' .. map)
+                    LOG("Found conflicting movie banks for map: '" .. map .. "', cannot mount the movie bank(s):")
                     for k, v in conflictingFiles do 
-                        LOG(" - Conflicting movie file: " .. v )
+                        LOG(" - Conflicting movie bank: '" .. v.file .. "' of map '" .. map .. "' is conflicting with a movie bank from: '" .. v.conflict .. "'" )
                     end
                 -- else, mount folder
                 else
                     LOG("Mounting movies of map: " .. map )
-                    MountDirectory(dir..map..'/movies', '/movies')
+                    MountDirectory(dir .. "/" .. map .. '/movies', '/movies')
                 end
             elseif folder == 'sounds' then
                 -- find conflicting files
                 local conflictingFiles = { }
                 for _, file in IoDir(dir .. '/' .. map .. '/sounds/*') do
-                    if soundsBlocked[StringLower(file)] then 
-                        TableInsert(conflictingFiles, file)
+                    if not (file == '.' or file == '..') then 
+                        local identifier = StringLower(file) 
+                        if soundsBlocked[identifier] then 
+                            TableInsert(conflictingFiles, { file = file, conflict = soundsBlocked[identifier] })
+                        else 
+                            soundsBlocked[identifier] = StringLower(map)
+                        end
                     end
                 end
                     
                 -- report them if they exist and do not mount
                 if TableGetn(conflictingFiles) > 0 then 
-                    LOG('Found conflicting sounds with the base game for map, cannot mount sounds for: ' .. map)
+                    LOG("Found conflicting sound banks for map: '" .. map .. "', cannot mount the sound bank(s):")
                     for k, v in conflictingFiles do 
-                        LOG(" - Conflicting sound file: " .. v )
+                        LOG(" - Conflicting sound bank: '" .. v.file .. "' of map '" .. map .. "' is conflicting with a sound bank from: '" .. v.conflict .. "'" )
                     end
 
                 -- else, mount folder
                 else
                     LOG("Mounting sounds of map: " .. map )
-                    MountDirectory(dir..map..'/sounds', '/sounds')
+                    MountDirectory(dir.. "/" .. map .. '/sounds', '/sounds')
                 end
             end
         end
@@ -319,12 +332,20 @@ local function MountModContent(dir)
 
         -- do not load integrated mods
         if integratedMods[mod] then 
-            _ALERT("Blocked mod that is integrated: " .. mod )
+            LOG("Prevented loading a mod that is integrated: " .. mod )
+            continue 
+        end 
+
+        -- do not load deprecated mods
+        if deprecatedMods[mod] then 
+            LOG("Prevented loading a mod that is deprecated: " .. mod )
             continue 
         end 
 
         -- do not load archives as mods
-        if StringFind(mod, ".zip") or StringFind(mod, ".scd") or StringFind(mod, ".rar") then
+        local extension = StringSub(mod, -4)
+        if extension == ".zip" or extension == ".scd" or extension == ".rar" then
+            LOG("Prevented loading a mod inside a zip / scd / rar file: " .. dir .. "/" .. mod)
             continue 
         end
 
@@ -338,7 +359,7 @@ local function MountModContent(dir)
 
         -- check if it has a scenario file
         if not infoFile then 
-            _ALERT("Mod doesn't have an info file: " .. dir .. "/" .. mod)
+            LOG("Mod doesn't have an info file: " .. dir .. "/" .. mod)
             continue 
         end
 
@@ -362,21 +383,26 @@ local function MountModContent(dir)
                 -- find conflicting files
                 local conflictingFiles = { }
                 for _, file in IoDir(dir .. '/' .. mod .. '/sounds/*') do
-                    if soundsBlocked[StringLower(file)] then 
-                        TableInsert(conflictingFiles, file)
+                    if not (file == '.' or file == '..') then 
+                        local identifier = StringLower(file) 
+                        if soundsBlocked[identifier] then 
+                            TableInsert(conflictingFiles, { file = file, conflict = soundsBlocked[identifier] })
+                        else 
+                            soundsBlocked[identifier] = StringLower(mod)
+                        end
                     end
                 end
                     
                 -- report them if they exist and do not mount
                 if TableGetn(conflictingFiles) > 0 then 
-                    LOG('Found conflicting sounds with the base game for mod, cannot mount sounds for: ' .. mod)
+                    LOG("Found conflicting sound banks for mod: '" .. mod .. "', cannot mount the sound bank(s):")
                     for k, v in conflictingFiles do 
-                        LOG(" - Conflicting sound file: " .. v )
+                        LOG(" - Conflicting sound bank: '" .. v.file .. "' of mod '" .. mod .. "' is conflicting with a sound bank from: '" .. v.conflict .. "'" )
                     end
                 -- else, mount folder
                 else
                     LOG("Mounting sounds in mod: " .. mod )
-                    MountDirectory(dir .. mod .. '/sounds', '/sounds')
+                    MountDirectory(dir .. "/" .. mod .. '/sounds', '/sounds')
                 end
             end
 
@@ -407,9 +433,39 @@ end
 
 -- END OF COPY --
 
+-- minimum viable shader version - should be bumped to the next release version when we change the shaders
+local minimumShaderVersion = 3729
+
+-- look for unviable shaders and remove them
+local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
+for k, file in IoDir(shaderCache .. '/*') do
+    if file != '.' and file != '..' then 
+        local version = tonumber(string.sub(file, -4))
+        if not version or version < minimumShaderVersion then 
+            LOG("Removed incompatible shader: " .. file)
+            os.remove(shaderCache .. '/' .. file)
+        end
+    end
+end
+
+-- typical FAF packages
+local allowedAssetsNxy = { }
+allowedAssetsNxy["effects.nx2"] = true
+allowedAssetsNxy["env.nx2"] = true
+allowedAssetsNxy["etc.nx2"] = true
+allowedAssetsNxy["loc.nx2"] = true
+allowedAssetsNxy["lua.nx2"] = true
+allowedAssetsNxy["meshes.nx2"] = true
+allowedAssetsNxy["mods.nx2"] = true
+allowedAssetsNxy["projectiles.nx2"] = true
+-- allowedAssetsNxy["schook.nx2"] = true
+allowedAssetsNxy["textures.nx2"] = true
+allowedAssetsNxy["units.nx2"] = true
+allowedAssetsNxy = LowerHashTable(allowedAssetsNxy)
+
 -- load maps / mods from custom vault location, if set by client
 if custom_vault_path then
-	LOG('Loading custom vault path' .. custom_vault_path)
+	LOG('Loading custom vault path: ' .. custom_vault_path)
 	LoadVaultContent(custom_vault_path)
 else
     LOG("No custom vault path defined: loading from backup locations. You should update your client to 2021/10/+.")
@@ -421,7 +477,7 @@ end
 
 -- load in .nxt / .nx2 / .scd files that we allow
 MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nxt', allowedAssetsNxt)
-MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', allowedAssetsNx2)
+MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', allowedAssetsNxy)
 MountAllowedContent(fa_path .. '/gamedata/', '*.scd', allowedAssetsScd)
 
 -- get direct access to preferences file, letting us have much more control over its content. This also includes cache and similar

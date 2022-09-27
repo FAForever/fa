@@ -1,8 +1,10 @@
---- Class CLuaWldUIProvider
--- @classmod User.CLuaWldUIProvider
+---@meta
+
+---@class moho.WldUIProvider_methods : Destroyable
+local CLuaWldUIProvider = {}
 
 ---
---
-function CLuaWldUIProvider:moho.WldUIProvider_methods()
+function CLuaWldUIProvider:Destroy()
 end
 
+return CLuaWldUIProvider

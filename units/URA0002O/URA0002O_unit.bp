@@ -1,4 +1,5 @@
 UnitBlueprint {
+    AI = { },
     Air = {
         BankFactor = 0.1,
         BankForward = false,
@@ -39,6 +40,7 @@ UnitBlueprint {
         'UNSPAWNABLE',
         'UNSELECTABLE',
         'INSIGNIFICANTUNIT',
+        'DUMMYUNIT',
         
         -- make it visible to recon at least
         'VISIBLETORECON',

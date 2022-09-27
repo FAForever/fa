@@ -23,10 +23,16 @@ local SPAI = import('/lua/ScenarioPlatoonAI.lua')
 --for sorian AI
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
+---@alias PlatoonSquads 'Attack' | 'Artillery' | 'Guard' | 'None' | 'Scout' | 'Support' | 'Unassigned'
+
+---@class Platoon : moho.platoon_methods
+---@field PlatoonData table
 Platoon = Class(moho.platoon_methods) {
     NeedCoolDown = false,
     LastAttackDestination = {},
 
+    ---@param self Platoon
+    ---@param plan table
     OnCreate = function(self, plan)
         self.Trash = TrashBag()
         if self[plan] then
@@ -40,10 +46,13 @@ Platoon = Class(moho.platoon_methods) {
         self.CreationTime = GetGameTimeSeconds()
     end,
 
+    ---@param self Platoon
+    ---@param dataTable table
     SetPlatoonData = function(self, dataTable)
         self.PlatoonData = table.deepcopy(dataTable)
     end,
 
+    ---@param self Platoon
     SetPartOfAttackForce = function(self)
         if not self.PlatoonData then
             self.PlatoonData = {}
@@ -84,11 +93,16 @@ Platoon = Class(moho.platoon_methods) {
         self:AddDestroyCallback(aiBrain.AttackManager.DecrementCount)
     end,
 
-
+    ---@param self Platoon
+    ---@return boolean
     IsPartOfAttackForce = function(self)
         return self.PartOfAttackForce
     end,
 
+    ---@param self Platoon
+    ---@param fn function
+    ---@param ... any
+    ---@return thread
     ForkAIThread = function(self, fn, ...)
         if fn then
             self.AIThread = ForkThread(fn, self, unpack(arg))
@@ -99,12 +113,15 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     StopAI = function(self)
         if self.AIThread != nil then
             self.AIThread:Destroy()
         end
     end,
 
+    ---@param self Platoon
+    ---@param callbackFunction function
     AddDestroyCallback = function(self, callbackFunction)
         if not callbackFunction then
             error('*ERROR: Tried to add an OnDestroy on a platoon callback with a nil function')
@@ -113,6 +130,7 @@ Platoon = Class(moho.platoon_methods) {
         table.insert(self.EventCallbacks.OnDestroyed, callbackFunction)
     end,
 
+    ---@param self Platoon
     DoDestroyCallbacks = function(self)
         if self.EventCallbacks.OnDestroyed then
             for k, cb in self.EventCallbacks.OnDestroyed do
@@ -123,6 +141,8 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
+    ---@param fn function
     RemoveDestroyCallback = function(self, fn)
         for k,v in self.EventCallbacks.OnDestroyed do
             if v == fn then
@@ -131,6 +151,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     OnDestroy = function(self)
 
         --DUNCAN - Added
@@ -142,6 +163,10 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
+    ---@param fn function
+    ---@param ... any
+    ---@return thread
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -152,6 +177,8 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
+    ---@param plan table
     SetAIPlan = function(self, plan)
         if not self[plan] then return end
         if self.AIThread then
@@ -161,26 +188,35 @@ Platoon = Class(moho.platoon_methods) {
         self:ForkAIThread(self[plan])
     end,
 
+    ---@param self Platoon
+    ---@return string|nil
     GetPlan = function(self)
         if self.PlanName then
             return self.PlanName
         end
     end,
 
+    ---@param self Platoon
+    ---@param rings number
+    ---@return number
     GetThreatLevel = function(self, rings)
         local brain = self:GetBrain()
         return brain:GetThreatAtPosition(self:GetPlatoonPosition(), rings, true)
     end,
 
+    ---@param self Platoon
+    ---@param commands PlatoonCommand[]
+    ---@return boolean 
     CheckCommandsCompleted = function(self, commands)
         for k, v in commands do
-            if self:IsCommandsActive(commands) then
+            if self:IsCommandsActive(v) then
                 return false
             end
         end
         return true
     end,
 
+    ---@param self Platoon
     TurnOffPoolAI = function(self)
         if self.PoolAIOn then
             self.AIThread:Destroy()
@@ -189,15 +225,18 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     TurnOnPoolAI = function(self)
         if not self.PoolAIOn and not self.AIThread then
             self.AIThread = self:ForkAIThread(self.PoolAI)
         end
     end,
 
+    ---@param self Platoon
     PoolAI = function(self)
     end,
 
+    ---@param self Platoon
     OnUnitsAddedToPlatoon = function(self)
         for k,v in self:GetPlatoonUnits() do
             if not v.Dead then
@@ -206,6 +245,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     PlatoonDisband = function(self)
         local aiBrain = self:GetBrain()
         if self.BuilderHandle then
@@ -245,6 +285,12 @@ Platoon = Class(moho.platoon_methods) {
         aiBrain:DisbandPlatoon(self)
     end,
 
+    ---@param self Platoon
+    ---@param threatType BrainThreatType
+    ---@param unitCategory EntityCategory
+    ---@param position Vector
+    ---@param radius number
+    ---@return number|nil
     GetPlatoonThreat = function(self, threatType, unitCategory, position, radius)
         local threat = 0
         if position then
@@ -255,6 +301,11 @@ Platoon = Class(moho.platoon_methods) {
         return threat
     end,
 
+    ---@param self Platoon
+    ---@param category EntityCategory
+    ---@param point Vector
+    ---@param radius number
+    ---@return Unit[]
     GetPlatoonUnitsAroundPoint = function(self, category, point, radius)
         local units = {}
         for k,v in self:GetPlatoonUnits() do
@@ -274,6 +325,11 @@ Platoon = Class(moho.platoon_methods) {
         return units
     end,
 
+    ---@param self Platoon
+    ---@param category EntityCategory
+    ---@param position Vector
+    ---@param radius number
+    ---@return nil 
     GetNumCategoryUnits = function(self, category, position, radius)
         local numUnits = 0
         if position then
@@ -285,6 +341,7 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     -- ===== AI THREADS ===== --
+    ---@param self Platoon
     BuildOnceAI = function(self)
         local aiBrain = self:GetBrain()
         for k,v in self:GetPlatoonUnits() do
@@ -296,6 +353,7 @@ Platoon = Class(moho.platoon_methods) {
         aiBrain:PBMSetPriority(self, 0)
     end,
 
+    ---@param self Platoon
     EnhanceAI = function(self)
         local aiBrain = self:GetBrain()
         local unit
@@ -330,6 +388,7 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
+    ---@param self Platoon
     HuntAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -350,6 +409,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     TacticalAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -420,6 +480,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     NukeAI = function(self)
         --self:Stop()
         local aiBrain = self:GetBrain()
@@ -456,6 +517,7 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
+    ---@param self Platoon
     AntiNukeAI = function(self)
         self:Stop()
         local platoonUnits = self:GetPlatoonUnits()
@@ -472,6 +534,7 @@ Platoon = Class(moho.platoon_methods) {
         antiNuke:SetAutoMode(true)
     end,
 
+    ---@param self Platoon
     PauseAI = function(self)
         local platoonUnits = self:GetPlatoonUnits()
         local aiBrain = self:GetBrain()
@@ -489,15 +552,10 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
-    -------------------------------------------------------
-    --   Function: ExperimentalAIHub
-    --   Args:
-    --       self - the single-experimental platoon to run the AI on
-    --   Description:
-    --       If set as a platoon's AI function, will select an appropriate behavior based on the unit type.
-    --   Returns:
-    --       nil (tail calls into a behavior function)
-    -------------------------------------------------------
+    ---## Function: ExperimentalAIHub
+    --- If set as a platoon's AI function, will select an appropriate behavior based on the unit type.
+    ---@param self Platoon
+    ---@return nil
     ExperimentalAIHub = function(self)
 
         local behaviors = import('/lua/ai/AIBehaviors.lua')
@@ -521,17 +579,12 @@ Platoon = Class(moho.platoon_methods) {
         return behaviors.BehemothBehavior(self)
     end,
 
-    -------------------------------------------------------
-    --   Function: GuardEngineer
-    --   Args:
-    --       platoon - platoon to run the AI
-    --       function [opt] - AI function to run when done guarding
-    --       bool [opt] - if true, forces a platoon's units to disband and guard a base forever
-    --   Description:
-    --       Provides logic for platoons to guard expansion areas and engineers.
-    --   Returns:
-    --       nil (tail calls into the nextAIFunc or itself)
-    -------------------------------------------------------
+    ---## Function: GuardEngineer
+    --- Provides logic for platoons to guard expansion areas and engineers.
+    ---@param self Platoon
+    ---@param nextAIFunc? function
+    ---@param forceGuardBase? boolean
+    ---@return nil
     GuardEngineer = function(self, nextAIFunc, forceGuardBase)
         local aiBrain = self:GetBrain()
 
@@ -657,7 +710,8 @@ Platoon = Class(moho.platoon_methods) {
         return self:GuardEngineer(nextAIFunc, forceGuardBase)
     end,
 
-    --DUNCAN - added
+    ---@param self Platoon
+    ---@return AIBrain|nil
     GuardUnit = function(self)
         --LOG('GuardUnit AI started...')
         local aiBrain = self:GetBrain()
@@ -723,15 +777,10 @@ Platoon = Class(moho.platoon_methods) {
         return self:HuntAI()
     end,
 
-    -------------------------------------------------------
-    --   Function: GuardMarker
-    --   Args:
-    --       platoon - platoon to run the AI
-    --   Description:
-    --       Will guard the location of a marker
-    --   Returns:
-    --       nil
-    -------------------------------------------------------
+    ---## Function: GuardMarker
+    --- Will guard the location of a marker
+    ---@param self Platoon
+    ---@return nil
     GuardMarker = function(self)
         local aiBrain = self:GetBrain()
 
@@ -989,6 +1038,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     GuardBase = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -1042,15 +1092,10 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: LandScoutingAI
-    --   Args:
-    --       platoon - platoon to run the AI
-    --   Description:
-    --       Handles sending land scouts to important locations.
-    --   Returns:
-    --       nil (loops until platoon is destroyed)
-    -------------------------------------------------------
+    ---## Function: LandScoutingAI
+    --- Handles sending land scouts to important locations.
+    ---@param self Platoon
+    ---@return nil
     LandScoutingAI = function(self)
         AIAttackUtils.GetMostRestrictiveLayer(self)
 
@@ -1117,19 +1162,14 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: DoAirScoutVecs
-    --   Args:
-    --       platoon - platoon to run the AI
-    --       unit - the scout
-    --       targetArea - a position to scout
-    --   Description:
-    --       Creates an attack vector that will cause the scout to fly by the target at a distance of its visual range.
-    --       Whether to fly by on the left or right is decided randomly. This whole affair should hopefully extend the
-    --       life of the air scout.
-    --   Returns:
-    --       destination position
-    -------------------------------------------------------
+    ---## Function: DoAirScoutVecs
+    --- Creates an attack vector that will cause the scout to fly by the target at a distance of its visual range.
+    --- Whether to fly by on the left or right is decided randomly. This whole affair should hopefully extend the
+    --- life of the air scout.
+    ---@param self Platoon
+    ---@param scout Unit
+    ---@param targetArea Vector
+    ---@return Vector
     DoAirScoutVecs = function(self, scout, targetArea)
         local vec = {0, 0, 0}
         vec[1] = targetArea[1] - scout:GetPosition()[1]
@@ -1159,15 +1199,9 @@ Platoon = Class(moho.platoon_methods) {
         return dest
     end,
 
-    -------------------------------------------------------
-    --   Function: AirScoutingAI
-    --   Args:
-    --       platoon - platoon to run the AI
-    --   Description:
-    --       Handles sending air scouts to important locations.
-    --   Returns:
-    --       nil (loops until platoon is destroyed)
-    -------------------------------------------------------
+    ---## Function: AirScoutingAI
+    --- Handles sending air scouts to important locations.
+    ---@param self Platoon
     AirScoutingAI = function(self)
 
         local scout = self:GetPlatoonUnits()[1]
@@ -1268,15 +1302,10 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: ScoutingAI
-    --   Args:
-    --       platoon - a single-scout platoon to run the AI for
-    --   Description:
-    --       Switches to AirScoutingAI or LandScoutingAI depending on the unit's movement capabilities.
-    --   Returns:
-    --       nil. (Tail call into other AI functions)
-    -------------------------------------------------------
+    ---## Function: ScoutingAI
+    --- Switches to AirScoutingAI or LandScoutingAI depending on the unit's movement capabilities.
+    ---@param self Platoon
+    ---@return nil
     ScoutingAI = function(self)
         AIAttackUtils.GetMostRestrictiveLayer(self)
 
@@ -1287,6 +1316,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     PatrolBaseVectorsAI = function(self)
         self:Stop()
         self:SetPartOfAttackForce()
@@ -1316,6 +1346,7 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
+    ---@param self Platoon
     PlatoonCallForHelpAI = function(self)
         local aiBrain = self:GetBrain()
         local checkTime = self.PlatoonData.DistressCheckTime or 7
@@ -1333,6 +1364,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     DistressResponseAI = function(self)
         local aiBrain = self:GetBrain()
         while aiBrain:PlatoonExists(self) do
@@ -1388,6 +1420,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     PoolDistressAI = function(self)
         local aiBrain = self:GetBrain()
         local distressRange = aiBrain.BaseMonitor.PoolDistressRange
@@ -1425,11 +1458,14 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
+    ---@param locData table
     UnlockPBMDistressLocation = function(self, locData)
         WaitSeconds(15)
         locData.DistressCall = false
     end,
 
+    ---@param self Platoon
     BaseManagersDistressAI = function(self)
         local aiBrain = self:GetBrain()
         while aiBrain:PlatoonExists(self) do
@@ -1467,16 +1503,20 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
+    ---@param locData table
     UnlockBaseManagerDistressLocation = function(self, locData)
         WaitSeconds(15)
         locData.DistressCall = false
     end,
 
+    ---@param self Platoon
     DisbandAI = function(self)
         self:Stop()
         self:PlatoonDisband()
     end,
 
+    ---@param self Platoon
     CaptureAI = function(self)
         local engineers = {}
         local notEngineers = {}
@@ -1574,7 +1614,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    --DUNCAN - credit to Sorian
+    ---@param self Platoon
     ReclaimStructuresAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -1635,6 +1675,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     ReclaimAI = function(self)
         self:Stop()
         local brain = self:GetBrain()
@@ -1666,7 +1707,7 @@ Platoon = Class(moho.platoon_methods) {
             for k,v in ents do
                 if not IsProp(v) or eng.BadReclaimables[v] then continue end
                 if not needEnergy or v.MaxEnergyReclaim then
-                    local rpos = v:GetCachePosition()
+                    local rpos = v:GetPosition()
                     table.insert(reclaim, {entity=v, pos=rpos, distance=VDist2(pos[1], pos[3], rpos[1], rpos[3])})
                 end
             end
@@ -1706,6 +1747,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     ReclaimUnitsAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -1756,7 +1798,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    --DUNCAN - credit to Sorian
+    ---@param self Platoon
     RepairAI = function(self)
         local aiBrain = self:GetBrain()
         if not self.PlatoonData or not self.PlatoonData.LocationType then
@@ -1786,7 +1828,7 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
-    --DUNCAN - credit to Sorian
+    ---@param self Platoon
     ManagerEngineerFindUnfinished = function(self)
         local aiBrain = self:GetBrain()
         local eng = self:GetPlatoonUnits()[1]
@@ -1826,6 +1868,7 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
+    ---@param self Platoon
     EconUnfinishedBody = function(self)
         local aiBrain = self:GetBrain()
         local eng = self:GetPlatoonUnits()[1]
@@ -1873,6 +1916,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     ManagerEngineerAssistAI = function(self)
         local aiBrain = self:GetBrain()
         local eng = self:GetPlatoonUnits()[1]
@@ -1911,6 +1955,7 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
+    ---@param self Platoon
     EconAssistBody = function(self)
         local aiBrain = self:GetBrain()
         local eng = self:GetPlatoonUnits()[1]
@@ -1984,6 +2029,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     AssistBody = function(self)
         local aiBrain = self:GetBrain()
         WaitTicks(5)
@@ -2084,6 +2130,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     EngineerAssistAI = function(self)
         self:ForkThread(self.AssistBody)
         local aiBrain = self:GetBrain()
@@ -2097,18 +2144,12 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
-
-    -------------------------------------------------------
-    --   Function: EngineerBuildAI
-    --   Args:
-    --       self - the single-engineer platoon to run the AI on
-    --   Description:
-    --       a single-unit platoon made up of an engineer, this AI will determine
-    --       what needs to be built (based on platoon data set by the calling
-    --       abstraction, and then issue the build commands to the engineer
-    --   Returns:
-    --       nil (tail calls into a behavior function)
-    -------------------------------------------------------
+    ---## Function: EngineerBuildAI
+    --- a single-unit platoon made up of an engineer, this AI will determine
+    --- what needs to be built based on platoon data set by the calling
+    --- abstraction, and then issue the build commands to the engineer
+    ---@param self Platoon
+    ---@return nil
     EngineerBuildAI = function(self)
         local aiBrain = self:GetBrain()
         local platoonUnits = self:GetPlatoonUnits()
@@ -2441,6 +2482,7 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     --UpgradeAnEngineeringPlatoon
+    ---@param self Platoon
     UnitUpgradeAI = function(self)
         local aiBrain = self:GetBrain()
         local platoonUnits = self:GetPlatoonUnits()
@@ -2520,6 +2562,7 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
+    ---@param self Platoon
     TransferAI = function(self)
         if not self.PlatoonData or not self.PlatoonData.LocationType then
             self:PlatoonDisband()
@@ -2538,6 +2581,7 @@ Platoon = Class(moho.platoon_methods) {
         aiBrain.BuilderManagers[self.PlatoonData.LocationType].EngineerManager:AddUnit(eng, true)
     end,
 
+    ---@param self Platoon
     RepairCDRAI = function(self)
         local aiBrain = self:GetBrain()
         local cdrUnits = aiBrain:GetListOfUnits(categories.COMMAND, false)
@@ -2551,6 +2595,7 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     --DUNCAN - Credit to sorian, called AirHuntAI in his pack
+    ---@param self Platoon
     GunshipHuntAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -2586,6 +2631,7 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     --DUNCAN - Credit to sorian, called FighterHuntAI in his pack
+    ---@param self Platoon
     InterceptorAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -2635,6 +2681,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     StrikeForceAI = function(self)
         local aiBrain = self:GetBrain()
         local armyIndex = aiBrain:GetArmyIndex()
@@ -2707,17 +2754,11 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: CarrierAI
-    --   Args:
-    --       self - the carrier platoon to run the AI on
-    --   Description:
-    --       Uses the carrier as a sea-based powerful anti-air unit.
-    --       Dispatches the carrier to a location with heavy air cover
-    --       to wreck havoc on air units
-    --   Returns:
-    --       nil (tail calls into a behavior function)
-    -------------------------------------------------------
+    ---## Function: CarrierAI
+    --- Uses the carrier as a sea-based powerful anti-air unit.
+    --- Dispatches the carrier to a location with heavy air cover
+    --- to wreck havoc on air units
+    ---@param self Platoon
     CarrierAI = function(self)
         local aiBrain = self:GetBrain()
         if not aiBrain then
@@ -2810,23 +2851,18 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: DummyAI
-    --   Args:
-    --       self - the single platoon to run the AI on
-    --   Description:
-    --       Does nothing, just returns
-    --   Returns:
-    --       nil (tail calls into a behavior function)
-    -------------------------------------------------------
+    ---## Function: DummyAI
+    --- Does nothing, just returns
+    ---@param self Platoon
     DummyAI = function(self)
     end,
 
+    ---@param self Platoon
     ArtilleryAI = function(self)
         local aiBrain = self:GetBrain()
 
         local atkPri = { 'STRUCTURE STRATEGIC', 'EXPERIMENTAL LAND', 'STRUCTURE SHIELD', 'COMMAND', 'STRUCTURE FACTORY',
-            'STRUCTURE DEFENSE', 'MOBILE TECH3 LAND', 'MOBILE TECH2 LAND', 'SPECIALLOWPRI', 'ALLUNITS' }
+            'STRUCTURE DEFENSE', 'MOBILE TECH3 LAND', 'MOBILE TECH2 LAND', 'ALLUNITS' }
         local atkPriTable = {}
         for k,v in atkPri do
             table.insert(atkPriTable, ParseEntityCategory(v))
@@ -2861,16 +2897,10 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: NavalForceAI
-    --   Args:
-    --       self - the single platoon to run the AI on
-    --   Description:
-    --       Basic attack logic for boats.  Searches for a good area to go attack, and will use
-    --       a safe path (if available) to get there.
-    --   Returns:
-    --       nil (tail calls into a behavior function)
-    -------------------------------------------------------
+    ---##   Function: NavalForceAI
+    --- Basic attack logic for boats.  Searches for a good area to go attack, and will use
+    --- a safe path (if available) to get there.
+    ---@param self Platoon
     NavalForceAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -3021,19 +3051,12 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-
-    -------------------------------------------------------
-    --   Function: AttackForceAI
-    --   Args:
-    --       self - the single platoon to run the AI on
-    --   Description:
-    --       Basic attack logic.  Searches for a good area to go attack, and will use
-    --       a safe path (if available) to get there.  If the threat of the platoon
-    --       drops too low, it will try and guard an engineer (to be more useful)
-    --       See AIAttackUtils for the bulk of the logic
-    --   Returns:
-    --       nil (tail calls into a behavior function)
-    -------------------------------------------------------
+    ---## Function: AttackForceAI
+    --- Basic attack logic.  Searches for a good area to go attack, and will use
+    --- a safe path (if available) to get there.  If the threat of the platoon
+    --- drops too low, it will try and guard an engineer (to be more useful)
+    --- See AIAttackUtils for the bulk of the logic
+    ---@param self Platoon
     AttackForceAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -3205,16 +3228,10 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: ReturnToBaseAI
-    --   Args:
-    --       self - the single platoon to run the AI on
-    --   Description:
-    --       Finds a base to return to and disband - that way it can be used
-    --       for a new platoon
-    --   Returns:
-    --       nil (tail calls into AttackForceAI or disbands)
-    -------------------------------------------------------
+    ---## Function: ReturnToBaseAI
+    --- Finds a base to return to and disband - that way it can be used
+    --- for a new platoon
+    ---@param self Platoon
     ReturnToBaseAI = function(self)
         local aiBrain = self:GetBrain()
 
@@ -3274,15 +3291,18 @@ Platoon = Class(moho.platoon_methods) {
     --  Support Functions
     -- -------------------
 
-    -- stop platoon and delete last attack destination so new one will be picked
+    --- stop platoon and delete last attack destination so new one will be picked
+    ---@param self Platoon
     StopAttack = function(self)
         self:Stop()
         self.LastAttackDestination = {}
     end,
 
-    -- NOTES:
-    -- don't always use defensive point, use naval point for navies, etc.
-    -- or gather around center
+    ---## NOTES:
+    --- don't always use defensive point, use naval point for navies, etc.
+    --- or gather around center
+    ---@param self Platoon
+    ---@return boolean
     GatherUnits = function(self)
         local pos = self:GetPlatoonPosition()
         local unitsSet = true
@@ -3309,18 +3329,13 @@ Platoon = Class(moho.platoon_methods) {
         return true
     end,
 
-    -------------------------------------------------------
-    --   Function: MergeWithNearbyPlatoons
-    --   Args:
-    --       self - the single platoon to run the AI on
-    --       planName - AI plan to merge with
-    --       radius - check to see if we should merge with platoons in this radius
-    --   Description:
-    --       Finds platoons nearby (when self platoon is not near a base) and merge
-    --       with them if they're a good fit.
-    --   Returns:
-    --       nil
-    -------------------------------------------------------
+    ---## Function: MergeWithNearbyPlatoons
+    --- Finds platoons nearby (when self platoon is not near a base) and merge
+    --- with them if they're a good fit.
+    ---@param self Platoon
+    ---@param planName string
+    ---@param radius number
+    ---@return nil
     MergeWithNearbyPlatoons = function(self, planName, radius)
         -- check to see we're not near an ally base
         local aiBrain = self:GetBrain()
@@ -3398,7 +3413,8 @@ Platoon = Class(moho.platoon_methods) {
 
     end,
 
-    -- names units in platoon
+    --- names units in platoon
+    ---@param self Platoon
     NameUnits = function(self)
         local units = self:GetPlatoonUnits()
         if units and not table.empty(units) then
@@ -3412,7 +3428,9 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    --returns each type of threat for this platoon
+    ---returns each type of threat for this platoon
+    ---@param self Platoon
+    ---@return table
     GetPlatoonThreatEx = function(self)
         local threat = {
             AirThreatLevel = 0,
@@ -3433,10 +3451,12 @@ Platoon = Class(moho.platoon_methods) {
         return threat
     end,
 
-    -- ---------------------------------------------------------------------
-    -- Helper functions for GuardMarker AI
-
-    -- Checks radius around base to see if marker is sufficiently far away
+    --- Checks radius around base to see if marker is sufficiently far away
+    ---@param self Platoon
+    ---@param markerPos Vector
+    ---@param avoidBasesDefault any
+    ---@param baseRadius number
+    ---@return boolean
     AvoidsBases = function(self, markerPos, avoidBasesDefault, baseRadius)
         if not avoidBasesDefault then
             return true
@@ -3453,17 +3473,19 @@ Platoon = Class(moho.platoon_methods) {
         return true
     end,
 
-    -- greater than or less than check, based on what kind of threat order we want
+    --- greater than or less than check, based on what kind of threat order we want
+    ---@param findHighestThreat number[]
+    ---@param newMarker number
+    ---@param oldMarker number
+    ---@return boolean
     IsBetterThreat = function(findHighestThreat, newMarker, oldMarker)
         if findHighestThreat then
             return newMarker > oldMarker
         end
         return newMarker < oldMarker
     end,
-    -- ---------------------------------------------------------------------
 
-
-
+    ---@param eng EngineerBuilder
     SetupEngineerCallbacks = function(eng)
         if eng and not eng.Dead and not eng.BuildDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDone, eng, categories.ALLUNITS)
@@ -3484,6 +3506,8 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     -- Callback functions for EngineerBuildAI
+    ---@param unit Unit
+    ---@param params any
     EngineerBuildDone = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAI' then return end
@@ -3493,6 +3517,8 @@ Platoon = Class(moho.platoon_methods) {
             unit.ProcessBuildDone = true
         end
     end,
+    ---@param unit Unit
+    ---@param params any
     EngineerCaptureDone = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAI' then return end
@@ -3501,6 +3527,8 @@ Platoon = Class(moho.platoon_methods) {
             unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, false)
         end
     end,
+    ---@param unit Unit
+    ---@param params any
     EngineerReclaimDone = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAI' then return end
@@ -3509,6 +3537,8 @@ Platoon = Class(moho.platoon_methods) {
             unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, false)
         end
     end,
+    ---@param unit Unit
+    ---@param params any
     EngineerFailedToBuild = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAI' then return end
@@ -3529,17 +3559,11 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: WatchForNotBuilding
-    --   Args:
-    --       eng - the engineer that's gone through EngineerBuildAI
-    --   Description:
-    --       After we try to build something, watch the engineer to
-    --       make sure that the build goes through.  If not,
-    --       try the next thing in the queue
-    --   Returns:
-    --       nil
-    -------------------------------------------------------
+    ---## Function: WatchForNotBuilding
+    --- After we try to build something, watch the engineer to
+    --- make sure that the build goes through.  If not,
+    --- try the next thing in the queue
+    ---@param eng EngineerBuilder
     WatchForNotBuilding = function(eng)
         coroutine.yield(10)
         local aiBrain = eng:GetAIBrain()
@@ -3557,27 +3581,21 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: ProcessBuildCommand
-    --   Args:
-    --       eng - the engineer that's gone through EngineerBuildAI
-    --   Description:
-    --       Run after every build order is complete/fails.  Sets up the next
-    --       build order in queue, and if the engineer has nothing left to do
-    --       will return the engineer back to the army pool by disbanding the
-    --       the platoon.  Support function for EngineerBuildAI
-    --   Returns:
-    --       nil (tail calls into a behavior function)
-    -------------------------------------------------------
+    ---## Function: ProcessBuildCommand
+    --- Run after every build order is complete/fails.  Sets up the next
+    --- build order in queue, and if the engineer has nothing left to do
+    --- will return the engineer back to the army pool by disbanding the
+    --- the platoon.  Support function for EngineerBuildAI
+    ---@param eng any
+    ---@param removeLastBuild boolean
     ProcessBuildCommand = function(eng, removeLastBuild)
         if not eng or eng.Dead or not eng.PlatoonHandle then
             return
         end
         local aiBrain = eng.PlatoonHandle:GetBrain()
-
         if not aiBrain or eng.Dead or not eng.EngineerBuildQueue or table.empty(eng.EngineerBuildQueue) then
             if aiBrain:PlatoonExists(eng.PlatoonHandle) then
-                if not eng.AssistSet and not eng.AssistPlatoon and not eng.UnitBeingAssist then
+                if not eng.AssistSet and not eng.AssistPlatoon and not eng.UnitBeingAssist and not eng.UnitBeingBuiltBehavior then
                     eng.PlatoonHandle:PlatoonDisband()
                 end
             end
@@ -3594,9 +3612,12 @@ Platoon = Class(moho.platoon_methods) {
         IssueClearCommands({eng})
         local commandDone = false
         local PlatoonPos
+        local whatToBuild
+        local buildLocation
+        local buildRelative
         while not eng.Dead and not commandDone and not table.empty(eng.EngineerBuildQueue)  do
-            local whatToBuild = eng.EngineerBuildQueue[1][1]
-            local buildLocation = {eng.EngineerBuildQueue[1][2][1], 0, eng.EngineerBuildQueue[1][2][2]}
+            whatToBuild = eng.EngineerBuildQueue[1][1]
+            buildLocation = {eng.EngineerBuildQueue[1][2][1], 0, eng.EngineerBuildQueue[1][2][2]}
             if GetTerrainHeight(buildLocation[1], buildLocation[3]) > GetSurfaceHeight(buildLocation[1], buildLocation[3]) then
                 --land
                 buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[3])
@@ -3604,7 +3625,7 @@ Platoon = Class(moho.platoon_methods) {
                 --water
                 buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
             end
-            local buildRelative = eng.EngineerBuildQueue[1][3]
+            buildRelative = eng.EngineerBuildQueue[1][3]
             if not eng.NotBuildingThread then
                 eng.NotBuildingThread = eng:ForkThread(eng.PlatoonHandle.WatchForNotBuilding)
             end
@@ -3613,28 +3634,40 @@ Platoon = Class(moho.platoon_methods) {
                 if not eng or eng.Dead or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
                     return
                 end
-                -- issue buildcommand to block other engineers from caping mex/hydros or to reserve the buildplace
-                aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
-                -- wait until we are close to the buildplace so we have intel
-                while not eng.Dead do
-                    PlatoonPos = eng:GetPosition()
-                    if VDist2(PlatoonPos[1] or 0, PlatoonPos[3] or 0, buildLocation[1] or 0, buildLocation[3] or 0) < 12 then
-                        break
+                PlatoonPos = eng:GetPosition()
+                if VDist2(PlatoonPos[1] or 0, PlatoonPos[3] or 0, buildLocation[1] or 0, buildLocation[3] or 0) >= 30 then
+                    -- issue buildcommand to block other engineers from caping mex/hydros or to reserve the buildplace
+                    aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
+                    coroutine.yield(3)
+                    -- wait until we are close to the buildplace so we have intel
+                    while not eng.Dead do
+                        PlatoonPos = eng:GetPosition()
+                        if VDist2(PlatoonPos[1] or 0, PlatoonPos[3] or 0, buildLocation[1] or 0, buildLocation[3] or 0) < 12 then
+                            break
+                        end
+                        -- check if we are already building in close range
+                        -- (ACU can build at higher range than engineers)
+                        if eng:IsUnitState("Building") then
+                            break
+                        end
+                        coroutine.yield(1)
                     end
-                    coroutine.yield(1)
                 end
                 if not eng or eng.Dead or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
                     if eng then eng.ProcessBuild = nil end
                     return
                 end
-                -- cancel all commands, also the buildcommand for blocking mex to check for reclaim or capture
-                eng.PlatoonHandle:Stop()
-                -- check to see if we need to reclaim or capture...
-                AIUtils.EngineerTryReclaimCaptureArea(aiBrain, eng, buildLocation)
-                -- check to see if we can repair
-                AIUtils.EngineerTryRepair(aiBrain, eng, whatToBuild, buildLocation)
-                -- otherwise, go ahead and build the next structure there
-                aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
+                -- if we are already building then we don't need to reclaim, repair or issue the BuildStructure again
+                if not eng:IsUnitState("Building") then
+                    -- cancel all commands, also the buildcommand for blocking mex to check for reclaim or capture
+                    eng.PlatoonHandle:Stop()
+                    -- check to see if we need to reclaim or capture...
+                    AIUtils.EngineerTryReclaimCaptureArea(aiBrain, eng, buildLocation)
+                    -- check to see if we can repair
+                    AIUtils.EngineerTryRepair(aiBrain, eng, whatToBuild, buildLocation)
+                    -- otherwise, go ahead and build the next structure there
+                    aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
+                end
                 if not eng.NotBuildingThread then
                     eng.NotBuildingThread = eng:ForkThread(eng.PlatoonHandle.WatchForNotBuilding)
                 end
@@ -3652,9 +3685,9 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
         if eng then eng.ProcessBuild = nil end
-    end,
+    end,    
 
-    --DUNCAN - added
+    ---@param self Platoon
     EngineerDropAI = function(self)
         LOG('*AI DEBUG:  Using Engineer Drop')
         local aiBrain = self:GetBrain()
@@ -3686,7 +3719,8 @@ Platoon = Class(moho.platoon_methods) {
         end
    end,
 
-   --DUNCAN - added
+   ---@param self Platoon
+   ---@return boolean
    GhettoAI = function(self)
        --LOG('*AI DEBUG:  Using Ghetto AI')
        local aiBrain = self:GetBrain()
@@ -3752,6 +3786,7 @@ Platoon = Class(moho.platoon_methods) {
 --   Below is Sorian AI stuff... there's a lot of it   ---
 ----------------------------------------------------------
 
+    ---@param self Platoon
     PlatoonDisbandNoAssign = function(self)
         if self.BuilderHandle then
             self.BuilderHandle:RemoveHandle(self)
@@ -3762,6 +3797,7 @@ Platoon = Class(moho.platoon_methods) {
         self:GetBrain():DisbandPlatoon(self)
     end,
 
+    ---@param self Platoon
     NukeAISAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -3801,6 +3837,8 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
+    ---@param self Platoon
+    ---@return nil
     ExperimentalAIHubSorian = function(self)
         local aiBrain = self:GetBrain()
         local behaviors = import('/lua/ai/AIBehaviors.lua')
@@ -3837,6 +3875,8 @@ Platoon = Class(moho.platoon_methods) {
         return behaviors.BehemothBehaviorSorian(self)
     end,
 
+    ---@param self Platoon
+    ---@return nil
     FighterDistributionHubSorian = function(self)
         local aiBrain = self:GetBrain()
         local location = self.PlatoonData.Location
@@ -3857,6 +3897,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     PlatoonCallForHelpAISorian = function(self)
         local aiBrain = self:GetBrain()
         local checkTime = self.PlatoonData.DistressCheckTime or 7
@@ -3877,6 +3918,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     DistressResponseAISorian = function(self)
         local aiBrain = self:GetBrain()
         while aiBrain:PlatoonExists(self) do
@@ -3991,6 +4033,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     BaseManagersDistressAISorian = function(self)
         local aiBrain = self:GetBrain()
         while aiBrain:PlatoonExists(self) do
@@ -4029,6 +4072,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     EnhanceAISorian = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -4077,12 +4121,12 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
-
+    ---@param self Platoon
     ArtilleryAISorian = function(self)
         local aiBrain = self:GetBrain()
 
         local atkPri = { 'STRUCTURE STRATEGIC EXPERIMENTAL', 'EXPERIMENTAL ARTILLERY OVERLAYINDIRECTFIRE', 'STRUCTURE STRATEGIC TECH3', 'STRUCTURE NUKE TECH3', 'EXPERIMENTAL ORBITALSYSTEM', 'EXPERIMENTAL ENERGYPRODUCTION STRUCTURE', 'STRUCTURE ANTIMISSILE TECH3', 'TECH3 MASSFABRICATION', 'TECH3 ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE TECH3 ANTIAIR',
-        'COMMAND', 'STRUCTURE DEFENSE TECH3', 'STRUCTURE DEFENSE TECH2', 'EXPERIMENTAL LAND', 'MOBILE TECH3 LAND', 'MOBILE TECH2 LAND', 'MOBILE TECH1 LAND', 'STRUCTURE FACTORY', 'SPECIALLOWPRI', 'ALLUNITS' }
+        'COMMAND', 'STRUCTURE DEFENSE TECH3', 'STRUCTURE DEFENSE TECH2', 'EXPERIMENTAL LAND', 'MOBILE TECH3 LAND', 'MOBILE TECH2 LAND', 'MOBILE TECH1 LAND', 'STRUCTURE FACTORY', 'ALLUNITS' }
         local atkPriTable = {}
         for k,v in atkPri do
             table.insert(atkPriTable, ParseEntityCategory(v))
@@ -4127,6 +4171,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     SatelliteAISorian = function(self)
         local aiBrain = self:GetBrain()
         local data = self.PlatoonData
@@ -4158,6 +4203,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     TacticalAISorian = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -4233,6 +4279,8 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
+    ---@return nil
     AirHuntAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -4293,6 +4341,8 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
+    ---@return nil
     ThreatStrikeSorian = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -4342,6 +4392,8 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
+    ---@return nil
     FighterHuntAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -4387,15 +4439,9 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: GuardMarkerSorian
-    --   Args:
-    --       platoon - platoon to run the AI
-    --   Description:
-    --       Will guard the location of a marker
-    --   Returns:
-    --       nil
-    -------------------------------------------------------
+    ---## Function: GuardMarkerSorian
+    --- Will guard the location of a marker
+    ---@param self Platoon
     GuardMarkerSorian = function(self)
         local aiBrain = self:GetBrain()
 
@@ -4645,15 +4691,10 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: AirIntelToggle
-    --   Args:
-    --       self - platoon to run the AI
-    --   Description:
-    --       Turns on Air unit cloak/stealth.
-    --   Returns:
-    --       nil
-    -------------------------------------------------------
+    ---## Function: AirIntelToggle
+    --- Turns on Air unit cloak/stealth.
+    ---@param self any
+    ---@return nil
     AirIntelToggle = function(self)
         --LOG('*AI DEBUG: AirIntelToggle run')
         for k,v in self:GetPlatoonUnits() do
@@ -4663,6 +4704,8 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---comment
+    ---@param self any
     GuardBaseSorian = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -4720,6 +4763,8 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---comment
+    ---@param self any
     NavalForceAISorian = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -4879,6 +4924,9 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---comment
+    ---@param self any
+    ---@return boolean
     GatherUnitsSorian = function(self)
         if table.getn(self:GetPlatoonUnits()) == 1 then return true end
         local pos = self:GetPlatoonPosition()
@@ -4919,6 +4967,9 @@ Platoon = Class(moho.platoon_methods) {
         return true
     end,
 
+    ---@param self Platoon
+    ---@param nextAIFunc function
+    ---@return any
     GuardExperimentalSorian = function(self, nextAIFunc)
         local aiBrain = self:GetBrain()
 
@@ -4972,7 +5023,7 @@ Platoon = Class(moho.platoon_methods) {
         return self:GuardExperimentalSorian(nextAIFunc)
     end,
 
-
+    ---@param self Platoon
     SorianManagerEngineerAssistAI = function(self)
         local aiBrain = self:GetBrain()
         local assistData = self.PlatoonData.Assist
@@ -4996,6 +5047,7 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
+    ---@param self Platoon
     SorianEconAssistBody = function(self)
         local eng = self:GetPlatoonUnits()[1]
         if not eng then
@@ -5060,6 +5112,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     ManagerEngineerFindLowShield = function(self)
         local aiBrain = self:GetBrain()
         self:EconDamagedShield()
@@ -5070,6 +5123,7 @@ Platoon = Class(moho.platoon_methods) {
         self:PlatoonDisband()
     end,
 
+    ---@param self Platoon
     EconDamagedShield = function(self)
         local eng = self:GetPlatoonUnits()[1]
         if not eng then
@@ -5112,6 +5166,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     LandScoutingAISorian = function(self)
         AIAttackUtils.GetMostRestrictiveLayer(self)
 
@@ -5177,6 +5232,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     AirScoutingAISorian = function(self)
 
         local aiBrain = self:GetBrain()
@@ -5289,6 +5345,8 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
+    ---@return nil
     ScoutingAISorian = function(self)
         AIAttackUtils.GetMostRestrictiveLayer(self)
 
@@ -5299,6 +5357,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     NavalHuntAI = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -5309,8 +5368,8 @@ Platoon = Class(moho.platoon_methods) {
         local platoonUnits = self:GetPlatoonUnits()
         local PlatoonFormation = self.PlatoonData.UseFormation or 'NoFormation'
         self:SetPlatoonFormationOverride(PlatoonFormation)
-        local atkPri = { 'SPECIALHIGHPRI', 'STRUCTURE ANTINAVY', 'MOBILE NAVAL', 'STRUCTURE NAVAL', 'COMMAND', 'EXPERIMENTAL', 'STRUCTURE STRATEGIC EXPERIMENTAL', 'ARTILLERY EXPERIMENTAL', 'STRUCTURE ARTILLERY TECH3', 'STRUCTURE NUKE TECH3', 'STRUCTURE ANTIMISSILE SILO',
-                            'STRUCTURE DEFENSE DIRECTFIRE', 'TECH3 MASSFABRICATION', 'TECH3 ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE', 'STRUCTURE', 'MOBILE', 'SPECIALLOWPRI', 'ALLUNITS' }
+        local atkPri = { 'STRUCTURE ANTINAVY', 'MOBILE NAVAL', 'STRUCTURE NAVAL', 'COMMAND', 'EXPERIMENTAL', 'STRUCTURE STRATEGIC EXPERIMENTAL', 'ARTILLERY EXPERIMENTAL', 'STRUCTURE ARTILLERY TECH3', 'STRUCTURE NUKE TECH3', 'STRUCTURE ANTIMISSILE SILO',
+                            'STRUCTURE DEFENSE DIRECTFIRE', 'TECH3 MASSFABRICATION', 'TECH3 ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE', 'STRUCTURE', 'MOBILE', 'ALLUNITS' }
         local atkPriTable = {}
         for k,v in atkPri do
             table.insert(atkPriTable, ParseEntityCategory(v))
@@ -5358,6 +5417,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     HuntAISorian = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -5386,6 +5446,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     CDRHuntAISorian = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -5448,6 +5509,8 @@ Platoon = Class(moho.platoon_methods) {
         eng.PlatoonHandle:PlatoonDisband()
     end,
 
+    ---@param self Platoon
+    ---@return any
     GhettoAISorian = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -5503,6 +5566,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
     AttackForceAISorian = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -5716,6 +5780,8 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self Platoon
+    ---@return nil
     ReturnToBaseAISorian = function(self)
         local aiBrain = self:GetBrain()
 
@@ -5771,6 +5837,7 @@ Platoon = Class(moho.platoon_methods) {
         return self:AttackForceAISorian()
     end,
 
+    ---@param self Platoon
     StrikeForceAISorian = function(self)
         local aiBrain = self:GetBrain()
         local armyIndex = aiBrain:GetArmyIndex()
@@ -5907,6 +5974,8 @@ Platoon = Class(moho.platoon_methods) {
     --   Returns:
     --       nil (tail calls into a behavior function)
     -------------------------------------------------------
+    ---@param self Platoon
+    ---@return nil
     EngineerBuildAISorian = function(self)
         self:Stop()
         local aiBrain = self:GetBrain()
@@ -6226,6 +6295,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param eng EngineerBuilder
     SetupEngineerCallbacksSorian = function(eng)
         if eng and not eng.Dead and not eng.BuildDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDoneSorian, eng, categories.ALLUNITS)
@@ -6245,6 +6315,7 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param eng EngineerBuilder
     RemoveEngineerCallbacksSorian = function(eng)
         if eng.BuildDoneCallbackSet then
             import('/lua/ScenarioTriggers.lua')RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerBuildDoneSorian)
@@ -6264,7 +6335,9 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -- Callback functions for EngineerBuildAI
+    --- Callback functions for EngineerBuildAI
+    ---@param unit Unit
+    ---@param params any
     EngineerBuildDoneSorian = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAISorian' then return end
@@ -6274,6 +6347,9 @@ Platoon = Class(moho.platoon_methods) {
             unit.ProcessBuildDone = true
         end
     end,
+
+    ---@param unit Unit
+    ---@param params any
     EngineerCaptureDoneSorian = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAISorian' then return end
@@ -6282,6 +6358,9 @@ Platoon = Class(moho.platoon_methods) {
             unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommandSorian, false)
         end
     end,
+
+    ---@param unit Unit
+    ---@param params any
     EngineerReclaimDoneSorian = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAISorian' then return end
@@ -6290,6 +6369,9 @@ Platoon = Class(moho.platoon_methods) {
             unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommandSorian, false)
         end
     end,
+
+    ---@param unit Unit
+    ---@param params any
     EngineerFailedToBuildSorian = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAISorian' then return end
@@ -6302,17 +6384,11 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: WatchForNotBuildingSorian
-    --   Args:
-    --       eng - the engineer that's gone through EngineerBuildAI
-    --   Description:
-    --       After we try to build something, watch the engineer to
-    --       make sure that the build goes through.  If not,
-    --       try the next thing in the queue
-    --   Returns:
-    --       nil
-    -------------------------------------------------------
+    ---## Function: WatchForNotBuildingSorian
+    --- After we try to build something, watch the engineer to
+    --- make sure that the build goes through.  If not,
+    --- try the next thing in the queue
+    ---@param eng EngineerBuilder
     WatchForNotBuildingSorian = function(eng)
         WaitTicks(5)
         local aiBrain = eng:GetAIBrain()
@@ -6350,18 +6426,13 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    -------------------------------------------------------
-    --   Function: ProcessBuildCommandSorian
-    --   Args:
-    --       eng - the engineer that's gone through EngineerBuildAI
-    --   Description:
-    --       Run after every build order is complete/fails.  Sets up the next
-    --       build order in queue, and if the engineer has nothing left to do
-    --       will return the engineer back to the army pool by disbanding the
-    --       the platoon.  Support function for EngineerBuildAI
-    --   Returns:
-    --       nil (tail calls into a behavior function)
-    -------------------------------------------------------
+    ---## Function: ProcessBuildCommandSorian
+    --- Run after every build order is complete/fails.  Sets up the next
+    --- build order in queue, and if the engineer has nothing left to do
+    --- will return the engineer back to the army pool by disbanding the
+    --- the platoon.  Support function for EngineerBuildAI
+    ---@param eng EngineerManager
+    ---@param removeLastBuild boolean
     ProcessBuildCommandSorian = function(eng, removeLastBuild)
         if not eng or eng.Dead or not eng.PlatoonHandle or eng:IsUnitState("Enhancing") or eng:IsUnitState("Upgrading") or eng.Upgrading or eng.GoingHome or eng.Fighting or eng.UnitBeingBuiltBehavior then
             if eng then eng.ProcessBuild = nil end
@@ -6445,6 +6516,10 @@ Platoon = Class(moho.platoon_methods) {
         if eng then eng.ProcessBuild = nil end
     end,
 
+    ---@param self Platoon
+    ---@param planName string
+    ---@param radius number
+    ---@param fullrestart boolean
     MergeWithNearbyPlatoonsSorian = function(self, planName, radius, fullrestart)
         -- check to see we're not near an ally base
         local aiBrain = self:GetBrain()
@@ -6526,7 +6601,12 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    --Modified version of AvoidsBases() that checks for and avoids ally bases
+    ---Modified version of AvoidsBases() that checks for and avoids ally bases
+    ---@param self Platoon
+    ---@param markerPos Vector
+    ---@param avoidBasesDefault any
+    ---@param baseRadius number
+    ---@return boolean
     AvoidsBasesSorian = function(self, markerPos, avoidBasesDefault, baseRadius)
         if not avoidBasesDefault then
             return true
@@ -6551,6 +6631,7 @@ Platoon = Class(moho.platoon_methods) {
         return true
     end,
 
+    ---@param self Platoon
     NameUnitsSorian = function(self)
         local units = self:GetPlatoonUnits()
         local AINames = import('/lua/AI/sorianlang.lua').AINames
@@ -6566,10 +6647,10 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     --- Patrols the platoon along the path, orientating at each node to match the line from the previous node to the current node.
-    -- @param self The platoon itself.
-    -- @param path A table of positions, preferably of type Vector. Converted otherwise.
-    -- @param self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
-    -- @return Table of commands.
+    ---@param self Platoon
+    ---@param path Vector[] path A table of positions, preferably of type Vector. Converted otherwise.
+    ---@param formation? UnitFormations self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
+    ---@return PlatoonCommand[]
     IssuePatrolAlongRoute = function(self, path, formation)
 
         -- check for optional / default values
@@ -6651,10 +6732,10 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     --- Aggressive-moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
-    -- @param self The platoon itself.
-    -- @param path A table of positions, preferably of type Vector. Converted otherwise.
-    -- @param self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
-    -- @return Table of commands.
+    ---@param self Platoon
+    ---@param path Vector[]
+    ---@param formation? UnitFormations
+    ---@return PlatoonCommand[]
     IssueAggressiveMoveAlongRoute = function(self, path, formation)
         -- check for optional / default values
         local formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
@@ -6738,10 +6819,10 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     --- Moves the platoon along the path, orientating at each node to match the line from the previous node to the current node.
-    -- @param self The platoon itself.
-    -- @param path A table of positions, preferably of type Vector. Converted otherwise.
-    -- @param self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
-    -- @return Table of commands.
+    ---@param self Platoon
+    ---@param path Vector[] A table of positions, preferably of type Vector. Converted otherwise.
+    ---@param formation? UnitFormations self.PlatoonData.UseFormation The formation to apply, such as GrowthFormation, AttackFormation or NoFormation.
+    ---@return PlatoonCommand[]
     IssueMoveAlongRoute = function(self, path, formation)
         -- check for optional / default values
         local formation = formation or self.PlatoonData.UseFormation or 'NoFormation'
@@ -6822,5 +6903,4 @@ Platoon = Class(moho.platoon_methods) {
 
         return commands
     end,
-
 }

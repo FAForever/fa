@@ -1,0 +1,47 @@
+-- unused by faf
+
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'UEF_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'SERAPHIM',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+    },
+    General = {
+        Category = 'Bomb',
+        Faction = 'Seraphim',
+        TechLevel = 1,
+        Weapon = 'Zhanasee Strategic Bomb 2',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        TrackTarget = false,
+        TurnRate = 0,
+        VelocityAlign = true,
+        StayUpright = false,
+        Lifetime = 0.5,
+        UseGravity = false,
+        RotationalVelocity= 0,
+        RotationalAcceleration = 0,
+        Acceleration = 0,
+    },
+}

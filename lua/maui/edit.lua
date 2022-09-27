@@ -30,10 +30,11 @@
 -- SetDropShadow(bool)
 -- AcquireFocus()
 
-local Control = import('control.lua').Control
+local Control = import('/lua/maui/control.lua').Control
 local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
-local ScaleNumber = import('layouthelpers.lua').ScaleNumber
+local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 
+---@class Edit : moho.edit_methods, Control, InternalObject
 Edit = Class(moho.edit_methods, Control) {
 
     __init = function(self, parent, debugname)

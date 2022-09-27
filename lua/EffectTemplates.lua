@@ -1,3 +1,4 @@
+---@diagnostic disable:local-limit
 -- ****************************************************************************
 -- **
 -- **  File     :  /data/lua/EffectTemplates.lua
@@ -84,9 +85,15 @@ SmokePlumeMedDensitySml03 = { EmtBpPath .. 'destruction_explosion_smoke_11_emit.
 -- ---------------------------------------------------------------
 -- Wreckage Smoke Effects
 -- ---------------------------------------------------------------
+
 DefaultWreckageEffectsSml01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsSml01Count = table.getn(DefaultWreckageEffectsSml01)
+
 DefaultWreckageEffectsMed01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsMed01Count = table.getn(DefaultWreckageEffectsMed01)
+
 DefaultWreckageEffectsLrg01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsLrg01Count = table.getn(DefaultWreckageEffectsLrg01)
 
 
 -- ---------------------------------------------------------------
@@ -275,8 +282,12 @@ DamageStructureFireSmoke01 = table.concatenate(DamageStructureSmoke01, DamageStr
 -- ---------------------------------------------------------------
 -- Ambient effects
 -- ---------------------------------------------------------------
-TreeBurning01 = table.concatenate(DamageFire01 ,{EmtBpPath .. 'forest_fire_smoke_01_emit.bp'})
 
+TreeBurning01 = {
+    EmtBpPath .. 'forest_fire_01.bp',
+    EmtBpPath .. 'forest_distortion_01.bp',
+    EmtBpPath .. 'forest_smoke_01.bp',
+}
 
 -- ---------------------------------------------------------------
 -- Shield Impact effects
@@ -650,6 +661,13 @@ AQuantumGateAmbient = {
     EmtBpPath .. 'aeon_gate_02_emit.bp',
     EmtBpPath .. 'aeon_gate_03_emit.bp',
 }
+
+ATractorAmbient = {
+    EmtBpPath .. 'tractor_01_emit.bp',
+    EmtBpPath .. 'tractor_02_emit.bp',
+    EmtBpPath .. 'tractor_03_emit.bp',
+}
+
 
 AResourceGenAmbient = {
     EmtBpPath .. 'aeon_rgen_ambient_01_emit.bp',
@@ -1980,8 +1998,20 @@ TBigLandGaussCannonHit01 = {
     EmtBpPath .. 'shipgauss_cannon_hit_09_emit.bp',
 }
 
+TLandGaussCannonHit01 = { 
+    EmtBpPath .. 'landgauss_cannon_hit_01_emit.bp',
+    EmtBpPath .. 'shipgauss_cannon_hit_02_emit.bp',
+    EmtBpPath .. 'landgauss_cannon_hit_03_emit.bp',
+    EmtBpPath .. 'landgauss_cannon_hit_04_emit.bp',
+    EmtBpPath .. 'landgauss_cannon_hit_05_emit.bp',
+    EmtBpPath .. 'shipgauss_cannon_hit_06_emit.bp',
+    -- EmtBpPath .. 'shipgauss_cannon_hit_07_emit.bp',
+    EmtBpPath .. 'shipgauss_cannon_hit_09_emit.bp',
+}
+
 TShipGaussCannonHitUnit01 = table.concatenate(TShipGaussCannonHit01, UnitHitShrapnel01)
 TShipGaussCannonHitUnit02 = table.concatenate(TShipGaussCannonHit02, UnitHitShrapnel01)
+TLandGaussCannonHitUnit01 = table.concatenate(TLandGaussCannonHit01, UnitHitShrapnel01)
 TBigLandGaussCannonHitUnit01 = table.concatenate(TBigLandGaussCannonHit01, UnitHitShrapnel01)
 TMediumLandGaussCannonHitUnit01 = table.concatenate(TMediumLandGaussCannonHit01, UnitHitShrapnel01)
 TMediumShipGaussCannonHitUnit01 = table.concatenate(TMediumShipGaussCannonHit01, UnitHitShrapnel01)

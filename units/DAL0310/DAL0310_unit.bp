@@ -26,15 +26,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTDL',
@@ -55,6 +46,7 @@ UnitBlueprint {
     },
     CollisionOffsetZ = 0.1,
     Defense = {
+        SkipDynamicThreatCalculations = true,
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
@@ -275,15 +267,14 @@ UnitBlueprint {
             RateOfFire = 0.5,
             SlavedToBody = true,
             SlavedToBodyArcRange = 5,
-            TargetCheckInterval = 0.75,
-            TranscendentPriorities = {'SHIELD', 'PERSONALSHIELD'},
             TargetPriorities = {
+                'SHIELD',
+                'PERSONALSHIELD',
                 'MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Barrel',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',
@@ -307,9 +298,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

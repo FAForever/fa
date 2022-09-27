@@ -5,7 +5,7 @@
 --
 --  Summary  :  Aeon Guided Split Missile, DAA0206
 --
---  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
 local AGuidedMissileProjectile = import('/lua/aeonprojectiles.lua').AGuidedMissileProjectile
@@ -23,27 +23,6 @@ AIFGuidedMissile02 = Class(AGuidedMissileProjectile) {
 		WaitSeconds(0.6)
 		self:TrackTarget(true)
 	end,
-    
-    OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
-
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius*3, radius*3, 200, 70, army)
-        end
-        
-        AGuidedMissileProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 TypeClass = AIFGuidedMissile02
 

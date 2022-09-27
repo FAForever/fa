@@ -21,7 +21,8 @@ local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
 local MIBC = '/lua/editor/MiscBuildConditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
 
-OpAI = Class {
+---@class OpAI
+OpAI = ClassSimple {
         -- Set up variables local to this OpAI instance
         PreCreate = function(self)
             if self.PreCreateFinished then
@@ -138,11 +139,9 @@ OpAI = Class {
             return self:SetTargettingPriorities(
             {
                 categories.EXPERIMENTAL,
-                categories.SPECIALHIGHPRI,
                 categories.STRUCTURE * categories.DEFENSE,
                 categories.STRUCTURE * categories.ECONOMIC,
                 categories.MOBILE - categories.COMMAND,
-                categories.SPECIALLOWPRI,
                 categories.ALLUNITS - categories.COMMAND,
                 categories.COMMAND,
 
@@ -154,11 +153,9 @@ OpAI = Class {
             return self:SetTargettingPriorities(
             {
                 categories.EXPERIMENTAL,
-                categories.SPECIALHIGHPRI,
                 categories.STRUCTURE * categories.DEFENSE,
                 categories.STRUCTURE * categories.ECONOMIC,
                 categories.MOBILE - categories.COMMAND,
-                categories.SPECIALLOWPRI,
                 categories.ALLUNITS - categories.COMMAND,
             }
             , cat)
@@ -171,7 +168,7 @@ OpAI = Class {
             end
 
             local priList = { unpack(priTable) }
-            local defList = {'SPECIALHIGHPRI', 'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'SPECIALLOWPRI', 'ALLUNITS',}
+            local defList = { 'COMMAND', 'MOBILE', 'STRUCTURE DEFENSE', 'ALLUNITS',}
 
             if categories then
                 --save the priorities for this category.

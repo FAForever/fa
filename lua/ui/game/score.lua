@@ -42,6 +42,8 @@ local resModeSwitch = {}
 local DisplayResMode = 0
 local DisplayStorage = 0
 
+local created = false 
+
 function armyGroupHeight()
     local height = 0
     for _, line in controls.armyLines do
@@ -51,6 +53,7 @@ function armyGroupHeight()
 end
 
 function CreateScoreUI(parent)
+    created = true
     savedParent = GetFrame(0)
 
     controls.bg = Group(savedParent)
@@ -113,25 +116,15 @@ function CreateScoreUI(parent)
 
     controls.bg:SetNeedsFrameUpdate(true)
     controls.bg.OnFrame = function(self, delta)
-        if controls.collapseArrow:IsChecked() then
-            local newRight = self.Right() + (1000 * delta)
-            if newRight > savedParent.Right() + self.Width() then
-                self.Right:Set(function() return savedParent.Right() + self.Width() end)
-                self:Hide()
-                self:SetNeedsFrameUpdate(false)
-            else
-                self.Right:Set(newRight)
-            end
-        else
-            local newRight = self.Right() - (1000*delta)
-            if newRight < savedParent.Right() - 3 then
-                self.Right:Set(function() return savedParent.Right() - 18 end)
-                self:SetNeedsFrameUpdate(false)
-            else
-                self.Right:Set(newRight)
-            end
+        local newRight = self.Right() + (1000*delta)
+        if newRight > savedParent.Right() + self.Width() then
+            newRight = savedParent.Right() + self.Width()
+            self:Hide()
+            self:SetNeedsFrameUpdate(false)
         end
+        self.Right:Set(newRight)
     end
+
     controls.collapseArrow:SetCheck(true, true)
 end
 
@@ -233,6 +226,23 @@ local function ResourceClickProcessing(self, event, uiGroup, resType)
         end
     end
 end
+
+-- table to convert key to LOC value
+local ShareNameLookup = { }
+ShareNameLookup["FullShare"] = "lobui_0742"
+ShareNameLookup["ShareUntilDeath"] = "lobui_0744"
+ShareNameLookup["TransferToKiller"] = "lobui_0762"
+ShareNameLookup["Defectors"] = "lobui_0766"
+ShareNameLookup["CivilianDeserter"] = "lobui_0764"
+
+local ShareDescriptionLookup = { }
+ShareDescriptionLookup["FullShare"] = "lobui_0743"
+ShareDescriptionLookup["ShareUntilDeath"] = "lobui_0745"
+ShareDescriptionLookup["TransferToKiller"] = "lobui_0763"
+ShareDescriptionLookup["Defectors"] = "lobui_0767"
+ShareDescriptionLookup["CivilianDeserter"] = "lobui_0765"
+
+local mapSizeUI = false
 
 function SetupPlayerLines()
     local function CreateArmyLine(data, armyIndex)
@@ -412,28 +422,68 @@ function SetupPlayerLines()
         observerLine.speedSlider:SetValue(gameSpeed)
     end
 
+    -- data = {
+    --     ShareConditionsTitle :: String 
+    --     ShareConditionsDescription :: String
+    --     Size :: String
+    --     MapTitle :: String
+    --     MapDescription :: String
+    -- }
+
     local function CreateMapNameLine(data)
         local group = Group(controls.bgStretch)
 
-        group.name = UIUtil.CreateText(group, data.mapname, 10, UIUtil.bodyFont)
-        group.name:DisableHitTest()
-        LayoutHelpers.AtLeftIn(group.name, group)
-        LayoutHelpers.AtVerticalCenterIn(group.name, group)
-        group.name:SetColor('ffffffff')
+        local offset = 0
+        local previous = false
 
-        if sessionInfo.Options.Ranked then
-            group.ranked = Bitmap(group)
-            group.ranked:SetTexture("/textures/ui/powerlobby/rankedscore.dds")
-            LayoutHelpers.SetDimensions(group.ranked, 16, 16)
-            group.ranked:DisableHitTest()
-            LayoutHelpers.AtRightTopIn(group.ranked, group, -1)
+        local function AddDash()
+            local dash = UIUtil.CreateText(group, " - ", 10, UIUtil.bodyFont)
+            LayoutHelpers.RightOf(dash, previous)
+            LayoutHelpers.AtVerticalCenterIn(dash, previous)
+            dash:SetColor('ffffffff')
+            return dash
         end
 
-        group.name.Right:Set(group.Right)
-        group.name:SetClipToWidth(true)
+        -- ui for share conditions
+        group.ShareConditions = UIUtil.CreateText(group, data.ShareConditionsTitle, 10, UIUtil.bodyFont)
+        Tooltip.AddForcedControlTooltipManual(group.ShareConditions, data.ShareConditionsTitle, data.ShareConditionsDescription)
+        LayoutHelpers.AtLeftIn(group.ShareConditions, group)
+        LayoutHelpers.AtVerticalCenterIn(group.ShareConditions, group)
+        group.ShareConditions:SetColor('ffffffff')
+        previous = group.ShareConditions
+        previous = AddDash()
+
+        -- ui for map size
+        group.Size = UIUtil.CreateText(group, data.SizeText, 10, UIUtil.bodyFont)
+        LayoutHelpers.RightOf(group.Size, previous)
+        LayoutHelpers.AtVerticalCenterIn(group.Size, group)
+        group.Size:SetColor('ffffffff')
+        previous = group.Size
+        previous = AddDash()
+
+        -- ui for map name
+        group.MapName = UIUtil.CreateText(group, data.MapTitle, 10, UIUtil.bodyFont)
+        Tooltip.AddForcedControlTooltipManual(group.MapName, data.MapTitle, data.MapDescription)
+        LayoutHelpers.RightOf(group.MapName, previous)
+        LayoutHelpers.AtVerticalCenterIn(group.MapName, group)
+        group.MapName:SetColor('ffffffff')
+        previous = group.MapName
+
+        -- ui for ranked icon
+        local rankedOffset = 32
+        if data.Ranked then
+            group.RankedIcon = Bitmap(group)
+            group.RankedIcon:SetTexture("/textures/ui/powerlobby/rankedscore.dds")
+            LayoutHelpers.SetDimensions(group.RankedIcon, 16, 16)
+            LayoutHelpers.AtRightTopIn(group.RankedIcon, group, -1)
+            rankedOffset = 32
+        end
+
+        -- make it extent and clip text
+        group.MapName.Right:Set(function() return group.Right() - rankedOffset end)
+        group.MapName:SetClipToWidth(true)
         LayoutHelpers.SetHeight(group, 19)
         group.Width:Set(controls.armyGroup.Width)
-        group:DisableHitTest()
 
         return group
     end
@@ -456,18 +506,48 @@ function SetupPlayerLines()
         line.name:SetText(playerClan .. playerName .. playerRating)
     end
 
-    mapData = {}
-    mapData.Sizekm = {Width = math.floor(sessionInfo.size[1] / 51.2), Height = math.floor(sessionInfo.size[2] / 51.2)}
-    mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)..' ('..mapData.Sizekm.Width..' x '..mapData.Sizekm.Height..')'
-    local replayID = UIUtil.GetReplayId()
-    if replayID then
-        mapData.mapname = mapData.mapname..', ID: '..replayID
+    local mapData = {}
+
+    -- add share information to the score board
+    mapData.ShareConditionsTitle = LOC("<LOC " .. ShareNameLookup[sessionInfo.Options.Share] .. ">")
+    mapData.ShareConditionsDescription = LOC("<LOC " .. ShareDescriptionLookup[sessionInfo.Options.Share] .. ">")
+    mapData.ShareConditionsDescription = mapData.ShareConditionsDescription .. "\r\n\r\n" .. LOC("<LOC info_game_settings_dialog>Other game settings can be found in the map information dialog (F12).")
+
+    -- add size to the score board
+    local mapWidth = sessionInfo.size[1]
+    local mapHeight = sessionInfo.size[2]
+    local areaData = Sync.NewPlayableArea
+    if areaData then
+        -- use the playable area if provided by the map
+        mapWidth = areaData[3] - areaData[1]
+        mapHeight = areaData[4] - areaData[2]
+    end
+    mapData.SizeText = MapSizeText(mapWidth, mapHeight)
+    sessionInfo.PlayableAreaWidth = mapWidth
+    sessionInfo.PlayableAreaHeight = mapHeight
+
+    -- add map title / description to the scoreboard
+    mapData.MapTitle = LOCF("<LOC gamesel_0002>%s", sessionInfo.name)
+    local description = sessionInfo.description
+    if not description or description == "" then 
+        description = "No description set by the author."
     end
 
-    controls.armyLines[index] = CreateMapNameLine(mapData)
+    -- add replay ID
+    mapData.MapDescription = LOC(description) .. 
+        "\r\n\r\n" .. LOC("<LOC map_version>Map version") .. ": " .. tostring(sessionInfo.map_version) ..
+        "\r\n" .. LOC("<LOC replay_id>Replay ID") .. ": " .. tostring(UIUtil.GetReplayId())
+
+    -- add ladder icon
+    mapData.Ranked = sessionInfo.Options.Ranked or false
+
+    -- construct UI elements
+    local mapUI = CreateMapNameLine(mapData)
+    controls.armyLines[index] = mapUI
+    mapSizeUI = mapUI.Size
 
     resModeSwitch.icon = UIUtil.CreateText(controls.armyGroup, '⃝', 13, 'Calibri')
-    resModeSwitch.icon.Depth:Set(resModeSwitch.icon.Depth() + 1)
+    resModeSwitch.icon.Depth:Set(mapUI.Depth() + 1)
     LayoutHelpers.AtLeftTopIn(resModeSwitch.icon, controls.armyLines[table.getn(controls.armyLines) - 1], 0, -1)
     LayoutHelpers.AtHorizontalCenterIn(resModeSwitch.icon, controls.armyLines[1].energy)
     resModeSwitch.text = UIUtil.CreateText(resModeSwitch.icon, 'I', 10, UIUtil.bodyFont)
@@ -495,6 +575,13 @@ function SetupPlayerLines()
     Tooltip.AddControlTooltip(resModeSwitch.icon, {text = '', body = bodyText}, 1)
 end
 
+function MapSizeText(width, height)
+    -- round half down; this won't let fractional map sizes (e.g. from the map gen) make it needlessly long
+    local widthKm = math.ceil(width / 51.2 - 0.5)
+    local heightKm = math.ceil(height / 51.2 - 0.5)
+    return tostring(widthKm) .. "x" .. tostring(heightKm)
+end
+
 function DisplayResources(resources, line, mode)
     if resources then
         local Tmp = {}
@@ -507,21 +594,9 @@ function DisplayResources(resources, line, mode)
         end
         line.mass_in:SetText('  '..fmtnum(Tmp.Mass * 10))
         line.energy_in:SetText('  '..fmtnum(Tmp.Energy * 10))
-        line.mass.OnHide = nil
-        line.energy.OnHide = nil
-        line.units.OnHide = nil
-        line.mass:Show()
-        line.energy:Show()
-        line.units:Show()
     else
         line.mass_in:SetText('')
         line.energy_in:SetText('')
-        line.mass:Hide()
-        line.energy:Hide()
-        line.units:Hide()
-        line.mass.OnHide = blockOnHide
-        line.energy.OnHide = blockOnHide
-        line.units.OnHide = blockOnHide
     end
 end
 
@@ -614,7 +689,7 @@ function _OnBeat()
                 line = data
             end
         end
-        LayoutHelpers.Below(resModeSwitch.icon, line.energy, -1)
+        LayoutHelpers.Below(resModeSwitch.icon, line.energy, 1)
         currentScores = false -- dont render score UI until next score update
     end
 
@@ -657,6 +732,20 @@ function _OnBeat()
         end
         prevArmy = curFA
     end
+    
+    -- this will be needed only for very few maps that change the playable area after initialization
+    local areaData = Sync.NewPlayableArea
+    if areaData then
+        local width = areaData[3] - areaData[1]
+        local height = areaData[4] - areaData[2]
+        if width ~= sessionInfo.PlayableAreaWidth or height ~= sessionInfo.PlayableAreaHeight then
+            sessionInfo.PlayableAreaWidth = width
+            sessionInfo.PlayableAreaHeight = height
+            if mapSizeUI then
+                mapSizeUI:SetText(MapSizeText(width, height))
+            end
+        end
+    end
 end
 
 function SetUnitText(current, cap)
@@ -691,11 +780,30 @@ function ToggleScoreControl(state)
             controls.collapseArrow:SetCheck(false, true)
             controls.bg:Show()
             controls.bg:SetNeedsFrameUpdate(true)
+            controls.bg.OnFrame = function(self, delta)
+                local newRight = self.Right() - (1000 * delta)
+                if newRight < savedParent.Right() - 3 then
+                    self.Right:Set(function() return savedParent.Right() - 18 end)
+                    self:SetNeedsFrameUpdate(false)
+                else
+                    self.Right:Set(newRight)
+                end
+            end
         else
             Prefs.SetToCurrentProfile("scoreoverlay", false)
             local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
             PlaySound(sound)
             controls.bg:SetNeedsFrameUpdate(true)
+            controls.bg.OnFrame = function(self, delta)
+                local newRight = self.Right() + (1000 * delta)
+                if newRight > savedParent.Right() + self.Width() then
+                    self.Right:Set(function() return savedParent.Right() + self.Width() end)
+                    self:Hide()
+                    self:SetNeedsFrameUpdate(false)
+                else
+                    self.Right:Set(newRight)
+                end
+            end
             controls.collapseArrow:SetCheck(true, true)
         end
     else
@@ -716,28 +824,37 @@ function ToggleScoreControl(state)
 end
 
 function Expand()
-    if needExpand then
-        controls.bg:Show()
-        controls.collapseArrow:Show()
-        local sound = Sound({Cue = "UI_Score_Window_Open", Bank = "Interface",})
-        PlaySound(sound)
-        needExpand = false
+    if created then 
+        if needExpand then
+            controls.bg:Show()
+            controls.collapseArrow:Show()
+            local sound = Sound({Cue = "UI_Score_Window_Open", Bank = "Interface",})
+            PlaySound(sound)
+            needExpand = false
+        else
+            controls.collapseArrow:Show()
+        end
     end
 end
 
 function Contract()
-    if controls.bg then
-        if not controls.bg:IsHidden() then
-            local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
-            PlaySound(sound)
-            controls.bg:Hide()
-            controls.collapseArrow:Hide()
-            needExpand = true
+    if created then 
+        if controls.bg then
+            if not controls.bg:IsHidden() then
+                local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
+                PlaySound(sound)
+                controls.bg:Hide()
+                controls.collapseArrow:Hide()
+                if Prefs.GetFromCurrentProfile("scoreoverlay") ~= false then
+                    needExpand = true
+                end
+            else
+                needExpand = false
+                controls.collapseArrow:Hide()
+            end
         else
-            needExpand = false
+            contractOnCreate = true
         end
-    else
-        contractOnCreate = true
     end
 end
 
@@ -748,6 +865,17 @@ function InitialAnimation(state)
         controls.collapseArrow:SetCheck(false, true)
         controls.bg:Show()
         controls.bg:SetNeedsFrameUpdate(true)
+        controls.bg.OnFrame = function(self, delta)
+            local newRight = self.Right() - (1000 * delta)
+            if newRight < savedParent.Right() - 3 then
+                self.Right:Set(function() return savedParent.Right() - 18 end)
+                self:SetNeedsFrameUpdate(false)
+            else
+                self.Right:Set(newRight)
+            end
+        end
+    else
+        controls.collapseArrow:Show()
     end
 end
 

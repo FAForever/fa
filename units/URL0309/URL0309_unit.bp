@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 26, -- allows for factory reclaim bug 
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',
@@ -69,6 +72,7 @@ UnitBlueprint {
         'BUILTBYTIER3FACTORY',
         'CYBRAN',
         'MOBILE',
+        'AMPHIBIOUS',
         'LAND',
         'TECH3',
         'CONSTRUCTION',

@@ -38,7 +38,7 @@ function DoNukePing(NukeLaunchData)
         end
 
         if pingOkFlag then
-            local data = {Owner = army, Type = pingType, Location = position, Type = pingType}
+            local data = {Owner = army, Type = pingType, Location = position}
             data = table.merged(data, PingTypes[pingType])
             SimCallback({Func = 'SpawnSpecialPing', Args = data})
         end

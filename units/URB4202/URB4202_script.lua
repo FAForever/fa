@@ -1,14 +1,15 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/URB4202/URB4202_script.lua
---#**  Author(s):  David Tomandl, Greg Kohne
---#**
---#**  Summary  :  Cybran Shield Generator lvl 1 Script
---#**
---#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/URB4202/URB4202_script.lua
+----**  Author(s):  David Tomandl, Greg Kohne
+----**
+----**  Summary  :  Cybran Shield Generator lvl 1 Script
+----**
+----**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local CShieldStructureUnit = import('/lua/cybranunits.lua').CShieldStructureUnit
 
+---@class URB4202 : CShieldStructureUnit
 URB4202 = Class(CShieldStructureUnit) {
     ShieldEffects = {
         '/effects/emitters/cybran_shield_01_generator_01_emit.bp',

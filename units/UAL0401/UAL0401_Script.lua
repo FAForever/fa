@@ -14,12 +14,69 @@ local explosion = import('/lua/defaultexplosions.lua')
 
 local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
 
+-- upvalue for performance
+local MathSqrt = math.sqrt
+local MathCos = math.cos 
+local MathSin = math.sin 
+
+
+-- store for performance
+local ZeroDegrees = Vector(0, 0, 1)
+local SignCheck = Vector(1, 0, 0)
+
+---@class UAL0401 : AWalkingLandUnit
 UAL0401 = Class(AWalkingLandUnit) {
     Weapons = {
         EyeWeapon = Class(ADFPhasonLaser) {},
         RightArmTractor = Class(ADFTractorClaw) {},
         LeftArmTractor = Class(ADFTractorClaw) {},
     },
+
+    OnCreate = function (self, spec)
+        AWalkingLandUnit.OnCreate(self, spec)
+
+        self:ForkThread(self.AdjustWeaponsThread)
+    end,
+
+
+    AdjustWeaponsThread = function(self)
+
+        while not self.Dead do 
+
+            -- only perform this logic if the unit is on the move
+            if self:IsUnitState("Moving") then
+
+                -- compute the direction of the heading
+                local sx, sy, sz = self:GetPositionXYZ()
+                local heading = self:GetHeading()
+                local hx, hz = MathSin(heading), MathCos(heading)
+
+                for k = 1, self.WeaponCount do 
+
+                    -- retrieve weapon and its target
+                    local weapon = self:GetWeapon(k)
+                    local target = weapon:GetCurrentTarget()
+
+                    if target then 
+
+                        -- compute direction and normalize
+                        local tx, ty, tz = target:GetPositionXYZ()
+                        local dx, dz = tx - sx, tz - sz
+                        local invLength = 1.0 / MathSqrt(dx * dx + dz * dz)
+                        dx, dz = invLength * dx, invLength * dz
+
+                        -- compute dot product between weapon target and our heading, if it is lower than 0 it means the target is behind us
+                        local dot = dx * hx + dz * hz
+                        if dot < 0 then 
+                            weapon:ResetTarget()
+                        end
+                    end
+                end
+            end
+
+            WaitSeconds(0.2)
+        end
+    end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
         AWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
@@ -45,9 +102,10 @@ UAL0401 = Class(AWalkingLandUnit) {
     end,
 
     DeathThread = function(self, overkillRatio , instigator)
+        local size = self.Size
         self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
         WaitSeconds(2)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         WaitSeconds(0.1)
@@ -92,14 +150,14 @@ UAL0401 = Class(AWalkingLandUnit) {
         -- hopes that this will look better in the future.. =)
         if self.ShowUnitDestructionDebris and overkillRatio then
             if overkillRatio <= 1 then
-                self.CreateUnitDestructionDebris(self, true, true, false)
+                self:CreateUnitDestructionDebris(true, true, false)
             elseif overkillRatio <= 2 then
-                self.CreateUnitDestructionDebris(self, true, true, false)
+                self:CreateUnitDestructionDebris(true, true, false)
             elseif overkillRatio <= 3 then
-                self.CreateUnitDestructionDebris(self, true, true, true)
-                self.CreateUnitDestructionDebris(self, true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
             else -- Vaporized
-                self.CreateUnitDestructionDebris(self, true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
             end
         end
 

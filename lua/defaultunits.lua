@@ -4,6 +4,7 @@
 -- Summary  :  Default definitions of units
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+local Entity = import('/lua/sim/Entity.lua').Entity
 local Unit = import('/lua/sim/Unit.lua').Unit
 local explosion = import('defaultexplosions.lua')
 local EffectUtil = import('EffectUtilities.lua')
@@ -14,25 +15,8 @@ local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
-local teleportTime = {}
-
-local CreateScaledBoom = function(unit, overkill, bone)
-    explosion.CreateDefaultHitExplosionAtBone(
-        unit,
-        bone or 0,
-        explosion.CreateUnitExplosionEntity(unit, overkill).Spec.BoundingXZRadius
-)
-end
-
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
-
--- MISC UNITS
-DummyUnit = Class(Unit) {
-    OnStopBeingBuilt = function(self, builder, layer)
-        self:Destroy()
-    end,
-}
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
@@ -40,6 +24,7 @@ local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categ
 local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
 
 -- STRUCTURE UNITS
+---@class StructureUnit : Unit
 StructureUnit = Class(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
@@ -50,19 +35,35 @@ StructureUnit = Class(Unit) {
     FxDamage2 = {EffectTemplate.DamageStructureFireSmoke01, EffectTemplate.DamageStructureSparks01},
     FxDamage3 = {EffectTemplate.DamageStructureFire01, EffectTemplate.DamageStructureSparks01},
 
+    ---@param self StructureUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
-        self.WeaponMod = {}
+        self:HideLandBones()
+        self.AdjacentUnits = {}
         self.FxBlinkingLightsBag = {}
-        if self.Layer == 'Land' and self:GetBlueprint().Physics.FlattenSkirt then
+        if self.Layer == 'Land' and self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
         end
     end,
 
+    --- Hides parts of a mesh that should be visible when the structure is made on water
+    ---@param self StructureUnit
+    HideLandBones = function(self)
+        if self.LandBuiltHiddenBones and self.Layer == 'Land' then
+            for _, v in self.LandBuiltHiddenBones do
+                if self:IsValidBone(v) then
+                    self:HideBone(v, true)
+                end
+            end
+        end
+    end,
+
+    --- Rotates the structure towards the enemy, primarily used for point defenses
+    ---@param self StructureUnit
     RotateTowardsEnemy = function(self)
 
         -- retrieve information we may need
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local brain = self:GetAIBrain()
         local pos = self:GetPosition()
 
@@ -93,7 +94,7 @@ StructureUnit = Class(Unit) {
                 if radar or identified then
 
                     -- if we've identified the blip then we can use the threat of the unit, otherwise default to 1.
-                    local threat = (identified and u:GetBlueprint().Defense.SurfaceThreatLevel) or 1
+                    local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
 
                     -- if this is more of a threat than what we have, compute distance
                     if threat >= target.threat then
@@ -130,13 +131,17 @@ StructureUnit = Class(Unit) {
         self:SetRotation(degrees)
     end,
 
+    ---@param self StructureUnit
+    ---@param builder Builder
+    ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
+        Unit.OnStartBeingBuilt(self, builder, layer)
+
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         end
 
-        Unit.OnStartBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
                 self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
@@ -146,31 +151,49 @@ StructureUnit = Class(Unit) {
         end
     end,
 
+    ---@param self StructureUnit
+    ---@param builder Builder
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         Unit.OnStopBeingBuilt(self, builder, layer)
-        -- Whaa why can't we have sane inheritance chains :/
-        if self:GetBlueprint().General.FactionName == "Seraphim" then
+
+        -- tarmac is made once seraphim animation is complete
+        if self.Blueprint.General.FactionName == "Seraphim" then
             self:CreateTarmac(true, true, true, false, false)
         end
+
         self:PlayActiveAnimation()
+
+        -- remove land bones if the structure has them
+        self:HideLandBones()
     end,
 
+    ---@param self StructureUnit
     OnFailedToBeBuilt = function(self)
         Unit.OnFailedToBeBuilt(self)
         self:DestroyTarmac()
     end,
 
+    ---@param self StructureUnit
     FlattenSkirt = function(self)
-        local x, y, z = unpack(self:GetCachePosition())
+        local x, y, z = self:GetPositionXYZ()
         local x0, z0, x1, z1 = self:GetSkirtRect()
         x0, z0, x1, z1 = math.floor(x0), math.floor(z0), math.ceil(x1), math.ceil(z1)
         FlattenMapRect(x0, z0, x1 - x0, z1 - z0, y)
     end,
 
+    ---@param self StructureUnit
+    ---@param albedo string
+    ---@param normal string
+    ---@param glow string
+    ---@param orientation number
+    ---@param specTarmac string
+    ---@param lifeTime number
+    ---@return boolean
     CreateTarmac = function(self, albedo, normal, glow, orientation, specTarmac, lifeTime)
         if self.Layer ~= 'Land' then return end
         local tarmac
-        local bp = self:GetBlueprint().Display.Tarmacs
+        local bp = self.Blueprint.Display.Tarmacs
         if not specTarmac then
             if bp and not table.empty(bp) then
                 local num = Random(1, table.getn(bp))
@@ -186,7 +209,7 @@ StructureUnit = Class(Unit) {
         local l = tarmac.Length
         local fadeout = tarmac.FadeOut
 
-        local x, y, z = unpack(self:GetPosition())
+        local x, y, z = self:GetPositionXYZ()
 
         -- I'm disabling this for now since there are so many things wrong with it
         local orient = orientation
@@ -250,6 +273,7 @@ StructureUnit = Class(Unit) {
         end
     end,
 
+    ---@param self StructureUnit
     DestroyTarmac = function(self)
         if not self.TarmacBag then return end
 
@@ -261,34 +285,13 @@ StructureUnit = Class(Unit) {
         self.TarmacBag.CurrentBP = nil
     end,
 
+    ---@param self StructureUnit
     HasTarmac = function(self)
         if not self.TarmacBag then return false end
         return not table.empty(self.TarmacBag.Decals)
     end,
 
-    OnMassStorageStateChange = function(self, state)
-    end,
-
-    OnEnergyStorageStateChange = function(self, state)
-    end,
-
-    CreateBlinkingLights = function(self, color)
-        self:DestroyBlinkingLights()
-        local bp = self:GetBlueprint()
-        if bp.Display.BlinkingLights then
-            local fxbp = bp.Display.BlinkingLightsFx[color]
-            for _, v in bp.Display.BlinkingLights do
-                if type(v) == 'table' then
-                    local fx = CreateAttachedEmitter(self, v.BLBone, self.Army, fxbp)
-                    fx:OffsetEmitter(v.BLOffsetX or 0, v.BLOffsetY or 0, v.BLOffsetZ or 0)
-                    fx:ScaleEmitter(v.BLScale or 1)
-                    table.insert(self.FxBlinkingLightsBag, fx)
-                    self.Trash:Add(fx)
-                end
-            end
-        end
-    end,
-
+    ---@param self StructureUnit
     DestroyBlinkingLights = function(self)
         for _, v in self.FxBlinkingLightsBag do
             v:Destroy()
@@ -296,17 +299,22 @@ StructureUnit = Class(Unit) {
         self.FxBlinkingLightsBag = {}
     end,
 
+    ---@param self StructureUnit
+    ---@param overkillRatio number
     CreateDestructionEffects = function(self, overkillRatio)
         if explosion.GetAverageBoundingXZRadius(self) < 1.0 then
-            explosion.CreateScalableUnitExplosion(self, overkillRatio)
+            explosion.CreateScalableUnitExplosion(self)
         else
             explosion.CreateTimedStuctureUnitExplosion(self)
             WaitSeconds(0.5)
-            explosion.CreateScalableUnitExplosion(self, overkillRatio)
+            explosion.CreateScalableUnitExplosion(self)
         end
     end,
 
     -- Modified to use same upgrade logic as the ui. This adds more upgrade options via General.UpgradesFromBase blueprint option
+    ---@param self StructureUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order boolean
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Check for death loop
         if not Unit.OnStartBuild(self, unitBeingBuilt, order) then
@@ -314,8 +322,8 @@ StructureUnit = Class(Unit) {
         end
         self.UnitBeingBuilt = unitBeingBuilt
 
-        local builderBp = self:GetBlueprint()
-        local targetBp = unitBeingBuilt:GetBlueprint()
+        local builderBp = self.Blueprint
+        local targetBp = unitBeingBuilt.Blueprint
         local performUpgrade = false
 
         if targetBp.General.UpgradesFrom == builderBp.BlueprintId then
@@ -333,8 +341,26 @@ StructureUnit = Class(Unit) {
 
         if performUpgrade and order == 'Upgrade' then
             ChangeState(self, self.UpgradingState)
+
+            -- Fix an oddly specific bug to structures with damaged shields:
+            -- 1) let an engineer to assist the structure, repairing the damaged shield
+            -- 2) upgrade the structure while the shield is being healed
+            -- 3) engineer changes consumption target, but is in limbo - it consumes resources, but it doesn't repair the shield or help upgrade the structure
+
+            -- Luckily, engineers do not heal damaged shields on their own. It usually only happens when an engineer was specifically told to assist the shield,
+            -- therefore we add a check when we upgrade a structure that has a shield. For each guarding unit, check if this is the only command. If so,
+            -- re-issue the guard command
+            if self.MyShield then
+                local guards = self:GetGuards()
+                for k, guard in guards do
+                    if table.getn(guard:GetCommandQueue()) == 1 then
+                        IssueClearCommands({guard})
+                        IssueGuard({guard}, self)
+                    end
+                end
+            end
         end
-     end,
+    end,
 
     IdleState = State {
         Main = function(self)
@@ -343,18 +369,19 @@ StructureUnit = Class(Unit) {
 
     UpgradingState = State {
         Main = function(self)
-            self:StopRocking()
-            local bp = self:GetBlueprint().Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
             self:DisableDefaultToggleCaps()
-            if bp.AnimationUpgrade then
+
+            local animation = self:GetUpgradeAnimation(self.UnitBeingBuilt)
+            if animation then
+
                 local unitBuilding = self.UnitBeingBuilt
                 self.AnimatorUpgradeManip = CreateAnimator(self)
                 self.Trash:Add(self.AnimatorUpgradeManip)
                 local fractionOfComplete = 0
                 self:StartUpgradeEffects(unitBuilding)
-                self.AnimatorUpgradeManip:PlayAnim(bp.AnimationUpgrade, false):SetRate(0)
+                self.AnimatorUpgradeManip:PlayAnim(animation, false):SetRate(0)
 
                 while fractionOfComplete < 1 and not self.Dead do
                     fractionOfComplete = unitBuilding:GetFractionComplete()
@@ -395,9 +422,12 @@ StructureUnit = Class(Unit) {
         end,
     },
 
+    ---@param self StructureUnit
+    ---@param builder Unit
+    ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         Unit.StartBeingBuiltEffects(self, builder, layer)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local FactionName = bp.General.FactionName
 
         if FactionName == 'UEF' then
@@ -417,37 +447,54 @@ StructureUnit = Class(Unit) {
         end
     end,
 
+    ---@param self StructureUnit
+    ---@param builder Unit
+    ---@param layer Layer
     StopBeingBuiltEffects = function(self, builder, layer)
-        local FactionName = self:GetBlueprint().General.FactionName
-        if FactionName == 'Aeon' then
-            WaitSeconds(2.0)
-        elseif FactionName == 'UEF' and not self.BeingBuiltShowBoneTriggered then
+        local FactionName = self.Blueprint.General.FactionName
+        if FactionName == 'UEF' and not self.BeingBuiltShowBoneTriggered then
             self:ShowBone(0, true)
             self:HideLandBones()
         end
+
         Unit.StopBeingBuiltEffects(self, builder, layer)
     end,
 
+    ---comment
+    ---@param self StructureUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order table
     StartBuildingEffects = function(self, unitBeingBuilt, order)
         Unit.StartBuildingEffects(self, unitBeingBuilt, order)
     end,
 
+    ---@param self StructureUnit
+    ---@param unitBeingBuilt Unit
     StopBuildingEffects = function(self, unitBeingBuilt)
         Unit.StopBuildingEffects(self, unitBeingBuilt)
     end,
 
+    ---@param self StructureUnit
+    ---@param unitBeingBuilt Unit
     StartUpgradeEffects = function(self, unitBeingBuilt)
         unitBeingBuilt:HideBone(0, true)
     end,
 
+    ---@param self StructureUnit
+    ---@param unitBeingBuilt Unit
     StopUpgradeEffects = function(self, unitBeingBuilt)
         unitBeingBuilt:ShowBone(0, true)
     end,
 
+    ---@param self StructureUnit
     PlayActiveAnimation = function(self)
 
     end,
 
+    ---@param self StructureUnit
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         local scus = EntityCategoryFilterDown(categories.SUBCOMMANDER, self:GetGuards())
         if scus[1] then
@@ -466,6 +513,8 @@ StructureUnit = Class(Unit) {
         self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
     end,
 
+    ---@param self StructureUnit
+    ---@param wreckage Wreckage
     CheckRepairersForRebuild = function(self, wreckage)
         local units = {}
         for id, u in self.Repairers do
@@ -485,6 +534,9 @@ StructureUnit = Class(Unit) {
         wreckage:Rebuild(units)
     end,
 
+    ---@param self StructureUnit
+    ---@param overkillRatio number
+    ---@return Wreckage|nil
     CreateWreckage = function(self, overkillRatio)
         local wreckage = Unit.CreateWreckage(self, overkillRatio)
         if wreckage then
@@ -496,12 +548,15 @@ StructureUnit = Class(Unit) {
 
     -- Adjacency
     -- When we're adjacent, try to apply all the possible bonuses
+    ---@param self StructureUnit
+    ---@param adjacentUnit StructureUnit
+    ---@param triggerUnit StructureUnit
     OnAdjacentTo = function(self, adjacentUnit, triggerUnit) -- What is triggerUnit?
         if self:IsBeingBuilt() then return end
         if adjacentUnit:IsBeingBuilt() then return end
 
         -- Does the unit have any adjacency buffs to use?
-        local adjBuffs = self:GetBlueprint().Adjacency
+        local adjBuffs = self.Blueprint.Adjacency
         if not adjBuffs then return end
 
         -- Apply each buff needed to you and/or adjacent unit
@@ -520,13 +575,15 @@ StructureUnit = Class(Unit) {
      end,
 
     -- When we're not adjacent, try to remove all the possible bonuses
+    ---@param self StructureUnit
+    ---@param adjacentUnit StructureUnit
     OnNotAdjacentTo = function(self, adjacentUnit)
         if not self.AdjacentUnits then
             WARN("Precondition Failed: No AdjacentUnits registered for entity: " .. repr(self.GetEntityId))
             return
         end
 
-        local adjBuffs = self:GetBlueprint().Adjacency
+        local adjBuffs = self.Blueprint.Adjacency
 
         if adjBuffs and AdjacencyBuffs[adjBuffs] then
             for k, v in AdjacencyBuffs[adjBuffs] do
@@ -549,8 +606,9 @@ StructureUnit = Class(Unit) {
 
     -- Add/Remove Adjacency Functionality
     -- Applies all appropriate buffs to all adjacent units
+    ---@param self StructureUnit
     ApplyAdjacencyBuffs = function(self)
-        local adjBuffs = self:GetBlueprint().Adjacency
+        local adjBuffs = self.Blueprint.Adjacency
         if not adjBuffs then return end
 
         -- There won't be any adjacentUnit if this is a producer just built...
@@ -566,8 +624,9 @@ StructureUnit = Class(Unit) {
     end,
 
     -- Removes all appropriate buffs from all adjacent units
+    ---@param self StructureUnit
     RemoveAdjacencyBuffs = function(self)
-        local adjBuffs = self:GetBlueprint().Adjacency
+        local adjBuffs = self.Blueprint.Adjacency
         if not adjBuffs then return end
 
         if self.AdjacentUnits then
@@ -584,6 +643,8 @@ StructureUnit = Class(Unit) {
     end,
 
     -- Add/Remove Adjacency Effects
+    ---@param self StructureUnit
+    ---@param adjacentUnit StructureUnit
     CreateAdjacentEffect = function(self, adjacentUnit)
         -- Create trashbag to hold all these entities and beams
         if not self.AdjacencyBeamsBag then
@@ -598,6 +659,8 @@ StructureUnit = Class(Unit) {
         EffectUtil.CreateAdjacencyBeams(self, adjacentUnit, self.AdjacencyBeamsBag)
     end,
 
+    ---@param self StructureUnit
+    ---@param adjacentUnit StructureUnit
     DestroyAdjacentEffects = function(self, adjacentUnit)
         if not self.AdjacencyBeamsBag then return end
 
@@ -609,118 +672,61 @@ StructureUnit = Class(Unit) {
         end
     end,
 
+    ---@param self StructureUnit
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
 	    -- Handle incoming OC damage
         if damageType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
-            amount = wep:GetBlueprint().Overcharge.structureDamage
+            amount = wep.Blueprint.Overcharge.structureDamage
         end
         Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
+    end,
+
+    ---@deprecated
+    ---@param self StructureUnit
+    ChangeBlinkingLights = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self StructureUnit
+    CreateBlinkingLights = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self StructureUnit
+    OnMassStorageStateChange = function(self, state)
+    end,
+
+    ---@deprecated
+    ---@param self StructureUnit
+    OnEnergyStorageStateChange = function(self, state)
     end,
 }
 
 -- FACTORY UNITS
+---@class FactoryUnit : StructureUnit
 FactoryUnit = Class(StructureUnit) {
+
+    ---@param self FactoryUnit
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
 
-        -- keeps track of what HQs are available
-        if EntityCategoryContains(categories.RESEARCH, self) then
-
-            -- is called when:
-            -- - structure is being upgraded
-            self:AddUnitCallback(
-                function(self, unitBeingBuilt)
-                    if EntityCategoryContains(categories.RESEARCH, self) then
-                        unitBeingBuilt.UpgradedHQFromTech = self.techCategory
-                    end
-                end,
-                "OnStartBuild"
-            )
-
-            -- is called when:
-            --  - unit is built
-            --  - unit is captured (for the new army)
-            --  - unit is given (for the new army)
-            self:AddUnitCallback(
-                function(self) 
-                    local brain = ArmyBrains[self.Army]
-
-                    -- if we're an upgrade then remove the HQ we came from
-                    if self.UpgradedHQFromTech then
-                        brain:RemoveHQ(self.factionCategory, self.layerCategory, self.UpgradedHQFromTech)
-                    end
-
-                    -- update internal state
-                    brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
-
-                    -- update all units affected by this
-                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
-                    for id, unit in affected do
-                        unit:UpdateBuildRestrictions()
-                    end
-                end, "OnStopBeingBuilt")
-
-            -- is called when:
-            --  - unit is killed
-            self:AddUnitCallback(
-                function(self) 
-                    local brain = ArmyBrains[self.Army]
-
-                    -- update internal state
-                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
-
-                    -- update all units affected by this
-                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
-                    for id, unit in affected do
-                        unit:UpdateBuildRestrictions()
-                    end
-                end, "OnKilled")
-
-            -- is called when:
-            --  - unit is given (used for the old army)
-            --  - unit is captured (used for the old army)
-            self:AddUnitCallback(
-                function(self, newUnit) 
-                    local brain = ArmyBrains[self.Army]
-
-                    -- update internal state
-                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
-
-                    -- update all units affected by this
-                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
-                    for id, unit in affected do
-                        unit:UpdateBuildRestrictions()
-                    end
-                end, "OnGiven")
-
-            -- is called when:
-            --  - unit is reclaimed
-            self:AddUnitCallback(
-                function(self) 
-                    local brain = ArmyBrains[self.Army]
-
-                    -- update internal state
-                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
-
-                    -- update all units affected by this
-                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
-                    for id, unit in affected do
-                        unit:UpdateBuildRestrictions()
-                    end
-                end, "OnReclaimed")
+        -- if we're a support factory, make sure our build restrictions are correct
+        if self.Blueprint.CategoriesHash["SUPPORTFACTORY"] then
+            self:UpdateBuildRestrictions()
         end
 
         -- Save build effect bones for faster access when creating build effects
-        self.BuildEffectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+        self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
     end,
 
+    ---@param self FactoryUnit
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             if self.UnitBeingBuilt:GetFractionComplete() > 0.5 then
@@ -731,12 +737,27 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self FactoryUnit
     OnDestroy = function(self)
         StructureUnit.OnDestroy(self)
+        
+        if self.Blueprint.CategoriesHash["RESEARCH"] and self:GetFractionComplete() == 1.0 then
+            
+            -- update internal state
+            self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
+            self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
 
-        self.DestroyUnitBeingBuilt(self)
+            -- update all units affected by this
+            local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+            for id, unit in affected do
+                unit:UpdateBuildRestrictions()
+            end
+        end
+
+        self:DestroyUnitBeingBuilt()
     end,
 
+    ---@param self FactoryUnit
     OnPaused = function(self)
         StructureUnit.OnPaused(self)
 
@@ -747,6 +768,7 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self FactoryUnit
     OnUnpaused = function(self)
         StructureUnit.OnUnpaused(self)
         if self:IsUnitState('Building') then
@@ -755,78 +777,17 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
-    OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
-
-        local aiBrain = GetArmyBrain(self.Army)
-        aiBrain:ESRegisterUnitMassStorage(self)
-        aiBrain:ESRegisterUnitEnergyStorage(self)
-        local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
-        local curMass = aiBrain:GetEconomyStoredRatio('MASS')
-        if curEnergy > 0.11 and curMass > 0.11 then
-            self:CreateBlinkingLights('Green')
-            self.BlinkingLightsState = 'Green'
-        else
-            self:CreateBlinkingLights('Red')
-            self.BlinkingLightsState = 'Red'
-        end
-    end,
-
-    ChangeBlinkingLights = function(self, state)
-        local bls = self.BlinkingLightsState
-        if state == 'Yellow' then
-            if bls == 'Green' then
-                self:CreateBlinkingLights('Yellow')
-                self.BlinkingLightsState = state
-            end
-        elseif state == 'Green' then
-            if bls == 'Yellow' then
-                self:CreateBlinkingLights('Green')
-                self.BlinkingLightsState = state
-            elseif bls == 'Red' then
-                local aiBrain = GetArmyBrain(self.Army)
-                local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
-                local curMass = aiBrain:GetEconomyStoredRatio('MASS')
-                if curEnergy > 0.11 and curMass > 0.11 then
-                    if self:GetNumBuildOrders(categories.ALLUNITS) == 0 then
-                        self:CreateBlinkingLights('Green')
-                        self.BlinkingLightsState = state
-                    else
-                        self:CreateBlinkingLights('Yellow')
-                        self.BlinkingLightsState = 'Yellow'
-                    end
-                end
-            end
-        elseif state == 'Red' then
-            self:CreateBlinkingLights('Red')
-            self.BlinkingLightsState = state
-        end
-    end,
-
-    OnMassStorageStateChange = function(self, newState)
-        if newState == 'EconLowMassStore' then
-            self:ChangeBlinkingLights('Red')
-        else
-            self:ChangeBlinkingLights('Green')
-        end
-    end,
-
-    OnEnergyStorageStateChange = function(self, newState)
-        if newState == 'EconLowEnergyStore' then
-            self:ChangeBlinkingLights('Red')
-        else
-            self:ChangeBlinkingLights('Green')
-        end
-    end,
-
+    ---@param self FactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order boolean
     OnStartBuild = function(self, unitBeingBuilt, order)
-        self:ChangeBlinkingLights('Yellow')
         StructureUnit.OnStartBuild(self, unitBeingBuilt, order)
+
         self.BuildingUnit = true
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = false
-        elseif unitBeingBuilt:GetBlueprint().CategoriesHash.RESEARCH then
+        elseif unitBeingBuilt.Blueprint.CategoriesHash["RESEARCH"] then
             -- Removes assist command to prevent accidental cancellation when right-clicking on other factory
             self:RemoveCommandCap('RULEUCC_Guard')
             self.DisabledAssist = true
@@ -835,12 +796,15 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     --- Introduce a rolloff delay, where defined.
+    ---@param self FactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order boolean
     OnStopBuild = function(self, unitBeingBuilt, order)
         if self.DisabledAssist then
             self:AddCommandCap('RULEUCC_Guard')
             self.DisabledAssist = nil
         end
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if bp.General.RolloffDelay and bp.General.RolloffDelay > 0 and not self.FactoryBuildFailed then
             self:ForkThread(self.PauseThread, bp.General.RolloffDelay, unitBeingBuilt, order)
         else
@@ -848,7 +812,30 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self FactoryUnit
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        StructureUnit.OnStopBeingBuilt(self, builder, layer)
+
+        if self.Blueprint.CategoriesHash["RESEARCH"] then
+            -- update internal state
+            self.Brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
+            self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+            -- update all units affected by this
+            local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+            for _, unit in affected do
+                unit:UpdateBuildRestrictions()
+            end
+        end
+    end,
+
     --- Adds a pause between unit productions
+    ---@param self FactoryUnit
+    ---@param productionpause number
+    ---@param unitBeingBuilt Unit
+    ---@param order boolean
     PauseThread = function(self, productionpause, unitBeingBuilt, order)
         self:StopBuildFx()
         self:SetBusy(true)
@@ -861,6 +848,9 @@ FactoryUnit = Class(StructureUnit) {
         self:DoStopBuild(unitBeingBuilt, order)
     end,
 
+    ---@param self FactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order boolean
     DoStopBuild = function(self, unitBeingBuilt, order)
         StructureUnit.OnStopBuild(self, unitBeingBuilt, order)
 
@@ -874,10 +864,13 @@ FactoryUnit = Class(StructureUnit) {
         self.BuildingUnit = false
     end,
 
+    ---@param self FactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order boolean
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
             self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim)
@@ -898,6 +891,10 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
+    ---#
+    ---@param self FactoryUnit
+    ---@param target_bp any
+    ---@return boolean
     CheckBuildRestriction = function(self, target_bp)
         -- Check basic build restrictions first (Unit.CheckBuildRestriction but we only go up one inheritance level)
         if not StructureUnit.CheckBuildRestriction(self, target_bp) then
@@ -909,6 +906,7 @@ FactoryUnit = Class(StructureUnit) {
         return target_bp.General.Category ~= 'Factory'
     end,
 
+    ---@param self FactoryUnit
     OnFailedToBuild = function(self)
         StructureUnit.OnFailedToBuild(self)
         self.FactoryBuildFailed = true
@@ -917,13 +915,15 @@ FactoryUnit = Class(StructureUnit) {
         ChangeState(self, self.IdleState)
     end,
 
+    ---@param self FactoryUnit
     RollOffUnit = function(self)
         local spin, x, y, z = self:CalculateRollOffPoint()
         self.MoveCommand = IssueMove({self.UnitBeingBuilt}, Vector(x, y, z))
     end,
 
+    ---@param self FactoryUnit
     CalculateRollOffPoint = function(self)
-        local bp = self:GetBlueprint().Physics.RollOffPoints
+        local bp = self.Blueprint.Physics.RollOffPoints
         local px, py, pz = unpack(self:GetPosition())
 
         if not bp then return 0, px, py, pz end
@@ -944,7 +944,7 @@ FactoryUnit = Class(StructureUnit) {
 
         local fx, fy, fz, spin
         local bpP = bp[bpKey]
-        local unitBP = self.UnitBeingBuilt:GetBlueprint().Display.ForcedBuildSpin
+        local unitBP = self.UnitBeingBuilt.Blueprint.Display.ForcedBuildSpin
         if unitBP then
             spin = unitBP
         else
@@ -958,15 +958,20 @@ FactoryUnit = Class(StructureUnit) {
         return spin, fx, fy, fz
     end,
 
+    ---@param self FactoryUnit
+    ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
     end,
 
+    ---@param self FactoryUnit
     StopBuildFx = function(self)
     end,
 
+    ---@param self FactoryUnit
     PlayFxRollOff = function(self)
     end,
 
+    ---@param self FactoryUnit
     PlayFxRollOffEnd = function(self)
         if self.RollOffAnim then
             self.RollOffAnim:SetRate(-1)
@@ -976,15 +981,17 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self FactoryUnit
     CreateBuildRotator = function(self)
         if not self.BuildBoneRotator then
             local spin = self:CalculateRollOffPoint()
-            local bp = self:GetBlueprint().Display
+            local bp = self.Blueprint.Display
             self.BuildBoneRotator = CreateRotator(self, bp.BuildAttachBone or 0, 'y', spin, 10000)
             self.Trash:Add(self.BuildBoneRotator)
         end
     end,
 
+    ---@param self FactoryUnit
     DestroyBuildRotator = function(self)
         if self.BuildBoneRotator then
             self.BuildBoneRotator:Destroy()
@@ -992,6 +999,7 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self FactoryUnit
     RolloffBody = function(self)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
@@ -1012,7 +1020,6 @@ FactoryUnit = Class(StructureUnit) {
 
     IdleState = State {
         Main = function(self)
-            self:ChangeBlinkingLights('Green')
             self:SetBusy(false)
             self:SetBlockCommandQueue(false)
             self:DestroyBuildRotator()
@@ -1022,7 +1029,7 @@ FactoryUnit = Class(StructureUnit) {
     BuildingState = State {
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             local bone = bp.Display.BuildAttachBone or 0
             self:DetachAll(bone)
             unitBuilding:AttachBoneTo(-2, self, bone)
@@ -1039,20 +1046,17 @@ FactoryUnit = Class(StructureUnit) {
 }
 
 -- AIR FACTORY UNITS
+---@class AirFactoryUnit : FactoryUnit
 AirFactoryUnit = Class(FactoryUnit) {}
 
 -- AIR STAGING PLATFORMS UNITS
-AirStagingPlatformUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
-    OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
-        self:SetMaintenanceConsumptionActive()
-    end,
-}
+---@class AirStagingPlatformUnit : StructureUnit
+AirStagingPlatformUnit = Class(StructureUnit) { }
 
 -- ENERGY CREATION UNITS
+---@class ConcreteStructureUnit : StructureUnit
 ConcreteStructureUnit = Class(StructureUnit) {
+    ---@param self ConcreteStructureUnit
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
         self:Destroy()
@@ -1060,62 +1064,44 @@ ConcreteStructureUnit = Class(StructureUnit) {
 }
 
 -- ENERGY CREATION UNITS
-EnergyCreationUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-}
+---@class EnergyCreationUnit : StructureUnit
+EnergyCreationUnit = Class(StructureUnit) { }
 
 -- ENERGY STORAGE UNITS
-EnergyStorageUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
-    OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
-        local aiBrain = GetArmyBrain(self.Army)
-        aiBrain:ESRegisterUnitEnergyStorage(self)
-        local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
-        if curEnergy > 0.11 then
-            self:CreateBlinkingLights('Yellow')
-        else
-            self:CreateBlinkingLights('Red')
-        end
-    end,
-
-    OnEnergyStorageStateChange = function(self, newState)
-        if newState == 'EconLowEnergyStore' then
-            self:CreateBlinkingLights('Red')
-        elseif newState == 'EconMidEnergyStore' then
-            self:CreateBlinkingLights('Yellow')
-        elseif newState == 'EconFullEnergyStore' then
-            self:CreateBlinkingLights('Green')
-        end
-    end,
-}
+---@class EnergyStorageUnit : StructureUnit
+EnergyStorageUnit = Class(StructureUnit) { }
 
 -- LAND FACTORY UNITS
+---@class LandFactoryUnit : FactoryUnit
 LandFactoryUnit = Class(FactoryUnit) {}
 
 -- MASS COLLECTION UNITS
+---@class MassCollectionUnit : StructureUnit
 MassCollectionUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
 
+    ---@param self MassCollectionUnit
     OnConsumptionActive = function(self)
         StructureUnit.OnConsumptionActive(self)
         self:ApplyAdjacencyBuffs()
         self._productionActive = true
     end,
 
+    ---@param self MassCollectionUnit
     OnConsumptionInActive = function(self)
         StructureUnit.OnConsumptionInActive(self)
         self:RemoveAdjacencyBuffs()
         self._productionActive = false
     end,
 
+    ---@param self MassCollectionUnit
+    ---@param adjacentUnit MassCollectionUnit
+    ---@param triggerUnit MassCollectionUnit
     OnAdjacentTo = function(self, adjacentUnit, triggerUnit) -- What is triggerUnit?
         if self:IsBeingBuilt() then return end
         if adjacentUnit:IsBeingBuilt() then return end
 
         -- Does the unit have any adjacency buffs to use?
-        local adjBuffs = self:GetBlueprint().Adjacency
+        local adjBuffs = self.Blueprint.Adjacency
         if not adjBuffs then return end
 
         -- Apply each buff needed to you and/or adjacent unit, only if turned on
@@ -1135,50 +1121,43 @@ MassCollectionUnit = Class(StructureUnit) {
         adjacentUnit:RequestRefreshUI()
     end,
 
-    OnCreate = function(self)
-        StructureUnit.OnCreate(self)
-        local markers = ScenarioUtils.GetMarkers()
-        local unitPosition = self:GetPosition()
-
-        for _, v in pairs(markers) do
-            if v.type == 'MASS' then
-                local massPosition = v.position
-                if (massPosition[1] < unitPosition[1] + 1) and (massPosition[1] > unitPosition[1] - 1) and
-                    (massPosition[2] < unitPosition[2] + 1) and (massPosition[2] > unitPosition[2] - 1) and
-                    (massPosition[3] < unitPosition[3] + 1) and (massPosition[3] > unitPosition[3] - 1) then
-                    self:SetProductionPerSecondMass(self:GetProductionPerSecondMass() * (v.amount / 100))
-                    break
-                end
-            end
-        end
-    end,
-
+    ---@param self MassCollectionUnit
+    ---@param builder Unit
+    ---@param layer string
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
     end,
 
+    ---comment
+    ---@param self MassCollectionUnit
+    ---@param unitbuilding MassCollectionUnit
+    ---@param order boolean
     OnStartBuild = function(self, unitbuilding, order)
         StructureUnit.OnStartBuild(self, unitbuilding, order)
         self:AddCommandCap('RULEUCC_Stop')
         self.UpgradeWatcher = self:ForkThread(self.WatchUpgradeConsumption)
     end,
 
+    ---@param self MassCollectionUnit
+    ---@param unitbuilding MassCollectionUnit
+    ---@param order boolean
     OnStopBuild = function(self, unitbuilding, order)
         StructureUnit.OnStopBuild(self, unitbuilding, order)
         self:RemoveCommandCap('RULEUCC_Stop')
         if self.UpgradeWatcher then
             KillThread(self.UpgradeWatcher)
             self:SetConsumptionPerSecondMass(0)
-            self:SetProductionPerSecondMass((self:GetBlueprint().Economy.ProductionPerSecondMass or 0) * (self.MassProdAdjMod or 1))
+            self:SetProductionPerSecondMass((self.Blueprint.Economy.ProductionPerSecondMass or 0) * (self.MassProdAdjMod or 1))
         end
     end,
 
     -- Band-aid on lack of multiple separate resource requests per unit...
     -- If mass econ is depleted, take all the mass generated and use it for the upgrade
     -- Old WatchUpgradeConsumption replaced with this on, enabling mex to not use resources when paused
+    ---@param self MassCollectionUnit
     WatchUpgradeConsumption = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local massConsumption = self:GetConsumptionPerSecondMass()
 
         -- Fix for weird mex behaviour when upgrading with depleted resource stock or while paused [100]
@@ -1224,19 +1203,13 @@ MassCollectionUnit = Class(StructureUnit) {
         end
     end,
 
-    OnPaused = function(self)
-        StructureUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        StructureUnit.OnUnpaused(self)
-    end,
-
+    ---@param self MassCollectionUnit
     OnProductionPaused = function(self)
         StructureUnit.OnProductionPaused(self)
         self:StopUnitAmbientSound('ActiveLoop')
     end,
 
+    ---@param self MassCollectionUnit
     OnProductionUnpaused = function(self)
         StructureUnit.OnProductionUnpaused(self)
         self:PlayUnitAmbientSound('ActiveLoop')
@@ -1244,15 +1217,47 @@ MassCollectionUnit = Class(StructureUnit) {
 }
 
 -- MASS FABRICATION UNITS
+---@class MassFabricationUnit : StructureUnit
 MassFabricationUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
 
+    ---@param self MassFabricationUnit
+    ---@param bit number
+    OnScriptBitSet = function(self, bit)
+        if bit == 4 then
+            -- no longer track us, we want to be disabled
+            self.Brain:RemoveEnergyExcessUnit(self)
+
+            -- immediately disable production
+            self:OnProductionPaused()
+        else
+            StructureUnit.OnScriptBitSet(self, bit)
+        end
+    end,
+
+    ---@param self MassFabricationUnit
+    ---@param bit number
+    OnScriptBitClear = function (self, bit)
+        if bit == 4 then 
+            -- make brain track us to enable / disable accordingly
+            self.Brain:AddDisabledEnergyExcessUnit(self)
+        else 
+            StructureUnit.OnScriptBitClear(self, bit)
+        end
+    end,
+
+    ---@param self MassFabricationUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
+
+        -- make brain track us to enable / disable accordingly
+        self.Brain:AddEnabledEnergyExcessUnit(self)
     end,
 
+    ---@param self MassFabricationUnit
     OnConsumptionActive = function(self)
         StructureUnit.OnConsumptionActive(self)
         self:SetMaintenanceConsumptionActive()
@@ -1261,6 +1266,7 @@ MassFabricationUnit = Class(StructureUnit) {
         self._productionActive = true
     end,
 
+    ---@param self MassFabricationUnit
     OnConsumptionInActive = function(self)
         StructureUnit.OnConsumptionInActive(self)
         self:SetMaintenanceConsumptionInactive()
@@ -1269,12 +1275,15 @@ MassFabricationUnit = Class(StructureUnit) {
         self._productionActive = false
     end,
 
+    ---@param self MassFabricationUnit
+    ---@param adjacentUnit MassFabricationUnit
+    ---@param triggerUnit MassFabricationUnit
     OnAdjacentTo = function(self, adjacentUnit, triggerUnit) -- What is triggerUnit?
         if self:IsBeingBuilt() then return end
         if adjacentUnit:IsBeingBuilt() then return end
 
         -- Does the unit have any adjacency buffs to use?
-        local adjBuffs = self:GetBlueprint().Adjacency
+        local adjBuffs = self.Blueprint.Adjacency
         if not adjBuffs then return end
 
         -- Apply each buff needed to you and/or adjacent unit, only if turned on
@@ -1294,81 +1303,67 @@ MassFabricationUnit = Class(StructureUnit) {
         adjacentUnit:RequestRefreshUI()
     end,
 
-    OnPaused = function(self)
-        StructureUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        StructureUnit.OnUnpaused(self)
-    end,
-
+    ---@param self MassFabricationUnit
     OnProductionPaused = function(self)
         StructureUnit.OnProductionPaused(self)
         self:StopUnitAmbientSound('ActiveLoop')
     end,
 
+    ---@param self MassFabricationUnit
     OnProductionUnpaused = function(self)
         StructureUnit.OnProductionUnpaused(self)
         self:PlayUnitAmbientSound('ActiveLoop')
     end,
+
+    ---@param self MassFabricationUnit
+    OnExcessEnergy = function(self)
+        self:OnProductionUnpaused()
+    end,
+
+    ---@param self MassFabricationUnit
+    OnNoExcessEnergy = function(self)
+        self:OnProductionPaused()
+    end,
+
 }
 
 -- MASS STORAGE UNITS
-MassStorageUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
-    OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
-        local aiBrain = GetArmyBrain(self.Army)
-        aiBrain:ESRegisterUnitMassStorage(self)
-        local curMass = aiBrain:GetEconomyStoredRatio('MASS')
-        if curMass > 0.11 then
-            self:CreateBlinkingLights('Yellow')
-        else
-            self:CreateBlinkingLights('Red')
-        end
-    end,
-
-    OnMassStorageStateChange = function(self, newState)
-        if newState == 'EconLowMassStore' then
-            self:CreateBlinkingLights('Red')
-        elseif newState == 'EconMidMassStore' then
-            self:CreateBlinkingLights('Yellow')
-        elseif newState == 'EconFullMassStore' then
-            self:CreateBlinkingLights('Green')
-        end
-    end,
-}
+---@class MassStorageUnit : StructureUnit
+MassStorageUnit = Class(StructureUnit) { }
 
 -- RADAR UNITS
+---@class RadarUnit : StructureUnit
 RadarUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
 
+    ---@param self RadarUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
     end,
 
+    ---@param self RadarUnit
     OnIntelDisabled = function(self)
         StructureUnit.OnIntelDisabled(self)
         self:DestroyIdleEffects()
-        self:DestroyBlinkingLights()
-        self:CreateBlinkingLights('Red')
     end,
 
+    ---@param self RadarUnit
     OnIntelEnabled = function(self)
         StructureUnit.OnIntelEnabled(self)
-        self:DestroyBlinkingLights()
-        self:CreateBlinkingLights('Green')
         self:CreateIdleEffects()
     end,
 }
 
 -- RADAR JAMMER UNITS
+---@class RadarJammerUnit : StructureUnit
 RadarJammerUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
 
     -- Shut down intel while upgrading
+    ---@param self RadarJammerUnit
+    ---@param unitbuilding RadarJammerUnit
+    ---@param order boolean
     OnStartBuild = function(self, unitbuilding, order)
         StructureUnit.OnStartBuild(self, unitbuilding, order)
         self:SetMaintenanceConsumptionInactive()
@@ -1377,6 +1372,8 @@ RadarJammerUnit = Class(StructureUnit) {
     end,
 
     -- If we abort the upgrade, re-enable the intel
+    ---@param self RadarJammerUnit
+    ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
         StructureUnit.OnStopBuild(self, unitBeingBuilt)
         self:SetMaintenanceConsumptionActive()
@@ -1385,6 +1382,7 @@ RadarJammerUnit = Class(StructureUnit) {
     end,
 
     -- If we abort the upgrade, re-enable the intel
+    ---@param self RadarJammerUnit
     OnFailedToBuild = function(self)
         StructureUnit.OnStopBuild(self)
         self:SetMaintenanceConsumptionActive()
@@ -1392,20 +1390,25 @@ RadarJammerUnit = Class(StructureUnit) {
         self:EnableUnitIntel('Construction', 'RadarStealthField')
     end,
 
+    ---@param self RadarJammerUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
     end,
 
+    ---@param self RadarJammerUnit
     OnIntelEnabled = function(self)
         StructureUnit.OnIntelEnabled(self)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
-            self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
+            self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             self.IntelFxOn = true
         end
     end,
 
+    ---@param self RadarJammerUnit
     OnIntelDisabled = function(self)
         StructureUnit.OnIntelDisabled(self)
         EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
@@ -1414,19 +1417,24 @@ RadarJammerUnit = Class(StructureUnit) {
 }
 
 -- SONAR UNITS
+---@class SonarUnit : StructureUnit
 SonarUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
 
+    ---@param self SonarUnit
+    ---@param builder Unit
+    ---@param layer string
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
     end,
 
+    ---@param self SonarUnit
     CreateIdleEffects = function(self)
         StructureUnit.CreateIdleEffects(self)
         self.TimedSonarEffectsThread = self:ForkThread(self.TimedIdleSonarEffects)
     end,
 
+    ---@param self SonarUnit
     TimedIdleSonarEffects = function(self)
         local layer = self.Layer
         local pos = self:GetPosition()
@@ -1451,66 +1459,109 @@ SonarUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self SonarUnit
     DestroyIdleEffects = function(self)
         StructureUnit.DestroyIdleEffects(self)
         if self.TimedSonarEffectsThread then
             self.TimedSonarEffectsThread:Destroy()
         end
     end,
-
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
-        self:DestroyBlinkingLights()
-        self:CreateBlinkingLights('Red')
-    end,
-
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
-        self:DestroyBlinkingLights()
-        self:CreateBlinkingLights('Green')
-    end,
 }
 
 -- SEA FACTORY UNITS
+---@class SeaFactoryUnit : FactoryUnit
 SeaFactoryUnit = Class(FactoryUnit) {
-    -- Disable the default rocking behavior
-    StartRocking = function(self)
-    end,
 
-    StopRocking = function(self)
-    end,
-
+    ---@param self SeaFactoryUnit
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             self.UnitBeingBuilt:Destroy()
         end
     end,
+
+    ---@param self SeaFactoryUnit
+    CalculateRollOffPoint = function(self)
+
+        -- backwards compatible, don't try and fix mods that rely on the old logic
+        if not self.Blueprint.Physics.ComputeRollOffPoint then
+            return FactoryUnit.CalculateRollOffPoint(self)
+        end
+
+        -- retrieve our position
+        local px, py, pz = self:GetPositionXYZ()
+
+        -- retrieve roll off points
+        local bp = self.Blueprint.Physics.RollOffPoints
+        if not bp then 
+            return 0, px, py, pz 
+        end
+
+        -- retrieve rally point
+        local rallyPoint = self:GetRallyPoint()
+        if not rallyPoint then 
+            return 0, px, py, pz
+        end
+
+        -- find the attachpoint for the build location
+        local bone = (self:IsValidBone('Attachpoint') and 'Attachpoint') or (self:IsValidBone('Attachpoint01') and 'Attachpoint01')
+        local bx, by, bz = self:GetPositionXYZ(bone)
+        local ropx = bx - px
+        local modz = 1.0 + 0.1 * self.UnitBeingBuilt.Blueprint.SizeZ
+
+        -- find the nearest roll off point
+        local bpKey = 1
+        local distance, lowest = nil
+        for k, rolloffPoint in bp do
+
+            local ropz = modz * rolloffPoint.Z
+            distance = VDist2(rallyPoint[1], rallyPoint[3], ropx + px, ropz + pz)
+            if not lowest or distance < lowest then
+                bpKey = k
+                lowest = distance
+            end
+        end
+
+        -- finalize the computation
+        local fx, fy, fz, spin
+        local bpP = bp[bpKey]
+        local unitBP = self.UnitBeingBuilt.Blueprint.Display.ForcedBuildSpin
+        if unitBP then
+            spin = unitBP
+        else
+            spin = bpP.UnitSpin
+        end
+
+        fx = ropx + px
+        fy = bpP.Y + py
+        fz = modz * bpP.Z + pz
+
+        return spin, fx, fy, fz
+    end,
+
 }
 
 -- SHIELD STRCUTURE UNITS
-ShieldStructureUnit = Class(StructureUnit) {
-    UpgradingState = State(StructureUnit.UpgradingState) {
-        Main = function(self)
-            StructureUnit.UpgradingState.Main(self)
-        end,
-
-        OnFailedToBuild = function(self)
-            StructureUnit.UpgradingState.OnFailedToBuild(self)
-        end,
-    }
-}
+---@class ShieldStructureUnit : StructureUnit
+ShieldStructureUnit = Class(StructureUnit) { }
 
 -- TRANSPORT BEACON UNITS
+---@class TransportBeaconUnit : StructureUnit
 TransportBeaconUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
+
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
     FxTransportBeaconScale = 0.5,
 
-    -- Invincibility!  (the only way to kill a transport beacon is
-    -- to kill the transport unit generating it)
+    --- Invincibility!  (the only way to kill a transport beacon is
+    --- to kill the transport unit generating it)
+    ---@param self TransportBeaconUnit
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
     end,
 
+    ---@param self TransportBeaconUnit
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
         self:SetCapturable(false)
@@ -1519,31 +1570,29 @@ TransportBeaconUnit = Class(StructureUnit) {
 }
 
 -- WALL STRCUTURE UNITS
-WallStructureUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-}
+---@class WallStructureUnit : StructureUnit
+WallStructureUnit = Class(StructureUnit) { }
 
 -- QUANTUM GATE UNITS
-QuantumGateUnit = Class(FactoryUnit) {
-    OnKilled = function(self, instigator, type, overkillRatio)
-        self:StopUnitAmbientSound('ActiveLoop')
-        FactoryUnit.OnKilled(self, instigator, type, overkillRatio)
-    end,
-}
+---@class QuantumGateUnit : FactoryUnit
+QuantumGateUnit = Class(FactoryUnit) { }
 
 -- MOBILE UNITS
+---@class MobileUnit : Unit
 MobileUnit = Class(Unit) {
-    -- Added for engymod. After creating an enhancement, units must re-check their build restrictions
-    CreateEnhancement = function(self, enh)
-        Unit.CreateEnhancement(self, enh)
-    end,
 
     -- Added for engymod. When created, units must re-check their build restrictions
+    ---@param self MobileUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:SetFireState(FireState.GROUND_FIRE)
     end,
 
+    ---comment
+    ---@param self MobileUnit
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         -- This unit was in a transport and should create a wreck on crash
         if self.killedInTransport then
@@ -1553,48 +1602,31 @@ MobileUnit = Class(Unit) {
         end
     end,
 
+    ---comment
+    ---@param self MobileUnit
+    ---@param builder Unit
+    ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         Unit.StartBeingBuiltEffects(self, builder, layer)
-        local bp = self:GetBlueprint()
-        local FactionName = bp.General.FactionName
-
-        if FactionName == 'UEF' then
+        if self.factionCategory == 'UEF' then
             EffectUtil.CreateUEFUnitBeingBuiltEffects(self, builder, self.OnBeingBuiltEffectsBag)
         end
-    end,
-
-    StopBeingBuiltEffects = function(self, builder, layer)
-        Unit.StopBeingBuiltEffects(self, builder, layer)
-    end,
-
-    StartBuildingEffects = function(self, unitBeingBuilt, order)
-        Unit.StartBuildingEffects(self, unitBeingBuilt, order)
-    end,
-
-    StopBuildingEffects = function(self, unitBeingBuilt)
-        Unit.StopBuildingEffects(self, unitBeingBuilt)
-    end,
-
-    CreateReclaimEffects = function(self, target)
-        EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
-    end,
-
-    CreateReclaimEndEffects = function(self, target)
-        EffectUtil.PlayReclaimEndEffects(self, target)
-    end,
-
-    CreateCaptureEffects = function(self, target)
-        EffectUtil.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
     end,
 
     -- Units with layer change effects (amphibious units like Megalith) need
     -- those changes applied when build ends, so we need to trigger the
     -- layer change event
+    ---@param self MobileUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
        Unit.OnStopBeingBuilt(self, builder, layer)
        self:OnLayerChange(layer, 'None')
     end,
 
+    ---@param self MobileUnit
+    ---@param new string
+    ---@param old string
     OnLayerChange = function(self, new, old)
         Unit.OnLayerChange(self, new, old)
 
@@ -1605,6 +1637,10 @@ MobileUnit = Class(Unit) {
         end
     end,
 
+    ---comment
+    ---@param self MobileUnit
+    ---@param transport AirUnit
+    ---@param bone Bone
     OnDetachedFromTransport = function(self, transport, bone)
         Unit.OnDetachedFromTransport(self, transport, bone)
 
@@ -1615,6 +1651,7 @@ MobileUnit = Class(Unit) {
 }
 
 -- WALKING LAND UNITS
+---@class WalkingLandUnit : MobileUnit
 WalkingLandUnit = Class(MobileUnit) {
     WalkingAnim = nil,
     WalkingAnimRate = 1,
@@ -1623,6 +1660,21 @@ WalkingLandUnit = Class(MobileUnit) {
     DeathAnim = false,
     DisabledBones = {},
 
+    ---comment
+    ---@param self WalkingLandUnit
+    ---@param spec any
+    OnCreate = function(self, spec)
+        MobileUnit.OnCreate(self, spec)
+
+        local blueprint = self.Blueprint
+        self.AnimationWalk = blueprint.Display.AnimationWalk
+        self.AnimationWalkRate = blueprint.Display.AnimationWalkRate
+    end,
+
+    ---comment
+    ---@param self WalkingLandUnit
+    ---@param new string
+    ---@param old string
     OnMotionHorzEventChange = function(self, new, old)
         MobileUnit.OnMotionHorzEventChange(self, new, old)
 
@@ -1631,10 +1683,9 @@ WalkingLandUnit = Class(MobileUnit) {
                 self.Animator = CreateAnimator(self, true)
             end
 
-            local bpDisplay = self:GetBlueprint().Display
-            if bpDisplay.AnimationWalk then
-                self.Animator:PlayAnim(bpDisplay.AnimationWalk, true)
-                self.Animator:SetRate(bpDisplay.AnimationWalkRate or 1)
+            if self.AnimationWalk then
+                self.Animator:PlayAnim(self.AnimationWalk, true)
+                self.Animator:SetRate(self.AnimationWalkRate or 1)
             end
         elseif new == 'Stopped' then
             -- Only keep the animator around if we are dying and playing a death anim
@@ -1651,18 +1702,33 @@ WalkingLandUnit = Class(MobileUnit) {
 
 -- SUB UNITS
 -- These units typically float under the water and have wake when they move
+---@class SubUnit : MobileUnit
 SubUnit = Class(MobileUnit) {
     -- Use default spark effect until underwater damaged states are made
-    FxDamage1 = {EffectTemplate.DamageSparks01},
-    FxDamage2 = {EffectTemplate.DamageSparks01},
-    FxDamage3 = {EffectTemplate.DamageSparks01},
+    FxDamage1 = { EffectTemplate.DamageSparks01 },
+    FxDamage2 = { EffectTemplate.DamageSparks01 },
+    FxDamage3 = { EffectTemplate.DamageSparks01 },
 
     -- DESTRUCTION PARAMS
     ShowUnitDestructionDebris = false,
     DeathThreadDestructionWaitTime = 0,
+
+    ---comment
+    ---@param self SubUnit
+    ---@param spec any
+    OnCreate = function(self, spec)
+        MobileUnit.OnCreate(self, spec)
+
+        -- submarines do not make a sound by default, we want them to make sound so we use an entity as source instead
+        self.SoundEntity = Entity()
+        self.Trash:Add(self.SoundEntity)
+        Warp(self.SoundEntity, self:GetPosition())
+        self.SoundEntity:AttachTo(self,-1)
+    end,
 }
 
 -- AIR UNITS
+---@class AirUnit : MobileUnit
 AirUnit = Class(MobileUnit) {
     -- Contrails
     ContrailEffects = {'/effects/emitters/contrail_polytrail_01_emit.bp', },
@@ -1674,14 +1740,16 @@ AirUnit = Class(MobileUnit) {
     DestructionExplosionWaitDelayMax = 0,
     DestroyNoFallRandomChance = 0.5,
 
+    ---@param self AirUnit
     OnCreate = function(self)
         MobileUnit.OnCreate(self)
         self.HasFuel = true
         self:AddPingPong()
     end,
 
+    ---@param self AirUnit
     AddPingPong = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if bp.Display.PingPongScroller then
             bp = bp.Display.PingPongScroller
             if bp.Ping1 and bp.Ping1Speed and bp.Pong1 and bp.Pong1Speed and bp.Ping2 and bp.Ping2Speed
@@ -1692,6 +1760,9 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
+    ---@param self AirUnit
+    ---@param new string
+    ---@param old string
     OnMotionVertEventChange = function(self, new, old)
         MobileUnit.OnMotionVertEventChange(self, new, old)
 
@@ -1700,7 +1771,7 @@ AirUnit = Class(MobileUnit) {
             self:StopUnitAmbientSound('ActiveLoop')
         elseif new == 'Bottom' then
             -- While landed, planes can only see half as far
-            local vis = self:GetBlueprint().Intel.VisionRadius / 2
+            local vis = self.Blueprint.Intel.VisionRadius / 2
             self:SetIntelRadius('Vision', vis)
 
             -- Turn off the ambient hover sound
@@ -1709,7 +1780,7 @@ AirUnit = Class(MobileUnit) {
             self:StopUnitAmbientSound('ActiveLoop')
         elseif new == 'Up' or (new == 'Top' and (old == 'Down' or old == 'Bottom')) then
             -- Set the vision radius back to default
-            local bpVision = self:GetBlueprint().Intel.VisionRadius
+            local bpVision = self.Blueprint.Intel.VisionRadius
             if bpVision then
                 self:SetIntelRadius('Vision', bpVision)
             else
@@ -1718,10 +1789,12 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
+    ---@param self AirUnit
     OnStartRefueling = function(self)
         self:PlayUnitSound('Refueling')
     end,
 
+    ---@param self AirUnit
     OnRunOutOfFuel = function(self)
         self.HasFuel = false
         self:DestroyTopSpeedEffects()
@@ -1732,6 +1805,7 @@ AirUnit = Class(MobileUnit) {
         self:SetTurnMult(0.25) -- Change the turn ability of the unit by this mult
     end,
 
+    ---@param self AirUnit
     OnGotFuel = function(self)
         self.HasFuel = true
         -- Revert these values to the blueprint values
@@ -1741,6 +1815,8 @@ AirUnit = Class(MobileUnit) {
     end,
 
     -- Planes need to crash. Called by engine or by ShieldCollider projectile on collision with ground or water
+    ---@param self AirUnit
+    ---@param with string
     OnImpact = function(self, with)
         if self.GroundImpacted then return end
 
@@ -1762,7 +1838,7 @@ AirUnit = Class(MobileUnit) {
 
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
+            EffectUtil.CreateEffectsOpti(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
             self.shallSink = true
             self.colliderProj:Destroy()
             self.colliderProj = nil
@@ -1774,10 +1850,16 @@ AirUnit = Class(MobileUnit) {
     end,
 
     -- ONLY works for Terrain, not Water
+    ---@param self AirUnit
+    ---@param bone Bone
+    ---@param x number
+    ---@param y number
+    ---@param z number
     OnAnimTerrainCollision = function(self, bone, x, y, z)
         self:OnImpact('Terrain')
     end,
 
+    ---@param self AirUnit
     ShallSink = function(self)
         local layer = self.Layer
         local shallSink = (
@@ -1788,16 +1870,23 @@ AirUnit = Class(MobileUnit) {
         return shallSink
     end,
 
+    ---@param self AirUnit
+    ---@param scale number
     CreateUnitAirDestructionEffects = function(self, scale)
         local scale = explosion.GetAverageBoundingXZRadius(self)
+        local size = self.Size
         explosion.CreateDefaultHitExplosion(self, scale)
 
         if self.ShowUnitDestructionDebris then
-            explosion.CreateDebrisProjectiles(self, scale, {self:GetUnitSizes()})
+            explosion.CreateDebrisProjectiles(self, scale, {size.SizeX, size.SizeY, size.SizeZ})
         end
     end,
 
     --- Called when the unit is killed, but before it falls out of the sky and blows up.
+    ---@param self AirUnit
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         -- A completed, flying plane expects an OnImpact event due to air crash.
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
@@ -1806,7 +1895,7 @@ AirUnit = Class(MobileUnit) {
         -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
         -- It also wouldn't call this code, and hence the cargo destruction. Awful!
         if self:GetFractionComplete() == 1 and (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
-            self.CreateUnitAirDestructionEffects(self, 1.0)
+            self:CreateUnitAirDestructionEffects(1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
             self.OverKillRatio = overkillRatio
@@ -1815,7 +1904,7 @@ AirUnit = Class(MobileUnit) {
             self:DisableShield()
 
             -- Store our death weapon's damage on the unit so it can be edited remotely by the shield bouncer projectile
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             local i = 1
             for i, numweapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'DeathImpact' then
@@ -1845,48 +1934,35 @@ AirUnit = Class(MobileUnit) {
     end,
 
 
-    -- It's a modified copy of unit.OnCollisionCheck, this way we can get rid of unnecessary calls and double checks
-    -- the only difference is the `elseif other.Nuke...` condition
-    -- this can't be done in projectile.OnCollisionCheck because it's called after unit.OnCollisionCheck and then it's too late
+    --- Called when a unit collides with a projectile to check if the collision is valid, allows
+    -- ASF to be destroyed when they impact with strategic missiles
+    ---@param self AirUnit The unit we're checking the collision for
+    ---@param other Unit other The projectile we're checking the collision with
+    ---@param firingWeapon Unit The weapon that the projectile originates from
+    ---@return boolean
     OnCollisionCheck = function(self, other, firingWeapon)
         if self.DisallowCollisions then
             return false
         end
 
-        if EntityCategoryContains(categories.PROJECTILE, other) then
-            if IsAlly(self:GetArmy(), other:GetArmy()) then
-                return other.CollideFriendly
-            elseif other.Nuke and not self:GetBlueprint().CategoriesHash.EXPERIMENTAL then
-                self:Kill()
-                return false
-            end
+        -- allow regular air units to be destroyed by strategic missiles
+        if other.Nuke and not self.Blueprint.CategoriesHash.EXPERIMENTAL then 
+            self:Kill()
+            return false 
         end
 
-        -- Check for specific non-collisions
-        local bp = other:GetBlueprint()
-        if bp.DoNotCollideList then
-            for _, v in pairs(bp.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-
-        bp = self:GetBlueprint()
-        if bp.DoNotCollideList then
-            for _, v in pairs(bp.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), other) then
-                    return false
-                end
-            end
-        end
-        return true
+        return MobileUnit.OnCollisionCheck(self, other, firingWeapon)
     end,
 }
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
 local slotsData = {}
-BaseTransport = Class() {
+---@class BaseTransport 
+BaseTransport = ClassSimple {
+
+    ---@param self BaseTransport
+    ---@param attachBone Bone
+    ---@param unit Unit
     OnTransportAttach = function(self, attachBone, unit)
         self:PlayUnitSound('Load')
         self:RequestRefreshUI()
@@ -1901,6 +1977,9 @@ BaseTransport = Class() {
         unit:OnAttachedToTransport(self, attachBone)
     end,
 
+    ---@param self BaseTransport
+    ---@param attachBone Bone
+    ---@param unit Unit
     OnTransportDetach = function(self, attachBone, unit)
         self:PlayUnitSound('Unload')
         self:RequestRefreshUI()
@@ -1910,10 +1989,13 @@ BaseTransport = Class() {
     end,
 
     -- When one of our attached units gets killed, detach it
+    ---@param self BaseTransport
+    ---@param attached Unit
     OnAttachedKilled = function(self, attached)
         attached:DetachFrom()
     end,
 
+    ---@param self BaseTransport
     OnStartTransportLoading = function(self)
         -- We keep the aibrain up to date with the last transport to start loading so, among other
         -- things, we can determine which transport is being referenced during an OnTransportFull
@@ -1922,13 +2004,18 @@ BaseTransport = Class() {
         self:GetAIBrain().loadingTransport = self
     end,
 
+    ---comment
+    ---@param ... BaseTransport
     OnStopTransportLoading = function(...)
     end,
 
+    ---comment
+    ---@param self BaseTransport
     DestroyedOnTransport = function(self)
     end,
 
     -- Detaches cargo from a dying unit
+    ---@param self BaseTransport
     DetachCargo = function(self)
         if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
 
@@ -1943,6 +2030,7 @@ BaseTransport = Class() {
         end
     end,
 
+    ---@param self BaseTransport
     SaveCargoMass = function(self)
         local mass = 0
         for _, unit in self:GetCargo() do
@@ -1954,19 +2042,26 @@ BaseTransport = Class() {
 }
 
 --- Base class for air transports.
+---@class AirTransport: AirUnit, BaseTransport
 AirTransport = Class(AirUnit, BaseTransport) {
+
+    ---@param self AirTransport
     OnTransportAborted = function(self)
     end,
 
+    ---@param self AirTransport
     OnTransportOrdered = function(self)
     end,
 
+    ---@param self AirTransport
     OnCreate = function(self)
         AirUnit.OnCreate(self)
         self.slots = {}
         self.transData = {}
     end,
 
+    ---@param self AirTransport
+    ---@param ... any
     Kill = function(self, ...) -- Hook the engine 'Kill' command to flag cargo properly
          -- The arguments are (self, instigator, type, overkillRatio) but we can't just use normal arguments or AirUnit.Kill will complain if type is nil (which does happen)
         local instigator = arg[1]
@@ -1975,6 +2070,8 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 
     -- Override OnImpact to kill all cargo
+    ---@param self AirTransport
+    ---@param with AirTransport
     OnImpact = function(self, with)
         if self.GroundImpacted then return end
 
@@ -1982,6 +2079,8 @@ AirTransport = Class(AirUnit, BaseTransport) {
         AirUnit.OnImpact(self, with)
     end,
 
+    ---@param self AirTransport
+    ---@param loading boolean
     OnStorageChange = function(self, loading)
         AirUnit.OnStorageChange(self, loading)
         for k, v in self:GetCargo() do
@@ -1990,6 +2089,8 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 
     -- Flags cargo that it's been killed while in a transport
+    ---@param self AirTransport
+    ---@param suicide boolean
     FlagCargo = function(self, suicide)
         if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
 
@@ -2012,6 +2113,7 @@ AirTransport = Class(AirUnit, BaseTransport) {
         end
     end,
 
+    ---@param self BaseTransport
     KillCrashedCargo = function(self)
         if self:BeenDestroyed() then return end
 
@@ -2025,14 +2127,18 @@ AirTransport = Class(AirUnit, BaseTransport) {
 }
 
 -- LAND UNITS
+---@class LandUnit : MobileUnit
 LandUnit = Class(MobileUnit) {}
 
 --  CONSTRUCTION UNITS
+---@class ConstructionUnit : MobileUnit
 ConstructionUnit = Class(MobileUnit) {
+
+    ---@param self ConstructionUnit
     OnCreate = function(self)
         MobileUnit.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildEffectBones = bp.General.BuildBones.BuildEffectBones
@@ -2057,6 +2163,7 @@ ConstructionUnit = Class(MobileUnit) {
         self.BuildingUnit = false
     end,
 
+    ---@param self ConstructionUnit
     OnPaused = function(self)
         -- When factory is paused take some action
         self:StopUnitAmbientSound('ConstructLoop')
@@ -2066,6 +2173,7 @@ ConstructionUnit = Class(MobileUnit) {
         end
     end,
 
+    ---@param self ConstructionUnit
     OnUnpaused = function(self)
         if self.BuildingUnit then
             self:PlayUnitAmbientSound('ConstructLoop')
@@ -2074,6 +2182,9 @@ ConstructionUnit = Class(MobileUnit) {
         MobileUnit.OnUnpaused(self)
     end,
 
+    ---@param self ConstructionUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
             return
@@ -2084,12 +2195,14 @@ ConstructionUnit = Class(MobileUnit) {
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
-        if unitBeingBuilt.UnitId == self:GetBlueprint().General.UpgradesTo and order == 'Upgrade' then
+        if unitBeingBuilt.UnitId == self.Blueprint.General.UpgradesTo and order == 'Upgrade' then
             self.Upgrading = true
             self.BuildingUnit = false
         end
     end,
 
+    ---@param self ConstructionUnit
+    ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
         MobileUnit.OnStopBuild(self, unitBeingBuilt)
         if self.Upgrading then
@@ -2109,11 +2222,14 @@ ConstructionUnit = Class(MobileUnit) {
         self:SetImmobile(false)
     end,
 
+    ---@param self ConstructionUnit
     OnFailedToBuild = function(self)
         MobileUnit.OnFailedToBuild(self)
         self:SetImmobile(false)
     end,
 
+    ---@param self ConstructionUnit
+    ---@param enable boolean
     WaitForBuildAnimation = function(self, enable)
         if self.BuildArmManipulator then
             WaitFor(self.BuildingOpenAnimManip)
@@ -2123,11 +2239,12 @@ ConstructionUnit = Class(MobileUnit) {
         end
     end,
 
+    ---@param self ConstructionUnit
     OnPrepareArmToBuild = function(self)
         MobileUnit.OnPrepareArmToBuild(self)
 
         if self.BuildingOpenAnimManip then
-            self.BuildingOpenAnimManip:SetRate(self:GetBlueprint().Display.AnimationBuildRate or 1)
+            self.BuildingOpenAnimManip:SetRate(self.Blueprint.Display.AnimationBuildRate or 1)
             if self.BuildArmManipulator then
                 self.StoppedBuilding = false
                 self:ForkThread(self.WaitForBuildAnimation, true)
@@ -2144,13 +2261,14 @@ ConstructionUnit = Class(MobileUnit) {
         end
     end,
 
+    ---@param self ConstructionUnit
     OnStopBuilderTracking = function(self)
         MobileUnit.OnStopBuilderTracking(self)
 
         if self.StoppedBuilding then
             self.StoppedBuilding = false
             self.BuildArmManipulator:Disable()
-            self.BuildingOpenAnimManip:SetRate(-(self:GetBlueprint().Display.AnimationBuildRate or 1))
+            self.BuildingOpenAnimManip:SetRate(-(self.Blueprint.Display.AnimationBuildRate or 1))
             self:SetImmobile(false)
         end
     end,
@@ -2158,12 +2276,16 @@ ConstructionUnit = Class(MobileUnit) {
 
 -- SEA UNITS
 -- These units typically float on the water and have wake when they move
+---@class SeaUnit : MobileUnit
 SeaUnit = Class(MobileUnit){
     DeathThreadDestructionWaitTime = 0,
     ShowUnitDestructionDebris = false,
     PlayEndestructionEffects = false,
     CollidedBones = 0,
 
+    ---@param self SeaUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         MobileUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
@@ -2171,7 +2293,13 @@ SeaUnit = Class(MobileUnit){
 }
 
 --- Base class for aircraft carriers.
+---@class AircraftCarrier : SeaUnit
 AircraftCarrier = Class(SeaUnit, BaseTransport) {
+
+    ---@param self AircraftCarrier
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         self:SaveCargoMass()
         SeaUnit.OnKilled(self, instigator, type, overkillRatio)
@@ -2180,9 +2308,15 @@ AircraftCarrier = Class(SeaUnit, BaseTransport) {
 }
 
 -- HOVERING LAND UNITS
-HoverLandUnit = Class(MobileUnit) {}
+---@class HoverLandUnit : MobileUnit
+HoverLandUnit = Class(MobileUnit) { }
 
+---@class SlowHoverLandUnit : HoverLandUnit
 SlowHoverLandUnit = Class(HoverLandUnit) {
+
+    ---@param self SlowHoverLandUnit
+    ---@param new string
+    ---@param old string
     OnLayerChange = function(self, new, old)
 
         -- call base class to make sure self.layer is set
@@ -2192,7 +2326,7 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
 
-        local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
+        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
         if new == 'Water' then
             self:SetSpeedMult(mult)
         else
@@ -2202,15 +2336,21 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
 }
 
 -- AMPHIBIOUS LAND UNITS
-AmphibiousLandUnit = Class(MobileUnit) {}
+---@class AmphibiousLandUnit : MobileUnit
+AmphibiousLandUnit = Class(MobileUnit) { }
 
+---@class SlowAmphibiousLandUnit : AmphibiousLandUnit
 SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
+
+    ---@param self SlowAmphibiousLandUnit
+    ---@param new string
+    ---@param old string
     OnLayerChange = function(self, new, old)
 
         -- call base class to make sure self.layer is set
         HoverLandUnit.OnLayerChange(self, new, old)
 
-        local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
+        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
         if new == 'Seabed'  then
             self:SetSpeedMult(mult)
         else
@@ -2220,20 +2360,25 @@ SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
 }
 
 --- Base class for command units.
+---@class CommandUnit : WalkingLandUnit
 CommandUnit = Class(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
 
+    ---@param self CommandUnit
+    ---@param rightGunName string
     __init = function(self, rightGunName)
         self.rightGunLabel = rightGunName
     end,
 
+    ---@param self CommandUnit
     OnCreate = function(self)
-        -- Save build effect bones for faster access when creating build effects
-        self.BuildEffectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
-
         WalkingLandUnit.OnCreate(self)
+
+        -- Save build effect bones for faster access when creating build effects
+        self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
     end,
 
+    ---@param self CommandUnit
     ResetRightArm = function(self)
         self:BuildManipulatorSetEnabled(false)
         self.BuildArmManipulator:SetPrecedence(0)
@@ -2242,30 +2387,38 @@ CommandUnit = Class(WalkingLandUnit) {
         self:SetImmobile(false)
     end,
 
+    ---@param self CommandUnit
     OnFailedToBuild = function(self)
         WalkingLandUnit.OnFailedToBuild(self)
         if self:BeenDestroyed() then return end
         self:ResetRightArm()
     end,
 
+    ---@param self CommandUnit
+    ---@param target Unit
     OnStopCapture = function(self, target)
         WalkingLandUnit.OnStopCapture(self, target)
         if self:BeenDestroyed() then return end
         self:ResetRightArm()
     end,
 
+    ---@param self CommandUnit
+    ---@param target Unit
     OnFailedCapture = function(self, target)
         WalkingLandUnit.OnFailedCapture(self, target)
         if self:BeenDestroyed() then return end
         self:ResetRightArm()
     end,
 
+    ---@param self CommandUnit
+    ---@param target Unit
     OnStopReclaim = function(self, target)
         WalkingLandUnit.OnStopReclaim(self, target)
         if self:BeenDestroyed() then return end
         self:ResetRightArm()
     end,
 
+    ---@param self CommandUnit
     OnPrepareArmToBuild = function(self)
         WalkingLandUnit.OnPrepareArmToBuild(self)
         if self:BeenDestroyed() then return end
@@ -2285,6 +2438,9 @@ CommandUnit = Class(WalkingLandUnit) {
         end
     end,
 
+    ---@param self CommandUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         WalkingLandUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
@@ -2299,13 +2455,15 @@ CommandUnit = Class(WalkingLandUnit) {
         -- assisting builds of other races, just not *starting* them.
         -- We skip the check if we're assisting another builder: it's up to them to have the ability
         -- to start this build, not us.
-        if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and not self:CanBuild(unitBeingBuilt:GetBlueprint().BlueprintId) then
+        if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and not self:CanBuild(unitBeingBuilt.Blueprint.BlueprintId) then
             IssueStop({self})
             IssueClearCommands({self})
             unitBeingBuilt:Destroy()
         end
     end,
 
+    ---@param self CommandUnit
+    ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
         WalkingLandUnit.OnStopBuild(self, unitBeingBuilt)
         if self:BeenDestroyed() then return end
@@ -2316,6 +2474,7 @@ CommandUnit = Class(WalkingLandUnit) {
         self.BuildingUnit = false
     end,
 
+    ---@param self CommandUnit
     OnPaused = function(self)
         WalkingLandUnit.OnPaused(self)
         if self.BuildingUnit then
@@ -2323,6 +2482,7 @@ CommandUnit = Class(WalkingLandUnit) {
         end
     end,
 
+    ---@param self CommandUnit
     OnUnpaused = function(self)
         if self.BuildingUnit then
             WalkingLandUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
@@ -2330,6 +2490,8 @@ CommandUnit = Class(WalkingLandUnit) {
         WalkingLandUnit.OnUnpaused(self)
     end,
 
+    ---@param self CommandUnit
+    ---@param auto boolean
     SetAutoOvercharge = function(self, auto)
         local wep = self:GetWeaponByLabel('AutoOverCharge')
         if wep.NeedsUpgrade then return end
@@ -2338,6 +2500,8 @@ CommandUnit = Class(WalkingLandUnit) {
         self.Sync.AutoOvercharge = auto
     end,
 
+    ---@param self CommandUnit
+    ---@param bones string
     PlayCommanderWarpInEffect = function(self, bones)
         self:HideBone(0, true)
         self:SetUnSelectable(true)
@@ -2345,12 +2509,14 @@ CommandUnit = Class(WalkingLandUnit) {
         self:ForkThread(self.WarpInEffectThread, bones)
     end,
 
+    ---@param self CommandUnit
+    ---@param bones Bone[]
     WarpInEffectThread = function(self, bones)
         self:PlayUnitSound('CommanderArrival')
         self:CreateProjectile('/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
         WaitSeconds(2.1)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local psm = bp.Display.WarpInEffect.PhaseShieldMesh
         if psm then
             self:SetMesh(psm, true)
@@ -2381,13 +2547,18 @@ CommandUnit = Class(WalkingLandUnit) {
     -------------------------------------------------------------------------------------------
     -- TELEPORTING WITH DELAY
     -------------------------------------------------------------------------------------------
+
+    ---@param self CommandUnit
+    ---@param teleporter any
+    ---@param location Vector
+    ---@param orientation Quaternion
     InitiateTeleportThread = function(self, teleporter, location, orientation)
         self.UnitBeingTeleported = self
         self:SetImmobile(true)
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpEco = bp.Economy
         local teleDelay = bp.General.TeleportDelay
         local energyCost, time
@@ -2432,7 +2603,6 @@ CommandUnit = Class(WalkingLandUnit) {
         Warp(self, location, orientation)
         self:PlayTeleportInEffects()
         self:CleanupRemainingTeleportChargeEffects()
-        teleportTime[self.EntityId] = GetGameTick()
 
         WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
 
@@ -2443,10 +2613,28 @@ CommandUnit = Class(WalkingLandUnit) {
         self.UnitBeingTeleported = nil
         self.TeleportThread = nil
     end,
+
+    ---@param self CommandUnit
+    ---@param work any
+    ---@return boolean
+    OnWorkBegin = function(self, work)
+        if WalkingLandUnit.OnWorkBegin(self, work) then 
+
+            -- Prevent consumption bug where two enhancements in a row prevents assisting units from
+            -- updating their consumption costs based on the new build rate values.
+            self:UpdateAssistersConsumption()
+
+            -- Inform EnhanceTask that enhancement is not restricted
+            return true
+        end
+    end,
 }
 
+---@class ACUUnit : CommandUnit
 ACUUnit = Class(CommandUnit) {
     -- The "commander under attack" warnings.
+    ---@param self ACUUnit
+    ---@param bpShield any
     CreateShield = function(self, bpShield)
         CommandUnit.CreateShield(self, bpShield)
 
@@ -2460,6 +2648,8 @@ ACUUnit = Class(CommandUnit) {
         end
     end,
 
+    ---@param self ACUUnit
+    ---@param enh string
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
 
@@ -2467,6 +2657,9 @@ ACUUnit = Class(CommandUnit) {
         self:SetImmobile(false)
     end,
 
+    ---@param self ACUUnit
+    ---@param work string
+    ---@return boolean
     OnWorkBegin = function(self, work)
         local legalWork = CommandUnit.OnWorkBegin(self, work)
         if not legalWork then return end
@@ -2481,6 +2674,8 @@ ACUUnit = Class(CommandUnit) {
         return true
     end,
 
+    ---@param self ACUUnit
+    ---@param work string
     OnWorkFail = function(self, work)
         self:SendNotifyMessage('cancelled', work)
         self:SetImmobile(false)
@@ -2488,17 +2683,25 @@ ACUUnit = Class(CommandUnit) {
         CommandUnit.OnWorkFail(self, work)
     end,
 
+    ---@param self ACUUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
         ArmyBrains[self.Army]:SetUnitStat(self.UnitId, "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
     end,
 
+    ---@param self ACUUnit
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Handle incoming OC damage
         if damageType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
-            amount = wep:GetBlueprint().Overcharge.commandDamage
+            amount = wep.Blueprint.Overcharge.commandDamage
         end
 
         WalkingLandUnit.DoTakeDamage(self, instigator, amount, vector, damageType)
@@ -2512,6 +2715,10 @@ ACUUnit = Class(CommandUnit) {
         end
     end,
 
+    ---@param self ACUUnit
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         CommandUnit.OnKilled(self, instigator, type, overkillRatio)
 
@@ -2530,15 +2737,12 @@ ACUUnit = Class(CommandUnit) {
             if IsAlly(self.Army, instigator.Army) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
                 WARN('Teamkill detected')
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
-            else
-                ForkThread(function()
-                    instigatorBrain:ReportScore()
-                end)
             end
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
     end,
 
+    ---@param self ACUUnit
     ResetRightArm = function(self)
         CommandUnit.ResetRightArm(self)
 
@@ -2550,20 +2754,23 @@ ACUUnit = Class(CommandUnit) {
         wep:SetAutoOvercharge(wep.AutoMode)
     end,
 
+    ---@param self ACUUnit
     OnPrepareArmToBuild = function(self)
         CommandUnit.OnPrepareArmToBuild(self)
         self:SetWeaponEnabledByLabel('OverCharge', false)
         self:SetWeaponEnabledByLabel('AutoOverCharge', false)
     end,
 
+    ---@param self ACUUnit
     GiveInitialResources = function(self)
         WaitTicks(1)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local aiBrain = self:GetAIBrain()
         aiBrain:GiveResource('Energy', bp.Economy.StorageEnergy)
         aiBrain:GiveResource('Mass', bp.Economy.StorageMass)
     end,
 
+    ---@param self ACUUnit
     BuildDisable = function(self)
         while self:IsUnitState('Building') or self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') or
                 self:IsUnitState('Repairing') or self:IsUnitState('Reclaiming') do
@@ -2578,6 +2785,10 @@ ACUUnit = Class(CommandUnit) {
     end,
 
     -- Store weapon status on upgrade. Ignore default and OC, which are dealt with elsewhere
+    ---@param self ACUUnit
+    ---@param label string
+    ---@param enable boolean
+    ---@param lockOut boolean
     SetWeaponEnabledByLabel = function(self, label, enable, lockOut)
         CommandUnit.SetWeaponEnabledByLabel(self, label, enable)
 
@@ -2588,6 +2799,9 @@ ACUUnit = Class(CommandUnit) {
         end
     end,
 
+    ---@param self ACUUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
 
@@ -2607,10 +2821,13 @@ ACUUnit = Class(CommandUnit) {
 }
 
 -- SHIELD HOVER UNITS
+---@class ShieldHoverLandUnit : HoverLandUnit
 ShieldHoverLandUnit = Class(HoverLandUnit) {}
 
 -- SHIELD LAND UNITS
+---@class ShieldLandUnit : LandUnit
 ShieldLandUnit = Class(LandUnit) {}
 
 -- SHIELD SEA UNITS
+---@class ShieldSeaUnit : SeaUnit
 ShieldSeaUnit = Class(SeaUnit) {}

@@ -6,6 +6,19 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+
+---@class EconomyResourceValues
+---@field MASS   number
+---@field ENERGY number
+
+---@class EconomyTotals
+---@field income           EconomyResourceValues
+---@field lastUseActual    EconomyResourceValues
+---@field lastUseRequested EconomyResourceValues
+---@field maxStorage       EconomyResourceValues
+---@field reclaimed        EconomyResourceValues
+---@field stored           EconomyResourceValues
+
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
@@ -169,7 +182,7 @@ function CommonLogic()
             group.reclaimDelta:SetHidden(hidden)
             group.reclaimTotal:SetHidden(hidden)
 
-            return true
+            return false
         end
 
         Tooltip.AddControlTooltip(group.reclaimDelta, prefix..'_reclaim_display')

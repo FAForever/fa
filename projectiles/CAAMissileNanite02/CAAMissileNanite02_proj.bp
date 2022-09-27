@@ -46,7 +46,7 @@ ProjectileBlueprint {
         Acceleration = 5,
         DestroyOnWater = true,
         InitialSpeed = 30,
-        LeadTarget = true,
+        LeadTarget = false,
         Lifetime = 4,
         MaxSpeed = 50,
         MaxZigZag = 5,

@@ -1,0 +1,13 @@
+BeamBlueprint {
+    Lifetime = 10,
+    TextureName = '/textures/particles/beam_uef_hiro_01.dds',
+    Thickness = 0.33,
+    StartColor = {x=1,y=1,z=1,w=0.0}, -- R,G,B,A
+    EndColor = {x=1,y=1,z=1,w=0.0}, -- R,G,B,A
+    Blendmode = 3.0,
+    RepeatRate = 0.1,
+    Length = 2000,
+    UShift = 0.0,
+    VShift = -0.45,
+    LODCutoff = 400,
+}

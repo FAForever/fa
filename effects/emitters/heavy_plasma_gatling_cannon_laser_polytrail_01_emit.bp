@@ -1,0 +1,12 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'heavy_plasma_gatling_cannon_laser_polytrail_01',
+	Lifetime = -4.00,
+    TrailLength = 2.85,
+    Size = 0.125,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1.0,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/ramp_phalanx_munition_01.dds',
+	RampTexture = '/textures/particles/ramp_blue_18.dds',
+}

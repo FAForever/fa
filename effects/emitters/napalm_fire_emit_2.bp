@@ -1,5 +1,6 @@
+-- not used by faf
 EmitterBlueprint {
-    BlueprintId = 'gorski_test_2',
+    BlueprintId = 'gorski_test_2', -- confused
     Lifetime = 5.00,
     Repeattime = 5.00,
     TextureFramecount = 1.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
     AlignRotation = false,
     AlignToBone = false,
     Flat = false,
-    LODCutoff = -1.00,
+    LODCutoff = 300.00,
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,
@@ -19,8 +20,8 @@ EmitterBlueprint {
     InterpolateEmission = true,
     TextureStripcount = 1.00,
     SortOrder = 0.00,
-    Texture = [[/textures/particles/fake_shadow_napalm.dds]],
-    RampTexture = [[/textures/particles/ramp_napalm_fire.dds]],
+    Texture = '/textures/particles/fake_shadow_napalm.dds',
+    RampTexture = '/textures/particles/ramp_napalm_fire.dds',
     XDirectionCurve = {
         XRange = 5.00,
         Keys = {

@@ -1,0 +1,13 @@
+BeamBlueprint {
+	BlueprintId = 'seraphim_build_beam_02',
+    Lifetime = 2,
+    TextureName = '/textures/particles/ser_plasma04.dds',
+    Thickness = 0.1,
+    StartColor = {x=1,y=1,z=1,w=0.05}, -- R,G,B,A
+    EndColor = {x=1,y=0.2,z=1,w=0.05}, -- R,G,B,A
+    Length = 8,
+    UShift = 0.0,
+    VShift = -0.25,
+    Blendmode = 3, 
+    RepeatRate = 0.15,   
+}

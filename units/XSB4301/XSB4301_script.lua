@@ -1,13 +1,14 @@
---#****************************************************************************
---#**
---#**  File     :  /units/XSB4301/XSB4301_script.lua
---#**
---#**  Summary  :  Seraphim Heavy Shield Generator Script
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /units/XSB4301/XSB4301_script.lua
+----**
+----**  Summary  :  Seraphim Heavy Shield Generator Script
+----**
+----**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local SShieldStructureUnit = import('/lua/seraphimunits.lua').SShieldStructureUnit
 
+---@class XSB4301 : SShieldStructureUnit
 XSB4301 = Class(SShieldStructureUnit) {
     ShieldEffects = {
         --'/effects/emitters/seraphim_shield_generator_t3_01_emit.bp',

@@ -1,0 +1,10 @@
+MeshBlueprint {
+    LODs = {
+        {
+            MeshName = '/projectiles/CDFRocketMeson01/CDFRocketMesonUnpacked01_lod0.scm',
+            AlbedoName = '/projectiles/CDFRocketMeson01/CDFRocketMesonUnpacked01_albedo.dds',
+            ShaderName = 'TMeshAlpha',
+            LODCutoff = 150,
+        },
+    },
+}

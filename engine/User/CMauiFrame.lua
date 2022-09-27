@@ -1,23 +1,20 @@
---- Class CMauiFrame
--- @classmod User.CMauiFrame
+---@meta
+
+---@class moho.frame_methods : moho.control_methods
+local CMauiFrame = {}
 
 ---
---  float GetTopmostDepth()
+function CMauiFrame:GetTargetHead()
+end
+
+---
+---@return number
 function CMauiFrame:GetTopmostDepth()
 end
 
 ---
---  SetTargetHead(int)
-function CMauiFrame:SetTargetHead(int)
+---@param head number
+function CMauiFrame:SetTargetHead(head)
 end
 
----
---  derived from CMauiControl
-function CMauiFrame:base()
-end
-
----
---
-function CMauiFrame:moho.frame_methods()
-end
-
+return CMauiFrame

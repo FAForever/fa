@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'AttachPoint'
+        }
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -26,15 +31,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 35,
     Categories = {
         'PRODUCTDL',
@@ -51,7 +47,8 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'OVERLAYDIRECTFIRE',
     },
-    CollisionOffsetZ = 0,
+    CollisionOffsetX = -0.05,
+    CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 27,
         ArmorType = 'Normal',
@@ -194,7 +191,7 @@ UnitBlueprint {
             LAYER_Orbit = false,
             LAYER_Seabed = false,
             LAYER_Sub = false,
-            LAYER_Water = true,
+            LAYER_Water = false,
         },
         DragCoefficient = 0.2,
         MaxAcceleration = 3.4,
@@ -215,9 +212,9 @@ UnitBlueprint {
     SelectionSizeX = 0.8,
     SelectionSizeZ = 0.8,
     SelectionThickness = 0.3,
-    SizeX = 0.8,
-    SizeY = 0.3,
-    SizeZ = 1.0,
+    SizeX = 0.7,
+    SizeY = 0.5,
+    SizeZ = 1.5,
     StrategicIconName = 'icon_land3_antiair',
     StrategicIconSortPriority = 115,
     Transport = {
@@ -282,16 +279,14 @@ UnitBlueprint {
             RateOfFire = 0.25,
             RequireTime = 0,
             SlavedToBody = false,
-            TargetCheckInterval = 0.7,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'muzzle02',
             TurretBonePitch = 'muzzle02',
             TurretBoneYaw = 'muzzle02',
@@ -311,7 +306,9 @@ UnitBlueprint {
             WeaponUnpacks = true,
         },
         {
-            AlwaysRecheckTarget = true,
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {
@@ -363,19 +360,16 @@ UnitBlueprint {
             RateOfFire = 1,
             ReTargetOnMiss = true,
             RequireTime = 0,
-            TargetCheckInterval = 0.7,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'muzzle01',
             TurretBonePitch = 'muzzle01',
             TurretBoneYaw = 'muzzle01',

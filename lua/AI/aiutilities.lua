@@ -14,6 +14,7 @@ local Buff = import('/lua/sim/Buff.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local AIBehaviors = import('/lua/ai/AIBehaviors.lua')
 
+---@param aiBrain AIBrain
 function AIGetEconomyNumbers(aiBrain)
     local econ = {}
     econ.MassTrend = aiBrain:GetEconomyTrend('MASS')
@@ -1338,7 +1339,7 @@ function GetTransports(platoon, units)
     local location = platoon:GetPlatoonPosition()
     if not location then
         -- We can assume we have at least one unit here
-        location = units[1]:GetCachePosition()
+        location = units[1]:GetPosition()
     end
 
     if not location then

@@ -8,10 +8,15 @@
 ---- We store the callbacks in a sub-table (instead of directly in the
 ---- module) so that we don't include any
 
-local SimUtils = import('/lua/SimUtils.lua')
-local SimPing = import('/lua/SimPing.lua')
+---@class SimCallback
+---@field Func string
+---@field Args table
+
+local SimUtils = import('/lua/simutils.lua')
+local SimPing = import('/lua/simping.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
+local ScenarioFramework = import('/lua/scenarioframework.lua')
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -19,6 +24,8 @@ local TableEmpty = table.empty
 local TableGetn = table.getn
 local TableRemove = table.remove
 local TableMerged = table.merged
+
+local MathAbs = math.abs
 
 -- upvalue globals for performance
 local type = type
@@ -37,12 +44,13 @@ local IssueFerry = IssueFerry
 
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
-local CategoriesEngineer = categories.ENGINEER
+local CategoriesEngineer = categories.ENGINEER - categories.INSIGNIFICANTUNIT
 
 --- Used to warn users (mainly developers) once for invalid use of functionality 
 local Warnings = { }
 
 --- List of callbacks that is being populated throughout this file
+---@type table<string, function>
 local Callbacks = {}
 
 function DoCallback(name, data, units)
@@ -50,7 +58,7 @@ function DoCallback(name, data, units)
     if fn then
         fn(data, units)
     else
-        error('No callback named ' .. repr(name))
+        SPEW('No callback named: ' .. repr(name))
     end
 end
 
@@ -72,6 +80,10 @@ local function SecureUnits(units)
     end
 
     return secure
+end
+
+--- Empty callback for ui mods to communicate
+Callbacks.EmptyCallback = function(data, units)
 end
 
 Callbacks.AutoOvercharge = function(data, units)
@@ -156,8 +168,8 @@ local skirtSizes = {
 }
 
 --- Computes the n'th layer of a previous layer.
--- @param skirtSize The skirt size of the unit.
--- @param layers The nth layer we'd like to have for this unit.
+---@param skirtSize number skirt size of the unit
+---@param nthLayer number nth layer we'd like to have for this unit
 local function RetrieveNthStructureLayer (skirtSize, nthLayer)
 
     -- attempt to retrieve the right set of layers for this skirtSize
@@ -192,8 +204,9 @@ end
 Callbacks.CapStructure = function(data, units)
 
     -- check if we have a structure
+    -- if army is not set then the structure is not 'our' structure (e.g., we're trying to cap an allied or hostile extractor)
     local structure = GetEntityById(data.target)
-    if not structure then return end 
+    if (not structure) or (not structure.Army) then return end 
 
     -- check if we're allowed to mess with this structure
     if not OkayToMessWithArmy(structure.Army) then return end
@@ -205,17 +218,20 @@ Callbacks.CapStructure = function(data, units)
     local units = EntityCategoryFilterDown(CategoriesEngineer, SecureUnits(units))
     if not units[1] then return end
 
+    -- check if it is our structure
+    if structure.Army ~= units[1].Army then return end
+
     -- check if we have buildings we want to use for capping
     if (not data.id) or (not data.layer) then return end 
 
     -- populate faction table
-    local others = { }
+    local otherBuilders = { }
     local buildersByFaction = { }
 
     -- determine of all units in selection what they can build
     for _, unit in units do
         -- make sure we're allowed to mess with this unit, if not we exclude
-        if OkayToMessWithArmy(unit.Army) then 
+        if unit.Army and OkayToMessWithArmy(unit.Army) then 
             -- compute blueprint id
             local faction = unit.factionCategory
             local blueprintID = ConstructBlueprintID(faction, data.id)
@@ -225,7 +241,7 @@ Callbacks.CapStructure = function(data, units)
                 buildersByFaction[faction] = buildersByFaction[faction] or { }
                 TableInsert(buildersByFaction[faction], unit)
             else
-                TableInsert(others, unit)
+                TableInsert(otherBuilders, unit)
             end
         end
     end 
@@ -253,15 +269,26 @@ Callbacks.CapStructure = function(data, units)
     for k, engineers in buildersByFaction do 
         if k ~= faction then 
             for k, engineer in engineers do 
-                TableInsert(others, engineer)
+                TableInsert(otherBuilders, engineer)
             end
         end
     end
 
+    -- -- only keep at most six builders due to performance
+    -- local allBuilders = builders
+    -- builders = { }
+    -- for k, engineer in allBuilders do 
+    --     if k < 7 then 
+    --         builders[k] = engineer 
+    --     else 
+    --         TableInsert(otherBuilders, engineer)
+    --     end
+    -- end
+
     -- compute / retrieve information for capping
-    local brain = builders[1]:GetAIBrain()
     local blueprintID = ConstructBlueprintID(faction, data.id)
-    local skirtSize = structure:GetBlueprint().Physics.SkirtSizeX
+    local blueprint = structure:GetBlueprint()
+    local skirtSize = blueprint.Physics.SkirtSizeX
 
     -- compute the layer locations
     local layer = RetrieveNthStructureLayer(skirtSize, data.layer)
@@ -270,24 +297,83 @@ Callbacks.CapStructure = function(data, units)
     if layer then 
 
         -- compute build locations and issue the capping
-        local center = structure:GetPosition()
+        local cx, cy, cz = structure:GetPositionXYZ()
+    
+        -- full extent of search rectangle for other buildings
+        local x1 = cx - (skirtSize + 10)
+        local z1 = cz - (skirtSize + 10)
+        local x2 = cx + (skirtSize + 10)
+        local z2 = cz + (skirtSize + 10)
+
+        -- find all units that may prevent us from building
+        local structures = GetUnitsInRect(x1, z1, x2, z2)
+        structures = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, structures)
+
+        -- determine offset to enlarge unit skirt to include structure we're trying to use to cap
+        -- this is a hard-coded fix to make walls work
+        local offset = 1
+        if skirtSize == 1 then 
+            offset = 0.5 
+        end
+
+        -- replace unit -> skirt to prevent allocating a new table
+        for k, unit in structures do 
+            local blueprint = unit:GetBlueprint()
+            local px, py, pz = unit:GetPositionXYZ()
+            local sx, sz = 0.5 * blueprint.Physics.SkirtSizeX, 0.5 * blueprint.Physics.SkirtSizeZ
+            local rect = { 
+                px - sx - offset, -- top left
+                pz - sz - offset, -- top left
+                px + sx + offset, -- bottom right
+                pz + sz + offset  -- bottom right
+            }
+
+            structures[k] = rect
+        end
+
+        -- name convention
+        local skirts = structures
+
+        -- loop over build locations in given layer
         for k, location in layer do 
 
             -- determine build location using cached value
-            buildLocation[1] = center[1] + location[1]
-            buildLocation[3] = center[3] + location[2]
+            buildLocation[1] = cx + location[1]
+            buildLocation[3] = cz + location[2]
             buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
 
-            -- order all builders to build if possible
-            if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
+            -- check all skirts manually as brain:CanBuildStructureAt(...) is unreliable when structures have been upgraded
+            local freeToBuild = true
+            for k, skirt in skirts do 
+                if buildLocation[1] > skirt[1] and buildLocation[1] < skirt[3] then 
+                    if buildLocation[3] > skirt[2] and buildLocation[3] < skirt[4] then 
+                        freeToBuild = false 
+                        break 
+                    end
+                end
+            end
+
+            -- issue if we can build here
+            if freeToBuild then
                 for _, builder in builders do 
                     IssueBuildMobile({builder}, buildLocation, blueprintID, {})
                 end
             end
         end
 
-        -- assist for all other builders
-        IssueGuard(others, builders[1])
+        -- assist for all other builders, spread over the number of actual builders
+        local t = { }
+        local builderIndex = 1
+        local builderCount = TableGetn(builders)
+        for k, builder in otherBuilders do 
+            t[1] = builder 
+            IssueGuard(t, builders[builderIndex])
+
+            builderIndex = builderIndex + 1 
+            if builderIndex > builderCount then 
+                builderIndex = 1 
+            end
+        end
     end
 end
 
@@ -305,6 +391,57 @@ Callbacks.SpawnAndSetVeterancyUnit = function(data)
     end
 end
 
+Callbacks.BoxFormationSpawn = function(data)
+    if not CheatsEnabled() then return end
+
+    local unitbp = __blueprints[data.bpId]
+
+    local function FootprintSize(axe)
+        axe = axe == 'x' and 'SizeX' or 'SizeZ'
+        return unitbp.Footprint
+        and unitbp.Footprint[axe]
+        or unitbp[axe]
+        or 1
+    end
+
+    local function RoundToSkirt(axe, val)
+        return unitbp.Physics.MotionType ~= 'RULEUMT_None'
+        and val
+        or math.floor(val) + (math.mod(FootprintSize(axe),2) == 1 and 0.5 or 0)
+    end
+
+    local posX = (data.pos[1])
+    local posZ = (data.pos[3])
+    local offsetX = 1.2 * (unitbp.Footprint.SizeX or 1)
+    local offsetZ = 1.2 * (unitbp.Footprint.SizeZ or 1)
+
+    if unitbp.Physics.MotionType == 'RULEUMT_None' then
+        offsetX = math.ceil(unitbp.Physics.SkirtSizeX or FootprintSize('x'))
+        offsetZ = math.ceil(unitbp.Physics.SkirtSizeZ or FootprintSize('y'))
+    end
+
+    local squareX = math.ceil(math.sqrt(data.count))
+    local squareZ = math.ceil(data.count/squareX)
+    local startOffsetX = (squareX-1) * 0.5 * offsetX
+    local startOffsetZ = (squareZ-1) * 0.5 * offsetZ
+
+    for i = 1, data.count do
+        local x = RoundToSkirt('x', posX - startOffsetX + math.mod(i,squareX) * offsetX)
+        local z = RoundToSkirt('z', posZ - startOffsetZ + math.mod(math.floor(i/squareX), squareZ) * offsetZ)
+        local unit = CreateUnitHPR(data.bpId, data.army, x, GetTerrainHeight(x,z), z, 0, data.yaw or 0, 0)
+
+        -- dummy units do not have this function
+        if unit.SetVeterancy then 
+            unit:SetVeterancy(data.veterancy)
+        end
+
+        -- only structures have this function
+        if unit.CreateTarmac and __blueprints[data.bpId].Display and __blueprints[data.bpId].Display.Tarmacs then
+            unit:CreateTarmac(true,true,true,false,false)
+        end
+    end
+end
+
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer
@@ -317,6 +454,8 @@ Callbacks.RequestAlliedVictory = SimUtils.RequestAlliedVictory
 
 Callbacks.SetOfferDraw = SimUtils.SetOfferDraw
 
+Callbacks.SetRecallVote = import("/lua/sim/recall.lua").SetRecallVote
+
 Callbacks.SpawnPing = SimPing.SpawnPing
 
 --Nuke Ping
@@ -324,17 +463,17 @@ Callbacks.SpawnSpecialPing = SimPing.SpawnSpecialPing
 
 Callbacks.UpdateMarker = SimPing.UpdateMarker
 
-Callbacks.FactionSelection = import('/lua/ScenarioFramework.lua').OnFactionSelect
+Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect
 
 Callbacks.ToggleSelfDestruct = import('/lua/selfdestruct.lua').ToggleSelfDestruct
 
 Callbacks.MarkerOnScreen = import('/lua/simcameramarkers.lua').MarkerOnScreen
 
-Callbacks.SimDialogueButtonPress = import('/lua/SimDialogue.lua').OnButtonPress
+Callbacks.SimDialogueButtonPress = import('/lua/simdialogue.lua').OnButtonPress
 
 Callbacks.AIChat = SUtils.FinishAIChat
 
-Callbacks.DiplomacyHandler = import('/lua/SimDiplomacy.lua').DiplomacyHandler
+Callbacks.DiplomacyHandler = import('/lua/simdiplomacy.lua').DiplomacyHandler
 
 Callbacks.Rebuild = function(data, units)
     local wreck = GetEntityById(data.entity)
@@ -386,21 +525,17 @@ Callbacks.OnControlGroupAssign = function(units)
     end
 end
 
-Callbacks.OnControlGroupApply = function(units)
-    --LOG(repr(units))
-end
-
-local SimCamera = import('/lua/SimCamera.lua')
+local SimCamera = import('/lua/simcamera.lua')
 
 Callbacks.OnCameraFinish = SimCamera.OnCameraFinish
 
-local SimPlayerQuery = import('/lua/SimPlayerQuery.lua')
+local SimPlayerQuery = import('/lua/simplayerquery.lua')
 
 Callbacks.OnPlayerQuery = SimPlayerQuery.OnPlayerQuery
 
 Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
-Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
+Callbacks.PingGroupClick = import('/lua/simpinggroup.lua').OnClickCallback
 
 Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
 
@@ -428,10 +563,13 @@ function IsInvalidAssist(unit, target)
 end
 
 Callbacks.AttackMove = function(data, units)
+    -- exclude structures as it makes no sense to apply a move command to them
+    local allNonStructures = EntityCategoryFilterDown(categories.ALLUNITS - categories.STRUCTURE, units)
+
     if data.Clear then
-        IssueClearCommands(units)
+        IssueClearCommands(allNonStructures)
     end
-    IssueAggressiveMove(units, data.Target)
+    IssueAggressiveMove(allNonStructures, data.Target)
 end
 
 --tells a unit to toggle its pointer
@@ -448,4 +586,157 @@ Callbacks.FlagShield = function(data, units)
     end
 end
 
-Callbacks.WeaponPriorities = import('/lua/WeaponPriorities.lua').SetWeaponPriorities
+Callbacks.WeaponPriorities = import('/lua/weaponpriorities.lua').SetWeaponPriorities
+
+Callbacks.ToggleDebugChainByName = function (data, units)
+    LOG("ToggleDebugChainByName")
+end
+
+Callbacks.ToggleDebugMarkersByType = function (data, units)
+    import("/lua/sim/markerutilities.lua").ToggleDebugMarkersByType(data.Type)
+end
+
+--- Toggles the profiler on / off
+Callbacks.ToggleProfiler = function (data)
+    import("/lua/sim/profiler.lua").ToggleProfiler(data.Army, data.ForceEnable or false )
+end
+
+-- Allows searching for benchmarks
+Callbacks.FindBenchmarks = function (data)
+    import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
+end
+
+-- Allows a benchmark to be run in the sim
+Callbacks.RunBenchmarks = function (data)
+    import("/lua/sim/profiler.lua").RunBenchmarks(data.Info)
+end
+
+do
+    -- upvalue for performance
+    local EntityCategoryFilterDown = EntityCategoryFilterDown
+    local IssueClearCommands = IssueClearCommands
+    local IssueUpgrade = IssueUpgrade
+
+    local cxrb0104 = categories.xrb0104
+    local cxrb0204 = categories.xrb0204
+
+    --- Forces hives in the selection to upgrade immediately
+    ---@param data {UpgradeTo: string} what we want to upgrade to, should be 'xrb0204' or 'xrb0304'
+    ---@param units Unit[] selected units
+    Callbacks.ImmediateHiveUpgrade = function(data, units)
+
+        -- make sure we have valid units
+        units = SecureUnits(units)
+
+        -- find t1 / t2 hives
+        local xrb0104 = EntityCategoryFilterDown(cxrb0104, units)
+        local xrb0204 = EntityCategoryFilterDown(cxrb0204, units)
+
+        -- upgrade tech 1 hives
+        if xrb0104[1] then 
+
+            -- oof for performance, but this doesn't get run that often
+            local notUpgradingh = 1
+            local notUpgrading = { }
+            
+            local upgradingh = 1 
+            local upgrading = { }
+
+            -- split between upgrading / and not upgrading hives for different behavior
+            for k, unit in xrb0104 do 
+                if not unit:IsUnitState('Upgrading') then 
+                    notUpgrading[notUpgradingh] = unit 
+                    notUpgradingh = notUpgradingh + 1
+                else 
+                    upgrading[upgradingh] = unit 
+                    upgradingh = upgradingh + 1
+                end
+            end
+
+            -- always clear things out
+            IssueClearCommands(notUpgrading)
+
+            -- upgrading to t2 from t1
+            if data.UpgradeTo == "xrb0204" then 
+                IssueUpgrade( notUpgrading, "xrb0204")
+            
+            -- upgrading to t3 from t1
+            elseif data.UpgradeTo == "xrb0304" then 
+                IssueUpgrade( notUpgrading, "xrb0204")
+                IssueUpgrade( xrb0104, "xrb0304")
+            end
+        end
+
+        -- upgrade tech 2 hives
+        if xrb0204[1] then 
+
+            -- always clear things out
+            if data.ClearCommands then 
+                IssueClearCommands(xrb0204)
+            end
+
+            -- upgrading to t3 form t1
+            if data.UpgradeTo == "xrb0304" then 
+                IssueUpgrade( xrb0204, "xrb0304")
+            end
+        end
+    end
+end
+
+do
+    --- Allows the player to force a target recheck on the selected units
+    ---@param data table   an empty table
+    ---@param units Unit[] table of units
+    Callbacks.RecheckTargetsOfWeapons = function(data, units)
+
+        -- make sure we have valid units with the correct command source
+        units = SecureUnits(units)
+        local tick = GetGameTick()
+        local rechecks = 0 
+
+        -- reset their weapons
+        for k, unit in units do
+            if
+                -- unit should still exist
+                not unit:BeenDestroyed() and
+                (   -- do not allow players to spam this
+                    not unit.RecheckTargetsOfWeaponsTick or
+                    (tick - unit.RecheckTargetsOfWeaponsTick > 10)
+                ) 
+            then
+                rechecks = rechecks + 1
+                unit.RecheckTargetsOfWeaponsTick = tick
+                for l = 1, unit.WeaponCount do
+                    unit:GetWeapon(l):ResetTarget()
+                end
+            end
+        end
+
+        -- user feedback
+        if rechecks > 0 then 
+            if units[1].Army == GetFocusArmy() then
+                if rechecks == 1 then 
+                    print("1 weapon target recheck")
+                else 
+                    print(string.format("%d weapon target rechecks", rechecks))
+                end
+            end
+        end
+    end
+end
+
+Callbacks.MapResoureCheck = function(data)
+    import("/lua/sim/maputilities.lua").MapResourceCheck()
+end
+
+Callbacks.iMapSwitchPerspective = function(data)
+    import("/lua/sim/maputilities.lua").iMapSwitchPerspective(data.Army)
+end
+
+Callbacks.iMapToggleRendering = function(data)
+    import("/lua/sim/maputilities.lua").iMapToggleRendering()
+end
+
+Callbacks.iMapToggleThreat = function(data)
+    import("/lua/sim/maputilities.lua").iMapToggleThreat(data.Identifier)
+end

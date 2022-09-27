@@ -29,14 +29,7 @@ AIFMiasmaShell01 = Class(AMiasmaProjectile) {
         self:CreateChildProjectile('/projectiles/AIFMiasmaShell02/AIFMiasmaShell02_proj.bp' )
         :SetVelocity(x,y,z):SetVelocity(speed):PassDamageData(self.DamageData)
                 
-        self:Destroy()
-        
-        -- already kill the trees, so better make them fall. Even if it would be better that it doesn't kill trees at all.
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
+        self:Destroy()       
     end,
     
 }

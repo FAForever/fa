@@ -9,6 +9,7 @@ local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CKrilTorpedoLauncherWeapon = import('/lua/cybranweapons.lua').CKrilTorpedoLauncherWeapon
 local utilities = import('/lua/utilities.lua')
 
+---@class XRB2308 : CStructureUnit
 XRB2308 = Class(CStructureUnit) {
     Weapons = {
         Turret01 = Class(CKrilTorpedoLauncherWeapon) {},
@@ -51,7 +52,7 @@ XRB2308 = Class(CStructureUnit) {
     CreateNewHarmsWithDelay = function(self, armySelf, pos, spottedByArmy, fireState) 
         WaitTicks(1) --wait 1 tick to determine HARMS target
         
-        if not self:IsDead() then
+        if not self.Dead then
             local health = self:GetHealth()
             local target = self:GetTargetEntity()
             
@@ -97,7 +98,7 @@ XRB2308 = Class(CStructureUnit) {
 
         -- Flying bits of metal and whatnot. More bits for more overkill.
         if self.ShowUnitDestructionDebris and overkillRatio then
-            self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
+            self:CreateUnitDestructionDebris(true, true, overkillRatio > 2)
         end
 
         self.DisallowCollisions = true

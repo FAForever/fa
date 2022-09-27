@@ -1,5 +1,7 @@
---- Class CUnitScriptTask
--- @classmod Sim.CUnitScriptTask
+---@meta
+
+---@class moho.ScriptTask_Methods
+local CUnitScriptTask = {}
 
 ---
 --  Set the AI result, success or fail
@@ -8,6 +10,7 @@ end
 
 ---
 --
-function CUnitScriptTask:moho.ScriptTask_Methods()
+function CUnitScriptTask:GetUnit()
 end
 
+return CUnitScriptTask

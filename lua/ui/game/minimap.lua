@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: UI for the multifunction display
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright  2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -18,7 +18,7 @@ local Window = import('/lua/maui/window.lua').Window
 local Prefs = import('/lua/user/prefs.lua')
 
 local minimap = Prefs.GetFromCurrentProfile('stratview') or false
-local minimap_resources = Prefs.GetFromCurrentProfile('minimap_resources') or false
+local minimap_resources = Prefs.GetFromCurrentProfile('MiniMap_resource_icons') or false
 
 controls = {
     displayGroup = false,
@@ -107,11 +107,12 @@ function CreateMinimap(parent)
         borderColor = 'ff415055',
     }
     local defPosition = {Left = 10, Top = 157, Bottom = 367, Right = 237}
-    controls.displayGroup = Window(GetFrame(0), nil, nil, false, false, false, false, 'mini_ui_minimap',
+    controls.displayGroup = Window(GetFrame(0), nil, nil, true, false, false, false, 'mini_ui_minimap',
         defPosition, windowTextures)
     controls.displayGroup.Depth:Set(4)
     controls.displayGroup.window_m:SetRenderPass(UIUtil.UIRP_UnderWorld)
     controls.displayGroup:SetMinimumResize(150, 150)
+    ConExecute("cam_DefaultMiniLOD 1.8") -- make sure minimap is created with normal LOD value as we change it later
     controls.miniMap = import('/lua/ui/controls/worldview.lua').WorldView(controls.displayGroup:GetClientGroup(), 'MiniMap', 2, true, 'WorldCamera')    -- depth value is above minimap
     controls.miniMap:SetName("Minimap")
     controls.miniMap:Register('MiniMap', true, '<LOC map_view_0001>MiniMap', 1)
@@ -123,21 +124,27 @@ function CreateMinimap(parent)
     local frameCount = 0
     controls.miniMap.OnFrame = function(self, elapsedTime)
         if frameCount == 1 then
-            controls.miniMap:EnableResourceRendering(minimap_resources)
-            controls.miniMap:CameraReset()
-            GetCamera(controls.miniMap._cameraName):SetMaxZoomMult(1.0)
-            controls.miniMap.OnFrame = nil  -- we want the control to continue to get frame updates in the engine, but not in Lua. PLEASE DON'T CHANGE THIS OR IT BREAKS CAMERA DRAGGING
+            self:EnableResourceRendering(minimap_resources)
+            self:CameraReset()
+            GetCamera(self._cameraName):SetMaxZoomMult(1.0)
+            self.OnFrame = nil  -- we want the control to continue to get frame updates in the engine, but not in Lua. PLEASE DON'T CHANGE THIS OR IT BREAKS CAMERA DRAGGING
         end
         frameCount = frameCount + 1
     end
+    controls.displayGroup.OnPinCheck = function(control, checked)
+        control:SetSizeLock(checked)
+        control:SetPositionLock(checked)
+        -- add save pin in prefs
+    end
+    Tooltip.AddCheckboxTooltip(controls.displayGroup._pinBtn, 'minimap_pin')
 
     controls.displayGroup.resetBtn = Button(controls.displayGroup.TitleGroup,
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_up.dds'),
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_down.dds'),
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_over.dds'),
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_dis.dds'))
-    LayoutHelpers.LeftOf(controls.displayGroup.resetBtn, controls.displayGroup._closeBtn)
-    controls.displayGroup.resetBtn.OnClick = function(modifiers)
+    LayoutHelpers.LeftOf(controls.displayGroup.resetBtn, controls.displayGroup._pinBtn )
+    controls.displayGroup.resetBtn.OnClick = function(self, modifiers)
         for index, val in defPosition do
             local i = index
             local v = val
@@ -175,10 +182,13 @@ function CreateMinimap(parent)
     controls.displayGroup.ClientGroup:DisableHitTest()
     controls.miniMap:EnableHitTest()
     CommonLogic()
+    if Prefs.GetFromCurrentProfile('disableMinimapMesh') ~= false then
+        ConExecute("cam_DefaultMiniLOD 0")
+    end
 end
 
 function ToggleMinimap()
-    # disable when in Screen Capture mode
+    ---- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end
