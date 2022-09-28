@@ -1,6 +1,7 @@
 -- This file contains key bindable actions that don't fit elsewhere
 
 local Prefs = import('/lua/user/prefs.lua')
+local SelectionUtils = import('/lua/ui/game/selection.lua')
 
 local lockZoomEnable = false
 function lockZoom()
@@ -392,4 +393,34 @@ end
 
 function RecheckTargetsOfWeapons()
     SimCallback({Func = 'RecheckTargetsOfWeapons', Args = { }}, true)
+end
+
+function SelectAllUpgradingExtractors()
+
+    -- by default, hide playing the selection sound
+    SelectionUtils.EnableSelectionSound(false)
+
+    -- try and find extractors
+    local oldSelection = GetSelectedUnits()
+    UISelectionByCategory("MASSEXTRACTION", false, false, false, false)
+    local selection = GetSelectedUnits()
+    if selection then
+
+        -- try and find extractors that are upgrading
+        local upgrading = { }
+        for k, unit in selection do
+            if unit:GetWorkProgress() > 0 then
+                table.insert(upgrading, unit)
+            end
+
+            if next(upgrading) then
+                SelectionUtils.EnableSelectionSound(true)
+                SelectUnits(upgrading)
+            end
+        end
+    else 
+        SelectUnits(oldSelection)
+    end
+
+    SelectionUtils.EnableSelectionSound(true)
 end

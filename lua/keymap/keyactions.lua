@@ -190,6 +190,8 @@ keyActions = {
         category = 'selection', order = 39,},
     ['fac_group0'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").FactorySelection(0)',
         category = 'selection', order = 40,},
+    ['select_upgrading_extractors'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllUpgradingExtractors()',
+        category = 'selection', order = 41,},
     ['select_air'] = {action = 'UI_SelectByCategory +excludeengineers AIR MOBILE',
         category = 'selection', order = 41,},
     ['select_naval'] = {action = 'UI_SelectByCategory +excludeengineers NAVAL MOBILE',
