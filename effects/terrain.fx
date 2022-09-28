@@ -1738,12 +1738,12 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
     float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
     float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
 
-    float3 blending = ComputeTriplanarBlending(normal);
-    float4 xAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.yz);
-    float4 yAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.xz);
-    float4 zAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.xy);
-    float4 stratum3Albedo = xAxis * blending.x + yAxis * blending.y + zAxis * blending.z;
-    //stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
+    // float3 blending = ComputeTriplanarBlending(normal);
+    // float4 xAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.yz);
+    // float4 yAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.xz);
+    // float4 zAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.xy);
+    // float4 stratum3Albedo = xAxis * blending.x + yAxis * blending.y + zAxis * blending.z;
+    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
 
     float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum3AlbedoTile);
     float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
