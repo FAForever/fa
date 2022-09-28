@@ -152,6 +152,7 @@ keyDescriptions = {
     ['select_nearest_naval_factory'] = '<LOC key_desc_0078>Select the nearest Naval Factory',
     ['toggle_build_mode'] = '<LOC key_desc_0102>Toggles keyboard build command mode on and off',
     ['toggle_reclaim_labels'] = '<LOC key_desc_0103>Toggles reclaim labels on and off',
+    ['select_upgrading_extractors'] = '<LOC key_desc_select_upgrading_extractors>Selects all extractors that are upgrading',
 
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
