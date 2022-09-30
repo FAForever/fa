@@ -740,3 +740,30 @@ end
 Callbacks.iMapToggleThreat = function(data)
     import("/lua/sim/maputilities.lua").iMapToggleThreat(data.Identifier)
 end
+
+--- Issues an assist origin for the origin group to the first unit in the target group
+---@param origin Unit[]
+---@param target Unit[]
+local function AssistGroup(origin, target)
+    if origin and target and next(origin) and next(target) then
+
+    end
+end
+
+Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
+    if selection then
+
+        ---@type Unit
+        local target = GetEntityById(data.TargetId)
+
+        local selectionWithoutTarget = { }
+        for k, unit in selection do 
+            if unit.EntityId != target.EntityId then
+                table.insert(selectionWithoutTarget, unit)
+            end
+        end
+
+        IssueClearCommands(selectionWithoutTarget)
+        IssueGuard(selectionWithoutTarget, target)
+    end
+end

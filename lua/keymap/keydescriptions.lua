@@ -153,7 +153,7 @@ keyDescriptions = {
     ['toggle_build_mode'] = '<LOC key_desc_0102>Toggles keyboard build command mode on and off',
     ['toggle_reclaim_labels'] = '<LOC key_desc_0103>Toggles reclaim labels on and off',
     ['select_upgrading_extractors'] = '<LOC key_desc_select_upgrading_extractors>Selects all extractors that are upgrading',
-
+    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filters the selection to the most advanced engineers, all other engineers assist those engineers',
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
     ['reset_game_speed'] = '<LOC key_desc_0081>Reset game speed to 0 (Normal Speed)',
