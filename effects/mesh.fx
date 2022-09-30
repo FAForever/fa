@@ -2140,6 +2140,11 @@ float4 PBR_PS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
     float ao = 1;
     float alpha = 0;
 
+    float3 p = vertex.position.xyz;
+    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
+    float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float3 v = vertex.viewDirection;
+
     // sample from gpg albedo texture
     float3 albedo = tex2D(albedoSampler, vertex.texcoord0.xy).rgb;
     float4 spec = tex2D(specularSampler, vertex.texcoord0.xy);
@@ -2149,11 +2154,6 @@ float4 PBR_PS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
     float3 ambient = (sunAmbient + sunAmbientOffset) * albedo * ao;
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, n));
     environment *= environmentStrengthMult;
-
-    float3 p = vertex.position.xyz;
-    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
-    float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float3 v = vertex.viewDirection;
 
     float3 lightDirections[2] = {sunDirection, reflect( -vertex.viewDirection, n)};
     float3 radiances[2] = {sunDiffuse * sunDiffuseStrengthMult, environment};
