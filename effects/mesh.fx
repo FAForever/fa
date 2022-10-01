@@ -2096,8 +2096,10 @@ float3 PBR_FresnelShlick(float hDotN, float3 F0)
 
 float PBR_Distribution(float3 n, float3 h, float roughness)
 {
-    float a = roughness*roughness;
-    float a2 = a*a;
+    // roughness only squared once @ https://learnopengl.com/PBR/Theory
+    // but squared again, which I think is a bug @ https://learnopengl.com/PBR/Lighting
+    // also α on the GeometrySchlick equation is represented with just roughness
+    float a2 = roughness*roughness;
     float nDotH = max(dot(n, h), 0.0);
     float nDotH2 = nDotH*nDotH;
 
