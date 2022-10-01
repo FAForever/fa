@@ -2131,10 +2131,9 @@ float PBR_GeometrySmith(float3 n, float3 v, float3 l, float roughness)
 
 float4 PBR_PS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
-    float albedoMult = 6;
+    float albedoMult = 3.5;
     float sunDiffuseStrengthMult = 1;
     float environmentStrengthMult = .1;
-    float3 sunAmbientOffset = float3(.05, .05, .05);
     float roughness = .6;
     float metallic = 1;
     float ao = 1;
@@ -2146,20 +2145,33 @@ float4 PBR_PS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
     float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float3 v = vertex.viewDirection;
 
-    float3 albedo = pow(tex2D(albedoSampler, vertex.texcoord0.xy).rgb, gamma);
+    float3 albedo = tex2D(albedoSampler, vertex.texcoord0.xy).rgb;
     float4 spec = tex2D(specularSampler, vertex.texcoord0.xy);
-    // the alpha channel of specular map is used for team colors
     albedo *= albedoMult; // make up for the dark textures
-    albedo.rgb = lerp(vertex.color.rgb, albedo, 1 - spec.a);
-    float3 ambient = (sunAmbient + sunAmbientOffset) * albedo * ao;
+    // the alpha channel of specular map is used for team colors
+    albedo.rgb = lerp(vertex.color.rgb, albedo, 1 - spec.a * 2.5);
+    albedo = pow(albedo, gamma);
+    float planeCockpitMask = saturate((spec.r - 0.6) * 2.5);
+    roughness = lerp(.6, .2, spec.a * 2.4);
+    //roughness = spec.g * 0.83 + 0.2 + saturate(spec.a * 1.4 - 0.1) + planeCockpitMask;
+    //roughness = saturate(1 - roughness);
+    metallic = saturate(1 - 5.4 * spec.a - planeCockpitMask);
+
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, n));
-    environment *= environmentStrengthMult;
+    environment = pow(environment, gamma) * environmentStrengthMult;
+    float3 ambient = pow(sunAmbient, gamma) * ao * .1;
+    ambient += pow(shadowFill, gamma) * .1;
+    ambient *= lightMultiplier;
+    environment += ambient;
+    alpha = spec.b;
+
     float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
+    float3 sunLight = pow(sunDiffuse, gamma) * shadow * lightMultiplier;
 
     float3 lightDirections[2] = {sunDirection, reflect( -vertex.viewDirection, n)};
-    float3 incomingRadiances[2] = {sunDiffuse * sunDiffuseStrengthMult * shadow, environment};
+    float3 incomingRadiances[2] = {sunLight * sunDiffuseStrengthMult, environment};
 
-    float3 color = ambient;
+    float3 color = float3(0, 0, 0);
     float3 F0 = float3(0.04, 0.04, 0.04);
     F0 = lerp(F0, albedo, metallic);
 
@@ -2204,6 +2216,7 @@ float4 PBR_PS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
         color += L0;
     }
 
+    color = color / (color + float3(1.0, 1.0, 1.0));
     float fr = 1 / gamma;
     color = pow(color, float3(fr, fr, fr));
 
