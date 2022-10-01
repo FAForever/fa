@@ -753,17 +753,12 @@ end
 Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
     if selection then
 
+        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
+
         ---@type Unit
         local target = GetEntityById(data.TargetId)
 
-        local selectionWithoutTarget = { }
-        for k, unit in selection do 
-            if unit.EntityId != target.EntityId then
-                table.insert(selectionWithoutTarget, unit)
-            end
-        end
-
-        IssueClearCommands(selectionWithoutTarget)
-        IssueGuard(selectionWithoutTarget, target)
+        IssueClearCommands(noACU)
+        IssueGuard(noACU, target)
     end
 end

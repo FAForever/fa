@@ -434,10 +434,10 @@ function SelectHighestEngineerAndAssist()
 
     if selection then
 
-        local tech1 = EntityCategoryFilterDown(categories.TECH1, selection)
-        local tech2 = EntityCategoryFilterDown(categories.TECH2, selection)
-        local tech3 = EntityCategoryFilterDown(categories.TECH3, selection)
-        local sACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER, selection)
+        local tech1 = EntityCategoryFilterDown(categories.TECH1 - categories.COMMAND, selection)
+        local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
+        local tech3 = EntityCategoryFilterDown(categories.TECH3 - categories.COMMAND, selection)
+        local sACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER - categories.COMMAND, selection)
 
         if next(sACUs) then
             SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = sACUs[1]:GetEntityId() }}, true)
