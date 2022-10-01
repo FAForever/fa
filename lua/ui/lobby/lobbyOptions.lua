@@ -170,7 +170,7 @@ teamOptions =
         values = {
             {
                 text = "<LOC at_Default>Default",
-                help = "Each player has their own army and their own resources. Allied players can not issue commands to your army. This is the default Supreme Commander experience.",
+                help = "<LOC lobui_CADDesc>Each player has their own army and their own resources. Allied players can not issue commands to your army. This is the default Supreme Commander experience.",
                 key = 'Off'
             },
             {
