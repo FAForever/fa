@@ -2131,96 +2131,83 @@ float PBR_GeometrySmith(float3 n, float3 v, float3 l, float roughness)
 
 float4 PBR_PS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
-    float albedoMult = 3.5;
-    float sunDiffuseStrengthMult = 1;
-    float environmentStrengthMult = .1;
-    float roughness = .6;
-    float metallic = 1;
-    float ao = 1;
-    float alpha = 0;
-    float gamma = 2.2;
-
     float3 p = vertex.position.xyz;
     float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
     float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float3 v = vertex.viewDirection;
-
-    float3 albedo = tex2D(albedoSampler, vertex.texcoord0.xy).rgb;
+    float3 albedo = tex2D(albedoSampler, vertex.texcoord0.xy);
     float4 spec = tex2D(specularSampler, vertex.texcoord0.xy);
-    albedo *= albedoMult; // make up for the dark textures
-    // the alpha channel of specular map is used for team colors
-    albedo.rgb = lerp(vertex.color.rgb, albedo, 1 - spec.a * 2.5);
-    albedo = pow(albedo, gamma);
-    float planeCockpitMask = saturate((spec.r - 0.6) * 2.5);
-    roughness = lerp(.6, .2, spec.a * 2.4);
-    //roughness = spec.g * 0.83 + 0.2 + saturate(spec.a * 1.4 - 0.1) + planeCockpitMask;
-    //roughness = saturate(1 - roughness);
-    metallic = saturate(1 - 5.4 * spec.a - planeCockpitMask);
-
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, n));
-    environment = pow(environment, gamma) * environmentStrengthMult;
+    float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
+
+    ///////////////////////////////
+    // Remap base game parameters
+    //
+    float gamma = 2.2;
+
+    // the alpha channel of specular map is used for team colors
+    albedo.rgb = 3.5 * lerp(vertex.color.rgb, albedo, 1 - spec.a * 2.5);
+    albedo.rgb = pow(albedo, gamma);
+
+    float roughness = lerp(.6, .2, spec.a * 2.4);
+
+    float planeCockpitMask = saturate((spec.r - 0.6) * 2.5);
+    float metallic = saturate(1 - 5.4 * spec.a - planeCockpitMask);
+
+    float ao = 1;
     float3 ambient = pow(sunAmbient, gamma) * ao * .1;
     ambient += pow(shadowFill, gamma) * .1;
     ambient *= lightMultiplier;
-    environment += ambient;
-    alpha = spec.b;
 
-    float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
+    environment = pow(environment, gamma) * .1;
+    environment += ambient;
+
+    float alphaGlow = spec.b;
+
     float3 sunLight = pow(sunDiffuse, gamma) * shadow * lightMultiplier;
 
+    //////////////////////////////
+    // Compute outgoing radiance
+    //
     float3 lightDirections[2] = {sunDirection, reflect( -vertex.viewDirection, n)};
-    float3 incomingRadiances[2] = {sunLight * sunDiffuseStrengthMult, environment};
+    float3 incomingRadiances[2] = {sunLight, environment};
 
     float3 color = float3(0, 0, 0);
-    float3 F0 = float3(0.04, 0.04, 0.04);
-    F0 = lerp(F0, albedo, metallic);
+    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedo, metallic);
 
     for (int i = 0; i < 2; i++) {
         float3 incomingRadiance = incomingRadiances[i];
-
-        // l: light vector
         float3 l = lightDirections[i];
-        // h: halfway vector
         float3 h = normalize(v + l);
 
-        // ------------------ //
-        // Cook-Torrance BRDF //
-        // ------------------ //
-
-        // Fresnel
+        // Cook-Torrance BRDF
         float3 F = PBR_FresnelShlick(max(dot(h, v), 0.0), F0);
-
-        // Distribution
         float NDF = PBR_Distribution(n, h, roughness);
-
-        // Geometry
         float G = PBR_GeometrySmith(n, v, l, roughness);
 
-        // BRDF
         float3 numerator = NDF * G * F;
         // add 0.0001 to avoid division by zero
         float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.0001;
         float3 specular = numerator / denominator;  
         
-        // ----------- //
-        // Reflectance //
-        //------------ //
-
-        float3 kS = F;              // reflection/specular
-        float3 kD = float3(1.0, 1.0, 1.0) - kS; // refraction/diffuse
+        // Reflectance
+        float3 kS = F;
+        float3 kD = float3(1.0, 1.0, 1.0) - kS;
         kD *= 1.0 - metallic;	
 
         float nDotL = max(dot(n, l), 0.0);        
-        // L0: outgoing radiance
         float3 L0 = (kD * albedo / PI + specular) * incomingRadiance * nDotL;
         color += L0;
     }
 
+    //////////////////////////////////
+    // Apply gamma & HDR correction
+    //
     color = color / (color + float3(1.0, 1.0, 1.0));
     float fr = 1 / gamma;
     color = pow(color, float3(fr, fr, fr));
 
-    return float4(color, alpha);
+    return float4(color, alphaGlow);
 }
 
 /// DepthPS
