@@ -161,33 +161,34 @@ teamOptions =
             },
         },
     },
-}
 
----@type ScenarioOption[]
-globalOpts = {
     {
         default = 1,
-        label = "<LOC lobui_CAName>Common Army",
-        help = "<LOC lobui_CADesc>Modifies team management",
+        label = "<LOC lobui_CAName>Army control",
+        help = "<LOC lobui_CADesc>Allows you to adjust how teams and armies co-operate with each other. Ranging from the default Supreme Commander experience to one army, shared by the entire team.",
         key = 'CommonArmy',
         values = {
             {
-                text = "<LOC _Off>Off",
-                help = "",
+                text = "<LOC at_Default>Default",
+                help = "Each player has their own army and their own resources. Allied players can not issue commands to your army. This is the default Supreme Commander experience.",
                 key = 'Off'
             },
             {
-                text = "<LOC lobui_CAUnion>Union control",
-                help = "<LOC lobui_CAUDesc>Union control for team",
+                text = "<LOC lobui_CAUnion>Multiple armies, union control",
+                help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
                 key = 'Union'
             },
             {
-                text = "<LOC lobui_CACommon>Common army",
-                help = "<LOC lobui_CACDesc>Uses a single army for team",
+                text = "<LOC lobui_CACommon>Single army, union control",
+                help = "<LOC lobui_CACDesc>Each team is one army. All units and resources are shared, all team members can issue commands.",
                 key = 'Common'
             }
         }
     },
+}
+
+---@type ScenarioOption[]
+globalOpts = {
     {
         default = 1,
         label = "<LOC lobui_0802>Unrate",
