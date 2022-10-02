@@ -2,11 +2,11 @@ historyInterval = 10
 scoreInterval = 1
 alliesScore = true
 
+local GameIsOver = false
 local ArmyScore = {}
 local scoreOption = ScenarioInfo.Options.Score or "no"
 scoreData = {interval = historyInterval, current = ArmyScore, history = {}}
 
-local victory = import('/lua/victory.lua')
 -- Some of these values pre-existed and are used in other places, that's why their naming is not consistent
 local categoriesToCollect = {
     land = categories.LAND,
@@ -23,6 +23,8 @@ local categoriesToCollect = {
     transportation = categories.TRANSPORTATION
 }
 
+---@param brain AIBrain
+---@return number
 function CalculateBrainScore(brain)
     local commanderKills = brain:GetArmyStat("Enemies_Commanders_Destroyed", 0).Value
     local massSpent = brain:GetArmyStat("Economy_TotalConsumed_Mass", 0).Value
@@ -45,7 +47,7 @@ function CalculateBrainScore(brain)
 end
 
 local function ScoreResourcesThread()
-    while not victory.gameOver do
+    while not GameIsOver do
         WaitSeconds(1)
         for index, brain in ArmyBrains do
             if ArmyIsCivilian(index) then continue end
@@ -87,7 +89,7 @@ local function ScoreResourcesThread()
 end
 
 local function ScoreHistoryThread()
-    while not victory.gameOver do
+    while not GameIsOver do 
         WaitSeconds(scoreData.interval)
         local data = {}
         for index, brain in ArmyBrains do
@@ -185,7 +187,7 @@ local function ScoreThread()
     local lastConsumedEnergy = 0
     local estimatedTicksSinceLastUpdate = 0
 
-    while not victory.gameOver do
+    while not GameIsOver do
         local updInterval = scoreInterval / table.getsize(ArmyBrains)
         for index, brain in ArmyBrains do
             local CurTime = GetGameTimeSeconds()
@@ -264,9 +266,8 @@ end
 function init()
     ForkThread(ScoreThread)
     table.insert(GameOverListeners, function()
+        GameIsOver = true
         Sync.ScoreAccum = scoreData
-        if victory.gameOver then
-            Sync.StatsToSend = ArmyScore
-        end
+        Sync.StatsToSend = ArmyScore
     end)
 end

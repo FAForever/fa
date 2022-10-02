@@ -5,16 +5,27 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
--- Legacy shield state:
+-- Legacy shield flags:
 --  - _IsUp: determines whether the shield is up
 
--- Current hield state:
+-- Shield flags:
 --  - Enabled: flag that indicates the shield is enabled or not (via the toggle of the user)
 --  - Recharged : flag that indicates whether the shield is recharged
 --  - DepletedByEnergy: flag that indicates the shield is drained of energy and needs to recharge
 --  - DepletedByDamage: flag that indicates the shield sustained too much damage and needs to recharge
 --  - NoEnergyToSustain: flag that indicates the shield does not have sufficient energy to recharge
 --  - RolledFromFactory: flag that allows us to skip the first attachment check
+
+-- Shield flags for mods:
+--  - SkipAttachmentCheck: flag that allows us to skip all attachment checks, as an example when the unit is attached to a transport
+
+-- Shield states:
+-- - OnState
+-- - OffState
+-- - RechargeState
+-- - DamageDrainedState
+-- - EnergyDrainedState
+-- - DeadState
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -99,6 +110,9 @@ local DEFAULT_OPTIONS = {
     ShieldRegenRate = 1,
     ShieldRegenStartTime = 5,
     PassOverkillDamage = false,
+
+    -- flags for mods
+    -- SkipAttachmentCheck = false, -- defaults to nil, same as false
 }
 
 -- scan blueprints for the largest shield radius
@@ -116,6 +130,8 @@ for k, bp in __blueprints do
     end
 end
 
+---@class Shield : moho.shield_methods, Entity
+---@field Brain AIBrain
 Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
@@ -128,6 +144,8 @@ Shield = Class(moho.shield_methods, Entity) {
         _c_CreateShield(self, spec)
     end,
 
+    ---@param self Shield
+    ---@param spec unknown is this Entity?
     OnCreate = function(self, spec)
         -- cache information that is used frequently
         self.Army = EntityGetArmy(self)
@@ -147,6 +165,8 @@ Shield = Class(moho.shield_methods, Entity) {
         self.RegenStartTime = spec.ShieldRegenStartTime
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
+        self.SkipAttachmentCheck = spec.SkipAttachmentCheck
+
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
@@ -234,24 +254,29 @@ Shield = Class(moho.shield_methods, Entity) {
         local EntityGetMaxHealth = EntityGetMaxHealth
         local EntityAdjustHealth = EntityAdjustHealth
 
-        while true do
+        while not IsDestroyed(self) do
 
             -- gather some information
             local fromSuspension = false
             local tick = GetGameTick()
             local health = EntityGetHealth(self)
+            local maxHealth = EntityGetMaxHealth(self)
 
             -- check if we need to suspend ourself
             if 
                 -- we're at zero health or lower
                     health <= 0 
                 -- we're full health
-                or  health == EntityGetMaxHealth(self) 
+                or  health == maxHealth
                 -- we're not enabled
                 or  not self.Enabled 
                 -- we're not recharged
                 or  not self.Recharged
             then 
+                -- adjust shield bar one last time
+                self:UpdateShieldRatio(health / maxHealth)
+
+                -- suspend ourselves and wait
                 self.RegenThreadSuspended = true 
                 SuspendCurrentThread()
                 self.RegenThreadSuspended = false
@@ -267,13 +292,11 @@ Shield = Class(moho.shield_methods, Entity) {
                     -- adjust health, rate is in seconds 
                     EntityAdjustHealth(self, self.Owner, 0.1 * self.RegenRate)
 
-                    -- adjust shield bar
-                    self:UpdateShieldRatio(-1)
-
                 -- if not, yield for the difference in ticks
-                else 
-                    CoroutineYield(self.RegenThreadStartTick - tick )
                 end
+
+                -- adjust shield bar as we may be assisted
+                self:UpdateShieldRatio(health / maxHealth)
             end
 
             -- wait till next tick
@@ -281,6 +304,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     OnEnergyDepleted = function(self)
         self.NoEnergyToSustain = true 
 
@@ -290,6 +314,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     OnEnergyViable = function(self)
         self.NoEnergyToSustain = false 
 
@@ -493,9 +518,6 @@ Shield = Class(moho.shield_methods, Entity) {
             -- take some damage
             EntityAdjustHealth(self, instigator, -absorbed)
 
-            -- adjust shield bar
-            self:UpdateShieldRatio(-1)
-
             -- check to spawn impact effect
             local r = Random(1, self.Size)
             if  dmgType ~= "ShieldSpill"
@@ -550,6 +572,10 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     CreateImpactEffect = function(self, vector)
+
+        if IsDestroyed(self) then
+            return
+        end
 
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
@@ -637,7 +663,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         -- special behavior for projectiles that represent strategic missiles
-        local otherHashedCats = other.Cache.HashedCats
+        local otherHashedCats = other.Blueprint.CategoriesHash
         if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
             return false
         end
@@ -744,7 +770,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.Owner:SetMaintenanceConsumptionActive()
 
             -- if we're attached to a transport then our shield should be off
-            if UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory then
+            if (not self.SkipAttachmentCheck) and (UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory) then
                 ChangeState(self, self.OffState)
 
             -- if we're still out of energy, go wait for that to fix itself
@@ -794,7 +820,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- remove the shield and the shield bar
             self:RemoveShield()
-            self:UpdateShieldRatio(-1)
+            self:UpdateShieldRatio(0)
 
             -- inform the owner that the shield is disabled
             self.Owner:OnShieldDisabled()
@@ -998,6 +1024,7 @@ Shield = Class(moho.shield_methods, Entity) {
 }
 
 --- A bubble shield attached to a single unit.
+---@class PersonalBubble : Shield
 PersonalBubble = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1069,6 +1096,7 @@ PersonalBubble = Class(Shield) {
 
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
+---@class TransportShield : Shield
 TransportShield = Class(Shield) {
 
     OnCreate = function(self, spec)
@@ -1096,11 +1124,11 @@ TransportShield = Class(Shield) {
 
     OnState = State(Shield.OnState) {
         Main = function(self)
+            Shield.OnState.Main(self)
+
             -- prevent ourself and our content from taking damage
             self:SetContentsVulnerable(false)
             self.Owner.CanTakeDamage = false 
-
-            Shield.OnState.Main(self)
         end,
 
         AddProtectedUnit = function(self, unit)
@@ -1111,30 +1139,38 @@ TransportShield = Class(Shield) {
 
     OffState = State(Shield.OffState) {
         Main = function(self)
+            Shield.OffState.Main(self)
+
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
             self.Owner.CanTakeDamage = true 
-
-            Shield.OffState.Main(self)
         end,
+    },
 
-        AddProtectedUnit = function(self, unit)
-            self.protectedUnits[unit] = true
+    DamageDrainedState = State(Shield.DamageDrainedState) {
+        Main = function(self)
+            Shield.DamageDrainedState.Main(self)
+
+            -- allow ourself and our content to take damage
+            self:SetContentsVulnerable(true)
+            self.Owner.CanTakeDamage = true 
         end
     },
 
-    RechargeState = State(Shield.RechargeState) {
+    EnergyDrainedState = State(Shield.EnergyDrainedState) {
         Main = function(self)
+            Shield.EnergyDrainedState.Main(self)
+
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
             self.Owner.CanTakeDamage = true 
-            Shield.RechargeState.Main(self)
         end
     },
 }
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
+---@class PersonalShield : Shield
 PersonalShield = Class(Shield){
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1169,6 +1205,10 @@ PersonalShield = Class(Shield){
     end,
 
     CreateImpactEffect = function(self, vector)
+
+        if IsDestroyed(self) then
+            return
+        end
 
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
@@ -1228,6 +1268,7 @@ PersonalShield = Class(Shield){
     end,
 }
 
+---@class AntiArtilleryShield : Shield
 AntiArtilleryShield = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1274,6 +1315,7 @@ AntiArtilleryShield = Class(Shield) {
 }
 
 -- Pretty much the same as personal shield (no collisions), but has its own mesh and special effects.
+---@class CzarShield : PersonalShield
 CzarShield = Class(PersonalShield) {
     OnCreate = function(self, spec)
         PersonalShield.OnCreate(self, spec)
@@ -1284,6 +1326,10 @@ CzarShield = Class(PersonalShield) {
 
 
     CreateImpactEffect = function(self, vector)
+
+        if IsDestroyed(self) then
+            return
+        end
 
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 

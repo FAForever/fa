@@ -1,15 +1,16 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/XSB0304/XSB0304_script.lua
---#**  Author(s):  Greg Kohne
---#**
---#**  Summary  :  Seraphim Sub Commander Gateway Unit Script
---#**
---#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/XSB0304/XSB0304_script.lua
+----**  Author(s):  Greg Kohne
+----**
+----**  Summary  :  Seraphim Sub Commander Gateway Unit Script
+----**
+----**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local SQuantumGateUnit = import('/lua/seraphimunits.lua').SQuantumGateUnit
 local EffectTemplates = import('/lua/EffectTemplates.lua')
 
+---@class XSB0304 : SQuantumGateUnit
 XSB0304 = Class(SQuantumGateUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         -- Place emitters at the center of the gateway.

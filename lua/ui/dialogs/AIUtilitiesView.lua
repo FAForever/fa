@@ -2,13 +2,14 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Combo = import('/lua/ui/controls/combo.lua').Combo
-local Window = import('/lua/maui/window.lua')
 local GameMain = import('/lua/ui/game/gamemain.lua')
-local Text = import('/lua/maui/text.lua').Text
 
 local sessionInfo = SessionGetScenarioInfo()
+local UpdateViewOfWindow
+local CloseWindow
+
+local TableGetN = table.getn
 
 local cachedSelection = { }
 cachedSelection.oldSelection = { }
@@ -126,7 +127,7 @@ function UpdateViewOfWindow()
     local parent = State.GUI.Combo
 
     -- get unit count
-    local count = table.getn(cachedSelection.newSelection) or 0
+    local count = TableGetN(cachedSelection.newSelection) or 0
 
     -- nope, no units
     if count == 0 then 
@@ -217,7 +218,7 @@ function OpenWindow()
         SPEW("Created AI utilities window")
 
         -- create the window
-        State.GUI = Window.CreateDefaultWindow(
+        State.GUI = UIUtil.CreateWindowStd(
             GetFrame(0), 
             "AI blueprint information", 
             false, 
@@ -301,3 +302,8 @@ function CloseWindow()
         State.GUI:Hide()
     end
 end
+
+-- kept for mod backwards compatibility
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Window = import('/lua/maui/window.lua')
+local Text = import('/lua/maui/text.lua').Text

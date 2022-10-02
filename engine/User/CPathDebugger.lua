@@ -1,8 +1,10 @@
---- Class CPathDebugger
--- @classmod User.CPathDebugger
+---@meta
+
+---@class moho.PathDebugger_methods : Destroyable
+local CPathDebugger = {}
 
 ---
---
-function CPathDebugger:moho.PathDebugger_methods()
+function CPathDebugger:Destroy()
 end
 
+return CPathDebugger

@@ -197,6 +197,9 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {
@@ -247,7 +250,6 @@ UnitBlueprint {
             RateOfFire = 0.05,
             RenderFireClock = true,
             SlavedToBody = false,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'EXPERIMENTAL MASSFABRICATION',
                 '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy
@@ -261,10 +263,9 @@ UnitBlueprint {
                 'TECH3 STRUCTURE',
                 'TECH3 MOBILE',
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.3, -- 1.1 - Satellite wobbles in orbit. This gives it a bit more lock on range for when it's circling
+            TargetRestrictDisallow = 'UNTARGETABLE', -- 1.1 - Satellite wobbles in orbit. This gives it a bit more lock on range for when it's circling
             TurretBoneMuzzle = 'Turret_Barrel_Muzzle',
             TurretBonePitch = 'Turret_Barrel01',
             TurretBoneYaw = 'Turret_Barrel01',

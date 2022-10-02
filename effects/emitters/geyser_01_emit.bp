@@ -19,8 +19,8 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
-	Texture = [[/textures/particles/geyser_01.dds]],
-	RampTexture = [[/textures/particles/ramp_yellow_01.dds]],
+	Texture = '/textures/particles/geyser_01.dds',
+	RampTexture = '/textures/particles/ramp_yellow_01.dds',
 	XDirectionCurve = {
 		XRange = 50.00,
 		Keys = {

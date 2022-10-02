@@ -546,11 +546,54 @@ Tooltips = {
         title = "<LOC tooltipui0129>Build Efficiency",
         description = "<LOC tooltipui0130>Your overall Economic Efficiency",
     },
-
+    -- **********************
+    -- ** Mass Fabs panel Strings
+    -- **********************
+    mf_mass_income_display = {
+        title = "<LOC tooltipui1000>Mass Income",
+        description = "<LOC tooltipui1001>Mass being generated with mass fabricators per second",
+    },
+    mf_energy_expense_display = {
+        title = "<LOC tooltipui1002>Energy Expense",
+        description = "<LOC tooltipui1003>Energy being spent with mass fabricators per second",
+    },
+    mf_active_amount = {
+        title = "<LOC tooltipui1004>Active mass fabricators",
+        description = "<LOC tooltipui1005>Amount of active mass fabricators",
+    },
+    mf_inactive_amount = {
+        title = "<LOC tooltipui1006>Inactive mass fabricators",
+        description = "<LOC tooltipui1007>Amount of inactive mass fabricators",
+    },
+    mf_energy_required = {
+        title = "<LOC tooltipui1008>Energy Required",
+        description = "<LOC tooltipui1009>Amount of required energy for mass fabricators to work",
+    },
 
     -- **********************
     -- ** Options Strings
     -- **********************
+
+    options_commands_ignore_mode = {
+        title = "Ignore mode",
+        description = "When enabled, ignore any other command but move commands when you hold left-ctrl. This can help to guarantee that you issue a move command, over (accidentally) starting a reclaim or attack command. \r\n\r\nThis is disabled when holding shift.",
+    },
+
+    options_selection_threshold_regular = {
+        title = "Default selection threshold",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This can help you select individual units or props, especially on displays with higher resolutions. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
+    options_selection_threshold_reclaim = {
+        title = "Default selection threshold",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when you are in reclaim mode. It makes it easier to hit all of your clicks, reducing the amount of fake reclaim orders. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
+    options_selection_threshold_replay = {
+        title = "Default selection threshold",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
     options_wheel_sensitivity = {
         title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
         description = "<LOC OPTIONS_0035>Sets the Zoom Speed when using the Mouse Wheel",
@@ -863,6 +906,10 @@ Tooltips = {
     Lobby_Mod_Option = {
         title = "<LOC tooltipui0668>Mods Enabled",
         description = "<LOC tooltipui0669>The host has enabled mods. Be sure to check the mod manager.",
+    },
+    Lobby_patchnotes = {
+        title = "<LOC tooltipui2000>Patchnotes",
+        description = "<LOC tooltipui2001>Access to all previous patch notes made by and for the community",
     },
     Lobby_Load = {
         title = "<LOC tooltipui0171>Load",
@@ -1547,6 +1594,42 @@ Tooltips = {
     dip_offer_draw = {
         title = "<LOC tooltipui0463>Propose Draw",
         description = "<LOC tooltipui0464>Propose ending the game in a draw.  All players must click this to accept.",
+    },
+    dip_recall_request = {
+        title = "<LOC tooltipui0722>Activate Recall Beacon",
+        description = "<LOC tooltipui0723>Signal to your allies that you are ready to recall from battle.",
+    },
+    dip_recall_request_dis_active = {
+        title = "<LOC tooltipui0724>Recall Beacon Active",
+        description = "<LOC tooltipui0725>Your team has been notified of your request to recall from battle.",
+    },
+    dip_recall_request_dis_scenario = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0727>You cannot recall from battle in this scenario.",
+    },
+    dip_recall_request_dis_gate = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0728>You cannot recall from battle within 5 minutes of gating in.",
+    },
+    dip_recall_request_dis_ai = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0729>There are AI armies on your team that will not recall.",
+    },
+    dip_recall_request_dis_request = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0730>You have sent a recall request too recently.",
+    },
+    dip_recall_request_dis_vote = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0731>Your team has had a recall vote too recently.",
+    },
+    dip_recall_request_accept = {
+        title = "<LOC tooltipui0732>Accept Recall Request",
+        description = "<LOC tooltipui0733>Accept the request for your team to recall from battle.",
+    },
+    dip_recall_request_veto = {
+        title = "<LOC tooltipui0734>Veto Recall Request",
+        description = "<LOC tooltipui0735>Veto the request for your team to recall from battle.",
     },
     dip_give_units = {
         title = "<LOC tooltipui0465>Give Units",

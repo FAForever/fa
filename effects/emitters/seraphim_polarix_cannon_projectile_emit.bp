@@ -7,6 +7,6 @@ TrailEmitterBlueprint {
     BlendMode = 1,
     TextureRepeatRate = 0.15,
     LODCutoff = 160,
-	RepeatTexture = [[/textures/particles/trail_ser_02.dds]],
-	RampTexture = [[/textures/particles/ramp_trail_18.dds]],
+	RepeatTexture = '/textures/particles/trail_ser_02.dds',
+	RampTexture = '/textures/particles/ramp_trail_18.dds',
 }

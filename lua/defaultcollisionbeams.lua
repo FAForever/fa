@@ -15,6 +15,7 @@ local Util = import('utilities.lua')
 -------------------------------
 --   Base class that defines supreme commander specific defaults
 -------------------------------
+---@class SCCollisionBeam : CollisionBeam
 SCCollisionBeam = Class(CollisionBeam) {
     FxImpactUnit = EffectTemplate.DefaultProjectileLandUnitImpact,
     FxImpactLand = {},-- EffectTemplate.DefaultProjectileLandImpact,
@@ -29,6 +30,7 @@ SCCollisionBeam = Class(CollisionBeam) {
 -------------------------------
 --   Ginsu COLLISION BEAM
 -------------------------------
+---@class GinsuCollisionBeam : SCCollisionBeam
 GinsuCollisionBeam = Class(SCCollisionBeam) {
     FxBeam = {'/effects/emitters/riot_gun_beam_01_emit.bp',
               '/effects/emitters/riot_gun_beam_02_emit.bp',},
@@ -46,6 +48,7 @@ GinsuCollisionBeam = Class(SCCollisionBeam) {
 ------------------------------------
 --   PARTICLE CANNON COLLISION BEAM
 ------------------------------------
+---@class ParticleCannonCollisionBeam : SCCollisionBeam
 ParticleCannonCollisionBeam = Class(SCCollisionBeam) {
     FxBeam = {
 		'/effects/emitters/particle_cannon_beam_01_emit.bp',
@@ -61,6 +64,7 @@ ParticleCannonCollisionBeam = Class(SCCollisionBeam) {
 ------------------------------------
 --   ZAPPER COLLISION BEAM
 ------------------------------------
+---@class ZapperCollisionBeam : SCCollisionBeam
 ZapperCollisionBeam = Class(SCCollisionBeam) {
     FxBeam = {'/effects/emitters/zapper_beam_01_emit.bp'},
     FxBeamEndPoint = {'/effects/emitters/cannon_muzzle_flash_01_emit.bp',
@@ -70,10 +74,12 @@ ZapperCollisionBeam = Class(SCCollisionBeam) {
 ------------------------------------
 --   QUANTUM BEAM GENERATOR COLLISION BEAM
 ------------------------------------
-QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
+--- used by CZAR
+---@class QuantumBeamGeneratorCollisionBeam : SCCollisionBeam
+QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { 
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
-        
+
     FxBeam = {'/effects/emitters/quantum_generator_beam_01_emit.bp'},
     FxBeamEndPoint = {
 		'/effects/emitters/quantum_generator_end_01_emit.bp',
@@ -87,10 +93,13 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
         '/effects/emitters/quantum_generator_02_emit.bp',
         '/effects/emitters/quantum_generator_04_emit.bp',
     },
-    
+
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.5,
 
+    ---@param self QuantumBeamGeneratorCollisionBeam
+    ---@param impactType string
+    ---@param targetEntity Unit | Projectile | Prop | nil
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -103,12 +112,14 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 
+    ---@param self QuantumBeamGeneratorCollisionBeam
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
     end,
 
+    ---@param self QuantumBeamGeneratorCollisionBeam
     ScorchThread = function(self)
         local army = self:GetArmy()
         local size = 3.5 + (Random() * 3.5) 
@@ -134,18 +145,19 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
             size = 3.2 + (Random() * 3.5)
             CurrentPosition = self:GetPosition(1)
         end
-    end,    
+    end,
 }
 
+---@class DisruptorBeamCollisionBeam : SCCollisionBeam
 DisruptorBeamCollisionBeam = Class(SCCollisionBeam) {
-    
+
     FxBeam = {'/effects/emitters/disruptor_beam_01_emit.bp'},
     FxBeamEndPoint = { 
         '/effects/emitters/aeon_commander_disruptor_hit_01_emit.bp', 
         '/effects/emitters/aeon_commander_disruptor_hit_02_emit.bp', 
     },
     FxBeamEndPointScale = 1.0,
-    
+
     FxBeamStartPoint = { 
         '/effects/emitters/aeon_commander_disruptor_flash_01_emit.bp', 
         '/effects/emitters/aeon_commander_disruptor_flash_02_emit.bp', 
@@ -153,8 +165,9 @@ DisruptorBeamCollisionBeam = Class(SCCollisionBeam) {
 
     
 }
-
-MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
+--- used by ML & cyb ACU
+---@class MicrowaveLaserCollisionBeam01 : SCCollisionBeam
+MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) {
 
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
@@ -164,6 +177,9 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.25,
 
+    ---@param self MicrowaveLaserCollisionBeam01
+    ---@param impactType string
+    ---@param targetEntity Unit | Projectile | Prop | nil
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -176,12 +192,14 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 
+    ---@param self MicrowaveLaserCollisionBeam01
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
     end,
 
+    ---@param self MicrowaveLaserCollisionBeam01
     ScorchThread = function(self)
         local army = self:GetArmy()
         local size = 1.5 + (Random() * 1.5) 
@@ -210,6 +228,7 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
     end,
 }
 
+---@class MicrowaveLaserCollisionBeam02 : MicrowaveLaserCollisionBeam01
 MicrowaveLaserCollisionBeam02 = Class(MicrowaveLaserCollisionBeam01) {
     TerrainImpactScale = 1,
     FxBeamStartPoint = EffectTemplate.CMicrowaveLaserMuzzle01,
@@ -217,8 +236,9 @@ MicrowaveLaserCollisionBeam02 = Class(MicrowaveLaserCollisionBeam01) {
     FxBeamEndPoint = EffectTemplate.CMicrowaveLaserEndPoint01,
 }
 
-
-PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
+---@class PhasonLaserCollisionBeam : SCCollisionBeam
+PhasonLaserCollisionBeam = Class(SCCollisionBeam) { 
+    -- used by GC
 
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
@@ -228,6 +248,9 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.25,
 
+    ---@param self PhasonLaserCollisionBeam
+    ---@param impactType string
+    ---@param targetEntity Unit | Projectile | Prop | nil
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -239,13 +262,15 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
         end
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
-    
+
+    ---@param self PhasonLaserCollisionBeam
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
     end,
 
+    ---@param self PhasonLaserCollisionBeam
     ScorchThread = function(self)
         local army = self:GetArmy()
         local size = 1.5 + (Random() * 1.5) 
@@ -274,8 +299,7 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
     end,
 }
 
-
-
+---@class TractorClawCollisionBeam : CollisionBeam
 TractorClawCollisionBeam = Class(CollisionBeam) {
     
     FxBeam = {EffectTemplate.ACollossusTractorBeam01},
@@ -287,7 +311,9 @@ TractorClawCollisionBeam = Class(CollisionBeam) {
 ------------------------------------
 --   QUANTUM BEAM GENERATOR COLLISION BEAM
 ------------------------------------
-ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit (big size though)
+--- unknown unit (big size though)
+---@class ExperimentalPhasonLaserCollisionBeam : SCCollisionBeam
+ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { 
 
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
@@ -297,6 +323,9 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
     SplatTexture = 'scorch_004_albedo',
     ScorchSplatDropTime = 0.1,
 
+    ---@param self ExperimentalPhasonLaserCollisionBeam
+    ---@param impactType string
+    ---@param targetEntity Unit | Projectile | Prop | nil
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -308,13 +337,15 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
         end
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
-    
+
+    ---@param self ExperimentalPhasonLaserCollisionBeam
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
     end,
 
+    ---@param self ExperimentalPhasonLaserCollisionBeam
     ScorchThread = function(self)
         local army = self:GetArmy()
         local size = 4.0 + (Random() * 1.0) 
@@ -341,7 +372,8 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
             CurrentPosition = self:GetPosition(1)
         end
     end,
-    
+
+    ---@param self ExperimentalPhasonLaserCollisionBeam
     CreateBeamEffects = function(self)
         SCCollisionBeam.CreateBeamEffects(self)
         for k, v in EffectTemplate.SExperimentalPhasonLaserBeam do
@@ -351,12 +383,12 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
         end
         -- local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), '/effects/emitters/seraphim_expirimental_laser_beam_02_emit.bp' )
 
-    end, 
+    end,
 }
 
-
-
-UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death energy ball
+---@class UnstablePhasonLaserCollisionBeam : SCCollisionBeam
+UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { 
+    -- ythota death energy ball
 
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
@@ -366,6 +398,9 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death ener
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.25,
 
+    ---@param self ExperimentalPhasonLaserCollisionBeam
+    ---@param impactType string
+    ---@param targetEntity Unit | Projectile | Prop | nil
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -378,12 +413,14 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death ener
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 
+    ---@param self ExperimentalPhasonLaserCollisionBeam
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
     end,
 
+    ---@param self ExperimentalPhasonLaserCollisionBeam
     ScorchThread = function(self)
         local army = self:GetArmy()
         local size = 1.5 + (Random() * 1.5) 
@@ -412,9 +449,8 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death ener
     end,
 }
 
-
-
 -- This is for sera destro and sera T2 point defense.
+---@class UltraChromaticBeamGeneratorCollisionBeam : SCCollisionBeam
 UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 
     TerrainImpactType = 'LargeBeam01',
@@ -425,6 +461,9 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.25,
 
+    ---@param self UltraChromaticBeamGeneratorCollisionBeam
+    ---@param impactType string
+    ---@param targetEntity Unit | Projectile | Prop | nil
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -436,13 +475,15 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
         end
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
-    
+
+    ---@param self UltraChromaticBeamGeneratorCollisionBeam
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
     end,
 
+    ---@param self UltraChromaticBeamGeneratorCollisionBeam
     ScorchThread = function(self)
         local army = self:GetArmy()
         local size = 1 + (Random() * 1) 
@@ -472,6 +513,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 }
 
 -- This is for sera destro and sera T2 point defense. (adjustment for ship muzzleflash)
+---@class UltraChromaticBeamGeneratorCollisionBeam02 : UltraChromaticBeamGeneratorCollisionBeam
 UltraChromaticBeamGeneratorCollisionBeam02 = Class(UltraChromaticBeamGeneratorCollisionBeam) {
 	FxBeamStartPoint = EffectTemplate.SUltraChromaticBeamGeneratorMuzzle02,
 }
@@ -479,7 +521,9 @@ UltraChromaticBeamGeneratorCollisionBeam02 = Class(UltraChromaticBeamGeneratorCo
 ------------------------------------
 --   HIRO LASER COLLISION BEAM
 ------------------------------------
-TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
+---@class TDFHiroCollisionBeam : CollisionBeam
+TDFHiroCollisionBeam = Class(CollisionBeam) { 
+    -- used by UEF battlecruser
 
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
@@ -489,6 +533,9 @@ TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.25,
 
+    ---@param self TDFHiroCollisionBeam
+    ---@param impactType string
+    ---@param targetEntity Unit | Projectile | Prop | nil
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -500,13 +547,15 @@ TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
         end
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
-    
+
+    ---@param self TDFHiroCollisionBeam
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
     end,
 
+    ---@param self TDFHiroCollisionBeam
     ScorchThread = function(self)
         local army = self:GetArmy()
         local size = 1.5 + (Random() * 1.5) 
@@ -535,14 +584,15 @@ TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
     end,
 }
 
-
 ------------------------------------
 --   ORBITAL DEATH LASER COLLISION BEAM
 ------------------------------------
-OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
+---@class OrbitalDeathLaserCollisionBeam : SCCollisionBeam
+OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { 
+    -- used by satellite
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
-        
+
     FxBeam = {'/effects/emitters/uef_orbital_death_laser_beam_01_emit.bp'},
     FxBeamEndPoint = {
 		'/effects/emitters/uef_orbital_death_laser_end_01_emit.bp',			-- big glow
@@ -562,14 +612,17 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
 		'/effects/emitters/uef_orbital_death_laser_muzzle_04_emit.bp',	-- small downward sparks
 		'/effects/emitters/uef_orbital_death_laser_muzzle_05_emit.bp',	-- big glow
     },
-    
+
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.5,
 
+    ---@param self OrbitalDeathLaserCollisionBeam
+    ---@param impactType string
+    ---@param targetEntity Unit | Projectile | Prop | nil
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
-                self.Scorching = self:ForkThread( self.ScorchThread )   
+                self.Scorching = self:ForkThread( self.ScorchThread )
             end
         else
             KillThread(self.Scorching)
@@ -577,13 +630,15 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
         end
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
-    
+
+    ---@param self OrbitalDeathLaserCollisionBeam
     OnDisable = function( self )
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
     end,
 
+    ---@param self OrbitalDeathLaserCollisionBeam
     ScorchThread = function(self)
         local army = self:GetArmy()
         local size = 3.5 + (Random() * 3.5) 
@@ -610,5 +665,5 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
             size = 3.2 + (Random() * 3.5)
             CurrentPosition = self:GetPosition(1)
         end
-    end,    
+    end,
 }

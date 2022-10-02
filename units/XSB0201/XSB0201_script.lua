@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB0201/UAB0201_script.lua
-#**  Author(s):  David Tomandl
-#**
-#**  Summary  :  Aeon Land Factory Tier 2 Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB0201/UAB0201_script.lua
+--**  Author(s):  David Tomandl
+--**
+--**  Summary  :  Aeon Land Factory Tier 2 Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SLandFactoryUnit = import('/lua/seraphimunits.lua').SLandFactoryUnit
 
+---@class XSB0201 : SLandFactoryUnit
 XSB0201 = Class(SLandFactoryUnit) {
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)

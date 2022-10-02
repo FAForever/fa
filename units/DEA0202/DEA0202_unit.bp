@@ -1,7 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 100,
-        GuardScanRadius = 80,
     },
     Air = {
         AutoLandTime = 1,
@@ -82,15 +81,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
+
     BuildIconSortPriority = 18,
     Categories = {
         'PRODUCTDL',
@@ -283,6 +274,11 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.4, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'UEAWeapon',
@@ -308,7 +304,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             ProjectileId = '/projectiles/TAARailgun03/TAARailgun03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             RackBones = {
@@ -330,19 +326,16 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Left_Muzzle',
             TurretBonePitch = 'Left_Muzzle',
             TurretBoneYaw = 'Left_Muzzle',
@@ -359,6 +352,11 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.4, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'UEAWeapon',
@@ -384,7 +382,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/TAARailgun03/TAARailgun03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
@@ -407,19 +405,11 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
-                'AIR MOBILE TECH3 BOMBER',
-                'AIR MOBILE BOMBER',
-                'AIR MOBILE GROUNDATTACK',
-                'AIR MOBILE TRANSPORTATION',
-                'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Right_Muzzle',
             TurretBonePitch = 'Right_Muzzle',
             TurretBoneYaw = 'Right_Muzzle',
@@ -463,10 +453,11 @@ UnitBlueprint {
             FiringRandomness = 0.1,
             FiringTolerance = 6,
             FixBombTrajectory = true,
+            DropBombShort = 0,
             InitialDamage = 20, -- Total impact damage = 400. Total overall damage = 1600
             Label = 'Bomb',
             MaxRadius = 60,
-            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 20,
             MuzzleVelocity = 0,
             NeedToComputeBombDrop = true,
@@ -491,13 +482,11 @@ UnitBlueprint {
             RateOfFire = 0.1,
             SkipReadyState = true,
             StopOnPrimaryWeaponBusy = true,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.25,
             TurretDualManipulators = false,
             TurretPitch = -90,
             TurretPitchRange = 20,

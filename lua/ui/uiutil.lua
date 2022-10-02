@@ -27,6 +27,8 @@ local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 local skins = import('/lua/skins/skins.lua').skins
 
+local Layouter = LayoutHelpers.LayoutFor
+
 
 --* Handy global variables to assist skinning
 buttonFont = LazyVar.Create()            -- default font used for button faces
@@ -245,6 +247,13 @@ function UpdateWorldBorderState(skin, isOn)
 
 end
 
+local currentSkinName = 'random'
+--- gets name of current skin that changes when calling SetCurrentSkin()
+--- returns 'random', 'uef', 'cybran', 'aeon', or 'seraphim'
+function GetCurrentSkinName()
+    return currentSkinName
+end
+
 --* skin control, sets the current skin table
 function SetCurrentSkin(skin, overrideTable)
     local skinTable = skins[skin]
@@ -253,6 +262,7 @@ function SetCurrentSkin(skin, overrideTable)
         skinTable = skins[skin]
     end
 
+    currentSkinName = skin -- updating name of current skin
     currentSkin:Set(skin)
 
     tooltipTitleColor:Set(skinTable.tooltipTitleColor)
@@ -495,6 +505,43 @@ function CreateText(parent, label, pointSize, font, dropshadow)
     return text
 end
 
+---@param parent Control
+---@param filename FileName
+---@return Bitmap
+function CreateBitmap(parent, filename)
+    return Bitmap(parent, UIFile(filename))
+end
+
+---@param parent Control
+---@param filename string
+---@return Bitmap
+function CreateBitmapStd(parent, filename)
+    return CreateBitmap(parent, filename .. "_bmp.dds")
+end
+
+---@param parent Control
+---@param color Color
+---@return Bitmap
+function CreateBitmapColor(parent, color)
+    local bitmap = Bitmap(parent)
+    bitmap:SetSolidColor(color)
+    return bitmap
+end
+
+---@param parent Control
+---@param filename FileName
+---@return Bitmap
+function CreateSkinnableBitmap(parent, filename)
+    return Bitmap(parent, SkinnableFile(filename))
+end
+
+---@param parent Control
+---@param filename string
+---@return Bitmap
+function CreateSkinnableBitmapStd(parent, filename)
+    return CreateSkinnableBitmap(parent, filename .. "_bmp.dds")
+end
+
 function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBack, fontFace, fontSize, charLimit)
     if charLimit then
         control:SetMaxChars(charLimit)
@@ -694,6 +741,22 @@ function CreateCheckbox(parent, texturePath, label, labelRight, labelSize, click
         SkinnableFile(texturePath .. 's_dis.dds'),
         label, labelRight, labelSize, clickCue, rollCue)
     return checkbox
+end
+
+---@param parent Control
+---@param position "l" | "t" | "r"
+---@return Checkbox
+function CreateCollapseArrow(parent, position)
+    local prefix = "/game/tab-" .. position .. "-btn/tab-"
+    local collapseArrow = Checkbox(parent,
+        SkinnableFile(prefix .. "close_btn_up.dds"),
+        SkinnableFile(prefix .. "open_btn_up.dds"),
+        SkinnableFile(prefix .. "close_btn_over.dds"),
+        SkinnableFile(prefix .. "open_btn_over.dds"),
+        SkinnableFile(prefix .. "close_btn_dis.dds"),
+        SkinnableFile(prefix .. "open_btn_dis.dds")
+    )
+    return collapseArrow
 end
 
 function CreateRadioButtonsStd(parent, texturePath, title, buttons, default)
@@ -1092,7 +1155,7 @@ function GetReplayId()
         id = GetFrontEndData('syncreplayid')
     elseif HasCommandLineArg("/savereplay") then
         -- /savereplay format is gpgnet://local_ip:port/replay_id/USERNAME.SCFAreplay
-        -- see https://github.com/FAForever/downlords-faf-client/blob/b819997b2c4964ae6e6801d5d2eecd232bca5688/src/main/java/com/faforever/client/fa/LaunchCommandBuilder.java#L192
+        -- see https://github.com/FAForever/downlords-faf-client/blob/b819997b2c4964ae6e6801d5d2eecd232bca5688/src/main/java/com/faforever/client/fa/LaunchCommandBuilder.java--L192
         local url = GetCommandLineArg("/savereplay", 1)[1]
         local fistpos = string.find(url, "/", 10) + 1
         local lastpos = string.find(url, "/", fistpos) - 1
@@ -1184,21 +1247,82 @@ function CreateWindowStd(parent, title, icon, pin, config, lockSize, lockPositio
 end
 
 function CreateAnnouncementStd(primary, secondary, control)
-
     -- make it originate from the top
-    if not control then 
+    if not control then
         local frame = GetFrame(0)
         control = Group(frame)
-        control.Left = function() return frame.Left() + 0.49 * frame.Right() end 
-        control.Right = function() return frame.Left() + 0.51 * frame.Right() end 
-        control.Top = frame.Top 
-        control.Bottom = frame.Top 
+        control.Left = function() return frame.Left() + 0.49 * frame.Right() end
+        control.Right = function() return frame.Left() + 0.51 * frame.Right() end
+        control.Top = frame.Top
+        control.Bottom = frame.Top
     end
 
     -- create the announcement accordingly
     import('/lua/ui/game/announcement.lua').CreateAnnouncement(
         primary,
         control,
-        secondary 
+        secondary
     )
+end
+
+
+---@param parent Control
+---@param filename FileName
+---@return Group
+function CreateVertFillGroup(parent, filename)
+    local group = Group(parent)
+    local top = CreateBitmap(group, filename .. "_bmp_t.dds")
+    local bottom = CreateBitmap(group, filename .. "_bmp_b.dds")
+    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
+
+    Layouter(top)
+        :Over(group, 0)
+        :AtLeftTopIn(group)
+
+    Layouter(bottom)
+        :Over(group, 0)
+        :AtLeftBottomIn(group)
+
+    Layouter(middle)
+        :Over(group, 0)
+        :AtLeftIn(group)
+        :Top(function() return top.Bottom() - 2 end)
+        :AnchorToTop(bottom)
+
+    group.Width:Set(top.Width)
+    group._top = top
+    group._middle = middle
+    group._bottom = bottom
+    return group
+end
+
+
+---@param parent Control
+---@param filename FileName
+---@return Group
+function CreateHorzFillGroup(parent, filename)
+    local group = Group(parent)
+    local left = CreateBitmap(group, filename .. "_bmp_l.dds")
+    local right = CreateBitmap(group, filename .. "_bmp_r.dds")
+    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
+
+    Layouter(left)
+        :Over(group, 0)
+        :AtLeftTopIn(group)
+
+    Layouter(right)
+        :Over(group, 0)
+        :AtRightTopIn(group)
+
+    Layouter(middle)
+        :Over(group, 0)
+        :AtTopIn(group)
+        :Left(function() return left.Right() - 2 end)
+        :AnchorToLeft(right)
+
+    group.Height:Set(right.Height)
+    group._left = left
+    group._middle = middle
+    group._right = right
+    return group
 end

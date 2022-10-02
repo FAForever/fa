@@ -3,6 +3,6 @@ BeamBlueprint {
     TextureName = '/textures/particles/beam_missile_exhaust_04.dds',
     Length = -0.5,
     Thickness = 0.25,
-    StartColor = {x=0.75,y=1,z=1,w=0}, # R,G,B,A
-    EndColor = {x=0.75,y=1,z=1,w=0}, # R,G,B,A
+    StartColor = {x=0.75,y=1,z=1,w=0}, -- R,G,B,A
+    EndColor = {x=0.75,y=1,z=1,w=0}, -- R,G,B,A
 }

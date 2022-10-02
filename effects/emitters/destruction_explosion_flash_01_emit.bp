@@ -18,8 +18,8 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
-	Texture = [[/textures/particles/sparkle_white_add_02.dds]],
-	RampTexture = [[/textures/particles/ramp_white_02.dds]],
+	Texture = '/textures/particles/sparkle_white_add_02.dds',
+	RampTexture = '/textures/particles/ramp_white_02.dds',
 	XDirectionCurve = {
 		XRange = 1.00,
 		Keys = {

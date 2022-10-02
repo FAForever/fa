@@ -1,53 +1,52 @@
---- Class ReconBlip
--- @classmod Sim.ReconBlip
+---@meta
+
+---@class moho.blip_methods : moho.entity_methods
+local ReconBlip = {}
 
 ---
---  unit = ReconBlip:GetSource()
+---@return UnitBlueprint
+function ReconBlip:GetBlueprint()
+end
+
+--- Returns the unit, even for blips that are part of jamming / spoofing
+---@return Unit
 function ReconBlip:GetSource()
 end
 
----
---  bool = ReconBlip:IsKnownFake()
+--- Does not appear to function
+---@deprecated
+---@return boolean
 function ReconBlip:IsKnownFake()
 end
 
 ---
---  bool = ReconBlip:IsMaybeDead()
+---@return boolean
 function ReconBlip:IsMaybeDead()
 end
 
 ---
---  bool = ReconBlip:IsOnOmni()
+---@return boolean
 function ReconBlip:IsOnOmni()
 end
 
 ---
---  bool = ReconBlip:IsOnRadar()
+---@return boolean
 function ReconBlip:IsOnRadar()
 end
 
 ---
---  bool = ReconBlip:IsOnSonar()
+---@return boolean
 function ReconBlip:IsOnSonar()
 end
 
 ---
---  bool = ReconBlip:IsSeenEver()
+---@return boolean
 function ReconBlip:IsSeenEver()
 end
 
 ---
---  bool = ReconBlip:IsSeenNow()
+---@return boolean
 function ReconBlip:IsSeenNow()
 end
 
----
---  derived from Entity
-function ReconBlip:base()
-end
-
----
---
-function ReconBlip:moho.blip_methods()
-end
-
+return ReconBlip

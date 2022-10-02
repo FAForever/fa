@@ -1,14 +1,15 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/URB5103/URB5103_script.lua
---#**  Author(s):  John Comes, David Tomandl
---#**
---#**  Summary  :  Cybran Quantum Gate Beacon Unit
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/URB5103/URB5103_script.lua
+----**  Author(s):  John Comes, David Tomandl
+----**
+----**  Summary  :  Cybran Quantum Gate Beacon Unit
+----**
+----**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 
+---@class URB5103 : CStructureUnit
 URB5103 = Class(CStructureUnit) {
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
     FxTransportBeaconScale = 1,

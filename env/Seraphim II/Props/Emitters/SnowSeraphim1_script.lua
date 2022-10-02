@@ -1,6 +1,6 @@
-#
-# LavaSteam01
-#
+--
+-- LavaSteam01
+--
 BlowingSnow01 = Class(import('/lua/sim/Prop.lua').Prop) {
 
     OnCreate = function(self)

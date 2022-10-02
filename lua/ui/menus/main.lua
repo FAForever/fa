@@ -22,7 +22,7 @@ local GetVersion = import('/lua/version.lua').GetVersion
 local mapErrorDialog = false
 
 local TOOLTIP_DELAY = 1
-local menuFontColor = 'feff77' --'FFbadbdb' (default grey-blue) #feff77 (light yellow) #edd570 (gold)
+local menuFontColor = 'feff77' --'FFbadbdb' (default grey-blue) --feff77 (light yellow) --edd570 (gold)
 local menuFontColorTitle = 'EEEEEE'
 local menuFontColorAlt = 'feff77' --currently the same as menuFontColor
 
@@ -149,11 +149,6 @@ function CreateUI()
     -- BACKGROUND
     local parent = UIUtil.CreateScreenGroup(GetFrame(0), "Main Menu ScreenGroup")
 
-    local backMovie = false
-    if Prefs.GetOption("mainmenu_bgmovie") then
-        backMovie = CreateBackMovie(parent)
-    end
-
     local darker = Bitmap(parent)
     LayoutHelpers.FillParent(darker, parent)
     darker:SetSolidColor('200000')
@@ -213,12 +208,25 @@ function CreateUI()
         self.Left:Set(newLeft)
     end
 
-    -- music
-    local ambientSoundHandle = PlaySound(Sound({Cue = "AMB_Menu_Loop", Bank = "AmbientTest",}))
+    -- ambient
+    local ambientSoundHandle = false
+    function StartAmbient()
+        if not ambientSoundHandle and not HasCommandLineArg("/nomovie") then
+            ambientSoundHandle = PlaySound(Sound({Cue = "AMB_Menu_Loop", Bank = "AmbientTest",}))
+        end
+    end
 
+    function StopAmbient()
+        if ambientSoundHandle then
+            StopSound(ambientSoundHandle)
+            ambientSoundHandle = false
+        end
+    end
+
+    -- music
     local musicHandle = false
     function StartMusic()
-        if not musicHandle then
+        if not musicHandle and not HasCommandLineArg("/nomusic") then
             musicHandle = PlaySound(Sound({Cue = "Main_Menu", Bank = "Music",}))
         end
     end
@@ -231,13 +239,15 @@ function CreateUI()
     end
 
     parent.OnDestroy = function()
-        if ambientSoundHandle then
-            StopSound(ambientSoundHandle)
-            ambientSoundHandle = false
-        end
+        StopAmbient()
         StopMusic()
     end
 
+    local backMovie = false
+    if Prefs.GetOption("mainmenu_bgmovie") then
+        backMovie = CreateBackMovie(parent)
+        StartAmbient()
+    end
     StartMusic()
 
     -- TOP-LEVEL GROUP TO PARENT ALL DYNAMIC CONTENT
@@ -338,7 +348,7 @@ function CreateUI()
         LayoutHelpers.AtHorizontalCenterIn(mainMenu.titleBack, mainMenuGroup)
         LayoutHelpers.AtTopIn(mainMenu.titleBack, mainMenuGroup, 0)
 
-        mainMenu.titleTxt = UIUtil.CreateText(mainMenu.titleBack, GetPreference("profile.current"), 26)
+        mainMenu.titleTxt = UIUtil.CreateText(mainMenu.titleBack, "", 26)
         LayoutHelpers.AtCenterIn(mainMenu.titleTxt, mainMenu.titleBack, 3)
         mainMenu.titleTxt:SetText(LOC(menuTable.title))
         mainMenu.titleTxt:SetNewColor(menuFontColorTitle)
@@ -759,11 +769,14 @@ function CreateUI()
         if Prefs.GetOption("mainmenu_bgmovie") and not backMovie then
             backMovie = CreateBackMovie(parent)
             darker.Depth:Set(function() return backMovie.Depth() + 10 end)
+            StartAmbient()
         elseif Prefs.GetOption("mainmenu_bgmovie") == false and backMovie then
             backMovie:Destroy()
             backMovie = false
+            StopAmbient()
         elseif backMovie then
             backMovie:Play()
+            StartAmbient()
         end
         MenuAnimation(true)
     end

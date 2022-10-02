@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardScanRadius = 26, -- allows for factory reclaim bug 
         TargetBones = {
             'Turret',
         },
@@ -75,6 +76,7 @@ UnitBlueprint {
         'BUILTBYTIER3FACTORY',
         'UEF',
         'MOBILE',
+        'AMPHIBIOUS',
         'LAND',
         'TECH1',
         'CONSTRUCTION',
@@ -285,7 +287,7 @@ UnitBlueprint {
     SelectionThickness = 0.95,
     SizeX = 0.7,
     SizeY = 0.8,
-    SizeZ = 0.9, #from 0.6
+    SizeZ = 0.9, --from 0.6
     StrategicIconName = 'icon_land1_engineer',
     StrategicIconSortPriority = 105,
     Wreckage = {
@@ -297,9 +299,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

@@ -1,8 +1,10 @@
---- Class CMauiLuaDragger
--- @classmod User.CMauiLuaDragger
+---@meta
+
+---@class moho.dragger_methods : Destroyable
+local CMauiLuaDragger = {}
 
 ---
---
-function CMauiLuaDragger:moho.dragger_methods()
+function CMauiLuaDragger:Destroy()
 end
 
+return  CMauiLuaDragger

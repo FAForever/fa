@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 30,
+        GuardScanRadius = 30, -- allow mobile shield to keep a distance when on attack move
     },
     Audio = {
         AmbientMove = Sound {
@@ -37,15 +37,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'UEF_Select_Vehicle',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
         },
     },
     BuildIconSortPriority = 110,
@@ -257,12 +248,10 @@ UnitBlueprint {
                 },
             },
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.2,
             Turreted = false,
             SlavedToBody = false,
         },

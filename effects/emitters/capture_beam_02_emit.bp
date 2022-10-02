@@ -3,8 +3,8 @@ BeamBlueprint {
     TextureName = '/textures/particles/beam_data_01.dds',
     Thickness = 0.05,
     Blendmode = 3.00,    
-    StartColor = {x=0.5,y=0.5,z=1,w=0.3}, # R,G,B,A
-    EndColor = {x=0.5,y=0.5,z=1,w=0.3}, # R,G,B,A
+    StartColor = {x=0.5,y=0.5,z=1,w=0.3}, -- R,G,B,A
+    EndColor = {x=0.5,y=0.5,z=1,w=0.3}, -- R,G,B,A
     Length = 8,
     RepeatRate = 0.25,
     UShift = 0.0,
