@@ -2088,10 +2088,11 @@ VERTEXNORMAL_VERTEX CommandFeedbackVS(
 ///
 
 const float PI = 3.14159265359;
+const float EU = 2.71828;
 
-float3 PBR_FresnelShlick(float hDotN, float3 F0)
+float3 PBR_FresnelSchlick(float hDotN, float3 F0)
 {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - hDotN, 0.0, 1.0), 5.0);
+    return F0 + (1.0 - F0) * pow(1.0 - hDotN, 5.0);
 }
 
 float PBR_Distribution(float3 n, float3 h, float roughness)
@@ -2104,7 +2105,7 @@ float PBR_Distribution(float3 n, float3 h, float roughness)
     float nDotH2 = nDotH*nDotH;
 
     float num = a2;
-    float denom = (nDotH2 * (a2 - 1.0) + 1.0);
+    float denom = nDotH2 * (a2 - 1.0) + 1.0;
     denom = PI * denom * denom;
 
     return num / denom;
@@ -2131,42 +2132,37 @@ float PBR_GeometrySmith(float3 n, float3 v, float3 l, float roughness)
     return gs1 * gs2;
 }
 
-float4 PBR_PS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+float logisticFn(float x, float x0, float k, float L)
+{
+    float denom = 1 + pow(EU, -k * (x-x0));
+    return L / denom;
+}
+
+float4 PBR_PS(
+    NORMALMAPPED_VERTEX vertex,
+    float3 albedo,
+    float metallic,
+    float roughness,
+    float ao,
+    uniform bool hiDefShadows
+) : COLOR0
 {
     float3 p = vertex.position.xyz;
     float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
     float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float3 v = vertex.viewDirection;
-    float3 albedo = tex2D(albedoSampler, vertex.texcoord0.xy);
-    float4 spec = tex2D(specularSampler, vertex.texcoord0.xy);
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, n));
     float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
 
-    ///////////////////////////////
-    // Remap base game parameters
-    //
-    float gamma = 2.2;
-
-    // the alpha channel of specular map is used for team colors
-    albedo.rgb = 3.5 * lerp(vertex.color.rgb, albedo, 1 - spec.a * 2.5);
-    albedo.rgb = pow(albedo, gamma);
-
-    float roughness = lerp(.6, .2, spec.a * 2.4);
-
-    float planeCockpitMask = saturate((spec.r - 0.6) * 2.5);
-    float metallic = saturate(1 - 5.4 * spec.a - planeCockpitMask);
-
-    float ao = 1;
-    float3 ambient = pow(sunAmbient, gamma) * ao * .1;
+/*     float3 ambient = pow(sunAmbient, gamma) * ao * .1;
     ambient += pow(shadowFill, gamma) * .1;
-    ambient *= lightMultiplier;
+    ambient *= lightMultiplier; */
+    float ambient = (sunAmbient + shadowFill) * ao * .25;
 
-    environment = pow(environment, gamma) * .1;
-    environment += ambient;
+    environment *= .5;
 
-    float alphaGlow = spec.b;
-
-    float3 sunLight = pow(sunDiffuse, gamma) * shadow * lightMultiplier;
+    //float3 sunLight = pow(sunDiffuse, gamma) * shadow * lightMultiplier;
+    float3 sunLight = float3(1.5,1.5,1.5) * shadow;
 
     //////////////////////////////
     // Compute outgoing radiance
@@ -2183,33 +2179,33 @@ float4 PBR_PS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
         float3 h = normalize(v + l);
 
         // Cook-Torrance BRDF
-        float3 F = PBR_FresnelShlick(max(dot(h, v), 0.0), F0);
+        float3 F = PBR_FresnelSchlick(max(dot(h, v), 0.0), F0);
         float NDF = PBR_Distribution(n, h, roughness);
         float G = PBR_GeometrySmith(n, v, l, roughness);
 
         float3 numerator = NDF * G * F;
         // add 0.0001 to avoid division by zero
         float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.0001;
-        float3 specular = numerator / denominator;  
+        float3 reflected = numerator / denominator;
         
-        // Reflectance
-        float3 kS = F;
-        float3 kD = float3(1.0, 1.0, 1.0) - kS;
+        float3 kD = float3(1.0, 1.0, 1.0) - F;
         kD *= 1.0 - metallic;	
 
-        float nDotL = max(dot(n, l), 0.0);        
-        float3 L0 = (kD * albedo / PI + specular) * incomingRadiance * nDotL;
-        color += L0;
+        float3 refracted = kD * albedo / PI;
+        float lambert = incomingRadiance * max(dot(n, l), 0.0);
+        color += (refracted + reflected) * lambert;
     }
+
+    color += ambient * albedo;
 
     //////////////////////////////////
     // Apply gamma & HDR correction
     //
-    color = color / (color + float3(1.0, 1.0, 1.0));
-    float fr = 1 / gamma;
-    color = pow(color, float3(fr, fr, fr));
+    //color = color / (color + float3(1.0, 1.0, 1.0));
+/*     float fr = 1 / gamma;
+    color = pow(color, float3(fr, fr, fr)); */
 
-    return float4(color, alphaGlow);
+    return float4(color.rgb, 0);
 }
 
 /// DepthPS
@@ -2425,7 +2421,37 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
                        uniform int alphaFunc,
                        uniform int alphaRef ) : COLOR0
 {
-    return PBR_PS(vertex, hiDefShadows);
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float dotLightNormal = dot(sunDirection,normal);
+
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
+    if ( maskAlbedo )
+        albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    else
+        albedo.rgb = albedo.rgb * vertex.color.rgb;
+
+    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+    float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 2) * specular.g;
+    float3 phongMultiplicative = float3( 2 * environment * specular.r);
+
+    float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
+
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
+
+    float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
+
+#ifdef DIRECT3D10
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+#endif
+    return float4( color.rgb, alpha );
 }
 
 /// NomadsNormalMappedPS
@@ -2488,7 +2514,40 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
                        uniform int alphaFunc,
                        uniform int alphaRef ) : COLOR0
 {
-    return PBR_PS(vertex, hiDefShadows);
+    if (1 == mirrored) clip(vertex.depth.x);
+
+    float4 albedo = tex2D(albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D(specularSampler, vertex.texcoord0.xy);
+
+    // the alpha channel of specular map is used for team colors
+    if ( maskAlbedo )
+        albedo.rgb = lerp(vertex.color.rgb, albedo.rgb, 1 - specular.a);
+    else
+        albedo.rgb = albedo.rgb * vertex.color.rgb;
+    // try to counteract the baked in shading of the original supcom albedos
+    // there's technically not supposed to be any shading in PBR albedos, just surface color
+    float x = length(albedo.rgb) / sqrt(3);
+    float mult = 1.5-(log2(2*x+.1)/2);
+    albedo.rgb *= mult;
+
+    //float planeCockpitMask = saturate((specular.r - 0.6) * 2.5);
+    //float metallic = saturate(1 - 5.4 * specular.a - planeCockpitMask);
+    float metallic = pow(specular.r, 1/8);
+
+    float roughness = 1 - pow(specular.g, 1.0/2.0);
+    // Value range:
+    //   dielectrics: 0.15-1.0
+    //   metals: 0.3-0.5
+    float mLow = .3;
+    float mHigh = .5;
+    roughness = lerp(roughness, mLow + roughness * (mHigh - mLow), metallic);
+
+    float ao = 1;
+
+    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
+
+    float alphaGlow = mirrored ? 0.5 : (glow ? (specular.b + glowMinimum) : (vertex.material.g * albedo.a));
+    return float4(color.rgb, alphaGlow);
 }
 
 /// MapImagerPS0
@@ -2888,6 +2947,7 @@ float4 AeonPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 //NewAeonPS
 float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
+    //return PBR_PS(vertex, false, false, hiDefShadows);
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
@@ -3019,6 +3079,7 @@ float4 UnitFalloffPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : C
 //New SeraPS
 float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
+    //return PBR_PS(vertex, false, false, hiDefShadows);
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
