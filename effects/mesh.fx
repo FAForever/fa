@@ -2192,7 +2192,7 @@ float4 PBR_PS(
         kD *= 1.0 - metallic;	
 
         float3 refracted = kD * albedo / PI;
-        float lambert = incomingRadiance * max(dot(n, l), 0.0);
+        float3 lambert = incomingRadiance * max(dot(n, l), 0.0);
         color += (refracted + reflected) * lambert;
     }
 
