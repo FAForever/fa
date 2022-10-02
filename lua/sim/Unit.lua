@@ -104,6 +104,7 @@ local cUnit = moho.unit_methods
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
+---@field Blueprint UnitBlueprint
 Unit = Class(moho.unit_methods) {
 
     Weapons = {},

@@ -363,7 +363,10 @@ keyActions = {
     ['filter_highest_engineer_and_assist'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
         category = 'selection', order = 9,},
 
-    ['select_all_radars'] = {action = 'UI_SelectByCategory (RADAR + OMNI) * STRUCTURE',
+    ['select_all_radars'] = {action = 'UI_SelectByCategory INTELLIGENCE STRUCTURE RADAR, INTELLIGENCE STRUCTURE OMNI',
+        category = 'selection', order = 9,},
+
+    ['load_into_transports'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports()',
         category = 'selection', order = 9,},
 
     ['select_all_idle_eng_onscreen'] = {action = 'UI_SelectByCategory +inview +idle ENGINEER',

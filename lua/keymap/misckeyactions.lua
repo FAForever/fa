@@ -453,3 +453,17 @@ function SelectHighestEngineerAndAssist()
         end
     end
 end
+
+function LoadIntoTransports()
+
+    local selection = GetSelectedUnits()
+    if selection then
+
+        local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
+        local others = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
+        if transports[1] and others[1] then
+            SimCallback({Func= 'LoadIntoTransports', Args = { }}, true)
+            SelectUnits(transports)
+        end
+    end
+end
