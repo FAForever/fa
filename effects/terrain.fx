@@ -1770,7 +1770,7 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
 
     // load in utility map
     float4 properties = tex2D(UpperAlbedoSampler, coords.xz);
-    float shadowSample = 2 * (1 - properties.x); //0.75 + 0.25 * (1 - properties.x);
+    float shadowSample = (1 - properties.x); //0.75 + 0.25 * (1 - properties.x);
     float ambientSample = properties.y;
 
     float4 albedo = lowerAlbedo;
