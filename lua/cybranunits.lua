@@ -604,22 +604,22 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     OnPaused = function(self)
+        StructureUnit.OnPaused(self)
         if not self.Dead and self:GetFractionComplete() == 1 then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StopArmsMoving()
         end
-        StructureUnit.OnPaused(self)
     end,
 
     ---@param self CSeaFactoryUnit
     OnUnpaused = function(self)
+        StructureUnit.OnUnpaused(self)
         if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') and self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
             self:StartBuildingEffects(self.UnitBeingBuilt)
             self:StartArmsMoving()
         end
-        StructureUnit.OnUnpaused(self)
     end,
 
     ---@param self CSeaFactoryUnit
