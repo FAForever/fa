@@ -28,7 +28,7 @@
 ---@field DummyWeapon boolean          This instructs the engine not to create a C++ weapon object that is usually linked with the script object. This is for purely script driven weapons (like death weapons).
 ---@field EnergyDrainPerSecond number  How much energy this weapon will drain per second
 ---@field EnergyRequired number        How much energy is required to fire this weapon
----@field FireTargetLayerCapsTable table<LayerName, FireTargetCategory>  FireTargetLayerCapsTable allows you to pick which layers you can target in relation to the layer that you are currently at
+---@field FireTargetLayerCapsTable table<Layer, FireTargetCategory>  FireTargetLayerCapsTable allows you to pick which layers you can target in relation to the layer that you are currently at
 ---@field FiringRandomness number    How much random inaccuracy should we be from the target
 ---@field FiringTolerance number     How much misalignment can the barrel be before starting to fire. Used when you are trying to target ammo that does not require lots of accuracy due to the size of their damage radius or because the ammo does automatic targetting
 ---@field HeadingArcCenter number    Controls what the weapon is allowed to target in reference to the heading of the unit

@@ -1,6 +1,6 @@
 ---@meta
 
----@class moho.IEffect
+---@class moho.IEffect : Destroyable
 local IEffect = {}
 
 ---@alias IEffectBeamParameters

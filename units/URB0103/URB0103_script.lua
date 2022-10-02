@@ -18,7 +18,6 @@ URB0103 = Class(CSeaFactoryUnit) {
             self.ArmSlider = CreateSlider(self, 'Right_Arm03')
             self.Trash:Add(self.ArmSlider)
         end
-        
     end,
 
     MovingArmsThread = function(self)
@@ -35,6 +34,8 @@ URB0103 = Class(CSeaFactoryUnit) {
     
     StopArmsMoving = function(self)
         CSeaFactoryUnit.StopArmsMoving(self)
+        if not self.ArmSlider then return end
+
         self.ArmSlider:SetGoal(0, 0, 0)
         self.ArmSlider:SetSpeed(40)
     end,

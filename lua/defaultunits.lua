@@ -754,7 +754,7 @@ FactoryUnit = Class(StructureUnit) {
             end
         end
 
-        self.DestroyUnitBeingBuilt(self)
+        self:DestroyUnitBeingBuilt()
     end,
 
     ---@param self FactoryUnit
@@ -1403,7 +1403,7 @@ RadarJammerUnit = Class(StructureUnit) {
         StructureUnit.OnIntelEnabled(self)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
-            self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
+            self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             self.IntelFxOn = true
         end
     end,
@@ -1895,7 +1895,7 @@ AirUnit = Class(MobileUnit) {
         -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
         -- It also wouldn't call this code, and hence the cargo destruction. Awful!
         if self:GetFractionComplete() == 1 and (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
-            self.CreateUnitAirDestructionEffects(self, 1.0)
+            self:CreateUnitAirDestructionEffects(1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
             self.OverKillRatio = overkillRatio

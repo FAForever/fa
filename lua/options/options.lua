@@ -73,12 +73,12 @@ optionsOrder = {
 
 local Prefs = import('/lua/user/prefs.lua')
 local SetMusicVolume = import('/lua/UserMusic.lua').SetMusicVolume
-local savedMasterVol = false
-local savedFXVol = false
-local savedMusicVol = false
-local savedVOVol = false
+local savedMasterVol = nil
+local savedFXVol = nil
+local savedMusicVol = nil
+local savedVOVol = nil
 local nomusicSwitchSet = HasCommandLineArg("/nomusic")
-local savedBgMovie = false
+local savedBgMovie = nil
 local noMovieSwitchSet = HasCommandLineArg("/nomovie")
 
 function PlayTestSound()
@@ -86,7 +86,7 @@ function PlayTestSound()
     PlaySound(sound)
 end
 
-local voiceHandle = false
+local voiceHandle = nil
 function PlayTestVoice()
     if not voiceHandle then
         local sound = Sound{ Bank = 'XGG', Cue = 'Computer_Computer_MissileLaunch_01351' }
@@ -361,6 +361,30 @@ options = {
                     states = {
                         {text = "<LOC _Off>", key = 'off'},
                         {text = "<LOC _On>", key = 'on'},
+                    },
+                },
+            },
+
+            {
+                title = 'Cursor features',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "Depth scanning",
+                key = 'cursor_depth_scanning',
+                type = 'toggle',
+                default = 'commands',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _OnlyWhenBuilding>Only when building", key = 'building' },
+                        {text = "<LOC _CommandMode>When you issue commands", key = 'commands' },
+                        {text = "<LOC _Always>Always", key = 'always' },
                     },
                 },
             },
@@ -897,36 +921,6 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0275>Maximum Reclaim Label Count",
-                tip = "<LOC OPTIONS_0276>When showing the reclaim label overlay, no more than this many labels will be shown",
-                key = 'maximum_reclaim_count',
-                type = 'slider',
-                set = function(key, value, startup)
-                    import('/lua/ui/game/reclaim.lua').updateMaxLabels(value)
-                end,
-                default = 1000,
-                custom = {
-                    min = 500,
-                    max = 5000,
-                    inc = 500,
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0277>Minimum Reclaim Label Amount",
-                tip = "<LOC OPTIONS_0278>When showing the reclaim label overlay, items with mass values less than this won't be shown",
-                key = 'minimum_reclaim_amount',
-                type = 'slider',
-                set = function(key, value, startup)
-                    import('/lua/ui/game/reclaim.lua').updateMinAmount(value)
-                end,
-                default = 10,
-                custom = {
-                    min = 10,
-                    max = 300,
-                    inc = 10,
-                },
-            },
-            {
                 title = "<LOC OPTIONS_0281>Hotkey Labels",
                 key = 'show_hotkeylabels',
                 type = 'toggle',
@@ -1171,7 +1165,7 @@ options = {
 
                     aaoptions = GetAntiAliasingOptions()
 
-                    aamax = 0
+                    aahigh = 0
                     aamed = 0
                     if 0 < table.getn(aaoptions) then
                         aahigh = aaoptions[table.getn(aaoptions)]

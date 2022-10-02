@@ -107,21 +107,21 @@ Tree = Class(Prop) {
             elseif type == 'Nuke' and canBurn then
                 -- slight chance we catch fire
                 if Random(1, 250) < 5 then
-                    self.Burn(self)
+                    self:Burn()
                 end
 
             elseif (type == 'Fire' or type == 'TreeFire') and canBurn then 
 
                 -- fire type damage, slightly higher odds to catch fire
                 if Random(1, 35) <= 2 then
-                    self.Burn(self)
+                    self:Burn()
                 end
             end
             
             if (type ~= 'Force') and (type ~= 'Fire') and canBurn and canFall then 
                 -- any damage type but force can cause a burn
                 if Random(1, 20) <= 1 then
-                    self.Burn(self)
+                    self:Burn()
                 end
             end
         end
@@ -207,8 +207,8 @@ Tree = Class(Prop) {
         effect = CreateLightParticleIntel( self, -1, -1, 1.5, 10, 'glow_03', 'ramp_flare_02' )
 
         -- sounds
-        self.PlayPropSound(self, 'BurnStart')
-        self.PlayPropAmbientSound(self, 'BurnLoop')
+        self:PlayPropSound('BurnStart')
+        self:PlayPropAmbientSound('BurnLoop')
 
         -- wait a bit before we change to a scorched tree
         WaitTicks(50 + Random(0, 10))
@@ -238,7 +238,7 @@ Tree = Class(Prop) {
         DamageArea(self, position, 1, 1, 'TreeFire', true)
 
         -- stop all sound
-        self.PlayPropAmbientSound(self, nil)
+        self:PlayPropAmbientSound(nil)
 
         -- destroy all effects
         for k = 1, effectsHead - 1 do 
@@ -254,7 +254,7 @@ Tree = Class(Prop) {
         -- fall down in a random direction if we didn't before
         if not self.Fallen then 
             self.Fallen = true
-            self.FallThread(self, Random() * 2 - 1, 0, Random() * 2 - 1, 0.25)
+            self:FallThread(Random() * 2 - 1, 0, Random() * 2 - 1, 0.25)
         end
     end,
 }

@@ -103,6 +103,7 @@ local cUnit = moho.unit_methods
 ---@field Army Army
 ---@field UnitId UnitId
 ---@field EntityId EntityId
+---@field EventCallbacks table<string, function[]>
 Unit = Class(moho.unit_methods) {
 
     Weapons = {},
@@ -337,6 +338,10 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- Returns 4 numbers: skirt x0, skirt z0, skirt.x1, skirt.z1
     ---@param self Unit
+    ---@return number x0
+    ---@return number z0
+    ---@return number x1
+    ---@return number z1
     GetSkirtRect = function(self)
         local x, y, z = self:GetPositionXYZ()
         local fx = x - self.Footprint.SizeX * .5
@@ -378,7 +383,7 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     ---@param fn function
     ---@param ... any
-    ---@return thread
+    ---@return thread | nil
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -2051,7 +2056,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Flying bits of metal and whatnot. More bits for more overkill.
         if self.ShowUnitDestructionDebris and overkillRatio then
-            self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
+            self:CreateUnitDestructionDebris(true, true, overkillRatio > 2)
         end
 
         if shallSink then
@@ -2323,7 +2328,7 @@ Unit = Class(moho.unit_methods) {
     GetWeaponByLabel = function(self, label)
 
         -- if we're sinking then all death weapons should already have been applied
-        if self.Sinking or self.BeenDestroyed(self) then 
+        if self.Sinking or self:BeenDestroyed() then 
             return nil
         end
 
@@ -4959,8 +4964,8 @@ Unit = Class(moho.unit_methods) {
     ---@param position Vector Location where the missile got intercepted
     OnMissileIntercepted = function(self, target, defense, position)
         -- try and run callbacks
-        if self.Callbacks['OnMissileIntercepted'] then
-            for k, callback in self.Callbacks['OnMissileIntercepted'] do
+        if self.EventCallbacks['OnMissileIntercepted'] then
+            for k, callback in self.EventCallbacks['OnMissileIntercepted'] do
                 local ok, msg = pcall(callback, target, defense, position)
                 if not ok then
                     WARN("OnMissileIntercepted callback triggered an error:")
@@ -4978,8 +4983,8 @@ Unit = Class(moho.unit_methods) {
     ---@param position Vector Location where the missile hit the shield
     OnMissileImpactShield = function(self, target, shield, position)
         -- try and run callbacks
-        if self.Callbacks['OnMissileImpactShield'] then
-            for k, callback in self.Callbacks['OnMissileImpactShield'] do
+        if self.EventCallbacks['OnMissileImpactShield'] then
+            for k, callback in self.EventCallbacks['OnMissileImpactShield'] do
                 local ok, msg = pcall(callback, target, shield, position)
                 if not ok then
                     WARN("OnMissileImpactShield callback triggered an error:")
@@ -4995,9 +5000,9 @@ Unit = Class(moho.unit_methods) {
     ---@param position Vector Location where the missile hit the terrain
     OnMissileImpactTerrain = function(self, target, position)
         -- try and run callbacks
-        if self.Callbacks['OnMissileImpactTerrain'] then
-            for k, callback in self.Callbacks['OnMissileImpactTerrain'] do
-                local ok, msg = pcall(callback, target, position)
+        if self.EventCallbacks['OnMissileImpactTerrain'] then
+            for k, callback in self.EventCallbacks['OnMissileImpactTerrain'] do
+                local ok, msg = pcall(callback, self, target, position)
                 if not ok then
                     WARN("OnMissileImpactTerrain callback triggered an error:")
                     WARN(msg)
@@ -5010,24 +5015,24 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     ---@param callback function<Vector, Unit, Vector>
     AddMissileInterceptedCallback = function(self, callback)
-        self.Callbacks['OnMissileIntercepted'] = self.Callbacks['OnMissileIntercepted'] or { }
-        table.insert(self.Callbacks['OnMissileIntercepted'], callback)
+        self.EventCallbacks['OnMissileIntercepted'] = self.EventCallbacks['OnMissileIntercepted'] or { }
+        table.insert(self.EventCallbacks['OnMissileIntercepted'], callback)
     end,
 
     --- Add a callback when a missile launched by this unit hits a shield
     ---@param self Unit
     ---@param callback function<Vector, Unit, Vector>
     AddMissileImpactShieldCallback = function(self, callback)
-        self.Callbacks['OnMissileImpactShield'] = self.Callbacks['OnMissileImpactShield'] or { }
-        table.insert(self.Callbacks['OnMissileImpactShield'], callback)
+        self.EventCallbacks['OnMissileImpactShield'] = self.EventCallbacks['OnMissileImpactShield'] or { }
+        table.insert(self.EventCallbacks['OnMissileImpactShield'], callback)
     end,
 
     --- Add a callback when a missile launched by this unit hits the terrain, note that this can be the same location as the target
     ---@param self Unit
     ---@param callback function<Vector, Vector>
     AddMissileImpactTerrainCallback = function(self, callback)
-        self.Callbacks['OnMissileImpactTerrain'] = self.Callbacks['OnMissileImpactTerrain'] or { }
-        table.insert(self.Callbacks['OnMissileImpactTerrain'], callback)
+        self.EventCallbacks['OnMissileImpactTerrain'] = self.EventCallbacks['OnMissileImpactTerrain'] or { }
+        table.insert(self.EventCallbacks['OnMissileImpactTerrain'], callback)
     end,
 
     --- Various callback-like functions
@@ -5218,7 +5223,7 @@ Unit = Class(moho.unit_methods) {
         -- end
 
         -- call the old function
-        self.UpdateBuildRestrictions(self)
+        self:UpdateBuildRestrictions()
     end,
 
     ---@param aiBrain AIBrain

@@ -44,17 +44,17 @@ function CMauiEdit:GetFontHeight()
 end
 
 ---
----@return string
+---@return Color
 function CMauiEdit:GetForegroundColor()
 end
 
 ---
----@return string
+---@return Color
 function CMauiEdit:GetHighlightBackgroundColor()
 end
 
 ---
----@return string
+---@return Color
 function CMauiEdit:GetHighlightForegroundColor()
 end
 
@@ -156,10 +156,14 @@ end
 function CMauiEdit:ShowCaret(show)
 end
 
+---@class EventModifiers
+---@field Shift? true
+---@field Alt? true
+
 ---@class KeyEvent
 ---@field Control Control
 ---@field KeyCode number
----@field Modifiers {Shift?: true, Alt?: true} only `Shift` and `Alt` are acceptable modifiers
+---@field Modifiers EventModifiers only `Shift` and `Alt` are acceptable modifiers
 ---@field MouseX number
 ---@field MouseY number
 ---@field RawKeyCode number
@@ -178,7 +182,7 @@ CMauiEdit.OnEnterPressed = nil
 
 --- Called when non-text keys are pressed. If the key already affected the text, such as with `Backspace`
 --- or `Delete`, then the event has already been handled and won't propagate down.
----@param keycode number Windows VK keycode
+-- @param keycode number Windows VK keycode
 ---@type fun(self: Edit, keycode: number, event: KeyEvent)
 CMauiEdit.OnNonTextKeyPressed = nil
 

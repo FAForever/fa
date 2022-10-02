@@ -3204,7 +3204,7 @@ function CreateUI(maxPlayers)
     cbox_ShowChangedOption.OnCheck = function(self, checked)
         HideDefaultOptions = checked
         RefreshOptionDisplayData()
-        GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
+        GUI.OptionContainer:ScrollSetTop('Vert', 0)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 

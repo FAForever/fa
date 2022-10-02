@@ -268,43 +268,55 @@ ADFTractorClaw = Class(Weapon) {
     ---@param muzzle string
     TargetFallThread = function(self, target, trash, muzzle)
 
-        -- let it create the wreck, with the rotator manipulators attached
-        target.PlayDeathAnimation = false
-        target.DestructionExplosionWaitDelayMin = 0
-        target.DestructionExplosionWaitDelayMax = 0
-        local oldDestroyUnit = target.DestroyUnit
-        target.DestroyUnit = function(target, overkillRatio)
+        -- clean up the effects once the unit starts falling
+        if not IsDestroyed(self) then
             self:ForkThread(self.TrashDelayedDestroyThread, trash)
-            oldDestroyUnit(target, overkillRatio)
         end
 
-        -- create a projectile that matches the velocity / orientation 
-        local vx, vy, vz = target:GetVelocity()
-        local projectile = target:CreateProjectileAtBone('/effects/entities/ADFTractorFall01/ADFTractorFall01_proj.bp', 0)
-        projectile:SetVelocity(10 * vx, 10 * vy, 10 * vz)
-        Warp(projectile, target:GetPosition(), target:GetOrientation())
+        -- if the unit is magically already destroyed, then just return - nothing we can do,
+        --  we'll likely end up with a flying wreck :)
+        if IsDestroyed(target) then
+            return
+        end
 
-        projectile.OnImpact = function(projectile)
-            if not IsDestroyed(target) then
-                target.CanTakeDamage = true
-                if not IsDestroyed(self.unit) then
-                    if target.MyShield and target.MyShield:IsOn() then
-                        Damage(self.unit, self.unit:GetPosition(muzzle), target.MyShield, target.MyShield:GetHealth() + 1, 'Disintegrate')
+        -- air units drop on their own
+        if target.Blueprint.CategoriesHash.AIR then
+            target:Kill()
+        -- assist land units with a natural drop
+        else 
+            -- let it create the wreck, with the rotator manipulators attached
+            target.PlayDeathAnimation = false
+            target.DestructionExplosionWaitDelayMin = 0
+            target.DestructionExplosionWaitDelayMax = 0
+
+            -- create a projectile that matches the velocity / orientation 
+            local vx, vy, vz = target:GetVelocity()
+            local projectile = target:CreateProjectileAtBone('/effects/entities/ADFTractorFall01/ADFTractorFall01_proj.bp', 0)
+            projectile:SetVelocity(10 * vx, 10 * vy, 10 * vz)
+            Warp(projectile, target:GetPosition(), target:GetOrientation())
+
+            projectile.OnImpact = function(projectile)
+                if not IsDestroyed(target) then
+                    target.CanTakeDamage = true
+                    if not IsDestroyed(self.unit) then
+                        if target.MyShield and target.MyShield:IsOn() then
+                            Damage(self.unit, self.unit:GetPosition(muzzle), target.MyShield, target.MyShield:GetHealth() + 1, 'Disintegrate')
+                        end
+                        Damage(self.unit, self.unit:GetPosition(muzzle), target, target:GetHealth() + 1, 'Disintegrate')
+                        
+                    else
+                        target:Kill()
                     end
-                    Damage(self.unit, self.unit:GetPosition(muzzle), target, target:GetHealth() + 1, 'Disintegrate')
-                    
-                else
-                    target:Kill()
+
+                    CreateLightParticle(target, 0, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
+
+                    local position = target:GetPosition()
+                    DamageArea(target, position, 3, 1, 'TreeFire', false, false)
+                    DamageArea(target, position, 2, 1, 'TreeForce', false, false)
                 end
 
-                CreateLightParticle(target, 0, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
-
-                local position = target:GetPosition()
-                DamageArea(target, position, 3, 1, 'TreeFire', false, false)
-                DamageArea(target, position, 2, 1, 'TreeForce', false, false)
+                projectile:Destroy()
             end
-
-            projectile:Destroy()
         end
     end,
 
