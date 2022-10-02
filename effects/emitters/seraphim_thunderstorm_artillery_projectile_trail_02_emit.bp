@@ -7,9 +7,9 @@ TrailEmitterBlueprint {
     BlendMode = 3,
     TextureRepeatRate = 1,
     LODCutoff = 160,
-	RepeatTexture = [[/textures/particles/electricity_05.dds]],
-	RampTexture = [[/textures/particles/ramp_color_build_spray.dds]],
+	RepeatTexture = '/textures/particles/electricity_05.dds',
+	RampTexture = '/textures/particles/ramp_color_build_spray.dds',
 }
 
 
-#ramp_ser_01_reverse.dds
+--ramp_ser_01_reverse.dds

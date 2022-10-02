@@ -148,7 +148,6 @@ list = false
 
 --- Opens up the window
 function OpenWindow()
-
     local gameHasAIs = GameMain.GameHasAIs
     local cheatsOn = sessionInfo.Options.CheatsEnabled
     local isThisJip = "jip" == GetArmiesTable()[GameMain.OriginalFocusArmy].nickname
@@ -205,6 +204,7 @@ function CloseWindow()
     end
 end
 
+---@class ProfilerWindow : Window
 ProfilerWindow = Class(Window) {
     __init = function(self, parent)
         Window.__init(self, parent, "Profiler", false, false, false, true, false, "profiler2", {

@@ -1,24 +1,24 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/SorianMainTurtle.lua
-#**  Author(s): Michael Robbins aka Sorian
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/SorianMainTurtle.lua
+--**  Author(s): Michael Robbins aka Sorian
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'SorianMainTurtle',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'SorianT1BalancedUpgradeBuilders',
         'SorianT2BalancedUpgradeBuilders',
         'SorianEmergencyUpgradeBuilders',
         'SorianMassFabPause',
 
-        # Engineer Builders
+        -- Engineer Builders
         'SorianEngineerFactoryBuilders',
         'SorianT1EngineerBuilders',
         'SorianT2EngineerBuilders',
@@ -26,39 +26,39 @@ BaseBuilderTemplate {
         'SorianEngineerFactoryConstruction Balance',
         'SorianEngineerFactoryConstruction',
 
-        # SCU Upgrades
+        -- SCU Upgrades
         'SorianSCUUpgrades',
 
-        # Engineer Support buildings
+        -- Engineer Support buildings
         'SorianEngineeringSupportBuilder',
 
-        # Build energy at this base
+        -- Build energy at this base
         'SorianEngineerEnergyBuilders',
 
-        # Build Mass high pri at this base
+        -- Build Mass high pri at this base
         'SorianEngineerMassBuildersHighPri',
 
-        # Extractors
+        -- Extractors
         'SorianTime Exempt Extractor Upgrades',
 
-        # ACU Builders
+        -- ACU Builders
         'Sorian Initial ACU Builders',
         'SorianACUBuilders',
         'SorianACUUpgrades',
 
-        # ACU Defense
+        -- ACU Defense
         'SorianT1ACUDefenses',
         'SorianT2ACUDefenses',
         'SorianT2ACUShields',
         'SorianT3ACUShields',
         'SorianT3ACUNukeDefenses',
 
-        # ==== EXPANSION ==== #
+        -- ==== EXPANSION ==== --
         'SorianEngineerExpansionBuildersFull',
         'SorianEngineerExpansionBuildersSmall',
         'SorianEngineerFirebaseBuilders',
 
-        # ==== DEFENSES ==== #
+        -- ==== DEFENSES ==== --
         'SorianT1BaseDefenses',
         'SorianT2BaseDefenses',
         'SorianT3BaseDefenses',
@@ -80,12 +80,12 @@ BaseBuilderTemplate {
 
         'SorianMassAdjacencyDefenses',
 
-        # ==== NAVAL EXPANSION ==== #
+        -- ==== NAVAL EXPANSION ==== --
         'SorianNavalExpansionBuilders',
 
-        # ==== LAND UNIT BUILDERS ==== #
-        #'SorianT1LandFactoryBuilders',
-        #'SorianT2LandFactoryBuilders',
+        -- ==== LAND UNIT BUILDERS ==== --
+        --'SorianT1LandFactoryBuilders',
+        --'SorianT2LandFactoryBuilders',
         'SorianT3LandFactoryBuilders',
 
         'SorianFrequentLandAttackFormBuilders',
@@ -93,8 +93,8 @@ BaseBuilderTemplate {
         'SorianMiscLandFormBuilders',
         'SorianUnitCapLandAttackFormBuilders',
 
-        #'SorianT1LandAA',
-        #'SorianT2LandAA',
+        --'SorianT1LandAA',
+        --'SorianT2LandAA',
         'SorianT3LandResponseBuilders',
 
         'SorianT1ReactionDF',
@@ -106,9 +106,9 @@ BaseBuilderTemplate {
         'SorianT3Shields',
         'SorianEngineeringUpgrades',
 
-        # ==== AIR UNIT BUILDERS ==== #
-        #'SorianT1AirFactoryBuilders',
-        #'SorianT2AirFactoryBuilders',
+        -- ==== AIR UNIT BUILDERS ==== --
+        --'SorianT1AirFactoryBuilders',
+        --'SorianT2AirFactoryBuilders',
         'SorianT3AirFactoryBuilders',
         'SorianFrequentAirAttackFormBuilders',
         'SorianMassHunterAirFormBuilders',
@@ -116,7 +116,7 @@ BaseBuilderTemplate {
         'SorianUnitCapAirAttackFormBuilders',
         'SorianACUHunterAirFormBuilders',
 
-        #'SorianTransportFactoryBuilders',
+        --'SorianTransportFactoryBuilders',
 
         'SorianExpResponseFormBuilders',
 
@@ -125,20 +125,20 @@ BaseBuilderTemplate {
         'SorianT3AntiAirBuilders',
         'SorianBaseGuardAirFormBuilders',
 
-        # ==== EXPERIMENTALS ==== #
+        -- ==== EXPERIMENTALS ==== --
         'SorianMobileLandExperimentalEngineers',
         'SorianMobileLandExperimentalForm',
 
         'SorianMobileAirExperimentalEngineers',
         'SorianMobileAirExperimentalForm',
 
-        #'SorianMobileNavalExperimentalEngineers',
-        #'SorianMobileNavalExperimentalForm',
+        --'SorianMobileNavalExperimentalEngineers',
+        --'SorianMobileNavalExperimentalForm',
 
         'SorianEconomicExperimentalEngineers',
         'SorianMobileExperimentalEngineersGroup',
 
-        # ==== ARTILLERY BUILDERS ==== #
+        -- ==== ARTILLERY BUILDERS ==== --
         'SorianT3ArtilleryGroup',
 
         'SorianExperimentalArtillery',
@@ -149,7 +149,7 @@ BaseBuilderTemplate {
         'SorianSatelliteExperimentalEngineers',
         'SorianSatelliteExperimentalForm',
 
-        # ======== Strategies ======== #
+        -- ======== Strategies ======== --
         'SorianHeavyAirStrategy',
         'SorianBigAirGroup',
         'SorianJesterRush',
@@ -166,7 +166,7 @@ BaseBuilderTemplate {
         'SorianEnemyTurtle - Out of Range',
         'Sorian Excess Mass Strategy',
 
-        # ===== Strategy Platoons ===== #
+        -- ===== Strategy Platoons ===== --
         'SorianT1BomberHighPrio',
         'SorianT2BomberHighPrio',
         'SorianT3BomberHighPrio',
@@ -202,7 +202,7 @@ BaseBuilderTemplate {
         EngineerCount = {
             Tech1 = 15,
             Tech2 = 10,
-            Tech3 = 45, #30,
+            Tech3 = 45, --30,
             SCU = 8,
         },
         FactoryCount = {
@@ -212,9 +212,9 @@ BaseBuilderTemplate {
             Gate = 1,
         },
         MassToFactoryValues = {
-            T1Value = 6, #8
-            T2Value = 15, #20
-            T3Value = 22.5, #27.5
+            T1Value = 6, --8
+            T2Value = 15, --20
+            T3Value = 22.5, --27.5
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
@@ -242,16 +242,16 @@ BaseBuilderTemplate {
             return 1000, 'sorianturtle'
         end
 
-        #If we're playing on an island map,  use this plan
+        --If we're playing on an island map,  use this plan
         if isIsland and mapSizeX > 500 and mapSizeZ > 500 then
             return Random(50, 100), 'sorianturtle'
-        #If we're playing on a 256 map, do not turtle
+        --If we're playing on a 256 map, do not turtle
         elseif mapSizeX < 500 and mapSizeZ < 500 then
             return 10, 'sorianturtle'
-        #If we're playing on a 512 map, possibly go rush, possibly go turtle
+        --If we're playing on a 512 map, possibly go rush, possibly go turtle
         elseif mapSizeX > 500 and mapSizeZ > 500 and mapSizeX < 1000 and mapSizeZ < 1000 then
             return 50, 'sorianturtle'
-        #If we're playing on a 1024 or bigger, turtling is best.
+        --If we're playing on a 1024 or bigger, turtling is best.
         elseif mapSizeX > 1000 and mapSizeZ > 1000 then
             return Random(60, 100), 'sorianturtle'
         elseif mapSizeX > 2000 and mapSizeZ > 2000 then

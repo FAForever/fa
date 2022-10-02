@@ -19,8 +19,8 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 2.00,
-	Texture = [[/textures/particles/cloud_smoke_alpha_10.dds]],
-	RampTexture = [[/textures/particles/ramp_white_08.dds]],
+	Texture = '/textures/particles/cloud_smoke_alpha_10.dds',
+	RampTexture = '/textures/particles/ramp_white_08.dds',
 	XDirectionCurve = {
 		XRange = 2.00,
 		Keys = {

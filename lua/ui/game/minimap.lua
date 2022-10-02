@@ -18,7 +18,7 @@ local Window = import('/lua/maui/window.lua').Window
 local Prefs = import('/lua/user/prefs.lua')
 
 local minimap = Prefs.GetFromCurrentProfile('stratview') or false
-local minimap_resources = Prefs.GetFromCurrentProfile('minimap_resources') or false
+local minimap_resources = Prefs.GetFromCurrentProfile('MiniMap_resource_icons') or false
 
 controls = {
     displayGroup = false,
@@ -112,6 +112,7 @@ function CreateMinimap(parent)
     controls.displayGroup.Depth:Set(4)
     controls.displayGroup.window_m:SetRenderPass(UIUtil.UIRP_UnderWorld)
     controls.displayGroup:SetMinimumResize(150, 150)
+    ConExecute("cam_DefaultMiniLOD 1.8") -- make sure minimap is created with normal LOD value as we change it later
     controls.miniMap = import('/lua/ui/controls/worldview.lua').WorldView(controls.displayGroup:GetClientGroup(), 'MiniMap', 2, true, 'WorldCamera')    -- depth value is above minimap
     controls.miniMap:SetName("Minimap")
     controls.miniMap:Register('MiniMap', true, '<LOC map_view_0001>MiniMap', 1)
@@ -187,7 +188,7 @@ function CreateMinimap(parent)
 end
 
 function ToggleMinimap()
-    --# disable when in Screen Capture mode
+    ---- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end

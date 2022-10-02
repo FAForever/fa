@@ -30,6 +30,7 @@ ProjectileBlueprint {
             LODs = {
                 {
                     ShaderName = 'TMeshGlow',
+                    LODCutoff = 90,
                 },
             },
         },

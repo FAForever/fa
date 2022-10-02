@@ -11,6 +11,7 @@
 *.jpeg
 *.orig
 *.swp
+.vscode
 textures/ui/common/BUTTON/backgroundselect/original/
 textures/ui/common/BUTTON/backgroundselect/test/
 textures/ui/common/countries/original/

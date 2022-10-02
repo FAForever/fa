@@ -37,6 +37,7 @@ ProjectileBlueprint {
                     AlbedoName = '/projectiles/tifmissilecruise01/tifmissilecruise01_albedo.dds',
                     MeshName = '/projectiles/tifmissilecruise01/tifmissilecruise01_lod0.scm',
                     ShaderName = 'TMeshAlpha',
+                    LODCutoff = 230,
                 },
             },
         },

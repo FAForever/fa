@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'AttachPoint'
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -24,15 +29,6 @@ UnitBlueprint {
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Tank',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
         },
     },
     BuildIconSortPriority = 20,
@@ -79,7 +75,7 @@ UnitBlueprint {
                     AlbedoName = 'xsl0201_lod1_albedo.dds',
                     LODCutoff = 215,
                     ShaderName = 'Seraphim',
-#                    SpecularName = 'xsl0201_lod1_specteam.dds',
+--                    SpecularName = 'xsl0201_lod1_specteam.dds',
                 },
             },
         },
@@ -247,16 +243,14 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.75,
-            TargetCheckInterval = 0.75,
             TargetPriorities = {
                 'TECH1 MOBILE',
                 'TECH2 MOBILE',
                 'TECH3 MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Barrel_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',

@@ -23,7 +23,6 @@ local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local CommandUnit = DefaultUnitsFile.CommandUnit
 
-local Util = import('utilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local CreateCybranBuildBeams = false
@@ -63,15 +62,18 @@ local TrashBag = _G.TrashBag
 local TrashBagAdd = TrashBag.Add
 
 --- A class to managing the build bots. Make sure to call all the relevant functions.
-CConstructionTemplate = Class() {
+---@class CConstructionTemplate
+CConstructionTemplate = ClassSimple {
 
     --- Prepares the values required to support bots
+    ---@param self CConstructionTemplate
     OnCreate = function(self)
         -- cache the total amount of drones
         self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
     end,
 
     --- When dying, destroy everything.
+    ---@param self CConstructionTemplate
     DestroyAllBuildEffects = function(self)
         -- make sure we're not dead (then bots are destroyed by trashbag)
         if self.Dead then 
@@ -95,6 +97,8 @@ CConstructionTemplate = Class() {
     end,
 
     --- When stopping to build, send the bots back after a bit.
+    ---@param self CConstructionTemplate
+    ---@param built Unit
     StopBuildingEffects = function(self, built)
         -- make sure we're not dead (then bots are destroyed by trashbag)
         if self.Dead then 
@@ -119,9 +123,11 @@ CConstructionTemplate = Class() {
     end,
 
     --- When pausing, send the bots back after a bit.
+    ---@param self CConstructionTemplate
+    ---@param delay number
     OnPaused = function(self, delay)
         -- delay until they move back
-        delay = delay or 0.5 + 2 * Random()
+        delay = delay or (0.5 + 2) * Random()
 
         -- make sure thread is not running already
         if self.ReturnBotsThreadInstance then 
@@ -144,6 +150,10 @@ CConstructionTemplate = Class() {
     end,
 
     --- When making build effects, try and make the bots.
+    ---@param self CConstructionTemplate
+    ---@param unitBeingBuilt Unit
+    ---@param order number
+    ---@param stationary boolean
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
         -- check if the unit still exists, this can happen when: 
         -- pause during construction, constructing unit dies, unpause
@@ -163,6 +173,7 @@ CConstructionTemplate = Class() {
     end,
 
     --- When destroyed, destroy the bots too.
+    ---@param self CConstructionTemplate
     OnDestroy = function(self) 
         -- destroy bots if we have them
         if self.BuildBotsNext > 1 then 
@@ -172,10 +183,10 @@ CConstructionTemplate = Class() {
         end
     end,
 
-    --- Destroys all the bots of a builder. Assumes the bots exist.
-    -- @param self The builder in question.
-    -- @param bots The bots of the builder.
-    -- @param count The maximum number of bots.
+    --- Destroys all the bots of a builder. Assumes the bots exist
+    ---@param self CConstructionTemplate
+    ---@param bots Unit[]
+    ---@param count number
     DestroyBotsThread = function(self, bots, count)
 
         -- kill potential return thread
@@ -196,9 +207,9 @@ CConstructionTemplate = Class() {
         end
     end,
 
-    --- Destroys all the bots of a builder. Assumes the bots exist.
-    -- @param self The builder in question.
-    -- @param delay The delay until the bots decide to return.
+    --- Destroys all the bots of a builder. Assumes the bots exist
+    ---@param self CConstructionTemplate
+    ---@param delay number
     ReturnBotsThread = function(self, delay)
 
         -- hold up a bit in case we just switch target
@@ -260,17 +271,20 @@ CConstructionTemplate = Class() {
 
 --- The build bot class for drones. It removes a lot of
 -- the basic functionality of a unit to save on performance.
+---@class CBuildBotUnit : DummyUnit
 CBuildBotUnit = Class(DummyUnit) {
 
     -- Keep track of the builder that made the bot
     SpawnedBy = false,
 
-    -- only initialise what we need (drones typically have some aim functionality)
+    --- only initialise what we need (drones typically have some aim functionality)
+    ---@param self CBuildBotUnit
     OnPreCreate = function(self) 
         self.Trash = TrashBag()
     end,             
 
-    -- only initialise what we need
+    --- only initialise what we need
+    ---@param self CBuildBotUnit
     OnCreate = function(self)
         DummyUnit.OnCreate(self)
         
@@ -278,7 +292,8 @@ CBuildBotUnit = Class(DummyUnit) {
         UnitSetConsumptionActive(self, false)
     end,
 
-    -- short-cut when being destroyed
+    --- short-cut when being destroyed
+    ---@param self CBuildBotUnit
     OnDestroy = function(self) 
         self.Dead = true 
         self.Trash:Destroy()
@@ -287,7 +302,8 @@ CBuildBotUnit = Class(DummyUnit) {
             self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
         end
     end,
-
+    
+    ---@param self CBuildBotUnit
     Kill = function(self)
         -- make it go boom
         if self.PlayDestructionEffects then
@@ -297,16 +313,22 @@ CBuildBotUnit = Class(DummyUnit) {
         self:Destroy()
     end,
 
-    -- prevent this type of operations
+    --- prevent this type of operations
+    ---@param self CBuildBotUnit
+    ---@param target Unit
     OnStartCapture = function(self, target)
         IssueStop({self}) -- You can't capture!
     end,
-
+    
+    ---@param self CBuildBotUnit
+    ---@param target Unit
     OnStartReclaim = function(self, target)
         IssueStop({self}) -- You can't reclaim!
     end,
 
-    -- short cut - just get destroyed
+    --- short cut - just get destroyed
+    ---@param self CBuildBotUnit
+    ---@param with any
     OnImpact = function(self, with)
 
         -- make it go boom
@@ -323,13 +345,20 @@ CBuildBotUnit = Class(DummyUnit) {
 }
 
 -- AIR FACTORY STRUCTURES
+---@class CAirFactoryUnit : AirFactoryUnit
 CAirFactoryUnit = Class(AirFactoryUnit) {
+
+    ---@param self CAirFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitTicks(2)
         EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
     end,
 
+    ---@param self CAirFactoryUnit
+    ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
         if not unitBeingBuilt then return end
 
@@ -342,17 +371,20 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
         self.BuildAnimManip:SetRate(1)
     end,
 
+    ---@param self CAirFactoryUnit
     StopBuildFx = function(self)
         if self.BuildAnimManip then
             self.BuildAnimManip:SetRate(0)
         end
     end,
 
+    ---@param self CAirFactoryUnit
     OnPaused = function(self)
         AirFactoryUnit.OnPaused(self)
         self:StopBuildFx()
     end,
 
+    ---@param self CAirFactoryUnit
     OnUnpaused = function(self)
         AirFactoryUnit.OnUnpaused(self)
         if self:IsUnitState('Building') then
@@ -362,56 +394,74 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
 }
 
 -- AIR STAGING STRUCTURES
+---@class CAirStagingPlatformUnit : AirStagingPlatformUnit
 CAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
 -- AIR UNITS
+---@class CAirUnit : AirUnit
 CAirUnit = Class(AirUnit) {}
 
 -- WALL STRUCTURES
+---@class CConcreteStructureUnit : ConcreteStructureUnit
 CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 
 -- CONSTRUCTION UNITS
+---@class CConstructionUnit : ConstructionUnit, CConstructionTemplate
 CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 
+    ---@param self CConstructionUnit
     OnCreate = function(self)
         ConstructionUnit.OnCreate(self)
         CConstructionTemplate.OnCreate(self)
     end,
 
+    ---@param self CConstructionUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
-        -- If created with F2 on land, then play the transform anim.
         if self.Layer == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
     end,
 
+    ---@param self CConstructionUnit
     DestroyAllBuildEffects = function(self)
         ConstructionUnit.DestroyAllBuildEffects(self)
         CConstructionTemplate.DestroyAllBuildEffects(self)
     end,
 
+    ---@param self CConstructionUnit
+    ---@param built boolean
     StopBuildingEffects = function(self, built)
         ConstructionUnit.StopBuildingEffects(self, built)
         CConstructionTemplate.StopBuildingEffects(self, built)
     end,
 
+    ---@param self CConstructionUnit
     OnPaused = function(self)
         ConstructionUnit.OnPaused(self)
         CConstructionTemplate.OnPaused(self)
     end,
 
+    ---@param self CConstructionUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order number
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order)
     end,
 
+    ---@param self CConstructionUnit
     OnDestroy = function(self) 
         ConstructionUnit.OnDestroy(self)
         CConstructionTemplate.OnDestroy(self)
     end,
 
+    ---@param self CConstructionUnit
+    ---@param new Layer
+    ---@param old Layer
     LayerChangeTrigger = function(self, new, old)
-        if self.AnimationWater then
+        if self.Blueprint.Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
@@ -422,6 +472,8 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
         end
     end,
 
+    ---@param self CConstructionUnit
+    ---@param water boolean
     TransformThread = function(self, water)
         if not self.TransformManipulator then
             self.TransformManipulator = CreateAnimator(self)
@@ -429,7 +481,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
         end
 
         if water then
-            self.TransformManipulator:PlayAnim(self.AnimationWater)
+            self.TransformManipulator:PlayAnim(self.Blueprint.Display.AnimationWater)
             self.TransformManipulator:SetRate(1)
             self.TransformManipulator:SetPrecedence(0)
         else
@@ -443,7 +495,12 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 }
 
 -- ENERGY CREATION UNITS
+---@class CEnergyCreationUnit : EnergyCreationUnit
 CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
+
+    ---@param self CEnergyCreationUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         DefaultUnitsFile.EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         if self.AmbientEffects then
@@ -455,16 +512,24 @@ CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
 }
 
 -- ENERGY STORAGE STRUCTURES
+---@class CEnergyStorageUnit : EnergyStorageUnit
 CEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
 -- LAND FACTORY STRUCTURES
+---@class CLandFactoryUnit : LandFactoryUnit
 CLandFactoryUnit = Class(LandFactoryUnit) {
+
+    ---@param self CLandFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order number
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitSeconds(0.1)
         EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
     end,
 
+    ---@param self CLandFactoryUnit
+    ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
         if not unitBeingBuilt then
             unitBeingBuilt = self:GetFocusUnit()
@@ -480,17 +545,20 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
         self.BuildAnimManip:SetRate(1)
     end,
 
+    ---@param self CLandFactoryUnit
     StopBuildFx = function(self)
         if self.BuildAnimManip then
             self.BuildAnimManip:SetRate(0)
         end
     end,
 
+    ---@param self CLandFactoryUnit
     OnPaused = function(self)
         LandFactoryUnit.OnPaused(self)
         self:StopBuildFx(self:GetFocusUnit())
     end,
 
+    ---@param self CLandFactoryUnit
     OnUnpaused = function(self)
         LandFactoryUnit.OnUnpaused(self)
         if self:IsUnitState('Building') then
@@ -500,49 +568,63 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
 }
 
 -- LAND UNITS
+---@class CLandUnit : LandUnit
 CLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
+---@class CMassCollectionUnit : MassCollectionUnit
 CMassCollectionUnit = Class(DefaultUnitsFile.MassCollectionUnit) {}
 
 --  MASS FABRICATION UNITS
+---@class CMassFabricationUnit : MassFabricationUnit
 CMassFabricationUnit = Class(DefaultUnitsFile.MassFabricationUnit) {}
 
 --  MASS STORAGE UNITS
+---@class CMassStorageUnit : MassStorageUnit
 CMassStorageUnit = Class(DefaultUnitsFile.MassStorageUnit) {}
 
 -- RADAR STRUCTURES
+---@class CRadarUnit : RadarUnit
 CRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
 
 -- SONAR STRUCTURES
+---@class CSonarUnit : SonarUnit
 CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
+---@class CSeaFactoryUnit : SeaFactoryUnit
 CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
+    ---@param self CSeaFactoryUnit
+    ---@param unitBeingBuilt Unit
     StartBuildingEffects = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeamsOpti, nil, unitBeingBuilt, self.BuildEffectsBag, false)
         unitBeingBuilt.Trash:Add(thread)
     end,
 
+    ---@param self CSeaFactoryUnit
     OnPaused = function(self)
+        StructureUnit.OnPaused(self)
         if not self.Dead and self:GetFractionComplete() == 1 then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StopArmsMoving()
         end
-        StructureUnit.OnPaused(self)
     end,
 
+    ---@param self CSeaFactoryUnit
     OnUnpaused = function(self)
+        StructureUnit.OnUnpaused(self)
         if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') and self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
             self:StartBuildingEffects(self.UnitBeingBuilt)
             self:StartArmsMoving()
         end
-        StructureUnit.OnUnpaused(self)
     end,
 
+    ---@param self CSeaFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order number
     OnStartBuild = function(self, unitBeingBuilt, order)
         SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         if order ~= 'Upgrade' then
@@ -550,6 +632,8 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
         end
     end,
 
+    ---@param self CSeaFactoryUnit
+    ---@param unitBuilding boolean
     OnStopBuild = function(self, unitBuilding)
         SeaFactoryUnit.OnStopBuild(self, unitBuilding)
         if not self.Dead and self:GetFractionComplete() == 1 then
@@ -557,6 +641,7 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
         end
     end,
 
+    ---@param self CSeaFactoryUnit
     OnFailedToBuild = function(self)
         SeaFactoryUnit.OnFailedToBuild(self)
         if not self.Dead and self:GetFractionComplete() == 1 then
@@ -564,13 +649,16 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
         end
     end,
 
+    ---@param self CSeaFactoryUnit
     StartArmsMoving = function(self)
         self.ArmsThread = self:ForkThread(self.MovingArmsThread)
     end,
 
+    ---@param self CSeaFactoryUnit
     MovingArmsThread = function(self)
     end,
 
+    ---@param self CSeaFactoryUnit
     StopArmsMoving = function(self)
         if self.ArmsThread then
             KillThread(self.ArmsThread)
@@ -580,39 +668,55 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 }
 
 -- SEA UNITS
+---@class CSeaUnit : SeaUnit
 CSeaUnit = Class(SeaUnit) {}
 
 -- SHIELD LAND UNITS
+---@class CShieldLandUnit : ShieldLandUnit
 CShieldLandUnit = Class(ShieldLandUnit) {}
 
 -- SHIELD STRUCTURES
+---@class CShieldStructureUnit : ShieldStructureUnit
 CShieldStructureUnit = Class(ShieldStructureUnit) {}
 
 -- STRUCTURES
+---@class CStructureUnit : StructureUnit
 CStructureUnit = Class(StructureUnit) {}
 
 -- SUBMARINE UNITS
+---@class CSubUnit : SubUnit
 CSubUnit = Class(DefaultUnitsFile.SubUnit) {}
 
 -- TRANSPORT BEACON UNITS
+---@class CTransportBeaconUnit : TransportBeaconUnit
 CTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 
 -- WALKING LAND UNITS
+---@class CWalkingLandUnit : WalkingLandUnit
 CWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 -- WALL STRUCTURES
+---@class CWallStructureUnit : WallStructureUnit
 CWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES
+---@class CCivilianStructureUnit : CStructureUnit
 CCivilianStructureUnit = Class(CStructureUnit) {}
 
 -- QUANTUM GATE UNITS
+---@class CQuantumGateUnit : QuantumGateUnit
 CQuantumGateUnit = Class(QuantumGateUnit) {}
 
 -- RADAR JAMMER UNITS
+---@class CRadarJammerUnit : RadarJammerUnit
 CRadarJammerUnit = Class(RadarJammerUnit) {}
 
+---@class CConstructionEggUnit : CStructureUnit
 CConstructionEggUnit = Class(CStructureUnit) {
+
+    ---@param self CConstructionEggUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         LandFactoryUnit.OnStopBeingBuilt(self, builder, layer)
         local bp = self:GetBlueprint()
@@ -645,16 +749,22 @@ CConstructionEggUnit = Class(CStructureUnit) {
         )
     end,
 
+    ---@param self CConstructionEggUnit
+    ---@param instigator Unit
+    ---@param type DamageType
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         if self.Spawn then overkillRatio = 1.1 end
         CStructureUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 }
 
-
 -- TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
 -- CConstructionStructureUnit
+---@class CConstructionStructureUnit : CStructureUnit, CConstructionTemplate
 CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
+
+    ---@param self CConstructionStructureUnit
     OnCreate = function(self)
 
         -- Initialize the class
@@ -683,16 +793,20 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         self.BuildingUnit = false
     end,
 
+    ---@param self CConstructionStructureUnit
     DestroyAllBuildEffects = function(self)
         CStructureUnit.DestroyAllBuildEffects(self)
         CConstructionTemplate.DestroyAllBuildEffects(self)
     end,
 
+    ---@param self CConstructionStructureUnit
+    ---@param built boolean
     StopBuildingEffects = function(self, built)
         CStructureUnit.StopBuildingEffects(self, built)
         CConstructionTemplate.StopBuildingEffects(self, built)
     end,
 
+    ---@param self CConstructionStructureUnit
     OnPaused = function(self)
         CStructureUnit.OnPaused(self)
         CStructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
@@ -701,6 +815,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         self.AnimationManipulator:SetRate(-0.25)
     end,
 
+    ---@param self CConstructionStructureUnit
     OnUnpaused = function(self)
         CStructureUnit.OnUnpaused(self)
 
@@ -712,15 +827,22 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         end
     end,
 
+    ---@param self CConstructionStructureUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         CConstructionTemplate.CreateBuildEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder, true)
     end,
 
+    ---@param self CConstructionStructureUnit
     OnDestroy = function(self) 
         CStructureUnit.OnDestroy(self)
         CConstructionTemplate.OnDestroy(self)
     end,
 
+    ---@param self CConstructionStructureUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         CStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
 
@@ -733,6 +855,9 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         self.BuildingUnit = true
     end,
 
+    ---@param self CConstructionStructureUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
@@ -742,7 +867,9 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         end
     end,
 
-    -- This will only be called if not in StructureUnit's upgrade state
+    --- This will only be called if not in StructureUnit's upgrade state
+    ---@param self CConstructionStructureUnit
+    ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
         CStructureUnit.OnStopBuild(self, unitBeingBuilt)
 
@@ -755,6 +882,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         self.BuildingUnit = false
     end,
 
+    ---@param self CConstructionStructureUnit
     OnProductionPaused = function(self)
         if self:IsUnitState('Building') then
             self:SetMaintenanceConsumptionInactive()
@@ -762,6 +890,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         self:SetProductionActive(false)
     end,
 
+    ---@param self CConstructionStructureUnit
     OnProductionUnpaused = function(self)
         if self:IsUnitState('Building') then
             self:SetMaintenanceConsumptionActive()
@@ -769,6 +898,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         self:SetProductionActive(true)
     end,
 
+    ---@param self CConstructionStructureUnit
     OnStopBuilderTracking = function(self)
         CStructureUnit.OnStopBuilderTracking(self)
 
@@ -779,6 +909,9 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         end
     end,
 
+    ---@param self CConstructionStructureUnit
+    ---@param target_bp UnitBlueprint
+    ---@return boolean
     CheckBuildRestriction = function(self, target_bp)
         if self:CanBuild(target_bp.BlueprintId) then
             return true
@@ -786,53 +919,53 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
             return false
         end
     end,
-
-    CreateReclaimEffects = function(self, target)
-        EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
-    end,
-
-    CreateReclaimEndEffects = function(self, target)
-        EffectUtil.PlayReclaimEndEffects(self, target)
-    end,
-
-    CreateCaptureEffects = function(self, target)
-        EffectUtil.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
-    end,
 }
 
--- CCommandUnit
--- Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
+---# CCommandUnit
+---Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
+---@class CCommandUnit : CommandUnit
 CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
 
+    ---@param self CCommandUnit
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         CConstructionTemplate.OnCreate(self)
     end,
 
+    ---@param self CCommandUnit
     DestroyAllBuildEffects = function(self)
         CommandUnit.DestroyAllBuildEffects(self)
         CConstructionTemplate.DestroyAllBuildEffects(self)
     end,
 
+    ---@param self CCommandUnit
+    ---@param built boolean
     StopBuildingEffects = function(self, built)
         CommandUnit.StopBuildingEffects(self, built)
         CConstructionTemplate.StopBuildingEffects(self, built)
     end,
 
+    ---@param self CCommandUnit
     OnPaused = function(self)
         CommandUnit.OnPaused(self)
         CConstructionTemplate.OnPaused(self)
     end,
 
+    ---@param self CCommandUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order)
     end,
 
+    ---@param self CCommandUnit
     OnDestroy = function(self) 
         CommandUnit.OnDestroy(self)
         CConstructionTemplate.OnDestroy(self)
     end,
 
+    ---@param self CCommandUnit
+    ---@param bit number
     OnScriptBitSet = function(self, bit)
         if bit == 8 then -- Cloak toggle
             self:StopUnitAmbientSound('ActiveLoop')
@@ -845,6 +978,8 @@ CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
         end
     end,
 
+    ---@param self CCommandUnit
+    ---@param bit number
     OnScriptBitClear = function(self, bit)
         if bit == 8 then -- Cloak toggle
             self:PlayUnitAmbientSound('ActiveLoop')
@@ -857,3 +992,6 @@ CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
         end
     end,
 }
+
+-- kept for mod backwards compatibility
+local Util = import('utilities.lua')

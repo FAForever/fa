@@ -17,6 +17,7 @@ local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
 local Buff = import('/lua/sim/Buff.lua')
 
+---@class UAL0001 : ACUUnit
 UAL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(DeathNukeWeapon) {},

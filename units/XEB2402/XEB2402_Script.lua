@@ -6,6 +6,7 @@
 -----------------------------------------------------------------
 local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
+---@class XEB2402 : TAirFactoryUnit
 XEB2402 = Class(TAirFactoryUnit) {
 
     OnStopBeingBuilt = function(self)

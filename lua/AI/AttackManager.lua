@@ -26,7 +26,8 @@ local Utilities = import('/lua/utilities.lua')
 --     AMPlatoons = { AMPlatoonName, AMPlatoonName, etc },
 -- },
 
-AttackManager = Class({
+---@class AttackManager
+AttackManager = ClassSimple {
     brain = nil,
     NeedSort = false,
     PlatoonCount = { DefaultGroupAir = 0, DefaultGroupLand = 0, DefaultGroupSea = 0, },
@@ -366,4 +367,4 @@ AttackManager = Class({
             AM.PlatoonCount[v] = AM.PlatoonCount[v] - 1
         end
     end
-})
+}

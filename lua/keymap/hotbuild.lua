@@ -386,8 +386,7 @@ function buildActionFactoryTemplate(modifier)
     local selection = GetSelectedUnits()
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
     local buildable = EntityCategoryGetUnitList(buildableCategories)
-
-    effectiveTemplates, effectiveIcons = availableTemplate(allFactoryTemplates, buildable)
+    local effectiveTemplates, effectiveIcons = availableTemplate(allFactoryTemplates, buildable)
 
     local maxPos = table.getsize(effectiveTemplates)
     if maxPos == 0 then
@@ -572,7 +571,36 @@ function buildActionUnit(name, modifier)
     end
 end
 
--- Does not upgrade T1 facs that are currently upgrading to T2 to T3 when issued
+-- Helper function for the buildActionUpgrade() function below. 
+-- Recursively finds and tries to order possible upgrades from highest tech to lowest tech. This allows queuing upgrades
+-- successively using keybinds, even if the previous upgrade isn't finished yet.
+-- Doing this fully recursively is probably overkill as the support fac / HQ is the only time when there are more than
+-- two possible upgrade paths, and the cybran shield is the only building with more than two successive upgrades, but
+-- hacking it together didn't feel right, hence the 'better' recursive solution.
+function IssueUpgradeCommand(upgrades, buildableCategories)
+    local success = false
+    for _, u in upgrades do
+        local bp = __blueprints[u]
+        local successiveUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
+        if successiveUpgrades then
+            success = IssueUpgradeCommand(successiveUpgrades, buildableCategories)
+            if success then
+                break
+            end
+        end
+        if not success then
+            if EntityCategoryContains(buildableCategories, u) then
+                -- Queue the upgrade of the selected structure, if possible
+                IssueBlueprintCommand("UNITCOMMAND_Upgrade", u, 1, false)
+                success = true
+                break
+            end
+        end
+    end
+    return success 
+end
+
+-- Does support upgrading T1 structures (facs, radars, etc.) that are currently upgrading to T2 to T3 when issued
 function buildActionUpgrade()
     local selectedUnits = GetSelectedUnits()
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selectedUnits)
@@ -580,24 +608,13 @@ function buildActionUpgrade()
 
     for index, unit in selectedUnits do
         local bp = unit:GetBlueprint()
-        local cmd = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
-
+        -- If upgradeTab[bp.BlueprintId] returns a table, there are two or more possible upgrades, e.g. HQ and 
+        -- support factory. If instead bp.General.UpgradesTo returns a string, then there is only one possible 
+        -- upgrade, e.g. for a radar. For our helper function IssueUpgradeCommand we want a table, hence the { } 
+        -- brackets
+        local upgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
         SelectUnits({unit})
-        local success = false
-        if type(cmd) == "table" then -- Issue the first upgrade command that we may build
-            for k,v in cmd do
-                if EntityCategoryContains(buildableCategories, v) then
-                    IssueBlueprintCommand("UNITCOMMAND_Upgrade", v, 1, false)
-                    success = true
-                    break
-                end
-            end
-        elseif type(cmd) == "string" then -- Direct upgrade path
-            if EntityCategoryContains(buildableCategories, cmd) then
-                IssueBlueprintCommand("UNITCOMMAND_Upgrade", cmd, 1, false)
-                success = true
-            end
-        end
+        local success = IssueUpgradeCommand(upgrades, buildableCategories)
         if not success then
             result = false
         end

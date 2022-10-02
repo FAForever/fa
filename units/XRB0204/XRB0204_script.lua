@@ -6,6 +6,7 @@
 -----------------------------------------------------------------
 local CConstructionStructureUnit = import('/lua/cybranunits.lua').CConstructionStructureUnit
 
+---@class XRB0204 : CConstructionStructureUnit
 XRB0204 = Class(CConstructionStructureUnit) {
     OnStartBeingBuilt = function(self, builder, layer)
         CConstructionStructureUnit.OnStartBeingBuilt(self, builder, layer)
@@ -19,7 +20,7 @@ XRB0204 = Class(CConstructionStructureUnit) {
         local candidates = GetUnitsInRect(upos[1], upos[3], upos[1], upos[3])
         for k, v in candidates do
             if target == v:GetBlueprint().BlueprintId then
-                self:HideBone('xrb0304', true)
+                self:HideBone('xrb0204', true)
                 self:ShowBone('TurretT2', true)
                 self:ShowBone('Door2_B02', true)
                 self:ShowBone('B02', true)
@@ -32,7 +33,7 @@ XRB0204 = Class(CConstructionStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CConstructionStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
-        self:ShowBone('xrb0304', true)
+        self:ShowBone('xrb0204', true)
     end,
 }
 

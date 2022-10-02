@@ -1,3 +1,4 @@
+---@declare-global
 -- ==========================================================================================
 -- * File       : lua/system/utils.lua
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
@@ -475,9 +476,9 @@ function printField(k, v, tblName, printer)
 end
 
 --- Prints keys and values of a table and sub-tables if present
---- @param tbl specifies a table to print
---- @param tblPrefix specifies optional table prefix/name
---- @param printer specifies optional message printer: LOG, WARN, error, etc.
+--- @param tbl? table specifies a table to print
+--- @param tblPrefix? string specifies optional table prefix/name
+--- @param printer? function specifies optional message printer: LOG, WARN, error, etc.
 --- e.g. table.print(categories)
 ---      table.print(categories, 'categories')
 ---      table.print(categories, 'categories', 'WARN')
@@ -671,7 +672,9 @@ end
 
 --- Clamps numeric value to specified Min and Max range
 function math.clamp(v, min, max)
-    return math.max(min, math.min(max, v))
+    if v <= min then return min end
+    if v >= max then return max end
+    return v
 end
 
 -- Return a table parsed from key:value pairs passed on the command line
@@ -705,9 +708,9 @@ end
 --- timer:Start() -- then execute some LUA code
 --- timer:Stop()
 --- or
---- timer:Start('task1') -- then execute task #1
+--- timer:Start('task1') -- then execute task --1
 --- timer:Stop('task1')
---- timer:Start('task2') -- then execute task #2
+--- timer:Start('task2') -- then execute task --2
 --- timer:Stop('task2')
 function CreateTimer()
     return {

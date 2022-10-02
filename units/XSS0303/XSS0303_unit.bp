@@ -5,6 +5,7 @@ UnitBlueprint {
         RepairConsumeEnergy = 30,
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
+        GuardReturnRadius = 15,
     },
     Audio = {
         AmbientMove = Sound {
@@ -31,15 +32,6 @@ UnitBlueprint {
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
         },
     },
     BuildIconSortPriority = 30,
@@ -305,16 +297,14 @@ UnitBlueprint {
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 0.5,
             RenderFireClock = true,
-            TargetCheckInterval = 5,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Missile',
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XSS_Weapon',
@@ -357,19 +347,16 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.13333333333333,
             TurretBoneMuzzle = 'Right_Turret_Muzzle01',
             TurretBonePitch = 'Right_Turret_Barrel',
             TurretBoneYaw = 'Right_Turret',
@@ -384,7 +371,6 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XSS_Weapon',
@@ -428,18 +414,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.13333333333333,
             TurretBoneMuzzle = 'Left_Turret_Muzzle01',
             TurretBonePitch = 'Left_Turret_Barrel',
             TurretBoneYaw = 'Left_Turret',

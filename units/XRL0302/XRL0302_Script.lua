@@ -61,6 +61,7 @@ local DeathWeaponEMP = Class(Weapon) {
     end,
 }
 
+---@class XRL0302 : CWalkingLandUnit
 XRL0302 = Class(CWalkingLandUnit) {
 
     IntelEffects = {
@@ -94,7 +95,7 @@ XRL0302 = Class(CWalkingLandUnit) {
 
         self.EffectsBagXRL = TrashBag()
         self.AmbientExhaustEffectsBagXRL = TrashBag()
-        self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
+        self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
         self.PeriodicFXThread = self:ForkThread(self.EmitPeriodicEffects)
     end,
 

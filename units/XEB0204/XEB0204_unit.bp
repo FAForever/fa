@@ -1,6 +1,5 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 25,
         InitialAutoMode = true,
         ShowAssistRangeOnSelect = true,
         StagingPlatformScanRadius = 25,
@@ -124,10 +123,11 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 2500,
-        BuildCostMass = 500,
+        BuildCostEnergy = 5250,
+        BuildCostMass = 1050,
         BuildRate = 20,
         BuildTime = 2000,
+        DifferentialUpgradeCostCalculation = true,
         EngineeringPods = {
             {
                 CreateWithUnit = true,

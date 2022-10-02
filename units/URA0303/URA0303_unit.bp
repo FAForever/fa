@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
+        GuardScanRadius = 45,       -- 150% of range
     },
     Air = {
         AutoLandTime = 1,
@@ -80,15 +80,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTSC1',
@@ -110,7 +101,7 @@ UnitBlueprint {
     CollisionOffsetZ = 0,
     Defense = {
         AirThreatLevel = 9,
-        ArmorType = 'ASF', # Light
+        ArmorType = 'ASF',
         EconomyThreatLevel = 0,
         Health = 1725,
         MaxHealth = 1725,
@@ -256,7 +247,7 @@ UnitBlueprint {
     SelectionSizeX = 0.8,
     SelectionSizeZ = 1.1,
     SelectionThickness = 0.39,
-    SizeSphere = 2,
+    SizeSphere = 2.2,
     SizeX = 1,
     SizeY = 0.3,
     SizeZ = 1.2,
@@ -275,6 +266,11 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.4, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.0,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'URAWeapon',
@@ -286,7 +282,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 200, # 100
+            Damage = 200,
             DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
@@ -297,18 +293,18 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'Missiles1',
             MaxRadius = 30,
-            MuzzleSalvoDelay = 0, # 0.1
-            MuzzleSalvoSize = 1, # 2
+            MuzzleSalvoDelay = 0.1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 65,
             ProjectileId = '/projectiles/CAAMissileNanite03/CAAMissileNanite03_proj.bp',
             ProjectileLifetime = 3,
-            ProjectilesPerOnFire = 1, # 2
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
-                        'Missile_L',
+                        'Aim',
                     },
-                    RackBone = 'Missile_L',
+                    RackBone = 'Aim',
                 },
             },
             RackFireTogether = true,
@@ -322,90 +318,14 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.5, # 0.3
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 0,
-            TurretBoneMuzzle = 'Missile_L',
-            TurretBonePitch = 'Missile_L',
-            TurretBoneYaw = 'Missile_L',
-            TurretDualManipulators = false,
-            TurretPitch = 0,
-            TurretPitchRange = 55,
-            TurretPitchSpeed = 360,
-            TurretYaw = 0,
-            TurretYawRange = 55,
-            TurretYawSpeed = 360,
-            Turreted = true,
-            UseFiringSolutionInsteadOfAimBone = true,
-            WeaponCategory = 'Anti Air',
-        },
-        {
-            Audio = {
-                Fire = Sound {
-                    Bank = 'URAWeapon',
-                    Cue = 'URA0303_Missile_Nanite',
-                    LodCutoff = 'Weapon_LodCutoff',
-                },
-            },
-            AutoInitiateAttackCommand = true,
-            BallisticArc = 'RULEUBA_None',
-            CannotAttackGround = true,
-            CollideFriendly = false,
-            Damage = 200, # 100
-            DamageFriendly = false,
-            DamageRadius = 0,
-            DamageType = 'Normal',
-            DisplayName = 'Nanite Missile System',
-            FireTargetLayerCapsTable = {
-                Air = 'Air|Land|Water',
-                Land = 'Air|Land|Water',
-            },
-            FiringTolerance = 2,
-            Label = 'Missiles2',
-            MaxRadius = 30,
-            MuzzleSalvoDelay = 0, # 0.1
-            MuzzleSalvoSize = 1, # 2
-            MuzzleVelocity = 65,
-            PrefersPrimaryWeaponTarget = true,
-            ProjectileId = '/projectiles/CAAMissileNanite03/CAAMissileNanite03_proj.bp',
-            ProjectileLifetime = 3,
-            ProjectilesPerOnFire = 1, #2
-            RackBones = {
-                {
-                    MuzzleBones = {
-                        'Missile_R',
-                    },
-                    RackBone = 'Missile_R',
-                },
-            },
-            RackFireTogether = true,
-            RackRecoilDistance = 0,
-            RackReloadTimeout = 10,
-            RackSalvoChargeTime = 0,
-            RackSalvoReloadTime = 0,
-            RackSalvoSize = 1,
-            RackSlavedToTurret = false,
-            RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1,
-            SlavedToBody = true,
-            SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.5, # 0.3
-            TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
-            },
-            TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
-            TargetRestrictOnlyAllow = 'AIR',
-            TurretBoneMuzzle = 'Missile_R',
-            TurretBonePitch = 'Missile_R',
-            TurretBoneYaw = 'Missile_R',
+            TurretBoneMuzzle = 'Aim',
+            TurretBonePitch = 'Aim',
+            TurretBoneYaw = 'Aim',
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 55,

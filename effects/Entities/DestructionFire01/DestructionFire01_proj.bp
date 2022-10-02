@@ -1,0 +1,17 @@
+ProjectileBlueprint {
+    Physics = {
+        CollideEntity = false,
+        CollideSurface = false,
+        DestroyOnWater = true,
+        DirectionX = 0,
+        DirectionXRange = 0.1,
+        DirectionY = 0.375,
+        DirectionYRange = 0.25,
+        DirectionZ = 0,
+        DirectionZRange = 0.1,
+        InitialSpeed = 3.75,
+        InitialSpeedRange = 1.75,
+        RotationalVelocity = 15,
+        RotationalVelocityRange = 15,
+    },
+}

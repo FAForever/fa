@@ -1,0 +1,181 @@
+UnitBlueprint {
+    BuildIconSortPriority = 60,
+    Categories = {
+        'SELECTABLE',
+        'MOBILE',
+        'LAND',
+        'TECH1',
+        'DIRECTFIRE',
+        'HOVER',
+        'CIVILIAN',
+        'VISIBLETORECON',
+        'RECLAIMABLE',
+    },
+    Defense = {
+        ArmorType = 'Normal',
+        Health = 170,
+        MaxHealth = 170,
+        RegenRate = 0,
+    },
+    Description = '<LOC opc2002_desc>Seraphim Tech',
+    Display = {
+        Abilities = {
+            '<LOC ability_radar>Radar',
+        },
+        IdleEffects = {
+            Land = {
+                Effects = {
+                    {
+                        Bones = {
+                            0,
+                        },
+                        Offset = {
+                            0,
+                            -0.25,
+                            0,
+                        },
+                        Scale = 0.75,
+                        Type = 'AeonGroundFX01',
+                    },
+                },
+            },
+        },
+        Mesh = {
+            IconFadeInZoom = 130,
+            LODs = {
+                {
+                    LODCutoff = 100,
+                    ShaderName = 'Aeon',
+                },
+            },
+        },
+        MovementEffects = {
+            Land = {
+                Effects = {
+                    {
+                        Bones = {
+                            0,
+                        },
+                        Type = 'GroundKickup01',
+                    },
+                    {
+                        Bones = {
+                            0,
+                        },
+                        Offset = {
+                            0,
+                            -0.05,
+                            0,
+                        },
+                        Scale = 0.75,
+                        Type = 'AeonGroundFX01',
+                    },
+                },
+            },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            0,
+                        },
+                        Scale = 0.3,
+                        Type = 'BackWake',
+                    },
+                },
+            },
+        },
+        PlaceholderMeshName = 'UXL0011',
+        SpawnRandomRotation = true,
+        UniformScale = 0.06,
+    },
+    Economy = {
+        BuildCostEnergy = 260,
+        BuildCostMass = 52,
+        BuildTime = 130,
+        TeleportEnergyMod = 0.15,
+        TeleportMassMod = 1,
+        TeleportTimeMod = 0.01,
+    },
+    General = {
+        CommandCaps = {
+            RULEUCC_Attack = true,
+            RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = true,
+            RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = true,
+            RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
+        },
+        FactionName = 'Aeon',
+        UnitWeight = 1,
+    },
+    Intel = {
+        VisionRadius = 20,
+    },
+    Interface = {
+        HelpText = '<LOC opc2002_desc>Seraphim Tech',
+    },
+    LifeBarHeight = 0.075,
+    LifeBarOffset = 0.45,
+    LifeBarSize = 0.5,
+    Physics = {
+        BankingSlope = 0.5,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        DragCoefficient = 0.2,
+        Elevation = 1,
+        MaxAcceleration = 0.38,
+        MaxBrake = 1.9,
+        MaxSpeed = 3.8,
+        MaxSpeedReverse = 0,
+        MaxSteerForce = 1000,
+        MeshExtentsX = 0.75,
+        MeshExtentsY = 0.5,
+        MeshExtentsZ = 0.8,
+        MinSpeedPercent = 0,
+        MotionType = 'RULEUMT_Hover',
+        RotateBodyWhileMoving = true,
+        RotateOnSpot = true,
+        RotateOnSpotThreshold = 0.5,
+        TurnFacingRate = 120,
+        TurnRadius = 0,
+        TurnRate = 45,
+    },
+    SelectionSizeX = 0.6,
+    SelectionSizeZ = 0.6,
+    SelectionThickness = 0.57,
+    SizeX = 0.75,
+    SizeY = 0.75,
+    SizeZ = 0.75,
+    StrategicIconName = 'icon_land_generic',
+    StrategicIconSortPriority = 207,
+    Transport = {
+        CanFireFromTransport = true,
+        TransportClass = 2,
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
+        },
+    },
+}

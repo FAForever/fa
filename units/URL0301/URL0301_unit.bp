@@ -1,13 +1,13 @@
 UnitBlueprint {
     AI = {
-        GuardRadius = 10,
+        GuardScanRadius = 26, -- allows for factory reclaim bug 
         TargetBones = {
             'Torso',
             'Head',
-#            'Right_Arm01',
-#            'Left_Arm01',
-#            'Left_Thigh',
-#            'Right_Thigh',
+--            'Right_Arm01',
+--            'Left_Arm01',
+--            'Left_Thigh',
+--            'Right_Thigh',
         },
     },
     Audio = {
@@ -100,15 +100,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Cybran_Select_Commander',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
         },
     },
     BuildIconSortPriority = 10,
@@ -779,14 +770,13 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE TECH1',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Laser',
@@ -805,7 +795,6 @@ UnitBlueprint {
         },
         {
             AboveWaterFireOnly = true,
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',
@@ -855,18 +844,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.3,
-            TargetCheckInterval = 0.333,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Muzzle01',
             TurretBonePitch = 'Barrel01',
             TurretBoneYaw = 'Barrel01',
@@ -906,7 +892,6 @@ UnitBlueprint {
             },
             RackRecoilDistance = 0,
             RateOfFire = 1,
-            TargetCheckInterval = 9999999,
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',

@@ -1,14 +1,15 @@
---#****************************************************************************
---#**
---#**  File     :  /data/units/XES0205/XES0205_script.lua
---#**  Author(s):  Jessica St. Croix
---#**
---#**  Summary  :  UEF Mobile Shield Boat Script
---#**
---#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /data/units/XES0205/XES0205_script.lua
+----**  Author(s):  Jessica St. Croix
+----**
+----**  Summary  :  UEF Mobile Shield Boat Script
+----**
+----**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local TShieldSeaUnit = import('/lua/terranunits.lua').TShieldSeaUnit
 
+---@class XES0205 : TShieldSeaUnit
 XES0205 = Class(TShieldSeaUnit) {
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_shipmobile_01_emit.bp',

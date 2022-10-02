@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardScanRadius = 26, -- allows for factory reclaim bug 
         TargetBones = {
             'XSL0105',
         },
@@ -88,7 +89,7 @@ UnitBlueprint {
         'PATROLHELPER',
         'SHOWQUEUE',
     },
-    CollisionOffsetY = -0.25,
+    CollisionOffsetY = -0.15,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -309,9 +310,9 @@ UnitBlueprint {
     SelectionSizeX = 0.4,
     SelectionSizeZ = 0.4,
     SelectionThickness = 0.99,
-    SizeX = 0.8,
-    SizeY = 0.7,
-    SizeZ = 0.8,
+    SizeX = 0.6,
+    SizeY = 0.65,
+    SizeZ = 0.7,
     StrategicIconName = 'icon_land1_engineer',
     StrategicIconSortPriority = 105,
     Wreckage = {

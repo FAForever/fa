@@ -1,21 +1,21 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/TechMain.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/TechMain.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'TechMain',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1SpeedUpgradeBuilders',
         'T2SpeedUpgradeBuilders',
 
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
@@ -23,43 +23,43 @@ BaseBuilderTemplate {
         'EngineerFactoryConstruction',
         'EngineerFactoryConstructionAirHigherPriority',
 
-        # Engineer Support buildings
+        -- Engineer Support buildings
         'EngineeringSupportBuilder',
 
-        # Build energy at this base
+        -- Build energy at this base
         'EngineerEnergyBuilders',
 
-        # Build Mass high pri at this base
+        -- Build Mass high pri at this base
         'EngineerMassBuildersHighPri',
 
-        # Extractors
+        -- Extractors
         'Time Exempt Extractor Upgrades',
 
-        # ACU Builders
+        -- ACU Builders
         'Default Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
         'ACUUpgrades - Tech 2 Engineering',
         'ACUUpgrades - Shields',
 
-        # ACU Defense
+        -- ACU Defense
         'T1ACUDefenses',
         'T2ACUDefenses',
         'T2ACUShields',
         'T3ACUShields',
         'T3ACUNukeDefenses',
 
-        # ==== EXPANSION ==== #
+        -- ==== EXPANSION ==== --
         'EngineerExpansionBuildersFull',
         'EngineerExpansionBuildersSmall',
-        #'EngineerFirebaseBuilders',
+        --'EngineerFirebaseBuilders',
 
-        # ==== DEFENSES ==== #
+        -- ==== DEFENSES ==== --
         'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
 
-        #'T2MissileDefenses',
+        --'T2MissileDefenses',
         'T2ArtilleryFormBuilders',
 
         'T1DefensivePoints',
@@ -75,10 +75,10 @@ BaseBuilderTemplate {
 
         'MiscDefensesEngineerBuilders',
 
-        # ==== NAVAL EXPANSION ==== #
+        -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders',
 
-        # ==== LAND UNIT BUILDERS ==== #
+        -- ==== LAND UNIT BUILDERS ==== --
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
         'T3LandFactoryBuilders',
@@ -95,7 +95,7 @@ BaseBuilderTemplate {
         'T2ReactionDF',
         'T3ReactionDF',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'T1AirFactoryBuilders',
         'T2AirFactoryBuilders',
         'T3AirFactoryBuilders',
@@ -111,11 +111,11 @@ BaseBuilderTemplate {
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuilders',
 
-        # ==== UNIT CAP BUILDERS ==== #
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 
-        # ==== ARTILLERY BUILDERS ==== #
+        -- ==== ARTILLERY BUILDERS ==== --
         'T3ArtilleryGroup',
         'T3ArtilleryFormBuilders',
 
@@ -124,7 +124,7 @@ BaseBuilderTemplate {
         'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
-        # ==== EXPERIMENTALS ==== #
+        -- ==== EXPERIMENTALS ==== --
         'MobileLandExperimentalEngineers',
         'MobileLandExperimentalForm',
 
@@ -159,7 +159,7 @@ BaseBuilderTemplate {
             SCU = 4,
         },
         FactoryCount = {
-            #DUNCAN - Factory number tweaks, was 3, 3, 0, 1
+            --DUNCAN - Factory number tweaks, was 3, 3, 0, 1
             Land = 4,
             Air = 5,
             Sea = 0,
@@ -186,13 +186,13 @@ BaseBuilderTemplate {
         local mapSizeX, mapSizeZ = GetMapSize()
         local startX, startZ = aiBrain:GetArmyStartPos()
 
-        #If we're playing on a 256 map
+        --If we're playing on a 256 map
         if mapSizeX < 500 and mapSizeZ < 500 then
             return 10, 'tech'
-        #If we're playing on a 512 map
+        --If we're playing on a 512 map
         elseif mapSizeX > 500 and mapSizeZ > 500 and mapSizeX < 1000 and mapSizeZ < 1000 then
             return Random(50, 75), 'tech'
-        #If we're playing on a 1024 or bigger
+        --If we're playing on a 1024 or bigger
         elseif mapSizeX > 1000 and mapSizeZ > 1000 then
             return Random(65, 100), 'tech'
         elseif mapSizeX > 2000 and mapSizeZ > 2000 then

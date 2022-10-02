@@ -52,15 +52,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 40,
-            Level3 = 70,
-            Level4 = 95,
-            Level5 = 125,
-        },
-    },
     BuildIconSortPriority = 20,
     Categories = {
         'PRODUCTSC1',
@@ -74,8 +65,6 @@ UnitBlueprint {
         'BOT',
         'DIRECTFIRE',
         'AMPHIBIOUS',
-        'ANTIAIR',
-        'ANTINAVY',
         'NEEDMOBILEBUILD',
         'INTELLIGENCE',
         'COUNTERINTELLIGENCE',
@@ -349,7 +338,6 @@ UnitBlueprint {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = true,
-            AlwaysRecheckTarget = false,
             Audio = {
                 BeamLoop = Sound {
                     Bank = 'URLWeapon',
@@ -412,7 +400,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 10,
-            TargetCheckInterval = 0.3,
             MaximumBeamLength = 26,
             TargetPriorities = {
                 'EXPERIMENTAL',
@@ -421,7 +408,7 @@ UnitBlueprint {
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Center_Turret_Muzzle',
@@ -438,7 +425,6 @@ UnitBlueprint {
             WeaponCategory = 'Direct Fire Experimental',
             WeaponRepackTimeout = 0,
             WeaponUnpacks = false,
-            TrackingRadius = 1.15,
         },
         {
             AboveWaterFireOnly = true,
@@ -490,16 +476,14 @@ UnitBlueprint {
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 1.5,
             SlavedToBody = false,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'TECH1 MOBILE',
                 'TECH2 MOBILE',
                 'TECH3 MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
             TurretBonePitch = 'Right_Turret_Barrel',
             TurretBoneYaw = 'Right_Turret',
@@ -564,16 +548,14 @@ UnitBlueprint {
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 1.5,
             SlavedToBody = false,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'TECH1 MOBILE',
                 'TECH2 MOBILE',
                 'TECH3 MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Left_Turret_Muzzle',
             TurretBonePitch = 'Left_Turret_Barrel',
             TurretBoneYaw = 'Left_Turret',
@@ -589,7 +571,6 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',
@@ -635,18 +616,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretPitch = 0,
             TurretPitchRange = 0,
             TurretPitchSpeed = 0,
@@ -657,7 +635,6 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',
@@ -704,18 +681,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretPitch = 0,
             TurretPitchRange = 0,
             TurretPitchSpeed = 0,
@@ -770,16 +744,14 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
             RateOfFire = 0.25,
-            TargetCheckInterval = 2.5,
             TargetPriorities = {
                 'SUBMERSIBLE',
                 '(STRUCTURE * DEFENSE - ANTIAIR)',
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
                 'MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
-            TrackingRadius = 1.15,
             TurretPitch = 0,
             TurretPitchRange = 0,
             TurretPitchSpeed = 0,

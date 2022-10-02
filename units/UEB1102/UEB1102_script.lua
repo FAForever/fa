@@ -5,11 +5,12 @@
 --
 --  Summary  :  UEF Hydrocarbon Power Plant Script
 --
---  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
 local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
 
+---@class UEB1102 : TEnergyCreationUnit
 UEB1102 = Class(TEnergyCreationUnit) {
     DestructionPartsHighToss = {'Exhaust01',},
     DestructionPartsLowToss = {'Exhaust01','Exhaust02','Exhaust03','Exhaust04','Exhaust05',},
@@ -27,7 +28,7 @@ UEB1102 = Class(TEnergyCreationUnit) {
 
     ActiveState = State {
         Main = function(self)
-            # Play the "activate" sound
+            -- Play the "activate" sound
             local myBlueprint = self:GetBlueprint()
             if myBlueprint.Audio.Activate then
                 self:PlaySound(myBlueprint.Audio.Activate)

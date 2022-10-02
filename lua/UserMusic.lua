@@ -1,12 +1,12 @@
---#****************************************************************************
---# UserMusic
---# Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---#
---#****************************************************************************
+----****************************************************************************
+---- UserMusic
+---- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+----
+----****************************************************************************
 
---#****************************************************************************
---# Config options
---#****************************************************************************
+----****************************************************************************
+---- Config options
+----****************************************************************************
 
 -- List of battle cues to cycle through
 local BattleCues = {
@@ -31,9 +31,9 @@ local BattleCounterReset = 30 -- 3 seconds
 -- How many ticks of battle inactivity until we switch back to peaceful music
 local PeaceTimer = 200 -- 20 seconds
 
---#****************************************************************************
---# Internal
---#****************************************************************************
+----****************************************************************************
+---- Internal
+----****************************************************************************
 
 -- The last tick in which we got a battle notification
 local LastBattleNotify = 0
@@ -54,9 +54,10 @@ local PeaceCueIndex = 1
 local currentMusic = nil
 local battleWatch = nil
 local paused = GetVolume("Music") == 0
-
+local nomusicSwitchSet = HasCommandLineArg("/nomusic")
 
 function NotifyBattle()
+    if nomusicSwitchSet then return end -- nomusic set - save threading
     local tick = GameTick()
     local prevNotify = LastBattleNotify
     LastBattleNotify = tick
@@ -76,6 +77,7 @@ function NotifyBattle()
 end
 
 function StartBattleMusic()
+    if nomusicSwitchSet then return end -- nomusic set - save threading
     BattleStart = GameTick()
     PlayMusic(BattleCues[BattleCueIndex], 0) -- immediately
     BattleCueIndex = math.mod(BattleCueIndex,table.getn(BattleCues)) + 1
@@ -93,6 +95,7 @@ function StartBattleMusic()
 end
 
 function StartPeaceMusic()
+    if nomusicSwitchSet then return end -- nomusic set - save threading
     BattleStart = 0
     BattleEventCounter = 0
     LastBattleNotify = GameTick()

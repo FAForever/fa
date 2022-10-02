@@ -65,22 +65,45 @@ integratedMods = LowerHashTable(integratedMods)
 -- mods that are deprecated, based on folder name
 local deprecatedMods = { }
 deprecatedMods["simspeed++"] = true
+deprecatedMods["#quality of performance 2022"] = true
+
+-- as per #4119 the control groups (called selection sets in code) are completely overhauled and extended feature-wise,
+-- because of that these mods are no longer viable.
+deprecatedMods["group_split"] = true
+deprecatedMods["Control Group Zoom Mod"] = true
+deprecatedMods["additionalControlGroupStuff"] = true
+
+-- as per #4124 the cursor and command interactions are complete overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["additionalCameraStuff"] = true
+deprecatedMods["RUI"] = true
 deprecatedMods = LowerHashTable(deprecatedMods)
+
+-- as per #4232 the reclaim view is completely overhauled
+deprecatedMods["Advanced Reclaim&Selection Info"] = true
+deprecatedMods["AdvancedReclaimInfo"] = true
+deprecatedMods["BetterReclaimView"] = true
+deprecatedMods["disableReclaimUI"] = true
+deprecatedMods["DynamicReclaimGrouping"] = true
+deprecatedMods["EzReclaim"] = true
+deprecatedMods["OnScreenReclaimCounter"] = true
+deprecatedMods["ORV"] = true
+deprecatedMods["SmartReclaimSupport"] = true
 
 -- typical FA packages
 local allowedAssetsScd = { }
 allowedAssetsScd["units.scd"] = true
 allowedAssetsScd["textures.scd"] = true
 allowedAssetsScd["skins.scd"] = true
-allowedAssetsScd["schook.scd"] = true
+allowedAssetsScd["schook.scd"] = false      -- completely embedded in the repository
 allowedAssetsScd["props.scd"] = true
 allowedAssetsScd["projectiles.scd"] = true
 allowedAssetsScd["objects.scd"] = true
-allowedAssetsScd["moholua.scd"] = true
-allowedAssetsScd["mohodata.scd"] = true
+allowedAssetsScd["moholua.scd"] = false     -- completely embedded in the repository
+allowedAssetsScd["mohodata.scd"] = false    -- completely embedded in the repository
 allowedAssetsScd["mods.scd"] = true
 allowedAssetsScd["meshes.scd"] = true
-allowedAssetsScd["lua.scd"] = true
+allowedAssetsScd["lua.scd"] = false         -- completely embedded in the repository
 allowedAssetsScd["loc_us.scd"] = true
 allowedAssetsScd["loc_es.scd"] = true
 allowedAssetsScd["loc_fr.scd"] = true
@@ -89,9 +112,8 @@ allowedAssetsScd["loc_de.scd"] = true
 allowedAssetsScd["loc_ru.scd"] = true
 allowedAssetsScd["env.scd"] = true
 allowedAssetsScd["effects.scd"] = true
-allowedAssetsScd["editor.scd"] = true
-allowedAssetsScd["ambience.scd"] = true
-allowedAssetsScd["lobbymanager_v105.scd"] = true
+allowedAssetsScd["editor.scd"] = false      -- Unused
+allowedAssetsScd["ambience.scd"] = false    -- Empty 
 allowedAssetsScd["sc_music.scd"] = true
 allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 
@@ -134,22 +156,6 @@ local function MountDirectory(dir, mountpoint)
     UpvaluedPathNext = UpvaluedPathNext + 1
 end
 
---- Mounts all allowed content in a directory, including scd and zip files, to the mountpoint.
--- @param dir The absolute path to the directory
--- @param mountpoint The path to use in the game (e.g., /maps/...)
-local function MountContent(dir, mountpoint, allowedAssets)
-    for _,entry in IoDir(dir .. '/*') do
-        if entry != '.' and entry != '..' then
-            local mp = StringLower(entry)
-            if allowedAssets[mp] then 
-                MountDirectory(dir .. '/' .. entry, mountpoint .. '/' .. mp)
-            else 
-                LOG("Prevented loading content that is not allowed: " .. entry)
-            end
-        end
-    end
-end
-
 --- Mounts all allowed content in a directory, including scd and zip files, directly.
 -- @param dir The absolute path to the directory
 -- @param mountpoint The path to use in the game (e.g., /maps/...)
@@ -158,9 +164,8 @@ local function MountAllowedContent(dir, pattern, allowedAssets)
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
             if allowedAssets[mp] then 
+                LOG("Mounting content: " .. entry)
                 MountDirectory(dir .. "/" .. entry, '/')
-            else 
-                LOG("Prevented loading content that is not allowed: " .. entry)
             end
         end
     end
@@ -445,7 +450,7 @@ allowedAssetsNxy["lua.nx5"] = true
 allowedAssetsNxy["meshes.nx5"] = true
 allowedAssetsNxy["mods.nx5"] = true
 allowedAssetsNxy["projectiles.nx5"] = true
-allowedAssetsNxy["schook.nx5"] = true
+-- allowedAssetsNxy["schook.nx5"] = true
 allowedAssetsNxy["textures.nx5"] = true
 allowedAssetsNxy["units.nx5"] = true
 allowedAssetsNxy = LowerHashTable(allowedAssetsNxy)

@@ -209,6 +209,7 @@ function ResetOrderQueue(factory)
 end
 
 function ResetOrderQueues(units)
+    LOG("ResetOrderQueues")
     local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY, units)
     if factories[1] then
         Select.Hidden(function()
@@ -1199,93 +1200,95 @@ end
 
 function OrderEnhancement(item, clean, destroy)
     local units = sortedOptions.selection
-    local enhancementQueue = getEnhancementQueue()
+    if not table.empty(units) then
+        local enhancementQueue = getEnhancementQueue()
+        
+        SetIgnoreSelection(true)
+        for _, unit in units do
+            local orders = {}
+            local cleanOrder = clean
+            local id = unit:GetEntityId()
+            local existingEnhancements = EnhanceCommon.GetEnhancements(id)
 
-    SetIgnoreSelection(true)
-    for _, unit in units do
-        local orders = {}
-        local cleanOrder = clean
-        local id = unit:GetEntityId()
-        local existingEnhancements = EnhanceCommon.GetEnhancements(id)
+            SelectUnits({unit})
 
-        SelectUnits({unit})
+            if clean and not EnhancementQueueFile.currentlyUpgrading(unit) then
+                enhancementQueue[id] = {}
+            end
 
-        if clean and not EnhancementQueueFile.currentlyUpgrading(unit) then
-            enhancementQueue[id] = {}
-        end
+            local doOrder = true
+            local prereqAlreadyOrdered = false
+            local removeAlreadyOrdered = false
 
-        local doOrder = true
-        local prereqAlreadyOrdered = false
-        local removeAlreadyOrdered = false
+            local slot = item.enhTable.Slot
+            local enhSlot = existingEnhancements[slot]
+            local enhTableId = item.enhTable.ID
+            local prereq = item.enhTable.Prerequisite
 
-        local slot = item.enhTable.Slot
-        local enhSlot = existingEnhancements[slot]
-        local enhTableId = item.enhTable.ID
-        local prereq = item.enhTable.Prerequisite
-
-        for _, enhancement in enhancementQueue[id] or {} do
-            local enhId = enhancement.ID
-            if enhancement.Slot == slot then
-                if string.find(enhId, 'Remove') and enhId == (enhSlot .. 'Remove') then
-                    removeAlreadyOrdered = true
-                elseif enhId == enhTableId or enhId ~= prereq then
-                    doOrder = false
-                    break
-                elseif enhId == prereq then
-                    prereqAlreadyOrdered = true
+            for _, enhancement in enhancementQueue[id] or {} do
+                local enhId = enhancement.ID
+                if enhancement.Slot == slot then
+                    if string.find(enhId, 'Remove') and enhId == (enhSlot .. 'Remove') then
+                        removeAlreadyOrdered = true
+                    elseif enhId == enhTableId or enhId ~= prereq then
+                        doOrder = false
+                        break
+                    elseif enhId == prereq then
+                        prereqAlreadyOrdered = true
+                    end
                 end
             end
-        end
 
-        if enhSlot == enhTableId then
-            doOrder = false
-        end
+            if enhSlot == enhTableId then
+                doOrder = false
+            end
 
-        if doOrder == false then
-            continue
-        end
-
-        if not removeAlreadyOrdered and enhSlot and enhSlot ~= prereq then
-            if not destroy then
+            if doOrder == false then
                 continue
             end
 
-            table.insert(orders, enhSlot .. 'Remove')
-        end
+            if not removeAlreadyOrdered and enhSlot and enhSlot ~= prereq then
+                if not destroy then
+                    continue
+                end
 
-        if cleanOrder and not unit:IsIdle() then
-            local cmdqueue = unit:GetCommandQueue()
-            if cmdqueue and cmdqueue[1] and cmdqueue[1].type == 'Script' then
-                cleanOrder = false
+                table.insert(orders, enhSlot .. 'Remove')
+            end
+
+            if cleanOrder and not unit:IsIdle() then
+                local cmdqueue = unit:GetCommandQueue()
+                if cmdqueue and cmdqueue[1] and cmdqueue[1].type == 'Script' then
+                    cleanOrder = false
+                end
+            end
+
+            if prereq and prereq ~= enhSlot and not prereqAlreadyOrdered then
+                table.insert(orders, prereq)
+            end
+
+            table.insert(orders, item.id)
+
+            local first_order = true
+            for _, order in orders do
+                orderTable = {TaskName = 'EnhanceTask', Enhancement = order}
+                IssueCommand("UNITCOMMAND_Script", orderTable, cleanOrder)
+                if first_order and cleanOrder then
+                    cleanOrder = false
+                    first_order = false
+                end
+            end
+
+            if unit:IsInCategory('COMMAND') then
+                local availableOrders, availableToggles, buildableCategories = GetUnitCommandData({unit})
+                OnSelection(buildableCategories, {unit}, true)
             end
         end
 
-        if prereq and prereq ~= enhSlot and not prereqAlreadyOrdered then
-            table.insert(orders, prereq)
-        end
+        SelectUnits(units)
+        SetIgnoreSelection(false)
 
-        table.insert(orders, item.id)
-
-        local first_order = true
-        for _, order in orders do
-            orderTable = {TaskName = 'EnhanceTask', Enhancement = order}
-            IssueCommand("UNITCOMMAND_Script", orderTable, cleanOrder)
-            if first_order and cleanOrder then
-                cleanOrder = false
-                first_order = false
-            end
-        end
-
-        if unit:IsInCategory('COMMAND') then
-            local availableOrders, availableToggles, buildableCategories = GetUnitCommandData({unit})
-            OnSelection(buildableCategories, {unit}, true)
-        end
+        controls.choices:Refresh(FormatData(sortedOptions[item.enhTable.Slot], item.enhTable.Slot))
     end
-
-    SelectUnits(units)
-    SetIgnoreSelection(false)
-
-    controls.choices:Refresh(FormatData(sortedOptions[item.enhTable.Slot], item.enhTable.Slot))
 end
 
 function OnClickHandler(button, modifiers)
@@ -1528,11 +1531,11 @@ function OnClickHandler(button, modifiers)
                     UIUtil.QuickDialog(GetFrame(0), "<LOC enhancedlg_0000>Choosing this enhancement will destroy the existing enhancement in this slot.  Are you sure?",
                         "<LOC _Yes>",
                         function()
-                            OrderEnhancement(item, clean, true)
+                            safecall("OrderEnhancement", OrderEnhancement, item, clean, true)
                         end,
                         "<LOC _No>",
                         function()
-                            OrderEnhancement(item, clean, false)
+                            safecall("OrderEnhancement", OrderEnhancement, item, clean, false)
                         end,
                         nil, nil,
                         true,  {worldCover = true, enterButton = 1, escapeButton = 2})

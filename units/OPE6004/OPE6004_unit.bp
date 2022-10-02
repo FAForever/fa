@@ -1,0 +1,87 @@
+UnitBlueprint {
+    Categories = {
+        'OPERATION',
+        'VISIBLETORECON',
+        'RECLAIMABLE',
+    },
+    Defense = {
+        ArmorType = 'Normal',
+        Health = 500,
+        MaxHealth = 500,
+        RegenRate = 0,
+    },
+    Description = '<LOC ope6004_desc>Black Sun Power',
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 200,
+            LODs = {
+                {
+                    AlbedoName = '/Env/Structures/Props/UEF_Power01_albedo.dds',
+                    LODCutoff = 250,
+                    MeshName = '/Env/Structures/Props/UEF_Power01_lod0.scm',
+                    Shader = 'TMeshAlpha',
+                },
+            },
+        },
+        SpawnRandomRotation = false,
+        UniformScale = 0.1,
+    },
+    Economy = {
+        BuildCostEnergy = 0,
+        BuildCostMass = 0,
+    },
+    General = {
+        Classification = 'RULEUC_MiscSupport',
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = false,
+            RULEUCC_Move = false,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = false,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
+            RULEUCC_Stop = false,
+            RULEUCC_Transport = false,
+        },
+        FactionName = 'Cybran',
+        TechLevel = 'RULEUTL_Basic',
+    },
+    Interface = {
+        HelpText = '<LOC ope6004_help>Black Sun Power',
+    },
+    LifeBarHeight = 0.075,
+    Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        MotionType = 'RULEUMT_None',
+    },
+    SelectionThickness = 0.2,
+    SizeX = 1,
+    SizeY = 0.5,
+    SizeZ = 1,
+    StrategicIconName = 'icon_structure_generic',
+    StrategicIconSortPriority = 207,
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
+        },
+    },
+}

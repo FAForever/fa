@@ -14,6 +14,7 @@ local AIFQuasarAntiTorpedoWeapon = WeaponsFile.AIFQuasarAntiTorpedoWeapon
 
 local CreateAeonTempestBuildingEffects = import("/lua/effectutilities.lua").CreateAeonTempestBuildingEffects
 
+---@class UAS0401 : ASeaUnit
 UAS0401 = Class(ASeaUnit) {
     BuildAttachBone = 'Attachpoint01',
 

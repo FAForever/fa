@@ -1,0 +1,44 @@
+---@meta
+
+---@class EmitterBlueprint : EffectBlueprint
+---@field SizeCurve             EffectCurve  Size of emitter over time
+---@field XDirectionCurve       EffectCurve  X direction
+---@field YDirectionCurve       EffectCurve  Y direction
+---@field ZDirectionCurve       EffectCurve  Z direction
+---@field EmitRateCurve         EffectCurve
+---@field LifetimeCurve         EffectCurve
+---@field VelocityCurve         EffectCurve
+---@field XAccelCurve           EffectCurve
+---@field YAccelCurve           EffectCurve
+---@field ZAccelCurve           EffectCurve
+---@field ResistanceCurve       EffectCurve  drag coefficient (actually, the drag coefficient divied by the mass)
+---@field StartSizeCurve        EffectCurve
+---@field EndSizeCurve          EffectCurve
+---@field InitialRotationCurve  EffectCurve
+---@field RotationRateCurve     EffectCurve
+---@field FrameRateCurve        EffectCurve
+---@field TextureSelectionCurve EffectCurve
+---@field XPosCurve             EffectCurve  X Offset Curve
+---@field YPosCurve             EffectCurve  Y Offset Curve
+---@field ZPosCurve             EffectCurve  Z Offset Curve
+---@field RampSelectionCurve    EffectCurve
+---@field LocalVelocity         boolean      Is velocity attached to bone
+---@field LocalAcceleration     boolean      Is acceleration attached to bone
+---@field Gravity               boolean      Gravity enabled?
+---@field AlignRotation         boolean      Align the rotation of the particle with direction?
+---@field AlignToBone           boolean      Align the intitial rotation of the particle to the bone
+---@field ParticleResistance    boolean      true to enable the use of drag on a particle
+---@field CreateIfVisible       boolean      when this emitter is initially created only create and emit if visible
+---@field Flat                  boolean      Make the particles flat in world space.
+---@field InterpolateEmission   boolean      Interpolate emission over tick
+---@field SnapToWaterline       boolean      Snap underwater emission to the waterline
+---@field OnlyEmitOnWater       boolean      Only emit if over water
+---@field TextureStripcount     number       Number of strips in the animated texture
+---@field SortOrder             number       Sort order of particles emitted
+---@field Lifetime              number       Lifetime of emitter in ticks
+---@field Distance              number       emission cuts out.
+---@field Repeattime            number       Repeattime of emitter in ticks
+---@field TextureFramecount     number       number of frames in texture we are using.
+---@field Blendmode             number       Blendmode for this emitter.
+---@field TextureName           string       Texture Name of texture we are using for this particle
+---@field RampTexture           string       Name of ramp texture we are using for this particle

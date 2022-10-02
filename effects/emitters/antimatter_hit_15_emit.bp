@@ -24,8 +24,8 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/glow_02.dds]],
-    RampTexture = [[/textures/particles/ramp_nuke_04.dds]],
+    Texture = '/textures/particles/glow_02.dds',
+    RampTexture = '/textures/particles/ramp_nuke_04.dds',
     XDirectionCurve = {
         XRange = 1.00,
         Keys = {

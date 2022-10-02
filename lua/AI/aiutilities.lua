@@ -14,6 +14,7 @@ local Buff = import('/lua/sim/Buff.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local AIBehaviors = import('/lua/ai/AIBehaviors.lua')
 
+---@param aiBrain AIBrain
 function AIGetEconomyNumbers(aiBrain)
     local econ = {}
     econ.MassTrend = aiBrain:GetEconomyTrend('MASS')

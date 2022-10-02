@@ -6,7 +6,7 @@
 --  Summary  :  Thuntho Artillery Shell Projectile script
 --              Seraphim T1 Artillery : XSL0103
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 -- cache for re-using of memory
