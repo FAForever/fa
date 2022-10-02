@@ -2132,9 +2132,9 @@ float PBR_GeometrySmith(float3 n, float3 v, float3 l, float roughness)
     return gs1 * gs2;
 }
 
-float logisticFn(float x, float x0, float k, float L)
+float logisticFn(float x, float x0, float k, float L, float m)
 {
-    float denom = 1 + pow(EU, -k * (x-x0));
+    float denom = 1 + pow(EU, -k * (m * x - x0));
     return L / denom;
 }
 
@@ -2151,7 +2151,8 @@ float4 PBR_PS(
     float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
     float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float3 v = vertex.viewDirection;
-    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, n));
+    float3 environmentLightDirection = reflect(-vertex.viewDirection, n);
+    float3 environment = texCUBE(environmentSampler, environmentLightDirection);
     float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
 
 /*     float3 ambient = pow(sunAmbient, gamma) * ao * .1;
@@ -2167,7 +2168,7 @@ float4 PBR_PS(
     //////////////////////////////
     // Compute outgoing radiance
     //
-    float3 lightDirections[2] = {sunDirection, reflect( -vertex.viewDirection, n)};
+    float3 lightDirections[2] = {sunDirection, environmentLightDirection};
     float3 incomingRadiances[2] = {sunLight, environment};
 
     float3 color = float3(0, 0, 0);
@@ -2198,14 +2199,7 @@ float4 PBR_PS(
 
     color += ambient * albedo;
 
-    //////////////////////////////////
-    // Apply gamma & HDR correction
-    //
-    //color = color / (color + float3(1.0, 1.0, 1.0));
-/*     float fr = 1 / gamma;
-    color = pow(color, float3(fr, fr, fr)); */
-
-    return float4(color.rgb, 0);
+    return float4(color, 0);
 }
 
 /// DepthPS
@@ -2519,35 +2513,42 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
     float4 albedo = tex2D(albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D(specularSampler, vertex.texcoord0.xy);
 
+    // try to extract some ambient occlusion information from the albedo
+    // unfortunately the albedos have lots of baked in lighting so
+    // we have to keep the effect slight
+    float ao = .5 + logisticFn(length(albedo.rgb) / sqrt(3), .1, 40, .5, 2);
+
     // the alpha channel of specular map is used for team colors
     if ( maskAlbedo )
-        albedo.rgb = lerp(vertex.color.rgb, albedo.rgb, 1 - specular.a);
+        albedo.rgb = lerp(vertex.color.rgb, albedo.rgb, 1 - pow(specular.a, 1.0/2.0));
     else
         albedo.rgb = albedo.rgb * vertex.color.rgb;
     // try to counteract the baked in shading of the original supcom albedos
     // there's technically not supposed to be any shading in PBR albedos, just surface color
-    float x = length(albedo.rgb) / sqrt(3);
+/*     float x = length(albedo.rgb) / sqrt(3);
     float mult = 1.5-(log2(2*x+.1)/2);
-    albedo.rgb *= mult;
+    albedo.rgb *= mult; */
+    //albedo.rgb = pow(albedo.rgb, 1/2.2);
+    float m = max(albedo.r, (albedo.g, albedo.b));
+    float x = pow(m, 1/2.2) / m;
+    albedo.rgb *= x;
 
     //float planeCockpitMask = saturate((specular.r - 0.6) * 2.5);
     //float metallic = saturate(1 - 5.4 * specular.a - planeCockpitMask);
-    float metallic = pow(specular.r, 1/8);
+    float metallic = pow(specular.r, 1.0/4.0);
 
     float roughness = 1 - pow(specular.g, 1.0/2.0);
     // Value range:
     //   dielectrics: 0.15-1.0
     //   metals: 0.3-0.5
-    float mLow = .3;
-    float mHigh = .5;
-    roughness = lerp(roughness, mLow + roughness * (mHigh - mLow), metallic);
-
-    float ao = 1;
+    //float mLow = .3;
+    //float mHigh = .5;
+    //roughness = lerp(roughness, mLow + roughness * (mHigh - mLow), metallic);
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
 
     float alphaGlow = mirrored ? 0.5 : (glow ? (specular.b + glowMinimum) : (vertex.material.g * albedo.a));
-    return float4(color.rgb, alphaGlow);
+    return float4(color.rgb, 0);
 }
 
 /// MapImagerPS0
