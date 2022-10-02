@@ -8,44 +8,59 @@
     typedef float4 position_t;
 #endif
 
-float4x4    ViewMatrix;
-float4x4    ProjMatrix;
+// defined by the editor
+float Time;
 
-float        LightingMultiplier;
+float4x4 ViewMatrix;
+float4x4 ProjMatrix;
 
-float3        SunDirection;
-float3        SunAmbience;
-float3        SunColor;
-float3        HalfAngle;
-float3      CameraPosition;
-float3      CameraDirection;
-float4      SpecularColor;
+// defined in the editor
+float LightingMultiplier;
+float3 SunDirection;
+float3 SunAmbience;
+float3 SunColor;
+float3 HalfAngle;
+float3 CameraPosition;
+float3 CameraDirection;
+float4 SpecularColor;
 
-int         ShadowsEnabled;
-float       ShadowSize;
-float4x4    ShadowMatrix;
-texture        ShadowTexture;
-float3        ShadowFillColor = float3(0,0,0);
+// defined by the engine
+int ShadowsEnabled;
+float ShadowSize;
+float4x4 ShadowMatrix;
+texture ShadowTexture;
 
-texture     WaterRamp;
-float        WaterElevation;
-float        WaterElevationDeep;
-float        WaterElevationAbyss;
+// defined in the editor
+float3 ShadowFillColor = float3(0,0,0);
 
-float        Time;
+// defined in the editor
+texture WaterRamp;
+float WaterElevation;
+float WaterElevationDeep;
+float WaterElevationAbyss;
 
-texture        NoiseTexture;        // the fog noise texture
-texture     OverlayTexture;     // debug terrain overlay
-
+// masks of stratum layers 1 - 4
 texture        UtilityTextureA;
+
+// masks of stratum layers 5 - 8
 texture        UtilityTextureB;
+
+// red: water depth
+// blue: foam
+// green: depth bias
+// ???
 texture        UtilityTextureC;
 
-float4      NormalMapScale;
-float4      NormalMapOffset;
-float4      SampleOffset;
-float2      ViewportScale;
-float2      ViewportOffset;
+// appear to be unused
+texture NoiseTexture; 
+texture OverlayTexture;
+
+// defined by the engine
+float4 NormalMapScale;
+float4 NormalMapOffset;
+float4 SampleOffset;
+float2 ViewportScale;
+float2 ViewportOffset;
 
 #define DECLARE_STRATUM(n)                        \
     float4 n##Tile;                                \
@@ -98,20 +113,23 @@ float2 size_source;
 // this is a very empirical value right now
 float   TerrainErrorScale = 1.0005;
 
+// defined by the engine
 texture        NormalTexture;
 
-float4x4    DecalMatrix;
-float4x4    TangentMatrix;
-texture        DecalAlbedoTexture;
-texture        DecalNormalTexture;
-texture     DecalSpecTexture;
-texture        DecalMaskTexture;
-float       DecalAlpha;
+// defined by the engine, depending on what decal we're rendering
+float4x4 DecalMatrix;
+float4x4 TangentMatrix;
+texture DecalAlbedoTexture;
+texture DecalNormalTexture;
+texture DecalSpecTexture;
+texture DecalMaskTexture;
+float DecalAlpha;
 
-float4 TerrainScale; // scale of the terrain for generating texture coordinates
+// defined by the engine, used to generate texture coordinates
+float4 TerrainScale; 
 
 // scale of Y coordinate as it's 16-bit
-float  HeightScale;
+float HeightScale;
 
 struct VS_OUTPUT
 {
@@ -1686,36 +1704,42 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     float2 uvZ = coords.xy; // z facing plane
 
     // pre-fetch mask information
-    float4 mask0 = tex2D(UtilitySamplerA, position);
-    float4 mask1 = tex2D(UtilitySamplerB, position);
+    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA, position));
+    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB, position));
 
-    // sample screen for basic normal information
-    float4 rgba             = tex2D       (Stratum7NormalSampler,coords.xz);
-    float3 highNormal       = normalize (2 * rgba.xyz - 1);
-    float highMask          = rgba.a;
-    float3 terrainNormal    = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
+    // load in utility map
+    float4 properties = tex2D(UpperAlbedoSampler, coords.xz);
+    float3 precomputedNormal;
+    precomputedNormal.x = 2 * properties.z - 1;
+    precomputedNormal.y = 2 * properties.w - 1;
+    precomputedNormal.z = sqrt(1 - dot(precomputedNormal.xy,precomputedNormal.xy));
 
-    float4 lowerNormal      = tex2D(LowerNormalSampler,    position * LowerNormalTile   );
-    float4 stratum0Normal   = tex2D(Stratum0NormalSampler, position * Stratum0NormalTile);
-    float4 stratum1Normal   = tex2D(Stratum1NormalSampler, position * Stratum1NormalTile);
-    float4 stratum2Normal   = tex2D(Stratum2NormalSampler, position * Stratum2NormalTile);
-    float4 stratum3Normal   = tex2D(Stratum3NormalSampler, position * Stratum3NormalTile);
+    // float3 terrainNormal    = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
 
-    float4 stratum4Normal   = tex2D(Stratum4NormalSampler, position * Stratum4NormalTile);
-    float4 stratum5Normal   = tex2D(Stratum5NormalSampler, position * Stratum5NormalTile);
-    float4 stratum6Normal   = tex2D(Stratum6NormalSampler, position * Stratum6NormalTile);
+    // load in normals
+    float4 lowerNormal      = tex2Dproj(LowerNormalSampler,    position * LowerNormalTile   );
+    float4 stratum0Normal   = tex2Dproj(Stratum0NormalSampler, position * Stratum0NormalTile);
+    float4 stratum1Normal   = tex2Dproj(Stratum1NormalSampler, position * Stratum1NormalTile);
+    float4 stratum2Normal   = tex2Dproj(Stratum2NormalSampler, position * Stratum2NormalTile);
+    float4 stratum3Normal   = tex2Dproj(Stratum3NormalSampler, position * Stratum3NormalTile);
+    float4 stratum4Normal   = tex2Dproj(Stratum4NormalSampler, position * Stratum4NormalTile);
+    float4 stratum5Normal   = tex2Dproj(Stratum5NormalSampler, position * Stratum5NormalTile);
+    float4 stratum6Normal   = tex2Dproj(Stratum6NormalSampler, position * Stratum6NormalTile);
+    float4 stratum7Normal   = tex2Dproj(Stratum7NormalSampler, position * Stratum7NormalTile);
 
-    float4 normal = float4(highNormal.xyz, 0);
+    // combine them
+    float4 normal = float4(precomputedNormal.xyz, 0);
     normal = lerp(normal, 2 * stratum0Normal - 1, mask0.x);
     normal = lerp(normal, 2 * stratum1Normal - 1, mask0.y);
     normal = lerp(normal, 2 * stratum2Normal - 1, mask0.z);
     normal = lerp(normal, 2 * stratum3Normal - 1, mask0.w);
     normal = lerp(normal, 2 * stratum4Normal - 1, mask1.x);
     normal = lerp(normal, 2 * stratum5Normal - 1, mask1.y);
-    normal = lerp(normal, float4(highNormal, 0), highMask);
+    normal = lerp(normal, 2 * stratum6Normal - 1, mask1.y);
+    normal = lerp(normal, 2 * stratum7Normal - 1, mask1.y);
     normal.xyz = normalize( normal.xyz );
 
-    return float4( 0.5 + 0.5 * normal.xyz, 1);
+    return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
 
 /// TerrainBakedPS
@@ -1730,59 +1754,44 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
     // do arthmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
 
-    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position)*2-1);
-    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position)*2-1);
+    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position));
+    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position));
+    float4 mask2 = saturate(tex2Dproj(OverlaySampler,position));
 
     float4 lowerAlbedo = tex2Dproj(LowerAlbedoSampler,position*LowerAlbedoTile);
     float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
     float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
     float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
-
-    // float3 blending = ComputeTriplanarBlending(normal);
-    // float4 xAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.yz);
-    // float4 yAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.xz);
-    // float4 zAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.xy);
-    // float4 stratum3Albedo = xAxis * blending.x + yAxis * blending.y + zAxis * blending.z;
     float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
-
     float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum3AlbedoTile);
     float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
-    float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler,coords.xz);
-
-    // load in rgba map
-    float4 rgba = tex2D(Stratum7AlbedoSampler,coords.xz);
+    float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
+    float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
 
     // load in utility map
-    float4 properties     = tex2D(Stratum6AlbedoSampler, coords.xz);
-    float wetness = properties.x;
-    float shadows = properties.y;
-    float ambient = properties.z;
-    float metallic = properties.w;
-
-    float4 upperAlbedo      = tex2Dproj(UpperAlbedoSampler,position*UpperAlbedoTile);
+    float4 properties = tex2D(UpperAlbedoSampler, coords.xz);
+    float shadowSample = 2 * (1 - properties.x); //0.75 + 0.25 * (1 - properties.x);
+    float ambientSample = properties.y;
 
     float4 albedo = lowerAlbedo;
     albedo = lerp(albedo, stratum0Albedo, mask0.x);
     albedo = lerp(albedo, stratum1Albedo, mask0.y);
-
-
-    albedo = BlendLayersBaked(albedo, stratum2Albedo, mask0.z);
+    albedo = lerp(albedo, stratum2Albedo, mask0.z);
     albedo = lerp(albedo, stratum3Albedo, mask0.w);
     albedo = lerp(albedo, stratum4Albedo, mask1.x);
     albedo = lerp(albedo, stratum5Albedo, mask1.y);
-    // albedo = lerp(albedo, stratum6Albedo, mask1.y);
-    albedo = lerp(albedo, rgba, 0.75 * rgba.a);
-    albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
+    albedo = lerp(albedo, stratum6Albedo, mask1.z);
+    albedo = lerp(albedo, stratum7Albedo, mask1.z);
 
     // compute specular
     float3 r = reflect(normalize(pixel.mViewDirection), normal);
     float3 specular = 0.04 * pow(saturate(dot(r, SunDirection)), 80);
 
     // compute shadow (unit + shadow map)
-    float shadow = min(tex2D(ShadowSampler, pixel.mShadow.xy).g, shadows);
+    float shadow = min(tex2D(ShadowSampler, pixel.mShadow.xy).g, shadowSample);
 
     // compute generic light
-    float3 light = SunColor * dot(SunDirection, normal) * shadow * ambient;
+    float3 light = SunColor * dot(SunDirection, normal) * shadow * ambientSample;
     light = LightingMultiplier * light + ShadowFillColor * ( 1 - light );
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
