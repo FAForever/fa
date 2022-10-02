@@ -363,6 +363,9 @@ keyActions = {
     ['filter_highest_engineer_and_assist'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
         category = 'selection', order = 9,},
 
+    ['select_all_radars'] = {action = 'UI_SelectByCategory (RADAR + OMNI) * STRUCTURE',
+        category = 'selection', order = 9,},
+
     ['select_all_idle_eng_onscreen'] = {action = 'UI_SelectByCategory +inview +idle ENGINEER',
         category = 'selection', order = 18,},
     ['select_all_land_units_onscreen'] = {action = 'UI_SelectByCategory +inview +excludeengineers MOBILE LAND',
