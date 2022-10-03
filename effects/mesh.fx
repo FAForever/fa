@@ -3550,33 +3550,20 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float dotLightNormal = dot(sunDirection,normal);
-
-    //Textures'n Stuff
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    float ao = 1;
+    float metallic = clamp((pow(specular.r, 0.7) + specular.g * 0.2 - specular.a * 0.5) * 4.37 - .0, 0.0, 1.0);
+    float roughness = lerp(1 - specular.g, lerp(0.4, 0.2, specular.g), metallic);
 
-    //Lighting, Specularity and Reflection
-    float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
-    float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
-    light = light * 1.2;
-    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-    float3 phongAdditive = pow( phongAmount, 3) * specular.g * light * 0.5;
-    float3 phongMultiplicative = (phongAmount * environment * specular.r * light * 2);
-  
-    float emissive = glowMultiplier * specular.b;
+    albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 5, pow(metallic, 2.5)), float3(1, 1, 1));
+    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb, specular.a);
 
-    //Finish it
-    float3 color = (albedo.rgb * 0.125) + emissive + (light * albedo.rgb) + (phongAdditive) + phongMultiplicative;
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (phongAdditive * 0.04);
-    //color = phongAdditive;
-    //alpha = 0;
-    return float4( color, alpha);
+    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
+
+    float alpha = mirrored ? 0.5 : max(specular.b - 0.06, 0.0);
+    return float4(color.rgb, alpha);
 }
 
 /// ShieldPS
