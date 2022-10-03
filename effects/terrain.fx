@@ -1685,6 +1685,14 @@ float3 slerp(float3 n0, float3 n1, float t)
     return ((n0*sin((1-t)*theta) + n1*sin(t*theta)) / sin(theta));
 }
 
+float4 UDNBlending(float4 n1, float4 n2) {
+    return normalize(float4(n1.xy + n2.xy, n1.z, 0));
+}
+
+float4 WhiteoutBlending(float4 n1, float4 n2) {
+    return normalize(float4(n1.xy + n2.xy, n1.z*n2.z, 0));
+}
+
 /// TerrainNormalsBakedPS
 // Adjusts the normals of the terrain as a whole. The normals of the terrain are computed via 
 // the the TerrainBasisPSBiCubic shader and we do not appear to have control over that 
@@ -1704,8 +1712,8 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     float2 uvZ = coords.xy; // z facing plane
 
     // pre-fetch mask information
-    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA, position));
-    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB, position));
+    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy));
+    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy));
 
     // load in utility map
     float4 properties = tex2D(UpperAlbedoSampler, coords.xz);
@@ -1714,34 +1722,41 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     precomputedNormal.y = 2 * properties.w - 1;
     precomputedNormal.z = sqrt(1 - dot(precomputedNormal.xy,precomputedNormal.xy));
 
-    // float3 terrainNormal    = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
-
     // load in normals
-    float4 lowerNormal      = tex2Dproj(LowerNormalSampler,    position * LowerNormalTile   );
-    float4 stratum0Normal   = tex2Dproj(Stratum0NormalSampler, position * Stratum0NormalTile);
-    float4 stratum1Normal   = tex2Dproj(Stratum1NormalSampler, position * Stratum1NormalTile);
-    float4 stratum2Normal   = tex2Dproj(Stratum2NormalSampler, position * Stratum2NormalTile);
-    float4 stratum3Normal   = tex2Dproj(Stratum3NormalSampler, position * Stratum3NormalTile);
-    float4 stratum4Normal   = tex2Dproj(Stratum4NormalSampler, position * Stratum4NormalTile);
-    float4 stratum5Normal   = tex2Dproj(Stratum5NormalSampler, position * Stratum5NormalTile);
-    float4 stratum6Normal   = tex2Dproj(Stratum6NormalSampler, position * Stratum6NormalTile);
-    float4 stratum7Normal   = tex2Dproj(Stratum7NormalSampler, position * Stratum7NormalTile);
+    float4 lowerNormal      = tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   );
+    float4 stratum0Normal   = tex2D(Stratum0NormalSampler, position.xy * Stratum0NormalTile.xy);
+    float4 stratum1Normal   = tex2D(Stratum1NormalSampler, position.xy * Stratum1NormalTile.xy);
+    float4 stratum2Normal   = tex2D(Stratum2NormalSampler, position.xy * Stratum2NormalTile.xy);
+    float4 stratum3Normal   = tex2D(Stratum3NormalSampler, position.xy * Stratum3NormalTile.xy);
+    float4 stratum4Normal   = tex2D(Stratum4NormalSampler, position.xy * Stratum4NormalTile.xy);
+    float4 stratum5Normal   = tex2D(Stratum5NormalSampler, position.xy * Stratum5NormalTile.xy);
+    float4 stratum6Normal   = tex2D(Stratum6NormalSampler, 1.5 * position.xy * Stratum6NormalTile.xy);
+    float4 stratum7Normal   = tex2D(Stratum7NormalSampler, 4 * position.xy * Stratum7NormalTile.xy);
+
+    float4 stratum6NormalOut = tex2D(Stratum6NormalSampler, 0.6 * position.yx * Stratum6NormalTile.xy);
+    float4 stratum7NormalOut = tex2D(Stratum7NormalSampler, 0.6 * position.yx * Stratum7NormalTile.xy);
+    float4 stratum7NormalFurtherOut = tex2D(Stratum7NormalSampler, 0.1 * position.xy * Stratum7NormalTile.xy);
 
     // combine them
     float4 normal = float4(precomputedNormal.xyz, 0);
-    normal = lerp(normal, 2 * stratum0Normal - 1, mask0.x);
-    normal = lerp(normal, 2 * stratum1Normal - 1, mask0.y);
-    normal = lerp(normal, 2 * stratum2Normal - 1, mask0.z);
-    normal = lerp(normal, 2 * stratum3Normal - 1, mask0.w);
-    normal = lerp(normal, 2 * stratum4Normal - 1, mask1.x);
-    normal = lerp(normal, 2 * stratum5Normal - 1, mask1.y);
+    // normal = lerp(normal, 2 * stratum0Normal - 1, mask0.x);
+    // normal = lerp(normal, 2 * stratum1Normal - 1, mask0.y);
+    // normal = lerp(normal, 2 * stratum2Normal - 1, mask0.z);
+    // normal = lerp(normal, 2 * stratum3Normal - 1, mask0.w);
+    // normal = lerp(normal, 2 * stratum4Normal - 1, mask1.x);
+    // normal = lerp(normal, 2 * stratum5Normal - 1, mask1.y);
 
     // allow rock-related texture to scale as we zoom out
     float cameraFractionOut = 0.3 + 0.70 * clamp(0.005 * CameraPosition.y, 0, 1);
     float cameraFractionFurtherOut = 0.3 + 0.7 * clamp(0.001 * CameraPosition.y, 0, 1);
 
-    normal = lerp(normal, 2 * stratum6Normal - 1, mask1.y);
-    normal = lerp(normal, 2 * stratum7Normal - 1, mask1.y);
+    // normal = lerp(normal, 2 * stratum6Normal - 1, mask1.z); 
+    // normal = lerp(normal, 2 * stratum6NormalOut - 1, mask1.z * cameraFractionOut);
+    // normal = lerp(normal, 2 * stratum7Normal - 1, 1); 
+    normal = WhiteoutBlending(normal, (2 * stratum7Normal - 1));
+    // normal = lerp(normal, 8 * (2 * stratum7NormalOut - 1), mask1.w * cameraFractionOut);
+    // normal = lerp(normal, 16 * (2 * stratum7NormalFurtherOut - 1), mask1.w * cameraFractionFurtherOut);
+
     normal.xyz = normalize( normal.xyz );
 
     return float4( 0.5 + 0.5 * normal.rgb, 1);
@@ -1759,8 +1774,8 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
     // do arthmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
 
-    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA, position));
-    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB, position));
+    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy));
+    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy));
 
     // Layer 0: Base layer - used for sea level ground.
     // Layer 1: Ground Accent - used to accent land not on plateaus
@@ -1772,13 +1787,13 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
     // Layer 7: Rock - used to texture impassable terrain
     // Layer 8: Rock Accent - used to accent impassable terrain
 
-    float4 lowerAlbedo = tex2Dproj(LowerAlbedoSampler, position * LowerAlbedoTile);
-    float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler, position * Stratum0AlbedoTile);
-    float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler, position * Stratum1AlbedoTile);
-    float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler, position * Stratum2AlbedoTile);
-    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler, position * Stratum3AlbedoTile);
-    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler, position * Stratum3AlbedoTile);
-    float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler, position * Stratum5AlbedoTile);
+    float4 lowerAlbedo = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, position.xy * Stratum0AlbedoTile.xy);
+    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, position.xy * Stratum1AlbedoTile.xy);
+    float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler, position.xy * Stratum2AlbedoTile.xy);
+    float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler, position.xy * Stratum3AlbedoTile.xy);
+    float4 stratum4Albedo = tex2D(Stratum4AlbedoSampler, position.xy * Stratum3AlbedoTile.xy);
+    float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler, position.xy * Stratum5AlbedoTile.xy);
     float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, 1.5 * position.xy * Stratum6AlbedoTile.xy); // TODO: adjust scale in generator
     float4 stratum7Albedo = tex2D(Stratum7AlbedoSampler, 4 * position.xy * Stratum7AlbedoTile.xy);   // TODO: adjust scale in generator
 
@@ -1807,9 +1822,9 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
 
     albedo = lerp(albedo, stratum6Albedo, mask1.z); 
     albedo = lerp(albedo, stratum6AlbedoOut, mask1.z * cameraFractionOut);
-    albedo = lerp(albedo, stratum7Albedo, mask1.z); 
-    albedo = lerp(albedo, stratum7AlbedoOut, mask1.z * cameraFractionOut);
-    albedo = lerp(albedo, stratum7AlbedoFurtherOut, mask1.z * cameraFractionFurtherOut);
+    albedo = lerp(albedo, stratum7Albedo, mask1.w); 
+    albedo = lerp(albedo, stratum7AlbedoOut, mask1.w * cameraFractionOut);
+    albedo = lerp(albedo, stratum7AlbedoFurtherOut, mask1.w * cameraFractionFurtherOut);
 
     // compute specular
     float3 r = reflect(normalize(pixel.mViewDirection), normal);
