@@ -1714,7 +1714,7 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     precomputedNormal.y = 2 * properties.w - 1;
     precomputedNormal.z = sqrt(1 - dot(precomputedNormal.xy,precomputedNormal.xy));
 
-    float3 terrainNormal    = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
+    // float3 terrainNormal    = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
 
     // load in normals
     float4 lowerNormal      = tex2Dproj(LowerNormalSampler,    position * LowerNormalTile   );
@@ -1728,18 +1728,23 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     float4 stratum7Normal   = tex2Dproj(Stratum7NormalSampler, position * Stratum7NormalTile);
 
     // combine them
-    float4 normal = float4(terrainNormal.xyz, 0);
+    float4 normal = float4(precomputedNormal.xyz, 0);
     normal = lerp(normal, 2 * stratum0Normal - 1, mask0.x);
     normal = lerp(normal, 2 * stratum1Normal - 1, mask0.y);
     normal = lerp(normal, 2 * stratum2Normal - 1, mask0.z);
     normal = lerp(normal, 2 * stratum3Normal - 1, mask0.w);
     normal = lerp(normal, 2 * stratum4Normal - 1, mask1.x);
     normal = lerp(normal, 2 * stratum5Normal - 1, mask1.y);
+
+    // allow rock-related texture to scale as we zoom out
+    float cameraFractionOut = 0.3 + 0.70 * clamp(0.005 * CameraPosition.y, 0, 1);
+    float cameraFractionFurtherOut = 0.3 + 0.7 * clamp(0.001 * CameraPosition.y, 0, 1);
+
     normal = lerp(normal, 2 * stratum6Normal - 1, mask1.y);
     normal = lerp(normal, 2 * stratum7Normal - 1, mask1.y);
     normal.xyz = normalize( normal.xyz );
 
-    return float4( 0.5 + 0.5 * precomputedNormal.rgb, 1);
+    return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
 
 /// TerrainBakedPS
