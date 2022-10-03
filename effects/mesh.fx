@@ -2152,19 +2152,18 @@ float4 PBR_PS(
     float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
     float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float3 v = vertex.viewDirection;
-    float3 environmentLightDirection = reflect(-vertex.viewDirection, n);
+    float3 environmentLightDirection = n;
     float3 environment = texCUBE(environmentSampler, environmentLightDirection);
     float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
 
 /*     float3 ambient = pow(sunAmbient, gamma) * ao * .1;
     ambient += pow(shadowFill, gamma) * .1;
     ambient *= lightMultiplier; */
-    float ambient = (sunAmbient + shadowFill) * ao * .25;
+    float ambient = (sunAmbient + shadowFill) * ao;
 
-    environment *= .5;
+    environment += ambient;
 
-    //float3 sunLight = pow(sunDiffuse, gamma) * shadow * lightMultiplier;
-    float3 sunLight = float3(1.5,1.5,1.5) * shadow;
+    float3 sunLight = sunDiffuse * shadow * lightMultiplier;
 
     //////////////////////////////
     // Compute outgoing radiance
@@ -2197,8 +2196,6 @@ float4 PBR_PS(
         float3 lambert = incomingRadiance * max(dot(n, l), 0.0);
         color += (refracted + reflected) * lambert;
     }
-
-    color += ambient * albedo;
 
     return float4(color, 0);
 }
