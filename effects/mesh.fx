@@ -2096,6 +2096,11 @@ float3 PBR_FresnelSchlick(float hDotN, float3 F0)
     return F0 + (1.0 - F0) * pow(1.0 - hDotN, 5.0);
 }
 
+float3 fresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
+{
+    return F0 + (max(float3(1.0, 1.0, 1.0) - roughness, F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+} 
+
 float PBR_Distribution(float3 n, float3 h, float roughness)
 {
     // roughness only squared once @ https://learnopengl.com/PBR/Theory
@@ -2152,50 +2157,56 @@ float4 PBR_PS(
     float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
     float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float3 v = vertex.viewDirection;
-    float3 environmentLightDirection = n;
-    float3 environment = texCUBE(environmentSampler, environmentLightDirection);
     float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
-
-/*     float3 ambient = pow(sunAmbient, gamma) * ao * .1;
-    ambient += pow(shadowFill, gamma) * .1;
-    ambient *= lightMultiplier; */
-    float ambient = (sunAmbient + shadowFill) * ao;
-
-    environment += ambient;
-
     float3 sunLight = sunDiffuse * shadow * lightMultiplier;
 
+    // This should be convolved into a proper irradiance map
+    float3 env_irradiance = texCUBE(environmentSampler, n);
+    // Not sure if increasing bias by 1 goes to exactly the next mipmap.
+    // There seems to be no difference between bias 0 and bias 1
+    float bias = roughness * 7;
+    float3 env_reflection = texCUBEbias(environmentSampler, float4(reflect(-v, n), bias));
+    float3 ambient = sunAmbient + shadowFill;
+    env_irradiance += ambient;
+
     //////////////////////////////
-    // Compute outgoing radiance
+    // Compute sun light
     //
-    float3 lightDirections[2] = {sunDirection, environmentLightDirection};
-    float3 incomingRadiances[2] = {sunLight, environment};
-
-    float3 color = float3(0, 0, 0);
     float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedo, metallic);
+    float3 l = sunDirection;
+    float3 h = normalize(v + l);
 
-    for (int i = 0; i < 2; i++) {
-        float3 incomingRadiance = incomingRadiances[i];
-        float3 l = lightDirections[i];
-        float3 h = normalize(v + l);
+    // Cook-Torrance BRDF
+    float3 F = PBR_FresnelSchlick(max(dot(h, v), 0.0), F0);
+    float NDF = PBR_Distribution(n, h, roughness);
+    float G = PBR_GeometrySmith(n, v, l, roughness);
 
-        // Cook-Torrance BRDF
-        float3 F = PBR_FresnelSchlick(max(dot(h, v), 0.0), F0);
-        float NDF = PBR_Distribution(n, h, roughness);
-        float G = PBR_GeometrySmith(n, v, l, roughness);
+    float3 numerator = NDF * G * F;
+    // add 0.0001 to avoid division by zero
+    float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.0001;
+    float3 reflected = numerator / denominator;
+    
+    float3 kD = float3(1.0, 1.0, 1.0) - F;
+    kD *= 1.0 - metallic;	
 
-        float3 numerator = NDF * G * F;
-        // add 0.0001 to avoid division by zero
-        float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.0001;
-        float3 reflected = numerator / denominator;
-        
-        float3 kD = float3(1.0, 1.0, 1.0) - F;
-        kD *= 1.0 - metallic;	
+    float3 refracted = kD * albedo / PI;
+    float3 lambert = sunLight * max(dot(n, l), 0.0);
+    float3 color = (refracted + reflected) * lambert;
 
-        float3 refracted = kD * albedo / PI;
-        float3 lambert = incomingRadiance * max(dot(n, l), 0.0);
-        color += (refracted + reflected) * lambert;
-    }
+    //////////////////////////////
+    // Compute environment light
+    //
+    float3 kS = fresnelSchlickRoughness(max(dot(n, v), 0.0), F0, roughness); 
+    kD = float3(1.0, 1.0, 1.0) - kS;
+    kD *= 1.0 - metallic;
+
+    float3 diffuse = env_irradiance * albedo;
+
+    // Need to find out how to implement this
+    float2 envBRDFlookuptexture = float2(0.5, 0.0);
+    float3 specular = env_reflection * (kS * envBRDFlookuptexture.x + envBRDFlookuptexture.y);
+
+    color += (kD * diffuse + specular) * ao;
 
     return float4(color, 0);
 }
