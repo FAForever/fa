@@ -159,6 +159,8 @@ Unit = Class(moho.unit_methods) {
             self.Trash = TrashBag()
         end
 
+        self.
+
         self.IntelDisables = {
             Radar = {NotInitialized = true},
             Sonar = {NotInitialized = true},

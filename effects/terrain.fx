@@ -45,9 +45,9 @@ texture        UtilityTextureA;
 // masks of stratum layers 5 - 8
 texture        UtilityTextureB;
 
-// red: water depth
-// blue: foam
-// green: depth bias
+// red: ???
+// green: foam
+// blue: water depth
 // ???
 texture        UtilityTextureC;
 
@@ -114,7 +114,7 @@ float2 size_source;
 float   TerrainErrorScale = 1.0005;
 
 // defined by the engine
-texture        NormalTexture;
+texture NormalTexture;
 
 // defined by the engine, depending on what decal we're rendering
 float4x4 DecalMatrix;
@@ -1714,7 +1714,7 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     precomputedNormal.y = 2 * properties.w - 1;
     precomputedNormal.z = sqrt(1 - dot(precomputedNormal.xy,precomputedNormal.xy));
 
-    // float3 terrainNormal    = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
+    float3 terrainNormal    = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
 
     // load in normals
     float4 lowerNormal      = tex2Dproj(LowerNormalSampler,    position * LowerNormalTile   );
@@ -1728,7 +1728,7 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     float4 stratum7Normal   = tex2Dproj(Stratum7NormalSampler, position * Stratum7NormalTile);
 
     // combine them
-    float4 normal = float4(precomputedNormal.xyz, 0);
+    float4 normal = float4(terrainNormal.xyz, 0);
     normal = lerp(normal, 2 * stratum0Normal - 1, mask0.x);
     normal = lerp(normal, 2 * stratum1Normal - 1, mask0.y);
     normal = lerp(normal, 2 * stratum2Normal - 1, mask0.z);
@@ -1739,7 +1739,7 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     normal = lerp(normal, 2 * stratum7Normal - 1, mask1.y);
     normal.xyz = normalize( normal.xyz );
 
-    return float4( 0.5 + 0.5 * normal.rgb, 1);
+    return float4( 0.5 + 0.5 * precomputedNormal.rgb, 1);
 }
 
 /// TerrainBakedPS
@@ -1754,38 +1754,61 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
     // do arthmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
 
-    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position));
-    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position));
-    float4 mask2 = saturate(tex2Dproj(OverlaySampler,position));
+    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA, position));
+    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB, position));
 
-    float4 lowerAlbedo = tex2Dproj(LowerAlbedoSampler,position*LowerAlbedoTile);
-    float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
-    float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
-    float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
-    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
-    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum3AlbedoTile);
-    float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
-    float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
-    float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
+    // Layer 0: Base layer - used for sea level ground.
+    // Layer 1: Ground Accent - used to accent land not on plateaus
+    // Layer 2: Plateau Accent - used on land higher than sea level
+    // Layer 3: Slopes - used to texture ramps
+    // Layer 4: Slopes Accent - used to accent slopes
+    // Layer 5: Steep Hills - used to texture high slope areas
+    // Layer 6: Beach Texture - used to texture the beaches where land and water meet
+    // Layer 7: Rock - used to texture impassable terrain
+    // Layer 8: Rock Accent - used to accent impassable terrain
+
+    float4 lowerAlbedo = tex2Dproj(LowerAlbedoSampler, position * LowerAlbedoTile);
+    float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler, position * Stratum0AlbedoTile);
+    float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler, position * Stratum1AlbedoTile);
+    float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler, position * Stratum2AlbedoTile);
+    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler, position * Stratum3AlbedoTile);
+    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler, position * Stratum3AlbedoTile);
+    float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler, position * Stratum5AlbedoTile);
+    float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, 1.5 * position.xy * Stratum6AlbedoTile.xy); // TODO: adjust scale in generator
+    float4 stratum7Albedo = tex2D(Stratum7AlbedoSampler, 4 * position.xy * Stratum7AlbedoTile.xy);   // TODO: adjust scale in generator
+
+    float4 stratum6AlbedoOut = tex2D(Stratum6AlbedoSampler, 0.6 * position.yx * Stratum6AlbedoTile.xy);
+    float4 stratum7AlbedoOut = tex2D(Stratum7AlbedoSampler, 0.6 * position.yx * Stratum7AlbedoTile.xy);
+    float4 stratum7AlbedoFurtherOut = tex2D(Stratum7AlbedoSampler, 0.1 * position.xy * Stratum7AlbedoTile.xy);
 
     // load in utility map
     float4 properties = tex2D(UpperAlbedoSampler, coords.xz);
-    float shadowSample = (1 - properties.x); //0.75 + 0.25 * (1 - properties.x);
-    float ambientSample = properties.y;
+    float shadowSample = 0.75 + 0.25 * (1 - (properties.x));    // TODO: adjust texture in generator
+    float ambientSample = 1;
+
+    float4 mask2 = saturate(tex2Dproj(UtilitySamplerC,position));
 
     float4 albedo = lowerAlbedo;
-    albedo = lerp(albedo, stratum0Albedo, mask0.x);
-    albedo = lerp(albedo, stratum1Albedo, mask0.y);
-    albedo = lerp(albedo, stratum2Albedo, mask0.z);
-    albedo = lerp(albedo, stratum3Albedo, mask0.w);
-    albedo = lerp(albedo, stratum4Albedo, mask1.x);
-    albedo = lerp(albedo, stratum5Albedo, mask1.y);
-    albedo = lerp(albedo, stratum6Albedo, mask1.z);
-    albedo = lerp(albedo, stratum7Albedo, mask1.z);
+    albedo = lerp(albedo, stratum0Albedo, mask0.x); 
+    albedo = lerp(albedo, stratum1Albedo, mask0.y); 
+    albedo = lerp(albedo, stratum2Albedo, mask0.z); 
+    albedo = lerp(albedo, stratum3Albedo, mask0.w); 
+    albedo = lerp(albedo, stratum4Albedo, mask1.x); 
+    albedo = lerp(albedo, stratum5Albedo, mask1.y); 
+
+    // allow rock-related texture to scale as we zoom out
+    float cameraFractionOut = 0.3 + 0.70 * clamp(0.005 * CameraPosition.y, 0, 1);
+    float cameraFractionFurtherOut = 0.3 + 0.7 * clamp(0.001 * CameraPosition.y, 0, 1);
+
+    albedo = lerp(albedo, stratum6Albedo, mask1.z); 
+    albedo = lerp(albedo, stratum6AlbedoOut, mask1.z * cameraFractionOut);
+    albedo = lerp(albedo, stratum7Albedo, mask1.z); 
+    albedo = lerp(albedo, stratum7AlbedoOut, mask1.z * cameraFractionOut);
+    albedo = lerp(albedo, stratum7AlbedoFurtherOut, mask1.z * cameraFractionFurtherOut);
 
     // compute specular
     float3 r = reflect(normalize(pixel.mViewDirection), normal);
-    float3 specular = 0.04 * pow(saturate(dot(r, SunDirection)), 80);
+    float3 specular = (1 - mask2.b) * 0.05 * pow(saturate(dot(r, SunDirection)), 80) * SunColor;
 
     // compute shadow (unit + shadow map)
     float shadow = min(tex2D(ShadowSampler, pixel.mShadow.xy).g, shadowSample);
@@ -1800,7 +1823,7 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
     float4 water = tex1D(WaterRampSampler, waterDepth);
     albedo.rgb = lerp(albedo.rgb, water.rgb, water.a);
 
-    return float4(albedo.rgb, 0.01f); //float4(albedo.rgb, 0.01f);
+    return float4(albedo.rgb, 0.01f);
 }
 
 /// TTerrainNormalsBaked
