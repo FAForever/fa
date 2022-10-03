@@ -2532,31 +2532,21 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
     // we have to keep the effect slight
     float ao = .5 + logisticFn(length(albedo.rgb) / sqrt(3), .1, 40, .5, 2);
 
-    // the alpha channel of specular map is used for team colors
-    if ( maskAlbedo )
-        albedo.rgb = lerp(vertex.color.rgb, albedo.rgb, 1 - pow(specular.a, 1.0/2.0));
-    else
-        albedo.rgb = albedo.rgb * vertex.color.rgb;
-    // try to counteract the baked in shading of the original supcom albedos
-    // there's technically not supposed to be any shading in PBR albedos, just surface color
-/*     float x = length(albedo.rgb) / sqrt(3);
-    float mult = 1.5-(log2(2*x+.1)/2);
-    albedo.rgb *= mult; */
-    //albedo.rgb = pow(albedo.rgb, 1/2.2);
-    float m = max(albedo.r, (albedo.g, albedo.b));
-    float x = pow(m, 1/2.2) / m;
-    albedo.rgb *= x * 2;
+    float teamcolor = min(specular.a * 4, 1);
+    albedo.rgb *= (2 - teamcolor);
+    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.5, teamcolor); 
 
     float planeCockpitMask = saturate((specular.r - 0.6) * 2.5);
-    float metallic = saturate(1 - 5.4 * specular.a - planeCockpitMask);
+    albedo.rgb += planeCockpitMask;
 
+    float metallic = 1 - teamcolor;
     float roughness = specular.g * 0.6 + 0.4 + saturate(specular.a * 1.4 - 0.1) + planeCockpitMask;
     roughness = saturate(1 - roughness);
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
 
-    float alphaGlow = mirrored ? 0.5 : (glow ? (specular.b + glowMinimum) : (vertex.material.g * albedo.a));
-    return float4(color.rgb, 0);
+    float alphaGlow = mirrored ? 0.5 : (glow ? specular.b : (vertex.material.g * albedo.a));
+    return float4(color.rgb, alphaGlow);
 }
 
 /// MapImagerPS0
