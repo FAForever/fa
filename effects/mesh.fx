@@ -960,10 +960,11 @@ NORMALMAPPED_VERTEX NormalMappedVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
-
+    vertex.position = mul( vertex.position, viewMatrix);
+    // I'm not sure why this is working, should use the camera position for view vector calculation once that is available
     vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, vertex.viewDirection);
+    vertex.position = mul(vertex.position, projMatrix);
 
     vertex.texcoord0 = ( anim.w > 0.5 ) ? ComputeScrolledTexcoord( texcoord0, material) : texcoord0;
     vertex.color = color;
