@@ -2156,16 +2156,18 @@ float4 PBR_PS(
     float3 p = vertex.position.xyz;
     float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
     float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float3 v = vertex.viewDirection;
+    float3 v = normalize(vertex.viewDirection);
     float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
     float3 sunLight = sunDiffuse * shadow * lightMultiplier;
 
     // This should be convolved into a proper irradiance map
-    float3 env_irradiance = texCUBE(environmentSampler, n);
+    float3 env_irradiance = texCUBE(environmentSampler, (n.y < 0) ? float3(n.x, -n.y, n.z) : n);
     // Not sure if increasing bias by 1 goes to exactly the next mipmap.
     // There seems to be no difference between bias 0 and bias 1
     float bias = roughness * 7;
-    float3 env_reflection = texCUBEbias(environmentSampler, float4(reflect(-v, n), bias));
+    float3 reflection = reflect(-v, n);
+    reflection = (reflection.y < 0) ? float3(reflection.x, -reflection.y, reflection.z) : reflection;
+    float3 env_reflection = texCUBEbias(environmentSampler, float4(reflection, bias));
     float3 ambient = sunAmbient + shadowFill;
     env_irradiance += ambient;
 
@@ -2190,8 +2192,11 @@ float4 PBR_PS(
     kD *= 1.0 - metallic;	
 
     float3 refracted = kD * albedo / PI;
-    float3 lambert = sunLight * max(dot(n, l), 0.0);
-    float3 color = (refracted + reflected) * lambert;
+    // We divide the diffuse from point lights by pi, so to get the same response like we 
+    // would get from the environment light where we don't need to divide by pi, we need
+    // to multiply the radiance here with pi.
+    float3 irradiance = sunLight * max(dot(n, l), 0.0) * PI;
+    float3 color = (refracted + reflected) * irradiance;
 
     //////////////////////////////
     // Compute environment light
