@@ -2529,19 +2529,13 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
     //albedo.rgb = pow(albedo.rgb, 1/2.2);
     float m = max(albedo.r, (albedo.g, albedo.b));
     float x = pow(m, 1/2.2) / m;
-    albedo.rgb *= x;
+    albedo.rgb *= x * 2;
 
-    //float planeCockpitMask = saturate((specular.r - 0.6) * 2.5);
-    //float metallic = saturate(1 - 5.4 * specular.a - planeCockpitMask);
-    float metallic = pow(specular.r, 1.0/4.0);
+    float planeCockpitMask = saturate((specular.r - 0.6) * 2.5);
+    float metallic = saturate(1 - 5.4 * specular.a - planeCockpitMask);
 
-    float roughness = 1 - pow(specular.g, 1.0/2.0);
-    // Value range:
-    //   dielectrics: 0.15-1.0
-    //   metals: 0.3-0.5
-    //float mLow = .3;
-    //float mHigh = .5;
-    //roughness = lerp(roughness, mLow + roughness * (mHigh - mLow), metallic);
+    float roughness = specular.g * 0.6 + 0.4 + saturate(specular.a * 1.4 - 0.1) + planeCockpitMask;
+    roughness = saturate(1 - roughness);
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
 
