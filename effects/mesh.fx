@@ -2532,15 +2532,15 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
     // we have to keep the effect slight
     float ao = .5 + logisticFn(length(albedo.rgb) / sqrt(3), .1, 40, .5, 2);
 
-    float teamcolor = min(specular.a * 4, 1);
-    albedo.rgb *= (2 - teamcolor);
-    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.5, teamcolor); 
+    float teamcolor = min(pow(specular.a * 1.1, 0.5), 1);
+    albedo.rgb *= (2 - teamcolor * 2);
+    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.6, teamcolor); 
 
     float planeCockpitMask = saturate((specular.r - 0.6) * 2.5);
     albedo.rgb += planeCockpitMask;
 
-    float metallic = 1 - teamcolor;
-    float roughness = specular.g * 0.6 + 0.4 + saturate(specular.a * 1.4 - 0.1) + planeCockpitMask;
+    float metallic = max(1 - teamcolor * 2.2, 0);
+    float roughness = specular.g * 0.6 + 0.3 + saturate(specular.a * 1.4 - 0.1) + planeCockpitMask - specular.b * 3;
     roughness = saturate(1 - roughness);
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
@@ -3554,11 +3554,11 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
 
     float ao = 1;
-    float metallic = clamp((pow(specular.r, 0.7) + specular.g * 0.2 - specular.a * 0.5) * 4.37 - .0, 0.0, 1.0);
-    float roughness = lerp(1 - specular.g, lerp(0.4, 0.2, specular.g), metallic);
+    float metallic = saturate((pow(specular.r, 0.7) + specular.g * 0.2 - specular.a * 0.5) * 4.37);
+    float roughness = lerp((1 - specular.g) * 0.7, lerp(0.5, 0.25, specular.g), metallic);
 
     albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 5, pow(metallic, 2.5)), float3(1, 1, 1));
-    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb, specular.a);
+    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.8, specular.a);
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
 
