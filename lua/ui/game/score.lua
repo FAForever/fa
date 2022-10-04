@@ -42,7 +42,7 @@ local resModeSwitch = {}
 local DisplayResMode = 0
 local DisplayStorage = 0
 
-local created = false 
+local created = false
 
 function armyGroupHeight()
     local height = 0
@@ -423,7 +423,7 @@ function SetupPlayerLines()
     end
 
     -- data = {
-    --     ShareConditionsTitle :: String 
+    --     ShareConditionsTitle :: String
     --     ShareConditionsDescription :: String
     --     Size :: String
     --     MapTitle :: String
@@ -529,12 +529,12 @@ function SetupPlayerLines()
     -- add map title / description to the scoreboard
     mapData.MapTitle = LOCF("<LOC gamesel_0002>%s", sessionInfo.name)
     local description = sessionInfo.description
-    if not description or description == "" then 
+    if not description or description == "" then
         description = "No description set by the author."
     end
 
     -- add replay ID
-    mapData.MapDescription = LOC(description) .. 
+    mapData.MapDescription = LOC(description) ..
         "\r\n\r\n" .. LOC("<LOC map_version>Map version") .. ": " .. tostring(sessionInfo.map_version) ..
         "\r\n" .. LOC("<LOC replay_id>Replay ID") .. ": " .. tostring(UIUtil.GetReplayId())
 
@@ -629,6 +629,9 @@ function _OnBeat()
         for index, scoreData in currentScores do
             for _, line in controls.armyLines do
                 if line.armyID == index then
+                    if scoreData.name then
+                        line.name:SetText(scoreData.name)
+                    end
                     if scoreData.general.score >= 0 then
                         line.score:SetText(fmtnum(scoreData.general.score))
                     end
@@ -732,7 +735,7 @@ function _OnBeat()
         end
         prevArmy = curFA
     end
-    
+
     -- this will be needed only for very few maps that change the playable area after initialization
     local areaData = Sync.NewPlayableArea
     if areaData then
@@ -824,7 +827,7 @@ function ToggleScoreControl(state)
 end
 
 function Expand()
-    if created then 
+    if created then
         if needExpand then
             controls.bg:Show()
             controls.collapseArrow:Show()
@@ -838,7 +841,7 @@ function Expand()
 end
 
 function Contract()
-    if created then 
+    if created then
         if controls.bg then
             if not controls.bg:IsHidden() then
                 local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
