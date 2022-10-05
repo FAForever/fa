@@ -2175,7 +2175,7 @@ float4 PBR_PS(
     float3 env_irradiance = texCUBEgrad(environmentSampler, env_light_direction, float3(scale/256, 0, 0), float3(0, scale/256, 0));
 
     float3 ambient = sunAmbient + shadowFill;
-    env_irradiance += ambient * saturate(dot(env_light_direction, float3(0, 1, 0)));
+    env_irradiance += ambient;
     // sunLight = (sunLight - shadowFill);
 
     //////////////////////////////
@@ -2952,47 +2952,50 @@ float4 AeonPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
     return float4( color, alpha );
 }
 
+float mapRange(float value, float min1, float max1, float min2, float max2)
+{
+    // Convert the current value to a percentage
+    float perc = (value - min1) / (max1 - min1);
+    // Do the same operation backwards with min2 and max2
+    return perc * (max2 - min2) + min2;
+}
+
 //NewAeonPS
 float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
-    //return PBR_PS(vertex, false, false, hiDefShadows);
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float dotLightNormal = dot(sunDirection,normal);
-
-    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float3 albedo = tex2D( albedoSampler, vertex.texcoord0.xy).rgb;
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-    //albedo.rgb = (0.8 * specular.r) -  albedo.rgb;
+    float ao = 1;
+    float metallic = 0;
+    if (specular.r < 0.4)
+        metallic = saturate(mapRange(specular.r, 0.2267, 0.3643, 0, 1));
+    else
+        metallic = saturate(mapRange(specular.r, 0.4129, 0.5384, 1, 0));
 
-    // Calculate lighting and shadows
-    float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
+    albedo *= 1 + metallic * 1;
+    // We need to make the dark areas darker
+    // Need to find something that offers more control over the result
+    albedo = (- pow(albedo - 1, 2) * albedo + albedo) * (1 - albedo) + pow(albedo, 2);
 
-    light = (light * 0.5) * pow((1 - specular.a), 8);
-    //light = light * (0.8 - (light * 0.125));
-    //float3 lightpow = (light.r + light.g + light.b) / 3;
-    //light = light * lightpow * lightpow * lightpow;
+    albedo = lerp(albedo, vertex.color.rgb * 0.8, specular.a);
 
-    // Calculate Specular and Reflection
-    float3 reflection = reflect( sunDirection, normal);
-    float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
-    float3 phongAdditive = AeonPhongCoeff * pow( phongAmount, 5) * light *  specular.g * pow((1 - (specular.a * 0.5) ), 8) * 2;
-    float3 phongMultiplicative = specular.r * light * environment * (1 - specular.a) * 1.2;
-    float phongMultiplicativeGlow = (phongMultiplicative.r + phongMultiplicative.g + phongMultiplicative.b)/3;
-    float phongAdditiveGlow = (phongAdditive.r + phongAdditive.g + phongAdditive.b)/3;
+    float teamcolorBorder = saturate(mapRange(specular.a, 0.54, 0.6, 0, 1));
+    float darkAreas = saturate(mapRange(specular.r, 0.3, 0.44, 1, 0)) - pow(length(albedo), 0.25);
+    // Still need to tune this
+    specular.g = specular.g * 0.7 + 0.03;
+    float roughness = lerp(specular.g, 0.03, teamcolorBorder);
+    roughness += saturate(darkAreas);
 
-    // Does the rest of the stuff
-    float emissive = glowMultiplier * specular.b;
-    float3 color = (albedo.rgb * 0.125) + (emissive + (light * albedo.rgb)) + phongAdditive + phongMultiplicative;
-    color += vertex.color.rgb * specular.a;
-    float teamColGlowCompensation = ((vertex.color.r + vertex.color.g + vertex.color.b) / 3);
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.07 * (1.4 - teamColGlowCompensation)) + ((phongMultiplicativeGlow + phongAdditiveGlow) * 0.05);
-    //alpha = 0;
-    //color = light;
-    return float4( color, alpha );
+    float4 color = PBR_PS(vertex, albedo, metallic, roughness, ao, hiDefShadows);
+
+    float emission = specular.b + (pow(specular.a, 2) * 0.1);
+    color.rgb += emission * albedo;
+    float alpha = mirrored ? 0.5 : emission;
+
+    return float4(color.rgb, alpha);
 }
 
 /// AeonCZARPS
