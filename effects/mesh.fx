@@ -2541,20 +2541,23 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
     // we have to keep the effect slight
     float ao = .5 + logisticFn(length(albedo.rgb) / sqrt(3), .1, 40, .5, 2);
 
-    float teamcolor = min(pow(specular.a * 1.1, 0.5), 1);
-    albedo.rgb *= (1 - teamcolor) * 1.5;
+    float teamcolor = min(pow(specular.a * 1.1, 0.6), 1);
+    float metallic = max(1 - teamcolor * 2.2, 0);
+
+    albedo.rgb = lerp(albedo.rgb, albedo.rgb * 2, metallic);
     albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.6, teamcolor); 
 
     float planeCockpitMask = saturate((specular.r - 0.6) * 2.5);
     albedo.rgb += planeCockpitMask;
 
-    float metallic = max(1 - teamcolor * 2.2, 0);
-    float roughness = specular.g * 0.6 + 0.3 + saturate(specular.a * 1.4 - 0.1) + planeCockpitMask - specular.b * 3;
+    float roughness = specular.g * 0.6 + 0.35 + pow(specular.a, 1.4) * 1.7 + planeCockpitMask - specular.b * 3;
     roughness = saturate(1 - roughness);
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
 
-    float alphaGlow = mirrored ? 0.5 : (glow ? specular.b : (vertex.material.g * albedo.a));
+    float emission = specular.b * 0.5;
+    color += emission * albedo;
+    float alphaGlow = mirrored ? 0.5 : (glow ? emission : (vertex.material.g * albedo.a));
     return float4(color.rgb, alphaGlow);
 }
 
@@ -3569,12 +3572,15 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
     float metallic = saturate((pow(specular.r, 0.7) + specular.g * 0.2 - specular.a * 0.5) * 4.37);
     float roughness = lerp((1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
 
-    albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 5, pow(metallic, 2.5)), float3(1, 1, 1));
+    albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 3, pow(metallic, 2.5)), float3(1, 1, 1));
     albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.8, specular.a);
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
 
-    float alpha = mirrored ? 0.5 : max(specular.b - 0.06, 0.0);
+    float emission = max(specular.b - 0.06, 0.0);
+    color += emission * albedo;
+    float alpha = mirrored ? 0.5 : emission;
+
     return float4(color.rgb, alpha);
 }
 
