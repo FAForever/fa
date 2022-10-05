@@ -209,6 +209,7 @@ sampler2D secondarySampler = sampler_state
     AddressV  = WRAP;
 };
 
+// We use this to store the BRDF response, but we need to keep the name for the engine (I guess)
 sampler2D anisotropicSampler = sampler_state
 {
     Texture = (anisotropicTexture);
@@ -2160,16 +2161,22 @@ float4 PBR_PS(
     float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
     float3 sunLight = sunDiffuse * shadow * lightMultiplier;
 
-    // This should be convolved into a proper irradiance map
-    float3 env_irradiance = texCUBE(environmentSampler, (n.y < 0) ? float3(n.x, -n.y, n.z) : n);
-    // Not sure if increasing bias by 1 goes to exactly the next mipmap.
-    // There seems to be no difference between bias 0 and bias 1
-    float bias = roughness * 7;
     float3 reflection = reflect(-v, n);
-    reflection = (reflection.y < 0) ? float3(reflection.x, -reflection.y, reflection.z) : reflection;
-    float3 env_reflection = texCUBEbias(environmentSampler, float4(reflection, bias));
+    float3 env_light_direction = n;
+    // Mirror env map for ships only
+    //reflection = (reflection.y < 0) ? float3(reflection.x, -reflection.y, reflection.z) : reflection;
+    //env_light_direction = (n.y < 0) ? float3(n.x, -n.y, n.z) : n;
+    // We can't use texCUBElod so we need to use a workaround
+    float lod = roughness * 8;
+    float scale = exp2(lod);
+    float3 env_reflection = texCUBEgrad(environmentSampler, reflection, float3(scale/256, 0, 0), float3(0, scale/256, 0));
+    // This should be convolved into a proper irradiance map, but we will settle for lod 5 for now
+    scale = exp2(5);
+    float3 env_irradiance = texCUBEgrad(environmentSampler, env_light_direction, float3(scale/256, 0, 0), float3(0, scale/256, 0));
+
     float3 ambient = sunAmbient + shadowFill;
-    env_irradiance += ambient;
+    env_irradiance += ambient * saturate(dot(env_light_direction, float3(0, 1, 0)));
+    // sunLight = (sunLight - shadowFill);
 
     //////////////////////////////
     // Compute sun light
@@ -2207,8 +2214,10 @@ float4 PBR_PS(
 
     float3 diffuse = env_irradiance * albedo;
 
-    // Need to find out how to implement this
-    float2 envBRDFlookuptexture = float2(0.5, 0.0);
+    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).xy;
+    // We don't have good ao textures to counteract fresnel highlights showing in unplausible places,
+    // so we have to tune them down a bit across the board.
+    envBRDFlookuptexture.y *= 0.5;
     float3 specular = env_reflection * (kS * envBRDFlookuptexture.x + envBRDFlookuptexture.y);
 
     color += (kD * diffuse + specular) * ao;
@@ -2533,7 +2542,7 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
     float ao = .5 + logisticFn(length(albedo.rgb) / sqrt(3), .1, 40, .5, 2);
 
     float teamcolor = min(pow(specular.a * 1.1, 0.5), 1);
-    albedo.rgb *= (2 - teamcolor * 2);
+    albedo.rgb *= (1 - teamcolor) * 1.5;
     albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.6, teamcolor); 
 
     float planeCockpitMask = saturate((specular.r - 0.6) * 2.5);
@@ -3555,7 +3564,7 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
 
     float ao = 1;
     float metallic = saturate((pow(specular.r, 0.7) + specular.g * 0.2 - specular.a * 0.5) * 4.37);
-    float roughness = lerp((1 - specular.g) * 0.7, lerp(0.5, 0.25, specular.g), metallic);
+    float roughness = lerp((1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
 
     albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 5, pow(metallic, 2.5)), float3(1, 1, 1));
     albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.8, specular.a);
