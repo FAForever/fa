@@ -2167,7 +2167,7 @@ float4 PBR_PS(
     //reflection = (reflection.y < 0) ? float3(reflection.x, -reflection.y, reflection.z) : reflection;
     //env_light_direction = (n.y < 0) ? float3(n.x, -n.y, n.z) : n;
     // We can't use texCUBElod so we need to use a workaround
-    float lod = roughness * 8;
+    float lod = roughness * 10;
     float scale = exp2(lod);
     float3 env_reflection = texCUBEgrad(environmentSampler, reflection, float3(scale/256, 0, 0), float3(0, scale/256, 0));
     // This should be convolved into a proper irradiance map, but we will settle for lod 5 for now
