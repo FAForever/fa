@@ -2,8 +2,6 @@
 -- LazyVar module
 --
 
----@alias Lazy<T> T | LazyVar<T> | fun(): T
-
 local TableInsert = table.insert
 
 local iscallable = iscallable
@@ -11,12 +9,14 @@ local pcall = pcall
 local setmetatable = setmetatable
 
 
+---@alias Lazy<T> T | LazyVar<T> | fun(): T
+
+
 -- Set this true to get tracebacks in error messages. It slows down lazyvars a lot,
 -- so don't use except when debugging.
-ExtendedErrorMessages = false
+ExtendedErrorMessages = true
 
 local EvalContext = nil
-local WeakKeyMeta = { __mode = 'k' }
 
 -- note: generic classes don't have full support yet, so we need to add all fields and methods to
 -- the parent table--otherwise, generic instances won't have *anything*
@@ -231,14 +231,13 @@ function Create(initial)
     ---@diagnostic disable-next-line:assign-type-mismatch,miss-symbol,exp-in-action,unknown-symbol
     local result = {&4 initial} -- preallocate table with hashsize=4, arraysize=1
     setmetatable(result, LazyVarMetaTable)
-    local WeakKeyMeta = WeakKeyMeta
     do
         local used_by = {}
-        setmetatable(used_by, WeakKeyMeta)
+        setmetatable(used_by, WeakKeyMetatable)
         result.used_by = used_by
     end
     local uses = {}
-    setmetatable(uses, WeakKeyMeta)
+    setmetatable(uses, WeakKeyMetatable)
     result.uses = uses
     return result
 end

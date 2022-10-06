@@ -306,16 +306,16 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyExcessConverted = 0
 
         self.EnergyExcessUnitsEnabled = { }
-        setmetatable(self.EnergyExcessUnitsEnabled, { __mode = 'v' })
+        setmetatable(self.EnergyExcessUnitsEnabled, WeakValueMetatable)
         self.EnergyExcessUnitsDisabled = { }
-        setmetatable(self.EnergyExcessUnitsDisabled, { __mode = 'v' })
+        setmetatable(self.EnergyExcessUnitsDisabled, WeakValueMetatable)
 
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
     
         self.Jammers = { }
-        setmetatable(self.Jammers, { __mode = 'v' })
+        setmetatable(self.Jammers, WeakValueMetatable)
 
         self.JammerResetTime = 15
 

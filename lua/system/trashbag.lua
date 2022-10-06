@@ -24,6 +24,11 @@
 -- looking over at /lua/EffectTemplate.lua there can be up to nine emitters (oblivion_cannon_hit_08_emit)
 -- for a given effect.
 
+
+WeakKeyMetatable = {__mode = 'k'}
+WeakValueMetatable = {__mode = 'v'}
+WeakKeyValueMetatable = {__mode = "kv"}
+
 local TableGetn = table.getn
 local TableEmpty = table.empty
 

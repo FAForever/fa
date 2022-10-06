@@ -1,6 +1,33 @@
 local PlayReclaimEndEffects = import('/lua/EffectUtilities.lua').PlayReclaimEndEffects
 
-local minimumLabelMass, minimumLabelEnergy = 10, 10
+local EntityMethods = moho.entity_methods
+local UnitMethods = moho.unit_methods
+
+local EntityAdjustHealth = EntityMethods.AdjustHealth
+local EntityBeenDestroyed = EntityMethods.BeenDestroyed
+local EntityDestroy = EntityMethods.Destroy
+local EntityGetBlueprint = EntityMethods.GetBlueprint
+local EntityGetBoneCount = EntityMethods.GetBoneCount
+local EntityGetBoneName = EntityMethods.GetBoneName
+local EntityGetEntityId = EntityMethods.GetEntityId
+local EntityGetFractionComplete = EntityMethods.GetFractionComplete
+local EntityGetHealth = EntityMethods.GetHealth
+local EntityGetMaxHealth = EntityMethods.GetMaxHealth
+local EntityGetPosition = EntityMethods.GetPosition
+local EntitySetAmbientSound = EntityMethods.SetAmbientSound
+local EntitySetCollisionShape = EntityMethods.SetCollisionShape
+local EntitySetHealth = EntityMethods.SetHealth
+local EntitySetMaxHealth = EntityMethods.SetMaxHealth
+local StringGsub = string.gsub
+local TableInsert = table.insert
+local UnitGetBuildRate = UnitMethods.GetBuildRate
+
+local TrashDestroy = TrashBag.Destroy
+
+local GetTerrainHeight = GetTerrainHeight
+local pcall = pcall
+local type = type
+local Warp = Warp
 
 
 ---@class BaseReclaimData
@@ -10,97 +37,57 @@ local minimumLabelMass, minimumLabelEnergy = 10, 10
 ---@class PropSyncData : BaseReclaimData
 ---@field energy number
 
--- upvalue globals for performance
-local type = type
-local Warp = Warp
-local pcall = pcall
-local GetTerrainHeight = GetTerrainHeight
 
--- upvalue moho functions for performance
-local EntityMethods = moho.entity_methods
-local EntityDestroy = EntityMethods.Destroy
-local EntitySetHealth = EntityMethods.SetHealth
-local EntitySetMaxHealth = EntityMethods.SetMaxHealth
-local EntityAdjustHealth = EntityMethods.AdjustHealth
-local EntityGetHealth = EntityMethods.GetHealth
-local EntityGetMaxHealth = EntityMethods.GetMaxHealth
-local EntityGetEntityId = EntityMethods.GetEntityId
-local EntityGetBlueprint = EntityMethods.GetBlueprint
-local EntityGetPosition = EntityMethods.GetPosition
-local EntityBeenDestroyed = EntityMethods.BeenDestroyed
-local EntityGetFractionComplete = EntityMethods.GetFractionComplete
-local EntitySetCollisionShape = EntityMethods.SetCollisionShape
-local EntityGetBoneCount = EntityMethods.GetBoneCount
-local EntityGetBoneName = EntityMethods.GetBoneName
-local EntitySetAmbientSound = EntityMethods.SetAmbientSound
+local minimumLabelMass, minimumLabelEnergy = 1, 5
 
-local UnitMethods = moho.unit_methods 
-local UnitGetBuildRate = UnitMethods.GetBuildRate
-
--- upvalue trashbag functions for performance
--- local TrashBag = TrashBag
-local TrashDestroy = TrashBag.Destroy
-
--- upvalue string functions for performance
-local StringGsub = string.gsub
-
--- upvalue table functions for performance
-local TableInsert = table.insert
 
 ---@class Prop : moho.prop_methods
 ---@field SyncData PropSyncData
 Prop = Class(moho.prop_methods) {
-
     IsProp = true,
 
     ---@param self Prop
     OnCreate = function(self)
-
-        -- -- Caching
+        -- caching
+        local pos = EntityGetPosition(self)
+        local bp = EntityGetBlueprint(self)
 
         self.Trash = TrashBag()
         self.EntityId = EntityGetEntityId(self)
-        self.Blueprint = EntityGetBlueprint(self)
-        self.CachePosition = EntityGetPosition(self)
-        self.SyncData = { }
+        self.Blueprint = bp
+        self.CachePosition = pos
+        self.SyncData = {}
 
-        -- -- Reclaim values
-
-        -- used by typical props, wrecks have their own mechanism to set its value
-        if not self.Blueprint.UnitWreckage then
-            local economy = self.Blueprint.Economy
+        -- set reclaim values for typical props; wrecks have their own mechanism to set its value
+        if not bp.UnitWreckage then
+            local economy = bp.Economy
 
             -- set by some adaptive maps to influence how much a prop is worth
             local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1
 
             self:SetMaxReclaimValues(
-                economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
-                (economy.ReclaimMassMax * modifier) or 0,
-                (economy.ReclaimEnergyMax * modifier) or 0
+                economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or
+                        economy.ReclaimEnergyTimeMultiplier or 1,
+                (economy.ReclaimMassMax or 0) * modifier,
+                (economy.ReclaimEnergyMax or 0) * modifier
             )
         end
 
-        -- -- Terrain correction
-
-        -- Find props that, for some reason, are below ground at their central bone
-        local terrainAltitude = GetTerrainHeight(self.CachePosition[1], self.CachePosition[3])
-        if self.CachePosition[2] < terrainAltitude then
-            self.CachePosition[2] = terrainAltitude
-
-            -- Warp the prop to the surface. We never want things hiding underground!
-            Warp(self, self.CachePosition)
+        -- ensure props aren't underground
+        local terrainAltitude = GetTerrainHeight(pos[1], pos[3])
+        if pos[2] < terrainAltitude then
+            pos[2] = terrainAltitude
+            Warp(self, pos)
         end
 
-        -- -- Set health and status
-
-        local maxHealth = self.Blueprint.Defense.MaxHealth
-        if maxHealth < 50 then
+        -- set health and status
+        local maxHealth = bp.Defense.MaxHealth
+        if not maxHealth or maxHealth < 50 then
             maxHealth = 50
         end
-
         EntitySetMaxHealth(self, maxHealth)
         EntitySetHealth(self, self, maxHealth)
-        self.CanTakeDamage = (not self.Blueprint.Categories.INVULNERABLE) or false
+        self.CanTakeDamage = not bp.Categories.INVULNERABLE
         self.CanBeKilled = true
     end,
 
@@ -173,47 +160,6 @@ Prop = Class(moho.prop_methods) {
         PlayReclaimEndEffects(target, self)
     end,
 
-    --- Syncs the mass label to the UI.
-    SyncMassLabel = function(self)
-        local mass, energy = self.MaxMassReclaim, self.MaxEnergyReclaim
-
-        -- check if prop has sufficient amount of reclaim to begin with
-        if mass < minimumLabelMass and energy < minimumLabelEnergy then
-            return
-        end
-
-        -- check if prop has sufficient amount of reclaim left
-        do
-            local left = self.ReclaimLeft
-            mass = mass * left
-            energy = energy * left
-        end
-        local unworthy = mass < minimumLabelMass and energy < minimumLabelEnergy
-        if unworthy and not self.hasLabel then
-            return
-        end
-
-        -- construct sync data
-        local data = self.SyncData
-
-        -- check if prop should receive sync data
-        if not (EntityBeenDestroyed(self) or unworthy) then
-            -- set the data
-            data.mass = mass
-            data.energy = energy
-            data.position = self.CachePosition
-            self.hasLabel = true
-        else -- prop is not worthy anymore
-            data.mass = nil
-            data.energy = nil
-            data.position = nil
-            self.hasLabel = nil
-        end
-
-        -- update the sync
-        Sync.Reclaim[self.EntityId] = data
-    end,
-
     --- Called by the engine when the prop is destroyed.
     OnDestroy = function(self)
         self.Dead = true
@@ -283,7 +229,7 @@ Prop = Class(moho.prop_methods) {
         self:UpdateReclaimLeft()
     end,
 
-    --- Mimics the engine behavior when calculating the reclaim value of a prop.
+    --- Mimics the engine behavior when calculating the reclaim value of a prop
     UpdateReclaimLeft = function(self)
         if not self.Dead then
             local max = EntityGetMaxHealth(self)
@@ -294,9 +240,48 @@ Prop = Class(moho.prop_methods) {
             self.ReclaimLeft = ratio * EntityGetFractionComplete(self)
         end
 
-        -- Notify UI about the mass change
-        self:SyncMassLabel()
-    end,
+        -- Notify UI about the change
+        self:SyncUserData()
+    end;
+
+    --- Syncs the reclaim label to the UI
+    SyncUserData = function(self)
+        local mass, energy = self.MaxMassReclaim, self.MaxEnergyReclaim
+
+        -- check if prop has sufficient amount of reclaim to begin with
+        if mass < minimumLabelMass and energy < minimumLabelEnergy then
+            return
+        end
+
+        -- check if prop has sufficient amount of reclaim left
+        local left = self.ReclaimLeft
+        mass = mass * left
+        energy = energy * left
+
+        local unworthy = mass < minimumLabelMass and energy < minimumLabelEnergy
+        if unworthy and not self.hasLabel then
+            return
+        end
+
+        -- construct sync data
+        local data = self.SyncData
+
+        -- check if prop should receive sync data
+        if unworthy or EntityBeenDestroyed(self) then
+            data.mass = nil
+            data.energy = nil
+            data.position = nil
+            self.hasLabel = false
+        else
+            data.mass = mass
+            data.energy = energy
+            data.position = self.CachePosition
+            self.hasLabel = true
+        end
+
+        -- update the sync
+        Sync.Reclaim[self.EntityId] = data
+    end;
 
     --- Sets the collision box of the prop.
     -- @param shape The shape of the collider: 'Sphere', 'Box' or 'None'
@@ -494,7 +479,7 @@ Prop = Class(moho.prop_methods) {
 }
 
 
--- imports kept for backwards compatibility with mods
+-- kept for backwards compatibility with mods
 local Entity = import('/lua/sim/Entity.lua').Entity
-local DeprecatedWarnings = { }
+local DeprecatedWarnings = {}
 local TrashAdd = TrashBag.Add

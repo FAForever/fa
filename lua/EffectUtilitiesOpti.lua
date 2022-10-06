@@ -72,7 +72,7 @@ function SpawnBuildBots(builder)
         bots = builder.BuildBots
 
         -- make it weak so that the garbage collection can clean up the table when the unit is destroyed
-        setmetatable(bots, { __mode = "v" })
+        setmetatable(bots, WeakValueMetatable)
     end
 
     -- get information about the builder

@@ -96,10 +96,10 @@ function SetHeight(control, height)
     end
 end
 
---- Sets fixed dimensions of a control, scaled by the pixel scale factor if functcions
+--- Sets fixed dimensions of a control, scaled by the pixel scale factor for non-function values
 ---@param control Control
 ---@param width? number | fun(): number no change if nil
----@param height? number | fun(): number  no change if nil
+---@param height? number | fun(): number no change if nil
 function SetDimensions(control, width, height)
     SetWidth(control, width)
     SetHeight(control, height)
@@ -1184,10 +1184,9 @@ end
 
 
 -- Set this to true to validate a control's layout on `End()`
-ValidateLayouter = false
+ValidateLayouter = import("/lua/lazyvar.lua").ExtendedErrorMessages or false
 
-
----@alias Layoutable Layoutable
+---@alias Layoutable Layouter | Control
 
 --- Returns the control a layout represents, whether a layouter or an actual control
 ---@param layout Layoutable
@@ -1326,38 +1325,35 @@ local LayouterAttributeControl = ClassSimple {
     -- Dimensional setters
     ----------
 
-    --- Sets the width of the control
+    --- Sets fixed width of a control, scaled by the pixel scale factor if not a function
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param width Lazy<number> if a number, width will be scaled by the pixel factor
+    ---@param width? number | fun(): number no change if nil
     ---@return T
     Width = function(self, width)
-        local controlWidth = self.layoutControl.Width
-        if iscallable(width) then
-            controlWidth:SetFunction(width)
-        else
-            controlWidth:SetValue(ScaleNumber(width))
-        end
+        SetWidth(self.layoutControl, width)
         return self
     end;
 
-    --- Sets the height of the control
+    --- Sets fixed height of a control, scaled by the pixel scale factor if not a function
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param height Lazy<number> if a number, height will be scaled by the pixel factor
+    ---@param height? number | fun(): number no change if nil
     ---@return T
     Height = function(self, height)
-        local controlHeight = self.layoutControl.Height
-        if iscallable(height) then
-            controlHeight:SetFunction(height)
-        else
-            controlHeight:SetValue(ScaleNumber(height))
-        end
+        SetHeight(self.layoutControl, height)
         return self
     end;
 
+    --- Sets fixed dimensions of a control, scaled by the pixel scale factor for non-function values
+    ---@generic T : LayouterAttributeControl
+    ---@param self T
+    ---@param width? number | fun(): number no change if nil
+    ---@param height? number | fun(): number no change if nil
+    ---@return T
     Dimensions = function(self, width, height)
-
+        SetDimensions(self.layoutControl, width, height)
+        return self
     end;
 
     --- Sets the width of the control to a texture
