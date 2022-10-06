@@ -3,14 +3,12 @@
 --* Author: Chris Blackwell
 --* Summary: manages user profiles
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
-
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
 local Edit = import('/lua/maui/edit.lua').Edit
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
 local Tooltip = import('/lua/ui/game/tooltip.lua')
@@ -311,3 +309,6 @@ function CreationDialog(parent, callback)
     end
     UIUtil.MakeInputModal(bg, OnEnterFunc, OnEscFunc)
 end
+
+-- kept for mod backwards compatibility
+local Button = import('/lua/maui/button.lua').Button

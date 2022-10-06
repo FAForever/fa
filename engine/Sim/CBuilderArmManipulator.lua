@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.BuilderArmManipulator : moho.manipulator_methods
 local CBuilderArmManipulator = {}
 

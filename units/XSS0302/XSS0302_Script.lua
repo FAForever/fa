@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/XSS0302/XSS0302_script.lua
 -- Author(s):  Jessica St. Croix, Gordon Duclos, Aaron Lundquist
 -- Summary  :  Seraphim Battleship Script
--- Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit

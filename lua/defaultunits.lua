@@ -133,7 +133,7 @@ StructureUnit = Class(Unit) {
 
     ---@param self StructureUnit
     ---@param builder Builder
-    ---@param layer string
+    ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
         Unit.OnStartBeingBuilt(self, builder, layer)
 
@@ -153,7 +153,7 @@ StructureUnit = Class(Unit) {
 
     ---@param self StructureUnit
     ---@param builder Builder
-    ---@param layer string
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         Unit.OnStopBeingBuilt(self, builder, layer)
 
@@ -424,7 +424,7 @@ StructureUnit = Class(Unit) {
 
     ---@param self StructureUnit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         Unit.StartBeingBuiltEffects(self, builder, layer)
         local bp = self.Blueprint
@@ -449,7 +449,7 @@ StructureUnit = Class(Unit) {
 
     ---@param self StructureUnit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     StopBeingBuiltEffects = function(self, builder, layer)
         local FactionName = self.Blueprint.General.FactionName
         if FactionName == 'UEF' and not self.BeingBuiltShowBoneTriggered then
@@ -514,7 +514,7 @@ StructureUnit = Class(Unit) {
     end,
 
     ---@param self StructureUnit
-    ---@param wreckage Prop
+    ---@param wreckage Wreckage
     CheckRepairersForRebuild = function(self, wreckage)
         local units = {}
         for id, u in self.Repairers do
@@ -676,7 +676,7 @@ StructureUnit = Class(Unit) {
     ---@param instigator Unit
     ---@param amount number
     ---@param vector Vector
-    ---@param damageType string
+    ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
 	    -- Handle incoming OC damage
         if damageType == 'Overcharge' then
@@ -754,7 +754,7 @@ FactoryUnit = Class(StructureUnit) {
             end
         end
 
-        self.DestroyUnitBeingBuilt(self)
+        self:DestroyUnitBeingBuilt()
     end,
 
     ---@param self FactoryUnit
@@ -812,6 +812,9 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self FactoryUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
 
@@ -1218,7 +1221,7 @@ MassCollectionUnit = Class(StructureUnit) {
 MassFabricationUnit = Class(StructureUnit) {
 
     ---@param self MassFabricationUnit
-    ---@param bit integer
+    ---@param bit number
     OnScriptBitSet = function(self, bit)
         if bit == 4 then
             -- no longer track us, we want to be disabled
@@ -1232,7 +1235,7 @@ MassFabricationUnit = Class(StructureUnit) {
     end,
 
     ---@param self MassFabricationUnit
-    ---@param bit integer
+    ---@param bit number
     OnScriptBitClear = function (self, bit)
         if bit == 4 then 
             -- make brain track us to enable / disable accordingly
@@ -1244,7 +1247,7 @@ MassFabricationUnit = Class(StructureUnit) {
 
     ---@param self MassFabricationUnit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
@@ -1334,7 +1337,7 @@ RadarUnit = Class(StructureUnit) {
 
     ---@param self RadarUnit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
@@ -1389,7 +1392,7 @@ RadarJammerUnit = Class(StructureUnit) {
 
     ---@param self RadarJammerUnit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
@@ -1400,7 +1403,7 @@ RadarJammerUnit = Class(StructureUnit) {
         StructureUnit.OnIntelEnabled(self)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
-            self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
+            self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             self.IntelFxOn = true
         end
     end,
@@ -1548,13 +1551,13 @@ TransportBeaconUnit = Class(StructureUnit) {
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
     FxTransportBeaconScale = 0.5,
 
-    -- Invincibility!  (the only way to kill a transport beacon is
-    -- to kill the transport unit generating it)
+    --- Invincibility!  (the only way to kill a transport beacon is
+    --- to kill the transport unit generating it)
     ---@param self TransportBeaconUnit
     ---@param instigator Unit
-    ---@param amount integer
+    ---@param amount number
     ---@param vector Vector
-    ---@param damageType string
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
     end,
 
@@ -1602,7 +1605,7 @@ MobileUnit = Class(Unit) {
     ---comment
     ---@param self MobileUnit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         Unit.StartBeingBuiltEffects(self, builder, layer)
         if self.factionCategory == 'UEF' then
@@ -1615,7 +1618,7 @@ MobileUnit = Class(Unit) {
     -- layer change event
     ---@param self MobileUnit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
        Unit.OnStopBeingBuilt(self, builder, layer)
        self:OnLayerChange(layer, 'None')
@@ -1637,7 +1640,7 @@ MobileUnit = Class(Unit) {
     ---comment
     ---@param self MobileUnit
     ---@param transport AirUnit
-    ---@param bone string
+    ---@param bone Bone
     OnDetachedFromTransport = function(self, transport, bone)
         Unit.OnDetachedFromTransport(self, transport, bone)
 
@@ -1848,7 +1851,7 @@ AirUnit = Class(MobileUnit) {
 
     -- ONLY works for Terrain, not Water
     ---@param self AirUnit
-    ---@param bone string
+    ---@param bone Bone
     ---@param x number
     ---@param y number
     ---@param z number
@@ -1883,7 +1886,7 @@ AirUnit = Class(MobileUnit) {
     ---@param self AirUnit
     ---@param instigator Unit
     ---@param type string
-    ---@param overkillRatio any
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         -- A completed, flying plane expects an OnImpact event due to air crash.
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
@@ -1892,7 +1895,7 @@ AirUnit = Class(MobileUnit) {
         -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
         -- It also wouldn't call this code, and hence the cargo destruction. Awful!
         if self:GetFractionComplete() == 1 and (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
-            self.CreateUnitAirDestructionEffects(self, 1.0)
+            self:CreateUnitAirDestructionEffects(1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
             self.OverKillRatio = overkillRatio
@@ -1955,7 +1958,7 @@ AirUnit = Class(MobileUnit) {
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
 local slotsData = {}
 ---@class BaseTransport 
-BaseTransport = Class() {
+BaseTransport = ClassSimple {
 
     ---@param self BaseTransport
     ---@param attachBone Bone
@@ -2282,7 +2285,7 @@ SeaUnit = Class(MobileUnit){
 
     ---@param self SeaUnit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         MobileUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
@@ -2507,7 +2510,7 @@ CommandUnit = Class(WalkingLandUnit) {
     end,
 
     ---@param self CommandUnit
-    ---@param bones string
+    ---@param bones Bone[]
     WarpInEffectThread = function(self, bones)
         self:PlayUnitSound('CommanderArrival')
         self:CreateProjectile('/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
@@ -2547,8 +2550,8 @@ CommandUnit = Class(WalkingLandUnit) {
 
     ---@param self CommandUnit
     ---@param teleporter any
-    ---@param location number
-    ---@param orientation number
+    ---@param location Vector
+    ---@param orientation Quaternion
     InitiateTeleportThread = function(self, teleporter, location, orientation)
         self.UnitBeingTeleported = self
         self:SetImmobile(true)
@@ -2682,7 +2685,7 @@ ACUUnit = Class(CommandUnit) {
 
     ---@param self ACUUnit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
         ArmyBrains[self.Army]:SetUnitStat(self.UnitId, "lowest_health", self:GetHealth())
@@ -2693,7 +2696,7 @@ ACUUnit = Class(CommandUnit) {
     ---@param instigator Unit
     ---@param amount number
     ---@param vector Vector
-    ---@param damageType string
+    ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Handle incoming OC damage
         if damageType == 'Overcharge' then

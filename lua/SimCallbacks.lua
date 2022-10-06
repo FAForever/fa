@@ -12,10 +12,11 @@
 ---@field Func string
 ---@field Args table
 
-local SimUtils = import('/lua/SimUtils.lua')
-local SimPing = import('/lua/SimPing.lua')
+local SimUtils = import('/lua/simutils.lua')
+local SimPing = import('/lua/simping.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
+local ScenarioFramework = import('/lua/scenarioframework.lua')
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -453,6 +454,8 @@ Callbacks.RequestAlliedVictory = SimUtils.RequestAlliedVictory
 
 Callbacks.SetOfferDraw = SimUtils.SetOfferDraw
 
+Callbacks.SetRecallVote = import("/lua/sim/recall.lua").SetRecallVote
+
 Callbacks.SpawnPing = SimPing.SpawnPing
 
 --Nuke Ping
@@ -460,17 +463,17 @@ Callbacks.SpawnSpecialPing = SimPing.SpawnSpecialPing
 
 Callbacks.UpdateMarker = SimPing.UpdateMarker
 
-Callbacks.FactionSelection = import('/lua/ScenarioFramework.lua').OnFactionSelect
+Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect
 
 Callbacks.ToggleSelfDestruct = import('/lua/selfdestruct.lua').ToggleSelfDestruct
 
 Callbacks.MarkerOnScreen = import('/lua/simcameramarkers.lua').MarkerOnScreen
 
-Callbacks.SimDialogueButtonPress = import('/lua/SimDialogue.lua').OnButtonPress
+Callbacks.SimDialogueButtonPress = import('/lua/simdialogue.lua').OnButtonPress
 
 Callbacks.AIChat = SUtils.FinishAIChat
 
-Callbacks.DiplomacyHandler = import('/lua/SimDiplomacy.lua').DiplomacyHandler
+Callbacks.DiplomacyHandler = import('/lua/simdiplomacy.lua').DiplomacyHandler
 
 Callbacks.Rebuild = function(data, units)
     local wreck = GetEntityById(data.entity)
@@ -522,21 +525,17 @@ Callbacks.OnControlGroupAssign = function(units)
     end
 end
 
-Callbacks.OnControlGroupApply = function(units)
-    --LOG(repr(units))
-end
-
-local SimCamera = import('/lua/SimCamera.lua')
+local SimCamera = import('/lua/simcamera.lua')
 
 Callbacks.OnCameraFinish = SimCamera.OnCameraFinish
 
-local SimPlayerQuery = import('/lua/SimPlayerQuery.lua')
+local SimPlayerQuery = import('/lua/simplayerquery.lua')
 
 Callbacks.OnPlayerQuery = SimPlayerQuery.OnPlayerQuery
 
 Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
-Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
+Callbacks.PingGroupClick = import('/lua/simpinggroup.lua').OnClickCallback
 
 Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
 
@@ -587,7 +586,7 @@ Callbacks.FlagShield = function(data, units)
     end
 end
 
-Callbacks.WeaponPriorities = import('/lua/WeaponPriorities.lua').SetWeaponPriorities
+Callbacks.WeaponPriorities = import('/lua/weaponpriorities.lua').SetWeaponPriorities
 
 Callbacks.ToggleDebugChainByName = function (data, units)
     LOG("ToggleDebugChainByName")
@@ -727,17 +726,17 @@ do
 end
 
 Callbacks.MapResoureCheck = function(data)
-    import("/lua/sim/MapUtilities.lua").MapResourceCheck()
+    import("/lua/sim/maputilities.lua").MapResourceCheck()
 end
 
 Callbacks.iMapSwitchPerspective = function(data)
-    import("/lua/sim/MapUtilities.lua").iMapSwitchPerspective(data.Army)
+    import("/lua/sim/maputilities.lua").iMapSwitchPerspective(data.Army)
 end
 
 Callbacks.iMapToggleRendering = function(data)
-    import("/lua/sim/MapUtilities.lua").iMapToggleRendering()
+    import("/lua/sim/maputilities.lua").iMapToggleRendering()
 end
 
 Callbacks.iMapToggleThreat = function(data)
-    import("/lua/sim/MapUtilities.lua").iMapToggleThreat(data.Identifier)
+    import("/lua/sim/maputilities.lua").iMapToggleThreat(data.Identifier)
 end

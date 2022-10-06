@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.ScriptTask_Methods
 local CUnitScriptTask = {}
 

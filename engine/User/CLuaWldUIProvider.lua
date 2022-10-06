@@ -1,5 +1,6 @@
----@declare-global
----@class moho.WldUIProvider_methods
+---@meta
+
+---@class moho.WldUIProvider_methods : Destroyable
 local CLuaWldUIProvider = {}
 
 ---

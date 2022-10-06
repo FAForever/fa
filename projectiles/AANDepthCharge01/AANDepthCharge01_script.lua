@@ -21,7 +21,7 @@ AANDepthCharge01 = Class(ADepthChargeProjectile) {
         WaitSeconds(self.CountdownLength)
 
         if not self.HasImpacted then
-            self.OnImpact(self, 'Underwater', nil)
+            self:OnImpact('Underwater', nil)
         end
     end,
 

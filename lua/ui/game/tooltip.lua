@@ -356,7 +356,7 @@ function AddControlTooltip(control, tooltipID, delay, width)
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end
-        return self.oldHandleEvent(self, event)
+        return self:oldHandleEvent(event)
     end
 end
 
@@ -385,7 +385,7 @@ function AddControlTooltipManual(control, title, description, delay, width, padd
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end
-        return self.oldHandleEvent(self, event)
+        return self:oldHandleEvent(event)
     end
 end
 
@@ -405,7 +405,7 @@ function AddForcedControlTooltipManual(control, title, description, delay, width
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end
-        return self.oldHandleEvent(self, event)
+        return self:oldHandleEvent(event)
     end
 end
 
@@ -420,7 +420,7 @@ function AddAutoUpdatedControlTooltip(control, displayText, displayBody, delay, 
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end
-        return self.oldHandleEvent(self, event)
+        return self:oldHandleEvent(event)
     end
 end
 
@@ -434,7 +434,7 @@ function AddCheckboxTooltip(control, tooltipID, delay, width)
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end
-        return self.oldHandleEvent(self, event)
+        return self:oldHandleEvent(event)
     end
 end
 

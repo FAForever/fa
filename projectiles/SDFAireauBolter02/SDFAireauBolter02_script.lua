@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aire-au Bolter Projectile script, XSL0303
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 SDFAireauBolter02 = Class(import('/lua/seraphimprojectiles.lua').SAireauBolter) {

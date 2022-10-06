@@ -1,11 +1,10 @@
----@declare-global
----@class moho.entity_methods
+---@meta
+
+---@class moho.entity_methods : Destroyable
 local Entity = {}
 
----@alias Army number | string
 ---@alias EntityId number
----@alias EntityVisionType 'Intel' | 'Never' | 'Always' | 'Vision'
----@alias EntityIntelTypes 'Radar' | 'Sonar' | 'Cloak' | 'CloakField' | 'Spoof' | 'RadarStealth' | 'RadarStealthField' | 'SonarStealth' | 'SonarStealthField'
+
 
 --- Does not appear to be used
 ---@unknown
@@ -16,7 +15,7 @@ end
 
 ---
 --  Entity:AddPingPongScroller(ping1, pingSpeed1, pong1, pongSpeed1, ping2, pingSpeed2, pong2, pongSpeed2)
-function Entity:AddPingPongScroller(ping1,  pingSpeed1,  pong1,  pongSpeed1,  ping2,  pingSpeed2,  pong2,  pongSpeed2)
+function Entity:AddPingPongScroller(ping1, pingSpeed1, pong1, pongSpeed1, ping2, pingSpeed2, pong2, pongSpeed2)
 end
 
 --- Does not appear to be used
@@ -28,25 +27,25 @@ end
 --- Attaches a thread scroller to an entity, animating the bottom section of their textures / UVs
 ---@param sideDist number
 ---@param scrollMult number
-function Entity:AddThreadScroller(sideDist,  scrollMult)
+function Entity:AddThreadScroller(sideDist, scrollMult)
 end
 
 ---
 --  AddWorldImpulse(self, Ix, Iy, Iz, Px, Py, Pz) Note: Does not appear to be functional.
-function Entity:AddWorldImpulse(self,  Ix,  Iy,  Iz,  Px,  Py,  Pz)
+function Entity:AddWorldImpulse(Ix, Iy, Iz, Px, Py, Pz)
 end
 
 --- Adjusts the health of the entity, with credits to the instigator
 ---@param instigator Unit
 ---@param delta number
-function Entity:AdjustHealth(instigator,  delta)
+function Entity:AdjustHealth(instigator, delta)
 end
 
 --- Attaches this entity to another entity, matching the bone position of `selfBone` and `bone` accordingly
----@param selfbone number | string
+---@param selfbone Bone
 ---@param entity Entity
----@param bone number | string
-function Entity:AttachBoneTo(selfbone,  entity,  bone)
+---@param bone Bone
+function Entity:AttachBoneTo(selfbone, entity, bone)
 end
 
 ---
@@ -79,13 +78,13 @@ end
 
 --- Creates a projectile at a bone matching the orientation of the bone such that `projectile:GetLauncher()` returns the entity
 ---@param projectile_blueprint string
----@param bone number | string
+---@param bone Bone
 ---@return Projectile
-function Entity:CreateProjectileAtBone(projectile_blueprint,  bone)
+function Entity:CreateProjectileAtBone(projectile_blueprint, bone)
 end
 
 --- Creates a prop at a bone matching the orientation of the bone, used by tree groups when they break
----@param bone number | string
+---@param bone Bone
 ---@param propid string
 ---@return Prop
 function Entity:CreatePropAtBone(bone, propid)
@@ -96,7 +95,7 @@ function Entity:Destroy()
 end
 
 --- Detaches all entities attached to the given bone
----@param bone number | string
+---@param bone Bone
 ---@param skipBallistic? boolean
 function Entity:DetachAll(bone, skipBallistic)
 end
@@ -115,7 +114,6 @@ end
 --  EnableIntel(type)
 function Entity:EnableIntel(type)
 end
-
 
 ---@param dx any
 ---@param dy any
@@ -147,7 +145,7 @@ end
 
 --- Returns separate three numbers representing the roll, pitch, yaw of the bone
 ---@see EulerToQuaternion if you need a Quaternion instead
----@param bone number | string
+---@param bone Bone
 ---@return number
 ---@return number
 ---@return number
@@ -207,13 +205,13 @@ function Entity:GetParent()
 end
 
 --- Returns the position of the entity at a given bone (or its center bone if absent) as a table that is re-used on each call
----@param bone? string | number
+---@param bone? Bone
 ---@return Vector
 function Entity:GetPosition(bone)
 end
 
 --- Returns the position of the entity at a given bone (or its center bone if absent) as three separate numbers
----@param bone? string | number
+---@param bone? Bone
 ---@return number X
 ---@return number Y
 ---@return number Z
@@ -241,7 +239,7 @@ end
 --  Entity:IsValidBone(nameOrIndex,allowNil=false)
 
 --- Returns whether the bone is a valid bone for the entity
----@param bone number | string
+---@param bone Bone
 ---@param allowNil boolean Flag that to consider nil a valid bone, defaults to false
 ---@return boolean
 function Entity:IsValidBone(bone, allowNil)
@@ -261,7 +259,7 @@ end
 
 ---
 --  Entity:PushOver(nx, ny, nz, depth)
-function Entity:PushOver(nx,  ny,  nz,  depth)
+function Entity:PushOver(nx, ny, nz, depth)
 end
 
 ---
@@ -289,16 +287,13 @@ end
 function Entity:SetAmbientSound(paramTableDetail, paramTableRumble)
 end
 
----
---  Entity:SetCollisionShape(['Box'|'Sphere'|'None'], centerX, Y, Z, size) -- size is radius for sphere, x,y,z extent for box
-
 --- Defines the collision shape of the entity. Should not be used excessively due to its performance impact
----@param type 'Box' | 'Sphere' | 'None'
+---@param type CollisionShape
 ---@param centerX number
 ---@param Y number
 ---@param Z number
 ---@param size number
-function Entity:SetCollisionShape(type,  centerX,  Y,  Z,  size)
+function Entity:SetCollisionShape(type, centerX, Y, Z, size)
 end
 
 ---
@@ -320,19 +315,17 @@ end
 function Entity:SetMaxHealth(maxhealth)
 end
 
---
-
 --- Change the mesh of the entity
 ---@param meshBp string
 ---@param keepActor boolean if set, keep all manipulators attached
-function Entity:SetMesh(meshBp,  keepActor)
+function Entity:SetMesh(meshBp, keepActor)
 end
 
 --- Defines the orientation of the entity
 ---@see `entity:SetPosition` for the position of the entity
 ---@param orientation Quaternion
 ---@param immediately boolean defaults to false
-function Entity:SetOrientation(orientation,  immediately)
+function Entity:SetOrientation(orientation, immediately)
 end
 
 ---
@@ -354,22 +347,22 @@ function Entity:SetScale(sx, sy, sz)
 end
 
 --- Defines when allied armies to this entity gain vision of (the mesh of) this entity
----@param type EntityVisionType
+---@param type VisionMode
 function Entity:SetVizToAllies(type)
 end
 
 --- Defines when hostile armies to this entity gain vision of (the mesh of) this entity
----@param type EntityVisionType
+---@param type VisionMode
 function Entity:SetVizToEnemies(type)
 end
 
 --- Defines when the focus army of this entity gaisn vision of (the mesh of) this entity
----@param type EntityVisionType
+---@param type VisionMode
 function Entity:SetVizToFocusPlayer(type)
 end
 
 --- Defines when neutral armies to this entity gain vision of (the mesh of) this entity
----@param type EntityVisionType
+---@param type VisionMode
 function Entity:SetVizToNeutrals(type)
 end
 
@@ -378,7 +371,7 @@ end
 ---@param max number
 ---@param min number
 ---@param duration number
-function Entity:ShakeCamera(radius,  max,  min,  duration)
+function Entity:ShakeCamera(radius, max, min, duration)
 end
 
 --- Sink into the ground

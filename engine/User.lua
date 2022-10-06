@@ -1,5 +1,17 @@
 ---@meta
 
+
+---@alias SubmergeStatus
+---| -1  # submerged
+---|  0  # unknown
+---|  1  # not submerged
+
+
+---@alias FireState
+---| 0 # Return fire
+---| 1 # Hold fire
+---| 2 # Ground fire
+
 --- No clue what this does
 ---@param entityId number
 ---@param onTime number
@@ -29,22 +41,17 @@ end
 function AddSelectUnits(selection)
 end
 
---- Add unit to the session extra select list
+--- Adds unit to the session extra select list
 ---@param unit UserUnit
 function AddToSessionExtraSelectList(unit)
 end
 
---- Return `true` if there is anything currently on the capture stack
+--- Returns `true` if there is anything currently on the capture stack
 ---@return boolean
 function AnyInputCapture()
 end
 
---- Set the audio language
----@param language Language
-function AudioSetLanguage(language)
-end
-
---- Clear and disable the build templates
+--- Clears and disables the build templates
 function ClearBuildTemplates()
 end
 
@@ -52,38 +59,38 @@ end
 function ClearCurrentFactoryForQueueDisplay()
 end
 
---- Destroy all controls in frame, `nil` head will clear all frames
+--- Destroys all controls in frame, `nil` head will clear all frames
 ---@param head number | nil
 function ClearFrame(head)
 end
 
---- Clear the session extra select list
+--- Clears the session extra select list
 function ClearSessionExtraSelectList()
 end
 
---- Perform a console command
+--- Performs a console command
 ---@param command string
 function ConExecute(command)
 end
 
---- Perform a console command, saved to stack
+--- Performs a console command, saved to stack
 ---@param command string
 function ConExecuteSave(command)
 end
 
---- Get console commands that `text` can auto-complete to
+--- Gets console commands that `text` can auto-complete to
 ---@param text string
 ---@return string[]
 function ConTextMatches(text)
 end
 
---- Copy the current replay to another file
+--- Copies the current replay to another file
 ---@param profile string
----@param newFilename string
+---@param newFilename FileName
 function CopyCurrentReplay(profile, newFilename)
 end
 
---- Create a Unit AtMouse
+--- Creates a Unit AtMouse
 ---@param blueprintId string
 ---@param ownerArmyIndex number
 ---@param offsetMouseWorldPosX number
@@ -93,13 +100,13 @@ end
 function CreateUnitAtMouse(blueprintId, ownerArmyIndex, offsetMouseWorldPosX, offsetMouseWorldPosZ, rotation)
 end
 
---- Get the current time in seconds, counting from 0 at application start.
+--- Gets the current time in seconds, counting from 0 at application start.
 --- This is wall-clock time and is unaffected by gameplay.
 ---@return number
 function CurrentTime()
 end
 
---- Return `true` if debug facilities are enabled
+--- Returns `true` if debug facilities are enabled
 ---@return boolean
 function DebugFacilitiesEnabled()
 end
@@ -119,7 +126,7 @@ end
 function DisableWorldSounds()
 end
 
---- Eject another client from your session
+--- Ejects another client from your session
 ---@param clientIndex number
 function EjectSessionClient(clientIndex)
 end
@@ -128,76 +135,63 @@ end
 function EnableWorldSounds()
 end
 
---- Kill current UI and start main menu from top
+--- Kills current UI and starts main menu from top
 function EngineStartFrontEndUI()
 end
 
---- Kill current UI and start splash screens
+--- Kills current UI and starts splash screens
 function EngineStartSplashScreens()
 end
 
---- Return true if a unit category contains this unit
----@param category moho.EntityCategory
----@param unit UserUnit
-function EntityCategoryContains(category, unit)
-end
-
---- Filter a list of units to only those found in the category
----@param category moho.EntityCategory
----@param units UserUnit[]
----@return UserUnit[]
-function EntityCategoryFilterDown(category, units)
-end
-
---- Filter a list of units to exclude those found in the category
----@param category moho.EntityCategory
+--- Filters a list of units to exclude from those found in the category
+---@param category EntityCategory
 ---@param units UserUnit[]
 ---@return UserUnit[]
 function EntityCategoryFilterOut(category, units)
 end
 
---- Execute some Lua code in the sim
+--- Executes some Lua code in the sim
 ---@param func function
 ---@param ... any this may actually be a comma-separated string of args instead of a vararg
 ---@return any
 function ExecLuaInSim(func, ...)
 end
 
---- Request that the application shut down
+--- Requests that the application shut down
 function ExitApplication()
 end
 
---- Quit the sim, but not the app
+--- Quits the sim, but not the app
 function ExitGame()
 end
 
---- Flush mouse/keyboard events
+--- Flushes mouse/keyboard events
 function FlushEvents()
 end
 
---- Format a string displaying the time specified in seconds
+--- Formats a string displaying the time specified in seconds
 ---@param seconds number
 ---@return string
 function FormatTime(seconds)
 end
 
---- Get the current game time in ticks. The game time is the simulation time,
+--- Gets the current game time in ticks. The game time is the simulation time,
 --- that stops when the game is paused.
 ---@return number
 function GameTick()
 end
 
---- Get the current game time in seconds. The game time is the simulation time,
+--- Gets the current game time in seconds. The game time is the simulation time,
 --- that stops when the game is paused.
 ---@return number
 function GameTime()
 end
 
---- Generate and enable build templates from the current selection
+--- Generates and enables build templates from the current selection
 function GenerateBuildTemplateFromSelection()
 end
 
---- Get active build template back to Lua
+--- Gets active build template back to Lua
 ---@return BuildTemplate
 function GetActiveBuildTemplate()
 end
@@ -213,7 +207,7 @@ end
 function GetArmiesTable()
 end
 
---- Return a table of avatar units for the army
+--- Returns a table of avatar units for the army
 ---@return UserUnit[]
 function GetArmyAvatars()
 end
@@ -224,25 +218,16 @@ end
 function GetArmyScore(armyIndex)
 end
 
---- Get a list of units assisting me
+--- Gets a list of units assisting me
 ---@param units UserUnit[]
 ---@return UserUnit[]
 function GetAssistingUnitsList(units)
 end
 
---- Get a list of units blueprint attached to transports
+--- Gets a list of units blueprint attached to transports
 ---@param units UserUnit[]
 ---@return UserUnit[]
 function GetAttachedUnitsList(units)
-end
-
---- Get the blueprint of an object
----@overload fun(effect: moho.IEffect): TrailEmitterBlueprint | BeamBlueprint
----@overload fun(projectile: Projectile): ProjectileBlueprint
----@overload fun(prop: Prop): PropBlueprint
----@overload fun(unit: UserUnit | Unit): UnitBlueprint
----@overload fun(weapon: Weapon): WeaponBlueprint
-function GetBlueprint(object)
 end
 
 ---
@@ -261,7 +246,7 @@ end
 function GetCommandLineArg(option, maxArgs)
 end
 
---- Return 'splash', 'frontend', or 'game' depending on the current state of the UI
+--- Returns 'splash', 'frontend', or 'game' depending on the current state of the UI
 ---@return 'splash' | 'frontend' | 'game'
 function GetCurrentUIState()
 end
@@ -271,29 +256,18 @@ end
 function GetCursor()
 end
 
---- Get the player's economy totals, for things such as resources `reclaimed`
---- or `income`
+--- Gets the player's economy totals, for things such as resources `reclaimed` or `income`
 ---@return EconomyTotals
 function GetEconomyTotals()
 end
 
----@alias FireState
----| 0 # Return fire
----| 1 # Hold fire
----| 2 # Ground fire
-
---- Get the right fire state for the units passed in
+--- Gets the right fire state for the units passed in
 ---@param units UserUnit[]
 ---@return FireState
 function GetFireState(units)
 end
 
---- The current army number that the player has focused, or `-1` for none (i.e. observer)
----@return number
-function GetFocusArmy()
-end
-
---- Return the root UI frame for a given head
+--- Returns the root UI frame for a given head
 ---@param head number
 ---@return Frame
 function GetFrame(head)
@@ -305,62 +279,50 @@ end
 function GetFrontEndData(key)
 end
 
---- Return the current game speed
+--- Returns the current game speed
 ---@return number
 function GetGameSpeed()
 end
 
---- Return a formatted string displaying the time the game has been played
+--- Returns a formatted string displaying the time the game has been played
 ---@return string
 function GetGameTime()
 end
 
---- Return game time in seconds
----@return number
-function GetGameTimeSeconds()
-end
-
---- Return a table of idle engineer units for the army
+--- Returns a table of idle engineer units for the army
 ---@return UserUnit[]
 function GetIdleEngineers()
 end
 
---- Return a table of idle factory units for the army
+--- Returns a table of idle factory units for the army
 ---@return UserUnit[]
 function GetIdleFactories()
 end
 
 --- Returns the current capture control, or `nil` if none
----@return Control | nil
+---@returns Control | nil
 function GetInputCapture()
 end
 
---- See if anyone in the list is auto building
+--- Sees if any units in the list are auto-building
 ---@param units UserUnit[]
 ---@return boolean
 function GetIsAutoMode(units)
 end
 
---- See if anyone in the list is auto surfacing
+--- Sees if any units in the list are auto-surfacing
 ---@param units UserUnit[]
 ---@return boolean
 function GetIsAutoSurfaceMode(units)
 end
 
---- Is anyone in this list builder paused?
+--- Sees if any units in the list are paused
 ---@param units UserUnit[]
 ---@return boolean
 function GetIsPaused(units)
 end
 
--- FIXME it doesn't like negative numbers
-
----@alias SubmergeStatus
----| -1  # submerged
----|  0  # unknown
----|  1  # not submerged
-
---- Determine if units are submerged
+--- Sees if any units in the list are submerged
 ---@param units UserUnit[]
 ---@return SubmergeStatus
 function GetIsSubmerged(units)
@@ -381,7 +343,7 @@ end
 function GetMovieVolume()
 end
 
---- Return the current number of root frames (typically one per head)
+--- Returns the current number of root frames (typically one per head)
 ---@return number
 function GetNumRootFrames()
 end
@@ -404,24 +366,26 @@ end
 function GetResourceSharing()
 end
 
---- Get the rollover information about the unit the cursor is currently hovered over
+--- Gets the rollover information about the unit the cursor is currently hovered over.
+--- The output of this function is replicated by `/lua/keymap/selectedinfo.lua#GetUnitRolloverInfo`
+--- for any unit.
 ---@return RolloverInfo
 function GetRolloverInfo()
 end
 
---- Get the state for the script bit
+--- Gets the state for the script bit
 ---@param unit UserUnit
 ---@param bit number
 ---@return boolean
 function GetScriptBit(unit, bit)
 end
 
---- Return a table of the currently selected units
+--- Returns a table of the currently selected units
 ---@return UserUnit[]
 function GetSelectedUnits()
 end
 
---- Return a table of the various clients in the current session.
+--- Returns a table of the various clients in the current session.
 --- Note that this is cached by `/lua/ui/override/SessionClients.lua`
 ---@return Client[]
 function GetSessionClients()
@@ -437,7 +401,7 @@ end
 function GetSimTicksPerSecond()
 end
 
---- Get information on a profile based file, `nil` if unable to find
+--- Gets information on a profile based file, `nil` if unable to find
 ---@param profileName string
 ---@param basename string
 ---@param type string
@@ -453,7 +417,7 @@ end
 function GetSpecialFilePath(profilename,  filename,  type)
 end
 
---- Return a table of strings which are the names of files in special locations (currently SaveFile, Replay)
+--- Returns a table of strings which are the names of files in special locations (currently SaveFile, Replay)
 ---@param type string
 ---@return table
 function GetSpecialFiles(type)
@@ -465,12 +429,12 @@ end
 function GetSpecialFolder(type)
 end
 
---- Return a formatted string displaying the System time
+--- Returns a formatted string displaying the System time
 ---@return string
 function GetSystemTime()
 end
 
---- Return System time in seconds
+--- Returns System time in seconds
 ---@return number
 function GetSystemTimeSeconds()
 end
@@ -483,27 +447,22 @@ end
 function GetTextureDimensions(filename,  border)
 end
 
---- Get the alpha multiplier for 2D UI controls
+--- Gets the alpha multiplier for 2D UI controls
 ---@return number
 function GetUIControlsAlpha()
 end
 
----
----@param id string
----@return UserUnit
-function GetUnitById(id)
-end
-
---- Given a set of units, get the union of orders and unit categories (for determining builds)
+--- Given a set of units, gets the union of orders and unit categories (for determining builds)
 ---@param unitSet any
 ---@return string[] orders
----@return OrderInfo[] availableToggles
----@return moho.EntityCategory[] buildableCategories
+---@return CommandCap[] availableToggles
+---@return EntityCategory[] buildableCategories
 function GetUnitCommandData(unitSet)
 end
 
---- Given a RULEUCC type command, return the equivalent UNITCOMMAND command
----@param rule string
+--- Givens a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command.
+--- See `/lua/ui/game/commandgraphparams.lua#CommandGraphParams`.
+---@param rule CommandCap
 ---@return string
 function GetUnitCommandFromCommandCap(rule)
 end
@@ -533,11 +492,6 @@ end
 function HasCommandLineArg(option)
 end
 
----
----@param language Language
-function HasLocalizedVO(language)
-end
-
 --- Add a set of key mappings
 ---@param keyMapTable table<string, string>
 function IN_AddKeyMapTable(keyMapTable)
@@ -560,7 +514,7 @@ end
 
 --- For internal use by `Bitmap.__init()`
 ---@param bitmap Bitmap
----@param parent any
+---@param parent Control
 function InternalCreateBitmap(bitmap, parent)
 end
 
@@ -643,7 +597,7 @@ end
 --- For internal use by `ScrollBar.__init()`
 ---@param scrollBar Scrollbar
 ---@param parent Control
----@param axis "Vert"|"Horz" found in `/lua/scrollbar.lua#ScrollAxis`
+---@param axis ScrollAxis found in `/lua/scrollbar.lua#ScrollAxis`
 function InternalCreateScrollbar(scrollBar, parent, axis)
 end
 
@@ -671,30 +625,9 @@ function InternalSaveGame(filename, friendlyname, oncompletion)
 end
 
 ---
----@param army1 number
----@param army2 number
----@return boolean
-function IsAlly(army1, army2)
-end
-
----
----@param army1 number
----@param army2 number
----@return boolean
-function IsEnemy(army1, army2)
-end
-
----
 ---@param keyCode string
 ---@return boolean
 function IsKeyDown(keyCode)
-end
-
----
----@param army1 number
----@param army2 number
----@return boolean
-function IsNeutral(army1, army2)
 end
 
 ---
@@ -779,12 +712,6 @@ end
 function OpenURL(url)
 end
 
---- Parse a string to generate a new entity category
----@param cat string
----@return moho.EntityCategory
-function ParseEntityCategory(cat)
-end
-
 ---
 ---@param category string
 ---@param pause boolean
@@ -798,9 +725,9 @@ function PauseVoice(category, pause)
 end
 
 ---
----@param sound BpSoundResult
+---@param sound SoundHandle
 ---@param prepareOnly? boolean
----@return moho.sound_methods
+---@return SoundHandle
 function PlaySound(sound, prepareOnly)
 end
 
@@ -810,9 +737,9 @@ function PlayTutorialVO(params)
 end
 
 ---
----@param sound BpSoundResult
+---@param sound SoundHandle
 ---@param duck? boolean
----@return moho.sound_methods
+---@return SoundHandle
 function PlayVoice(sound, duck)
 end
 
@@ -830,15 +757,6 @@ end
 ---@param mods ModInfo[]
 ---@param hipri? boolean
 function PrefetchSession(mapname, mods, hipri)
-end
-
---- Generate a random number between `min` and `max`
----@param min number defaults to 0
----@param max number defaults to 1
----@return number
----@overload fun(max: number): number
----@overload fun(): number
-function Random(min, max)
 end
 
 ---
@@ -951,11 +869,6 @@ end
 function SessionIsPaused()
 end
 
---- Return true iff the active session is a replay session
----@return boolean
-function SessionIsReplay()
-end
-
 --- Pause the world simulation
 function SessionRequestPause()
 end
@@ -966,7 +879,7 @@ end
  
 ---
 ---@param client? number | number[] client or clients
----@param message string
+---@param message table | number | string
 function SessionSendChatMessage(client, message)
 end
 
@@ -1005,11 +918,6 @@ function SetFireState(units, fireState)
 end
 
 ---
----@param armyIndex number index or -1
-function SetFocusArmy(armyIndex)
-end
-
----
 ---@param key string
 ---@param data any
 function SetFrontEndData(key, data)
@@ -1027,10 +935,10 @@ end
 
 ---
 ---@param overlay string
----@param categories moho.EntityCategory
----@param normalColor string
----@param selectColor string
----@param rolloverColor string
+---@param categories EntityCategory
+---@param normalColor Color
+---@param selectColor Color
+---@param rolloverColor Color
 ---@param inner1 number
 ---@param inner2 number
 ---@param outer1 number
@@ -1075,13 +983,13 @@ function SimCallback(callback, addUnitSelection)
 end
 
 ---
----@param handle moho.sound_methods
+---@param handle SoundHandle
 ---@return boolean
 function SoundIsPrepared(handle)
 end
 
 ---
----@param handle moho.sound_methods
+---@param handle SoundHandle
 function StartSound(handle)
 end
 
@@ -1090,7 +998,7 @@ function StopAllSounds()
 end
 
 ---
----@param handle moho.sound_methods
+---@param handle SoundHandle
 ---@param immediate? boolean defaults to false
 function StopSound(handle, immediate)
 end
@@ -1100,19 +1008,12 @@ end
 function SyncPlayableRect(region)
 end
 
----
----@param mode boolean
+--- Now also supports string with hex colors
+--- Colors separated by commas, no spaces. Example:
+--- TeamColorMode("ffffffff,ffff32ff,ffb76518,ffa79602")
+--- colors will be applied to army according to its index. first color -> army with index 1, second color -> 2 etc.
+---@param mode boolean | string
 function TeamColorMode(mode)
-end
-
----
--- TeamColorMode
--- Now also supports string with hex colors
--- Colors separated by commas, no spaces. Example:
--- TeamColorMode("ffffffff,ffff32ff,ffb76518,ffa79602")
--- colors will be applied to army according to its index. first color -> army with index 1, second color -> 2 etc.
-
-function INFO: TeamColorMode(bool/string)()
 end
 
 
@@ -1198,30 +1099,4 @@ end
 ---@param pathDebugger PathDebugger
 ---@param spec fa-class
 function _c_CreatePathDebugger(pathDebugger, spec)
-end
-
-------
--- New functions from engine patch:
-------
-
----@alias PatchedDepositType
----| 0 #all
----| 1 #mass
----| 2 #hydrocarbon
-
----@class PatchedDepositResult
----@field X1 number
----@field X2 number
----@field Z1 number
----@field Z2 number
----@field Type PatchedDepositType
----@field Dist number
-
---- Return list of deposits around a point of type
----@param x number
----@param z number
----@param radius number
----@param type PatchedDepositType
----@return PatchedDepositResult[]
-function GetDepositsAroundPoint(x, z, radius, type)
 end

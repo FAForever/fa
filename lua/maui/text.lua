@@ -8,10 +8,10 @@
 -- SetCenteredVertically(bool)
 -- SetCenteredHorizontally(bool)
 
-local Control = import('control.lua').Control
-local ScaleNumber = import('layouthelpers.lua').ScaleNumber
+local Control = import('/lua/maui/control.lua').Control
+local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 
----@class Text : moho.text_methods, Control
+---@class Text : moho.text_methods, Control, InternalObject
 Text = Class(moho.text_methods, Control) {
 
     __init = function(self, parent, debugname)
@@ -117,7 +117,7 @@ function FitText(text, lineWidth, advanceFunction)
             return lineWidth
         end
     else
-        lineWidthFunc = linWidth
+        lineWidthFunc = lineWidth
     end
 
     local result = {}

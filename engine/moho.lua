@@ -1,6 +1,7 @@
 ---@meta
+
 --- none of this code is executed, it is for example only
----@declare-global
+
 moho = {
     -- sim
 
@@ -42,7 +43,6 @@ moho = {
     sound_methods = require('/engine/core/csound.lua'),
     EntityCategory = require('/engine/core/entitycategory.lua'),
     CPrefetchSet = require('/engine/core/cprefetchset.lua'),
-
 
     -- user
 

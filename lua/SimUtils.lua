@@ -15,7 +15,6 @@ local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categor
 
 local sharedUnits = {}
 
-
 ---
 ---@param data {From: number, To: number}
 function BreakAlliance(data)
@@ -52,9 +51,9 @@ function OnAllianceResult(resultData)
             table.insert(Sync.FormedAlliances, { From = resultData.From, To = resultData.To })
         end
     end
-    import('/lua/SimPing.lua').OnAllianceChange()
+    import('/lua/simping.lua').OnAllianceChange()
 end
-import('/lua/SimPlayerQuery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
+import('/lua/simplayerquery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
 
 ---
 ---@param owner number
@@ -620,6 +619,7 @@ function GiveUnitsToPlayer(data, units)
                     print((unitsBefore - unitsAfter) .. " engineers/factories could not be transferred due to manual share rules")
                 end
             end
+
             TransferUnitsOwnership(units, toArmy)
         end
     end
@@ -661,6 +661,24 @@ function SetOfferDraw(data)
     local brain = GetArmyBrain(army)
     brain.OfferingDraw = data.Value
 end
+
+function BreakAlliance(data)
+    -- You cannot change alliances in a team game
+    if ScenarioInfo.TeamGame then
+        return
+    end
+
+    if OkayToMessWithArmy(data.From) then
+        SetAlliance(data.From, data.To, "Enemy")
+
+        if Sync.BrokenAlliances == nil then
+            Sync.BrokenAlliances = {}
+        end
+        table.insert(Sync.BrokenAlliances, { From = data.From, To = data.To })
+    end
+    import('/lua/simping.lua').OnAllianceChange()
+end
+
 
 
 -- ==============================================================================
@@ -728,7 +746,8 @@ function GiveResourcesToPlayer(data)
         end
         local massTaken = fromBrain:TakeResource('Mass', data.Mass * fromBrain:GetEconomyStored('Mass'))
         local energyTaken = fromBrain:TakeResource('Energy', data.Energy * fromBrain:GetEconomyStored('Energy'))
-        toBrain:GiveResource('Mass',massTaken)
-        toBrain:GiveResource('Energy',energyTaken)
+
+        toBrain:GiveResource('Mass', massTaken)
+        toBrain:GiveResource('Energy', energyTaken)
     end
 end

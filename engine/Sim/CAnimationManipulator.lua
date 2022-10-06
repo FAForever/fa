@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.AnimationManipulator : moho.manipulator_methods
 local CAnimationManipulator = {}
 

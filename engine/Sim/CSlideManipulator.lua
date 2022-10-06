@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.SlideManipulator : moho.manipulator_methods
 local CSlideManipulator = {}
 
