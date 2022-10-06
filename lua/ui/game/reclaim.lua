@@ -174,9 +174,10 @@ local WorldLabel = Class(Group) {
         else
             hue = (MathLog(mass + 100) - 4.67730196076) * 0.144764827301
         end
+        hue = MathClamp(hue, 0, 1)
 
         -- saturation will just be an abstract indicator of how "compact" the label is
-        local sat = self.max / mass
+        local sat = MathClamp(self.max / mass, 0, 1)
 
         -- we now have a number 0-1 of the hue & saturation range we want to use; transform them
         -- into the proper ranges

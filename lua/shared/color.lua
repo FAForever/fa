@@ -1,6 +1,6 @@
 -- Color library
 
----@param hue? number defaults to 0 degrees (red)
+---@param hue? number defaults to 0 turns (red)
 ---@param sat? number defaults to 1.0 (fully colorful)
 ---@param val? number defaults to 1.0 (fully bright)
 ---@return number r
@@ -71,7 +71,7 @@ function HSVtoRGB(hue, sat, val)
     return r, g, b
 end
 
----@param hue? number defaults to 0 degrees (red)
+---@param hue? number defaults to 0 turns (red)
 ---@param sat? number defaults to 1.0 (fully colorful)
 ---@param lit? number defaults to 0.5 (fully saturated)
 ---@return number r
@@ -107,7 +107,7 @@ function ColorRGB(r, g, b, a)
     return ("%02X%02X%02X"):format(r, g, b)
 end
 
----@param hue? number defaults to 0 degrees (red)
+---@param hue? number defaults to 0 turns (red)
 ---@param sat? number defaults to 1.0 (fully colorful)
 ---@param val? number defaults to 1.0 (fully bright)
 ---@param alpha? number
@@ -119,7 +119,7 @@ function ColorHSV(hue, sat, val, alpha)
     return ("%02X%02X%02X"):format(HSVtoRGB(hue, sat, val))
 end
 
----@param hue? number defaults to 0 degrees (red)
+---@param hue? number defaults to 0 turns (red)
 ---@param sat? number defaults to 1.0 (fully colorful)
 ---@param lit? number defaults to 0.5 (fully saturated)
 ---@param alpha? number
