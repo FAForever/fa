@@ -1803,8 +1803,8 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
 
     // load in utility map
     float4 properties = tex2D(UpperAlbedoSampler, coords.xz);
-    float shadowSample = 0.75 + 0.25 * (1 - (properties.x));    // TODO: adjust texture in generator
-    float ambientSample = 1;
+    float shadowSample = (1 - (properties.x));    // TODO: adjust texture in generator
+    float ambientSample = properties.y;
 
     float4 mask2 = saturate(tex2Dproj(UtilitySamplerC,position));
 
