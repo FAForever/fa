@@ -2995,20 +2995,25 @@ float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR
 
     albedo = lerp(albedo, vertex.color.rgb * 0.8, specular.a);
 
+    if (specular.g < 0.45)
+        specular.g = 0.022 * (exp(6 * specular.g) - 1) + 0.023 + specular.a * 0.2;
+    else
+        specular.g = 0.762 * specular.g - 0.014;
     float teamcolorBorder = saturate(mapRange(specular.a, 0.54, 0.6, 0, 1));
-    float darkAreas = saturate(mapRange(specular.r, 0.3, 0.44, 1, 0)) - pow(length(albedo), 0.25);
-    // Still need to tune this
-    specular.g = specular.g * 0.7 + 0.03;
+    float darkAreas = saturate(saturate(mapRange(specular.r, 0.3, 0.44, 1, 0)) - pow(length(albedo), 0.25));
     float roughness = lerp(specular.g, 0.03, teamcolorBorder);
-    roughness += saturate(darkAreas);
+    roughness = saturate(roughness + darkAreas);
 
-    float4 color = PBR_PS(vertex, albedo, metallic, roughness, ao, hiDefShadows);
+    float specularAmount = lerp(0.08, 0, darkAreas);
+    specularAmount = lerp(specularAmount, 0.04, saturate(specular.a * 3));
+
+    float3 color = PBR_PS(vertex, albedo, metallic, roughness, ao, hiDefShadows, specularAmount).rgb;
 
     float emission = specular.b + (pow(specular.a, 2) * 0.1);
-    color.rgb += emission * albedo;
+    color += emission * albedo;
     float alpha = mirrored ? 0.5 : emission;
 
-    return float4(color.rgb, alpha);
+    return float4(color, alpha);
 }
 
 /// AeonCZARPS
