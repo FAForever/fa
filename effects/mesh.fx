@@ -3103,63 +3103,38 @@ float4 UnitFalloffPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : C
 //New SeraPS
 float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
-    //return PBR_PS(vertex, false, false, hiDefShadows);
     if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
 
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float dotLightNormal = dot(sunDirection,normal);
-
-    float4 diffuse = tex2D( albedoSampler, vertex.texcoord0.xy);
-    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-
     // Calculate lookup texture for falloff ramp
     float NdotV = saturate(dot( normalize(vertex.viewDirection), normal ));
     float4 fallOff = tex2D( falloffSampler, float2(pow(1 - NdotV, 0.6),vertex.material.x));
-
-    // Calculate lighting and shadows
-    float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
-    float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
-    // Normalizes the light to 1 for consistent results across different maps
-    float correction = sunDiffuse.g + sunAmbient.g; 
-    light = light / correction + ( 1 - light / correction ) * shadowFill * 0.5;
-
-    // Calculate specular highlights of the sun
-    float3 reflection = reflect( sunDirection, normal);
-    float specularAmount = saturate( dot( reflection, -vertex.viewDirection));
-    float3 phongAdditive = pow( specularAmount, 9) * specular.g * shadow * sunDiffuse * 0.7;
-    phongAdditive *= (diffuse.g + 1);
-
-    // Calculate environment map reflection
-    float reflectivity = saturate(specular.r * 2.5); // Reduce artifacts of texture
-    environment *= reflectivity * fallOff.a * light;
-    
-    // This gives almost the same result as the ramp in fallOff.rgb, but we will use this,
-    // because it produces consistent results with different player colors
-    NdotV = 2 * pow(NdotV, 6) - 2 * NdotV + 1.5;
-    float3 teamColor = NdotV * vertex.color.rgb;
+    float3 teamColor = fallOff.a * vertex.color.rgb;
 	
-    // There are also white highlights in the diffuse texture in some models
-    float3 whiteness = light * saturate(diffuse.rgb - float3 (0.4,0.4,0.4));
+    // There are also white highlights in the albedo texture in some models
+    float3 whiteness = saturate(albedo.rgb - float3 (0.4,0.4,0.4));
+
+    albedo.rgb = albedo.rgb * 0.5 + float3(0.1, 0.13, 0.17) * 2.5;
+    albedo.rgb = lerp(albedo.rgb, teamColor, albedo.a);
+
+    float metallic = 1;
+    float roughness = saturate((1 - pow(specular.g, 0.5) + 0.25) * 0.6);
+    float ao = 1;
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows).rgb;
     
-    // Combine all previous computations
-    float3 color = (diffuse.rgb + float3 (0.25,0.35,0.45)) * light * (1 - diffuse.a) * 0.65;
-    color += phongAdditive + environment;
-    color += (teamColor * diffuse.a) + whiteness;
-    
-    // Substitute all the computations on pure glowing parts with the pure brightness texture
-    // to get rid of reflections and shadows
-    float mask = saturate( saturate(specular.b * 2) - diffuse.a );
-    color *= 1 - mask;
-    color += specular.b * 2 * mask;
+    float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness;
+    color = lerp(color, emission, length(emission));
 
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
-    teamColorGlow = diffuse.a * (1 - teamColorGlow) * 0.06;
-    float alpha = mirrored ? 0.5 : specular.b * 0.4 + teamColorGlow;
+    teamColorGlow = albedo.a * (1 - teamColorGlow) * 0.06;
+    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow;
     
-    return float4( color, alpha );
+    return float4(color, alpha);
 }
 
 float4 LowFiUnitFalloffPS( NORMALMAPPED_VERTEX vertex) : COLOR0
