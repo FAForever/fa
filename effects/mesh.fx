@@ -452,6 +452,12 @@ float4 ComputeScrolledTexcoord( float4 texcoord, float4 material)
     return scrolled;
 }
 
+float logisticFn(float x, float x0, float k, float L, float m)
+{
+    float denom = 1 + pow(2.71828, -k * (m * x - x0));
+    return L / denom;
+}
+
 /// ComputeShadow
 ///
 /// Computes the "light attenuation factor" for a pixel given its shadow
@@ -2090,19 +2096,18 @@ VERTEXNORMAL_VERTEX CommandFeedbackVS(
 ///
 
 const float PI = 3.14159265359;
-const float EU = 2.71828;
 
-float3 PBR_FresnelSchlick(float hDotN, float3 F0)
+float3 FresnelSchlick(float hDotN, float3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - hDotN, 5.0);
 }
 
-float3 fresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
+float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 {
     return F0 + (max(float3(1.0, 1.0, 1.0) - roughness, F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 } 
 
-float PBR_Distribution(float3 n, float3 h, float roughness)
+float NormalDistribution(float3 n, float3 h, float roughness)
 {
     // roughness only squared once @ https://learnopengl.com/PBR/Theory
     // but squared again, which I think is a bug @ https://learnopengl.com/PBR/Lighting
@@ -2118,7 +2123,7 @@ float PBR_Distribution(float3 n, float3 h, float roughness)
     return num / denom;
 }
 
-float PBR_GeometrySchlick(float nDotV, float roughness)
+float GeometrySchlick(float nDotV, float roughness)
 {
     float r = (roughness + 1.0);
     float k = (r*r) / 8.0;
@@ -2129,20 +2134,14 @@ float PBR_GeometrySchlick(float nDotV, float roughness)
     return num / denom;
 }
 
-float PBR_GeometrySmith(float3 n, float3 v, float3 l, float roughness)
+float GeometrySmith(float3 n, float3 v, float3 l, float roughness)
 {
     float nDotV = max(dot(n, v), 0.0);
     float nDotL = max(dot(n, l), 0.0);
-    float gs2 = PBR_GeometrySchlick(nDotV, roughness);
-    float gs1 = PBR_GeometrySchlick(nDotL, roughness);
+    float gs2 = GeometrySchlick(nDotV, roughness);
+    float gs1 = GeometrySchlick(nDotL, roughness);
 
     return gs1 * gs2;
-}
-
-float logisticFn(float x, float x0, float k, float L, float m)
-{
-    float denom = 1 + pow(EU, -k * (m * x - x0));
-    return L / denom;
 }
 
 float4 PBR_PS(
@@ -2151,7 +2150,14 @@ float4 PBR_PS(
     float metallic,
     float roughness,
     float ao,
-    uniform bool hiDefShadows
+    uniform bool hiDefShadows,
+    // Common material specular values:
+    // water: .02
+    // plastic: .03-.05
+    // most materials: .04
+    // diamond: .17
+    // Not used for metals
+    float facingSpecular = .04
 ) : COLOR0
 {
     float3 p = vertex.position.xyz;
@@ -2162,18 +2168,28 @@ float4 PBR_PS(
     float3 sunLight = sunDiffuse * shadow * lightMultiplier;
 
     float3 reflection = reflect(-v, n);
-    float3 env_light_direction = n;
-    // Mirror env map for ships only
+    // For environment maps that have ground (not vertically mirrored like most)
+    // we might want to mirror the normal for ships to fake the water reflections
     //reflection = (reflection.y < 0) ? float3(reflection.x, -reflection.y, reflection.z) : reflection;
     //env_light_direction = (n.y < 0) ? float3(n.x, -n.y, n.z) : n;
+
     // We can't use texCUBElod so we need to use a workaround
     float lod = roughness * 10;
     float scale = exp2(lod);
     float3 env_reflection = texCUBEgrad(environmentSampler, reflection, float3(scale/256, 0, 0), float3(0, scale/256, 0));
     // This should be convolved into a proper irradiance map, but we will settle for lod 5 for now
     scale = exp2(5);
-    float3 env_irradiance = texCUBEgrad(environmentSampler, env_light_direction, float3(scale/256, 0, 0), float3(0, scale/256, 0));
+    float3 env_irradiance = texCUBEgrad(environmentSampler, n, float3(scale/256, 0, 0), float3(0, scale/256, 0));
 
+    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).rg;
+    // We don't have good ao textures to counteract fresnel highlights showing in unplausible places,
+    // so we have to tune them down a bit across the board.
+    envBRDFlookuptexture.g *= 0.5;
+
+    // TODO: sunAmbient and shadowFill should be mutually exclusive (kinda?)
+    // excerpt from original ComputeLight code:
+    // float3 light = sunDiffuse * saturate( dotLightNormal ) * attenuation + sunAmbient;
+    // return lightMultiplier * light + ( 1 - light ) * shadowFill
     float3 ambient = sunAmbient + shadowFill;
     env_irradiance += ambient;
     // sunLight = (sunLight - shadowFill);
@@ -2181,14 +2197,14 @@ float4 PBR_PS(
     //////////////////////////////
     // Compute sun light
     //
-    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedo, metallic);
+    float3 F0 = lerp(float3(facingSpecular, facingSpecular, facingSpecular), albedo, metallic);
     float3 l = sunDirection;
     float3 h = normalize(v + l);
 
     // Cook-Torrance BRDF
-    float3 F = PBR_FresnelSchlick(max(dot(h, v), 0.0), F0);
-    float NDF = PBR_Distribution(n, h, roughness);
-    float G = PBR_GeometrySmith(n, v, l, roughness);
+    float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
+    float NDF = NormalDistribution(n, h, roughness);
+    float G = GeometrySmith(n, v, l, roughness);
 
     float3 numerator = NDF * G * F;
     // add 0.0001 to avoid division by zero
@@ -2208,18 +2224,12 @@ float4 PBR_PS(
     //////////////////////////////
     // Compute environment light
     //
-    float3 kS = fresnelSchlickRoughness(max(dot(n, v), 0.0), F0, roughness); 
+    float3 kS = FresnelSchlickRoughness(max(dot(n, v), 0.0), F0, roughness); 
     kD = float3(1.0, 1.0, 1.0) - kS;
     kD *= 1.0 - metallic;
 
     float3 diffuse = env_irradiance * albedo;
-
-    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).xy;
-    // We don't have good ao textures to counteract fresnel highlights showing in unplausible places,
-    // so we have to tune them down a bit across the board.
-    envBRDFlookuptexture.y *= 0.5;
-    float3 specular = env_reflection * (kS * envBRDFlookuptexture.x + envBRDFlookuptexture.y);
-
+    float3 specular = env_reflection * (kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g);
     color += (kD * diffuse + specular) * ao;
 
     return float4(color, 0);
