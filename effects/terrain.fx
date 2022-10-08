@@ -8,44 +8,59 @@
     typedef float4 position_t;
 #endif
 
-float4x4    ViewMatrix;
-float4x4    ProjMatrix;
+// defined by the editor
+float Time;
 
-float        LightingMultiplier;
+float4x4 ViewMatrix;
+float4x4 ProjMatrix;
 
-float3        SunDirection;
-float3        SunAmbience;
-float3        SunColor;
-float3        HalfAngle;
-float3      CameraPosition;
-float3      CameraDirection;
-float4      SpecularColor;
+// defined in the editor
+float LightingMultiplier;
+float3 SunDirection;
+float3 SunAmbience;
+float3 SunColor;
+float3 HalfAngle;
+float3 CameraPosition;
+float3 CameraDirection;
+float4 SpecularColor;
 
-int         ShadowsEnabled;
-float       ShadowSize;
-float4x4    ShadowMatrix;
-texture        ShadowTexture;
-float3        ShadowFillColor = float3(0,0,0);
+// defined by the engine
+int ShadowsEnabled;
+float ShadowSize;
+float4x4 ShadowMatrix;
+texture ShadowTexture;
 
-texture     WaterRamp;
-float        WaterElevation;
-float        WaterElevationDeep;
-float        WaterElevationAbyss;
+// defined in the editor
+float3 ShadowFillColor = float3(0,0,0);
 
-float        Time;
+// defined in the editor
+texture WaterRamp;
+float WaterElevation;
+float WaterElevationDeep;
+float WaterElevationAbyss;
 
-texture        NoiseTexture;        // the fog noise texture
-texture     OverlayTexture;     // debug terrain overlay
-
+// masks of stratum layers 1 - 4
 texture        UtilityTextureA;
+
+// masks of stratum layers 5 - 8
 texture        UtilityTextureB;
+
+// red: ???
+// green: foam
+// blue: water depth
+// ???
 texture        UtilityTextureC;
 
-float4      NormalMapScale;
-float4      NormalMapOffset;
-float4      SampleOffset;
-float2      ViewportScale;
-float2      ViewportOffset;
+// appear to be unused
+texture NoiseTexture; 
+texture OverlayTexture;
+
+// defined by the engine
+float4 NormalMapScale;
+float4 NormalMapOffset;
+float4 SampleOffset;
+float2 ViewportScale;
+float2 ViewportOffset;
 
 #define DECLARE_STRATUM(n)                        \
     float4 n##Tile;                                \
@@ -98,20 +113,23 @@ float2 size_source;
 // this is a very empirical value right now
 float   TerrainErrorScale = 1.0005;
 
-texture        NormalTexture;
+// defined by the engine
+texture NormalTexture;
 
-float4x4    DecalMatrix;
-float4x4    TangentMatrix;
-texture        DecalAlbedoTexture;
-texture        DecalNormalTexture;
-texture     DecalSpecTexture;
-texture        DecalMaskTexture;
-float       DecalAlpha;
+// defined by the engine, depending on what decal we're rendering
+float4x4 DecalMatrix;
+float4x4 TangentMatrix;
+texture DecalAlbedoTexture;
+texture DecalNormalTexture;
+texture DecalSpecTexture;
+texture DecalMaskTexture;
+float DecalAlpha;
 
-float4 TerrainScale; // scale of the terrain for generating texture coordinates
+// defined by the engine, used to generate texture coordinates
+float4 TerrainScale; 
 
 // scale of Y coordinate as it's 16-bit
-float  HeightScale;
+float HeightScale;
 
 struct VS_OUTPUT
 {
@@ -259,7 +277,7 @@ sampler DecalAlbedoSampler = sampler_state
     MipFilter = LINEAR;
     MinFilter = LINEAR;
     MagFilter = LINEAR;
-    AddressU  = CLAMP;
+    AddressU  = CLAMP; // OR: use WRAP instead of CLAMP
     AddressV  = CLAMP;
 };
 
@@ -269,7 +287,7 @@ sampler DecalSpecSampler = sampler_state
     MipFilter = LINEAR;
     MinFilter = LINEAR;
     MagFilter = LINEAR;
-    AddressU  = CLAMP;
+    AddressU  = CLAMP; // OR: use WRAP instead of CLAMP
     AddressV  = CLAMP;
 };
 
@@ -279,7 +297,7 @@ sampler DecalNormalSampler = sampler_state
     MipFilter = LINEAR;
     MinFilter = LINEAR;
     MagFilter = LINEAR;
-    AddressU  = CLAMP;
+    AddressU  = CLAMP; // OR: use WRAP instead of CLAMP
     AddressV  = CLAMP;
 };
 
@@ -289,7 +307,7 @@ sampler DecalMaskSampler = sampler_state
     MipFilter = LINEAR;
     MinFilter = LINEAR;
     MagFilter = LINEAR;
-    AddressU  = CLAMP;
+    AddressU  = CLAMP; // OR: use WRAP instead of CLAMP
     AddressV  = CLAMP;
 };
 
@@ -974,10 +992,6 @@ technique TTerrainSkirt
     }
 }
 
-
-
-
-
 //****************************
 //****************************
 //****************************
@@ -1007,7 +1021,15 @@ VS_OUTPUT DecalsVS( position_t p : POSITION0, uniform bool shadowed)
     result.mTexWT = position.xzyw;
 
     // calculate the decal local texcoords
-    result.mTexDecal = mul( position, DecalMatrix ).xzyw;
+
+    float4 coords = mul(position, DecalMatrix).xzyw;
+    result.mTexDecal = abs(coords);
+    //  float4(
+    //     coords.x - (float)floor(coords.x),
+    //     coords.y - (float)floor(coords.y),
+    //     coords.z - (float)floor(coords.z),
+    //     coords.w - (float)floor(coords.w)
+    // );
 
     // caluclate screen space coordinate for sample a frame buffer of this size
     result.mTexSS = result.mPos;
@@ -1050,7 +1072,7 @@ VS_OUTPUT DecalsVSWaterAlbedo( position_t p : POSITION0, uniform bool shadowed)
     result.mTexWT = position.xzyw;
 
     // calculate the decal local texcoords
-    result.mTexDecal = mul( position, DecalMatrix ).xzyw;
+    result.mTexDecal = mul( position, DecalMatrix).xzyw;
 
     // caluclate screen space coordinate for sample a frame buffer of this size
     result.mTexSS = result.mPos;
@@ -1107,9 +1129,13 @@ float4 DecalsPSGlow( VS_OUTPUT inV) : COLOR
 
 float4 DecalsNormalsPS( VS_OUTPUT inV, uniform bool alphablend ) : COLOR
 {
+    float2 fixed = 1.2 * (inV.mTexDecal.xy - 0.1);
+    fixed.y += 0.05;
+
+
     // read textures
-    float4 decalMask = tex2Dproj( DecalMaskSampler, inV.mTexDecal );
-    float4 decalRaw = tex2Dproj( DecalNormalSampler, inV.mTexDecal );
+    float4 decalMask = tex2D( DecalMaskSampler, fixed );
+    float4 decalRaw = tex2D( DecalNormalSampler, fixed );
     float3 decalNormal;
     decalNormal.xz = decalRaw.ag * 2 - 1;
     decalNormal.y = sqrt(1 - dot(decalNormal.xz,decalNormal.xz));
@@ -1130,23 +1156,26 @@ float4 DecalsNormalsPS( VS_OUTPUT inV, uniform bool alphablend ) : COLOR
 
 float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
 {
+    float2 fixed = 1.2 * (inV.mTexDecal.xy / inV.mTexDecal.w - 0.1);
+    fixed.y += 0.05;
+
     // sample all the textures we'll need
-    float4 decalAlbedo = tex2Dproj( DecalAlbedoSampler, inV.mTexDecal );
-    float4 decalSpec = tex2Dproj( DecalSpecSampler, inV.mTexDecal );
-    float4 decalMask = tex2Dproj( DecalMaskSampler, inV.mTexDecal ).xxxx;
+    float4 decalAlbedo = tex2D( DecalAlbedoSampler, fixed );
+    float4 decalSpec = tex2D( DecalSpecSampler, fixed );
+    float4 decalMask = tex2D( DecalMaskSampler, fixed ).xxxx;
     float3 normal = SampleScreen(NormalSampler, inV.mTexSS).xyz * 2 -1;
 
     float waterDepth = tex2Dproj( UtilitySamplerC, inV.mTexWT * TerrainScale).g;
     // calculate the lit pixel
     float3 color = CalculateLighting( normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
-    return float4( color.rgb, decalAlbedo.w * decalMask.w * DecalAlpha);
+    return float4(decalAlbedo.rgb, decalAlbedo.a);
 }
 
 float4 DecalAlbedoXP( VS_OUTPUT inV, uniform bool inShadows) : COLOR
 {
-    float4 albedo = tex2Dproj(DecalAlbedoSampler,inV.mTexDecal);
-    float  specularAmount = tex2Dproj(DecalSpecSampler,inV.mTexDecal).a;
-    float  mask = tex2Dproj(DecalMaskSampler,inV.mTexDecal).a;
+    float4 albedo = tex2D(DecalAlbedoSampler,inV.mTexDecal);
+    float  specularAmount = tex2D(DecalSpecSampler,inV.mTexDecal).a;
+    float  mask = tex2D(DecalMaskSampler,inV.mTexDecal).a;
     float3 normal = normalize(2*SampleScreen(NormalSampler,inV.mTexSS).xyz-1);
 
     float3 r = reflect(normalize(inV.mViewDirection),normal);
@@ -1159,7 +1188,7 @@ float4 DecalAlbedoXP( VS_OUTPUT inV, uniform bool inShadows) : COLOR
     light = LightingMultiplier*light + ShadowFillColor*(1-light);
     albedo.rgb = light * ( albedo.rgb + specular.rgb );
 
-    float waterDepth = tex2Dproj(UtilitySamplerC,inV.mTexWT*TerrainScale).g;
+    float waterDepth = tex2D(UtilitySamplerC,inV.mTexWT*TerrainScale).g;
     float4 water = tex1D(WaterRampSampler,waterDepth);
     albedo.rgb = lerp(albedo.rgb,water.rgb,water.a);
 
