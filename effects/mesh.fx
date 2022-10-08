@@ -2164,8 +2164,6 @@ float4 PBR_PS(
     float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
     float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float3 v = normalize(vertex.viewDirection);
-    float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
-    float3 sunLight = sunDiffuse * shadow * lightMultiplier;
 
     float3 reflection = reflect(-v, n);
     // For environment maps that have ground (not vertically mirrored like most)
@@ -2186,13 +2184,13 @@ float4 PBR_PS(
     // so we have to tune them down a bit across the board.
     envBRDFlookuptexture.g *= 0.5;
 
-    // TODO: sunAmbient and shadowFill should be mutually exclusive (kinda?)
-    // excerpt from original ComputeLight code:
-    // float3 light = sunDiffuse * saturate( dotLightNormal ) * attenuation + sunAmbient;
-    // return lightMultiplier * light + ( 1 - light ) * shadowFill
     float3 ambient = sunAmbient + shadowFill;
     env_irradiance += ambient;
-    // sunLight = (sunLight - shadowFill);
+
+    float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
+    float3 sunLight = sunDiffuse * lightMultiplier;
+    sunLight += (1 - sunLight) * shadowFill;
+    sunLight *= shadow;
 
     //////////////////////////////
     // Compute sun light
