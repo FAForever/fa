@@ -1591,36 +1591,20 @@ technique LowFidelityLighting
 // |  | Albedo stratum                                              | Normal stratum
 // |L | R           | G             | B             | A             | R             | G             | B             | A                 |
 // ----            ---             ---             ---             ---             ---             ---             ---                 ---
-// |0 | R             G               B               ?             | X               Y               Z               ?                   
-// |1 | R             G               B               ?             | X               Y               Z               ?                   
-// |2 | R             G               B               ?             | X               Y               Z               ?                   
-// |3 | R             G               B               ?             | X               Y               Z               ?                   
-// |4 | R             G               B               ?             | X               Y               Z               ?                   
+// |0 | R             G               B               D             | AO              ?               Z               X                  
+// |1 | R             G               B               D             | AO              ?               Z               X                   
+// |2 | R             G               B               D             | AO              ?               Z               X                   
+// |3 | R             G               B               D             | AO              ?               Z               X                   
+// |4 | R             G               B               D             | AO              ?               Z               X                   
 // ----            ---             ---             ---             ---             ---             ---             ---                 ---
-// |5 | R             G               B               ?             | X               Y               Z               ?                   
-// |6 | R             G               B               ?             | X               Y               Z               ?   
+// |5 | R             G               B               D             | AO              ?               Z               X                  
+// |6 | R             G               B               D             | AO              ?               Z               X   
 // ---------------------------------------------------------------------------------------------------------------------------------------
 // # Map wide assets #
 // ---------------------------------------------------------------------------------------------------------------------------------------               
 // |7 | Map R         Map G           Map B           Shadows       | Map X           Map Y           Map Z           Ambient occlusion
 // |8 | Map wetness   Map shadows     Map Ambient     Map metallic  | RGB Alpha       Normals Alpha                   Shadows
 // |9 | ?             ?               ?               ?               ?               ?               ?               ?
-
-// Advanced terrain texture splatting technique
-// https://www.gamedeveloper.com/programming/advanced-terrain-texture-splatting
-float4 BlendLayersBaked(float4 texture1, float4 texture2, float a2)
-{
-    float a1 = 1 - a2;
-    float depth = 0.2;
-    float ma = max(texture1.a + a1, texture2.a + a2) - depth;
-
-    float b1 = max(texture1.a + a1 - ma, 0);
-    float b2 = max(texture2.a + a2 - ma, 0);
-
-    return ((texture1.rgba * b1 + texture2.rgba * b2) / (b1 + b2));
-
-    // return texture1.a + (1 - a2) > texture2.a + a2 ? texture1.rgba : texture2.rgba;
-}
 
 struct VerticesBaked
 {
@@ -1685,12 +1669,24 @@ float3 slerp(float3 n0, float3 n1, float t)
     return ((n0*sin((1-t)*theta) + n1*sin(t*theta)) / sin(theta));
 }
 
-float4 UDNBlending(float4 n1, float4 n2) {
+float4 UDNBlending(float4 n1, float4 n2, float factor) {
+    n2.xy *= factor;
     return normalize(float4(n1.xy + n2.xy, n1.z, 0));
 }
 
-float4 WhiteoutBlending(float4 n1, float4 n2) {
-    return normalize(float4(n1.xy + n2.xy, n1.z*n2.z, 0));
+float4 WhiteoutBlending(float4 n1, float4 n2, float factor) {
+    return normalize(float4(n1.xy + n2.xy, n1.z * n2.z, 0));
+}
+
+// Advanced terrain texture splatting technique
+// https://www.gamedeveloper.com/programming/advanced-terrain-texture-splatting
+float4 BlendLayersBaked(float4 texture1, float4 texture2, float m)
+{
+    float i = 1 - m;
+    float i2 = i * i;
+    float v = max(0, m * m * texture2.a);
+
+    return lerp(texture1, texture2, v);
 }
 
 /// TerrainNormalsBakedPS
@@ -1730,8 +1726,8 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     float4 stratum3Normal   = tex2D(Stratum3NormalSampler, position.xy * Stratum3NormalTile.xy);
     float4 stratum4Normal   = tex2D(Stratum4NormalSampler, position.xy * Stratum4NormalTile.xy);
     float4 stratum5Normal   = tex2D(Stratum5NormalSampler, position.xy * Stratum5NormalTile.xy);
-    float4 stratum6Normal   = tex2D(Stratum6NormalSampler, 1.5 * position.xy * Stratum6NormalTile.xy);
-    float4 stratum7Normal   = tex2D(Stratum7NormalSampler, 4 * position.xy * Stratum7NormalTile.xy);
+    float4 stratum6Normal   = tex2D(Stratum6NormalSampler, position.xy * Stratum6NormalTile.xy);
+    float4 stratum7Normal   = tex2D(Stratum7NormalSampler, position.xy * Stratum7NormalTile.xy);
 
     float4 stratum6NormalOut = tex2D(Stratum6NormalSampler, 0.6 * position.yx * Stratum6NormalTile.xy);
     float4 stratum7NormalOut = tex2D(Stratum7NormalSampler, 0.6 * position.yx * Stratum7NormalTile.xy);
@@ -1739,23 +1735,21 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
 
     // combine them
     float4 normal = float4(precomputedNormal.xyz, 0);
-    // normal = lerp(normal, 2 * stratum0Normal - 1, mask0.x);
-    // normal = lerp(normal, 2 * stratum1Normal - 1, mask0.y);
-    // normal = lerp(normal, 2 * stratum2Normal - 1, mask0.z);
-    // normal = lerp(normal, 2 * stratum3Normal - 1, mask0.w);
-    // normal = lerp(normal, 2 * stratum4Normal - 1, mask1.x);
-    // normal = lerp(normal, 2 * stratum5Normal - 1, mask1.y);
+    normal = UDNBlending(normal,        (2 * stratum0Normal - 1),           mask0.x);
+    normal = UDNBlending(normal,        (2 * stratum1Normal - 1),           mask0.y);
+    normal = UDNBlending(normal,        (2 * stratum2Normal - 1),           mask0.z);
+    normal = UDNBlending(normal,        (2 * stratum3Normal - 1),           mask0.w);
+    normal = UDNBlending(normal,        (2 * stratum4Normal - 1),           mask1.x);
+    normal = UDNBlending(normal,        (2 * stratum5Normal - 1),           mask1.y);
 
     // allow rock-related texture to scale as we zoom out
     float cameraFractionOut = 0.3 + 0.70 * clamp(0.005 * CameraPosition.y, 0, 1);
     float cameraFractionFurtherOut = 0.3 + 0.7 * clamp(0.001 * CameraPosition.y, 0, 1);
-
-    // normal = lerp(normal, 2 * stratum6Normal - 1, mask1.z); 
-    // normal = lerp(normal, 2 * stratum6NormalOut - 1, mask1.z * cameraFractionOut);
-    // normal = lerp(normal, 2 * stratum7Normal - 1, 1); 
-    normal = WhiteoutBlending(normal, (2 * stratum7Normal - 1));
-    // normal = lerp(normal, 8 * (2 * stratum7NormalOut - 1), mask1.w * cameraFractionOut);
-    // normal = lerp(normal, 16 * (2 * stratum7NormalFurtherOut - 1), mask1.w * cameraFractionFurtherOut);
+    normal = UDNBlending(normal,        (2 * stratum6Normal - 1),           mask1.z); 
+    normal = UDNBlending(normal, 2 *    (2 * stratum6NormalOut - 1),        mask1.z * cameraFractionOut);
+    normal = UDNBlending(normal,        (2 * stratum7Normal - 1),           mask0.w);
+    normal = UDNBlending(normal, 2 *    (2 * stratum7NormalOut - 1),        mask1.w * cameraFractionOut);
+    normal = UDNBlending(normal, 4 *    (2 * stratum7NormalFurtherOut - 1), mask1.w * cameraFractionFurtherOut);
 
     normal.xyz = normalize( normal.xyz );
 
@@ -1776,55 +1770,49 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
 
     float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy));
     float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy));
-
-    // Layer 0: Base layer - used for sea level ground.
-    // Layer 1: Ground Accent - used to accent land not on plateaus
-    // Layer 2: Plateau Accent - used on land higher than sea level
-    // Layer 3: Slopes - used to texture ramps
-    // Layer 4: Slopes Accent - used to accent slopes
-    // Layer 5: Steep Hills - used to texture high slope areas
-    // Layer 6: Beach Texture - used to texture the beaches where land and water meet
-    // Layer 7: Rock - used to texture impassable terrain
-    // Layer 8: Rock Accent - used to accent impassable terrain
+    float4 mask2 = saturate(tex2D(UtilitySamplerC, position.xy));
 
     float4 lowerAlbedo = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+    lowerAlbedo.a = 0.5;
     float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, position.xy * Stratum0AlbedoTile.xy);
     float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, position.xy * Stratum1AlbedoTile.xy);
     float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler, position.xy * Stratum2AlbedoTile.xy);
     float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler, position.xy * Stratum3AlbedoTile.xy);
     float4 stratum4Albedo = tex2D(Stratum4AlbedoSampler, position.xy * Stratum3AlbedoTile.xy);
     float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler, position.xy * Stratum5AlbedoTile.xy);
-    float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, 1.5 * position.xy * Stratum6AlbedoTile.xy); // TODO: adjust scale in generator
-    float4 stratum7Albedo = tex2D(Stratum7AlbedoSampler, 4 * position.xy * Stratum7AlbedoTile.xy);   // TODO: adjust scale in generator
+    float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, position.xy * Stratum6AlbedoTile.xy);
+    float4 stratum7Albedo = tex2D(Stratum7AlbedoSampler, position.xy * Stratum7AlbedoTile.xy);
 
     float4 stratum6AlbedoOut = tex2D(Stratum6AlbedoSampler, 0.6 * position.yx * Stratum6AlbedoTile.xy);
+    stratum7Albedo.a = stratum7Albedo.a;
     float4 stratum7AlbedoOut = tex2D(Stratum7AlbedoSampler, 0.6 * position.yx * Stratum7AlbedoTile.xy);
+    stratum7AlbedoOut.a = stratum7Albedo.a;
     float4 stratum7AlbedoFurtherOut = tex2D(Stratum7AlbedoSampler, 0.1 * position.xy * Stratum7AlbedoTile.xy);
+    stratum7AlbedoFurtherOut.a = stratum7Albedo.a;
 
     // load in utility map
     float4 properties = tex2D(UpperAlbedoSampler, coords.xz);
     float shadowSample = (1 - (properties.x));    // TODO: adjust texture in generator
-    float ambientSample = properties.y;
-
-    float4 mask2 = saturate(tex2Dproj(UtilitySamplerC,position));
+    float ambientSample = 0.5 + 0.5 * properties.y;
 
     float4 albedo = lowerAlbedo;
-    albedo = lerp(albedo, stratum0Albedo, mask0.x); 
-    albedo = lerp(albedo, stratum1Albedo, mask0.y); 
-    albedo = lerp(albedo, stratum2Albedo, mask0.z); 
-    albedo = lerp(albedo, stratum3Albedo, mask0.w); 
-    albedo = lerp(albedo, stratum4Albedo, mask1.x); 
-    albedo = lerp(albedo, stratum5Albedo, mask1.y); 
+    albedo = BlendLayersBaked(albedo, stratum0Albedo, mask0.x); 
+    albedo = BlendLayersBaked(albedo, stratum1Albedo, mask0.y); 
+    albedo = BlendLayersBaked(albedo, stratum2Albedo, mask0.z); 
+    albedo = BlendLayersBaked(albedo, stratum3Albedo, mask0.w); 
+    albedo = BlendLayersBaked(albedo, stratum4Albedo, mask1.x); 
+    albedo = BlendLayersBaked(albedo, stratum5Albedo, mask1.y); 
 
     // allow rock-related texture to scale as we zoom out
     float cameraFractionOut = 0.3 + 0.70 * clamp(0.005 * CameraPosition.y, 0, 1);
     float cameraFractionFurtherOut = 0.3 + 0.7 * clamp(0.001 * CameraPosition.y, 0, 1);
 
-    albedo = lerp(albedo, stratum6Albedo, mask1.z); 
-    albedo = lerp(albedo, stratum6AlbedoOut, mask1.z * cameraFractionOut);
-    albedo = lerp(albedo, stratum7Albedo, mask1.w); 
-    albedo = lerp(albedo, stratum7AlbedoOut, mask1.w * cameraFractionOut);
-    albedo = lerp(albedo, stratum7AlbedoFurtherOut, mask1.w * cameraFractionFurtherOut);
+    albedo = BlendLayersBaked(albedo, stratum6Albedo, mask1.z); 
+    albedo = BlendLayersBaked(albedo, stratum6AlbedoOut, mask1.z * cameraFractionOut);
+
+    albedo = BlendLayersBaked(albedo, stratum7Albedo, mask1.w); 
+    albedo = BlendLayersBaked(albedo, stratum7AlbedoOut, mask1.w * cameraFractionOut);
+    albedo = BlendLayersBaked(albedo, stratum7AlbedoFurtherOut, mask1.w * cameraFractionFurtherOut);
 
     // compute specular
     float3 r = reflect(normalize(pixel.mViewDirection), normal);
@@ -1839,7 +1827,7 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
     // compute water color
-    float waterDepth = tex2Dproj(UtilitySamplerC, pixel.mTexWT * TerrainScale).g - 0.15;
+    float waterDepth = mask2.g - 0.15;
     float4 water = tex1D(WaterRampSampler, waterDepth);
     albedo.rgb = lerp(albedo.rgb, water.rgb, water.a);
 
