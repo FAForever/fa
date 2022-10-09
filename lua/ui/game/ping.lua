@@ -108,8 +108,11 @@ function DoPing(pingType)
                 data.Color = armies.armiesTable[armies.focusArmy].color
                 SimCallback({Func = 'SpawnPing', Args = data})
 
+                -- carefully chosen settings at the given zoom (for full hd)
                 local cameraSettings = GetCamera('WorldCamera'):SaveSettings()
-                cameraSettings.Zoom = 200
+                cameraSettings.Zoom = 211.12
+                cameraSettings.Pitch = 1.2807490825653
+                cameraSettings.Heading = 3.1415927410126
                 cameraSettings.Focus = position
 
                 SessionSendChatMessage(GetAlliedAndObserverClients(), {
