@@ -128,17 +128,12 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
                 unitBuilding:DetachFrom(true)
                 self:DetachAll(self.Blueprint.Display.BuildAttachBone or 0)
 
-                CreateLightParticle(unitBuilding, -1, unitBuilding.Army, 4, 12, 'glow_02', 'ramp_blue_22')
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
                 unitBuilding:HideBone(0, true)
             end
 
-            WaitTicks(1)
-            CreateLightParticle(self, 'B01', self.Army, 4, 12, 'glow_02', 'ramp_blue_22')
-
-            WaitTicks(1)
-            CreateLightParticle(self, 'B03', self.Army, 4, 12, 'glow_02', 'ramp_blue_22')
-
-            WaitTicks(2)
+            WaitTicks(4)
 
             if not IsDestroyed(unitBuilding) then
                 CreateLightParticle(unitBuilding, -1, unitBuilding.Army, 4, 12, 'glow_02', 'ramp_blue_22')
