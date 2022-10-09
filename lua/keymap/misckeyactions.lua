@@ -412,21 +412,17 @@ function SelectAllUpgradingExtractors()
             if unit:GetWorkProgress() > 0 then
                 table.insert(upgrading, unit)
             end
+        end
 
-            if next(upgrading) then
-                SelectionUtils.EnableSelectionSound(true)
-                SelectUnits(upgrading)
-            end
+        if next(upgrading) then
+            SelectionUtils.EnableSelectionSound(true)
+            SelectUnits(upgrading)
         end
     else 
         SelectUnits(oldSelection)
     end
 
     SelectionUtils.EnableSelectionSound(true)
-end
-
-local function FindNearestUnitToLocation(units, location)
-    
 end
 
 function SelectHighestEngineerAndAssist()
