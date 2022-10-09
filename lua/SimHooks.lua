@@ -66,19 +66,23 @@ do
         Random()
 
         oldDrawLinePop(a, b, color)
-    end 
+    end
 end
 
-do 
+do
 
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
-    _G.ChangeUnitArmy = function(unit, army)
+    _G.ChangeUnitArmy = function(unit, army, noRestrictions)
+        if unit and noRestrictions then
+            return oldChangeUnitArmy(unit, army)
+        end
+
+        -- do not allow command units to be shared
         if unit and unit.Blueprint.CategoriesHash["COMMAND"] then
             return nil
         end
 
         return oldChangeUnitArmy(unit, army)
     end
-
 end
