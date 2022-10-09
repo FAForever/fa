@@ -73,8 +73,8 @@ do
 
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
-    _G.ChangeUnitArmy = function(unit, army)
-        if unit and ScenarioInfo.Options.CommonArmy == 'Common' then
+    _G.ChangeUnitArmy = function(unit, army, noRestrictions)
+        if unit and (noRestrictions or ScenarioInfo.Options.CommonArmy == 'Common') then
             return oldChangeUnitArmy(unit, army)
         end
 
@@ -85,6 +85,4 @@ do
 
         return oldChangeUnitArmy(unit, army)
     end
-
-    _G.ChangeUnitArmyNoRestrictions = oldChangeUnitArmy
 end
