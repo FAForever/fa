@@ -28,6 +28,30 @@ OriginalFocusArmy = -1
 --- List of marker-pings with text underneath.
 local markers = {}
 
+local clients = GetSessionClients()
+local armies = GetArmiesTable().armiesTable
+
+---comment
+---@return table
+local function GetAlliedAndObserverClients()
+
+    local focusArmy = OriginalFocusArmy
+    if focusArmy == -1 then
+        return {}
+    end
+
+    local recipients = { }
+    for k, client in clients do
+        for l, source in client.authorizedCommandSources do
+            if IsAlly(focusArmy, source) then
+                recipients[source] = true
+            end
+        end
+    end
+
+    return table.keys(recipients)
+end
+
 --- Performs a ping operation.
 -- @param pingType can be 'alert', 'move', 'attack' or 'marker'.
 function DoPing(pingType)
@@ -83,6 +107,17 @@ function DoPing(pingType)
                 local armies = GetArmiesTable()
                 data.Color = armies.armiesTable[armies.focusArmy].color
                 SimCallback({Func = 'SpawnPing', Args = data})
+
+                local cameraSettings = GetCamera('WorldCamera'):SaveSettings()
+                cameraSettings.Zoom = 200
+                cameraSettings.Focus = position
+
+                SessionSendChatMessage(GetAlliedAndObserverClients(), {
+                    to = 'allies',
+                    text = tostring(name),
+                    camera = cameraSettings,
+                    Chat = true,
+                })
             end)
         end
 
