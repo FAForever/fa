@@ -44,8 +44,10 @@ do
     local oldDrawCircle = _G.DrawCircle
     _G.DrawCircle = function(position, diameter, color)
 
-        -- cause a desync if only one player calls this function
-        Random()
+        if not ScenarioInfo.GameHasAIs then
+            -- cause a desync if only one player calls this function
+            Random()
+        end
 
         oldDrawCircle(position, diameter, color)
     end
@@ -53,8 +55,10 @@ do
     local oldDrawLine = _G.DrawLine
     _G.DrawLine = function(a, b, color)
 
-        -- cause a desync if only one player calls this function
-        Random()
+        if not ScenarioInfo.GameHasAIs then
+            -- cause a desync if only one player calls this function
+            Random()
+        end
 
         oldDrawLine(a, b, color)
     end
@@ -62,14 +66,16 @@ do
     local oldDrawLinePop = _G.DrawLinePop
     _G.DrawLinePop = function(a, b, color)
 
-        -- cause a desync if only one player calls this function
-        Random()
+        if not ScenarioInfo.GameHasAIs then
+            -- cause a desync if only one player calls this function
+            Random()
+        end
 
         oldDrawLinePop(a, b, color)
-    end 
+    end
 end
 
-do 
+do
 
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
