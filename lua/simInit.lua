@@ -403,7 +403,7 @@ function BeginSession()
                             SetArmyUnitCap(i, GetArmyUnitCap(i) + GetArmyUnitCap(i2))
                             Units = ArmyBrains[i2]:GetListOfUnits(categories.ALLUNITS, false, true)
                             for _, unit in Units do
-                                ChangeUnitArmy(unit, i)
+                                ChangeUnitArmy(unit, i, true)
                             end
                             local v1 = ArmyBrains[i]:GetEconomyStored('MASS') + ArmyBrains[i2]:GetEconomyStored('MASS')
                             local v2 = ArmyBrains[i]:GetEconomyStored('ENERGY') + ArmyBrains[i2]:GetEconomyStored('ENERGY')
