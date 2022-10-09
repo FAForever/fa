@@ -85,4 +85,6 @@ do
 
         return oldChangeUnitArmy(unit, army)
     end
+
+    _G.ChangeUnitArmyNoRestrictions = oldChangeUnitArmy
 end
