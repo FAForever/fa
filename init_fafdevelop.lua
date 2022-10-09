@@ -480,3 +480,6 @@ MountDirectory(fa_path .. "/movies", '/movies')
 MountDirectory(fa_path .. "/sounds", '/sounds')
 MountDirectory(fa_path .. "/maps", '/maps')
 MountDirectory(fa_path .. "/fonts", '/fonts')
+
+-- Please do not delete these lines. This is necessary for testing.
+table.insert(path, 1, { dir = InitFileDir .. '\\..\\DevData', mountpoint = '/' })
