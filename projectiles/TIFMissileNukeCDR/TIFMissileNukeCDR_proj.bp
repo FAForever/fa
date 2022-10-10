@@ -21,7 +21,7 @@ ProjectileBlueprint {
         'PROJECTILE',
         'INDIRECTFIRE',
         'TACTICAL',
-		'TACTICALNUKE',
+        'TACTICALNUKE',
         'MISSILE',
         'NOSPLASHDAMAGE',
     },
