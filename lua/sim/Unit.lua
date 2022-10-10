@@ -4738,12 +4738,12 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- prevent cheats (teleport off map)
-        if location[1] < 1 or location[1] > ScenarioInfo.PlayableArea[1] - 1 then
+        if location[1] < 1 or location[1] > ScenarioInfo.PlayableArea[3] - 1 then
             return
         end
 
         -- prevent cheats (teleport off map)
-        if location[3] < 1 or location[3] > ScenarioInfo.PlayableArea[3] - 1 then
+        if location[3] < 1 or location[3] > ScenarioInfo.PlayableArea[4] - 1 then
             return
         end
 
