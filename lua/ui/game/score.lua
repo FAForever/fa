@@ -345,6 +345,13 @@ function SetupPlayerLines()
         group.Width:Set(controls.armyGroup.Width)
         group.armyID = armyIndex
 
+        group.div = Bitmap(group)
+        group.div:SetTexture("/lua/divisions/grandmaster_medium.png")
+        group.div.Width:Set(function() return group.Height()*2 end)
+        group.div.Height:Set(group.Height)
+        LayoutHelpers.AtCenterIn(group.div, group)
+
+
         group.bg = Bitmap(group)
         group.bg:SetSolidColor('ffa0a0a0')
         group.bg:SetAlpha(0)
