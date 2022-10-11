@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local ATorpedoCluster = import('/lua/aeonprojectiles.lua').ATorpedoCluster
@@ -30,7 +30,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
         WaitSeconds(self.CountdownLength)
 
         if not self.HasImpacted then
-            self.OnImpact(self, 'Underwater', nil)
+            self:OnImpact('Underwater', nil)
         end
     end,
 

@@ -1,4 +1,3 @@
-
 local Conditions = {
     demoralization = categories.COMMAND,
     domination = categories.STRUCTURE + categories.ENGINEER - categories.WALL,
@@ -19,15 +18,15 @@ function CallEndGame()
 end
 
 --- Finds and collectors the brains that are defeated
----@param aliveBrains AIBrain[] # Table of brains that are relevant to check for defeat
----@param condition Categories  # Categories to check for units that are required to remain in the game
----@param delay number          # Delay between each brain to spread the load over various ticks
----@return AIBrain[]            # Table of brains that are considered defeated, can be empty
+---@param aliveBrains AIBrain[]         # Table of brains that are relevant to check for defeat
+---@param condition EntityCategory      # Categories to check for units that are required to remain in the game
+---@param delay number                  # Delay between each brain to spread the load over various ticks
+---@return AIBrain[]                    # Table of brains that are considered defeated, can be empty
 local function CollectDefeatedBrains(aliveBrains, condition, delay)
     local defeatedBrains = { }
     for k, brain in aliveBrains do
         local criticalUnits = brain:GetListOfUnits(condition)
-        if criticalUnits then
+        if (not brain:IsDefeated()) and (criticalUnits) then
             -- critical units found, make sure they all exist properly
             local oneCriticalUnitAlive = false
             for _, unit in criticalUnits do
@@ -38,12 +37,12 @@ local function CollectDefeatedBrains(aliveBrains, condition, delay)
             end
 
             -- no critical units alive or finished, brain is defeated
-            if not oneCriticalUnitAlive then 
+            if not oneCriticalUnitAlive then
                 defeatedBrains[k] = brain
             end
 
         -- no critical units found, brain is defeated
-        else 
+        else
             defeatedBrains[k] = brain
         end
 
@@ -83,8 +82,12 @@ local function MatchStateThread()
 
     -- determine game conditions
     local condition = Conditions[ScenarioInfo.Options.Victory]
-    if not condition and not (ScenarioInfo.Options.Victory == 'sandbox') then
-        SPEW("Unknown victory condition supplied: " .. ScenarioInfo.Options.Victory .. ", victory condition defaults to sandbox.")
+
+    if not condition then
+        if ScenarioInfo.Options.Victory ~= 'sandbox' then
+            SPEW("Unknown victory condition supplied: " .. ScenarioInfo.Options.Victory .. ", victory condition defaults to sandbox.")
+        end
+
         return
     end
 
@@ -92,7 +95,7 @@ local function MatchStateThread()
     local aliveBrains = { }
     for _, brain in ArmyBrains do
         local index = brain:GetArmyIndex()
-        if not ArmyIsCivilian(index) then
+        if (not ArmyIsCivilian(index)) and (not ArmyIsOutOfGame(index)) then
             aliveBrains[index] = brain
         end
     end
@@ -106,9 +109,9 @@ local function MatchStateThread()
 
             -- take into account cascading effects
             local lastDefeatedBrainsCount
-            repeat 
+            repeat
                 WaitTicks(4)
-                
+
                 lastDefeatedBrainsCount = defeatedBrainsCount
 
                 -- re-compute the defeated brains until it no longer increases
@@ -135,7 +138,7 @@ local function MatchStateThread()
 
         -- loop through the brains that are still alive to check for alliance differences
 
-        if table.getsize(aliveBrains) > 0 then 
+        if table.getsize(aliveBrains) > 0 then
 
             -- check for draw
             local draw = true
@@ -164,18 +167,16 @@ local function MatchStateThread()
             end
 
             -- check for win
-            local win = true 
-            for _, brain in aliveBrains do
-                win = win and brain.RequestingAlliedVictory
-            end
-
-            for k, _ in aliveBrains do
+            local win = true
+            for k, brain in aliveBrains do
                 for l, _ in aliveBrains do
-                    win = win and IsAlly(k, l)
+                    if k ~= l then
+                        win = win and IsAlly(k, l) and brain.RequestingAlliedVictory
+                    end
                 end
             end
 
-            if win then 
+            if win then
                 for k, brain in aliveBrains do
                     -- take the army out of the game, adjust command sources
                     SetArmyOutOfGame(k)

@@ -1,9 +1,9 @@
----@declare-global
----@class moho.CDecalHandle
+---@meta
+
+---@class moho.CDecalHandle : Destroyable
 local CDecalHandle = {}
 
 function CDecalHandle:Destroy()
 end
 
 return CDecalHandle
-

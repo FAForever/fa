@@ -10,6 +10,7 @@
 
 local AMassCollectionUnit = import('/lua/aeonunits.lua').AMassCollectionUnit
 
+---@class UAB1302 : AMassCollectionUnit
 UAB1302 = Class(AMassCollectionUnit) {
 
     OnCreate = function(self)

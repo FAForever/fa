@@ -599,7 +599,7 @@ FilePicker = Class(Group) {
         self._filenameErrorMsg:SetText("")
 
         if self._selectAction then
-            self._selectAction(self, self:GetFileInfo())
+            self:_selectAction(self:GetFileInfo())
         end
 
         return true

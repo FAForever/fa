@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardScanRadius = 40,
         TargetBones = {
             'Front_Turret',
             'Back_Turret',
@@ -43,7 +44,6 @@ UnitBlueprint {
         'MOBILE',
         'NAVAL',
         'TECH1',
-        'ANTIAIR',
         'DIRECTFIRE',
         'INTELLIGENCE',
         'RADAR',

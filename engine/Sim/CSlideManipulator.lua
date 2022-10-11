@@ -1,6 +1,12 @@
----@declare-global
+---@meta
+
 ---@class moho.SlideManipulator : moho.manipulator_methods
 local CSlideManipulator = {}
+
+---
+---@return boolean
+function CSlideManipulator:BeenDestroyed()
+end
 
 ---
 --  CSlideManipulator:SetAcceleration(acc)

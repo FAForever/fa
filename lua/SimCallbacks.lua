@@ -8,10 +8,15 @@
 ---- We store the callbacks in a sub-table (instead of directly in the
 ---- module) so that we don't include any
 
-local SimUtils = import('/lua/SimUtils.lua')
-local SimPing = import('/lua/SimPing.lua')
+---@class SimCallback
+---@field Func string
+---@field Args table
+
+local SimUtils = import('/lua/simutils.lua')
+local SimPing = import('/lua/simping.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
+local ScenarioFramework = import('/lua/scenarioframework.lua')
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -45,6 +50,7 @@ local CategoriesEngineer = categories.ENGINEER - categories.INSIGNIFICANTUNIT
 local Warnings = { }
 
 --- List of callbacks that is being populated throughout this file
+---@type table<string, function>
 local Callbacks = {}
 
 function DoCallback(name, data, units)
@@ -162,8 +168,8 @@ local skirtSizes = {
 }
 
 --- Computes the n'th layer of a previous layer.
--- @param skirtSize The skirt size of the unit.
--- @param layers The nth layer we'd like to have for this unit.
+---@param skirtSize number skirt size of the unit
+---@param nthLayer number nth layer we'd like to have for this unit
 local function RetrieveNthStructureLayer (skirtSize, nthLayer)
 
     -- attempt to retrieve the right set of layers for this skirtSize
@@ -448,6 +454,8 @@ Callbacks.RequestAlliedVictory = SimUtils.RequestAlliedVictory
 
 Callbacks.SetOfferDraw = SimUtils.SetOfferDraw
 
+Callbacks.SetRecallVote = import("/lua/sim/recall.lua").SetRecallVote
+
 Callbacks.SpawnPing = SimPing.SpawnPing
 
 --Nuke Ping
@@ -455,17 +463,17 @@ Callbacks.SpawnSpecialPing = SimPing.SpawnSpecialPing
 
 Callbacks.UpdateMarker = SimPing.UpdateMarker
 
-Callbacks.FactionSelection = import('/lua/ScenarioFramework.lua').OnFactionSelect
+Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect
 
 Callbacks.ToggleSelfDestruct = import('/lua/selfdestruct.lua').ToggleSelfDestruct
 
 Callbacks.MarkerOnScreen = import('/lua/simcameramarkers.lua').MarkerOnScreen
 
-Callbacks.SimDialogueButtonPress = import('/lua/SimDialogue.lua').OnButtonPress
+Callbacks.SimDialogueButtonPress = import('/lua/simdialogue.lua').OnButtonPress
 
 Callbacks.AIChat = SUtils.FinishAIChat
 
-Callbacks.DiplomacyHandler = import('/lua/SimDiplomacy.lua').DiplomacyHandler
+Callbacks.DiplomacyHandler = import('/lua/simdiplomacy.lua').DiplomacyHandler
 
 Callbacks.Rebuild = function(data, units)
     local wreck = GetEntityById(data.entity)
@@ -517,21 +525,17 @@ Callbacks.OnControlGroupAssign = function(units)
     end
 end
 
-Callbacks.OnControlGroupApply = function(units)
-    --LOG(repr(units))
-end
-
-local SimCamera = import('/lua/SimCamera.lua')
+local SimCamera = import('/lua/simcamera.lua')
 
 Callbacks.OnCameraFinish = SimCamera.OnCameraFinish
 
-local SimPlayerQuery = import('/lua/SimPlayerQuery.lua')
+local SimPlayerQuery = import('/lua/simplayerquery.lua')
 
 Callbacks.OnPlayerQuery = SimPlayerQuery.OnPlayerQuery
 
 Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
-Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
+Callbacks.PingGroupClick = import('/lua/simpinggroup.lua').OnClickCallback
 
 Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
 
@@ -559,10 +563,13 @@ function IsInvalidAssist(unit, target)
 end
 
 Callbacks.AttackMove = function(data, units)
+    -- exclude structures as it makes no sense to apply a move command to them
+    local allNonStructures = EntityCategoryFilterDown(categories.ALLUNITS - categories.STRUCTURE, units)
+
     if data.Clear then
-        IssueClearCommands(units)
+        IssueClearCommands(allNonStructures)
     end
-    IssueAggressiveMove(units, data.Target)
+    IssueAggressiveMove(allNonStructures, data.Target)
 end
 
 --tells a unit to toggle its pointer
@@ -579,7 +586,7 @@ Callbacks.FlagShield = function(data, units)
     end
 end
 
-Callbacks.WeaponPriorities = import('/lua/WeaponPriorities.lua').SetWeaponPriorities
+Callbacks.WeaponPriorities = import('/lua/weaponpriorities.lua').SetWeaponPriorities
 
 Callbacks.ToggleDebugChainByName = function (data, units)
     LOG("ToggleDebugChainByName")
@@ -614,8 +621,8 @@ do
     local cxrb0204 = categories.xrb0204
 
     --- Forces hives in the selection to upgrade immediately
-    -- @param data A table { UpgradeTo :: String } that tells us what we want to upgrade to, should be 'xrb0204' or 'xrb0304'
-    -- @param units A table of the selected units
+    ---@param data {UpgradeTo: string} what we want to upgrade to, should be 'xrb0204' or 'xrb0304'
+    ---@param units Unit[] selected units
     Callbacks.ImmediateHiveUpgrade = function(data, units)
 
         -- make sure we have valid units
@@ -678,8 +685,8 @@ end
 
 do
     --- Allows the player to force a target recheck on the selected units
-    ---@param data table            # an empty table
-    ---@param units table<Unit>     # table of units
+    ---@param data table   an empty table
+    ---@param units Unit[] table of units
     Callbacks.RecheckTargetsOfWeapons = function(data, units)
 
         -- make sure we have valid units with the correct command source
@@ -719,17 +726,100 @@ do
 end
 
 Callbacks.MapResoureCheck = function(data)
-    import("/lua/sim/MapUtilities.lua").MapResourceCheck()
+    import("/lua/sim/maputilities.lua").MapResourceCheck()
 end
 
 Callbacks.iMapSwitchPerspective = function(data)
-    import("/lua/sim/MapUtilities.lua").iMapSwitchPerspective(data.Army)
+    import("/lua/sim/maputilities.lua").iMapSwitchPerspective(data.Army)
 end
 
 Callbacks.iMapToggleRendering = function(data)
-    import("/lua/sim/MapUtilities.lua").iMapToggleRendering()
+    import("/lua/sim/maputilities.lua").iMapToggleRendering()
 end
 
 Callbacks.iMapToggleThreat = function(data)
-    import("/lua/sim/MapUtilities.lua").iMapToggleThreat(data.Identifier)
+    import("/lua/sim/maputilities.lua").iMapToggleThreat(data.Identifier)
+end
+
+Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
+    if selection then
+
+        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
+
+        ---@type Unit
+        local target = GetEntityById(data.TargetId)
+
+        IssueClearCommands(noACU)
+        IssueGuard(noACU, target)
+    end
+end
+
+---@class CargoSlots
+---@field Large number 
+---@field Medium number 
+---@field Small number
+
+---@type CargoSlots[]
+local GetCargoSlotsCache = {}
+
+---@param unit Unit
+---@return CargoSlots
+local function GetCargoSlots(unit)
+
+    -- try the cache first
+    if GetCargoSlotsCache[unit.UnitId] then 
+        return GetCargoSlotsCache[unit.UnitId]
+    end
+
+    ---@type CargoSlots
+    local slots = {
+        Large = 0,
+        Medium = 0,
+        Small = 0,
+    }
+
+    -- based on attachment points
+    for i = 1, unit:GetBoneCount() do
+        if unit:GetBoneName(i) ~= nil then
+            if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
+                slots.Large = slots.Large + 1
+            elseif string.find(unit:GetBoneName(i), 'Attachpoint_Med') then
+                slots.Medium = slots.Medium + 1
+            elseif string.find(unit:GetBoneName(i), 'Attachpoint') then
+                slots.Small = slots.Small + 1
+            end
+        end
+    end
+
+    -- based on blueprint definitions
+    slots.Large = math.min(slots.Large, unit.Blueprint.Transport.SlotsLarge or slots.Large)
+    slots.Medium = math.min(slots.Medium, unit.Blueprint.Transport.SlotsMedium or slots.Medium)
+    slots.Small = math.min(slots.Small, unit.Blueprint.Transport.SlotsSmall or slots.Small)
+
+    -- cache it and return
+    GetCargoSlotsCache[unit.UnitId] = slots
+    return slots
+end
+
+Callbacks.LoadIntoTransports = function(data, selection)
+    if selection then
+
+        local uTransports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
+
+        -- retrieve usable data about transports
+        local dTransports = { }
+        for k, transport in uTransports do
+            local cargoSlots = GetCargoSlots(transport)
+            table.insert(dTransports, {
+                Transport = transport,
+                Cargo = { },
+                Small = cargoSlots.Small,
+                Medium = cargoSlots.Medium,
+                Large = cargoSlots.Large,
+            })
+        end
+
+        local uCargo = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
+
+    end
 end

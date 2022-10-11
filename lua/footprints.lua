@@ -6,6 +6,15 @@ WATER = 0x08
 AIR = 0x10
 ORBIT = 0x20
 
+---@class FootprintSpec
+---@field Name string
+---@field SizeX number
+---@field SizeZ number
+---@field Caps number
+---@field MaxWaterDepth number
+---@field MaxSlope number
+---@field Flags number
+
 -- Flags
 IgnoreStructures = 0x01
 

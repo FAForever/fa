@@ -9,6 +9,7 @@
 --****************************************************************************
 local TConcreteStructureUnit = import('/lua/terranunits.lua').TConcreteStructureUnit
 
+---@class UEB5204 : TConcreteStructureUnit
 UEB5204 = Class(TConcreteStructureUnit) {
 }
 

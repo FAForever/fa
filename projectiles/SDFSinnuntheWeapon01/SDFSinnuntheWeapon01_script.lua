@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Sinn-Uthe Projectile script, XSL0401
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 local SDFSinnuntheWeaponProjectile = import('/lua/seraphimprojectiles.lua').SDFSinnuntheWeaponProjectile
 SDFSinnuntheWeapon01 = Class(SDFSinnuntheWeaponProjectile) {}
 

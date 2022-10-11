@@ -13,6 +13,7 @@ local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
 local TDFHeavyPlasmaCannonWeapon = TerranWeaponFile.TDFHeavyPlasmaCannonWeapon
 local TSAMLauncher = TerranWeaponFile.TSAMLauncher
 
+---@class UEL0303 : TWalkingLandUnit
 UEL0303 = Class(TWalkingLandUnit) {
 
     Weapons = {

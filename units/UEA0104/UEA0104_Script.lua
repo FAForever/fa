@@ -16,6 +16,7 @@ local AirTransport = import('/lua/defaultunits.lua').AirTransport
 local TAirToAirLinkedRailgun = WeaponsFile.TAirToAirLinkedRailgun
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 
+---@class UEA0104 : AirTransport
 UEA0104 = Class(AirTransport) {
     AirDestructionEffectBones = { 'Char04', 'Char03', 'Char02', 'Char01',
                                 'Front_Right_Exhaust','Front_Left_Exhaust','Back_Right_Exhaust','Back_Left_Exhaust',

@@ -10,6 +10,7 @@
 
 local TSonarUnit = import('/lua/terranunits.lua').TSonarUnit
 
+---@class UEB3102 : TSonarUnit
 UEB3102 = Class(TSonarUnit) {
     TimedSonarTTIdleEffects = {
         {

@@ -76,6 +76,7 @@ UnitBlueprint {
         'BUILTBYNAVALTIER3FACTORY',
         'UEF',
         'MOBILE',
+        'AMPHIBIOUS',
         'LAND',
         'TECH2',
         'CONSTRUCTION',

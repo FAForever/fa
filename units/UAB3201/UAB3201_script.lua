@@ -10,6 +10,7 @@
 
 local ARadarUnit = import('/lua/aeonunits.lua').ARadarUnit
 
+---@class UAB3201 : ARadarUnit
 UAB3201 = Class(ARadarUnit) {
 
     OnIntelDisabled = function(self)

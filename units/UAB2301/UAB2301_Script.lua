@@ -10,6 +10,7 @@
 
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 
+---@class UAB2301 : AStructureUnit
 UAB2301 = Class(AStructureUnit) {
     Weapons = {
         MainGun = Class(import('/lua/aeonweapons.lua').ADFCannonOblivionWeapon03) {}

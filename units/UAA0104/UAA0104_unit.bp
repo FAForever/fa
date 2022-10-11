@@ -1,9 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'UAB5102',
-        TargetBones = {
-            'UAA0104',
-        },
     },
     Air = {
         AutoLandTime = 1,
@@ -112,7 +109,7 @@ UnitBlueprint {
         'SNIPEMODE',
     },
     CollisionOffsetX = 0,
-    CollisionOffsetY = -1.5,
+    CollisionOffsetY = 0.1,
     CollisionOffsetZ = -1.5,
     Defense = {
         AirThreatLevel = 1.5,
@@ -240,7 +237,7 @@ UnitBlueprint {
     SelectionSizeZ = 3.8,
     SelectionThickness = 0.26,
     SizeX = 2.2,
-    SizeY = 2.5,
+    SizeY = 1.9,
     SizeZ = 6,
     StrategicIconName = 'icon_gunship2_transport',
     StrategicIconSortPriority = 65,

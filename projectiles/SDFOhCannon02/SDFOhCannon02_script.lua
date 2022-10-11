@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Oh Spectra Cannon Projectile script, XSS0203
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 SDFOhCannon02 = Class(import('/lua/seraphimprojectiles.lua').SOhCannon02) {

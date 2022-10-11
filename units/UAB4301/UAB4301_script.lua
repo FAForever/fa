@@ -9,6 +9,7 @@
 ----****************************************************************************
 local AShieldStructureUnit = import('/lua/aeonunits.lua').AShieldStructureUnit
 
+---@class UAB4301 : AShieldStructureUnit
 UAB4301 = Class(AShieldStructureUnit) {
     ShieldEffects = {
         '/effects/emitters/aeon_shield_generator_t2_01_emit.bp',

@@ -7,6 +7,7 @@
 --****************************************************************************
 local SCivilianStructureUnit = import('/lua/seraphimunits.lua').SCivilianStructureUnit
 
+---@class XSC8012 : SCivilianStructureUnit
 XSC8012 = Class(SCivilianStructureUnit) {
 }
 

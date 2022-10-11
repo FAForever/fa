@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.CollisionBeamEntity : moho.entity_methods
 local CCollisionBeamEntity = {}
 

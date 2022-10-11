@@ -18,6 +18,7 @@ local AIFQuasarAntiTorpedoWeapon = AeonWeapons.AIFQuasarAntiTorpedoWeapon
 local NavalCannonOblivionWeapon = import('/lua/aeon_naval_weapons.lua').ADFCannonOblivionNaval
 
 
+---@class UAS0201 : ASeaUnit
 UAS0201 = Class(ASeaUnit) {
     BackWakeEffect = {},
     Weapons = {

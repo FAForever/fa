@@ -8,7 +8,6 @@
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
-local Utils = import('/lua/system/utils.lua')
 
 local quickDialog = false
 
@@ -93,3 +92,6 @@ function HandleEsc(quit_game)
         SelectUnits(nil)
     end
 end
+
+-- kept for mod backwards compatibility
+local Utils = import('/lua/system/utils.lua')

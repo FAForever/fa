@@ -1,13 +1,13 @@
----@declare-global
+---@meta
+
 ---@class moho.BoneEntityManipulator : moho.manipulator_methods
 local CBoneEntityManipulator = {}
 
 ---
---  derived from IAniManipulator
-function CBoneEntityManipulator:SetPivot()
+---@param x number
+---@param y number
+---@param z number
+function CBoneEntityManipulator:SetPivot(x, y, z)
 end
 
 return CBoneEntityManipulator
-
-
-

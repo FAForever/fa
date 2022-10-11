@@ -24,12 +24,13 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 WaitTicks = coroutine.yield
 
+---@param n number
 function WaitSeconds(n)
-    local ticks = math.max(1, n * 10)
-    if ticks > 1 then
-        ticks = ticks + 1
+    if n <= 0.1 then
+        WaitTicks(1)
+        return
     end
-    WaitTicks(ticks)
+    WaitTicks(n * 10 + 1)
 end
 
 -- Hook some globals
@@ -75,7 +76,6 @@ end
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
 function SetupSession()
-
     ScenarioInfo.TriggerManager = import('/lua/TriggerManager.lua').Manager
     TriggerManager = ScenarioInfo.TriggerManager
 
@@ -83,25 +83,25 @@ function SetupSession()
     ScenarioInfo.GameHasAIs = false
 
     -- if the AI replacement is on then there may be AIs
-    if ScenarioInfo.Options.AIReplacement == 'On' then 
-        ScenarioInfo.GameHasAIs = true 
+    if ScenarioInfo.Options.AIReplacement == 'On' then
+        ScenarioInfo.GameHasAIs = true
         SPEW("Detected ai replacement option being enabled: enabling AI functionality")
     end
 
     -- if we're doing a campaign / special map then there may be AIs
-    if ScenarioInfo.type ~= 'skirmish' then 
-        ScenarioInfo.GameHasAIs = true 
+    if ScenarioInfo.type ~= 'skirmish' then
+        ScenarioInfo.GameHasAIs = true
         SPEW("Detected a non-skirmish type map: enabling AI functionality")
     end
 
     -- if the map maker explicitly tells us
-    if ScenarioInfo.requiresAiFunctionality then 
-        ScenarioInfo.GameHasAIs = true 
+    if ScenarioInfo.requiresAiFunctionality then
+        ScenarioInfo.GameHasAIs = true
         SPEW("Detected the 'requiresAiFunctionality' field set by the map: enabling AI functionality")
     end
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
-    ---@type table<Army, AIBrain>
+    ---@type AIBrain[]
     ArmyBrains = {}
 
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
@@ -242,13 +242,13 @@ function OnCreateArmyBrain(index, brain, name, nickname)
         AddBuildRestriction(index, ScenarioInfo.BuildRestrictions)
     end
 
-    -- check if this brain is an active AI by checking its type and whether 
+    -- check if this brain is an active AI by checking its type and whether
     -- skirmish systems are setup (prevents detecting NEUTRAL_CIVILIAN or ARMY_17)
-    local brainType = brain.BrainType 
-    local brainSkirmishSystems = brain.SkirmishSystems 
-    if brainType == 'AI' and brainSkirmishSystems then 
+    local brainType = brain.BrainType
+    local brainSkirmishSystems = brain.SkirmishSystems
+    if brainType == 'AI' and brainSkirmishSystems then
         ScenarioInfo.GameHasAIs = true
-        SPEW("Detected an AI with skirmish systems: " .. brain.Name .. ", enabling AI functionality") 
+        SPEW("Detected an AI with skirmish systems: " .. brain.Name .. ", enabling AI functionality")
     end
 end
 
@@ -352,9 +352,71 @@ function BeginSession()
     end
 
     import('/lua/sim/score.lua').init()
+    import('/lua/sim/recall.lua').init()
 
     --start watching for victory conditions
     import('/lua/sim/matchstate.lua')
+
+    if ScenarioInfo.Options.CommonArmy == 'Union' then
+        local humanIndex = 0
+        for i, brain in ArmyBrains do
+            if brain.BrainType ~= 'Human' then continue end
+            for i2, _ in ArmyBrains do
+                if not IsAlly(i, i2) then continue end
+                SetCommandSource(i2 - 1, humanIndex, true)
+            end
+            humanIndex = humanIndex + 1
+        end
+    elseif ScenarioInfo.Options.CommonArmy == 'Common' then
+        local humanIndex = 0
+        local IsHuman = {}
+        for _, brain in ArmyBrains do
+            if brain.BrainType == 'Human' then
+                table.insert(IsHuman, humanIndex)
+                humanIndex = humanIndex + 1
+            else
+                table.insert(IsHuman, false)
+            end
+        end
+        local teamIndex = 1
+        for _, armyIndices in teams do
+            for _, i in armyIndices do
+                if ArmyBrains[i].BrainType ~= 'Human' then continue end
+                ArmyBrains[i].Nickname = 'Team ' .. tostring(teamIndex)
+                teamIndex = teamIndex + 1
+                for _, i2 in armyIndices do
+                    if (i2 == i) or (not IsHuman[i2]) then continue end
+                    ArmyBrains[i2].Nickname = 'Merged'
+                    ArmyBrains[i2].Status = 'Defeat'
+                    SetArmyOutOfGame(i2)
+                    local Units = ArmyBrains[i2]:GetListOfUnits(categories.COMMAND, false, true)
+                    ForkThread(function(i, i2, comm)
+                        while true do
+                            if comm then
+                                WaitTicks(1)
+                                if comm:IsUnitState('Busy') then continue end
+                                if comm:IsUnitState('UnSelectable') then continue end
+                                if comm:IsUnitState('BlockCommandQueue') then continue end
+                            end
+                            SetCommandSource(i2 - 1, IsHuman[i2], false)
+                            SetCommandSource(i - 1, IsHuman[i2], true)
+                            SetArmyUnitCap(i, GetArmyUnitCap(i) + GetArmyUnitCap(i2))
+                            Units = ArmyBrains[i2]:GetListOfUnits(categories.ALLUNITS, false, true)
+                            for _, unit in Units do
+                                ChangeUnitArmy(unit, i, true)
+                            end
+                            local v1 = ArmyBrains[i]:GetEconomyStored('MASS') + ArmyBrains[i2]:GetEconomyStored('MASS')
+                            local v2 = ArmyBrains[i]:GetEconomyStored('ENERGY') + ArmyBrains[i2]:GetEconomyStored('ENERGY')
+                            SetArmyEconomy(i, v1, v2)
+                            SetFocusArmy(i - 1)
+                            break
+                        end
+                    end, i, i2, Units[1])
+                end
+                break
+            end
+        end
+    end
 end
 
 function GameTimeLogger()

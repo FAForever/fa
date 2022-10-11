@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.CollisionManipulator : moho.manipulator_methods
 local CCollisionManipulator = {}
 
@@ -16,11 +17,6 @@ end
 ---
 --  CollisionDetector:WatchBone(bone) -- add the given bone to those watched by this manipulator
 function CCollisionManipulator:WatchBone(bone)
-end
-
----
---  derived from IAniManipulator
-function CCollisionManipulator:base()
 end
 
 return CCollisionManipulator

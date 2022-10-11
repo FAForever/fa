@@ -8,6 +8,7 @@
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local AMPlatoonHelperFunctions = import('/lua/editor/AMPlatoonHelperFunctions.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local TriggerFile = import('/lua/scenariotriggers.lua')
 local Buff = import('/lua/sim/Buff.lua')
@@ -127,13 +128,8 @@ function BaseManagerSingleEngineerPlatoon(platoon)
                 BaseManagerAssistThread(platoon)
 
             -- Try to patrol
-            elseif BMBC.BasePatrollingEnabled(aiBrain, baseName) and not (unit:IsUnitState('Moving') or unit:IsUnitState('Patrolling')) then
-                platoon.PlatoonData.LocationType = baseName
-                if bManager:GetDefaultEngineerPatrolChain() then
-                    BaseManagerEngineerPatrol(platoon)
-                else
-                    BaseManagerPatrolLocationFactoriesAI(platoon)
-                end
+            elseif BMBC.BasePatrollingEnabled(aiBrain, baseName) and not unit:IsUnitState('Patrolling') then
+                BaseManagerEngineerPatrol(platoon)
             end
         end
         WaitTicks(Random(51, 113))
@@ -435,12 +431,46 @@ end
 
 function BaseManagerEngineerPatrol(platoon)
     local aiBrain = platoon:GetBrain()
+    local bManager = aiBrain.BaseManagers[platoon.PlatoonData.BaseName]
+    local chain = bManager:GetDefaultEngineerPatrolChain()
+
+    -- Use the default chain or generate random one from factories
+    if chain then
+        platoon.PlatoonData.PatrolChain = chain
+        ScenarioPlatoonAI.PatrolThread(platoon)
+    else
+        BaseManagerPatrolLocationFactoriesAI(platoon)
+    end
+end
+
+function BaseManagerPatrolLocationFactoriesAI(platoon)
+    local aiBrain = platoon:GetBrain()
     local baseName = platoon.PlatoonData.BaseName
     local bManager = aiBrain.BaseManagers[baseName]
-    local patrolChain = ScenarioUtils.ChainToPositions(bManager:GetDefaultEngineerPatrolChain())
+
+    local factories = aiBrain:PBMGetAllFactories(baseName)
+    if not factories then
+        return
+    end
+
+    local posTable = {}
+    for _, fac in factories do
+        if not fac.Dead then
+            table.insert(posTable, fac:GetPosition())
+        end
+    end
+
     platoon:Stop()
-    for k, v in patrolChain do
-        platoon:Patrol(v)
+
+    local i = 1
+    while i <= table.getn(posTable) do
+        local facNum = Random(1, table.getn(posTable))
+        local movePos = posTable[facNum]
+        movePos[3] = movePos[3] + 5
+
+        platoon:Patrol(movePos)
+
+        table.remove(posTable, facNum)
     end
 end
 
@@ -933,52 +963,6 @@ function BuildUnfinishedStructures(platoon)
     until not unfinishedBuildings
 end
 
-function BaseManagerPatrolLocationFactoriesAI(platoon)
-    local aiBrain = platoon:GetBrain()
-    local location = platoon.PlatoonData.BaseName
-    local patrol = true
-    if platoon.PlatoonData.BaseName and aiBrain.BaseManagers[platoon.PlatoonData.BaseName]
-            and not aiBrain.BaseManagers[platoon.PlatoonData.BaseName].FunctionalityStates.EngineerReclaiming then
-        patrol = false
-    end
-
-    local returnOut = false
-    while aiBrain:PlatoonExists(platoon) and not returnOut do
-        platoon:Stop()
-        local factories = aiBrain:PBMGetLocationFactories(location)
-        local posTable = {}
-        if factories then
-            for _, fac in factories do
-                if not fac.Dead then
-                    table.insert(posTable, fac:GetPosition())
-                    local guards = fac:GetGuards()
-                    if guards then
-                        for num, guard in guards do
-                            if not guard.Dead then
-                                table.insert(posTable, guard:GetPosition())
-                            end
-                        end
-                    end
-                end
-            end
-
-            local i = 1
-            while i <= table.getn(posTable) do
-                local facNum = Random(1, table.getn(posTable))
-                local movePos = posTable[facNum]
-                movePos[3] = movePos[3] + 5
-                if patrol then
-                    platoon:Patrol(movePos)
-                else
-                    platoon:MoveToLocation(movePos, false)
-                end
-                table.remove(posTable, facNum)
-            end
-        end
-        return
-    end
-end
-
 function PlatoonSetTargetPriorities(platoon)
     if platoon.PlatoonData.CategoryPriorities then
         -- Get the list of units in the platoon
@@ -1292,4 +1276,3 @@ end
 
 -- kept for mod compatibility, as they may depend on these
 local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')

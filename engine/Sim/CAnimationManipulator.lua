@@ -1,6 +1,12 @@
----@declare-global
+---@meta
+
 ---@class moho.AnimationManipulator : moho.manipulator_methods
 local CAnimationManipulator = {}
+
+---
+---@return number
+function CAnimationManipulator:GetAnimationDuration()
+end
 
 ---
 --  fraction = AnimationManipulator:GetAnimationFraction()

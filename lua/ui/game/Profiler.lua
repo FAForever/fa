@@ -148,7 +148,6 @@ list = false
 
 --- Opens up the window
 function OpenWindow()
-
     local gameHasAIs = GameMain.GameHasAIs
     local cheatsOn = sessionInfo.Options.CheatsEnabled
     local isThisJip = "jip" == GetArmiesTable()[GameMain.OriginalFocusArmy].nickname

@@ -9,6 +9,7 @@
 --****************************************************************************
 local AEnergyCreationUnit = import('/lua/aeonunits.lua').AEnergyCreationUnit
 
+---@class UAB1201 : AEnergyCreationUnit
 UAB1201 = Class(AEnergyCreationUnit) {
     AmbientEffects = 'AT2PowerAmbient',
 
