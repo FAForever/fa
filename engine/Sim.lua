@@ -70,11 +70,12 @@ end
 function AttachBeamToEntity(emitter, entity, bone, army)
 end
 
---- Changes the army of a unit, returning a new unit
+--- Changes the army of a unit, returning a new unit. By default the ACU can not be shared
 ---@param unit Unit
 ---@param army Army
+---@param noRestrictions? boolean
 ---@return Unit
-function ChangeUnitArmy(unit, army)
+function ChangeUnitArmy(unit, army, noRestrictions)
 end
 
 --- Returns true if cheats are enabled, logs the cheat attempt no matter what
