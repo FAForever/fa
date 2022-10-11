@@ -26,7 +26,7 @@ local function CollectDefeatedBrains(aliveBrains, condition, delay)
     local defeatedBrains = { }
     for k, brain in aliveBrains do
         local criticalUnits = brain:GetListOfUnits(condition)
-        if criticalUnits then
+        if (not brain:IsDefeated()) and (criticalUnits) then
             -- critical units found, make sure they all exist properly
             local oneCriticalUnitAlive = false
             for _, unit in criticalUnits do
@@ -95,7 +95,7 @@ local function MatchStateThread()
     local aliveBrains = { }
     for _, brain in ArmyBrains do
         local index = brain:GetArmyIndex()
-        if not ArmyIsCivilian(index) then
+        if (not ArmyIsCivilian(index)) and (not ArmyIsOutOfGame(index)) then
             aliveBrains[index] = brain
         end
     end
@@ -109,7 +109,7 @@ local function MatchStateThread()
 
             -- take into account cascading effects
             local lastDefeatedBrainsCount
-            repeat 
+            repeat
                 WaitTicks(4)
 
                 lastDefeatedBrainsCount = defeatedBrainsCount
@@ -167,7 +167,7 @@ local function MatchStateThread()
             end
 
             -- check for win
-            local win = true 
+            local win = true
             for k, brain in aliveBrains do
                 for l, _ in aliveBrains do
                     if k ~= l then

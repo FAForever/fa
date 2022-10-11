@@ -595,20 +595,31 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             return
         end
 
-        -- This bit is for the Hotbuild labels
+        -- This bit is for the Hotbuild labels. See the buildActionUpgrade() function in hotbuild.lua for a bit more 
+        -- documentation
         local bp = newSelection[1]:GetBlueprint()
         local upgradesTo = nil
-        local potentialUpgrades = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
+        local potentialUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
         if potentialUpgrades then
-            if type(potentialUpgrades) == "string" then
-                upgradesTo = potentialUpgrades
-            elseif type(potentialUpgrades) == "table" then
-                local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
-                for _, v in potentialUpgrades do
-                    if EntityCategoryContains(buildableCategories, v) then
-                        upgradesTo = v
+            local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
+            for _, upgr in potentialUpgrades do
+                if EntityCategoryContains(buildableCategories, upgr) then
+                    upgradesTo = upgr
+                    break
+                end
+                local nextSuccessiveUpgrade = __blueprints[upgr].General.UpgradesTo
+                while nextSuccessiveUpgrade do
+                    -- Note: Should we ever add a structure that has different upgrade path choices on a non-base 
+                    -- version of the structure, e.g. different choices for the 4th cybran shield upgrade or something 
+                    -- like it, the way we find the correct icon to put the hotbuild upgrade keybind label using this 
+                    -- while loop will break. As there currently is no such structure in the game, and I don't know how
+                    -- the general case of finding that correct icon should work in such an imaginary case, I'll leave
+                    -- it at this, currently working, code.
+                    if EntityCategoryContains(buildableCategories, nextSuccessiveUpgrade) then
+                        upgradesTo = nextSuccessiveUpgrade
                         break
                     end
+                    nextSuccessiveUpgrade = __blueprints[nextSuccessiveUpgrade].General.UpgradesTo
                 end
             end
         end
