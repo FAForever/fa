@@ -4821,7 +4821,6 @@ Unit = Class(moho.unit_methods) {
             self:PlayTeleportInEffects()
         else 
             IssueClearCommands({self})
-            return
         end
         
         self:SetWorkProgress(0.0)
