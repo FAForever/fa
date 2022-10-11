@@ -104,6 +104,7 @@ local cUnit = moho.unit_methods
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
+---@field Blueprint UnitBlueprint
 ---@field EngineFlags any
 ---@field EngineCommandCap? table<string, boolean>
 Unit = Class(moho.unit_methods) {
