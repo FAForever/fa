@@ -346,7 +346,7 @@ function SetupPlayerLines()
         group.armyID = armyIndex
 
         group.div = Bitmap(group)
-        group.div:SetTexture("/lua/divisions/grandmaster_medium.png")
+        group.div:SetTexture("/textures/divisions/grandmaster_medium.png")
         group.div.Width:Set(function() return group.Height()*2 end)
         group.div.Height:Set(group.Height)
         LayoutHelpers.AtCenterIn(group.div, group)
@@ -499,6 +499,7 @@ function SetupPlayerLines()
         local playerName = line.name:GetText()
         local playerRating = sessionInfo.Options.Ratings[playerName] or 0
         local playerClan = sessionInfo.Options.ClanTags[playerName]
+        local playerDiv = sessionInfo.Options.Divisions[playerName]
 
         if playerClan and playerClan ~= "" then
             playerClan = '[' .. playerClan .. '] '
@@ -511,6 +512,9 @@ function SetupPlayerLines()
         end
 
         line.name:SetText(playerClan .. playerName .. playerRating)
+        if playerDiv~=""then
+            line.div:SetTexture("/textures/divisions/".. playerDiv.."_medium.png")
+        end
     end
 
     local mapData = {}
