@@ -33,8 +33,6 @@ local HeightRatio = 0.012
 --- where you can reclaim.
 local ZoomThreshold = 150
 local MaxLabels = 200
---- The minimum mass a label needs to show up
-local MassDisplayThres = 10
 --- Width and height of the reclaim grid map structure used for in-view reclaim
 local GridSize = 4
 
@@ -95,11 +93,11 @@ local WorldLabel = Class(Group) {
     ---@param parent ReclaimLabelGroup
     ---@param data UserReclaimData
     __init = function(self, parent, data)
+        self.mass = data.mass or 0
         Group.__init(self, parent)
 
         self.parent = parent
         self.position = data.position
-        self.mass = data.mass or 0
         self.max = data.max or self.mass
         self.count = data.count or 1
 
@@ -140,41 +138,67 @@ local WorldLabel = Class(Group) {
     ---@param self WorldLabel
     ---@return Color
     GetColor = function(self)
-        local mass = self.mass - MassDisplayThres
+        local mass = self.mass - 10 -- fit to minimum
         if mass <= 0 then
             return "7FC7FF8F"
         end
 
-        -- The nominal hue scaling formula used is `log_{1000}(value / 100 + 1)` clamped to 1.
-        -- We approximate this in the more commonly-used small end of the scale using a proportional
-        -- function up to 50; in order to be continuous, we will use the derivative there as the
-        -- slope.
-        --    nominal(x) = log_{1000}(x / 100 + 1)
-        --               = log_{1000}(x + 100) - 2/3
-        --    approx(x)  = nominal'(50) x
-        --               = 1 / (50 + 100)ln(1000)  x
-        --              ~= 0.000965098848674 x
-        -- We'll need to shift the nominal function to be continuous to the approximal one as well
-        --    shifted(x) = nominal(x) + approx(50) - nominal(50)
-        --               = log_{1000}(x + 100) - 2/3 + 50 / 450ln(10) - log_{1000}(50 + 100) + 2/3
-        --               = (ln(x + 100) - ln(150) + 1/3) / ln(1000)
-        --              ~= (ln(x + 100) - 4.67730196076) * 0.144764827301
-        -- and then we'll bind it together in a piecewise function `hue(x)`:
-        --  = { x <= 50         : approx(x)
-        --    { shifted(x) >= 1 : 1
-        --    { else            : shifted(x)
-        --  = { x <= 50             ~ 0.000965098848674 x
-        --    { x >= ~107379.696586 : 1
-        --    { else                ~ (ln(x + 100) - 4.67730196076) * 0.144764827301
+        -- We'd like to scale the hue of the label based on the logarithm of the mass value clamped
+        -- to 1 at some cutoff point. We'd also like to approximate this in the more commonly-used
+        -- small end of the scale using a proportional quadratic function up to a threshold.
+        -- 
+        -- Thus, we have three parameters to consider for our function
+        --    base: how quickly the function scales a mass value to hue
+        --    cutoff: when the function meets 1
+        --    thres: when the logarithm stops being approximated with a proportional one
+        --
+        -- We use the nominal logarithm scaling function
+        --    nominal(x) = log_{base}(x / scale + 1)
+        --               = ln(x + scale)/ln(base) - ln(scale)/ln(base)
+        -- where `scale` depends on the cutoff value:
+        --             1 = nominal(cutoff)
+        --             1 = log_{base}(cutoff / scale + 1)
+        --         scale = cutoff / (base - 1)
+        -- 
+        -- The approximating function is `a x^2 + b x` where we choose `a` and `b` such that the
+        -- slopes of the approximating function and the nominal function are smooth up to the first
+        -- derivative at the threshold point:
+        --     approx(thres) = nominal(thres)
+        --     approx'(thres) = nominal'(thres)
+        -- "it is left as an exercise to the reader to validate the solutions for `a` and `b`:"
+        --     a = ((-ln(thres + scale) + ln(scale)) / thres + 1 / (thres + scale)) / ln(base)thres
+        --     b = (2 (ln(thres + scale) - ln(scale)) / thres - 1 / (thres + scale)) / ln(base)
+        --
+        -- We now up it all together in a piecewise function for the hue:
+        --        hue(x) = { x <= thres  : approx(x)     => A x (x + B)
+        --                 { x >= cutoff : 1
+        --                 { else        : nominal(x)    => ln(x + scale) * C + D
+        -- where
+        --         scale = cutoff / (base - 1)
+        --             C = 1 / ln(base)
+        --             D = - C ln(scale)
+        --             A = C ((-ln(thres + scale) + ln(scale)) / thres + 1 / (thres + scale)) / thres
+        --             B = C (2 (ln(thres + scale) - ln(scale)) / thres - 1 / (thres + scale)) / A
+        --
+        -- the current parameter values are:
+        --     threshold = 94.5692754978
+        --          base = 100000
+        --        cutoff = 30,000
+        -- which yield the following constants:
+        --         scale = 0.30000300003
+        --             A = -0.0000358285014945
+        --             B = -240.180201571
+        --             C = 0.0868588963807
+        --             D = 0.104574880463
+
         local hue
-        if mass <= 50 then
-            hue = mass * 0.000965098848674
-        elseif mass >= 107379.696586 then
+        if mass <= 100 then
+            hue = -0.0000358285014945 * mass * (mass - 240.180201571)
+        elseif mass >= 30000 then
             hue = 1
         else
-            hue = (MathLog(mass + 100) - 4.67730196076) * 0.144764827301
+            hue = MathLog(mass + 0.30000300003) * 0.0868588963807 - 0.104574880463
         end
-        hue = MathClamp(hue, 0, 1)
 
         -- saturation will just be an abstract indicator of how "compact" the label is
         local sat = MathClamp(self.max / mass, 0, 1)
@@ -194,7 +218,7 @@ local WorldLabel = Class(Group) {
         if mass < 1 then
             return "<1"
         end
-        if mass < MassDisplayThres then
+        if mass < 10 then
             return ("%.2f"):format(mass + 0.005)
         end
         return MathFloor(mass + 0.5)
@@ -234,10 +258,6 @@ local WorldLabel = Class(Group) {
     ---@param self WorldLabel
     ---@param reclaim UserReclaimData
     DisplayReclaim = function(self, reclaim)
-        if self:IsHidden() then
-            self:Show()
-        end
-
         local mass = reclaim.mass or 0
         local count = reclaim.count or 1
         local max = reclaim.max or mass
@@ -248,6 +268,8 @@ local WorldLabel = Class(Group) {
             self:Update()
         end
         self:MoveTo(reclaim.position)
+        self:Show()
+        self:SetNeedsFrameUpdate(true)
     end;
 
     ---@param self WorldLabel
@@ -273,9 +295,13 @@ local WorldLabel = Class(Group) {
     ---@param self WorldLabel
     ---@param hidden boolean
     OnHide = function(self, hidden)
-        self:SetNeedsFrameUpdate(not hidden)
-        if not hidden and self.parent then
-            self:UpdatePosition()
+        if self.mass then
+            self:SetNeedsFrameUpdate(not hidden)
+            if not hidden and self.parent then
+                self:UpdatePosition()
+            end
+        else
+            return true
         end
     end;
 }
@@ -435,7 +461,6 @@ function ShowReclaimThread(view)
     InitReclaimGroup(view, camera)
     local oldZoom, oldPosition
 
-    local mod = 0
     while view.ShowingReclaim do
         if IsDestroyed(camera) then
             break
@@ -461,6 +486,8 @@ function ShowReclaimThread(view)
     if not IsDestroyed(view) then
         view.ReclaimThread = nil
         view.ReclaimGroup:Hide()
+        HideUnusedLabels(LabelPool, 0, LabelPoolUse)
+        LabelPoolUse = 0
     end
 end
 
@@ -697,6 +724,8 @@ end
 ---@param b UserReclaimData
 ---@return boolean
 local function ReclaimComparator(a, b)
+    -- If you change this function, make sure that all data with a mass value of 0 (or whatever you
+    -- change in `UnsortUnusedReclaimData()`) sorts lower than everything else
     return a.mass > b.mass
 end
 
@@ -781,57 +810,6 @@ local function UnsortUnusedReclaimData(dataPool, newDataSize, lastDataSize)
     end
 end
 
----@param reclaim UserReclaimData[]
----@param count number
----@param threshold UserReclaimData
----@return number
-local function FilterOutReclaim(reclaim, count, threshold)
-    TableSort(reclaim, ReclaimComparator)
-
-    -- special case
-    if count == 1 then
-        if reclaim[1].mass < 0.1 then
-            return 0
-        end
-        return 1
-    end
-    -- end conditions
-    if reclaim[count].mass >= threshold then
-        return count
-    end
-    if reclaim[count - 1].mass >= threshold then
-        return count - 1
-    end
-    if reclaim[1].mass < threshold then
-        return 0
-    end
-    if reclaim[2].mass < threshold then
-        return 1
-    end
-
-    -- binary search for threshold
-    local pos = (count * 0.5) ^ 0
-    local offset = (count * 0.25) ^ 0
-
-    repeat
-        local value = reclaim[pos].mass
-        if value < threshold then
-            if reclaim[pos - 1].mass >= threshold then
-                return pos - 1
-            end
-            pos = pos - offset
-        else
-            if reclaim[pos + 1].mass < threshold then
-                return pos
-            end
-            pos = pos + offset
-        end
-        if offset > 1 then
-            offset = (offset * 0.5) ^ 0
-        end
-    until false
-end
-
 ---@param labelPool WorldLabel[] pool of labels to reuse
 ---@param parent ReclaimLabelGroup parent of any newly created relcaim labels
 ---@param reclaimData UserReclaimData[] reclaim data to display
@@ -853,17 +831,17 @@ end
 ---@param labelPool WorldLabel[] pool of labels to reuse
 ---@param newLabelCount number size of reclaim data
 ---@param lastLabelCount number number of labels used last update
-local function HideUnusedLabels(labelPool, newLabelCount, lastLabelCount)
+function HideUnusedLabels(labelPool, newLabelCount, lastLabelCount)
     local IsDestroyed = IsDestroyed
 
     for i = newLabelCount + 1, lastLabelCount do
         local label = labelPool[i]
-        if label then
+        if label ~= nil then
             if not IsDestroyed(label) then
                 label:Hide()
-            else
-                labelPool[i] = nil
             end
+            label.mass = nil
+            labelPool[i] = nil
         end
     end
 end
@@ -895,7 +873,8 @@ function UpdateLabels(view, zoom)
             if labelCount > maxLabels then
                 labelCount = maxLabels
             end
-            labelCount = FilterOutReclaim(labelData, labelCount, MassDisplayThres)
+
+            TableSort(labelData, ReclaimComparator)
 
             if labelCount > 0 then
                 -- displaying
@@ -917,7 +896,7 @@ function UpdateLabels(view, zoom)
     if labelCount < labelPoolUse then
         HideUnusedLabels(labelPool, labelCount, labelPoolUse)
         Updating = true
-    elseif labelCount > LabelPoolSize then
+    elseif LabelPoolSize < labelCount then
         LabelPoolSize = labelCount
     end
     LabelPoolUse = labelCount

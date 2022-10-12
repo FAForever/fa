@@ -38,7 +38,7 @@ local Warp = Warp
 ---@field energy number
 
 
-local minimumLabelMass, minimumLabelEnergy = 1, 5
+local MinimumLabelMass, MinimumLabelEnergy = 10, 50
 
 
 ---@class Prop : moho.prop_methods
@@ -249,7 +249,7 @@ Prop = Class(moho.prop_methods) {
         local mass, energy = self.MaxMassReclaim, self.MaxEnergyReclaim
 
         -- check if prop has sufficient amount of reclaim to begin with
-        if mass < minimumLabelMass and energy < minimumLabelEnergy then
+        if mass < MinimumLabelMass and energy < MinimumLabelEnergy then
             return
         end
 
@@ -258,7 +258,7 @@ Prop = Class(moho.prop_methods) {
         mass = mass * left
         energy = energy * left
 
-        local unworthy = mass < minimumLabelMass and energy < minimumLabelEnergy
+        local unworthy = mass < MinimumLabelMass and energy < MinimumLabelEnergy
         if unworthy and not self.hasLabel then
             return
         end
@@ -273,8 +273,16 @@ Prop = Class(moho.prop_methods) {
             data.position = nil
             self.hasLabel = false
         else
-            data.mass = mass
-            data.energy = energy
+            if mass >= MinimumLabelMass then
+                data.mass = mass
+            else
+                data.mass = nil
+            end
+            if energy >= MinimumLabelEnergy then
+                data.energy = energy
+            else
+                data.energy = nil
+            end
             data.position = self.CachePosition
             self.hasLabel = true
         end
