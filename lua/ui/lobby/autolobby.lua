@@ -107,8 +107,8 @@ local function MakeLocalPlayerInfo(name)
     result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""
     result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""
     result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
-    result.DIV = tonumber(GetCommandLineArg("/division", 1)[1]) or ""
-    result.SUBDIV = tonumber(GetCommandLineArg("/subdivision", 1)[1]) or ""
+    result.DIV = (GetCommandLineArg("/division", 1)[1]) or ""
+    result.SUBDIV = (GetCommandLineArg("/subdivision", 1)[1]) or ""
     result.PL = math.floor(result.MEAN - 3 * result.DEV)
     LOG('Local player info: ' .. repr(result))
     return result
