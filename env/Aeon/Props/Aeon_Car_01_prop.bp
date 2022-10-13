@@ -31,9 +31,6 @@ PropBlueprint {
     Interface = {
         HelpText = 'Aeon Car 01',
     },
-    Physics = {
-        BlockPath = true,
-    },
     SizeX = 0.5,
     SizeY = 0.5,
     SizeZ = 0.5,

@@ -31,9 +31,6 @@ PropBlueprint {
     Interface = {
         HelpText = 'UEF Car 1',
     },
-    Physics = {
-        BlockPath = true,
-    },
     SizeX = 0.2,
     SizeY = 0.25,
     SizeZ = 0.5,

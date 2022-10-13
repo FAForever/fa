@@ -31,9 +31,6 @@ PropBlueprint {
     Interface = {
         HelpText = 'chad on a Log',
     },
-    Physics = {
-        BlockPath = true,
-    },
     SizeX = 0.4,
     SizeY = 0.25,
     SizeZ = 0.25,

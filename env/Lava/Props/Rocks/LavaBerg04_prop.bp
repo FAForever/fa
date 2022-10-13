@@ -31,9 +31,6 @@ PropBlueprint {
     Interface = {
         HelpText = 'Small Rock',
     },
-    Physics = {
-        BlockPath = true,
-    },
     SizeX = 0.8,
     SizeY = 0.25,
     SizeZ = 0.8,

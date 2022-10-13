@@ -31,9 +31,6 @@ PropBlueprint {
     Interface = {
         HelpText = 'Cybran Adjacency Node',
     },
-    Physics = {
-        BlockPath = true,
-    },
     SizeX = 0,
     SizeY = 0,
     SizeZ = 0,
