@@ -36,8 +36,23 @@ end
 ---@param eStorage integer
 ---@return boolean
 function GreaterThanEconStorageMax(aiBrain, mStorage, eStorage)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassMaxStored >= mStorage and econ.EnergyMaxStored >= eStorage) then
+    local massMaxStored
+    local energyMaxStored
+    local massStorageRatio = GetEconomyStoredRatio(aiBrain, 'MASS')
+    local energyStorageRatio = GetEconomyStoredRatio(aiBrain, 'ENERGY')
+
+    if massStorageRatio ~= 0 then
+        massMaxStored = GetEconomyStored('MASS') / massStorageRatio
+    else
+        massMaxStored = GetEconomyStored('MASS')
+    end
+    if energyStorageRatio ~= 0 then
+        energyMaxStored = GetEconomyStored('ENERGY') / energyStorageRatio
+    else
+        energyMaxStored = GetEconomyStored('ENERGY')
+    end
+
+    if (massMaxStored >= mStorage and energyMaxStored >= eStorage) then
         return true
     end
     return false
@@ -107,8 +122,23 @@ end
 ---@param eStorage integer
 ---@return boolean
 function LessEconStorageMax(aiBrain, mStorage, eStorage)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassMaxStored < mStorage and econ.EnergyMaxStored < eStorage) then
+    local massMaxStored
+    local energyMaxStored
+    local massStorageRatio = GetEconomyStoredRatio(aiBrain, 'MASS')
+    local energyStorageRatio = GetEconomyStoredRatio(aiBrain, 'ENERGY')
+
+    if massStorageRatio ~= 0 then
+        massMaxStored = GetEconomyStored('MASS') / massStorageRatio
+    else
+        massMaxStored = GetEconomyStored('MASS')
+    end
+    if energyStorageRatio ~= 0 then
+        energyMaxStored = GetEconomyStored('ENERGY') / energyStorageRatio
+    else
+        energyMaxStored = GetEconomyStored('ENERGY')
+    end
+
+    if (massMaxStored < mStorage and energyMaxStored < eStorage) then
         return true
     end
     return false
@@ -238,8 +268,8 @@ function GreaterThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEffici
         --LOG('*AI DEBUG: Found Paragon')
         return true
     end
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassEfficiencyOverTime >= MassEfficiency and econ.EnergyEfficiencyOverTime >= EnergyEfficiency) then
+    if (aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime >= MassEfficiency and 
+    aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime >= EnergyEfficiency) then
         return true
     end
     return false
@@ -255,8 +285,8 @@ function LessThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficienc
         --LOG('*AI DEBUG: Found Paragon')
         return false
     end
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassEfficiencyOverTime <= MassEfficiency and econ.EnergyEfficiencyOverTime <= EnergyEfficiency) then
+    if (aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime <= MassEfficiency and 
+    aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime <= EnergyEfficiency) then
         return true
     end
     return false
@@ -269,7 +299,6 @@ end
 ---@param unitCategory EntityCategory
 ---@return boolean
 function MassIncomeToUnitRatio(aiBrain, ratio, compareType, unitCategory)
-    local econTime = aiBrain:GetEconomyOverTime()
 
     local testCat = unitCategory
     if type(testCat) == 'string' then
@@ -280,7 +309,7 @@ function MassIncomeToUnitRatio(aiBrain, ratio, compareType, unitCategory)
     -- Find units of this type being built or about to be built
     unitCount = unitCount + aiBrain:GetEngineerManagerUnitsBeingBuilt(testCat)
 
-    local checkRatio = (econTime.MassIncome * 10) / unitCount
+    local checkRatio = (aiBrain.EconomyOverTimeCurrent.MassIncome * 10) / unitCount
 
     return CompareBody(checkRatio, ratio, compareType)
 end
@@ -292,7 +321,6 @@ end
 ---@param t3Drain integer
 ---@return boolean
 function GreaterThanMassIncomeToFactory(aiBrain, t1Drain, t2Drain, t3Drain)
-    local econTime = aiBrain:GetEconomyOverTime()
 
     -- T1 Test
     local testCat = categories.TECH1 * categories.FACTORY
@@ -314,7 +342,7 @@ function GreaterThanMassIncomeToFactory(aiBrain, t1Drain, t2Drain, t3Drain)
 
     massTotal = massTotal + (unitCount * t3Drain)
 
-    if not CompareBody((econTime.MassIncome * 10), massTotal, '>') then
+    if not CompareBody((aiBrain.EconomyOverTimeCurrent.MassIncome * 10), massTotal, '>') then
         return false
     end
 

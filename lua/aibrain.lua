@@ -29,6 +29,9 @@ local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 -- upvalue for performance
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local GetEconomyIncome = moho.aibrain_methods.GetEconomyIncome
+local GetEconomyRequested = moho.aibrain_methods.GetEconomyRequested
+local GetEconomyTrend = moho.aibrain_methods.GetEconomyTrend
 local CategoriesDummyUnit = categories.DUMMYUNIT
 local CoroutineYield = coroutine.yield
 
@@ -1519,8 +1522,8 @@ AIBrain = Class(moho.aibrain_methods) {
 
         -- Economy monitor for new skirmish - stores out econ over time to get trend over 10 seconds
         self.EconomyData = {}
-        self.EconomyTicksMonitor = 50
-        self.EconomyCurrentTick = 1
+        self.EconomyOverTimeCurrent = {}
+        self.EconomyTicksMonitor = 300
         self.EconomyMonitorThread = self:ForkThread(self.EconomyMonitor)
         self.LowEnergyMode = false
 
@@ -1997,25 +2000,105 @@ AIBrain = Class(moho.aibrain_methods) {
     ---Monitors the economy over time for skirmish; allows better trend analysis
     ---@param self AIBrain
     EconomyMonitor = function(self)
-        -- build "eco trend over time" table
-        for i = 1, self.EconomyTicksMonitor do
-            self.EconomyData[i] = { EnergyIncome=0, EnergyRequested=0, MassIncome=0, MassRequested=0 }
-        end
-        -- make counters local (they are not used anywhere else)
-        local EconomyTicksMonitor = self.EconomyTicksMonitor
-        local EconomyCurrentTick = self.EconomyCurrentTick
-        -- loop until the AI is dead
-        while self.Result ~= "defeat" do
-            self.EconomyData[EconomyCurrentTick].EnergyIncome = self:GetEconomyIncome('ENERGY')
-            self.EconomyData[EconomyCurrentTick].MassIncome = self:GetEconomyIncome('MASS')
-            self.EconomyData[EconomyCurrentTick].EnergyRequested = self:GetEconomyRequested('ENERGY')
-            self.EconomyData[EconomyCurrentTick].MassRequested = self:GetEconomyRequested('MASS')
-            -- store eco trend for the last 50 ticks (5 seconds)
-            EconomyCurrentTick = EconomyCurrentTick + 1
-            if EconomyCurrentTick > EconomyTicksMonitor then
-                EconomyCurrentTick = 1
+        -- This over time thread is based on Sprouto's LOUD AI.
+        self.EconomyData = { ['EnergyIncome'] = {}, ['EnergyRequested'] = {}, ['EnergyStorage'] = {}, ['EnergyTrend'] = {}, ['MassIncome'] = {}, ['MassRequested'] = {}, ['MassStorage'] = {}, ['MassTrend'] = {}, ['Period'] = self.EconomyTicksMonitor }
+        -- number of sample points
+        -- local point
+        local samplerate = 10
+        local samples = self.EconomyData['Period'] / samplerate
+
+        -- create the table to store the samples
+        for point = 1, samples do
+            self.EconomyData['EnergyIncome'][point] = 0
+            self.EconomyData['EnergyRequested'][point] = 0
+            self.EconomyData['EnergyStorage'][point] = 0
+            self.EconomyData['EnergyTrend'][point] = 0
+            self.EconomyData['MassIncome'][point] = 0
+            self.EconomyData['MassRequested'][point] = 0
+            self.EconomyData['MassStorage'][point] = 0
+            self.EconomyData['MassTrend'][point] = 0
+        end    
+
+        -- array totals
+        local eIncome = 0
+        local mIncome = 0
+        local eRequested = 0
+        local mRequested = 0
+        local eStorage = 0
+        local mStorage = 0
+        local eTrend = 0
+        local mTrend = 0
+
+        -- this will be used to multiply the totals
+        -- to arrive at the averages
+        local samplefactor = 1/samples
+
+        local EcoData = self.EconomyData
+
+        local EcoDataEnergyIncome = EcoData['EnergyIncome']
+        local EcoDataMassIncome = EcoData['MassIncome']
+        local EcoDataEnergyRequested = EcoData['EnergyRequested']
+        local EcoDataMassRequested = EcoData['MassRequested']
+        local EcoDataEnergyTrend = EcoData['EnergyTrend']
+        local EcoDataMassTrend = EcoData['MassTrend']
+        local EcoDataEnergyStorage = EcoData['EnergyStorage']
+        local EcoDataMassStorage = EcoData['MassStorage']
+
+        local e,m
+
+        while true do
+
+            for point = 1, samples do
+
+                -- remove this point from the totals
+                eIncome = eIncome - EcoDataEnergyIncome[point]
+                mIncome = mIncome - EcoDataMassIncome[point]
+                eRequested = eRequested - EcoDataEnergyRequested[point]
+                mRequested = mRequested - EcoDataMassRequested[point]
+                eTrend = eTrend - EcoDataEnergyTrend[point]
+                mTrend = mTrend - EcoDataMassTrend[point]
+
+                -- insert the new data --
+                EcoDataEnergyIncome[point] = GetEconomyIncome( self, 'ENERGY')
+                EcoDataMassIncome[point] = GetEconomyIncome( self, 'MASS')
+                EcoDataEnergyRequested[point] = GetEconomyRequested( self, 'ENERGY')
+                EcoDataMassRequested[point] = GetEconomyRequested( self, 'MASS')
+
+                e = GetEconomyTrend( self, 'ENERGY')
+                m = GetEconomyTrend( self, 'MASS')
+
+                if e then
+                    EcoDataEnergyTrend[point] = e
+                else
+                    EcoDataEnergyTrend[point] = 0.1
+                end
+
+                if m then
+                    EcoDataMassTrend[point] = m
+                else
+                    EcoDataMassTrend[point] = 0.1
+                end
+
+                -- add the new data to totals
+                eIncome = eIncome + EcoDataEnergyIncome[point]
+                mIncome = mIncome + EcoDataMassIncome[point]
+                eRequested = eRequested + EcoDataEnergyRequested[point]
+                mRequested = mRequested + EcoDataMassRequested[point]
+                eTrend = eTrend + EcoDataEnergyTrend[point]
+                mTrend = mTrend + EcoDataMassTrend[point]
+
+                -- calculate new OverTime values --
+                self.EconomyOverTimeCurrent.EnergyIncome = eIncome * samplefactor
+                self.EconomyOverTimeCurrent.MassIncome = mIncome * samplefactor
+                self.EconomyOverTimeCurrent.EnergyRequested = eRequested * samplefactor
+                self.EconomyOverTimeCurrent.MassRequested = mRequested * samplefactor
+                self.EconomyOverTimeCurrent.EnergyEfficiencyOverTime = math.min( (eIncome * samplefactor) / (eRequested * samplefactor), 2)
+                self.EconomyOverTimeCurrent.MassEfficiencyOverTime = math.min( (mIncome * samplefactor) / (mRequested * samplefactor), 2)
+                self.EconomyOverTimeCurrent.EnergyTrendOverTime = eTrend * samplefactor
+                self.EconomyOverTimeCurrent.MassTrendOverTime = mTrend * samplefactor
+
+                coroutine.yield(samplerate)
             end
-            WaitTicks(1)
         end
     end,
 
