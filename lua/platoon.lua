@@ -1010,8 +1010,7 @@ Platoon = Class(moho.platoon_methods) {
             if moveNext == 'None' then
                 -- this won't be 0... see above
                 WaitSeconds(guardTimer)
-                self:PlatoonDisband()
-                return
+                return self:ReturnToBaseAI()
             end
 
             if moveNext == 'Guard Base' then
@@ -3233,6 +3232,7 @@ Platoon = Class(moho.platoon_methods) {
     --- for a new platoon
     ---@param self Platoon
     ReturnToBaseAI = function(self)
+        LOG('ReturnToBaseAI initialized')
         local aiBrain = self:GetBrain()
 
         if not aiBrain:PlatoonExists(self) or not self:GetPlatoonPosition() then
@@ -3255,9 +3255,12 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         if bestBase then
+            LOG('ReturnToBaseAI returning to '..repr(bestBase.Position))
             AIAttackUtils.GetMostRestrictiveLayer(self)
             local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
-            IssueClearCommands(self)
+            -- remove any formation settings to ensure a quick return to base.
+            self:SetPlatoonFormationOverride('NoFormation')
+            self:Stop()
 
             if path then
                 local pathLength = table.getn(path)
@@ -3269,21 +3272,24 @@ Platoon = Class(moho.platoon_methods) {
 
             local oldDistSq = 0
             while aiBrain:PlatoonExists(self) do
+                LOG('ReturnToBaseAI waiting to arrive, current distance is  '..VDist2Sq(platPos[1], platPos[3], bestBase.Position[1], bestBase.Position[3]))
                 WaitSeconds(10)
                 platPos = self:GetPlatoonPosition()
                 local distSq = VDist2Sq(platPos[1], platPos[3], bestBase.Position[1], bestBase.Position[3])
-                if distSq < 10 then
+                if distSq < 100 then
                     self:PlatoonDisband()
                     return
                 end
                 -- if we haven't moved in 10 seconds... go back to attacking
                 if (distSq - oldDistSq) < 5 then
+                    LOG('ReturnToBaseAI hasnt moved so breaking loop')
                     break
                 end
                 oldDistSq = distSq
             end
         end
         -- default to returning to attacking
+        LOG('ReturnToBaseAI is going back to attackforceai')
         return self:AttackForceAI()
     end,
 
