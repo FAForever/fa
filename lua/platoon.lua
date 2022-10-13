@@ -3408,7 +3408,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             if not aPlat.MovementLayer then
                 AIAttackUtils.GetMostRestrictiveLayer(aPlat)
-            en
+            end
 
             -- make sure we're the same movement layer type to avoid hamstringing air of amphibious
             if self.MovementLayer != aPlat.MovementLayer then
