@@ -6834,7 +6834,7 @@ Platoon = Class(moho.platoon_methods) {
         -- move over the path, store the commands
         local units = self:GetPlatoonUnits()
 
-        for k = fi1rst, count do
+        for k = 1, count do
             local point = path[k]
             local angle = angles[k]
             local command = IssueFormAggressiveMove(units, point, formation, angle)
@@ -6920,12 +6920,15 @@ Platoon = Class(moho.platoon_methods) {
         -- move over the path, store the commands
         local units = self:GetPlatoonUnits()
 
-        for k = 1, count do
+        for k = 1, count -1 do
             local point = path[k]
             local angle = angles[k]
             local command = IssueFormMove(units, point, formation, angle)
             table.insert(commands, command)
         end
+
+        -- aggressive move for the final path node
+        table.insert(commands, IssueFormAggressiveMove(units, path[count], formation, angles[count]))
 
         return commands
     end,

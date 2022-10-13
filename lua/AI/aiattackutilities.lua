@@ -815,7 +815,6 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
                 -- force reevaluation
                 platoon.LastAttackDestination = {attackPos}
             else
-                local pathSize = table.getn(path)
                 -- store path
                 platoon.LastAttackDestination = path
                 -- move to new location

@@ -36,8 +36,8 @@ function AIGetEconomyNumbers(aiBrain)
     if aiBrain.EconomyMonitorThread then
         econ.EnergyRequestOverTime = aiBrain.EconomyOverTimeCurrent.EnergyRequested
         econ.MassRequestOverTime = aiBrain.EconomyOverTimeCurrent.MassRequested
-        econ.EnergyIncomeOverTime = aiBrain.EconomyOverTimeCurrentEnergyIncome
-        econ.MassIncomeOverTime = aiBrain.EconomyOverTimeCurrentMassIncome
+        econ.EnergyIncomeOverTime = aiBrain.EconomyOverTimeCurrent.EnergyIncome
+        econ.MassIncomeOverTime = aiBrain.EconomyOverTimeCurrent.MassIncome
         econ.EnergyEfficiencyOverTime = aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime
         econ.MassEfficiencyOverTime = aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime
     end
