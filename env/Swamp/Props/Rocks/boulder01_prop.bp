@@ -23,9 +23,6 @@ PropBlueprint {
         ReclaimMassMax = 15,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
     Interface = {
         HelpText = 'Medium Rock',
     },

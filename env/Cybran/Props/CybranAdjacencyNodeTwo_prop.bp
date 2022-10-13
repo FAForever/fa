@@ -25,9 +25,6 @@ PropBlueprint {
         ReclaimMassMax = 1,
         ReclaimTime = 1,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
     Interface = {
         HelpText = 'Cybran Adjacency Node',
     },

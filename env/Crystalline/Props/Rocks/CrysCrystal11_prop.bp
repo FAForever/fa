@@ -30,6 +30,9 @@ PropBlueprint {
     Interface = {
         HelpText = 'Huge Crystal',
     },
+    Physics = {
+        Blockpath = true
+    },
     SizeX = 2,
     SizeY = 1,
     SizeZ = 0.5,
