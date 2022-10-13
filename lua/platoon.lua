@@ -639,7 +639,7 @@ Platoon = Class(moho.platoon_methods) {
             if bestBase and bestDefense < threshold then
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
 
-                IssueClearCommands(self)
+                IssueClearCommands(self:GetPlatoonUnits())
 
                 if path then
                     local pathLength = table.getn(path)
@@ -1140,7 +1140,7 @@ Platoon = Class(moho.platoon_methods) {
                 --Can we get there safely?
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 400) --DUNCAN - Increase threatwieght from 100
 
-                IssueClearCommands(self)
+                IssueClearCommands(self:GetPlatoonUnits())
 
                 if path then
                     local pathLength = table.getn(path)
@@ -5212,7 +5212,7 @@ Platoon = Class(moho.platoon_methods) {
                 --Can we get there safely?
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 100)
 
-                IssueClearCommands(self)
+                IssueClearCommands(self:GetPlatoonUnits())
 
                 if path then
                     local pathLength = table.getn(path)
@@ -5808,7 +5808,7 @@ Platoon = Class(moho.platoon_methods) {
         if bestBase then
             AIAttackUtils.GetMostRestrictiveLayer(self)
             local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
-            IssueClearCommands(self)
+            IssueClearCommands(self:GetPlatoonUnits())
 
             if path then
                 local pathLength = table.getn(path)
