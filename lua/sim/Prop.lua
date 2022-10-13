@@ -39,8 +39,6 @@ local StringGsub = string.gsub
 -- upvalue table functions for performance
 local TableInsert = table.insert
 
-local once = true
-
 ---@class Prop : moho.prop_methods
 Prop = Class(moho.prop_methods) {
 
@@ -95,11 +93,6 @@ Prop = Class(moho.prop_methods) {
         EntitySetHealth(self, self, maxHealth)
         self.CanTakeDamage = (not self.Blueprint.Categories.INVULNERABLE) or false
         self.CanBeKilled = true
-
-        if self.Blueprint.Economy.ReclaimMassMax == 10 and once then
-            once = false
-            reprsl(self:GetBlueprint())
-        end
     end,
 
     --- Adds a prop callback.
