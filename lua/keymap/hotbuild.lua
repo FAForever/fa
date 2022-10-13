@@ -263,6 +263,7 @@ function availableTemplate(allTemplates,buildable)
 end
 
 function factoryHotkey(units, count)
+    LOG("factoryHotkey")
     CommandMode.StartCommandMode("build", {name = ''})
     worldview.HandleEvent = function(self, event)
         if event.Type == 'ButtonPress' then
