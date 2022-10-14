@@ -3074,6 +3074,7 @@ Platoon = Class(moho.platoon_methods) {
         local numberOfUnitsInPlatoon = table.getn(platoonUnits)
         local oldNumberOfUnitsInPlatoon = numberOfUnitsInPlatoon
         local stuckCount = 0
+        local maxPlatoonSize = self.PlatoonData.MaxPlatoonSize or 40
 
         self.PlatoonAttackForce = true
         -- formations have penalty for taking time to form up... not worth it here
@@ -3103,7 +3104,12 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- merge with nearby platoons
-            self:MergeWithNearbyPlatoons('AttackForceAI', 10)
+            if numberOfUnitsInPlatoon < self.PlatoonData.MaxPlatoonSize then
+                self.PlatoonFull = false
+                self:MergeWithNearbyPlatoons('AttackForceAI', 10, maxPlatoonSize)
+            else
+                self.PlatoonFull = true
+            end
 
             -- rebuild formation
             platoonUnits = self:GetPlatoonUnits()
@@ -3336,7 +3342,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param planName string
     ---@param radius number
     ---@return nil
-    MergeWithNearbyPlatoons = function(self, planName, radius)
+    MergeWithNearbyPlatoons = function(self, planName, radius, maxPlatoonCount)
         -- check to see we're not near an ally base
         local aiBrain = self:GetBrain()
         if not aiBrain then
@@ -3351,6 +3357,18 @@ Platoon = Class(moho.platoon_methods) {
         if not platPos then
             return
         end
+
+        -- Count platoon units so that we have adhere to maximums to avoid platoons that are too big to move correctly
+        local platUnits = GetPlatoonUnits(self)
+        local platCount = 0
+        for _, u in platUnits do
+            if not u.Dead then
+                platCount = platCount + 1
+            end
+        end
+        if (maxPlatoonCount and platCount > maxPlatoonCount) or platCount < 1 then
+            return 
+        end 
 
         local radiusSq = radius*radius
         -- if we're too close to a base, forget it
@@ -3376,13 +3394,21 @@ Platoon = Class(moho.platoon_methods) {
                 continue
             end
 
+            if aPlat.PlatoonFull then
+                continue
+            end
+
             local allyPlatPos = aPlat:GetPlatoonPosition()
             if not allyPlatPos or not aiBrain:PlatoonExists(aPlat) then
                 continue
             end
 
-            AIAttackUtils.GetMostRestrictiveLayer(self)
-            AIAttackUtils.GetMostRestrictiveLayer(aPlat)
+            if not self.MovementLayer then
+                AIAttackUtils.GetMostRestrictiveLayer(self)
+            end
+            if not aPlat.MovementLayer then
+                AIAttackUtils.GetMostRestrictiveLayer(aPlat)
+            end
 
             -- make sure we're the same movement layer type to avoid hamstringing air of amphibious
             if self.MovementLayer != aPlat.MovementLayer then
@@ -6808,7 +6834,7 @@ Platoon = Class(moho.platoon_methods) {
         -- move over the path, store the commands
         local units = self:GetPlatoonUnits()
 
-        for k = fi1rst, count do
+        for k = 1, count do
             local point = path[k]
             local angle = angles[k]
             local command = IssueFormAggressiveMove(units, point, formation, angle)
@@ -6894,12 +6920,15 @@ Platoon = Class(moho.platoon_methods) {
         -- move over the path, store the commands
         local units = self:GetPlatoonUnits()
 
-        for k = 1, count do
+        for k = 1, count -1 do
             local point = path[k]
             local angle = angles[k]
             local command = IssueFormMove(units, point, formation, angle)
             table.insert(commands, command)
         end
+
+        -- aggressive move for the final path node
+        table.insert(commands, IssueFormAggressiveMove(units, path[count], formation, angles[count]))
 
         return commands
     end,

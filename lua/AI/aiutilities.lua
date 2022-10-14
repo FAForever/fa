@@ -34,16 +34,12 @@ function AIGetEconomyNumbers(aiBrain)
     econ.MassStorage = aiBrain:GetEconomyStored('MASS')
 
     if aiBrain.EconomyMonitorThread then
-        local econTime = aiBrain:GetEconomyOverTime()
-
-        econ.EnergyRequestOverTime = econTime.EnergyRequested
-        econ.MassRequestOverTime = econTime.MassRequested
-
-        econ.EnergyIncomeOverTime = SUtils.Round(econTime.EnergyIncome, 2)
-        econ.MassIncomeOverTime = SUtils.Round(econTime.MassIncome, 2)
-
-        econ.EnergyEfficiencyOverTime = math.min(econTime.EnergyIncome / econTime.EnergyRequested, 2)
-        econ.MassEfficiencyOverTime = math.min(econTime.MassIncome / econTime.MassRequested, 2)
+        econ.EnergyRequestOverTime = aiBrain.EconomyOverTimeCurrent.EnergyRequested
+        econ.MassRequestOverTime = aiBrain.EconomyOverTimeCurrent.MassRequested
+        econ.EnergyIncomeOverTime = aiBrain.EconomyOverTimeCurrent.EnergyIncome
+        econ.MassIncomeOverTime = aiBrain.EconomyOverTimeCurrent.MassIncome
+        econ.EnergyEfficiencyOverTime = aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime
+        econ.MassEfficiencyOverTime = aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime
     end
 
     if econ.MassStorageRatio ~= 0 then
