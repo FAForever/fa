@@ -126,7 +126,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             elseif targetEntity then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
                     Damage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
-                
+                else
                     ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), damage, damageData.DamageType, damageData.DamageFriendly)
                 end
             else
