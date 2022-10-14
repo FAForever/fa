@@ -11,6 +11,7 @@
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local AIFArtilleryMiasmaShellWeapon = import('/lua/aeonweapons.lua').AIFArtilleryMiasmaShellWeapon
 
+---@class UAB2303 : AStructureUnit
 UAB2303 = Class(AStructureUnit) {
 
     Weapons = {

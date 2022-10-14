@@ -1,160 +1,198 @@
----@declare-global
----@class moho.edit_methods
+---@meta
+
+---@class moho.edit_methods : moho.control_methods
 local CMauiEdit = {}
 
 ---
---  AcquireFocus()
+function CMauiEdit:AbandonFocus()
+end
+
+---
 function CMauiEdit:AcquireFocus()
 end
 
 ---
---  Edit:ClearText()
 function CMauiEdit:ClearText()
 end
 
 ---
---  Edit:Disable()
 function CMauiEdit:DisableInput()
 end
 
 ---
---  Edit:EnableInput()
 function CMauiEdit:EnableInput()
 end
 
 ---
---  color Edit:GetBackgroundColor()
+---@return string
 function CMauiEdit:GetBackgroundColor()
 end
 
 ---
---  color Edit:GetCaretColor()
+---@return string
 function CMauiEdit:GetCaretColor()
 end
 
 ---
---  int GetCaretPosition
+---@return number
 function CMauiEdit:GetCaretPosition()
 end
 
 ---
---  int GetFontHeight()
+---@return number
 function CMauiEdit:GetFontHeight()
 end
 
 ---
---  color Edit:GetForegroundColor()
+---@return Color
 function CMauiEdit:GetForegroundColor()
 end
 
 ---
---  color GetHighlightBackgroundColor()
+---@return Color
 function CMauiEdit:GetHighlightBackgroundColor()
 end
 
 ---
---  color GetHighlightForegroundColor()
+---@return Color
 function CMauiEdit:GetHighlightForegroundColor()
 end
 
 ---
---  int Edit:GetMaxChars()
+---@return number
 function CMauiEdit:GetMaxChars()
 end
 
----
---  number Edit:GetAdvance(string) - get the advance of a string using the same font as the control
-function CMauiEdit:GetStringAdvance()
+--- Gets the advance of a string using the same font as the text box
+---@param text string
+function CMauiEdit:GetStringAdvance(text)
 end
 
 ---
---  string Edit:GetText()
+---@return string
 function CMauiEdit:GetText()
 end
 
 ---
---  bool Edit:IsBackgroundVisible()
+---@return boolean
 function CMauiEdit:IsBackgroundVisible()
 end
 
 ---
---  bool Edit:IsCaretVisible()
+---@return boolean
 function CMauiEdit:IsCaretVisible()
 end
 
 ---
---  bool Edit:IsEnabled()
+---@return boolean
 function CMauiEdit:IsEnabled()
 end
 
 ---
---  edit:SetCaretCycle(float seconds, uint32 minAlpha, uint32 maxAlpha)
-function CMauiEdit:SetCaretCycle(float seconds,  uint32 minAlpha,  uint32 maxAlpha)
+---@param seconds number
+---@param minAlpha number
+---@param maxAlpha number
+function CMauiEdit:SetCaretCycle(seconds, minAlpha, maxAlpha)
 end
 
 ---
---  SetCaretPosition(int)
-function CMauiEdit:SetCaretPosition(int)
+---@param pos number
+function CMauiEdit:SetCaretPosition(pos)
 end
 
 ---
---  SetDropShadow(bool)
-function CMauiEdit:SetDropShadow(bool)
+---@param show boolean
+function CMauiEdit:SetDropShadow(show)
 end
 
 ---
---  Edit:SetMaxChars(int size)
-function CMauiEdit:SetMaxChars(int size)
+---@param size number
+function CMauiEdit:SetMaxChars(size)
 end
 
 ---
---  Edit:SetNewBackgroundColor(color)
+---@param color string
 function CMauiEdit:SetNewBackgroundColor(color)
 end
 
 ---
---  Edit:SetNewCaretColor(color)
+---@param color string
 function CMauiEdit:SetNewCaretColor(color)
 end
 
 ---
---  Edit:SetNewFont(family, pointsize)
-function CMauiEdit:SetNewFont(family,  pointsize)
+---@param family string
+---@param pointsize number
+function CMauiEdit:SetNewFont(family, pointsize)
 end
 
 ---
---  Edit:SetNewForegroundColor(color)
+---@param color string
 function CMauiEdit:SetNewForegroundColor(color)
 end
 
 ---
---  SetNewHighlightBackgroundColor(color)
+---@param color string
 function CMauiEdit:SetNewHighlightBackgroundColor(color)
 end
 
 ---
---  SetNewHightlightForegroundColor(color)
-function CMauiEdit:SetNewHighlightForegroundColor()
+---@param color string
+function CMauiEdit:SetNewHighlightForegroundColor(color)
 end
 
 ---
---  Edit:SetText(string text)
-function CMauiEdit:SetText(string text)
+---@param text string
+function CMauiEdit:SetText(text)
 end
 
 ---
---  Edit:ShowBackground(bool)
-function CMauiEdit:ShowBackground(bool)
+---@param show boolean
+function CMauiEdit:ShowBackground(show)
 end
 
 ---
---  Edit:ShowCaret(bool)
-function CMauiEdit:ShowCaret(bool)
+---@param show boolean
+function CMauiEdit:ShowCaret(show)
 end
 
----
---  derived from CMauiControl
-function CMauiEdit:base()
-end
+---@class EventModifiers
+---@field Shift? true
+---@field Alt? true
+
+---@class KeyEvent
+---@field Control Control
+---@field KeyCode number
+---@field Modifiers EventModifiers only `Shift` and `Alt` are acceptable modifiers
+---@field MouseX number
+---@field MouseY number
+---@field RawKeyCode number
+---@field Type string
+---@field WheelDelta number
+---@field WheelRotation number
+
+--- Called when the text has changed in the text box. Passes in the newly changed text
+--- and the previous text.
+---@type fun(self: Edit, newText: string, oldText: string)
+CMauiEdit.OnTextChanged = nil
+
+--- Called when the user presses the enter key. Passes in the current contents of the text box.
+---@type fun(self: Edit, text: string)
+CMauiEdit.OnEnterPressed = nil
+
+--- Called when non-text keys are pressed. If the key already affected the text, such as with `Backspace`
+--- or `Delete`, then the event has already been handled and won't propagate down.
+-- @param keycode number Windows VK keycode
+---@type fun(self: Edit, keycode: number, event: KeyEvent)
+CMauiEdit.OnNonTextKeyPressed = nil
+
+--- Called when a character key is pressed, before it is entered in to the dialog. If the function
+--- returns `true` (indicating the char is handled) then the character is not inserted in the dialog.
+---@type fun(self: Edit, charcode: number): boolean
+CMauiEdit.OnCharPressed = nil
+
+--- Called when the `escape` key is pressed. Return `true` to prevent the text box from clearing.
+---@type fun(self: Edit, text: string): boolean
+CMauiEdit.OnEscPressed = nil
 
 return CMauiEdit

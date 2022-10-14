@@ -13,6 +13,7 @@ local CybranWeaponsFile = import('/lua/cybranweapons.lua')
 local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
 local CDFProtonCannonWeapon = CybranWeaponsFile.CDFProtonCannonWeapon
 
+---@class URS0103 : CSeaUnit
 URS0103 = Class(CSeaUnit) {
     DestructionTicks = 200,
 

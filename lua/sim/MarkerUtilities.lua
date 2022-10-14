@@ -1,4 +1,3 @@
-
 -----------------------------------------------------------------
 -- File     : /lua/sim/MarkerUtilities.lua
 -- Summary  : Aim of this file is to work with markers without
@@ -23,6 +22,9 @@
 local StringSplit = import('/lua/system/utils.lua').StringSplit
 local TableDeepCopy = table.deepcopy
 
+--- TODO
+---@class MarkerData 
+
 -- MARKERS --
 
 --- Contains all the markers that are part of the map, including markers of chains
@@ -37,6 +39,8 @@ end
 --- Retrieves a single marker on the map.
 -- @param name The name or key of the marker.
 -- returns A marker of the map or nil.
+---@param name string
+---@return MarkerData
 function GetMarker(name)
     return AllMarkers[name]
 end
@@ -46,7 +50,7 @@ local MarkerCache = { }
 
 -- Pre-enable the caching of resource markers, to support adaptive maps
 MarkerCache["Mass"] = { Count = 0, Markers = { } }
-MarkerCache["Hydrocarbon"] = { Count = 0, Markers = { } } 
+MarkerCache["Hydrocarbon"] = { Count = 0, Markers = { } }
 
 --- Retrieves all markers of a given type. This is a shallow copy,
 -- which means the reference is copied but the values are not. If you
@@ -58,25 +62,27 @@ MarkerCache["Hydrocarbon"] = { Count = 0, Markers = { } }
 -- - "Protected Experimental Construction"
 -- The list is not limited to these marker types - any marker that has a 'type' property
 -- can be cached. You can find them in the <map>_save.lua file.
--- @param type The type of marker to retrieve.
 -- returns A table with markers and its length.
+---@param type string The type of marker to retrieve.
+---@return MarkerData
+---@return number
 function GetMarkersByType(type)
 
     -- check if it is cached and return that
     local cache = MarkerCache[type]
-    if cache then 
+    if cache then
         return cache.Markers, cache.Count
     end
 
     -- prepare cache population
-    ms = { }
-    n = 1
+    local ms = { }
+    local n = 1
 
     -- find all the relevant markers
-    for k, marker in AllMarkers do 
-        if marker.type == type then 
-            ms[n] = marker 
-            n = n + 1 
+    for k, marker in AllMarkers do
+        if marker.type == type then
+            ms[n] = marker
+            n = n + 1
         end
     end
 
@@ -86,11 +92,11 @@ function GetMarkersByType(type)
     -- construct the cache
     cache = {
         Count = n - 1,
-        Markers = ms 
+        Markers = ms
     }
 
     -- cache it and return it
-    MarkerCache[type] = cache 
+    MarkerCache[type] = cache
     return cache.Markers, cache.Count
 end
 
@@ -99,6 +105,9 @@ end
 -- unless you strictly need to.
 -- @param type The type of marker to retrieve.
 -- returns A table with markers and its length.
+---@param type string
+---@return table
+---@return MarkerData
 function GetMarkersByTypeDeep(type)
     local cache = GetMarkersByType(type)
     return TableDeepCopy(cache.Markers), cache.Count
@@ -106,7 +115,7 @@ end
 
 --- Flushes the cache of a certain type. Does not remove
 -- existing references.
--- @param type The type to flush.
+---@param type string The type to flush.
 function FlushMarkerCacheByType(type)
 
     -- give developer a warning, you can't do this
@@ -141,8 +150,10 @@ local ChainCache = { }
 -- does not exist. This is a shallow copy, which means the
 -- reference is copied but the values are not. If you need a
 -- copy with unique values use GetMarkerByTypeDeep instead.
--- @param type The type of marker to retrieve.
 -- returns A table with markers and its length.
+---@param name MarkerChain The type of marker to retrieve.
+---@return MarkerData
+---@return number
 function GetMarkersInChain(name)
     -- check if it is cached and return that
     local cache = ChainCache[name]
@@ -157,8 +168,8 @@ function GetMarkersInChain(name)
     end
 
     -- prepare cache population
-    ms = { }
-    n = 1
+    local ms = { }
+    local n = 1
 
     -- find all the relevant markers
     for k, elem in chain.Markers do 
@@ -181,8 +192,10 @@ end
 -- chain does not exist. This is a deep copy and involves
 -- a lot of additional allocations. Do not use this unless
 -- you strictly need to.
--- @param type The type of marker to retrieve.
 -- returns A table with markers and its length.
+---@param type MarkerChain The type of marker to retrieve.
+---@return table
+---@return MarkerData
 function GetMarkersInChainDeep(type)
     local cache = GetMarkersInChain(type)
     return TableDeepCopy(cache.Markers), cache.Count
@@ -190,9 +203,9 @@ end
 
 --- Flushes the chain cache of a certain type. Does not 
 -- remove existing references.
--- @param type The type to flush.
+---@param name MarkerChain The type to flush.
 function FlushChainCacheByName(name)
-    ChainCache[name] = false 
+    ChainCache[name] = false
 end
 
 --- Flushes the chain cache. Does not remove existing references.
@@ -228,7 +241,7 @@ local DebugMarkerSuspend = { }
 
 --- Debugs the marker cache of a given type by drawing it on-screen. Useful
 -- to check for errors. Can be toggled on and off by calling it again.
--- @param type The type of markers you wish to debug.
+---@param type MarkerChain The type of markers you wish to debug.
 function ToggleDebugMarkersByType(type)
 
     SPEW("Toggled type to debug: " .. type)
@@ -310,7 +323,7 @@ local DebugChainSuspend = { }
 
 --- Debugs the chain cache of a given type by drawing it on-screen. Useful
 -- to check for errors. Can be toggled on and off by calling it again.
--- @param type The name of the chain you wish to debug.
+---@param name MarkerChain The name of the chain you wish to debug.
 function ToggleDebugChainByName(name)
 
     SPEW("Toggled chain to debug: " .. name)
@@ -372,7 +385,6 @@ end
 -- HOOKING --
 
 do
-
     -- hook to cache markers created on the fly by crazy rush type of games
     local OldCreateResourceDeposit = _G.CreateResourceDeposit
     _G.CreateResourceDeposit = function (type, x, y, z, size)
@@ -382,8 +394,8 @@ do
         OldCreateResourceDeposit(type, x, y, z, size)
 
         -- commented values are used by the editor and not by the game
-        local marker = false 
-        if type == 'Mass' then 
+        local marker = nil
+        if type == 'Mass' then
             marker = {
                 size = size,
                 resource = true,
@@ -395,7 +407,7 @@ do
                 orientation = Vector(0, -0, 0),
                 position = Vector(x, y, z),
             }
-        else 
+        else
             marker = {
                 size = size,
                 resource = true,

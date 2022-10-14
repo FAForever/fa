@@ -23,6 +23,8 @@ local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
 local SAI = '/lua/ScenarioPlatoonAI.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
+---@alias BuilderGroupsAirAttack 'T1AirFactoryBuilders' | 'T1AntiAirBuilders' | 'T2AirFactoryBuilders' | 'T2AntiAirBuilders' | 'T3AirFactoryBuilders' | 'T3AntiAirBuilders' | 'TransportFactoryBuilders' | 'UnitCapAirAttackFormBuilders' | 'FrequentAirAttackFormBuilders' | 'BigAirAttackFormBuilders' | 'MassHunterAirFormBuilders' | 'BaseGuardAirFormBuildersNaval' | 'BaseGuardAirFormBuilders' | 'ACUHunterAirFormBuilders'
+
 function AirAttackCondition(aiBrain, locationType, targetNumber)
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
 

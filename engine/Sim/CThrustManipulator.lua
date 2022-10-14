@@ -1,13 +1,11 @@
---- Class CThrustManipulator
--- @classmod Sim.CThrustManipulator
+---@meta
+
+---@class moho.ThrustManipulator : moho.manipulator_methods
+local CThrustManipulator = {}
 
 ---
 --  derived from IAniManipulator
-function CThrustManipulator:base()
+function CThrustManipulator:SetThrustingParam()
 end
 
----
---
-function CThrustManipulator:moho.ThrustManipulator()
-end
-
+return CThrustManipulator

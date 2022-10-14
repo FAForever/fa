@@ -348,7 +348,7 @@ function CreateUI()
         LayoutHelpers.AtHorizontalCenterIn(mainMenu.titleBack, mainMenuGroup)
         LayoutHelpers.AtTopIn(mainMenu.titleBack, mainMenuGroup, 0)
 
-        mainMenu.titleTxt = UIUtil.CreateText(mainMenu.titleBack, GetPreference("profile.current"), 26)
+        mainMenu.titleTxt = UIUtil.CreateText(mainMenu.titleBack, "", 26)
         LayoutHelpers.AtCenterIn(mainMenu.titleTxt, mainMenu.titleBack, 3)
         mainMenu.titleTxt:SetText(LOC(menuTable.title))
         mainMenu.titleTxt:SetNewColor(menuFontColorTitle)

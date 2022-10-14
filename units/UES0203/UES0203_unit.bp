@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 30,
         TargetBones = {
             'Spinner',
             'UES0203',
@@ -56,15 +56,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'UEF_Select_Sub',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
         },
     },
     BuildIconSortPriority = 20,
@@ -291,7 +282,7 @@ UnitBlueprint {
     SelectionSizeX = 0.36,
     SelectionSizeZ = 1.3,
     SelectionThickness = 0.31,
-    SizeX = 0.35,
+    SizeX = 0.6,
     SizeY = 0.5,
     SizeZ = 1.85,
     StrategicIconName = 'icon_sub1_antinavy',

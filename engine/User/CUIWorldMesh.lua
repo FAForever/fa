@@ -1,83 +1,86 @@
---- Class CUIWorldMesh
--- @classmod User.CUIWorldMesh
+---@meta
+
+---@class moho.world_mesh_methods : Destroyable
+local CUIWorldMesh = {}
 
 ---
---  Vector WorldMesh:GetInterpolatedAlignedBox()
+function CUIWorldMesh:Destroy()
+end
+
+---
+---@return Vector
 function CUIWorldMesh:GetInterpolatedAlignedBox()
 end
 
 ---
---  Vector WorldMesh:GetInterpolatedOrientedBox()
+---@return Vector
 function CUIWorldMesh:GetInterpolatedOrientedBox()
 end
 
 ---
---  Vector WorldMesh:GetInterpolatedPosition()
+---@return Vector
 function CUIWorldMesh:GetInterpolatedPosition()
 end
 
 ---
---  Vector WorldMesh:GetInterpolatedScroll()
+---@return Vector
 function CUIWorldMesh:GetInterpolatedScroll()
 end
 
 ---
---  Vector WorldMesh:GetInterpolatedSphere()
+---@return Vector
 function CUIWorldMesh:GetInterpolatedSphere()
 end
 
 ---
---  bool WorldMesh:IsHidden()
+---@return boolean
 function CUIWorldMesh:IsHidden()
 end
 
 ---
---  WorldMesh:SetAuxiliaryParameter(float param)
-function CUIWorldMesh:SetAuxiliaryParameter(float param)
+---@param param number
+function CUIWorldMesh:SetAuxiliaryParameter(param)
 end
 
 ---
---  WorldMesh:SetColor(bool hidden)
-function CUIWorldMesh:SetColor(bool hidden)
+---@param hidden boolean
+function CUIWorldMesh:SetColor(hidden)
 end
 
 ---
---  WorldMesh:SetFractionCompleteParameter(float param)
-function CUIWorldMesh:SetFractionCompleteParameter(float param)
+---@param param number
+function CUIWorldMesh:SetFractionCompleteParameter(param)
 end
 
 ---
---  WorldMesh:SetFractionHealthParameter(float param)
-function CUIWorldMesh:SetFractionHealthParameter(float param)
+---@param param number
+function CUIWorldMesh:SetFractionHealthParameter(param)
 end
 
 ---
---  WorldMesh:SetHidden(bool hidden)
-function CUIWorldMesh:SetHidden(bool hidden)
+---@param hidden boolean
+function CUIWorldMesh:SetHidden(hidden)
 end
 
 ---
---  WorldMesh:SetLifetimeParameter(float param)
-function CUIWorldMesh:SetLifetimeParameter(float param)
+---@param param number
+function CUIWorldMesh:SetLifetimeParameter(param)
 end
 
 ---
---  WorldMesh:SetMesh(meshDesc)
-function CUIWorldMesh:SetMesh(meshDesc)
+---@param spec table
+function CUIWorldMesh:SetMesh(spec)
 end
 
 ---
---  WorldMesh:SetScale(vector scale)
-function CUIWorldMesh:SetScale(vector scale)
+---@param scale Vector
+function CUIWorldMesh:SetScale(scale)
 end
 
 ---
---  WorldMesh:SetStance(vector position, [quaternion orientation])
-function CUIWorldMesh:SetStance(vector position,  [quaternion orientation])
+---@param position Vector
+---@param orientation? Quaternion
+function CUIWorldMesh:SetStance(position, orientation)
 end
 
----
---
-function CUIWorldMesh:moho.world_mesh_methods()
-end
-
+return CUIWorldMesh

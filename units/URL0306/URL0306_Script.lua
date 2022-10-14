@@ -12,6 +12,7 @@ local CRadarJammerUnit = import('/lua/cybranunits.lua').CRadarJammerUnit
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
+---@class URL0306 : CRadarJammerUnit
 URL0306 = Class(CRadarJammerUnit) {
 
     Weapons = {        

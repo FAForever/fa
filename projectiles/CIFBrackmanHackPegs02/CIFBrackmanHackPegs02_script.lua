@@ -6,7 +6,7 @@
 --**
 --**  Summary  :  Brackman Peg Launching Projectile script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TargetPos
@@ -22,7 +22,7 @@ CIFBrackmanHackPegs02 = Class(import('/lua/cybranprojectiles.lua').CDFBrackmanHa
         self:SetVelocity(0)
         self:SetBallisticAcceleration(0)
         self:ForkThread(self.WaitingForDeath)
-        self.CreateImpactEffects( self, self:GetArmy(), self.FxImpactLand, 1 )
+        self:CreateImpactEffects(self:GetArmy(), self.FxImpactLand, 1 )
         for k, v in EffectTemplate.CBrackmanCrabPegAmbient01 do
 			CreateEmitterOnEntity( self, self:GetArmy(), v )
 		end			

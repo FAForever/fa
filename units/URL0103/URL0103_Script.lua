@@ -11,6 +11,7 @@
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CIFGrenadeWeapon = import('/lua/cybranweapons.lua').CIFGrenadeWeapon
 
+---@class URL0103 : CWalkingLandUnit
 URL0103 = Class(CWalkingLandUnit) {
 
     Weapons = {

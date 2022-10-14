@@ -27,6 +27,7 @@ local cmdMode = import('/lua/ui/game/commandmode.lua')
 local UIPing = import('/lua/ui/game/ping.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
+local gameSpeed = 0
 local lastUnitWarning = 0
 local unitWarningUsed = false
 local objectives = {}
@@ -118,11 +119,16 @@ function SetLayout()
 end
 
 function _OnBeat()
-    controls.time:SetText(GetGameTime())
+    controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate()))
     local scoreData = import('/lua/ui/game/score.lua').currentScores
-    if scoreData[GetFocusArmy()].general then
-        SetUnitText(scoreData[GetFocusArmy()].general.currentunits, scoreData[GetFocusArmy()].general.currentcap)
+    local armyId = GetFocusArmy()
+    if scoreData[armyId].general then
+        SetUnitText(scoreData[armyId].general.currentunits, scoreData[armyId].general.currentcap)
     end
+end
+
+function NoteGameSpeedChanged(newSpeed)
+    gameSpeed = newSpeed
 end
 
 function SetUnitText(current, cap)

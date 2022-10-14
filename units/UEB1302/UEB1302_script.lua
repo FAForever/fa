@@ -10,6 +10,7 @@
 
 local TMassCollectionUnit = import('/lua/terranunits.lua').TMassCollectionUnit
 
+---@class UEB1302 : TMassCollectionUnit
 UEB1302 = Class(TMassCollectionUnit) {
     
     

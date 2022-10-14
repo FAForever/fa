@@ -9,6 +9,7 @@
 --****************************************************************************
 local TMassFabricationUnit = import('/lua/terranunits.lua').TMassFabricationUnit
 
+---@class UEB1104 : TMassFabricationUnit
 UEB1104 = Class(TMassFabricationUnit) {
 
     DestructionPartsLowToss = {'B01','B02',},

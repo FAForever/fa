@@ -1,0 +1,155 @@
+EmitterBlueprint {
+	BlueprintId = 'aeon_gate_01',
+	Lifetime = -0.20,
+	Repeattime = 0.20,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = true,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = true,
+	AlignToBone = false,
+	Flat = true,
+	LODCutoff = 500.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = false,
+	OnlyEmitOnWater = false,
+	ParticleResistance = false,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 0.00,
+	LowFidelity = true,
+	MedFidelity = true,
+	HighFidelity = true,
+	Texture = '/textures/particles/quantum_generator_add_03.dds',
+	RampTexture = '/textures/particles/ramp_quantum_01.dds',
+	XDirectionCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=2.000 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.011,y=0.000,z=0.000 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=2.000 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.000,y=1.000,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=15.000,z=3.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.001,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=0.000 },
+		},
+	},
+	ResistanceCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.094,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.101,y=0.000,z=0.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 0,
+		Keys = {
+			{ x=0.0,y=0.000,z=0.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.068,y=0.000,z=0.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=0.100 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.108,y=3.000,z=0.000 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=0.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=0.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.100,y=0.000,z=0.000 },
+		},
+	},
+}
+

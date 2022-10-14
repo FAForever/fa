@@ -10,38 +10,30 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
-local Text = import('/lua/maui/text.lua').Text
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local Button = import('/lua/maui/button.lua').Button
 local Edit = import('/lua/maui/edit.lua').Edit
 local Group = import('/lua/maui/group.lua').Group
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local MainMenu = import('/lua/ui/menus/main.lua')
 local MapUtil = import('/lua/ui/maputil.lua')
-local Mods = import('/lua/mods.lua')
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
-local ModManager = import('/lua/ui/lobby/ModsManager.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
 local scenarios = nil
-local selectedScenario = false
-local isSinglePlayer = false
-local description = false
-local descText = false
-local posGroup = false
-local mapList = false
+local selectedScenario = nil
+local isSinglePlayer = nil
+local description = nil
+local descText = nil
+local posGroup = nil
+local mapList = nil
 local filters = {}
-local filterTitle = false
-local mapListTitle = false
-local mapsize = false
-local mapplayers = false
-local mapInfo = false
+local filterTitle = nil
+local mapListTitle = nil
+local mapsize = nil
+local mapplayers = nil
+local mapInfo = nil
 local preview = nil
-local selectButton = false
+local selectButton = nil
 
 -- Table containing filter functions to apply to the map list.
 local currentFilters = {}
@@ -50,8 +42,8 @@ local nameFilter = nil
 local scenarioKeymap = {}
 local Options = {}
 local OptionSource = {}
-local OptionContainer = false
-local advOptions = false
+local OptionContainer = nil
+local advOptions = nil
 local changedOptions = {}
 local restrictedCategories = nil
 
@@ -1104,3 +1096,13 @@ function mapIsOutdated()
     local obsoleteFilter = obsoleteFilterFactory:Build()
     return not obsoleteFilter(selectedScenario)
 end
+
+-- kept for mod backwards compatibility
+local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
+local Text = import('/lua/maui/text.lua').Text
+local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
+local Button = import('/lua/maui/button.lua').Button
+local MenuCommon = import('/lua/ui/menus/menucommon.lua')
+local MainMenu = import('/lua/ui/menus/main.lua')
+local Mods = import('/lua/mods.lua')
+local ModManager = import('/lua/ui/lobby/ModsManager.lua')

@@ -8,19 +8,12 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: BrainGreaterThanNumCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: string	targetBrain	= "ArmyName"
--- parameter 2: int	numReq		= 0			doc = "docs for param1"
--- parameter 3: expr	category	= categories.ALLUNITS			doc = "param2 docs"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param targetBrain string
+---@param numReq integer
+---@param category EntityCategory
+---@return boolean
 function BrainGreaterThanNumCategory( aiBrain, targetBrain, numReq, category )
     local testBrain = ArmyBrains[1]
     for k,v in ArmyBrains do
@@ -37,16 +30,11 @@ function BrainGreaterThanNumCategory( aiBrain, targetBrain, numReq, category )
     end
 end
 
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: BrainLessThanNumCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: string	targetBrain	= "ArmyName"
--- parameter 2: int	numReq		= 0			doc = "docs for param1"
--- parameter 3: expr	category	= categories.ALLUNITS			doc = "param2 docs"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param targetBrain string
+---@param numReq integer
+---@param category EntityCategory
+---@return boolean
 function BrainLessThanNumCategory( aiBrain, targetBrain, numReq, category )
     local testBrain = ArmyBrains[1]
     for k,v in ArmyBrains do
@@ -63,16 +51,11 @@ function BrainLessThanNumCategory( aiBrain, targetBrain, numReq, category )
     end
 end
 
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: BrainGreaterThanOrEqualNumCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: string	targetBrain	= "ArmyName"
--- parameter 2: int	numReq		= 0			doc = "docs for param1"
--- parameter 3: expr	category	= categories.ALLUNITS			doc = "param2 docs"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param targetBrain string
+---@param numReq integer
+---@param category EntityCategory
+---@return boolean
 function BrainGreaterThanOrEqualNumCategory( aiBrain, targetBrain, numReq, category )
     local testBrain = ArmyBrains[1]
     for k,v in ArmyBrains do
@@ -89,16 +72,11 @@ function BrainGreaterThanOrEqualNumCategory( aiBrain, targetBrain, numReq, categ
     end
 end
 
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: BrainLessThanOrEqualNumCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: string	targetBrain	= "ArmyName"
--- parameter 2: int	numReq		= 0			doc = "docs for param1"
--- parameter 3: expr	category	= categories.ALLUNITS			doc = "param2 docs"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param targetBrain string
+---@param numReq integer
+---@param category EntityCategory
+---@return boolean
 function BrainLessThanOrEqualNumCategory( aiBrain, targetBrain, numReq, category )
     local testBrain = ArmyBrains[1]
     for k,v in ArmyBrains do
@@ -115,15 +93,11 @@ function BrainLessThanOrEqualNumCategory( aiBrain, targetBrain, numReq, category
     end
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: FocusBrainBeingBuiltOrActiveCategoryCompare = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: int	numReq		= 0			doc = "docs for param1"
--- parameter 2: expr	categories	= categories.ALLUNITS			doc = "param2 docs"
--- parameter 3: string compareType = ">="
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param numReq integer
+---@param categories EntityCategory
+---@param compareType string
+---@return boolean
 function FocusBrainBeingBuiltOrActiveCategoryCompare( aiBrain, numReq, categories, compareType )
     local testBrain = ArmyBrains[GetFocusArmy()]
     local num = 0
@@ -155,3 +129,8 @@ function FocusBrainBeingBuiltOrActiveCategoryCompare( aiBrain, numReq, categorie
     end
     return false
 end
+
+-- Moved unsed Imports to bottom for mod compatibilty
+local AIUtils = import('/lua/ai/aiutilities.lua')
+local ScenarioFramework = import('/lua/scenarioframework.lua')
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')

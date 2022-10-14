@@ -23,15 +23,9 @@ local MyArmyResultStrings = {
     replay = "<LOC GAMERESULT_0003>Replay Finished.",
 }
 
-function OnReplayEnd()
-    import('/lua/ui/game/tabs.lua').TabAnnouncement('main', LOC(MyArmyResultStrings.replay))
-    import('/lua/ui/game/tabs.lua').AddModeText("<LOC _Score>", function() import('/lua/ui/dialogs/score.lua').CreateDialog(true) end)
-end
-
 local announced = {}
 
 function DoGameResult(armyIndex, result)
-    LOG("GAMERESULT : ", result)
     local condPos = string.find(result, " ")
     if condPos ~= 0 then
         result = string.sub(result, 1, condPos - 1)

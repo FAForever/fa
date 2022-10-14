@@ -4,8 +4,8 @@
 --
 -- You can clear the current trigger function by calling OnEvent(nil). If you want to change the trigger function
 -- before it has been called, you must clear the old one before setting the new one.
---
-SingleEvent = Class {
+---@class SingleEvent
+SingleEvent = ClassSimple {
     OnEvent = function(self, fun, arg)
         if fun and self._EventFun then
             error('SingleEvent: only one trigger can be set at a time')

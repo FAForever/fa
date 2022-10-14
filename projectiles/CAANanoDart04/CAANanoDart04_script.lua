@@ -6,7 +6,7 @@
 --**
 --**  Summary  :  Cybran Anti Air Projectile, on unit DRA0202
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 import('/lua/utilities.lua')

@@ -21,7 +21,8 @@ local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
 local MIBC = '/lua/editor/MiscBuildConditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
 
-OpAI = Class {
+---@class OpAI
+OpAI = ClassSimple {
         -- Set up variables local to this OpAI instance
         PreCreate = function(self)
             if self.PreCreateFinished then

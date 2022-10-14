@@ -1,13 +1,14 @@
---- Class CPrefetchSet
--- @classmod Core.CPrefetchSet
+---@meta
 
----
---  CPrefetchSet:Update({d3d_textures=..., batch_textures=..., models=..., anims=...})
-function CPrefetchSet:Update({d3d_textures=...,  batch_textures=...,  models=...,  anims=...})
+---@class moho.CPrefetchSet
+local CPrefetchSet = {}
+
+---@param data {d3d_textures: string[], batch_textures: string[], models: string[], anims: string[]}
+function CPrefetchSet:Update(data)
 end
 
 ---
---
-function CPrefetchSet:moho.CPrefetchSet()
+function CPrefetchSet:Reset()
 end
 
+return CPrefetchSet

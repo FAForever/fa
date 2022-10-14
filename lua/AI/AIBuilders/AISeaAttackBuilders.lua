@@ -23,6 +23,8 @@ local TBC = '/lua/editor/ThreatBuildConditions.lua'
 local SAI = '/lua/ScenarioPlatoonAI.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
+---@alias BuilderGroupsSeaAttack 'T1SeaFactoryBuilders' | 'T2SeaFactoryBuilders' | 'T3SeaFactoryBuilders' | 'FrequentSeaAttackFormBuilders' | 'BigSeaAttackFormBuilders' | 'MassHunterSeaFormBuilders'
+
 function SeaAttackCondition(aiBrain, locationType, targetNumber)
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
 

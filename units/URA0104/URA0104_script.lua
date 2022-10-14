@@ -16,6 +16,7 @@ local cWeapons = import('/lua/cybranweapons.lua')
 local CAAAutocannon = cWeapons.CAAAutocannon
 local CEMPAutoCannon = cWeapons.CEMPAutoCannon
 
+---@class URA0104 : AirTransport
 URA0104 = Class(AirTransport) {
     Weapons = {
         AAAutocannon = Class(CAAAutocannon) {},

@@ -24,6 +24,7 @@ local MathSin = math.sin
 local ZeroDegrees = Vector(0, 0, 1)
 local SignCheck = Vector(1, 0, 0)
 
+---@class UAL0401 : AWalkingLandUnit
 UAL0401 = Class(AWalkingLandUnit) {
     Weapons = {
         EyeWeapon = Class(ADFPhasonLaser) {},
@@ -43,7 +44,7 @@ UAL0401 = Class(AWalkingLandUnit) {
         while not self.Dead do 
 
             -- only perform this logic if the unit is on the move
-            if self:IsUnitState("Moving") then 
+            if self:IsUnitState("Moving") then
 
                 -- compute the direction of the heading
                 local sx, sy, sz = self:GetPositionXYZ()
@@ -149,14 +150,14 @@ UAL0401 = Class(AWalkingLandUnit) {
         -- hopes that this will look better in the future.. =)
         if self.ShowUnitDestructionDebris and overkillRatio then
             if overkillRatio <= 1 then
-                self.CreateUnitDestructionDebris(self, true, true, false)
+                self:CreateUnitDestructionDebris(true, true, false)
             elseif overkillRatio <= 2 then
-                self.CreateUnitDestructionDebris(self, true, true, false)
+                self:CreateUnitDestructionDebris(true, true, false)
             elseif overkillRatio <= 3 then
-                self.CreateUnitDestructionDebris(self, true, true, true)
-                self.CreateUnitDestructionDebris(self, true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
             else -- Vaporized
-                self.CreateUnitDestructionDebris(self, true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
             end
         end
 

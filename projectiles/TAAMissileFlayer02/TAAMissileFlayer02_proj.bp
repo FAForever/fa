@@ -23,7 +23,7 @@ ProjectileBlueprint {
         'MISSILE',
     },
     Display = {
-        MeshBlueprint = '/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_mesh.bp',
+        MeshBlueprint = '/projectiles/TAAMissileFlayer01/TAAMissileFlayer01_mesh.bp',
         StrategicIconSize = 2,
         UniformScale = 0.07,
     },

@@ -26,14 +26,8 @@ PropBlueprint {
         ReclaimMassMax = 10,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
     Interface = {
         HelpText = 'Round Thing',
-    },
-    Physics = {
-        BlockPath = true,
     },
     SizeX = 0.5,
     SizeY = 0.5,

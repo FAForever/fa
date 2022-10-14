@@ -15,6 +15,7 @@ local CzarShield = import('/lua/shield.lua').CzarShield
 
 local CreateAeonCZARBuildingEffects = import("/lua/effectutilities.lua").CreateAeonCZARBuildingEffects
 
+---@class UAA0310 : AirTransport
 UAA0310 = Class(AirTransport) {
     DestroyNoFallRandomChance = 1.1,
     BuildAttachBone = 'UAA0310',

@@ -110,7 +110,6 @@ local menus = {
             },
             {
                 action = 'Return',
-                disableOnGameOver = true,
                 label = '<LOC main_menu_9586>Close Menu',
                 tooltip = 'esc_return',
             },
@@ -158,7 +157,6 @@ local menus = {
             },
             {
                 action = 'Return',
-                disableOnGameOver = true,
                 label = '<LOC main_menu_9586>Close Menu',
                 tooltip = 'esc_return',
             },
@@ -196,7 +194,6 @@ local menus = {
             },
             {
                 action = 'Return',
-                disableOnGameOver = true,
                 label = '<LOC main_menu_9586>Close Menu',
                 tooltip = 'esc_return',
             },
@@ -240,7 +237,6 @@ local menus = {
             },
             {
                 action = 'Return',
-                disableOnGameOver = true,
                 label = '<LOC main_menu_9586>Close Menu',
                 tooltip = 'esc_return',
             },

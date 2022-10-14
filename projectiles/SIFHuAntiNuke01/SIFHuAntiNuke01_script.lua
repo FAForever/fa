@@ -5,7 +5,7 @@
 --**
 --**  Summary  : Seraphim Anti Nuke Missile
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 

@@ -1,5 +1,4 @@
 ProjectileBlueprint {
-    DevStatus = 'STABLE',
     Physics = {
         MinBounceCount = 10000,
         MaxBounceCount = 10000,
