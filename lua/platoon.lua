@@ -639,7 +639,7 @@ Platoon = Class(moho.platoon_methods) {
             if bestBase and bestDefense < threshold then
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
 
-                IssueClearCommands(self)
+                IssueClearCommands(self:GetPlatoonUnits())
 
                 if path then
                     local pathLength = table.getn(path)
@@ -1010,8 +1010,7 @@ Platoon = Class(moho.platoon_methods) {
             if moveNext == 'None' then
                 -- this won't be 0... see above
                 WaitSeconds(guardTimer)
-                self:PlatoonDisband()
-                return
+                return self:ReturnToBaseAI()
             end
 
             if moveNext == 'Guard Base' then
@@ -1141,7 +1140,7 @@ Platoon = Class(moho.platoon_methods) {
                 --Can we get there safely?
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 400) --DUNCAN - Increase threatwieght from 100
 
-                IssueClearCommands(self)
+                IssueClearCommands(self:GetPlatoonUnits())
 
                 if path then
                     local pathLength = table.getn(path)
@@ -3263,7 +3262,9 @@ Platoon = Class(moho.platoon_methods) {
         if bestBase then
             AIAttackUtils.GetMostRestrictiveLayer(self)
             local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
-            IssueClearCommands(self)
+            -- remove any formation settings to ensure a quick return to base.
+            self:SetPlatoonFormationOverride('NoFormation')
+            self:Stop()
 
             if path then
                 local pathLength = table.getn(path)
@@ -3278,7 +3279,7 @@ Platoon = Class(moho.platoon_methods) {
                 WaitSeconds(10)
                 platPos = self:GetPlatoonPosition()
                 local distSq = VDist2Sq(platPos[1], platPos[3], bestBase.Position[1], bestBase.Position[3])
-                if distSq < 10 then
+                if distSq < 100 then
                     self:PlatoonDisband()
                     return
                 end
@@ -5237,7 +5238,7 @@ Platoon = Class(moho.platoon_methods) {
                 --Can we get there safely?
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 100)
 
-                IssueClearCommands(self)
+                IssueClearCommands(self:GetPlatoonUnits())
 
                 if path then
                     local pathLength = table.getn(path)
@@ -5833,7 +5834,7 @@ Platoon = Class(moho.platoon_methods) {
         if bestBase then
             AIAttackUtils.GetMostRestrictiveLayer(self)
             local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
-            IssueClearCommands(self)
+            IssueClearCommands(self:GetPlatoonUnits())
 
             if path then
                 local pathLength = table.getn(path)
