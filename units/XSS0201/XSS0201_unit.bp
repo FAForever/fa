@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 70,
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 30,
     },
     Audio = {
         AmbientMove = Sound {
@@ -53,15 +53,6 @@ UnitBlueprint {
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
         },
     },
     BuildIconSortPriority = 30,
@@ -263,6 +254,9 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = false,
             Audio = {
@@ -339,12 +333,15 @@ UnitBlueprint {
             TurretYawRange = 120,
             TurretYawSpeed = 60,
             Turreted = true,
-        UseFiringSolutionInsteadOfAimBone = true,
+            UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = true,
             Audio = {

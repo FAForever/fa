@@ -13,6 +13,7 @@ local WeaponsFile = import('/lua/cybranweapons.lua')
 local CANNaniteTorpedoWeapon = WeaponsFile.CANNaniteTorpedoWeapon
 local CIFSmartCharge = WeaponsFile.CIFSmartCharge
 
+---@class XRS0204 : CSubUnit
 XRS0204 = Class(CSubUnit) {
     DeathThreadDestructionWaitTime = 0,
 

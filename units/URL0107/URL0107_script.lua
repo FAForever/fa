@@ -15,6 +15,7 @@ local CDFLaserHeavyWeapon = CybranWeaponsFile.CDFLaserHeavyWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
 
+---@class URL0107 : CWalkingLandUnit
 URL0107 = Class(CWalkingLandUnit) {
     Weapons = {
         LaserArms = Class(CDFLaserHeavyWeapon) {},

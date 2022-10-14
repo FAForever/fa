@@ -965,11 +965,24 @@ local function OverchargeFrame(self, deltaTime)
     end
 end
 
--- Sets up an orderInfo for each order that comes in
--- preferredSlot is custom data that is used to determine what slot the order occupies
--- initialStateFunc is a function that gets called once the control is created and allows you to set the initial state of the button
---      the function should have this declaration: function(checkbox, unitList)
--- extraInfo is used for storing any extra information required in setting up the button
+
+---@class OrderInfo
+---@field helpText string
+---@field bitmapId string
+---@field preferredSlot integer
+---@field behavior function
+---@field initialStateFunc? fun(control: Control, unitList: table<Unit>): any
+---@field onframe? fun(control: Control, delta: number)
+---@field ButtonTextFunc? fun(button: Button): string
+---@field extraInfo? any
+
+
+--- Sets up an orderInfo for each order that comes in
+--- preferredSlot is custom data that is used to determine what slot the order occupies
+--- initialStateFunc is a function that gets called once the control is created and allows you to set the initial state of the button
+---      the function should have this declaration: function(checkbox, unitList)
+--- extraInfo is used for storing any extra information required in setting up the button
+
 local defaultOrdersTable = {
     -- Common rules
     AttackMove = {                  helpText = "attack_move",       bitmapId = 'attack_move',           preferredSlot = 1,  behavior = AttackMoveBehavior},
@@ -1010,6 +1023,7 @@ local defaultOrdersTable = {
     RULEUTC_SpecialToggle = {       helpText = "toggle_special",    bitmapId = 'activate-weapon',       preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 7},
     RULEUTC_CloakToggle = {         helpText = "toggle_cloak",      bitmapId = 'intel-counter',         preferredSlot = 12, behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 8},
 }
+
 
 local standardOrdersTable = nil
 

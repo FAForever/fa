@@ -10,6 +10,7 @@
 
 local CConstructionUnit = import('/lua/cybranunits.lua').CConstructionUnit
 
+---@class URL0208 : CConstructionUnit
 URL0208 = Class(CConstructionUnit) {
     Treads = {
         ScrollTreads = true,

@@ -73,12 +73,12 @@ optionsOrder = {
 
 local Prefs = import('/lua/user/prefs.lua')
 local SetMusicVolume = import('/lua/UserMusic.lua').SetMusicVolume
-local savedMasterVol = false
-local savedFXVol = false
-local savedMusicVol = false
-local savedVOVol = false
+local savedMasterVol = nil
+local savedFXVol = nil
+local savedMusicVol = nil
+local savedVOVol = nil
 local nomusicSwitchSet = HasCommandLineArg("/nomusic")
-local savedBgMovie = false
+local savedBgMovie = nil
 local noMovieSwitchSet = HasCommandLineArg("/nomovie")
 
 function PlayTestSound()
@@ -86,7 +86,7 @@ function PlayTestSound()
     PlaySound(sound)
 end
 
-local voiceHandle = false
+local voiceHandle = nil
 function PlayTestVoice()
     if not voiceHandle then
         local sound = Sound{ Bank = 'XGG', Cue = 'Computer_Computer_MissileLaunch_01351' }
@@ -342,6 +342,101 @@ options = {
                     },
                 },
             },
+
+            {
+                title = 'Commands',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "Ignore mode via CTRL",
+                key = 'commands_ignore_mode',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _On>", key = 'on'},
+                    },
+                },
+            },
+
+            {
+                title = 'Cursor features',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "Depth scanning",
+                key = 'cursor_depth_scanning',
+                type = 'toggle',
+                default = 'commands',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _OnlyWhenBuilding>Only when building", key = 'building' },
+                        {text = "<LOC _CommandMode>When you issue commands", key = 'commands' },
+                        {text = "<LOC _Always>Always", key = 'always' },
+                    },
+                },
+            },
+
+            {
+                title = 'Selection threshold',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "Default selection threshold",
+                tip = "this is a tip",
+                key = 'selection_threshold_regular',
+                type = 'slider',
+                default = 10,
+                custom = {
+                    min = 10,
+                    max = 200,
+                    inc = 10,
+                },
+            },
+
+            {
+                title = "Reclaim selection threshold",
+                tip = "this is a tip",
+                key = 'selection_threshold_reclaim',
+                type = 'slider',
+                default = 10,
+                custom = {
+                    min = 10,
+                    max = 200,
+                    inc = 10,
+                },
+            },
+
+            {
+                title = "Replay selection threshold",
+                tip = "this is a tip",
+                key = 'selection_threshold_replay',
+                type = 'slider',
+                default = 7,
+                custom = {
+                    min = 10,
+                    max = 400,
+                    inc = 10,
+                },
+            },
+
             {
                 title = "<LOC OPTIONS_0273>Automated Structure Ringing",
                 key = 'structure_capping_feature_01',
@@ -826,36 +921,6 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0275>Maximum Reclaim Label Count",
-                tip = "<LOC OPTIONS_0276>When showing the reclaim label overlay, no more than this many labels will be shown",
-                key = 'maximum_reclaim_count',
-                type = 'slider',
-                set = function(key, value, startup)
-                    import('/lua/ui/game/reclaim.lua').updateMaxLabels(value)
-                end,
-                default = 1000,
-                custom = {
-                    min = 500,
-                    max = 5000,
-                    inc = 500,
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0277>Minimum Reclaim Label Amount",
-                tip = "<LOC OPTIONS_0278>When showing the reclaim label overlay, items with mass values less than this won't be shown",
-                key = 'minimum_reclaim_amount',
-                type = 'slider',
-                set = function(key, value, startup)
-                    import('/lua/ui/game/reclaim.lua').updateMinAmount(value)
-                end,
-                default = 10,
-                custom = {
-                    min = 10,
-                    max = 300,
-                    inc = 10,
-                },
-            },
-            {
                 title = "<LOC OPTIONS_0281>Hotkey Labels",
                 key = 'show_hotkeylabels',
                 type = 'toggle',
@@ -867,8 +932,80 @@ options = {
                     },
                 },
             },
+
             {
-                title = "<LOC spawnmenu001>Spawn Menu: Team Columns",
+                title = 'Control groups',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC selectionsets0001>Set behavior",
+                key = 'selection-sets-add-behavior',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC selectionsets0002>Default", key = false },
+                        {text = "<LOC selectionsets0003>Steal from other control groups", key = true },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC selectionsets0004>Factory behavior",
+                key = 'selection-sets-production-behavior',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC selectionsets0005>Add to control group of factory", key = true },
+                        {text = "<LOC selectionsets0006>Do nothing", key = false },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC selectionsets0007>Double tap behavior",
+                key = 'selection-sets-double-tap-behavior',
+                type = 'toggle',
+                default = 'translate-zoom',
+                custom = {
+                    states = {
+                        {text = "<LOC selectionsets0008>Do nothing", key = 'none' },
+                        {text = "<LOC selectionsets0009>Only translate", key = 'translate' },
+                        {text = "<LOC selectionsets00010>Translate, zoom only out", key = 'translate-zoom-out-only' },
+                        {text = "<LOC selectionsets00011>Translate and zoom", key = 'translate-zoom' },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC selectionsets0001>Double tap decay (in ms)",
+                key = 'selection-sets-double-tap-decay',
+                type = 'slider',
+                default = 1000,
+                custom = {
+                    min = 50,
+                    max = 2000,
+                    inc = 10,
+                },
+            },
+
+            {
+                title = 'Spawn menu',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC spawnmenu001>Team Columns",
                 key = 'spawn_menu_team_columns',
                 type = 'slider',
                 default = 4,
@@ -879,7 +1016,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu002>Spawn Menu: Filter Columns",
+                title = "<LOC spawnmenu002>Filter Columns",
                 key = 'spawn_menu_filter_columns',
                 type = 'slider',
                 default = 6,
@@ -890,7 +1027,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu003>Spawn Menu: Split Sources",
+                title = "<LOC spawnmenu003>Split Sources",
                 key = 'spawn_menu_split_sources',
                 type = 'toggle',
                 default = 0,
@@ -902,7 +1039,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu004>Spawn Menu: Type Filter Mode",
+                title = "<LOC spawnmenu004>Type Filter Mode",
                 key = 'spawn_menu_type_filter_mode',
                 type = 'toggle',
                 default = 0,
@@ -914,7 +1051,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu005>Spawn Menu: Include No-tech Filter",
+                title = "<LOC spawnmenu005>Include No-tech Filter",
                 key = 'spawn_menu_notech_filter',
                 type = 'toggle',
                 default = 1,
@@ -926,7 +1063,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu006>Spawn Menu: Include ACU/Paragon Filter",
+                title = "<LOC spawnmenu006>Include ACU/Paragon Filter",
                 key = 'spawn_menu_paragon_filter',
                 type = 'toggle',
                 default = 0,
@@ -938,7 +1075,7 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu007>Spawn Menu: Filter By Menu Sort",
+                title = "<LOC spawnmenu007>Filter By Menu Sort",
                 key = 'spawn_menu_filter_menu_sort',
                 type = 'toggle',
                 default = 1,
@@ -1028,7 +1165,7 @@ options = {
 
                     aaoptions = GetAntiAliasingOptions()
 
-                    aamax = 0
+                    aahigh = 0
                     aamed = 0
                     if 0 < table.getn(aaoptions) then
                         aahigh = aaoptions[table.getn(aaoptions)]

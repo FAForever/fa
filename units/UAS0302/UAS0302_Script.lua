@@ -14,6 +14,7 @@ local AAMWillOWisp = import('/lua/aeonweapons.lua').AAMWillOWisp
 --Custom files
 local NavalCannonOblivionWeapon = import('/lua/aeon_naval_weapons.lua').ADFCannonOblivionNaval
 
+---@class UAS0302 : ASeaUnit
 UAS0302 = Class(ASeaUnit) {
     FxDamageScale = 2,
     DestructionTicks = 400,

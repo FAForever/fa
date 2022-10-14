@@ -12,7 +12,6 @@ local EffectHelpers = import('/lua/maui/effecthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Button = import('/lua/maui/button.lua').Button
-local Text = import('/lua/maui/text.lua').Text
 local Movie = import('/lua/maui/movie.lua').Movie
 local WrapText = import('/lua/maui/text.lua').WrapText
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
@@ -20,25 +19,24 @@ local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local hotstats = import('/lua/ui/dialogs/hotstats.lua')
 local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 
 dialog = false
-local currentPage = false
-local curGrid = false
-local curInfo = false
-local elapsedTime = false
-local curType = false
-local curSortCol = false
+local currentPage = nil
+local curGrid = nil
+local curInfo = nil
+local elapsedTime = nil
+local curType = nil
+local curSortCol = nil
 local curSortDescending = true
-local savedGameTime = false
-local curScore = false
+local savedGameTime = nil
+local curScore = nil
 
 local campaignScore = ''
 
-scoreScreenActive = false
+scoreScreenActive = nil
 
 -- '<LOC SCORE_0058>Debrief'
 -- '<LOC SCORE_0059>Combat Report'
@@ -229,7 +227,7 @@ function UpdateData()
         if not armyInfo.civilian and armyInfo.showScore then
             -- set basic info from armies table
             curInfo[index] = {}
-            curInfo[index].name = armyInfo.nickname
+            curInfo[index].name = hotstats.scoreData.current[i].name
             curInfo[index].faction = armyInfo.faction
             curInfo[index].color = armyInfo.color
             --curInfo[index].teamName = index --TODO we need to get team data in here
@@ -272,7 +270,7 @@ function CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
         end
         if operationVictoryTable.opData.opMovies.postOpMovies[successKey] then
             GetCursor():Hide()
-            local subtitleThread = false
+            local subtitleThread = nil
             function DisplaySubtitles(textControl,captions)
                 if subtitleThread then
                     KillThread(subtitleThread)
@@ -404,7 +402,6 @@ function CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
         CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     end
 end
-
 
 function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     if dialog then return end
@@ -1167,7 +1164,6 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     hotstats.Set_graph(victory, showCampaign, operationVictoryTable, dialog, bg)
 end
 
-
 function CreateBorderGroup(parent)
     local group = Group(parent)
 
@@ -1210,3 +1206,7 @@ function CreateBorderGroup(parent)
 
     return group
 end
+
+-- kept for mod backwards compatibility
+local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
+local Text = import('/lua/maui/text.lua').Text

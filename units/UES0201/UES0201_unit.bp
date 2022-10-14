@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 90,
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 30,
         TargetBones = {
             'UES0202',
             'Back_Wake',
@@ -34,15 +34,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'UEF_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
         },
     },
     BuildIconSortPriority = 30,

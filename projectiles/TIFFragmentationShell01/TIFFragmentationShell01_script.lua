@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Terran Fragmentation Shells, DEL0204
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local TArtilleryProjectile = import('/lua/terranprojectiles.lua').TArtilleryProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')

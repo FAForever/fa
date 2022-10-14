@@ -23,6 +23,8 @@ local TBC = '/lua/editor/ThreatBuildConditions.lua'
 local IBC = '/lua/editor/InstantBuildConditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
+---@alias BuilderGroupsIntel 'AirScoutFactoryBuilders' | 'AirScoutFormBuilders' | 'LandScoutFactoryBuilders' | 'LandScoutFormBuilders' | 'RadarEngineerBuilders' | 'RadarUpgradeBuildersMain' | 'SonarEngineerBuilders' | 'SonarUpgradeBuilders' | 'CounterIntelBuilders' | 'RadarUpgradeBuildersExpansion' | 'SonarUpgradeBuildersSmall' | 'AeonOpticsEngineerBuilders' | 'CybranOpticsEngineerBuilders' | 
+
 BuilderGroup {
     BuilderGroupName = 'AirScoutFactoryBuilders',
     BuildersType = 'FactoryBuilder',

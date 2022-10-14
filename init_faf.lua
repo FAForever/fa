@@ -60,12 +60,36 @@ end
 -- mods that have been integrated, based on folder name 
 local integratedMods = { }
 integratedMods["nvidia fix"] = true
+
 integratedMods = LowerHashTable(integratedMods)
 
 -- mods that are deprecated, based on folder name
 local deprecatedMods = { }
 deprecatedMods["simspeed++"] = true
+deprecatedMods["#quality of performance 2022"] = true
+
+-- as per #4119 the control groups (called selection sets in code) are completely overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["group_split"] = true
+deprecatedMods["Control Group Zoom Mod"] = true
+deprecatedMods["additionalControlGroupStuff"] = true
+
+-- as per #4124 the cursor and command interactions are complete overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["additionalCameraStuff"] = true
+deprecatedMods["RUI"] = true
 deprecatedMods = LowerHashTable(deprecatedMods)
+
+-- as per #4232 the reclaim view is completely overhauled
+deprecatedMods["Advanced Reclaim&Selection Info"] = true
+deprecatedMods["AdvancedReclaimInfo"] = true
+deprecatedMods["BetterReclaimView"] = true
+deprecatedMods["disableReclaimUI"] = true
+deprecatedMods["DynamicReclaimGrouping"] = true
+deprecatedMods["EzReclaim"] = true
+deprecatedMods["OnScreenReclaimCounter"] = true
+deprecatedMods["ORV"] = true
+deprecatedMods["SmartReclaimSupport"] = true
 
 -- typical FA packages
 local allowedAssetsScd = { }

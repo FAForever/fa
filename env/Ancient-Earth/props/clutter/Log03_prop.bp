@@ -25,14 +25,8 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 0,
     },
-	Footprint = {
-        OccupancyCaps = 3,
-    },
     Interface = {
         HelpText = 'chad on a Log',
-    },
-    Physics = {
-        BlockPath = true,
     },
     SizeX = 0.4,
     SizeY = 0.25,

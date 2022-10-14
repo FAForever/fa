@@ -1,156 +1,164 @@
----@declare-global
+---@meta
+
 ---@class moho.projectile_methods : moho.entity_methods
 local Projectile = {}
 
----
---  Change the detonate below height for the projectile
-function Projectile:ChangeDetonateBelowHeight()
+--- Change the detonate above height for the projectile, relative to the terrain
+---@param height number
+function Projectile:ChangeDetonateAboveHeight(height)
 end
 
----
---  Change the amount of zig zag in degrees per second
-function Projectile:ChangeMaxZigZag()
+--- Change the detonate below height for the projectile, relative to the terrain
+---@param height number
+function Projectile:ChangeDetonateBelowHeight(height)
 end
 
----
---  Change the frequency of the zig zag --> min "0" (0 %), 0.5 (50%), max "1.0" (100%)
-function Projectile:ChangeZigZagFrequency()
+--- Change the amount of zig-zag in degrees per second
+---@param max number
+function Projectile:ChangeMaxZigZag(max)
 end
 
----
---  Projectile:CreateChildProjectile(blueprint)
--- Internally calls import to find the projectile
+--- Change the frequency of the zig-zag
+---@param freq number
+function Projectile:ChangeZigZagFrequency(freq)
+end
+
+--- Creates a child projectile that inherits the speed and orientation of its parent
+---@param blueprint ProjectileBlueprint
+---@return Projectile
 function Projectile:CreateChildProjectile(blueprint)
 end
 
 ---
---  Projectile:GetCurrentSpeed() -> val
+---@return number
 function Projectile:GetCurrentSpeed()
 end
 
 ---
---  Projectile:GetCurrentTargetPosition()
+---@return Vector
 function Projectile:GetCurrentTargetPosition()
 end
 
----
---  Get who launched this projectile
+--- Get who launched this projectile
+---@return Entity | Unit | nil
 function Projectile:GetLauncher()
 end
 
 ---
---  Projectile:GetTrackingTarget()
+---@return Entity | Unit | nil
 function Projectile:GetTrackingTarget()
 end
 
 ---
---  Projectile:GetVelocity() -> x,y,z
+---@return Vector
 function Projectile:GetVelocity()
 end
 
 ---
---  Projectile:SetAcceleration(accel)
+---@param accel number
 function Projectile:SetAcceleration(accel)
 end
 
----
---  Wrong number of arguments to Projectile:SetAccelerationVector(), expected 1, 2, or 4 but got %d
-function Projectile:SetBallisticAcceleration()
+--- 
+---@param accel number
+function Projectile:SetBallisticAcceleration(accel)
+end
+
+--- Whether or not this projecile collides with units and shields, should not be used for dummy projectiles as this is expensive
+---@param collide boolean
+function Projectile:SetCollideEntity(collide)
+end
+
+--- Whether or not this projectile collides with the terrain and water surface
+---@param collide boolean
+function Projectile:SetCollideSurface(collide)
 end
 
 ---
---  Projectile:SetCollideEntity(onoff)
-function Projectile:SetCollideEntity(onoff)
+---@param collide boolean
+function Projectile:SetCollision(collide)
+end
+
+--- Unused, damage is passed by the weapon via the damage table
+---@deprecated
+---@param amount number | nil
+---@param radius number | nil
+function Projectile:SetDamage(amount, radius)
 end
 
 ---
---  Projectile:SetCollideSurface(onoff)
-function Projectile:SetCollideSurface(onoff)
-end
-
----
---  Projectile:SetCollision(onoff)
-function Projectile:SetCollision(onoff)
-end
-
----
---  Projectile:SetDamage(amount, radius) -- change how much damage this projectile will do. Either amount or radius can be nil to leave unchanged.
-function Projectile:SetDamage(amount,  radius)
-end
-
----
---  Projectile:SetDestroyOnWater(flag)
+---@param flag boolean
 function Projectile:SetDestroyOnWater(flag)
 end
 
 ---
---  Projectile:SetLifetime(seconds)
+---@param seconds number
 function Projectile:SetLifetime(seconds)
 end
 
 ---
---  Projectile:SetLocalAngularVelocity(x,y,z)
+---@param x number
+---@param y number
+---@param z number
 function Projectile:SetLocalAngularVelocity(x, y, z)
 end
 
 ---
---  Projectile:SetMaxSpeed(speed)
+---@param speed number
 function Projectile:SetMaxSpeed(speed)
 end
 
 ---
---  Projectile:SetNewTarget(entity)
-function Projectile:SetNewTarget(entity)
+---@param object Entity | Unit
+function Projectile:SetNewTarget(object)
 end
 
 ---
---  Projectile:SetNewTargetGround(location)
+---@param location Vector
 function Projectile:SetNewTargetGround(location)
 end
 
 ---
---  Projectile:SetScaleVelocity(vs) or Projectile:SetScaleVelocity(vsx, vsy, vsz)
-function Projectile:SetScaleVelocity(vs)
+---@param svx number
+---@param svy number
+---@param svz number
+function Projectile:SetScaleVelocity(svx, svy, svz)
 end
 
 ---
---  Projectile:SetStayUpright(truefalse)
-function Projectile:SetStayUpright(truefalse)
+---@param upright boolean
+function Projectile:SetStayUpright(upright)
 end
 
 ---
---  Projectile:SetTurnRate(radians_per_second)
-function Projectile:SetTurnRate(radians_per_second)
+---@param radiansPerSecond number
+function Projectile:SetTurnRate(radiansPerSecond)
 end
 
 ---
---  Projectile:SetVelocity(speed) or Projectile:SetVelocity(vx,vy,vz)
-function Projectile:SetVelocity(speed)
+---@param velX number
+---@param velY number
+---@param velZ number
+function Projectile:SetVelocity(velX, velY, velZ)
 end
 
 ---
---  Projectile:SetVelocityAlign(truefalse)
-function Projectile:SetVelocityAlign(truefalse)
+---@param align boolean
+function Projectile:SetVelocityAlign(align)
+end
+
+---@unknown
+function Projectile:SetVelocityRandomUpVector()
 end
 
 ---
---  SetVelocityRandomUpVector(self)
-function Projectile:SetVelocityRandomUpVector(self)
+---@param stay boolean
+function Projectile:StayUnderwater(stay)
 end
 
 ---
---  Projectile:StayUnderwater(onoff)
-function Projectile:StayUnderwater(onoff)
-end
-
----
---  Projectile:TrackTarget(onoff)
-function Projectile:TrackTarget(onoff)
-end
-
----
---  derived from Entity
-function Projectile:base()
+---@param track boolean
+function Projectile:TrackTarget(track)
 end
 
 return Projectile

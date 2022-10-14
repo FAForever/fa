@@ -10,6 +10,7 @@
 
 local TMassStorageUnit = import('/lua/terranunits.lua').TMassStorageUnit
 
+---@class UEB1106 : TMassStorageUnit
 UEB1106 = Class(TMassStorageUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)

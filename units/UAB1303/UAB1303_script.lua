@@ -10,6 +10,7 @@
 
 local AMassFabricationUnit = import('/lua/aeonunits.lua').AMassFabricationUnit
 
+---@class UAB1303 : AMassFabricationUnit
 UAB1303 = Class(AMassFabricationUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)

@@ -9,6 +9,7 @@
 local CCivilianStructureUnit = import('/lua/cybranunits.lua').CCivilianStructureUnit
 local SSQuantumJammerTowerAmbient = import('/lua/EffectTemplates.lua').SJammerTowerAmbient
 
+---@class XRC1101 : CCivilianStructureUnit
 XRC1101 = Class(CCivilianStructureUnit) 
 
 {

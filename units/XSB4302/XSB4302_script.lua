@@ -12,6 +12,7 @@ local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
 local SIFHuAntiNukeWeapon = import('/lua/seraphimweapons.lua').SIFHuAntiNukeWeapon
 local nukeFiredOnGotTarget = false
 
+---@class XSB4302 : SStructureUnit
 XSB4302 = Class(SStructureUnit) {
 
     Weapons = {

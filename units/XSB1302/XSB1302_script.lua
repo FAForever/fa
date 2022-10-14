@@ -10,6 +10,7 @@
 
 local SMassCollectionUnit = import('/lua/seraphimunits.lua').SMassCollectionUnit
 
+---@class XSB1302 : SMassCollectionUnit
 XSB1302 = Class(SMassCollectionUnit) {
 
     OnCreate = function(self)

@@ -7,20 +7,12 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local BBTmplFile = '/lua/basetemplates.lua'
-local BuildingTmpl = 'BuildingTemplates'
-local BaseTmpl = 'BaseTemplates'
 local ExBaseTmpl = 'ExpansionBaseTemplates'
-local Adj2x2Tmpl = 'Adjacency2x2'
 local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
 local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local MABC = '/lua/editor/MarkerBuildConditions.lua'
 local IBC = '/lua/editor/InstantBuildConditions.lua'
-local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
 local EBC = '/lua/editor/EconomyBuildConditions.lua'
-local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
 local SAI = '/lua/ScenarioPlatoonAI.lua'
-local PlatoonFile = '/lua/platoon.lua'
 local SBC = '/lua/editor/SorianBuildConditions.lua'
 local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 
@@ -185,7 +177,6 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian T3 Engineer Assist Experimental Mobile Air - Excess Mass',
         PlatoonTemplate = 'T3EngineerAssistSorian',
-        Priority = 0.1,
         Priority = 981,
         InstanceCount = 15,
         BuilderConditions = {
@@ -1758,3 +1749,13 @@ BuilderGroup {
         },
     },
 }
+
+-- kept for mod compatibility, as they may depend on these
+local BBTmplFile = '/lua/basetemplates.lua'
+local BuildingTmpl = 'BuildingTemplates'
+local BaseTmpl = 'BaseTemplates'
+local Adj2x2Tmpl = 'Adjacency2x2'
+local MABC = '/lua/editor/MarkerBuildConditions.lua'
+local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
+local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
+local PlatoonFile = '/lua/platoon.lua'

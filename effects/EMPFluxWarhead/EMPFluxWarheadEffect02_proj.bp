@@ -1,5 +1,4 @@
 ProjectileBlueprint {
-    DevStatus = 'STABLE',
     Display = {
         Mesh = {
             LODs = {

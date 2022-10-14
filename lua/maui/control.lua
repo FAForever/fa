@@ -26,11 +26,20 @@
     -- Dump()
 
 ---@class Control : moho.control_methods
+---@field _isDisabled boolean
+---
+---@field Left LazyVar
+---@field Width LazyVar
+---@field Right LazyVar
+---@field Top LazyVar
+---@field Height LazyVar
+---@field Bottom LazyVar
+---@field Depth LazyVar
 Control = Class(moho.control_methods) {
-
-    -- reset the control's layout to the defaults, in this case
-    -- makes a circular dependency where you must have at least 4 defined
-    -- Overload this in your own classes to make it behave differently
+    --- Resets the control's layout to the defaults, in this case
+    --- makes a circular dependency where you must have at least 4 defined.
+    --- Overload this in your own classes to make it behave differently
+    ---@param self Control
     ResetLayout = function(self)
         self.Left:Set(function() return self.Right() - self.Width() end)
         self.Top:Set(function() return self.Bottom() - self.Height() end)
@@ -40,89 +49,124 @@ Control = Class(moho.control_methods) {
         self.Height:Set(function() return self.Bottom() - self.Top() end)
     end,
 
+    --- Called when the internal C object is created using one of the internal creation functions
+    ---@param self Control
     OnInit = function(self)
         self:ResetLayout()
 
         -- default to setting the depth to parent + 1
         self.Depth:Set(function() return self:GetParent().Depth() + 1 end)
-        
+
         self._isDisabled = false
     end,
 
-    -- The function is called when event occurs for this control.
-    -- If returns false then calls parent HandleEvent
-    -- If returns true then doesn't
-    -- Requires HitTest to be true
+    --- The function is called when a event occurs for this control.
+    --- If it returns false then it calls parent HandleEvent.
+    --- If it returns true then it doesn't.
+    --- Requires HitTest to be true.
+    ---@param self Control
+    ---@param event KeyEvent
+    ---@return boolean
     HandleEvent = function(self, event)
         return false
     end,
 
+    --- Sets this control to be disabled and calls `OnDisable()`
+    ---@param self Control
     Disable = function(self)
         self._isDisabled = true
         self:DisableHitTest()
         self:OnDisable()
     end,
 
+    --- Sets this control to be enabled and calls `OnEnable()`
+    ---@param self any
     Enable = function(self)
         self._isDisabled = false
         self:EnableHitTest()
         self:OnEnable()
     end,
 
+    --- Returns if this control is disabled
+    ---@param self Control
+    ---@return boolean _isDisabled
     IsDisabled = function(self)
         return self._isDisabled
     end,
 
-    -- called when the control is destroyed
+    --- Called when the control is destroyed
+    ---@param self Control
     OnDestroy = function(self)
     end,
 
-    -- called when a frame update is ready, elapsedTime is time since last frame
+    --- Called when a frame update is ready, elapsedTime is time since last frame
+    ---@param self Control
     OnFrame = function(self, elapsedTime)
     end,
 
-    -- called when the control is enabled
+    --- Called when the control is enabled
+    ---@param self Control
     OnEnable = function(self)
     end,
 
-    -- called when the control is disabled
+    --- Called when the control is disabled
+    ---@param self Control
     OnDisable = function(self)
     end,
-    
-    -- called when the control is shown or hidden
-    -- if this function returns true, its children will not get their OnHide functions called
+
+    --- Called when the control is shown or hidden.
+    --- If this function returns true, its children will not get their `OnHide` functions called.
+    ---@param self Control
+    ---@param hidden boolean
     OnHide = function(self, hidden)
     end,
-    
-    -- called when we have keyboard focus and another control is clicked on
+
+    --- Called when we have keyboard focus and another control is clicked on
+    ---@param self Control
     OnLoseKeyboardFocus = function(self)
     end,
-    
-    -- called when another control takes keyboard focus
+
+    --- Called when another control takes keyboard focus
+    ---@param self Control
     OnKeyboardFocusChange = function(self)
     end,
-    
-    -- called when the scrollbar for the control requires data to size itself
-    -- GetScrollValues must return 4 values in this order:
-    -- rangeMin, rangeMax, visibleMin, visibleMax
-    -- aixs can be "Vert" or "Horz"
+
+    -- Called when the scrollbar for the control requires data to size itself
+    ---@param self Control
+    ---@param axis ScrollAxis
+    ---@return number rangeMin
+    ---@return number rangeMax
+    ---@return number visibleMin
+    ---@return number visibleMax
     GetScrollValues = function(self, axis)
         return 0, 0, 0, 0
     end,
 
-    -- called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
+    --- Called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
+    ---@param self Control
+    ---@param axis ScrollAxis
+    ---@param delta number
     ScrollLines = function(self, axis, delta)
     end,
 
-    -- called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
+    --- Called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
+    ---@param self Control
+    ---@param axis ScrollAxis
+    ---@param delta number
     ScrollPages = function(self, axis, delta)
     end,
 
-    -- called when the scrollbar wants to set a new visible top line
+    --- Called when the scrollbar wants to set a new visible top line
+    ---@param self Control
+    ---@param axis ScrollAxis
+    ---@param top number
     ScrollSetTop = function(self, axis, top)
     end,
 
-    -- called to determine if the control is scrollable on a particular access. Must return true or false.
+    --- Called to determine if the control is scrollable on a particular access. Must return true or false.
+    ---@param self Control
+    ---@param axis ScrollAxis
+    ---@return boolean
     IsScrollable = function(self, axis)
         return false
     end,

@@ -7,7 +7,6 @@
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Prefs = import('/lua/user/prefs.lua')
 
 campaignSequence = {
@@ -233,3 +232,5 @@ function InstaWin()
     end
 end
 
+-- kept for mod backwards compatibility
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
