@@ -72,7 +72,7 @@ LabelTree = ClassSimple {
         -- LOG(string.format("Populate: <%f, %f> at %f", self.ox, self.oz, self.c))
 
         -- base case, if we're a square of 4 then we skip the children and become very pessimistic
-        if self.c <= 4 then
+        if self.c <= 1 then
             -- LOG(" - base case")
             local value = rCache[self.oz + 1][self.ox + 1]
             local uniform = true
@@ -145,6 +145,25 @@ LabelTree = ClassSimple {
         end
 
         return false
+    end,
+
+    FindLeaf = function(self, position)
+        if position[1] > self.bx + self.ox and position[1] < self.bx + self.ox + self.c then
+            if position[3] > self.bz + self.oz and position[3] < self.bz + self.oz + self.c then
+                if not self.children then
+                    return self
+                else
+                    for k, child in self.children do 
+                        local result = child:FindLeaf(position)
+                        if result then
+                            return result
+                        end
+                    end
+                end
+            end
+        end
+
+        return nil
     end,
 
     Draw = function(self, mouse, color)
@@ -451,12 +470,16 @@ function ProcessMap()
 
                 for z = 0, amount - 1 do
                     for x = 0, amount - 1 do
-                        -- for k, tree in trees[z][x] do 
-                            -- if tree:PointInside(mouse) then
-                                trees[z][x]['land']:Draw(mouse, colors['land'])
-                                trees[z][x]['naval']:Draw(mouse, colors['naval'])
-                        --     end
-                        -- end
+
+                        trees[z][x]['land']:Draw(mouse, colors['land'])
+                        trees[z][x]['naval']:Draw(mouse, colors['naval'])
+
+                        for k, tree in trees[z][x] do 
+                            local over = tree:FindLeaf(mouse)
+                            if over then 
+                                over:Draw(mouse, 'ff0000')
+                            end
+                        end
                     end
                 end
 
