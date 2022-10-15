@@ -298,7 +298,6 @@ LabelTree = ClassSimple {
     ---@param self LabelTree
     ---@param root LabelRoot
     GenerateNeighbors = function(self, root)
-
         -- we are not valid :(
         if self.label == -1 then
             return
@@ -306,107 +305,104 @@ LabelTree = ClassSimple {
 
         -- if we have children then we're a node, only leafs can have neighbors
         if self.children then
-            for k, child in self.children do 
+            for _, child in self.children do
                 child:GenerateNeighbors(root)
             end
-
             return
         end
 
         -- we are a leaf, so find those neighbors!
-        local px = self.bx + self.ox
-        local pz = self.bz + self.oz
-        local c = self.c
+        local x1 = self.bx + self.ox
+        local z1 = self.bz + self.oz
+        local size = self.c
+        local x2 = x1 + size
+        local z2 = z1 + size
+        local hx1, hz1 = x1 - 0.5, z1 - 0.5
+        local hx2, hz2 = x2 + 0.5, z2 + 0.5
 
-        local neighbor = nil
-        self.neighbors = { }
-        
+        local neighbors = {}
+        self.neighbors = neighbors
+
         -- scan top-left -> top-right
-
-        for k = px, px + c do
+        for k = x1, x2 do
             local x = k + 0.5
-            local z = pz - 0.5
-            DrawCircle({x, GetSurfaceHeight(x, z), z}, 0.5, 'ff0000')
-            neighbor = root:FindLeafXZ(x, z)
-            if neighbor and neighbor.label >= 0 then
+            DrawCircle({x, GetSurfaceHeight(x, hz1), hz1}, 0.5, 'ff0000')
+            local neighbor = root:FindLeafXZ(x, hz1)
+            if neighbor then
                 k = k + neighbor.c - 1
-                self.neighbors[neighbor.identifier] = neighbor
+                if neighbor.label >= 0 then
+                    neighbors[neighbor.identifier] = neighbor
+                end
             end
         end
 
-        -- -- scan bottom-left -> bottom-right
-        for k = px, px + c do 
-            
+        -- scan bottom-left -> bottom-right
+        for k = x1, x2 do
             local x = k + 0.5
-            local z = pz + c + 0.5
-            DrawCircle({x, GetSurfaceHeight(x, z), z}, 0.5, 'ff0000')
-            neighbor = root:FindLeafXZ(x, z)
-            if neighbor and neighbor.label >= 0 then
+            DrawCircle({x, GetSurfaceHeight(x, hz2), hz2}, 0.5, 'ff0000')
+            local neighbor = root:FindLeafXZ(x, hz2)
+            if neighbor then
                 k = k + neighbor.c - 1
-                self.neighbors[neighbor.identifier] = neighbor
+                if neighbor.label >= 0 then
+                    neighbors[neighbor.identifier] = neighbor
+                end
             end
         end
 
-        -- -- scan left-top -> left-bottom
-
-        for k = pz, pz + c do 
-            local x = px - 0.5
-            local z = k + 0.5
-            DrawCircle({x, GetSurfaceHeight(x, z), z}, 0.5, 'ff0000')
-            neighbor = root:FindLeafXZ(x, z)
-            if neighbor and neighbor.label >= 0 then
+        -- scan left-top -> left-bottom
+        for k = z1, z2 do
+            z = k + 0.5
+            DrawCircle({hx1, GetSurfaceHeight(hx1, z), z}, 0.5, 'ff0000')
+            local neighbor = root:FindLeafXZ(hx1, z)
+            if neighbor then
                 k = k + neighbor.c - 1
-                self.neighbors[neighbor.identifier] = neighbor
+                if neighbor.label >= 0 then
+                    neighbors[neighbor.identifier] = neighbor
+                end
             end
         end
 
-
-        -- -- scan right-top -> right-bottom
-
-        for k = pz, pz + c do 
-            local x = px + c + 0.5
-            local z = k + 0.5
-            DrawCircle({x, GetSurfaceHeight(x, z), z}, 0.5, 'ff0000')
-            neighbor = root:FindLeafXZ(x, z)
-            if neighbor and neighbor.label >= 0 then
+        -- scan right-top -> right-bottom
+        for k = z1, z2 do
+            z = k + 0.5
+            DrawCircle({hx2, GetSurfaceHeight(hx2, z), z}, 0.5, 'ff0000')
+            local neighbor = root:FindLeafXZ(hx2, z)
+            if neighbor then
                 k = k + neighbor.c - 1
-                self.neighbors[neighbor.identifier] = neighbor
-
+                if neighbor.label >= 0 then
+                    neighbors[neighbor.identifier] = neighbor
+                end
             end
         end
 
         -- scan top-left
-
-        neighbor = root:FindLeafXZ(px - 0.5, pz - 0.5)
-        DrawCircle({px - 0.5, GetSurfaceHeight(px - 0.5, pz - 0.5), pz - 0.5}, 0.5, 'ff0000')
+        local neighbor = root:FindLeafXZ(hx1, hz1)
+        DrawCircle({hx1, GetSurfaceHeight(hx1, hz1), hz1}, 0.5, 'ff0000')
         if neighbor and neighbor.label >= 0 then
-            self.neighbors[neighbor.identifier] = neighbor
+            neighbors[neighbor.identifier] = neighbor
         end
 
         -- scan top-right
-
-        neighbor = root:FindLeafXZ(px + c + 0.5, pz - 0.5)
-        DrawCircle({px + c + 0.5, GetSurfaceHeight(px + c + 0.5, pz - 0.5), pz - 0.5}, 0.5, 'ff0000')
+        neighbor = root:FindLeafXZ(hx2, hz1)
+        DrawCircle({hx2, GetSurfaceHeight(hx2, hz1), hz1}, 0.5, 'ff0000')
         if neighbor and neighbor.label >= 0 then
-            self.neighbors[neighbor.identifier] = neighbor
+            neighbors[neighbor.identifier] = neighbor
         end
 
         -- scan bottom-left
-
-        DrawCircle({px - 0.5, GetSurfaceHeight(px - 0.5, pz + c + 0.5), pz + c + 0.5}, 0.5, 'ff0000')
-        neighbor = root:FindLeafXZ(px - 0.5, pz + c + 0.5)
+        DrawCircle({hx1, GetSurfaceHeight(hx1, hz2), hz2}, 0.5, 'ff0000')
+        neighbor = root:FindLeafXZ(hx1, hz2)
         if neighbor and neighbor.label >= 0 then
-            self.neighbors[neighbor.identifier] = neighbor
+            neighbors[neighbor.identifier] = neighbor
         end
 
         -- scan bottom-right
-
-        DrawCircle({px + c + 0.5, GetSurfaceHeight(px + c + 0.5, pz + c + 0.5), pz + c + 0.5}, 0.5, 'ff0000')
-        neighbor = root:FindLeafXZ(px + c + 0.5, pz + c + 0.5)
+        DrawCircle({hx2, GetSurfaceHeight(hx2, hz2), hz2}, 0.5, 'ff0000')
+        neighbor = root:FindLeafXZ(hx2, hz2)
         if neighbor and neighbor.label >= 0 then
-            self.neighbors[neighbor.identifier] = neighbor
+            neighbors[neighbor.identifier] = neighbor
         end
-    end,
+    end;
 
     GenerateLabels = function(self)
 
@@ -769,7 +765,7 @@ function Generate()
         end
     end
 
-    ProfileData.TimeLabelTrees = start - GetSystemTimeSecondsOnlyForProfileUse()
+    ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
     WARN("Generating neighbours")
 
@@ -778,7 +774,7 @@ function Generate()
     LabelRoots['amph']:GenerateNeighbors()
     LabelRoots['hover']:GenerateNeighbors()
 
-    ProfileData.TimeLabelTrees = start - GetSystemTimeSecondsOnlyForProfileUse()
+    ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
 
     -- restart the scanning thread
