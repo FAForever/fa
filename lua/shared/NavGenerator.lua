@@ -5,7 +5,6 @@
 ---@field TimeLabelTrees number
 
 ---@class NavLayerDataInstance
----@field Trees number
 ---@field Subdivisions number
 ---@field PathableLeafs number
 ---@field UnpathableLeafs number
@@ -23,4 +22,11 @@ Layers = {
     'naval',
     'amph',
     'hover'
+}
+
+colors = {
+    land = '00ff00',
+    naval = '0000ff',
+    amph = 'ffa500',
+    hover = '008080'
 }
