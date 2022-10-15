@@ -731,7 +731,6 @@ function Scan()
 
         local over = LabelRoots['land']:FindLeaf(mouse)
         if over then 
-            LOG(over.label)
             if over.label > 0 then
                 over:Draw(Shared.labelColors[over.label], 0.1)
                 over:Draw(Shared.labelColors[over.label], 0.15)

@@ -25,8 +25,6 @@ local TableGetn = table.getn
 local TableRemove = table.remove
 local TableMerged = table.merged
 
-local MathAbs = math.abs
-
 -- upvalue globals for performance
 local type = type
 local Vector = Vector

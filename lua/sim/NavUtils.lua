@@ -65,5 +65,3 @@ function CanPathTo(layer, origin, destination)
         return false, 'Labels do not match, you will need a transport :)'
     end
 end
-
-
