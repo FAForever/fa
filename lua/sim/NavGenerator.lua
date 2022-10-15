@@ -297,10 +297,10 @@ LabelTree = ClassSimple {
             -- we're not uniform, split up to children
             local hc = 0.5 * self.c
             self.children = {
-                tl = LabelTree(self.layer, self.bx, self.bz, hc, self.ox, self.oz),
-                tr = LabelTree(self.layer, self.bx, self.bz, hc, self.ox + hc, self.oz),
-                bl = LabelTree(self.layer, self.bx, self.bz, hc, self.ox, self.oz + hc),
-                br = LabelTree(self.layer, self.bx, self.bz, hc, self.ox + hc, self.oz + hc)
+                LabelTree(self.layer, self.bx, self.bz, hc, self.ox, self.oz),
+                LabelTree(self.layer, self.bx, self.bz, hc, self.ox + hc, self.oz),
+                LabelTree(self.layer, self.bx, self.bz, hc, self.ox, self.oz + hc),
+                LabelTree(self.layer, self.bx, self.bz, hc, self.ox + hc, self.oz + hc)
             }
 
             for k, child in self.children do
@@ -334,8 +334,8 @@ LabelTree = ClassSimple {
         local size = self.c
         local x2 = x1 + size
         local z2 = z1 + size
-        local hx1, hz1 = x1 - 0.5, z1 - 0.5
-        local hx2, hz2 = x2 + 0.5, z2 + 0.5
+        local x1Outside, z1Outside = x1 - 0.5, z1 - 0.5
+        local x2Outside, z2Outside = x2 + 0.5, z2 + 0.5
 
         local neighbors = {}
         self.neighbors = neighbors
@@ -343,8 +343,8 @@ LabelTree = ClassSimple {
         -- scan top-left -> top-right
         for k = x1, x2 do
             local x = k + 0.5
-            DrawCircle({x, GetSurfaceHeight(x, hz1), hz1}, 0.5, 'ff0000')
-            local neighbor = root:FindLeafXZ(x, hz1)
+            DrawCircle({x, GetSurfaceHeight(x, z1Outside), z1Outside}, 0.5, 'ff0000')
+            local neighbor = root:FindLeafXZ(x, z1Outside)
             if neighbor then
                 k = k + neighbor.c - 1
                 if neighbor.label >= 0 then
@@ -356,8 +356,8 @@ LabelTree = ClassSimple {
         -- scan bottom-left -> bottom-right
         for k = x1, x2 do
             local x = k + 0.5
-            DrawCircle({x, GetSurfaceHeight(x, hz2), hz2}, 0.5, 'ff0000')
-            local neighbor = root:FindLeafXZ(x, hz2)
+            DrawCircle({x, GetSurfaceHeight(x, z2Outside), z2Outside}, 0.5, 'ff0000')
+            local neighbor = root:FindLeafXZ(x, z2Outside)
             if neighbor then
                 k = k + neighbor.c - 1
                 if neighbor.label >= 0 then
@@ -369,8 +369,8 @@ LabelTree = ClassSimple {
         -- scan left-top -> left-bottom
         for k = z1, z2 do
             z = k + 0.5
-            DrawCircle({hx1, GetSurfaceHeight(hx1, z), z}, 0.5, 'ff0000')
-            local neighbor = root:FindLeafXZ(hx1, z)
+            DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z), z}, 0.5, 'ff0000')
+            local neighbor = root:FindLeafXZ(x1Outside, z)
             if neighbor then
                 k = k + neighbor.c - 1
                 if neighbor.label >= 0 then
@@ -382,8 +382,8 @@ LabelTree = ClassSimple {
         -- scan right-top -> right-bottom
         for k = z1, z2 do
             z = k + 0.5
-            DrawCircle({hx2, GetSurfaceHeight(hx2, z), z}, 0.5, 'ff0000')
-            local neighbor = root:FindLeafXZ(hx2, z)
+            DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z), z}, 0.5, 'ff0000')
+            local neighbor = root:FindLeafXZ(x2Outside, z)
             if neighbor then
                 k = k + neighbor.c - 1
                 if neighbor.label >= 0 then
@@ -393,29 +393,29 @@ LabelTree = ClassSimple {
         end
 
         -- scan top-left
-        local neighbor = root:FindLeafXZ(hx1, hz1)
-        DrawCircle({hx1, GetSurfaceHeight(hx1, hz1), hz1}, 0.5, 'ff0000')
+        local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
+        DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
         if neighbor and neighbor.label >= 0 then
             neighbors[neighbor.identifier] = neighbor
         end
 
         -- scan top-right
-        neighbor = root:FindLeafXZ(hx2, hz1)
-        DrawCircle({hx2, GetSurfaceHeight(hx2, hz1), hz1}, 0.5, 'ff0000')
+        neighbor = root:FindLeafXZ(x2Outside, z1Outside)
+        DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
         if neighbor and neighbor.label >= 0 then
             neighbors[neighbor.identifier] = neighbor
         end
 
         -- scan bottom-left
-        DrawCircle({hx1, GetSurfaceHeight(hx1, hz2), hz2}, 0.5, 'ff0000')
-        neighbor = root:FindLeafXZ(hx1, hz2)
+        DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
+        neighbor = root:FindLeafXZ(x1Outside, z2Outside)
         if neighbor and neighbor.label >= 0 then
             neighbors[neighbor.identifier] = neighbor
         end
 
         -- scan bottom-right
-        DrawCircle({hx2, GetSurfaceHeight(hx2, hz2), hz2}, 0.5, 'ff0000')
-        neighbor = root:FindLeafXZ(hx2, hz2)
+        DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
+        neighbor = root:FindLeafXZ(x2Outside, z2Outside)
         if neighbor and neighbor.label >= 0 then
             neighbors[neighbor.identifier] = neighbor
         end
@@ -462,23 +462,42 @@ LabelTree = ClassSimple {
     ---@param z number z-coordinate, in world space
     ---@return LabelTree?
     FindLeafXZ = function(self, x, z)
-        if x > self.bx + self.ox and x < self.bx + self.ox + self.c then
-            if z > self.bz + self.oz and z < self.bz + self.oz + self.c then
-                if not self.children then
-                    return self
+        local x1 = self.bx + self.ox
+        local z1 = self.bz + self.oz
+        local size = self.c
+        -- Check if it's inside our rectangle the first time only
+        if x < x1 or x1 + size < x or z < z1 or z1 + size < z then
+            return nil
+        end
+        return self:_FindLeafXZ(x - self.bx, z - self.bz)
+    end;
+
+    _FindLeafXZ = function(self, x, z)
+        local children = self.children
+        if children then
+            local hsize = self.c * 0.5
+            local hx, hz = self.ox + hsize, self.oz + hsize
+            local child
+            if z < hz then
+                if x < hx then
+                    child = children[1] -- top left
                 else
-                    for k, child in self.children do 
-                        local result = child:FindLeafXZ(x, z)
-                        if result then
-                            return result
-                        end
-                    end
+                    child = children[2] -- top right
+                end
+            else
+                if x < hx then
+                    child = children[3] -- bottom left
+                else
+                    child = children[4] -- bottom right
                 end
             end
+            if child then
+                return child:_FindLeafXZ(x, z)
+            end
+        else
+            return self
         end
-
-        return nil
-    end,
+    end;
 
     ---@param self LabelTree
     ---@param color Color
@@ -488,7 +507,7 @@ LabelTree = ClassSimple {
                 DrawSquare(self.bx + self.ox, self.bz + self.oz, self.c, color, inset)
             end
         else
-            for k, child in self.children do
+            for _, child in self.children do
                 child:Draw(color, inset)
             end
         end
@@ -505,14 +524,14 @@ LabelTree = ClassSimple {
 ---@return NavTerrainBlockCache
 ---@return NavLabelCache
 function InitCaches(cells)
-    local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = { }, { }, { }, { }, { }, { }, { }, { }
+    local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = {}, {}, {}, {}, {}, {}, {}, {}
 
     -- these need one additional element, as they represent the corners / sides of the cell we're evaluating
     for z = 1, cells + 1 do
-        tCache[z] = { }
-        dCache[z] = { }
-        pxCache[z] = { }
-        pzCache[z] = { }
+        tCache[z] = {}
+        dCache[z] = {}
+        pxCache[z] = {}
+        pzCache[z] = {}
         for x = 1, cells + 1 do
             tCache[z][x] = -1
             dCache[z][x] = -1
@@ -523,10 +542,10 @@ function InitCaches(cells)
 
     -- these represent the cell as a whole, and therefore do not need an additional element
     for z = 1, cells do
-        pCache[z] = { }
-        bCache[z] = { }
-        rCache[z] = { }
-        daCache[z] = { }
+        pCache[z] = {}
+        bCache[z] = {}
+        rCache[z] = {}
+        daCache[z] = {}
         for x = 1, cells do
             pCache[z][x] = false
             bCache[z][x] = false
@@ -549,64 +568,57 @@ end
 ---@param pCache NavPathCache
 ---@param bCache NavTerrainBlockCache
 function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pCache, bCache)
-
-    local mathabs = math.abs
+    local MathAbs = math.abs
     local GetTerrainHeight = GetTerrainHeight
     local GetSurfaceHeight = GetSurfaceHeight
     local GetTerrainType = GetTerrainType
 
+    local size = labelTree.c
+    local bx, bz = labelTree.bx, labelTree.bz
+
     -- scan / cache terrain and depth
-    for z = labelTree.bz, labelTree.bz + labelTree.c do
-        local lz = z - labelTree.bz + 1
+    for z = 1, size + 1 do
+        local absZ = bz + z
+        for x = 1, size + 1 do
+            local absX = bx + x
+            local terrain = GetTerrainHeight(absX, absZ)
+            local surface = GetSurfaceHeight(absX, absZ)
 
-        for x = labelTree.bx, labelTree.bx + labelTree.c do
-            local lx = x - labelTree.bx + 1
-
-            local terrain = GetTerrainHeight(x, z)
-            local surface = GetSurfaceHeight(x, z)
-
-            tCache[lz][lx] = terrain
-            dCache[lz][lx] = surface - terrain
+            tCache[z][x] = terrain
+            dCache[z][x] = surface - terrain
 
             -- DrawSquare(x - 0.15, z - 0.15, 0.3, 'ff0000')
         end
     end
 
     -- scan / cache cliff walkability
-    for z = labelTree.bz, labelTree.bz + labelTree.c do
-        local lz = z - labelTree.bz + 1
-        for x = labelTree.bx, labelTree.bx + labelTree.c - 1 do
-            local lx = x - labelTree.bx + 1
-            pxCache[lz][lx] = mathabs(tCache[lz][lx] - tCache[lz][lx + 1]) < MaxHeightDifference
+    for z = 1, size + 1 do
+        for x = 1, size do
+            pxCache[z][x] = MathAbs(tCache[z][x] - tCache[z][x + 1]) < MaxHeightDifference
         end
     end
 
-    for z = labelTree.bz, labelTree.bz + labelTree.c - 1 do
-        local lz = z - labelTree.bz + 1
-        for x = labelTree.bx, labelTree.bx + labelTree.c do
-            local lx = x - labelTree.bx + 1
-            pzCache[lz][lx] = mathabs(tCache[lz][lx] - tCache[lz + 1][lx]) < MaxHeightDifference
+    for z = 1, size do
+        for x = 1, size + 1 do
+            pzCache[z][x] = MathAbs(tCache[z][x] - tCache[z + 1][x]) < MaxHeightDifference
         end
     end
 
     -- compute cliff walkability
     -- compute average depth
     -- compute terrain type
-    for z = labelTree.bz, labelTree.bz + labelTree.c - 1 do
-        local lz = z - labelTree.bz + 1
-        for x = labelTree.bx, labelTree.bx + labelTree.c - 1 do
-            local lx = x - labelTree.bx + 1
-
-            pCache[lz][lx] = pxCache[lz][lx] and pzCache[lz][lx] and pxCache[lz][lx+1] and pzCache[lz+1][lx]
-            daCache[lz][lx] = 0.25 * (dCache[lz][lx] + dCache[lz + 1][lx] + dCache[lz][lx + 1] + dCache[lz + 1][lx + 1])
-            bCache[lz][lx] = not GetTerrainType(x, z).Blocking
+    for z = 1, size do
+        for x = 1, size do
+            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z][x + 1] and pzCache[z + 1][x]
+            daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
+            bCache[z][x] = not GetTerrainType(x, z).Blocking
 
             -- local color = 'ff0000'
             -- if pCache[lz][lx] == 0 then
             --     color = '00ff00'
             -- end
 
-            -- DrawSquare(x + 0.35, z + 0.35, 0.3, color)
+            -- DrawSquare(labelTree.bx + x + 0.35, labelTree.bz + z + 0.35, 0.3, color)
         end
     end
 end
@@ -617,23 +629,18 @@ end
 ---@param pCache NavPathCache
 ---@param rCache NavLabelCache
 function ComputeLandPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
-    for z = labelTree.bz, labelTree.bz + labelTree.c - 1 do
-        local lz = z - labelTree.bz + 1
-        for x = labelTree.bx, labelTree.bx + labelTree.c - 1 do
-            local lx = x - labelTree.bx + 1
-            rCache[lz][lx] = (
-                -- should be on land
-                daCache[lz][lx] <= 0.0 and
-                -- should have accessible terrain type
-                bCache[lz][lx] and 
-                -- should be flat enough
-                pCache[lz][lx] and 0)
-                -- or this is inaccessible
-                or -1
-
-            -- if rCache[lz][lx] == 0 then
-            --     DrawSquare(x + 0.30, z + 0.30, 0.4, '00ff00')
-            -- end
+    local size = labelTree.c
+    for z = 1, size do
+        for x = 1, size do
+            if  daCache[z][x] <= 0 and -- should be on land
+                bCache[z][x] and       -- should have accessible terrain type
+                pCache[z][x]           -- should be flat enough
+            then
+                rCache[z][x] = 0
+                --DrawSquare(labelTree.bx + x + 0.3, labelTree.bz + z + 0.3, 0.4, '00ff00')
+            else
+                rCache[z][x] = -1
+            end
         end
     end
 end
@@ -644,25 +651,18 @@ end
 ---@param pCache NavPathCache
 ---@param rCache NavLabelCache
 function ComputeHoverPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
-    for z = labelTree.bz, labelTree.bz + labelTree.c - 1 do
-        local lz = z - labelTree.bz + 1
-        for x = labelTree.bx, labelTree.bx + labelTree.c - 1 do
-            local lx = x - labelTree.bx + 1
-            rCache[lz][lx] = (
-                -- should have accessible terrain type
-                bCache[lz][lx] and 
-                (
-                    -- can either be on water
-                    daCache[lz][lx] >= 0.01 or
-                    -- or on flat enough terrain
-                    pCache[lz][lx]
-                ) and 0)
-                -- or this is inaccessible  
-                or -1
-
-            -- if rCache[lz][lx] == 0 then
-            --     DrawSquare(x + 0.4, z + 0.4, 0.2, '00b3b3')
-            -- end
+    local size = labelTree.c
+    for z = 1, size do
+        for x = 1, size do
+            if bCache[z][x] and (        -- should have accessible terrain type
+                daCache[z][x] >= 0.01 or -- can either be on water
+                pCache[z][x]             -- or on flat enough terrain
+            ) then
+                rCache[z][x] = 0
+                --DrawSquare(labelTree.bx + x + 0.4, labelTree.bz + z + 0.4, 0.2, '00b3b3')
+            else
+                rCache[z][x] = -1
+            end
         end
     end
 end
@@ -673,21 +673,17 @@ end
 ---@param pCache NavPathCache
 ---@param rCache NavLabelCache
 function ComputeNavalPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
-    for z = labelTree.bz, labelTree.bz + labelTree.c - 1 do
-        local lz = z - labelTree.bz + 1
-        for x = labelTree.bx, labelTree.bx + labelTree.c - 1 do
-            local lx = x - labelTree.bx + 1
-            rCache[lz][lx] = (
-                -- should be deep enough
-                daCache[lz][lx] >= MinWaterDepthNaval and
-                -- should have accessible terrain type
-                bCache[lz][lx] and 0)
-                -- or this is inaccessible
-                or -1
-
-            -- if rCache[lz][lx] == 0 then
-            --     DrawSquare(x + 0.45, z + 0.45, 0.1, '0000ff')
-            -- end
+    local size = labelTree.c
+    for z = 1, size do
+        for x = 1, size do
+            if daCache[z][x] >= MinWaterDepthNaval and -- should be deep enough
+                bCache[z][x] -- should have accessible terrain type
+            then
+                rCache[z][x] = 0
+                --DrawSquare(labelTree.bx + x + 0.45, labelTree.bz + z + 0.45, 0.1, '0000ff')
+            else -- this is inaccessible
+                rCache[z][x] = -1
+            end
         end
     end
 end
@@ -698,32 +694,25 @@ end
 ---@param pCache NavPathCache
 ---@param rCache NavLabelCache
 function ComputeAmphPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
-    for z = labelTree.bz, labelTree.bz + labelTree.c - 1 do
-        local lz = z - labelTree.bz + 1
-        for x = labelTree.bx, labelTree.bx + labelTree.c - 1 do
-            local lx = x - labelTree.bx + 1
-            rCache[lz][lx] = (
-                -- should be on land
-                daCache[lz][lx] <= MaxWaterDepthAmphibious and
-                -- should have accessible terrain type
-                bCache[lz][lx] and 
-                -- should be flat enough
-                pCache[lz][lx] and 0)
-                -- or this is inaccessible
-                or -1
-
-            -- if rCache[lz][lx] == 0 then
-            --     DrawSquare(x + 0.35, z + 0.35, 0.3, 'ffa500')
-            -- end
+    local size = labelTree.c
+    for z = 1, size do
+        for x = 1, size do
+            if daCache[z][x] <= MaxWaterDepthAmphibious and -- should be on land
+                bCache[z][x] and -- should have accessible terrain type
+                pCache[z][x] -- should be flat enough
+            then
+                rCache[z][x] = 0
+                --DrawSquare(labelTree.bx + x + 0.35, labelTree.bz + z + 0.35, 0.3, 'ffa500')
+            else -- this is inaccessible
+                rCache[z][x] = -1
+            end
         end
     end
 end
 
 --- Scans and draws the navigational mesh, is controllable by the UI for debugging purposes
 function Scan()
-
     while true do
-
         local mouse = GetMouseWorldPos()
 
         LabelRoots['land']:Draw()
@@ -735,7 +724,7 @@ function Scan()
                 over:Draw(Shared.labelColors[over.label], 0.1)
                 over:Draw(Shared.labelColors[over.label], 0.15)
                 over:Draw(Shared.labelColors[over.label], 0.2)
-            else 
+            else
                 over:Draw('ff0000', 0.1)
                 over:Draw('ff0000', 0.15)
                 over:Draw('ff0000', 0.2)
@@ -743,21 +732,23 @@ function Scan()
 
             over:GenerateNeighbors(LabelRoots['land'])
             if over.neighbors then
-                for k, neighbor in over.neighbors do 
+                for _, neighbor in over.neighbors do
                     neighbor:Draw('22ff22', 0.25)
                 end
             end
         end
 
         WaitTicks(2)
+
     end
 end
 
 --- Generates the navigational mesh from `a` to `z`
 function Generate()
+    local blockSize = BlockSize
 
     -- eliminate any previous scanning threads
-    if ScanningThread then 
+    if ScanningThread then
         ScanningThread:Destroy()
     end
 
@@ -770,47 +761,52 @@ function Generate()
     WARN("Generating with: ")
     WARN(string.format(" - BlockCountPerAxis: %d", BlockCountPerAxis))
     WARN(string.format(" - MapSize: %d", MapSize))
-    WARN(string.format(" - BlockSize: %d", BlockSize))
+    WARN(string.format(" - BlockSize: %d", blockSize))
 
     WARN("Constructing caches")
 
-    local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(BlockSize)
+    local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(blockSize)
 
     ProfileData.TimeSetupCaches = start - GetSystemTimeSecondsOnlyForProfileUse()
     WARN(string.format("Time spent: %f", ProfileData.TimeSetupCaches))
     WARN("Generating label trees")
 
-    LabelRoots['land'] = (LabelRoot('land'))
-    LabelRoots['naval'] = (LabelRoot('naval'))
-    LabelRoots['hover'] = (LabelRoot('hover'))
-    LabelRoots['amph'] = (LabelRoot('amph'))
+    local labelRootLand = LabelRoot('land')
+    local labelRootNaval = LabelRoot('naval')
+    local labelRootHover = LabelRoot('hover')
+    local labelRootAmph = LabelRoot('amph')
+    LabelRoots['land'] = labelRootLand
+    LabelRoots['naval'] = labelRootNaval
+    LabelRoots['hover'] = labelRootHover
+    LabelRoots['amph'] = labelRootAmph
 
     for z = 0, BlockCountPerAxis - 1 do
+        local blockZ = z * blockSize
         for x = 0, BlockCountPerAxis - 1 do
-
-            local labelTreeLand = LabelTree('land', x * BlockSize, z * BlockSize, BlockSize)
-            local labelTreeNaval = LabelTree('naval', x * BlockSize, z * BlockSize, BlockSize)
-            local labelTreeHover = LabelTree('hover', x * BlockSize, z * BlockSize, BlockSize)
-            local labelTreeAmph = LabelTree('amph', x * BlockSize, z * BlockSize, BlockSize)
+            local blockX = x * blockSize
+            local labelTreeLand = LabelTree('land', blockX, blockZ, blockSize)
+            local labelTreeNaval = LabelTree('naval', blockX, blockZ, blockSize)
+            local labelTreeHover = LabelTree('hover', blockX, blockZ, blockSize)
+            local labelTreeAmph = LabelTree('amph', blockX, blockZ, blockSize)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the land layer
-            PopulateCaches(labelTreeLand, tCache, dCache,    daCache, pxCache, pzCache,  pCache, bCache)
+            PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
 
-            ComputeLandPathingMatrix(labelTreeLand,           daCache,                    pCache, bCache, rCache)
+            ComputeLandPathingMatrix(labelTreeLand,        daCache,                    pCache, bCache, rCache)
             labelTreeLand:Compress(rCache)
-            LabelRoots['land']:AddTree(z, x, labelTreeLand)
+            labelRootLand:AddTree(z, x, labelTreeLand)
 
-            ComputeNavalPathingMatrix(labelTreeNaval,         daCache,                    pCache, bCache, rCache)
+            ComputeNavalPathingMatrix(labelTreeNaval,      daCache,                    pCache, bCache, rCache)
             labelTreeNaval:Compress(rCache)
-            LabelRoots['naval']:AddTree(z, x, labelTreeNaval)
+            labelRootNaval:AddTree(z, x, labelTreeNaval)
 
-            ComputeHoverPathingMatrix(labelTreeHover,       daCache,                    pCache, bCache, rCache)
+            ComputeHoverPathingMatrix(labelTreeHover,      daCache,                    pCache, bCache, rCache)
             labelTreeHover:Compress(rCache)
-            LabelRoots['hover']:AddTree(z, x, labelTreeHover)
+            labelRootHover:AddTree(z, x, labelTreeHover)
 
-            ComputeAmphPathingMatrix(labelTreeAmph,         daCache,                    pCache, bCache, rCache)
+            ComputeAmphPathingMatrix(labelTreeAmph,        daCache,                    pCache, bCache, rCache)
             labelTreeAmph:Compress(rCache)
-            LabelRoots['amph']:AddTree(z, x, labelTreeAmph)
+            labelRootAmph:AddTree(z, x, labelTreeAmph)
         end
     end
 
@@ -818,10 +814,10 @@ function Generate()
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
     WARN("Generating neighbours")
 
-    LabelRoots['land']:GenerateNeighbors()
-    LabelRoots['naval']:GenerateNeighbors()
-    LabelRoots['amph']:GenerateNeighbors()
-    LabelRoots['hover']:GenerateNeighbors()
+    labelRootLand:GenerateNeighbors()
+    labelRootNaval:GenerateNeighbors()
+    labelRootHover:GenerateNeighbors()
+    labelRootAmph:GenerateNeighbors()
 
     ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
