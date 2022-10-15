@@ -114,7 +114,6 @@ local LabelRoot = ClassSimple {
     ---@param self LabelRoot
     ---@param layer NavLayers
     __init = function(self, layer)
-        self.Layer = layer
         self.Trees = { }
         for z = 0, BlockCountPerAxis - 1 do
             self.Trees[z] = { }
@@ -122,6 +121,9 @@ local LabelRoot = ClassSimple {
                 self.Trees[z][x] = { }
             end
         end
+
+        self.Layer = layer
+        self.FreeLabel = 1
     end,
 
     --- Adds a (compressed) label tree
@@ -167,8 +169,23 @@ local LabelRoot = ClassSimple {
         end
     end,
 
-    GenerateLabels = function(self)
+    --- Generates a unique label for an enclosed area
+    ---@param self LabelRoot
+    ---@return integer
+    GenerateUniqueLabel = function(self)
+        self.FreeLabel = self.FreeLabel + 1
+        return self.FreeLabel
+    end,
 
+    ---@param self LabelRoot
+    GenerateLabels = function(self)
+        for z = 0, BlockCountPerAxis - 1 do
+            for x = 0, BlockCountPerAxis - 1 do
+                local tree = self.Trees[z][x]
+                local label = self:GenerateUniqueLabel()
+                tree:GenerateLabels(label)
+            end
+        end
     end,
 
     --- Draws all trees with the correct layer color
@@ -402,10 +419,33 @@ LabelTree = ClassSimple {
         if neighbor and neighbor.label >= 0 then
             neighbors[neighbor.identifier] = neighbor
         end
-    end;
+    end,
 
-    GenerateLabels = function(self)
+    ---@param self LabelTree
+    ---@param label number
+    GenerateLabels = function(self, label)
+        -- leaf case
+        if self.label then
 
+            -- if we have no label yet
+            if self.label == 0 then
+
+                -- assign the label, and then search through our neighbors to assign the same label to them
+                self.label = label
+                for _, neighbor in self.neighbors do
+                    if neighbor.label == 0 then
+                        neighbor:GenerateLabels(label)
+                    end
+                end
+            end
+
+            return
+        end
+
+        -- node case
+        for _, child in self.children do
+            child:GenerateLabels(label)
+        end
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
@@ -691,11 +731,21 @@ function Scan()
 
         local over = LabelRoots['land']:FindLeaf(mouse)
         if over then 
-            over:Draw('ffffff')
+            LOG(over.label)
+            if over.label > 0 then
+                over:Draw(Shared.labelColors[over.label], 0.1)
+                over:Draw(Shared.labelColors[over.label], 0.15)
+                over:Draw(Shared.labelColors[over.label], 0.2)
+            else 
+                over:Draw('ff0000', 0.1)
+                over:Draw('ff0000', 0.15)
+                over:Draw('ff0000', 0.2)
+            end
+
             over:GenerateNeighbors(LabelRoots['land'])
             if over.neighbors then
                 for k, neighbor in over.neighbors do 
-                    neighbor:Draw('ff2222', 0.25)
+                    neighbor:Draw('22ff22', 0.25)
                 end
             end
         end
@@ -773,6 +823,15 @@ function Generate()
     LabelRoots['naval']:GenerateNeighbors()
     LabelRoots['amph']:GenerateNeighbors()
     LabelRoots['hover']:GenerateNeighbors()
+
+    ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
+    WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
+    WARN("Generating labels")
+
+    LabelRoots['land']:GenerateLabels()
+    LabelRoots['naval']:GenerateLabels()
+    LabelRoots['amph']:GenerateLabels()
+    LabelRoots['hover']:GenerateLabels()
 
     ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
