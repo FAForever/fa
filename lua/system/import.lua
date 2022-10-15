@@ -114,8 +114,8 @@ function dirty_module(name, why)
         LOG("  marking '", name, "' for reload")
 
         -- allow us to run code when a module is ejected
-        if rawget(module, 'OnDirtyModule') then
-            local ok, msg = pcall(module.OnDirtyModule)
+        if rawget(module, '__OnDirtyModule') then
+            local ok, msg = pcall(module.__OnDirtyModule)
             if not ok then
                 WARN(msg)
             end

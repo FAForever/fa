@@ -259,7 +259,7 @@ function OnNavLayerData(data)
 end
 
 --- Called by the module manager when this module is dirty due to a disk change
-function OnDirtyModule()
+function __OnDirtyModule()
     if Root then
         Root:Destroy()
     end

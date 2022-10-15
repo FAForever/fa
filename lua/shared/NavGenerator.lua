@@ -22,12 +22,14 @@ function CreateEmptyNavLayerData()
         land = {
             Subdivisions = 0,
             PathableLeafs = 0,
-            UnpathableLeafs = 0
+            UnpathableLeafs = 0,
+            Neighbors = 0
         },
         amph = {
             Subdivisions = 0,
             PathableLeafs = 0,
-            UnpathableLeafs = 0
+            UnpathableLeafs = 0,
+            Neighbors = 0
         },
         hover = {
             Subdivisions = 0,
