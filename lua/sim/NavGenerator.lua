@@ -190,7 +190,7 @@ LabelTree = ClassSimple {
     ---@param rCache NavLabelCache
     Compress = function(self, rCache)
 
-        -- base case, if we're a square of 4 then we skip the chiComputeAmphPathingMatrixComputeHoverPathingMatrixComputeNavalPathingMatrixComputeLandPathingMatrixComputeNavalPathingFieldldren and become very pessimistic
+        -- base case, if we're a square of 4 then we skip the children and become very pessimistic
         if self.c <= 4 then
             local value = rCache[self.oz + 1][self.ox + 1]
             local uniform = true
