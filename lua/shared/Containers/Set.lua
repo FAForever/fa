@@ -182,6 +182,63 @@ Set = ClassSimple {
 
     -- end,
 
+    
+    ---Returns true if any element of set satisfies condition
+    ---@param self Set
+    ---@param condition? fun(value:any):boolean
+    ---@return boolean
+    Any = function(self, condition)
+        for v, _ in self._data do
+            if not condition or condition(v) then
+                return true
+            end
+        end
+        return false
+    end,
+
+    ---Returns true if all elements of set satisfy condition or set is empty
+    ---@param self Set
+    ---@param condition fun(value:any):boolean
+    ---@return boolean
+    All = function(self, condition)
+        for v, _ in self._data do
+            if not condition(v) then
+                return false
+            end
+        end
+        return true
+    end,
+
+    ---Returns new set where each element satisfies condition
+    ---@param self Set
+    ---@param condition fun(value:any):boolean
+    ---@return Set
+    Where = function(self, condition)
+        local result = _Set()
+        for v, _ in self._data do
+            if condition(v) then
+                result:Add(v)
+            end
+        end
+        return result
+    end,
+
+    ---Set Iterator
+    ---@param self Set
+    ---@return fun(tbl: table<any,boolean>, key:any):any,nil
+    ---@return table<any,boolean>
+    Iter = function(self)
+        return self.Next, self._data
+    end,
+
+    ---Next function for set data
+    ---@param tbl table<any,boolean>
+    ---@param key any
+    ---@return any
+    ---@return nil
+    Next = function(tbl, key)
+        return (next(tbl, key)), nil
+    end
 
 }
 _Set = Set
