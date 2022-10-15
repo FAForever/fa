@@ -51,6 +51,9 @@ local MinWaterDepthNaval = 1.5
 --- TODO: properly annotate this, it is an array of an array of objects?
 local LabelTrees = { }
 
+---TODO: properly annotate this
+local LabelRoots = { }
+
 --- Scanning thread for debugging utilities
 ---@type thread?
 local ScanningThread = nil
@@ -119,6 +122,59 @@ local function DrawSquare(px, pz, c, color)
     DrawLine(br, tr, color)
 end
 
+---@class LabelRoot
+---@field Layer NavLayers
+---@field Trees LabelTree[][]
+local LabelRoot = ClassSimple {
+
+    ---@param self LabelRoot
+    ---@param layer NavLayers
+    __init = function(self, layer)
+        self.Layer = layer
+        self.Trees = { }
+        for z = 0, BlockCountPerAxis - 1 do
+            self.Trees[z] = { }
+            for x = 0, BlockCountPerAxis - 1 do
+                self.Trees[z][x] = { }
+            end
+        end
+    end,
+
+    ---@param self LabelRoot
+    ---@param z number
+    ---@param x number
+    ---@param labelTree LabelTree
+    AddTree = function (self, z, x, labelTree)
+        self.Trees[z][x] = labelTree
+    end,
+
+    --- Returns the leaf that encompasses the position, or nil if no leaf does
+    ---@param self LabelRoot
+    ---@param position Vector A position in world space
+    ---@return LabelTree?
+    FindLeaf = function(self, position)
+        if position[1] > 0 and position[3] > 0 then
+            local bx = (position[1] / BlockSize) ^ 0
+            local bz = (position[3] / BlockSize) ^ 0
+            local labelTree = self.Trees[bz][bx]
+            if labelTree then
+                return labelTree:FindLeaf(position)
+            end
+        end
+
+        return nil
+    end,
+
+    Draw = function(self)
+        for z = 0, BlockCountPerAxis - 1 do
+            for x = 0, BlockCountPerAxis - 1 do
+                self.Trees[z][x]:Draw(Shared.colors[self.Layer])
+            end
+        end
+    end,
+}
+
+-- defined here, as it is a recursive class
 local LabelTree
 
 --- A simplified quad tree to act as a compression of the pathing capabilities of a section of the heightmap
@@ -157,7 +213,7 @@ LabelTree = ClassSimple {
     ---@param rCache number[][]
     Compress = function(self, rCache)
 
-        -- base case, if we're a square of 4 then we skip the children and become very pessimistic
+        -- base case, if we're a square of 4 then we skip the chiComputeAmphPathingMatrixComputeHoverPathingMatrixComputeNavalPathingMatrixComputeLandPathingMatrixComputeNavalPathingFieldldren and become very pessimistic
         if self.c <= 4 then
             local value = rCache[self.oz + 1][self.ox + 1]
             local uniform = true
@@ -393,7 +449,7 @@ end
 ---@param bCache boolean[][]
 ---@param pCache boolean[][]
 ---@param rCache number[][]
-function ComputeLandPathingField(labelTree, daCache, pCache, bCache, rCache)
+function ComputeLandPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     for z = labelTree.bz, labelTree.bz + labelTree.c - 1 do
         local lz = z - labelTree.bz + 1
         for x = labelTree.bx, labelTree.bx + labelTree.c - 1 do
@@ -420,7 +476,7 @@ end
 ---@param bCache boolean[][]
 ---@param pCache boolean[][]
 ---@param rCache number[][]
-function ComputeHoverPathingField(labelTree, daCache, pCache, bCache, rCache)
+function ComputeHoverPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     for z = labelTree.bz, labelTree.bz + labelTree.c - 1 do
         local lz = z - labelTree.bz + 1
         for x = labelTree.bx, labelTree.bx + labelTree.c - 1 do
@@ -449,7 +505,7 @@ end
 ---@param bCache boolean[][]
 ---@param pCache boolean[][]
 ---@param rCache number[][]
-function DetermineNavalPathingField(labelTree, daCache, pCache, bCache, rCache)
+function ComputeNavalPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     for z = labelTree.bz, labelTree.bz + labelTree.c - 1 do
         local lz = z - labelTree.bz + 1
         for x = labelTree.bx, labelTree.bx + labelTree.c - 1 do
@@ -474,7 +530,7 @@ end
 ---@param bCache boolean[][]
 ---@param pCache boolean[][]
 ---@param rCache number[][]
-function DetermineAmphPathingField(labelTree, daCache, pCache, bCache, rCache)
+function ComputeAmphPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     for z = labelTree.bz, labelTree.bz + labelTree.c - 1 do
         local lz = z - labelTree.bz + 1
         for x = labelTree.bx, labelTree.bx + labelTree.c - 1 do
@@ -503,19 +559,12 @@ function Scan()
 
         local mouse = GetMouseWorldPos()
 
-        for z = 0, BlockCountPerAxis - 1 do
-            for x = 0, BlockCountPerAxis - 1 do
+        LabelRoots['land']:Draw()
+        LabelRoots['naval']:Draw()
 
-                LabelTrees[z][x]['land']:Draw(Shared.colors['land'])
-                LabelTrees[z][x]['naval']:Draw(Shared.colors['naval'])
-
-                for k, tree in LabelTrees[z][x] do
-                    local over = tree:FindLeaf(mouse)
-                    if over then 
-                        over:Draw('ff0000')
-                    end
-                end
-            end
+        local over = LabelRoots['land']:FindLeaf(mouse)
+        if over then 
+            over:Draw('ffffff')
         end
 
         WaitTicks(2)
@@ -550,31 +599,37 @@ function Generate()
     WARN(string.format("Time spent: %f", ProfileData.TimeSetupCaches))
     WARN("Constructing label trees")
 
-    local trees = LabelTrees
-    for z = 0, BlockCountPerAxis - 1 do
-        trees[z] = { }
-        for x = 0, BlockCountPerAxis - 1 do
-            trees[z][x] = { }
+    LabelRoots['land'] = LabelRoot('land')
+    LabelRoots['naval'] = LabelRoot('naval')
+    LabelRoots['hover'] = LabelRoot('hover')
+    LabelRoots['amph'] = LabelRoot('amph')
 
-            trees[z][x]['land'] = LabelTree('land', z * BlockSize, x * BlockSize, BlockSize)
-            trees[z][x]['naval'] = LabelTree('naval', z * BlockSize, x * BlockSize, BlockSize)
-            trees[z][x]['hover'] = LabelTree('hover', z * BlockSize, x * BlockSize, BlockSize)
-            trees[z][x]['amph'] = LabelTree('amph', z * BlockSize, x * BlockSize, BlockSize)
+    for z = 0, BlockCountPerAxis - 1 do
+        for x = 0, BlockCountPerAxis - 1 do
+
+            local labelTreeLand = LabelTree('land', x * BlockSize, z * BlockSize, BlockSize)
+            local labelTreeNaval = LabelTree('naval', x * BlockSize, z * BlockSize, BlockSize)
+            local labelTreeHover = LabelTree('hover', x * BlockSize, z * BlockSize, BlockSize)
+            local labelTreeAmph = LabelTree('amph', x * BlockSize, z * BlockSize, BlockSize)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the land layer
-            PopulateCaches(trees[z][x]['land'], tCache, dCache,    daCache, pxCache, pzCache,  pCache, bCache)
+            PopulateCaches(labelTreeLand, tCache, dCache,    daCache, pxCache, pzCache,  pCache, bCache)
 
-            ComputeLandPathingField(trees[z][x]['land'],           daCache,                    pCache, bCache, rCache)
-            trees[z][x]['land']:Compress(rCache)
+            ComputeLandPathingMatrix(labelTreeLand,           daCache,                    pCache, bCache, rCache)
+            labelTreeLand:Compress(rCache)
+            LabelRoots['land']:AddTree(z, x, labelTreeLand)
 
-            ComputeHoverPathingField(trees[z][x]['hover'],         daCache,                    pCache, bCache, rCache)
-            trees[z][x]['hover']:Compress(rCache)
+            ComputeNavalPathingMatrix(labelTreeNaval,         daCache,                    pCache, bCache, rCache)
+            labelTreeNaval:Compress(rCache)
+            LabelRoots['naval']:AddTree(z, x, labelTreeNaval)
 
-            DetermineNavalPathingField(trees[z][x]['naval'],       daCache,                    pCache, bCache, rCache)
-            trees[z][x]['naval']:Compress(rCache)
+            ComputeHoverPathingMatrix(labelTreeHover,       daCache,                    pCache, bCache, rCache)
+            labelTreeHover:Compress(rCache)
+            LabelRoots['hover']:AddTree(z, x, labelTreeHover)
 
-            DetermineAmphPathingField(trees[z][x]['amph'],         daCache,                    pCache, bCache, rCache)
-            trees[z][x]['amph']:Compress(rCache)
+            ComputeAmphPathingMatrix(labelTreeAmph,         daCache,                    pCache, bCache, rCache)
+            labelTreeAmph:Compress(rCache)
+            LabelRoots['amph']:AddTree(z, x, labelTreeAmph)
         end
     end
 
