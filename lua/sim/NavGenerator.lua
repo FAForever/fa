@@ -27,6 +27,8 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 
 -- Tweakable data
 
+local SmallestLabelTree = 1
+
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
 ---@type number
@@ -55,8 +57,13 @@ local MinWaterDepthNaval = 1.5
 
 -- Generated data
 
---- TODO: properly annotate this, it is an array of an array of objects?
-local LabelTrees = { }
+local labelTreeIdentifier = 0
+
+local function GenerateLabelTreeIdentifier()
+    labelTreeIdentifier = labelTreeIdentifier + 1
+    return labelTreeIdentifier
+end
+
 
 ---TODO: properly annotate this
 local LabelRoots = { }
@@ -83,11 +90,12 @@ local br = { 0, 0, 0 }
 ---@param pz number
 ---@param c number
 ---@param color string
-local function DrawSquare(px, pz, c, color)
-    tl[1], tl[2], tl[3] = px, GetSurfaceHeight(px, pz), pz
-    tr[1], tr[2], tr[3] = px + c, GetSurfaceHeight(px + c, pz), pz
-    bl[1], bl[2], bl[3] = px, GetSurfaceHeight(px, pz + c), pz + c
-    br[1], br[2], br[3] = px + c, GetSurfaceHeight(px + c, pz + c), pz + c
+local function DrawSquare(px, pz, c, color, inset)
+    inset = inset or 0
+    tl[1], tl[2], tl[3] = px + inset, GetSurfaceHeight(px + inset, pz + inset), pz + inset
+    tr[1], tr[2], tr[3] = px + c - inset, GetSurfaceHeight(px + c - inset, pz + inset), pz + inset
+    bl[1], bl[2], bl[3] = px + inset, GetSurfaceHeight(px + inset, pz + c - inset), pz + c - inset
+    br[1], br[2], br[3] = px + c - inset, GetSurfaceHeight(px + c - inset, pz + c - inset), pz + c - inset
 
     DrawLine(tl, tr, color)
     DrawLine(tl, bl, color)
@@ -113,7 +121,7 @@ local LabelRoot = ClassSimple {
         end
     end,
 
-    --- Adds a (compressed) label tree, registering 
+    --- Adds a (compressed) label tree
     ---@param self LabelRoot
     ---@param z number
     ---@param x number
@@ -127,16 +135,37 @@ local LabelRoot = ClassSimple {
     ---@param position Vector A position in world space
     ---@return LabelTree?
     FindLeaf = function(self, position)
-        if position[1] > 0 and position[3] > 0 then
-            local bx = (position[1] / BlockSize) ^ 0
-            local bz = (position[3] / BlockSize) ^ 0
+        return self:FindLeafXZ(position[1], position[3])
+    end,
+
+    --- Returns the leaf that encompasses the x / z coordinates, or nil if no leaf does
+    ---@param self LabelRoot
+    ---@param x number x-coordinate, in world space
+    ---@param z number z-coordinate, in world space
+    ---@return LabelTree?
+    FindLeafXZ = function(self, x, z)
+        if x > 0 and z > 0 then
+            local bx = (x / BlockSize) ^ 0
+            local bz = (z / BlockSize) ^ 0
             local labelTree = self.Trees[bz][bx]
             if labelTree then
-                return labelTree:FindLeaf(position)
+                return labelTree:FindLeafXZ(x, z)
             end
         end
 
         return nil
+    end,
+
+    GenerateNeighbors = function(self)
+        for z = 0, BlockCountPerAxis - 1 do
+            for x = 0, BlockCountPerAxis - 1 do
+                self.Trees[z][x]:GenerateNeighbors(self)
+            end
+        end
+    end,
+
+    GenerateLabels = function(self)
+
     end,
 
     --- Draws all trees with the correct layer color
@@ -155,14 +184,16 @@ local LabelTree
 
 --- A simplified quad tree to act as a compression of the pathing capabilities of a section of the heightmap
 ---@class LabelTree
----@field layer NavLayers           # Layer that this label tree is operating on, used for debugging
----@field bx number                 # Location of top-left corner, in world space
----@field bz number                 # Location of top-left corner, in world space
----@field ox number                 # Offset of top-left corner, in world space
----@field oz number                 # Offset of top-left corner, in world space
----@field c number                  # Element count starting at { bx + ox, bz + oz } that describes the square that is covered
----@field children? LabelTree[]     # Children, is nil if we are assigned a label
----@field label? number             # Label, is nil if we require a subdivision
+---@field identifier number                     # Unique number used for table operations
+---@field layer NavLayers                       # Layer that this label tree is operating on, used for debugging
+---@field bx number                             # Location of top-left corner, in world space
+---@field bz number                             # Location of top-left corner, in world space
+---@field ox number                             # Offset of top-left corner, in world space
+---@field oz number                             # Offset of top-left corner, in world space
+---@field c number                              # Element count starting at { bx + ox, bz + oz } that describes the square that is covered
+---@field children? LabelTree[]                 # Is nil if we are a leaf (label assigned)
+---@field label? number                         # Is nil if we are a node (no label assigned)
+---@field neighbors? table<number, LabelTree>   # Is nil if we are a node (no label assigned)
 LabelTree = ClassSimple {
 
     ---@param self LabelTree
@@ -170,8 +201,9 @@ LabelTree = ClassSimple {
     ---@param bz number
     ---@param c number
     __init = function(self, layer, bx, bz, c, ox, oz)
-        self.layer = layer
+        self.identifier = GenerateLabelTreeIdentifier()
 
+        self.layer = layer
         self.bx = bx
         self.bz = bz
         self.c = c
@@ -182,6 +214,7 @@ LabelTree = ClassSimple {
         -- these are technically obsolete, but are here for code readability
         self.children = nil
         self.label = nil
+        self.neighbors = nil
     end,
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
@@ -191,7 +224,7 @@ LabelTree = ClassSimple {
     Compress = function(self, rCache)
 
         -- base case, if we're a square of 4 then we skip the children and become very pessimistic
-        if self.c <= 4 then
+        if self.c <= SmallestLabelTree then
             local value = rCache[self.oz + 1][self.ox + 1]
             local uniform = true
             for z = self.oz + 1, self.oz + self.c do
@@ -258,14 +291,118 @@ LabelTree = ClassSimple {
         end
     end,
 
+    ---
+    ---@param self LabelTree
+    ---@param root LabelRoot
+    GenerateNeighbors = function(self, root)
 
-    IsBlocked = function(self, x, z)
-
-        if not self.children then
-            return false
+        -- we are not valid :(
+        if self.label == -1 then
+            return
         end
 
-        -- check when we do have children
+        -- if we have children then we're a node, only leafs can have neighbors
+        if self.children then
+            for k, child in self.children do 
+                child:GenerateNeighbors(root)
+            end
+
+            return
+        end
+
+        -- we are a leaf, so find those neighbors!
+        local px = self.bx + self.ox
+        local pz = self.bz + self.oz
+        local c = self.c
+
+        local neighbor = nil
+        self.neighbors = { }
+        
+        -- scan top-left -> top-right
+
+        for k = px, px + c do
+            local x = k + 0.5
+            local z = pz - 0.5
+            -- DrawCircle({x, GetSurfaceHeight(x, z), z}, 0.5, 'ff0000')
+            neighbor = root:FindLeafXZ(x, z)
+            if neighbor and neighbor.label >= 0 then
+                k = k + neighbor.c - 1
+                self.neighbors[neighbor.identifier] = neighbor
+            end
+        end
+
+        -- -- scan bottom-left -> bottom-right
+        for k = px, px + c do 
+            
+            local x = k + 0.5
+            local z = pz + c + 0.5
+            -- DrawCircle({x, GetSurfaceHeight(x, z), z}, 0.5, 'ff0000')
+            neighbor = root:FindLeafXZ(x, z)
+            if neighbor and neighbor.label >= 0 then
+                k = k + neighbor.c - 1
+                self.neighbors[neighbor.identifier] = neighbor
+            end
+        end
+
+        -- -- scan left-top -> left-bottom
+
+        for k = pz, pz + c do 
+            local x = px - 0.5
+            local z = k + 0.5
+            -- DrawCircle({x, GetSurfaceHeight(x, z), z}, 0.5, 'ff0000')
+            neighbor = root:FindLeafXZ(x, z)
+            if neighbor and neighbor.label >= 0 then
+                k = k + neighbor.c - 1
+                self.neighbors[neighbor.identifier] = neighbor
+            end
+        end
+
+
+        -- -- scan right-top -> right-bottom
+
+        for k = pz, pz + c do 
+            local x = px + c + 0.5
+            local z = k + 0.5
+            -- DrawCircle({x, GetSurfaceHeight(x, z), z}, 0.5, 'ff0000')
+            neighbor = root:FindLeafXZ(x, z)
+            if neighbor and neighbor.label >= 0 then
+                k = k + neighbor.c - 1
+                self.neighbors[neighbor.identifier] = neighbor
+
+            end
+        end
+
+        -- scan top-left
+
+        neighbor = root:FindLeafXZ(px - 0.5, pz - 0.5)
+        -- DrawCircle({px - 0.5, GetSurfaceHeight(px - 0.5, pz - 0.5), pz - 0.5}, 0.5, 'ff0000')
+        if neighbor and neighbor.label >= 0 then
+            self.neighbors[neighbor.identifier] = neighbor
+        end
+
+        -- scan top-right
+
+        neighbor = root:FindLeafXZ(px + c + 0.5, pz - 0.5)
+        -- DrawCircle({px + c + 0.5, GetSurfaceHeight(px + c + 0.5, pz - 0.5), pz - 0.5}, 0.5, 'ff0000')
+        if neighbor and neighbor.label >= 0 then
+            self.neighbors[neighbor.identifier] = neighbor
+        end
+
+        -- scan bottom-left
+
+        -- DrawCircle({px - 0.5, GetSurfaceHeight(px - 0.5, pz + c + 0.5), pz + c + 0.5}, 0.5, 'ff0000')
+        neighbor = root:FindLeafXZ(px - 0.5, pz + c + 0.5)
+        if neighbor and neighbor.label >= 0 then
+            self.neighbors[neighbor.identifier] = neighbor
+        end
+
+        -- scan bottom-right
+
+        -- DrawCircle({px + c + 0.5, GetSurfaceHeight(px + c + 0.5, pz + c + 0.5), pz + c + 0.5}, 0.5, 'ff0000')
+        neighbor = root:FindLeafXZ(px + c + 0.5, pz + c + 0.5)
+        if neighbor and neighbor.label >= 0 then
+            self.neighbors[neighbor.identifier] = neighbor
+        end
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
@@ -273,13 +410,22 @@ LabelTree = ClassSimple {
     ---@param position Vector A position in world space
     ---@return LabelTree?
     FindLeaf = function(self, position)
-        if position[1] > self.bx + self.ox and position[1] < self.bx + self.ox + self.c then
-            if position[3] > self.bz + self.oz and position[3] < self.bz + self.oz + self.c then
+        return self:FindLeafXZ(position[1], position[3])
+    end,
+
+    --- Returns the leaf that encompasses the position, or nil if no leaf does
+    ---@param self LabelTree
+    ---@param x number x-coordinate, in world space
+    ---@param z number z-coordinate, in world space
+    ---@return LabelTree?
+    FindLeafXZ = function(self, x, z)
+        if x > self.bx + self.ox and x < self.bx + self.ox + self.c then
+            if z > self.bz + self.oz and z < self.bz + self.oz + self.c then
                 if not self.children then
                     return self
                 else
                     for k, child in self.children do 
-                        local result = child:FindLeaf(position)
+                        local result = child:FindLeafXZ(x, z)
                         if result then
                             return result
                         end
@@ -293,14 +439,14 @@ LabelTree = ClassSimple {
 
     ---@param self LabelTree
     ---@param color Color
-    Draw = function(self, color)
+    Draw = function(self, color, inset)
         if self.label != nil then
             if self.label >= 0 then
-                DrawSquare(self.bx + self.ox, self.bz + self.oz, self.c, color)
+                DrawSquare(self.bx + self.ox, self.bz + self.oz, self.c, color, inset)
             end
         else
             for k, child in self.children do
-                child:Draw(color)
+                child:Draw(color, inset)
             end
         end
     end,
@@ -543,6 +689,11 @@ function Scan()
         local over = LabelRoots['land']:FindLeaf(mouse)
         if over then 
             over:Draw('ffffff')
+            if over.neighbors then
+                for k, neighbor in over.neighbors do 
+                    neighbor:Draw('222222', 0.25)
+                end
+            end
         end
 
         WaitTicks(2)
@@ -575,12 +726,12 @@ function Generate()
 
     ProfileData.TimeSetupCaches = start - GetSystemTimeSecondsOnlyForProfileUse()
     WARN(string.format("Time spent: %f", ProfileData.TimeSetupCaches))
-    WARN("Constructing label trees")
+    WARN("Generating label trees")
 
-    LabelRoots['land'] = LabelRoot('land')
-    LabelRoots['naval'] = LabelRoot('naval')
-    LabelRoots['hover'] = LabelRoot('hover')
-    LabelRoots['amph'] = LabelRoot('amph')
+    LabelRoots['land'] = (LabelRoot('land') --[[@as LabelRoot]])
+    LabelRoots['naval'] = (LabelRoot('naval') --[[@as LabelRoot]])
+    LabelRoots['hover'] = (LabelRoot('hover') --[[@as LabelRoot]])
+    LabelRoots['amph'] = (LabelRoot('amph') --[[@as LabelRoot]])
 
     for z = 0, BlockCountPerAxis - 1 do
         for x = 0, BlockCountPerAxis - 1 do
@@ -610,6 +761,15 @@ function Generate()
             LabelRoots['amph']:AddTree(z, x, labelTreeAmph)
         end
     end
+
+    ProfileData.TimeLabelTrees = start - GetSystemTimeSecondsOnlyForProfileUse()
+    WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
+    WARN("Generating neighbours")
+
+    LabelRoots['land']:GenerateNeighbors()
+    LabelRoots['naval']:GenerateNeighbors()
+    LabelRoots['amph']:GenerateNeighbors()
+    LabelRoots['hover']:GenerateNeighbors()
 
     ProfileData.TimeLabelTrees = start - GetSystemTimeSecondsOnlyForProfileUse()
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
