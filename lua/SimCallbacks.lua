@@ -829,3 +829,7 @@ Callbacks.LoadIntoTransports = function(data, selection)
 
     end
 end
+
+Callbacks.NavGenerate = function(data)
+    import("/lua/sim/NavGenerator.lua").Generate()
+end

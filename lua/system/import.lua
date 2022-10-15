@@ -112,6 +112,15 @@ function dirty_module(name, why)
     if module then
         if why then LOG("Module '", name, "' changed on disk") end
         LOG("  marking '", name, "' for reload")
+
+        -- allow us to run code when a module is ejected
+        if rawget(module, 'OnDirtyModule') then
+            local ok, msg = pcall(module.OnDirtyModule)
+            if not ok then
+                WARN(msg)
+            end
+        end
+
         modules[name] = nil
         local deps = module.__moduleinfo.used_by
         if deps then

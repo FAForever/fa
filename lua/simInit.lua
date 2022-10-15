@@ -77,15 +77,6 @@ end
 --but before any armies are created.
 function SetupSession()
 
-    local ok, msg = pcall(
-        function()
-            import("/lua/sim/MarkerGenerator.lua").ProcessMap()
-        end
-    )
-    
-    reprsl(ok)
-    reprsl(msg)
-
     ScenarioInfo.TriggerManager = import('/lua/TriggerManager.lua').Manager
     TriggerManager = ScenarioInfo.TriggerManager
 
