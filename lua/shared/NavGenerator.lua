@@ -52,18 +52,20 @@ function CreateEmptyProfileData()
     }
 end
 
-Layers = {
-    'land',
-    'naval',
-    'amph',
-    'hover'
+ValidLayers = {
+    land = true,
+    naval = true,
+    amph = true,
+    hover = true,
+    air = true,
 }
 
 colors = {
     land = '00ff00',
     naval = '0000ff',
     amph = 'ffa500',
-    hover = '008080'
+    hover = '008080',
+    air = 'add8e6'
 }
 
 labelColors = { 

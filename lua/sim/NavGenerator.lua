@@ -69,7 +69,7 @@ end
 ---@field naval? LabelRoot
 ---@field hover? LabelRoot
 ---@field amph? LabelRoot
-local LabelRoots = { }
+LabelRoots = { }
 
 --- Scanning thread for debugging utilities
 ---@type thread?
