@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** This file is licensed using GNU GPL v3. You can find more information here:
+--** The code in this file is licensed using GNU GPL v3. You can find more information here:
 --** - https://www.gnu.org/licenses/gpl-3.0.en.html
 --**
 --** You can find an informal description of this license here:
