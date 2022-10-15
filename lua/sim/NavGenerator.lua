@@ -691,7 +691,7 @@ function Scan()
             over:Draw('ffffff')
             if over.neighbors then
                 for k, neighbor in over.neighbors do 
-                    neighbor:Draw('222222', 0.25)
+                    neighbor:Draw('ff2222', 0.25)
                 end
             end
         end
