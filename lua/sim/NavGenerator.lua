@@ -343,78 +343,86 @@ LabelTree = ClassSimple {
         -- scan top-left -> top-right
         for k = x1, x2 do
             local x = k + 0.5
-            DrawCircle({x, GetSurfaceHeight(x, z1Outside), z1Outside}, 0.5, 'ff0000')
+            -- DrawCircle({x, GetSurfaceHeight(x, z1Outside), z1Outside}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x, z1Outside)
             if neighbor then
                 k = k + neighbor.c - 1
                 if neighbor.label >= 0 then
                     neighbors[neighbor.identifier] = neighbor
                 end
+            else 
+                break
             end
         end
 
         -- scan bottom-left -> bottom-right
         for k = x1, x2 do
             local x = k + 0.5
-            DrawCircle({x, GetSurfaceHeight(x, z2Outside), z2Outside}, 0.5, 'ff0000')
+            -- DrawCircle({x, GetSurfaceHeight(x, z2Outside), z2Outside}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x, z2Outside)
             if neighbor then
                 k = k + neighbor.c - 1
                 if neighbor.label >= 0 then
                     neighbors[neighbor.identifier] = neighbor
                 end
+            else 
+                break
             end
         end
 
         -- scan left-top -> left-bottom
         for k = z1, z2 do
             z = k + 0.5
-            DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z), z}, 0.5, 'ff0000')
+            -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x1Outside, z)
             if neighbor then
                 k = k + neighbor.c - 1
                 if neighbor.label >= 0 then
                     neighbors[neighbor.identifier] = neighbor
                 end
+            else 
+                break
             end
         end
 
         -- scan right-top -> right-bottom
         for k = z1, z2 do
             z = k + 0.5
-            DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z), z}, 0.5, 'ff0000')
+            -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x2Outside, z)
             if neighbor then
                 k = k + neighbor.c - 1
                 if neighbor.label >= 0 then
                     neighbors[neighbor.identifier] = neighbor
                 end
+            else 
+                break
             end
         end
 
         -- scan top-left
         local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
-        DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
+        -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
         if neighbor and neighbor.label >= 0 then
             neighbors[neighbor.identifier] = neighbor
         end
 
         -- scan top-right
         neighbor = root:FindLeafXZ(x2Outside, z1Outside)
-        DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
+        -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
         if neighbor and neighbor.label >= 0 then
             neighbors[neighbor.identifier] = neighbor
         end
 
         -- scan bottom-left
-        DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
+        -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x1Outside, z2Outside)
         if neighbor and neighbor.label >= 0 then
             neighbors[neighbor.identifier] = neighbor
         end
 
         -- scan bottom-right
-        DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
+        -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x2Outside, z2Outside)
         if neighbor and neighbor.label >= 0 then
             neighbors[neighbor.identifier] = neighbor
