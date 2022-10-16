@@ -438,6 +438,12 @@ function OnCommandIssued(command)
             SimCallback({ Func = 'ImmediateHiveUpgrade', Args = { UpgradeTo = command.Blueprint } }, true )
         end
     end
+
+    -- unusual command, where we use the build interface
+    if modeData.callback and command.CommandType == "BuildMobile" and (not command.Units[1]) then
+        modeData.callback(modeData, command)
+        return false
+    end
         
     -- part of the cheat menu
     if modeData.cheat and command.CommandType == "BuildMobile" and (not command.Units[1]) then

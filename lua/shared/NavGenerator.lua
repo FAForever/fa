@@ -1,6 +1,11 @@
 
 ---@alias NavLayers 'Land' | 'Water' | 'Amphibious' | 'Hover' | 'Air'
 
+---@type NavLayers[]
+Layers = {
+    'Land', 'Water', 'Amphibious', 'Hover', 'Air'
+}
+
 ---@class NavProfileData
 ---@field TimeSetupCaches number
 ---@field TimeLabelTrees number

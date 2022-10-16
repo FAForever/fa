@@ -21,47 +21,47 @@ local NavGenerator = import('/lua/sim/NavGenerator.lua')
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector
----@return boolean
+---@return boolean?
 ---@return string?
 function CanPathTo(layer, origin, destination)
 
     -- check layer argument
     local root = NavGenerator.LabelRoots[layer] --[[@as LabelRoot]]
     if not root then
-        return false, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
+        return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
     end
 
     -- check origin argument
     local originLeaf = root:FindLeafXZ(origin[1], origin[3])
     if not originLeaf then
-        return false, 'Origin is not inside the map'
+        return nil, 'Origin is not inside the map'
     end
 
     if originLeaf.label == -1 then
-        return false, 'Origin is unpathable'
+        return nil, 'Origin is unpathable'
     end
 
     if originLeaf.label == 0 then
-        return false, 'Origin has no label assigned, report to the maintainers. This should not be possible'
+        return nil, 'Origin has no label assigned, report to the maintainers. This should not be possible'
     end
 
     -- check destination argument
     local destinationLeaf = root:FindLeafXZ(destination[1], destination[3])
     if not destinationLeaf then
-        return false, 'Destination is not inside the map'
+        return nil, 'Destination is not inside the map'
     end
 
     if destinationLeaf.label == -1 then
-        return false, 'Destination is unpathable'
+        return nil, 'Destination is unpathable'
     end
 
     if destinationLeaf.label == 0 then
-        return false, 'Destination has no label assigned, report to the maintainers. This should not be possible'
+        return nil, 'Destination has no label assigned, report to the maintainers. This should not be possible'
     end
 
     if originLeaf.label == destinationLeaf.label then
         return true
     else
-        return false, 'Labels do not match, you will need a transport :)'
+        return false, 'Labels do not match, you will need a transport ^^'
     end
 end

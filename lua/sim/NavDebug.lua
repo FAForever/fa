@@ -16,6 +16,7 @@
 
 local Shared = import('/lua/shared/NavGenerator.lua')
 local NavGenerator = import('/lua/sim/NavGenerator.lua')
+local NavUtils = import('/lua/sim/NavUtils.lua')
 
 local scanLand = false
 local scanHover = false
@@ -43,6 +44,57 @@ function ToggleAirScan()
     scanAir = not scanAir
 end
 
+local CanPathToDataOrigin = nil
+local CanPathToDataDestination = nil
+local CanPathToDataLayer = nil
+
+function CanPathToLayer(data)
+    CanPathToDataLayer = data.Layer
+end
+
+function CanPathToOrigin(data)
+    CanPathToLayer(data)
+    CanPathToDataOrigin = data.Location
+end
+
+function CanPathToDestination(data)
+    CanPathToLayer(data)
+    CanPathToDataDestination = data.Location
+end
+
+function CanPathToRerun(data)
+    CanPathToLayer(data)
+end
+
+function CanPathToReset()
+    CanPathToDataOrigin = nil
+    CanPathToDataDestination = nil
+    CanPathToDataLayer = nil
+end
+
+function ScanOver(mouse, layer)
+    NavGenerator.LabelRoots[layer]:Draw()
+    local over = NavGenerator.LabelRoots[layer]:FindLeaf(mouse)
+    if over then 
+        if over.label > 0 then
+            local color = Shared.labelColors[over.label]
+            over:Draw(color, 0.1)
+            over:Draw(color, 0.15)
+            over:Draw(color, 0.2)
+
+            if over.neighbors then
+                for _, neighbor in over.neighbors do
+                    neighbor:Draw(color, 0.25)
+                end
+            end
+        else
+            over:Draw('ff0000', 0.1)
+            over:Draw('ff0000', 0.15)
+            over:Draw('ff0000', 0.2)
+        end
+    end
+end
+
 --- Scans and draws the navigational mesh, is controllable by the UI for debugging purposes
 function Scan()
     while true do
@@ -53,50 +105,56 @@ function Scan()
         -- we can only work with it once it is finished generating
         if NavGenerator.IsGenerated() then
 
+            local mouse = GetMouseWorldPos()
+
             if scanLand then
-                NavGenerator.LabelRoots['Land']:Draw()
+                ScanOver(mouse, 'Land')
             end
 
             if scanHover then
-                NavGenerator.LabelRoots['Hover']:Draw()
+                ScanOver(mouse, 'Hover')
             end
 
             if scanWater then
-                NavGenerator.LabelRoots['Water']:Draw()
+                ScanOver(mouse, 'Water')
             end
 
             if scanAmph then
-                NavGenerator.LabelRoots['Amphibious']:Draw()
+                ScanOver(mouse, 'Amphibious')
             end
 
             if scanAir then
-                NavGenerator.LabelRoots['Air']:Draw()
+                ScanOver(mouse, 'Air')
+            end
+        end
+
+        if CanPathToDataOrigin then
+            DrawCircle(CanPathToDataOrigin, 3.9, '000000')
+            DrawCircle(CanPathToDataOrigin, 4, Shared.colors[CanPathToDataLayer] or 'ffffff')
+            DrawCircle(CanPathToDataOrigin, 4.1, '000000')
+        end
+
+        if CanPathToDataDestination then
+            DrawCircle(CanPathToDataDestination, 3.9, '000000')
+            DrawCircle(CanPathToDataDestination, 4, Shared.colors[CanPathToDataLayer] or 'ffffff')
+            DrawCircle(CanPathToDataDestination, 4.1, '000000')
+        end
+
+        if CanPathToDataOrigin and CanPathToDataDestination and CanPathToDataLayer then 
+            local ok, msg = NavUtils.CanPathTo(CanPathToDataLayer, CanPathToDataOrigin, CanPathToDataDestination)
+
+            if ok then 
+                DrawLinePop(CanPathToDataOrigin, CanPathToDataDestination, 'ffffff')
+            else 
+                DrawLinePop(CanPathToDataOrigin, CanPathToDataDestination, 'ff0000')
             end
 
-            -- local mouse = GetMouseWorldPos()
-
-            -- LabelRoots['land']:Draw()
-            -- LabelRoots['naval']:Draw()
-
-            -- local over = LabelRoots['land']:FindLeaf(mouse)
-            -- if over then 
-            --     if over.label > 0 then
-            --         over:Draw(Shared.labelColors[over.label], 0.1)
-            --         over:Draw(Shared.labelColors[over.label], 0.15)
-            --         over:Draw(Shared.labelColors[over.label], 0.2)
-            --     else
-            --         over:Draw('ff0000', 0.1)
-            --         over:Draw('ff0000', 0.15)
-            --         over:Draw('ff0000', 0.2)
-            --     end
-
-            --     over:GenerateNeighbors(LabelRoots['land'])
-            --     if over.neighbors then
-            --         for _, neighbor in over.neighbors do
-            --             neighbor:Draw('22ff22', 0.25)
-            --         end
-            --     end
-            -- end
+            Sync.NavCanPathToDebug = {
+                Ok = ok,
+                Msg = msg,
+                Origin = CanPathToDataOrigin,
+                Destination = CanPathToDataDestination,
+            }
         end
 
         WaitTicks(2)

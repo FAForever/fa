@@ -851,3 +851,19 @@ end
 Callbacks.NavToggleAirScan = function(data)
     import("/lua/sim/NavDebug.lua").ToggleAirScan()
 end
+
+Callbacks.NavDebugCanPathToOrigin = function(data)
+    import("/lua/sim/NavDebug.lua").CanPathToOrigin(data)
+end
+
+Callbacks.NavDebugCanPathToDestination = function(data)
+    import("/lua/sim/NavDebug.lua").CanPathToDestination(data)
+end
+
+Callbacks.NavDebugCanPathToLayer = function(data)
+    import("/lua/sim/NavDebug.lua").CanPathToLayer(data)
+end
+
+Callbacks.NavDebugCanPathToRerun = function(data)
+    import("/lua/sim/NavDebug.lua").CanPathToRerun(data)
+end
