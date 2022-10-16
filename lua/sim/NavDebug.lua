@@ -77,7 +77,7 @@ function ScanOver(mouse, layer)
     local over = NavGenerator.LabelRoots[layer]:FindLeaf(mouse)
     if over then 
         if over.label > 0 then
-            local color = Shared.labelColors[over.label]
+            local color = Shared.LabelToColor(over.label)
             over:Draw(color, 0.1)
             over:Draw(color, 0.15)
             over:Draw(color, 0.2)
@@ -130,13 +130,13 @@ function Scan()
 
         if CanPathToDataOrigin then
             DrawCircle(CanPathToDataOrigin, 3.9, '000000')
-            DrawCircle(CanPathToDataOrigin, 4, Shared.colors[CanPathToDataLayer] or 'ffffff')
+            DrawCircle(CanPathToDataOrigin, 4, Shared.LayerColors[CanPathToDataLayer] or 'ffffff')
             DrawCircle(CanPathToDataOrigin, 4.1, '000000')
         end
 
         if CanPathToDataDestination then
             DrawCircle(CanPathToDataDestination, 3.9, '000000')
-            DrawCircle(CanPathToDataDestination, 4, Shared.colors[CanPathToDataLayer] or 'ffffff')
+            DrawCircle(CanPathToDataDestination, 4, Shared.LayerColors[CanPathToDataLayer] or 'ffffff')
             DrawCircle(CanPathToDataDestination, 4.1, '000000')
         end
 
@@ -151,9 +151,7 @@ function Scan()
 
             Sync.NavCanPathToDebug = {
                 Ok = ok,
-                Msg = msg,
-                Origin = CanPathToDataOrigin,
-                Destination = CanPathToDataDestination,
+                Msg = msg
             }
         end
 

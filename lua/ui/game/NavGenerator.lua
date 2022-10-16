@@ -165,7 +165,7 @@ NavUILayerStatistics = Class(Group) {
 
         self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
             :Fill(self)
-            :Color('77' .. Shared.colors[layer])
+            :Color('77' .. Shared.LayerColors[layer])
             :DisableHitTest(true)
             :End()
 
@@ -176,20 +176,32 @@ NavUILayerStatistics = Class(Group) {
             :End()
 
         ---@type Text
-        self.Subdivisions = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Subdivisions: 0', 12, UIUtil.bodyFont))
+        self.Subdivisions = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Subdivisions: 0', 11, UIUtil.bodyFont))
             :Below(self.Title, 2)
             :Over(self, 1)
             :End()
 
         ---@type Text
-        self.PathableLeafs = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'PathableLeafs: 0', 12, UIUtil.bodyFont))
+        self.PathableLeafs = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'PathableLeafs: 0', 11, UIUtil.bodyFont))
             :Below(self.Subdivisions)
             :Over(self, 1)
             :End()
 
         ---@type Text
-        self.UnpathableLeafs = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'UnpathableLeafs: 0', 12, UIUtil.bodyFont))
+        self.UnpathableLeafs = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'UnpathableLeafs: 0', 11, UIUtil.bodyFont))
             :Below(self.PathableLeafs)
+            :Over(self, 1)
+            :End()
+
+        ---@type Text
+        self.Neighbors = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Neighbors: 0', 11, UIUtil.bodyFont))
+            :Below(self.UnpathableLeafs)
+            :Over(self, 1)
+            :End()
+
+        ---@type Text
+        self.Labels = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Labels: 0', 11, UIUtil.bodyFont))
+            :Below(self.Neighbors)
             :Over(self, 1)
             :End()
 
@@ -213,6 +225,8 @@ NavUILayerStatistics = Class(Group) {
                     self.Subdivisions:SetText(string.format('Subdivisions: %d', data[layer].Subdivisions))
                     self.PathableLeafs:SetText(string.format('PathableLeafs: %d', data[layer].PathableLeafs))
                     self.UnpathableLeafs:SetText(string.format('UnpathableLeafs: %d', data[layer].UnpathableLeafs))
+                    self.Neighbors:SetText(string.format('Neighbors: %d', data[layer].Neighbors))
+                    self.Labels:SetText(string.format('Labels: %d', data[layer].Labels))
                 end
             end, name
         )
@@ -247,7 +261,7 @@ NavUIActions = Class(Group) {
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.BodyGenerate.Top() + LayoutHelpers.ScaleNumber(10) end)
-            :Bottom(function() return self.BodyGenerate.Top() + LayoutHelpers.ScaleNumber(85) end)
+            :Bottom(function() return self.BodyGenerate.Top() + LayoutHelpers.ScaleNumber(100) end)
             :Over(self, 1)
             :End()
 
@@ -255,7 +269,7 @@ NavUIActions = Class(Group) {
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsLand.Bottom() + LayoutHelpers.ScaleNumber(10) end)
-            :Bottom(function() return self.StatisticsLand.Bottom() + LayoutHelpers.ScaleNumber(85) end)
+            :Bottom(function() return self.StatisticsLand.Bottom() + LayoutHelpers.ScaleNumber(100) end)
             :Over(self, 1)
             :End()
 
@@ -263,7 +277,7 @@ NavUIActions = Class(Group) {
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsAmph.Bottom() + LayoutHelpers.ScaleNumber(10) end)
-            :Bottom(function() return self.StatisticsAmph.Bottom() + LayoutHelpers.ScaleNumber(85) end)
+            :Bottom(function() return self.StatisticsAmph.Bottom() + LayoutHelpers.ScaleNumber(100) end)
             :Over(self, 1)
             :End()
 
@@ -271,12 +285,20 @@ NavUIActions = Class(Group) {
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsHover.Bottom() + LayoutHelpers.ScaleNumber(10) end)
-            :Bottom(function() return self.StatisticsHover.Bottom() + LayoutHelpers.ScaleNumber(85) end)
+            :Bottom(function() return self.StatisticsHover.Bottom() + LayoutHelpers.ScaleNumber(100) end)
+            :Over(self, 1)
+            :End()
+
+        self.StatisticsAir = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'Air'))
+            :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
+            :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.StatisticsNaval.Bottom() + LayoutHelpers.ScaleNumber(10) end)
+            :Bottom(function() return self.StatisticsNaval.Bottom() + LayoutHelpers.ScaleNumber(100) end)
             :Over(self, 1)
             :End()
 
         self.ButtonGenerate = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self.BodyGenerate, '/BUTTON/medium/', "Generate"))
-            :CenteredBelow(self.StatisticsNaval, 10)
+            :CenteredBelow(self.StatisticsAir, 10)
             :Over(self.BodyGenerate, 1)
             :End()
 
@@ -315,11 +337,11 @@ NavUI = Class(Window) {
 
         -- prepare base class
 
-        Window.__init(self, parent, "NavUI", false, false, false, true, false, "NavUI2", {
+        Window.__init(self, parent, "NavUI", false, false, false, true, false, "NavUI5", {
             Left = 10,
             Top = 300,
             Right = 830,
-            Bottom = 750
+            Bottom = 910
         })
 
         LayoutHelpers.DepthOverParent(self, parent, 1)
@@ -373,6 +395,8 @@ NavUI = Class(Window) {
         if not DebugInterface then
             self.Debug:Hide()
         end
+
+        LOG(math.mod(10, 4))
     end,
 
     ---comment

@@ -27,7 +27,7 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 
 -- Tweakable data
 
-local SmallestLabelTree = 1
+local SmallestLabelTree = 2
 
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
@@ -109,6 +109,7 @@ end
 ---@class LabelRoot
 ---@field Layer NavLayers
 ---@field Trees LabelTree[][]
+---@field FreeLabel number
 local LabelRoot = ClassSimple {
 
     ---@param self LabelRoot
@@ -161,6 +162,7 @@ local LabelRoot = ClassSimple {
         return nil
     end,
 
+    ---@param self LabelRoot
     GenerateNeighbors = function(self)
         for z = 0, BlockCountPerAxis - 1 do
             for x = 0, BlockCountPerAxis - 1 do
@@ -171,7 +173,7 @@ local LabelRoot = ClassSimple {
 
     --- Generates a unique label for an enclosed area
     ---@param self LabelRoot
-    ---@return integer
+    ---@return number
     GenerateUniqueLabel = function(self)
         self.FreeLabel = self.FreeLabel + 1
         return self.FreeLabel
@@ -179,13 +181,14 @@ local LabelRoot = ClassSimple {
 
     ---@param self LabelRoot
     GenerateLabels = function(self)
+        local stack = { }
         for z = 0, BlockCountPerAxis - 1 do
             for x = 0, BlockCountPerAxis - 1 do
-                local tree = self.Trees[z][x]
-                local label = self:GenerateUniqueLabel()
-                tree:GenerateLabels(label)
+                self.Trees[z][x]:GenerateLabels(self, stack)
             end
         end
+
+        NavLayerData[self.Layer].Labels = self.FreeLabel - 1
     end,
 
     --- Draws all trees with the correct layer color
@@ -193,7 +196,7 @@ local LabelRoot = ClassSimple {
     Draw = function(self)
         for z = 0, BlockCountPerAxis - 1 do
             for x = 0, BlockCountPerAxis - 1 do
-                self.Trees[z][x]:Draw(Shared.colors[self.Layer])
+                self.Trees[z][x]:Draw(Shared.LayerColors[self.Layer])
             end
         end
     end,
@@ -427,22 +430,54 @@ LabelTree = ClassSimple {
         if neighbor and neighbor.label >= 0 then
             neighbors[neighbor.identifier] = neighbor
         end
+
+        NavLayerData[self.layer].Neighbors = NavLayerData[self.layer].Neighbors + table.getsize(neighbors)
     end,
 
     ---@param self LabelTree
-    ---@param label number
-    GenerateLabels = function(self, label)
+    ---@param root LabelRoot
+    ---@param stack table
+    GenerateLabels = function(self, root, stack)
         -- leaf case
         if self.label then
 
-            -- if we have no label yet
+            -- check if we are unassigned (labels start at 1)
             if self.label == 0 then
+
+                -- we can hit a stack overflow if we do this recursively, therefore we do a 
+                -- depth first search using a stack that we re-use for better performance
+                local free = 1 
+                local label = root:GenerateUniqueLabel()
 
                 -- assign the label, and then search through our neighbors to assign the same label to them
                 self.label = label
+
+                -- add our pathable neighbors to the stack
                 for _, neighbor in self.neighbors do
                     if neighbor.label == 0 then
-                        neighbor:GenerateLabels(label)
+                        stack[free] = neighbor
+                        free = free + 1
+                    end
+
+                    if neighbor.label > 0 then 
+                        WARN("Something fishy happened")
+                    end
+                end
+
+                -- do depth first search
+                while free > 1 do
+
+                    -- retrieve from stack
+                    local other = stack[free - 1]
+                    free = free - 1
+
+                    -- assign label, and add unlabelled neighbors
+                    other.label = label
+                    for _, neighbor in other.neighbors do
+                        if neighbor.label == 0 then
+                            stack[free] = neighbor
+                            free = free + 1
+                        end
                     end
                 end
             end
@@ -452,7 +487,7 @@ LabelTree = ClassSimple {
 
         -- node case
         for _, child in self.children do
-            child:GenerateLabels(label)
+            child:GenerateLabels(root, stack)
         end
     end,
 
