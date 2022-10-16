@@ -29,6 +29,7 @@ NavUILayerStatistics = Class(Group) {
         self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
             :Fill(self)
             :Color('77' .. Shared.colors[layer])
+            :DisableHitTest(true)
             :End()
 
         ---@type Text
@@ -54,6 +55,17 @@ NavUILayerStatistics = Class(Group) {
             :Below(self.PathableLeafs)
             :Over(self, 1)
             :End()
+
+        self.ToggleScanButton = LayoutHelpers.LayoutFor(UIUtil.CreateButtonStd(self, '/game/mfd_btn/control', nil, nil, nil, nil, 'UI_Tab_Click_01', 'UI_Tab_Rollover_01'))
+            :AtRightTopIn(self)
+            :Width(24)
+            :Height(16)
+            :Over(self, 1)
+            :End()
+
+        self.ToggleScanButton.OnClick = function()
+            SimCallback({ Func = string.format("NavToggle%sScan", layer), Args = { }}, false)
+        end
 
         AddOnSyncCallback(
             function(Sync)
@@ -94,7 +106,7 @@ NavUIActions = Class(Group) {
             :Color('99999999')
             :End()
 
-        self.StatisticsLand = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'land'))
+        self.StatisticsLand = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'Land'))
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.BodyGenerate.Top() + LayoutHelpers.ScaleNumber(10) end)
@@ -102,7 +114,7 @@ NavUIActions = Class(Group) {
             :Over(self, 1)
             :End()
 
-        self.StatisticsAmph = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'amph'))
+        self.StatisticsAmph = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'Amphibious'))
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsLand.Bottom() + LayoutHelpers.ScaleNumber(10) end)
@@ -110,7 +122,7 @@ NavUIActions = Class(Group) {
             :Over(self, 1)
             :End()
 
-        self.StatisticsHover = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'hover'))
+        self.StatisticsHover = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'Hover'))
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsAmph.Bottom() + LayoutHelpers.ScaleNumber(10) end)
@@ -118,7 +130,7 @@ NavUIActions = Class(Group) {
             :Over(self, 1)
             :End()
 
-        self.StatisticsNaval = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'naval'))
+        self.StatisticsNaval = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'Naval'))
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsHover.Bottom() + LayoutHelpers.ScaleNumber(10) end)

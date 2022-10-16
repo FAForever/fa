@@ -27,7 +27,7 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 
 -- Tweakable data
 
-local SmallestLabelTree = 4
+local SmallestLabelTree = 1
 
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
@@ -51,29 +51,29 @@ local MaxHeightDifference = 0.75
 ---@type number
 local MaxWaterDepthAmphibious = 25
 
---- Minimum dept that naval units consider to be pathable
+--- Minimum dept that Naval units consider to be pathable
 ---@type number
 local MinWaterDepthNaval = 1.5
+
+local Generated = false
+function IsGenerated()
+    return Generated
+end
 
 -- Generated data
 
 local labelTreeIdentifier = 0
-
 local function GenerateLabelTreeIdentifier()
     labelTreeIdentifier = labelTreeIdentifier + 1
     return labelTreeIdentifier
 end
 
 ---@class LabelRoots
----@field land? LabelRoot
----@field naval? LabelRoot
----@field hover? LabelRoot
----@field amph? LabelRoot
+---@field Land? LabelRoot
+---@field Naval? LabelRoot
+---@field Hover? LabelRoot
+---@field Amphibious? LabelRoot
 LabelRoots = { }
-
---- Scanning thread for debugging utilities
----@type thread?
-local ScanningThread = nil
 
 -- Shared data with UI
 
@@ -718,47 +718,11 @@ function ComputeAmphPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     end
 end
 
---- Scans and draws the navigational mesh, is controllable by the UI for debugging purposes
-function Scan()
-    while true do
-        local mouse = GetMouseWorldPos()
 
-        LabelRoots['land']:Draw()
-        LabelRoots['naval']:Draw()
-
-        local over = LabelRoots['land']:FindLeaf(mouse)
-        if over then 
-            if over.label > 0 then
-                over:Draw(Shared.labelColors[over.label], 0.1)
-                over:Draw(Shared.labelColors[over.label], 0.15)
-                over:Draw(Shared.labelColors[over.label], 0.2)
-            else
-                over:Draw('ff0000', 0.1)
-                over:Draw('ff0000', 0.15)
-                over:Draw('ff0000', 0.2)
-            end
-
-            over:GenerateNeighbors(LabelRoots['land'])
-            if over.neighbors then
-                for _, neighbor in over.neighbors do
-                    neighbor:Draw('22ff22', 0.25)
-                end
-            end
-        end
-
-        WaitTicks(2)
-
-    end
-end
 
 --- Generates the navigational mesh from `a` to `z`
 function Generate()
     local blockSize = BlockSize
-
-    -- eliminate any previous scanning threads
-    if ScanningThread then
-        ScanningThread:Destroy()
-    end
 
     ProfileData = Shared.CreateEmptyProfileData()
     NavLayerData = Shared.CreateEmptyNavLayerData()
@@ -779,25 +743,25 @@ function Generate()
     WARN(string.format("Time spent: %f", ProfileData.TimeSetupCaches))
     WARN("Generating label trees")
 
-    local labelRootLand = LabelRoot('land')
-    local labelRootNaval = LabelRoot('naval')
-    local labelRootHover = LabelRoot('hover')
-    local labelRootAmph = LabelRoot('amph')
-    LabelRoots['land'] = labelRootLand
-    LabelRoots['naval'] = labelRootNaval
-    LabelRoots['hover'] = labelRootHover
-    LabelRoots['amph'] = labelRootAmph
+    local labelRootLand = LabelRoot('Land')
+    local labelRootNaval = LabelRoot('Naval')
+    local labelRootHover = LabelRoot('Hover')
+    local labelRootAmph = LabelRoot('Amphibious')
+    LabelRoots['Land'] = labelRootLand
+    LabelRoots['Naval'] = labelRootNaval
+    LabelRoots['Hover'] = labelRootHover
+    LabelRoots['Amphibious'] = labelRootAmph
 
     for z = 0, BlockCountPerAxis - 1 do
         local blockZ = z * blockSize
         for x = 0, BlockCountPerAxis - 1 do
             local blockX = x * blockSize
-            local labelTreeLand = LabelTree('land', blockX, blockZ, blockSize)
-            local labelTreeNaval = LabelTree('naval', blockX, blockZ, blockSize)
-            local labelTreeHover = LabelTree('hover', blockX, blockZ, blockSize)
-            local labelTreeAmph = LabelTree('amph', blockX, blockZ, blockSize)
+            local labelTreeLand = LabelTree('Land', blockX, blockZ, blockSize)
+            local labelTreeNaval = LabelTree('Naval', blockX, blockZ, blockSize)
+            local labelTreeHover = LabelTree('Hover', blockX, blockZ, blockSize)
+            local labelTreeAmph = LabelTree('Amphibious', blockX, blockZ, blockSize)
 
-            -- pre-computing the caches is irrelevant layer-wise, so we just pick the land layer
+            -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
             PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
 
             ComputeLandPathingMatrix(labelTreeLand,        daCache,                    pCache, bCache, rCache)
@@ -831,25 +795,27 @@ function Generate()
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
     WARN("Generating labels")
 
-    LabelRoots['land']:GenerateLabels()
-    LabelRoots['naval']:GenerateLabels()
-    LabelRoots['amph']:GenerateLabels()
-    LabelRoots['hover']:GenerateLabels()
+    LabelRoots['Land']:GenerateLabels()
+    LabelRoots['Naval']:GenerateLabels()
+    LabelRoots['Amphibious']:GenerateLabels()
+    LabelRoots['Hover']:GenerateLabels()
 
     ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
 
-    -- restart the scanning thread
-    ScanningThread = ForkThread(Scan)
+    -- allows debugging tools to function
+    import("/lua/sim/NavDebug.lua")
 
     -- pass data to sync
     Sync.NavProfileData = ProfileData
     Sync.NavLayerData = NavLayerData
+
+    -- we're done :)!
+    Generated = true
 end
 
 --- Called by the module manager when this module is dirty due to a disk change
 function __OnDirtyModule()
-    if ScanningThread then
-        ScanningThread:Destroy()
-    end
 end
+
+

@@ -1,5 +1,5 @@
 
----@alias NavLayers 'land' | 'naval' | 'amph' | 'hover' | 'air'
+---@alias NavLayers 'Land' | 'Naval' | 'Amphibious' | 'Hover' | 'Air'
 
 ---@class NavProfileData
 ---@field TimeSetupCaches number
@@ -19,24 +19,29 @@
 ---@return NavLayerData
 function CreateEmptyNavLayerData()
     return {
-        land = {
+        Land = {
             Subdivisions = 0,
             PathableLeafs = 0,
             UnpathableLeafs = 0,
             Neighbors = 0
         },
-        amph = {
+        Amphibious = {
             Subdivisions = 0,
             PathableLeafs = 0,
             UnpathableLeafs = 0,
             Neighbors = 0
         },
-        hover = {
+        Hover = {
             Subdivisions = 0,
             PathableLeafs = 0,
             UnpathableLeafs = 0
         },
-        naval = {
+        Naval = {
+            Subdivisions = 0,
+            PathableLeafs = 0,
+            UnpathableLeafs = 0
+        },
+        Air = {
             Subdivisions = 0,
             PathableLeafs = 0,
             UnpathableLeafs = 0
@@ -52,20 +57,12 @@ function CreateEmptyProfileData()
     }
 end
 
-ValidLayers = {
-    land = true,
-    naval = true,
-    amph = true,
-    hover = true,
-    air = true,
-}
-
 colors = {
-    land = '00ff00',
-    naval = '0000ff',
-    amph = 'ffa500',
-    hover = '008080',
-    air = 'add8e6'
+    Land = '00ff00',
+    Naval = '0000ff',
+    Amphibious = 'ffa500',
+    Hover = '008080',
+    Air = 'add8e6'
 }
 
 labelColors = { 

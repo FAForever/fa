@@ -831,3 +831,23 @@ end
 Callbacks.NavGenerate = function(data)
     import("/lua/sim/NavGenerator.lua").Generate()
 end
+
+Callbacks.NavToggleLandScan = function(data)
+    import("/lua/sim/NavDebug.lua").ToggleLandScan()
+end
+
+Callbacks.NavToggleHoverScan = function(data)
+    import("/lua/sim/NavDebug.lua").ToggleHoverScan()
+end
+
+Callbacks.NavToggleNavalScan = function(data)
+    import("/lua/sim/NavDebug.lua").ToggleNavalScan()
+end
+
+Callbacks.NavToggleAmphibiousScan = function(data)
+    import("/lua/sim/NavDebug.lua").ToggleAmphScan()
+end
+
+Callbacks.NavToggleAirScan = function(data)
+    import("/lua/sim/NavDebug.lua").ToggleAirScan()
+end
