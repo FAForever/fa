@@ -1,5 +1,5 @@
 
----@alias NavLayers 'Land' | 'Naval' | 'Amphibious' | 'Hover' | 'Air'
+---@alias NavLayers 'Land' | 'Water' | 'Amphibious' | 'Hover' | 'Air'
 
 ---@class NavProfileData
 ---@field TimeSetupCaches number
@@ -36,7 +36,7 @@ function CreateEmptyNavLayerData()
             PathableLeafs = 0,
             UnpathableLeafs = 0
         },
-        Naval = {
+        Water = {
             Subdivisions = 0,
             PathableLeafs = 0,
             UnpathableLeafs = 0
@@ -59,7 +59,7 @@ end
 
 colors = {
     Land = '00ff00',
-    Naval = '0000ff',
+    Water = '0000ff',
     Amphibious = 'ffa500',
     Hover = '008080',
     Air = 'add8e6'

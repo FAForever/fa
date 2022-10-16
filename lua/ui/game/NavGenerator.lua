@@ -130,7 +130,7 @@ NavUIActions = Class(Group) {
             :Over(self, 1)
             :End()
 
-        self.StatisticsNaval = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'Naval'))
+        self.StatisticsNaval = LayoutHelpers.LayoutFor(NavUILayerStatistics(self, 'Water'))
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsHover.Bottom() + LayoutHelpers.ScaleNumber(10) end)

@@ -19,7 +19,7 @@ local NavGenerator = import('/lua/sim/NavGenerator.lua')
 
 local scanLand = false
 local scanHover = false
-local scanNaval = false
+local scanWater = false
 local scanAmph = false
 local scanAir = false
 
@@ -31,8 +31,8 @@ function ToggleHoverScan()
     scanHover = not scanHover
 end
 
-function ToggleNavalScan()
-    scanNaval = not scanNaval
+function ToggleWaterScan()
+    scanWater = not scanWater
 end
 
 function ToggleAmphScan()
@@ -53,8 +53,6 @@ function Scan()
         -- we can only work with it once it is finished generating
         if NavGenerator.IsGenerated() then
 
-            LOG("Scanning!")
-
             if scanLand then
                 NavGenerator.LabelRoots['Land']:Draw()
             end
@@ -63,8 +61,8 @@ function Scan()
                 NavGenerator.LabelRoots['Hover']:Draw()
             end
 
-            if scanNaval then
-                NavGenerator.LabelRoots['Naval']:Draw()
+            if scanWater then
+                NavGenerator.LabelRoots['Water']:Draw()
             end
 
             if scanAmph then
@@ -102,7 +100,6 @@ function Scan()
         end
 
         WaitTicks(2)
-
     end
 end
 

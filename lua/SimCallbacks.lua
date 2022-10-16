@@ -840,8 +840,8 @@ Callbacks.NavToggleHoverScan = function(data)
     import("/lua/sim/NavDebug.lua").ToggleHoverScan()
 end
 
-Callbacks.NavToggleNavalScan = function(data)
-    import("/lua/sim/NavDebug.lua").ToggleNavalScan()
+Callbacks.NavToggleWaterScan = function(data)
+    import("/lua/sim/NavDebug.lua").ToggleWaterScan()
 end
 
 Callbacks.NavToggleAmphibiousScan = function(data)

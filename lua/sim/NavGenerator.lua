@@ -70,7 +70,7 @@ end
 
 ---@class LabelRoots
 ---@field Land? LabelRoot
----@field Naval? LabelRoot
+---@field Water? LabelRoot
 ---@field Hover? LabelRoot
 ---@field Amphibious? LabelRoot
 LabelRoots = { }
@@ -744,11 +744,11 @@ function Generate()
     WARN("Generating label trees")
 
     local labelRootLand = LabelRoot('Land')
-    local labelRootNaval = LabelRoot('Naval')
+    local labelRootNaval = LabelRoot('Water')
     local labelRootHover = LabelRoot('Hover')
     local labelRootAmph = LabelRoot('Amphibious')
     LabelRoots['Land'] = labelRootLand
-    LabelRoots['Naval'] = labelRootNaval
+    LabelRoots['Water'] = labelRootNaval
     LabelRoots['Hover'] = labelRootHover
     LabelRoots['Amphibious'] = labelRootAmph
 
@@ -757,7 +757,7 @@ function Generate()
         for x = 0, BlockCountPerAxis - 1 do
             local blockX = x * blockSize
             local labelTreeLand = LabelTree('Land', blockX, blockZ, blockSize)
-            local labelTreeNaval = LabelTree('Naval', blockX, blockZ, blockSize)
+            local labelTreeNaval = LabelTree('Water', blockX, blockZ, blockSize)
             local labelTreeHover = LabelTree('Hover', blockX, blockZ, blockSize)
             local labelTreeAmph = LabelTree('Amphibious', blockX, blockZ, blockSize)
 
@@ -796,7 +796,7 @@ function Generate()
     WARN("Generating labels")
 
     LabelRoots['Land']:GenerateLabels()
-    LabelRoots['Naval']:GenerateLabels()
+    LabelRoots['Water']:GenerateLabels()
     LabelRoots['Amphibious']:GenerateLabels()
     LabelRoots['Hover']:GenerateLabels()
 
