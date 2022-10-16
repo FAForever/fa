@@ -32,9 +32,7 @@ local HeightRatio = 0.012
 --- distance that allows for the reclaim command to work. Guarantees that the  labels represent
 --- where you can reclaim.
 local ZoomThreshold = 150
-local MaxLabels = 200
---- Width and height of the reclaim grid map structure used for in-view reclaim
-local GridSize = 4
+local MaxLabels = 500
 
 
 ---@type table<EntityId, PropSyncData>
@@ -56,8 +54,6 @@ local MapWidth, MapHeight
 local CommandGraphActive
 ---@type boolean
 local ReclaimChanged
----@type boolean
-local Updating
 
 
 function Init()
@@ -74,7 +70,6 @@ function Init()
 
     CommandGraphActive = false
     ReclaimChanged = false
-    Updating = false
 end
 
 
@@ -93,11 +88,11 @@ local WorldLabel = Class(Group) {
     ---@param parent ReclaimLabelGroup
     ---@param data UserReclaimData
     __init = function(self, parent, data)
-        self.mass = data.mass or 0
         Group.__init(self, parent)
 
         self.parent = parent
         self.position = data.position
+        self.mass = data.mass or 0
         self.max = data.max or self.mass
         self.count = data.count or 1
 
@@ -269,7 +264,6 @@ local WorldLabel = Class(Group) {
         end
         self:MoveTo(reclaim.position)
         self:Show()
-        self:SetNeedsFrameUpdate(true)
     end;
 
     ---@param self WorldLabel
@@ -281,6 +275,7 @@ local WorldLabel = Class(Group) {
 
     ---@param self WorldLabel
     UpdatePosition = function(self)
+        projectionCount = projectionCount + 1
         local proj = self.parent.view:Project(self.position)
         self.Left:SetValue(proj[1] - 0.5 * self.icon.Width())
         self.Top:SetValue(proj[2] - 0.5 * self.Height())
@@ -288,21 +283,16 @@ local WorldLabel = Class(Group) {
 
     ---@param self WorldLabel
     OnFrame = function(self)
-        self:UpdatePosition()
+        if self.parent.isMoving then
+            self:UpdatePosition()
+        end
     end;
 
     --- Called when the control is hidden or shown, used to start updating
     ---@param self WorldLabel
     ---@param hidden boolean
     OnHide = function(self, hidden)
-        if self.mass then
-            self:SetNeedsFrameUpdate(not hidden)
-            if not hidden and self.parent then
-                self:UpdatePosition()
-            end
-        else
-            return true
-        end
+        self:SetNeedsFrameUpdate(not hidden)
     end;
 }
 
@@ -424,15 +414,6 @@ function OnCommandGraphShow(show)
 
             end
             ShowReclaim(false)
-            -- check if it's worth freeing the memory
-            if TableGetn(Reclaim) * 2 > DataPoolSize then
-                DataPool = {}
-                DataPoolSize = 0
-            end
-            if LabelPoolSize * 2 > MaxLabels then
-                LabelPool = {}
-                LabelPoolSize = 0
-            end
         end)
     end
 end
@@ -481,13 +462,26 @@ function ShowReclaimThread(view)
             oldPosition = position
         end
         WaitSeconds(0.1)
+
     end
 
     if not IsDestroyed(view) then
-        view.ReclaimThread = nil
-        view.ReclaimGroup:Hide()
         HideUnusedLabels(LabelPool, 0, LabelPoolUse)
         LabelPoolUse = 0
+    end
+    view.ReclaimGroup:SetNeedsFrameUpdate(false)
+    view.ReclaimThread = nil
+
+    if not CommandGraphActive then
+        -- check if it's worth freeing the memory
+        if TableGetn(Reclaim) * 2 > DataPoolSize then
+            DataPool = {}
+            DataPoolSize = 0
+        end
+        if LabelPoolSize * 2 > MaxLabels then
+            LabelPool = {}
+            LabelPoolSize = 0
+        end
     end
 end
 
@@ -509,9 +503,6 @@ function InitReclaimGroup(view, camera)
             local prevPos = self.prevPos
             if curPos[1] ~= prevPos[1] or curPos[2] ~= prevPos[2] or curPos[3] ~= prevPos[3] then
                 self.isMoving = true
-                if Updating then
-                    Updating = false
-                end
             else
                 self.isMoving = false
             end
@@ -519,9 +510,9 @@ function InitReclaimGroup(view, camera)
         end
 
         view.ReclaimGroup = reclaimGroup
+        reclaimGroup:Show()
     end
-
-    reclaimGroup:Show()
+    reclaimGroup:SetNeedsFrameUpdate(true)
     view.NewViewing = true
 end
 
@@ -725,7 +716,7 @@ end
 ---@return boolean
 local function ReclaimComparator(a, b)
     -- If you change this function, make sure that all data with a mass value of 0 (or whatever you
-    -- change in `UnsortUnusedReclaimData()`) sorts lower than everything else
+    -- make happen in `UnsortUnusedReclaimData()`) sorts lower than everything else
     return a.mass > b.mass
 end
 
@@ -765,7 +756,7 @@ local function CombineReclaim(dataPool, reclaim, maxDist)
     local index = 0
 
     for _, recl in reclaim do
-        local notAdded = true
+        local combined
         local reclPos = recl.position
         local reclX, reclZ = reclPos[1], reclPos[3]
 
@@ -775,13 +766,13 @@ local function CombineReclaim(dataPool, reclaim, maxDist)
             local curPos = cur.position
             local dx, dz = reclX - curPos[1], reclZ - curPos[3]
             if dx*dx + dz*dz < maxDist then
-                notAdded = false
+                combined = true
                 SumReclaim(cur, recl)
                 break
             end
         end
 
-        if notAdded then
+        if not combined then
             index = index + 1
             local data = dataPool[index]
             if not data then
@@ -879,7 +870,6 @@ function UpdateLabels(view, zoom)
             if labelCount > 0 then
                 -- displaying
                 DisplayReclaim(labelPool, view.ReclaimGroup, labelData, labelCount)
-                Updating = true
             end
         end
     end
@@ -895,7 +885,6 @@ function UpdateLabels(view, zoom)
 
     if labelCount < labelPoolUse then
         HideUnusedLabels(labelPool, labelCount, labelPoolUse)
-        Updating = true
     elseif LabelPoolSize < labelCount then
         LabelPoolSize = labelCount
     end
