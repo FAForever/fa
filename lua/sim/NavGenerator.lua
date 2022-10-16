@@ -34,12 +34,12 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 
 -- Tweakable data
 
-local SmallestLabelTree = 2
+local LabelCompressionThreshold = 2
 
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
 ---@type number
-local BlockCountPerAxis = 16
+local LabelCompressionTreesPerAxis = 16
 
 --- TODO: this approach does not support non-square maps
 --- Total width / height of the map
@@ -48,7 +48,7 @@ local MapSize = ScenarioInfo.size[1]
 
 --- Number of cells per block
 ---@type number
-local BlockSize = MapSize / BlockCountPerAxis
+local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
 --- Maximum height difference that is considered to be pathable, within a single oGrid
 ---@type number
@@ -62,25 +62,27 @@ local MaxWaterDepthAmphibious = 25
 ---@type number
 local MinWaterDepthNaval = 1.5
 
+-- Generated data
+
+---@class NavGrids
+---@field Land? NavGrid
+---@field Water? NavGrid
+---@field Hover? NavGrid
+---@field Amphibious? NavGrid
+---@field Air? NavGrid
+NavGrids = { }
+
+
 local Generated = false
 function IsGenerated()
     return Generated
 end
 
--- Generated data
-
-local labelTreeIdentifier = 0
-local function GenerateLabelTreeIdentifier()
-    labelTreeIdentifier = labelTreeIdentifier + 1
-    return labelTreeIdentifier
+local CompressedTreeIdentifier = 0
+local function GenerateCompressedTreeIdentifier()
+    CompressedTreeIdentifier = CompressedTreeIdentifier + 1
+    return CompressedTreeIdentifier
 end
-
----@class LabelRoots
----@field Land? LabelRoot
----@field Water? LabelRoot
----@field Hover? LabelRoot
----@field Amphibious? LabelRoot
-LabelRoots = { }
 
 -- Shared data with UI
 
@@ -113,53 +115,50 @@ local function DrawSquare(px, pz, c, color, inset)
     DrawLine(br, tr, color)
 end
 
----@class LabelRoot
+---@class NavGrid
 ---@field Layer NavLayers
----@field Trees LabelTree[][]
+---@field Trees CompressedLabelTree[][]
 ---@field FreeLabel number
-local LabelRoot = ClassSimple {
+NavGrid = ClassSimple {
 
-    ---@param self LabelRoot
+    ---@param self NavGrid
     ---@param layer NavLayers
     __init = function(self, layer)
         self.Trees = { }
-        for z = 0, BlockCountPerAxis - 1 do
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
             self.Trees[z] = { }
-            for x = 0, BlockCountPerAxis - 1 do
-                self.Trees[z][x] = { }
-            end
         end
 
         self.Layer = layer
         self.FreeLabel = 1
     end,
 
-    --- Adds a (compressed) label tree
-    ---@param self LabelRoot
-    ---@param z number
-    ---@param x number
-    ---@param labelTree LabelTree
+    --- Adds a compressed label tree to the navigational grid
+    ---@param self NavGrid
+    ---@param z number index
+    ---@param x number index
+    ---@param labelTree CompressedLabelTree
     AddTree = function (self, z, x, labelTree)
         self.Trees[z][x] = labelTree
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
-    ---@param self LabelRoot
+    ---@param self NavGrid
     ---@param position Vector A position in world space
-    ---@return LabelTree?
+    ---@return CompressedLabelTreeLeaf?
     FindLeaf = function(self, position)
         return self:FindLeafXZ(position[1], position[3])
     end,
 
     --- Returns the leaf that encompasses the x / z coordinates, or nil if no leaf does
-    ---@param self LabelRoot
+    ---@param self NavGrid
     ---@param x number x-coordinate, in world space
     ---@param z number z-coordinate, in world space
-    ---@return LabelTree?
+    ---@return CompressedLabelTreeLeaf?
     FindLeafXZ = function(self, x, z)
         if x > 0 and z > 0 then
-            local bx = (x / BlockSize) ^ 0
-            local bz = (z / BlockSize) ^ 0
+            local bx = (x / CompressionTreeSize) ^ 0
+            local bz = (z / CompressionTreeSize) ^ 0
             local labelTree = self.Trees[bz][bx]
             if labelTree then
                 return labelTree:FindLeafXZ(x, z)
@@ -169,28 +168,28 @@ local LabelRoot = ClassSimple {
         return nil
     end,
 
-    ---@param self LabelRoot
+    ---@param self NavGrid
     GenerateNeighbors = function(self)
-        for z = 0, BlockCountPerAxis - 1 do
-            for x = 0, BlockCountPerAxis - 1 do
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
                 self.Trees[z][x]:GenerateNeighbors(self)
             end
         end
     end,
 
     --- Generates a unique label for an enclosed area
-    ---@param self LabelRoot
+    ---@param self NavGrid
     ---@return number
     GenerateUniqueLabel = function(self)
         self.FreeLabel = self.FreeLabel + 1
         return self.FreeLabel
     end,
 
-    ---@param self LabelRoot
+    ---@param self NavGrid
     GenerateLabels = function(self)
         local stack = { }
-        for z = 0, BlockCountPerAxis - 1 do
-            for x = 0, BlockCountPerAxis - 1 do
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
                 self.Trees[z][x]:GenerateLabels(self, stack)
             end
         end
@@ -198,15 +197,16 @@ local LabelRoot = ClassSimple {
         NavLayerData[self.Layer].Labels = self.FreeLabel - 1
     end,
 
+    ---@param self NavGrid
     Precompute = function(self)
-        for z = 0, BlockCountPerAxis - 1 do
-            for x = 0, BlockCountPerAxis - 1 do
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
                 self.Trees[z][x]:PrecomputePhase1()
             end
         end
 
-        for z = 0, BlockCountPerAxis - 1 do
-            for x = 0, BlockCountPerAxis - 1 do
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
                 self.Trees[z][x]:PrecomputePhase2()
             end
         end
@@ -215,8 +215,8 @@ local LabelRoot = ClassSimple {
     --- Draws all trees with the correct layer color
     ---@param self any
     Draw = function(self)
-        for z = 0, BlockCountPerAxis - 1 do
-            for x = 0, BlockCountPerAxis - 1 do
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
                 self.Trees[z][x]:Draw(Shared.LayerColors[self.Layer])
             end
         end
@@ -224,32 +224,41 @@ local LabelRoot = ClassSimple {
 }
 
 -- defined here, as it is a recursive class
-local LabelTree
+local CompressedLabelTree
 
---- A simplified quad tree to act as a compression of the pathing capabilities of a section of the heightmap
----@class LabelTree
----@field identifier number                         # Unique number used for table operations
----@field layer NavLayers                           # Layer that this label tree is operating on, used for debugging
----@field bx number                                 # Location of top-left corner, in world space
----@field bz number                                 # Location of top-left corner, in world space
----@field ox number                                 # Offset of top-left corner, in world space
----@field oz number                                 # Offset of top-left corner, in world space
----@field c number                                  # Element count starting at { bx + ox, bz + oz } that describes the square that is covered
----@field children? LabelTree[]                     # Is nil if we are a leaf (label assigned)
----@field label? number                             # Is nil if we are a node (no label assigned)
----@field neighbors? table<number, LabelTree>       # Is nil if we are a node (no label assigned)
----@field neighborDistances? table<number, number>  # Is nil if we are a node (no label assigned)
----@field neighborDirections? table<number, number> #
----@field px? number                                # Is nil if we are a node (no label assigned), x-coordinate of center in world space
----@field pz? number                                # Is nil if we are a node (no label assigned), z-coordinate of center in world space
-LabelTree = ClassSimple {
+--- The leaf of the compression tree, with additional properties used during path finding
+---@class CompressedLabelTreeLeaf : CompressedLabelTree
+---@field label number                                      # Label for efficient `CanPathTo` check
+---@field neighbors table<number, CompressedLabelTreeLeaf>  # Neighbors of this leaf that acts like a graph
+---@field neighborDistances table<number, number>           # Distance to each neighbor neighbors
+---@field neighborDirections table<number, any>             # Normalized direction to each neighbor
+---@field px number                                         # x-coordinate of center in world space
+---@field pz number                                         # z-coordinate of center in world space
 
-    ---@param self LabelTree
+--- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
+---@class CompressedLabelTree
+---@field identifier number     # Unique number used for table operations
+---@field layer NavLayers       # Layer that this label tree is operating on, used for debugging
+---@field bx number             # Location of top-left corner, in world space
+---@field bz number             # Location of top-left corner, in world space
+---@field ox number             # Offset of top-left corner, in world space
+---@field oz number             # Offset of top-left corner, in world space
+---@field c number              # Element count starting at { bx + ox, bz + oz } that describes the square that is covered
+---@field children? CompressedLabelTree[]                   # Is populated if we are a node
+---@field label? number                                     # Is populated if we are a leaf
+---@field neighbors? table<number, CompressedLabelTree>     # Is populated if we are a leaf
+---@field neighborDistances? table<number, number>          # Is populated if we are a leaf
+---@field neighborDirections? table<number, any>            # Is populated if we are a leaf
+---@field px? number                                        # Is populated if we are a leaf
+---@field pz? number                                        # Is populated if we are a leaf
+CompressedLabelTree = ClassSimple {
+
+    ---@param self CompressedLabelTree
     ---@param bx number
     ---@param bz number
     ---@param c number
     __init = function(self, layer, bx, bz, c, ox, oz)
-        self.identifier = GenerateLabelTreeIdentifier()
+        self.identifier = GenerateCompressedTreeIdentifier()
 
         self.layer = layer
         self.bx = bx
@@ -267,12 +276,12 @@ LabelTree = ClassSimple {
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
     --- the label cache only exists of 0s and -1s
-    ---@param self LabelTree
+    ---@param self CompressedLabelTree
     ---@param rCache NavLabelCache
     Compress = function(self, rCache)
 
         -- base case, if we're a square of 4 then we skip the children and become very pessimistic
-        if self.c <= SmallestLabelTree then
+        if self.c <= LabelCompressionThreshold then
             local value = rCache[self.oz + 1][self.ox + 1]
             local uniform = true
             for z = self.oz + 1, self.oz + self.c do
@@ -325,10 +334,10 @@ LabelTree = ClassSimple {
             -- we're not uniform, split up to children
             local hc = 0.5 * self.c
             self.children = {
-                LabelTree(self.layer, self.bx, self.bz, hc, self.ox, self.oz),
-                LabelTree(self.layer, self.bx, self.bz, hc, self.ox + hc, self.oz),
-                LabelTree(self.layer, self.bx, self.bz, hc, self.ox, self.oz + hc),
-                LabelTree(self.layer, self.bx, self.bz, hc, self.ox + hc, self.oz + hc)
+                CompressedLabelTree(self.layer, self.bx, self.bz, hc, self.ox, self.oz),
+                CompressedLabelTree(self.layer, self.bx, self.bz, hc, self.ox + hc, self.oz),
+                CompressedLabelTree(self.layer, self.bx, self.bz, hc, self.ox, self.oz + hc),
+                CompressedLabelTree(self.layer, self.bx, self.bz, hc, self.ox + hc, self.oz + hc)
             }
 
             for k, child in self.children do
@@ -340,8 +349,8 @@ LabelTree = ClassSimple {
     end,
 
     ---
-    ---@param self LabelTree
-    ---@param root LabelRoot
+    ---@param self CompressedLabelTree
+    ---@param root NavGrid
     GenerateNeighbors = function(self, root)
         -- we are not valid :(
         if self.label == -1 then
@@ -459,8 +468,8 @@ LabelTree = ClassSimple {
         NavLayerData[self.layer].Neighbors = NavLayerData[self.layer].Neighbors + table.getsize(neighbors)
     end,
 
-    ---@param self LabelTree
-    ---@param root LabelRoot
+    ---@param self CompressedLabelTree
+    ---@param root NavGrid
     ---@param stack table
     GenerateLabels = function(self, root, stack)
         -- leaf case
@@ -516,7 +525,7 @@ LabelTree = ClassSimple {
         end
     end,
 
-    ---@param self LabelTree
+    ---@param self CompressedLabelTreeLeaf
     PrecomputePhase1 = function(self)
         if self.children then 
             for k, child in self.children do
@@ -530,7 +539,7 @@ LabelTree = ClassSimple {
         end
     end,
 
-    ---@param self LabelTree
+    ---@param self CompressedLabelTreeLeaf
     PrecomputePhase2 = function(self)
         if self.children then 
             for k, child in self.children do
@@ -551,33 +560,28 @@ LabelTree = ClassSimple {
         end
     end,
 
-    ---@param self LabelTree
-    ---@param other LabelTree
+    ---@param self CompressedLabelTreeLeaf
+    ---@param other CompressedLabelTreeLeaf
     ---@return number
     DistanceTo = function(self, other)
-        if not (self.neighbors and other.neighbors) then
-            WARN("Something fishy happened")
-            return -1
-        end
-
         local dx = self.px - other.px
         local dz = self.pz - other.pz
         return math.sqrt(dx * dx + dz * dz)
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
-    ---@param self LabelTree
+    ---@param self CompressedLabelTree
     ---@param position Vector A position in world space
-    ---@return LabelTree?
+    ---@return CompressedLabelTreeLeaf?
     FindLeaf = function(self, position)
         return self:FindLeafXZ(position[1], position[3])
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
-    ---@param self LabelTree
+    ---@param self CompressedLabelTree
     ---@param x number x-coordinate, in world space
     ---@param z number z-coordinate, in world space
-    ---@return LabelTree?
+    ---@return CompressedLabelTreeLeaf?
     FindLeafXZ = function(self, x, z)
         local x1 = self.bx + self.ox
         local z1 = self.bz + self.oz
@@ -589,6 +593,10 @@ LabelTree = ClassSimple {
         return self:_FindLeafXZ(x - self.bx, z - self.bz)
     end;
 
+    ---@param self CompressedLabelTree
+    ---@param x number
+    ---@param z number
+    ---@return CompressedLabelTreeLeaf?
     _FindLeafXZ = function(self, x, z)
         local children = self.children
         if children then
@@ -612,11 +620,11 @@ LabelTree = ClassSimple {
                 return child:_FindLeafXZ(x, z)
             end
         else
-            return self
+            return self --[[@as CompressedLabelTreeLeaf]]
         end
     end;
 
-    ---@param self LabelTree
+    ---@param self CompressedLabelTree
     ---@param color Color
     Draw = function(self, color, inset)
         if self.label != nil then
@@ -676,7 +684,7 @@ end
 
 --- Populates the caches for the given label tree,
 --- Heavily inspired by the code written by Softles
----@param labelTree LabelTree
+---@param labelTree CompressedLabelTree
 ---@param tCache NavTerrainCache
 ---@param dCache NavDepthCache
 ---@param daCache NavAverageDepthCache
@@ -740,7 +748,7 @@ function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pC
     end
 end
 
----@param labelTree LabelTree
+---@param labelTree CompressedLabelTree
 ---@param daCache NavAverageDepthCache
 ---@param bCache NavTerrainBlockCache
 ---@param pCache NavPathCache
@@ -762,7 +770,7 @@ function ComputeLandPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     end
 end
 
----@param labelTree LabelTree
+---@param labelTree CompressedLabelTree
 ---@param daCache NavAverageDepthCache
 ---@param bCache NavTerrainBlockCache
 ---@param pCache NavPathCache
@@ -784,7 +792,7 @@ function ComputeHoverPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     end
 end
 
----@param labelTree LabelTree
+---@param labelTree CompressedLabelTree
 ---@param daCache NavAverageDepthCache
 ---@param bCache NavTerrainBlockCache
 ---@param pCache NavPathCache
@@ -805,7 +813,7 @@ function ComputeNavalPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     end
 end
 
----@param labelTree LabelTree
+---@param labelTree CompressedLabelTree
 ---@param daCache NavAverageDepthCache
 ---@param bCache NavTerrainBlockCache
 ---@param pCache NavPathCache
@@ -831,7 +839,7 @@ end
 
 --- Generates the navigational mesh from `a` to `z`
 function Generate()
-    local blockSize = BlockSize
+    local blockSize = CompressionTreeSize
 
     ProfileData = Shared.CreateEmptyProfileData()
     NavLayerData = Shared.CreateEmptyNavLayerData()
@@ -840,7 +848,7 @@ function Generate()
 
     WARN("")
     WARN("Generating with: ")
-    WARN(string.format(" - BlockCountPerAxis: %d", BlockCountPerAxis))
+    WARN(string.format(" - BlockCountPerAxis: %d", LabelCompressionTreesPerAxis))
     WARN(string.format(" - MapSize: %d", MapSize))
     WARN(string.format(" - BlockSize: %d", blockSize))
 
@@ -852,23 +860,23 @@ function Generate()
     WARN(string.format("Time spent: %f", ProfileData.TimeSetupCaches))
     WARN("Generating label trees")
 
-    local labelRootLand = LabelRoot('Land')
-    local labelRootNaval = LabelRoot('Water')
-    local labelRootHover = LabelRoot('Hover')
-    local labelRootAmph = LabelRoot('Amphibious')
-    LabelRoots['Land'] = labelRootLand
-    LabelRoots['Water'] = labelRootNaval
-    LabelRoots['Hover'] = labelRootHover
-    LabelRoots['Amphibious'] = labelRootAmph
+    local labelRootLand = NavGrid('Land')
+    local labelRootNaval = NavGrid('Water')
+    local labelRootHover = NavGrid('Hover')
+    local labelRootAmph = NavGrid('Amphibious')
+    NavGrids['Land'] = labelRootLand
+    NavGrids['Water'] = labelRootNaval
+    NavGrids['Hover'] = labelRootHover
+    NavGrids['Amphibious'] = labelRootAmph
 
-    for z = 0, BlockCountPerAxis - 1 do
+    for z = 0, LabelCompressionTreesPerAxis - 1 do
         local blockZ = z * blockSize
-        for x = 0, BlockCountPerAxis - 1 do
+        for x = 0, LabelCompressionTreesPerAxis - 1 do
             local blockX = x * blockSize
-            local labelTreeLand = LabelTree('Land', blockX, blockZ, blockSize)
-            local labelTreeNaval = LabelTree('Water', blockX, blockZ, blockSize)
-            local labelTreeHover = LabelTree('Hover', blockX, blockZ, blockSize)
-            local labelTreeAmph = LabelTree('Amphibious', blockX, blockZ, blockSize)
+            local labelTreeLand = CompressedLabelTree('Land', blockX, blockZ, blockSize)
+            local labelTreeNaval = CompressedLabelTree('Water', blockX, blockZ, blockSize)
+            local labelTreeHover = CompressedLabelTree('Hover', blockX, blockZ, blockSize)
+            local labelTreeAmph = CompressedLabelTree('Amphibious', blockX, blockZ, blockSize)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
             PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
@@ -904,19 +912,19 @@ function Generate()
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
     WARN("Generating labels")
 
-    LabelRoots['Land']:GenerateLabels()
-    LabelRoots['Water']:GenerateLabels()
-    LabelRoots['Amphibious']:GenerateLabels()
-    LabelRoots['Hover']:GenerateLabels()
+    NavGrids['Land']:GenerateLabels()
+    NavGrids['Water']:GenerateLabels()
+    NavGrids['Amphibious']:GenerateLabels()
+    NavGrids['Hover']:GenerateLabels()
 
     ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
     WARN("Precomputing neighbor information")
 
-    LabelRoots['Land']:Precompute()
-    LabelRoots['Water']:Precompute()
-    LabelRoots['Amphibious']:Precompute()
-    LabelRoots['Hover']:Precompute()
+    NavGrids['Land']:Precompute()
+    NavGrids['Water']:Precompute()
+    NavGrids['Amphibious']:Precompute()
+    NavGrids['Hover']:Precompute()
 
     ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))

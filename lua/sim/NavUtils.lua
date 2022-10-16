@@ -34,7 +34,7 @@ local NavDatastructures = import('/lua/sim/NavDatastructures.lua')
 function CanPathTo(layer, origin, destination)
 
     -- check layer argument
-    local root = NavGenerator.LabelRoots[layer] --[[@as LabelRoot]]
+    local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
     if not root then
         return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
     end
@@ -123,7 +123,7 @@ function PathTo(layer, origin, destination, options)
 
     -- setup pathing
     local seenIdentifier = PathToGetUniqueIdentifier()
-    local root = NavGenerator.LabelRoots[layer] --[[@as LabelRoot]]
+    local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
     local originLeaf = root:FindLeafXZ(origin[1], origin[3]) --[[@as LabelTree]]
     local destinationLeaf = root:FindLeafXZ(destination[1], destination[3]) --[[@as LabelTree]]
 

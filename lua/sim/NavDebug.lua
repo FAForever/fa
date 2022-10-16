@@ -80,8 +80,8 @@ function CanPathToReset()
 end
 
 function ScanOver(mouse, layer)
-    NavGenerator.LabelRoots[layer]:Draw()
-    local over = NavGenerator.LabelRoots[layer]:FindLeaf(mouse)
+    NavGenerator.NavGrids[layer]:Draw()
+    local over = NavGenerator.NavGrids[layer]:FindLeaf(mouse)
     if over then 
         if over.label > 0 then
             local color = Shared.LabelToColor(over.label)
