@@ -198,6 +198,20 @@ local LabelRoot = ClassSimple {
         NavLayerData[self.Layer].Labels = self.FreeLabel - 1
     end,
 
+    Precompute = function(self)
+        for z = 0, BlockCountPerAxis - 1 do
+            for x = 0, BlockCountPerAxis - 1 do
+                self.Trees[z][x]:PrecomputePhase1()
+            end
+        end
+
+        for z = 0, BlockCountPerAxis - 1 do
+            for x = 0, BlockCountPerAxis - 1 do
+                self.Trees[z][x]:PrecomputePhase2()
+            end
+        end
+    end,
+
     --- Draws all trees with the correct layer color
     ---@param self any
     Draw = function(self)
@@ -214,16 +228,20 @@ local LabelTree
 
 --- A simplified quad tree to act as a compression of the pathing capabilities of a section of the heightmap
 ---@class LabelTree
----@field identifier number                     # Unique number used for table operations
----@field layer NavLayers                       # Layer that this label tree is operating on, used for debugging
----@field bx number                             # Location of top-left corner, in world space
----@field bz number                             # Location of top-left corner, in world space
----@field ox number                             # Offset of top-left corner, in world space
----@field oz number                             # Offset of top-left corner, in world space
----@field c number                              # Element count starting at { bx + ox, bz + oz } that describes the square that is covered
----@field children? LabelTree[]                 # Is nil if we are a leaf (label assigned)
----@field label? number                         # Is nil if we are a node (no label assigned)
----@field neighbors? table<number, LabelTree>   # Is nil if we are a node (no label assigned)
+---@field identifier number                         # Unique number used for table operations
+---@field layer NavLayers                           # Layer that this label tree is operating on, used for debugging
+---@field bx number                                 # Location of top-left corner, in world space
+---@field bz number                                 # Location of top-left corner, in world space
+---@field ox number                                 # Offset of top-left corner, in world space
+---@field oz number                                 # Offset of top-left corner, in world space
+---@field c number                                  # Element count starting at { bx + ox, bz + oz } that describes the square that is covered
+---@field children? LabelTree[]                     # Is nil if we are a leaf (label assigned)
+---@field label? number                             # Is nil if we are a node (no label assigned)
+---@field neighbors? table<number, LabelTree>       # Is nil if we are a node (no label assigned)
+---@field neighborDistances? table<number, number>  # Is nil if we are a node (no label assigned)
+---@field neighborDirections? table<number, number> #
+---@field px? number                                # Is nil if we are a node (no label assigned), x-coordinate of center in world space
+---@field pz? number                                # Is nil if we are a node (no label assigned), z-coordinate of center in world space
 LabelTree = ClassSimple {
 
     ---@param self LabelTree
@@ -496,6 +514,55 @@ LabelTree = ClassSimple {
         for _, child in self.children do
             child:GenerateLabels(root, stack)
         end
+    end,
+
+    ---@param self LabelTree
+    PrecomputePhase1 = function(self)
+        if self.children then 
+            for k, child in self.children do
+                child:PrecomputePhase1()
+            end
+        else 
+            if self.neighbors then
+                self.px = self.bx + self.ox + 0.5 * self.c
+                self.pz = self.bz + self.oz + 0.5 * self.c
+            end
+        end
+    end,
+
+    ---@param self LabelTree
+    PrecomputePhase2 = function(self)
+        if self.children then 
+            for k, child in self.children do
+                child:PrecomputePhase2()
+            end
+        else 
+            if self.neighbors then
+                self.neighborDirections = { }
+                self.neighborDistances = { }
+
+                for k, neighbor in self.neighbors do
+                    local dx = neighbor.px - self.px
+                    local dz = neighbor.pz - self.pz
+                    self.neighborDirections[k] = { dx, dz}
+                    self.neighborDistances[k] = math.sqrt(dx * dx + dz * dz)
+                end
+            end
+        end
+    end,
+
+    ---@param self LabelTree
+    ---@param other LabelTree
+    ---@return number
+    DistanceTo = function(self, other)
+        if not (self.neighbors and other.neighbors) then
+            WARN("Something fishy happened")
+            return -1
+        end
+
+        local dx = self.px - other.px
+        local dz = self.pz - other.pz
+        return math.sqrt(dx * dx + dz * dz)
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
@@ -841,6 +908,15 @@ function Generate()
     LabelRoots['Water']:GenerateLabels()
     LabelRoots['Amphibious']:GenerateLabels()
     LabelRoots['Hover']:GenerateLabels()
+
+    ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
+    WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
+    WARN("Precomputing neighbor information")
+
+    LabelRoots['Land']:Precompute()
+    LabelRoots['Water']:Precompute()
+    LabelRoots['Amphibious']:Precompute()
+    LabelRoots['Hover']:Precompute()
 
     ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))

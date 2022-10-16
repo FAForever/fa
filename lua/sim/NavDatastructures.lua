@@ -21,15 +21,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class NavPathToNode 
----@field Root LabelTree
----@field Target LabelTree
----@field At LabelTree
----@field AcquiredCosts number
----@field ExpectedCosts number 
-
 ---@class NavPathToHeap
----@field Heap NavPathToNode[]
+---@field Heap LabelTree[]
 ---@field HeapSize number
 NavPathToHeap = ClassSimple {
 
@@ -46,7 +39,7 @@ NavPathToHeap = ClassSimple {
     end,
 
     ---@param self NavPathToHeap
-    ---@return NavPathToNode?
+    ---@return LabelTree?
     ExtractMin = function(self)
         -- if the Heap is empty, we got nothing to return!
         if self.HeapSize == 0 then
@@ -127,7 +120,7 @@ NavPathToHeap = ClassSimple {
     end,
 
     ---@param self NavPathToHeap
-    ---@param element NavPathToNode
+    ---@param element LabelTree
     Insert = function(self, element)
         if element then
             self.HeapSize = self.HeapSize + 1
@@ -160,21 +153,5 @@ NavPathToHeap = ClassSimple {
     ToLeftChild = function (self, index)
         -- 2 * index
         return 2 * index
-    end,
-}
-
----@class NavNodePool
-NavPathToNodePool = ClassSimple {
-
-    __init = function(self)
-        self.Pool = { }
-    end,
-
-    Acquire = function(self)
-
-    end,
-
-    Release = function(self)
-
     end,
 }

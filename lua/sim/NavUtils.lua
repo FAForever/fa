@@ -74,12 +74,13 @@ function CanPathTo(layer, origin, destination)
     end
 end
 
----@type NavHeap
+---@type NavPathToHeap
 local PathToHeap = NavDatastructures.NavPathToHeap()
-local PathToPool = NavDatastructures.NavPathToNodePool()
+
+---@type number
 local PathToIdentifier = 1
 
----@return integer
+---@return number
 local function PathToGetUniqueIdentifier()
     PathToIdentifier = PathToIdentifier + 1
     return PathToIdentifier
@@ -121,10 +122,10 @@ function PathTo(layer, origin, destination, options)
     end
 
     -- setup pathing
-    local identifier = PathToGetUniqueIdentifier()
+    local seenIdentifier = PathToGetUniqueIdentifier()
     local root = NavGenerator.LabelRoots[layer] --[[@as LabelRoot]]
-    local originLeaf = root:FindLeafXZ(origin[1], origin[3])
-    local destinationLeaf = root:FindLeafXZ(destination[1], destination[3])
+    local originLeaf = root:FindLeafXZ(origin[1], origin[3]) --[[@as LabelTree]]
+    local destinationLeaf = root:FindLeafXZ(destination[1], destination[3]) --[[@as LabelTree]]
 
     return false
 
