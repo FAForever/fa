@@ -395,8 +395,6 @@ NavUI = Class(Window) {
         if not DebugInterface then
             self.Debug:Hide()
         end
-
-        LOG(math.mod(10, 4))
     end,
 
     ---comment
