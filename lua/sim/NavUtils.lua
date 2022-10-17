@@ -77,6 +77,10 @@ end
 ---@type NavPathToHeap
 local PathToHeap = NavDatastructures.NavPathToHeap()
 
+---@type Vector[]
+local PathToPath = { }
+local PathToPathHead = 1
+
 ---@type number
 local PathToIdentifier = 1
 
@@ -111,22 +115,108 @@ end
 ---@param origin Vector
 ---@param destination Vector
 ---@param options NavPathToOptions
----@return boolean?
----@return string?
+---@return Vector[]?
+---@return (string | number)?
+---@return number?
 function PathTo(layer, origin, destination, options)
 
     -- check if we can path
     local ok, msg = CanPathTo(layer, origin, destination)
     if not ok then
-        return ok, msg
+        LOG(msg)
+        return nil, msg
     end
 
+    -- debug info
+
+    local opened = 0
+
     -- setup pathing
+
     local seenIdentifier = PathToGetUniqueIdentifier()
     local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
-    local originLeaf = root:FindLeafXZ(origin[1], origin[3]) --[[@as LabelTree]]
-    local destinationLeaf = root:FindLeafXZ(destination[1], destination[3]) --[[@as LabelTree]]
+    local originLeaf = root:FindLeafXZ(origin[1], origin[3]) --[[@as CompressedLabelTreeLeaf]]
+    local destinationLeaf = root:FindLeafXZ(destination[1], destination[3]) --[[@as CompressedLabelTreeLeaf]]
 
-    return false
+    -- 0th iteration of search
 
+    originLeaf.From = nil
+    originLeaf.AcquiredCosts = 0
+    originLeaf.ExpectedCosts = originLeaf:DistanceTo(destinationLeaf)
+    originLeaf.Seen = seenIdentifier
+    PathToHeap:Insert(originLeaf)
+
+    destinationLeaf.From = nil
+    destinationLeaf.AcquiredCosts = 0
+    destinationLeaf.ExpectedCosts = 0
+    destinationLeaf.Seen = 0
+
+    -- search iterations
+
+    while not PathToHeap:IsEmpty() do
+
+        local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
+
+        -- final state
+        if leaf == destinationLeaf then
+            break
+        end
+
+        -- continue state
+        for id, neighbor in leaf.neighbors do
+            if neighbor.Seen != seenIdentifier then
+                opened = opened + 1
+                neighbor.From = leaf
+                neighbor.Seen = seenIdentifier
+                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf.neighborDistances[id]
+                neighbor.ExpectedCosts = destinationLeaf:DistanceTo(neighbor)
+
+                PathToHeap:Insert(neighbor)
+            else 
+                -- if neighbor.AcquiredCosts > leaf.AcquiredCosts + leaf.neighborDistances[id] then
+                --     neighbor.From = leaf
+                -- end
+            end
+        end
+    end
+
+    LOG(opened)
+
+    -- check if we found a path
+
+    if not destinationLeaf.Seen == seenIdentifier then
+        return nil, 'Did not manage to find the destination'
+    end
+
+    -- construct current path
+
+    local head = 1
+    local leaf = destinationLeaf
+    while leaf.From and leaf.From != leaf do
+
+        -- retrieve node
+        local node = PathToPath[head] or { }
+
+        -- add to path
+        node[1] = leaf.px
+        node[3] = leaf.pz 
+        node[2] = GetSurfaceHeight(leaf.px, leaf.pz)
+        PathToPath[head] = node
+        
+        -- continue down the tree
+        head = head + 1
+        leaf = leaf.From
+    end
+
+    -- clear up after ourselves
+
+    PathToHeap:Clear()
+    for k = head, PathToPathHead do
+        PathToPath[k] = nil
+    end
+
+    PathToPathHead = head
+
+
+    return PathToPath, PathToPathHead - 1, seenIdentifier
 end

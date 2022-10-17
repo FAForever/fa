@@ -22,7 +22,7 @@
 --******************************************************************************************************
 
 ---@class NavPathToHeap
----@field Heap LabelTree[]
+---@field Heap CompressedLabelTreeLeaf[]
 ---@field HeapSize number
 NavPathToHeap = ClassSimple {
 
@@ -39,7 +39,15 @@ NavPathToHeap = ClassSimple {
     end,
 
     ---@param self NavPathToHeap
-    ---@return LabelTree?
+    Clear = function(self)
+        for k = 1, self.HeapSize do
+            self.Heap[k] = nil
+        end
+        self.HeapSize = 0
+    end,
+
+    ---@param self NavPathToHeap
+    ---@return CompressedLabelTreeLeaf?
     ExtractMin = function(self)
         -- if the Heap is empty, we got nothing to return!
         if self.HeapSize == 0 then
@@ -120,7 +128,7 @@ NavPathToHeap = ClassSimple {
     end,
 
     ---@param self NavPathToHeap
-    ---@param element LabelTree
+    ---@param element CompressedLabelTreeLeaf
     Insert = function(self, element)
         if element then
             self.HeapSize = self.HeapSize + 1
@@ -136,7 +144,7 @@ NavPathToHeap = ClassSimple {
     ---@return number
     ToParent = function(self, index)
         -- index / 2
-        return 0.5 * index
+        return (0.5 * index ) ^ 0
     end,
 
     ---@param self NavPathToHeap

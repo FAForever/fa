@@ -79,6 +79,18 @@ function CanPathToReset()
     CanPathToDataLayer = nil
 end
 
+---@type NavDebugCanPathToState
+local CanPathToState = { }
+
+function PathTo(data)
+    CanPathToState = data
+end
+
+function PathToReset()
+    CanPathToState = { }
+end
+
+
 function ScanOver(mouse, layer)
     NavGenerator.NavGrids[layer]:Draw()
     local over = NavGenerator.NavGrids[layer]:FindLeaf(mouse)
@@ -160,6 +172,36 @@ function Scan()
                 Ok = ok,
                 Msg = msg
             }
+        end
+
+        if CanPathToState.Origin then 
+            DrawCircle(CanPathToState.Origin, 3.9, '000000')
+            DrawCircle(CanPathToState.Origin, 4, Shared.LayerColors[CanPathToState.Layer] or 'ffffff')
+            DrawCircle(CanPathToState.Origin, 4.1, '000000')
+        end
+
+        if CanPathToState.Destination then 
+            DrawCircle(CanPathToState.Destination, 3.9, '000000')
+            DrawCircle(CanPathToState.Destination, 4, Shared.LayerColors[CanPathToState.Layer] or 'ffffff')
+            DrawCircle(CanPathToState.Destination, 4.1, '000000')
+        end
+
+        if CanPathToState.Origin and CanPathToState.Destination then
+            local start = GetSystemTimeSecondsOnlyForProfileUse()
+            local path, n, label = NavUtils.PathTo(CanPathToState.Layer, CanPathToState.Origin, CanPathToState.Destination, nil)
+            LOG(string.format('Time taken to generate path: %f', GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+            if not path then
+                DrawLinePop(CanPathToState.Origin, CanPathToState.Destination, 'ff0000')
+            else
+                if n >= 2 then
+                    local last = path[1]
+                    for k = 2, n do
+                        DrawLinePop(last, path[k], 'ff0000')
+                        last = path[k]
+                    end
+                end
+            end
         end
 
         WaitTicks(2)

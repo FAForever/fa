@@ -869,5 +869,9 @@ Callbacks.NavDebugCanPathToRerun = function(data)
 end
 
 Callbacks.NavDebugCanPathToReset = function(data)
-    import("/lua/sim/NavDebug.lua").CanPathToReset()
+    import("/lua/sim/NavDebug.lua").PathToReset()
+end
+
+Callbacks.NavDebugCanPathTo = function(data)
+    import("/lua/sim/NavDebug.lua").PathTo(data)
 end

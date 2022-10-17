@@ -34,7 +34,7 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 
 -- Tweakable data
 
-local LabelCompressionThreshold = 2
+local LabelCompressionThreshold = 4
 
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
@@ -234,6 +234,10 @@ local CompressedLabelTree
 ---@field neighborDirections table<number, any>             # Normalized direction to each neighbor
 ---@field px number                                         # x-coordinate of center in world space
 ---@field pz number                                         # z-coordinate of center in world space
+---@field From CompressedLabelTreeLeaf
+---@field AcquiredCosts number
+---@field ExpectedCosts number
+---@field Seen number   
 
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class CompressedLabelTree

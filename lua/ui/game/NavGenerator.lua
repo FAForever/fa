@@ -32,7 +32,7 @@ local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Shared = import('/lua/shared/NavGenerator.lua')
 
 local Root = nil
-local DebugInterface = false 
+local DebugInterface = false
 
 ---@alias NavUIStates 'overview' | 'actions'
 
@@ -43,11 +43,148 @@ NavUIOverview = Class(Group) {
     end
 }
 
+---@class NavUIPathTo : Group
+---@field State NavDebugCanPathToState
+NavUIPathTo = Class(Group) {
+    __init = function (self, parent)
+        local name = 'NavUIPathTo'
+        Group.__init(self, parent, name)
+
+        self.State = { }
+
+        self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
+            :Fill(self)
+            :Color('77000000')
+            :DisableHitTest(true)
+            :End()
+
+        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'PathTo\'', 8, UIUtil.bodyFont))
+            :AtLeftTopIn(self, 10, 10)
+            :Over(self, 1)
+            :End() --[[@as Text]]
+
+
+        self.ButtonOrigin = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Origin"))
+            :AtLeftBottomIn(self.Background, -5, 5)
+            :Over(self, 1)
+            :End()
+
+        self.ButtonOrigin.OnClick = function()
+
+            -- make sure we have nothing selected
+            local selection = GetSelectedUnits()
+            SelectUnits(nil);
+
+            -- enables command mode for spawning units
+            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+                "build",
+                {
+                    -- default information required
+                    name = 'ual0105',
+
+                    --- 
+                    ---@param mode CommandModeDataBuild
+                    ---@param command any
+                    callback = function(mode, command)
+                        self.State.Origin = command.Target.Position
+                        SimCallback({Func = 'NavDebugCanPathTo', Args = self.State })
+                        SelectUnits(selection)
+                    end,
+                }
+            )
+        end
+
+        self.ButtonDestination = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Destination"))
+            :RightOf(self.ButtonOrigin, -20)
+            :Over(self, 1)
+            :End()
+
+        self.ButtonDestination.OnClick = function()
+            -- make sure we have nothing selected
+            local selection = GetSelectedUnits()
+            SelectUnits(nil);
+
+            -- enables command mode for spawning units
+            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+                "build",
+                {
+                    -- default information required
+                    name = 'ual0105',
+
+                    --- 
+                    ---@param mode CommandModeDataBuild
+                    ---@param command any
+                    callback = function(mode, command)
+                        self.State.Destination = command.Target.Position
+                        SimCallback({Func = 'NavDebugCanPathTo', Args = self.State })
+                        SelectUnits(selection)
+                    end,
+                }
+            )
+        end
+
+        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 8, UIUtil.bodyFont))
+            :RightOf(self.ButtonDestination)
+            :Top(function() return self.ButtonDestination.Top() + LayoutHelpers.ScaleNumber(6) end)
+            :Over(self, 1)
+            :End()
+
+        self.ComboLayer = LayoutHelpers.LayoutFor(Combo(self, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01"))
+            :RightOf(self.ButtonDestination)
+            :Top(function() return self.ButtonDestination.Top() + LayoutHelpers.ScaleNumber(18) end)
+            :Width(100)
+            :End() --[[@as Combo]]
+
+        self.ComboLayer:AddItems(Shared.Layers)
+        self.ComboLayer:SetItem(1)
+        self.State.Layer = Shared.Layers[1]
+        self.ComboLayer.OnClick = function(combo, index, text)
+            self.State.Layer = Shared.Layers[index]
+            SimCallback({Func = 'NavDebugCanPathTo', Args = self.State })
+        end
+
+        self.ButtonRerun = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Rerun"))
+            :RightOf(self.ComboLayer)
+            :Top(self.ButtonDestination.Top)
+            :Over(self, 1)
+            :End()
+
+        self.ButtonRerun.OnClick = function()
+            SimCallback({Func = 'NavDebugCanPathTo', Args = self.State })
+        end
+
+        self.ButtonReset = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Reset"))
+            :RightOf(self.ButtonRerun, -20)
+            :Over(self, 1)
+            :End()
+
+        self.ButtonReset.OnClick = function()
+            self.State.Origin = nil
+            self.State.Destination = nil
+            SimCallback({Func = 'NavDebugCanPathTo', Args = { }})
+        end
+
+        -- AddOnSyncCallback(
+        --     function(Sync)
+        --         if Sync.NavCanPathToDebug then
+        --             local data = Sync.NavCanPathToDebug
+
+        --             if data.Ok then
+        --                 self.Title:SetText(string.format('Debug \'CanPathTo\': %s', tostring(data.Ok)))
+        --             else 
+        --                 self.Title:SetText(string.format('Debug \'CanPathTo\': %s (%s)', tostring(data.Ok), data.Msg))
+        --             end
+        --         end
+        --     end, name
+        -- )
+    end,
+}
+
 ---@class NavUICanPathTo : Group
 NavUICanPathTo = Class(Group) {
     __init = function (self, parent)
         local name = 'NavUICanPathTo'
-        Group.__init(self, parent, 'NavUICanPathTo')
+        Group.__init(self, parent, name)
 
         self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
             :Fill(self)
@@ -345,11 +482,18 @@ NavUIActions = Class(Group) {
             :Bottom(function() return self.BodyDebug.Top() + LayoutHelpers.ScaleNumber(85) end)
             :End()
 
+        self.NavUIPathTo = LayoutHelpers.LayoutFor(NavUIPathTo(self))
+            :Left(function() return self.BodyDebug.Left() + LayoutHelpers.ScaleNumber(10) end)
+            :Right(function() return self.BodyDebug.Right() - LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.NavUICanPathTo.Bottom() + LayoutHelpers.ScaleNumber(10) end)
+            :Bottom(function() return self.NavUICanPathTo.Bottom() + LayoutHelpers.ScaleNumber(85) end)
+            :End()
+
         self.Debug:DisableHitTest(true)
         if not DebugInterface then
             self.Debug:Hide()
         end
-    end,    
+    end,
 }
 
 ---@class NavUI : Window

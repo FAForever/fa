@@ -14,14 +14,17 @@ LayerColors = {
     Air = 'add8e6'
 }
 
----@class NavProfileData
----@field TimeSetupCaches number
----@field TimeLabelTrees number
+---@class NavDebugCanPathToState
+---@field Origin Vector 
+---@field Destination Vector 
+---@field Layer NavLayers
 
 ---@class NavLayerDataInstance
 ---@field Subdivisions number
 ---@field PathableLeafs number
 ---@field UnpathableLeafs number
+---@field Neighbors number
+---@field Labels number
 
 ---@class NavLayerData
 ---@field Land NavLayerDataInstance
