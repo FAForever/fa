@@ -275,7 +275,6 @@ local WorldLabel = Class(Group) {
 
     ---@param self WorldLabel
     UpdatePosition = function(self)
-        projectionCount = projectionCount + 1
         local proj = self.parent.view:Project(self.position)
         self.Left:SetValue(proj[1] - 0.5 * self.icon.Width())
         self.Top:SetValue(proj[2] - 0.5 * self.Height())
