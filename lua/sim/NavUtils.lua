@@ -165,11 +165,15 @@ function PathTo(layer, origin, destination, options)
         -- continue state
         for id, neighbor in leaf.neighbors do
             if neighbor.Seen != seenIdentifier then
+                local preferLargeNeighbor = 0
+                if leaf.c > neighbor.c then
+                    preferLargeNeighbor = 100
+                end
                 opened = opened + 1
                 neighbor.From = leaf
                 neighbor.Seen = seenIdentifier
-                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf.neighborDistances[id]
-                neighbor.ExpectedCosts = destinationLeaf:DistanceTo(neighbor)
+                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf.neighborDistances[id] + 2 + preferLargeNeighbor
+                neighbor.ExpectedCosts = 0.25 * destinationLeaf:DistanceTo(neighbor)
 
                 PathToHeap:Insert(neighbor)
             else 
