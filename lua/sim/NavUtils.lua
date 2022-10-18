@@ -184,7 +184,7 @@ function PathTo(layer, origin, destination, options)
         end
     end
 
-    LOG(opened)
+    -- LOG(opened)
 
     -- check if we found a path
 
