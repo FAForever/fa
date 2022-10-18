@@ -195,7 +195,7 @@ function Scan()
         if CanPathToState.Origin and CanPathToState.Destination then
             local start = GetSystemTimeSecondsOnlyForProfileUse()
             local path, n, label = NavUtils.PathTo(CanPathToState.Layer, CanPathToState.Origin, CanPathToState.Destination, nil)
-            LOG(string.format('Time taken to generate path: %f', GetSystemTimeSecondsOnlyForProfileUse() - start))
+            -- LOG(string.format('Time taken to generate path: %f', GetSystemTimeSecondsOnlyForProfileUse() - start))
 
             if not path then
                 DrawLinePop(CanPathToState.Origin, CanPathToState.Destination, 'ff0000')
