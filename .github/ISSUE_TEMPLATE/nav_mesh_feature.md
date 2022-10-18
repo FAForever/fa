@@ -2,7 +2,7 @@
 name: Navigational mesh feature request
 about: To discuss the request of implementing queries for the navigational mesh, 
 title: ''
-labels: 'status: novel issue'
+labels: 'status: novel issue, area: nav-mesh'
 assignees: ''
 
 ---
