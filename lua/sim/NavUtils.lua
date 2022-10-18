@@ -123,7 +123,6 @@ function PathTo(layer, origin, destination, options)
     -- check if we can path
     local ok, msg = CanPathTo(layer, origin, destination)
     if not ok then
-        LOG(msg)
         return nil, msg
     end
 
@@ -183,8 +182,6 @@ function PathTo(layer, origin, destination, options)
             end
         end
     end
-
-    -- LOG(opened)
 
     -- check if we found a path
 

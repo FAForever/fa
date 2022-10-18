@@ -839,6 +839,19 @@ function ComputeAmphPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     end
 end
 
+---@param labelTree CompressedLabelTree
+---@param daCache NavAverageDepthCache
+---@param bCache NavTerrainBlockCache
+---@param pCache NavPathCache
+---@param rCache NavLabelCache
+function ComputeAirPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
+    local size = labelTree.c
+    for z = 1, size do
+        for x = 1, size do
+            rCache[z][x] = 0
+        end
+    end
+end
 
 
 --- Generates the navigational mesh from `a` to `z`
@@ -868,10 +881,12 @@ function Generate()
     local labelRootNaval = NavGrid('Water')
     local labelRootHover = NavGrid('Hover')
     local labelRootAmph = NavGrid('Amphibious')
+    local labelRootAir = NavGrid('Air')
     NavGrids['Land'] = labelRootLand
     NavGrids['Water'] = labelRootNaval
     NavGrids['Hover'] = labelRootHover
     NavGrids['Amphibious'] = labelRootAmph
+    NavGrids['Air'] = labelRootAir
 
     for z = 0, LabelCompressionTreesPerAxis - 1 do
         local blockZ = z * blockSize
@@ -881,6 +896,7 @@ function Generate()
             local labelTreeNaval = CompressedLabelTree('Water', blockX, blockZ, blockSize)
             local labelTreeHover = CompressedLabelTree('Hover', blockX, blockZ, blockSize)
             local labelTreeAmph = CompressedLabelTree('Amphibious', blockX, blockZ, blockSize)
+            local labelTreeAir = CompressedLabelTree('Air', blockX, blockZ, blockSize)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
             PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
@@ -900,6 +916,10 @@ function Generate()
             ComputeAmphPathingMatrix(labelTreeAmph,        daCache,                    pCache, bCache, rCache)
             labelTreeAmph:Compress(rCache)
             labelRootAmph:AddTree(z, x, labelTreeAmph)
+
+            ComputeAirPathingMatrix(labelTreeAir,          daCache,                    pCache, bCache, rCache)
+            labelTreeAir:Compress(rCache)
+            labelRootAir:AddTree(z, x, labelTreeAir)
         end
     end
 
@@ -911,24 +931,27 @@ function Generate()
     labelRootNaval:GenerateNeighbors()
     labelRootHover:GenerateNeighbors()
     labelRootAmph:GenerateNeighbors()
+    labelRootAir:GenerateNeighbors()
 
     ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
     WARN("Generating labels")
 
-    NavGrids['Land']:GenerateLabels()
-    NavGrids['Water']:GenerateLabels()
-    NavGrids['Amphibious']:GenerateLabels()
-    NavGrids['Hover']:GenerateLabels()
+    labelRootLand:GenerateLabels()
+    labelRootNaval:GenerateLabels()
+    labelRootAmph:GenerateLabels()
+    labelRootHover:GenerateLabels()
+    labelRootAir:GenerateLabels()
 
     ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
     WARN("Precomputing neighbor information")
 
-    NavGrids['Land']:Precompute()
-    NavGrids['Water']:Precompute()
-    NavGrids['Amphibious']:Precompute()
-    NavGrids['Hover']:Precompute()
+    labelRootLand:Precompute()
+    labelRootNaval:Precompute()
+    labelRootAmph:Precompute()
+    labelRootAmph:Precompute()
+    labelRootAir:Precompute()
 
     ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
     WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))

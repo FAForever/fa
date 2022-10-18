@@ -364,10 +364,10 @@ NavUILayerStatistics = Class(Group) {
             :Over(self, 1)
             :End()
 
-        self.ToggleScanButton = LayoutHelpers.LayoutFor(UIUtil.CreateButtonStd(self, '/game/mfd_btn/control', nil, nil, nil, nil, 'UI_Tab_Click_01', 'UI_Tab_Rollover_01'))
-            :AtRightTopIn(self)
-            :Width(24)
-            :Height(16)
+        self.ToggleScanButton = LayoutHelpers.LayoutFor(UIUtil.CreateButtonStd(self, '/game/nav-ui/toggle-grid/toggle', nil, nil, nil, nil, 'UI_Tab_Click_01', 'UI_Tab_Rollover_01'))
+            :AtRightTopIn(self, 2, 16)
+            :Width(32)
+            :Height(32)
             :Over(self, 1)
             :End()
 
