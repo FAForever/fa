@@ -364,16 +364,28 @@ NavUILayerStatistics = Class(Group) {
             :Over(self, 1)
             :End()
 
-        self.ToggleScanButton = LayoutHelpers.LayoutFor(UIUtil.CreateButtonStd(self, '/game/nav-ui/toggle-grid/toggle', nil, nil, nil, nil, 'UI_Tab_Click_01', 'UI_Tab_Rollover_01'))
+        self.ToggleLayerGrid = LayoutHelpers.LayoutFor(UIUtil.CreateButtonStd(self, '/game/nav-ui/toggle-layer-grid/', nil, nil, nil, nil, 'UI_Tab_Click_01', 'UI_Tab_Rollover_01'))
             :AtRightTopIn(self, 2, 16)
             :Width(32)
             :Height(32)
             :Over(self, 1)
             :End()
 
-        self.ToggleScanButton.OnClick = function()
-            SimCallback({ Func = string.format("NavToggle%sScan", layer), Args = { }}, false)
+        self.ToggleLayerGrid.OnClick = function()
+            SimCallback({ Func = 'NavToggleScanLayer', Args = { Layer = layer }}, false)
         end
+
+        self.ToggleLabelGrid = LayoutHelpers.LayoutFor(UIUtil.CreateButtonStd(self, '/game/nav-ui/toggle-label-grid/', nil, nil, nil, nil, 'UI_Tab_Click_01', 'UI_Tab_Rollover_01'))
+            :Below(self.ToggleLayerGrid, 0)
+            :Width(32)
+            :Height(32)
+            :Over(self, 1)
+            :End()
+
+        self.ToggleLabelGrid.OnClick = function()
+            SimCallback({ Func = 'NavToggleScanLabels', Args = { Layer = layer }}, false)
+        end
+    
 
         AddOnSyncCallback(
             function(Sync)
@@ -403,7 +415,7 @@ NavUIActions = Class(Group) {
 
         self.BodyGenerate = LayoutHelpers.LayoutFor(Group(self))
             :Left(function() return self.Left() + LayoutHelpers.ScaleNumber(10) end)
-            :Right(function() return self.Left() + LayoutHelpers.ScaleNumber(180) end)
+            :Right(function() return self.Left() + LayoutHelpers.ScaleNumber(200) end)
             :Top(function() return self.Top() + LayoutHelpers.ScaleNumber(10) end)
             :Bottom(function() return self.Bottom() - LayoutHelpers.ScaleNumber(10) end)
             :Over(self, 1)
@@ -420,7 +432,7 @@ NavUIActions = Class(Group) {
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.BodyGenerate.Top() + LayoutHelpers.ScaleNumber(10) end)
-            :Bottom(function() return self.BodyGenerate.Top() + LayoutHelpers.ScaleNumber(100) end)
+            :Bottom(function() return self.BodyGenerate.Top() + LayoutHelpers.ScaleNumber(110) end)
             :Over(self, 1)
             :End()
 
@@ -428,7 +440,7 @@ NavUIActions = Class(Group) {
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsLand.Bottom() + LayoutHelpers.ScaleNumber(10) end)
-            :Bottom(function() return self.StatisticsLand.Bottom() + LayoutHelpers.ScaleNumber(100) end)
+            :Bottom(function() return self.StatisticsLand.Bottom() + LayoutHelpers.ScaleNumber(110) end)
             :Over(self, 1)
             :End()
 
@@ -436,7 +448,7 @@ NavUIActions = Class(Group) {
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsAmph.Bottom() + LayoutHelpers.ScaleNumber(10) end)
-            :Bottom(function() return self.StatisticsAmph.Bottom() + LayoutHelpers.ScaleNumber(100) end)
+            :Bottom(function() return self.StatisticsAmph.Bottom() + LayoutHelpers.ScaleNumber(110) end)
             :Over(self, 1)
             :End()
 
@@ -444,7 +456,7 @@ NavUIActions = Class(Group) {
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsHover.Bottom() + LayoutHelpers.ScaleNumber(10) end)
-            :Bottom(function() return self.StatisticsHover.Bottom() + LayoutHelpers.ScaleNumber(100) end)
+            :Bottom(function() return self.StatisticsHover.Bottom() + LayoutHelpers.ScaleNumber(110) end)
             :Over(self, 1)
             :End()
 
@@ -452,7 +464,7 @@ NavUIActions = Class(Group) {
             :Left(function() return self.BodyGenerate.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyGenerate.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.StatisticsNaval.Bottom() + LayoutHelpers.ScaleNumber(10) end)
-            :Bottom(function() return self.StatisticsNaval.Bottom() + LayoutHelpers.ScaleNumber(100) end)
+            :Bottom(function() return self.StatisticsNaval.Bottom() + LayoutHelpers.ScaleNumber(110) end)
             :Over(self, 1)
             :End()
 
@@ -503,11 +515,11 @@ NavUI = Class(Window) {
 
         -- prepare base class
 
-        Window.__init(self, parent, "NavUI", false, false, false, true, false, "NavUI5", {
+        Window.__init(self, parent, "NavUI", false, false, false, true, false, "NavUI7", {
             Left = 10,
             Top = 300,
             Right = 830,
-            Bottom = 910
+            Bottom = 960
         })
 
         LayoutHelpers.DepthOverParent(self, parent, 1)

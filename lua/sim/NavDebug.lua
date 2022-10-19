@@ -25,30 +25,32 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 local NavGenerator = import('/lua/sim/NavGenerator.lua')
 local NavUtils = import('/lua/sim/NavUtils.lua')
 
-local scanLand = false
-local scanHover = false
-local scanWater = false
-local scanAmph = false
-local scanAir = false
+local ScanState = {
+    LandLayer = false,
+    AirLayer = false,
+    NavalLayer = false,
+    HoverLayer = false,
+    AmphibiousLayer = false,
 
-function ToggleLandScan()
-    scanLand = not scanLand
+    LandLabels = false,
+    AirLabels = false,
+    NavalLabels = false,
+    HoverLabels = false,
+    AmphibiousLabels = false,
+}
+
+function ToggleScanLayer(data)
+    local keyLayer = string.format('%sLayer', data.Layer)
+    local keyLabels = string.format('%sLabels', data.Layer)
+    ScanState[keyLayer] = not ScanState[keyLayer]
+    ScanState[keyLabels] = false
 end
 
-function ToggleHoverScan()
-    scanHover = not scanHover
-end
-
-function ToggleWaterScan()
-    scanWater = not scanWater
-end
-
-function ToggleAmphScan()
-    scanAmph = not scanAmph
-end
-
-function ToggleAirScan()
-    scanAir = not scanAir
+function ToggleScanLabels(data)
+    local keyLayer = string.format('%sLayer', data.Layer)
+    local keyLabels = string.format('%sLabels', data.Layer)
+    ScanState[keyLabels] = not ScanState[keyLabels]
+    ScanState[keyLayer] = false
 end
 
 local CanPathToDataOrigin = nil
@@ -92,8 +94,6 @@ end
 
 
 function ScanOver(mouse, layer)
-    NavGenerator.NavGrids[layer]:Draw()
-
     if mouse then
         local over = NavGenerator.NavGrids[layer]:FindLeaf(mouse)
         if over then 
@@ -132,24 +132,54 @@ function Scan()
                 mouse = GetMouseWorldPos()
             end
 
-            if scanLand then
-                ScanOver(mouse, 'Land')
+            if ScanState.LandLayer then
+                local layer = 'Land'
+                NavGenerator.NavGrids[layer]:Draw()
+                ScanOver(mouse, layer)
             end
 
-            if scanHover then
-                ScanOver(mouse, 'Hover')
+            if ScanState.HoverLayer then
+                local layer = 'Hover'
+                NavGenerator.NavGrids[layer]:Draw()
+                ScanOver(mouse, layer)
             end
 
-            if scanWater then
-                ScanOver(mouse, 'Water')
+            if ScanState.WaterLayer then
+                local layer = 'Water'
+                NavGenerator.NavGrids[layer]:Draw()
+                ScanOver(mouse, layer)
             end
 
-            if scanAmph then
-                ScanOver(mouse, 'Amphibious')
+            if ScanState.AmphibiousLayer then
+                local layer = 'Amphibious'
+                NavGenerator.NavGrids[layer]:Draw()
+                ScanOver(mouse, layer)
             end
 
-            if scanAir then
-                ScanOver(mouse, 'Air')
+            if ScanState.AirLayer then
+                local layer = 'Air'
+                NavGenerator.NavGrids[layer]:Draw()
+                ScanOver(mouse, layer)
+            end
+
+            if ScanState.LandLabels then
+                NavGenerator.NavGrids['Land']:DrawLabels()
+            end
+
+            if ScanState.HoverLabels then
+                NavGenerator.NavGrids['Hover']:DrawLabels()
+            end
+
+            if ScanState.WaterLabels then
+                NavGenerator.NavGrids['Water']:DrawLabels()
+            end
+
+            if ScanState.AmphibiousLabels then
+                NavGenerator.NavGrids['Amphibious']:DrawLabels()
+            end
+
+            if ScanState.AirLabels then
+                NavGenerator.NavGrids['Air']:DrawLabels()
             end
         end
 

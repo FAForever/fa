@@ -270,6 +270,9 @@ function BeginSession()
 
     -- brains can have adjusted this value by now, ready to sync
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+    if ScenarioInfo.GameHasAIs then
+        import("/lua/sim/NavGenerator.lua").Generate()
+    end
 
     SPEW('Active mods in sim: ', repr(__active_mods))
 

@@ -213,11 +213,21 @@ NavGrid = ClassSimple {
     end,
 
     --- Draws all trees with the correct layer color
-    ---@param self any
+    ---@param self NavGrid
     Draw = function(self)
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
                 self.Trees[z][x]:Draw(Shared.LayerColors[self.Layer])
+            end
+        end
+    end,
+
+    --- Draws all trees with their corresponding labels
+    ---@param self NavGrid
+    DrawLabels = function(self, inset)
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
+                self.Trees[z][x]:DrawLabels(inset)
             end
         end
     end,
@@ -638,6 +648,19 @@ CompressedLabelTree = ClassSimple {
         else
             for _, child in self.children do
                 child:Draw(color, inset)
+            end
+        end
+    end,
+
+    ---@param self CompressedLabelTree
+    DrawLabels = function(self, inset)
+        if self.label != nil then
+            if self.label >= 0 then
+                DrawSquare(self.bx + self.ox, self.bz + self.oz, self.c, Shared.LabelToColor(self.label), inset)
+            end
+        else
+            for _, child in self.children do
+                child:DrawLabels(inset)
             end
         end
     end,

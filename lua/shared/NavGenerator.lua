@@ -86,6 +86,21 @@ end
 ---@param label number
 ---@return string
 function LabelToColor(label)
-    local v1 = math.mod(label + 200, 255)
-    return string.format("%x%x%x", v1, v1, v1)
+    local r = string.format("%x", math.mod(math.sin(label) * 256 + 512, 256) ^ 0)
+    local g = string.format("%x", math.mod(math.sin(label + 2) * 256 + 512, 256) ^ 0)
+    local b = string.format("%x", math.mod(math.cos(label) * 256 + 512, 256) ^ 0)
+
+    if string.len(r) == 1 then
+        r = '0' .. r
+    end
+
+    if string.len(g) == 1 then
+        g = '0' .. g
+    end
+
+    if string.len(b) == 1 then
+        b = '0' .. b
+    end
+
+    return r .. g .. b
 end
