@@ -768,9 +768,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param unit Unit
     AssignEngineerTask = function(self, unit)
         --LOG('+ AssignEngineerTask')
-        if unit.UnitBeingAssist or unit.UnitBeingBuilt or unit.Combat then
-            if unit.Combat then
-            end
+        if unit.UnitBeingAssist or unit.UnitBeingBuilt or unit.UnitBeingBuiltBehavior or unit.Combat then
             self:DelayAssign(unit, 50)
             return
         end
