@@ -197,7 +197,7 @@ globalOpts = {
          values = {
              {
                  text = "<LOC lobui_0742>Full Share",
-                 help = "<LOC lobui_0743>Your units will be transferred to your highest scoring ally when you die. Previously transferred units will stay where they are.",
+                 help = "<LOC lobui_0743>Your units will be transferred to your highest rated ally when you die. Previously transferred units will stay where they are.",
                  key = 'FullShare',
              },
              {
