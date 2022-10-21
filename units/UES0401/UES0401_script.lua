@@ -11,6 +11,7 @@ local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 
+---@class UES0401 : AircraftCarrier
 UES0401 = Class(AircraftCarrier) {
     BuildAttachBone = 'UES0401',
 

@@ -1,16 +1,17 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB2109/UAB2109_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Aeon Torpedo Launcher Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB2109/UAB2109_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Aeon Torpedo Launcher Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local AANChronoTorpedoWeapon = import('/lua/aeonweapons.lua').AANChronoTorpedoWeapon
 
+---@class UAB2109 : AStructureUnit
 UAB2109 = Class(AStructureUnit) {
     Weapons = {
         Turret01 = Class(AANChronoTorpedoWeapon) {},

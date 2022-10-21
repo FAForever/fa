@@ -13,6 +13,7 @@ local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 
+---@class XEA0306 : AirTransport
 XEA0306 = Class(AirTransport) {
     AirDestructionEffectBones = {'FrontRight_Engine_Exhaust','FrontLeft_Engine_Exhaust','BackRight_Engine_Exhaust','BackLeft_Engine_Exhaust'},
 

@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB1202/UAB1202_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Aeon Tier 2 Mass Extractor Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB1202/UAB1202_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Aeon Tier 2 Mass Extractor Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SMassCollectionUnit = import('/lua/seraphimunits.lua').SMassCollectionUnit
 
+---@class XSB1202 : SMassCollectionUnit
 XSB1202 = Class(SMassCollectionUnit) {
     
     OnStartBuild = function(self, unitBeingBuilt, order)

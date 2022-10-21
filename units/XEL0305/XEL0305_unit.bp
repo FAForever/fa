@@ -4,7 +4,7 @@ UnitBlueprint {
             'Torso',
             'Turret',
             'AttachPoint',
-#            'Turret_Barrel',
+--            'Turret_Barrel',
         },
     },
     Audio = {
@@ -42,15 +42,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'UEF_Select_Bot',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
         },
     },
     BuildIconSortPriority = 30,
@@ -301,17 +292,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.23,
-            TargetCheckInterval = 0.23,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'COMMAND',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'TECH1 MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.2,
             TurretBoneMuzzle = 'Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',
@@ -338,9 +327,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

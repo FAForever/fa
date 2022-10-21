@@ -51,6 +51,7 @@ local defaultBitmaps = {
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------- COMBO
+---@class Combo : Group
 Combo = Class(Group) {
     __init = function(self, parent, pointSize, maxVisibleItems, staticTitle, bitmaps, rolloverCue, clickCue, itemCue, debugName, EnableColor)
         Group.__init(self, parent)
@@ -59,6 +60,12 @@ Combo = Class(Group) {
         self.mClickCue = clickCue
         self.mItemCue = itemCue or "UI_Tab_Click_01"
         self.EnableColor = EnableColor or true
+
+        -- sets the offsets to the auto-attached scrollbar
+        -- these are the better defaults for the FAF design
+        self._scrollbarOffsetRight = -22
+        self._scrollbarOffsetBottom = -6
+        self._scrollbarOffsetTop = -6
 
         bitmaps = bitmaps or defaultBitmaps
 
@@ -75,10 +82,8 @@ Combo = Class(Group) {
         self._btnRight:DisableHitTest()
         self._btnMid:DisableHitTest()
 
-        LayoutHelpers.AtLeftIn(self._btnLeft, self)
-        LayoutHelpers.AtTopIn(self._btnLeft, self)
-        LayoutHelpers.AtRightIn(self._btnRight, self)
-        LayoutHelpers.AtTopIn(self._btnRight, self)
+        LayoutHelpers.AtLeftTopIn(self._btnLeft, self)
+        LayoutHelpers.AtRightTopIn(self._btnRight, self)
         LayoutHelpers.AtTopIn(self._btnMid, self)
         LayoutHelpers.AnchorToRight(self._btnMid, self._btnLeft, -1)
         self._btnMid.Right:Set(self._btnRight.Left)
@@ -96,7 +101,7 @@ Combo = Class(Group) {
 
         self._dropdown = Group(self._text)
         self._dropdown.Top:Set(self.Bottom)
-        self._dropdown.Right:Set(function() return self.Right() end)
+        self._dropdown.Right:Set(self.Right)
         self._dropdown.Width:Set(function() return self.Width() - LayoutHelpers.ScaleNumber(5) end)
 
         local ddul = Bitmap(self._dropdown, bitmaps.list.ul)
@@ -110,10 +115,8 @@ Combo = Class(Group) {
         local ddlr = Bitmap(self._dropdown, bitmaps.list.lr)
 
         -- top part is fixed under self
-        LayoutHelpers.AtLeftIn(ddul, self._dropdown)
-        LayoutHelpers.AtTopIn(ddul, self._dropdown)
-        LayoutHelpers.AtRightIn(ddur, self._dropdown)
-        LayoutHelpers.AtTopIn(ddur, self._dropdown)
+        LayoutHelpers.AtLeftTopIn(ddul, self._dropdown)
+        LayoutHelpers.AtRightTopIn(ddur, self._dropdown)
         LayoutHelpers.AtTopIn(ddum, self._dropdown)
         ddum.Left:Set(ddul.Right)
         ddum.Right:Set(ddur.Left)
@@ -197,9 +200,8 @@ Combo = Class(Group) {
         -- set the height of the list based on the number of items visible and the font metrics
         self._maxVisibleItems = maxVisibleItems
         self._visibleItems = LazyVar.Create()
-        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading() + 1) end)
+        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading()) + 1 end)
         self._dropdown.Height:Set(function() return self._list.Height() + ddum.Height() + ddlm.Height() end)
-        self._visibleItems:Set(1)
 
         -- set up button logic
         self.HandleEvent = function(ctrl, event)
@@ -316,7 +318,7 @@ Combo = Class(Group) {
             self._scrollbar:Destroy()
         end
         if numItems > self._visibleItems() then
-            self._scrollbar = UIUtil.CreateVertScrollbarFor(self._list)
+            self._scrollbar = UIUtil.CreateVertScrollbarFor(self._list, self._scrollbarOffsetRight, nil, self._scrollbarOffsetBottom, self._scrollbarOffsetTop)
         end
 
         local realDefFinded = false
@@ -334,6 +336,13 @@ Combo = Class(Group) {
         end
 
         self:SetItem(defaultItemIndex)
+    end,
+
+    -- helper function to (re)set scrollbar offsets for dialogs or UI parts using Vanila design (Replays, Multiplayer LAN, etc)
+    SetScrollBarOffsets = function(self, offset_right, offset_bottom, offset_top)
+        self._scrollbarOffsetRight = offset_right or 0
+        self._scrollbarOffsetBottom = offset_bottom or 0
+        self._scrollbarOffsetTop = offset_top or 0
     end,
 
     ClearItems = function(self)
@@ -396,6 +405,7 @@ Combo = Class(Group) {
 -- This combo is used when you have a few bitmaps you want to choose between, no scrollbar.
 -- NOTE: At some point a flexible control combo that uses grid should be made so anything can be in it
 -- bitmap array expects an array of bitmap names or colors
+---@class BitmapCombo : Group
 BitmapCombo = Class(Group) {
     __init = function(self, parent, bitmapArray, defaultIndex, isColor, bitmaps, rolloverCue, clickCue, debugName)
         Group.__init(self, parent)

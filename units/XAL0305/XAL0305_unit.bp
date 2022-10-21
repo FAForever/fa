@@ -29,15 +29,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 15,
     Categories = {
         'PRODUCTFA',
@@ -161,9 +152,9 @@ UnitBlueprint {
         UniformScale = 0.095,
     },
     Economy = {
-        BuildCostEnergy = 8900,
-        BuildCostMass = 800,
-        BuildTime = 4500,
+        BuildCostEnergy = 14080,
+        BuildCostMass = 880,
+        BuildTime = 4950,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -296,7 +287,6 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.15,
             RenderFireClock = true,
-            TargetCheckInterval = 3,
             TargetPriorities = {
                 'SNIPER',
                 '(ARTILLERY - TECH1)',
@@ -307,10 +297,9 @@ UnitBlueprint {
                 'TECH2 MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',

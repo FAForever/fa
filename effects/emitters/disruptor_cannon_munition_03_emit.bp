@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/gas_alpha_01.dds]],
-	RampTexture = [[/textures/particles/ramp_fire_03.dds]],
+	Texture = '/textures/particles/gas_alpha_01.dds',
+	RampTexture = '/textures/particles/ramp_fire_03.dds',
 	XDirectionCurve = {
 		XRange = 50.00,
 		Keys = {

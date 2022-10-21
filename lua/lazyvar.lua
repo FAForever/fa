@@ -109,6 +109,7 @@ function LazyVarMetaTable:Destroy()
 end
 
 function Create(initial)
+    ---@diagnostic disable-next-line:miss-symbol,unknown-symbol
     local result = {&1&4}
     setmetatable(result, LazyVarMetaTable)
     if initial == nil then 

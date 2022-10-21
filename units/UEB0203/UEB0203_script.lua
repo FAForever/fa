@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEB0203/UEB0203_script.lua
-#**  Author(s):  David Tomandl
-#**
-#**  Summary  :  UEF Tier 2 Naval Factory Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UEB0203/UEB0203_script.lua
+--**  Author(s):  David Tomandl
+--**
+--**  Summary  :  UEF Tier 2 Naval Factory Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
 
+---@class UEB0203 : TSeaFactoryUnit
 UEB0203 = Class(TSeaFactoryUnit) {
     OnCreate = function(self)
         TSeaFactoryUnit.OnCreate(self)

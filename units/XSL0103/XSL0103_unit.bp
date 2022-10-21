@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'AttachPoint'
+        }
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -24,15 +29,6 @@ UnitBlueprint {
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Vehicle',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
         },
     },
     BuildIconSortPriority = 60,
@@ -261,9 +257,9 @@ UnitBlueprint {
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.75,
-    SizeX = 0.55,
-    SizeY = 0.35,
-    SizeZ = 0.6,
+    SizeX = 0.65,
+    SizeY = 0.40,
+    SizeZ = 0.90,
     StrategicIconName = 'icon_land1_artillery',
     StrategicIconSortPriority = 135,
     Veteran = {
@@ -324,7 +320,6 @@ UnitBlueprint {
             RateOfFire = 0.35,
             SlavedToBody = true,
             SlavedToBodyArcRange = 45,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE EXPERIMENTAL',
                 'TECH3 ANTIMISSILE',
@@ -343,10 +338,9 @@ UnitBlueprint {
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 '(MOBILE * TECH1 + COMMAND)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret',
             TurretBoneYaw = 'Turret',

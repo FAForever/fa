@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB1303/URB1303_script.lua
-#**  Author(s):  Jessica St. Croix, David Tomandl
-#**
-#**  Summary  :  Cybran T3 Mass Fabricator
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URB1303/URB1303_script.lua
+--**  Author(s):  Jessica St. Croix, David Tomandl
+--**
+--**  Summary  :  Cybran T3 Mass Fabricator
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CMassFabricationUnit = import('/lua/cybranunits.lua').CMassFabricationUnit
 
+---@class URB1303 : CMassFabricationUnit
 URB1303 = Class(CMassFabricationUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)

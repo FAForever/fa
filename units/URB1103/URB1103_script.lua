@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB1103/URB1103_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Cybran Tier 1 Mass Extractor Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URB1103/URB1103_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Cybran Tier 1 Mass Extractor Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CMassCollectionUnit = import('/lua/cybranunits.lua').CMassCollectionUnit
 
+---@class URB1103 : CMassCollectionUnit
 URB1103 = Class(CMassCollectionUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         CMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)

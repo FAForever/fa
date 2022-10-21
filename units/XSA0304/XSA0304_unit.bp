@@ -81,15 +81,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTFA',
@@ -199,7 +190,7 @@ UnitBlueprint {
         UniformScale = 0.08,
     },
     Economy = {
-        BuildCostEnergy = 144000,#105000
+        BuildCostEnergy = 144000,--105000
         BuildCostMass = 2100,
         BuildTime = 9600,
     },
@@ -315,7 +306,7 @@ UnitBlueprint {
             },
             FiringRandomness = 0,
             FiringTolerance = 6,
-            FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true, -- [152]
             Label = 'Bomb',
             MaxRadius = 90,
             MuzzleSalvoDelay = 0,
@@ -339,16 +330,14 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.2,
-            TargetCheckInterval = 2.5,
             TargetPriorities = {
                 'TECH4',
                 'TECH3 STRUCTURE',
                 'TECH2 STRUCTURE',
                 'TECH1 STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             WeaponCategory = 'Bomb',
         },
         {

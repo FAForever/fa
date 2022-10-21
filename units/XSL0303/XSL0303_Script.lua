@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XSL0303/XSL0303_script.lua
-#**  Author(s):  Dru Staltman, Aaron Lundquist
-#**
-#**  Summary  :  Seraphim Siege Tank Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/XSL0303/XSL0303_script.lua
+--**  Author(s):  Dru Staltman, Aaron Lundquist
+--**
+--**  Summary  :  Seraphim Siege Tank Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
 local WeaponsFile = import('/lua/seraphimweapons.lua')
@@ -15,6 +15,7 @@ local SDFAireauBolter = WeaponsFile.SDFAireauBolterWeapon
 local SANUallCavitationTorpedo = WeaponsFile.SANUallCavitationTorpedo
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
+---@class XSL0303 : SLandUnit
 XSL0303 = Class(SLandUnit) {
     Weapons = {
         MainTurret = Class(SDFThauCannon) {},

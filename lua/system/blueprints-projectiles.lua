@@ -1,4 +1,4 @@
-
+---@declare-global
 
 -- Origin of tables of a projectile blueprint
 
@@ -40,6 +40,18 @@ local function PostProcessProjectile(projectile)
         projectile.DoNotCollideListCount = table.getn(projectile.DoNotCollideList)
         for k, category in projectile.DoNotCollideList do 
             projectile.DoNotCollideListHash[category] = true 
+        end
+    end
+
+    -- # fix desired shooter cap for missiles
+
+    if projectile.CategoriesHash['MISSILE'] and (not projectile.CategoriesHash['STRATEGIC']) then
+        if not projectile.DesiredShooterCap then
+            projectile.DesiredShooterCap = projectile.Defense.Health or 1
+        else 
+            if projectile.DesiredShooterCap != (projectile.Defense.Health or 1) then
+                WARN(string.format("Inconsistent shooter cap defined for projectile %s, it should match its health", projectile.BlueprintId))
+            end
         end
     end
 end

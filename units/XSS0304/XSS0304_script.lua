@@ -1,17 +1,18 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/xss0304/xss0304_script.lua
-#**  Author(s):  Greg Kohne, Dru Staltman, Gordon DUclos
-#**
-#**  Summary  :  Seaphim Submarine Hunter Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/xss0304/xss0304_script.lua
+--**  Author(s):  Greg Kohne, Dru Staltman, Gordon DUclos
+--**
+--**  Summary  :  Seaphim Submarine Hunter Script
+--**
+--**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
 local SANUallCavitationTorpedo = import('/lua/seraphimweapons.lua').SANUallCavitationTorpedo
 local SDFAjelluAntiTorpedoDefense = import('/lua/seraphimweapons.lua').SDFAjelluAntiTorpedoDefense
 local SAALosaareAutoCannonWeapon = import('/lua/seraphimweapons.lua').SAALosaareAutoCannonWeaponSeaUnit
 
+---@class XSS0304 : SSubUnit
 XSS0304 = Class(SSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {

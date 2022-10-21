@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UES0302/UES0302_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  UEF Battleship Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UES0302/UES0302_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  UEF Battleship Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 local WeaponsFile = import('/lua/terranweapons.lua')
@@ -14,6 +14,7 @@ local TAALinkedRailgun = WeaponsFile.TAALinkedRailgun
 local TAMPhalanxWeapon = WeaponsFile.TAMPhalanxWeapon
 local TDFGaussCannonWeapon = WeaponsFile.TDFShipGaussCannonWeapon
 
+---@class UES0302 : TSeaUnit
 UES0302 = Class(TSeaUnit) {
 
 

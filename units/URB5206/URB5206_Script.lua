@@ -1,14 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB5206/URB5206_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  Cybran Tracking Device Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URB5206/URB5206_script.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  Cybran Tracking Device Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local Unit = import('/lua/sim/Unit.lua').Unit
 
+---@class URB5206 : Unit
 URB5206 = Class(Unit) {
 
     OnCreate = function(self)

@@ -1,21 +1,21 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/RushMainAir.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/RushMainAir.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'RushMainAir',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1BalancedUpgradeBuilders',
         'T2BalancedUpgradeBuilders',
 
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
@@ -23,48 +23,48 @@ BaseBuilderTemplate {
         'EngineerFactoryConstruction',
         'EngineerFactoryConstructionAirHigherPriority',
 
-        # Engineer Support buildings
+        -- Engineer Support buildings
         'EngineeringSupportBuilder',
 
-        # Build energy at this base
+        -- Build energy at this base
         'EngineerEnergyBuilders',
 
-        # Build Mass high pri at this base
+        -- Build Mass high pri at this base
         'EngineerMassBuildersHighPri',
 
-        # Extractors
+        -- Extractors
         'Time Exempt Extractor Upgrades',
 
-        # ACU Builders
+        -- ACU Builders
         'Air Rush Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
         'ACUUpgrades - Tech 2 Engineering',
         'ACUUpgrades - Shields',
 
-        # ACU Defense
+        -- ACU Defense
         'T1ACUDefenses',
         'T2ACUDefenses',
         'T2ACUShields',
         'T3ACUShields',
         'T3ACUNukeDefenses',
 
-        # ==== EXPANSION ==== #
+        -- ==== EXPANSION ==== --
         'EngineerExpansionBuildersFull',
         'EngineerExpansionBuildersSmall',
         'EngineerFirebaseBuilders',
 
-        # ==== DEFENSES ==== #
-        #'T1BaseDefenses',
+        -- ==== DEFENSES ==== --
+        --'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
 
         'T2MissileDefenses',
-        #'T2ArtilleryFormBuilders',
+        --'T2ArtilleryFormBuilders',
 
-        #'T1DefensivePoints',
-        #'T2DefensivePoints',
-        #'T3DefensivePoints',
+        --'T1DefensivePoints',
+        --'T2DefensivePoints',
+        --'T3DefensivePoints',
 
         'T2Shields',
         'ShieldUpgrades',
@@ -75,10 +75,10 @@ BaseBuilderTemplate {
 
         'MiscDefensesEngineerBuilders',
 
-        # ==== NAVAL EXPANSION ==== #
+        -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders',
 
-        # ==== LAND UNIT BUILDERS ==== #
+        -- ==== LAND UNIT BUILDERS ==== --
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
         'T3LandFactoryBuilders',
@@ -95,7 +95,7 @@ BaseBuilderTemplate {
         'T2ReactionDF',
         'T3ReactionDF',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'T1AirFactoryBuilders',
         'T2AirFactoryBuilders',
         'T3AirFactoryBuilders',
@@ -106,16 +106,16 @@ BaseBuilderTemplate {
 
         'TransportFactoryBuilders',
 
-        'T1AntiAirBuilders', #DUNCAN - added back in
+        'T1AntiAirBuilders', --DUNCAN - added back in
         'T2AntiAirBuilders',
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuilders',
 
-        # ==== UNIT CAP BUILDERS ==== #
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 
-        # ==== ARTILLERY BUILDERS ==== #
+        -- ==== ARTILLERY BUILDERS ==== --
         'T3ArtilleryGroup',
         'T3ArtilleryFormBuilders',
 
@@ -124,8 +124,8 @@ BaseBuilderTemplate {
         'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
-        # ==== EXPERIMENTALS ==== #
-        #'MobileLandExperimentalEngineers',
+        -- ==== EXPERIMENTALS ==== --
+        --'MobileLandExperimentalEngineers',
         'MobileLandExperimentalForm',
 
         'MobileAirExperimentalEngineers',
@@ -156,7 +156,7 @@ BaseBuilderTemplate {
             SCU = 1,
         },
         FactoryCount = {
-            #DUNCAN - was 2, 10, 0, 1
+            --DUNCAN - was 2, 10, 0, 1
             Land = 1,
             Air = 8,
             Sea = 0,
@@ -181,7 +181,7 @@ BaseBuilderTemplate {
             return 1000, 'rushair'
         end
 
-        #DUNCAN - dont use this AI on setons
+        --DUNCAN - dont use this AI on setons
         if ScenarioInfo.name =='Seton\'s Clutch' then
             return 1, 'rushair'
         end
@@ -194,13 +194,13 @@ BaseBuilderTemplate {
         end
 
         if true then
-            #return 1000, 'rushair'
+            --return 1000, 'rushair'
         end
 
         local mapSizeX, mapSizeZ = GetMapSize()
         local startX, startZ = aiBrain:GetArmyStartPos()
 
-        #DUNCAN - Add island check
+        --DUNCAN - Add island check
         local isIsland = false
         local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then

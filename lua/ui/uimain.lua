@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: The entry point for UI scripting
 --*
---* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('uiutil.lua')
@@ -146,6 +146,7 @@ function NoteGameSpeedChanged(clientIndex, newSpeed)
     -- I'm not going to change it and risk the wrath of the producers.
     print(LOCF("<LOC Engine0006>%s: adjusting game speed to %+d", client.name, newSpeed))
     import('/lua/ui/game/score.lua').NoteGameSpeedChanged(newSpeed)
+    import('/lua/ui/game/objectives2.lua').NoteGameSpeedChanged(newSpeed)
 end
 
 function NoteGameOver()
@@ -154,8 +155,6 @@ function NoteGameOver()
         GetCursor():Show()
     end
     if SessionIsReplay() then
-        --local scoreDlg = import('/lua/ui/dialogs/score.lua').dialog
-        --import('/lua/ui/game/gameresult.lua').OnReplayEnd()
         import('/lua/ui/game/score.lua').ArmyAnnounce(1, '<LOC _Replay_over>Replay over.')
     else
         import('/lua/ui/game/score.lua').ArmyAnnounce(1, '<LOC _Game_over>Game over.')

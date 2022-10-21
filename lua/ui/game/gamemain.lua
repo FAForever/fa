@@ -145,9 +145,17 @@ end
 
 function CreateUI(isReplay)
 
-    -- override some UI globals
-    import("/lua/ui/override/ArmiesTable.lua").Setup()
-    import("/lua/ui/override/SessionClients.lua").Setup()
+    -- # Overwrite some globals for performance / safety
+
+    import('/lua/ui/override/Exit.lua')
+    import('/lua/ui/override/ArmiesTable.lua')
+    import('/lua/ui/override/SessionClients.lua')
+
+    -- # Track performance
+
+    import('/lua/system/performance.lua')
+
+    -- # Overwrite some globals for performance / safety
 
     -- ensure logger is turned off for the average user
     if not GetPreference('debug.enable_debug_facilities') then
@@ -176,7 +184,7 @@ function CreateUI(isReplay)
 
                 if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
                     -- allow meshes and effects to be seen from further away
-                    ConExecute("cam_SetLOD WorldCamera 0.7")
+                    ConExecute("cam_SetLOD WorldCamera 0.65")
                 end
 
                 if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 

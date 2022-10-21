@@ -1,14 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB1102/UAB1102_script.lua
-#**  Author(s):  Jessica St. Croix, John Comes
-#**
-#**  Summary  :  Aeon Hydrocarbon Power Plant Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB1102/UAB1102_script.lua
+--**  Author(s):  Jessica St. Croix, John Comes
+--**
+--**  Summary  :  Aeon Hydrocarbon Power Plant Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AEnergyCreationUnit = import('/lua/aeonunits.lua').AEnergyCreationUnit
+---@class UAB1102 : AEnergyCreationUnit
 UAB1102 = Class(AEnergyCreationUnit) {
 
     AirEffects = {'/effects/emitters/hydrocarbon_smoke_01_emit.bp',},

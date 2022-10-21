@@ -1,21 +1,22 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB3104/URB3104_script.lua
-#**  Author(s):  David Tomandl
-#**
-#**  Summary  :  Cybran Omni Sensor Suite Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URB3104/URB3104_script.lua
+--**  Author(s):  David Tomandl
+--**
+--**  Summary  :  Cybran Omni Sensor Suite Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CRadarUnit = import('/lua/cybranunits.lua').CRadarUnit
 
+---@class URB3104 : CRadarUnit
 URB3104 = Class(CRadarUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CRadarUnit.OnStopBeingBuilt(self,builder,layer)
 
-        # move the dishes about
+        -- move the dishes about
     end,
 
     OnIntelDisabled = function(self)

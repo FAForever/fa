@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XSB3104/XSB3104_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  Seraphim T3 Radar Tower Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/XSB3104/XSB3104_script.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  Seraphim T3 Radar Tower Script
+--**
+--**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SRadarUnit = import('/lua/seraphimunits.lua').SRadarUnit
 
+---@class XSB3104 : SRadarUnit
 XSB3104 = Class(SRadarUnit) {
     
     OnIntelDisabled = function(self)

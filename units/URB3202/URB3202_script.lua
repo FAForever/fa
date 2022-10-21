@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB3202/URB3202_script.lua
-#**  Author(s):  John Comes
-#**
-#**  Summary  :  Cybran Long Range Sonar Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URB3202/URB3202_script.lua
+--**  Author(s):  John Comes
+--**
+--**  Summary  :  Cybran Long Range Sonar Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CSonarUnit = import('/lua/cybranunits.lua').CSonarUnit
 
+---@class URB3202 : CSonarUnit
 URB3202 = Class(CSonarUnit) {
     TimedSonarTTIdleEffects = {
         {

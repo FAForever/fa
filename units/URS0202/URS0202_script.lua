@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/URS0202/URS0202_script.lua
 -- Author(s):  David Tomandl, Jessica St. Croix
 -- Summary  :  Cybran Cruiser Script
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
@@ -12,6 +12,7 @@ local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local CAMZapperWeapon03 = CybranWeaponsFile.CAMZapperWeapon03
 local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaserInvisible
 
+---@class URS0202 : CSeaUnit
 URS0202 = Class(CSeaUnit) {
     Weapons = {
         TargetPainter = Class(TargetingLaser) {

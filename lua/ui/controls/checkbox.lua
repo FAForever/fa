@@ -3,6 +3,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
 
+---@class Checkbox : Group
 Checkbox = Class(Group) {
     __init = function(self, parent, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked, label, labelRight, labelSize, clickCue, rolloverCue)
         Group.__init(self, parent)
@@ -47,7 +48,7 @@ Checkbox = Class(Group) {
         local enclosingInstance = self
 
         -- Delegate clicks on the label to the main handler.
-        textfield.OnClick = function(this, modifiers)
+        textfield.OnClick = function(control, modifiers)
             enclosingInstance:OnClick(modifiers)
         end
 

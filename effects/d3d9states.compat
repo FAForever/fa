@@ -1,0 +1,397 @@
+//
+// D3D9 state includes
+//
+
+#define FIXED_FUNC_VS null
+#define FIXED_FUNC_BLOOM_VS null
+#define FIXED_FUNC_PS null
+
+#define AlphaState(p) p
+#define DepthState(p) p
+#define RasterizerState(p) p
+
+// These defines are worthless on d3d9, 
+// but allow us to use the same code between d3d9 and d3d10
+#define d3d_LessEqual 0
+#define d3d_NotEqual 1
+#define d3d_Equal 2
+#define d3d_Greater 3
+
+// This is a NOP in D3D9 since the engine was written to use D3D9.
+#define CompatSwizzle(pixel) /* nop */
+
+//
+// Blend States
+//
+#define AlphaBlend_Disable \
+	AlphaBlendEnable=false; \
+	
+#define AlphaBlend_Default_Write_RGB \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x07; \
+
+#define AlphaBlend_Default_Write_A \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x08; \
+
+#define AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x0F; \
+    SrcBlend = SrcAlpha; \
+    DestBlend = InvSrcAlpha; \
+    
+#define AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x07; \
+    SrcBlend = SrcAlpha; \
+    DestBlend = InvSrcAlpha; \
+    
+#define AlphaBlend_SrcAlpha_One_Write_RGBA \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x0F; \
+    SrcBlend = SrcAlpha; \
+    DestBlend = One; \
+    
+#define AlphaBlend_SrcAlpha_One_Write_RGB \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x07; \
+    SrcBlend = SrcAlpha; \
+    DestBlend = One; \
+    
+#define AlphaBlend_SrcAlpha_One \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x07; \
+    SrcBlend = SrcAlpha; \
+    DestBlend = One; \
+    
+#define AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x07; \
+    SrcBlend = SrcAlpha; \
+    DestBlend = InvSrcAlpha; \
+    
+#define AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RG \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x03; \
+    SrcBlend = SrcAlpha; \
+    DestBlend = InvSrcAlpha; \
+
+#define AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RBA \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x0D; \
+    SrcBlend = SrcAlpha; \
+    DestBlend = InvSrcAlpha; \
+    
+#define AlphaBlend_One_InvSrcAlpha_Write_RGB \
+	AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x07; \
+    SrcBlend = One; \
+    DestBlend = InvSrcAlpha; \
+    
+#define AlphaBlend_One_InvSrcAlpha_Write_RGBA \
+	AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x0F; \
+    SrcBlend = One; \
+    DestBlend = InvSrcAlpha; \
+    
+#define AlphaBlend_One_InvSrcAlpha \
+	AlphaBlendEnable = true; \
+	SrcBlend = One; \
+	DestBlend = InvSrcColor; \
+	
+#define AlphaBlend_Zero_InvSrcColor \
+	AlphaBlendEnable = true; \
+	ColorWriteEnable = 0x07; \
+	SrcBlend = Zero; \
+	DestBlend = InvSrcColor; \
+	
+#define AlphaBlend_Zero_InvSrcColor_Write_RGBA \
+	AlphaBlendEnable = true; \
+	ColorWriteEnable = 0x0F; \
+	SrcBlend = Zero; \
+	DestBlend = InvSrcColor; \
+
+#define AlphaBlend_Zero_SrcColor_Write_RGB \
+	ColorWriteEnable = 0x07; \
+	AlphaBlendEnable = true; \
+	SrcBlend = Zero; \
+	DestBlend = SrcColor; \
+		
+#define AlphaBlend_One_SrcColor_Write_RGB \
+	ColorWriteEnable = 0x07; \
+	AlphaBlendEnable = true; \
+	SrcBlend = One; \
+	DestBlend = SrcColor; \
+		
+#define AlphaBlend_Zero_SrcColor \
+	ColorWriteEnable = 0x00; \
+	AlphaBlendEnable = true; \
+	SrcBlend = Zero; \
+	DestBlend = SrcColor; \
+	
+#define AlphaBlend_Zero_SrcColor_Write_RGBA \
+	ColorWriteEnable = 0x0F; \
+	AlphaBlendEnable = true; \
+	SrcBlend = Zero; \
+	DestBlend = SrcColor; \
+	
+#define AlphaBlend_SrcAlpha_InvSrcAlpha_Write_A \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x08; \
+    SrcBlend = SrcAlpha; \
+    DestBlend = InvSrcAlpha; \
+    
+#define AlphaBlend_InvDestColor_InvSrcColor \
+	AlphaBlendEnable = true; \
+	ColorWriteEnable = 0x07; \
+	SrcBlend = InvDestColor; \
+	DestBlend = InvSrcColor; \
+
+#define AlphaBlend_InvDestColor_InvSrcColor_Write_RGBA \
+	AlphaBlendEnable = true; \
+	ColorWriteEnable = 0x0F; \
+	SrcBlend = InvDestColor; \
+	DestBlend = InvSrcColor; \
+	
+#define AlphaBlend_One_Zero \
+    AlphaBlendEnable = true; \
+	SrcBlend = One; \
+	DestBlend = Zero; \
+	
+#define AlphaBlend_One_One \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x07; \
+	SrcBlend = One; \
+	DestBlend = One; \
+	
+#define AlphaBlend_One_One_Write_RGB \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x07; \
+	SrcBlend = One; \
+	DestBlend = One; \
+	
+#define AlphaBlend_One_One_Write_RGBA \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x0F; \
+	SrcBlend = One; \
+	DestBlend = One; \
+	
+#define AlphaBlend_One_One_Write_A \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x08; \
+	SrcBlend = One; \
+	DestBlend = One; \
+	
+#define AlphaBlend_One_Zero_Write_A \
+    AlphaBlendEnable = true; \
+    ColorWriteEnable = 0x08; \
+	SrcBlend = One; \
+	DestBlend = Zero; \
+	
+#define AlphaBlend_Write_A \
+	AlphaBlendEnable = true; \
+	ColorWriteEnable = 0x08; \
+	
+#define AlphaBlend_Write_RGB \
+	AlphaBlendEnable = true; \
+	ColorWriteEnable = 0x07; \
+	
+#define AlphaBlend_Write_RGBA \
+	AlphaBlendEnable = true; \
+	ColorWriteEnable = 0x0F; \
+	
+#define AlphaBlend_Disable_Write_A \
+	AlphaBlendEnable = false; \
+	ColorWriteEnable = 0x08; \
+	
+#define AlphaBlend_Disable_Write_RG \
+	AlphaBlendEnable = false; \
+	ColorWriteEnable = 0x03; \
+	
+#define AlphaBlend_Disable_Write_BA \
+	AlphaBlendEnable = false; \
+	ColorWriteEnable = 0x0C; \
+	
+#define AlphaBlend_Disable_Write_RGB \
+	AlphaBlendEnable = false; \
+	ColorWriteEnable = 0x07; \
+	
+#define AlphaBlend_Disable_Write_RGBA \
+	AlphaBlendEnable = false; \
+	ColorWriteEnable = 0x0F; \
+	
+#define AlphaBlend_Disable_Write_None \
+	ColorWriteEnable = 0x00; \
+	AlphaBlendEnable = false; \
+	
+//
+// DepthStencilStates
+//
+
+#define Depth_Disable \
+	ZEnable = false; \
+	
+#define Depth_Enable \
+	ZEnable = true; \
+	
+#define Depth_Always \
+	ZFunc = Always; \
+	
+#define Depth_Enable_Greater \
+	ZEnable = true; \
+	ZFunc = Greater; \
+	
+#define Depth_Enable_Less \
+	ZEnable = true; \
+	ZFunc = Less; \
+	
+#define Depth_Enable_Greater_Write_None \
+	ZEnable = true; \
+	ZFunc = Greater; \
+	ZWriteEnable = false; \
+	
+#define Depth_Enable_Less_Write_None \
+	ZEnable = true; \
+	ZFunc = Less; \
+	ZWriteEnable = false; \
+	
+#define Depth_Enable_LessEqual_Write_None \
+	ZEnable = true; \
+	ZFunc = LessEqual; \
+	ZWriteEnable = false; \
+	
+#define Depth_Enable_Always_Write_None \
+	ZEnable = true; \
+	ZFunc = Always; \
+	ZWriteEnable = false; \
+
+#define Depth_Enable_Always_Write \
+	ZEnable = true; \
+	ZFunc = Always; \
+	ZWriteEnable = true; \
+
+#define Depth_Disable_Write_None \
+	ZEnable = false; \
+	ZWriteEnable = false; \
+	
+#define Depth_Occlude \
+    StencilEnable = true; \
+    StencilWriteMask = 0x01; \
+    StencilMask = 0x01; \
+    StencilRef = 0xFF; \
+    StencilFunc = Always; \
+    StencilFail = Keep; \
+    StencilZFail = Keep; \
+    StencilPass = Replace; \
+        
+#define Depth_SilhouetteP0 \
+	ZEnable = false; \
+	ZWriteEnable = false; \
+	StencilEnable = true; \
+	StencilWriteMask = 0x02; \
+	StencilMask = 0x02; \
+	StencilRef = 0xFF; \
+	StencilFunc = Always; \
+	StencilFail = Keep; \
+	StencilZFail = Replace; \
+	StencilPass = Replace; \
+
+#define Depth_SilhouetteP1 \
+    ZEnable = true; \
+    StencilEnable = true; \
+    StencilWriteMask = 0x0F; \
+    StencilMask = 0x03; \
+    StencilRef = 0x03; \
+    StencilFunc = Equal; \
+    StencilFail = Keep; \
+    StencilZFail = Keep; \
+    StencilPass = Zero; \
+    
+#define Depth_TSilhouette \
+    StencilEnable = true; \
+    StencilWriteMask = 0xFF; \
+    StencilMask = 0xFF; \
+    StencilRef = 0x03; \
+    StencilFunc = Equal; \
+    StencilFail = Keep; \
+    StencilZFail = Keep; \
+    StencilPass = Keep; \
+    ZWriteEnable = false; \
+    ZEnable = false; \
+        
+#define Depth_TCommand \
+    StencilEnable = true; \
+    StencilRef = 1; \
+    StencilFunc = NotEqual; \
+    StencilFail = replace; \
+    StencilPass = replace; \
+    StencilWriteMask = 0xf; \
+    StencilMask = 0xf; \
+	ZEnable = false; \
+        
+#define Depth_TCommandOther \
+	StencilEnable = true; \
+    StencilRef = 2; \
+    StencilFunc = NotEqual; \
+    StencilFail = replace; \
+    StencilPass = replace; \
+    ZEnable = false; \
+        
+///
+/// RasterizerStates
+///
+#define Rasterizer_Cull_CCW \
+	CullMode = CCW; \
+	
+#define Rasterizer_Cull_CCW_Bias_Neg02 \
+	CullMode = CCW; \
+	DepthBias = -0.02; \
+
+#define Rasterizer_Cull_CCW_Bias_Neg001 \
+	CullMode = CCW; \
+	DepthBias = -0.001; \
+	
+#define Rasterizer_Cull_None_Bias_Neg001 \
+	CullMode = NONE; \
+	DepthBias = -0.001; \
+	
+#define Rasterizer_Bias_Decal \
+	DepthBias = decalDepthOffset; \
+	
+#define Rasterizer_Cull_CW \
+	CullMode = CW; \
+
+#define Rasterizer_Cull_None \
+	CullMode = None; \
+
+#define Rasterizer_Wire \
+	FillMode = WIREFRAME; \
+
+#define Rasterizer_Solid \
+	FillMode = SOLID; \
+
+#define Rasterizer_Cull_CCW_Fill_Wire \
+	FillMode = WIREFRAME; \
+	CullMode = CCW; \
+	
+#define Rasterizer_Cull_CCW_Bias_Neg02_Fill_Wire \
+	FillMode = WIREFRAME; \
+	CullMode = CCW; \
+	DepthBias = -0.02; \
+
+#define Rasterizer_Bias_Decal_Fill_Wire \
+	FillMode = WIREFRAME; \
+	DepthBias = decalDepthOffset; \
+	
+#define Rasterizer_Cull_CW_Fill_Wire \
+	FillMode = WIREFRAME; \
+	CullMode = CW; \
+
+#define Rasterizer_Cull_None_Fill_Wire \
+	FillMode = WIREFRAME; \
+	CullMode = None; \
+	
+//
+// End
+//
+

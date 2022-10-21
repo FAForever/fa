@@ -63,6 +63,7 @@ local TrashBag = _G.TrashBag
 local TrashBagAdd = TrashBag.Add
 
 --- A class to managing the build bots. Make sure to call all the relevant functions.
+---@class CConstructionTemplate : 
 CConstructionTemplate = Class() {
 
     --- Prepares the values required to support bots
@@ -260,6 +261,7 @@ CConstructionTemplate = Class() {
 
 --- The build bot class for drones. It removes a lot of
 -- the basic functionality of a unit to save on performance.
+---@class CBuildBotUnit : DummyUnit
 CBuildBotUnit = Class(DummyUnit) {
 
     -- Keep track of the builder that made the bot
@@ -323,6 +325,7 @@ CBuildBotUnit = Class(DummyUnit) {
 }
 
 -- AIR FACTORY STRUCTURES
+---@class CAirFactoryUnit : AirFactoryUnit
 CAirFactoryUnit = Class(AirFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
@@ -362,15 +365,19 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
 }
 
 -- AIR STAGING STRUCTURES
+---@class CAirStagingPlatformUnit : AirStagingPlatformUnit
 CAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
 -- AIR UNITS
+---@class CAirUnit : AirUnit
 CAirUnit = Class(AirUnit) {}
 
 -- WALL STRUCTURES
+---@class CConcreteStructureUnit : ConcreteStructureUnit
 CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 
 -- CONSTRUCTION UNITS
+---@class CConstuctionUnit : ConstructionUnit
 CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 
     OnCreate = function(self)
@@ -380,7 +387,6 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 
     OnStopBeingBuilt = function(self, builder, layer)
         ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
-        -- If created with F2 on land, then play the transform anim.
         if self.Layer == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
@@ -443,6 +449,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 }
 
 -- ENERGY CREATION UNITS
+---@class CEnergyCreationUnit : EnergyCreationUnit
 CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         DefaultUnitsFile.EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
@@ -455,9 +462,11 @@ CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
 }
 
 -- ENERGY STORAGE STRUCTURES
+---@class CEnergyStorageUnit : EnergyStorageUnit
 CEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
 -- LAND FACTORY STRUCTURES
+---@class CLandFactoryUnit : LandFactoryUnit
 CLandFactoryUnit = Class(LandFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
@@ -500,28 +509,35 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
 }
 
 -- LAND UNITS
+---@class CLandUnit : LandUnit
 CLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
+---@class CMassCollectionUnit : MassCollectionUnit
 CMassCollectionUnit = Class(DefaultUnitsFile.MassCollectionUnit) {}
 
 --  MASS FABRICATION UNITS
+---@class CMassFabricationUnit : MassFabricationUnit
 CMassFabricationUnit = Class(DefaultUnitsFile.MassFabricationUnit) {}
 
 --  MASS STORAGE UNITS
+---@class CMassStorageUnit : MassStorageUnit
 CMassStorageUnit = Class(DefaultUnitsFile.MassStorageUnit) {}
 
 -- RADAR STRUCTURES
+---@class CRadarUnit : RadarUnit
 CRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
 
 -- SONAR STRUCTURES
+---@class CSonarUnit : SonarUnit
 CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
+---@class CSeaFactoryUnit : SeaFactoryUnit
 CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     StartBuildingEffects = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeamsOpti, nil, unitBeingBuilt, self.BuildEffectsBag, false)
         unitBeingBuilt.Trash:Add(thread)
     end,
 
@@ -580,38 +596,50 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 }
 
 -- SEA UNITS
+---@class CSeaUnit : SeaUnit
 CSeaUnit = Class(SeaUnit) {}
 
 -- SHIELD LAND UNITS
+---@class CShieldLandUnit : ShieldLandUnit
 CShieldLandUnit = Class(ShieldLandUnit) {}
 
 -- SHIELD STRUCTURES
+---@class CShieldStructureUnit : ShieldStructureUnit
 CShieldStructureUnit = Class(ShieldStructureUnit) {}
 
 -- STRUCTURES
+---@class CStructureUnit : StructureUnit
 CStructureUnit = Class(StructureUnit) {}
 
 -- SUBMARINE UNITS
+---@class CSubUnit : SubUnit
 CSubUnit = Class(DefaultUnitsFile.SubUnit) {}
 
 -- TRANSPORT BEACON UNITS
+---@class CTransportBeaconUnit : TransportBeaconUnit
 CTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 
 -- WALKING LAND UNITS
+---@class CWalkingLandUnit : WalkingLandUnit
 CWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 -- WALL STRUCTURES
+---@class CWallStructureUnit : WallStructureUnit
 CWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES
+---@class CCivilianStructureUnit : CStructureUnit
 CCivilianStructureUnit = Class(CStructureUnit) {}
 
 -- QUANTUM GATE UNITS
+---@class CQuantumGateUnit : QuantumGateUnit
 CQuantumGateUnit = Class(QuantumGateUnit) {}
 
 -- RADAR JAMMER UNITS
+---@class CRadarJammerUnit : RadarJammerUnit
 CRadarJammerUnit = Class(RadarJammerUnit) {}
 
+---@class CConstructionEggUnit : CStructureUnit
 CConstructionEggUnit = Class(CStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         LandFactoryUnit.OnStopBeingBuilt(self, builder, layer)
@@ -786,22 +814,11 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
             return false
         end
     end,
-
-    CreateReclaimEffects = function(self, target)
-        EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
-    end,
-
-    CreateReclaimEndEffects = function(self, target)
-        EffectUtil.PlayReclaimEndEffects(self, target)
-    end,
-
-    CreateCaptureEffects = function(self, target)
-        EffectUtil.PlayCaptureEffects(self, target, self.BuildEffectBones or {0, }, self.CaptureEffectsBag)
-    end,
 }
 
 -- CCommandUnit
 -- Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
+---@class CCommandUnit : CommandUnit
 CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
 
     OnCreate = function(self)

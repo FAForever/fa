@@ -1,15 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB1103/UAB1103_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Aeon Mass Extractor Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB1103/UAB1103_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Aeon Mass Extractor Script
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AMassCollectionUnit = import('/lua/aeonunits.lua').AMassCollectionUnit
 
+---@class UAB1103 : AMassCollectionUnit
 UAB1103 = Class(AMassCollectionUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)

@@ -1,14 +1,15 @@
-#****************************************************************************
-#** 
-#**  File     :  /cdimage/units/URC1501/URC1501_script.lua 
-#**  Author(s):  John Comes, David Tomandl 
-#** 
-#**  Summary  :  Cybran Manufacturing Center, Ver1
-#** 
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--** 
+--**  File     :  /cdimage/units/URC1501/URC1501_script.lua 
+--**  Author(s):  John Comes, David Tomandl 
+--** 
+--**  Summary  :  Cybran Manufacturing Center, Ver1
+--** 
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local CCivilianStructureUnit = import('/lua/cybranunits.lua').CCivilianStructureUnit
 
+---@class URC1501 : CCivilianStructureUnit
 URC1501 = Class(CCivilianStructureUnit) {
 	EffectBones01 = {
 		'Smoke_Left01', 'Smoke_Left02', 'Smoke_Left03', 'Smoke_Left04',	'Smoke_Left05',					

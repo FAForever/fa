@@ -67,7 +67,7 @@ UnitBlueprint {
             LODs = {
                 {
 
-                    # NOTE: Must change Temp mesh and dds
+                    -- NOTE: Must change Temp mesh and dds
                     AlbedoName = '/Units/UAC1902/UAC1902_Albedo.dds',
                     LODCutoff = 300,
                     MeshName = '/Units/UAC1902/UAC1902_LOD0.scm',

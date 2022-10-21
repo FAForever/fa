@@ -1,14 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /units/XEB0204/XEB0204_script.lua
-#**  Author(s):  Dru Staltman
-#**
-#**  Summary  :  UEF Engineering tower
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /units/XEB0204/XEB0204_script.lua
+--**  Author(s):  Dru Staltman
+--**
+--**  Summary  :  UEF Engineering tower
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local TPodTowerUnit = import('/lua/terranunits.lua').TPodTowerUnit
 
+---@class XEB0204 : TPodTowerUnit
 XEB0204 = Class(TPodTowerUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         TPodTowerUnit.OnStopBeingBuilt(self,builder,layer)

@@ -1,14 +1,15 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/UAB1104/UAB1104_script.lua
---#**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
---#**
---#**  Summary  :  Aeon Mass Fabricator
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/UAB1104/UAB1104_script.lua
+----**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
+----**
+----**  Summary  :  Aeon Mass Fabricator
+----**
+----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local AMassFabricationUnit = import('/lua/aeonunits.lua').AMassFabricationUnit
 
+---@class UAB1104 : AMassFabricationUnit
 UAB1104 = Class(AMassFabricationUnit) {
     OnCreate = function(self)
         AMassFabricationUnit.OnCreate(self)

@@ -44,6 +44,7 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 ---------------------------------------------------------------
 --  FACTORIES
 ---------------------------------------------------------------
+---@class AFactoryUnit : FactoryUnit
 AFactoryUnit = Class(FactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
@@ -71,6 +72,7 @@ AFactoryUnit = Class(FactoryUnit) {
 ---------------------------------------------------------------
 --  AIR STRUCTURES
 ---------------------------------------------------------------
+---@class AAirFactoryUnit : AirFactoryUnit
 AAirFactoryUnit = Class(AirFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
@@ -88,16 +90,19 @@ AAirFactoryUnit = Class(AirFactoryUnit) {
 ---------------------------------------------------------------
 --  AIR UNITS
 ---------------------------------------------------------------
+---@class AAirUnit : AirUnit
 AAirUnit = Class(AirUnit) {}
 
 ---------------------------------------------------------------
 --  AIR STAGING STRUCTURES
 ---------------------------------------------------------------
+---@class AAirStagingPlatformUnit : AirStagingPlatformUnit
 AAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
 ---------------------------------------------------------------
 --  WALL  STRUCTURES
 ---------------------------------------------------------------
+---@class AConcreteStructureUnit : ConcreteStructureUnit
 AConcreteStructureUnit = Class(ConcreteStructureUnit) {
     AdjacencyBeam = false,
 }
@@ -105,6 +110,7 @@ AConcreteStructureUnit = Class(ConcreteStructureUnit) {
 ---------------------------------------------------------------
 --  Construction Units
 ---------------------------------------------------------------
+---@class AConstructionUnit : ConstructionUnit
 AConstructionUnit = Class(ConstructionUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, self.BuildEffectsBag)
@@ -114,6 +120,7 @@ AConstructionUnit = Class(ConstructionUnit) {
 ---------------------------------------------------------------
 --  ENERGY CREATION UNITS
 ---------------------------------------------------------------
+---@class AEnergyCreationUnit : EnergyCreationUnit
 AEnergyCreationUnit = Class(EnergyCreationUnit) {
     OnCreate = function(self)
         EnergyCreationUnit.OnCreate(self)
@@ -133,11 +140,13 @@ AEnergyCreationUnit = Class(EnergyCreationUnit) {
 ---------------------------------------------------------------
 -- ENERGY STORAGE STRUCTURES
 ---------------------------------------------------------------
+---@class AEnergyStorageUnit : EnergyStorageUnit
 AEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
 ---------------------------------------------------------------
 --  HOVERING LAND UNITS
 ---------------------------------------------------------------
+---@class AHoverLandUnit : HoverLandUnit
 AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
     FxHoverScale = 1,
     HoverEffects = nil,
@@ -147,6 +156,7 @@ AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 ---------------------------------------------------------------
 --  LAND FACTORY STRUCTURES
 ---------------------------------------------------------------
+---@class ALandFactoryUnit : LandFactoryUnit
 ALandFactoryUnit = Class(LandFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
@@ -164,36 +174,43 @@ ALandFactoryUnit = Class(LandFactoryUnit) {
 ---------------------------------------------------------------
 --  LAND UNITS
 ---------------------------------------------------------------
+---@class ALandUnit : LandUnit
 ALandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 ---------------------------------------------------------------
 --  MASS COLLECTION UNITS
 ---------------------------------------------------------------
+---@class AMassCollectionUnit : MassCollectionUnit
 AMassCollectionUnit = Class(MassCollectionUnit) {}
 
 ---------------------------------------------------------------
 --  MASS FABRICATION STRUCTURES
 ---------------------------------------------------------------
+---@class AMassFabricationUnit : MassFabricationUnit
 AMassFabricationUnit = Class(MassFabricationUnit) {}
 
 ---------------------------------------------------------------
 --  MASS STORAGE UNITS
 ---------------------------------------------------------------
+---@class AMassStorageUnit : MassStorageUnit
 AMassStorageUnit = Class(MassStorageUnit) {}
 
 ---------------------------------------------------------------
 --  RADAR STRUCTURES
 ---------------------------------------------------------------
+---@class ARadarUnit : RadarUnit
 ARadarUnit = Class(RadarUnit) {}
 
 ---------------------------------------------------------------
 --  RADAR STRUCTURES
 ---------------------------------------------------------------
+---@class ASonarUnit : SonarUnit
 ASonarUnit = Class(SonarUnit) {}
 
 ---------------------------------------------------------------
 --  SEA FACTORY STRUCTURES
 ---------------------------------------------------------------
+---@class ASeaFactoryUnit : SeaFactoryUnit
 ASeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
@@ -212,21 +229,25 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
 ---------------------------------------------------------------
 --  SEA UNITS
 ---------------------------------------------------------------
+---@class ASeaUnit : SeaUnit
 ASeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
 
 ---------------------------------------------------------------
 --  SHIELD LAND UNITS
 ---------------------------------------------------------------
+---@class AShieldHoverLandUnit : ShieldHoverLandUnit
 AShieldHoverLandUnit = Class(ShieldHoverLandUnit) {}
 
 ---------------------------------------------------------------
 --  SHIELD LAND UNITS
 ---------------------------------------------------------------
+---@class AShieldLandUnit : ShieldLandUnit
 AShieldLandUnit = Class(ShieldLandUnit) {}
 
 ---------------------------------------------------------------
 --  SHIELD STRUCTURES
 ---------------------------------------------------------------
+---@class AShieldStructureUnit : ShieldStructureUnit
 AShieldStructureUnit = Class(ShieldStructureUnit) {
     RotateSpeed = 60,
 
@@ -251,11 +272,13 @@ AShieldStructureUnit = Class(ShieldStructureUnit) {
 ---------------------------------------------------------------
 --  STRUCTURES
 ---------------------------------------------------------------
+---@class AStructureUnit : StructureUnit
 AStructureUnit = Class(StructureUnit) {}
 
 ---------------------------------------------------------------
 --  SUBMARINE UNITS
 ---------------------------------------------------------------
+---@class ASubUnit : SubUnit
 ASubUnit = Class(DefaultUnitsFile.SubUnit) {
     IdleSubBones = {},
     IdleSubEffects = {}
@@ -264,31 +287,37 @@ ASubUnit = Class(DefaultUnitsFile.SubUnit) {
 ---------------------------------------------------------------
 --  TRANSPORT BEACON UNITS
 ---------------------------------------------------------------
+---@class ATransportBeaconUnit : TransportBeaconUnit
 ATransportBeaconUnit = Class(TransportBeaconUnit) {}
 
 ---------------------------------------------------------------
 --  WALKING LAND UNITS
 ---------------------------------------------------------------
+---@class AWalkingLandUnit : WalkingLandUnit
 AWalkingLandUnit = Class(WalkingLandUnit) {}
 
 ---------------------------------------------------------------
 --  WALL  STRUCTURES
 ---------------------------------------------------------------
+---@class AWallStructureUnit : WallStructureUnit
 AWallStructureUnit = Class(WallStructureUnit) {}
 
 ---------------------------------------------------------------
 --  CIVILIAN STRUCTURES
 ---------------------------------------------------------------
+---@class ACivilianStructureUnit : AStructureUnit
 ACivilianStructureUnit = Class(AStructureUnit) {}
 
 ---------------------------------------------------------------
 --  QUANTUM GATE UNITS
 ---------------------------------------------------------------
+---@class AQuantumGateUnit : QuantumGateUnit
 AQuantumGateUnit = Class(QuantumGateUnit) {}
 
 ---------------------------------------------------------------
 --  RADAR JAMMER UNITS
 ---------------------------------------------------------------
+---@class ARadarJammerUnit : RadarJammerUnit
 ARadarJammerUnit = Class(RadarJammerUnit) {
     RotateSpeed = 60,
 

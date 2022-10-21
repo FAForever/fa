@@ -1,9 +1,9 @@
-#*****************************************************************************
-#* File: lua/modules/ui/controls/worldview.lua
-#* Summary: World view control
-#*
-#* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ui/controls/worldview.lua
+--* Summary: World view control
+--*
+--* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -147,6 +147,7 @@ DecalFunctions = {
     RULEUCC_Overcharge = OverchargeDecalFunc
 }
 
+---@class WorldView : moho.UIWorldView, Control
 WorldView = Class(moho.UIWorldView, Control) {
 
     Cursor = nil,
@@ -158,7 +159,7 @@ WorldView = Class(moho.UIWorldView, Control) {
 
     HandleEvent = function(self, event)
         if self.EventRedirect then
-            return self.EventRedirect(self,event)
+            return self.EventRedirect(self, event)
         end
         if event.Type == 'MouseEnter' or event.Type == 'MouseMotion' then
             self.bMouseIn = true
@@ -451,8 +452,8 @@ WorldView = Class(moho.UIWorldView, Control) {
 
             --If this ping is a marker, create the edit controls for it.
             if not self._disableMarkers and pingData.Marker then
-                if not self.Markers then self.Markers = {} end
-                if not self.Markers[pingData.Owner] then self.Markers[pingData.Owner] = {} end
+                self.Markers = self.Markers or {}
+                self.Markers[pingData.Owner] = self.Markers[pingData.Owner] or {}
                 if self.Markers[pingData.Owner][pingData.ID] then
                     return
                 end
@@ -588,25 +589,24 @@ WorldView = Class(moho.UIWorldView, Control) {
         if pingData.Action == 'flush' and self.Markers then
             for ownerID, pingTable in self.Markers do
                 for pingID, ping in pingTable do
-                    ping.Name:Destroy()
                     ping.Marker:Destroy()
                     ping:Destroy()
                 end
             end
             self.Markers = {}
         elseif not self._disableMarkers and self.Markers[pingData.Owner][pingData.ID] then
+            local marker = self.Markers[pingData.Owner][pingData.ID]
             if pingData.Action == 'delete' then
-                self.Markers[pingData.Owner][pingData.ID].Name:Destroy()
-                self.Markers[pingData.Owner][pingData.ID].Marker:Destroy()
-                self.Markers[pingData.Owner][pingData.ID]:Destroy()
+                marker.Marker:Destroy()
+                marker:Destroy()
                 self.Markers[pingData.Owner][pingData.ID] = nil
             elseif pingData.Action == 'move' then
-                self.Markers[pingData.Owner][pingData.ID].data.Location = pingData.Location
-                self.Markers[pingData.Owner][pingData.ID].NewPosition = false
-                self.Markers[pingData.Owner][pingData.ID].Marker:EnableHitTest()
+                marker.data.Location = pingData.Location
+                marker.NewPosition = false
+                marker.Marker:EnableHitTest()
             elseif pingData.Action == 'rename' then
-                self.Markers[pingData.Owner][pingData.ID].Name:SetText(pingData.Name)
-                self.Markers[pingData.Owner][pingData.ID].data.Name = pingData.Name
+                marker.Name:SetText(pingData.Name)
+                marker.data.Name = pingData.Name
             end
         end
     end,

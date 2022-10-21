@@ -27,9 +27,10 @@
 -- width, height GetTextureDimensions(filename)
 
 
-local Control = import('control.lua').Control
-local ScaleNumber = import('layouthelpers.lua').ScaleNumber
+local Control = import('/lua/maui/control.lua').Control
+local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 
+---@class Bitmap : moho.bitmap_methods, Control
 Bitmap = Class(moho.bitmap_methods, Control) {
 
     __init = function(self, parent, filename, debugname)
@@ -69,10 +70,6 @@ Bitmap = Class(moho.bitmap_methods, Control) {
         Control.ResetLayout(self)
         self.Width:SetFunction(function() return ScaleNumber(self.BitmapWidth()) end)
         self.Height:SetFunction(function() return ScaleNumber(self.BitmapHeight()) end)
-    end,
-
-    OnInit = function(self)
-        Control.OnInit(self)
     end,
 
     OnDestroy = function(self)

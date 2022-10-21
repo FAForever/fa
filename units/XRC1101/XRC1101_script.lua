@@ -1,19 +1,20 @@
-#****************************************************************************
-#** 
-#**  File     :  /cdimage/units/XRC1101/XRC1101_script.lua 
-#** 
-#**  Authors: Greg Kohne
-#** 
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--** 
+--**  File     :  /cdimage/units/XRC1101/XRC1101_script.lua 
+--** 
+--**  Authors: Greg Kohne
+--** 
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local CCivilianStructureUnit = import('/lua/cybranunits.lua').CCivilianStructureUnit
 local SSQuantumJammerTowerAmbient = import('/lua/EffectTemplates.lua').SJammerTowerAmbient
 
+---@class XRC1101 : CCivilianStructureUnit
 XRC1101 = Class(CCivilianStructureUnit) 
 
 {
    OnCreate = function(self, builder, layer)
-        ###Place emitters on certain light bones on the mesh.
+        ------Place emitters on certain light bones on the mesh.
         for k, v in SSQuantumJammerTowerAmbient do
             CreateAttachedEmitter(self, 'Jammer', self:GetArmy(), v)
         end

@@ -15,6 +15,7 @@ local CAAMissileNaniteWeapon = CWeapons.CAAMissileNaniteWeapon
 local CDFLaserDisintegratorWeapon = CWeapons.CDFLaserDisintegratorWeapon02
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 
+---@class URL0301 : CCommandUnit
 URL0301 = Class(CCommandUnit) {
     LeftFoot = 'Left_Foot02',
     RightFoot = 'Right_Foot02',
@@ -194,23 +195,6 @@ URL0301 = Class(CCommandUnit) {
             local wep = self:GetWeaponByLabel('RightDisintegrator')
             wep:DisableBuff('STUN')
         end
-    end,
-
-    -- Death
-    OnKilled = function(self, instigator, type, overkillRatio)
-        local bp
-        for k, v in self:GetBlueprint().Buffs do
-            if v.Add.OnDeath then
-                bp = v
-            end
-        end
-        -- If we could find a blueprint with v.Add.OnDeath, then add the buff
-        if bp ~= nil then
-            -- Apply Buff
-            self:AddBuff(bp)
-        end
-        -- Otherwise, we should finish killing the unit
-        CCommandUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     IntelEffects = {

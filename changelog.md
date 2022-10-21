@@ -1,4 +1,665 @@
 
+Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
+
+# Game version 3744 (25th of August, 2022)
+
+The maintainers of Nomads have resolved the issues with tactical and strategical defenses! They should
+now work as intended again.
+
+Jip
+
+## Bug fixes
+
+- (#4178) Do not allow regular projectiles to collide with missiles
+
+  Reverts the behavior to before game patch 3741.
+
+- (#4173) Fix minor issue with recoil of weapons
+
+## Contributors
+
+- Jip: #4178
+- Hdt80bro: #4173
+
+# Game version 3743 (23rd of August, 2022)
+
+There's an issue with tactical and strategic defenses not working when Nomads is enabled. This is due to
+changes to the base game done by patch 3741 that guarantees SMDs to function properly when there are
+multiple strategic missiles on top of each other. We can't revert this change without re-introducing the
+original bug that we're trying to fix.
+
+We've reported the issue and the solution to the maintainers of the mod.
+
+Jip
+
+## Bug fixes
+
+- (#4169) Fix internal state of HQs
+
+  There was an issue with the internal state of the HQs, causing it to get corrupt. This was caused by a refactoring of
+  patch 3741. If there are more issues with HQs then do report them on the forums or via Discord.
+
+- (#4167) Fix text focus of mods manager after exiting
+
+  You can now type again after exiting the mods manager as a non-host user :)!
+
+- (#4165) Add guard for Blueprint.General for command caps
+
+  Not having the guard broke a few mods, among one of them being SCTA.
+
+## Contributors
+
+- 4z0t: #4167
+- Jip: #4169
+- Hdt80bro: #4165
+
+# Game version 3742 (21st of August, 2022)
+
+## Bug fixes
+
+- (e35f16) Revert an engine patch that tries to update the `XACT` (audio engine) version
+
+## Contributors
+
+- Sheikah: e35f16
+- Jip: e35f16
+
+# Game version 3741 (21st of August, 2022)
+
+Another month, another patch! With pride we present the next version of the game where we slowly start
+tackling long-standing issues that we've been taking for granted. Among them the tactical missile
+defenses that feel underwhelming, broken weapons such as those of the Galactic Colossus and beam
+weapons being unable to hit reliable. But soon no more - we're tackling them one by one!
+
+Not only that, from a development perspective we've made great strides. The amount of annotated
+code has exploded, allowing our extension to give proper suggestions and hints. Step by step,
+pull request by pull request we slowly turn the code base into one that supports modern programming
+features such as being able to jump to a definition and we now provide sane suggestions and snippets.
+
+Let alone the improvements to the infrastructure surrounding FAF. With the cache servers of Cloudflare as
+our backbone the distribution of maps, mods and game assets have never been better.
+
+With appreciation towards all the contributors that made this patch possible,
+
+Jip
+
+## Bug fixes
+
+- (#4002) Fix issue with single-item combo list
+
+- (#4016, #4080) Re-implement game results
+
+  A complete re-implementation of how the game results are tracked. This should fix the famous
+  draw bug (where one player wins and the other loses) and in general there should be less
+  unknown game results.
+
+- (#4063) Fix targeting bones of static shields
+
+  Should make them easier to hit with low-arc projectiles and beams
+
+- (#4058) Fix units being able to evade area damage
+
+  Due to how the game processes the game over several steps the area damage could be applied too
+  late, allowing really fast units to already be out of the area of damage, even though the
+  projectile had a direct impact. This is particularly noticeable for spy planes, where they
+  are able to 'sustain' a lot of SAM fire while barely receiving a scratch in damage.
+
+  All in all, this makes the game feel a lot more consistent. A hit should be a hit.
+
+- (#4058) Fix beam weapons being unable to hit all air units
+
+  Due to how the game processes beams there's a possibility that the beam aims 'in front' of the
+  unit, causing it to miss. This is fixed by giving the unit (air units, for this change) a collision
+  box (or sphere) that is of sufficient size. As a result, the Seraphim Lighting Tank (T3 MAA) no
+  longer requires its hack, and because of that can no longer pierce shields :).
+
+- (#4071) Remove smoke ring on underwater SACU death
+
+- (#4074) Disable blue shield bar of shields when turned off
+
+- (#4079) Remove problematic code of JSON library
+
+  Could occasionally cause a game crash
+
+- (#4078) Adjust collision hitboxes of all transports
+
+  Allows their cargo to receive (splash) damage more consistently and makes the transports easier to
+  hit when they are landed.
+
+- (#4082, #4083, #4084) Fix target bones - Seraphim Land units
+
+  Similar to #4058 and #4063, makes these units easier and more consistent to hit when firing with
+  beam weapons. We'll slowly tackle all of the units in the base game, but this is a consuming process!
+
+- (#4093) Add guard to check if dummy weapon of shields are de-allocated
+
+- (#4088) Fix stack overflow in UI when units are assisting each other
+
+- (#4102) Adjust collision box of Megalith due to build animation
+
+  Allows units to consistently hit the Megalith while it is being constructed
+
+- (#4110, #4109, #4160) Add guards to prevent execution when c-object is de-allocated
+
+- (#4103) Attempt at fixing a shield assist bug that could send all your resources into limbo
+
+  Particularly relevant for hives when they are assisting shields that are also taking damage
+
+- (#4121) Rowey fixing Jip
+
+  What would we be without him!
+
+- (#4112) Attempt to fix the save / load functionality of the game
+
+  Long story short - we tried applying some tricks to improve performance a while ago and those
+  did not work anymore after saving and then loading in the game. As a consequence, after loading
+  the game was working with the wrong data causing all sorts of issues!
+
+  We hope this fixes it, but if you still have issues with saving and loading then you can
+  contact us via Discord or the forums.
+
+- (#4113) Reduce projectile speed of air to air weapons
+
+  There's a collision bug that causes the game engine to pick the furthest collision if a projectile
+  collides with multiple instances at the same time. As a consequence, it was difficult for interceptors
+  to hit landed air units and in particular transports. By reducing the projectile speed (and increasing
+  the size of the hitboxes with #4078) we try and solve this issue consistently for the base game
+
+- (#4115) Prevent manual attack move (via the UI) of clearing structure queues
+
+- (#4125) Fix Solace not having the bomber category
+
+- (#4120) Fix the enhancement removal dialogue being stuck
+
+- (#4132) Fix mass of wreckage of Kennel
+
+- (#4144) Fix the death animation of the tempest
+
+- (#4140, #4152) Fix rare occasions when the statuos quo of HQs are not updated properly
+  In particular, when gifting due to full share and when directly destroying the unit
+
+- Fix beam weapons not disabling themselves (#4154)
+
+## Features
+
+- (#4040, #4043, #4044) Re-implement the tractor beams of the Galactic Colossus
+
+  Re-implements the tractor beams of the Galactic Colossus from the ground up. They finally work
+  as intended and can no longer remain stuck on invalid targets. Includes a slight boost to the
+  effects, enjoy toying with the physics!
+
+- (#3893) Add shooter cap to tactical missiles
+
+  Prevents the TMDs from overshooting their targets, as a result TMDs feel a lot more consistent
+  and are in general a lot stronger.
+
+  Fixes an issue with multiple SMDs being unable to stop multiple strategic missiles.
+
+  Adds callbacks to units when their missile is intersected by a shield, a defense or by terrain.
+
+- (#4018) Improved Mod Manager UI  
+
+  Improves the mod manager by introducing a search bar, being able to mark mods as favorite and being
+  able to sort mods on their type. Introduces the capability of interpreting URLs from the `mod_info.lua`
+  file, allowing you to send people to a github, gitlab, bitbucket, sourceforge page or to a topic
+  on the forums.
+
+- (#3927) Allow jammers to recreate their jamming blips
+
+  Fixes the issue of jamming blips being gone forever once they were scouted. With this implementation,
+  after fifteen seconds of being in the fog of war the jamming blips should re-emerge on their own.
+
+- (#4114, 44fd74) Alternative CPU benchmark pt. 1 
+
+  The first of two parts on creating a new CPU benchmark. The current benchmark tries to run some computations
+  in the lobby. This has shown to be inaccurate. The new benchmark takes samples during the game and stores the highest
+  possible sim rate you can run in combination with the total amount of units. Initial data points suggest that this
+  is highly accurate and is even capable of detecting the throttling of laptops.
+
+  The next part will replace implementation of the CPU score in the lobby. That will be part of the next release. This
+  guarantees that everyone has some data to start off with.
+
+- (#3650, #4158) Improve team color mode
+
+  Allows players to adjust the colors used in team color mode. With it, we can finally support people with color blindness.
+
+  Players can choose their own colors by right clicking the team color mode button.
+
+- (#3916) Introduce reclaim statistics for engineers
+
+  The game now keeps track of the reclaim statistics of engineers. They are shown where you'd usually see the veterancy of
+  a unit. You can not see the statistics of allied units, just your own. Works for observers (and casters).
+
+  This is the start of a new era where we'll be introducing statistics gradually. They help players with understanding the
+  value of their actions - as an example, an engineer reclaiming trees on Seton's Clutch can quickly become responsible
+  for hundreds (if not thousands) of additional mass.
+
+## Performance
+
+- (#3932, #4011) Remove unused unit blueprint tabels related to veterancy
+
+  Reduces total amount of allocated memory
+
+- (#4003) Remove collision shape of the Cybran Build Bots
+
+- (#3995, #4000, #3995) Refactor effect utilities pt. 1, 3 and 4
+
+- (#4073, #4076, d86021) Optimize vision and range-ring shaders
+
+  Includes an engine patch - significantly reduces the impact of vision and range rings on your FPS.
+
+- (#4064, 84f68f, 9fd987, 647bdfe) Reduce memory allocations for when bombers fire their projectiles
+
+  Significantly reduces the amount of table allocations when we correct the trajectory of a
+  bomber in Lua.
+
+- (#4111) Reduce memory impact of weapons
+
+- (#4141) Reduce number of pre-allocated trashbags for units
+
+- (#4140) Remove remainders of an experimental setup for caching data
+
+- (#4037) Implement alternative, less resource-hungry vision entities
+
+  Used for example by the lobo - the tech 1 UEF mobile artillery
+
+## Annotation
+
+- (#3936) Annotate and refactor layouthelpers.lua
+
+  Improves performance of UI functions that are used by almost every UI element
+
+- (#4009) Annotate campaign related functions pt. 2
+
+- (#4021) Cleanup annotation of engine documentation
+
+- (#3975, #4023, #4086) Add annotation support for blueprints
+
+- (#4049) Annotate /Engine/Sim.lua creation functions
+
+- (#4050) Annotate /engine/Sim damage functions
+
+- (#4057) Annotate engine/Sim.lua
+
+- (#4053, #4055, #4054, #4056) Annotate engine/Sim/
+
+- (#4041) Annotate categories
+
+- (#4047) Conform /Engine/Sim/ to Moho
+
+- (#4039) Annotate entity.lua
+
+- (#4034) Annotate engine/core.lua
+
+- (#4051) Annotate /engine/Sim army functions
+
+- (#4052) Annotate command functions  
+
+- (#4065) Annotate scenario framework pt. 2
+
+- (#4106) Annotate inheritance of all remaining unit classes
+
+- (#4118) Add annotation to ignore some file specific non errors
+
+- (#4116) Annotate code of all scripts in the editor folder
+
+- (#4038) Annotate cAIBrain and AI related structures / functions
+
+- (#4126) Fix annotation for classes
+
+- (#4127, #4128, #4129, #4148) Annotate missing intermediate unit classes
+
+- (#4130) Annotate defaultunits.lua
+
+## Campaign
+
+- (32d97d, f555cb, 5d0802, 4ad7f8) Various small improvements to the campaign AI (base managers)
+
+- (439757) Fix the protect objective breaking when given dead units
+
+- (7f6a4e) Simplify base manager engineer patrol
+
+  When the patrol path was generated, there was a logic to move instead of patrol if the reclaiming was disabled on
+  the base. That got removed since just moving engineers around does nothing. So it's either patrol or nothing.
+
+- (26bcee) Fix base manager rebuild counter
+
+  Rebuild structure counter was deecremented even for spawning units. Meaning that that AI would not rebuild at all,
+  while it was supposee to be rebuilding once.
+
+- (fa1448) Update base manager rebuild data
+
+  Used for counting how many times to rebuild stuff, based on difficulty. Some of the names were wrong and
+  the list was kinda incomplete.
+
+- (8e167b) Fix base manager sometimes not upgrading factories
+
+  Upgrade thread was checking for IdleState, but if the factory that was suppose to be upgraded was grabbed first
+  to assist other factories in the base, it would never be idle.
+
+- (945df8) Simplify T3 mobile AA builder
+
+  Uses faction convert isntead of separate platoons, since the AA exists for all factions.
+
+- (f65240) Fix PlayerDeath cam unlocking input too early
+
+  Input is always unlocked when the final popup to end the mission shows up.
+
+- (8793ef) Add game speed into objectives UI
+
+  Next to time, just like normal score panel
+
+- (09a829) Improve TransportPool
+
+  Adds MoveRoute and MoveChain to add more control over movingthe transports
+
+- (#4092) Fix the guard return radius of naval units  
+
+  Prevents them from wandering off, taking on quests - finding loot and end up dying because they're on their own chasing
+  their dreams.
+
+- (#4155) Improve the balance of some of the adjusted mechanics
+
+  Such as the tactical missile defense improvements and the tractor beams of the Galactic Colossus
+
+## Other changes
+
+- (#3952) Update AI-related categories for the Cybran experimentals
+
+- (#4032) Update AI-related categories of Obsidian
+
+- (#4030) Update AI-related antiair and antinavy categories of Aeon Experimentals
+
+- (#4029) Update AI-related antiair and antinavy categories of Seraphim Experimentals
+
+- (#4028) Update AI-related antiair and antinavy categories of UEF Experimentals
+
+- (#4036) Update AI-related categories of engineers
+
+- (#4035) Update AI-related categories of ACUs
+
+- (#4031) Update AI-related categories of navy
+
+- (#3851) Reduce amount of unfinished buildings for the AI
+
+  This is a difficult one to tackle, but what happens is that buildings remain unfinished because there
+  is a nearby threat to the ACU. The ACU attempts to defend, but then doesn't always continue what he
+  started previously
+
+- (#3971) Cleaning up of files
+
+- (7ff888) Fix name of operational AI (related to campaign)
+
+- (#4033) Reduce amount of trees on fire at the start of the game  
+
+- (#4070, #4100) Add unit utilities
+  Step-up work to make sacrifice work properly again
+
+- (#4117) Refactor # -> -- for original performance testing scripts
+
+- (#4122) Fix duplicated functions and typo
+
+- (#3910) Refactor BuffAffectsUnit to be easier to mod
+
+  Previously all the functions (that apply the buff) were scoped in another function.
+
+- (#3783) Improve code style of common UI elements
+
+## Contributors
+
+- Hdt80bro: #3936, #3995, #4000, #3995, #4049, #4050, #4053, #4041, #4047, #4055, #4054, #4071, #4051, #4052, #4056, #4079,
+-   #4057, #4065, #4070, #4086, #4064, 84f68f, 9fd987
+- Rowey: #3932, #3971, #4117, #4116, #4122, #4127, #4128, #4129, #4130, #4132, #4148
+- Maudlin: #3952, #4032, #4030, #4029, #4028, #4036
+- Uveso: #3851, #4080
+- speed2: 7ff888, 32d97d, f555cb, 5d0802, 4ad7f8, 439757, 26bcee, fa1448, 8e167b, 945df8, f65240, 8793ef, 09a829
+- Jip: #4011, #4003, #4016, #4009, #4021, #4023, #4033, #4040, #4044, #3893, #4058, #4039, #4034, #4074, #4082, #4083, 
+-   #4084, #4093, #4100, #4110, #4106, #4109, #4112, #4113, #4114, #4125, #4111, #4038, #4144, #4141, #4140, #4152, #4037,
+-   #3916, #4154, #4158, #4156, #4159, #4160
+- Ejsstiil: #4002
+- hahn-kev: #3975, #4118, #4126, #4128
+- hussar-mtrela: #4018
+- SpikeyNoob: #3927
+- 4z0t: #4088, #3783, #4120
+- KionX: #4073, #4076, d86021, 44fd74, #8
+- Penguin: #4115
+- Balthazar: #3910
+- Strogo: #8, #3650
+
+Game version 3740 (23th of June, 2022)
+======================================
+
+## Bug fixes
+
+(#3987) Align the stun radius of a Medusa with its damage radius
+
+(#3988) Fix the initialisation of a state as part of a simple class
+
+(#3990) Fix various issues with transports for AIs
+    Specifically allows the AIs to properly understand the number of units that can be attached to a transport 
+
+## Features
+
+(#3979) Improve campaign AI behavior
+    Includes various fixes for campaign behavior, specifically to their use of transports
+
+(#3989, #3993) Allow all direct fire weapons to retarget as usual
+    Prevents units from 'being stuck' attacking a factory while an engineer is next to it. This type of issue
+    shows up a lot more often in matchmaking. Change made with thanks to a conversation on the forums.
+
+    I'd also like to use this opportunity to note that we're making the game better for the community. If a change 
+    appears to be the reverse of that then we're always open to discuss why you think that is the case. 
+
+## Other changes
+
+(#3962) Add annotation to campaign related files
+
+(#3983) Fix the Russian translation to 'Depth charges'
+
+(#3991) Prevent loading of the mod `Quality of Performance 2022`
+    It was damaging some of the optimalisations that were introduced the past few months. At the same time it
+    introduces a unit that is free and produces a lot of resources, but it is only available to the Cybran faction
+
+(#3992) Adjust the spacing of tech 1 / tech 2 bombers / gunships
+
+## Contributors
+
+Jip (#3962, #3988, #3992, #3991, #3993, #3990)
+Uveso (#3983)
+Fluffy (#3987)
+speed2 (#3979, #3990)
+
+Game version 3739 (20th of June, 2022)
+======================================
+
+## Bug fixes
+
+- (#3978) Fix tactical missile enhancements of (S)ACUs
+
+## Contributors
+
+- Jip (#3978)
+
+Game version 3738 (19th of June, 2022)
+======================================
+
+The past month has been exciting - there is no other word that we can use.
+
+From a development perspective we're on the verge of being able to provide a modern, interactive development environment to our community. With the work of Eluvatar a Visual Studio Code (VSC) extension is close to release that provides intellisense support for map scripters, mod makers and game developers. And with the work of Ejsstiil the Lua debugger that ships with the game is fully functional again when you work from your development environment. Programmers understand how critical these features are for the development of essentially anything.
+
+And from a user perspective the game has never been more performing. Specifically the infamously slow ASF battles has been tackled. For the majority of matches the game no longer slows down, with the assumption that there is no potato processor participating in the match.
+
+All of that shadows all of the other critical work that has been done the past month with thanks to all the remaining contributors, including SpikeyNoob, Hdt80bro and LilJoe7k4 who made their first contributions to the game repository.
+
+A great deal of appreciation towards everyone that made this patch possible.
+
+I hope you all enjoy the lack of APM during a late Seton's Clutch game,
+
+With kind regards,
+
+Jip
+
+## Bug fixes
+
+- (#3896, #3899, #3901) Fix UI elements ignoring the console command UI_ToggleGamePanels
+
+- (#3909) Fix enhancements ETAs leaking to the other screen when using split screen
+
+- (#3876) Sanitize weapon target priorities of Point Defenses
+    This fixes the issue that point defenses are not firing while a target is in range
+
+- (#3923, #3924) Fix an economy related glitch that allows you to gain resources free of charge
+    For all intends and purposes we will not dive into the details ;)
+
+- (#3946) Fix damage of child projectiles, such as Cybran tactical missiles after they split
+
+- (#3961) Fix issue with the attachment bones of the tech 2 Aeon Transport
+    As a consequence the tech 2 Aeon transport can now carry up to 3 tech 3 units, instead of 2
+
+- (#3966) Fix roll off points for various factories
+    The roll off points were not properly aligned, as a consequence ships had trouble leaving the dock. This was especially noticeable on the naval factories of the Cybran faction
+
+## Features
+
+- (#3887, #3968) Introduce Intellisense support for the FA Visual Studio Code (VSC) extension
+    As map scripters, mod makers and game developers we have been living in a cave. But no more - thanks to the work on the extension and the work in this pull request we are slowly introducing annotation across the repository.
+
+    For those with programming experience: it is like the introduction of Typescript, after working for years on ends in Javascript.
+
+    This also works when you have no development environment for the FA repository on your system, see the readme on the Github page of the FA repository for more information.
+
+- (#3938) Revive the FA Lua debugger
+    Revives the FA Lua debugger when you are working from your development environment. Allows you to set breakpoints and inspect the stack, locals and globals. Extremely useful when you are debugging your maps, mods and when you're working on game development in general.
+
+    Requires a development environment in order to work. You can set this up in half an hour, see the readme on the Github page of the FA repository for more information.
+
+- (#3883) Introduce a UI to keep track of the mass fabricator behavior
+    The UI element is to the right of the economy panel. It can be dragged horizontally by using the middle mouse button.
+
+- (#3889, #3906) Improve in-game chat settings panel
+    Fixes various small issues with the chat panel and allows you to view and inspect the changes in the settings live by using the apply button.
+
+- (#3863) Pimp the Aeon Quantum Optics Facility
+    The unit was unfinished in every regard - as part of a live programming session we improved the feeling and aesthetics.
+
+- (#3905) Add guidelines for a development environment for FA for Linux-based operating systems
+    For more information, see the work instructions of the github page.
+
+- (#3933) Use playable area instead of map size on the default scoreboard
+
+- (#3835) Introduce a builder pattern to create UI elements
+    An alternative, more modern approach to creating, positioning and checking of UI elements.
+
+- (#3972) Add the ability to manually recheck weapon targets of the selected units via a hotkey
+    As per #3857 the weapons of the majority of units do not recheck their targets. Usually this is not required, but it does cause a big hit on performance. This new hotkey is introduced to allow you to let your units retarget on command for those situations where that is required
+
+    You can find the hotkey by searching for 'recheck' in the hotkeys menu
+
+### For map, mod and AI developers
+
+- (#3884) Add support for a unit.IsCivilian flag
+    Introduces an easy to use flag to indicate whether a unit belongs to a civilian army
+
+- (#3894) Add support for a unit.ImmuneToStun flag
+    Introduces an easy to use flag to make a unit immune to stuns
+
+- (#3894) Add support for a shield.SkipAttachment flag
+    Introduces an easy to use flag to allow shields to function when attached
+
+- (#3944) Add support for multiple upgrade animations via the function unit.GetUpgradeAnimation
+
+## Performance
+
+- (#3845) Reduce table allocations when defining weapon target priorities
+
+- (#3875, #3945) Reduce memory impact of units, weapons and props
+
+- (#3891, 6fefe78) Sanitize guard scan radius of units
+    The guard scan radius is used by units on attack move or patrol to find and engage hostile units in their surrounding. The value was all over the place and could cause serious slowdowns, especially during the late game.
+
+- (#3892, #3903) Sanitize footprints of air units
+    All non-experimental air units had a footprint size of 1 - the size of a wall. Because of that there were two issues: due to their proximity it introduced mesh intersections that break the immersion of the game. And due to their density it causes performance issues. From now on all bombers have a footprint size of 4, all gunships have a footprint size of 3 and all interceptors have a footprint size of 2.
+
+- (#3930) Remove dependency on the schook folder
+    Improves code maintainability and reduces the amount of hooks that ships with the game.
+
+- (#3857, #3931, #3950) Sanitize weapon parameters
+    There are three crucial parameters that determine the behavior and performance of weaponary: the weapon target check interval, the weapon tracking radius and the retargeting behavior of weaponry. The weapon target check interval is now based on the rate of fire of the weapon. The weapon tracking radius is reduced to 7% for non-anti air weaponry units and 15% for anti air weaponry. The retargeting is disabled unless the weapon is considered artillery or anti air.
+
+    This slightly changes the behavior of units, by standardizing their weapon parameters. In return, the game performs a lot better and units respond more consistent based on their weapon statistics.
+
+- (#3949) Reduce impact of props on FPS
+    Aligns the rendering distance of props with the base game
+
+- (#3943, #3951) Reduce impact of mesh entities on FPS
+    Aligns the rendering of various mesh-based entities with their respective size. As an example, the adjancency node was rendered up to the same distance as that of shields.
+
+- (#3967, #3965) reduce impact of projectiles on FPS
+    Sanitizes the LODCutoff of projectiles that have a mesh. The average projectile is emitter based, but some use a mesh. These meshes were visible at extreme ranges, causing them to be rendered even though they were completely hidden behind the strategical overlay of projectiles (dots)
+
+## Other changes
+
+- (#3885) Fix argumentations for the Hunter AI
+
+- (#3879) Fix minor issue with lobby
+
+- (#3881) Refactor effect files of the Lighting Tank
+    As told to us by Rowey - we'd be lost without him.
+
+- (#3895) Fix minor issues with the initialisation files
+
+- (#3907, #3926) Improve the /nomovie command line switch
+
+- (#3908) Introduce a /nomusic command line switch
+
+- (#3904) Fix game options menu not being scrollable by mousewheel
+
+- (#3913) Fix issues with the .gitignore of the repository
+
+- (#3921) Add tooltip to patchnotes button in the lobby
+    The mighty Rowey - at work again.
+
+- (#3882) Fix bone names of the upgraded Hives
+
+- (#3925) Fix the width, padding and layouts of various UI elements
+
+- (#3912, #3724) Add in remaining base game blueprint and script files
+    Greatly improves code maintainability of working on the game as a whole.
+
+- (#3947) Fix UEF engineers not applying their water animation
+
+- (#3948) Fix a rare issue where the speed adjustment of (slow) hover units caused an error
+
+- (#3941) Fix categories missmatch for the Atlantis
+
+- (#3969) Fix the Flayer (AA) missiles of the tech 2 UEF Cruiser
+    The missiles were using a torpedo mesh, instead of the typical UEF AA Flayer mesh used by sams
+
+## Contributors
+
+- LilJoe7k4: (#3845)
+- speed2: (#3885)
+- 4z0t: (#3879, #3883, #3835)
+- Jip: (#3895, #3894, #3884, #3875, #3863, #3891, #3892, #3903, #3923, #3913, #3924, #3857, #3931, #3912, #3724, #3944, #3947, #3946, #3945, #3948, #3950, #3972)
+- Ejsstiil: (#3896, #3889, #3899, #3907, #3908, #3909, #3904, #3906, #3901, #3926, #3925, #3937)
+- Madmax: (#3863, #3951, #3943, #3961)
+- SpikeyNoob: (#3905)
+- Tagada: (#3876)
+- Rowey: (#3921, #3881, #3882)
+- Hdt80bro: (#3933)
+- Eluvatar: (#3887, #3968)
+- Uveso: (#3941)
+- M0rph3us (#3969, #3967, #3965)
+- KionX (6fefe78)
+
+## Translators
+
+- 4z0t (Russian)
+- M0rph3us (French)
+- Unknow (French)
+- Carchagassky (French)
+
+
 Game version 3737 (15th of May, 2022)
 ===================================
 
