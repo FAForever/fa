@@ -606,7 +606,7 @@ function CloseWindow()
 end
 
 --- Called by the module manager when this module is dirty due to a disk change
-function __OnDirtyModule()
+function __moduleinfo.OnDirty()
     if Root then
         Root:Destroy()
     end
