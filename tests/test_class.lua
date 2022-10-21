@@ -114,8 +114,6 @@ lust.describe(
 
             -- check the meta table
             lust.expect(tostring(getmetatable(instance))).to.equal(tostring(Entity))
-
-            lust.expect(true).to.equal(false)
           end
         )
 
