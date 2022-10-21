@@ -85,8 +85,6 @@ function CDROverCharge(aiBrain, cdr)
         end
     end
 
-    cdr.UnitBeingBuiltBehavior = false
-
     -- Added for ACUs starting near each other
     if GetGameTimeSeconds() < 60 then
         return
@@ -1911,7 +1909,7 @@ function CDRReturnHomeSorian(aiBrain, cdr, Mult)
 end
 
 function CDRFinishUnit(cdr)
-    if cdr.UnitBeingBuiltBehavior and not cdr.UnitBeingBuiltBehavior:BeenDestroyed() then
+    if cdr.UnitBeingBuiltBehavior and (not cdr.UnitBeingBuiltBehavior:BeenDestroyed()) then
         IssueClearCommands({cdr})
         IssueRepair({cdr}, cdr.UnitBeingBuiltBehavior)
         repeat
@@ -1922,7 +1920,13 @@ function CDRFinishUnit(cdr)
         until cdr:IsIdleState()
 
         IssueClearCommands({cdr})
-        cdr.UnitBeingBuiltBehavior = false
+        if cdr.UnitBeingBuiltBehavior and (not cdr.UnitBeingBuiltBehavior:BeenDestroyed()) then
+            if cdr.UnitBeingBuiltBehavior:GetFractionComplete() == 1 then
+                cdr.UnitBeingBuiltBehavior = false
+            end
+        else
+            cdr.UnitBeingBuiltBehavior = false
+        end
     end
 end
 

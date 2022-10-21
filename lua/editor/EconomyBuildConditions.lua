@@ -222,6 +222,22 @@ function LessThanEconIncome(aiBrain, MassIncome, EnergyIncome)
     return false
 end
 
+---GreaterThanEconIncomeOverTime = BuildCondition
+---@param aiBrain AIBrain
+---@param MassIncome integer
+---@param EnergyIncome integer
+---@return boolean
+function GreaterThanEconIncomeOverTime(aiBrain, MassIncome, EnergyIncome)
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
+        --LOG('*AI DEBUG: Found Paragon')
+        return true
+    end
+    if aiBrain.EconomyOverTimeCurrent.MassIncome >= MassIncome and aiBrain.EconomyOverTimeCurrent.EnergyIncome >= EnergyIncome then
+        return true
+    end
+    return false
+end
+
 ---LessThanEconEfficiency = BuildCondition
 ---@param aiBrain AIBrain
 ---@param MassEfficiency integer
@@ -288,6 +304,22 @@ function LessThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficienc
     if (aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime <= MassEfficiency and 
     aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime <= EnergyEfficiency) then
         return true
+    end
+    return false
+end
+
+---GreaterThanEconEfficiencyCombined = BuildCondition
+---@param aiBrain AIBrain
+---@param MassEfficiency integer
+---@param EnergyEfficiency integer
+---@return boolean
+function GreaterThanEconEfficiencyCombined(aiBrain, MassEfficiency, EnergyEfficiency)
+    if (aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime >= MassEfficiency and aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime >= EnergyEfficiency) then
+        local EnergyEfficiencyOverTime = math.min(GetEconomyIncome(aiBrain,'ENERGY') / GetEconomyRequested(aiBrain,'ENERGY'), 2)
+        local MassEfficiencyOverTime = math.min(GetEconomyIncome(aiBrain,'MASS') / GetEconomyRequested(aiBrain,'MASS'), 2)
+        if (MassEfficiencyOverTime >= MassEfficiency and EnergyEfficiencyOverTime >= EnergyEfficiency) then
+            return true
+        end
     end
     return false
 end
