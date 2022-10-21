@@ -25,14 +25,6 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 local NavGenerator = import('/lua/sim/NavGenerator.lua')
 local NavDatastructures = import('/lua/sim/NavDatastructures.lua')
 
-local function ReverseInPlace(table, n)
-    for k = 1, (0.5 * n) ^ 0 do
-        local temp = table[k]
-        table[k] = table[n - k]
-        table[n - k] = temp
-    end
-end
-
 --- Returns true when you can path from the origin to the destination
 ---@param layer NavLayers
 ---@param origin Vector
@@ -218,7 +210,12 @@ function PathTo(layer, origin, destination, options)
     end
 
     -- reverse the path
-    ReverseInPlace(PathToPath, head)
+
+    for k = 1, (0.5 * head) ^ 0 do
+        local temp = PathToPath[k]
+        PathToPath[k] = PathToPath[head - k]
+        PathToPath[head - k] = temp
+    end
 
     -- clear up after ourselves
 
