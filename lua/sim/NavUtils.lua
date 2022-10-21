@@ -115,9 +115,9 @@ end
 ---@param origin Vector
 ---@param destination Vector
 ---@param options NavPathToOptions
----@return Vector[]?
----@return (string | number)?
----@return number?
+---@return Vector[]?            # List of positions
+---@return (string | number)?   # Error message, or the number of positions
+---@return number?              # Length of path
 function PathTo(layer, origin, destination, options)
 
     -- check if we can path
@@ -191,6 +191,7 @@ function PathTo(layer, origin, destination, options)
 
     -- construct current path
 
+    local distance = 0
     local head = 1
     local leaf = destinationLeaf
     while leaf.From and leaf.From != leaf do
@@ -203,6 +204,9 @@ function PathTo(layer, origin, destination, options)
         node[3] = leaf.pz 
         node[2] = GetSurfaceHeight(leaf.px, leaf.pz)
         PathToPath[head] = node
+
+        -- keep track of distance
+        distance = distance + leaf.From.neighborDistances[leaf.identifier]
         
         -- continue down the tree
         head = head + 1
@@ -226,5 +230,5 @@ function PathTo(layer, origin, destination, options)
 
     PathToPathHead = head
 
-    return PathToPath, PathToPathHead - 1, seenIdentifier
+    return PathToPath, PathToPathHead - 1, distance
 end
