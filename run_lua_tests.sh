@@ -14,14 +14,14 @@ run_test() {
 
   if [[ $output != "" ]]; then
     echo "$output" > /dev/fd/2
-    if [[ {$output#FAIL} != "" ]]; then
+    if [[ "$output" != *"PASS"* ]]; then
       had_error=1
     fi
   fi
 }
 
 # make sure the test files run in the tests directory
-pushd tests
+pushd tests >/dev/null
 while read file; do
   # exclude the unit tester module
   if [ "$file" != "./lust.lua" ]; then
@@ -29,7 +29,7 @@ while read file; do
     ((tests_complete ++))
   fi
 done < <(find . -name '*.lua')
-popd
+popd >/dev/null
 
 echo "Ran $tests_complete tests"
 
