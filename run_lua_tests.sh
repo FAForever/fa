@@ -1,14 +1,15 @@
 #!/bin/bash
 
 # Simple lua code syntax checker using https://github.com/FAForever/lua-lang
-# Assumes that FAF lua is installed as `luac`
+# Assumes that FAF lua is installed as `lua`
 
 had_error=0
-files_checked=0
-check_file() {
+tests_complete=0
+
+run_test() {
   file="$1"
 
-  output="$(luac -p "$file" 2>&1 \
+  output="$(lua "$file" 2>&1 \
     | sed "s:/dev/fd/[0-9]\+:$file:g")"
 
   if [[ $output != "" ]]; then
@@ -17,28 +18,22 @@ check_file() {
   fi
 }
 
-# Some files have spaces in their name so we use this syntax to make sure the
-# output from `find` is split by line.
+# make sure the test files run in the tests directory
+pushd tests
 while read file; do
-
-  # file contains table pre-allocation synax ( {&1&4} ) that is not supported at the moment
-  if [ "$file" != "./lua/lazyvar.lua" ]; then 
-    if [ "$file" != "./.vscode/fa-plugin.lua" ]; then 
-      check_file "$file"
-      (( files_checked++ ))
-    fi
+  # exclude the unit tester module
+  if [ "$file" != "./lust.lua" ]; then
+    run_test "$file"
+    ((tests_complete ++))
   fi
-done < <(find . -type d \( -path ./testmaps -o -path ./engine \) -prune -false -o -name '*.lua' -o -name '*.bp')
+done < <(find . -name '*.lua')
+popd
 
-echo "Checked $files_checked files"
+echo "Ran $tests_complete tests"
 
 if [[ $had_error != 0 ]]; then
-  echo "Syntax errors detected."
+  echo "Tests returned errors."
   exit $had_error
 else
-  echo "Syntax OK."
+  echo "Tests OK."
 fi
-
-pushd tests && lua test_utils.lua && popd
-pushd tests && lua test_stringmatch.lua && popd
-pushd tests && lua test_class.lua && popd

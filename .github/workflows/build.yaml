@@ -5,7 +5,20 @@ on:
   pull_request:
 
 jobs:
-  test:
+  syntax:
+    name: Syntax
+    runs-on: ubuntu-latest
+    container: faforever/lua:v5.0-1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install bash
+        run: apk add bash findutils
+      - name: Run lua tests
+        run: "bash ./run_lua_syntax_checker.sh"
+  tests:
+    name: Tests
+    needs: syntax
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
