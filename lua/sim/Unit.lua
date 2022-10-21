@@ -4898,11 +4898,18 @@ Unit = Class(moho.unit_methods) {
     ---@param transport BaseTransport
     ---@param bone Bone
     OnDetachedFromTransport = function(self, transport, bone)
+        self.Trash:Add(ForkThread(self.OnDetachedFromTransportThread, self, transport, bone))
         self:MarkWeaponsOnTransport(false)
         self:EnableShield()
         self:EnableDefaultToggleCaps()
         self:TransportAnimation(-1)
         self:DoUnitCallbacks('OnDetachedFromTransport', transport, bone)
+    end,
+
+    OnDetachedFromTransportThread = function(self, transport, bone)
+        if IsDestroyed(transport) then
+            self:Destroy()
+        end
     end,
 
     -- Utility Functions

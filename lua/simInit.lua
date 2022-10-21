@@ -76,6 +76,7 @@ end
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
 function SetupSession()
+
     ScenarioInfo.TriggerManager = import('/lua/TriggerManager.lua').Manager
     TriggerManager = ScenarioInfo.TriggerManager
 
@@ -269,6 +270,9 @@ function BeginSession()
 
     -- brains can have adjusted this value by now, ready to sync
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+    if ScenarioInfo.GameHasAIs then
+        import("/lua/sim/NavGenerator.lua").Generate()
+    end
 
     SPEW('Active mods in sim: ', repr(__active_mods))
 
