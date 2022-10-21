@@ -970,7 +970,7 @@ function Generate()
 end
 
 --- Called by the module manager when this module is dirty due to a disk change
-function __OnDirtyModule()
+function __moduleinfo.OnDirty()
 end
 
 
