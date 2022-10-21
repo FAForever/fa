@@ -14,6 +14,11 @@ LayerColors = {
     Air = 'add8e6'
 }
 
+---@class NavDebugPathToState
+---@field Origin Vector 
+---@field Destination Vector 
+---@field Layer NavLayers
+
 ---@class NavDebugCanPathToState
 ---@field Origin Vector 
 ---@field Destination Vector 

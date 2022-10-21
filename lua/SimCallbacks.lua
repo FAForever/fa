@@ -51,12 +51,6 @@ local Warnings = { }
 ---@type table<string, function>
 local Callbacks = {}
 
-function AddCallback(name, fn)
-    if not Callbacks[name] then 
-        Callbacks[name] = fn
-    end
-end
-
 function DoCallback(name, data, units)
     local fn = Callbacks[name];
     if fn then
@@ -833,7 +827,6 @@ Callbacks.NavGenerate = function(data)
 end
 
 Callbacks.NavToggleScanLayer = function(data)
-    LOG("ToggleScanLayer")
     import("/lua/sim/NavDebug.lua").ToggleScanLayer(data)
 end
 
@@ -842,26 +835,10 @@ Callbacks.NavToggleScanLabels = function(data)
     import("/lua/sim/NavDebug.lua").ToggleScanLabels(data)
 end
 
-Callbacks.NavDebugCanPathToOrigin = function(data)
-    import("/lua/sim/NavDebug.lua").CanPathToOrigin(data)
-end
-
-Callbacks.NavDebugCanPathToDestination = function(data)
-    import("/lua/sim/NavDebug.lua").CanPathToDestination(data)
-end
-
-Callbacks.NavDebugCanPathToLayer = function(data)
-    import("/lua/sim/NavDebug.lua").CanPathToLayer(data)
-end
-
-Callbacks.NavDebugCanPathToRerun = function(data)
-    import("/lua/sim/NavDebug.lua").CanPathToRerun(data)
-end
-
-Callbacks.NavDebugCanPathToReset = function(data)
-    import("/lua/sim/NavDebug.lua").PathToReset()
-end
-
 Callbacks.NavDebugCanPathTo = function(data)
+    import("/lua/sim/NavDebug.lua").CanPathTo(data)
+end
+
+Callbacks.NavDebugPathTo = function(data)
     import("/lua/sim/NavDebug.lua").PathTo(data)
 end

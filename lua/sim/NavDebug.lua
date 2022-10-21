@@ -53,45 +53,19 @@ function ToggleScanLabels(data)
     ScanState[keyLayer] = false
 end
 
-local CanPathToDataOrigin = nil
-local CanPathToDataDestination = nil
-local CanPathToDataLayer = nil
-
-function CanPathToLayer(data)
-    CanPathToDataLayer = data.Layer
-end
-
-function CanPathToOrigin(data)
-    CanPathToLayer(data)
-    CanPathToDataOrigin = data.Location
-end
-
-function CanPathToDestination(data)
-    CanPathToLayer(data)
-    CanPathToDataDestination = data.Location
-end
-
-function CanPathToRerun(data)
-    CanPathToLayer(data)
-end
-
-function CanPathToReset()
-    CanPathToDataOrigin = nil
-    CanPathToDataDestination = nil
-    CanPathToDataLayer = nil
-end
-
 ---@type NavDebugCanPathToState
 local CanPathToState = { }
 
+function CanPathTo(data)
+    CanPathToState =  data
+end
+
+---@type NavDebugPathToState
+local PathToState = { }
+
 function PathTo(data)
-    CanPathToState = data
+    PathToState = data
 end
-
-function PathToReset()
-    CanPathToState = { }
-end
-
 
 function ScanOver(mouse, layer)
     if mouse then
@@ -183,25 +157,25 @@ function Scan()
             end
         end
 
-        if CanPathToDataOrigin then
-            DrawCircle(CanPathToDataOrigin, 3.9, '000000')
-            DrawCircle(CanPathToDataOrigin, 4, Shared.LayerColors[CanPathToDataLayer] or 'ffffff')
-            DrawCircle(CanPathToDataOrigin, 4.1, '000000')
+        if CanPathToState.Origin then
+            DrawCircle(CanPathToState.Origin, 3.9, '000000')
+            DrawCircle(CanPathToState.Origin, 4, Shared.LayerColors[CanPathToState.Layer] or 'ffffff')
+            DrawCircle(CanPathToState.Origin, 4.1, '000000')
         end
 
-        if CanPathToDataDestination then
-            DrawCircle(CanPathToDataDestination, 3.9, '000000')
-            DrawCircle(CanPathToDataDestination, 4, Shared.LayerColors[CanPathToDataLayer] or 'ffffff')
-            DrawCircle(CanPathToDataDestination, 4.1, '000000')
+        if CanPathToState.Destination then
+            DrawCircle(CanPathToState.Destination, 3.9, '000000')
+            DrawCircle(CanPathToState.Destination, 4, Shared.LayerColors[CanPathToState.Layer] or 'ffffff')
+            DrawCircle(CanPathToState.Destination, 4.1, '000000')
         end
 
-        if CanPathToDataOrigin and CanPathToDataDestination and CanPathToDataLayer then 
-            local ok, msg = NavUtils.CanPathTo(CanPathToDataLayer, CanPathToDataOrigin, CanPathToDataDestination)
+        if CanPathToState.Origin and CanPathToState.Destination and CanPathToState.Layer then 
+            local ok, msg = NavUtils.CanPathTo(CanPathToState.Layer, CanPathToState.Origin, CanPathToState.Destination)
 
             if ok then 
-                DrawLinePop(CanPathToDataOrigin, CanPathToDataDestination, 'ffffff')
+                DrawLinePop(CanPathToState.Origin, CanPathToState.Destination, 'ffffff')
             else 
-                DrawLinePop(CanPathToDataOrigin, CanPathToDataDestination, 'ff0000')
+                DrawLinePop(CanPathToState.Origin, CanPathToState.Destination, 'ff0000')
             end
 
             Sync.NavCanPathToDebug = {
@@ -210,25 +184,25 @@ function Scan()
             }
         end
 
-        if CanPathToState.Origin then 
-            DrawCircle(CanPathToState.Origin, 3.9, '000000')
-            DrawCircle(CanPathToState.Origin, 4, Shared.LayerColors[CanPathToState.Layer] or 'ffffff')
-            DrawCircle(CanPathToState.Origin, 4.1, '000000')
+        if PathToState.Origin then
+            DrawCircle(PathToState.Origin, 3.9, '000000')
+            DrawCircle(PathToState.Origin, 4, Shared.LayerColors[PathToState.Layer] or 'ffffff')
+            DrawCircle(PathToState.Origin, 4.1, '000000')
         end
 
-        if CanPathToState.Destination then 
-            DrawCircle(CanPathToState.Destination, 3.9, '000000')
-            DrawCircle(CanPathToState.Destination, 4, Shared.LayerColors[CanPathToState.Layer] or 'ffffff')
-            DrawCircle(CanPathToState.Destination, 4.1, '000000')
+        if PathToState.Destination then
+            DrawCircle(PathToState.Destination, 3.9, '000000')
+            DrawCircle(PathToState.Destination, 4, Shared.LayerColors[PathToState.Layer] or 'ffffff')
+            DrawCircle(PathToState.Destination, 4.1, '000000')
         end
 
-        if CanPathToState.Origin and CanPathToState.Destination then
+        if PathToState.Origin and PathToState.Destination then
             local start = GetSystemTimeSecondsOnlyForProfileUse()
-            local path, n, label = NavUtils.PathTo(CanPathToState.Layer, CanPathToState.Origin, CanPathToState.Destination, nil)
+            local path, n, label = NavUtils.PathTo(PathToState.Layer, PathToState.Origin, PathToState.Destination, nil)
             -- LOG(string.format('Time taken to generate path: %f', GetSystemTimeSecondsOnlyForProfileUse() - start))
 
             if not path then
-                DrawLinePop(CanPathToState.Origin, CanPathToState.Destination, 'ff0000')
+                DrawLinePop(PathToState.Origin, PathToState.Destination, 'ff0000')
             else
                 if n >= 2 then
                     local last = path[1]

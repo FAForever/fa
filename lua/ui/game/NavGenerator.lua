@@ -87,7 +87,7 @@ NavUIPathTo = Class(Group) {
                     ---@param command any
                     callback = function(mode, command)
                         self.State.Origin = command.Target.Position
-                        SimCallback({Func = 'NavDebugCanPathTo', Args = self.State })
+                        SimCallback({Func = 'NavDebugPathTo', Args = self.State })
                         SelectUnits(selection)
                     end,
                 }
@@ -116,7 +116,7 @@ NavUIPathTo = Class(Group) {
                     ---@param command any
                     callback = function(mode, command)
                         self.State.Destination = command.Target.Position
-                        SimCallback({Func = 'NavDebugCanPathTo', Args = self.State })
+                        SimCallback({Func = 'NavDebugPathTo', Args = self.State })
                         SelectUnits(selection)
                     end,
                 }
@@ -140,7 +140,7 @@ NavUIPathTo = Class(Group) {
         self.State.Layer = Shared.Layers[1]
         self.ComboLayer.OnClick = function(combo, index, text)
             self.State.Layer = Shared.Layers[index]
-            SimCallback({Func = 'NavDebugCanPathTo', Args = self.State })
+            SimCallback({Func = 'NavDebugPathTo', Args = self.State })
         end
 
         self.ButtonRerun = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Rerun"))
@@ -150,7 +150,7 @@ NavUIPathTo = Class(Group) {
             :End()
 
         self.ButtonRerun.OnClick = function()
-            SimCallback({Func = 'NavDebugCanPathTo', Args = self.State })
+            SimCallback({Func = 'NavDebugPathTo', Args = self.State })
         end
 
         self.ButtonReset = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Reset"))
@@ -161,7 +161,7 @@ NavUIPathTo = Class(Group) {
         self.ButtonReset.OnClick = function()
             self.State.Origin = nil
             self.State.Destination = nil
-            SimCallback({Func = 'NavDebugCanPathTo', Args = { }})
+            SimCallback({Func = 'NavDebugPathTo', Args = self.State})
         end
 
         -- AddOnSyncCallback(
@@ -181,10 +181,13 @@ NavUIPathTo = Class(Group) {
 }
 
 ---@class NavUICanPathTo : Group
+---@field State NavDebugCanPathToState
 NavUICanPathTo = Class(Group) {
     __init = function (self, parent)
         local name = 'NavUICanPathTo'
         Group.__init(self, parent, name)
+
+        self.State = { }
 
         self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
             :Fill(self)
@@ -221,10 +224,8 @@ NavUICanPathTo = Class(Group) {
                     ---@param mode CommandModeDataBuild
                     ---@param command any
                     callback = function(mode, command)
-                        SimCallback({Func = 'NavDebugCanPathToOrigin', Args = { 
-                            Location = command.Target.Position,
-                            Layer = Shared.Layers[self.ComboLayer:GetItem()]
-                        }})
+                        self.State.Origin = command.Target.Position
+                        SimCallback({Func = 'NavDebugCanPathTo', Args = self.State})
                         SelectUnits(selection)
                     end,
                 }
@@ -252,10 +253,8 @@ NavUICanPathTo = Class(Group) {
                     ---@param mode CommandModeDataBuild
                     ---@param command any
                     callback = function(mode, command)
-                        SimCallback({Func = 'NavDebugCanPathToDestination', Args = { 
-                            Location = command.Target.Position,
-                            Layer = Shared.Layers[self.ComboLayer:GetItem()]
-                        }})
+                        self.State.Destination = command.Target.Position
+                        SimCallback({Func = 'NavDebugCanPathTo', Args = self.State})
                         SelectUnits(selection)
                     end,
                 }
@@ -277,8 +276,10 @@ NavUICanPathTo = Class(Group) {
 
         self.ComboLayer:AddItems(Shared.Layers)
         self.ComboLayer:SetItem(1)
-        self.ComboLayer.OnClick = function(self, index, text)
-            SimCallback({Func = 'NavDebugCanPathToRerun', Args = { Layer =  Shared.Layers[index] }})
+        self.State.Layer = Shared.Layers[1]
+        self.ComboLayer.OnClick = function(combo, index, text)
+            self.State.Layer = Shared.Layers[index]
+            SimCallback({Func = 'NavDebugCanPathTo', Args = self.State})
         end
 
         self.ButtonRerun = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Rerun"))
@@ -288,7 +289,7 @@ NavUICanPathTo = Class(Group) {
             :End()
 
         self.ButtonRerun.OnClick = function()
-            SimCallback({Func = 'NavDebugCanPathToRerun', Args = { Layer = Shared.Layers[self.ComboLayer.GetItem()] }})
+            SimCallback({Func = 'NavDebugCanPathTo', Args = self.State})
         end
 
         self.ButtonReset = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Reset"))
@@ -297,7 +298,9 @@ NavUICanPathTo = Class(Group) {
             :End()
 
         self.ButtonReset.OnClick = function()
-            SimCallback({Func = 'NavDebugCanPathToReset', Args = { }})
+            self.State.Origin = nil
+            self.State.Destination = nil
+            SimCallback({Func = 'NavDebugCanPathTo', Args = self.State })
         end
 
         AddOnSyncCallback(
