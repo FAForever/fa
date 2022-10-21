@@ -25,8 +25,6 @@ local TableGetn = table.getn
 local TableRemove = table.remove
 local TableMerged = table.merged
 
-local MathAbs = math.abs
-
 -- upvalue globals for performance
 local type = type
 local Vector = Vector
@@ -63,7 +61,7 @@ function DoCallback(name, data, units)
 end
 
 --- Common utility function to retrieve the actual units.
-local function SecureUnits(units)
+function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
         units = {units}
@@ -822,4 +820,25 @@ Callbacks.LoadIntoTransports = function(data, selection)
         local uCargo = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
 
     end
+end
+
+Callbacks.NavGenerate = function(data)
+    import("/lua/sim/NavGenerator.lua").Generate()
+end
+
+Callbacks.NavToggleScanLayer = function(data)
+    import("/lua/sim/NavDebug.lua").ToggleScanLayer(data)
+end
+
+Callbacks.NavToggleScanLabels = function(data)
+    LOG("ToggleScanLabels")
+    import("/lua/sim/NavDebug.lua").ToggleScanLabels(data)
+end
+
+Callbacks.NavDebugCanPathTo = function(data)
+    import("/lua/sim/NavDebug.lua").CanPathTo(data)
+end
+
+Callbacks.NavDebugPathTo = function(data)
+    import("/lua/sim/NavDebug.lua").PathTo(data)
 end

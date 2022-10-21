@@ -810,7 +810,7 @@ function SavePreferences()
 end
 
 --- Select the specified units
----@param units UserUnit[]
+---@param units UserUnit[]?
 function SelectUnits(units)
 end
 
