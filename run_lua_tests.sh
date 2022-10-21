@@ -14,7 +14,9 @@ run_test() {
 
   if [[ $output != "" ]]; then
     echo "$output" > /dev/fd/2
-    had_error=1
+    if [[ {$output#FAIL} != "" ]]; then
+      had_error=1
+    fi
   fi
 }
 
