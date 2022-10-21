@@ -7796,7 +7796,7 @@ lobui_0730="Score désactivé"
 lobui_0740="Conditions de partage"
 lobui_0741="Choisir le devenir des unités d'un joueur défait"
 lobui_0742="Partage total"
-lobui_0743="Toutes les unités sont transferrées à l'allié au plus haut score lors d'une défaite. "
+lobui_0743="Toutes les unités sont transférées à l'allié le mieux classé lors d'une défaite."
 lobui_0744="Partager jusqu'à la mort"
 lobui_0745="Toutes les unités construites (mêmes partagées) seront détruites lors d'une défaite. Les unités capturées par un adversaire ne comptent pas."
 
