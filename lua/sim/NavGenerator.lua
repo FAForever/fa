@@ -885,20 +885,9 @@ function Generate()
     NavLayerData = Shared.CreateEmptyNavLayerData()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    WARN("")
-    WARN("Generating with: ")
-    WARN(string.format(" - BlockCountPerAxis: %d", LabelCompressionTreesPerAxis))
-    WARN(string.format(" - MapSize: %d", MapSize))
-    WARN(string.format(" - BlockSize: %d", blockSize))
-
-    WARN("Constructing caches")
+    print(string.format(" -- Navigational mesh generator -- "))
 
     local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(blockSize)
-
-    ProfileData.TimeSetupCaches = start - GetSystemTimeSecondsOnlyForProfileUse()
-    WARN(string.format("Time spent: %f", ProfileData.TimeSetupCaches))
-    WARN("Generating label trees")
 
     local labelRootLand = NavGrid('Land')
     local labelRootNaval = NavGrid('Water')
@@ -946,9 +935,7 @@ function Generate()
         end
     end
 
-    ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
-    WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
-    WARN("Generating neighbours")
+    print(string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start - 0.1))
 
     labelRootLand:GenerateNeighbors()
     labelRootNaval:GenerateNeighbors()
@@ -956,19 +943,11 @@ function Generate()
     labelRootAmph:GenerateNeighbors()
     labelRootAir:GenerateNeighbors()
 
-    ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
-    WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
-    WARN("Generating labels")
-
     labelRootLand:GenerateLabels()
     labelRootNaval:GenerateLabels()
     labelRootAmph:GenerateLabels()
     labelRootHover:GenerateLabels()
     labelRootAir:GenerateLabels()
-
-    ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
-    WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
-    WARN("Precomputing neighbor information")
 
     labelRootLand:Precompute()
     labelRootNaval:Precompute()
@@ -976,8 +955,7 @@ function Generate()
     labelRootAmph:Precompute()
     labelRootAir:Precompute()
 
-    ProfileData.TimeLabelTrees = GetSystemTimeSecondsOnlyForProfileUse() - start
-    WARN(string.format("Time spent: %f", ProfileData.TimeLabelTrees))
+    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start - 0.2))
 
     -- allows debugging tools to function
     import("/lua/sim/NavDebug.lua")
