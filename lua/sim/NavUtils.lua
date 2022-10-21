@@ -224,10 +224,6 @@ function PathTo(layer, origin, destination, options)
     -- clear up after ourselves
 
     PathToHeap:Clear()
-    for k = head, PathToPathHead do
-        PathToPath[k] = nil
-    end
-
     PathToPathHead = head
 
     return PathToPath, PathToPathHead - 1, distance
