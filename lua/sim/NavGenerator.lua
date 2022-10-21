@@ -935,7 +935,7 @@ function Generate()
         end
     end
 
-    print(string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start - 0.1))
+    print(string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
     labelRootLand:GenerateNeighbors()
     labelRootNaval:GenerateNeighbors()
@@ -955,8 +955,9 @@ function Generate()
     labelRootAmph:Precompute()
     labelRootAir:Precompute()
 
-    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start - 0.2))
-
+    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    
     -- allows debugging tools to function
     import("/lua/sim/NavDebug.lua")
 
