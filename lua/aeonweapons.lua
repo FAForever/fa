@@ -396,27 +396,11 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                         if not target:BeenDestroyed() then 
                             if buff.BuffType == 'STUN' then 
                                 target:SetStunned(0.1 * duration / slices + 0.1)
-                            else 
-
-                                if target.Animator then 
-                                    target.Animator:SetRate(0.1 * i)
-                                end
-
-                                -- slow movement speed
-                                target:SetSpeedMult(0.1 * i) -- TODO: get from blueprint
-
-                                -- slow weapons
-                                for i = 1, target.WeaponCount do
-                                    if not target.WeaponInstances[i]:BeenDestroyed() then 
-                                        target.WeaponInstances[i]:ChangeRateOfFire(0.1 * i * target.WeaponInstances[i].Blueprint.RateOfFire)
-                                    end
-                                end
                             end
                         end
 
                         -- add initial effect
                         if not target.InitialStunFxApplied then 
-
                             for k, effect in self.FxUnitStunFlash do 
                                 local emit = CreateEmitterOnEntity(target, target.Army, effect)
                                 emit:ScaleEmitter(math.max(target.Blueprint.SizeX, target.Blueprint.SizeZ))
@@ -444,36 +428,6 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                     end
 
                     WaitTicks(duration / slices + 1)
-                end
-
-                -- scan for targets again
-                local targets = utilities.GetTrueEnemyUnitsInSphere(
-                    self, 
-                    self.unit:GetPosition(), 
-                    buff.Radius, 
-                    CategoriesChronoDampener
-                )
-
-                -- reset state of targets
-                for k, target in targets do 
-
-                    target.InitialStunFxApplied = nil
-
-                    if not target:BeenDestroyed() then 
-                        -- slow movement speed
-                        target:SetSpeedMult(1.0) -- TODO: get from blueprint
-
-                        if target.Animator then 
-                            target.Animator:SetRate(1)
-                        end
-
-                        -- slow weapons
-                        for i = 1, target.WeaponCount do
-                            if not target.WeaponInstances[i]:BeenDestroyed() then 
-                                target.WeaponInstances[i]:ChangeRateOfFire(0.1 * i * target.WeaponInstances[i].Blueprint.RateOfFire)
-                            end
-                        end
-                    end
                 end
 
                 WaitTicks(51 - duration)
