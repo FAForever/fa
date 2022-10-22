@@ -219,7 +219,7 @@ end
 local ScanningThread = ForkThread(Scan)
 
 --- Called by the module manager when this module is dirty due to a disk change
-function __OnDirtyModule()
+function __moduleinfo.OnDirty()
     if ScanningThread then
         ScanningThread:Destroy()
     end

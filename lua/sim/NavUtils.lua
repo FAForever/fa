@@ -77,10 +77,6 @@ end
 ---@type NavPathToHeap
 local PathToHeap = NavDatastructures.NavPathToHeap()
 
----@type Vector[]
-local PathToPath = { }
-local PathToPathHead = 1
-
 ---@type number
 local PathToIdentifier = 1
 
@@ -92,11 +88,7 @@ end
 
 ---@class NavPathToOptions
 local PathToOptions = {
-    StepSize = 0,
-
-    IncludeOrigin = false,
-    IncludeDestination = true,
-    Simplify = true,
+    UseCache = false
 }
 
 --- Retrieves a shallow copy of the default options
@@ -125,10 +117,6 @@ function PathTo(layer, origin, destination, options)
     if not ok then
         return nil, msg
     end
-
-    -- debug info
-
-    local opened = 0
 
     -- setup pathing
 
@@ -168,7 +156,6 @@ function PathTo(layer, origin, destination, options)
                 if leaf.c > neighbor.c then
                     preferLargeNeighbor = 100
                 end
-                opened = opened + 1
                 neighbor.From = leaf
                 neighbor.Seen = seenIdentifier
                 neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf.neighborDistances[id] + 2 + preferLargeNeighbor
@@ -191,40 +178,40 @@ function PathTo(layer, origin, destination, options)
 
     -- construct current path
 
-    local distance = 0
     local head = 1
+    local path = { }
+    local distance = 0
     local leaf = destinationLeaf.From
     while leaf.From and leaf.From != leaf do
 
-        -- retrieve node
-        local node = PathToPath[head] or { }
-
         -- add to path
-        node[1] = leaf.px
-        node[3] = leaf.pz 
-        node[2] = GetSurfaceHeight(leaf.px, leaf.pz)
-        PathToPath[head] = node
+        path[head] = {
+            leaf.px,
+            GetSurfaceHeight(leaf.px, leaf.pz),
+            leaf.pz
+        }
+        head = head + 1
 
         -- keep track of distance
         distance = distance + leaf.From.neighborDistances[leaf.identifier]
         
         -- continue down the tree
-        head = head + 1
         leaf = leaf.From
     end
 
     -- reverse the path
 
     for k = 1, (0.5 * head) ^ 0 do
-        local temp = PathToPath[k]
-        PathToPath[k] = PathToPath[head - k]
-        PathToPath[head - k] = temp
+        local temp = path[k]
+        path[k] = path[head - k]
+        path[head - k] = temp
     end
 
     -- clear up after ourselves
 
     PathToHeap:Clear()
-    PathToPathHead = head
 
-    return PathToPath, PathToPathHead - 1, distance
+    -- return all the goodies!!
+
+    return path, head - 1, distance
 end
