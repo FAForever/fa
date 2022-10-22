@@ -181,7 +181,7 @@ function PathTo(layer, origin, destination, options)
     local head = 1
     local path = { }
     local distance = 0
-    local leaf = destinationLeaf
+    local leaf = destinationLeaf.From
     while leaf.From and leaf.From != leaf do
 
         -- add to path
@@ -207,11 +207,15 @@ function PathTo(layer, origin, destination, options)
         path[head - k] = temp
     end
 
+    -- add destination to the path
+
+    path[head] = destination
+
     -- clear up after ourselves
 
     PathToHeap:Clear()
 
     -- return all the goodies!!
 
-    return path, head - 1, distance
+    return path, head, distance
 end
