@@ -234,11 +234,11 @@ BuilderGroup {
         PlatoonTemplate = 'T3EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, (categories.RADAR + categories.OMNI) * categories.STRUCTURE } },
+            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, categories.STRUCTURE * ( categories.RADAR + categories.OMNI ) } },
             { EBC, 'GreaterThanEconIncomeOverTime',  { 15, 400}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.OMNI * categories.STRUCTURE, 'RADAR STRUCTURE' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.STRUCTURE * ( categories.RADAR + categories.OMNI ) } },
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -264,7 +264,7 @@ BuilderGroup {
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
             { IBC, 'BrainNotLowPowerMode', {} },
             --DUNCAN - added
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.RADAR * categories.STRUCTURE, 'RADAR STRUCTURE' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.RADAR * categories.STRUCTURE } },
         },
         BuilderType = 'Any',
         FormDebugFunction = function()
@@ -279,9 +279,7 @@ BuilderGroup {
             { EBC, 'GreaterThanEconIncomeOverTime',  { 9, 500}},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
             { IBC, 'BrainNotLowPowerMode', {} },
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.OMNI * categories.STRUCTURE, 'RADAR STRUCTURE' } },
-            --DUNCAN - added
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.RADAR * categories.STRUCTURE, 'RADAR STRUCTURE' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.STRUCTURE * ( categories.RADAR + categories.OMNI ) } },
         },
         BuilderType = 'Any',
     },
@@ -419,7 +417,7 @@ BuilderGroup {
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.OMNI * categories.STRUCTURE } },
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.OMNI * categories.STRUCTURE, 'RADAR STRUCTURE' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.STRUCTURE * ( categories.RADAR + categories.OMNI ) } },
         },
         BuilderType = 'Any',
     },
