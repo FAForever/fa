@@ -951,7 +951,7 @@ function Generate()
 
     labelRootLand:Precompute()
     labelRootNaval:Precompute()
-    labelRootAmph:Precompute()
+    labelRootHover:Precompute()
     labelRootAmph:Precompute()
     labelRootAir:Precompute()
 
