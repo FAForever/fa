@@ -3360,7 +3360,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         -- Count platoon units so that we have adhere to maximums to avoid platoons that are too big to move correctly
-        local platUnits = GetPlatoonUnits(self)
+        local platUnits = self:GetPlatoonUnits()
         local platCount = 0
         for _, u in platUnits do
             if not u.Dead then

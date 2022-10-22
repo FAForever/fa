@@ -437,7 +437,7 @@ BuilderGroup {
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE }},
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * categories.TECH3}},
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'BATTLESHIP'}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.BATTLESHIP}},
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
             { MABC, 'MarkerLessThanDistance',  { 'Naval Area', 400}},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
