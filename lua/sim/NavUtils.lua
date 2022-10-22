@@ -207,11 +207,15 @@ function PathTo(layer, origin, destination, options)
         path[head - k] = temp
     end
 
+    -- add destination to the path
+
+    path[head] = destination
+
     -- clear up after ourselves
 
     PathToHeap:Clear()
 
     -- return all the goodies!!
 
-    return path, head - 1, distance
+    return path, head, distance
 end
