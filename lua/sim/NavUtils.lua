@@ -193,7 +193,7 @@ function PathTo(layer, origin, destination, options)
 
     local distance = 0
     local head = 1
-    local leaf = destinationLeaf
+    local leaf = destinationLeaf.From
     while leaf.From and leaf.From != leaf do
 
         -- retrieve node
