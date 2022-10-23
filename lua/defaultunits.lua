@@ -76,7 +76,13 @@ StructureUnit = Class(Unit) {
         }
 
         -- retrieve units of certain type
-        local radius = 2 * (bp.AI.GuardScanRadius or 50)
+        local radius = 40
+        if self.Blueprint.CategoriesHash.TECH2 then
+            radius = 60
+        elseif self.Blueprint.CategoriesHash.TECH3 then
+            radius = 120
+        end
+
         local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
         local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
 
@@ -102,13 +108,13 @@ StructureUnit = Class(Unit) {
                         local distance = VDist2Sq(pos[1], pos[3], epos[1], epos[3])
 
                         -- if threat is bigger, then we don't need to compare distance
-                        if threat > target.threat then 
+                        if threat > target.threat then
                             target.location = epos
                             target.distance = distance
                             target.threat = threat
                         else 
                             -- threat is equal, therefore compare distance - closer wins
-                            if distance < target.distance then 
+                            if distance < target.distance then
                                 target.location = epos
                                 target.distance = distance
                                 target.threat = threat
