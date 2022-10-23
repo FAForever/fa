@@ -1,6 +1,6 @@
 ---@meta
 
----@class moho.discovery_service_methods
+---@class moho.discovery_service_methods : Destroyable
 local CDiscoveryService = {}
 
 ---

@@ -9,6 +9,9 @@
 local Chat = import('/lua/ui/game/chat.lua')
 local ChatTo = import('/lua/lazyvar.lua').Create()
 
+---@param group any
+---@param text string
+---@param sender any
 function AIChat(group, text, sender)
     if text then
         if import('/lua/ui/game/taunt.lua').CheckForAndHandleTaunt(text, sender) then
@@ -31,6 +34,8 @@ function AIChat(group, text, sender)
     end
 end
 
+---@param army Army
+---@return number[]
 function FindAllies(army)
     local t = GetArmiesTable()
     local result = {}
@@ -42,6 +47,8 @@ function FindAllies(army)
     return result
 end
 
+---@param army Army
+---@return number[]
 function FindEnemies(army)
     local t = GetArmiesTable()
     local result = {}
@@ -53,6 +60,8 @@ function FindEnemies(army)
     return result
 end
 
+---@param towho any
+---@param msg any
 function AISendChatMessage(towho, msg)
     local t = GetArmiesTable()
     local focus = t.focusArmy
@@ -71,6 +80,8 @@ function AISendChatMessage(towho, msg)
     end
 end
 
+---@param army string
+---@return number|nil
 function GetArmyData(army)
     local armies = GetArmiesTable()
     local result

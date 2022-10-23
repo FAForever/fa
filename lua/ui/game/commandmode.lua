@@ -81,7 +81,7 @@ function AddEndBehavior(behavior)
     TableInsert(endBehaviors, behavior)
 end
 
---- ???
+--- usually changing selection ends the command mode, this allows us to ignore that
 local ignoreSelection = false
 function SetIgnoreSelection(ignore)
     ignoreSelection = ignore
@@ -111,13 +111,22 @@ end
 -- @param isCancel Is set to true when it cancels a current command mode for a new one.
 function EndCommandMode(isCancel)
 
-    --- ???
     if ignoreSelection then
         return
     end
 
+    -- in case we want to end the command mode, without knowing it has already ended or not
+    if not modeData then
+        -- update our local state
+        commandMode = false
+        modeData = false
+        issuedOneCommand = false
+
+        return
+    end
+
     -- regain selection if we were cheating in units
-    if modeData.cheat then 
+    if modeData.cheat then
         if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
             local modeData = table.deepcopy(modeData)
             ForkThread(
@@ -428,6 +437,12 @@ function OnCommandIssued(command)
         if not IsKeyDown('Shift') then 
             SimCallback({ Func = 'ImmediateHiveUpgrade', Args = { UpgradeTo = command.Blueprint } }, true )
         end
+    end
+
+    -- unusual command, where we use the build interface
+    if modeData.callback and command.CommandType == "BuildMobile" and (not command.Units[1]) then
+        modeData.callback(modeData, command)
+        return false
     end
         
     -- part of the cheat menu

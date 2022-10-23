@@ -1,6 +1,6 @@
 ---@meta
 
----@class moho.control_methods
+---@class moho.control_methods : Destroyable
 local CMauiControl = {}
 
 ---

@@ -5,6 +5,13 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+---@alias DiplomacyActionType "accept" | "break" | "never" | "offer" | "reject"
+
+---@class DiplomacyAction
+---@field Action DiplomacyActionType
+---@field To number army index
+---@field From number army index
+
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -15,7 +22,7 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
 local Tabs = import('/lua/ui/game/tabs.lua')
 
 local ScaleNumber = LayoutHelpers.ScaleNumber
-local Layouter = LayoutHelpers.ReusedLayoutFor
+local Layouter = LayoutHelpers.LayoutFor
 local CreateBitmap = UIUtil.CreateBitmap
 local CreateBitmapStd = UIUtil.CreateBitmapStd
 

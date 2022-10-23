@@ -52,7 +52,7 @@ BuilderGroup {
        PlatoonTemplate = 'T1SeaSub',
        Priority = 1000,
        BuilderConditions = {
-            { UCBC,'HaveLessThanUnitsWithCategory', { 2, 'MOBILE NAVAL SUBMERSIBLE' } },
+            { UCBC,'HaveLessThanUnitsWithCategory', { 2, categories.MOBILE * categories.NAVAL * categories.SUBMERSIBLE } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.2 }},
        },
@@ -64,7 +64,7 @@ BuilderGroup {
        Priority = 1000,
        BuilderType = 'Sea',
        BuilderConditions = {
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'MOBILE NAVAL FRIGATE' } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.MOBILE * categories.NAVAL * categories.FRIGATE } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.2 }},
        },
@@ -113,7 +113,7 @@ BuilderGroup {
         Priority = 600,
         BuilderType = 'Sea',
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'CRUISER'}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.CRUISER }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }}, --DUNCAN - was 0.9
         },
@@ -135,7 +135,7 @@ BuilderGroup {
         Priority = 600,
         BuilderType = 'Sea',
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'DESTROYER'}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.DESTROYER }},
             --{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, 'T1SUBMARINE'}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -147,9 +147,9 @@ BuilderGroup {
         Priority = 600,
         BuilderType = 'Sea',
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'CRUISER'}},
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'DESTROYER'}},
-            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'SHIELD NAVAL MOBILE' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.CRUISER}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.DESTROYER}},
+            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.SHIELD * categories.NAVAL * categories.MOBILE } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -160,9 +160,9 @@ BuilderGroup {
         Priority = 600,
         BuilderType = 'Sea',
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'CRUISER'}},
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, 'DESTROYER'}},
-            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'COUNTERINTELLIGENCE NAVAL MOBILE' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.CRUISER}},
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.DESTROYER}},
+            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.COUNTERINTELLIGENCE * categories.NAVAL * categories.MOBILE } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -187,7 +187,7 @@ BuilderGroup {
         PlatoonTemplate = 'T3SeaNukeSub',
         Priority = 700,
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.BATTLESHIP } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.NUKE } }, --DUNCAN - added so it doesnt over build
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -200,7 +200,7 @@ BuilderGroup {
         Priority = 700,
         BuilderType = 'Sea',
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.BATTLESHIP } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -211,7 +211,7 @@ BuilderGroup {
         Priority = 700,
         BuilderType = 'Sea',
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.BATTLESHIP } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -222,7 +222,7 @@ BuilderGroup {
         Priority = 700,
         BuilderType = 'Sea',
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, 'BATTLESHIP' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.BATTLESHIP } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
         },
@@ -253,8 +253,8 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, 'MOBILE TECH2 NAVAL, MOBILE TECH3 NAVAL' } },
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 1, 'MOBILE NAVAL SUB' } },
+            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.NAVAL * ( categories.TECH2 + categories.TECH3 ) } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 1, categories.MOBILE * categories.NAVAL * categories.SUBMERSIBLE } },
             { SeaAttackCondition, { 'LocationType', 14 } },
         },
     },
@@ -279,7 +279,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, 'MOBILE TECH3 NAVAL' } },
+            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.TECH3 * categories.NAVAL } },
             { SeaAttackCondition, { 'LocationType', 50 } }, --DUNCAN - was 60
         },
     },
@@ -329,7 +329,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'NAVAL NUKE' } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, categories.NAVAL * categories.NUKE } },
         },
     },
     Builder {
@@ -353,7 +353,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, 'NAVAL NUKE' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, categories.NAVAL * categories.NUKE } },
         },
     },
 }
@@ -381,7 +381,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, 'MOBILE TECH2 NAVAL, MOBILE TECH3 NAVAL' } },
+            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.NAVAL * ( categories.TECH2 + categories.TECH3 ) } },
             { SeaAttackCondition, { 'LocationType', 40 } },
         },
     },
@@ -405,7 +405,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, 'MOBILE TECH3 NAVAL' } },
+            { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.TECH3 * categories.NAVAL } },
             { SeaAttackCondition, { 'LocationType', 120 } },
         },
     },

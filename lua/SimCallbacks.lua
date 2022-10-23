@@ -25,8 +25,6 @@ local TableGetn = table.getn
 local TableRemove = table.remove
 local TableMerged = table.merged
 
-local MathAbs = math.abs
-
 -- upvalue globals for performance
 local type = type
 local Vector = Vector
@@ -63,7 +61,7 @@ function DoCallback(name, data, units)
 end
 
 --- Common utility function to retrieve the actual units.
-local function SecureUnits(units)
+function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
         units = {units}
@@ -739,4 +737,108 @@ end
 
 Callbacks.iMapToggleThreat = function(data)
     import("/lua/sim/maputilities.lua").iMapToggleThreat(data.Identifier)
+end
+
+Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
+    if selection then
+
+        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
+
+        ---@type Unit
+        local target = GetEntityById(data.TargetId)
+
+        IssueClearCommands(noACU)
+        IssueGuard(noACU, target)
+    end
+end
+
+---@class CargoSlots
+---@field Large number 
+---@field Medium number 
+---@field Small number
+
+---@type CargoSlots[]
+local GetCargoSlotsCache = {}
+
+---@param unit Unit
+---@return CargoSlots
+local function GetCargoSlots(unit)
+
+    -- try the cache first
+    if GetCargoSlotsCache[unit.UnitId] then 
+        return GetCargoSlotsCache[unit.UnitId]
+    end
+
+    ---@type CargoSlots
+    local slots = {
+        Large = 0,
+        Medium = 0,
+        Small = 0,
+    }
+
+    -- based on attachment points
+    for i = 1, unit:GetBoneCount() do
+        if unit:GetBoneName(i) ~= nil then
+            if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
+                slots.Large = slots.Large + 1
+            elseif string.find(unit:GetBoneName(i), 'Attachpoint_Med') then
+                slots.Medium = slots.Medium + 1
+            elseif string.find(unit:GetBoneName(i), 'Attachpoint') then
+                slots.Small = slots.Small + 1
+            end
+        end
+    end
+
+    -- based on blueprint definitions
+    slots.Large = math.min(slots.Large, unit.Blueprint.Transport.SlotsLarge or slots.Large)
+    slots.Medium = math.min(slots.Medium, unit.Blueprint.Transport.SlotsMedium or slots.Medium)
+    slots.Small = math.min(slots.Small, unit.Blueprint.Transport.SlotsSmall or slots.Small)
+
+    -- cache it and return
+    GetCargoSlotsCache[unit.UnitId] = slots
+    return slots
+end
+
+Callbacks.LoadIntoTransports = function(data, selection)
+    if selection then
+
+        local uTransports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
+
+        -- retrieve usable data about transports
+        local dTransports = { }
+        for k, transport in uTransports do
+            local cargoSlots = GetCargoSlots(transport)
+            table.insert(dTransports, {
+                Transport = transport,
+                Cargo = { },
+                Small = cargoSlots.Small,
+                Medium = cargoSlots.Medium,
+                Large = cargoSlots.Large,
+            })
+        end
+
+        local uCargo = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
+
+    end
+end
+
+Callbacks.NavGenerate = function(data)
+    import("/lua/sim/NavGenerator.lua").Generate()
+end
+
+Callbacks.NavToggleScanLayer = function(data)
+    import("/lua/sim/NavDebug.lua").ToggleScanLayer(data)
+end
+
+Callbacks.NavToggleScanLabels = function(data)
+    LOG("ToggleScanLabels")
+    import("/lua/sim/NavDebug.lua").ToggleScanLabels(data)
+end
+
+Callbacks.NavDebugCanPathTo = function(data)
+    import("/lua/sim/NavDebug.lua").CanPathTo(data)
+end
+
+Callbacks.NavDebugPathTo = function(data)
+    import("/lua/sim/NavDebug.lua").PathTo(data)
 end

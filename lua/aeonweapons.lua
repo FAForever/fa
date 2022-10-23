@@ -9,20 +9,13 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local Weapon = import('/lua/sim/weapon.lua').Weapon
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local CollisionBeamFile = import('defaultcollisionbeams.lua')
-local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
 local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
-local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
 local Explosion = import('defaultexplosions.lua')
-
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
-local BareBonesWeapon = WeaponFile.BareBonesWeapon
-
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
-
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('EffectUtilities.lua')
 
 ---@class AIFBallisticMortarWeapon : DefaultProjectileWeapon
 AIFBallisticMortarWeapon = Class(DefaultProjectileWeapon) {
@@ -46,7 +39,7 @@ ADFOverchargeWeapon = Class(WeaponFile.OverchargeWeapon) {
     DesiredWeaponLabel = 'RightDisruptor'
 }
 
----@class ADFTractorClaw
+---@class ADFTractorClaw : Weapon
 ---@field TractorTrash TrashBag
 ---@field RunningTractorThread boolean
 ADFTractorClaw = Class(Weapon) {
@@ -275,43 +268,55 @@ ADFTractorClaw = Class(Weapon) {
     ---@param muzzle string
     TargetFallThread = function(self, target, trash, muzzle)
 
-        -- let it create the wreck, with the rotator manipulators attached
-        target.PlayDeathAnimation = false
-        target.DestructionExplosionWaitDelayMin = 0
-        target.DestructionExplosionWaitDelayMax = 0
-        local oldDestroyUnit = target.DestroyUnit
-        target.DestroyUnit = function(target, overkillRatio)
+        -- clean up the effects once the unit starts falling
+        if not IsDestroyed(self) then
             self:ForkThread(self.TrashDelayedDestroyThread, trash)
-            oldDestroyUnit(target, overkillRatio)
         end
 
-        -- create a projectile that matches the velocity / orientation 
-        local vx, vy, vz = target:GetVelocity()
-        local projectile = target:CreateProjectileAtBone('/effects/entities/ADFTractorFall01/ADFTractorFall01_proj.bp', 0)
-        projectile:SetVelocity(10 * vx, 10 * vy, 10 * vz)
-        Warp(projectile, target:GetPosition(), target:GetOrientation())
+        -- if the unit is magically already destroyed, then just return - nothing we can do,
+        --  we'll likely end up with a flying wreck :)
+        if IsDestroyed(target) then
+            return
+        end
 
-        projectile.OnImpact = function(projectile)
-            if not IsDestroyed(target) then
-                target.CanTakeDamage = true
-                if not IsDestroyed(self.unit) then
-                    if target.MyShield and target.MyShield:IsOn() then
-                        Damage(self.unit, self.unit:GetPosition(muzzle), target.MyShield, target.MyShield:GetHealth() + 1, 'Disintegrate')
+        -- air units drop on their own
+        if target.Blueprint.CategoriesHash.AIR then
+            target:Kill()
+        -- assist land units with a natural drop
+        else 
+            -- let it create the wreck, with the rotator manipulators attached
+            target.PlayDeathAnimation = false
+            target.DestructionExplosionWaitDelayMin = 0
+            target.DestructionExplosionWaitDelayMax = 0
+
+            -- create a projectile that matches the velocity / orientation 
+            local vx, vy, vz = target:GetVelocity()
+            local projectile = target:CreateProjectileAtBone('/effects/entities/ADFTractorFall01/ADFTractorFall01_proj.bp', 0)
+            projectile:SetVelocity(10 * vx, 10 * vy, 10 * vz)
+            Warp(projectile, target:GetPosition(), target:GetOrientation())
+
+            projectile.OnImpact = function(projectile)
+                if not IsDestroyed(target) then
+                    target.CanTakeDamage = true
+                    if not IsDestroyed(self.unit) then
+                        if target.MyShield and target.MyShield:IsOn() then
+                            Damage(self.unit, self.unit:GetPosition(muzzle), target.MyShield, target.MyShield:GetHealth() + 1, 'Disintegrate')
+                        end
+                        Damage(self.unit, self.unit:GetPosition(muzzle), target, target:GetHealth() + 1, 'Disintegrate')
+                        
+                    else
+                        target:Kill()
                     end
-                    Damage(self.unit, self.unit:GetPosition(muzzle), target, target:GetHealth() + 1, 'Disintegrate')
-                    
-                else
-                    target:Kill()
+
+                    CreateLightParticle(target, 0, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
+
+                    local position = target:GetPosition()
+                    DamageArea(target, position, 3, 1, 'TreeFire', false, false)
+                    DamageArea(target, position, 2, 1, 'TreeForce', false, false)
                 end
 
-                CreateLightParticle(target, 0, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
-
-                local position = target:GetPosition()
-                DamageArea(target, position, 3, 1, 'TreeFire', false, false)
-                DamageArea(target, position, 2, 1, 'TreeForce', false, false)
+                projectile:Destroy()
             end
-
-            projectile:Destroy()
         end
     end,
 
@@ -323,6 +328,8 @@ ADFTractorClaw = Class(Weapon) {
         trash:Destroy()
     end,
 
+    ---@param self ADFTractorClaw
+    ---@param target Unit
     MakeImmune = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(true)
@@ -331,6 +338,8 @@ ADFTractorClaw = Class(Weapon) {
         end
     end,
 
+    ---@param self ADFTractorClaw
+    ---@param target Unit
     MakeVulnerable = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(false)
@@ -379,6 +388,8 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
         end,
     },
 
+    ---@param self ADFChronoDampener
+    ---@param muzzle string
     CreateProjectileAtMuzzle = function(self, muzzle)
     end,
 }
@@ -461,6 +472,9 @@ AIFBombGravitonWeapon = Class(DefaultProjectileWeapon) {}
 AIFArtilleryMiasmaShellWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {},
 
+    ---@param self AIFArtilleryMiasmaShellWeapon
+    ---@param bone Bone
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -502,6 +516,9 @@ AIFBombQuarkWeapon = Class(DefaultProjectileWeapon) {
 AANDepthChargeBombWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp', },
 
+    ---@param self AANDepthChargeBombWeapon
+    ---@param bone Bone
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -531,6 +548,9 @@ AANDepthChargeBombWeapon = Class(DefaultProjectileWeapon) {
 AANDepthChargeBombWeapon02 = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_01_emit.bp', },
 
+    ---@param self AANDepthChargeBombWeapon02
+    ---@param bone Bone
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -560,6 +580,9 @@ AANDepthChargeBombWeapon02 = Class(DefaultProjectileWeapon) {
 AANTorpedoCluster = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/aeon_torpedocluster_flash_01_emit.bp', },
 
+    ---@param self AANTorpedoCluster
+    ---@param bone Bone
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -587,6 +610,9 @@ AANTorpedoCluster = Class(DefaultProjectileWeapon) {
 
 ---@class AIFSmartCharge : DefaultProjectileWeapon
 AIFSmartCharge = Class(DefaultProjectileWeapon) {
+
+    ---@param self AIFSmartCharge
+    ---@param muzzle string
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
         local tbl = self:GetBlueprint().DepthCharge
@@ -633,6 +659,7 @@ AAATemporalFizzWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/temporal_fizz_muzzle_flash_01_emit.bp', },
     ChargeEffectMuzzles = {},
 
+    ---@param self AAATemporalFizzWeapon
     PlayFxRackSalvoChargeSequence = function(self)
         DefaultProjectileWeapon.PlayFxRackSalvoChargeSequence(self)
         for _, v in self.ChargeEffectMuzzles do
@@ -686,6 +713,7 @@ AQuantumBeamGenerator = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffects = {},
     FxUpackingChargeEffectScale = 1,
 
+    ---@param self AQuantumBeamGenerator
     PlayFxWeaponUnpackSequence = function(self)
         local bp = self:GetBlueprint()
         for _, v in self.FxUpackingChargeEffects do
@@ -715,6 +743,7 @@ ADFPhasonLaser = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 
+    ---@param self ADFPhasonLaser
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local bp = self:GetBlueprint()
@@ -744,3 +773,10 @@ AIFQuanticArtillery = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.Aeon_QuanticClusterMuzzleFlash,
     FxChargeMuzzleFlash = EffectTemplate.Aeon_QuanticClusterChargeMuzzleFlash,
 }
+
+
+-- kept for mod backwards compatibility
+local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
+local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
+local BareBonesWeapon = WeaponFile.BareBonesWeapon
+local EffectUtil = import('EffectUtilities.lua')

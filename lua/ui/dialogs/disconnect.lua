@@ -7,17 +7,15 @@
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Group = import('/lua/maui/group.lua').Group
-local LazyVar = import('/lua/lazyvar.lua').Create
 local GameMain = import('/lua/ui/game/gamemain.lua')
 
 local SessionClients = import("/lua/ui/override/SessionClients.lua")
 
-local parent = false
+local parent = nil
 local myIndex = ''
+local CreateBorder
 
 function DestroyDialog()
     SessionClients.ResetInterval()
@@ -286,3 +284,8 @@ function CreateBorder(parent)
 
     return tbl
 end
+
+-- kept for mod backwards compatibility
+local Text = import('/lua/maui/text.lua').Text
+local Button = import('/lua/maui/button.lua').Button
+local LazyVar = import('/lua/lazyvar.lua').Create
