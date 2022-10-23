@@ -14,7 +14,6 @@ local page_active_graph = nil
 local page_active_graph2 = nil
 local create_anime_graph = nil
 local create_anime_graph2 = nil
-local WaitFrames = nil
 local graph_pos={Left=function() return 110 end, Top=function() return 120 end, Right=function() return GetFrame(0).Right()-100 end, Bottom=function() return GetFrame(0).Bottom()-160 end}
 local bar_pos={Left=function() return 90 end, Top=function() return 140 end, Right=function() return GetFrame(0).Right()-60 end, Bottom=function() return GetFrame(0).Bottom()-150 end}
 
