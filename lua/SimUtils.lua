@@ -537,21 +537,21 @@ end
 ---@param army Army
 function TryRebuildUnits(trackers, army)
     local rebuilders = {}
-    for _, tracker in ipairs(trackers) do
+    for k, tracker in ipairs(trackers) do
         if tracker.Success then
             continue
         end
         -- create invisible drone which belongs to allied army. BuildRange = 10000
         local rebuilder = CreateUnitHPR('ZXA0001', army, 5, 20, 5, 0, 0, 0)
         rebuilder.TargetBuildTime = tracker.TargetBuildTime
-        rebuilders[i] = rebuilder
+        rebuilders[k] = rebuilder
 
         IssueBuildMobile({rebuilder}, tracker.UnitPos, tracker.UnitBlueprintID, {})
     end
 
     WaitTicks(3) -- wait some ticks (3 is minimum), IssueBuildMobile() is not instant
 
-    for _, rebuilder in rebuilders do
+    for k, rebuilder in rebuilders do
         rebuilder:SetBuildRate(rebuilder.TargetBuildTime * 10) -- set crazy build rate and consumption = 0
         rebuilder:SetConsumptionPerSecondMass(0)
         rebuilder:SetConsumptionPerSecondEnergy(0)
@@ -559,12 +559,12 @@ function TryRebuildUnits(trackers, army)
 
     WaitTicks(1)
 
-    for i, rebuilder in ipairs(rebuilders) do
-        local tracker = trackers[i]
+    for k, rebuilder in ipairs(rebuilders) do
+        local tracker = trackers[k]
         local newUnit = rebuilder:GetFocusUnit()
         local progressDif = rebuilder:GetWorkProgress() - tracker.UnitProgress
         if newUnit and math.abs(progressDif) < 0.001 then
-            newUnit:SetHealth(newUnit, rebuilder.UnitHealth)
+            newUnit:SetHealth(newUnit, tracker.UnitHealth)
             tracker.Success = true
         end
         rebuilder:Destroy()
