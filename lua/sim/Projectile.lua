@@ -190,7 +190,7 @@ Projectile = Class(moho.projectile_methods) {
         end
 
         -- flag that indicates whether we should impact allied projectiles
-        local alliedCheck = not (self.DamageData.CollideFriendly and IsAlly(self.Army, firingWeapon.Army))
+        local alliedCheck = self.CollideFriendly and IsAlly(self.Army, firingWeapon.Army)
 
         -- specific check if we have a weapon that is defensive
         if firingWeapon.Blueprint.WeaponCategory == 'Defense' then 
