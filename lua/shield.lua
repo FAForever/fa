@@ -141,8 +141,6 @@ Shield = Class(moho.shield_methods, Entity) {
         local spec = TableAssimilate(spec, DEFAULT_OPTIONS)
         spec.Owner = owner
 
-        LOG("__init")
-
         _c_CreateShield(self, spec)
     end,
 
@@ -152,7 +150,6 @@ Shield = Class(moho.shield_methods, Entity) {
         -- cache information that is used frequently
         self.Army = EntityGetArmy(self)
         self.EntityId = EntityGetEntityId(self)
-        reprsl(spec)
         self.Brain = spec.Owner:GetAIBrain()
 
         -- copy over information from specifiaction

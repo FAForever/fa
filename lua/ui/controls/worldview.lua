@@ -230,15 +230,6 @@ WorldView = Class(moho.UIWorldView, Control) {
         self.IgnoreMode = false
 
         self.Trash = TrashBag()
-
-        ForkThread(
-            function()
-                while true do
-                    self:EnableResourceRendering(true)
-                    WaitFrames(1)
-                end
-            end
-        )
     end,
 
     --- Sets the selection tolerance to ignore everything

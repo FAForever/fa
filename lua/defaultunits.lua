@@ -611,7 +611,6 @@ StructureUnit = Class(Unit) {
         if not adjBuffs then return end
 
         -- There won't be any adjacentUnit if this is a producer just built...
-        reprsl(self.AdjacentUnits)
         if self.AdjacentUnits then
             for k, adjacentUnit in self.AdjacentUnits do
                 for k, v in AdjacencyBuffs[adjBuffs] do

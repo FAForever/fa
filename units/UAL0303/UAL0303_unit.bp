@@ -185,7 +185,7 @@ UnitBlueprint {
             },
         },
         Category = 'Direct Fire',
-        Classification = 'RULEUC_Commander',
+        Classification = 'RULEUC_MilitaryVehicle',
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
