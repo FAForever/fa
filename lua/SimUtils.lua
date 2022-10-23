@@ -55,7 +55,7 @@ end
 ---@param units Unit[]
 ---@param toArmy number 
 ---@param captured boolean
----@return Unit[]
+---@return Unit[]?
 function TransferUnitsOwnership(units, toArmy, captured)
     local toBrain = GetArmyBrain(toArmy)
     if not toBrain or toBrain:IsDefeated() or not units or table.empty(units) then
