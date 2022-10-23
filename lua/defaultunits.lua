@@ -709,6 +709,9 @@ StructureUnit = Class(Unit) {
 
 -- FACTORY UNITS
 ---@class FactoryUnit : StructureUnit
+---@field BuildingUnit boolean
+---@field BuildBoneRotator moho.RotateManipulator
+---@field BuildEffectBones string[]
 FactoryUnit = Class(StructureUnit) {
 
     ---@param self FactoryUnit
@@ -721,6 +724,8 @@ FactoryUnit = Class(StructureUnit) {
         end
 
         -- Save build effect bones for faster access when creating build effects
+        self.BuildBoneRotator = CreateRotator(self, self.Blueprint.Display.BuildAttachBone or 0, 'y', 0, 10000)
+        self.Trash:Add(self.BuildBoneRotator)
         self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
@@ -891,7 +896,6 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
-    ---#
     ---@param self FactoryUnit
     ---@param target_bp any
     ---@return boolean
@@ -910,7 +914,6 @@ FactoryUnit = Class(StructureUnit) {
     OnFailedToBuild = function(self)
         StructureUnit.OnFailedToBuild(self)
         self.FactoryBuildFailed = true
-        self:DestroyBuildRotator()
         self:StopBuildFx()
         ChangeState(self, self.IdleState)
     end,
@@ -919,7 +922,7 @@ FactoryUnit = Class(StructureUnit) {
     RollOffUnit = function(self)
         local spin, x, y, z = self:CalculateRollOffPoint()
         self.UnitBeingBuilt:SetRotation(spin)
-        self.MoveCommand = IssueMove({self.UnitBeingBuilt}, Vector(x, y, z))
+        IssueMove({self.UnitBeingBuilt}, Vector(x, y, z))
     end,
 
     ---@param self FactoryUnit
@@ -1004,36 +1007,29 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     ---@param self FactoryUnit
-    CreateBuildRotator = function(self)
-        if not self.BuildBoneRotator then
-            local spin = self:CalculateRollOffPoint()
-            self.UnitBeingBuilt:SetRotation(spin)
-            -- local bp = self.Blueprint.Display
-            -- self.BuildBoneRotator = CreateRotator(self, bp.BuildAttachBone or 0, 'y', spin, 10000)
-            -- self.Trash:Add(self.BuildBoneRotator)
-        end
-    end,
-
-    ---@param self FactoryUnit
-    DestroyBuildRotator = function(self)
-        if self.BuildBoneRotator then
-            self.BuildBoneRotator:Destroy()
-            self.BuildBoneRotator = nil
-        end
-    end,
-
-    ---@param self FactoryUnit
     RolloffBody = function(self)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
         self:PlayFxRollOff()
 
-        -- Wait until unit has left the factory
-        while not self.UnitBeingBuilt.Dead and self.MoveCommand and not IsCommandDone(self.MoveCommand) do
-            WaitSeconds(0.5)
+        -- find out when build pad is free again
+
+        local size = 0.5 * self.UnitBeingBuilt.Blueprint.SizeX
+        if size < self.UnitBeingBuilt.Blueprint.SizeZ then
+            size = 0.5 * self.UnitBeingBuilt.Blueprint.SizeZ
         end
 
-        self.MoveCommand = nil
+        size = size * size
+        local unitPosition, dx, dz, d
+        local buildPosition = self:GetPosition(self.Blueprint.Display.BuildAttachBone or 0)
+        repeat 
+            unitPosition = self.UnitBeingBuilt:GetPosition()
+            dx = buildPosition[1] - unitPosition[1]
+            dz = buildPosition[3] - unitPosition[3]
+            d = dx * dx + dz * dz
+            WaitTicks(2)
+        until IsDestroyed(self.UnitBeingBuilt) or d > size
+
         self:PlayFxRollOffEnd()
         self:SetBusy(false)
         self:SetBlockCommandQueue(false)
@@ -1041,27 +1037,41 @@ FactoryUnit = Class(StructureUnit) {
         ChangeState(self, self.IdleState)
     end,
 
+    ---@deprecated
+    ---@param self FactoryUnit
+    CreateBuildRotator = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self FactoryUnit
+    DestroyBuildRotator = function(self)
+    end,
+
     IdleState = State {
+        ---@param self FactoryUnit
         Main = function(self)
             self:SetBusy(false)
             self:SetBlockCommandQueue(false)
-            self:DestroyBuildRotator()
         end,
     },
 
     BuildingState = State {
+        ---@param self FactoryUnit
         Main = function(self)
-            local unitBuilding = self.UnitBeingBuilt
-            local bp = self.Blueprint
-            local bone = bp.Display.BuildAttachBone or 0
+            local spin = self:CalculateRollOffPoint()
+            self.BuildBoneRotator:SetGoal(spin)
+
+            WaitTicks(1)
+
+            local bone = self.Blueprint.Display.BuildAttachBone or 0
             self:DetachAll(bone)
-            unitBuilding:AttachBoneTo(-2, self, bone)
-            self:CreateBuildRotator()
-            self:StartBuildFx(unitBuilding)
+            self.UnitBeingBuilt:AttachBoneTo(-2, self, bone)
+            self:StartBuildFx(self.UnitBeingBuilt)
         end,
     },
 
     RollingOffState = State {
+        ---@param self FactoryUnit
         Main = function(self)
             self:RolloffBody()
         end,

@@ -107,6 +107,7 @@ local cUnit = moho.unit_methods
 ---@field Blueprint UnitBlueprint
 ---@field EngineFlags any
 ---@field EngineCommandCap? table<string, boolean>
+---@field UnitBeingBuilt Unit?
 Unit = Class(moho.unit_methods) {
 
     Weapons = {},
