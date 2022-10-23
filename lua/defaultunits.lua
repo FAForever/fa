@@ -918,42 +918,64 @@ FactoryUnit = Class(StructureUnit) {
     ---@param self FactoryUnit
     RollOffUnit = function(self)
         local spin, x, y, z = self:CalculateRollOffPoint()
+        self.UnitBeingBuilt:SetRotation(spin)
         self.MoveCommand = IssueMove({self.UnitBeingBuilt}, Vector(x, y, z))
     end,
 
     ---@param self FactoryUnit
     CalculateRollOffPoint = function(self)
-        local bp = self.Blueprint.Physics.RollOffPoints
-        local px, py, pz = unpack(self:GetPosition())
+        local px, py, pz = self:GetPositionXYZ()
 
-        if not bp then return 0, px, py, pz end
+        -- check if we have roll of points set
+        local rollOffPoints = self.Blueprint.Physics.RollOffPoints
+        if not rollOffPoints then
+            return 0, px, py, pz
+        end
 
-        local vectorObj = self:GetRallyPoint()
-
-        if not vectorObj then return 0, px, py, pz end
-
-        local bpKey = 1
-        local distance, lowest = nil
-        for k, v in bp do
-            distance = VDist2(vectorObj[1], vectorObj[3], v.X + px, v.Z + pz)
-            if not lowest or distance < lowest then
-                bpKey = k
-                lowest = distance
+        -- find our rally point, or of the factory that we're assisting
+        local rally = self:GetRallyPoint()
+        local focus = self:GetGuardedUnit()
+        while focus do
+            local next = focus:GetGuardedUnit()
+            if next then
+                focus = next
+            else
+                break
             end
         end
 
-        local fx, fy, fz, spin
-        local bpP = bp[bpKey]
-        local unitBP = self.UnitBeingBuilt.Blueprint.Display.ForcedBuildSpin
-        if unitBP then
-            spin = unitBP
-        else
-            spin = bpP.UnitSpin
+        if focus then
+            rally = focus:GetRallyPoint()
         end
 
-        fx = bpP.X + px
-        fy = bpP.Y + py
-        fz = bpP.Z + pz
+        -- check if we have a rally point set
+        if not rally then
+            return 0, px, py, pz
+        end
+
+        DrawCircle(rally, 4, 'ffffff')
+
+        -- find nearest roll off point for rally point
+        local nearestRollOffPoint = nil
+        local d, dx, dz, lowest = 0, 0, 0, nil
+        for k, rollOffPoint in rollOffPoints do
+            dx = rally[1] - (px + rollOffPoint.X)
+            dz = rally[3] - (pz + rollOffPoint.Z)
+            d = dx * dx + dz * dz
+
+            if not lowest or d < lowest then
+                nearestRollOffPoint = rollOffPoint
+                lowest = d
+            end
+        end
+
+        -- determine return parameters
+        local spin = self.UnitBeingBuilt.Blueprint.Display.ForcedBuildSpin or nearestRollOffPoint.UnitSpin
+        local fx = nearestRollOffPoint.X + px
+        local fy = nearestRollOffPoint.Y + py
+        local fz = nearestRollOffPoint.Z + pz
+
+        DrawCircle({fx, fy, fz}, 2, 'ff0000')
 
         return spin, fx, fy, fz
     end,
@@ -985,9 +1007,10 @@ FactoryUnit = Class(StructureUnit) {
     CreateBuildRotator = function(self)
         if not self.BuildBoneRotator then
             local spin = self:CalculateRollOffPoint()
-            local bp = self.Blueprint.Display
-            self.BuildBoneRotator = CreateRotator(self, bp.BuildAttachBone or 0, 'y', spin, 10000)
-            self.Trash:Add(self.BuildBoneRotator)
+            self.UnitBeingBuilt:SetRotation(spin)
+            -- local bp = self.Blueprint.Display
+            -- self.BuildBoneRotator = CreateRotator(self, bp.BuildAttachBone or 0, 'y', spin, 10000)
+            -- self.Trash:Add(self.BuildBoneRotator)
         end
     end,
 
