@@ -29,8 +29,8 @@ end
 
 -- used to make more expensive units transfer first, in case there's a unit cap issue
 local function TransferUnitsOwnershipComparator(a, b)
-    a = a.Blueprint or a:GetBlueprint()
-    b = b.Blueprint or b:GetBlueprint()
+    a = a.Blueprint or a.Blueprint
+    b = b.Blueprint or b.Blueprint
     return a.Economy.BuildCostMass > b.Economy.BuildCostMass
 end
 
@@ -39,7 +39,7 @@ end
 local function TransferUnitsOwnershipDelayedWeapons(weapon)
     if not weapon:BeenDestroyed() then
         -- compute delay
-        local bp = weapon:GetBlueprint()
+        local bp = weapon.Blueprint
         local delay = 1 / bp.RateOfFire
         WaitSeconds(delay)
 
@@ -92,7 +92,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
             continue
         end
 
-        local bp = unit:GetBlueprint()
+        local bp = unit.Blueprint
         local bpPhysics = bp.Physics
         local categoriesHash = bp.CategoriesHash
 
@@ -429,7 +429,7 @@ end
 ---@param blockingEntities RevertibleCollisionShapeEntity[]
 ---@return RebuildTracker tracker
 function CreateRebuildTracker(unit, blockingEntities)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local blueprintID = bp.BlueprintId
     local buildTime = bp.Economy.BuildTime
     local health = unit:GetHealth()
