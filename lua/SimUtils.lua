@@ -12,50 +12,8 @@ local transferUnbuiltCategory = categories.EXPERIMENTAL + categories.TECH3 * cat
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER
 
-
 local sharedUnits = {}
 
----
----@param data {From: number, To: number}
-function BreakAlliance(data)
-    -- You cannot change alliances in a team game
-    if ScenarioInfo.TeamGame then
-        return
-    end
-
-    if OkayToMessWithArmy(data.From) then
-        SetAlliance(data.From, data.To, "Enemy")
-
-        if Sync.BrokenAlliances == nil then
-            Sync.BrokenAlliances = {}
-        end
-        table.insert(Sync.BrokenAlliances, { From = data.From, To = data.To })
-    end
-    import('/lua/SimPing.lua').OnAllianceChange()
-end
-
----
----@param resultData {From: number, To: number, ResultValue: DiplomacyActionType}
-function OnAllianceResult(resultData)
-    -- You cannot change alliances in a team game
-    if ScenarioInfo.TeamGame then
-        return
-    end
-
-    if OkayToMessWithArmy(resultData.From) then
-        if resultData.ResultValue == "accept" then
-            SetAlliance(resultData.From,resultData.To, "Ally")
-            if Sync.FormedAlliances == nil then
-                Sync.FormedAlliances = {}
-            end
-            table.insert(Sync.FormedAlliances, { From = resultData.From, To = resultData.To })
-        end
-    end
-    import('/lua/simping.lua').OnAllianceChange()
-end
-import('/lua/simplayerquery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
-
----
 ---@param owner number
 function KillSharedUnits(owner)
     local sharedUnitOwner = sharedUnits[owner]
@@ -76,6 +34,8 @@ local function TransferUnitsOwnershipComparator(a, b)
     return a.Economy.BuildCostMass > b.Economy.BuildCostMass
 end
 
+--- Temporarily disables the weapons of gifted units
+---@param weapon Weapon
 local function TransferUnitsOwnershipDelayedWeapons(weapon)
     if not weapon:BeenDestroyed() then
         -- compute delay
@@ -321,13 +281,14 @@ end
 --- Pauses all drones in `kennels`
 ---@param kennels Unit[]
 function PauseTransferredKennels(kennels)
-    WaitTicks(1) -- spawn drones
+    -- wait for drones to spawn
+    WaitTicks(1)
 
     for _, unit in kennels do
         unit:SetPaused(true)
         local podData = unit.PodData
         if podData then
-            for _, pod in podData do -- pause drones
+            for _, pod in podData do
                 local podHandle = pod.PodHandle
                 if podHandle then
                     podHandle:SetPaused(true)
@@ -431,7 +392,6 @@ function UpgradeUnits(units)
         end
     end
 end
-
 
 --- Rebuilds `units`, giving a try for each army (in order) in case they can't for unit cap
 --- reasons. If a unit cannot be rebuilt at all, a wreckage is placed instead. Each unit can
@@ -596,7 +556,6 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
     end
 end
 
----
 ---@param data {To: number}
 ---@param units Unit[]
 function GiveUnitsToPlayer(data, units)
@@ -625,7 +584,6 @@ function GiveUnitsToPlayer(data, units)
     end
 end
 
----
 ---@param data {Army: number, Value: boolean}
 function SetResourceSharing(data)
     local army = data.Army
@@ -636,7 +594,6 @@ function SetResourceSharing(data)
     brain:SetResourceSharing(data.Value)
 end
 
----
 ---@param data {Army: number, Value: boolean}
 function RequestAlliedVictory(data)
     -- You cannot change this in a team game
@@ -651,7 +608,6 @@ function RequestAlliedVictory(data)
     brain.RequestingAlliedVictory = data.Value
 end
 
----
 ---@param data {Army: number, Value: boolean}
 function SetOfferDraw(data)
     local army = data.Army
@@ -661,25 +617,6 @@ function SetOfferDraw(data)
     local brain = GetArmyBrain(army)
     brain.OfferingDraw = data.Value
 end
-
-function BreakAlliance(data)
-    -- You cannot change alliances in a team game
-    if ScenarioInfo.TeamGame then
-        return
-    end
-
-    if OkayToMessWithArmy(data.From) then
-        SetAlliance(data.From, data.To, "Enemy")
-
-        if Sync.BrokenAlliances == nil then
-            Sync.BrokenAlliances = {}
-        end
-        table.insert(Sync.BrokenAlliances, { From = data.From, To = data.To })
-    end
-    import('/lua/simping.lua').OnAllianceChange()
-end
-
-
 
 -- ==============================================================================
 -- UNIT CAP
@@ -718,7 +655,6 @@ function UpdateUnitCap(deadArmy)
     end
 end
 
----
 ---@param data {Sender: number, Msg: string}
 function SendChatToReplay(data)
     if data.Sender and data.Msg then
@@ -729,7 +665,6 @@ function SendChatToReplay(data)
     end
 end
 
----
 ---@param data {From: number, To: number, Mass: number, Energy: number}
 function GiveResourcesToPlayer(data)
     SendChatToReplay(data)
@@ -751,3 +686,41 @@ function GiveResourcesToPlayer(data)
         toBrain:GiveResource('Energy', energyTaken)
     end
 end
+
+---@param data {From: number, To: number}
+function BreakAlliance(data)
+    -- You cannot change alliances in a team game
+    if ScenarioInfo.TeamGame then
+        return
+    end
+
+    if OkayToMessWithArmy(data.From) then
+        SetAlliance(data.From, data.To, "Enemy")
+
+        if Sync.BrokenAlliances == nil then
+            Sync.BrokenAlliances = {}
+        end
+        table.insert(Sync.BrokenAlliances, { From = data.From, To = data.To })
+    end
+    import('/lua/SimPing.lua').OnAllianceChange()
+end
+
+---@param resultData {From: number, To: number, ResultValue: DiplomacyActionType}
+function OnAllianceResult(resultData)
+    -- You cannot change alliances in a team game
+    if ScenarioInfo.TeamGame then
+        return
+    end
+
+    if OkayToMessWithArmy(resultData.From) then
+        if resultData.ResultValue == "accept" then
+            SetAlliance(resultData.From,resultData.To, "Ally")
+            if Sync.FormedAlliances == nil then
+                Sync.FormedAlliances = {}
+            end
+            table.insert(Sync.FormedAlliances, { From = resultData.From, To = resultData.To })
+        end
+    end
+    import('/lua/simping.lua').OnAllianceChange()
+end
+import('/lua/simplayerquery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
