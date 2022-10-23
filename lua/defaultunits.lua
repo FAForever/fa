@@ -944,7 +944,7 @@ FactoryUnit = Class(StructureUnit) {
         -- find our rally point, or of the factory that we're assisting
         local rally = self:GetRallyPoint()
         local focus = self:GetGuardedUnit()
-        while focus do
+        while focus and focus != self do
             local next = focus:GetGuardedUnit()
             if next then
                 focus = next
