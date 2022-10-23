@@ -75,6 +75,12 @@ local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categor
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
 ---@class Projectile : moho.projectile_methods
+---@field Army Army
+---@field Blueprint ProjectileBlueprint
+---@field Launcher Unit?
+---@field Trash TrashBag
+---@field DamageData? table
+---@field CollideFriendly boolean
 Projectile = Class(moho.projectile_methods) {
 
     DestroyOnImpact = true,
@@ -148,7 +154,7 @@ Projectile = Class(moho.projectile_methods) {
         end
 
         -- flag if we can hit allied projectiles
-        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, other.Army))
+        local alliedCheck = self.CollideFriendly and IsAlly(self.Army, other.Army)
 
         -- torpedoes can only be taken down by anti torpedo
         if self.Blueprint.CategoriesHash['TORPEDO'] then
@@ -184,7 +190,7 @@ Projectile = Class(moho.projectile_methods) {
         end
 
         -- flag that indicates whether we should impact allied projectiles
-        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, firingWeapon.Army))
+        local alliedCheck = not (self.DamageData.CollideFriendly and IsAlly(self.Army, firingWeapon.Army))
 
         -- specific check if we have a weapon that is defensive
         if firingWeapon.Blueprint.WeaponCategory == 'Defense' then 
@@ -522,6 +528,11 @@ Projectile = Class(moho.projectile_methods) {
     PassMetaDamage = function(self, data)
         self.DamageData = { }
         setmetatable(self.DamageData, data)
+
+        -- backwards compatibility
+        if data.CollideFriendly then 
+            self.CollideFriendly = data.CollideFriendly
+        end
     end,
 
     --- Called by Lua to process the damage logic of a projectile
