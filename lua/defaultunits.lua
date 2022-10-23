@@ -15,6 +15,9 @@ local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
+local RolloffUnitTable = { nil }
+local RolloffPositionTable = { 0, 0, 0 }
+
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
 
@@ -922,7 +925,10 @@ FactoryUnit = Class(StructureUnit) {
     RollOffUnit = function(self)
         local spin, x, y, z = self:CalculateRollOffPoint()
         self.UnitBeingBuilt:SetRotation(spin)
-        IssueMove({self.UnitBeingBuilt}, Vector(x, y, z))
+
+        RolloffUnitTable[1] = self.UnitBeingBuilt
+        RolloffPositionTable[1], RolloffPositionTable[2], RolloffPositionTable[3] = x, y, z
+        IssueMove(RolloffUnitTable, RolloffPositionTable)
     end,
 
     ---@param self FactoryUnit
