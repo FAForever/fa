@@ -956,8 +956,6 @@ FactoryUnit = Class(StructureUnit) {
             return 0, px, py, pz
         end
 
-        DrawCircle(rally, 4, 'ffffff')
-
         -- find nearest roll off point for rally point
         local nearestRollOffPoint = nil
         local d, dx, dz, lowest = 0, 0, 0, nil
@@ -977,8 +975,6 @@ FactoryUnit = Class(StructureUnit) {
         local fx = nearestRollOffPoint.X + px
         local fy = nearestRollOffPoint.Y + py
         local fz = nearestRollOffPoint.Z + pz
-
-        DrawCircle({fx, fy, fz}, 2, 'ff0000')
 
         return spin, fx, fy, fz
     end,
