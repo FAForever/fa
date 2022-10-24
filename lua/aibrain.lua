@@ -4976,16 +4976,12 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         while true do
-            --LOG('Start path checking')
-            --LOG('CanPathToCurrent Table '..repr(aiBrain.CanPathToEnemy))
-            
             --We are getting the current base position rather than the start position so we can use this for expansions.
             for k, v in self.BuilderManagers do
                 local locPos = v.Position 
                 -- added this incase the position came back nil
                 local enemyX, enemyZ
                 if self:GetCurrentEnemy() then
-                    --LOG('CanPathToCurrent we have an enemy')
                     enemyX, enemyZ = self:GetCurrentEnemy():GetArmyStartPos()
                     -- if we don't have an enemy position then we can't search for a path. Return until we have an enemy position
                     if not enemyX then
@@ -4993,7 +4989,6 @@ AIBrain = Class(moho.aibrain_methods) {
                         break
                     end
                 else
-                    --LOG('CanPathToCurrent no current enemy')
                     coroutine.yield(30)
                     break
                 end
@@ -5020,18 +5015,14 @@ AIBrain = Class(moho.aibrain_methods) {
                 
                 -- if we have a true path from the nav mesh....
                 if path then
-                    --LOG('CanPathToCurrentEnemy: Land path to the enemy found! LAND map! - '..OwnIndex..' vs '..EnemyIndex..''..' Location '..k)
                     self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Land'
                 else
                     -- we have no path from the nav mesh....
-                    --LOG('CanPathToCurrentEnemy: no path returned ')
                     local amphibPath, amphibReason = NavUtils.CanPathTo('Amphibious', locPos, {enemyX,0,enemyZ})
                     if not amphibPath then
-                        --LOG('CanPathToCurrentEnemy: No land or amphib path detected')
-                            -- No land or amphib path, we are likely on a plateu and cant go anywhere without transports.
-                            self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Air'
+                        -- No land or amphib path, we are likely on a plateu and cant go anywhere without transports.
+                        self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Air'
                     else
-                        --LOG('CanPathToCurrentEnemy: amphib path to the enemy found! AMPHIB map! - '..OwnIndex..' vs '..EnemyIndex..''..' Location '..k)
                         self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Amphibious'
                     end
                 end
