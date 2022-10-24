@@ -4968,8 +4968,8 @@ AIBrain = Class(moho.aibrain_methods) {
     CanPathToCurrentEnemy = function(self)
         -- Validate Pathing to enemies based on navmesh queries
         -- Removed from build conditions so it can run on a slower loop
-        -- added amphib vs nopath results so we can tell when we are trapped on a plateu
-        coroutine.yield(Random(5,20))
+        -- added amphib vs air results so we can tell when we are trapped on a plateu
+        WaitTicks(Random(5,20))
         local NavUtils = import('/lua/sim/NavUtils.lua')
         if not self.CanPathToEnemy then
             self.CanPathToEnemy = {}
@@ -4985,29 +4985,29 @@ AIBrain = Class(moho.aibrain_methods) {
                     enemyX, enemyZ = self:GetCurrentEnemy():GetArmyStartPos()
                     -- if we don't have an enemy position then we can't search for a path. Return until we have an enemy position
                     if not enemyX then
-                        coroutine.yield(30)
+                        WaitTicks(30)
                         break
                     end
                 else
-                    coroutine.yield(30)
+                    WaitTicks(30)
                     break
                 end
 
                 -- Get the armyindex from the enemy
-                local EnemyIndex = ArmyBrains[self:GetCurrentEnemy():GetArmyIndex()].Nickname
-                local OwnIndex = ArmyBrains[self:GetArmyIndex()].Nickname
+                local EnemyIndex = self:GetCurrentEnemy():GetArmyIndex()
+                local OwnIndex = self:GetArmyIndex()
                 -- create a table for the enemy index in case it's nil
                 self.CanPathToEnemy[OwnIndex] = self.CanPathToEnemy[OwnIndex] or {}
                 self.CanPathToEnemy[OwnIndex][EnemyIndex] = self.CanPathToEnemy[OwnIndex][EnemyIndex] or {}
                 -- Check if we have already done a path search to the current enemy
                 if self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Land' then
-                    coroutine.yield(5)
+                    WaitTicks(5)
                     continue
                 elseif self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Amphibious' then
-                    coroutine.yield(5)
+                    WaitTicks(5)
                     continue
                 elseif self.CanPathToEnemyRNG[OwnIndex][EnemyIndex][k] == 'Air' then
-                    coroutine.yield(5)
+                    WaitTicks(5)
                     continue
                 end
                 -- Check land path to current enemy
@@ -5026,9 +5026,9 @@ AIBrain = Class(moho.aibrain_methods) {
                         self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Amphibious'
                     end
                 end
-                coroutine.yield(5)
+                WaitTicks(5)
             end
-            coroutine.yield(100)
+            WaitTicks(100)
         end
     end,
 }
