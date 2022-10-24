@@ -3635,7 +3635,7 @@ AIBrain = Class(moho.aibrain_methods) {
             PlatoonAlertSounded = false,
         }
         self:ForkThread(self.BaseMonitorThread)
-        self:ForkThread(AIUtils.CanPathToCurrentEnemy)
+        self:ForkThread(self.CanPathToCurrentEnemy)
     end,
 
     ---@param self AIBrain
@@ -4961,7 +4961,85 @@ AIBrain = Class(moho.aibrain_methods) {
             end
         end
         return cdr
-    end;
+    end,
+
+    --- Monitors pathing from each AI base to the current enemy start position. Used for determining which movement layers can attack an enemy.
+    ---@param self AIBrain
+    CanPathToCurrentEnemy = function(self)
+        -- Validate Pathing to enemies based on navmesh queries
+        -- Removed from build conditions so it can run on a slower loop
+        -- added amphib vs nopath results so we can tell when we are trapped on a plateu
+        coroutine.yield(Random(5,20))
+        local NavUtils = import('/lua/sim/NavUtils.lua')
+        if not self.CanPathToEnemy then
+            self.CanPathToEnemy = {}
+        end
+
+        while true do
+            --LOG('Start path checking')
+            --LOG('CanPathToCurrent Table '..repr(aiBrain.CanPathToEnemy))
+            
+            --We are getting the current base position rather than the start position so we can use this for expansions.
+            for k, v in self.BuilderManagers do
+                local locPos = v.Position 
+                -- added this incase the position came back nil
+                local enemyX, enemyZ
+                if self:GetCurrentEnemy() then
+                    --LOG('CanPathToCurrent we have an enemy')
+                    enemyX, enemyZ = self:GetCurrentEnemy():GetArmyStartPos()
+                    -- if we don't have an enemy position then we can't search for a path. Return until we have an enemy position
+                    if not enemyX then
+                        coroutine.yield(30)
+                        break
+                    end
+                else
+                    --LOG('CanPathToCurrent no current enemy')
+                    coroutine.yield(30)
+                    break
+                end
+
+                -- Get the armyindex from the enemy
+                local EnemyIndex = ArmyBrains[self:GetCurrentEnemy():GetArmyIndex()].Nickname
+                local OwnIndex = ArmyBrains[self:GetArmyIndex()].Nickname
+                -- create a table for the enemy index in case it's nil
+                self.CanPathToEnemy[OwnIndex] = self.CanPathToEnemy[OwnIndex] or {}
+                self.CanPathToEnemy[OwnIndex][EnemyIndex] = self.CanPathToEnemy[OwnIndex][EnemyIndex] or {}
+                -- Check if we have already done a path search to the current enemy
+                if self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Land' then
+                    coroutine.yield(5)
+                    continue
+                elseif self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Amphibious' then
+                    coroutine.yield(5)
+                    continue
+                elseif self.CanPathToEnemyRNG[OwnIndex][EnemyIndex][k] == 'Air' then
+                    coroutine.yield(5)
+                    continue
+                end
+                -- Check land path to current enemy
+                local path, reason = NavUtils.CanPathTo('Land', locPos, {enemyX,0,enemyZ})
+                
+                -- if we have a true path from the nav mesh....
+                if path then
+                    --LOG('CanPathToCurrentEnemy: Land path to the enemy found! LAND map! - '..OwnIndex..' vs '..EnemyIndex..''..' Location '..k)
+                    self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Land'
+                else
+                    -- we have no path from the nav mesh....
+                    --LOG('CanPathToCurrentEnemy: no path returned ')
+                    local amphibPath, amphibReason = NavUtils.CanPathTo('Amphibious', locPos, {enemyX,0,enemyZ})
+                    if not amphibPath then
+                        --LOG('CanPathToCurrentEnemy: No land or amphib path detected')
+                            -- No land or amphib path, we are likely on a plateu and cant go anywhere without transports.
+                            self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Air'
+                    else
+                        --LOG('CanPathToCurrentEnemy: amphib path to the enemy found! AMPHIB map! - '..OwnIndex..' vs '..EnemyIndex..''..' Location '..k)
+                        self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Amphibious'
+                    end
+                end
+                coroutine.yield(5)
+            end
+            coroutine.yield(100)
+        end
+    end,
 }
 
 -- kept for mod backwards compatibility
