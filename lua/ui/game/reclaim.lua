@@ -140,12 +140,14 @@ local WorldLabel = Class(Group) {
 
         -- We'd like to scale the hue of the label based on the logarithm of the mass value clamped
         -- to 1 at some cutoff point. We'd also like to approximate this in the more commonly-used
-        -- small end of the scale using a proportional quadratic function up to a threshold.
+        -- small end of the scale using a proportional quadratic function up to a threshold. This
+        -- also ends up flattening it into something more useful, rather than a quarter of the
+        -- function being between 0 and 5.
         -- 
         -- Thus, we have three parameters to consider for our function
         --    base: how quickly the function scales a mass value to hue
         --    cutoff: when the function meets 1
-        --    thres: when the logarithm stops being approximated with a proportional one
+        --    thres: when the logarithm stops being approximated
         --
         -- We use the nominal logarithm scaling function
         --    nominal(x) = log_{base}(x / scale + 1)
@@ -161,34 +163,34 @@ local WorldLabel = Class(Group) {
         --     approx(thres) = nominal(thres)
         --     approx'(thres) = nominal'(thres)
         -- "it is left as an exercise to the reader to validate the solutions for `a` and `b`:"
-        --     a = ((-ln(thres + scale) + ln(scale)) / thres + 1 / (thres + scale)) / ln(base)thres
-        --     b = (2 (ln(thres + scale) - ln(scale)) / thres - 1 / (thres + scale)) / ln(base)
+        --     a = -((ln(thres + scale) - ln(scale)) / thres - 1 / (thres + scale)) / ln(base)thres
+        --     b = (2(ln(thres + scale) - ln(scale)) / thres - 1 / (thres + scale)) / ln(base)
         --
         -- We now up it all together in a piecewise function for the hue:
         --        hue(x) = { x <= thres  : approx(x)     => A x (x + B)
         --                 { x >= cutoff : 1
-        --                 { else        : nominal(x)    => ln(x + scale) * C + D
+        --                 { else        : nominal(x)    => ln(x + S) * C + D
         -- where
-        --         scale = cutoff / (base - 1)
+        --             S = cutoff / (base - 1)
         --             C = 1 / ln(base)
-        --             D = - C ln(scale)
-        --             A = C ((-ln(thres + scale) + ln(scale)) / thres + 1 / (thres + scale)) / thres
-        --             B = C (2 (ln(thres + scale) - ln(scale)) / thres - 1 / (thres + scale)) / A
+        --             D = -C ln(S)
+        --             A = -((C ln(thres + S) + D) / thres - C / (thres + S)) / thres
+        --             B = (2(C ln(thres + S) + D) / thres - C / (thres + S)) / A
         --
         -- the current parameter values are:
-        --     threshold = 94.5692754978
+        --     threshold = 94.5692754978 (chosen to split the function in half)
         --          base = 100000
-        --        cutoff = 30,000
+        --        cutoff = 30000
         -- which yield the following constants:
         --         scale = 0.30000300003
-        --             A = -0.0000358285014945
-        --             B = -240.180201571
+        --             A = -0.0000462260645186
+        --             B = -208.944779635
         --             C = 0.0868588963807
         --             D = 0.104574880463
 
         local hue
-        if mass <= 100 then
-            hue = -0.0000358285014945 * mass * (mass - 240.180201571)
+        if mass <= 94.5692754978 then
+            hue = -0.0000462260645186 * mass * (mass - 208.944779635)
         elseif mass >= 30000 then
             hue = 1
         else
@@ -888,4 +890,17 @@ function UpdateLabels(view, zoom)
         LabelPoolSize = labelCount
     end
     LabelPoolUse = labelCount
+end
+
+
+-- Update reclaim tables when the disk watcher reloads the module
+
+-- old module
+function __moduleinfo.OnReload(newmod)
+    newmod.RecieveOldModuleData(Reclaim, OutsidePlayableAreaReclaim)
+    Reclaim, OutsidePlayableAreaReclaim = nil, nil
+end
+-- new module
+function RecieveOldModuleData(reclaim, offmapReclaim)
+    Reclaim, OutsidePlayableAreaReclaim = reclaim, offmapReclaim
 end
