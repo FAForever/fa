@@ -67,6 +67,13 @@ function PathTo(data)
     PathToState = data
 end
 
+---@type NavDebugGetLabelState
+local GetLabelState = { }
+
+function GetLabel(data)
+    GetLabelState = data
+end
+
 function ScanOver(mouse, layer)
     if mouse then
         local over = NavGenerator.NavGrids[layer]:FindLeaf(mouse)
@@ -210,6 +217,25 @@ function Scan()
                     end
                 end
             end
+        end
+
+        if GetLabelState.Position then
+            local label, msg = NavUtils.GetLabel(GetLabelState.Layer, GetLabelState.Position)
+            if label then
+                local color = Shared.LabelToColor(label) or 'ffffff'
+                DrawCircle(GetLabelState.Position, 3.9, color)
+                DrawCircle(GetLabelState.Position, 4.0, color)
+                DrawCircle(GetLabelState.Position, 4.1, color)
+            else
+                DrawCircle(GetLabelState.Position, 3.9, '000000')
+                DrawCircle(GetLabelState.Position, 4.0, 'ffffff')
+                DrawCircle(GetLabelState.Position, 4.1, '000000')
+            end
+
+            Sync.NavDebugGetLabel = {
+                Label = label,
+                Msg = msg
+            }
         end
 
         WaitTicks(2)
