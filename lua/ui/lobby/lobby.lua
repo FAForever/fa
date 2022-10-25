@@ -3270,7 +3270,7 @@ function CreateUI(maxPlayers)
 
             GUI.chatEdit:AbandonFocus()
 
-            mapSelectDialog = import('/lua/ui/dialogs/mapselect.lua').CreateDialog(
+            mapSelectDialog = import('/lua/ui/dialogs/mapselect/MapDialog.lua').OpenWindow(
                 selectBehavior,
                 exitBehavior,
                 GUI,
@@ -3280,6 +3280,17 @@ function CreateUI(maxPlayers)
                 availableMods,
                 OnModsChanged
             )
+
+            -- mapSelectDialog = import('/lua/ui/dialogs/mapselect.lua').CreateDialog(
+            --     selectBehavior,
+            --     exitBehavior,
+            --     GUI,
+            --     singlePlayer,
+            --     gameInfo.GameOptions.ScenarioFile,
+            --     gameInfo.GameOptions,
+            --     availableMods,
+            --     OnModsChanged
+            -- )
         end
     else
         local modsManagerCallback = function(active_sim_mods, active_ui_mods)

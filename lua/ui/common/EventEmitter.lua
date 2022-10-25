@@ -15,6 +15,8 @@ EventEmitter = ClassSimple {
     ---@param identifier string
     OnEvent = function(self, instance, identifier)
 
+        LOG(string.format("Registered event %s for %s", identifier, instance:GetName()))
+
         -- sanity check
         if not instance[identifier] or not type(instance[identifier]) == 'function' then 
             WARN(string.format("Attempt to subscribe to an event (%s) with an instance (%s) that can not respond to it - skipping the subscribe", identifier, instance:GetName()))
@@ -30,14 +32,17 @@ EventEmitter = ClassSimple {
     ---@param identifier string
     ---@param data any
     EmitEvent = function(self, identifier, data)
+
+        LOG(string.format("Emitting event %s", identifier))
+
         if self.EventListeners[identifier] then
-            for k, instance in self.EventListeners[identifier] do
+            for instance, _ in self.EventListeners[identifier] do
 
                 -- sanity check
-                local ok, msg = pcall (instance[identifier], data)
+                local ok, msg = pcall (instance[identifier], instance, data)
                 if not ok then
-                    WARN(string.format("A subscriber (%s) crashed when processing an event (%s), removing the subscriber"))
                     WARN(msg)
+                    WARN(string.format("A subscriber (%s) crashed when processing an event (%s), removing the subscriber", instance:GetName(), identifier))
 
                     self.EventListeners[identifier][instance] = nil
                 end
