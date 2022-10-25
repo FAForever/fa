@@ -1,6 +1,10 @@
 --- Post process a unit
 ---@param unit Unit
 local function PostProcessUnit(unit)
+    if table.find(unit.Categories, "SUBCOMMANDER") then
+        table.insert(unit.Categories, "SACU_BEHAVIOR")
+    end
+
     -- create hash tables for quick lookup
     unit.CategoriesCount = 0
     unit.CategoriesHash = {}
@@ -10,6 +14,8 @@ local function PostProcessUnit(unit)
             unit.CategoriesHash[category] = true
         end
     end
+
+    unit.CategoriesHash[unit.BlueprintId] = true
 
     -- create hash tables for quick lookup
     unit.DoNotCollideListCount = 0

@@ -70,11 +70,12 @@ end
 function AttachBeamToEntity(emitter, entity, bone, army)
 end
 
---- Changes the army of a unit, returning a new unit
+--- Changes the army of a unit, returning a new unit. By default the ACU can not be shared
 ---@param unit Unit
 ---@param army Army
+---@param noRestrictions? boolean
 ---@return Unit
-function ChangeUnitArmy(unit, army)
+function ChangeUnitArmy(unit, army, noRestrictions)
 end
 
 --- Returns true if cheats are enabled, logs the cheat attempt no matter what
@@ -174,7 +175,7 @@ end
 function CreateBuilderArmController(unit, turretBone, barrelBone, aimBone)
 end
 
---- Creates a collision detection manipulator, calls the function `self.OnAnimTerrainCollision(self, bone, x, y, z)`
+--- Creates a collision detection manipulator, calls the function `self:OnAnimTerrainCollision(bone, x, y, z)`
 --- when a bone that is being watched collides with the terrain
 ---@param unit Unit
 ---@return moho.CollisionManipulator
@@ -1225,7 +1226,7 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- Instantly moves an entity to a location
----@param entity Object
+---@param object Object
 ---@param location Vector
 ---@param orientation? Vector
 function Warp(object, location, orientation)

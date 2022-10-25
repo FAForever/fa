@@ -597,7 +597,7 @@ end
 --- For internal use by `ScrollBar.__init()`
 ---@param scrollBar Scrollbar
 ---@param parent Control
----@param axis "Vert"|"Horz" found in `/lua/scrollbar.lua#ScrollAxis`
+---@param axis ScrollAxis found in `/lua/scrollbar.lua#ScrollAxis`
 function InternalCreateScrollbar(scrollBar, parent, axis)
 end
 
@@ -810,7 +810,7 @@ function SavePreferences()
 end
 
 --- Select the specified units
----@param units UserUnit[]
+---@param units UserUnit[]?
 function SelectUnits(units)
 end
 

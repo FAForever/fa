@@ -7,7 +7,6 @@ local Movie = import('/lua/maui/movie.lua').Movie
 local WrapText = import('/lua/maui/text.lua').WrapText
 local Button = import('/lua/maui/button.lua').Button
 local Prefs = import('/lua/user/prefs.lua')
-local PlayCampaignMovie = import('campaignmovies.lua').PlayCampaignMovie
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
@@ -701,3 +700,6 @@ function TimelineFMV(toOpSelect)
         end
     end
 end
+
+-- kept for mod backwards compatibility
+local PlayCampaignMovie = import('campaignmovies.lua').PlayCampaignMovie

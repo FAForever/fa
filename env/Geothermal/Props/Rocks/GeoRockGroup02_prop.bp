@@ -24,14 +24,8 @@ PropBlueprint {
         ReclaimMassMax = 175,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
     Interface = {
         HelpText = 'Medium Rockpile',
-    },
-    Physics = {
-        BlockPath = true,
     },
     SizeX = 2.5,
     SizeY = 0.75,

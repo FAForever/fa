@@ -63,6 +63,10 @@ ZRB0303 = Class(CSeaFactoryUnit) {
 
     StopArmsMoving = function(self)
         CSeaFactoryUnit.StopArmsMoving(self)
+        if not self.ArmSlider1 then return end
+        if not self.ArmSlider2 then return end
+        if not self.ArmSlider3 then return end
+        
         self.ArmSlider1:SetGoal(0, 0, 0)
         self.ArmSlider2:SetGoal(0, 0, 0)
         self.ArmSlider3:SetGoal(0, 0, 0)

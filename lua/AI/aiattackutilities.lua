@@ -815,16 +815,13 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
                 -- force reevaluation
                 platoon.LastAttackDestination = {attackPos}
             else
-                local pathSize = table.getn(path)
                 -- store path
                 platoon.LastAttackDestination = path
                 -- move to new location
-                for wpidx,waypointPath in path do
-                    if wpidx == pathSize or bAggro then
-                        platoon:AggressiveMoveToLocation(waypointPath)
-                    else
-                        platoon:MoveToLocation(waypointPath, false)
-                    end
+                if bAggro then
+                    platoon:IssueAggressiveMoveAlongRoute(path)
+                else
+                    platoon:IssueMoveAlongRoute(path)
                 end
             end
         end

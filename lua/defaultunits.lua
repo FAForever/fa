@@ -39,7 +39,6 @@ StructureUnit = Class(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:HideLandBones()
-        self.AdjacentUnits = {}
         self.FxBlinkingLightsBag = {}
         if self.Layer == 'Land' and self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
@@ -754,7 +753,7 @@ FactoryUnit = Class(StructureUnit) {
             end
         end
 
-        self.DestroyUnitBeingBuilt(self)
+        self:DestroyUnitBeingBuilt()
     end,
 
     ---@param self FactoryUnit
@@ -1403,7 +1402,7 @@ RadarJammerUnit = Class(StructureUnit) {
         StructureUnit.OnIntelEnabled(self)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
-            self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
+            self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             self.IntelFxOn = true
         end
     end,
@@ -1895,7 +1894,7 @@ AirUnit = Class(MobileUnit) {
         -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
         -- It also wouldn't call this code, and hence the cargo destruction. Awful!
         if self:GetFractionComplete() == 1 and (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
-            self.CreateUnitAirDestructionEffects(self, 1.0)
+            self:CreateUnitAirDestructionEffects(1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
             self.OverKillRatio = overkillRatio
@@ -2547,72 +2546,6 @@ CommandUnit = Class(WalkingLandUnit) {
     -------------------------------------------------------------------------------------------
     -- TELEPORTING WITH DELAY
     -------------------------------------------------------------------------------------------
-
-    ---@param self CommandUnit
-    ---@param teleporter any
-    ---@param location Vector
-    ---@param orientation Quaternion
-    InitiateTeleportThread = function(self, teleporter, location, orientation)
-        self.UnitBeingTeleported = self
-        self:SetImmobile(true)
-        self:PlayUnitSound('TeleportStart')
-        self:PlayUnitAmbientSound('TeleportLoop')
-
-        local bp = self.Blueprint
-        local bpEco = bp.Economy
-        local teleDelay = bp.General.TeleportDelay
-        local energyCost, time
-
-        if bpEco then
-            local mass = (bpEco.TeleportMassCost or bpEco.BuildCostMass or 1) * (bpEco.TeleportMassMod or 0.01)
-            local energy = (bpEco.TeleportEnergyCost or bpEco.BuildCostEnergy or 1) * (bpEco.TeleportEnergyMod or 0.01)
-            energyCost = mass + energy
-            time = energyCost * (bpEco.TeleportTimeMod or 0.01)
-        end
-
-        if teleDelay then
-            energyCostMod = (time + teleDelay) / time
-            time = time + teleDelay
-            energyCost = energyCost * energyCostMod
-
-            self.TeleportDestChargeBag = nil
-            self.TeleportCybranSphere = nil  -- this fixes some "...Game object has been destroyed" bugs in EffectUtilities.lua:TeleportChargingProgress
-
-            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-
-            -- Create teleport charge effect + exit animation delay
-            self:PlayTeleportChargeEffects(location, orientation, teleDelay)
-            WaitFor(self.TeleportDrain)
-        else
-            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-
-            -- Create teleport charge effect
-            self:PlayTeleportChargeEffects(location, orientation)
-            WaitFor(self.TeleportDrain)
-        end
-
-        if self.TeleportDrain then
-            RemoveEconomyEvent(self, self.TeleportDrain)
-            self.TeleportDrain = nil
-        end
-
-        self:PlayTeleportOutEffects()
-        self:CleanupTeleportChargeEffects()
-        WaitSeconds(0.1)
-        self:SetWorkProgress(0.0)
-        Warp(self, location, orientation)
-        self:PlayTeleportInEffects()
-        self:CleanupRemainingTeleportChargeEffects()
-
-        WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
-
-        -- Landing Sound
-        self:StopUnitAmbientSound('TeleportLoop')
-        self:PlayUnitSound('TeleportEnd')
-        self:SetImmobile(false)
-        self.UnitBeingTeleported = nil
-        self.TeleportThread = nil
-    end,
 
     ---@param self CommandUnit
     ---@param work any

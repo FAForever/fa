@@ -3,7 +3,27 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 
 ---@class NinePatch : Group
+---@field center? Bitmap
+---@field tl Bitmap
+---@field tr Bitmap
+---@field bl Bitmap
+---@field br Bitmap
+---@field l Bitmap
+---@field r Bitmap
+---@field t Bitmap
+---@field b Bitmap
 NinePatch = Class(Group) {
+    ---@param self NinePatch
+    ---@param parent Control
+    ---@param center Lazy<FileName> | nil
+    ---@param topLeft Lazy<FileName>
+    ---@param topRight Lazy<FileName>
+    ---@param bottomLeft Lazy<FileName>
+    ---@param bottomRight Lazy<FileName>
+    ---@param left Lazy<FileName>
+    ---@param right Lazy<FileName>
+    ---@param top Lazy<FileName>
+    ---@param bottom Lazy<FileName>
     __init = function(self, parent, center, topLeft, topRight, bottomLeft, bottomRight, left, right, top, bottom)
         Group.__init(self, parent)
 
@@ -75,7 +95,11 @@ NinePatch = Class(Group) {
     end;
 }
 
--- TODO: this is one weird function
+--- TODO: this is one weird function
+--- Alternate initializer using the border-name convention instead of the long-name convention
+---@param self NinePatch
+---@param parent Control
+---@param path FileName
 InitStd = function(self, parent, path)
     local SkinnableFile = import("/lua/ui/uiutil.lua").SkinnableFile
     NinePatch.__init(self, parent,

@@ -1,6 +1,4 @@
 
-
-
 --   - Children: table: 206A3EB0
 --   -    10: table: 206A3758
 --   -       Children: table: 14ECEE38
@@ -658,7 +656,7 @@ local function PerformanceTrackingThread()
         -- # Refresh data
 
         clients = GetSessionClients()
-        engineStats = __EngineStats
+        local engineStats = __EngineStats
 
         -- # Retrieve sim rate
 
@@ -675,7 +673,6 @@ local function PerformanceTrackingThread()
         -- # Retrieve engine statistics
 
         local unitCount = 0
-        local entityCount = 0
 
         -- their order is not set in stone, hence the extensive search
         for k, stat in engineStats.Children do
@@ -685,8 +682,6 @@ local function PerformanceTrackingThread()
                         unitCount = entry.Value
                     end
                 end
-
-                entityCount = stat.Value
             end
         end
 
