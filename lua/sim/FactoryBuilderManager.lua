@@ -278,19 +278,24 @@ FactoryBuilderManager = Class(BuilderManager) {
     ---@param factory Unit
     FactoryDestroyed = function(self, factory)
         local guards = factory:GetGuards()
+        local factoryDestroyed = false
         for k,v in guards do
             if not v.Dead and v.AssistPlatoon then
                 if self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
+                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBodyRNG)
                 else
                     v.AssistPlatoon = nil
                 end
             end
         end
         for k,v in self.FactoryList do
-            if v == factory then
+            if (not v.Sync.id) or v.Dead then
                 self.FactoryList[k] = nil
+                factoryDestroyed = true
             end
+        end
+        if factoryDestroyed then
+            self.FactoryList = self:RebuildTable(self.FactoryList)
         end
         for k,v in self.FactoryList do
             if not v.Dead then
@@ -465,13 +470,18 @@ FactoryBuilderManager = Class(BuilderManager) {
 
     ---@param self FactoryBuilderManager
     ---@param factory Unit
-    ---@param finishedUnit boolean
+    ---@param finishedUnit Unit
     FactoryFinishBuilding = function(self,factory,finishedUnit)
         if EntityCategoryContains(categories.ENGINEER, finishedUnit) then
             self.Brain.BuilderManagers[self.LocationType].EngineerManager:AddUnit(finishedUnit)
-        elseif EntityCategoryContains(categories.FACTORY, finishedUnit) then
-            self:AddFactory(finishedUnit)
-        end
+        elseif EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit ) then
+			if finishedUnit:GetFractionComplete() == 1 then
+				self:AddFactory(finishedUnit )			
+				factory.Dead = true
+                factory.Trash:Destroy()
+				return self:FactoryDestroyed(factory)
+			end
+		end
         self:AssignBuildOrder(factory, factory.BuilderManagerData.BuilderType)
     end,
 
