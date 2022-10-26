@@ -282,7 +282,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         for k,v in guards do
             if not v.Dead and v.AssistPlatoon then
                 if self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBodyRNG)
+                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
                 else
                     v.AssistPlatoon = nil
                 end
