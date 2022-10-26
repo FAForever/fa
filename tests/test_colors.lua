@@ -1,10 +1,5 @@
 local lust = require "lust"
 
-local describe = lust.describe
-local test = lust.test
-local subtest = lust.subtest
-local expect = lust.expect
-
 -- color library
 dofile "../lua/shared/color.lua"
 
@@ -78,6 +73,10 @@ local function RGBtoHSLsimp(r, g, b)
 end
 
 lust.describe("Color functions", function()
+    local colorConversions = {
+        HSV = {RGBtoHSVsimp, HSVtoRGBsimp, RGBtoHSV, HSVtoRGB},
+        HSL = {RGBtoHSLsimp, HSLtoRGBsimp, RGBtoHSL, HSLtoRGB},
+    }
     local testColors = {
     --    R    G    B
         {0.0, 0.0, 0.0},
@@ -129,47 +128,26 @@ lust.describe("Color functions", function()
         -- {23, 54, 124},
     }
     local err = 0.00001
-
-    local function testColorConversion(name, compareForward, compareBackward, testForward, testBackward)
-        describe(name .. " color conversion", function()
-            test("Test RGB to " .. name .. " forward conversion", function()
-                for k, col in testColors do
-                    local r, g, b = col[1], col[2], col[3]
-                    subtest(k).expect(compareForward(r, g, b)).to.be.within(err).of(testForward(r, g, b))
-                end
-            end)
-            test("Test RGB to " .. name .. " back conversion", function()
-                for _, col in testColors do
-                    local r, g, b = col[1], col[2], col[3]
-                    lust.expect(r, g, b).to.be.within(err).of(compareBackward(testForward(r, g, b)))
-                end
-            end)
-            test("Test " .. name .. " to RGB forward conversion", function()
-                for _, col in testColors do
-                    local r, g, b = col[1], col[2], col[3]
-                    local f1, f2, f3 = testForward(r, g, b)
-                    lust.expect(compareBackward(f1, f2, f3)).to.be.within(err).of(testBackward(f1, f2, f3))
-                end
-            end)
-            test("Test " .. name .. " to RGB back conversion", function()
-                for _, col in testColors do
-                    local r, g, b = col[1], col[2], col[3]
-                    local f1, f2, f3 = testForward(r, g, b)
-                    lust.expect(f1, f2, f3).to.be.within(err).of(compareForward(testBackward(f1, f2, f3)))
-                end
-            end)
-            lust.test("Test RGB to " .. name .. " to RGB round conversion", function()
-                for _, col in testColors do
-                    local r, g, b = col[1], col[2], col[3]
-                    local r1, g1, b1 = testBackward(testForward(r, g, b))
-                    lust.expect(r, g, b).to.be.within(err).of(r1, g1, b1)
-                end
-            end)
+    lust.describe_each("%s color conversion", colorConversions, function(name, fnSet)
+        local compareForward, compareBackward, testForward, testBackward = unpack(fnSet)
+        local converName = "Test RGB to " .. name
+        lust.test_all(converName .. " forward conversion", testColors, function(col)
+            local r, g, b = col[1], col[2], col[3]
+            lust.expect(compareForward(r, g, b)).to.be.within(err).of(testForward(r, g, b))
+            lust.expect(r, g, b).to.be.within(err).of(compareBackward(testForward(r, g, b)))
         end)
-    end
-
-    testColorConversion("HSV", RGBtoHSVsimp, HSVtoRGBsimp, RGBtoHSV, HSVtoRGB)
-    testColorConversion("HSL", RGBtoHSLsimp, HSLtoRGBsimp, RGBtoHSL, HSLtoRGB)
+        lust.test_all(converName .. " back conversion", testColors, function(col)
+            local r, g, b = col[1], col[2], col[3]
+            local f1, f2, f3 = testForward(r, g, b)
+            lust.expect(compareBackward(f1, f2, f3)).to.be.within(err).of(testBackward(f1, f2, f3))
+            lust.expect(f1, f2, f3).to.be.within(err).of(compareForward(testBackward(f1, f2, f3)))
+        end)
+        lust.test_all(converName .. " round conversion", testColors, function(col)
+            local r, g, b = col[1], col[2], col[3]
+            local r1, g1, b1 = testBackward(testForward(r, g, b))
+            lust.expect(r, g, b).to.be.within(err).of(r1, g1, b1)
+        end)
+    end)
 end)
 
 lust.finish()

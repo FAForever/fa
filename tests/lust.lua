@@ -7,129 +7,285 @@
 -- Useful for better test output
 require "../lua/system/repr.lua"
 
-local print, error = print, error
-local red, green, normal, tab = "", "", "", (' '):rep(4)
-if LOG then
-    print = LOG -- `print` won't work in FA
-    -- error = function(msg, lvl) -- we want sensical errors
-    --     LOG(_TRACEBACK(lvl + 1, msg))
-    --     os.exit(-1)
-    -- end
-else
-    local esc = string.char(27)
-    red = esc .. "[31m"
-    green = esc .. "[32m"
-    normal = esc .. "[0m"
-    tab = '\t'
+
+---@class Lust
+---@field befores? fun(name: string)[]
+---@field afters? fun(name: string)[]
+local Lust = {}
+
+---@class LustAssertion
+---@field values any[]    starting values to form expectation under
+---@field action string   current action path
+---@field negate boolean
+---@field support? any[]  support values for the expectation
+local Assertion = {}
+
+---@class LustSpy
+---@field capture function
+local Spy = {}
+
+
+
+----------------------------------------
+---  Environment setup
+----------------------------------------
+
+local environmentName
+local tab = '\t'
+local printTestResult
+local printer = print
+
+do
+    local oldenv = {}
+    for k, v in _G do
+        oldenv[k] = v
+    end
+
+    local environments = {
+        ------------------------------
+        --- FA init file environment
+        ------------------------------
+        FA = function()
+            tab = (' '):rep(4)
+            printer = LOG -- `print` won't work in FA
+            printTestResult = function(name, success, err)
+                if success then
+                    print("PASS " .. name)
+                else
+                    local sublvl = Lust.sublevel
+                    if sublvl then
+                        name = name .. ":" .. sublvl
+                    end
+                    print("FAIL " .. name)
+                end
+                if err then
+                    print(tab .. err)
+                end
+            end
+        end;
+        ------------------------------
+        --- Github workflow environment
+        ------------------------------
+        GH = function()
+            local esc = string.char(27)
+            local red = esc .. "[31m"
+            local green = esc .. "[32m"
+            local normal = esc .. "[0m"
+
+            printTestResult = function(name, success, err)
+                if success then
+                    print(green .. "PASS" .. normal .. " " .. name)
+                else
+                    local sublvl = Lust.sublevel
+                    if sublvl then
+                        name = name .. ":" .. sublvl
+                    end
+                    print(red .. "FAIL" .. normal .. " " .. name)
+                end
+                if err then
+                    print(tab .. red .. err .. normal)
+                end
+            end
+        end;
+    }
+
+    -- primitive check for FA environment
+    if LOG ~= nil then
+        environmentName = "FA"
+    else
+        environmentName = "GH"
+    end
+    environments[environmentName]() -- load environment
+
+    -- make printing functions use relative indentation
+    function print(...)
+        printer(Lust.indent .. table.concat(arg, '\t'))
+    end
+
+    -- if a global called `test_path` is provided, update relative paths to use it
+    if test_path then
+        local _dofile = oldenv.dofile
+        -- modify `dofile` to be relative to the test directory
+        function dofile(file)
+            _dofile(test_path .. file)
+        end
+    end
 end
 
-local lust = {
-    level = 0,
-    sublevel = 0,
-    passes = 0,
-    errors = 0,
-    befores = {},
-    afters = {},
-    indent = "",
-}
 
-function lust.finish()
-    if lust.errors ~= 0 then
+
+----------------------------------------
+---  Lua Unit Tester
+----------------------------------------
+
+Lust.level = 0
+Lust.passes = 0
+Lust.errors = 0
+Lust.indent = ""
+
+--- Starts a new test description, scoping new `before` and `after` functions added inside
+--- the function
+---@param name string
+---@param fn fun(...)
+---@param ... any
+---@return Lust
+function Lust.describe(name, fn, ...)
+    local level = Lust.level
+    local indent = Lust.indent
+    local befores, afters = Lust.befores, Lust.afters
+    local restore_befores_n, restore_afters_n
+
+    if befores then
+        restore_befores_n = table.getn(befores)
+    end
+    if afters then
+        restore_afters_n = table.getn(afters)
+    end
+
+    print(name)
+    Lust.level = level + 1
+    Lust.indent = indent .. tab
+    fn(unpack(arg))
+    Lust.indent = indent
+    Lust.level = level
+
+    if befores then
+        table.setn(befores, restore_befores_n)
+    end
+    if afters then
+        table.setn(afters, restore_afters_n)
+    end
+    return Lust
+end
+
+--- Starts a new test description for each item in a list
+---@param pattern string
+---@param list table
+---@param fn fun(item: any)
+---@return Lust
+function Lust.describe_each(pattern, list, fn)
+    for name, item in pairs(list) do
+        Lust.describe(pattern:format(name), fn, name, item)
+    end
+    return Lust
+end
+
+--- Runs a unit test, running all `before` and `after` functions of all described test levels,
+--- and then prints the test results.
+---@param name string
+---@param fn any
+---@param ... any
+---@return Lust
+function Lust.it(name, fn, ...)
+    local befores = Lust.befores
+    if befores then
+        for i = 1, table.getn(befores) do
+            befores[i](name)
+        end
+    end
+
+    local success, err = pcall(fn, unpack(arg))
+    if success then
+        Lust.passes = Lust.passes + 1
+    else
+        Lust.errors = Lust.errors + 1
+    end
+    printTestResult(name, success, err)
+
+    local afters = Lust.afters
+    if afters then
+        for i = 1, table.getn(afters) do
+            afters[i](name)
+        end
+    end
+    return Lust
+end
+Lust.test = Lust.it
+
+--- Runs a new test over each item in a list
+---@param pattern string
+---@param list table
+---@param fn fun(item: any)
+---@return Lust
+function Lust.test_each(pattern, list, fn)
+    for key, item in pairs(list) do
+        Lust.test(pattern:format(key), fn, item)
+    end
+    return Lust
+end
+
+--- Runs a test function over each item in a list as a single test, each item as a subtest
+---@param name string
+---@param list table
+---@param fn fun(item: any)
+---@return Lust
+function Lust.test_all(name, list, fn)
+    Lust.test(name, function()
+        for key, item in pairs(list) do
+            Lust.subtest(key)
+            fn(item)
+        end
+    end)
+    return Lust
+end
+
+--- Indicates that the following assertions are under a subtest group
+---@param num any
+---@return Lust
+function Lust.subtest(num)
+    Lust.sublevel = num
+    return Lust
+end
+
+--- Registers a function to run before each test in the current test scope
+---@param fn fun(name: string)
+---@return Lust
+function Lust.before(fn)
+    local befores = Lust.befores
+    if not befores then
+        befores = {}
+        Lust.befores = befores
+    end
+    table.insert(befores, fn)
+    return Lust
+end
+
+--- Registers a function to run after each test in the current test scope
+---@param fn fun(name: string)
+---@return Lust
+function Lust.after(fn)
+    local afters = Lust.afters
+    if not afters then
+        afters = {}
+        Lust.afters = afters
+    end
+    table.insert(afters, fn)
+    return Lust
+end
+
+--- Exits if there are errors
+---@return Lust
+function Lust.finish()
+    if Lust.errors ~= 0 then
         os.exit(-1)
     end
-    return lust
+    return Lust
 end
 
-function lust.describe(name, fn)
-    lust.sublevel = 0
-    local level = lust.level
-    local indent = lust.indent
-    lust.level = level + 1
-    lust.indent = indent .. tab
-    print(indent .. name)
-    fn()
-    lust.indent = indent
-    lust.level = level
-    lust.befores[level] = {}
-    lust.afters[level] = {}
-    return lust
-end
 
-function lust.testeach(name, list, fn, ...)
+------------------------------
+--- Assertions
+------------------------------
 
-    return lust
-end
+----------
+-- test functions
+----------
 
-function lust.it(name, fn)
-    lust.sublevel = 0
-    local befores = lust.befores
-    for level = 1, lust.level do
-        local beforeLevel = befores[level]
-        if beforeLevel then
-            for i = 1, table.getn(beforeLevel) do
-                beforeLevel[i](name)
-            end
-        end
-    end
-
-    local success, err = pcall(fn)
-    if success then
-        lust.passes = lust.passes + 1
-    else
-        lust.errors = lust.errors + 1
-    end
-    local color = success and green or red
-    local label = success and "PASS" or "FAIL"
-    local displayName = name
-    if lust.sublevel then
-        displayName = displayName .. ':' .. lust.sublevel
-    end
-    print(lust.indent .. color .. label .. normal .. " " .. displayName)
-    if err then
-        print(lust.indent .. tab .. red .. err .. normal)
-    end
-
-    local afters = lust.afters
-    for level = 1, lust.level do
-        local afterLevel = afters[level]
-        if afterLevel then
-            for i = 1, table.getn(afterLevel) do
-                afterLevel[i](name)
-            end
-        end
-    end
-    return lust
-end
-
-function lust.subtest(num)
-    lust.sublevel = num
-    return lust
-end
-
-function lust.before(fn)
-    local befores, level = lust.befores, lust.level
-    local beforeLevel = befores[level]
-    if not befores then
-        beforeLevel = {}
-        befores[level] = beforeLevel
-    end
-    table.insert(beforeLevel, fn)
-end
-
-function lust.after(fn)
-    local afters, level = lust.afters, lust.level
-    local afterLevel = afters[level]
-    if not afters then
-        afterLevel = {}
-        afters[level] = afterLevel
-    end
-    table.insert(afterLevel, fn)
-end
-
--- Assertions
+---@param v any
+---@param x any
+---@return boolean
 local function isa(v, x)
     if type(x) == "string" then
-        LOG(type(v))
         return type(v) == x
     elseif type(x) == "table" then
         if type(v) ~= "table" then
@@ -147,6 +303,9 @@ local function isa(v, x)
     error("invalid type " .. repr(x))
 end
 
+---@param t any
+---@param x any
+---@return boolean
 local function has(t, x)
     for _, v in pairs(t) do
         if v == x then return true end
@@ -154,9 +313,16 @@ local function has(t, x)
     return false
 end
 
+---@param t1 any
+---@param t2 any
+---@return boolean
 local function strict_eq(t1, t2)
-    if type(t1) ~= type(t2) then return false end
-    if type(t1) ~= "table" then return t1 == t2 end
+    if type(t1) ~= type(t2) then
+        return false
+    end
+    if type(t1) ~= "table" then
+        return t1 == t2
+    end
     for k, _ in pairs(t1) do
         if not strict_eq(t1[k], t2[k]) then return false end
     end
@@ -166,11 +332,83 @@ local function strict_eq(t1, t2)
     return true
 end
 
+---@param v1 number
+---@param v2 number
+---@param scale number
+---@return boolean
 local function fpoint_within(v1, v2, scale)
     return math.abs(v1 - v2) < math.abs(scale)
 end
 
-local paths
+
+--------------------
+-- Assertion class
+--------------------
+
+local paths, aliases, callEach
+
+--- Starts an assertion statement
+---@param ... any
+---@return LustAssertion
+function Lust.expect(...)
+    local assertion = {
+        values = arg,
+        action = "",
+        negate = false,
+    }
+    setmetatable(assertion, Assertion)
+
+    return assertion
+end
+
+Assertion.__index = function(self, k)
+    local alias = aliases[k]
+    if alias then
+        k = alias
+    end
+    if has(paths[rawget(self, "action")], k) then
+        rawset(self, "action", k)
+        local chain = paths[k].chain
+        if chain then
+            chain(self)
+        end
+        return self
+    end
+    return rawget(self, k)
+end
+
+Assertion.__call = function(t, ...)
+    local path = paths[t.action]
+    local test = path.test
+    if test then
+        local errMsg = t.negate and path.not_fail_string or path.fail_string
+        local support = t.support
+        if path.requires_support and not support then
+            error("expected support values")
+        end
+        callEach(test, t.negate, errMsg, t.values, arg, support)
+    else
+        local chain_call = path.chain_call
+        if chain_call then
+            chain_call(t, unpack(arg))
+            return t
+        end
+    end
+end
+
+----------
+-- path parsing
+----------
+
+---@class LustSemanticPath
+---@field chain?  fun(a: LustAssertion)  called after simple chaining e.g. a`.b`.c 
+---@field chain_call?  fun(a: LustAssertion, ...)  called after chained calling e.g. a`.b()`.c
+---@field test?  fun(...): boolean   function to test with all arguments (from the starting values, calling arguments, and support values); expects both `fail_string` formatters to be defined
+---@field fail_string?      string   formatter for unnegated tests, where `$x` indicates the `x`th argument to replace
+---@field not_fail_string?  string   formatter for negated tests, where `$x` indicates the `x`th argument to replace
+---@field requires_support?  boolean if the path action test requires support values to be previously set
+
+---@type table<string, LustSemanticPath>
 paths = {
     [""] = { "to", "to_not" },
     to = { "have", "equal", "be", "exist", "fail" },
@@ -184,13 +422,12 @@ paths = {
             a.support = arg
         end;
     },
-    a = {
+    an = {
         test = isa,
         fail_string = "expected $1 to be a $2",
         not_fail_string = "expected $1 to not be a $2",
     },
-    an = paths.a,
-    be = { "a", "an", "truthy", "within",
+    be = { "an", "truthy", "within",
         test = function(v, x)
             return v == x
         end;
@@ -206,7 +443,10 @@ paths = {
     },
     truthy = {
         test = function(v)
-            return v
+            if v then
+                return true
+            end
+            return false
         end;
         fail_string = "expected $1 to be truthy",
         not_fail_string = "expected $1 to be falsy",
@@ -240,25 +480,58 @@ paths = {
         requires_support = true,
     },
 }
+Lust.paths = paths
 
----@param test function
+aliases = {
+    a = "an",
+}
+Lust.aliases = aliases
+
+----------
+-- iterative tester
+----------
+
+---@param negate boolean
+---@param errMsg string
+---@param okay boolean
+---@param err boolean | string
+---@return string?
+local function getError(negate, errMsg, okay, err)
+    if okay then
+        -- function was called with no errors; `err` is the return value to compare
+        if (not err) ~= negate then
+            return errMsg
+        else
+            return nil
+        end
+    else
+        -- function had errors; `err` is the actual Lua error
+        if negate then
+            return nil
+        else
+            return err
+        end
+    end
+end
+
+---@param test fun(...): boolean, string
 ---@param negate boolean
 ---@param errMsg string?
 ---@param values? any[]
 ---@param args? any[]
 ---@param support? any[]
-local function callEach(test, negate, errMsg, values, args, support)
+callEach = function(test, negate, errMsg, values, args, support)
     errMsg = errMsg or "unknown failure"
     local arguments = {}
     local argCount = 0
 
-    local lists, iterator = {}, {}
+    local lists, iterators = {}, {}
     if values then   table.insert(lists, values)   end
     if args then     table.insert(lists, args)     end
     if support then  table.insert(lists, support)  end
 
     local eachn
-    -- find the number of times we are iterating
+    -- find the number of times we will be iterating
     for _, list in ipairs(lists) do
         local n = list.n
         if n > 0 then
@@ -268,10 +541,7 @@ local function callEach(test, negate, errMsg, values, args, support)
     end
     if not eachn then
         -- there must not be *any* arguments
-        local res, err = test()
-        if (not res) ~= negate then
-            err = err or errMsg
-        end
+        local err = getError(negate, errMsg, pcall(test))
         if err then
             error(err, 2)
         end
@@ -282,14 +552,14 @@ local function callEach(test, negate, errMsg, values, args, support)
     for k, list in ipairs(lists) do
         if list.n >= eachn then
             argCount = argCount + 1
-            iterator[k] = argCount
+            iterators[k] = argCount
         end
     end
 
     -- the rest of the non-iterating values in each list will be added as extra arguments
     for k, list in ipairs(lists) do
         local start = 1
-        if iterator[k] then
+        if iterators[k] then
             start = eachn + 1
         end
         for i = start, list.n do
@@ -302,28 +572,25 @@ local function callEach(test, negate, errMsg, values, args, support)
     for i = 1, eachn do
         -- set the iterating arguments
         for k, list in ipairs(lists) do
-            local iter = iterator[k]
+            local iter = iterators[k]
             if iter then
                 arguments[iter] = list[i]
             end
         end
 
         -- then run the test with the argument list
-        local res, err = test(unpack(arguments))
-        if (not res) ~= negate then
-            err = err or errMsg
-        end
+        local err = getError(negate, errMsg, pcall(test, unpack(arguments)))
         if err then
             if eachn > 1 then
                 -- in order to produce more meaningful error messages, all of the iterating lists
                 -- are displayed in the error instead of only the current value of each iterator
                 for k, list in ipairs(lists) do
-                    if not iterator[k] then continue end
+                    if not iterators[k] then continue end
                     local rep = repr(list[1])
                     for j = 2, list.n do
                         rep = rep .. ", " .. repr(list[j])
                     end
-                    arguments[iterator[k]] = '{' .. rep .. '}'
+                    arguments[iterators[k]] = '{' .. rep .. '}'
                 end
             end
             for j = 1, argCount do
@@ -334,82 +601,46 @@ local function callEach(test, negate, errMsg, values, args, support)
     end
 end
 
-local expectationMetatable = {
-    __index = function(t, k)
-        if has(paths[rawget(t, "action")], k) then
-            rawset(t, "action", k)
-            local chain = paths[k].chain
-            if chain then
-                chain(t)
-            end
-            return t
-        end
-        return rawget(t, k)
-    end,
-    __call = function(t, ...)
-        local path = paths[t.action]
-        local test = path.test
-        if test then
-            local errMsg = t.negate and path.not_fail_string or path.fail_string
-            local support = t.support
-            if path.requires_support and not support then
-                error("expected support values")
-            end
-            callEach(test, t.negate, errMsg, t.values, arg, support)
-        else
-            local chain_call = path.chain_call
-            if chain_call then
-                chain_call(t, unpack(arg))
-                return t
-            end
-        end
-    end
-}
 
-function lust.expect(...)
-    local assertion = {
-        values = arg,
-        action = "",
-        negate = false,
-    }
-    setmetatable(assertion, expectationMetatable)
+------------------------------
+--- Spying
+------------------------------
 
-    return assertion
-end
-
-function lust.spy(target, name, run)
+---@overload fun(target: function, run?: fun(spy: LustSpy)): LustSpy
+--- Returns a transparent callable object for a function target that collects all arguments
+---@param target table
+---@param name any
+---@param run? fun(spy: LustSpy) run after the spy is created
+---@return LustSpy
+function Lust.spy(target, name, run)
     local spy = {}
-    local subject
+    setmetatable(spy, Spy)
 
     local function capture(...)
         table.insert(spy, arg)
-        return subject(unpack(arg))
+        local tar = target
+        if tar then
+            return tar(unpack(arg))
+        end
     end
+    spy.capture = capture
 
     if type(target) == "table" then
-        subject = target[name]
+        local intercept = target[name]
         target[name] = capture
+        target = intercept
     else
         run = name
-        subject = target or function() end
     end
 
-    setmetatable(spy, {__call = function(_, ...) return capture(unpack(arg)) end})
-
-    if run then run() end
+    if run then run(spy) end
 
     return spy
 end
 
-lust.test = lust.it
-lust.paths = paths
-
-if test_path then
-    local oldDofile = dofile
-    -- modify `dofile` to be relative to the test directory
-    function dofile(file)
-        oldDofile(test_path .. file)
-    end
+Spy.__call = function(self, ...)
+    return self.capture(unpack(arg))
 end
 
-return lust
+
+return Lust
