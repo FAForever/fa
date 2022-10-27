@@ -375,6 +375,23 @@ BuilderManager = ClassSimple {
             end
         end
     end,
+    
+    ---@param self, BuilderManager
+    ---@param oldtable, Table
+    ---@return tempTable, Table
+    RebuildTable = function(self, oldtable)
+        local temptable = {}
+        for k, v in oldtable do
+            if v ~= nil then
+                if type(k) == 'string' then
+                    temptable[k] = v
+                else
+                    table.insert(temptable, v)
+                end
+            end
+        end
+        return temptable
+    end,
 }
 
 
