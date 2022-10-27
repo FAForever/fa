@@ -588,7 +588,7 @@ Assertion.__index = function(self, word)
             self.head = next_node
             next_node, process_next = node:GetNext(process_next)
         end
-        local chain = next_node[k].Chain
+        local chain = next_node.Chain
         if chain then
             chain(self)
         end
