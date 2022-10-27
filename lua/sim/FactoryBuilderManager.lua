@@ -289,7 +289,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
         end
         for k,v in self.FactoryList do
-            if (not v.Sync.id) or v.Dead then
+            if IsDestroyed(v) then
                 self.FactoryList[k] = nil
                 factoryDestroyed = true
             end
