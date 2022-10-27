@@ -70,13 +70,31 @@ local function RGBtoHSLsimp(r, g, b)
 end
 
 
+local function HSVtoHSLsimp(h, s, v)
+    local lit = v * (1 - s / 2)
+    local sat = 0
+    if v ~= 0 and v ~= 1 then
+        sat = (v - lit) / math.min(lit, 1 - lit)
+    end
+    return h, sat, lit
+end
+local function HSLtoHSVsimp(h, s, l)
+    local val = l + s * math.min(l, 1 - l)
+    local sat = 0
+    if val ~= 0 then
+        sat = 2 * (1 - l / val)
+    end
+    return h, sat, val
+end
+
+
 luft.describe("Color functions", function()
     local colorConversions = {
         HSV = {RGBtoHSVsimp, HSVtoRGBsimp, RGBtoHSV, HSVtoRGB},
         HSL = {RGBtoHSLsimp, HSLtoRGBsimp, RGBtoHSL, HSLtoRGB},
     }
     local testColors = {
-    --    R    G    B
+    --    R    G    B                subtest
         {0.0, 0.0, 0.0},              -- 1
         {0.1635, 0.0, 0.0},           -- 2
         {0.2, 0.0, 0.0},              -- 3
@@ -121,30 +139,51 @@ luft.describe("Color functions", function()
         {1.0, 0.2, 1.0},              -- 41
         {1.0, 1.0, 1.0},              -- 42
 
-        -- {2, 2, 3},
-        -- {242, 64, 4},
-        -- {23, 54, 124},
+        {2, 2, 3},
+        {242, 64, 4},
+        {23, 54, 124},
+        {123, 4, 144},
+        {201, 194, 95},
+        {255, 255, 255},
+        {255, 255, 0},
+        {255, 0, 255},
+        {0, 255, 255},
+        {0, 0, 255},
+        {0, 255, 0},
+        {255, 0, 0},
     }
-    local err = 0.00001
-    luft.describe_each("%s color conversion", colorConversions, function(name, fnSet)
+    luft.margin_of_error = 0.00000029
+    luft.describe_each("%s to RGB", colorConversions, function(name, fnSet)
         local compareForward, compareBackward, testForward, testBackward = unpack(fnSet)
-        local converName = "RGB to " .. name
-        luft.test_all(converName .. " forward conversion", testColors, function(col)
-            local r, g, b = col[1], col[2], col[3]
-            luft.expect(testForward(r, g, b)).to.be.within(err).of(compareForward(r, g, b))
-            luft.expect(compareBackward(testForward(r, g, b))).to.be.within(err).of(r, g, b)
-        end)
-        luft.test_all(converName .. " back conversion", testColors, function(col)
-            local r, g, b = col[1], col[2], col[3]
+        luft.test_all("Forward conversion", testColors, function(col)
+            local ro, go, bo = col[1], col[2], col[3]
+            local r, g, b = RGBtoFloat(ro, go, bo)
             local f1, f2, f3 = testForward(r, g, b)
-            luft.expect(testBackward(f1, f2, f3)).to.be.within(err).of(compareBackward(f1, f2, f3))
-            luft.expect(compareForward(testBackward(f1, f2, f3))).to.be.within(err).of(f1, f2, f3)
+            luft.expect(f1, f2, f3).to.be.close.to(compareForward(r, g, b))
+            luft.expect(compareBackward(f1, f2, f3)).to.be.close.to(r, g, b)
         end)
-        luft.test_all(converName .. " round conversion", testColors, function(col)
-            local r, g, b = col[1], col[2], col[3]
+        luft.test_all("Back conversion", testColors, function(col)
+            local ro, go, bo = col[1], col[2], col[3]
+            local r, g, b = RGBtoFloat(ro, go, bo)
+            local f1, f2, f3 = testForward(r, g, b)
+            local b1, b2, b3 = testBackward(f1, f2, f3)
+            luft.expect(b1, b2, b3).to.be.close.to(compareBackward(f1, f2, f3))
+            luft.expect(compareForward(b1, b2, b3)).to.be.close.to(f1, f2, f3)
+        end)
+        luft.test_all("Round conversion", testColors, function(col)
+            local ro, go, bo = col[1], col[2], col[3]
+            local r, g, b = RGBtoFloat(ro, go, bo)
             local r1, g1, b1 = testBackward(testForward(r, g, b))
-            luft.expect(r1, g1, b1).to.be.within(err).of(r, g, b)
+            luft.expect(r1, g1, b1).to.be.close.to(r, g, b)
+            if ro > 1 or go > 1 or bo > 1 then
+                luft.expect(ColorRGB(r1, g1, b1)).to.equal(ro, go, bo)
+            end
         end)
+    end)
+    luft.test_all("HSV and HSL conversions", testColors, function(col)
+        local a, b, c = RGBtoFloat(col[1], col[2], col[3])
+        luft.expect(HSVtoHSL(a, b, c)).to.equal(HSVtoHSLsimp(a, b, c))
+        luft.expect(HSLtoHSV(a, b, c)).to.equal(HSLtoHSVsimp(a, b, c))
     end)
 end)
 

@@ -13,6 +13,9 @@ require "../lua/system/repr.lua"
 ---@field tab string          tab string used by the indentation system
 ---@field environment string  name of the loaded environment
 ---@field strings table<string, string> set of strings used for printing or formatting; change these for localization or environment needs
+---@field total_module_passes number
+---@field total_module_errors number
+---@field total_module_assertions number
 ---
 ---@field befores? fun(name: string)[]  list of functions to run before each test
 ---@field afters? fun(name: string)[]   list of functions to run after each test
@@ -20,8 +23,10 @@ require "../lua/system/repr.lua"
 ---@field indentation_level number  current indentation level
 ---@field level number              current test description level
 ---@field sublevel any              current subtest name
+---@field expectation_number number current assertion number
 ---@field passes number             current number of passed tests
 ---@field errors number             current number of failed tests
+---@field assertions number         current number of assertions
 local Luft = {}
 
 ---@class LuftAssertion
@@ -37,13 +42,12 @@ local Assertion = {}
 ---@field NotName? string
 ---@field NotAlias? string
 ---@field Chain?  fun(a: LuftAssertion)  called after simple chaining e.g. a`.b`.c 
----@field Chain_call?  fun(a: LuftAssertion, ...)  called after chained calling e.g. a`.b()`.c
+---@field ChainCall?  fun(a: LuftAssertion, ...)  called after chained calling e.g. a`.b()`.c
 ---@field Test?  fun(...): boolean        function to test with all arguments (from the starting values, calling arguments, and support values); expects both `FailString` formatters to be defined
 ---@field Parameters number               number of parameters the test function has
 ---@field FailString?      string   formatter for unnegated tests, where `$x` indicates the `x`th argument to replace. auto genertes `NotFailString` if that one is absent by replacing "to " with "to not "
----@field NotFailString?  string   formatter for negated tests, where `$x` indicates the `x`th argument to replace
----@field Requires_support? boolean  if the node action test requires support values to be previously set
----@field Negative_action?  true | LuftPathNode  if the node action has a corresponding negative action; value is replaced with the action if generated
+---@field NotFailString?  string    formatter for negated tests, where `$x` indicates the `x`th argument to replace
+---@field RequiresSupport? boolean  if the node action test requires support values to be previously set
 local PathNode = {}
 
 ---@class LuftSpy
@@ -62,8 +66,9 @@ Luft.strings = {
     pass = "PASS",
     fail = "FAIL",
     bad_argument_count = "expected %s arguments, but got %s", -- expected args, actual args
-    subtest_fail = "%s %s in subtest %s",                     -- result indicator, test name, subtest name
-    test_result = "%s %s",                                    -- result indicator, test name
+    subtest_fail = "%s %s, subtest %s, assertion %s:", -- result indicator, test name, subtest name, expect number
+    test_fail = "%s %s, assertion %s:",                -- result indicator, test name, expect number
+    test_success = "%s %s",                           -- result indicator, test name
     unknown_error = "unknown error",
     support_required = "expected support values",
     condition_unnegated = "to",
@@ -215,11 +220,12 @@ Luft.start = Luft.start or function()
         Luft.total_module_passes = Luft.total_module_passes + Luft.passes
     end
     if Luft.errors then
-        Luft.total_module_errors = Luft.total_module_passes + Luft.errors
+        Luft.total_module_errors = Luft.total_module_errors + Luft.errors
     end
     if Luft.assertions then
-        Luft.total_module_assertions = Luft.total_module_passes + Luft.assertions
+        Luft.total_module_assertions = Luft.total_module_assertions + Luft.assertions
     end
+    Luft.margin_of_error = 0.01
     Luft.indentation = ""
     Luft.indentation_level = 0
     Luft.level = 0
@@ -381,19 +387,19 @@ end
 
 
 ---@param name string
+---@param expect number
 ---@param success boolean
 ---@param err? string
-Luft.PrintTestResult = Luft.PrintTestResult or function(name, success, err)
+Luft.PrintTestResult = Luft.PrintTestResult or function(name, expect, success, err)
     local strings = Luft.strings
-    local res_formatter = strings.test_result
     if success then
-        Luft.outf(res_formatter, Luft.string_color("green", strings.pass), name)
+        Luft.outf(strings.test_success, Luft.string_color("green", strings.pass), name)
     else
         local sublvl = Luft.sublevel
-        if sublvl then
-            Luft.outf(strings.subtest_fail, Luft.string_color("red", strings.fail), name, sublvl)
+        if not sublvl then
+            Luft.outf(strings.test_fail, Luft.string_color("red", strings.fail), name, expect)
         else
-            Luft.outf(res_formatter, Luft.string_color("red", strings.fail), name)
+            Luft.outf(strings.subtest_fail, Luft.string_color("red", strings.fail), name, sublvl, expect)
         end
     end
     if err then
@@ -464,6 +470,7 @@ end
 ---@return Luft
 function Luft.test(name, fn, ...)
     Luft.sublevel = nil
+    Luft.expectation_number = 0
     local befores = Luft.befores
     if befores then
         for i = 1, table.getn(befores) do
@@ -477,7 +484,7 @@ function Luft.test(name, fn, ...)
     else
         Luft.errors = Luft.errors + 1
     end
-    Luft.PrintTestResult(name, success, err)
+    Luft.PrintTestResult(name, Luft.expectation_number, success, err)
 
     local afters = Luft.afters
     if afters then
@@ -521,6 +528,7 @@ end
 ---@return Luft
 function Luft.subtest(name)
     Luft.sublevel = name
+    Luft.expectation_number = 0
     return Luft
 end
 
@@ -563,6 +571,7 @@ end
 ---@param ... any
 ---@return LuftAssertion
 function Luft.expect(...)
+    Luft.expectation_number = Luft.expectation_number + 1
     local assertion = {
         values = arg,
         head = false,
@@ -607,7 +616,7 @@ Assertion.__call = function(self, ...)
             error(Luft.strings.bad_argument_count:format(node.Parameters, argCount), 2)
         end
     else
-        local ChainCall = node.Chain_call
+        local ChainCall = node.ChainCall
         if ChainCall then
             ChainCall(self, unpack(arg))
             return self
@@ -627,7 +636,7 @@ end
 function Assertion:CallEach(test, args)
     local node = self:GetCurrentNode()
     local support = self.support
-    if node.Requires_support and not support then
+    if node.RequiresSupport and not support then
         error(Luft.strings.support_required, 2)
     end
     local values = self.values
@@ -862,7 +871,7 @@ do
             "positive", "negative",
             "falsy",
             "nil", "userdata",
-            "within",
+            "within", "close",
             "an",
         },
         Test = function(v, x)
@@ -901,7 +910,7 @@ do
             end
         end;
         Parameters = 3,
-        Requires_support = true,
+        RequiresSupport = true,
     }
     nodes["falsy"] = {
         NotName = "truthy",
@@ -916,7 +925,7 @@ do
     }
     nodes["within"] = {
         To = "of",
-        Chain_call = function(sert, ...)
+        ChainCall = function(sert, ...)
             sert.support = arg
         end;
     }
@@ -930,7 +939,19 @@ do
         end;
         Parameters = 3,
         FailFormat = strings.expectation1be:format("$1", "%s", strings.cond_within:format("$3", "$2")),
-        Requires_support = true,
+        RequiresSupport = true,
+    }
+    nodes["close"] = {
+        To = "close.to",
+        Chain = function(sert)
+            sert.support = {Luft.margin_of_error, n = 1}
+        end;
+    }
+    nodes["close.to"] = {
+        Test = nodes["of"].Test,
+        Parameters = nodes["of"].Parameters,
+        FailFormat = nodes["of"].FailFormat,
+        RequiresSupport = nodes["of"].RequiresSupport
     }
     nodes["negative"] = {
         NotName = "nonnegative",
