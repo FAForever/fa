@@ -101,13 +101,13 @@ StructureUnit = Class(Unit) {
                         local distance = VDist2Sq(pos[1], pos[3], epos[1], epos[3])
 
                         -- if threat is bigger, then we don't need to compare distance
-                        if threat > target.threat then 
+                        if threat > target.threat then
                             target.location = epos
                             target.distance = distance
                             target.threat = threat
-                        else 
+                        else
                             -- threat is equal, therefore compare distance - closer wins
-                            if distance < target.distance then 
+                            if distance < target.distance then
                                 target.location = epos
                                 target.distance = distance
                                 target.threat = threat
@@ -410,10 +410,10 @@ StructureUnit = Class(Unit) {
             Unit.OnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
 
-            if self.AnimatorUpgradeManip then 
-                self.AnimatorUpgradeManip:Destroy() 
+            if self.AnimatorUpgradeManip then
+                self.AnimatorUpgradeManip:Destroy()
             end
-            
+
             self:PlayUnitSound('UpgradeFailed')
             self:PlayActiveAnimation()
             self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
@@ -726,6 +726,64 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     ---@param self FactoryUnit
+    ---@return string?
+    ToSupportFactoryIdentifier = function(self)
+        local hashedCategories = self.Blueprint.CategoriesHash
+        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local faction = identifier:sub(2, 1)
+        local layer = identifier:sub(7, 1)
+
+        -- HQs can not upgrade to support factories
+        if hashedCategories["RESEARCH"] then
+            return nil
+        end
+
+        -- tech 1 factories can go tech 2 support factories if we have a tech 2 hq
+        if  hashedCategories["TECH1"] and
+            self.Brain:CountHQs(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, 'TECH2') > 0
+        then
+            return 'z' .. faction .. 'b950' .. layer
+        end
+
+        -- tech 2 support factories can go tech 3 support factories if we have a tech 3 hq
+        if  hashedCategories["TECH2"] and
+            hashedCategories["SUPPORTFACTORY"] and
+            self.Brain:CountHQs(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, 'TECH3') > 0
+        then
+            return 'z' .. faction .. 'b960' .. layer
+        end
+
+        -- anything else can not upgrade
+        return nil
+    end,
+
+    ---@param self FactoryUnit
+    ToHQFactoryIdentifier = function(self)
+        local hashedCategories = self.Blueprint.CategoriesHash
+        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local faction = identifier:sub(1, 3)
+        local layer = identifier:sub(7, 1)
+
+        -- support factories can not upgrade to HQs
+        if hashedCategories["SUPPORTFACTORY"] then
+            return nil
+        end
+
+        -- tech 1 factories can always upgrade
+        if hashedCategories["TECH1"] then
+            return faction .. '020' .. layer
+        end
+
+        -- tech 2 factories can always upgrade
+        if hashedCategories["TECH2"] and hashedCategories["RESEARCH"] then
+            return faction .. '030'  .. layer
+        end
+
+        -- anything else can not upgrade
+        return nil
+    end,
+    
+    ---@param self FactoryUnit
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             if self.UnitBeingBuilt:GetFractionComplete() > 0.5 then
@@ -739,9 +797,9 @@ FactoryUnit = Class(StructureUnit) {
     ---@param self FactoryUnit
     OnDestroy = function(self)
         StructureUnit.OnDestroy(self)
-        
+
         if self.Blueprint.CategoriesHash["RESEARCH"] and self:GetFractionComplete() == 1.0 then
-            
+
             -- update internal state
             self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
             self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
@@ -1236,10 +1294,10 @@ MassFabricationUnit = Class(StructureUnit) {
     ---@param self MassFabricationUnit
     ---@param bit number
     OnScriptBitClear = function (self, bit)
-        if bit == 4 then 
+        if bit == 4 then
             -- make brain track us to enable / disable accordingly
             self.Brain:AddDisabledEnergyExcessUnit(self)
-        else 
+        else
             StructureUnit.OnScriptBitClear(self, bit)
         end
     end,
@@ -1491,13 +1549,13 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
         -- retrieve roll off points
         local bp = self.Blueprint.Physics.RollOffPoints
-        if not bp then 
-            return 0, px, py, pz 
+        if not bp then
+            return 0, px, py, pz
         end
 
         -- retrieve rally point
         local rallyPoint = self:GetRallyPoint()
-        if not rallyPoint then 
+        if not rallyPoint then
             return 0, px, py, pz
         end
 
@@ -1945,9 +2003,9 @@ AirUnit = Class(MobileUnit) {
         end
 
         -- allow regular air units to be destroyed by strategic missiles
-        if other.Nuke and not self.Blueprint.CategoriesHash.EXPERIMENTAL then 
+        if other.Nuke and not self.Blueprint.CategoriesHash.EXPERIMENTAL then
             self:Kill()
-            return false 
+            return false
         end
 
         return MobileUnit.OnCollisionCheck(self, other, firingWeapon)
@@ -2551,7 +2609,7 @@ CommandUnit = Class(WalkingLandUnit) {
     ---@param work any
     ---@return boolean
     OnWorkBegin = function(self, work)
-        if WalkingLandUnit.OnWorkBegin(self, work) then 
+        if WalkingLandUnit.OnWorkBegin(self, work) then
 
             -- Prevent consumption bug where two enhancements in a row prevents assisting units from
             -- updating their consumption costs based on the new build rate values.
