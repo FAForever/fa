@@ -1063,6 +1063,7 @@ do
         from[route] = to
     end
     local function connectTo(from, to)
+        if not to then return end
         connectVia(from, to, to.Name)
         connectVia(from, to, to.Alias)
         connectVia(from, to, to.NotName, true)
