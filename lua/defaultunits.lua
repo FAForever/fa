@@ -723,9 +723,6 @@ FactoryUnit = Class(StructureUnit) {
         self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
-
-        LOG(string.format("ToSupportFactoryIdentifier: %s", tostring(self:ToSupportFactoryIdentifier())))
-        LOG(string.format("ToHQFactoryIdentifier: %s", tostring(self:ToHQFactoryIdentifier())))
     end,
 
     ---@param self FactoryUnit
