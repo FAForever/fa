@@ -74,6 +74,13 @@ local function GenerateCompressedTreeIdentifier()
     return CompressedTreeIdentifier
 end
 
+local LabelIdentifier = 0
+---@return number
+local function GenerateLabelIdentifier()
+    LabelIdentifier = LabelIdentifier + 1
+    return LabelIdentifier
+end
+
 -- Shared data with UI
 
 ---@type NavLayerData
@@ -106,7 +113,6 @@ end
 ---@field Layer NavLayers
 ---@field TreeSize number
 ---@field Trees CompressedLabelTree[][]
----@field FreeLabel number
 NavGrid = ClassSimple {
 
     ---@param self NavGrid
@@ -119,7 +125,6 @@ NavGrid = ClassSimple {
 
         self.TreeSize = treeSize
         self.Layer = layer
-        self.FreeLabel = 1
     end,
 
     --- Adds a compressed label tree to the navigational grid
@@ -166,24 +171,18 @@ NavGrid = ClassSimple {
         end
     end,
 
-    --- Generates a unique label for an enclosed area
-    ---@param self NavGrid
-    ---@return number
-    GenerateUniqueLabel = function(self)
-        self.FreeLabel = self.FreeLabel + 1
-        return self.FreeLabel
-    end,
-
     ---@param self NavGrid
     GenerateLabels = function(self)
+        local labelStart = LabelIdentifier
         local stack = { }
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:GenerateLabels(self, stack)
+                self.Trees[z][x]:GenerateLabels(stack)
             end
         end
 
-        NavLayerData[self.Layer].Labels = self.FreeLabel - 1
+        local labelEnd = LabelIdentifier
+        NavLayerData[self.Layer].Labels = labelEnd - labelStart
     end,
 
     ---@param self NavGrid
@@ -472,9 +471,8 @@ CompressedLabelTree = ClassSimple {
     end,
 
     ---@param self CompressedLabelTree
-    ---@param root NavGrid
     ---@param stack table
-    GenerateLabels = function(self, root, stack)
+    GenerateLabels = function(self, stack)
         -- leaf case
         if self.label then
 
@@ -483,8 +481,8 @@ CompressedLabelTree = ClassSimple {
 
                 -- we can hit a stack overflow if we do this recursively, therefore we do a 
                 -- depth first search using a stack that we re-use for better performance
-                local free = 1 
-                local label = root:GenerateUniqueLabel()
+                local free = 1
+                local label = GenerateLabelIdentifier()
 
                 -- assign the label, and then search through our neighbors to assign the same label to them
                 self.label = label
@@ -524,7 +522,7 @@ CompressedLabelTree = ClassSimple {
 
         -- node case
         for _, child in self.children do
-            child:GenerateLabels(root, stack)
+            child:GenerateLabels(stack)
         end
     end,
 
