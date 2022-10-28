@@ -587,20 +587,14 @@ BaseManager = ClassSimple {
     ---@param self BaseManager  # An instance of the BaseManager class
     ---@param num number        # Amount to add to the engineer count.
     AddCurrentEngineer = function(self, num)
-        if not num then
-            num = 1
-        end
-        self.CurrentEngineerCount = self.CurrentEngineerCount + num
+        self.CurrentEngineerCount = self.CurrentEngineerCount + (num or 1)
     end,
 
     --- Subtract from the engineer count
     ---@param self BaseManager  # An instance of the BaseManager class
     ---@param num number        # Amount to subtract from the engineer count.
     SubtractCurrentEngineer = function(self, num)
-        if not num then
-            num = 1
-        end
-        self.CurrentEngineerCount = self.CurrentEngineerCount - 1
+        self.CurrentEngineerCount = self.CurrentEngineerCount - (num or 1)
     end,
 
     --- Retrieve the engineer count
