@@ -113,7 +113,6 @@ end
 ---@field Layer NavLayers
 ---@field TreeSize number
 ---@field Trees CompressedLabelTree[][]
----@field FreeLabel number
 NavGrid = ClassSimple {
 
     ---@param self NavGrid
@@ -126,7 +125,6 @@ NavGrid = ClassSimple {
 
         self.TreeSize = treeSize
         self.Layer = layer
-        self.FreeLabel = 1
     end,
 
     --- Adds a compressed label tree to the navigational grid
@@ -173,16 +171,9 @@ NavGrid = ClassSimple {
         end
     end,
 
-    --- Generates a unique label for an enclosed area
-    ---@param self NavGrid
-    ---@return number
-    GenerateUniqueLabel = function(self)
-        self.FreeLabel = self.FreeLabel + 1
-        return self.FreeLabel
-    end,
-
     ---@param self NavGrid
     GenerateLabels = function(self)
+        local labelStart = LabelIdentifier
         local stack = { }
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
@@ -190,7 +181,8 @@ NavGrid = ClassSimple {
             end
         end
 
-        NavLayerData[self.Layer].Labels = self.FreeLabel - 1
+        local labelEnd = LabelIdentifier
+        NavLayerData[self.Layer].Labels = labelEnd - labelStart
     end,
 
     ---@param self NavGrid
