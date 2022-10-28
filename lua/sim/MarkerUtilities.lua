@@ -25,12 +25,12 @@ local TableDeepCopy = table.deepcopy
 ---@class MarkerData
 ---@field size number
 ---@field resource boolean
----@field type string 
+---@field type string
 ---@field orientation Vector
 ---@field position Vector
----@field adjacentTo string     # used by old pathing markers to identify the neighbors
----@field layer number          # Navigational layer that this marker is on, only defined for resources
----@field label number | nil    # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
+---@field adjacentTo string         # used by old pathing markers to identify the neighbors
+---@field NavLayer number           # Navigational layer that this marker is on, only defined for resources
+---@field NavLabel number | nil     # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
 
 -- MARKERS --
 
@@ -252,6 +252,9 @@ function ToggleDebugMarkersByType(type)
         -- make the thread if it did not exist yet
         thread = ForkThread(
             function()
+
+                local labelToColor = import('/lua/shared/NavGenerator.lua').LabelToColor
+
                 while true do
 
                     -- check if we should sleep or not
@@ -264,6 +267,10 @@ function ToggleDebugMarkersByType(type)
                     for k = 1, count do
                         local marker = markers[k]
                         DrawCircle(marker.position, marker.size or 1, marker.color or 'ffffffff')
+
+                        if marker.NavLabel then
+                            DrawCircle(marker.position, 2 * (marker.size or 1), labelToColor(marker.NavLabel))
+                        end
 
                         -- useful for pathing markers
                         if marker.adjacentTo then
@@ -407,6 +414,7 @@ do
 
         ---@type number | nil
         local label = nil
+        LOG(NavUtils.IsGenerated())
         if NavUtils.IsGenerated() then
             label = NavUtils.GetLabel(layer, { x, y, z })
         end
@@ -418,11 +426,11 @@ do
                 size = size,
                 resource = true,
                 type = type,
-                orientation = position,
-                position = orientation,
+                orientation = orientation,
+                position = position,
 
-                layer = layer,
-                label = label,
+                NavLayer = layer,
+                NavLabel = label,
             }
         else
             marker = {
@@ -432,8 +440,8 @@ do
                 orientation = orientation,
                 position = position,
 
-                layer = layer,
-                label = label,
+                NavLayer = layer,
+                NavLabel = label,
             }
         end
 
