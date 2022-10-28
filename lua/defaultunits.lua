@@ -723,6 +723,9 @@ FactoryUnit = Class(StructureUnit) {
         self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
+
+        LOG(string.format("ToSupportFactoryIdentifier: %s", tostring(self:ToSupportFactoryIdentifier())))
+        LOG(string.format("ToHQFactoryIdentifier: %s", tostring(self:ToHQFactoryIdentifier())))
     end,
 
     ---@param self FactoryUnit
@@ -730,8 +733,8 @@ FactoryUnit = Class(StructureUnit) {
     ToSupportFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
         local identifier = self.Blueprint.BlueprintId --[[@as string]]
-        local faction = identifier:sub(2, 1)
-        local layer = identifier:sub(7, 1)
+        local faction = identifier:sub(2, 2)
+        local layer = identifier:sub(7, 7)
 
         -- HQs can not upgrade to support factories
         if hashedCategories["RESEARCH"] then
@@ -762,7 +765,7 @@ FactoryUnit = Class(StructureUnit) {
         local hashedCategories = self.Blueprint.CategoriesHash
         local identifier = self.Blueprint.BlueprintId --[[@as string]]
         local faction = identifier:sub(1, 3)
-        local layer = identifier:sub(7, 1)
+        local layer = identifier:sub(7, 7)
 
         -- support factories can not upgrade to HQs
         if hashedCategories["SUPPORTFACTORY"] then
