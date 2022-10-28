@@ -831,7 +831,6 @@ Callbacks.NavToggleScanLayer = function(data)
 end
 
 Callbacks.NavToggleScanLabels = function(data)
-    LOG("ToggleScanLabels")
     import("/lua/sim/NavDebug.lua").ToggleScanLabels(data)
 end
 
@@ -841,4 +840,8 @@ end
 
 Callbacks.NavDebugPathTo = function(data)
     import("/lua/sim/NavDebug.lua").PathTo(data)
+end
+
+Callbacks.NavDebugGetLabel = function(data)
+    import("/lua/sim/NavDebug.lua").GetLabel(data)
 end

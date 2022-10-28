@@ -103,15 +103,13 @@ local function MatchStateThread()
     -- keep scanning the gamestate for changes in alliances and brain state
     while true do
         -- check for defeat
-        local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 4)
+        local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 1)
         local defeatedBrainsCount = table.getsize(defeatedBrains)
         if defeatedBrainsCount > 0 then
 
             -- take into account cascading effects
             local lastDefeatedBrainsCount
             repeat
-                WaitTicks(4)
-
                 lastDefeatedBrainsCount = defeatedBrainsCount
 
                 -- re-compute the defeated brains until it no longer increases
@@ -127,6 +125,7 @@ local function MatchStateThread()
 
                 -- process on defeat logic of brain
                 brain:OnDefeat()
+                SPEW("Matchstate - defeated: " .. brain.Nickname)
 
                 -- communicate to the server that this brain has been defeated
                 table.insert(Sync.GameResult, { k, "defeat -10" })
@@ -154,6 +153,7 @@ local function MatchStateThread()
 
                     -- process on draw logic of brain
                     brain:OnDraw()
+                    SPEW("Matchstate - drawed: " .. brain.Nickname)
 
                     -- communicate to the server that this brain has been defeated
                     table.insert(Sync.GameResult, { k, "draw 0" })
@@ -184,6 +184,7 @@ local function MatchStateThread()
 
                     -- process on draw logic of brain
                     brain:OnVictory()
+                    SPEW("Matchstate - won: " .. brain.Nickname)
 
                     -- communicate to the server that this brain has been defeated
                     table.insert(Sync.GameResult, { k, "victory 10" })
@@ -202,7 +203,7 @@ local function MatchStateThread()
             break
         end
 
-        WaitTicks(10)
+        WaitTicks(4)
     end
 
 end

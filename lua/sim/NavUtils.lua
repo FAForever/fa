@@ -181,7 +181,7 @@ function PathTo(layer, origin, destination, options)
     local head = 1
     local path = { }
     local distance = 0
-    local leaf = destinationLeaf
+    local leaf = destinationLeaf.From
     while leaf.From and leaf.From != leaf do
 
         -- add to path
@@ -207,11 +207,44 @@ function PathTo(layer, origin, destination, options)
         path[head - k] = temp
     end
 
+    -- add destination to the path
+
+    path[head] = destination
+
     -- clear up after ourselves
 
     PathToHeap:Clear()
 
     -- return all the goodies!!
 
-    return path, head - 1, distance
+    return path, head, distance
+end
+
+--- Returns a label that indicates to what sub-graph it belongs to, these graphs can be visualised using the Nav UI
+---@param layer NavLayers
+---@param position Vector
+---@return number? 
+---@return string?
+function GetLabel(layer, position)
+    -- check layer argument
+    local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
+    if not root then
+        return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
+    end
+
+    -- check position argument
+    local leaf = root:FindLeafXZ(position[1], position[3])
+    if not leaf then
+        return nil, 'Position is not inside the map'
+    end
+
+    if leaf.label == 0 then
+        return nil, 'Position has no label assigned, report to the maintainers. This should not be possible'
+    end
+
+    if leaf.label == -1 then
+        return nil, 'Position is unpathable'
+    end
+
+    return leaf.label, nil
 end

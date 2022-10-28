@@ -91,6 +91,7 @@ end
 ---@return number green
 ---@return number blue
 function HSVtoRGB(hue, sat, val)
+<<<<<<< HEAD
     --[[
     do
         local chroma = sat * val
@@ -114,6 +115,8 @@ function HSVtoRGB(hue, sat, val)
         return r + bright, g + bright, b + bright
     end
     --]]
+=======
+>>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
     if val then
         if val == 0 then -- check for black
             return 0, 0, 0
@@ -146,7 +149,11 @@ function HSVtoRGB(hue, sat, val)
     hue = hue * 6
     if hue < 0 then
         hue = 1 + math.mod(hue, 1)
+<<<<<<< HEAD
     elseif hue >= 1 then
+=======
+    elseif hue >= 6 then
+>>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
         hue = math.mod(hue, 1)
     end
 
@@ -160,7 +167,11 @@ function HSVtoRGB(hue, sat, val)
             if hue <= 1 then   -- sector 1, g: sat -> 1 (red -> yellow)
                 -- we can reuse `b` as a special optimization here
                 r, g = 1, b + hue * sat
+<<<<<<< HEAD
             else               -- sector 2, r: sat -> 1 (yellow -> green)
+=======
+            else               -- sector 2, r: 1 -> 1 (yellow -> green)
+>>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
                 g, r = 1, 1 + (1 - hue) * sat
             end
         elseif hue <= 4 then
@@ -235,6 +246,7 @@ end
 ---@return number green
 ---@return number blue
 function HSLtoRGB(hue, sat, lit)
+<<<<<<< HEAD
     --[[
     do
         local chroma = sat * (1 - math.abs(2 * lit - 1))
@@ -258,6 +270,8 @@ function HSLtoRGB(hue, sat, lit)
         return r + bright, g + bright, b + bright
     end
     --]]
+=======
+>>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
     local halfChroma
     if lit then
         if lit == 0 then -- check for black
@@ -293,6 +307,7 @@ function HSLtoRGB(hue, sat, lit)
     -- Split if-statements into a tree instead of a long elseif chain so that the worst case
     -- only checks 3 cases instead of all 5. Being a non- power of 2, some of the branches will
     -- have fewer checks; these are the yellow sectors.
+<<<<<<< HEAD
     if hue < 4 then
         b = lit - halfChroma
         if hue < 2 then    -- sector 1, g: 1 -> sat (red -> yellow)
@@ -314,6 +329,29 @@ function HSLtoRGB(hue, sat, lit)
             b, r = lit + halfChroma, lit + (hue - 9) * sat
         else               -- sector 6, b: 1 -> sat (magenta -> red)
             r, b = lit + halfChroma, lit + (11 - hue) * sat
+=======
+    if hue <= 4 then
+        b = lit - halfChroma
+        if hue <= 2 then   -- sector 1, g: sat -> 1 (red -> yellow)
+            -- we can reuse `b` as a special optimization here
+            r, g = lit + halfChroma, b + hue * halfChroma
+        else               -- sector 2, r: 1 -> sat (yellow -> green)
+            g, r = lit + halfChroma, lit + (3 - hue) * halfChroma
+        end
+    elseif hue <= 8 then
+        r = lit - halfChroma
+        if hue <= 6 then   -- sector 3, b: sat -> 1 (green -> cyan)
+            g, b = lit + halfChroma, lit + (hue - 5) * halfChroma
+        else               -- sector 4, g: 1 -> sat (cyan -> blue)
+            b, g = lit + halfChroma, lit + (7 - hue) * halfChroma
+        end
+    else
+        g = lit - halfChroma
+        if hue <= 10 then  -- sector 5, r: sat -> 1 (blue -> magenta)
+            b, r = lit + halfChroma, lit + (hue - 9) * halfChroma
+        else               -- sector 6, b: 1 -> sat (magenta -> red)
+            r, b = lit + halfChroma, lit + (11 - hue) * halfChroma
+>>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
         end
     end
     return r, g, b
@@ -429,6 +467,7 @@ end
 function RGBtoHSL(red, green, blue)
     -- convert integers to floats
     red, green, blue = RGBtoFloat(red, green, blue)
+<<<<<<< HEAD
     -- the gray-scale optimization
     if red == green and green == blue then
         return 0, 0, red
@@ -479,6 +518,54 @@ function RGBtoHSL(red, green, blue)
         hue * 0.1666666666666666,
         (primary - lit) / (1 - lit),
         lit
+=======
+    local hue, primary, tertiary
+    -- search for the order of the components, which tells us which sector we're in
+    if green >= blue then
+        if red >= green then    -- red >= green >= blue
+            if red == blue then -- red == green == blue == gray
+                return 0, 0, red
+            end
+            hue = 0.1666666716337204 * (green - blue) / (red - blue)
+            primary, tertiary = red, blue
+        else -- green > red & blue
+            primary = green
+            hue = 0.1666666716337204 * (blue - red)
+            if red >= blue then -- green > red >= blue
+                hue = 0.3333333432674408 + hue / (green - blue)
+                tertiary = blue
+            else                -- green >= blue > red
+                hue = 0.3333333432674408 + hue / (green - red)
+                tertiary = red
+            end
+        end
+    elseif blue >= red then -- blue > green & red
+        primary = blue
+        hue = 0.1666666716337204 * (red - green)
+        if green >= red then    -- blue > green >= red
+            hue = 0.66666668653488159 + hue / (blue - red)
+            tertiary = red
+        else                    -- blue >= red > green
+            hue = 0.66666668653488159 + hue / (blue - green)
+            tertiary = green
+        end
+    else                        -- red > blue > green
+        hue = 0.1666666716337204 * (green - blue) / (red - green)
+        primary, tertiary = red, green
+    end
+
+    local lit = (primary + tertiary) * 0.5
+    if lit < 0.5 then
+        if lit == 0 then
+            return 0, 0, 0
+        end
+        return hue, primary / lit - 1, lit
+    end
+    if lit == 1 then
+        return 0, 0, 1
+    end
+    return hue, (primary - lit) / (1 - lit), lit
+>>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
 end
 
 --------------------
@@ -629,8 +716,13 @@ end
 
 
 
+<<<<<<< HEAD
 
 --- Map of named colors the Moho engine can recognize and their representation
+=======
+--- Map of named colors the Moho engine can recognize and their representation
+---@see EnumColorNames()
+>>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
 ---@type table<EnumColor, Color>
 EnumColors = {
     AliceBlue = "F7FBFF",
@@ -774,4 +866,8 @@ EnumColors = {
     Yellow = "FFFF00",
     YellowGreen = "9CCF31",
     transparent = "00000000",
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> da277ab1992badd59740a0be83832bc837ee74f4

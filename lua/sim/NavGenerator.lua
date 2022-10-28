@@ -32,23 +32,12 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 ---@alias NavTerrainBlockCache boolean[][]
 ---@alias NavLabelCache number[][]
 
--- Tweakable data
-
 local LabelCompressionThreshold = 4
 
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
 ---@type number
 local LabelCompressionTreesPerAxis = 16
-
---- TODO: this approach does not support non-square maps
---- Total width / height of the map
----@type number
-local MapSize = ScenarioInfo.size[1]
-
---- Number of cells per block
----@type number
-local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
 --- Maximum height difference that is considered to be pathable, within a single oGrid
 ---@type number
@@ -72,22 +61,27 @@ local MinWaterDepthNaval = 1.5
 ---@field Air? NavGrid
 NavGrids = { }
 
-
 local Generated = false
+---@return boolean
 function IsGenerated()
     return Generated
 end
 
 local CompressedTreeIdentifier = 0
+---@return number
 local function GenerateCompressedTreeIdentifier()
     CompressedTreeIdentifier = CompressedTreeIdentifier + 1
     return CompressedTreeIdentifier
 end
 
--- Shared data with UI
+local LabelIdentifier = 0
+---@return number
+local function GenerateLabelIdentifier()
+    LabelIdentifier = LabelIdentifier + 1
+    return LabelIdentifier
+end
 
----@type NavProfileData
-local ProfileData = Shared.CreateEmptyProfileData()
+-- Shared data with UI
 
 ---@type NavLayerData
 local NavLayerData = Shared.CreateEmptyNavLayerData()
@@ -117,20 +111,20 @@ end
 
 ---@class NavGrid
 ---@field Layer NavLayers
+---@field TreeSize number
 ---@field Trees CompressedLabelTree[][]
----@field FreeLabel number
 NavGrid = ClassSimple {
 
     ---@param self NavGrid
     ---@param layer NavLayers
-    __init = function(self, layer)
+    __init = function(self, layer, treeSize)
         self.Trees = { }
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             self.Trees[z] = { }
         end
 
+        self.TreeSize = treeSize
         self.Layer = layer
-        self.FreeLabel = 1
     end,
 
     --- Adds a compressed label tree to the navigational grid
@@ -157,8 +151,8 @@ NavGrid = ClassSimple {
     ---@return CompressedLabelTreeLeaf?
     FindLeafXZ = function(self, x, z)
         if x > 0 and z > 0 then
-            local bx = (x / CompressionTreeSize) ^ 0
-            local bz = (z / CompressionTreeSize) ^ 0
+            local bx = (x / self.TreeSize) ^ 0
+            local bz = (z / self.TreeSize) ^ 0
             local labelTree = self.Trees[bz][bx]
             if labelTree then
                 return labelTree:FindLeafXZ(x, z)
@@ -177,24 +171,18 @@ NavGrid = ClassSimple {
         end
     end,
 
-    --- Generates a unique label for an enclosed area
-    ---@param self NavGrid
-    ---@return number
-    GenerateUniqueLabel = function(self)
-        self.FreeLabel = self.FreeLabel + 1
-        return self.FreeLabel
-    end,
-
     ---@param self NavGrid
     GenerateLabels = function(self)
+        local labelStart = LabelIdentifier
         local stack = { }
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:GenerateLabels(self, stack)
+                self.Trees[z][x]:GenerateLabels(stack)
             end
         end
 
-        NavLayerData[self.Layer].Labels = self.FreeLabel - 1
+        local labelEnd = LabelIdentifier
+        NavLayerData[self.Layer].Labels = labelEnd - labelStart
     end,
 
     ---@param self NavGrid
@@ -483,9 +471,8 @@ CompressedLabelTree = ClassSimple {
     end,
 
     ---@param self CompressedLabelTree
-    ---@param root NavGrid
     ---@param stack table
-    GenerateLabels = function(self, root, stack)
+    GenerateLabels = function(self, stack)
         -- leaf case
         if self.label then
 
@@ -494,8 +481,8 @@ CompressedLabelTree = ClassSimple {
 
                 -- we can hit a stack overflow if we do this recursively, therefore we do a 
                 -- depth first search using a stack that we re-use for better performance
-                local free = 1 
-                local label = root:GenerateUniqueLabel()
+                local free = 1
+                local label = GenerateLabelIdentifier()
 
                 -- assign the label, and then search through our neighbors to assign the same label to them
                 self.label = label
@@ -535,7 +522,7 @@ CompressedLabelTree = ClassSimple {
 
         -- node case
         for _, child in self.children do
-            child:GenerateLabels(root, stack)
+            child:GenerateLabels(stack)
         end
     end,
 
@@ -879,21 +866,28 @@ end
 
 --- Generates the navigational mesh from `a` to `z`
 function Generate()
-    local blockSize = CompressionTreeSize
 
-    ProfileData = Shared.CreateEmptyProfileData()
     NavLayerData = Shared.CreateEmptyNavLayerData()
+    
+    --- TODO: this approach does not support non-square maps
+    --- Total width / height of the map
+    ---@type number
+    local MapSize = ScenarioInfo.size[1]
+    
+    --- Number of cells per block
+    ---@type number
+    local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
     print(string.format(" -- Navigational mesh generator -- "))
 
-    local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(blockSize)
+    local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(CompressionTreeSize)
 
-    local labelRootLand = NavGrid('Land')
-    local labelRootNaval = NavGrid('Water')
-    local labelRootHover = NavGrid('Hover')
-    local labelRootAmph = NavGrid('Amphibious')
-    local labelRootAir = NavGrid('Air')
+    local labelRootLand = NavGrid('Land', CompressionTreeSize)
+    local labelRootNaval = NavGrid('Water', CompressionTreeSize)
+    local labelRootHover = NavGrid('Hover', CompressionTreeSize)
+    local labelRootAmph = NavGrid('Amphibious', CompressionTreeSize)
+    local labelRootAir = NavGrid('Air', CompressionTreeSize)
     NavGrids['Land'] = labelRootLand
     NavGrids['Water'] = labelRootNaval
     NavGrids['Hover'] = labelRootHover
@@ -901,14 +895,14 @@ function Generate()
     NavGrids['Air'] = labelRootAir
 
     for z = 0, LabelCompressionTreesPerAxis - 1 do
-        local blockZ = z * blockSize
+        local blockZ = z * CompressionTreeSize
         for x = 0, LabelCompressionTreesPerAxis - 1 do
-            local blockX = x * blockSize
-            local labelTreeLand = CompressedLabelTree('Land', blockX, blockZ, blockSize)
-            local labelTreeNaval = CompressedLabelTree('Water', blockX, blockZ, blockSize)
-            local labelTreeHover = CompressedLabelTree('Hover', blockX, blockZ, blockSize)
-            local labelTreeAmph = CompressedLabelTree('Amphibious', blockX, blockZ, blockSize)
-            local labelTreeAir = CompressedLabelTree('Air', blockX, blockZ, blockSize)
+            local blockX = x * CompressionTreeSize
+            local labelTreeLand = CompressedLabelTree('Land', blockX, blockZ, CompressionTreeSize)
+            local labelTreeNaval = CompressedLabelTree('Water', blockX, blockZ, CompressionTreeSize)
+            local labelTreeHover = CompressedLabelTree('Hover', blockX, blockZ, CompressionTreeSize)
+            local labelTreeAmph = CompressedLabelTree('Amphibious', blockX, blockZ, CompressionTreeSize)
+            local labelTreeAir = CompressedLabelTree('Air', blockX, blockZ, CompressionTreeSize)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
             PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
@@ -951,7 +945,7 @@ function Generate()
 
     labelRootLand:Precompute()
     labelRootNaval:Precompute()
-    labelRootAmph:Precompute()
+    labelRootHover:Precompute()
     labelRootAmph:Precompute()
     labelRootAir:Precompute()
 
@@ -962,7 +956,6 @@ function Generate()
     import("/lua/sim/NavDebug.lua")
 
     -- pass data to sync
-    Sync.NavProfileData = ProfileData
     Sync.NavLayerData = NavLayerData
 
     -- we're done :)!

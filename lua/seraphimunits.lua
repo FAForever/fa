@@ -591,6 +591,7 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
 
     OnCreate = function(self)
         SHoverLandUnit.OnCreate(self)
+        self:SetUnSelectable(true)
         self.CanTakeDamage = false
         self.CanBeKilled = false
         self:PlayUnitSound('Spawn')
