@@ -91,32 +91,6 @@ end
 ---@return number green
 ---@return number blue
 function HSVtoRGB(hue, sat, val)
-<<<<<<< HEAD
-    --[[
-    do
-        local chroma = sat * val
-        hue = hue * 6
-        local interp = chroma * (1 - math.abs(math.mod(hue, 2) - 1))
-        local r, g, b
-        if hue < 1 then
-            r, g, b = chroma, interp, 0
-        elseif hue < 2 then
-            r, g, b = interp, chroma, 0
-        elseif hue < 3 then
-            r, g, b = 0, chroma, interp
-        elseif hue < 4 then
-            r, g, b = 0, interp, chroma
-        elseif hue < 5 then
-            r, g, b = interp, 0, chroma
-        else
-            r, g, b = chroma, 0, interp
-        end
-        local bright = val - chroma
-        return r + bright, g + bright, b + bright
-    end
-    --]]
-=======
->>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
     if val then
         if val == 0 then -- check for black
             return 0, 0, 0
@@ -149,11 +123,7 @@ function HSVtoRGB(hue, sat, val)
     hue = hue * 6
     if hue < 0 then
         hue = 1 + math.mod(hue, 1)
-<<<<<<< HEAD
-    elseif hue >= 1 then
-=======
     elseif hue >= 6 then
->>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
         hue = math.mod(hue, 1)
     end
 
@@ -167,11 +137,7 @@ function HSVtoRGB(hue, sat, val)
             if hue <= 1 then   -- sector 1, g: sat -> 1 (red -> yellow)
                 -- we can reuse `b` as a special optimization here
                 r, g = 1, b + hue * sat
-<<<<<<< HEAD
-            else               -- sector 2, r: sat -> 1 (yellow -> green)
-=======
             else               -- sector 2, r: 1 -> 1 (yellow -> green)
->>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
                 g, r = 1, 1 + (1 - hue) * sat
             end
         elseif hue <= 4 then
@@ -246,32 +212,6 @@ end
 ---@return number green
 ---@return number blue
 function HSLtoRGB(hue, sat, lit)
-<<<<<<< HEAD
-    --[[
-    do
-        local chroma = sat * (1 - math.abs(2 * lit - 1))
-        hue = hue * 6
-        local interp = chroma * (1 - math.abs(math.mod(hue, 2) - 1))
-        local r, g, b
-        if hue < 1 then
-            r, g, b = chroma, interp, 0
-        elseif hue < 2 then
-            r, g, b = interp, chroma, 0
-        elseif hue < 3 then
-            r, g, b = 0, chroma, interp
-        elseif hue < 4 then
-            r, g, b = 0, interp, chroma
-        elseif hue < 5 then
-            r, g, b = interp, 0, chroma
-        else
-            r, g, b = chroma, 0, interp
-        end
-        local bright = lit - chroma / 2
-        return r + bright, g + bright, b + bright
-    end
-    --]]
-=======
->>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
     local halfChroma
     if lit then
         if lit == 0 then -- check for black
@@ -307,29 +247,6 @@ function HSLtoRGB(hue, sat, lit)
     -- Split if-statements into a tree instead of a long elseif chain so that the worst case
     -- only checks 3 cases instead of all 5. Being a non- power of 2, some of the branches will
     -- have fewer checks; these are the yellow sectors.
-<<<<<<< HEAD
-    if hue < 4 then
-        b = lit - halfChroma
-        if hue < 2 then    -- sector 1, g: 1 -> sat (red -> yellow)
-            -- we can reuse `b` as a special optimization here
-            r, g = lit + halfChroma, b + hue * halfChroma
-        else               -- sector 2, r: sat -> 1 (yellow -> green)
-            g, r = lit + halfChroma, lit + halfChroma * (3 - hue)
-        end
-    elseif hue < 8 then
-        r = lit - halfChroma
-        if hue < 6 then    -- sector 3, b: 1 -> sat (green -> cyan)
-            g, b = lit + halfChroma, lit + (hue - 5) * sat
-        else               -- sector 4, g: 1 -> sat (cyan -> blue)
-            b, g = lit + halfChroma, lit + (7 - hue) * sat
-        end
-    else
-        g = lit - halfChroma
-        if hue < 10 then   -- sector 5, r: sat -> 1 (blue -> magenta)
-            b, r = lit + halfChroma, lit + (hue - 9) * sat
-        else               -- sector 6, b: 1 -> sat (magenta -> red)
-            r, b = lit + halfChroma, lit + (11 - hue) * sat
-=======
     if hue <= 4 then
         b = lit - halfChroma
         if hue <= 2 then   -- sector 1, g: sat -> 1 (red -> yellow)
@@ -351,7 +268,6 @@ function HSLtoRGB(hue, sat, lit)
             b, r = lit + halfChroma, lit + (hue - 9) * halfChroma
         else               -- sector 6, b: 1 -> sat (magenta -> red)
             r, b = lit + halfChroma, lit + (11 - hue) * halfChroma
->>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
         end
     end
     return r, g, b
@@ -467,58 +383,6 @@ end
 function RGBtoHSL(red, green, blue)
     -- convert integers to floats
     red, green, blue = RGBtoFloat(red, green, blue)
-<<<<<<< HEAD
-    -- the gray-scale optimization
-    if red == green and green == blue then
-        return 0, 0, red
-    end
-    local hue, primary, tertiary
-    -- search for the order of the components, which tells us which sector we're in
-    if green > blue then
-        if red > green then     -- red > green > blue
-            hue = (green - blue) / (red - blue)
-            primary, tertiary = red, blue
-        else -- green > red & blue
-            primary = green
-            hue = blue - red
-            if red > blue then  -- green > red > blue
-                hue = 2 + hue / (green - blue)
-                tertiary = blue
-            else                -- green > blue > red
-                hue = 2 + hue / (green - red)
-                tertiary = red
-            end
-        end
-    elseif blue > red then -- blue > green & red
-        primary = blue
-        hue = red - green
-        if green > red then     -- blue > green > red
-            hue = 4 + hue / (blue - red)
-            tertiary = red
-        else                    -- blue > red > green
-            hue = 4 + hue / (blue - green)
-            tertiary = green
-        end
-    else                        -- red > blue > green
-        hue = (green - blue) / (red - green)
-        primary, tertiary = red, green
-    end
-
-    local lit = (primary - tertiary) * 0.5
-    if lit == 0.0 or lit == 1.0 then
-        return 0, 0, lit
-    end
-    if lit < 0.5 then
-        return
-            hue * 0.1666666666666666,
-            primary / lit - 1,
-            lit
-    end
-    return
-        hue * 0.1666666666666666,
-        (primary - lit) / (1 - lit),
-        lit
-=======
     local hue, primary, tertiary
     -- search for the order of the components, which tells us which sector we're in
     if green >= blue then
@@ -565,7 +429,6 @@ function RGBtoHSL(red, green, blue)
         return 0, 0, 1
     end
     return hue, (primary - lit) / (1 - lit), lit
->>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
 end
 
 --------------------
@@ -716,13 +579,8 @@ end
 
 
 
-<<<<<<< HEAD
-
---- Map of named colors the Moho engine can recognize and their representation
-=======
 --- Map of named colors the Moho engine can recognize and their representation
 ---@see EnumColorNames()
->>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
 ---@type table<EnumColor, Color>
 EnumColors = {
     AliceBlue = "F7FBFF",
@@ -866,8 +724,4 @@ EnumColors = {
     Yellow = "FFFF00",
     YellowGreen = "9CCF31",
     transparent = "00000000",
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> da277ab1992badd59740a0be83832bc837ee74f4
