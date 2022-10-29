@@ -17,8 +17,6 @@
 -- Supports crazyrush-like maps.
 -----------------------------------------------------------------
 
--- imports and upvalues
-
 local StringSplit = import('/lua/system/utils.lua').StringSplit
 local TableDeepCopy = table.deepcopy
 
@@ -32,8 +30,6 @@ local TableDeepCopy = table.deepcopy
 ---@field adjacentTo string         # used by old pathing markers to identify the neighbors
 ---@field NavLayer NavLayers        # Navigational layer that this marker is on, only defined for resources
 ---@field NavLabel number | nil     # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
-
--- MARKERS --
 
 --- Contains all the markers that are part of the map, including markers of chains
 local AllMarkers = Scenario.MasterChain._MASTERCHAIN_.Markers
@@ -140,8 +136,6 @@ function FlushMarkerCache()
     MarkerCache = cache
 end
 
--- CHAINS --
-
 --- Contains all the chains that are part of the map
 local AllChains = Scenario.Chains
 
@@ -214,8 +208,6 @@ function FlushChainCache()
     ChainCache = {}
 end
 
--- DEBUGGING --
-
 --- Retrieves the name / key values of the marker types that are in
 -- the cache. This returns a new table in each call - do not use in
 -- production code. Useful in combination with ToggleDebugMarkersByType.
@@ -275,7 +267,7 @@ function ToggleDebugMarkersByType(type)
 
                         -- useful for pathing markers
                         if marker.adjacentTo then
-                            for k, neighbour in StringSplit(marker.adjacentTo, " ") do
+                            for _, neighbour in StringSplit(marker.adjacentTo, " ") do
                                 local neighbour = AllMarkers[neighbour]
                                 if neighbour then
                                     DrawLine(marker.position, neighbour.position, marker.color or 'ffffffff')
@@ -390,15 +382,13 @@ function ToggleDebugChainByName(name)
     DebugChainThreads[name] = thread
 end
 
--- HOOKING --
-
 do
-
-    local NavUtils = import('/lua/sim/NavUtils.lua')
 
     -- hook to cache markers created on the fly by crazy rush type of games
     local OldCreateResourceDeposit = _G.CreateResourceDeposit
     _G.CreateResourceDeposit = function(type, x, y, z, size)
+
+        local NavUtils = import('/lua/sim/NavUtils.lua')
 
         -- fix to terrain height
         y = GetTerrainHeight(x, z)
