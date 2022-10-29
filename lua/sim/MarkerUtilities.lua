@@ -28,6 +28,7 @@ local TableDeepCopy = table.deepcopy
 ---@field type string
 ---@field orientation Vector
 ---@field position Vector
+---@field color Color | nil 
 ---@field adjacentTo string         # used by old pathing markers to identify the neighbors
 ---@field NavLayer NavLayers        # Navigational layer that this marker is on, only defined for resources
 ---@field NavLabel number | nil     # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
@@ -173,7 +174,7 @@ function GetMarkersInChain(name)
 
     -- find all the relevant markers
     for k, elem in chain.Markers do
-        ms[n] = marker.position
+        ms[n] = elem.position
         n = n + 1
     end
 
