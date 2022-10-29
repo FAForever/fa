@@ -878,6 +878,10 @@ function Generate()
     ---@type number
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
+    -------------------------------------------------
+    -- convert height map into a navigational mesh --
+    -------------------------------------------------
+
     local start = GetSystemTimeSecondsOnlyForProfileUse()
     print(string.format(" -- Navigational mesh generator -- "))
 
@@ -952,6 +956,10 @@ function Generate()
     print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
+    --------------------------------------------
+    -- post process markers to include labels --
+    --------------------------------------------
+
     local extractors, en = import('/lua/sim/MarkerUtilities.lua').GetMarkersByType('Mass')
     local hydrocarbons, hn = import('/lua/sim/MarkerUtilities.lua').GetMarkersByType('Hydrocarbon')
 
@@ -964,6 +972,10 @@ function Generate()
         local hydro = hydrocarbons[k]
         hydro.NavLabel = NavGrids[hydro.NavLayer]:FindLeaf(hydro.position).label
     end
+
+    ------------------
+    -- finishing up --
+    ------------------
 
     -- allows debugging tools to function
     import("/lua/sim/NavDebug.lua")
