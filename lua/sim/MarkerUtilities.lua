@@ -29,7 +29,7 @@ local TableDeepCopy = table.deepcopy
 ---@field orientation Vector
 ---@field position Vector
 ---@field adjacentTo string         # used by old pathing markers to identify the neighbors
----@field NavLayer number           # Navigational layer that this marker is on, only defined for resources
+---@field NavLayer NavLayers        # Navigational layer that this marker is on, only defined for resources
 ---@field NavLabel number | nil     # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
 
 -- MARKERS --
@@ -419,6 +419,7 @@ do
         end
 
         -- commented values are used by the editor and not by the game
+        ---@type MarkerData
         local marker = nil
         if type == 'Mass' then
             marker = {
