@@ -951,7 +951,20 @@ function Generate()
 
     print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
-    
+
+    local extractors, en = import('/lua/sim/MarkerUtilities.lua').GetMarkersByType('Mass')
+    local hydrocarbons, hn = import('/lua/sim/MarkerUtilities.lua').GetMarkersByType('Hydrocarbon')
+
+    for k = 1, en do
+        local extractor = extractors[k]
+        extractor.NavLabel = NavGrids[extractor.NavLayer]:FindLeaf(extractor.position).label
+    end
+
+    for k = 1, hn do
+        local hydro = hydrocarbons[k]
+        hydro.NavLabel = NavGrids[hydro.NavLayer]:FindLeaf(hydro.position).label
+    end
+
     -- allows debugging tools to function
     import("/lua/sim/NavDebug.lua")
 

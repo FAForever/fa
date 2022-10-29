@@ -269,7 +269,7 @@ function ToggleDebugMarkersByType(type)
                         DrawCircle(marker.position, marker.size or 1, marker.color or 'ffffffff')
 
                         if marker.NavLabel then
-                            DrawCircle(marker.position, 2 * (marker.size or 1), labelToColor(marker.NavLabel))
+                            DrawCircle(marker.position, (marker.size or 1) + 1, labelToColor(marker.NavLabel))
                         end
 
                         -- useful for pathing markers
@@ -414,7 +414,6 @@ do
 
         ---@type number | nil
         local label = nil
-        LOG(NavUtils.IsGenerated())
         if NavUtils.IsGenerated() then
             label = NavUtils.GetLabel(layer, { x, y, z })
         end
