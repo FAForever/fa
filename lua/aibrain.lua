@@ -2708,8 +2708,8 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@param loc Vector
-    ---@return boolean
+    ---@param loc? string
+    ---@return Vector | false
     PBMGetLocationCoords = function(self, loc)
         if not loc then
             return false
@@ -2717,11 +2717,13 @@ AIBrain = Class(moho.aibrain_methods) {
         if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
                 if v.LocationType == loc then
-                    local height = GetTerrainHeight(v.Location[1], v.Location[3])
-                    if GetSurfaceHeight(v.Location[1], v.Location[3]) > height then
-                        height = GetSurfaceHeight(v.Location[1], v.Location[3])
+                    local location = v.Location
+                    local height = GetTerrainHeight(location[1], location[3])
+                    local surfaceHeight = GetSurfaceHeight(location[1], location[3])
+                    if surfaceHeight > height then
+                        height = surfaceHeight
                     end
-                    return {v.Location[1], height, v.Location[3]}
+                    return {location[1], height, location[3]}
                 end
             end
         elseif self.BuilderManagers[loc] then
