@@ -30,133 +30,77 @@ end
 ---@return boolean
 function RandomNumber(aiBrain, higherThan, lowerThan, minNumber, maxNumber)
     local num = Random(minNumber, maxNumber)
-    if higherThan < num and lowerThan > num then
-        return true
-    end
-    return false
+    return higherThan < num and lowerThan > num
 end
 
 ---@param aiBrain AIBrain
 ---@param layerPref string
 ---@return boolean
 function IsAIBrainLayerPref(aiBrain, layerPref)
-    if layerPref == aiBrain.LayerPref then
-        return true
-    end
-    return false
+    return layerPref == aiBrain.LayerPref
 end
 
 ---@param aiBrain AIBrain
 ---@param num integer
 ---@return boolean
 function MissionNumber(aiBrain, num)
-    if ScenarioInfo.MissionNumber and num == ScenarioInfo.MissionNumber then
-        return true
-    else
-        return false
-    end
+    return ScenarioInfo.MissionNumber and num == ScenarioInfo.MissionNumber or false
 end
 
 ---@param aiBrain AIBrain
 ---@param num integer
 ---@return boolean
 function MissionNumberGreaterOrEqual(aiBrain, num)
-    if ScenarioInfo.MissionNumber and num <= ScenarioInfo.MissionNumber then
-        return true
-    else
-        return false
-    end
+    return ScenarioInfo.MissionNumber and num <= ScenarioInfo.MissionNumber or false
 end
 
 ---@param aiBrain AIBrain
 ---@param num integer
 ---@return boolean
 function MissionNumberLessOrEqual(aiBrain, num)
-    if ScenarioInfo.MissionNumber and num >= ScenarioInfo.MissionNumber then
-        return true
-    else
-        return false
-    end
+    return ScenarioInfo.MissionNumber and num >= ScenarioInfo.MissionNumber or false
 end
 
 ---@param aiBrain AIBrain
 ---@param varName string
 ---@return boolean
 function CheckScenarioInfoVarTable(aiBrain, varName)
-    if ScenarioInfo.VarTable then
-        local i = 1
-        if not ScenarioInfo.VarTable[varName] then
-            return false
-        end
-        return true
-    end
+    return ScenarioInfo.VarTable and ScenarioInfo.VarTable[varName] or false
 end
 
 ---@param aiBrain AIBrain
 ---@param varName string
 ---@return boolean
 function CheckScenarioInfoVarTableFalse(aiBrain, varName)
-    if ScenarioInfo.VarTable then
-        local i = 1
-        if ScenarioInfo.VarTable[varName] then
-            return false
-        end
-        return true
-    end
+    return ScenarioInfo.VarTable and not ScenarioInfo.VarTable[varName] or false
 end
 
 ---@param aiBrain AIBrain
 ---@param diffLevel integer
 ---@return boolean
 function DifficultyEqual(aiBrain, diffLevel)
-    if not ScenarioInfo.Options.Difficulty then
-        return false
-    end
-    if ScenarioInfo.Options.Difficulty == diffLevel then
-        return true
-    else
-        return false
-    end
+    return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty == diffLevel or false
 end
 
 ---@param aiBrain AIBrain
 ---@param diffLevel integer
 ---@return boolean
 function DifficultyGreaterOrEqual(aiBrain, diffLevel)
-    if not ScenarioInfo.Options.Difficulty then
-        return false
-    end
-    if ScenarioInfo.Options.Difficulty >= diffLevel then
-        return true
-    else
-        return false
-    end
+    return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty >= diffLevel or false
 end
 
 ---@param aiBrain AIBrain
 ---@param diffLevel integer
 ---@return boolean
 function DifficultyLessOrEqual(aiBrain, diffLevel)
-    if not ScenarioInfo.Options.Difficulty then
-        return false
-    end
-    if ScenarioInfo.Options.Difficulty <= diffLevel then
-        return true
-    else
-        return false
-    end
+    return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty <= diffLevel or false
 end
 
 ---@param aiBrain AIBrain
 ---@param chainName string
 ---@return boolean
 function MarkerChainExists(aiBrain, chainName)
-    local chain = Scenario.Chains[chainName]
-    if not chain then
-        return false
-    else
-        return true
-    end
+    return Scenario.Chains[chainName] or false
 end
 
 ---@param aiBrain AIBrain
@@ -188,11 +132,7 @@ function ReclaimablesInArea(aiBrain, locType)
     --end
 
     local ents = AIUtils.AIGetReclaimablesAroundLocation(aiBrain, locType)
-    if ents and not table.empty(ents) then
-        return true
-    end
-
-    return false
+    return ents and not table.empty(ents) or false
 end
 
 ---@param aiBrain AIBrain
@@ -201,7 +141,7 @@ end
 function CheckAvailableGates(aiBrain, locType)
     local pos, rad
     if aiBrain.HasPlatoonList then
-        for k,v in aiBrain.PBM.Locations do
+        for k, v in aiBrain.PBM.Locations do
             if v.LocationType == locType then
                 pos = v.Location
                 rad = v.Radius
@@ -219,7 +159,7 @@ function CheckAvailableGates(aiBrain, locType)
     if not gates then
         return false
     else
-        for k,v in gates do
+        for k, v in gates do
             if not v:IsUnitState('TransportLoading') then
                 return true
             end
@@ -233,10 +173,7 @@ end
 ---@return boolean
 function GreaterThanMapWaterRatio(aiBrain, num)
     local ratio = aiBrain:GetMapWaterRatio()
-    if ratio > num then
-        return true
-    end
-    return false
+    return ratio > num
 end
 
 ---@param aiBrain AIBrain
@@ -244,45 +181,34 @@ end
 ---@return boolean
 function LessThanMapWaterRatio(aiBrain, num)
     local ratio = aiBrain:GetMapWaterRatio()
-    if ratio < num then
-        return true
-    end
-    return false
+    return ratio < num
 end
 
 ---@param aiBrain AIBrain
 ---@return boolean
 function ArmyNeedsTransports(aiBrain)
-    if aiBrain and aiBrain:GetNoRushTicks() <= 0 and aiBrain.NeedTransports and aiBrain.NeedTransports > 0  then
-        return true
-    end
-    return false
+    return aiBrain and aiBrain:GetNoRushTicks() <= 0 and aiBrain.NeedTransports and aiBrain.NeedTransports > 0 or false
 end
 
 ---@param aiBrain AIBrain
 ---@param number integer
 ---@return boolean
 function TransportNeedGreater(aiBrain, number)
-    if aiBrain and aiBrain.NeedsTransports and aiBrain:GetNoRushTicks() <= 0 and aiBrain.NeedTransports > number then
-        return true
-    end
-    return false
+    return aiBrain and aiBrain.NeedsTransports and aiBrain:GetNoRushTicks() <= 0 and aiBrain.NeedTransports > number or
+        false
 end
 
 ---@param aiBrain AIBrain
 ---@return boolean
 function ArmyWantsTransports(aiBrain)
-    if aiBrain and aiBrain:GetNoRushTicks() <= 0 and aiBrain.WantTransports then
-        return true
-    end
-    return false
+    return aiBrain and aiBrain:GetNoRushTicks() <= 0 and aiBrain.WantTransports or false
 end
 
 ---@param aiBrain AIBrain
 ---@return boolean
 function CDRRunningAway(aiBrain)
     local units = aiBrain:GetListOfUnits(categories.COMMAND, false)
-    for k,v in units do
+    for k, v in units do
         if not v.Dead and v.Running then
             return true
         end
@@ -297,10 +223,8 @@ function GreaterThanGameTime(aiBrain, num)
     local time = GetGameTimeSeconds()
     if aiBrain.CheatEnabled and (0.5 * num) < time then
         return true
-    elseif num < time then
-        return true
     end
-    return false
+    return num < time
 end
 
 ---@param aiBrain AIBrain
@@ -313,21 +237,13 @@ end
 ---@param aiBrain AIBrain
 ---@return boolean
 function PreBuiltBase(aiBrain)
-    if aiBrain.PreBuilt then
-        return true
-    else
-        return false
-    end
+    return aiBrain.PreBuilt
 end
 
 ---@param aiBrain AIBrain
 ---@return boolean
 function NotPreBuilt(aiBrain)
-    if not aiBrain.PreBuilt then
-        return true
-    else
-        return false
-    end
+    return not aiBrain.PreBuilt
 end
 
 --- added to check the map.
@@ -336,10 +252,7 @@ end
 ---@param check boolean
 ---@return boolean
 function MapCheck(aiBrain, mapname, check)
-    if (ScenarioInfo.name == mapname) == check then
-        return true
-    end
-    return false
+    return (ScenarioInfo.name == mapname) == check
 end
 
 --- added to check for islands
@@ -358,11 +271,7 @@ function IsIsland(aiBrain, check)
         end
     end
 
-    if check == aiBrain.isIsland then
-        return true
-    else
-        return false
-    end
+    return check == aiBrain.isIsland
 end
 
 ---@param aiBrain AIBrain
@@ -371,12 +280,7 @@ end
 ---@return boolean
 function MapGreaterThan(aiBrain, sizeX, sizeZ)
     local mapSizeX, mapSizeZ = GetMapSize()
-    if mapSizeX > sizeX or mapSizeZ > sizeZ then
-        --LOG('*AI DEBUG: MapGreaterThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-        return true
-    end
-    --LOG('*AI DEBUG: MapGreaterThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-    return false
+    return mapSizeX > sizeX or mapSizeZ > sizeZ
 end
 
 ---@param aiBrain AIBrain
@@ -385,12 +289,7 @@ end
 ---@return boolean
 function MapLessThan(aiBrain, sizeX, sizeZ)
     local mapSizeX, mapSizeZ = GetMapSize()
-    if mapSizeX < sizeX and mapSizeZ < sizeZ then
-        --LOG('*AI DEBUG: MapLessThan returned True SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-        return true
-    end
-    --LOG('*AI DEBUG: MapLessThan returned False SizeX: ' .. sizeX .. ' sizeZ: ' .. sizeZ)
-    return false
+    return mapSizeX < sizeX and mapSizeZ < sizeZ
 end
 
 -- moved unused imports to bottom for modd support
