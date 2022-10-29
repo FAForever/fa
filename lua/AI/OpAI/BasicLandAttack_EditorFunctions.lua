@@ -20,23 +20,11 @@ local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
 -- parameter 1: string   master     = "default_master"
 --
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-function BasicLandAttackChildCountDifficulty(aiBrain, master, number)
+function BasicLandAttackChildCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
-    local number = ScenarioInfo.OSPlatoonCounter[master..'_D'..ScenarioInfo.Options.Difficulty]
-    if not number then
-        if ScenarioInfo.Options.Difficulty == 1 then
-            number = 1
-        elseif ScenarioInfo.Options.Difficulty == 2 then
-            number = 2
-        else
-            number = 3
-        end
-    end
-    if counter < number then
-        return true
-    else
-        return false
-    end
+    local number = ScenarioInfo.OSPlatoonCounter[master .. '_D' .. ScenarioInfo.Options.Difficulty]
+    number = number or ScenarioInfo.Options.Difficulty
+    return counter < number
 end
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -46,37 +34,21 @@ end
 -- parameter 1: string   master     = "default_master"
 --
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-function BasicLandAttackMasterCountDifficulty(aiBrain, master, number)
+function BasicLandAttackMasterCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
-    local number = ScenarioInfo.OSPlatoonCounter[master..'_D'..ScenarioInfo.Options.Difficulty]
-    if not number then
-        if ScenarioInfo.Options.Difficulty == 1 then
-            number = 1
-        elseif ScenarioInfo.Options.Difficulty == 2 then
-            number = 2
-        else
-            number = 3
-        end
-    end
-    if counter >= number then
-        return true
-    else
-        return false
-    end
+    local number = ScenarioInfo.OSPlatoonCounter[master .. '_D' .. ScenarioInfo.Options.Difficulty]
+    number = number or ScenarioInfo.Options.Difficulty
+    return counter >= number
 end
 
+
+
 function NeedTransports(aiBrain, masterName, locationName)
-    local enabled = ScenarioInfo.OSPlatoonCounter[masterName..'_Transports']
+    local enabled = ScenarioInfo.OSPlatoonCounter[masterName .. '_Transports']
     if not enabled then
         return false
     end
-    
-    local position, radius
-    position = aiBrain:PBMGetLocationCoords(locationName)
-    radius = 100000 --aiBrain:PBMGetLocationRadius(locationName)
-    if table.getn(AIUtils.GetOwnUnitsAroundPoint( aiBrain, categories.TRANSPORTATION, position, radius)) < 5 then
-        return true
-    end
-    
-    return false
+
+    local position, radius = aiBrain:PBMGetLocationCoords(locationName), 100000
+    return (table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.TRANSPORTATION, position, radius)) < 5)
 end
