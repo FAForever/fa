@@ -9,88 +9,87 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+---comment
 ---@param aiBrain AIBrain
----@param targetBrain string
----@param numReq integer
+---@param targetBrains string[]
+---@param numReq number
 ---@param category EntityCategory
+---@param compareType '>='|"<="|'=='|'>'|'<'|
 ---@return boolean
-function BrainGreaterThanNumCategory( aiBrain, targetBrain, numReq, category )
-    local testBrain = ArmyBrains[1]
-    for k,v in ArmyBrains do
-        if v.Name == targetBrain then
-            testBrain = v
-            break
+function BrainsCompareNumCategory(aiBrain, targetBrains, numReq, category, compareType)
+    local num = 0
+
+    local targetBrainSet = {}
+    for _, brain in targetBrains do
+        if brain == 'HumanPlayers' then
+            local tblArmy = ListArmies()
+            for _, strArmy in pairs(tblArmy) do
+                if ScenarioInfo.ArmySetup[strArmy].Human then
+                    targetBrainSet[ScenarioInfo.ArmySetup[strArmy].ArmyName] = true
+                end
+            end
+        else
+            targetBrainSet[brain] = true
         end
     end
-    local numUnits = testBrain:GetCurrentUnits(category)
-    if numUnits > numReq then
-        return true
+
+    for brain, _ in targetBrainSet do
+        for _, testBrain in ArmyBrains do
+            if testBrain.Name == brain then
+                num = num + testBrain:GetCurrentUnits(category)
+            end
+        end
+    end
+
+    if not compareType or compareType == '>=' then
+        return num >= numReq
+    elseif compareType == '==' then
+        return num == numReq
+    elseif compareType == '<=' then
+        return num <= numReq
+    elseif compareType == '>' then
+        return num > numReq
+    elseif compareType == '<' then
+        return num < numReq
     else
         return false
     end
 end
 
 ---@param aiBrain AIBrain
----@param targetBrain string
+---@param targetBrain string[]
 ---@param numReq integer
 ---@param category EntityCategory
 ---@return boolean
-function BrainLessThanNumCategory( aiBrain, targetBrain, numReq, category )
-    local testBrain = ArmyBrains[1]
-    for k,v in ArmyBrains do
-        if v.Name == targetBrain then
-            testBrain = v
-            break
-        end
-    end
-    local numUnits = testBrain:GetCurrentUnits(category)
-    if numUnits < numReq then
-        return true
-    else
-        return false
-    end
+function BrainGreaterThanNumCategory(aiBrain, targetBrain, numReq, category)
+    return BrainsCompareNumCategory(aiBrain, targetBrain, numReq, category, ">")
 end
 
 ---@param aiBrain AIBrain
----@param targetBrain string
+---@param targetBrain string[]
 ---@param numReq integer
 ---@param category EntityCategory
 ---@return boolean
-function BrainGreaterThanOrEqualNumCategory( aiBrain, targetBrain, numReq, category )
-    local testBrain = ArmyBrains[1]
-    for k,v in ArmyBrains do
-        if v.Name == targetBrain then
-            testBrain = v
-            break
-        end
-    end
-    local numUnits = testBrain:GetCurrentUnits(category)
-    if numUnits >= numReq then
-        return true
-    else
-        return false
-    end
+function BrainLessThanNumCategory(aiBrain, targetBrain, numReq, category)
+    return BrainsCompareNumCategory(aiBrain, targetBrain, numReq, category, "<")
 end
 
 ---@param aiBrain AIBrain
----@param targetBrain string
+---@param targetBrain string[]
 ---@param numReq integer
 ---@param category EntityCategory
 ---@return boolean
-function BrainLessThanOrEqualNumCategory( aiBrain, targetBrain, numReq, category )
-    local testBrain = ArmyBrains[1]
-    for k,v in ArmyBrains do
-        if v.Name == targetBrain then
-            testBrain = v
-            break
-        end
-    end
-    local numUnits = testBrain:GetCurrentUnits(category)
-    if numUnits <= numReq then
-        return true
-    else
-        return false
-    end
+function BrainGreaterThanOrEqualNumCategory(aiBrain, targetBrain, numReq, category)
+    return BrainsCompareNumCategory(aiBrain, targetBrain, numReq, category, ">=")
+end
+
+---@param aiBrain AIBrain
+---@param targetBrain string[]
+---@param numReq integer
+---@param category EntityCategory
+---@return boolean
+function BrainLessThanOrEqualNumCategory(aiBrain, targetBrain, numReq, category)
+    return BrainsCompareNumCategory(aiBrain, targetBrain, numReq, category, "<=")
 end
 
 ---@param aiBrain AIBrain
@@ -98,36 +97,31 @@ end
 ---@param categories EntityCategory
 ---@param compareType string
 ---@return boolean
-function FocusBrainBeingBuiltOrActiveCategoryCompare( aiBrain, numReq, categories, compareType )
-    local testBrain = ArmyBrains[GetFocusArmy()]
+function FocusBrainBeingBuiltOrActiveCategoryCompare(aiBrain, numReq, categories, compareType)
     local num = 0
-    for k,v in categories do
-        num = num + testBrain:GetBlueprintStat('Units_BeingBuilt', v)
-        num = num + testBrain:GetBlueprintStat('Units_Active', v)
+    local tblArmy = ListArmies()
+    for iArmy, strArmy in pairs(tblArmy) do
+        if ScenarioInfo.ArmySetup[strArmy].Human then
+            local testBrain = GetArmyBrain(strArmy)
+            for k, v in categories do
+                num = num + testBrain:GetBlueprintStat('Units_BeingBuilt', v)
+                num = num + testBrain:GetBlueprintStat('Units_Active', v)
+            end
+        end
     end
-
     if not compareType or compareType == '>=' then
-        if num >= numReq then
-            return true
-        end
+        return num >= numReq
     elseif compareType == '==' then
-        if num == numReq then
-            return true
-        end
+        return num == numReq
     elseif compareType == '<=' then
-        if num <= numReq then
-            return true
-        end
+        return num <= numReq
     elseif compareType == '>' then
-        if num > numReq then
-            return true
-        end
+        return num > numReq
     elseif compareType == '<' then
-        if num < numReq then
-            return true
-        end
+        return num < numReq
+    else
+        return false
     end
-    return false
 end
 
 -- Moved unsed Imports to bottom for mod compatibilty
