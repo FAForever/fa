@@ -8,24 +8,32 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+---@alias CompareType
+--- |'>='
+--- |"<="
+--- |'=='
+--- |'>'
+--- |'<'
+
 
 ---comment
 ---@param aiBrain AIBrain
 ---@param targetBrains string[]
 ---@param numReq number
 ---@param category EntityCategory
----@param compareType '>='|"<="|'=='|'>'|'<'|
+---@param compareType CompareType?
 ---@return boolean
 function BrainsCompareNumCategory(aiBrain, targetBrains, numReq, category, compareType)
     local num = 0
 
     local targetBrainSet = {}
+    local armySetup = ScenarioInfo.ArmySetup
     for _, brain in targetBrains do
         if brain == 'HumanPlayers' then
             local tblArmy = ListArmies()
-            for _, strArmy in pairs(tblArmy) do
-                if ScenarioInfo.ArmySetup[strArmy].Human then
-                    targetBrainSet[ScenarioInfo.ArmySetup[strArmy].ArmyName] = true
+            for _, strArmy in ipairs(tblArmy) do
+                if armySetup[strArmy].Human then
+                    targetBrainSet[armySetup[strArmy].ArmyName] = true
                 end
             end
         else
@@ -33,13 +41,13 @@ function BrainsCompareNumCategory(aiBrain, targetBrains, numReq, category, compa
         end
     end
 
-    for brain, _ in targetBrainSet do
-        for _, testBrain in ArmyBrains do
-            if testBrain.Name == brain then
-                num = num + testBrain:GetCurrentUnits(category)
-            end
+
+    for _, testBrain in ipairs(ArmyBrains) do
+        if targetBrainSet[testBrain.Name] then
+            num = num + testBrain:GetCurrentUnits(category)
         end
     end
+
 
     if not compareType or compareType == '>=' then
         return num >= numReq
