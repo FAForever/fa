@@ -747,10 +747,12 @@ function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pC
     -- compute average depth
     -- compute terrain type
     for z = 1, size do
+        local absZ = bz + z
         for x = 1, size do
+            local absX = bx + x
             pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z][x + 1] and pzCache[z + 1][x]
             daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
-            bCache[z][x] = not GetTerrainType(x, z).Blocking
+            bCache[z][x] = not GetTerrainType(absX, absZ).Blocking
 
             -- local color = 'ff0000'
             -- if pCache[lz][lx] == 0 then
