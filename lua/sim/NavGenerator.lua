@@ -32,8 +32,6 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 ---@alias NavTerrainBlockCache boolean[][]
 ---@alias NavLabelCache number[][]
 
-local LabelCompressionThreshold = 4
-
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
 ---@type number
@@ -280,10 +278,10 @@ CompressedLabelTree = ClassSimple {
     --- the label cache only exists of 0s and -1s
     ---@param self CompressedLabelTree
     ---@param rCache NavLabelCache
-    Compress = function(self, rCache)
+    Compress = function(self, rCache, compressionThreshold)
 
         -- base case, if we're a square of 4 then we skip the children and become very pessimistic
-        if self.c <= LabelCompressionThreshold then
+        if self.c <= compressionThreshold then
             local value = rCache[self.oz + 1][self.ox + 1]
             local uniform = true
             for z = self.oz + 1, self.oz + self.c do
@@ -343,7 +341,7 @@ CompressedLabelTree = ClassSimple {
             }
 
             for k, child in self.children do
-                child:Compress(rCache)
+                child:Compress(rCache, compressionThreshold)
             end
 
             NavLayerData[self.layer].Subdivisions = NavLayerData[self.layer].Subdivisions + 1
@@ -880,6 +878,13 @@ function Generate()
     ---@type number
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
+    ---@type number
+    local compressionThreshold = 2
+
+    if MapSize > 1024 then
+        compressionThreshold = 4
+    end
+
     local start = GetSystemTimeSecondsOnlyForProfileUse()
     print(string.format(" -- Navigational mesh generator -- "))
 
@@ -910,23 +915,23 @@ function Generate()
             PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
 
             ComputeLandPathingMatrix(labelTreeLand,        daCache,                    pCache, bCache, rCache)
-            labelTreeLand:Compress(rCache)
+            labelTreeLand:Compress(rCache, compressionThreshold)
             labelRootLand:AddTree(z, x, labelTreeLand)
 
             ComputeNavalPathingMatrix(labelTreeNaval,      daCache,                    pCache, bCache, rCache)
-            labelTreeNaval:Compress(rCache)
+            labelTreeNaval:Compress(rCache, 2 * compressionThreshold)
             labelRootNaval:AddTree(z, x, labelTreeNaval)
 
             ComputeHoverPathingMatrix(labelTreeHover,      daCache,                    pCache, bCache, rCache)
-            labelTreeHover:Compress(rCache)
+            labelTreeHover:Compress(rCache, compressionThreshold)
             labelRootHover:AddTree(z, x, labelTreeHover)
 
             ComputeAmphPathingMatrix(labelTreeAmph,        daCache,                    pCache, bCache, rCache)
-            labelTreeAmph:Compress(rCache)
+            labelTreeAmph:Compress(rCache, compressionThreshold)
             labelRootAmph:AddTree(z, x, labelTreeAmph)
 
             ComputeAirPathingMatrix(labelTreeAir,          daCache,                    pCache, bCache, rCache)
-            labelTreeAir:Compress(rCache)
+            labelTreeAir:Compress(rCache, compressionThreshold)
             labelRootAir:AddTree(z, x, labelTreeAir)
         end
     end
