@@ -3204,7 +3204,7 @@ function CreateUI(maxPlayers)
     cbox_ShowChangedOption.OnCheck = function(self, checked)
         HideDefaultOptions = checked
         RefreshOptionDisplayData()
-        GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
+        GUI.OptionContainer:ScrollSetTop('Vert', 0)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 
@@ -3285,6 +3285,7 @@ function CreateUI(maxPlayers)
         local modsManagerCallback = function(active_sim_mods, active_ui_mods)
             import('/lua/mods.lua').SetSelectedMods(SetUtils.Union(active_sim_mods, active_ui_mods))
             RefreshOptionDisplayData()
+            GUI.chatEdit:AcquireFocus()
         end
         GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', LOC("<LOC _Mod_Manager>"))
         GUI.gameoptionsButton.OnClick = function(self, modifiers)

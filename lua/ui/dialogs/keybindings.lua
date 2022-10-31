@@ -10,7 +10,6 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group     = import('/lua/maui/group.lua').Group
 local Bitmap    = import('/lua/maui/bitmap.lua').Bitmap
-local Text      = import('/lua/maui/text.lua').Text
 local Edit      = import('/lua/maui/edit.lua').Edit
 local Popup     = import('/lua/ui/controls/popups/popup.lua').Popup
 local Tooltip   = import('/lua/ui/game/tooltip.lua')
@@ -23,6 +22,7 @@ local keyCategoryOrder = import('/lua/keymap/keycategories.lua').keyCategoryOrde
 local KeyMapper = import('/lua/keymap/keymapper.lua')
 
 local popup = nil
+local FormatData
 local keyContainer
 local keyTable
 local keyFilter
@@ -1001,3 +1001,6 @@ function FormatKeyName(key)
 
     return result..LookupToken(key)
 end
+
+-- kept for mod backwards compatibility
+local Text = import('/lua/maui/text.lua').Text

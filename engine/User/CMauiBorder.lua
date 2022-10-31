@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.border_methods : moho.control_methods
 local CMauiBorder = {}
 

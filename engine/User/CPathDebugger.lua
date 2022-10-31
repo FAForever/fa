@@ -1,5 +1,6 @@
----@declare-global
----@class moho.PathDebugger_methods
+---@meta
+
+---@class moho.PathDebugger_methods : Destroyable
 local CPathDebugger = {}
 
 ---

@@ -286,7 +286,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     scrollGroup.Width:Set(function() return dialogContent.Width() - LayoutHelpers.ScaleNumber(30) end)
     scrollGroup.Height:Set(function() return scrollGroup.Bottom() - scrollGroup.Top() end)
 
-    modsPerPage = math.floor((scrollGroup.Height() - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
+    --modsPerPage = math.floor((scrollGroup.Height() - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
 
     UIUtil.CreateLobbyVertScrollbar(scrollGroup, 1, 0, 0, 10)
     scrollGroup.top = 1
@@ -308,26 +308,28 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
         local controlsCount = table.getsize(self:GetFilteredControls())
         top = math.floor(top)
         if top == self.top then return end
-        self.top = math.max(math.min(controlsCount - modsPerPage + 1 , top), 1)
+        self.top = math.max(math.min(controlsCount - modsPerPage + 1, top), 1)
         self:CalcVisible()
     end
 
     scrollGroup.CalcVisible = function(self)
         local top = self.top
-        local bottom = self.top + modsPerPage
+        local bottom = self.top + modsPerPage - 1
         local visibleIndex = 1
+        local lineIndex = 1
         for index, control in ipairs(controlList) do
             if control.filtered then
                 control:Hide()
-            elseif visibleIndex < top or visibleIndex >= bottom then
+            elseif visibleIndex < top or visibleIndex > bottom then
                 control:Hide()
                 visibleIndex = visibleIndex + 1
             else
                 control:Show()
-                local i = visibleIndex
                 local c = control
-                control.Top:Set(function() return self.Top() + ((i - top) * (c.Height() +2)) end)
+                local i = lineIndex
+                control.Top:Set(function() return self.Top() + ((i-1) * (c.Height() +2)) end)
                 visibleIndex = visibleIndex + 1
+                lineIndex = lineIndex + 1
             end
         end
     end
@@ -365,7 +367,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
         return mods.activated
     end
-    UIUtil.MakeInputModal(dialogContent, function() SaveButton.OnClick(SaveButton) end, function() SaveButton.OnClick(SaveButton) end)
+    UIUtil.MakeInputModal(dialogContent, function() SaveButton:OnClick() end, function() SaveButton:OnClick() end)
 
     RefreshModsList()
     
@@ -474,13 +476,7 @@ function CreateFilters()
     modSearch.Input:SetFont(UIUtil.titleFont, 17)
     modSearch.Input:SetMaxChars(30)
     modSearch.Input.OnTextChanged = function(self, newText, oldText)
-        mods.searchKeyword = string.lower(newText)
-        mods.searchKeyword = string.gsub(mods.searchKeyword, '  ', ' ')
-        -- excluding any invalid search characters:
-        mods.searchKeyword = StringReplace(mods.searchKeyword, '[', '')
-        mods.searchKeyword = StringReplace(mods.searchKeyword, ']', '')
-        mods.searchKeyword = StringReplace(mods.searchKeyword, '(', '')
-        mods.searchKeyword = StringReplace(mods.searchKeyword, ')', '')
+        mods.searchKeyword = newText:lower():gsub("[%[%]%(%)]",""):gsub(" +"," ")
         if mods.searchKeyword == ' ' or string.len(mods.searchKeyword) == 0 then
            mods.searchKeyword = false
         end
@@ -893,7 +889,7 @@ function RefreshModsList()
      end
 
     modsScrollableHeight = modSearch.Group.Top() - subtitle.Bottom()
-    modsPerPage = math.floor((modsScrollableHeight - 60) / modInfoHeight)
+    modsPerPage = math.floor((modsScrollableHeight - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
  
     -- Create entries for the list of interesting mods
     AppendMods(mods.sim.active, true, true)
@@ -1089,7 +1085,7 @@ function CreateListElement(parent, mod, index)
     group:EnableHitTest()
     LayoutHelpers.SetHeight(group, modInfoHeight)
     LayoutHelpers.SetWidth(group, dialogWidth - 40)
-    LayoutHelpers.AtLeftTopIn(group, parent, 8, group.Height() * (index - 1))
+    LayoutHelpers.AtLeftTopIn(group, parent, 8, modInfoHeight * (index - 1))
     group.Bottom:Set(function() return group.Top() + group.Height() end)
     
     -- creating a toggle for marking mods as favorite

@@ -694,19 +694,9 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
     end
 
     if path then
-        local pathSize = table.getn(path)
-        -- store path
         platoon.LastAttackDestination = path
         -- move to new location
-        for wpidx,waypointPath in path do
-            if wpidx == pathSize then
-                platoon:AggressiveMoveToLocation(waypointPath)
-                --platoon:MoveToLocation(waypointPath, false)
-            else
-                platoon:AggressiveMoveToLocation(waypointPath)
-                --platoon:MoveToLocation(waypointPath, false)
-            end
-        end
+        platoon:IssueAggressiveMoveAlongRoute(path)
     end
 
     -- return current command queue
@@ -815,16 +805,13 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
                 -- force reevaluation
                 platoon.LastAttackDestination = {attackPos}
             else
-                local pathSize = table.getn(path)
                 -- store path
                 platoon.LastAttackDestination = path
                 -- move to new location
-                for wpidx,waypointPath in path do
-                    if wpidx == pathSize or bAggro then
-                        platoon:AggressiveMoveToLocation(waypointPath)
-                    else
-                        platoon:MoveToLocation(waypointPath, false)
-                    end
+                if bAggro then
+                    platoon:IssueAggressiveMoveAlongRoute(path)
+                else
+                    platoon:IssueMoveAlongRoute(path)
                 end
             end
         end

@@ -20,7 +20,7 @@ local creditsMovies = {
     cybran = 'FMV_Cybran_Credits',
 }
 
-local subtitleThread = false
+local subtitleThread = nil
 
 function DisplaySubtitles(textControl,captions)
     subtitleThread = ForkThread(

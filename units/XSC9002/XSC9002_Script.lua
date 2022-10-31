@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/XSC9002/XSC9002_script.lua
 -- Author   :  Greg Kohne
 -- Summary  :  Jamming Crystal
--- Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit

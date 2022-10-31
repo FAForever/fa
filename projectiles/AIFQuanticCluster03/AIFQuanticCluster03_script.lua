@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Quantic Cluster Projectile script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
