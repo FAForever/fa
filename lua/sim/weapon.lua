@@ -365,7 +365,7 @@ Weapon = Class(moho.weapon_methods) {
     ---@param self Weapon
     ---@param sound SoundBlueprint
     PlayWeaponSound = function(self, sound)
-        local weaponSound = self.Audio[sound]
+        local weaponSound = self.PlaySound[sound]
         if not weaponSound then return end
         self:PlaySound(weaponSound)
     end,
@@ -373,7 +373,7 @@ Weapon = Class(moho.weapon_methods) {
     ---@param self Weapon
     ---@param sound SoundBlueprint
     PlayWeaponAmbientSound = function(self, sound)
-        local audio = self.Audio[sound]
+        local audio = self.PlaySound[sound]
         if not audio then return end
         local ambientSounds = self.AmbientSounds
         if not self.AmbientSounds then
@@ -397,7 +397,7 @@ Weapon = Class(moho.weapon_methods) {
         if not ambientSounds then return end
         local ambientSound = ambientSounds[sound]
         if not ambientSound then return end
-        if not self.Audio[sound] then return end
+        if not self.PlaySound[sound] then return end
         ambientSound:Destroy()
         ambientSounds[sound] = nil
     end,
@@ -444,7 +444,7 @@ Weapon = Class(moho.weapon_methods) {
 
     damageTableCache = false,
     ---@param self Weapon
-    ---@return table
+    ---@return table | boolean
     GetDamageTable = function(self)
         if not self.damageTableCache then
             self.damageTableCache = self:GetDamageTableInternal()
