@@ -397,7 +397,7 @@ Weapon = Class(moho.weapon_methods) {
         if not ambientSounds then return end
         local ambientSound = ambientSounds[sound]
         if not ambientSound then return end
-        if not self.PlaySound[sound] then return end
+        if not self.Audio[sound] then return end
         ambientSound:Destroy()
         ambientSounds[sound] = nil
     end,
