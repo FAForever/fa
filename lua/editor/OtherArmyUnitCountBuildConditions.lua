@@ -8,24 +8,23 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
 ---@alias CompareType
---- |'>='
---- |"<="
---- |'=='
---- |'>'
---- |'<'
+---| ">="
+---| "<="
+---| "=="
+---| '>'
+---| '<'
 
 
----comment
 ---@param aiBrain AIBrain
 ---@param targetBrains string[]
 ---@param numReq number
 ---@param category EntityCategory
----@param compareType CompareType?
+---@param compareType CompareType? defaults to `">="`
 ---@return boolean
 function BrainsCompareNumCategory(aiBrain, targetBrains, numReq, category, compareType)
     local num = 0
-
     local targetBrainSet = {}
     local armySetup = ScenarioInfo.ArmySetup
     for _, brain in targetBrains do
@@ -41,13 +40,11 @@ function BrainsCompareNumCategory(aiBrain, targetBrains, numReq, category, compa
         end
     end
 
-
     for _, testBrain in ipairs(ArmyBrains) do
         if targetBrainSet[testBrain.Name] then
             num = num + testBrain:GetCurrentUnits(category)
         end
     end
-
 
     if not compareType or compareType == '>=' then
         return num >= numReq
@@ -103,7 +100,7 @@ end
 ---@param aiBrain AIBrain
 ---@param numReq integer
 ---@param categories EntityCategory
----@param compareType string
+---@param compareType CompareType? defaults to `">="`
 ---@return boolean
 function FocusBrainBeingBuiltOrActiveCategoryCompare(aiBrain, numReq, categories, compareType)
     local num = 0
@@ -135,4 +132,4 @@ end
 -- Moved unsed Imports to bottom for mod compatibilty
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local ScenarioUtils = import('/lua/sim/scenarioutilities.lua')
