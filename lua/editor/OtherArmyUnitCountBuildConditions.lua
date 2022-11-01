@@ -27,6 +27,9 @@ function BrainsCompareNumCategory(aiBrain, targetBrains, numReq, category, compa
     local num = 0
     local targetBrainSet = {}
     local armySetup = ScenarioInfo.ArmySetup
+    if type(targetBrains) == "string" then
+        targetBrains = { targetBrains }
+    end
     for _, brain in targetBrains do
         if brain == 'HumanPlayers' then
             local tblArmy = ListArmies()
