@@ -22,8 +22,6 @@ local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
 
 local TableGetn = table.getn
 
-local MathFloor = math.floor
-
 -- upvalue moho functions for performance
 local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
 local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
@@ -31,12 +29,14 @@ local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
+
 ---@class NullShell : Projectile
 NullShell = Class(Projectile) {}
 
 -----------------------------------------------------------------
 -- PROJECTILE WITH ATTACHED EFFECT EMITTERS
 -----------------------------------------------------------------
+
 ---@class EmitterProjectile : Projectile
 EmitterProjectile = Class(Projectile) {
     FxTrails = {'/effects/emitters/missile_munition_trail_01_emit.bp',},
@@ -66,6 +66,7 @@ EmitterProjectile = Class(Projectile) {
 -----------------------------------------------------------------
 -- BEAM PROJECTILES
 -----------------------------------------------------------------
+
 ---@class SingleBeamProjectile : EmitterProjectile
 SingleBeamProjectile = Class(EmitterProjectile) {
 
@@ -99,7 +100,7 @@ MultiBeamProjectile = Class(EmitterProjectile) {
     end,
 }
 
--- Nukes
+--- Nukes
 ---@class NukeProjectile : NullShell
 NukeProjectile = Class(NullShell) {
     ---@param self NukeProjectile
@@ -127,6 +128,7 @@ NukeProjectile = Class(NullShell) {
         end
     end,
 
+    ---@param self NukeProjectile
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         -- Get the nuke as close to 90 deg as possible
@@ -145,6 +147,8 @@ NukeProjectile = Class(NullShell) {
         end
     end,
 
+    ---@param self NukeProjectile
+    ---@return number
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
@@ -152,6 +156,10 @@ NukeProjectile = Class(NullShell) {
         return dist
     end,
 
+    ---@param self NukeProjectile
+    ---@param EffectTable table
+    ---@param army string
+    ---@param scale number
     CreateEffects = function(self, EffectTable, army, scale)
         if not EffectTable then return end
         for k, v in EffectTable do
@@ -159,6 +167,7 @@ NukeProjectile = Class(NullShell) {
         end
     end,
 
+    ---@param self Unit
     ForceThread = function(self)
         -- Knockdown force rings
         local position = self:GetPosition()
@@ -167,6 +176,9 @@ NukeProjectile = Class(NullShell) {
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
     end,
 
+    ---@param self NukeProjectile
+    ---@param TargetType type
+    ---@param TargetEntity Unit
     OnImpact = function(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_THREE, TargetEntity) then
             -- Play the explosion sound
@@ -182,6 +194,7 @@ NukeProjectile = Class(NullShell) {
         NullShell.OnImpact(self, TargetType, TargetEntity)
     end,
 
+    ---@param self NukeProjectile
     LauncherCallbacks = function(self)
         local launcher = self:GetLauncher()
         if launcher and not launcher.Dead and launcher.EventCallbacks.ProjectileDamaged then
@@ -194,6 +207,11 @@ NukeProjectile = Class(NullShell) {
         self:ForkThread(self.MovementThread)
     end,
 
+    ---@param self NukeProjectile
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         if self.ProjectileDamaged then
             for k,v in self.ProjectileDamaged do
@@ -203,6 +221,11 @@ NukeProjectile = Class(NullShell) {
         NullShell.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
 
+    ---@param self NukeProjectile
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
 		local bp = self:GetBlueprint().Defense.MaxHealth
 			if bp then
@@ -216,6 +239,7 @@ NukeProjectile = Class(NullShell) {
 -----------------------------------------------------------------
 -- POLY-TRAIL PROJECTILES
 -----------------------------------------------------------------
+
 ---@class SinglePolyTrailProjectile : EmitterProjectile
 SinglePolyTrailProjectile = Class(EmitterProjectile) {
 
@@ -238,15 +262,16 @@ SinglePolyTrailProjectile = Class(EmitterProjectile) {
     end,
 }
 
--- upvalue for performance
-
+--- upvalue for performance
 ---@class MultiPolyTrailProjectile : EmitterProjectile
 MultiPolyTrailProjectile = Class(EmitterProjectile) {
 
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
     PolyTrailOffset = {0},
     FxTrails = {},
-    RandomPolyTrails = 0,   -- Count of how many are selected randomly for PolyTrail table
+    
+    --- Count of how many are selected randomly for PolyTrail table
+    RandomPolyTrails = 0,   
 
     ---@param self MultiPolyTrailProjectile
     OnCreate = function(self)
@@ -287,7 +312,7 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
 -- - THAT COMBINES BEAMS, POLYTRAILS, AND NORMAL EMITTERS
 -----------------------------------------------------------------
 
--- LIGHTWEIGHT VERSION THAT LIMITS USE TO 1 BEAM, 1 POLYTRAIL, AND STANDARD EMITTERS
+--- Lightweight Version That Limits Use To 1 Beam, polytrail and standard emitters
 ---@class SingleCompositeEmitterProjectile : SinglePolyTrailProjectile
 SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
 
@@ -304,14 +329,15 @@ SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
     end,
 }
 
--- HEAVYWEIGHT VERSION, ALLOWS FOR MULTIPLE BEAMS, POLYTRAILS, AND STANDARD EMITTERS
+--- Heavyweight Version, Allows for multiple beams, polytrails and standard emmiters
 ---@class MultiCompositeEmitterProjectile : MultiPolyTrailProjectile
 MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
 
     Beams = {'/effects/emitters/default_beam_01_emit.bp',},
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
     PolyTrailOffset = {0},
-    RandomPolyTrails = 0,   -- Count of how many are selected randomly for PolyTrail table
+    -- Count of how many are selected randomly for PolyTrail table
+    RandomPolyTrails = 0,
     FxTrails = {},
 
     ---@param self MultiCompositeEmitterProjectile
@@ -328,6 +354,7 @@ MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
 -----------------------------------------------------------------
 -- TRAIL ON ENTERING WATER PROJECTILE
 -----------------------------------------------------------------
+
 ---@class OnWaterEntryEmitterProjectile : Projectile
 OnWaterEntryEmitterProjectile = Class(Projectile) {
     FxTrails = {'/effects/emitters/torpedo_munition_trail_01_emit.bp',},
@@ -510,7 +537,6 @@ OverchargeProjectile = ClassSimple {
     ---@param self OverchargeProjectile
     ---@param targetType string
     ---@param targetEntity Unit
-
     OnImpact = function(self, targetType, targetEntity)
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
         self.DamageData.DamageAmount = 0
@@ -688,3 +714,6 @@ OverchargeProjectile = ClassSimple {
         OCProjectiles[self.Army] = OCProjectiles[self.Army] + 1
     end,
 }
+
+-- Kept for mod backwards compatability
+local MathFloor = math.floor
