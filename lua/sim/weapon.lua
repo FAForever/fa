@@ -365,7 +365,7 @@ Weapon = Class(moho.weapon_methods) {
     ---@param self Weapon
     ---@param sound SoundBlueprint
     PlayWeaponSound = function(self, sound)
-        local weaponSound = self.PlaySound[sound]
+        local weaponSound = self.Audio[sound]
         if not weaponSound then return end
         self:PlaySound(weaponSound)
     end,
@@ -373,7 +373,7 @@ Weapon = Class(moho.weapon_methods) {
     ---@param self Weapon
     ---@param sound SoundBlueprint
     PlayWeaponAmbientSound = function(self, sound)
-        local audio = self.PlaySound[sound]
+        local audio = self.Audio[sound]
         if not audio then return end
         local ambientSounds = self.AmbientSounds
         if not self.AmbientSounds then
