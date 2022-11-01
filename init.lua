@@ -78,7 +78,6 @@ deprecatedMods["additionalControlGroupStuff"] = true
 -- because of that these mods are no longer viable / broken / integrated
 deprecatedMods["additionalCameraStuff"] = true
 deprecatedMods["RUI"] = true
-deprecatedMods = LowerHashTable(deprecatedMods)
 
 -- as per #4232 the reclaim view is completely overhauled
 deprecatedMods["Advanced Reclaim&Selection Info"] = true
@@ -321,9 +320,6 @@ local loadedMods = { }
 local function MountModContent(dir)
     -- get all directories / mods at the mount point
     for _, mod in io.dir(dir..'/*.*') do
-        
-        -- prevent capital letters messing things up
-        mod = StringLower(mod)
 
         -- do not do anything with the current / previous directory
         if mod == '.' or mod == '..' then
