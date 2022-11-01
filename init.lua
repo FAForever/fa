@@ -319,17 +319,17 @@ end
 
 -- helper function to parse version number strings.
 function versionNumbers(versionStr)
-	local num = nil
-	local dec = nil
-	dec_start = string.find(tostring(versionStr),"[.]")
-	if dec_start then
-	   num = tonumber(string.sub(versionStr,0,dec_start-1))
-	   dec = tonumber(string.sub(versionStr,dec_start+1,-1))
-	else
-		num = tonumber(versionStr)
-		dec = nil
-	end
-	return num, dec
+    local num = nil
+    local dec = nil
+    dec_start = string.find(tostring(versionStr),"[.]")
+    if dec_start then
+        num = tonumber(string.sub(versionStr,0,dec_start-1))
+        dec = tonumber(string.sub(versionStr,dec_start+1,-1))
+    else
+        num = tonumber(versionStr)
+        dec = nil
+    end
+    return num, dec
 end
 
 --- keep track of what mods are loaded to prevent collisions
@@ -368,88 +368,88 @@ local function MountModContent(dir)
             end
         end
 
-		local info_file = io.open(dir .. "/" .. mod .. "/" .. infoFile, "r")
-		if not info_file then
-			LOG("Mod info file is not readable")
-			continue
-		end
-		local mod_version = nil
-		local mod_version_a = nil
-		local mod_version_b = nil
-		while true do
-			-- read next line until out of lines
-			local line = info_file:read("*line")
-			if not line then break end
-			
-			-- find the version line and parse the version as number
-			if string.find(line, "version[%s]*=") then
-				local c_start, c_end = string.find(line, "[0-9|.]+")
-				if c_start and c_end then
-					mod_version = string.sub(line, c_start, c_end)
-					mod_version_a, mod_version_b = versionNumbers(mod_version)
+        local info_file = io.open(dir .. "/" .. mod .. "/" .. infoFile, "r")
+        if not info_file then
+            LOG("Mod info file is not readable")
+            continue
+        end
+        local mod_version = nil
+        local mod_version_a = nil
+        local mod_version_b = nil
+        while true do
+            -- read next line until out of lines
+            local line = info_file:read("*line")
+            if not line then break end
+
+            -- find the version line and parse the version as number
+            if string.find(line, "version[%s]*=") then
+                local c_start, c_end = string.find(line, "[0-9|.]+")
+                if c_start and c_end then
+                    mod_version = string.sub(line, c_start, c_end)
+                    mod_version_a, mod_version_b = versionNumbers(mod_version)
                     break -- stop reading lines if version number found
-				end
-			end
-		end
-		info_file:close()
-		if mod_version == nil then
-			LOG("Mod info file does not specify a version number")
-			continue
-		end
+                end
+            end
+        end
+        info_file:close()
+        if mod_version == nil then
+            LOG("Mod info file does not specify a version number")
+            continue
+        end
 
         -- do not load deprecated mods
         if deprecatedMods[mod] then
-			if deprecatedMods[mod] == true then
-				-- deprecated regardless of version
-				LOG("Prevented loading a mod that is deprecated: " .. mod )
-				continue 
-			elseif type(deprecatedMods[mod]) == "string" then
-				local deprecated = false
-				local deprecated_a, deprecated_b = versionNumbers(deprecatedMods[mod])
-				
-				if mod_version_b then
-					-- version has decimal part: a.b
-					-- version a lower = disallowed
-					if mod_version_a < deprecated_a then
-						deprecated = true
-					end
-					-- version a equal
-					if mod_version_a == deprecated_a then
-						if deprecated_b then
-							-- version b lower = disallowed
-							if mod_version_b < deprecated_b then
-								deprecated = true
-							end
-							-- version b equal = disallowed
-							if mod_version_b == deprecated_b then
-								deprecated = true
-							end
-							-- version b higher = allowed
-						end
-						-- no deprecated_b = allowed (mod_version_b > 0)
-					end
-					-- version a higher = allowed
-				else
-					-- version is just a or a.0
-					-- version a lower = disallowed
-					if mod_version_a < deprecated_a then
-						deprecated = true
-					end
-					-- version a equal
-					if mod_version_a == deprecated_a then
-						-- deprecated is also a or a.0
-						if not deprecated_b then
-							deprecated = true
-						end
-						-- deprecated is a.1 or higher = allowed
-					end
-					-- version a higher = allowed
-				end
-				if deprecated then
-					LOG("Prevented loading a mod version that is deprecated: " .. mod .. " version: " .. mod_version .. " (version must be higher than " .. deprecatedMods[mod] .. ")")
-					continue
-				end
-			end
+            if deprecatedMods[mod] == true then
+                -- deprecated regardless of version
+                LOG("Prevented loading a mod that is deprecated: " .. mod )
+                continue 
+            elseif type(deprecatedMods[mod]) == "string" then
+                local deprecated = false
+                local deprecated_a, deprecated_b = versionNumbers(deprecatedMods[mod])
+                
+                if mod_version_b then
+                    -- version has decimal part: a.b
+                    -- version a lower = disallowed
+                    if mod_version_a < deprecated_a then
+                        deprecated = true
+                    end
+                    -- version a equal
+                    if mod_version_a == deprecated_a then
+                        if deprecated_b then
+                            -- version b lower = disallowed
+                            if mod_version_b < deprecated_b then
+                                deprecated = true
+                            end
+                            -- version b equal = disallowed
+                            if mod_version_b == deprecated_b then
+                                deprecated = true
+                            end
+                            -- version b higher = allowed
+                        end
+                        -- no deprecated_b = allowed (mod_version_b > 0)
+                    end
+                    -- version a higher = allowed
+                else
+                    -- version is just a or a.0
+                    -- version a lower = disallowed
+                    if mod_version_a < deprecated_a then
+                        deprecated = true
+                    end
+                    -- version a equal
+                    if mod_version_a == deprecated_a then
+                        -- deprecated is also a or a.0
+                        if not deprecated_b then
+                            deprecated = true
+                        end
+                        -- deprecated is a.1 or higher = allowed
+                    end
+                    -- version a higher = allowed
+                end
+                if deprecated then
+                    LOG("Prevented loading a mod version that is deprecated: " .. mod .. " version: " .. mod_version .. " (version must be higher than " .. deprecatedMods[mod] .. ")")
+                    continue
+                end
+            end
         end
 
         -- check if it has a scenario file
@@ -522,8 +522,8 @@ end
 -- @param path The root folder for the maps and mods
 local function LoadVaultContent(path)
     -- load in additional things, like sounds and 
-	MountMapContent(path .. '/maps')
-	MountModContent(path .. '/mods')
+    MountMapContent(path .. '/maps')
+    MountModContent(path .. '/mods')
 end
 
 -- END OF COPY --
@@ -560,8 +560,8 @@ allowedAssetsNxy = LowerHashTable(allowedAssetsNxy)
 
 -- load maps / mods from custom vault location, if set by client
 if custom_vault_path then
-	LOG('Loading custom vault path: ' .. custom_vault_path)
-	LoadVaultContent(custom_vault_path)
+    LOG('Loading custom vault path: ' .. custom_vault_path)
+    LoadVaultContent(custom_vault_path)
 else
     LOG("No custom vault path defined: loading from backup locations. You should update your client to 2021/10/+.")
     -- load maps / mods from backup vault location location
