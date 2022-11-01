@@ -24,7 +24,7 @@ Contributing
 
 There are instructions [in English](setup/setup-english.md) and [in Russian](setup/setup-russian.md) to help you set up a development environment. It is important that you discuss your contributions beforehand. You can do this by making a comment on an existing issue or, if it doesn't exist yet, by opening a new issue. Not all pull requests are merged by default. It is important that the changes align with the vision of the project. 
 
-Before contributing, make yourself aware of the [contribution guidelines](contributing.md), the [annotation guidelines](annotation.md) and the [translation guidelines](loc/guidelines.md).
+Before contributing, make yourself aware of the [contribution guidelines](CONTRIBUTING.md), which - depending on your contribution - may further involve the [annotation guidelines](annotation.md), [code style guidelines](codestyle.md), or the [localization guidelines](loc/guidelines.md).
 
 About this repository
 ---------------------

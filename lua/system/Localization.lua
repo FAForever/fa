@@ -1,6 +1,9 @@
 ---@declare-global
 ---@diagnostic disable:lowercase-global
 
+-- If you make any changes to this file, please revise the localization guidelines at `/loc/guidelines.md`
+
+
 -- upvalue globals for performance
 local AudioSetLanguage = AudioSetLanguage
 local DiskFindFiles = DiskFindFiles
