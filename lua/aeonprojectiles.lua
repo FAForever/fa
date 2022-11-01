@@ -89,7 +89,7 @@ ABeamProjectile = Class(NullShell) {
     FxImpactUnderWater = {},
 }
 
----## AEON GRAVITON BOMB
+--- AEON GRAVITON BOMB
 --- used by T1 bomber
 ---@class AGravitonBombProjectile : SinglePolyTrailProjectile
 AGravitonBombProjectile = Class(SinglePolyTrailProjectile) { 
@@ -342,7 +342,9 @@ AAALightDisplacementAutocannonMissileProjectile = Class(MultiPolyTrailProjectile
 ---@class AGuidedMissileProjectile : SinglePolyTrailProjectile
 AGuidedMissileProjectile = Class(SinglePolyTrailProjectile) {
     FxTrails =  EffectTemplate.AMercyGuidedMissileFxTrails,
-    PolyTrail = EffectTemplate.AMercyGuidedMissilePolyTrail, -- '/effects/emitters/aeon_missile_trail_02_emit.bp',
+
+    -- '/effects/emitters/aeon_missile_trail_02_emit.bp',
+    PolyTrail = EffectTemplate.AMercyGuidedMissilePolyTrail,
 
     FxImpactUnit = EffectTemplate.AMercyGuidedMissileSplitMissileHitUnit,
     FxImpactProp = EffectTemplate.AMercyGuidedMissileSplitMissileHit,
@@ -560,7 +562,7 @@ AQuantumWarheadProjectile = Class(NukeProjectile, MultiCompositeEmitterProjectil
     FxImpactUnderWater = {},
 }
 
----## AEON QUARK BOMB
+--- AEON QUARK BOMB
 --- Strategic bomber
 ---@class AQuarkBombProjectile : EmitterProjectile
 AQuarkBombProjectile = Class(EmitterProjectile) { 
@@ -596,9 +598,9 @@ ARailGunProjectile = Class(EmitterProjectile) {
 }
 
 --- AEON REACTON CANNON PROJECTILES
+--- Support Command Unit
 ---@class AReactonCannonProjectile : EmitterProjectile
 AReactonCannonProjectile = Class(EmitterProjectile) {
-    --SCU
     FxTrails = {
         '/effects/emitters/reacton_cannon_fxtrail_01_emit.bp',
         '/effects/emitters/reacton_cannon_fxtrail_02_emit.bp',

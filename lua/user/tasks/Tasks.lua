@@ -2,34 +2,64 @@
 
 local AbilityDefinition = import('/lua/abilitydefinition.lua').abilities
 
-
-function GetUnitsScript(TaskName, SelectedUnits, data)
-    return GetAbilityUnitsForFocusArmy(TaskName)
-end
-
-function GetRangeCheckUnits(TaskName)
-    return GetAbilityRangeCheckUnitsForFocusArmy(TaskName)
-end
-
-function VerifyScriptCommand(data)
--- TODO: cooldown check to see if ability is allowed to be used
-    local TaskName = data.TaskName
-    local army = GetFocusArmy()
-    if TaskName and UnitsAreInArmy(data.Units, army) and LocationIsOk(data, GetRangeCheckUnits(TaskName)) then
-        data.AuthorizedUnits = data.Units
-        data.UserValidated = true
-    else
-        data.UserValidated = false
-    end
-    return data
-end
-
--- --------------------------------------------------
-
 AbilityUnits = {}
 AbilityRangeCheckUnits = {}
 
+IsValidAbility = function(abilityName)
+    if AbilityDefinition[ abilityName ] then
+        return true
+    end
+    return false
+end
 
+UnitsAreInArmy = function(units, army)
+    local ua
+    for _, unit in units do
+        ua = unit:GetArmy()
+        if not army == ua then
+            return false, ua
+        end
+    end
+    return true, army
+end
+
+LocationIsOk = function(data, RangeCheckUnits)
+    -- almost same script as in worldview.lua
+    local InRange, RangeLimited = true, false
+    local TaskName = data.TaskName
+    local posM = data.Location
+    if data.ExtraInfo and data.ExtraInfo.DoRangeCheck then  -- if we do a range check then find that there's a unit in range for the current position
+        RangeLimited = true
+        InRange = false
+        if RangeCheckUnits then
+            local unit, maxDist, minDist, posU, dist
+            for k, u in RangeCheckUnits do
+                unit = GetUnitById(u)
+                if unit then
+                    maxDist = unit:GetBlueprint().SpecialAbilities[TaskName].MaxRadius
+                    minDist = 0  -- TODO: minimum radius distance check currently not implemented
+                    if not maxDist or maxDist < 0 then   -- unlimited range
+                        InRange = true
+                        RangeLimited = false
+                        break
+                    elseif maxDist == 0 then             -- skip unit
+                        continue
+                    elseif maxDist > 0 then              -- unit counts towards range check, do check
+                        posU = unit:GetPosition()
+                        dist = VDist2(posU[1], posU[3], posM[1], posM[3])
+                        InRange = (dist >= minDist and dist <= maxDist)
+                        if InRange then
+                            break
+                        end
+                    end
+                else
+                    WARN('*DEBUG: LocationIsOk in tasks.lua couldnt get blueprint for unit. u = '..repr(u)..' unit = '..repr(unit))
+                end
+            end
+        end
+    end
+    return InRange
+end
 
 GetAbilityUnitsForFocusArmy = function(abilityName)
     local army = GetFocusArmy()
@@ -90,59 +120,24 @@ SetAbilityRangeCheckUnits = function(abilityName, army, unitIds)
     return false
 end
 
-
-IsValidAbility = function(abilityName)
-    if AbilityDefinition[ abilityName ] then
-        return true
-    end
-    return false
+function GetUnitsScript(TaskName, SelectedUnits, data)
+    return GetAbilityUnitsForFocusArmy(TaskName)
 end
 
-UnitsAreInArmy = function(units, army)
-    local ua
-    for _, unit in units do
-        ua = unit:GetArmy()
-        if not army == ua then
-            return false, ua
-        end
-    end
-    return true, army
+function GetRangeCheckUnits(TaskName)
+    return GetAbilityRangeCheckUnitsForFocusArmy(TaskName)
 end
 
-LocationIsOk = function(data, RangeCheckUnits)
-    -- almost same script as in worldview.lua
-    local InRange, RangeLimited = true, false
+function VerifyScriptCommand(data)
+-- TODO: cooldown check to see if ability is allowed to be used
     local TaskName = data.TaskName
-    local posM = data.Location
-    if data.ExtraInfo and data.ExtraInfo.DoRangeCheck then  -- if we do a range check then find that there's a unit in range for the current position
-        RangeLimited = true
-        InRange = false
-        if RangeCheckUnits then
-            local unit, maxDist, minDist, posU, dist
-            for k, u in RangeCheckUnits do
-                unit = GetUnitById(u)
-                if unit then
-                    maxDist = unit:GetBlueprint().SpecialAbilities[TaskName].MaxRadius
-                    minDist = 0  -- TODO: minimum radius distance check currently not implemented
-                    if not maxDist or maxDist < 0 then   -- unlimited range
-                        InRange = true
-                        RangeLimited = false
-                        break
-                    elseif maxDist == 0 then             -- skip unit
-                        continue
-                    elseif maxDist > 0 then              -- unit counts towards range check, do check
-                        posU = unit:GetPosition()
-                        dist = VDist2(posU[1], posU[3], posM[1], posM[3])
-                        InRange = (dist >= minDist and dist <= maxDist)
-                        if InRange then
-                            break
-                        end
-                    end
-                else
-                    WARN('*DEBUG: LocationIsOk in tasks.lua couldnt get blueprint for unit. u = '..repr(u)..' unit = '..repr(unit))
-                end
-            end
-        end
+    local army = GetFocusArmy()
+    if TaskName and UnitsAreInArmy(data.Units, army) and LocationIsOk(data, GetRangeCheckUnits(TaskName)) then
+        data.AuthorizedUnits = data.Units
+        data.UserValidated = true
+    else
+        data.UserValidated = false
     end
-    return InRange
+    return data
 end
+
