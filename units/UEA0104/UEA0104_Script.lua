@@ -8,7 +8,7 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local explosion = import('/lua/defaultexplosions.lua')
+local Explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
 local WeaponsFile = import('/lua/terranweapons.lua')
 
@@ -75,7 +75,7 @@ UEA0104 = Class(AirTransport) {
     AirDestructionEffectsThread = function(self)
         local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
         for i = 0, numExplosions do
-            explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
+            Explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
             WaitSeconds(util.GetRandomFloat(0.2, 0.9))
         end
     end,

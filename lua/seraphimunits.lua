@@ -569,7 +569,7 @@ STransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 SWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 -- WALL  STRUCTURES
----@class SWallStrutureUnit : WallStructureUnit
+---@class SWallStructureUnit : WallStructureUnit
 SWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES

@@ -1,11 +1,8 @@
---****************************************************************************
---**
---**  Author(s):  Mikko Tyster, Atte Hulkkonen
---**
---**  Summary  :  Seraphim T3 Mobile Lightning Anti-Air
---**
---**  Copyright © 2008 Blade Braver!
---****************************************************************************
+------------------------------------------------------------------------------
+-- Author(s):  Mikko Tyster, Atte Hulkkonen
+-- Summary  :  Seraphim T3 Mobile Lightning Anti-Air
+-- Copyright © 2008 Blade Braver!
+------------------------------------------------------------------------------
 
 local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
 --local CollisionBeamFile = import('/lua/kirvesbeams.lua')
@@ -13,7 +10,7 @@ local DefaultBeamWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultBeamWeapo
 --local Dummy = import('/lua/kirvesweapons.lua').Dummy
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
-local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
+local CollisionBeamFile = import('/lua/sim/CollisionBeam.lua').CollisionBeam
 local SCCollisionBeam = import('/lua/defaultcollisionbeams.lua').SCCollisionBeam
 
 local PhasonCollisionBeam = Class(SCCollisionBeam) {

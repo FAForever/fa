@@ -13,10 +13,9 @@ local MobileUnit = import('/lua/defaultunits.lua').MobileUnit
 local explosion = import('/lua/defaultexplosions.lua')
 local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-local utilities = import('/lua/Utilities.lua')
+local utilities = import('/lua/utilities.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Entity = import('/lua/sim/Entity.lua').Entity
-
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
 local CybranWeaponsFile = import('/lua/cybranweapons.lua')
 local CDFHvyProtonCannonWeapon = CybranWeaponsFile.CDFHvyProtonCannonWeapon

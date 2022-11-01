@@ -11,7 +11,7 @@ local RandomFloat = Util.GetRandomFloat
 local explosion = import('/lua/defaultexplosions.lua')
 local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-local utilities = import('/lua/Utilities.lua')
+local utilities = import('/lua/utilities.lua')
 
 ---@class XRC2201 : CCivilianStructureUnit
 XRC2201 = Class(CCivilianStructureUnit) {

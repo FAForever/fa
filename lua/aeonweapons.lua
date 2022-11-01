@@ -7,7 +7,7 @@
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local Weapon = import('/lua/sim/weapon.lua').Weapon
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
+local WeaponFile = import('/lua/sim/defaultweapons.lua')
 local CollisionBeamFile = import('defaultcollisionbeams.lua')
 local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
@@ -779,4 +779,4 @@ AIFQuanticArtillery = Class(DefaultProjectileWeapon) {
 local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
-local EffectUtil = import('EffectUtilities.lua')
+local EffectUtil = import('/lua/EffectUtilities.lua')
