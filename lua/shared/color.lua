@@ -476,7 +476,7 @@ function HSLtoHSV(hue, sat, lit)
     if val == 0 then
         return hue, 0, 0
     end
-    return hue, 2 - 2 / (1 + sat), val
+    return hue, 2 - 2  * lit / val, val
 end
 
 

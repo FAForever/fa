@@ -41,7 +41,7 @@ local Assertion = {}
 ---@field Alias? string
 ---@field NotName? string
 ---@field NotAlias? string
----@field Chain?  fun(a: LuftAssertion)  called after simple chaining e.g. a`.b`.c 
+---@field Chain?  fun(a: LuftAssertion)  called after simple chaining e.g. a`.b`.c
 ---@field ChainCall?  fun(a: LuftAssertion, ...)  called after chained calling e.g. a`.b()`.c
 ---@field Test?  fun(...): boolean        function to test with all arguments (from the starting values, calling arguments, and support values); expects both `FailString` formatters to be defined
 ---@field Parameters number               number of parameters the test function has
@@ -583,9 +583,6 @@ function Luft.expect(...)
 end
 
 Assertion.__index = function(self, word)
-    if word:lower() ~= word then
-        return Assertion[word]
-    end
     local node = Assertion.GetCurrentNode(self)
     local next_node, process_next = node:GetNext(word)
     if next_node then
@@ -595,7 +592,7 @@ Assertion.__index = function(self, word)
                 chain(self)
             end
             self.head = next_node
-            next_node, process_next = node:GetNext(process_next)
+            next_node, process_next = next_node:GetNext(process_next)
         end
         local chain = next_node.Chain
         if chain then
@@ -756,7 +753,7 @@ PathNode.Nodes = {}
 
 ---@param word string
 ---@return LuftPathNode
----@return string? next_word 
+---@return string? next_word
 function PathNode:GetNext(word)
     local pos = word:find('_', 1, true)
     local next_word
@@ -764,11 +761,7 @@ function PathNode:GetNext(word)
         next_word = word:sub(pos + 1)
         word = word:sub(1, pos - 1)
     end
-    local node = self[word]
-    if node then
-        return node, next_word
-    end
-    node = self['!' .. word]
+    local node = self['!' .. word]
     if node then
         local not_node = self.Nodes["not"]
         if next_word then
@@ -776,7 +769,7 @@ function PathNode:GetNext(word)
         end
         return not_node, self.Name
     end
-    return self.Nodes[word]
+    return self[word], next_word
 end
 
 
@@ -809,19 +802,15 @@ do
     end
 
     nodes["root"] = {
-        To = {"not", "to"},
+        To = { "to" },
     }
     nodes["not"] = {
-        To = "to",
         Chain = negate,
+        To = { "succeed", "be", "have", "equal" },
     }
     nodes["to"] = {
-        NotName = "not_to",
-        To = {"to.not", "succeed", "to.equal", "be", "have"},
-    }
-    nodes["to.not"] = {
-        To = {"succeed", "to.equal", "be", "have"},
-        Chain = negate,
+        NotName = "to_not",
+        To = { "succeed", "be", "have", "not", "equal", "exist" },
     }
     nodes["succeed"] = {
         Alias = "pass",
@@ -833,11 +822,6 @@ do
         Parameters = 1,
         FailString = strings.expectation1:format("$1", strings.condition_unnegated, strings.cond_succeed),
         NotFailString = strings.expectation1:format("$1", strings.condition_unnegated, strings.cond_fail),
-    }
-    nodes["to.equal"] = {
-        test = strict_eq,
-        Parameters = 2,
-        FailFormat = strings.expectation2be:format("$1", "$2", "%s", strings.cond_strict_eq),
     }
     nodes["have"] = {
         ---@param t any
@@ -866,13 +850,12 @@ do
     }
     nodes["be"] = {
         To = {
-            "equal", "unequal",
             "greater", "less",
             "positive", "negative",
             "falsy",
             "nil", "userdata",
-            "within", "close",
-            "an",
+            "within", "close", "an",
+            "function", "integer", "string", "number", "boolean"
         },
         Test = function(v, x)
             return v == x
@@ -882,23 +865,20 @@ do
         NotFailString = strings.expectation2be:format("$1", "$2", strings.condition_unnegated, strings.cond_unequal),
     }
     nodes["equal"] = {
-        To = "equal.to",
-    }
-    nodes["equal.to"] = {
-        test = strict_eq,
+        Test = strict_eq,
         Parameters = 2,
-        FailFormat = nodes["to.equal"].FailFormat,
+        FailFormat = strings.expectation2be:format("$1", "$2", "%s", strings.cond_strict_eq),
     }
     nodes["greater"] = {
         To = "than",
         Chain = function(sert)
-            sert.support = {true}
+            sert.support = { true }
         end;
     }
     nodes["less"] = {
         To = "than",
         Chain = function(sert)
-            sert.support = {false}
+            sert.support = { false }
         end;
     }
     nodes["than"] = {
@@ -942,12 +922,9 @@ do
         RequiresSupport = true,
     }
     nodes["close"] = {
-        To = "close.to",
         Chain = function(sert)
-            sert.support = {Luft.margin_of_error, n = 1}
+            sert.support = { Luft.margin_of_error, n = 1 }
         end;
-    }
-    nodes["close.to"] = {
         Test = nodes["of"].Test,
         Parameters = nodes["of"].Parameters,
         FailFormat = nodes["of"].FailFormat,
