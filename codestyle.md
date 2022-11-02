@@ -47,10 +47,10 @@ Future contributors to this file will be added here.
 
 ### In-file grouping
 
-A file can be grouped into logically subcomponents and aspects by inserting a comment header in the form
+A file can be grouped into logical subcomponents and aspects by inserting a comment header in the form
 
 ```lua
-
+ 
 ----------
 -- lowest level header
 ----------
@@ -86,7 +86,7 @@ Aim for a maximum line width of 100 characters (up to the start of column 101 in
 Whitespace in code should be condensed to a single space, except for:
   - Leading whitespace in indentation
   - Separating statements on the same line; prefer two spaces `  ` for this task
-  - Spaces inserted to vertically align similar code to read better (such as is common in assignments)
+  - Spaces inserted to align similar code to read better vertically (such as is common in assignments)
 
 ### Where to not insert whitespace
 
@@ -118,7 +118,7 @@ Further guidance is subject to community consensus.
 
 - Place blank lines between functions, classes, and groups of imports or variable declarations
   * More than one blank line can be used to group such items into further logical groups (such as for the general file structure described above)
-  * You may elect to not put blank lines between functions that are there purely for another function, e.g. local helpers functions to a global one or the thread function of its instaniator
+  * You may elect to not put blank lines between functions that are there purely for another function, e.g. local helpers functions to a global one or the thread function of its instantiator
 - After logical breaks in code, e.g. to separate the setup, working, and cleanup code of a function
 
 ## Indentation
@@ -155,7 +155,7 @@ In general, a name should be about as long as it gets used: names in larger scop
 If this becomes confusing after several nestings of for-loops, you may be trying to do too much with them.
 Consider breaking them down into smaller chunks.
 
-### Variables and Parameters
+### Variables and parameters
 
 Are in lower `camelCase` or `snake_case` (which has been shown to increase readability of the name, but it also makes lines longer - which decreases overall readability)
 - For variables (but not parameters) that get used in another function within their scope: use `PascalCase` to indicate that they outlive that function and are more expensive to manipulate (being upvalues, not local variables)
@@ -168,7 +168,7 @@ Systems Hungarian notation (where names are prefixed by their data type) is stri
 ### Functions, methods, and classes
 
 Are in `PascalCase`
-* Note that this distinguishes them from library functions and modules that are all lowercase. This is a good thing.
+* Note that this distinguishes them from library functions and modules which are all lowercase. This is a good thing.
 
 ### Class fields
 
@@ -177,7 +177,7 @@ Are more vague. Generally:
 - In UI code
   * object attributes tend to be lower `camelCase`
   * UI components or other "private" data not meant to used outside of the file tend to be `_lowercase` (prefixed by that underscore `_`, and may or may not also be in `_snake_case`)
-- As usual, metafields and only metafields are prefixed by two underscores `__`
+- As usual, metafields (and only metafields) are prefixed by two underscores `__`
 
 ## Literals
 
@@ -237,14 +237,14 @@ This means that if you need to use `table["key with spaces"]`, similar items tha
 - Prefer for dictionary-like tables
 - Format as an new indentation block starting immediately after the opening brace `{` and before the closing brace `}`
   * Do not leave any fields after the opening brace, unless these are "pre-fields" that may not make sense to include with the rest of the data (such as a zero index or a few unkeyed values in an otherwise key-value paired table)
-- Put each item on a newline (unless it improves readability to do otherwise; separate these two )
+- Put each item on a newline (unless it improves readability to do otherwise)
 - Leave a trailing field separator after the last item
 
 # Semantics
 
 ## Classes
 
-- *Annotate every class*
+- ***Annotate every class***
 - For "fa-classes", the `Class` function is used:
   * Use the form `ClassName = Class(Base) {...}` only when you have class bases
   * Otherwise, use `ClassName = ClassSimple {...}`
