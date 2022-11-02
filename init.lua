@@ -63,12 +63,14 @@ integratedMods["nvidia fix"] = true
 
 integratedMods = LowerHashTable(integratedMods)
 
--- mods that are deprecated, based on mod folder name
+
 -- take care that the folder name is properly spelled and Capitalized
 -- deprecatedMods["Mod Folder Name"] = deprecation status
 --   true: deprecated regardless of mod version
 --   versionstring: lower or equal version numbers are deprecated, eg: "3.10"
-local deprecatedMods = { }
+local deprecatedMods = {}
+
+-- mods that are deprecated, based on mod folder name=
 deprecatedMods["simspeed++"] = true
 deprecatedMods["#quality of performance 2022"] = true
 
@@ -317,19 +319,65 @@ local function MountMapContent(dir)
     end
 end
 
--- helper function to parse version number strings.
-function versionNumbers(versionStr)
-    local num = nil
-    local dec = nil
-    dec_start = string.find(tostring(versionStr),"[.]")
-    if dec_start then
-        num = tonumber(string.sub(versionStr,0,dec_start-1))
-        dec = tonumber(string.sub(versionStr,dec_start+1,-1))
+
+--- Parses a `major.minor` string into its numeric parts, where the minor portion is optional
+---@param versionStr string
+---@return number major
+---@return number? minor
+local function VersionNumbers(versionStr)
+    local major, minor
+    local dec_pos = versionStr:find('.', 1, true)
+    if dec_pos then
+        major = tonumber(versionStr:sub(1, dec_pos - 1))
+        minor = tonumber(versionStr:sub(dec_pos + 1))
     else
-        num = tonumber(versionStr)
-        dec = nil
+        major = tonumber(versionStr)
     end
-    return num, dec
+    return major, minor
+end
+
+--- Returns the version string found in the mod info file (which can be `nil`), or `false` if the
+--- file cannot be read
+---@param modinfo FileName
+---@return string|nil | false
+local function GetModVersion(modinfo)
+    local filehandle = io.open(modinfo, 'r')
+    if not filehandle then
+        return false
+    end
+
+    local version
+    while true do
+        -- read next line until out of lines
+        local line = filehandle:read("*line")
+        if not line then break end
+
+        -- find the version line and parse the version as number
+        if line:find("version%s*=") then
+            local c_start, c_end = line:find("[0-9.]+")
+            if c_start and c_end then
+                version = line:sub(c_start, c_end)
+            end
+            break -- stop reading lines if version is found (whether successful or not)
+        end
+    end
+    filehandle:close()
+
+    return version
+end
+
+---@param majorA number
+---@param minorA number | nil
+---@param majorB number
+---@param minorB number | nil
+---@return number
+local function CompareVersions(majorA, minorA, majorB, minorB)
+    if majorA ~= majorB then
+        return majorA - majorB
+    end
+    minorA = minorA or 0
+    minorB = minorB or 0
+    return minorA - minorB
 end
 
 --- keep track of what mods are loaded to prevent collisions
@@ -346,6 +394,8 @@ local function MountModContent(dir)
             continue 
         end
 
+        local moddir = dir .. '/' .. mod
+
         -- do not load integrated mods
         if integratedMods[mod] then 
             LOG("Prevented loading a mod that is integrated: " .. mod )
@@ -355,107 +405,45 @@ local function MountModContent(dir)
         -- do not load archives as mods
         local extension = StringSub(mod, -4)
         if extension == ".zip" or extension == ".scd" or extension == ".rar" then
-            LOG("Prevented loading a mod inside a zip / scd / rar file: " .. dir .. "/" .. mod)
+            LOG("Prevented loading a mod inside a zip / scd / rar file: " .. moddir)
             continue 
         end
 
-        -- check if the folder contains a _info.lua
-        local infoFile = false 
-        for _, file in IoDir(dir .. "/" .. mod .. "/*") do 
-            if StringSub(file, -9) == '_info.lua' then 
-                infoFile = file
-                break
-            end
-        end
+        -- check if the folder contains a `mod_info.lua` file
+        -- unfortunately, the mod manager allows prefixes, so we must as well 
+        local modinfo = IoDir(moddir .. "/*mod_info.lua")[1]
 
-        local info_file = io.open(dir .. "/" .. mod .. "/" .. infoFile, "r")
-        if not info_file then
-            LOG("Mod info file is not readable")
+        -- check if it has a scenario file
+        if not modinfo then
+            LOG("Mod doesn't have an info file: " .. moddir)
             continue
         end
-        local mod_version = nil
-        local mod_version_a = nil
-        local mod_version_b = nil
-        while true do
-            -- read next line until out of lines
-            local line = info_file:read("*line")
-            if not line then break end
-
-            -- find the version line and parse the version as number
-            if string.find(line, "version[%s]*=") then
-                local c_start, c_end = string.find(line, "[0-9|.]+")
-                if c_start and c_end then
-                    mod_version = string.sub(line, c_start, c_end)
-                    mod_version_a, mod_version_b = versionNumbers(mod_version)
-                    break -- stop reading lines if version number found
-                end
-            end
-        end
-        info_file:close()
-        if mod_version == nil then
-            LOG("Mod info file does not specify a version number")
-            continue
-        end
+        modinfo = moddir .. '/' .. modinfo
 
         -- do not load deprecated mods
-        if deprecatedMods[mod] then
-            if deprecatedMods[mod] == true then
+        local deprecation_status = deprecatedMods[mod]
+        if deprecation_status then
+            if deprecation_status == true then
                 -- deprecated regardless of version
-                LOG("Prevented loading a mod that is deprecated: " .. mod )
-                continue 
-            elseif type(deprecatedMods[mod]) == "string" then
-                local deprecated = false
-                local deprecated_a, deprecated_b = versionNumbers(deprecatedMods[mod])
-                
-                if mod_version_b then
-                    -- version has decimal part: a.b
-                    -- version a lower = disallowed
-                    if mod_version_a < deprecated_a then
-                        deprecated = true
-                    end
-                    -- version a equal
-                    if mod_version_a == deprecated_a then
-                        if deprecated_b then
-                            -- version b lower = disallowed
-                            if mod_version_b < deprecated_b then
-                                deprecated = true
-                            end
-                            -- version b equal = disallowed
-                            if mod_version_b == deprecated_b then
-                                deprecated = true
-                            end
-                            -- version b higher = allowed
-                        end
-                        -- no deprecated_b = allowed (mod_version_b > 0)
-                    end
-                    -- version a higher = allowed
-                else
-                    -- version is just a or a.0
-                    -- version a lower = disallowed
-                    if mod_version_a < deprecated_a then
-                        deprecated = true
-                    end
-                    -- version a equal
-                    if mod_version_a == deprecated_a then
-                        -- deprecated is also a or a.0
-                        if not deprecated_b then
-                            deprecated = true
-                        end
-                        -- deprecated is a.1 or higher = allowed
-                    end
-                    -- version a higher = allowed
+                LOG("Prevented loading a mod that is deprecated: " .. mod)
+                continue
+            elseif type(deprecation_status) == "string" then
+                local mod_version = GetModVersion(modinfo)
+                if mod_version == false then
+                    LOG(modinfo .. " is not readable")
+                    continue
                 end
-                if deprecated then
-                    LOG("Prevented loading a mod version that is deprecated: " .. mod .. " version: " .. mod_version .. " (version must be higher than " .. deprecatedMods[mod] .. ")")
+                if mod_version == nil then
+                    LOG(modinfo .. " does not specify a version number")
+                    continue
+                end
+                local mod_major, mod_minor = VersionNumbers(mod_version)
+                local dep_major, dep_minor = VersionNumbers(deprecation_status)
+                if not mod_major or CompareVersions(mod_major, mod_minor, dep_major, dep_minor) <= 0 then
+                    LOG("Prevented loading a mod version that is deprecated: " .. mod .. " version " .. mod_version .. " (must be higher than " .. deprecation_status .. ')')
                     continue
                 end
             end
-        end
-
-        -- check if it has a scenario file
-        if not infoFile then 
-            LOG("Mod doesn't have an info file: " .. dir .. "/" .. mod)
-            continue 
         end
 
         -- do not load mods twice
