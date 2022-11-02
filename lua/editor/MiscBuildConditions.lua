@@ -282,10 +282,10 @@ end
 ---@param check boolean
 ---@return boolean
 function MapCheck(aiBrain, mapname, check)
-	if ScenarioInfo.name == mapname then
-		return check
-	end
-	return not check
+    if ScenarioInfo.name == mapname then
+        return check
+    end
+    return not check
 end
 
 ---@param aiBrain AIBrain
