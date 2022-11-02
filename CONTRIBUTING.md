@@ -1,18 +1,19 @@
 # Contributing
 
 The general workflow for contributions is as follows:
+
 Phase 1 - design
-1. An issue is opened by the contributor for larger ideas
-2. The idea is discussed
-3. A design plan is made
+* 1. An issue is opened by the contributor for larger ideas
+* 2. The idea is discussed
+* 3. A design plan is made
 
 Phase 2 - development
-4. The contributor starts work using the design plan and a pull request opened
-5. The contributor works with the maintainer and other reviewers to resolve technical concerns and bugs
+* 4. The contributor starts work using the design plan and a pull request opened
+* 5. The contributor works with the maintainer and other reviewers to resolve technical concerns and bugs
 
 Phase 3 - wind-down
-6. The maintainer makes sure the pull request is in proper shape to become part of Forged Alliance Forever
-7. The pull request is merged and the behavior resulting from is monitored for several weeks to ensure stability
+* 6. The maintainer makes sure the pull request is in proper shape to become part of Forged Alliance Forever
+* 7. The pull request is merged and the behavior resulting from is monitored for several weeks to ensure stability
 
 Smaller features or bug fixes can skip phase 1 and be opened as a pull request straightaway to reduce the workflow overhead.
 Technical details will be discussed in tandem with design details (if any) to quickly merge the request.
