@@ -36,7 +36,7 @@ local curScore = nil
 
 local campaignScore = ''
 
-scoreScreenActive = nil
+scoreScreenActive = false
 
 -- '<LOC SCORE_0058>Debrief'
 -- '<LOC SCORE_0059>Combat Report'
