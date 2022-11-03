@@ -133,6 +133,6 @@ function FocusBrainBeingBuiltOrActiveCategoryCompare(aiBrain, numReq, categories
 end
 
 -- Moved unsed Imports to bottom for mod compatibilty
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/scenarioutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")

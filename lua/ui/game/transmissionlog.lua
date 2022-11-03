@@ -3,14 +3,14 @@
 --* Author: Ted Snook
 --* Summary: Transmission log
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local WinMgr = import('/lua/ui/game/windowmanager.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local WinMgr = import("/lua/ui/game/windowmanager.lua")
 local WIN_ID = 'Transmission_Log'
 
 -- Possible LOC tag for the future
@@ -259,7 +259,7 @@ function AddEntry(entryData)
     end
     tempData.time = GetGameTime()
 
-    local factionData = import('/lua/factions.lua')
+    local factionData = import("/lua/factions.lua")
     local factionColor
     if entryData.Faction then
         factionColor = factionData.Factions[factionData.FactionIndexMap[string.lower(entryData.faction)]].TransmissionLogColor
@@ -282,7 +282,7 @@ end
 
 function WrapText(intext)
     local textBoxWidth = controls.logEntries[1].text.Right() - controls.logEntries[1].text.Left()
-    local retText = import('/lua/maui/text.lua').WrapText(intext, textBoxWidth,
+    local retText = import("/lua/maui/text.lua").WrapText(intext, textBoxWidth,
     function(text)
         return controls.logEntries[1].text:GetStringAdvance(text)
     end)

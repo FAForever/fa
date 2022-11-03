@@ -1,7 +1,7 @@
 --
 -- script for projectile CDFTrackerProjectile
 --
-local CDFTrackerProjectile = import('/lua/cybranprojectiles.lua').CDFTrackerProjectile
+local CDFTrackerProjectile = import("/lua/cybranprojectiles.lua").CDFTrackerProjectile
 
 CDFTracker01 = Class(CDFTrackerProjectile) {
     OnImpact = function(self, TargetType, TargetEntity)

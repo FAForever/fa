@@ -10,18 +10,18 @@
 ----------------------------------------------------------------------------------
 -- Platoon Lua Module                    --
 ----------------------------------------------------------------------------------
-local AIUtils = import('ai/aiutilities.lua')
-local Utilities = import('/lua/utilities.lua')
-local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
-local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local Behaviors = import('/lua/ai/aibehaviors.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local SPAI = import('/lua/ScenarioPlatoonAI.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Utilities = import("/lua/utilities.lua")
+local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
+local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local Behaviors = import("/lua/ai/aibehaviors.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local SPAI = import("/lua/scenarioplatoonai.lua")
 
 --for sorian AI
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 ---@alias PlatoonSquads 'Attack' | 'Artillery' | 'Guard' | 'None' | 'Scout' | 'Support' | 'Unassigned'
 
@@ -505,7 +505,7 @@ Platoon = Class(moho.platoon_methods) {
                     end
                 end
 
-                nukePos = import('/lua/ai/aibehaviors.lua').GetHighestThreatClusterLocation(aiBrain, unit)
+                nukePos = import("/lua/ai/aibehaviors.lua").GetHighestThreatClusterLocation(aiBrain, unit)
                 if nukePos then
                    IssueNuke({unit}, nukePos)
                    WaitSeconds(12)
@@ -558,7 +558,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@return nil
     ExperimentalAIHub = function(self)
 
-        local behaviors = import('/lua/ai/AIBehaviors.lua')
+        local behaviors = import("/lua/ai/aibehaviors.lua")
 
         local experimental = self:GetPlatoonUnits()[1]
         if not experimental then
@@ -3515,19 +3515,19 @@ Platoon = Class(moho.platoon_methods) {
     ---@param eng EngineerBuilder
     SetupEngineerCallbacks = function(eng)
         if eng and not eng.Dead and not eng.BuildDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDone, eng, categories.ALLUNITS)
+            import("/lua/scenariotriggers.lua").CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDone, eng, categories.ALLUNITS)
             eng.BuildDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.CaptureDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDone, eng)
+            import("/lua/scenariotriggers.lua").CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDone, eng)
             eng.CaptureDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.ReclaimDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDone, eng)
+            import("/lua/scenariotriggers.lua").CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDone, eng)
             eng.ReclaimDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.FailedToBuildCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuild, eng)
+            import("/lua/scenariotriggers.lua").CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuild, eng)
             eng.FailedToBuildCallbackSet = true
         end
     end,
@@ -3852,7 +3852,7 @@ Platoon = Class(moho.platoon_methods) {
                     end
                 end
 
-                nukePos = import('/lua/ai/aibehaviors.lua').GetHighestThreatClusterLocation(aiBrain, unit)
+                nukePos = import("/lua/ai/aibehaviors.lua").GetHighestThreatClusterLocation(aiBrain, unit)
                 if nukePos then
                     IssueNuke({unit}, nukePos)
                     WaitSeconds(12)
@@ -3868,7 +3868,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@return nil
     ExperimentalAIHubSorian = function(self)
         local aiBrain = self:GetBrain()
-        local behaviors = import('/lua/ai/AIBehaviors.lua')
+        local behaviors = import("/lua/ai/aibehaviors.lua")
 
         local experimental = self:GetPlatoonUnits()[1]
         if not experimental or experimental.Dead then
@@ -6325,19 +6325,19 @@ Platoon = Class(moho.platoon_methods) {
     ---@param eng EngineerBuilder
     SetupEngineerCallbacksSorian = function(eng)
         if eng and not eng.Dead and not eng.BuildDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDoneSorian, eng, categories.ALLUNITS)
+            import("/lua/scenariotriggers.lua").CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDoneSorian, eng, categories.ALLUNITS)
             eng.BuildDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.CaptureDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDoneSorian, eng)
+            import("/lua/scenariotriggers.lua").CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDoneSorian, eng)
             eng.CaptureDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.ReclaimDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDoneSorian, eng)
+            import("/lua/scenariotriggers.lua").CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDoneSorian, eng)
             eng.ReclaimDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.FailedToBuildCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuildSorian, eng)
+            import("/lua/scenariotriggers.lua").CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuildSorian, eng)
             eng.FailedToBuildCallbackSet = true
         end
     end,
@@ -6345,19 +6345,19 @@ Platoon = Class(moho.platoon_methods) {
     ---@param eng EngineerBuilder
     RemoveEngineerCallbacksSorian = function(eng)
         if eng.BuildDoneCallbackSet then
-            import('/lua/ScenarioTriggers.lua')RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerBuildDoneSorian)
+            import("/lua/scenariotriggers.lua")RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerBuildDoneSorian)
             eng.BuildDoneCallbackSet = false
         end
         if eng.CaptureDoneCallbackSet then
-            import('/lua/ScenarioTriggers.lua')RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerCaptureDoneSorian)
+            import("/lua/scenariotriggers.lua")RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerCaptureDoneSorian)
             eng.CaptureDoneCallbackSet = false
         end
         if eng.ReclaimDoneCallbackSet then
-            import('/lua/ScenarioTriggers.lua')RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerReclaimDoneSorian)
+            import("/lua/scenariotriggers.lua")RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerReclaimDoneSorian)
             eng.ReclaimDoneCallbackSet = false
         end
         if eng.FailedToBuildCallbackSet then
-            import('/lua/ScenarioTriggers.lua')RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerFailedToBuildSorian)
+            import("/lua/scenariotriggers.lua")RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerFailedToBuildSorian)
             eng.FailedToBuildCallbackSet = false
         end
     end,
@@ -6661,7 +6661,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     NameUnitsSorian = function(self)
         local units = self:GetPlatoonUnits()
-        local AINames = import('/lua/AI/sorianlang.lua').AINames
+        local AINames = import("/lua/ai/sorianlang.lua").AINames
         if units and not table.empty(units) then
             for k, v in units do
                 local ID = v.UnitId

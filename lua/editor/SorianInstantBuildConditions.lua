@@ -7,8 +7,8 @@
 --**             Build conditions always return true or false
 --**
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 ---@param aiBrain AIBrain
 ---@param locationType string
@@ -495,7 +495,7 @@ end
 function LessThanNavalBases(aiBrain)
     local expBaseCount = 0
     local checkNum = tonumber(ScenarioInfo.Options.NavalExpansionsAllowed) or 4
-    local isIsland = import('/lua/editor/SorianBuildConditions.lua').IsIslandMap(aiBrain)
+    local isIsland = import("/lua/editor/sorianbuildconditions.lua").IsIslandMap(aiBrain)
     expBaseCount = aiBrain:GetManagerCount('Naval Area')
     --LOG('*AI DEBUG: '.. aiBrain.Nickname ..' LessThanNavalBases Total = '..expBaseCount)
     if isIsland and expBaseCount < checkNum then
@@ -591,6 +591,6 @@ end
 
 -- Moved Unused Imports to bttom fro mod support
 
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")

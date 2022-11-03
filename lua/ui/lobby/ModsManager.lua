@@ -3,28 +3,28 @@
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
 -- * Summary    : Contains UI for managing mods in FA lobby
 -- ==========================================================================================
-local Mods = import('/lua/mods.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Group  = import('/lua/maui/group.lua').Group
-local Text   = import('/lua/maui/text.lua').Text
-local Edit   = import('/lua/maui/edit.lua').Edit
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Combo  = import('/lua/ui/controls/combo.lua').Combo
+local Mods = import("/lua/mods.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Group  = import("/lua/maui/group.lua").Group
+local Text   = import("/lua/maui/text.lua").Text
+local Edit   = import("/lua/maui/edit.lua").Edit
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo  = import("/lua/ui/controls/combo.lua").Combo
 
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
-local Prefs = import('/lua/user/prefs.lua')
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
+local RadioButton = import("/lua/ui/controls/radiobutton.lua").RadioButton
+local Prefs = import("/lua/user/prefs.lua")
 -- this version of Checkbox allows scaling of checkboxes
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local ToggleButton = import('/lua/ui/controls/togglebutton.lua').ToggleButton
-local RestrictedData = import('/lua/ui/lobby/UnitsRestrictions.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local ToggleButton = import("/lua/ui/controls/togglebutton.lua").ToggleButton
+local RestrictedData = import("/lua/ui/lobby/unitsrestrictions.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
-local ModsBlacklist = import('/etc/faf/blacklist.lua').Blacklist
-local SetUtils = import('/lua/system/setutils.lua')
-local Links = import('/lua/system/utils.links.lua')
+local ModsBlacklist = import("/etc/faf/blacklist.lua").Blacklist
+local SetUtils = import("/lua/system/setutils.lua")
+local Links = import("/lua/system/utils.links.lua")
 
 local GUI = { 
     isOpen = false, 
@@ -362,7 +362,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
             callback(mods.sim.active, mods.ui.active)
         else
-            import('/lua/mods.lua').SetSelectedMods(mods.activated)
+            import("/lua/mods.lua").SetSelectedMods(mods.activated)
         end
 
         return mods.activated
@@ -1398,7 +1398,7 @@ end
 function AddTooltip(control, title, description, width, padding, fontSize, position)
     if not fontSize then fontSize = 14 end
     if not position then position = 'left' end
-    import('/lua/ui/game/tooltip.lua').AddControlTooltipManual(control, title, description, 0, width, 6, fontSize, fontSize, position)
+    import("/lua/ui/game/tooltip.lua").AddControlTooltipManual(control, title, description, 0, width, 6, fontSize, fontSize, position)
 end
 
 -- saves favorite mods, mods sorting order, mods expanded/collapsed

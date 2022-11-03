@@ -6,9 +6,9 @@
 --
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --**************************************************************************
-local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')  --added for effects
+local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+local SeraphimWeapons = import("/lua/seraphimweapons.lua")
+local EffectUtil = import("/lua/effectutilities.lua")  --added for effects
 
 local SDFSihEnergyRifleNormalMode = SeraphimWeapons.SDFSniperShotNormalMode
 local SDFSihEnergyRifleSniperMode = SeraphimWeapons.SDFSniperShotSniperMode

@@ -7,8 +7,8 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TAALinkedRailgun = import('/lua/terranweapons.lua').TAALinkedRailgun
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TAALinkedRailgun = import("/lua/terranweapons.lua").TAALinkedRailgun
 
 
 ---@class UEB2104 : TStructureUnit

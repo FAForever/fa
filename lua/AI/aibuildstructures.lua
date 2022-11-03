@@ -7,21 +7,21 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local BaseTmplFile = import('/lua/basetemplates.lua')
-local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local Utils = import('/lua/utilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local StructureUpgradeTemplates = import('/lua/upgradeTemplates.lua').StructureUpgradeTemplates
-local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
-local RebuildStructuresTemplate = import('/lua/BuildingTemplates.lua').RebuildStructuresTemplate
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
+local BaseTmplFile = import("/lua/basetemplates.lua")
+local BaseTemplates = import("/lua/basetemplates.lua").BaseTemplates
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local Utils = import("/lua/utilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
+local RebuildStructuresTemplate = import("/lua/buildingtemplates.lua").RebuildStructuresTemplate
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 local aiEconomy
 local allowedEnergyStorageRatio = 0.7
 local allowedMassStorageRatio = 0.6
 
-local TriggerFile = import('/lua/scenariotriggers.lua')
+local TriggerFile = import("/lua/scenariotriggers.lua")
 
 function AISetEconomyNumbers(aiBrain)
     --LOG('*AI DEBUG: SETTING ECONOMY NUMBERS FROM AIBRAIN ', repr(aiBrain))
@@ -182,7 +182,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
             SPEW('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', Engineer with faction ('..HasFaction..') can build faction ('..NeedFaction..') - BuildUnitWithID: '..repr(BuildUnitWithID))
         end
 
-        local IsRestricted = import('/lua/game.lua').IsRestricted
+        local IsRestricted = import("/lua/game.lua").IsRestricted
         if IsRestricted(BuildUnitWithID, GetFocusArmy()) then
             WARN('*AIExecuteBuildStructure: Unit is Restricted!!! Building Type: '..repr(buildingType)..', faction: '..repr(builder.factionCategory)..' - Unit:'..BuildUnitWithID)
             AntiSpamList[buildingType] = true
@@ -481,7 +481,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
 
         -- Setup base
         --SPEW('*AI DEBUG: AINewExpansionBase(): ARMY ' .. aiBrain:GetArmyIndex() .. ': Expanding using - ' .. pick .. ' at location ' .. baseName)
-        import('/lua/ai/AIAddBuilderTable.lua').AddGlobalBaseTemplate(aiBrain, baseName, pick)
+        import("/lua/ai/aiaddbuildertable.lua").AddGlobalBaseTemplate(aiBrain, baseName, pick)
 
         -- If air base switch to building an air factory rather than land
         if (string.find(pick, 'Air') or string.find(pick, 'Water')) then

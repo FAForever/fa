@@ -8,6 +8,6 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-SDFHeavyQuarnonCannon01 = Class(import('/lua/seraphimprojectiles.lua').SHeavyQuarnonCannon) {
+SDFHeavyQuarnonCannon01 = Class(import("/lua/seraphimprojectiles.lua").SHeavyQuarnonCannon) {
 }
 TypeClass = SDFHeavyQuarnonCannon01

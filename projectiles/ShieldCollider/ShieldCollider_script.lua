@@ -5,8 +5,8 @@
 -- Copyright c 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------
 
-local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local Projectile = import('/lua/sim/projectile.lua').Projectile
+local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local Projectile = import("/lua/sim/projectile.lua").Projectile
 local VectorCached = Vector(0, 0, 0)
 
 ShieldCollider = Class(Projectile) {

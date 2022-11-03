@@ -8,6 +8,6 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-SIFZthuthaamArtilleryShell01 = Class(import('/lua/seraphimprojectiles.lua').SZthuthaamArtilleryShell) {
+SIFZthuthaamArtilleryShell01 = Class(import("/lua/seraphimprojectiles.lua").SZthuthaamArtilleryShell) {
 }
 TypeClass = SIFZthuthaamArtilleryShell01

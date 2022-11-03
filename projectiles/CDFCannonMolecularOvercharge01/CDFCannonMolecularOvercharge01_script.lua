@@ -1,8 +1,8 @@
 -- Cybran Molecular Cannon
 
-local CMolecularCannonProjectile = import('/lua/cybranprojectiles.lua').CMolecularCannonProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local OverchargeProjectile = import('/lua/sim/DefaultProjectiles.lua').OverchargeProjectile
+local CMolecularCannonProjectile = import("/lua/cybranprojectiles.lua").CMolecularCannonProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local OverchargeProjectile = import("/lua/sim/defaultprojectiles.lua").OverchargeProjectile
 
 CDFCannonMolecular01 = Class(CMolecularCannonProjectile, OverchargeProjectile) {
     PolyTrail = '/effects/emitters/default_polytrail_03_emit.bp',

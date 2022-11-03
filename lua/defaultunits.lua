@@ -4,16 +4,16 @@
 -- Summary  :  Default definitions of units
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local Entity = import('/lua/sim/Entity.lua').Entity
-local Unit = import('/lua/sim/Unit.lua').Unit
-local explosion = import('defaultexplosions.lua')
-local EffectUtil = import('EffectUtilities.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
-local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
-local FireState = import('/lua/game.lua').FireState
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
+local Entity = import("/lua/sim/entity.lua").Entity
+local Unit = import("/lua/sim/unit.lua").Unit
+local explosion = import("/lua/defaultexplosions.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
+local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
+local FireState = import("/lua/game.lua").FireState
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
@@ -229,7 +229,7 @@ StructureUnit = Class(Unit) {
             }
         end
 
-        local GetTarmac = import('/lua/tarmacs.lua').GetTarmacType
+        local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 
         local terrain = GetTerrainType(x, z)
         local terrainName
