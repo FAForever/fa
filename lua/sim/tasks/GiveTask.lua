@@ -1,7 +1,7 @@
-local ScriptTask = import('/lua/sim/ScriptTask.lua').ScriptTask
-local TASKSTATUS = import('/lua/sim/ScriptTask.lua').TASKSTATUS
-local GiveUnitsToPlayer = import('/lua/simutils.lua').GiveUnitsToPlayer
-local SpawnPing = import('/lua/SimPing.lua').SpawnPing
+local ScriptTask = import("/lua/sim/scripttask.lua").ScriptTask
+local TASKSTATUS = import("/lua/sim/scripttask.lua").TASKSTATUS
+local GiveUnitsToPlayer = import("/lua/simutils.lua").GiveUnitsToPlayer
+local SpawnPing = import("/lua/simping.lua").SpawnPing
 
 local transferList =  {}
 ---@class GiveTask : ScriptTask
@@ -65,4 +65,4 @@ GiveTask = Class(ScriptTask) {
 }
 
 -- imports kept for backwards compatibility with mods
-local AIRESULT = import('/lua/sim/ScriptTask.lua').AIRESULT
+local AIRESULT = import("/lua/sim/scripttask.lua").AIRESULT

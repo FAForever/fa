@@ -6,25 +6,25 @@
 -----------------------------------------------------------------
 
 -- AIBrain Lua Module
-local AIDefaultPlansList = import('/lua/aibrainplans.lua').AIPlansList
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIDefaultPlansList = import("/lua/aibrainplans.lua").AIPlansList
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
-local Utilities = import('/lua/utilities.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Behaviors = import('/lua/ai/aibehaviors.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local Utilities = import("/lua/utilities.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Behaviors = import("/lua/ai/aibehaviors.lua")
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
 
-local FactoryManager = import('/lua/sim/FactoryBuilderManager.lua')
-local PlatoonFormManager = import('/lua/sim/PlatoonFormManager.lua')
-local BrainConditionsMonitor = import('/lua/sim/BrainConditionsMonitor.lua')
-local EngineerManager = import('/lua/sim/EngineerManager.lua')
+local FactoryManager = import("/lua/sim/factorybuildermanager.lua")
+local PlatoonFormManager = import("/lua/sim/platoonformmanager.lua")
+local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
+local EngineerManager = import("/lua/sim/engineermanager.lua")
 
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local StratManager = import('/lua/sim/StrategyManager.lua')
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local StratManager = import("/lua/sim/strategymanager.lua")
 
-local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
-local TransferUnfinishedUnitsAfterDeath = import('/lua/SimUtils.lua').TransferUnfinishedUnitsAfterDeath
-local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
+local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
+local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
+local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 
 -- upvalue for performance
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
@@ -35,7 +35,7 @@ local GetEconomyTrend = moho.aibrain_methods.GetEconomyTrend
 local CategoriesDummyUnit = categories.DUMMYUNIT
 local CoroutineYield = coroutine.yield
 
-local Factions = import('/lua/factions.lua').GetFactions(true)
+local Factions = import("/lua/factions.lua").GetFactions(true)
 
 ---@alias AIResult "defeat"|"draw"|"victor"
 ---@alias HqTech "TECH2"|"TECH3"
@@ -513,7 +513,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local function ProtectedOnNoExcessEnergy(unitToProcess)
             unitToProcess:OnNoExcessEnergy()
         end
-        local fabricatorParameters = import('/lua/shared/FabricatorBehaviorParams.lua')
+        local fabricatorParameters = import("/lua/shared/fabricatorbehaviorparams.lua")
         local disableRatio = fabricatorParameters.DisableRatio
         local disableStorage = fabricatorParameters.DisableStorage
         
@@ -848,8 +848,8 @@ AIBrain = Class(moho.aibrain_methods) {
     OnDefeat = function(self)
         self.Status = 'Defeat'
 
-        import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
-        import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
+        import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
+        import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
 
         local function KillArmy()
             local shareOption = ScenarioInfo.Options.Share
@@ -1005,7 +1005,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
 
-            local KillSharedUnits = import('/lua/SimUtils.lua').KillSharedUnits
+            local KillSharedUnits = import("/lua/simutils.lua").KillSharedUnits
 
             -- This part determines the share condition
             if shareOption == 'ShareUntilDeath' then
@@ -1904,7 +1904,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupUnderEnergyStatTrigger = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderEnergyThreshold, self, 'SkirmishUnderEnergyThreshold',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderEnergyThreshold, self, 'SkirmishUnderEnergyThreshold',
             {
                 {
                     StatType = 'Economy_Ratio_Energy',
@@ -1918,7 +1918,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupOverEnergyStatTrigger = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverEnergyThreshold, self, 'SkirmishOverEnergyThreshold',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverEnergyThreshold, self, 'SkirmishOverEnergyThreshold',
             {
                 {
                     StatType = 'Economy_Ratio_Energy',
@@ -1932,7 +1932,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupUnderMassStatTrigger = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderMassThreshold, self, 'SkirmishUnderMassThreshold',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderMassThreshold, self, 'SkirmishUnderMassThreshold',
             {
                 {
                     StatType = 'Economy_Ratio_Mass',
@@ -1946,7 +1946,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupOverMassStatTrigger = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverMassThreshold, self, 'SkirmishOverMassThreshold',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverMassThreshold, self, 'SkirmishOverMassThreshold',
             {
                 {
                     StatType = 'Economy_Ratio_Mass',
@@ -2129,7 +2129,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param attackDataTable table
     InitializeAttackManager = function(self, attackDataTable)
-        self.AttackManager = import('/lua/AI/attackmanager.lua').AttackManager(self, attackDataTable)
+        self.AttackManager = import("/lua/ai/attackmanager.lua").AttackManager(self, attackDataTable)
         self.AttackData = self.AttackManager
     end,
 
@@ -4811,7 +4811,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupUnderEnergyStatTriggerSorian = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderEnergyThresholdSorian, self, 'SkirmishUnderEnergyThresholdSorian',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderEnergyThresholdSorian, self, 'SkirmishUnderEnergyThresholdSorian',
             {
                 {
                     StatType = 'Economy_Ratio_Energy',
@@ -4825,7 +4825,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupOverEnergyStatTriggerSorian = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverEnergyThresholdSorian, self, 'SkirmishOverEnergyThresholdSorian',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverEnergyThresholdSorian, self, 'SkirmishOverEnergyThresholdSorian',
             {
                 {
                     StatType = 'Economy_Ratio_Energy',
@@ -4839,7 +4839,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupUnderMassStatTriggerSorian = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderMassThresholdSorian, self, 'SkirmishUnderMassThresholdSorian',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderMassThresholdSorian, self, 'SkirmishUnderMassThresholdSorian',
             {
                 {
                     StatType = 'Economy_Ratio_Mass',
@@ -4853,7 +4853,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupOverMassStatTriggerSorian = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverMassThresholdSorian, self, 'SkirmishOverMassThresholdSorian',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverMassThresholdSorian, self, 'SkirmishOverMassThresholdSorian',
             {
                 {
                     StatType = 'Economy_Ratio_Mass',
@@ -4970,7 +4970,7 @@ AIBrain = Class(moho.aibrain_methods) {
         -- Removed from build conditions so it can run on a slower loop
         -- added amphib vs air results so we can tell when we are trapped on a plateu
         WaitTicks(Random(5,20))
-        local NavUtils = import('/lua/sim/NavUtils.lua')
+        local NavUtils = import("/lua/sim/navutils.lua")
         if not self.CanPathToEnemy then
             self.CanPathToEnemy = {}
         end
@@ -5034,5 +5034,5 @@ AIBrain = Class(moho.aibrain_methods) {
 }
 
 -- kept for mod backwards compatibility
-local PCBC = import('/lua/editor/platooncountbuildconditions.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
+local PCBC = import("/lua/editor/platooncountbuildconditions.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")

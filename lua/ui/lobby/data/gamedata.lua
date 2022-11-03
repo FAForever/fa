@@ -14,8 +14,8 @@
 ---@field Observers WatchedValueArray<PlayerData>
 ---@field PlayerOptions WatchedValueArray<PlayerData>
 
-local PlayerData = import('/lua/ui/lobby/data/playerdata.lua').PlayerData
-local WatchedValueArray = import('/lua/ui/lobby/data/watchedvalue/watchedvaluearray.lua').WatchedValueArray
+local PlayerData = import("/lua/ui/lobby/data/playerdata.lua").PlayerData
+local WatchedValueArray = import("/lua/ui/lobby/data/watchedvalue/watchedvaluearray.lua").WatchedValueArray
 
 --- Represents the gameInfo object.
 -- Not actually a WatchedValueTable, as we don't want to handle the situation when these values are

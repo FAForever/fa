@@ -14,7 +14,7 @@
 
 ---@param scen UIScenarioInfo
 function OnPopulate(scen)
-    --import('/lua/sim/ScenarioUtilities.lua').InitializeArmies()
+    --import("/lua/sim/scenarioutilities.lua").InitializeArmies()
 end
 
 ---@param scen UIScenarioInfo

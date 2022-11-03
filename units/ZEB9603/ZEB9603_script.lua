@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
+local TSeaFactoryUnit = import("/lua/terranunits.lua").TSeaFactoryUnit
 
 ---@class UEB0303 : TSeaFactoryUnit
 UEB0303 = Class(TSeaFactoryUnit) {

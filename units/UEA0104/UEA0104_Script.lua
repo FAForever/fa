@@ -8,11 +8,11 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local explosion = import('/lua/defaultexplosions.lua')
-local util = import('/lua/utilities.lua')
-local WeaponsFile = import('/lua/terranweapons.lua')
+local explosion = import("/lua/defaultexplosions.lua")
+local util = import("/lua/utilities.lua")
+local WeaponsFile = import("/lua/terranweapons.lua")
 
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local TAirToAirLinkedRailgun = WeaponsFile.TAirToAirLinkedRailgun
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 

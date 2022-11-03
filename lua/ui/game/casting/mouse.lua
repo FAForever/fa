@@ -67,9 +67,9 @@ local function GetObserverClients()
     return observers
 end
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
-local WorldViewManager = import('/lua/ui/game/worldview.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
+local WorldViewManager = import("/lua/ui/game/worldview.lua")
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
 ---@type WorldMesh[]
@@ -215,6 +215,6 @@ if clientCount > playerCount then
     LOG("Sharing is caring!")
     AddOnSyncCallback(SendData, 'SendingCastingMouse')
     AddOnSyncCallback(CleanupData, 'ProcessingCastingMouse')
-    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(ProcessData, 'CastingMouse')
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ProcessData, 'CastingMouse')
     ForkThread(DisplayThread)
 end

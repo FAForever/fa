@@ -10,7 +10,7 @@
 ----------------------------------------------------------------------------
 -- AEON DEFAULT UNITS
 ----------------------------------------------------------------------------
-local DefaultUnitsFile = import('defaultunits.lua')
+local DefaultUnitsFile = import("/lua/defaultunits.lua")
 local FactoryUnit = DefaultUnitsFile.FactoryUnit
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -36,8 +36,8 @@ local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
 local WalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 local WallStructureUnit = DefaultUnitsFile.WallStructureUnit
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
 
 

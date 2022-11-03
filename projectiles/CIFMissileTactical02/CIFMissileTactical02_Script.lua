@@ -4,7 +4,7 @@
 -- with a higher arc and distance based adjusting trajectory. Splits into child projectile 
 -- if it takes enough damage.
 -- 
-local CLOATacticalMissileProjectile = import('/lua/cybranprojectiles.lua').CLOATacticalMissileProjectile
+local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
 
 CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
 

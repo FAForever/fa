@@ -5,17 +5,17 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 
-local Entity = import('/lua/sim/Entity.lua').Entity
-local Weapon = import('/lua/sim/weapon.lua').Weapon
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
-local CollisionBeamFile = import('defaultcollisionbeams.lua')
+local Entity = import("/lua/sim/entity.lua").Entity
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
 local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
-local Explosion = import('defaultexplosions.lua')
+local Explosion = import("/lua/defaultexplosions.lua")
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class AIFBallisticMortarWeapon : DefaultProjectileWeapon
 AIFBallisticMortarWeapon = Class(DefaultProjectileWeapon) {
@@ -779,4 +779,4 @@ AIFQuanticArtillery = Class(DefaultProjectileWeapon) {
 local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
-local EffectUtil = import('EffectUtilities.lua')
+local EffectUtil = import("/lua/effectutilities.lua")

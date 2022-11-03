@@ -642,7 +642,7 @@ local function PerformanceTrackingThread()
 
     -- # Add on exit callbacks to store information
 
-    local AddOnExitCallback = import('/lua/ui/override/Exit.lua').AddOnExitCallback
+    local AddOnExitCallback = import("/lua/ui/override/exit.lua").AddOnExitCallback
     AddOnExitCallback('PerformanceTracking', StoreSamples)
 
     -- # Start sampling!

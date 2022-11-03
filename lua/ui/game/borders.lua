@@ -1,8 +1,8 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local GameMain = import('/lua/ui/game/gamemain.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
 local gameParent = false
 mapSplitState = false
@@ -103,12 +103,12 @@ function SplitMapGroup(splitState, forceSplit)
     end
     
     if not forceSplit then
-        if import('/lua/ui/game/worldview.lua').IsInputLocked() or GameMain.gameUIHidden then
+        if import("/lua/ui/game/worldview.lua").IsInputLocked() or GameMain.gameUIHidden then
             return
         end
     end
     
-    import('/lua/ui/game/tracking.lua').ClearModeText()
+    import("/lua/ui/game/tracking.lua").ClearModeText()
     SelectUnits(nil)
     
     mapSplitState = splitState
@@ -125,13 +125,13 @@ function SplitMapGroup(splitState, forceSplit)
             controls.mapGroup = Group(gameParent, "mapGroup")
         end
         
-        import('/lua/ui/game/worldview.lua').CreateMainWorldView(gameParent, controls.mapGroupLeft, controls.mapGroupRight)
+        import("/lua/ui/game/worldview.lua").CreateMainWorldView(gameParent, controls.mapGroupLeft, controls.mapGroupRight)
     else
         if not controls.mapGroup then
             controls.mapGroup = Group(gameParent, "mapGroup")
         end
         
-        import('/lua/ui/game/worldview.lua').CreateMainWorldView(gameParent, controls.mapGroup)
+        import("/lua/ui/game/worldview.lua").CreateMainWorldView(gameParent, controls.mapGroup)
     end
     SetLayout()
 end

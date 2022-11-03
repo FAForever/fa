@@ -8,22 +8,22 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local Entity = import('/lua/sim/entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 
-local util = import('utilities.lua')
+local util = import("/lua/utilities.lua")
 local GetRandomFloat = util.GetRandomFloat
 local GetRandomInt = util.GetRandomInt
 local GetRandomOffset = util.GetRandomOffset
 local GetRandomOffset2 = util.GetRandomOffset2
 
 -- upvalue for performance
-local EfctUtil = import('EffectUtilities.lua')
+local EfctUtil = import("/lua/effectutilities.lua")
 local ApplyWindDirection = EfctUtil.ApplyWindDirection
 local CreateEffectsOpti = EfctUtil.CreateEffectsOpti
 local CreateBoneEffectsOpti = EfctUtil.CreateBoneEffectsOpti
 local CreateBoneEffectsOffsetOpti = EfctUtil.CreateBoneEffectsOffsetOpti
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 local ExplosionSmall = EffectTemplate.ExplosionSmall
 local ExplosionLarge = EffectTemplate.ExplosionLarge
 local ExplosionMedium = EffectTemplate.ExplosionMedium

@@ -5,17 +5,17 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------
 
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
-local CCommandUnit = import('/lua/cybranunits.lua').CCommandUnit
-local CWeapons = import('/lua/cybranweapons.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
+local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
+local CCommandUnit = import("/lua/cybranunits.lua").CCommandUnit
+local CWeapons = import("/lua/cybranweapons.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
 local CCannonMolecularWeapon = CWeapons.CCannonMolecularWeapon
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
 local CDFHeavyMicrowaveLaserGeneratorCom = CWeapons.CDFHeavyMicrowaveLaserGeneratorCom
 local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
-local Entity = import('/lua/sim/Entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 
 URL0001 = Class(ACUUnit, CCommandUnit) {
     Weapons = {

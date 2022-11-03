@@ -6,7 +6,7 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local SShieldStructureUnit = import('/lua/seraphimunits.lua').SShieldStructureUnit
+local SShieldStructureUnit = import("/lua/seraphimunits.lua").SShieldStructureUnit
 
 ---@class XSB4202 : SShieldStructureUnit
 XSB4202 = Class(SShieldStructureUnit) {

@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AAirStagingPlatformUnit = import('/lua/aeonunits.lua').AAirStagingPlatformUnit
+local AAirStagingPlatformUnit = import("/lua/aeonunits.lua").AAirStagingPlatformUnit
 
 ---@class UAB5202 : AAirStagingPlatformUnit
 UAB5202 = Class(AAirStagingPlatformUnit) {

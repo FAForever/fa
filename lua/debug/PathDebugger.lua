@@ -6,22 +6,22 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Border = import('/lua/maui/border.lua').Border
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Text = import('/lua/maui/text.lua').Text
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Border = import("/lua/maui/border.lua").Border
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Text = import("/lua/maui/text.lua").Text
 
 
 local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
 local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')
 
-local statusCluster = import('/lua/ui/game/gamemain.lua').GetStatusCluster()
-local controlCluster = import('/lua/ui/game/gamemain.lua').GetControlCluster()
-local gameParent = import('/lua/ui/game/gamemain.lua').GetGameParent()
-local worldView = import('/lua/ui/game/worldview.lua').view
+local statusCluster = import("/lua/ui/game/gamemain.lua").GetStatusCluster()
+local controlCluster = import("/lua/ui/game/gamemain.lua").GetControlCluster()
+local gameParent = import("/lua/ui/game/gamemain.lua").GetGameParent()
+local worldView = import("/lua/ui/game/worldview.lua").view
 
 local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
 local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')

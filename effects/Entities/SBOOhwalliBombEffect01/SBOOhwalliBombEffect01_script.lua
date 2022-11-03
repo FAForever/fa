@@ -7,9 +7,9 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-SBOOhwalliBombEffect01 = Class(import('/lua/sim/defaultprojectiles.lua').EmitterProjectile) {
+SBOOhwalliBombEffect01 = Class(import("/lua/sim/defaultprojectiles.lua").EmitterProjectile) {
 	FxTrails = EffectTemplate.SOhwalliBombPlumeFxTrails01,
 }
 TypeClass = SBOOhwalliBombEffect01

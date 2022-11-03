@@ -21,15 +21,15 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
-local Window = import('/lua/maui/window.lua').Window
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Combo = import('/lua/ui/controls/combo.lua').Combo
+local Window = import("/lua/maui/window.lua").Window
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo = import("/lua/ui/controls/combo.lua").Combo
 
-local Shared = import('/lua/shared/NavGenerator.lua')
+local Shared = import("/lua/shared/navgenerator.lua")
 
 local Root = nil
 local DebugInterface = false
@@ -76,7 +76,7 @@ NavUIGetLabel = Class(Group) {
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
                 "build",
                 {
                     -- default information required
@@ -183,7 +183,7 @@ NavUIPathTo = Class(Group) {
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
                 "build",
                 {
                     -- default information required
@@ -212,7 +212,7 @@ NavUIPathTo = Class(Group) {
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
                 "build",
                 {
                     -- default information required
@@ -321,7 +321,7 @@ NavUICanPathTo = Class(Group) {
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
                 "build",
                 {
                     -- default information required
@@ -350,7 +350,7 @@ NavUICanPathTo = Class(Group) {
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
                 "build",
                 {
                     -- default information required

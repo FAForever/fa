@@ -7,8 +7,8 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
 local CDFProtonCannonWeapon = CybranWeaponsFile.CDFProtonCannonWeapon
 local CANNaniteTorpedoWeapon = CybranWeaponsFile.CANNaniteTorpedoWeapon
