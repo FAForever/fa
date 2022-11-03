@@ -64,7 +64,7 @@ integratedMods["nvidia fix"] = true
 integratedMods = LowerHashTable(integratedMods)
 
 
--- take care that the folder name is properly spelled and Capitalized
+-- take care that the folder name is properly spelled
 -- deprecatedMods["Mod Folder Name"] = deprecation status
 --   true: deprecated regardless of mod version
 --   versionstring: lower or equal version numbers are deprecated, eg: "3.10"
@@ -96,6 +96,9 @@ deprecatedMods["OnScreenReclaimCounter"] = true
 deprecatedMods["ORV"] = true
 deprecatedMods["SmartReclaimSupport"] = true
 deprecatedMods["DrimsUIPack"] = "3"
+
+-- convert all mod folder name keys to lower case to prevent typos
+deprecatedMods = LowerHashTable(deprecatedMods)
 
 -- typical FA packages
 local allowedAssetsScd = { }
@@ -388,6 +391,9 @@ local loadedMods = { }
 local function MountModContent(dir)
     -- get all directories / mods at the mount point
     for _, mod in io.dir(dir..'/*.*') do
+        
+        -- prevent capital letters messing things up
+        mod = StringLower(mod)
 
         -- do not do anything with the current / previous directory
         if mod == '.' or mod == '..' then
