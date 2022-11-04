@@ -1,11 +1,11 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local gamemain = import('/lua/ui/game/gamemain.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local gamemain = import("/lua/ui/game/gamemain.lua")
 scoreData = {}
 
 local noData = nil
@@ -14,11 +14,10 @@ local page_active_graph = nil
 local page_active_graph2 = nil
 local create_anime_graph = nil
 local create_anime_graph2 = nil
-local WaitFrames = nil
 local graph_pos={Left=function() return 110 end, Top=function() return 120 end, Right=function() return GetFrame(0).Right()-100 end, Bottom=function() return GetFrame(0).Bottom()-160 end}
 local bar_pos={Left=function() return 90 end, Top=function() return 140 end, Right=function() return GetFrame(0).Right()-60 end, Bottom=function() return GetFrame(0).Bottom()-150 end}
 
-local SCAEffect = import('/lua/ui/dialogs/myeffecthelpers.lua')
+local SCAEffect = import("/lua/ui/dialogs/myeffecthelpers.lua")
 local chartInfoText = nil
 local Title_score = nil
 
@@ -508,8 +507,8 @@ function page_graph(parent)
     page_active_graph=create_graph(parent,info_dialog[5].path,graph_pos.Left(),graph_pos.Top(),graph_pos.Right(),graph_pos.Bottom())
     -- build the list box
     local graph_list={}
-    local Combo = import('/lua/ui/controls/combo.lua').Combo
-    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
+    local Combo = import("/lua/ui/controls/combo.lua").Combo
+    local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
     combo_graph=Combo(page_active, 17, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     combo_graph.Right:Set(function() return graph_pos.Right() end) --function() return 300 end)
     combo_graph.Top:Set(function() return graph_pos.Top()-25 end) --function() return 300 end)
@@ -1117,7 +1116,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             ConExecute("ren_Oblivion false")
             if HasCommandLineArg("/gpgnet") then
                 -- Quit to desktop
-                import('/lua/ui/dialogs/eschandler.lua').SafeQuit()
+                import("/lua/ui/dialogs/eschandler.lua").SafeQuit()
             else
                 -- Back to main menu
                 ExitGame()
@@ -1135,5 +1134,5 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
 end
 
 -- kept for mod backwards compatibility
-local Button = import('/lua/maui/button.lua').Button
-local Text = import('/lua/maui/text.lua').Text
+local Button = import("/lua/maui/button.lua").Button
+local Text = import("/lua/maui/text.lua").Text

@@ -7,7 +7,7 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-XSB1201 = Class(import('/lua/seraphimunits.lua').SEnergyCreationUnit) {
+XSB1201 = Class(import("/lua/seraphimunits.lua").SEnergyCreationUnit) {
     AmbientEffects = 'ST2PowerAmbient',
 }
 TypeClass = XSB1201

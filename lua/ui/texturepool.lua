@@ -8,7 +8,7 @@
 ---@class TexturePool
 TexturePool = ClassSimple {
     __init = function(self, textureURL, textureParent, width, height)
-        local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+        local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
         self.textureURL = textureURL
 

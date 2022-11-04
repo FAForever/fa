@@ -8,8 +8,8 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TerranWeaponFile = import('/lua/terranweapons.lua')
-local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
+local TerranWeaponFile = import("/lua/terranweapons.lua")
+local TWalkingLandUnit = import("/lua/terranunits.lua").TWalkingLandUnit
 local TDFHeavyPlasmaCannonWeapon = TerranWeaponFile.TDFHeavyPlasmaCannonWeapon
 local TSAMLauncher = TerranWeaponFile.TSAMLauncher
 

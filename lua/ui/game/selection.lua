@@ -1,5 +1,5 @@
 
-local Prefs = import('/lua/user/prefs.lua')
+local Prefs = import("/lua/user/prefs.lua")
 
 ---@alias SelectionSetDoubleTapBehavior
 --- | 'none'                        # When you double tap it will have no effect
@@ -399,7 +399,7 @@ function IsHidden()
 end
 
 function Hidden(callback)
-    local CM = import('/lua/ui/game/commandmode.lua')
+    local CM = import("/lua/ui/game/commandmode.lua")
     local current_command = CM.GetCommandMode()
     local old_selection = GetSelectedUnits() or {}
 

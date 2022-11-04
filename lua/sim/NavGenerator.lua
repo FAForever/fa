@@ -21,7 +21,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Shared = import('/lua/shared/NavGenerator.lua')
+local Shared = import("/lua/shared/navgenerator.lua")
 
 ---@alias NavTerrainCache number[][]
 ---@alias NavDepthCache number[][]
@@ -31,8 +31,6 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 ---@alias NavPathCache boolean[][]
 ---@alias NavTerrainBlockCache boolean[][]
 ---@alias NavLabelCache number[][]
-
-local LabelCompressionThreshold = 4
 
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
@@ -74,6 +72,13 @@ local function GenerateCompressedTreeIdentifier()
     return CompressedTreeIdentifier
 end
 
+local LabelIdentifier = 0
+---@return number
+local function GenerateLabelIdentifier()
+    LabelIdentifier = LabelIdentifier + 1
+    return LabelIdentifier
+end
+
 -- Shared data with UI
 
 ---@type NavLayerData
@@ -106,7 +111,6 @@ end
 ---@field Layer NavLayers
 ---@field TreeSize number
 ---@field Trees CompressedLabelTree[][]
----@field FreeLabel number
 NavGrid = ClassSimple {
 
     ---@param self NavGrid
@@ -119,7 +123,6 @@ NavGrid = ClassSimple {
 
         self.TreeSize = treeSize
         self.Layer = layer
-        self.FreeLabel = 1
     end,
 
     --- Adds a compressed label tree to the navigational grid
@@ -166,24 +169,18 @@ NavGrid = ClassSimple {
         end
     end,
 
-    --- Generates a unique label for an enclosed area
-    ---@param self NavGrid
-    ---@return number
-    GenerateUniqueLabel = function(self)
-        self.FreeLabel = self.FreeLabel + 1
-        return self.FreeLabel
-    end,
-
     ---@param self NavGrid
     GenerateLabels = function(self)
+        local labelStart = LabelIdentifier
         local stack = { }
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:GenerateLabels(self, stack)
+                self.Trees[z][x]:GenerateLabels(stack)
             end
         end
 
-        NavLayerData[self.Layer].Labels = self.FreeLabel - 1
+        local labelEnd = LabelIdentifier
+        NavLayerData[self.Layer].Labels = labelEnd - labelStart
     end,
 
     ---@param self NavGrid
@@ -281,10 +278,10 @@ CompressedLabelTree = ClassSimple {
     --- the label cache only exists of 0s and -1s
     ---@param self CompressedLabelTree
     ---@param rCache NavLabelCache
-    Compress = function(self, rCache)
+    Compress = function(self, rCache, compressionThreshold)
 
         -- base case, if we're a square of 4 then we skip the children and become very pessimistic
-        if self.c <= LabelCompressionThreshold then
+        if self.c <= compressionThreshold then
             local value = rCache[self.oz + 1][self.ox + 1]
             local uniform = true
             for z = self.oz + 1, self.oz + self.c do
@@ -344,7 +341,7 @@ CompressedLabelTree = ClassSimple {
             }
 
             for k, child in self.children do
-                child:Compress(rCache)
+                child:Compress(rCache, compressionThreshold)
             end
 
             NavLayerData[self.layer].Subdivisions = NavLayerData[self.layer].Subdivisions + 1
@@ -472,9 +469,8 @@ CompressedLabelTree = ClassSimple {
     end,
 
     ---@param self CompressedLabelTree
-    ---@param root NavGrid
     ---@param stack table
-    GenerateLabels = function(self, root, stack)
+    GenerateLabels = function(self, stack)
         -- leaf case
         if self.label then
 
@@ -483,8 +479,8 @@ CompressedLabelTree = ClassSimple {
 
                 -- we can hit a stack overflow if we do this recursively, therefore we do a 
                 -- depth first search using a stack that we re-use for better performance
-                local free = 1 
-                local label = root:GenerateUniqueLabel()
+                local free = 1
+                local label = GenerateLabelIdentifier()
 
                 -- assign the label, and then search through our neighbors to assign the same label to them
                 self.label = label
@@ -524,7 +520,7 @@ CompressedLabelTree = ClassSimple {
 
         -- node case
         for _, child in self.children do
-            child:GenerateLabels(root, stack)
+            child:GenerateLabels(stack)
         end
     end,
 
@@ -749,10 +745,12 @@ function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pC
     -- compute average depth
     -- compute terrain type
     for z = 1, size do
+        local absZ = bz + z
         for x = 1, size do
+            local absX = bx + x
             pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z][x + 1] and pzCache[z + 1][x]
             daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
-            bCache[z][x] = not GetTerrainType(x, z).Blocking
+            bCache[z][x] = not GetTerrainType(absX, absZ).Blocking
 
             -- local color = 'ff0000'
             -- if pCache[lz][lx] == 0 then
@@ -880,6 +878,17 @@ function Generate()
     ---@type number
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
+    -------------------------------------------------
+    -- convert height map into a navigational mesh --
+    -------------------------------------------------
+
+    ---@type number
+    local compressionThreshold = 2
+
+    if MapSize > 1024 then
+        compressionThreshold = 4
+    end
+
     local start = GetSystemTimeSecondsOnlyForProfileUse()
     print(string.format(" -- Navigational mesh generator -- "))
 
@@ -910,23 +919,23 @@ function Generate()
             PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
 
             ComputeLandPathingMatrix(labelTreeLand,        daCache,                    pCache, bCache, rCache)
-            labelTreeLand:Compress(rCache)
+            labelTreeLand:Compress(rCache, compressionThreshold)
             labelRootLand:AddTree(z, x, labelTreeLand)
 
             ComputeNavalPathingMatrix(labelTreeNaval,      daCache,                    pCache, bCache, rCache)
-            labelTreeNaval:Compress(rCache)
+            labelTreeNaval:Compress(rCache, 2 * compressionThreshold)
             labelRootNaval:AddTree(z, x, labelTreeNaval)
 
             ComputeHoverPathingMatrix(labelTreeHover,      daCache,                    pCache, bCache, rCache)
-            labelTreeHover:Compress(rCache)
+            labelTreeHover:Compress(rCache, compressionThreshold)
             labelRootHover:AddTree(z, x, labelTreeHover)
 
             ComputeAmphPathingMatrix(labelTreeAmph,        daCache,                    pCache, bCache, rCache)
-            labelTreeAmph:Compress(rCache)
+            labelTreeAmph:Compress(rCache, compressionThreshold)
             labelRootAmph:AddTree(z, x, labelTreeAmph)
 
             ComputeAirPathingMatrix(labelTreeAir,          daCache,                    pCache, bCache, rCache)
-            labelTreeAir:Compress(rCache)
+            labelTreeAir:Compress(rCache, compressionThreshold)
             labelRootAir:AddTree(z, x, labelTreeAir)
         end
     end
@@ -953,9 +962,30 @@ function Generate()
 
     print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
-    
+
+    --------------------------------------------
+    -- post process markers to include labels --
+    --------------------------------------------
+
+    local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
+
+    for k = 1, en do
+        local extractor = extractors[k]
+        extractor.NavLabel = NavGrids[extractor.NavLayer]:FindLeaf(extractor.position).label
+    end
+
+    for k = 1, hn do
+        local hydro = hydrocarbons[k]
+        hydro.NavLabel = NavGrids[hydro.NavLayer]:FindLeaf(hydro.position).label
+    end
+
+    ------------------
+    -- finishing up --
+    ------------------
+
     -- allows debugging tools to function
-    import("/lua/sim/NavDebug.lua")
+    import("/lua/sim/navdebug.lua")
 
     -- pass data to sync
     Sync.NavLayerData = NavLayerData

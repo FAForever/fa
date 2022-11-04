@@ -4,7 +4,7 @@
 -- Summary  :  Inaino Strategic Missile Projectile script, XSS0302
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------------------------
-local SIFInainoStrategicMissile = import('/lua/seraphimprojectiles.lua').SIFInainoStrategicMissile
+local SIFInainoStrategicMissile = import("/lua/seraphimprojectiles.lua").SIFInainoStrategicMissile
 
 SIFInainoStrategicMissile02 = Class(SIFInainoStrategicMissile) {
     FxSplashScale = 0.5,

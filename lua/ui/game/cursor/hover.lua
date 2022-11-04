@@ -1,6 +1,6 @@
 
-local Prefs = import('/lua/user/prefs.lua')
-local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
+local Prefs = import("/lua/user/prefs.lua")
+local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
 
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 local meshCylinder = '/meshes/game/PathRing_LOD0.scm'
@@ -51,7 +51,7 @@ end
 local function HoverScanningThread()
 
     local scenario = SessionGetScenarioInfo()
-    local Exit = import('/lua/ui/override/Exit.lua')
+    local Exit = import("/lua/ui/override/exit.lua")
     
     -- clear out all entities before we exit
     Exit.AddOnExitCallback(
@@ -62,7 +62,7 @@ local function HoverScanningThread()
     )
 
     -- keep track of the current selection
-    import('/lua/ui/game/gamemain.lua').ObserveSelection:AddObserver(
+    import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
         function(selectionData)
             Selection = selectionData.newSelection
         end

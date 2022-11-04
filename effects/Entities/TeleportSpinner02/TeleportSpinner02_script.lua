@@ -8,8 +8,8 @@
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 TeleportSpinner02 = Class(NullShell) {
     OnCreate = function(self)

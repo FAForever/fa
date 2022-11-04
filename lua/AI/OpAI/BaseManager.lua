@@ -62,18 +62,18 @@
 ---@field Retry boolean                         # Flag that allows the AI to retry
 ---@field PlatoonData PlatoonData               # Parameters of the platoon AI function
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local RebuildStructuresTemplate = import('/lua/BuildingTemplates.lua').RebuildStructuresTemplate
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local Buff = import('/lua/sim/Buff.lua')
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local RebuildStructuresTemplate = import("/lua/buildingtemplates.lua").RebuildStructuresTemplate
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local Buff = import("/lua/sim/buff.lua")
 
-local BaseOpAI = import('/lua/ai/opai/baseopai.lua')
-local ReactiveAI = import('/lua/ai/opai/ReactiveAI.lua')
-local NavalOpAI = import('/lua/ai/opai/NavalOpAI.lua')
+local BaseOpAI = import("/lua/ai/opai/baseopai.lua")
+local ReactiveAI = import("/lua/ai/opai/reactiveai.lua")
+local NavalOpAI = import("/lua/ai/opai/navalopai.lua")
 
 local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'

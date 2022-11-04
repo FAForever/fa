@@ -1,6 +1,6 @@
-local Group = import('/lua/maui/group.lua').Group
-local UIUtil = import('/lua/ui/uiutil.lua')
-local StaticScrollable = import("StaticScrollable.lua").StaticScrollable
+local Group = import("/lua/maui/group.lua").Group
+local UIUtil = import("/lua/ui/uiutil.lua")
+local StaticScrollable = import("/lua/ui-framework/views/staticscrollable.lua").StaticScrollable
 
 
 ---@class DynamicScrollable : StaticScrollable

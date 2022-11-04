@@ -1,9 +1,9 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local GameMain = import('/lua/ui/game/gamemain.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
 local sessionInfo = SessionGetScenarioInfo()
 local UpdateViewOfWindow
@@ -304,6 +304,6 @@ function CloseWindow()
 end
 
 -- kept for mod backwards compatibility
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Window = import('/lua/maui/window.lua')
-local Text = import('/lua/maui/text.lua').Text
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Window = import("/lua/maui/window.lua")
+local Text = import("/lua/maui/text.lua").Text

@@ -2,11 +2,11 @@ local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
 
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 
 ---@class UIReclaimDataPoint
@@ -347,7 +347,7 @@ function UpdateLabels()
         reclaimDataPool = {}
     end
 
-    local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
+    local view = import("/lua/ui/game/worldview.lua").viewLeft -- Left screen's camera
     local onScreenReclaimIndex = 1
     local onScreenReclaims = {}
 
@@ -469,7 +469,7 @@ end
 
 local ReclaimThread
 function ShowReclaim(show)
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
     view.ShowingReclaim = show
 
     if show and not view.ReclaimThread then
@@ -505,7 +505,7 @@ function InitReclaimGroup(view)
 end
 
 function ShowReclaimThread(watch_key)
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
     local camera = GetCamera("WorldCamera")
 
     InitReclaimGroup(view)
@@ -548,13 +548,13 @@ function ShowReclaimThread(watch_key)
 end
 
 function ToggleReclaim()
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
     ShowReclaim(not view.ShowingReclaim)
 end
 
 local CommandGraphActive = false
 function OnCommandGraphShow(bool)
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
     if view.ShowingReclaim and not CommandGraphActive then return end -- if on by toggle key
 
     CommandGraphActive = bool

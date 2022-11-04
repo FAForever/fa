@@ -234,7 +234,7 @@ BaseBuilderTemplate {
         local mapSizeX, mapSizeZ = GetMapSize()
 
         local startX, startZ = aiBrain:GetArmyStartPos()
-        local isIsland = import('/lua/editor/SorianBuildConditions.lua').IsIslandMap(aiBrain)
+        local isIsland = import("/lua/editor/sorianbuildconditions.lua").IsIslandMap(aiBrain)
 
         if per == 'sorianair' then
             return 1000, 'sorianair'

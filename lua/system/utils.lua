@@ -610,7 +610,7 @@ end
 function StringSplitCamel(str)
     local first = str:sub(1, 1)
     local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
-    return split:gsub("^.", string.upper)
+    return (split:gsub("^.", string.upper))
 end
 
 --- Reverses order of letters for specified string

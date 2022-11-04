@@ -1,7 +1,7 @@
 -- This file contains key bindable actions that don't fit elsewhere
 
-local Prefs = import('/lua/user/prefs.lua')
-local SelectionUtils = import('/lua/ui/game/selection.lua')
+local Prefs = import("/lua/user/prefs.lua")
+local SelectionUtils = import("/lua/ui/game/selection.lua")
 
 local lockZoomEnable = false
 function lockZoom()
@@ -110,7 +110,7 @@ function toggleOverlay(type)
     end
 
     Prefs.SetToCurrentProfile('activeFilters', currentFilters)
-    import('/lua/ui/game/multifunction.lua').UpdateActiveFilters()
+    import("/lua/ui/game/multifunction.lua").UpdateActiveFilters()
 end
 
 --- Function builder for "Get next factory of type" functions
@@ -162,7 +162,7 @@ end
 
 -- This function might be too slow in larger games, needs testing
 function GetSimilarUnits()
-    local enhance = import('/lua/enhancementcommon.lua')
+    local enhance = import("/lua/enhancementcommon.lua")
     local curSelection = GetSelectedUnits()
     if curSelection then
         -- Find out what enhancements the current unit has
@@ -212,7 +212,7 @@ function ACUAppendCG()
     AddSelectUnits(selection)
 end
 
-local GetDistanceBetweenTwoVectors = import('/lua/utilities.lua').GetDistanceBetweenTwoVectors
+local GetDistanceBetweenTwoVectors = import("/lua/utilities.lua").GetDistanceBetweenTwoVectors
 function GetNearestIdleEngineerNotACU()
     local idleEngineers = GetIdleEngineers()
     if not idleEngineers then
@@ -373,7 +373,7 @@ function CreateTemplateFactory()
     if selection and table.getn(selection) == 1 and selection[1]:IsInCategory('FACTORY') then
         currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
     end
-    import('/lua/ui/templates_factory.lua').CreateBuildTemplate(currentCommandQueue)
+    import("/lua/ui/templates_factory.lua").CreateBuildTemplate(currentCommandQueue)
 end
 
 function SetWeaponPriorities(prioritiesString, name, exclusive)

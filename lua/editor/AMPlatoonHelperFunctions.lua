@@ -7,7 +7,7 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local ScenarioFramework = import('/lua/scenarioframework.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 ---AMLockPlatoon = AddFunction
 ---@param platoon Platoon
@@ -133,5 +133,5 @@ function PlatoonDeathUnlockThread( pName, time )
 end
 
 -- Unused Files but moved for Mod Support
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")

@@ -4,7 +4,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Lazyvar = import("/lua/lazyvar.lua").Create
 local NinePatch = import("/lua/ui/controls/ninepatch.lua")
 local Prefs = import("/lua/user/prefs.lua")
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
@@ -50,7 +50,7 @@ end
 
 function RequestHandler(data)
     if data.CannotRequest ~= nil then
-        import('/lua/ui/game/diplomacy.lua').UpdateCannotRequestRecall(data.CannotRequest)
+        import("/lua/ui/game/diplomacy.lua").UpdateCannotRequestRecall(data.CannotRequest)
     end
     if data.Open then
         panel:StartVote(data.Blocks, data.Open, data.CanVote)
@@ -394,17 +394,17 @@ RecallPanel = Class(NinePatch.NinePatch) {
     end;
 
     OnVoteAccepted = function(self)
-        import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC("<LOC diplomacy_0021>The recall vote was accepted."))
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC("<LOC diplomacy_0021>The recall vote was accepted."))
         self.label:SetText(LOC("<LOC diplomacy_0023>Recalling..."))
     end;
 
     OnVoteVetoed = function(self)
-        import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC("<LOC diplomacy_0022>The recall vote was vetoed."))
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC("<LOC diplomacy_0022>The recall vote was vetoed."))
         self.label:SetText(LOC("<LOC diplomacy_0024>Not ready for recall"))
     end;
 
     OnHide = function(self, hide)
-        local supress = import('/lua/ui/game/gamecommon.lua').SupressShowingWhenRestoringUI(self, hide)
+        local supress = import("/lua/ui/game/gamecommon.lua").SupressShowingWhenRestoringUI(self, hide)
         local collapse = self.collapseArrow
         if collapse then
             if supress or collapse:IsDisabled() then

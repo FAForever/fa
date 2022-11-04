@@ -12,11 +12,11 @@
 ---@field Func string
 ---@field Args table
 
-local SimUtils = import('/lua/simutils.lua')
-local SimPing = import('/lua/simping.lua')
-local SimTriggers = import('/lua/scenariotriggers.lua')
-local SUtils = import('/lua/ai/sorianutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
+local SimUtils = import("/lua/simutils.lua")
+local SimPing = import("/lua/simping.lua")
+local SimTriggers = import("/lua/scenariotriggers.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -463,15 +463,15 @@ Callbacks.UpdateMarker = SimPing.UpdateMarker
 
 Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect
 
-Callbacks.ToggleSelfDestruct = import('/lua/selfdestruct.lua').ToggleSelfDestruct
+Callbacks.ToggleSelfDestruct = import("/lua/selfdestruct.lua").ToggleSelfDestruct
 
-Callbacks.MarkerOnScreen = import('/lua/simcameramarkers.lua').MarkerOnScreen
+Callbacks.MarkerOnScreen = import("/lua/simcameramarkers.lua").MarkerOnScreen
 
-Callbacks.SimDialogueButtonPress = import('/lua/simdialogue.lua').OnButtonPress
+Callbacks.SimDialogueButtonPress = import("/lua/simdialogue.lua").OnButtonPress
 
 Callbacks.AIChat = SUtils.FinishAIChat
 
-Callbacks.DiplomacyHandler = import('/lua/simdiplomacy.lua').DiplomacyHandler
+Callbacks.DiplomacyHandler = import("/lua/simdiplomacy.lua").DiplomacyHandler
 
 Callbacks.Rebuild = function(data, units)
     local wreck = GetEntityById(data.entity)
@@ -485,7 +485,7 @@ Callbacks.Rebuild = function(data, units)
     wreck:Rebuild(units)
 end
 
---Callbacks.GetUnitHandle = import('/lua/debugai.lua').GetHandle
+--Callbacks.GetUnitHandle = import("/lua/debugai.lua").GetHandle
 
 function Callbacks.OnMovieFinished(name)
     ScenarioInfo.DialogueFinished[name] = true
@@ -523,19 +523,19 @@ Callbacks.OnControlGroupAssign = function(units)
     end
 end
 
-local SimCamera = import('/lua/simcamera.lua')
+local SimCamera = import("/lua/simcamera.lua")
 
 Callbacks.OnCameraFinish = SimCamera.OnCameraFinish
 
-local SimPlayerQuery = import('/lua/simplayerquery.lua')
+local SimPlayerQuery = import("/lua/simplayerquery.lua")
 
 Callbacks.OnPlayerQuery = SimPlayerQuery.OnPlayerQuery
 
 Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
-Callbacks.PingGroupClick = import('/lua/simpinggroup.lua').OnClickCallback
+Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
-Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
+Callbacks.GiveOrders = import("/lua/spreadattack.lua").GiveOrders
 
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
@@ -584,7 +584,7 @@ Callbacks.FlagShield = function(data, units)
     end
 end
 
-Callbacks.WeaponPriorities = import('/lua/weaponpriorities.lua').SetWeaponPriorities
+Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriorities
 
 Callbacks.ToggleDebugChainByName = function (data, units)
     LOG("ToggleDebugChainByName")
@@ -823,22 +823,25 @@ Callbacks.LoadIntoTransports = function(data, selection)
 end
 
 Callbacks.NavGenerate = function(data)
-    import("/lua/sim/NavGenerator.lua").Generate()
+    import("/lua/sim/navgenerator.lua").Generate()
 end
 
 Callbacks.NavToggleScanLayer = function(data)
-    import("/lua/sim/NavDebug.lua").ToggleScanLayer(data)
+    import("/lua/sim/navdebug.lua").ToggleScanLayer(data)
 end
 
 Callbacks.NavToggleScanLabels = function(data)
-    LOG("ToggleScanLabels")
-    import("/lua/sim/NavDebug.lua").ToggleScanLabels(data)
+    import("/lua/sim/navdebug.lua").ToggleScanLabels(data)
 end
 
 Callbacks.NavDebugCanPathTo = function(data)
-    import("/lua/sim/NavDebug.lua").CanPathTo(data)
+    import("/lua/sim/navdebug.lua").CanPathTo(data)
 end
 
 Callbacks.NavDebugPathTo = function(data)
-    import("/lua/sim/NavDebug.lua").PathTo(data)
+    import("/lua/sim/navdebug.lua").PathTo(data)
+end
+
+Callbacks.NavDebugGetLabel = function(data)
+    import("/lua/sim/navdebug.lua").GetLabel(data)
 end

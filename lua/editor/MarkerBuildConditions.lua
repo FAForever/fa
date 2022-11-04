@@ -9,7 +9,7 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
 ---@param aiBrain AIBrain
 ---@param markerType string

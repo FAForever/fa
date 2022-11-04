@@ -7,11 +7,11 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TDFHeavyPlasmaCannonWeapon = import('/lua/terranweapons.lua').TDFHeavyPlasmaGatlingCannonWeapon
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TDFHeavyPlasmaCannonWeapon = import("/lua/terranweapons.lua").TDFHeavyPlasmaGatlingCannonWeapon
 
-local EffectUtils = import('/lua/effectutilities.lua')
-local Effects = import('/lua/effecttemplates.lua')
+local EffectUtils = import("/lua/effectutilities.lua")
+local Effects = import("/lua/effecttemplates.lua")
 
 ---@class XEB2306 : TStructureUnit
 XEB2306 = Class(TStructureUnit) {

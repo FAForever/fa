@@ -66,7 +66,7 @@ function GetAItypes()
     local CustomAIfile
     local ModAIFiles
     -- get all sim mods installed in /mods/
-    local simMods = import('/lua/mods.lua').GetGameMods()
+    local simMods = import("/lua/mods.lua").GetGameMods()
     -- loop over all installed mods
     for Index, ModData in simMods do
         -- check if we have a CustomAIs_v2 folder (then we have an AI mod)

@@ -7,7 +7,7 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local Prop = import('/lua/sim/Prop.lua').Prop
+local Prop = import("/lua/sim/prop.lua").Prop
 
 CybranAdjacencyNodeThree = Class(Prop) {
     OnCreate = function(self)

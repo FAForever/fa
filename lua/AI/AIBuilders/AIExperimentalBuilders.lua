@@ -23,7 +23,7 @@ local IBC = '/lua/editor/InstantBuildConditions.lua'
 local TBC = '/lua/editor/ThreatBuildConditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
-local AIAddBuilderTable = import('/lua/ai/AIAddBuilderTable.lua')
+local AIAddBuilderTable = import("/lua/ai/aiaddbuildertable.lua")
 
 ---@alias BuildergroupsExperimentals 'MobileLandExperimentalEngineers' | 'MobileLandExperimentalForm' | 'MobileAirExperimentalEngineers' | 'MobileAirExperimentalForm' | 'SatelliteExperimentalEngineers' | 'SatelliteExperimentalForm' | 'MobileNavalExperimentalEngineers' | 'MobileNavalExperimentalForm' | 'EconomicExperimentalEngineers'
 
