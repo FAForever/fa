@@ -565,7 +565,7 @@ StructureUnit = Class(Unit) {
         -- keep track of who is adjacent to who
         self.AdjacentUnits = self.AdjacentUnits or { }
         adjacentUnit.AdjacentUnits = adjacentUnit.AdjacentUnits or { }
-        
+
         self.AdjacentUnits[adjacentUnit.EntityId] = adjacentUnit
         adjacentUnit.AdjacentUnits[self.EntityId] = self
 
@@ -579,7 +579,7 @@ StructureUnit = Class(Unit) {
         adjacentUnit:RequestRefreshUI()
      end,
 
-    -- Called by the engine when two structures are no loner adjacent to each other
+    -- Called by the engine when two structures are no longer adjacent to each other
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     OnNotAdjacentTo = function(self, adjacentUnit)
