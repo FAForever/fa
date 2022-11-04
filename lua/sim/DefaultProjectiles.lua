@@ -5,14 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local Projectile = import('/lua/sim/Projectile.lua').Projectile
-local DummyProjectile = import('/lua/sim/Projectile.lua').DummyProjectile
-local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
-local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities
+local Projectile = import("/lua/sim/projectile.lua").Projectile
+local DummyProjectile = import("/lua/sim/projectile.lua").DummyProjectile
+local UnitsInSphere = import("/lua/utilities.lua").GetTrueEnemyUnitsInSphere
+local GetDistanceBetweenTwoEntities = import("/lua/utilities.lua").GetDistanceBetweenTwoEntities
 local OCProjectiles = {}
 
 -- shared between sim and ui
-local OverchargeShared = import('/lua/shared/overcharge.lua')
+local OverchargeShared = import("/lua/shared/overcharge.lua")
 
 -- upvalue globals for performance
 local Random = Random

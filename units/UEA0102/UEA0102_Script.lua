@@ -8,8 +8,8 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local TAirToAirLinkedRailgun = import('/lua/terranweapons.lua').TAirToAirLinkedRailgun
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local TAirToAirLinkedRailgun = import("/lua/terranweapons.lua").TAirToAirLinkedRailgun
 
 ---@class UEA0102 : TAirUnit
 UEA0102 = Class(TAirUnit) {

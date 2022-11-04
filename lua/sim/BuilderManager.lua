@@ -7,7 +7,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local Builder = import('/lua/sim/Builder.lua')
+local Builder = import("/lua/sim/builder.lua")
 
 ---@class BuilderManager
 BuilderManager = ClassSimple {
@@ -396,5 +396,5 @@ BuilderManager = ClassSimple {
 
 
 -- kept for mod backwards compatibility
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")

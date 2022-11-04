@@ -1,4 +1,4 @@
-local PlayReclaimEndEffects = import('/lua/EffectUtilities.lua').PlayReclaimEndEffects
+local PlayReclaimEndEffects = import("/lua/effectutilities.lua").PlayReclaimEndEffects
 
 local minimumLabelMass = 10
 
@@ -491,6 +491,6 @@ Prop = Class(moho.prop_methods) {
 
 
 -- imports kept for backwards compatibility with mods
-local Entity = import('/lua/sim/Entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 local DeprecatedWarnings = { }
 local TrashAdd = TrashBag.Add

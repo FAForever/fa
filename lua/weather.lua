@@ -1,9 +1,9 @@
-local WeatherDefinition = import('/lua/weatherdefinitions.lua')
+local WeatherDefinition = import("/lua/weatherdefinitions.lua")
 local MapStyleList = WeatherDefinition.MapStyleList
 local MapWeatherList = WeatherDefinition.MapWeatherList
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local util = import('/lua/utilities.lua')
-local Entity = import('/lua/sim/Entity.lua').Entity
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local util = import("/lua/utilities.lua")
+local Entity = import("/lua/sim/entity.lua").Entity
 
 local TableGetN = table.getn
 

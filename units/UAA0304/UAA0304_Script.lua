@@ -5,8 +5,8 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
-local AIFBombQuarkWeapon = import('/lua/aeonweapons.lua').AIFBombQuarkWeapon
+local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
+local AIFBombQuarkWeapon = import("/lua/aeonweapons.lua").AIFBombQuarkWeapon
 
 
 ---@class UAA0304 : AAirUnit

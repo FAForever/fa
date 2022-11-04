@@ -7,9 +7,9 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
+local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
 
@@ -250,7 +250,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                                             -- Call function on builder manager; let it handle death of factory
                                             self:FactoryDestroyed(v)
                                         end
-                import('/lua/ScenarioTriggers.lua').CreateUnitDestroyedTrigger(factoryDestroyed, v)
+                import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(factoryDestroyed, v)
 
                 local factoryNewlyCaptured = function(unit, captor)
                                             local aiBrain = captor:GetAIBrain()
@@ -262,13 +262,13 @@ FactoryBuilderManager = Class(BuilderManager) {
                                                 end
                                             end
                                         end
-                import('/lua/ScenarioTriggers.lua').CreateUnitCapturedTrigger(nil, factoryNewlyCaptured, v)
+                import("/lua/scenariotriggers.lua").CreateUnitCapturedTrigger(nil, factoryNewlyCaptured, v)
 
                 local factoryWorkFinish = function(v, finishedUnit)
                                             -- Call function on builder manager; let it handle the finish of work
                                             self:FactoryFinishBuilding(v, finishedUnit)
                                         end
-                import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(factoryWorkFinish, v, categories.ALLUNITS)
+                import("/lua/scenariotriggers.lua").CreateUnitBuiltTrigger(factoryWorkFinish, v, categories.ALLUNITS)
             end
             self:ForkThread(self.DelayBuildOrder, v, bType, 0.1)
         end
@@ -582,4 +582,4 @@ function CreateFactoryBuilderManager(brain, lType, location, radius, useCenterPo
 end
 
 --- Moved Unsused Imports to bottome for mod support 
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")

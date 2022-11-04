@@ -7,7 +7,7 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TPlasmaCannonProjectile = import('/lua/terranprojectiles.lua').TGatlingPlasmaCannonProjectile
+local TPlasmaCannonProjectile = import("/lua/terranprojectiles.lua").TGatlingPlasmaCannonProjectile
 TDFPlasma02 = Class(TPlasmaCannonProjectile) {}
 TypeClass = TDFPlasma02
 

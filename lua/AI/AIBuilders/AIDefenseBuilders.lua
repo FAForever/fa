@@ -23,7 +23,7 @@ local IBC = '/lua/editor/InstantBuildConditions.lua'
 local TBC = '/lua/editor/ThreatBuildConditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
-local AIAddBuilderTable = import('/lua/ai/AIAddBuilderTable.lua')
+local AIAddBuilderTable = import("/lua/ai/aiaddbuildertable.lua")
 
 ---@alias BuilderGroupsDefense 'T1BaseDefenses' | 'T2BaseDefenses' | 'T2ArtilleryFormBuilders' | 'T3BaseDefenses' | 'T1PerimeterDefenses' | 'T2PerimeterDefenses' | 'T3PerimeterDefenses' | 'T1DefensivePoints' | 'T2DefensivePoints' | 'T3DefensivePoints' | 'T1DefensivePoints High Pri' | 'T2DefensivePoints High Pri' | 'T3DefensivePoints High Pri' | 'T1NavalDefenses' | 'T2NavalDefenses' | 'T3NavalDefenses' | 'T2Shields' | 'ShieldUpgrades' | 'T3Shields' | 'T3NukeDefenses' | 'T3NukeDefenseBehaviors' | 'MiscDefensesEngineerBuilders' | 'T1LightDefenses' | 'T2MissileDefenses' | 'T2LightDefenses' | 'T3LightDefenses' | 'T1ACUDefenses' | 'T2ACUDefenses' | 'T2ACUShields' | 'T3ACUShields' | 'T3ACUNukeDefenses'
 

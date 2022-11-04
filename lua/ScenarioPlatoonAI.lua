@@ -5,10 +5,10 @@
 --- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------
 
-local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
 --- Retrieves all human brains that are hostile to the given army index
 ---@param armyIndex number Army index to check alliance with
@@ -656,9 +656,9 @@ function EngineersBuildPlatoon(platoon)
                     end
                 end
                 if buildingData.ScenPlatoonAI then
-                    plat:ForkAIThread(import('/lua/ScenarioPlatoonAI.lua')[buildingData.ScenPlatoonAI])
+                    plat:ForkAIThread(import("/lua/scenarioplatoonai.lua")[buildingData.ScenPlatoonAI])
                 elseif buildingData.PlatoonAI then
-                    plat:ForkAIThread(import('/lua/platoon.lua')[buildingData.PlatoonAI])
+                    plat:ForkAIThread(import("/lua/platoon.lua")[buildingData.PlatoonAI])
                 elseif buildingData.LocalFunction and buildingData.ScenName then
                     plat:ForkAIThread(import('/maps/'..buildingData.ScenName..'/'..buildingData.ScenName..'_script.lua')[LocalFunction])
                 end
@@ -2414,4 +2414,4 @@ end
 
 -- kept for mod backwards compatibility
 
-local Utilities = import('/lua/utilities.lua')
+local Utilities = import("/lua/utilities.lua")

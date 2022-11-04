@@ -11,8 +11,8 @@
 -- CollisionBeam is the simulation (gameplay-relevant) portion of a beam. It wraps a special effect
 -- that may or may not exist depending on how the simulation is executing.
 --
-local DefaultDamage = import('/lua/sim/defaultdamage.lua')
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
+local DefaultDamage = import("/lua/sim/defaultdamage.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 ---@class CollisionBeam : moho.CollisionBeamEntity
 CollisionBeam = Class(moho.CollisionBeamEntity) {

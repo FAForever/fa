@@ -1,10 +1,10 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
 function SetLayout()
-    local GUI = import('/lua/ui/game/chat.lua').GUI
+    local GUI = import("/lua/ui/game/chat.lua").GUI
     
     local windowTextures = {
         tl = UIUtil.UIFile('/game/chat_brd/chat_brd_ul.dds'),

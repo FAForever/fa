@@ -5,17 +5,17 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Utilities = import('/lua/utilities.lua')
-local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
-local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
-local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
-local TriggerFile = import('/lua/scenariotriggers.lua')
-local UCBC = import('/lua/editor/UnitCountBuildConditions.lua')
-local SBC = import('/lua/editor/SorianBuildConditions.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Utilities = import("/lua/utilities.lua")
+local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
+local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local TriggerFile = import("/lua/scenariotriggers.lua")
+local UCBC = import("/lua/editor/unitcountbuildconditions.lua")
+local SBC = import("/lua/editor/sorianbuildconditions.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 -- CDR ADD BEHAVIORS
 function CDRRunAway(aiBrain, cdr)

@@ -1,11 +1,11 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Edit = import('/lua/maui/edit.lua').Edit
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Edit = import("/lua/maui/edit.lua").Edit
 
 --- The dialog used to define marker-pings.
 local dialog = false
@@ -57,7 +57,7 @@ end
 function DoPing(pingType)
 
     -- can't ping in replays
-    if SessionIsReplay() or import('/lua/ui/game/gamemain.lua').supressExitDialog then 
+    if SessionIsReplay() or import("/lua/ui/game/gamemain.lua").supressExitDialog then 
         WARN("You can not ping in a replay.")
         return 
     end
@@ -164,7 +164,7 @@ end
 -- @param data A table where each element is data about a ping.
 function DisplayPing(data)
     --Table of all map views to display pings in
-    local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
+    local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
 
     -- for each ping
     for index, ping in data do

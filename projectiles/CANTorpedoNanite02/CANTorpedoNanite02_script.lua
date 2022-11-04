@@ -8,9 +8,9 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CTorpedoShipProjectile = import('/lua/cybranprojectiles.lua').CTorpedoShipProjectile
-local Entity = import('/lua/sim/Entity.lua').Entity
-local defaultDamage = import('/lua/sim/defaultdamage.lua')
+local CTorpedoShipProjectile = import("/lua/cybranprojectiles.lua").CTorpedoShipProjectile
+local Entity = import("/lua/sim/entity.lua").Entity
+local defaultDamage = import("/lua/sim/defaultdamage.lua")
 
 CANTorpedoNanite02 = Class(CTorpedoShipProjectile) {
 

@@ -7,15 +7,17 @@
 --------------------------------------------------------------------------
 --  TERRAN PROJECTILES SCRIPTS
 --------------------------------------------------------------------------
-local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
+local DefaultProjectileFile = import("/lua/sim/defaultprojectiles.lua")
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
 local OnWaterEntryEmitterProjectile = DefaultProjectileFile.OnWaterEntryEmitterProjectile
 local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
 local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectile
 local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
 local SingleCompositeEmitterProjectile = DefaultProjectileFile.SingleCompositeEmitterProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local DepthCharge = import('/lua/defaultantiprojectile.lua').DepthCharge
+
+local NukeProjectile = DefaultProjectileFile.NukeProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 
 ---@class TFragmentationGrenade : EmitterProjectile
