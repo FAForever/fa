@@ -74,44 +74,33 @@ StructureUnit = Class(Unit) {
             threat = -1,
         }
 
-        -- retrieve units of certain type
-        local radius = 2 * (bp.AI.GuardScanRadius or 50)
+        -- determine radius
+        local radius = 40
+        local weapons = self.Blueprint.Weapon
+        if weapons then
+            for k, weapon in weapons do
+                if weapon.MaxRadius and weapon.MaxRadius > radius then
+                    radius = 1.1 * weapon.MaxRadius
+                end
+            end
+        end
+
         local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
         local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
 
-        -- for each unit found
-        local threats = { }
-        for _, u in units do
+        if units then
+            for _, u in units do
+                local blip = u:GetBlip(self.Army)
+                if blip then
 
-            -- find its blip
-            local blip = u:GetBlip(self.Army)
-            if blip then
-
-                -- check if we've got it on radar and whether it is identified by army in question
-                local radar = blip:IsOnRadar(self.Army)
-                local identified = blip:IsSeenEver(self.Army)
-                if radar or identified then
-
-                    -- if we've identified the blip then we can use the threat of the unit, otherwise default to 1.
-                    local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
-
-                    -- if this is more of a threat than what we have, compute distance
-                    if threat >= target.threat then
-                        local epos = u:GetPosition()
-                        local distance = VDist2Sq(pos[1], pos[3], epos[1], epos[3])
-
-                        -- if threat is bigger, then we don't need to compare distance
-                        if threat > target.threat then
-                            target.location = epos
-                            target.distance = distance
+                    -- check if we've got it on radar and whether it is identified by army in question
+                    local radar = blip:IsOnRadar(self.Army)
+                    local identified = blip:IsSeenEver(self.Army)
+                    if radar or identified then
+                        local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
+                        if threat >= target.threat then
+                            target.location = u:GetPosition()
                             target.threat = threat
-                        else
-                            -- threat is equal, therefore compare distance - closer wins
-                            if distance < target.distance then
-                                target.location = epos
-                                target.distance = distance
-                                target.threat = threat
-                            end
                         end
                     end
                 end
