@@ -169,79 +169,14 @@ options = {
         key = 'gameplay',
         items = {
             {
-                title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
-                key = 'wheel_sensitivity',
-                type = 'slider',
-                default = 40,
-                set = function(key,value,startup)
-                    ConExecute("cam_ZoomAmount " .. tostring(value / 100))
-                end,
-                custom = {
-                    min = 1,
-                    max = 100,
-                    inc = 0,
-                },
+                title = 'Camera controls',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
             },
-            {
-                title = "<LOC OPTIONS_0109>Always Render Strategic Icons",
-                key = 'strat_icons_always_on',
-                type = 'toggle',
-                default = 0,
-                set = function(key,value,startup)
-                    ConExecute("ui_AlwaysRenderStrategicIcons " .. tostring(value))
-                end,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0107>Construction Tooltip Information",
-                tip = "<LOC OPTIONS_0108>Change the layout that information is displayed in the rollover window for units in the construction manager.",
-                key = 'uvd_format',
-                type = 'toggle',
-                default = 'full',
-                set = function(key,value,startup)
-                    -- needs logic to set priority (do we really want to do this though?)
-                end,
-                custom = {
-                    states = {
-                        {text = "<LOC _Full>", key = 'full'},
-                        {text = "<LOC _Limited>", key = 'limited'},
-                        {text = "<LOC _Off>", key = 'off'},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0215>Show Waypoint ETAs",
-                key = 'display_eta',
-                type = 'toggle',
-                default = true,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = true,},
-                        {text = "<LOC _Off>", key = false,},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0102>Multiplayer Taunts",
-                tip = "<LOC OPTIONS_0103>Enable or Disable displaying taunts in multiplayer.",
-                key = 'mp_taunt_head_enabled',
-                type = 'toggle',
-                default = 'true',
-                set = function(key,value,startup)
-                    -- needs logic to set priority (do we really want to do this though?)
-                end,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = 'true'},
-                        {text = "<LOC _Off>", key = 'false'},
-                    },
-                },
-            },
+
             {
                 title = "<LOC OPTIONS_0158>Screen Edge Pans Main View",
                 key = 'screen_edge_pans_main_view',
@@ -258,18 +193,17 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0159>Arrow Keys Pan Main View",
-                key = 'arrow_keys_pan_main_view',
-                type = 'toggle',
-                default = 1,
+                title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
+                key = 'wheel_sensitivity',
+                type = 'slider',
+                default = 40,
                 set = function(key,value,startup)
-                    ConExecute("ui_ArrowKeysScrollView " .. tostring(value))
+                    ConExecute("cam_ZoomAmount " .. tostring(value / 100))
                 end,
                 custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
+                    min = 1,
+                    max = 100,
+                    inc = 0,
                 },
             },
             {
@@ -328,6 +262,45 @@ options = {
                     inc = 1,
                 },
             },
+
+            {
+                title = "<LOC OPTIONS_0236>Zoom Pop Distance",
+                key = 'gui_zoom_pop_distance',
+                type = 'slider',
+                default = 80,
+                custom = {
+                    min = 1,
+                    max = 160,
+                    inc = 1,
+                },
+            },   
+
+            -- TODO: what to do with this?
+            {
+                title = "<LOC OPTIONS_0159>Arrow Keys Pan Main View",
+                key = 'arrow_keys_pan_main_view',
+                type = 'toggle',
+                default = 1,
+                set = function(key,value,startup)
+                    ConExecute("ui_ArrowKeysScrollView " .. tostring(value))
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
+                title = 'Build templates',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
             {
                 title = "<LOC OPTIONS_0212>Accept Build Templates",
                 key = 'accept_build_templates',
@@ -339,370 +312,6 @@ options = {
                     states = {
                         {text = "<LOC _On>", key = 'yes' },
                         {text = "<LOC _Off>", key = 'no' },
-                    },
-                },
-            },
-
-            {
-                title = 'Commands',
-                type = 'header',
-
-                -- these are expected everywhere
-                default = '',
-                key = '',
-            },
-
-            {
-                title = "Ignore mode via CTRL",
-                key = 'commands_ignore_mode',
-                type = 'toggle',
-                default = 'off',
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 'off'},
-                        {text = "<LOC _On>", key = 'on'},
-                    },
-                },
-            },
-
-            {
-                title = 'Cursor features',
-                type = 'header',
-
-                -- these are expected everywhere
-                default = '',
-                key = '',
-            },
-
-            {
-                title = "Depth scanning",
-                key = 'cursor_depth_scanning',
-                type = 'toggle',
-                default = 'commands',
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 'off'},
-                        {text = "<LOC _OnlyWhenBuilding>Only when building", key = 'building' },
-                        {text = "<LOC _CommandMode>When you issue commands", key = 'commands' },
-                        {text = "<LOC _Always>Always", key = 'always' },
-                    },
-                },
-            },
-
-            {
-                title = 'Selection threshold',
-                type = 'header',
-
-                -- these are expected everywhere
-                default = '',
-                key = '',
-            },
-
-            {
-                title = "Default selection threshold",
-                tip = "this is a tip",
-                key = 'selection_threshold_regular',
-                type = 'slider',
-                default = 10,
-                custom = {
-                    min = 10,
-                    max = 200,
-                    inc = 10,
-                },
-            },
-
-            {
-                title = "Reclaim selection threshold",
-                tip = "this is a tip",
-                key = 'selection_threshold_reclaim',
-                type = 'slider',
-                default = 10,
-                custom = {
-                    min = 10,
-                    max = 200,
-                    inc = 10,
-                },
-            },
-
-            {
-                title = "Replay selection threshold",
-                tip = "this is a tip",
-                key = 'selection_threshold_replay',
-                type = 'slider',
-                default = 7,
-                custom = {
-                    min = 10,
-                    max = 400,
-                    inc = 10,
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0273>Automated Structure Ringing",
-                key = 'structure_capping_feature_01',
-                type = 'toggle',
-                default = "full-suite",
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>Off",                                            key = "off"},
-                        {text = "<LOC _OnlyExtractors>Only mass storages and extractors",   key = "only-storages-extractors"},
-                        {text = "<LOC _FullSuite>Full suite",                               key = "full-suite"},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
-                key = 'automex',
-                type = 'toggle',
-                default = 'onlyT1',
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 'off'},
-                        {text = "<LOC _OnlyT1>", key = 'onlyT1'},
-                        {text = "<LOC _MaxTech>", key = 'maxTech'},
-                    },
-                },
-            },
-        },
-    },
-    ui = {
-        title = "<LOC OPTIONS_0164>Interface",
-        key = 'ui',
-        items = {
-            {
-                title = "<LOC OPTIONS_0006>Language",
-                key = 'selectedlanguage',
-                type = 'toggle',
-                restart = true,
-                default = __language,
-                custom = {
-                    states = __installedlanguages,
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0283>UI Scale",
-                key = 'ui_scale',
-                restart = true,
-                type = 'toggle',
-                default = 1.0,
-                custom = {
-                    states = {
-                        {text = "80%", key = 0.8,},
-                        {text = "100%", key = 1.0,},
-                        {text = "125%", key = 1.25,},
-                        {text = "150%", key = 1.5,},
-                        {text = "175%", key = 1.75,},
-                        {text = "200%", key = 2.0,},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0151>Display Subtitles",
-                key = 'subtitles',
-                type = 'toggle',
-                default = false,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0223>Display World Border",
-                key = 'world_border',
-                type = 'toggle',
-                default = true,
-                set = function(key, value, startup)
-                    import("/lua/ui/uiutil.lua").UpdateWorldBorderState(nil, value)
-                end,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0005>Display Tooltips",
-                key = 'tooltips',
-                type = 'toggle',
-                default = true,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0009>Display Loading Tips",
-                key = 'loading_tips',
-                type = 'toggle',
-                default = true,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0076>Economy Warnings",
-                key = 'econ_warnings',
-                type = 'toggle',
-                default = true,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = true,},
-                        {text = "<LOC _Off>", key = false,},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0078>Tooltip Delay",
-                key = 'tooltip_delay',
-                type = 'slider',
-                default = 0,
-                set = function(key,value,startup)
-                end,
-                custom = {
-                    min = 0,
-                    max = 3,
-                    inc = 0,
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0125>Quick Exit",
-                tip = "<LOC OPTIONS_0126>When close box or alt-f4 are pressed, no confirmation dialog is shown",
-                key = 'quick_exit',
-                type = 'toggle',
-                default = 'false',
-                set = function(key,value,startup)
-                end,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = 'true'},
-                        {text = "<LOC _Off>", key = 'false'},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0165>Lock Fullscreen Cursor To Window",
-                key = 'lock_fullscreen_cursor_to_window',
-                type = 'toggle',
-                default = 0,
-                set = function(key,value,startup)
-                    ConExecute("SC_ToggleCursorClip " .. tostring(value))
-                end,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0207>Main Menu Background Movie",
-                key = 'mainmenu_bgmovie',
-                type = 'toggle',
-                default = true,
-                set = function(key,value,startup)
-                end,
-                init = function ()
-                    savedBgMovie = Prefs.GetOption("mainmenu_bgmovie")
-                end,
-                custom = {
-                    states = (function()
-                        if noMovieSwitchSet then
-                            return {
-                                { text = "<LOC _Command_Line_Override>", key = savedBgMovie },
-                            }
-                        else
-                            return {
-                                { text = "<LOC _Off>", key = false },
-                                { text = "<LOC _On>", key = true },
-                            }
-                        end
-                    end)(),
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0210>Show Lifebars of Attached Units",
-                key = 'show_attached_unit_lifebars',
-                type = 'toggle',
-                default = true,
-                set = function(key,value,startup)
-                end,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = false },
-                        {text = "<LOC _On>", key = true },
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0211>Use Factional UI Skin",
-                key = 'skin_change_on_start',
-                type = 'toggle',
-                default = 'yes',
-                set = function(key,value,startup)
-                end,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = 'yes' },
-                        {text = "<LOC _Off>", key = 'no' },
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0279>Use Factional UI Font Color",
-                key = 'faction_font_color',
-                type = 'toggle',
-                default = false,
-                set = function(key,value,startup)
-                    import("/lua/ui/uiutil.lua").UpdateCurrentSkin({faction_font_color = value})
-                end,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0226>Enable Cycle Preview for Hotbuild",
-                key = 'hotbuild_cycle_preview',
-                type = 'toggle',
-                default = 1,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-            {
-              title = "<LOC OPTIONS_0227>Cycle reset time (ms)",
-              key = 'hotbuild_cycle_reset_time',
-              type = 'slider',
-              default = 1100,
-              custom = {
-                min = 100,
-                max = 5000,
-                inc = 100,
-              },
-            },
-            {
-                title = "<LOC OPTIONS_0228>Bigger Strategic Build Icons",
-                key = 'gui_bigger_strat_build_icons',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC OPTIONS_0254>Bigger icons", key = 1 },
-                        {text = "<LOC OPTIONS_0255>Bigger icons with TechMarker", key = 2 },
                     },
                 },
             },
@@ -721,47 +330,7 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0231>Draggable Build Queue",
-                key = 'gui_draggable_queue',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0246>Show Factory Queue on Hover",
-                key = 'gui_queue_on_hover_02',
-                type = 'toggle',
-                default = 'only-obs',
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>Off", key = 'off' },
-                        {text = "<LOC _Obs>Only when observing", key = 'only-obs' },
-                        {text = "<LOC _Always>Always", key = 'always' },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0232>Middle Click Avatars",
-                key = 'gui_idle_engineer_avatars',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0233>All Race Templates",
+                title = "<LOC OPTIONS_0233>All Faction Templates",
                 key = 'gui_all_race_templates',
                 type = 'toggle',
                 default = 0,
@@ -770,31 +339,6 @@ options = {
                         {text = "<LOC _Off>", key = 0 },
                         {text = "<LOC _On>", key = 1 },
                     },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0234>Single Unit Selected Info",
-                key = 'gui_enhanced_unitview',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0236>Zoom Pop Distance",
-                key = 'gui_zoom_pop_distance',
-                type = 'slider',
-                default = 80,
-                custom = {
-                    min = 1,
-                    max = 160,
-                    inc = 1,
                 },
             },
 
@@ -811,20 +355,6 @@ options = {
                 },
             },
 
-            
-
-            {
-                title = "<LOC OPTIONS_0238>Seperate Idle Builders",
-                key = 'gui_seperate_idle_builders',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
             {
                 title = "<LOC OPTIONS_0239>Visible Template Names",
                 key = 'gui_visible_template_names',
@@ -851,8 +381,128 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0241>Display more Unit Stats",
-                key = 'gui_detailed_unitview',
+                title = 'Control groups',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC selectionsets0001>Steal from other control groups",
+                key = 'selection-sets-add-behavior',
+                type = 'toggle',
+                default = false,
+                custom = {
+                    states = {
+                        {text = "<LOC selectionsets0002>No", key = false },
+                        {text = "<LOC selectionsets0003>Yes", key = true },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC selectionsets0004>Add to factory control group",
+                key = 'selection-sets-production-behavior',
+                type = 'toggle',
+                default = false,
+                custom = {
+                    states = {
+                        {text = "<LOC selectionsets0005>No", key = true },
+                        {text = "<LOC selectionsets0006>Yes", key = false },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC selectionsets0007>Double tap control group behavior",
+                key = 'selection-sets-double-tap-behavior',
+                type = 'toggle',
+                default = 'translate-zoom',
+                custom = {
+                    states = {
+                        {text = "<LOC selectionsets0008>Do nothing", key = 'none' },
+                        {text = "<LOC selectionsets0009>Only translate", key = 'translate' },
+                        {text = "<LOC selectionsets00010>Translate, zoom only out", key = 'translate-zoom-out-only' },
+                        {text = "<LOC selectionsets00011>Translate and zoom", key = 'translate-zoom' },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC selectionsets0001>Double tap control group decay (in ms)",
+                key = 'selection-sets-double-tap-decay',
+                type = 'slider',
+                default = 1000,
+                custom = {
+                    min = 100,
+                    max = 2000,
+                    inc = 10,
+                },
+            },
+
+            {
+                title = 'Commands',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "Ignore mode via CTRL",
+                key = 'commands_ignore_mode',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _On>", key = 'on'},
+                    },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_0273>Automated Structure Ringing",
+                key = 'structure_capping_feature_01',
+                type = 'toggle',
+                default = "full-suite",
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>Off",                                            key = "off"},
+                        {text = "<LOC _OnlyExtractors>Only mass storages and extractors",   key = "only-storages-extractors"},
+                        {text = "<LOC _FullSuite>Full suite",                               key = "full-suite"},
+                    },
+                },
+            }, 
+            {
+                title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
+                key = 'automex',
+                type = 'toggle',
+                default = 'onlyT1',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _OnlyT1>", key = 'onlyT1'},
+                        {text = "<LOC _MaxTech>", key = 'maxTech'},
+                    },
+                },
+            },
+
+            {
+                title = 'Selection',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC OPTIONS_0232>Middle Click Avatars",
+                key = 'gui_idle_engineer_avatars',
                 type = 'toggle',
                 default = 0,
                 custom = {
@@ -864,23 +514,173 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0242>Always Render Custom Names",
-                key = 'gui_render_custom_names',
+                title = "<LOC OPTIONS_0238>Separate Idle Builders",
+                key = 'gui_seperate_idle_builders',
                 type = 'toggle',
                 default = 0,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0245>Improved Unit deselection",
+                key = 'gui_improved_unit_deselection',
+                type = 'toggle',
+                default = 0,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+            {
+                title = "Default selection threshold",
+                tip = "this is a tip",
+                key = 'selection_threshold_regular',
+                type = 'slider',
+                default = 10,
+                custom = {
+                    min = 10,
+                    max = 200,
+                    inc = 10,
+                },
+            },
+            {
+                title = "Reclaim selection threshold",
+                tip = "this is a tip",
+                key = 'selection_threshold_reclaim',
+                type = 'slider',
+                default = 10,
+                custom = {
+                    min = 10,
+                    max = 200,
+                    inc = 10,
+                },
+            },
+            {
+                title = "Replay selection threshold",
+                tip = "this is a tip",
+                key = 'selection_threshold_replay',
+                type = 'slider',
+                default = 7,
+                custom = {
+                    min = 10,
+                    max = 400,
+                    inc = 10,
+                },
+            },
+
+            {
+                title = 'Cursor features',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "Depth scanning",
+                key = 'cursor_depth_scanning',
+                type = 'toggle',
+                default = 'commands',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _OnlyWhenBuilding>Only when building", key = 'building' },
+                        {text = "<LOC _CommandMode>When you issue commands", key = 'commands' },
+                        {text = "<LOC _Always>Always", key = 'always' },
+                    },
+                },
+            },
+        },
+    },
+    ui = {
+        title = "<LOC OPTIONS_0164>Interface",
+        key = 'ui',
+        items = {
+            {
+                title = "<LOC OPTIONS_0006>Language",
+                key = 'selectedlanguage',
+                type = 'toggle',
+                restart = true,
+                default = __language,
+                custom = {
+                    states = __installedlanguages,
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0151>Display Subtitles",
+                key = 'subtitles',
+                type = 'toggle',
+                default = false,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0283>UI Scale",
+                key = 'ui_scale',
+                restart = true,
+                type = 'toggle',
+                default = 1.0,
+                custom = {
+                    states = {
+                        {text = "80%", key = 0.8,},
+                        {text = "100%", key = 1.0,},
+                        {text = "125%", key = 1.25,},
+                        {text = "150%", key = 1.5,},
+                        {text = "175%", key = 1.75,},
+                        {text = "200%", key = 2.0,},
+                    },
+                },
+            },
+
+            {
+                title = 'HUD',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC OPTIONS_0215>Show Waypoint ETAs",
+                key = 'display_eta',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true,},
+                        {text = "<LOC _Off>", key = false,},
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0210>Show Lifebars of Attached Units",
+                key = 'show_attached_unit_lifebars',
+                type = 'toggle',
+                default = true,
                 set = function(key,value,startup)
-                    ConExecute("ui_RenderCustomNames " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        {text = "<LOC _Off>", key = false },
+                        {text = "<LOC _On>", key = true },
                     },
                 },
             },
 
             {
-                title = "<LOC OPTIONS_0243>Force Render Enemy Lifebars",
+                title = "<LOC OPTIONS_0243>Always Show Enemy Lifebars",
                 key = 'gui_render_enemy_lifebars',
                 type = 'toggle',
                 default = 0,
@@ -896,10 +696,13 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0244>Show Armament Build in Factory Menu",
-                key = 'gui_render_armament_detail',
+                title = "<LOC OPTIONS_0242>Always Show Custom Names",
+                key = 'gui_render_custom_names',
                 type = 'toggle',
-                default = 1,
+                default = 0,
+                set = function(key,value,startup)
+                    ConExecute("ui_RenderCustomNames " .. tostring(value))
+                end,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -909,8 +712,46 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0245>Improved Unit deselection",
-                key = 'gui_improved_unit_deselection',
+                title = "<LOC OPTIONS_0109>Always Show Strategic Icons",
+                key = 'strat_icons_always_on',
+                type = 'toggle',
+                default = 0,
+                set = function(key,value,startup)
+                    ConExecute("ui_AlwaysRenderStrategicIcons " .. tostring(value))
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
+                title = 'Building',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC OPTIONS_0228>Bigger Strategic Build Icons",
+                key = 'gui_bigger_strat_build_icons',
+                type = 'toggle',
+                default = 0,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC OPTIONS_0254>Bigger icons", key = 1 },
+                        {text = "<LOC OPTIONS_0255>Bigger icons with TechMarker", key = 2 },
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0231>Draggable Build Queue",
+                key = 'gui_draggable_queue',
                 type = 'toggle',
                 default = 0,
                 custom = {
@@ -932,127 +773,9 @@ options = {
                     },
                 },
             },
-
             {
-                title = 'Control groups',
-                type = 'header',
-
-                -- these are expected everywhere
-                default = '',
-                key = '',
-            },
-
-            {
-                title = "<LOC selectionsets0001>Set behavior",
-                key = 'selection-sets-add-behavior',
-                type = 'toggle',
-                default = true,
-                custom = {
-                    states = {
-                        {text = "<LOC selectionsets0002>Default", key = false },
-                        {text = "<LOC selectionsets0003>Steal from other control groups", key = true },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC selectionsets0004>Factory behavior",
-                key = 'selection-sets-production-behavior',
-                type = 'toggle',
-                default = true,
-                custom = {
-                    states = {
-                        {text = "<LOC selectionsets0005>Add to control group of factory", key = true },
-                        {text = "<LOC selectionsets0006>Do nothing", key = false },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC selectionsets0007>Double tap behavior",
-                key = 'selection-sets-double-tap-behavior',
-                type = 'toggle',
-                default = 'translate-zoom',
-                custom = {
-                    states = {
-                        {text = "<LOC selectionsets0008>Do nothing", key = 'none' },
-                        {text = "<LOC selectionsets0009>Only translate", key = 'translate' },
-                        {text = "<LOC selectionsets00010>Translate, zoom only out", key = 'translate-zoom-out-only' },
-                        {text = "<LOC selectionsets00011>Translate and zoom", key = 'translate-zoom' },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC selectionsets0001>Double tap decay (in ms)",
-                key = 'selection-sets-double-tap-decay',
-                type = 'slider',
-                default = 1000,
-                custom = {
-                    min = 50,
-                    max = 2000,
-                    inc = 10,
-                },
-            },
-
-            {
-                title = 'Spawn menu',
-                type = 'header',
-
-                -- these are expected everywhere
-                default = '',
-                key = '',
-            },
-
-            {
-                title = "<LOC spawnmenu001>Team Columns",
-                key = 'spawn_menu_team_columns',
-                type = 'slider',
-                default = 4,
-                custom = {
-                    min = 1,
-                    max = 10,
-                    inc = 1,
-                },
-            },
-            {
-                title = "<LOC spawnmenu002>Filter Columns",
-                key = 'spawn_menu_filter_columns',
-                type = 'slider',
-                default = 6,
-                custom = {
-                    min = 1,
-                    max = 15,
-                    inc = 1,
-                },
-            },
-            {
-                title = "<LOC spawnmenu003>Split Sources",
-                key = 'spawn_menu_split_sources',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
-            {
-                title = "<LOC spawnmenu004>Type Filter Mode",
-                key = 'spawn_menu_type_filter_mode',
-                type = 'toggle',
-                default = 0,
-                custom = {
-                    states = {
-                        {text = "<LOC spawnmenu004phs>Physics Motion Type", key = 0 },
-                        {text = "<LOC spawnmenu004cat>Blueprint Category", key = 1 },
-                    },
-                },
-            },
-            {
-                title = "<LOC spawnmenu005>Include No-tech Filter",
-                key = 'spawn_menu_notech_filter',
+                title = "<LOC OPTIONS_0226>Enable Cycle Preview for Hotbuild",
+                key = 'hotbuild_cycle_preview',
                 type = 'toggle',
                 default = 1,
                 custom = {
@@ -1063,8 +786,106 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu006>Include ACU/Paragon Filter",
-                key = 'spawn_menu_paragon_filter',
+                title = "<LOC OPTIONS_0227>Cycle reset time (ms)",
+                key = 'hotbuild_cycle_reset_time',
+                type = 'slider',
+                default = 1100,
+                custom = {
+                  min = 100,
+                  max = 5000,
+                  inc = 100,
+                },
+            },
+
+            {
+                title = 'UI',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC OPTIONS_0005>Display Tooltips",
+                key = 'tooltips',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0078>Tooltip Delay",
+                key = 'tooltip_delay',
+                type = 'slider',
+                default = 0,
+                set = function(key,value,startup)
+                end,
+                custom = {
+                    min = 0,
+                    max = 3,
+                    inc = 0,
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0211>Use Factional UI Skin",
+                key = 'skin_change_on_start',
+                type = 'toggle',
+                default = 'yes',
+                set = function(key,value,startup)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = 'yes' },
+                        {text = "<LOC _Off>", key = 'no' },
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0279>Use Factional UI Font Color",
+                key = 'faction_font_color',
+                type = 'toggle',
+                default = false,
+                set = function(key,value,startup)
+                    import('/lua/ui/uiutil.lua').UpdateCurrentSkin({faction_font_color = value})
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0076>Economy Warnings",
+                key = 'econ_warnings',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true,},
+                        {text = "<LOC _Off>", key = false,},
+                    },
+                },
+            },
+
+
+            {
+                title = 'Additional Information',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC OPTIONS_0241>Display more Unit Stats",
+                key = 'gui_detailed_unitview',
                 type = 'toggle',
                 default = 0,
                 custom = {
@@ -1075,8 +896,37 @@ options = {
                 },
             },
             {
-                title = "<LOC spawnmenu007>Filter By Menu Sort",
-                key = 'spawn_menu_filter_menu_sort',
+                title = "<LOC OPTIONS_0234>Single Unit Selected Info",
+                key = 'gui_enhanced_unitview',
+                type = 'toggle',
+                default = 0,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0107>Construction Tooltip Information",
+                tip = "<LOC OPTIONS_0108>Change the layout that information is displayed in the rollover window for units in the construction manager.",
+                key = 'uvd_format',
+                type = 'toggle',
+                default = 'full',
+                set = function(key,value,startup)
+                    -- needs logic to set priority (do we really want to do this though?)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _Full>", key = 'full'},
+                        {text = "<LOC _Limited>", key = 'limited'},
+                        {text = "<LOC _Off>", key = 'off'},
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0244>Show Armament Build in Factory Menu",
+                key = 'gui_render_armament_detail',
                 type = 'toggle',
                 default = 1,
                 custom = {
@@ -1086,6 +936,99 @@ options = {
                     },
                 },
             },
+            {
+                title = "<LOC OPTIONS_0246>Show Factory Queue on Hover",
+                key = 'gui_queue_on_hover_02',
+                type = 'toggle',
+                default = 'only-obs',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>Off", key = 'off' },
+                        {text = "<LOC _Obs>Only when observing", key = 'only-obs' },
+                        {text = "<LOC _Always>Always", key = 'always' },
+                    },
+                },
+            },
+
+            {
+                title = 'Misc',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC OPTIONS_0207>Main Menu Background Movie",
+                key = 'mainmenu_bgmovie',
+                type = 'toggle',
+                default = true,
+                set = function(key,value,startup)
+                end,
+                init = function ()
+                    savedBgMovie = Prefs.GetOption("mainmenu_bgmovie")
+                end,
+                custom = {
+                    states = (function()
+                        if noMovieSwitchSet then
+                            return {
+                                { text = "<LOC _Command_Line_Override>", key = savedBgMovie },
+                            }
+                        else
+                            return {
+                                { text = "<LOC _Off>", key = false },
+                                { text = "<LOC _On>", key = true },
+                            }
+                        end
+                    end)(),
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_0009>Show Loading Tips",
+                key = 'loading_tips',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0125>Quick Exit",
+                tip = "<LOC OPTIONS_0126>When close box or alt-f4 are pressed, no confirmation dialog is shown",
+                key = 'quick_exit',
+                type = 'toggle',
+                default = 'false',
+                set = function(key,value,startup)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = 'true'},
+                        {text = "<LOC _Off>", key = 'false'},
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0102>Multiplayer Taunts",
+                tip = "<LOC OPTIONS_0103>Enable or Disable displaying taunts in multiplayer.",
+                key = 'mp_taunt_head_enabled',
+                type = 'toggle',
+                default = 'true',
+                set = function(key,value,startup)
+                    -- needs logic to set priority (do we really want to do this though?)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = 'true'},
+                        {text = "<LOC _Off>", key = 'false'},
+                    },
+                },
+            },
+
         },
     },
     video = {
@@ -1152,6 +1095,21 @@ options = {
                         { text = "1280x768(60)", key = '1280,768,60' },
                         { text = "1280x800(60)", key = '1280,800,60' },
                         { text = "1280x1024(60)", key = '1280,1024,60' },
+                    },
+                },
+            },
+            {
+                title = "<LOC OPTIONS_0165>Lock Fullscreen Cursor To Window",
+                key = 'lock_fullscreen_cursor_to_window',
+                type = 'toggle',
+                default = 0,
+                set = function(key,value,startup)
+                    ConExecute("SC_ToggleCursorClip " .. tostring(value))
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -1234,6 +1192,22 @@ options = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
                         {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_0223>Render World Border",
+                key = 'world_border',
+                type = 'toggle',
+                default = true,
+                set = function(key, value, startup)
+                    import('/lua/ui/uiutil.lua').UpdateWorldBorderState(nil, value)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
                     },
                 },
             },
@@ -1376,7 +1350,7 @@ options = {
             },
 
             {
-                title = "Experimental graphics",
+                title = "Extended graphics",
                 key = 'experimental_graphics',
                 type = 'toggle',
                 default = 0,

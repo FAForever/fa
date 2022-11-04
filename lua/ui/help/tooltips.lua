@@ -647,7 +647,7 @@ Tooltips = {
         description = "<LOC OPTIONS_0079>Sets the Delay before Tooltips are displayed",
     },
     options_loading_tips = {
-        title = "<LOC OPTIONS_0009>Display Loading Tips",
+        title = "<LOC OPTIONS_0009>Show Loading Tips",
         description = "<LOC OPTIONS_0011>Toggles whether or not tips are displayed on the loading screen",
     },
     options_persistent_built_mode = {
@@ -2138,7 +2138,7 @@ Tooltips = {
         description = '<LOC OPTIONS_0259>Allows middle clicking idle engineer avatars to select all idle engineers on screen.',
     },
     options_gui_all_race_templates = {
-        title = '<LOC OPTIONS_0233>All Race Templates',
+        title = '<LOC OPTIONS_0233>All Faction Templates',
         description = '<LOC OPTIONS_0260>Allows build templates to be used across all 4 factions.',
     },
     options_gui_enhanced_unitview = {
@@ -2154,7 +2154,7 @@ Tooltips = {
         description = '<LOC OPTIONS_0263>Allows creation of factory build queue templates.',
     },
     options_gui_seperate_idle_builders = {
-        title = '<LOC OPTIONS_0238>Seperate Idle Builders',
+        title = '<LOC OPTIONS_0238>Separate Idle Builders',
         description = '<LOC OPTIONS_0264>Use a seperate icon for idle Engineers and other builders.',
     },
     options_gui_visible_template_names = {
@@ -2170,11 +2170,11 @@ Tooltips = {
         description = '<LOC OPTIONS_0267>Displays Shield Hp, Regen rate, Hp Regen rate and Build rate. Adapted from Total Veterancy by Eni.',
     },
     options_gui_render_custom_names = {
-        title = '<LOC OPTIONS_0242>Always Render Custom Names',
+        title = '<LOC OPTIONS_0242>Always Show Custom Names',
         description = '<LOC OPTIONS_0268>Toggle display of custom names. Enabled by default.',
     },
     options_gui_render_enemy_lifebars = {
-        title = '<LOC OPTIONS_0243>Force Render Enemy Lifebars',
+        title = '<LOC OPTIONS_0243>Always Show Enemy Lifebars',
         description = '<LOC OPTIONS_0269>Force rendering enemy lifebars. Disabled by default',
     },
     options_gui_render_armament_detail = {
