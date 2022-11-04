@@ -63,7 +63,6 @@ integratedMods["nvidia fix"] = true
 
 integratedMods = LowerHashTable(integratedMods)
 
-
 -- take care that the folder name is properly spelled and Capitalized
 -- deprecatedMods["Mod Folder Name"] = deprecation status
 --   true: deprecated regardless of mod version
@@ -73,11 +72,12 @@ local deprecatedMods = {}
 -- mods that are deprecated, based on mod folder name
 deprecatedMods["simspeed++"] = true
 deprecatedMods["#quality of performance 2022"] = true
+deprecatedMods["em"] = "11"
 
 -- as per #4119 the control groups (called selection sets in code) are completely overhauled and extended feature-wise,
 -- because of that these mods are no longer viable / broken / integrated
-deprecatedMods["group_split"] = true
-deprecatedMods["Control Group Zoom Mod"] = true
+deprecatedMods["group_split"] = "0.1"
+deprecatedMods["Control Group Zoom Mod"] = "2"
 deprecatedMods["additionalControlGroupStuff"] = true
 
 -- as per #4124 the cursor and command interactions are complete overhauled and extended feature-wise,
@@ -86,15 +86,15 @@ deprecatedMods["additionalCameraStuff"] = "3"
 deprecatedMods["RUI"] = "1.0"
 
 -- as per #4232 the reclaim view is completely overhauled
-deprecatedMods["Advanced Reclaim&Selection Info"] = true
-deprecatedMods["AdvancedReclaimInfo"] = true
-deprecatedMods["BetterReclaimView"] = true
-deprecatedMods["disableReclaimUI"] = true
-deprecatedMods["DynamicReclaimGrouping"] = true
-deprecatedMods["EzR"] = true
-deprecatedMods["OnScreenReclaimCounter"] = true
-deprecatedMods["ORV"] = true
-deprecatedMods["SmartReclaimSupport"] = true
+deprecatedMods["Advanced Reclaim&Selection Info"] = "1"
+deprecatedMods["AdvancedReclaimInfo"] = "1"
+deprecatedMods["BetterReclaimView"] = "2"
+deprecatedMods["disableReclaimUI"] = "2"
+deprecatedMods["DynamicReclaimGrouping"] = "1"
+deprecatedMods["EzReclaim"] = "1.0"
+deprecatedMods["OnScreenReclaimCounter"] = "8"
+deprecatedMods["ORV"] = "1"
+deprecatedMods["SmartReclaimSupport"] = "3"
 deprecatedMods["DrimsUIPack"] = "3"
 
 -- convert all mod folder name keys to lower case to prevent typos
