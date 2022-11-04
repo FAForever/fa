@@ -57,7 +57,7 @@ luft.describe("NavDatastructures", function()
         luft.expect(heap:IsEmpty()).to.equal(true)
     end)
 
-    luft.test("Extract sorted with dupilcates", function()
+    luft.test("Extract sorted with duplicates", function()
         local heap = NavPathToHeap()
 
         local values = { 25, 16, 9.1, 16, 36, 25, 49, 64, 89, 9.1 }
