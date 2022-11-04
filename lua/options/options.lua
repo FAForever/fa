@@ -451,18 +451,18 @@ options = {
                 key = '',
             },
 
-            {
-                title = "Ignore mode via CTRL",
-                key = 'commands_ignore_mode',
-                type = 'toggle',
-                default = 'off',
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 'off'},
-                        {text = "<LOC _On>", key = 'on'},
-                    },
-                },
-            },
+            -- {
+            --     title = "Ignore mode via CTRL",
+            --     key = 'commands_ignore_mode',
+            --     type = 'toggle',
+            --     default = 'off',
+            --     custom = {
+            --         states = {
+            --             {text = "<LOC _Off>", key = 'off'},
+            --             {text = "<LOC _On>", key = 'on'},
+            --         },
+            --     },
+            -- },
 
             {
                 title = "<LOC OPTIONS_0273>Automated Structure Ringing",
