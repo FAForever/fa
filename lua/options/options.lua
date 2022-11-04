@@ -329,9 +329,8 @@ options = {
                 },
             },
 
-            -- TODO: change name
             {
-                title = "<LOC OPTIONS_0233>All Race Templates",
+                title = "<LOC OPTIONS_0233>All Faction Templates",
                 key = 'gui_all_race_templates',
                 type = 'toggle',
                 default = 0,
@@ -390,37 +389,34 @@ options = {
                 key = '',
             },
 
-            -- TODO: improve naming
             {
-                title = "<LOC selectionsets0001>Set behavior",
+                title = "<LOC selectionsets0001>Steal from other control groups",
                 key = 'selection-sets-add-behavior',
                 type = 'toggle',
-                default = true,
+                default = false,
                 custom = {
                     states = {
-                        {text = "<LOC selectionsets0002>Default", key = false },
-                        {text = "<LOC selectionsets0003>Steal from other control groups", key = true },
+                        {text = "<LOC selectionsets0002>No", key = false },
+                        {text = "<LOC selectionsets0003>Yes", key = true },
                     },
                 },
             },
 
-            -- TODO: improve naming
             {
-                title = "<LOC selectionsets0004>Factory behavior",
+                title = "<LOC selectionsets0004>Add to factory control group",
                 key = 'selection-sets-production-behavior',
                 type = 'toggle',
-                default = true,
+                default = false,
                 custom = {
                     states = {
-                        {text = "<LOC selectionsets0005>Add to control group of factory", key = true },
-                        {text = "<LOC selectionsets0006>Do nothing", key = false },
+                        {text = "<LOC selectionsets0005>No", key = true },
+                        {text = "<LOC selectionsets0006>Yes", key = false },
                     },
                 },
             },
 
-            -- TODO: improve naming
             {
-                title = "<LOC selectionsets0007>Double tap behavior",
+                title = "<LOC selectionsets0007>Double tap control group behavior",
                 key = 'selection-sets-double-tap-behavior',
                 type = 'toggle',
                 default = 'translate-zoom',
@@ -434,14 +430,13 @@ options = {
                 },
             },
 
-            -- TODO: improve naming
             {
-                title = "<LOC selectionsets0001>Double tap decay (in ms)",
+                title = "<LOC selectionsets0001>Double tap control group decay (in ms)",
                 key = 'selection-sets-double-tap-decay',
                 type = 'slider',
                 default = 1000,
                 custom = {
-                    min = 50,
+                    min = 100,
                     max = 2000,
                     inc = 10,
                 },
@@ -518,7 +513,6 @@ options = {
                 },
             },
 
-            -- TODO: fix typo (also in loc)
             {
                 title = "<LOC OPTIONS_0238>Separate Idle Builders",
                 key = 'gui_seperate_idle_builders',
@@ -684,9 +678,9 @@ options = {
                     },
                 },
             },
-            -- TODO: Render -> Show (also in loc)
+
             {
-                title = "<LOC OPTIONS_0243>Force Render Enemy Lifebars",
+                title = "<LOC OPTIONS_0243>Always Show Enemy Lifebars",
                 key = 'gui_render_enemy_lifebars',
                 type = 'toggle',
                 default = 0,
@@ -700,9 +694,9 @@ options = {
                     },
                 },
             },
-            -- TODO: Render -> Show (also in loc)
+
             {
-                title = "<LOC OPTIONS_0242>Always Render Custom Names",
+                title = "<LOC OPTIONS_0242>Always Show Custom Names",
                 key = 'gui_render_custom_names',
                 type = 'toggle',
                 default = 0,
@@ -716,9 +710,9 @@ options = {
                     },
                 },
             },
-            -- TODO: Render -> Show (also in loc)
+
             {
-                title = "<LOC OPTIONS_0109>Always Render Strategic Icons",
+                title = "<LOC OPTIONS_0109>Always Show Strategic Icons",
                 key = 'strat_icons_always_on',
                 type = 'toggle',
                 default = 0,
@@ -990,9 +984,9 @@ options = {
                     end)(),
                 },
             },
-            -- TODO: Display -> Show (also in loc)
+
             {
-                title = "<LOC OPTIONS_0009>Display Loading Tips",
+                title = "<LOC OPTIONS_0009>Show Loading Tips",
                 key = 'loading_tips',
                 type = 'toggle',
                 default = true,
@@ -1202,9 +1196,8 @@ options = {
                 },
             },
 
-            -- TODO: Display -> render
             {
-                title = "<LOC OPTIONS_0223>Display World Border",
+                title = "<LOC OPTIONS_0223>Render World Border",
                 key = 'world_border',
                 type = 'toggle',
                 default = true,
