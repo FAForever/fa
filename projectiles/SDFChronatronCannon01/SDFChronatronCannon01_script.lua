@@ -7,8 +7,8 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SChronatronCannon = import('/lua/seraphimprojectiles.lua').SChronatronCannon
-local ChronatronBlastAttackAOE = import('/lua/EffectTemplates.lua').SChronatronCannonBlastAttackAOE 
+local SChronatronCannon = import("/lua/seraphimprojectiles.lua").SChronatronCannon
+local ChronatronBlastAttackAOE = import("/lua/effecttemplates.lua").SChronatronCannonBlastAttackAOE 
 
 SDFChronatronCannon01 = Class(SChronatronCannon) {
 	FxImpactTrajectoryAligned = false,

@@ -5,12 +5,12 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
-local WeaponsFile = import ('/lua/aeonweapons.lua')
+local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
+local WeaponsFile = import("/lua/aeonweapons.lua")
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
-local utilities = import('/lua/utilities.lua')
-local explosion = import('/lua/defaultexplosions.lua')
+local utilities = import("/lua/utilities.lua")
+local explosion = import("/lua/defaultexplosions.lua")
 
 local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
 

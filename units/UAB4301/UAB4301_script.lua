@@ -7,7 +7,7 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local AShieldStructureUnit = import('/lua/aeonunits.lua').AShieldStructureUnit
+local AShieldStructureUnit = import("/lua/aeonunits.lua").AShieldStructureUnit
 
 ---@class UAB4301 : AShieldStructureUnit
 UAB4301 = Class(AShieldStructureUnit) {

@@ -1,6 +1,6 @@
 
 
-local Control = import('/lua/maui/control.lua').Control
+local Control = import("/lua/maui/control.lua").Control
 
 ---@class MapPreview : moho.ui_map_preview_methods, Control, InternalObject
 MapPreview = Class(moho.ui_map_preview_methods, Control) {

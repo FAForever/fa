@@ -5,14 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- --------------------------------------------------------------
 
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local AIBehaviors = import('/lua/ai/AIBehaviors.lua')
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local UnitTemplates = import("/lua/unittemplates.lua").UnitTemplates
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local AIBehaviors = import("/lua/ai/aibehaviors.lua")
 
 ---@param aiBrain AIBrain
 function AIGetEconomyNumbers(aiBrain)

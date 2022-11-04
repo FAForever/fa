@@ -27,8 +27,8 @@
 -- width, height GetTextureDimensions(filename)
 
 
-local Control = import('/lua/maui/control.lua').Control
-local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
+local Control = import("/lua/maui/control.lua").Control
+local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 
 ---@class BitmapTexture
 ---@field _texture LazyVar<FileName>
@@ -48,7 +48,7 @@ Bitmap = Class(moho.bitmap_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import('/lua/lazyvar.lua')
+        local LazyVar = import("/lua/lazyvar.lua")
         self._filename = {_texture = LazyVar.Create(), _border = 1}
         self._color = LazyVar.Create()
         self._color.OnDirty = function(var)

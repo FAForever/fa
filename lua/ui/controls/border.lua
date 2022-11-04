@@ -1,4 +1,4 @@
-local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
+local NinePatch = import("/lua/ui/controls/ninepatch.lua").NinePatch
 
 -- A nine-patch without a background, useful for laying out around things. An eight-patch.
 ---@class Border : NinePatch

@@ -2,7 +2,7 @@
 -- https://www.lua.org/pil/23.1.html
 
 local Statistics = import("/lua/shared/statistics.lua")
-local CreateEmptyProfilerTable = import("/lua/shared/Profiler.lua").CreateEmptyProfilerTable
+local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 
 -- upvalue for performance
 local SPEW = SPEW

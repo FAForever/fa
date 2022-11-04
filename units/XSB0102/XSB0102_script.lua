@@ -6,7 +6,7 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SAirFactoryUnit = import('/lua/seraphimunits.lua').SAirFactoryUnit
+local SAirFactoryUnit = import("/lua/seraphimunits.lua").SAirFactoryUnit
 
 ---@class XSB0102 : SAirFactoryUnit
 XSB0102 = Class(SAirFactoryUnit) {

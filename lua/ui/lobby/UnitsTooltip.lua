@@ -6,18 +6,18 @@
 --                weapons, and other stats such as DPS, DPM, etc.
 -- ==========================================================================================
 
-local Prefs    = import('/lua/user/prefs.lua')
-local UIUtil   = import('/lua/ui/uiutil.lua')
-local Utils    = import('/lua/system/utils.lua')
-local Group    = import('/lua/maui/group.lua').Group
-local Bitmap   = import('/lua/maui/bitmap.lua').Bitmap
-local Text     = import('/lua/maui/text.lua')
-local TextArea = import('/lua/ui/controls/TextArea.lua').TextArea
+local Prefs    = import("/lua/user/prefs.lua")
+local UIUtil   = import("/lua/ui/uiutil.lua")
+local Utils    = import("/lua/system/utils.lua")
+local Group    = import("/lua/maui/group.lua").Group
+local Bitmap   = import("/lua/maui/bitmap.lua").Bitmap
+local Text     = import("/lua/maui/text.lua")
+local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
-local UnitsAnalyzer   = import('/lua/ui/lobby/UnitsAnalyzer.lua')
-local UnitDescriptions = import('/lua/ui/help/unitdescription.lua').Description
+local UnitsAnalyzer   = import("/lua/ui/lobby/unitsanalyzer.lua")
+local UnitDescriptions = import("/lua/ui/help/unitdescription.lua").Description
 
 local tooltipUI = false
 

@@ -71,8 +71,8 @@ optionsOrder = {
     "sound",
 }
 
-local Prefs = import('/lua/user/prefs.lua')
-local SetMusicVolume = import('/lua/UserMusic.lua').SetMusicVolume
+local Prefs = import("/lua/user/prefs.lua")
+local SetMusicVolume = import("/lua/usermusic.lua").SetMusicVolume
 local savedMasterVol = nil
 local savedFXVol = nil
 local savedMusicVol = nil
@@ -1119,7 +1119,7 @@ options = {
                 type = 'toggle',
                 default = 4,
                 update = function(control,value)
-                    logic = import('/lua/options/optionsLogic.lua')
+                    logic = import("/lua/options/optionslogic.lua")
 
                     aaoptions = GetAntiAliasingOptions()
 
@@ -1183,7 +1183,7 @@ options = {
                 type = 'toggle',
                 default = 1,
                 update = function(control,value)
-                    import('/lua/options/optionsLogic.lua').SetValue('fidelity_presets',4,true)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
                 end,
                 set = function(key,value,startup)
                     ConExecute("ren_Skydome " .. tostring(value))
@@ -1217,7 +1217,7 @@ options = {
                 type = 'toggle',
                 default = 1,
                 update = function(control,value)
-                    import('/lua/options/optionsLogic.lua').SetValue('fidelity_presets',4,true)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
                 end,
                 set = function(key,value,startup)
                     ConExecute("graphics_Fidelity " .. tostring(value))
@@ -1236,7 +1236,7 @@ options = {
                 type = 'toggle',
                 default = 1,
                 update = function(control,value)
-                    import('/lua/options/optionsLogic.lua').SetValue('fidelity_presets',4,true)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
                 end,
                 set = function(key,value,startup)
                     ConExecute("shadow_Fidelity " .. tostring(value))
@@ -1256,7 +1256,7 @@ options = {
                 type = 'toggle',
                 default = 0,
                 update = function(control,value)
-                    import('/lua/options/optionsLogic.lua').SetValue('fidelity_presets',4,true)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
                 end,
                 set = function(key,value,startup)
                     if not startup then
@@ -1281,7 +1281,7 @@ options = {
                 type = 'toggle',
                 default = 1,
                 update = function(control,value)
-                    import('/lua/options/optionsLogic.lua').SetValue('fidelity_presets',4,true)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
                 end,
                 set = function(key,value,startup)
                     ConExecute("ren_MipSkipLevels " .. tostring(value))
@@ -1300,7 +1300,7 @@ options = {
                 type = 'toggle',
                 default = 1,
                 update = function(control,value)
-                    import('/lua/options/optionsLogic.lua').SetValue('fidelity_presets',4,true)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
                 end,
                 set = function(key,value,startup)
                     ConExecute("SC_CameraScaleLOD " .. tostring(value))
@@ -1336,7 +1336,7 @@ options = {
                 type = 'toggle',
                 default = 0,
                 update = function(control,value)
-                    import('/lua/options/optionsLogic.lua').SetValue('fidelity_presets',4,true)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
                 end,
                 set = function(key,value,startup)
                     ConExecute("ren_bloom " .. tostring(value))

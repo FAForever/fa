@@ -5,19 +5,19 @@
 --* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Control = import('/lua/maui/control.lua').Control
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Group = import('/lua/maui/group.lua').Group
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Ping = import('/lua/ui/game/ping.lua')
-local UserDecal = import('/lua/user/UserDecal.lua').UserDecal
-local WorldViewMgr = import('/lua/ui/game/worldview.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local OverchargeCanKill = import('/lua/ui/game/unitview.lua').OverchargeCanKill
-local CommandMode = import('/lua/ui/game/commandmode.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Control = import("/lua/maui/control.lua").Control
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local Group = import("/lua/maui/group.lua").Group
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Ping = import("/lua/ui/game/ping.lua")
+local UserDecal = import("/lua/user/userdecal.lua").UserDecal
+local WorldViewMgr = import("/lua/ui/game/worldview.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
+local CommandMode = import("/lua/ui/game/commandmode.lua")
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -937,7 +937,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             local toFlash
 
             -- Find the UI element we need to flash.
-            local scoreBoardControls = import('/lua/ui/game/score.lua').controls
+            local scoreBoardControls = import("/lua/ui/game/score.lua").controls
             for _, line in scoreBoardControls.armyLines or {} do
                 if line.armyID == pingOwnerIndex then
                     toFlash = line.faction
@@ -1312,7 +1312,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             self:EnableResourceRendering(Prefs.GetFromCurrentProfile(cameraName.."_resource_icons"))
         end
         if GetCamera(self._cameraName) then
-            GetCamera(self._cameraName):SetMaxZoomMult(import('/lua/ui/game/gamemain.lua').defaultZoom)
+            GetCamera(self._cameraName):SetMaxZoomMult(import("/lua/ui/game/gamemain.lua").defaultZoom)
         end
     end,
 

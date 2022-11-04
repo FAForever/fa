@@ -16,8 +16,8 @@ local UnitMethods = moho.unit_methods
 local UnitGetVelocity = UnitMethods.GetVelocity
 local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
-local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 
 local MathMax = math.max
 local MathMin = math.min
@@ -1619,7 +1619,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     end,
 }
 
-local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
+local NukeDamage = import("/lua/sim/nukedamage.lua").NukeAOE
 ---@class DeathNukeWeapon : BareBonesWeapon
 DeathNukeWeapon = Class(BareBonesWeapon) {
 
@@ -1672,4 +1672,4 @@ SCUDeathWeapon = Class(BareBonesWeapon) {
 }
 
 -- kept for mod backwards compatibility
-local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors
+local XZDist = import("/lua/utilities.lua").XZDistanceTwoVectors

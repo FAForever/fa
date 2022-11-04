@@ -21,15 +21,15 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
-local Window = import('/lua/maui/window.lua').Window
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Combo = import('/lua/ui/controls/combo.lua').Combo
+local Window = import("/lua/maui/window.lua").Window
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo = import("/lua/ui/controls/combo.lua").Combo
 
-local Shared = import('/lua/shared/NavGenerator.lua')
+local Shared = import("/lua/shared/navgenerator.lua")
 
 local Root = nil
 local DebugInterface = false
@@ -41,6 +41,113 @@ NavUIOverview = Class(Group) {
     __init = function(self, parent) 
         Group.__init(self, parent, 'NavUIOverview')
     end
+}
+
+---@class NavUIPathTo : Group
+---@field State NavDebugGetLabelState
+NavUIGetLabel = Class(Group) {
+    __init = function (self, parent)
+        local name = 'NavUIGetLabel'
+        Group.__init(self, parent, name)
+
+        self.State = { }
+
+        self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
+            :Fill(self)
+            :Color('77000000')
+            :DisableHitTest(true)
+            :End()
+
+        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'GetLabel\'', 10, UIUtil.bodyFont))
+            :AtLeftTopIn(self, 10, 10)
+            :Over(self, 1)
+            :End() --[[@as Text]]
+
+
+        self.ButtonPosition = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Position"))
+            :AtLeftBottomIn(self.Background, -5, 5)
+            :Over(self, 1)
+            :End()
+
+        self.ButtonPosition.OnClick = function()
+
+            -- make sure we have nothing selected
+            local selection = GetSelectedUnits()
+            SelectUnits(nil);
+
+            -- enables command mode for spawning units
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
+                "build",
+                {
+                    -- default information required
+                    name = 'ual0105',
+
+                    --- 
+                    ---@param mode CommandModeDataBuild
+                    ---@param command any
+                    callback = function(mode, command)
+                        self.State.Position = command.Target.Position
+                        SimCallback({Func = 'NavDebugGetLabel', Args = self.State })
+                        SelectUnits(selection)
+                    end,
+                }
+            )
+        end
+
+        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 10, UIUtil.bodyFont))
+            :RightOf(self.ButtonPosition)
+            :Top(function() return self.ButtonPosition.Top() + LayoutHelpers.ScaleNumber(6) end)
+            :Over(self, 1)
+            :End()
+
+        self.ComboLayer = LayoutHelpers.LayoutFor(Combo(self, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01"))
+            :RightOf(self.ButtonPosition)
+            :Top(function() return self.ButtonPosition.Top() + LayoutHelpers.ScaleNumber(18) end)
+            :Width(100)
+            :End() --[[@as Combo]]
+
+        self.ComboLayer:AddItems(Shared.Layers)
+        self.ComboLayer:SetItem(1)
+        self.State.Layer = Shared.Layers[1]
+        self.ComboLayer.OnClick = function(combo, index, text)
+            self.State.Layer = Shared.Layers[index]
+            SimCallback({Func = 'NavDebugGetLabel', Args = self.State })
+        end
+
+        self.ButtonRerun = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Rerun"))
+            :RightOf(self.ComboLayer)
+            :Top(self.ButtonPosition.Top)
+            :Over(self, 1)
+            :End()
+
+        self.ButtonRerun.OnClick = function()
+            SimCallback({Func = 'NavDebugGetLabel', Args = self.State })
+        end
+
+        self.ButtonReset = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Reset"))
+            :RightOf(self.ButtonRerun, -20)
+            :Over(self, 1)
+            :End()
+
+        self.ButtonReset.OnClick = function()
+            self.State.Position = nil
+            SimCallback({Func = 'NavDebugGetLabel', Args = self.State})
+        end
+
+        AddOnSyncCallback(
+            function(Sync)
+                if Sync.NavDebugGetLabel then
+                    local data = Sync.NavDebugGetLabel
+
+                    if data.Label then
+                        self.Title:SetText(string.format('Debug \'GetLabel\': %s', tostring(data.Label)))
+                    else
+                        self.Title:SetText(string.format('Debug \'GetLabel\': %s (%s)', tostring(data.Label), data.Msg))
+                    end
+                end
+            end, name
+        )
+    end,
 }
 
 ---@class NavUIPathTo : Group
@@ -58,7 +165,7 @@ NavUIPathTo = Class(Group) {
             :DisableHitTest(true)
             :End()
 
-        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'PathTo\'', 8, UIUtil.bodyFont))
+        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'PathTo\'', 10, UIUtil.bodyFont))
             :AtLeftTopIn(self, 10, 10)
             :Over(self, 1)
             :End() --[[@as Text]]
@@ -76,7 +183,7 @@ NavUIPathTo = Class(Group) {
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
                 "build",
                 {
                     -- default information required
@@ -105,7 +212,7 @@ NavUIPathTo = Class(Group) {
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
                 "build",
                 {
                     -- default information required
@@ -123,7 +230,7 @@ NavUIPathTo = Class(Group) {
             )
         end
 
-        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 8, UIUtil.bodyFont))
+        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 10, UIUtil.bodyFont))
             :RightOf(self.ButtonDestination)
             :Top(function() return self.ButtonDestination.Top() + LayoutHelpers.ScaleNumber(6) end)
             :Over(self, 1)
@@ -196,7 +303,7 @@ NavUICanPathTo = Class(Group) {
             :End()
 
         ---@type Text
-        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'CanPathTo\'', 8, UIUtil.bodyFont))
+        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'CanPathTo\'', 10, UIUtil.bodyFont))
             :AtLeftTopIn(self, 10, 10)
             :Over(self, 1)
             :End()
@@ -214,7 +321,7 @@ NavUICanPathTo = Class(Group) {
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
                 "build",
                 {
                     -- default information required
@@ -243,7 +350,7 @@ NavUICanPathTo = Class(Group) {
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
                 "build",
                 {
                     -- default information required
@@ -261,7 +368,7 @@ NavUICanPathTo = Class(Group) {
             )
         end
 
-        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 8, UIUtil.bodyFont))
+        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 10, UIUtil.bodyFont))
             :RightOf(self.ButtonDestination)
             :Top(function() return self.ButtonDestination.Top() + LayoutHelpers.ScaleNumber(6) end)
             :Over(self, 1)
@@ -332,7 +439,7 @@ NavUILayerStatistics = Class(Group) {
             :End()
 
         ---@type Text
-        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, string.format('Layer: %s', layer), 8, UIUtil.bodyFont))
+        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, string.format('Layer: %s', layer), 10, UIUtil.bodyFont))
             :AtLeftTopIn(self, 10, 10)
             :Over(self, 1)
             :End()
@@ -502,6 +609,13 @@ NavUIActions = Class(Group) {
             :Right(function() return self.BodyDebug.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.NavUICanPathTo.Bottom() + LayoutHelpers.ScaleNumber(10) end)
             :Bottom(function() return self.NavUICanPathTo.Bottom() + LayoutHelpers.ScaleNumber(85) end)
+            :End()
+
+        self.NavUIGetLabel = LayoutHelpers.LayoutFor(NavUIGetLabel(self))
+            :Left(function() return self.BodyDebug.Left() + LayoutHelpers.ScaleNumber(10) end)
+            :Right(function() return self.BodyDebug.Right() - LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.NavUIPathTo.Bottom() + LayoutHelpers.ScaleNumber(10) end)
+            :Bottom(function() return self.NavUIPathTo.Bottom() + LayoutHelpers.ScaleNumber(85) end)
             :End()
 
         self.Debug:DisableHitTest(true)

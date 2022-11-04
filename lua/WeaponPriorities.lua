@@ -1,5 +1,5 @@
 local parsedPriorities
-local ParseEntityCategoryProperly = import('/lua/sim/CategoryUtils.lua').ParseEntityCategoryProperly
+local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEntityCategoryProperly
 
 --we are loading an arbitrary string that a user can send to us on the sim side.
 --in order to not break things, we sanitize the input first before doing anything with it.

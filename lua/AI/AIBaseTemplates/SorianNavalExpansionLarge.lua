@@ -96,7 +96,7 @@ BaseBuilderTemplate {
 
         local isIsland = false
         local startX, startZ = aiBrain:GetArmyStartPos()
-        local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
+        local islandMarker = import("/lua/ai/aiutilities.lua").AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then
             isIsland = true
         end

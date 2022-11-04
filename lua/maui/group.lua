@@ -1,4 +1,4 @@
-local Control = import('/lua/maui/control.lua').Control
+local Control = import("/lua/maui/control.lua").Control
 
 ---@class Group : moho.group_methods, Control, InternalObject
 Group = Class(moho.group_methods, Control) {

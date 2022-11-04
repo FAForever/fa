@@ -11,12 +11,12 @@
 --------------------------------------------------------------------------
 --  SERAPHIM PROJECTILES SCRIPTS
 --------------------------------------------------------------------------
-local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
+local DefaultProjectileFile = import("/lua/sim/defaultprojectiles.lua")
 local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectile
 local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
-local util = import('utilities.lua')
+local util = import("/lua/utilities.lua")
 local RandomInt = util.GetRandomInt
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 
@@ -750,4 +750,4 @@ SDFAireauProjectile = Class(MultiPolyTrailProjectile) {
 -- kept for mod backwards compatibility
 
 local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat

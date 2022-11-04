@@ -1,9 +1,9 @@
-local WeatherDefinition = import('/lua/weatherdefinitions.lua')
+local WeatherDefinition = import("/lua/weatherdefinitions.lua")
 local MapStyleList = WeatherDefinition.MapStyleList
 local MapWeatherList = WeatherDefinition.MapWeatherList
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local util = import('/lua/utilities.lua')
-local Entity = import('/lua/sim/Entity.lua').Entity
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local util = import("/lua/utilities.lua")
+local Entity = import("/lua/sim/entity.lua").Entity
 
 -- CreateWeather, this is the entry point for map script, OnPopulate to
 -- generate weather. We spawn a thread here so we can do dynamic movement

@@ -8,7 +8,7 @@
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TLandFactoryUnit = import('/lua/terranunits.lua').TLandFactoryUnit
+local TLandFactoryUnit = import("/lua/terranunits.lua").TLandFactoryUnit
 
 ---@class ZEB9601 : TLandFactoryUnit
 ZEB9601 = Class(TLandFactoryUnit) {}

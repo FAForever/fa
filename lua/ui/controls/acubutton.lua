@@ -1,9 +1,9 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
 
 local teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',

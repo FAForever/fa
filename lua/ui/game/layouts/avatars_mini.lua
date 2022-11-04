@@ -1,8 +1,8 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 function SetLayout()
-    local controls = import('/lua/ui/game/avatars.lua').controls
+    local controls = import("/lua/ui/game/avatars.lua").controls
 
     LayoutHelpers.AtRightTopIn(controls.avatarGroup, controls.parent, 0, 200)
     LayoutHelpers.SetDimensions(controls.avatarGroup, 200, 0)
@@ -36,7 +36,7 @@ function SetLayout()
 end
 
 function LayoutAvatars()
-    local controls = import('/lua/ui/game/avatars.lua').controls
+    local controls = import("/lua/ui/game/avatars.lua").controls
 
     local rightOffset, topOffset, space = 14, 14, -5
 

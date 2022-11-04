@@ -5,7 +5,7 @@ local Group = import("/lua/maui/group.lua").Group
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 local Prefs = import("/lua/user/prefs.lua")
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local panel
 
@@ -216,7 +216,7 @@ MassFabPanel = Class(Group) {
         })
     end,
 
-    OnHide = import('/lua/ui/game/gamecommon.lua').SupressShowingWhenRestoringUI,
+    OnHide = import("/lua/ui/game/gamecommon.lua").SupressShowingWhenRestoringUI,
 
 }
 

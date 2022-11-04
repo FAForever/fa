@@ -5,13 +5,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
-local CybranWeapons = import('/lua/cybranweapons.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
+local CybranWeapons = import("/lua/cybranweapons.lua")
 local CAAAutocannon = CybranWeapons.CAAAutocannon
 local CDFProtonCannonWeapon = CybranWeapons.CDFProtonCannonWeapon
-local CANNaniteTorpedoWeapon = import('/lua/cybranweapons.lua').CANNaniteTorpedoWeapon
-local CIFSmartCharge = import('/lua/cybranweapons.lua').CIFSmartCharge
+local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedoWeapon
+local CIFSmartCharge = import("/lua/cybranweapons.lua").CIFSmartCharge
 
 ---@class URS0201 : CSeaUnit
 URS0201 = Class(CSeaUnit) {
