@@ -20,7 +20,7 @@ local options = Prefs.GetFromCurrentProfile('options')
 ---@field max number
 
 ---@type number
-local HeightRatio = 0.012
+local HeightRatio = 0.020
 
 --- Reclaim is no longer combined once this threshold is met, the value (150) is the same
 --- camera distance that allows for the reclaim command to work. Guarantees that the
@@ -120,6 +120,7 @@ local WorldLabel = Class(Group) {
             self.text:SetText(mass)
             self.oldMass = r.mass
             self:AdjustToValue(r.mass)
+            self.Depth:Set(r.mass)
         end
     end,
 
