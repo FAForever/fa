@@ -25,6 +25,7 @@ local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (ca
 
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
+---@field AdjacentUnits? Unit[] 
 StructureUnit = Class(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
@@ -545,45 +546,50 @@ StructureUnit = Class(Unit) {
         return wreckage
     end,
 
-    -- Adjacency
-    -- When we're adjacent, try to apply all the possible bonuses
+    -- Called by the engine when two structures are adjacent to each other
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     ---@param triggerUnit StructureUnit
-    OnAdjacentTo = function(self, adjacentUnit, triggerUnit) -- What is triggerUnit?
-        if self:IsBeingBuilt() then return end
-        if adjacentUnit:IsBeingBuilt() then return end
+    OnAdjacentTo = function(self, adjacentUnit, triggerUnit)
+        -- make sure we're both finished building
+        if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt() then
+            return
+        end
 
-        -- Does the unit have any adjacency buffs to use?
+        -- make sure we have adjacency buffs to apply
         local adjBuffs = self.Blueprint.Adjacency
-        if not adjBuffs then return end
+        if not adjBuffs then
+            return
+        end
 
-        -- Apply each buff needed to you and/or adjacent unit
+        -- keep track of who is adjacent to who
+        self.AdjacentUnits = self.AdjacentUnits or { }
+        adjacentUnit.AdjacentUnits = adjacentUnit.AdjacentUnits or { }
+        
+        self.AdjacentUnits[adjacentUnit.EntityId] = adjacentUnit
+        adjacentUnit.AdjacentUnits[self.EntityId] = self
+
+        -- apply the buffs
         for k, v in AdjacencyBuffs[adjBuffs] do
             Buff.ApplyBuff(adjacentUnit, v, self)
         end
 
-        -- Keep track of adjacent units
-        if not self.AdjacentUnits then
-            self.AdjacentUnits = {}
-        end
-        table.insert(self.AdjacentUnits, adjacentUnit)
-
+        -- refresh the UI
         self:RequestRefreshUI()
         adjacentUnit:RequestRefreshUI()
      end,
 
-    -- When we're not adjacent, try to remove all the possible bonuses
+    -- Called by the engine when two structures are no loner adjacent to each other
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     OnNotAdjacentTo = function(self, adjacentUnit)
-        if not self.AdjacentUnits then
-            WARN("Precondition Failed: No AdjacentUnits registered for entity: " .. repr(self.GetEntityId))
+        -- make sure we have buffs to remove
+        local adjBuffs = self.Blueprint.Adjacency
+        if not adjBuffs then
             return
         end
 
-        local adjBuffs = self.Blueprint.Adjacency
-
+        -- remove the buffs
         if adjBuffs and AdjacencyBuffs[adjBuffs] then
             for k, v in AdjacencyBuffs[adjBuffs] do
                 if Buff.HasBuff(adjacentUnit, v) then
@@ -591,15 +597,16 @@ StructureUnit = Class(Unit) {
                 end
             end
         end
-        self:DestroyAdjacentEffects()
 
-        -- Keep track of units losing adjacent structures
-        for k, u in self.AdjacentUnits do
-            if u == adjacentUnit then
-                table.remove(self.AdjacentUnits, k)
-                adjacentUnit:RequestRefreshUI()
-            end
-        end
+        -- clean up effects
+        self:DestroyAdjacentEffects(adjacentUnit)
+
+        -- keep track of who is adjacent to who
+        self.AdjacentUnits[adjacentUnit.EntityId] = nil
+        adjacentUnit.AdjacentUnits[self.EntityId] = nil
+
+        -- refresh the UI
+        adjacentUnit:RequestRefreshUI()
         self:RequestRefreshUI()
     end,
 
