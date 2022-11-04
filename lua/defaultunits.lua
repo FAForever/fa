@@ -76,17 +76,19 @@ StructureUnit = Class(Unit) {
 
         -- retrieve units of certain type
         local radius = 40
-        if self.Blueprint.CategoriesHash.TECH2 then
-            radius = 60
-        elseif self.Blueprint.CategoriesHash.TECH3 then
-            radius = 120
+        local weapons = self.Blueprint.Weapon
+        if weapons then
+            for k, weapon in weapons do
+                if weapon.MaxRadius and weapon.MaxRadius > radius then
+                    radius = 1.1 * weapon.MaxRadius
+                end
+            end
         end
 
         local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
         local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
 
         -- for each unit found
-        local threats = { }
         for _, u in units do
 
             -- find its blip
@@ -100,25 +102,9 @@ StructureUnit = Class(Unit) {
 
                     -- if we've identified the blip then we can use the threat of the unit, otherwise default to 1.
                     local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
-
-                    -- if this is more of a threat than what we have, compute distance
                     if threat >= target.threat then
-                        local epos = u:GetPosition()
-                        local distance = VDist2Sq(pos[1], pos[3], epos[1], epos[3])
-
-                        -- if threat is bigger, then we don't need to compare distance
-                        if threat > target.threat then
-                            target.location = epos
-                            target.distance = distance
-                            target.threat = threat
-                        else
-                            -- threat is equal, therefore compare distance - closer wins
-                            if distance < target.distance then
-                                target.location = epos
-                                target.distance = distance
-                                target.threat = threat
-                            end
-                        end
+                        target.location = u:GetPosition()
+                        target.threat = threat
                     end
                 end
             end
