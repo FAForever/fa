@@ -15,6 +15,9 @@ local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
+local RolloffUnitTable = { nil }
+local RolloffPositionTable = { 0, 0, 0 }
+
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
 
@@ -697,6 +700,9 @@ StructureUnit = Class(Unit) {
 
 -- FACTORY UNITS
 ---@class FactoryUnit : StructureUnit
+---@field BuildingUnit boolean
+---@field BuildBoneRotator moho.RotateManipulator
+---@field BuildEffectBones string[]
 FactoryUnit = Class(StructureUnit) {
 
     ---@param self FactoryUnit
@@ -709,6 +715,8 @@ FactoryUnit = Class(StructureUnit) {
         end
 
         -- Save build effect bones for faster access when creating build effects
+        self.BuildBoneRotator = CreateRotator(self, self.Blueprint.Display.BuildAttachBone or 0, 'y', 0, 10000)
+        self.Trash:Add(self.BuildBoneRotator)
         self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
@@ -937,7 +945,6 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
-    ---#
     ---@param self FactoryUnit
     ---@param target_bp any
     ---@return boolean
@@ -956,7 +963,6 @@ FactoryUnit = Class(StructureUnit) {
     OnFailedToBuild = function(self)
         StructureUnit.OnFailedToBuild(self)
         self.FactoryBuildFailed = true
-        self:DestroyBuildRotator()
         self:StopBuildFx()
         ChangeState(self, self.IdleState)
     end,
@@ -964,42 +970,63 @@ FactoryUnit = Class(StructureUnit) {
     ---@param self FactoryUnit
     RollOffUnit = function(self)
         local spin, x, y, z = self:CalculateRollOffPoint()
-        self.MoveCommand = IssueMove({self.UnitBeingBuilt}, Vector(x, y, z))
+        self.UnitBeingBuilt:SetRotation(spin)
+
+        RolloffUnitTable[1] = self.UnitBeingBuilt
+        RolloffPositionTable[1], RolloffPositionTable[2], RolloffPositionTable[3] = x, y, z
+        IssueMove(RolloffUnitTable, RolloffPositionTable)
     end,
 
     ---@param self FactoryUnit
     CalculateRollOffPoint = function(self)
-        local bp = self.Blueprint.Physics.RollOffPoints
-        local px, py, pz = unpack(self:GetPosition())
+        local px, py, pz = self:GetPositionXYZ()
 
-        if not bp then return 0, px, py, pz end
+        -- check if we have roll of points set
+        local rollOffPoints = self.Blueprint.Physics.RollOffPoints
+        if not rollOffPoints then
+            return 0, px, py, pz
+        end
 
-        local vectorObj = self:GetRallyPoint()
-
-        if not vectorObj then return 0, px, py, pz end
-
-        local bpKey = 1
-        local distance, lowest = nil
-        for k, v in bp do
-            distance = VDist2(vectorObj[1], vectorObj[3], v.X + px, v.Z + pz)
-            if not lowest or distance < lowest then
-                bpKey = k
-                lowest = distance
+        -- find our rally point, or of the factory that we're assisting
+        local rally = self:GetRallyPoint()
+        local focus = self:GetGuardedUnit()
+        while focus and focus != self do
+            local next = focus:GetGuardedUnit()
+            if next then
+                focus = next
+            else
+                break
             end
         end
 
-        local fx, fy, fz, spin
-        local bpP = bp[bpKey]
-        local unitBP = self.UnitBeingBuilt.Blueprint.Display.ForcedBuildSpin
-        if unitBP then
-            spin = unitBP
-        else
-            spin = bpP.UnitSpin
+        if focus then
+            rally = focus:GetRallyPoint()
         end
 
-        fx = bpP.X + px
-        fy = bpP.Y + py
-        fz = bpP.Z + pz
+        -- check if we have a rally point set
+        if not rally then
+            return 0, px, py, pz
+        end
+
+        -- find nearest roll off point for rally point
+        local nearestRollOffPoint = nil
+        local d, dx, dz, lowest = 0, 0, 0, nil
+        for k, rollOffPoint in rollOffPoints do
+            dx = rally[1] - (px + rollOffPoint.X)
+            dz = rally[3] - (pz + rollOffPoint.Z)
+            d = dx * dx + dz * dz
+
+            if not lowest or d < lowest then
+                nearestRollOffPoint = rollOffPoint
+                lowest = d
+            end
+        end
+
+        -- determine return parameters
+        local spin = self.UnitBeingBuilt.Blueprint.Display.ForcedBuildSpin or nearestRollOffPoint.UnitSpin
+        local fx = nearestRollOffPoint.X + px
+        local fy = nearestRollOffPoint.Y + py
+        local fz = nearestRollOffPoint.Z + pz
 
         return spin, fx, fy, fz
     end,
@@ -1028,35 +1055,29 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     ---@param self FactoryUnit
-    CreateBuildRotator = function(self)
-        if not self.BuildBoneRotator then
-            local spin = self:CalculateRollOffPoint()
-            local bp = self.Blueprint.Display
-            self.BuildBoneRotator = CreateRotator(self, bp.BuildAttachBone or 0, 'y', spin, 10000)
-            self.Trash:Add(self.BuildBoneRotator)
-        end
-    end,
-
-    ---@param self FactoryUnit
-    DestroyBuildRotator = function(self)
-        if self.BuildBoneRotator then
-            self.BuildBoneRotator:Destroy()
-            self.BuildBoneRotator = nil
-        end
-    end,
-
-    ---@param self FactoryUnit
     RolloffBody = function(self)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
         self:PlayFxRollOff()
 
-        -- Wait until unit has left the factory
-        while not self.UnitBeingBuilt.Dead and self.MoveCommand and not IsCommandDone(self.MoveCommand) do
-            WaitSeconds(0.5)
+        -- find out when build pad is free again
+
+        local size = 0.5 * self.UnitBeingBuilt.Blueprint.SizeX
+        if size < self.UnitBeingBuilt.Blueprint.SizeZ then
+            size = 0.5 * self.UnitBeingBuilt.Blueprint.SizeZ
         end
 
-        self.MoveCommand = nil
+        size = size * size
+        local unitPosition, dx, dz, d
+        local buildPosition = self:GetPosition(self.Blueprint.Display.BuildAttachBone or 0)
+        repeat 
+            unitPosition = self.UnitBeingBuilt:GetPosition()
+            dx = buildPosition[1] - unitPosition[1]
+            dz = buildPosition[3] - unitPosition[3]
+            d = dx * dx + dz * dz
+            WaitTicks(2)
+        until IsDestroyed(self.UnitBeingBuilt) or d > size
+
         self:PlayFxRollOffEnd()
         self:SetBusy(false)
         self:SetBlockCommandQueue(false)
@@ -1064,27 +1085,41 @@ FactoryUnit = Class(StructureUnit) {
         ChangeState(self, self.IdleState)
     end,
 
+    ---@deprecated
+    ---@param self FactoryUnit
+    CreateBuildRotator = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self FactoryUnit
+    DestroyBuildRotator = function(self)
+    end,
+
     IdleState = State {
+        ---@param self FactoryUnit
         Main = function(self)
             self:SetBusy(false)
             self:SetBlockCommandQueue(false)
-            self:DestroyBuildRotator()
         end,
     },
 
     BuildingState = State {
+        ---@param self FactoryUnit
         Main = function(self)
-            local unitBuilding = self.UnitBeingBuilt
-            local bp = self.Blueprint
-            local bone = bp.Display.BuildAttachBone or 0
+            local spin = self:CalculateRollOffPoint()
+            self.BuildBoneRotator:SetGoal(spin)
+
+            WaitTicks(1)
+
+            local bone = self.Blueprint.Display.BuildAttachBone or 0
             self:DetachAll(bone)
-            unitBuilding:AttachBoneTo(-2, self, bone)
-            self:CreateBuildRotator()
-            self:StartBuildFx(unitBuilding)
+            self.UnitBeingBuilt:AttachBoneTo(-2, self, bone)
+            self:StartBuildFx(self.UnitBeingBuilt)
         end,
     },
 
     RollingOffState = State {
+        ---@param self FactoryUnit
         Main = function(self)
             self:RolloffBody()
         end,
