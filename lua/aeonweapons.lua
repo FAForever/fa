@@ -98,9 +98,12 @@ ADFTractorClaw = Class(Weapon) {
 
         ---@type Blip | Unit
         local blipOrUnit = self:GetCurrentTarget()
-        local target = self:GetUnitBehindTarget(blipOrUnit)
+        if not blipOrUnit then
+            return
+        end
 
         -- only tractor actual units
+        local target = self:GetUnitBehindTarget(blipOrUnit)
         if not target then
             self:ForkThread(self.OnInvalidTargetThread)
             return
@@ -274,7 +277,7 @@ ADFTractorClaw = Class(Weapon) {
         end
 
         -- if the unit is magically already destroyed, then just return - nothing we can do,
-        --  we'll likely end up with a flying wreck :)
+        -- we'll likely end up with a flying wreck :)
         if IsDestroyed(target) then
             return
         end
@@ -330,6 +333,8 @@ ADFTractorClaw = Class(Weapon) {
     MakeImmune = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(true)
+            target.CanTakeDamage = false
+            target.DisallowCollisions = true
         end
     end,
 
@@ -338,6 +343,8 @@ ADFTractorClaw = Class(Weapon) {
     MakeVulnerable = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(false)
+            target.CanTakeDamage = true
+            target.DisallowCollisions = false
         end
     end,
 }

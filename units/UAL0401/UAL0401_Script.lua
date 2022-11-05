@@ -27,7 +27,20 @@ local SignCheck = Vector(1, 0, 0)
 ---@class UAL0401 : AWalkingLandUnit
 UAL0401 = Class(AWalkingLandUnit) {
     Weapons = {
-        EyeWeapon = Class(ADFPhasonLaser) {},
+        EyeWeapon = Class(ADFPhasonLaser) {
+            CreateProjectileAtMuzzle = function(self, muzzle)
+                ADFPhasonLaser.CreateProjectileAtMuzzle(self, muzzle)
+
+                -- if possible, try not to fire on units that we're tractoring
+                local target = self:GetCurrentTarget()
+                if target then
+                    local unit = (IsUnit(target) and target) or target:GetSource()
+                    if unit and unit.Tractored then
+                        self:ResetTarget()
+                    end
+                end
+            end,
+        },
         RightArmTractor = Class(ADFTractorClaw) {},
         LeftArmTractor = Class(ADFTractorClaw) {},
     },
