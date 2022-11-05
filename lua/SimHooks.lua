@@ -1,5 +1,8 @@
 
-
+do 
+    -- can only cause issues, like remote code exploit
+    _G.loadstring = nil
+end
 
 do
 
