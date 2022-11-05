@@ -295,18 +295,15 @@ ADFTractorClaw = Class(Weapon) {
             projectile:SetVelocity(10 * vx, 10 * vy, 10 * vz)
             Warp(projectile, target:GetPosition(), target:GetOrientation())
 
+            -- happens when the projectile is created underwater
+            if IsDestroyed(projectile) then
+                target:Kill()
+            end
+
             projectile.OnImpact = function(projectile)
                 if not IsDestroyed(target) then
                     target.CanTakeDamage = true
-                    if not IsDestroyed(self.unit) then
-                        if target.MyShield and target.MyShield:IsOn() then
-                            Damage(self.unit, self.unit:GetPosition(muzzle), target.MyShield, target.MyShield:GetHealth() + 1, 'Disintegrate')
-                        end
-                        Damage(self.unit, self.unit:GetPosition(muzzle), target, target:GetHealth() + 1, 'Disintegrate')
-                        
-                    else
-                        target:Kill()
-                    end
+                    target:Kill()
 
                     CreateLightParticle(target, 0, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
 
@@ -333,8 +330,6 @@ ADFTractorClaw = Class(Weapon) {
     MakeImmune = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(true)
-            target.CanTakeDamage = false
-            target.DisallowCollisions = true
         end
     end,
 
@@ -343,8 +338,6 @@ ADFTractorClaw = Class(Weapon) {
     MakeVulnerable = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(false)
-            target.CanTakeDamage = true
-            target.DisallowCollisions = false
         end
     end,
 }
