@@ -13,12 +13,6 @@ local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
 
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-local Group = import("/lua/maui/group.lua").Group
-local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local UIUtil = import("/lua/ui/uiutil.lua")
-local Prefs = import("/lua/user/prefs.lua")
-local options = Prefs.GetFromCurrentProfile('options')
 
 ---@class UIReclaimDataPoint
 ---@field mass number
