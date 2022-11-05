@@ -4,6 +4,7 @@ local parsedPriorities
 local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEntityCategoryProperly
 
 local cachedTablePriorities = { }
+local cachedLimitedTablePriorities = { }
 
 --- We can't serialize categories, therefore the UI sends us a string of categories. We manually
 --- parse the string here into categories. 
@@ -42,8 +43,8 @@ function ParseTableOfCategories(inputString)
             limited = { }
             for k, category in categories do
                 if not (category == '' or string.find(category, 'COMMAND')) then
-                    local parsed = cachedTablePriorities[category] or ParseEntityCategoryProperly(string.format('(%s) - COMMAND', category))
-                    cachedTablePriorities[category] = parsed
+                    local parsed = cachedLimitedTablePriorities[category] or ParseEntityCategoryProperly(string.format('(%s) - COMMAND', category))
+                    cachedLimitedTablePriorities[category] = parsed
                     if parsed then
                         table.insert(limited, parsed)
                     end
