@@ -6,24 +6,24 @@
 -----------------------------------------------------------------
 
 -- Imports. Localise commonly used subfunctions for speed
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Buff = import('/lua/sim/buff.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtilities = import('/lua/EffectUtilities.lua')
-local EnhancementCommon = import('/lua/enhancementcommon.lua')
-local Explosion = import('/lua/defaultexplosions.lua')
-local Game = import('/lua/game.lua')
-local Set = import('/lua/system/setutils.lua')
-local SimUtils = import('/lua/SimUtils.lua')
-local utilities = import('/lua/utilities.lua')
-local Wreckage = import('/lua/wreckage.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtilities = import("/lua/effectutilities.lua")
+local EnhancementCommon = import("/lua/enhancementcommon.lua")
+local Explosion = import("/lua/defaultexplosions.lua")
+local Game = import("/lua/game.lua")
+local Set = import("/lua/system/setutils.lua")
+local SimUtils = import("/lua/simutils.lua")
+local utilities = import("/lua/utilities.lua")
+local Wreckage = import("/lua/wreckage.lua")
 
-local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
-local PersonalBubble = import('/lua/shield.lua').PersonalBubble
-local PersonalShield = import('/lua/shield.lua').PersonalShield
-local Shield = import('/lua/shield.lua').Shield
-local TransportShield = import('/lua/shield.lua').TransportShield
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
+local AntiArtilleryShield = import("/lua/shield.lua").AntiArtilleryShield
+local PersonalBubble = import("/lua/shield.lua").PersonalBubble
+local PersonalShield = import("/lua/shield.lua").PersonalShield
+local Shield = import("/lua/shield.lua").Shield
+local TransportShield = import("/lua/shield.lua").TransportShield
+local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
@@ -107,6 +107,7 @@ local cUnit = moho.unit_methods
 ---@field Blueprint UnitBlueprint
 ---@field EngineFlags any
 ---@field EngineCommandCap? table<string, boolean>
+---@field UnitBeingBuilt Unit?
 Unit = Class(moho.unit_methods) {
 
     Weapons = {},

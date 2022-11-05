@@ -8,8 +8,8 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
-local AGuidedMissileProjectile = import('/lua/aeonprojectiles.lua').AGuidedMissileProjectile
-local DefaultExplosion = import('/lua/defaultexplosions.lua')
+local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissileProjectile
+local DefaultExplosion = import("/lua/defaultexplosions.lua")
 
 AIFGuidedMissile02 = Class(AGuidedMissileProjectile) {
 	-- FxTrailScale = 0.5,

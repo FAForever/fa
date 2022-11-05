@@ -6,20 +6,20 @@
 --* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Movie = import('/lua/maui/movie.lua').Movie
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Button = import('/lua/maui/button.lua').Button
-local Prefs = import('/lua/user/prefs.lua')
-local MapUtil = import('/lua/ui/maputil.lua')
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Movie = import("/lua/maui/movie.lua").Movie
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Button = import("/lua/maui/button.lua").Button
+local Prefs = import("/lua/user/prefs.lua")
+local MapUtil = import("/lua/ui/maputil.lua")
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local CampaignManager = import("/lua/ui/campaign/campaignmanager.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local mapErrorDialog = nil
 local activePopupButton = nil
@@ -67,10 +67,10 @@ function CreateUI(operationID, briefingData)
     LayoutHelpers.AtBottomIn(backBtn, backgrounds.bottom, -4)
     backBtn.OnClick = function(self)
         parent:Destroy()
-        import('/lua/ui/campaign/selectcampaign.lua').CreateUI()
+        import("/lua/ui/campaign/selectcampaign.lua").CreateUI()
     end
 
-    import('/lua/ui/uimain.lua').SetEscapeHandler(function() backBtn.OnClick() end)
+    import("/lua/ui/uimain.lua").SetEscapeHandler(function() backBtn.OnClick() end)
 
     local launchBtn = UIUtil.CreateButtonStd(briefingGroup, '/scx_menu/medium-no-br-btn/medium-uef', "<LOC opbrief_0003>Launch", 20, 2)
     LayoutHelpers.AtRightIn(launchBtn, backgrounds.bottom, 20)
@@ -80,8 +80,8 @@ function CreateUI(operationID, briefingData)
         local scenario = MapUtil.LoadScenario(briefingData.opMap)
         if scenario then
             local function TryLaunch()
-                local factionToIndex = import('/lua/factions.lua').FactionIndexMap
-                LaunchSinglePlayerSession(import('/lua/SinglePlayerLaunch.lua').SetupCampaignSession(scenario, difficulty, factionToIndex[faction],
+                local factionToIndex = import("/lua/factions.lua").FactionIndexMap
+                LaunchSinglePlayerSession(import("/lua/singleplayerlaunch.lua").SetupCampaignSession(scenario, difficulty, factionToIndex[faction],
                     {opKey = operationID, campaignID = faction, difficulty = difficulty}, false))
                 parent:Destroy()
                 MenuCommon.MenuCleanup()
@@ -276,7 +276,7 @@ function CreateUI(operationID, briefingData)
                     local data = briefingData.opBriefingText
                     if fmv_time > nextCueTime and data[nextSection] then
                         local inText = LOCF("%s: %s", data[nextSection].character, data[nextSection].text)
-                        local text = import('/lua/maui/text.lua').WrapText(inText, briefText.Width(),
+                        local text = import("/lua/maui/text.lua").WrapText(inText, briefText.Width(),
                             function(text)
                                 return briefText:GetStringAdvance(text)
                             end)
@@ -399,7 +399,7 @@ function CreateUI(operationID, briefingData)
         local data = briefingData.opBriefingText
         for i, v in data do
             local inText = LOCF("%s: %s", v.character, v.text)
-            local text = import('/lua/maui/text.lua').WrapText(inText, briefText.Width(),
+            local text = import("/lua/maui/text.lua").WrapText(inText, briefText.Width(),
                 function(text)
                     return briefText:GetStringAdvance(text)
                 end)
@@ -612,4 +612,4 @@ function CreatePopupBackground(parent)
 end
 
 -- kept for mod backwards compatibility
-local WrapText = import('/lua/maui/text.lua').WrapText
+local WrapText = import("/lua/maui/text.lua").WrapText

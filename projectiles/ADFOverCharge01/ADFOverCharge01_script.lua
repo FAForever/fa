@@ -1,8 +1,8 @@
 -- Aeon Mortar
 
-local ALaserBotProjectile = import('/lua/aeonprojectiles.lua').ALaserBotProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local OverchargeProjectile = import('/lua/sim/DefaultProjectiles.lua').OverchargeProjectile
+local ALaserBotProjectile = import("/lua/aeonprojectiles.lua").ALaserBotProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local OverchargeProjectile = import("/lua/sim/defaultprojectiles.lua").OverchargeProjectile
 
 TDFOverCharge01 = Class(ALaserBotProjectile, OverchargeProjectile) {
 

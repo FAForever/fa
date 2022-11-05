@@ -18,7 +18,7 @@ DamageArea = function(instigator, location, radius, damage, type, damageAllies, 
         if VDist3(u:GetPosition(), location) > radius then continue end
         if instigator == u then
             if damageSelf then
-                local vector = import('/lua/utilities.lua').GetDirectionVector(location, u:GetPosition())
+                local vector = import("/lua/utilities.lua").GetDirectionVector(location, u:GetPosition())
                 -- need this ugliness due to Damage() refuse to damage when instigator == u
                 instigator:OnDamage(instigator, damage, vector, type)
             end

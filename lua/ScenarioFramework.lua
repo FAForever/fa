@@ -24,18 +24,18 @@
 ---@field [4] string faction
 
 
-local CategoryToString = import('/lua/sim/categoryutils.lua').ToString
-local Cinematics = import('/lua/cinematics.lua')
-local Game = import('/lua/game.lua')
-local ScenarioPlatoonAI = import('/lua/scenarioplatoonai.lua')
-local ScenarioUtils = import('/lua/sim/scenarioutilities.lua')
-local SimCamera = import('/lua/simcamera.lua').SimCamera
-local SimUIVars = import('/lua/sim/simuistate.lua')
-local TriggerFile = import('/lua/scenariotriggers.lua')
-local VizMarker = import('/lua/sim/vizmarker.lua').VizMarker
+local CategoryToString = import("/lua/sim/categoryutils.lua").ToString
+local Cinematics = import("/lua/cinematics.lua")
+local Game = import("/lua/game.lua")
+local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local SimCamera = import("/lua/simcamera.lua").SimCamera
+local SimUIVars = import("/lua/sim/simuistate.lua")
+local TriggerFile = import("/lua/scenariotriggers.lua")
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
-Objectives = import('/lua/simobjectives.lua')
-PingGroups = import('/lua/simpinggroup.lua')
+Objectives = import("/lua/simobjectives.lua")
+PingGroups = import("/lua/simpinggroup.lua")
 
 ---@class Team
 ---@field ArmyCount number
@@ -63,7 +63,7 @@ function EndOperation(success, allPrimary, allSecondary, allBonus)
         opData = import(opFile)
     end
 
-    import('/lua/sim/matchstate.lua').CallEndGame() -- We need this here to populate the score screen
+    import("/lua/sim/matchstate.lua").CallEndGame() -- We need this here to populate the score screen
 
     ForkThread(function()
         WaitSeconds(3) -- Wait for the stats to be synced
@@ -809,7 +809,7 @@ function RestrictEnhancements(enhancements)
     end
 
     SimUIVars.SaveEnhancementRestriction(restrict)
-    import('/lua/enhancementcommon.lua').RestrictList(restrict)
+    import("/lua/enhancementcommon.lua").RestrictList(restrict)
     Sync.EnhanceRestrict = restrict
 end
 
@@ -990,7 +990,7 @@ function FakeGateInUnit(unit, callback, bonesToHide)
         unit:SetBusy(false)
 
         local totalBones = unit:GetBoneCount() - 1
-        for _, v in import('/lua/EffectTemplates.lua').UnitTeleportSteam01 do
+        for _, v in import("/lua/effecttemplates.lua").UnitTeleportSteam01 do
             for bone = 1, totalBones do
                 CreateAttachedEmitter(unit, bone, unit.Army, v)
             end
@@ -1240,14 +1240,14 @@ function SetPlayableArea(rect, voFlag)
         table.insert(Sync.Voice, {Cue = 'Computer_Computer_MapExpansion_01380', Bank = 'XGG'})
     end
 
-    import('/lua/SimSync.lua').SyncPlayableRect(rect)
+    import("/lua/simsync.lua").SyncPlayableRect(rect)
     Sync.NewPlayableArea = {x0, y0, x1, y1}
     ForkThread(GenerateOffMapAreas)
 end
 
 --- unused
 function PlayableRectCameraThread(rect)
---    local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
+--    local cam = import("/lua/simcamera.lua").SimCamera('WorldCamera')
 --    LockInput()
 --    cam:UseGameClock()
 --    cam:SyncPlayableRect(rect)
@@ -1491,7 +1491,7 @@ function PlatoonAttackWithTransportsThread(platoon, landingChain, attackChain, i
             end
         end
     else
-        if not import('/lua/ai/aiutilities.lua').UseTransports(units, transports, landingLocation) then
+        if not import("/lua/ai/aiutilities.lua").UseTransports(units, transports, landingLocation) then
             return
         end
     end
@@ -1828,7 +1828,7 @@ end
 ---@param unlock? boolean 
 ---@param unlockTime? number
 function OperationCameraThread(location, heading, faction, track, trackUnit, unlock, unlockTime)
-    local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
+    local cam = import("/lua/simcamera.lua").SimCamera('WorldCamera')
     LockInput()
     cam:UseGameClock()
     WaitTicks(1)
@@ -1909,7 +1909,7 @@ end
 function MissionNISCameraThread(unit, blendTime, holdTime, orientationOffset, positionOffset, zoom)
     if not ScenarioInfo.NIS then
         ScenarioInfo.NIS = true
-        local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
+        local cam = import("/lua/simcamera.lua").SimCamera('WorldCamera')
         LockInput()
         cam:UseGameClock()
         WaitTicks(1)
@@ -2002,7 +2002,7 @@ end
 ---@param camInfo CamInfo
 function OperationNISCameraThread(unitInfo, camInfo)
     if not ScenarioInfo.NIS or camInfo.overrideCam then
-        local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
+        local cam = import("/lua/simcamera.lua").SimCamera('WorldCamera')
 
         local position, heading, vizmarker
         -- Setup camera information

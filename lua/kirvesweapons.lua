@@ -1,9 +1,9 @@
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
-local OriginalEffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectTemplate = import('/lua/kirveseffects.lua')
-local CollisionBeamFile = import('/lua/kirvesbeams.lua')
+local OriginalEffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/kirveseffects.lua")
+local CollisionBeamFile = import("/lua/kirvesbeams.lua")
 
 ---@class TargetingLaser : DefaultBeamWeapon
 TargetingLaser = Class(DefaultBeamWeapon) {

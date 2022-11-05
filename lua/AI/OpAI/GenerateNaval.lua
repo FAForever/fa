@@ -7,7 +7,7 @@
 --*  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --******************************************************************************************************************
 
-local ScenarioFramework = import('/lua/scenarioframework.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 --To make life easier with factions not having identical naval units and such.
 local TIERS =

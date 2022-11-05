@@ -1,8 +1,8 @@
-local Group = import('/lua/maui/group.lua').Group
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Text = import('/lua/maui/text.lua').Text
-local Border = import('/lua/maui/border.lua').Border
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Group = import("/lua/maui/group.lua").Group
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Text = import("/lua/maui/text.lua").Text
+local Border = import("/lua/maui/border.lua").Border
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 ---@class RadioButtons : Group
 RadioButtons = Class(Group) {

@@ -13,6 +13,13 @@ local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
 
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local options = Prefs.GetFromCurrentProfile('options')
+
 ---@class UIReclaimDataPoint
 ---@field mass number
 ---@field position Vector
@@ -24,7 +31,7 @@ local TableGetn = table.getn
 ---@field max number
 
 ---@type number
-local HeightRatio = 0.012
+local HeightRatio = 0.020
 
 --- Reclaim is no longer combined once this threshold is met, the value (150) is the same
 --- camera distance that allows for the reclaim command to work. Guarantees that the
@@ -517,7 +524,7 @@ function UpdateLabels()
 end
 
 function ShowReclaim(show)
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
     view.ShowingReclaim = show
 
     if show and not view.ReclaimThread then
@@ -553,7 +560,7 @@ function InitReclaimGroup(view)
 end
 
 function ShowReclaimThread(watch_key)
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
     local camera = GetCamera("WorldCamera")
 
     InitReclaimGroup(view)

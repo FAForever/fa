@@ -35,7 +35,7 @@
 --     },
 -- }
 
-local CreateEmptyProfilerTable = import("/lua/shared/Profiler.lua").CreateEmptyProfilerTable
+local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 
 -- upvalue for performance
 local StringFind = string.find

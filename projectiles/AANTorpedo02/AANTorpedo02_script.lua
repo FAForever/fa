@@ -1,7 +1,7 @@
 --
 -- Aeon Torpedo Bomb
 --
-local ATorpedoShipProjectile= import('/lua/aeonprojectiles.lua').ATorpedoShipProjectile
+local ATorpedoShipProjectile= import("/lua/aeonprojectiles.lua").ATorpedoShipProjectile
 
 AANTorpedo02 = Class(ATorpedoShipProjectile) {
     FxSplashScale = 1,

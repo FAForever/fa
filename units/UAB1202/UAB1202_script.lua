@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AMassCollectionUnit = import('/lua/aeonunits.lua').AMassCollectionUnit
+local AMassCollectionUnit = import("/lua/aeonunits.lua").AMassCollectionUnit
 
 ---@class UAB1202 : AMassCollectionUnit
 UAB1202 = Class(AMassCollectionUnit) {

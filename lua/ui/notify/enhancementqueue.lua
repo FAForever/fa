@@ -1,6 +1,6 @@
 -- This file contains the functions needed to keep track of ACU upgrade queueing
 
-local SetIgnoreSelection = import('/lua/ui/game/gamemain.lua').SetIgnoreSelection
+local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
 
 local enhancementQueue = {}
 
@@ -18,7 +18,7 @@ function enqueueEnhancement(units, enhancement)
 
             table.insert(enhancementQueue[id], enhancements[enhancement])
         end
-        import('/lua/ui/game/construction.lua').updateCommandQueue()
+        import("/lua/ui/game/construction.lua").updateCommandQueue()
     end
 end
 
@@ -103,7 +103,7 @@ function ModifyBuildablesForACU(originalBuildables, selection)
     if upgradingACUFound == false then
         newBuildableCategories = originalBuildables
     else
-        local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
+        local restrictedUnits = import("/lua/ui/lobby/restrictedunitsdata.lua").restrictedUnits
         for _, generalCategory in SessionGetScenarioInfo().Options.RestrictedCategories or {} do
             for _, category in restrictedUnits[generalCategory].categories or {} do
                 newBuildableCategories = newBuildableCategories - ParseEntityCategory(category)

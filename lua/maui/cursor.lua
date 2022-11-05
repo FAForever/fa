@@ -21,7 +21,7 @@ Cursor = Class(moho.cursor_methods) {
         self._hotspotX = 0
         self._hotspotY = 0
 
-        self._filename = import('/lua/lazyvar.lua').Create()
+        self._filename = import("/lua/lazyvar.lua").Create()
         self._filename.OnDirty = function(var)
             self:SetNewTexture(var(), self._hotspotX, self._hotspotY)
         end

@@ -21,7 +21,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Shared = import('/lua/shared/NavGenerator.lua')
+local Shared = import("/lua/shared/navgenerator.lua")
 
 ---@alias NavTerrainCache number[][]
 ---@alias NavDepthCache number[][]
@@ -967,8 +967,8 @@ function Generate()
     -- post process markers to include labels --
     --------------------------------------------
 
-    local extractors, en = import('/lua/sim/MarkerUtilities.lua').GetMarkersByType('Mass')
-    local hydrocarbons, hn = import('/lua/sim/MarkerUtilities.lua').GetMarkersByType('Hydrocarbon')
+    local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
 
     for k = 1, en do
         local extractor = extractors[k]
@@ -985,7 +985,7 @@ function Generate()
     ------------------
 
     -- allows debugging tools to function
-    import("/lua/sim/NavDebug.lua")
+    import("/lua/sim/navdebug.lua")
 
     -- pass data to sync
     Sync.NavLayerData = NavLayerData

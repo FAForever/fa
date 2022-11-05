@@ -1,6 +1,6 @@
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 SIFExperimentalStrategicDeath01 = Class(NullShell) {
     NormalEffects = {'/effects/emitters/quantum_warhead_01_emit.bp',},

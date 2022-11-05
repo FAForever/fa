@@ -1,8 +1,8 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
-local Group = import('/lua/maui/group.lua').Group
+local Group = import("/lua/maui/group.lua").Group
 
 --- Various marker types in categories that we support
 local EnabledMarkerTypes = {
