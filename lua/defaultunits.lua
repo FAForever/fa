@@ -543,6 +543,9 @@ StructureUnit = Class(Unit) {
     ---@param adjacentUnit StructureUnit
     ---@param triggerUnit StructureUnit
     OnAdjacentTo = function(self, adjacentUnit, triggerUnit)
+
+        LOG("OnAdjacentTo")
+
         -- make sure we're both finished building
         if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt() then
             return
@@ -575,6 +578,12 @@ StructureUnit = Class(Unit) {
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     OnNotAdjacentTo = function(self, adjacentUnit)
+
+        -- make sure we're both finished building
+        if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt() then
+            return
+        end
+
         -- make sure we have buffs to remove
         local adjBuffs = self.Blueprint.Adjacency
         if not adjBuffs then
