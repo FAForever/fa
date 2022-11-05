@@ -45,8 +45,9 @@ Jip
 - (#4203, #4204, #4212, #4234, #4244) Introduce recall
     Adds in a recall feature. Similar to a the 'concede' feature that other games provide,
     it allows you to cast a team vote on whether you want to recall as a team. When you
-    are with two or less players it requires all players of the same team to agree. When
-    you are with three or more players it requires all but one player of the team to agree.
+    are with two or less alive players it requires all alive players of the same team to
+    agree. When you are with three or more alive players it requires all but one
+    of the alive players of the team to agree.
 
     Was introduced because people got frustrated with the Fullshare mode in combination
     with the limitated player base size.
@@ -112,13 +113,13 @@ Jip
     areas. The navigational mesh can be used by AIs to understand and interact with the map.
 
     The feature is based on compression via quad trees that compress the pathing information. We use
-    the leafs of the quad tree to create a graph. This graph is initially used for just path finding,
+    the leafs of the quad tree to create a graph. This graph is initially used for just pathfinding,
     but we can use the graph for so much more.
 
     All the code related to this feature is licensed using the MIT license. We're improving
     it in collaboration with the AI developers. We try to convert their requests into an
-    algorithm computes the answer. The algorithm needs to be simple, yet efficient as there
-    is essentially no budged to perform computationally expensive algorithms.
+    algorithm that computes the answer. The algorithm needs to be simple, yet efficient as there
+    is essentially no budget to perform computationally expensive algorithms.
 
     We're open to new contributors to help maintain and expand this exciting new feature of FAF.
 
@@ -142,7 +143,7 @@ Jip
     They now attack move as you'd expect, instead of notoriously reclaiming the nearest tree.
 
 - (#4248) Fix issues with Tractor Claws of the Colossus
-    Air units are now distroyed as soon as they reach the claw
+    Air units are now destroyed as soon as they reach the claw
 
 - (#4250) Fix missing meshes and normals of various units
     Including the Summit, that now again looks a lot better.
