@@ -120,7 +120,6 @@ local WorldLabel = Class(Group) {
             self.text:SetText(mass)
             self.oldMass = r.mass
             self:AdjustToValue(r.mass)
-            self.Depth:Set(r.mass)
         end
     end,
 
