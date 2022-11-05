@@ -8,8 +8,8 @@
 -- There's not really any error handling. In the presence of malformed category expressions the
 -- behaviour is undefined, possibly resulting in native-code crashes due to invalid calls to the
 -- native category classes.
----@param categoryExpression any
----@return number|nil
+---@param categoryExpression string
+---@return EntityCategory | nil
 function ParseEntityCategoryProperly(categoryExpression)
     local tokens = {}
 

@@ -1,26 +1,53 @@
 local parsedPriorities
 local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEntityCategoryProperly
 
---we are loading an arbitrary string that a user can send to us on the sim side.
---in order to not break things, we sanitize the input first before doing anything with it.
+--- We can't serialize categories, therefore the UI sends us a string of categories. We manually
+--- parse the string here into categories. 
+---@param inputString string
+---@return EntityCategory[] | nil
+---@return EntityCategory[] | nil
 function HandleInputString(inputString)
-    local inputTable = false
-    --we check that its a table by its first character
-    --we also check that it doesnt contain any functions that would have been run, by looking for "("
-    if string.sub(inputString, 1, 1) == "{" and not string.find(inputString,"%(") then
-        --this checks for syntax errors in the string so we can continue onwards.
-        --for some reason the compiling also works out if the categories even exist? well whatever that just makes this work better i guess.
-        if pcall(loadstring("return "..inputString)) then
-            --WARN('would have totally run this string just now: '..inputString)
-            inputTable = loadstring("return "..inputString)()
-            inputTableLimited = categoryLimiter(inputString, "categories.COMMAND")
-        else
-            WARN('Syntax error in target priorities string, was discarded: '..inputString)
+
+    local complete, limited = nil, nil
+
+    local ok, msg = pcall(
+        function()
+            local categories = StringSplit(inputString, ',')
+
+            for k, category in categories do 
+                local clean = category
+                clean = string.gsub(clean, '{', '')
+                clean = string.gsub(clean, '}', '')
+                categories[k] = clean
+            end
+
+            complete = { }
+            for k, category in categories do
+                local parsed = ParseEntityCategoryProperly(category)
+                if parsed then 
+                    table.insert(complete, parsed)
+                end
+            end
+
+            -- excludes the use of the COMMAND category, to prevent sniping
+            limited = { }
+            for k, category in categories do
+                if not string.find(category, 'categories.COMMAND') then
+                    local parsed = ParseEntityCategoryProperly(category)
+                    if parsed then
+                        table.insert(limited, parsed - categories.COMMAND)
+                    end
+                end
+            end
         end
-    else
-        WARN('Target priorities string contained improper content, so was discarded: '..inputString)
+    )
+
+    if not ok then
+        WARN(msg)
+        WARN(inputString)
     end
-    return inputTable, inputTableLimited
+
+    return complete, limited
 end
 
 function SetWeaponPriorities(data)
