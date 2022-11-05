@@ -29,13 +29,21 @@ Jip
     Acts as an integration of the 'Random UI improvements' mod of Strogo. This includes:
 
     - disabled reclaim cursor when you can't issue reclaim orders due to camera distance
-    - manual tactical / nuke launchers no longer attach to units, and instead always 
+    - manual tactical / nuke launchers no longer attach to units, and instead always
         target the ground
     - area of effect preview when you try to issue an attack order
-    - allow you to adjust the selection threshold, particular useful for 2K+ displays or 
+    - allow you to adjust the selection threshold, particular useful for 2K+ displays or
         when watching replays
 
     You can find the settings in the game options.
+
+- (#4124) Extend camera features
+    Acts as an integration of Additional Camera Stuff. This includes:
+
+    - Allows you to retrieve up to 9 camera locations
+    - Allows you to restore the previous camera position
+
+    You can find the additional hotkeys in the hotkeys menu.
 
 - (#4188, #4190, #4191) Allow observers to view mouse position of players in-game
     In particular useful for casters. The feature does not work with replays or live games
@@ -58,7 +66,7 @@ Jip
 - (#4232) Add batching of reclaim labels
     Reclaim labels are batched as you zoom out. As a result they remain readable.
 
-- (#4241) Add coloring of reclaim labels
+- (#4241, #4334) Add coloring of reclaim labels
     Reclaim labels are colored based on their value.
 
 - (#4175) Add PBR blender nodes for rendering of units  
@@ -137,13 +145,21 @@ Jip
 
 ## Bug fixes
 
+- (#4338) Fix remote code exploit
+    It was possible to inject arbitrary code into the simulation via a UI mod. This would
+    not be able to affect your system, but it would allow you to run any code in the simulation
+    and have that code run for all players involved.
+
+    It is highly appreciated that this was brought to our attention discretely.
+
 - (#4205) Fix typo with missile callbacks for AIs
 
 - (#4225, E#13) Fix Harbingers preference to reclaim instead of attacking during an attack move
     They now attack move as you'd expect, instead of notoriously reclaiming the nearest tree.
 
-- (#4248) Fix issues with Tractor Claws of the Colossus
-    Air units are now destroyed as soon as they reach the claw
+- (#4248, #4337) Fix issues with Tractor Claws of the Colossus
+    Air units are now destroyed as soon as they reach the claw and the beam of the colossus
+    is now less likely to try and attack units that are being tractored.
 
 - (#4250) Fix missing meshes and normals of various units
     Including the Summit, that now again looks a lot better.
@@ -153,17 +169,17 @@ Jip
 - (#4171) Fix scaling issue with new mod manager
 
 - (#4262) Fix teleportation glitches
-    No more teleporting Cybran ACU with a laser attached to its chest
+    No more teleporting Cybran ACU with a laser attached to its chest.
 
 - (#4264) Fix a glitch with an Atlantis and a gunship with its cargo
-    No more invincible units through this weird glitch
+    No more invincible units through this weird glitch.
 
 - (#4291) Allow turrets to rotate to the nearest threat again
     This was broken by the previous patch, it now functions as expected again.
 
 - (#4329) Fix collision size of Titans, Loyalists and Ilshahovs for beam weapons
     Beam weapons (in particular, the Seraphim tech 2 point defense) should now more
-    reliably hit these specific units
+    reliably hit these specific units.
 
 - Properly populate `AdjacentUnits` of structures
     Useful for AIs to quickly determine adjacent units. Only units that provide an
@@ -273,10 +289,10 @@ Github group, as found here: https://github.com/FAForever
 4z0t (#4232, #4242, #4171, #4269, #4309, #4310, #4319, #4311)
 Penguin5 (#4214, #4217)
 Relent0r (#4180, #4205, #4265, #4268, #4271, #4284, #4305, #4294) 
-hdt80bro (#4172, #4186, #4176, #4174, #4203, #4204, #4183, #4184, #4185, #4236, #4225, #4234, #4226, #4237, #4228, #4227, #4238, #4280, #4270, #4229, #4069, #4301, #4321, #4325, #4217)
+hdt80bro (#4172, #4186, #4176, #4174, #4203, #4204, #4183, #4184, #4185, #4236, #4225, #4234, #4226, #4237, #4228, #4227, #4238, #4280, #4270, #4229, #4069, #4301, #4321, #4325, #4217, #4334)
 Rowey (#4172, #4176, #4174, #4183, #4184, #4185, #4235, #4236, #4238)
-Jip (#4119, #4124#4188, #4190, #4191, #4212, #4205, #4232, #4241, #4243, #4244, #4248, #4250, #4253, #4260, #4254, #4262, #4249, #4025, #4267, #4266, #4264, #4281, #4270, #4282, #4285, #4286, #4292, #4290, #4304, #4298, #4312, #4313, #4308, #4291, #4287, #4328, #4329, #4307, #4331, #4332, #4327)
-
+Jip (#4119, #4124#4188, #4190, #4191, #4212, #4205, #4232, #4241, #4243, #4244, #4248, #4250, #4253, #4260, #4254, #4262, #4249, #4025, #4267, #4266, #4264, #4281, #4270, #4282, #4285, #4286, #4292, #4290, #4304, #4298, #4312, #4313, #4308, #4291, #4287, #4328, #4329, #4307, #4331, #4332, #4327, #4334, #4338, #4336)
+iczero (#4338)
 FemtoZetta (#4274)
 KionX (#4131, #4255)
 CheeseBerry (#4219)
