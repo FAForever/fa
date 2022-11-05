@@ -154,7 +154,6 @@ function ParseEntityCategoryProperly(categoryExpression)
 
         return currentCategory
     end
-
     return _parseSubexpression(1, numTokens)
 end
 -- converts specified category expression to a string
