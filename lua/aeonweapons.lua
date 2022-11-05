@@ -345,6 +345,7 @@ ADFTractorClaw = Class(Weapon) {
             target:SetDoNotTarget(false)
             target.CanTakeDamage = true
             target.DisallowCollisions = false
+            target.Tractored = nil
         end
     end,
 }
