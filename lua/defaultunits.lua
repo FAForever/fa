@@ -538,11 +538,12 @@ StructureUnit = Class(Unit) {
         return wreckage
     end,
 
-    -- Called by the engine when two structures are adjacent to each other
+    -- Called by the engine when a structure is finished building for each adjacent unit
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     ---@param triggerUnit StructureUnit
     OnAdjacentTo = function(self, adjacentUnit, triggerUnit)
+
         -- make sure we're both finished building
         if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt() then
             return
@@ -571,10 +572,16 @@ StructureUnit = Class(Unit) {
         adjacentUnit:RequestRefreshUI()
      end,
 
-    -- Called by the engine when two structures are no longer adjacent to each other
+    -- Called by the engine when a structure is destroyed for each adjacent unit
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     OnNotAdjacentTo = function(self, adjacentUnit)
+
+        -- make sure we're both finished building
+        if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt() then
+            return
+        end
+
         -- make sure we have buffs to remove
         local adjBuffs = self.Blueprint.Adjacency
         if not adjBuffs then
