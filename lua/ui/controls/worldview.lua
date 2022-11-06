@@ -185,6 +185,7 @@ local orderToCursorCallback = {
 
     -- misc
     CommandHighlight = 'OnCursorCommandHover',
+    MESSAGE = 'OnCursorMessage',
 
     -- orders that are a one-click type of thing
     RULEUCC_Stop = nil,
@@ -364,6 +365,8 @@ WorldView = Class(moho.UIWorldView, Control) {
     ---@param self WorldView
     ---@param identifier CommandCap
     OnCursor = function(self, identifier)
+
+        LOG(identifier)
 
         -- map order to event name
         local event = orderToCursorCallback[identifier]
@@ -774,6 +777,21 @@ WorldView = Class(moho.UIWorldView, Control) {
     ---@param enabled boolean
     ---@param changed boolean
     OnCursorFerry = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `MESSAGE` is being applied
+    ---@param self WorldView
+    ---@param identifier 'MESSAGE'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorMessage = function(self, identifier, enabled, changed, commandData)
         if enabled then
             if changed then
                 local cursor = self.Cursor
