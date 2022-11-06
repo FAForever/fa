@@ -39,6 +39,8 @@ StructureUnit = Class(Unit) {
     FxDamage2 = {EffectTemplate.DamageStructureFireSmoke01, EffectTemplate.DamageStructureSparks01},
     FxDamage3 = {EffectTemplate.DamageStructureFire01, EffectTemplate.DamageStructureSparks01},
 
+    ConsumptionActive = true,
+
     ---@param self StructureUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
@@ -563,8 +565,10 @@ StructureUnit = Class(Unit) {
         adjacentUnit.AdjacentUnits[self.EntityId] = self
 
         -- apply the buffs
-        for k, v in AdjacencyBuffs[adjBuffs] do
-            Buff.ApplyBuff(adjacentUnit, v, self)
+        if self.ConsumptionActive then
+            for k, v in AdjacencyBuffs[adjBuffs] do
+                Buff.ApplyBuff(adjacentUnit, v, self)
+            end
         end
 
         -- refresh the UI
@@ -1178,42 +1182,14 @@ MassCollectionUnit = Class(StructureUnit) {
     OnConsumptionActive = function(self)
         StructureUnit.OnConsumptionActive(self)
         self:ApplyAdjacencyBuffs()
-        self._productionActive = true
+        self.ConsumptionActive = true
     end,
 
     ---@param self MassCollectionUnit
     OnConsumptionInActive = function(self)
         StructureUnit.OnConsumptionInActive(self)
         self:RemoveAdjacencyBuffs()
-        self._productionActive = false
-    end,
-
-    ---@param self MassCollectionUnit
-    ---@param adjacentUnit MassCollectionUnit
-    ---@param triggerUnit MassCollectionUnit
-    OnAdjacentTo = function(self, adjacentUnit, triggerUnit) -- What is triggerUnit?
-        if self:IsBeingBuilt() then return end
-        if adjacentUnit:IsBeingBuilt() then return end
-
-        -- Does the unit have any adjacency buffs to use?
-        local adjBuffs = self.Blueprint.Adjacency
-        if not adjBuffs then return end
-
-        -- Apply each buff needed to you and/or adjacent unit, only if turned on
-        if self._productionActive then
-            for k, v in AdjacencyBuffs[adjBuffs] do
-                Buff.ApplyBuff(adjacentUnit, v, self)
-            end
-        end
-
-        -- Keep track of adjacent units
-        if not self.AdjacentUnits then
-            self.AdjacentUnits = {}
-        end
-        table.insert(self.AdjacentUnits, adjacentUnit)
-
-        self:RequestRefreshUI()
-        adjacentUnit:RequestRefreshUI()
+        self.ConsumptionActive = false
     end,
 
     ---@param self MassCollectionUnit
@@ -1358,7 +1334,7 @@ MassFabricationUnit = Class(StructureUnit) {
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
         self:ApplyAdjacencyBuffs()
-        self._productionActive = true
+        self.ConsumptionActive = true
     end,
 
     ---@param self MassFabricationUnit
@@ -1367,35 +1343,7 @@ MassFabricationUnit = Class(StructureUnit) {
         self:SetMaintenanceConsumptionInactive()
         self:SetProductionActive(false)
         self:RemoveAdjacencyBuffs()
-        self._productionActive = false
-    end,
-
-    ---@param self MassFabricationUnit
-    ---@param adjacentUnit MassFabricationUnit
-    ---@param triggerUnit MassFabricationUnit
-    OnAdjacentTo = function(self, adjacentUnit, triggerUnit) -- What is triggerUnit?
-        if self:IsBeingBuilt() then return end
-        if adjacentUnit:IsBeingBuilt() then return end
-
-        -- Does the unit have any adjacency buffs to use?
-        local adjBuffs = self.Blueprint.Adjacency
-        if not adjBuffs then return end
-
-        -- Apply each buff needed to you and/or adjacent unit, only if turned on
-        if self._productionActive then
-            for _, v in AdjacencyBuffs[adjBuffs] do
-                Buff.ApplyBuff(adjacentUnit, v, self)
-            end
-        end
-
-        -- Keep track of adjacent units
-        if not self.AdjacentUnits then
-            self.AdjacentUnits = {}
-        end
-        table.insert(self.AdjacentUnits, adjacentUnit)
-
-        self:RequestRefreshUI()
-        adjacentUnit:RequestRefreshUI()
+        self.ConsumptionActive = false
     end,
 
     ---@param self MassFabricationUnit
