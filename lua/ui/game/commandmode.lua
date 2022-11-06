@@ -135,7 +135,6 @@ function EndCommandMode(isCancel)
             else 
                 if modeData.selection then
                     SelectUnits(modeData.selection)
-                    return
                 end
             end
         end
@@ -148,6 +147,7 @@ function EndCommandMode(isCancel)
             ClearBuildTemplates()
         end
     end
+    
     -- do end behaviors
     for i,v in endBehaviors do
         v(commandMode, modeData)
