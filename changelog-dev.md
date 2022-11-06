@@ -1,18 +1,54 @@
 
 # Game version 3745 (6th of November, 2022)
 
+I'd like to show my appreciation to those that made a friendly report on what was broken. We tackled
+the majority of the issues, with the exception of the resource button in the diplomacy tab. As an
+alternative you can also share resources via the scoreboard. The default scoreboard supports
+this too by ctrl / shift clicking on the resources of an ally. See also the tooltips. For now, we've
+disabled the resources button. 
+
+Jip
+
 ## Features
+
+- (#4358) Allow reclaim overview to be customizeable
+    You can now enable / disable batching via the game options. It is part of the
+    interface section. You can also scale the text of the labels. Note that
+    excessive scaling doesn't work properly with batching.
+
+    It is highly recommended to enable batching for low-end systems.
 
 ## Bug fixes
 
-## Performance
+- (#4348) Fix attack ping cursor being stuck
+    Occured when you tried to issue an attack ping.
 
+- (#4353) Update Nomad shaders to the latest version
+    As part of a series of steps to remove shaders from the Nomads repository. We can't
+    update our shaders unless we update theirs too. Instead, we now migrate the Nomads
+    shaders into the base repository and remove the version in Nomads.
 
-## Campaign / AI
+    This should fix graphics issues that people are experiencing.
 
-## Annotations
+- (#4354) Fix cursor for text message
+    Occured when you tried to issue a text ping
 
+- (#4354) Fix decals not showing for strategic launcher
 
-## Other changes
+- (#4352) Re-introduce the zoom pop hotkey
+    This was removed on accident
+
+- (#4355) Rating now shows properly on the scoreboard again
+
+- (#4359, #4363) Fix hotbuild being unable to reset the cycle properly
+
+- (#4361) Fix error when spawning in units
+
+- (#4362) Fix air units not sinking
+    This was not related to the patch, but we included it anyhow. Transports would sometimes be unable to sink
+    properly, especially when they are landed on water.
 
 ## Contributors
+
+- 4z0t (#4363)
+- Jip (#4348, #4353, #4354, #4352, #4355, #4359, #4362, #4361, #4358)
