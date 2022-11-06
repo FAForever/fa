@@ -528,13 +528,24 @@ AIBrain = Class(moho.aibrain_methods) {
         
         local ok, msg
 
-        local energyRequired
+        
+        -- Instead of creating a new sync table each tick, we'll reuse two tables as a double
+        -- buffer: one table represents the data from the current tick, the other the data last
+        -- synced. We only send the data when one field in the current tick differs from the last
+        -- data synced, and then swap the two tables when that happens. 
         local syncTable = {
             on = 0,
             off = 0,
             totalEnergyConsumed = 0,
             totalEnergyRequired = 0,
-            totalMassProduced = 0
+            totalMassProduced = 0,
+        }
+        local lastSyncTable = {
+            on = 0,
+            off = 0,
+            totalEnergyConsumed = 0,
+            totalEnergyRequired = 0,
+            totalMassProduced = 0,
         }
 
         local EnergyExcessUnitsDisabled = self.EnergyExcessUnitsDisabled
@@ -608,8 +619,17 @@ AIBrain = Class(moho.aibrain_methods) {
                 syncTable.totalEnergyConsumed = self.EnergyExcessConsumed
                 syncTable.totalEnergyRequired = self.EnergyExcessRequired
                 syncTable.totalMassProduced = self.EnergyExcessConverted
-                
-                Sync.MassFabs = syncTable
+                -- only send new data
+                if lastSyncTable.on ~= syncTable.on
+                    or lastSyncTable.off ~= syncTable.off
+                    or lastSyncTable.totalEnergyConsumed ~= syncTable.totalEnergyConsumed
+                    or lastSyncTable.totalEnergyRequired ~= syncTable.totalEnergyRequired
+                    or lastSyncTable.totalMassProduced ~= syncTable.totalMassProduced
+                then
+                    Sync.MassFabs = syncTable
+                    -- swap the data buffers
+                    syncTable, lastSyncTable = lastSyncTable, syncTable
+                end
             end
             CoroutineYield(1)
         end
@@ -1240,11 +1260,22 @@ AIBrain = Class(moho.aibrain_methods) {
             TransferUnitsToHighestBrain(enemies)
         end
 
-        -- Kill all units left over
-        local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-        if tokill then
-            for _, unit in tokill do
-                unit:Kill()
+        local toDestroy = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+        -- first halt all units
+        if toDestroy then
+            IssueStop(toDestroy)
+        end
+
+        -- then wait a bit; if we were the last team, the game will have ended and we get to see
+        -- the final game state
+        WaitSeconds(1)
+
+        -- otherwise, destroy all units
+        if toDestroy then
+            for _, unit in toDestroy do
+                if not unit.Dead then
+                    unit:Kill()
+                end
             end
         end
 
@@ -1261,25 +1292,17 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    RecallAllCommanders = function(self, camera)
+    RecallAllCommanders = function(self)
         local commandCat = categories.COMMAND + categories.SUBCOMMANDER
-        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false), camera)
+        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false))
     end;
 
     ---@param self AIBrain
     ---@param recallingUnits Unit[]
-    RecallArmyThread = function(self, recallingUnits, camera)
+    RecallArmyThread = function(self, recallingUnits)
         if recallingUnits then
-            local ScenarioFramework = import("/lua/scenarioframework.lua")
-            -- if camera then
-            --     local cdr = self:GetCommander()
-            --     if cdr then
-            --         ScenarioFramework.EndOperationCamera(cdr, true, 3.5)
-            --     end
-            -- end
-            ScenarioFramework.FakeTeleportUnits(recallingUnits, true)
+            import("/lua/scenarioframework.lua").FakeTeleportUnits(recallingUnits, true)
         end
-        --SPEW("Recalling army brain " .. self.Nickname .. " (" .. (camera and "with camera)" or "no camera)"))
         self:OnRecalled()
     end;
 

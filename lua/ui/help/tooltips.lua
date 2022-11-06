@@ -1665,6 +1665,16 @@ Tooltips = {
         description = "",
         keyID = "toggle_score_screen",
     },
+    fabricator_collapse = {
+        title = "<LOC tooltipui0736>[Hide/Show] Mass Fabricator Panel",
+        description = "",
+        keyID = "toggle_mass_fabricator_panel",
+    },
+    voting_collapse = {
+        title = "<LOC tooltipui0737>[Hide/Show] Voting Panel",
+        description = "",
+        keyID = "toggle_voting_panel",
+    },
     econ_collapse = {
         title = "<LOC tooltipui0558>[Hide/Show] Resource Bar",
         description = "",

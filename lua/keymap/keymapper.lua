@@ -375,6 +375,7 @@ function NormalizeKey(inKey)
     return norm
 end
 
+-- TODO: reconcile with `/lua/ui/dialogs/keybindings.lua#FormatKeyName`
 function LocalizeKeyName(inKey)
     local ctrl, alt, shift = false, false, false
     local norm = ""

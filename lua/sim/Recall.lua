@@ -23,6 +23,7 @@ function init()
                         IsAlly(focus, index) and
                         brainWith.BrainType ~= "Human" and
                         not ArmyIsCivilian(index)
+                          and false
                     then
                         Sync.RecallRequest = {CannotRequest = "ai"}
                         return
@@ -135,7 +136,7 @@ local function RecallVotingThread(requestingArmy)
     if recallAccepted then
         SPEW("Vote passed; recalling!")
         for army, brain in team do
-            brain:RecallAllCommanders(focus == army)
+            brain:RecallAllCommanders()
         end
     else
         brain.LastRecallRequestTime = gametick
@@ -202,7 +203,7 @@ local function ArmyRequestRecall(army, teammates, lastVote)
     elseif lastVote then
         -- if we're the first and last vote, it's just us; recall our army
         SPEW("Immediately recalling")
-        GetArmyBrain(army):RecallAllCommanders(army == GetFocusArmy())
+        GetArmyBrain(army):RecallAllCommanders()
     end
 end
 
@@ -223,7 +224,7 @@ function SetRecallVote(data)
     local teammates = 0
     for index, ally in ArmyBrains do
         if army ~= index and not ally:IsDefeated() and IsAlly(army, index) and not ArmyIsCivilian(index) then
-            if ally.BrainType ~= "Human" then
+            if ally.BrainType ~= "Human" and false then
                 if army == focus then
                     SetCannotRequestRecall("ai")
                 end
