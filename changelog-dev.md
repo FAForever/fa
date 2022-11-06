@@ -2,11 +2,14 @@
 # Game version 3745 (6th of November, 2022)
 
 I'd like to show my appreciation to those that made a friendly report on what was broken. We tackled
-the majority of the issues, with the exception of the resource button in the diplomacy tab.
+the majority of the issues, with the exception of the resource button in the diplomacy tab. We disabled
+that for now.
 
 As an alternative you can also share resources via the scoreboard. The default scoreboard supports
-this too by ctrl / shift clicking on the resources of an ally. See also the tooltips. For now, we've
-disabled the resources button.
+this too by ctrl / shift clicking on the resources of an ally. See also the tooltips.
+
+I was also informed that the author of Economy Manager released a patch, it is now compatible again. For
+those that use the range ring preview you can download a UI mod called 'Build Range Preview' made by Sheikah.
 
 With thanks to 4z0t and Sheikah for their help in writing this hotfix,
 
