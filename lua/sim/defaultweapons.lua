@@ -220,11 +220,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                 if not targetPos then
                     return 4.75
                 end
-<<<<<<< HEAD
                 if target and not target.IsProp then
-=======
-                if not target.IsProp then
->>>>>>> b29dec61d (Fix props breaking bomber targeting (#4207))
                     targetVelX, _, targetVelZ = UnitGetVelocity(target)
                 end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
