@@ -1189,34 +1189,6 @@ MassCollectionUnit = Class(StructureUnit) {
     end,
 
     ---@param self MassCollectionUnit
-    ---@param adjacentUnit MassCollectionUnit
-    ---@param triggerUnit MassCollectionUnit
-    OnAdjacentTo = function(self, adjacentUnit, triggerUnit) -- What is triggerUnit?
-        if self:IsBeingBuilt() then return end
-        if adjacentUnit:IsBeingBuilt() then return end
-
-        -- Does the unit have any adjacency buffs to use?
-        local adjBuffs = self.Blueprint.Adjacency
-        if not adjBuffs then return end
-
-        -- Apply each buff needed to you and/or adjacent unit, only if turned on
-        if self._productionActive then
-            for k, v in AdjacencyBuffs[adjBuffs] do
-                Buff.ApplyBuff(adjacentUnit, v, self)
-            end
-        end
-
-        -- Keep track of adjacent units
-        if not self.AdjacentUnits then
-            self.AdjacentUnits = {}
-        end
-        table.insert(self.AdjacentUnits, adjacentUnit)
-
-        self:RequestRefreshUI()
-        adjacentUnit:RequestRefreshUI()
-    end,
-
-    ---@param self MassCollectionUnit
     ---@param builder Unit
     ---@param layer string
     OnStopBeingBuilt = function(self, builder, layer)
@@ -1368,34 +1340,6 @@ MassFabricationUnit = Class(StructureUnit) {
         self:SetProductionActive(false)
         self:RemoveAdjacencyBuffs()
         self._productionActive = false
-    end,
-
-    ---@param self MassFabricationUnit
-    ---@param adjacentUnit MassFabricationUnit
-    ---@param triggerUnit MassFabricationUnit
-    OnAdjacentTo = function(self, adjacentUnit, triggerUnit) -- What is triggerUnit?
-        if self:IsBeingBuilt() then return end
-        if adjacentUnit:IsBeingBuilt() then return end
-
-        -- Does the unit have any adjacency buffs to use?
-        local adjBuffs = self.Blueprint.Adjacency
-        if not adjBuffs then return end
-
-        -- Apply each buff needed to you and/or adjacent unit, only if turned on
-        if self._productionActive then
-            for _, v in AdjacencyBuffs[adjBuffs] do
-                Buff.ApplyBuff(adjacentUnit, v, self)
-            end
-        end
-
-        -- Keep track of adjacent units
-        if not self.AdjacentUnits then
-            self.AdjacentUnits = {}
-        end
-        table.insert(self.AdjacentUnits, adjacentUnit)
-
-        self:RequestRefreshUI()
-        adjacentUnit:RequestRefreshUI()
     end,
 
     ---@param self MassFabricationUnit

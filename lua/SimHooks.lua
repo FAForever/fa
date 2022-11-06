@@ -48,7 +48,7 @@ do
 
         -- cause a desync when players during non-ai games try and call this function separate from other players
         if not ScenarioInfo.GameHasAIs then
-            Random()
+            -- Random()
         end
 
         oldDrawCircle(position, diameter, color)
@@ -59,7 +59,7 @@ do
 
         -- cause a desync when players during non-ai games try and call this function separate from other players
         if not ScenarioInfo.GameHasAIs then
-            Random()
+            -- Random()
         end
 
         oldDrawLine(a, b, color)
@@ -70,7 +70,7 @@ do
 
         -- cause a desync when players during non-ai games try and call this function separate from other players
         if not ScenarioInfo.GameHasAIs then
-            Random()
+            -- Random()
         end
 
         oldDrawLinePop(a, b, color)
