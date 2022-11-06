@@ -20,7 +20,7 @@ should automatically make it available again.
 As a minor note to the authors of UI mods: it is better to have many small UI mods that each
 add in a single feature, then it is to have one large UI mod that adds in many features. One
 example is Economy Manager - a mod often used by players - is no longer compatible because
-one of its dozen features is incompatible:the command feedback no longer riggers with Economy
+one of its dozen features is incompatible:the command feedback no longer triggers with Economy
 Manager enabled. Long story short: keep the UI mods small and simple, as people can enable
 any number of them.
 
@@ -334,26 +334,26 @@ Github group, as found here: https://github.com/FAForever
 
 ## Contributors
 
-4z0t (#4232, #4242, #4171, #4269, #4309, #4310, #4319, #4311)
-Penguin5 (#4214, #4217)
-Relent0r (#4180, #4205, #4265, #4268, #4271, #4284, #4305, #4294)
-hdt80bro (#4172, #4186, #4176, #4174, #4203, #4204, #4183, #4184, #4185, #4236, #4225, #4234,
+- 4z0t (#4232, #4242, #4171, #4269, #4309, #4310, #4319, #4311)
+- Penguin5 (#4214, #4217)
+- Relent0r (#4180, #4205, #4265, #4268, #4271, #4284, #4305, #4294)
+- hdt80bro (#4172, #4186, #4176, #4174, #4203, #4204, #4183, #4184, #4185, #4236, #4225, #4234,
     #4226, #4237, #4228, #4227, #4238, #4280, #4270, #4229, #4069, #4301, #4321, #4325, #4217,
     #4334, #4207)
-Rowey (#4172, #4176, #4174, #4183, #4184, #4185, #4235, #4236, #4238)
-Jip (#4119, #4124#4188, #4190, #4191, #4212, #4205, #4232, #4241, #4243, #4244, #4248, #4250,
+- Rowey (#4172, #4176, #4174, #4183, #4184, #4185, #4235, #4236, #4238)
+- Jip (#4119, #4124#4188, #4190, #4191, #4212, #4205, #4232, #4241, #4243, #4244, #4248, #4250,
     #4253, #4260, #4254, #4262, #4249, #4025, #4267, #4266, #4264, #4281, #4270, #4282, #4285,
     #4286, #4292, #4290, #4304, #4298, #4312, #4313, #4308, #4291, #4287, #4328, #4329, #4307,
     #4331, #4332, #4327, #4334, #4338, #4336, #4201, #4202, 4230)
-iczero (#4338)
-FemtoZetta (#4274)
-KionX (#4131, #4255)
-CheeseBerry (#4219)
-BlackYps (#4175)
-YuchenJimmy (#4279)
-xXEddieXxx (#4299)
-Zjonn (#4323, #4326)
-ErikMekkes (#4321)
+- iczero (#4338)
+- FemtoZetta (#4274)
+- KionX (#4131, #4255)
+- CheeseBerry (#4219)
+- BlackYps (#4175)
+- YuchenJimmy (#4279)
+- xXEddieXxx (#4299)
+- Zjonn (#4323, #4326)
+- ErikMekkes (#4321)
 
 And with thanks to Fichom for creating various textures scattered over the pull requests.
 
@@ -386,6 +386,7 @@ deprecatedMods["OnScreenReclaimCounter"] = "8"
 deprecatedMods["ORV"] = "1"
 deprecatedMods["SmartReclaimSupport"] = "3"
 deprecatedMods["DrimsUIPack"] = "3"
+deprecatedMods["Rheclaim"] = "2"
 
 Note that mods like Quality of Performance are no longer required - they barely have impact on the
 performance of the simulation these days.

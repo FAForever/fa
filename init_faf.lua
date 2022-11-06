@@ -96,6 +96,7 @@ deprecatedMods["OnScreenReclaimCounter"] = "8"
 deprecatedMods["ORV"] = "1"
 deprecatedMods["SmartReclaimSupport"] = "3"
 deprecatedMods["DrimsUIPack"] = "3"
+deprecatedMods["Rheclaim"] = "2"
 
 -- convert all mod folder name keys to lower case to prevent typos
 deprecatedMods = LowerHashTable(deprecatedMods)
@@ -523,7 +524,7 @@ end
 -- END OF COPY --
 
 -- minimum viable shader version - should be bumped to the next release version when we change the shaders
-local minimumShaderVersion = 3729
+local minimumShaderVersion = 3745
 
 -- look for unviable shaders and remove them
 local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
