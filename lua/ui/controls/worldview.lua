@@ -112,18 +112,22 @@ local function NukeDecalFunc()
             outer = w.NukeOuterRingRadius
         end
 
-        if w.NukeInnerRinzgRadius > inner then
+        if w.NukeInnerRingRadius > inner then
             inner = w.NukeInnerRingRadius
         end
     end
 
-    if inner > 0 and outer > 0 then
-        local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
-        return {
-            { texture = prefix .. 'outer.dds', scale = outer * 2 },
-            { texture = prefix .. 'inner.dds', scale = inner* 2 }
-        }
+    local decals = { }
+    local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
+    if inner > 0  then
+        table.insert(decals, { texture = prefix .. 'inner.dds', scale = inner * 2 } )
     end
+
+    if outer > 0 then
+        table.insert(decals, { texture = prefix .. 'outer.dds', scale = outer * 2 } )
+    end
+
+    return decals
 end
 
 --- A decal texture / size computation function for `RULEUCC_Tactical`
