@@ -587,7 +587,7 @@ options = {
                 title = "Depth scanning",
                 key = 'cursor_depth_scanning',
                 type = 'toggle',
-                default = 'commands',
+                default = 'off',
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 'off'},
