@@ -217,7 +217,7 @@ Jip
 - (#4171) Fix scaling issue with new mod manager
 
 - (#4262) Fix teleportation glitches
-    No more teleporting Cybran ACU with a laser attached to its chest.
+    No more teleporting Cybran ACU with a cloak upgrade.
 
 - (#4264) Fix a glitch with an Atlantis and a gunship with its cargo
     No more invincible units through this weird glitch.
