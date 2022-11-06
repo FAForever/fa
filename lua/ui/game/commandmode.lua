@@ -148,6 +148,7 @@ function EndCommandMode(isCancel)
         else 
             if modeData.selection then
                 SelectUnits(modeData.selection)
+                return
             end
         end
     end
