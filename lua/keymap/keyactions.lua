@@ -469,6 +469,8 @@ keyActions = {
         category = 'selection', order =65,},
     ['lock_zoom'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").lockZoom()',
         category = 'camera', order = 666,},
+    ['zoom_pop'] = {action = "UI_Lua import('/lua/ui/game/zoompopper.lua').ToggleZoomPop()",
+        category = 'camera', order = 29,},
     ['dock'] = {action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(true)',
         category = 'orders', order = 35,},
     ['shift_dock'] = {action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(false)',
