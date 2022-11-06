@@ -53,13 +53,15 @@ local function GetSelectedWeaponsWithReticules(predicate)
     end
 
     -- find valid units
-    for i, u in selectedUnits do
-        local bp = u:GetBlueprint()
-        if bp.CategoriesHash['SHOWATTACKRETICLE'] and (not weapons[bp.BlueprintId]) then
-            for k, v in bp.Weapon do
-                if predicate(v) then
-                    weapons[bp.BlueprintId] = v
-                    break
+    if selectedUnits then
+        for i, u in selectedUnits do
+            local bp = u:GetBlueprint()
+            if bp.CategoriesHash['SHOWATTACKRETICLE'] and (not weapons[bp.BlueprintId]) then
+                for k, v in bp.Weapon do
+                    if predicate(v) then
+                        weapons[bp.BlueprintId] = v
+                        break
+                    end
                 end
             end
         end
