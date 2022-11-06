@@ -1,11 +1,51 @@
 
 # Game version 3745 (6th of November, 2022)
 
-< todo general introduction >
+And there it is, the last major patch of the year!
 
-< todo list of known incompatible mods >
+This patch was ambitious. The purpose was to introduce modern features into the game, while at
+the same time make the game easier to customize to your liking. Some of the patch can be
+immediately applied by players, like the extended features on control groups, camera recall
+functionality and the improved performance of the reclaim overview. Other features are not
+immediately visible but are a major step forward, like the navigational mesh we generate for
+the map you're playing on for AIs.
 
-< todo plans for next year >
+Previous patches primarily made changes in the code directly related to the simulation. This
+patch also includes changes to the code surrounding the user interface. Also refers to UI
+code or UI mods. It was not possible to do this patch without causing incompatibility with
+some of the UI mods that are out there. We introduced a list of incompatible mods at the
+end of this changelog. Authors can update their mod, bump the version number and the game
+should automatically make it available again.
+
+As a minor note to the authors of UI mods: it is better to have many small UI mods that each
+add in a single feature, then it is to have one large UI mod that adds in many features. One
+example is Economy Manager - a mod often used by players - is no longer compatible because
+one of its dozen features is incompatible:the command feedback no longer riggers with Economy
+Manager enabled. Long story short: keep the UI mods small and simple, as people can enable
+any number of them.
+
+And as this year ends I'd like to show my personal appreciation to some contributors and community
+members. I'll start off with hdt80bro, who has been working on the repository for the past few
+months. His extensive knowledge and motivation was visible in our discussions and above all in his
+code changes. We're lucky to have him. Next to that I'd like to thank Madmax for always being
+there when I needed essentially anything. Whenever I needed a tester, Madmax is usually there
+ready to help confirm the stability of it. And of course there is Rowey - always ready to assist
+with his friendly character. Rowey has pushed the FAF Youtube that increased exposure on the development
+of this game, like being there when we were producing the game development series. a lot of the videos
+on game development. And last I'd like to thank Sprouto - creator of the LOUD community - for being an
+inspiration to what he managed to achieve with LOUD. Every time we talk I learn something new and I am
+looking forward to our next conversation.
+
+And like that, a new year of development will start. And with a new year we'll take a new route
+to how we'll further develop this game. Instead of having a 'game team' - that introduces an arbitrary
+boundary between contributors - we'll move towards how other projects are managed: by creating a clear,
+properly scoped backlog of issues that contributors can pick up. Anyone can add and discuss issues in
+the backlog. Once an issue is accepted it is added to a milestone. Milestones allow us to steer contributors
+towards a common vision. They make it immediately clear when you can expect your changes to be live.  Alas -
+there's too much to tell and too little room in this changelog. For those interested, we'll soon make a post
+on the forums and release the new contribution guidelines on the repository.
+
+With appreciation towards all the contributors that made this patch possible,
 
 Jip
 
@@ -309,3 +349,38 @@ YuchenJimmy (#4279)
 xXEddieXxx (#4299)
 Zjonn (#4323, #4326)
 ErikMekkes (#4321)
+
+And with thanks to Fichom for creating various textures scattered over the pull requests.
+
+## List of incompatible mods
+
+-- mods that are deprecated, based on mod folder name
+deprecatedMods["simspeed++"] = true
+deprecatedMods["#quality of performance 2022"] = true
+deprecatedMods["em"] = "11"
+
+-- as per #4119 the control groups (called selection sets in code) are completely overhauled
+-- and extended feature-wise, because of that these mods are no longer viable / broken / integrated
+deprecatedMods["group_split"] = "0.1"
+deprecatedMods["Control Group Zoom Mod"] = "2"
+deprecatedMods["additionalControlGroupStuff"] = true
+
+-- as per #4124 the cursor and command interactions are complete overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["additionalCameraStuff"] = "3"
+deprecatedMods["RUI"] = "1.0"
+
+-- as per #4232 the reclaim view is completely overhauled
+deprecatedMods["Advanced Reclaim&Selection Info"] = "1"
+deprecatedMods["AdvancedReclaimInfo"] = "1"
+deprecatedMods["BetterReclaimView"] = "2"
+deprecatedMods["disableReclaimUI"] = "2"
+deprecatedMods["DynamicReclaimGrouping"] = "1"
+deprecatedMods["EzReclaim"] = "1.0"
+deprecatedMods["OnScreenReclaimCounter"] = "8"
+deprecatedMods["ORV"] = "1"
+deprecatedMods["SmartReclaimSupport"] = "3"
+deprecatedMods["DrimsUIPack"] = "3"
+
+Note that mods like Quality of Performance are no longer required - they barely have impact on the
+performance of the simulation these days.
