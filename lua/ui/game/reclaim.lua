@@ -174,7 +174,7 @@ local WorldLabel = Class(Group) {
     ---@param reclaimData UIReclaimDataCombined
     ---@return number
     CalculateFontSizeFromMass = function(self, reclaimData)
-        local scaling = 1 + 0.002 * Prefs.GetFromCurrentProfile('options.reclaim_overview_size_scale')
+        local scaling = 0.02 * Prefs.GetFromCurrentProfile('options.reclaim_overview_size_scale')
         if scaling == 0 then
             return 10
         end
