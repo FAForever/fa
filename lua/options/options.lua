@@ -728,7 +728,7 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_RECLAIMBATCHING>Enable reclaim batching",
+                title = "<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching",
                 key = 'reclaim_overview_batching',
                 type = 'toggle',
                 default = 1,
