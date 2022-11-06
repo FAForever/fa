@@ -1402,6 +1402,7 @@ Unit = Class(moho.unit_methods) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
+
         local layer = self.Layer
         self.Dead = true
 
@@ -2008,7 +2009,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Start the sinking after a delay of the given number of seconds, attaching to a given bone
         -- and entity.
-        proj:Start(10 * math.max(2, math.min(7, scale)), self, bone, callback)
+        proj:Start(4 * math.max(2, math.min(7, scale)), self, bone, callback)
         self.Trash:Add(proj)
     end,
 
@@ -2044,7 +2045,6 @@ Unit = Class(moho.unit_methods) {
     DeathThread = function(self, overkillRatio, instigator)
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = self:ShallSink()
-
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
 
         if not self.BagsDestroyed then
@@ -2234,6 +2234,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Destroy everything added to the trash
         self.Trash:Destroy()
+
         -- Destroy all extra trashbags in case the DeathTread() has not already destroyed it (modded DeathThread etc.)
         if not self.BagsDestroyed then
             self:DestroyAllBuildEffects()
@@ -3339,7 +3340,6 @@ Unit = Class(moho.unit_methods) {
 
         local unitEnhancements = EnhancementCommon.GetEnhancements(self.EntityId)
         local tempEnhanceBp = self.Blueprint.Enhancements[work]
-        --LOG('ACU is ordering enhancement ['..repr(tempEnhanceBp.Name)..'] ' )
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
                 WARN('*WARNING: Ordered enhancement ['..tempEnhanceBp.Name..'] does not have the proper prerequisite. Slot ['..tempEnhanceBp.Slot..'] - Needed: ['..unitEnhancements[tempEnhanceBp.Slot]..'] - Installed: ['..tempEnhanceBp.Prerequisite..']')

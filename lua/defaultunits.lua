@@ -1976,7 +1976,6 @@ AirUnit = Class(MobileUnit) {
         end
     end,
 
-
     --- Called when a unit collides with a projectile to check if the collision is valid, allows
     -- ASF to be destroyed when they impact with strategic missiles
     ---@param self AirUnit The unit we're checking the collision for
