@@ -39,6 +39,8 @@ StructureUnit = Class(Unit) {
     FxDamage2 = {EffectTemplate.DamageStructureFireSmoke01, EffectTemplate.DamageStructureSparks01},
     FxDamage3 = {EffectTemplate.DamageStructureFire01, EffectTemplate.DamageStructureSparks01},
 
+    ConsumptionActive = true,
+
     ---@param self StructureUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
@@ -563,8 +565,10 @@ StructureUnit = Class(Unit) {
         adjacentUnit.AdjacentUnits[self.EntityId] = self
 
         -- apply the buffs
-        for k, v in AdjacencyBuffs[adjBuffs] do
-            Buff.ApplyBuff(adjacentUnit, v, self)
+        if self.ConsumptionActive then
+            for k, v in AdjacencyBuffs[adjBuffs] do
+                Buff.ApplyBuff(adjacentUnit, v, self)
+            end
         end
 
         -- refresh the UI
@@ -1178,14 +1182,14 @@ MassCollectionUnit = Class(StructureUnit) {
     OnConsumptionActive = function(self)
         StructureUnit.OnConsumptionActive(self)
         self:ApplyAdjacencyBuffs()
-        self._productionActive = true
+        self.ConsumptionActive = true
     end,
 
     ---@param self MassCollectionUnit
     OnConsumptionInActive = function(self)
         StructureUnit.OnConsumptionInActive(self)
         self:RemoveAdjacencyBuffs()
-        self._productionActive = false
+        self.ConsumptionActive = false
     end,
 
     ---@param self MassCollectionUnit
@@ -1330,7 +1334,7 @@ MassFabricationUnit = Class(StructureUnit) {
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
         self:ApplyAdjacencyBuffs()
-        self._productionActive = true
+        self.ConsumptionActive = true
     end,
 
     ---@param self MassFabricationUnit
@@ -1339,7 +1343,7 @@ MassFabricationUnit = Class(StructureUnit) {
         self:SetMaintenanceConsumptionInactive()
         self:SetProductionActive(false)
         self:RemoveAdjacencyBuffs()
-        self._productionActive = false
+        self.ConsumptionActive = false
     end,
 
     ---@param self MassFabricationUnit
