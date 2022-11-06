@@ -362,6 +362,7 @@ And with thanks to Fichom for creating various textures scattered over the pull 
 
 ## List of incompatible mods
 
+```lua
 -- mods that are deprecated, based on mod folder name
 deprecatedMods["simspeed++"] = true
 deprecatedMods["#quality of performance 2022"] = true
@@ -390,6 +391,7 @@ deprecatedMods["ORV"] = "1"
 deprecatedMods["SmartReclaimSupport"] = "3"
 deprecatedMods["DrimsUIPack"] = "3"
 deprecatedMods["Rheclaim"] = "2"
+```
 
 Note that mods like Quality of Performance are no longer required - they barely have impact on the
 performance of the simulation these days.
