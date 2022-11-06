@@ -179,4 +179,4 @@ local function HoverScanningThread()
     end
 end
 
-Trash:Add(ForkThread(HoverScanningThread))
+-- Trash:Add(ForkThread(HoverScanningThread))

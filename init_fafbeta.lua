@@ -96,6 +96,7 @@ deprecatedMods["OnScreenReclaimCounter"] = "8"
 deprecatedMods["ORV"] = "1"
 deprecatedMods["SmartReclaimSupport"] = "3"
 deprecatedMods["DrimsUIPack"] = "3"
+deprecatedMods["Rheclaim"] = "2"
 
 -- convert all mod folder name keys to lower case to prevent typos
 deprecatedMods = LowerHashTable(deprecatedMods)
