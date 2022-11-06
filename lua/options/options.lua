@@ -747,7 +747,7 @@ options = {
                 default = 25,
                 custom = {
                     min = 0,
-                    max = 100,
+                    max = 50,
                     inc = 1,
                 },
             },
