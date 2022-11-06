@@ -175,6 +175,15 @@ local WorldLabel = Class(Group) {
         local proj = view:Project(self.position)
         self.Left:SetValue(proj.x - 0.5 * self.Width())
         self.Top:SetValue(proj.y - 0.5 * self.Height() + 1)
+    end,    
+    
+    --- Updates the reclaim that this label displays
+    ---@param self WorldLabel
+    ---@param r UIReclaimDataCombined
+    UpdateLabel = function(self, r)
+        local mass = tostring(math.floor(0.5 + r.mass))
+        self.text:SetText(mass)
+        self.text:SetColor(self:CalculateTextColor(r))
     end,
 
     --- Updates the reclaim that this label displays
@@ -188,10 +197,8 @@ local WorldLabel = Class(Group) {
         self.position = r.position
         self:ProjectToScreen()
         if r.mass ~= self.oldMass then
-            local mass = tostring(math.floor(0.5 + r.mass))
+            self:UpdateLabel(r)
             self.oldMass = r.mass
-            self.text:SetText(mass)
-            self.text:SetColor(self:CalculateTextColor(r))
         end
     end,
 
@@ -323,6 +330,10 @@ local function SumReclaim(r1, r2)
     r1.max = MathMax(r1.max or r1.mass, r2.mass)
     r1.mass = massSum
     return r1
+end
+
+local function _CopyReclaim(reclaim)
+
 end
 
 ---@param reclaim UIReclaimDataPoint
