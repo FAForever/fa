@@ -114,18 +114,22 @@ local function NukeDecalFunc()
             outer = w.NukeOuterRingRadius
         end
 
-        if w.NukeInnerRinzgRadius > inner then
+        if w.NukeInnerRingRadius > inner then
             inner = w.NukeInnerRingRadius
         end
     end
 
-    if inner > 0 and outer > 0 then
-        local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
-        return {
-            { texture = prefix .. 'outer.dds', scale = outer * 2 },
-            { texture = prefix .. 'inner.dds', scale = inner* 2 }
-        }
+    local decals = { }
+    local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
+    if inner > 0  then
+        table.insert(decals, { texture = prefix .. 'inner.dds', scale = inner * 2 } )
     end
+
+    if outer > 0 then
+        table.insert(decals, { texture = prefix .. 'outer.dds', scale = outer * 2 } )
+    end
+
+    return decals
 end
 
 --- A decal texture / size computation function for `RULEUCC_Tactical`
@@ -183,6 +187,7 @@ local orderToCursorCallback = {
 
     -- misc
     CommandHighlight = 'OnCursorCommandHover',
+    MESSAGE = 'OnCursorMessage',
 
     -- orders that are a one-click type of thing
     RULEUCC_Stop = nil,
@@ -772,6 +777,21 @@ WorldView = Class(moho.UIWorldView, Control) {
     ---@param enabled boolean
     ---@param changed boolean
     OnCursorFerry = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `MESSAGE` is being applied
+    ---@param self WorldView
+    ---@param identifier 'MESSAGE'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorMessage = function(self, identifier, enabled, changed, commandData)
         if enabled then
             if changed then
                 local cursor = self.Cursor
