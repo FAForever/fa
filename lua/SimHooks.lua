@@ -1,12 +1,9 @@
 
-<<<<<<< HEAD
 do 
     -- can only cause issues, like remote code exploit
     _G.loadstring = nil
 end
 
-=======
->>>>>>> 697e11ef1 (Allow the debug draw tools to work in AI-related games (#4208))
 do
     -- upvalue for performance
     local EntityCategoryFilterDown = EntityCategoryFilterDown
