@@ -188,7 +188,7 @@ local WorldLabel = Class(Group) {
         end
 
         local value = MathClamp(MathLog(mass) * scaling + minSize, minSize, maxSize)
-        return value
+        return value ^ 0
     end,
 
     ---@param self WorldLabel
