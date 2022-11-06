@@ -363,6 +363,7 @@ And with thanks to Fichom for creating various textures scattered over the pull 
 ## List of incompatible mods
 
 ```lua
+-- you can find the most recent list here: https://github.com/FAForever/fa/blob/deploy/fafdevelop/init_fafdevelop.lua#L70
 -- mods that are deprecated, based on mod folder name
 deprecatedMods["simspeed++"] = true
 deprecatedMods["#quality of performance 2022"] = true
