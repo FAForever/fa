@@ -366,8 +366,6 @@ WorldView = Class(moho.UIWorldView, Control) {
     ---@param identifier CommandCap
     OnCursor = function(self, identifier)
 
-        LOG(identifier)
-
         -- map order to event name
         local event = orderToCursorCallback[identifier]
 
