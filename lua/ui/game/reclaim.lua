@@ -169,12 +169,44 @@ local WorldLabel = Class(Group) {
         return ColorHSV(hue, sat)
     end,
 
+    --- Returns the color of the reclaim label
+    ---@param self WorldLabel
+    ---@param reclaimData UIReclaimDataCombined
+    ---@return number
+    CalculateFontSizeFromMass = function(self, reclaimData)
+        local scaling = 0.02 * Prefs.GetFromCurrentProfile('options.reclaim_overview_size_scale')
+        if scaling == 0 then
+            return 10
+        end
+        
+        local minSize = 10
+        local maxSize = 30
+        local mass = reclaimData.mass
+        mass = mass - 10 -- fit to minimum
+        if mass <= 0 then
+            return minSize
+        end
+
+        local value = MathClamp(MathLog(mass) * scaling + minSize, minSize, maxSize)
+        return value ^ 0
+    end,
+
     ---@param self WorldLabel
     ProjectToScreen = function(self)
         local view = self.parent.view
         local proj = view:Project(self.position)
         self.Left:SetValue(proj.x - 0.5 * self.Width())
         self.Top:SetValue(proj.y - 0.5 * self.Height() + 1)
+    end,    
+    
+    --- Updates the reclaim that this label displays
+    ---@param self WorldLabel
+    ---@param r UIReclaimDataCombined
+    UpdateLabel = function(self, r)
+        local mass = tostring(math.floor(0.5 + r.mass))
+        self.text:SetText(mass)
+        self.text:SetColor(self:CalculateTextColor(r))
+        self.text:SetFont(UIUtil.bodyFont, self:CalculateFontSizeFromMass(r))
     end,
 
     --- Updates the reclaim that this label displays
@@ -188,10 +220,8 @@ local WorldLabel = Class(Group) {
         self.position = r.position
         self:ProjectToScreen()
         if r.mass ~= self.oldMass then
-            local mass = tostring(math.floor(0.5 + r.mass))
+            self:UpdateLabel(r)
             self.oldMass = r.mass
-            self.text:SetText(mass)
-            self.text:SetColor(self:CalculateTextColor(r))
         end
     end,
 
@@ -325,7 +355,20 @@ local function SumReclaim(r1, r2)
     return r1
 end
 
----@param reclaim UIReclaimDataPoint
+
+---@param reclaim UIReclaimDataPoint[]
+---@return boolean | number         # Returns the number of labels, or false if the zoom threshold is
+local function _CopyReclaim(reclaim)
+    totalReclaimData = 0
+    for _, r in reclaim do
+        totalReclaimData = totalReclaimData + 1
+        reclaimDataPool[totalReclaimData] = r
+    end
+
+    return totalReclaimData
+end
+
+---@param reclaim UIReclaimDataPoint[]
 ---@return boolean | number         # Returns the number of labels, or false if the zoom threshold is
 local function _CombineReclaim(reclaim)
 
@@ -336,6 +379,8 @@ local function _CombineReclaim(reclaim)
     end
 
     local minDist = zoom * HeightRatio
+
+
     local minDistSq = minDist * minDist
     local index = 0
 
@@ -463,7 +508,12 @@ function UpdateLabels()
         end
     end
 
-    local size = _CombineReclaim(onScreenReclaims)
+    local size
+    if Prefs.GetFromCurrentProfile('options.reclaim_overview_batching') == 1 then
+        size = _CombineReclaim(onScreenReclaims)
+    else
+        size = _CopyReclaim(onScreenReclaims)
+    end
 
     table.sort(reclaimDataPool, CompareMass)
 

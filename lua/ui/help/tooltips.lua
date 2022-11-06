@@ -2189,4 +2189,12 @@ Tooltips = {
         title = '<LOC OPTIONS_0236>Zoom Pop Distance',
         description = '<LOC OPTIONS_0272>Adjusts distance to which Zoom Pop zooms to.',
     },
+    options_reclaim_overview_size_scale = {
+        title = '<LOC OPTIONS_RECLAIMSIZE>Reclaim label scaling factor',
+        description = '<LOC OPTIONS_RECLAIMSIZEDESC>Scales the text of the reclaim label to its value',
+    },
+    options_reclaim_overview_batching = {
+        title = '<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching>',
+        description = '<LOC OPTIONS_RECLAIMBATCHINGDESC>Batches nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more. \r\n\r\nSignificantly improves performance. Is recommended for lower end systems.',
+    }
 }

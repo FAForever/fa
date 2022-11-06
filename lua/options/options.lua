@@ -728,6 +728,31 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching",
+                key = 'reclaim_overview_batching',
+                type = 'toggle',
+                default = 1,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_RECLAIMSIZE>Reclaim label scaling factor",
+                key = 'reclaim_overview_size_scale',
+                type = 'slider',
+                default = 10,
+                custom = {
+                    min = 0,
+                    max = 100,
+                    inc = 1,
+                },
+            },
+
+            {
                 title = 'Building',
                 type = 'header',
 
