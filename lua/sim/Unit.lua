@@ -1402,6 +1402,8 @@ Unit = Class(moho.unit_methods) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
+        LOG(string.format("%s: OnKilled pt. 1", tostring(self.EntityId)))
+
         local layer = self.Layer
         self.Dead = true
 
@@ -1425,6 +1427,8 @@ Unit = Class(moho.unit_methods) {
         else
             self:PlayUnitSound('Killed')
         end
+
+        LOG(string.format("%s: OnKilled pt. 2", tostring(self.EntityId)))
 
         -- apply death animation on half built units (do not apply for ML and mega)
         local FractionThreshold = bp.General.FractionThreshold or 0.5
@@ -1452,6 +1456,8 @@ Unit = Class(moho.unit_methods) {
         if self.totalDamageTaken > 0 and not self.veterancyDispersed then
             self:VeterancyDispersal(not instigator or not IsUnit(instigator))
         end
+
+        LOG(string.format("%s: OnKilled pt. 3", tostring(self.EntityId)))
 
         self:DisableShield()
         self:DisableUnitIntel('Killed')
@@ -2004,11 +2010,12 @@ Unit = Class(moho.unit_methods) {
         local bone = 0
 
         -- Create sinker projectile
+        LOG("Creating sinker projectile")
         local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
 
         -- Start the sinking after a delay of the given number of seconds, attaching to a given bone
         -- and entity.
-        proj:Start(10 * math.max(2, math.min(7, scale)), self, bone, callback)
+        proj:Start(4 * math.max(2, math.min(7, scale)), self, bone, callback)
         self.Trash:Add(proj)
     end,
 
@@ -2042,8 +2049,10 @@ Unit = Class(moho.unit_methods) {
     ---@param overkillRatio number
     ---@param instigator Unit
     DeathThread = function(self, overkillRatio, instigator)
+        LOG(string.format("%s: DeathThread!", tostring(self.EntityId)))
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = self:ShallSink()
+        LOG(string.format("%s: shallSink: %b", tostring(self.EntityId), shallSink))
 
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
 
@@ -2067,6 +2076,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         if shallSink then
+            LOG(string.format("%s: I shall sink!", tostring(self.EntityId)))
             self.DisallowCollisions = true
 
             -- Bubbles and stuff coming off the sinking wreck.
@@ -2234,6 +2244,8 @@ Unit = Class(moho.unit_methods) {
 
         -- Destroy everything added to the trash
         self.Trash:Destroy()
+        LOG("Destroyed!")
+
         -- Destroy all extra trashbags in case the DeathTread() has not already destroyed it (modded DeathThread etc.)
         if not self.BagsDestroyed then
             self:DestroyAllBuildEffects()

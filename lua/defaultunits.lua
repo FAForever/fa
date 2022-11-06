@@ -1931,6 +1931,9 @@ AirUnit = Class(MobileUnit) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
+
+        LOG(string.format("%s: OnKilled Air pt. 1", tostring(self.EntityId)))
+
         -- A completed, flying plane expects an OnImpact event due to air crash.
         -- An incomplete unit in the factory still reports as being in layer "Air", so needs this
         -- stupid check.
@@ -1938,6 +1941,9 @@ AirUnit = Class(MobileUnit) {
         -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
         -- It also wouldn't call this code, and hence the cargo destruction. Awful!
         if self:GetFractionComplete() == 1 and (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
+
+            LOG(string.format("%s: OnKilled Air LAYER=AIR", tostring(self.EntityId)))
+
             self:CreateUnitAirDestructionEffects(1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
@@ -1963,7 +1969,15 @@ AirUnit = Class(MobileUnit) {
             end
 
             -- Create a projectile we'll use to interact with Shields
+            LOG(string.format("%s: Creating shield collider", tostring(self.EntityId)))
             local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', 0)
+            LOG(string.format("%s: OnKilled Air ProjisDestroyed=%s", tostring(self.EntityId), tostring(IsDestroyed(proj))))
+
+            ForkThread(
+                function()
+                    LOG(string.format("%s: shield collider is destroyed: %s", tostring(self.EntityId), tostring(proj:BeenDestroyed())))
+                end
+            )
             self.colliderProj = proj
             proj:Start(self, 0)
             self.Trash:Add(proj)
@@ -1972,10 +1986,10 @@ AirUnit = Class(MobileUnit) {
                 self:VeterancyDispersal(not instigator or not IsUnit(instigator))
             end
         else
+            LOG(string.format("%s: OnKilled Air LAYER!=AIR", tostring(self.EntityId)))
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
     end,
-
 
     --- Called when a unit collides with a projectile to check if the collision is valid, allows
     -- ASF to be destroyed when they impact with strategic missiles
