@@ -2195,6 +2195,6 @@ Tooltips = {
     },
     options_reclaim_overview_batching = {
         title = '<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching>',
-        description = '<LOC OPTIONS_RECLAIMBATCHINGDESC>Batches nearby reclaim labels as you zoom out. \r\n\r\nSignificantly improves performance. Is recommended for lower end systems.',
+        description = '<LOC OPTIONS_RECLAIMBATCHINGDESC>Batches nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more. \r\n\r\nSignificantly improves performance. Is recommended for lower end systems.',
     }
 }
