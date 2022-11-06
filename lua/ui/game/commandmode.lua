@@ -117,6 +117,11 @@ function EndCommandMode(isCancel)
 
     -- in case we want to end the command mode, without knowing it has already ended or not
     if not modeData then
+        -- do end behaviors
+        for i,v in endBehaviors do
+            v(commandMode, modeData)
+        end
+
         -- update our local state
         commandMode = false
         modeData = false
