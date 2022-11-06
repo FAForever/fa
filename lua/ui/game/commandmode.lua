@@ -137,6 +137,11 @@ function EndCommandMode(isCancel)
                     SelectUnits(modeData.selection)
                 end
             end
+
+            -- we can end up here because we re-start the command mode
+            if not modeData then
+                return
+            end
         end
 
         -- add information to modeData for end behavior
@@ -147,7 +152,7 @@ function EndCommandMode(isCancel)
             ClearBuildTemplates()
         end
     end
-    
+
     -- do end behaviors
     for i,v in endBehaviors do
         v(commandMode, modeData)
