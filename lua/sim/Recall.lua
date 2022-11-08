@@ -23,7 +23,6 @@ function init()
                         IsAlly(focus, index) and
                         brainWith.BrainType ~= "Human" and
                         not ArmyIsCivilian(index)
-                          and false
                     then
                         Sync.RecallRequest = {CannotRequest = "ai"}
                         return
@@ -224,7 +223,7 @@ function SetRecallVote(data)
     local teammates = 0
     for index, ally in ArmyBrains do
         if army ~= index and not ally:IsDefeated() and IsAlly(army, index) and not ArmyIsCivilian(index) then
-            if ally.BrainType ~= "Human" and false then
+            if ally.BrainType ~= "Human" then
                 if army == focus then
                     SetCannotRequestRecall("ai")
                 end

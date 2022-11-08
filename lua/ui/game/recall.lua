@@ -14,22 +14,22 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 -- seconds to see recall voting results
 local reviewResultsDuration = 5
 
-local Panel
+local panel
 
 function Create(parent)
-    Panel = RecallPanel(parent)
-    return Panel
+    panel = RecallPanel(parent)
+    return panel
 end
 
 function SetLayout()
-    Layouter(Panel)
-        :AtLeftIn(Panel.parent, Panel:LoadPosition().left)
+    Layouter(panel)
+        :AtLeftIn(panel.parent, panel:LoadPosition().left)
         -- set to uncollapsed position; lets us layout the collapse button and setup the height
         -- so we know where the panel's actual inital position is
-        :Top(Panel.parent.Top() + LayoutHelpers.ScaleNumber(4) + Panel.t.Height())
-        :Width(Panel.DefaultWidth)
+        :Top(panel.parent.Top() + LayoutHelpers.ScaleNumber(4) + panel.t.Height())
+        :Width(panel.DefaultWidth)
         :Height(function()
-            local panel = Panel
+            local panel = panel
             local Scale = LayoutHelpers.ScaleNumber
             local height = Scale(-4) + panel.label.Height() + Scale(5) + panel.votes.Height()
             -- make sure these register as a dependency
@@ -47,12 +47,12 @@ function SetLayout()
         end)
         :Hide()
         :End()
-    Panel.Top:Set(Panel.parent.Top() - Panel:TotalHeight())
+    panel.Top:Set(panel.parent.Top() - panel:TotalHeight())
 end
 
 function ToggleControl()
-    if Panel and not Panel.collapseArrow:IsDisabled() then
-        Panel.collapseArrow:ToggleCheck()
+    if panel and not panel.collapseArrow:IsDisabled() then
+        panel.collapseArrow:ToggleCheck()
     end
 end
 
@@ -61,14 +61,14 @@ function RequestHandler(data)
         import('/lua/ui/game/diplomacy.lua').UpdateCannotRequestRecall(data.CannotRequest)
     end
     if data.Open then
-        Panel:StartVote(data.Blocks, data.Open, data.CanVote)
+        panel:StartVote(data.Blocks, data.Open, data.CanVote)
     end
     local accept, veto = data.Accept, data.Veto
     if accept or veto then
-        Panel:AddVotes(accept, veto)
+        panel:AddVotes(accept, veto)
     end
     if data.Close ~= nil then
-        Panel:CloseVote(data.Close)
+        panel:CloseVote(data.Close)
     end
 end
 
@@ -448,13 +448,13 @@ RecallPanel = Class(NinePatch.NinePatch) {
     end;
 
     LoadPosition = function(self)
-        return Prefs.GetFromCurrentProfile("VotingPanelPos") or {
+        return Prefs.GetFromCurrentProfile("RecallPanelPos") or {
             left = 800,
         }
     end;
 
     SavePosition = function(self)
-        Prefs.SetToCurrentProfile("VotingPanelPos", {
+        Prefs.SetToCurrentProfile("RecallPanelPos", {
             left = LayoutHelpers.InvScaleNumber(self.Left()),
         })
     end;
