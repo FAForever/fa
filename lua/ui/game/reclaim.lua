@@ -156,7 +156,7 @@ local WorldLabel = Class(Group) {
         elseif mass >= 30000 then
             hue = 1
         else
-            hue = MathLog(mass + 0.30000300003) * 0.0868588963807 + 0.104574880463
+            hue = MathLog(mass + 0.30000300003) * 0.0868588963807 - 0.104574880463
         end
 
         -- saturation will just be an abstract indicator of how "compact" the label is
