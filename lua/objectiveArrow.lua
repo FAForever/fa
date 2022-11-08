@@ -5,7 +5,7 @@ ObjectiveArrow = Class(Entity) {
 
     ---@param self ObjectiveArrow
     ---@param spec table
-    OnCreate = function(self,spec)
+    OnCreate = function(self, spec)
         self.BounceTime = 0.0
         self.Size = spec.Size or 1.0
         self:SetVizToFocusPlayer('Always')
@@ -19,15 +19,15 @@ ObjectiveArrow = Class(Entity) {
 
         if spec.AttachTo then
             spec.AttachTo.Trash:Add(self)
-            self:AttachBoneTo(-1,spec.AttachTo,-1)
+            self:AttachBoneTo(-1, spec.AttachTo, -1)
 
             -- Position at the top of the parent's collision box
             local yOff = 0
             local extents = spec.AttachTo:GetCollisionExtents()
             if extents then
                 -- scale up arrow based on unit's size
-                unitScale = math.min( extents.Max.x - extents.Min.x, extents.Max.z - extents.Min.z)
-                unitScale = math.max( unitScale, 1.0 )
+                unitScale = math.min(extents.Max.x - extents.Min.x, extents.Max.z - extents.Min.z)
+                unitScale = math.max(unitScale, 1.0)
 
                 yOff = (self.Size * unitScale) / 2.0 + extents.Max.y - spec.AttachTo:GetPosition().y
                 yOff = yOff + 0.5
@@ -35,9 +35,10 @@ ObjectiveArrow = Class(Entity) {
                 yOff = spec.Size / 2.0 + 0.5
             end
 
-            self:SetParentOffset(Vector(0,yOff,0))
             self.SavedOffset = yOff;
-            ForkThread(self.BounceThread,self)
+            self.SavedVector = Vector(0, yOff, 0)
+            self:SetParentOffset(self.SavedVector)
+            ForkThread(self.BounceThread, self)
         end
 
         -- magic 0.4 scaling so spec.Size can be specified in OGrid units
@@ -53,8 +54,8 @@ ObjectiveArrow = Class(Entity) {
 
             --LOG('sin =',math.sin(self.BounceTime))
             local yOff = self.SavedOffset + math.sin(self.BounceTime) / 4
-
-            self:SetParentOffset( Vector(0,yOff,0) )
+            self.SavedVector.y = yOff
+            self:SetParentOffset(self.SavedVector)
 
             WaitSeconds(0.1)
             self.BounceTime = self.BounceTime + math.pi * 0.25
