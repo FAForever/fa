@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
 
 ---@class URB3103 : CStructureUnit
 URB3103 = Class(CStructureUnit) {

@@ -8,7 +8,7 @@ local saveCameraPositionSound = Sound({Bank = 'Interface', Cue = 'UI_Camera_Save
 local restoreCameraPositionSound = Sound({Bank = 'Interface', Cue = 'UI_Camera_Recall_Position'})
 
 function Test2()
-    import('/lua/ui/game/commandmode.lua').StartCommandMode('build', { name = 'uel0105'})
+    import("/lua/ui/game/commandmode.lua").StartCommandMode('build', { name = 'uel0105'})
 end
 
 --- Stores the camera settings, allowing you to restore it at a later moment

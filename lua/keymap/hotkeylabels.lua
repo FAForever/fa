@@ -1,10 +1,10 @@
 -- This file is called from gamemain.lua when a game launches
 -- It assigns unit IDs and order strings to the basic key (The key without modifiers) bound to them
 
-local unitkeygroups = import('/lua/keymap/unitkeygroups.lua').unitkeygroups
-local construction = import('/lua/ui/game/construction.lua')
-local orders = import('/lua/ui/game/orders.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local unitkeygroups = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
+local construction = import("/lua/ui/game/construction.lua")
+local orders = import("/lua/ui/game/orders.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
 -- Turn engine string reference to certain symbols into the actual symbol
 local signs = {

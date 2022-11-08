@@ -9,8 +9,9 @@ local TWeapons = import('/lua/terranweapons.lua')
 local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon
 local TIFFragLauncherWeapon = TWeapons.TDFFragmentationGrenadeLauncherWeapon
 
-local EffectUtils = import('/lua/EffectUtilities.lua')
-local Effects = import('/lua/EffectTemplates.lua')
+local EffectUtils = import("/lua/effectutilities.lua")
+local Effects = import("/lua/effecttemplates.lua")
+
 
 ---@class DEL0204 : TWalkingLandUnit
 DEL0204 = Class(TWalkingLandUnit)

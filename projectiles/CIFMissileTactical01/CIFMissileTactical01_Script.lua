@@ -4,7 +4,7 @@
 -- Splits into child projectile if it takes enough damage.
 --
 
-local CLOATacticalMissileProjectile = import('/lua/cybranprojectiles.lua').CLOATacticalMissileProjectile
+local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
 
 CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
 

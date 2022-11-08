@@ -4,14 +4,14 @@
 -- Copyright © 2008 Blade Braver!
 ------------------------------------------------------------------------------
 
-local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
---local CollisionBeamFile = import('/lua/kirvesbeams.lua')
-local DefaultBeamWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultBeamWeapon
---local Dummy = import('/lua/kirvesweapons.lua').Dummy
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+--local CollisionBeamFile = import("/lua/kirvesbeams.lua")
+local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
+--local Dummy = import("/lua/kirvesweapons.lua").Dummy
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-local CollisionBeamFile = import('/lua/sim/CollisionBeam.lua').CollisionBeam
-local SCCollisionBeam = import('/lua/defaultcollisionbeams.lua').SCCollisionBeam
+local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
+local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
 local PhasonCollisionBeam = Class(SCCollisionBeam) {
 
@@ -69,7 +69,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-        local Util = import('/lua/utilities.lua')
+        local Util = import("/lua/utilities.lua")
 
         while true do
             if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then

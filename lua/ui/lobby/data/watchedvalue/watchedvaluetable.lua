@@ -1,4 +1,4 @@
-local WatchedValue = import('/lua/ui/lobby/data/watchedvalue/watchedvalue.lua')
+local WatchedValue = import("/lua/ui/lobby/data/watchedvalue/watchedvalue.lua")
 
 -- A version of the builtin "next" function that unboxes WatchedValues. Useful for making iteration
 -- over WatchedValueTables work.

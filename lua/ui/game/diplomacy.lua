@@ -12,14 +12,14 @@
 ---@field To number army index
 ---@field From number army index
 
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local Slider = import('/lua/maui/Slider.lua').Slider
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Tabs = import('/lua/ui/game/tabs.lua')
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local Slider = import("/lua/maui/slider.lua").Slider
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Tabs = import("/lua/ui/game/tabs.lua")
 
 local ScaleNumber = LayoutHelpers.ScaleNumber
 local Layouter = LayoutHelpers.LayoutFor
@@ -199,6 +199,7 @@ local function LayoutMajorAlliedEntry(entry, manualShare)
     Tooltip.AddButtonTooltip(giveResourcesBtn, 'dip_give_resources')
     entry.giveResourcesBtn = giveResourcesBtn
 
+    giveResourcesBtn:Disable()
     giveResourcesBtn.OnClick = function(self, modifiers)
         CreateShareResourcesDialog(entry)
     end
@@ -416,7 +417,7 @@ function BuildPlayerLines()
 
     local belowEntry = parent
 
-    if not import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+    if not import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
         local personalGroup = CreateBitmapStd(parent, "/game/options-diplomacy-panel/panel-recall")
         if belowEntry == parent then
             LayoutHelpers.AtLeftTopIn(personalGroup, belowEntry, 0, 8)
@@ -704,12 +705,12 @@ end
 
 --- Unused
 
-local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-local Text = import('/lua/maui/text.lua').Text
-local Edit = import('/lua/maui/edit.lua').Edit
-local Checkbox = import('/lua/maui/Checkbox.lua').Checkbox
-local Button = import('/lua/maui/button.lua').Button
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
+local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local Text = import("/lua/maui/text.lua").Text
+local Edit = import("/lua/maui/edit.lua").Edit
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Button = import("/lua/maui/button.lua").Button
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
 local NeverAllyWith = {}
 
 if SessionGetScenarioInfo().Options.TeamLock == 'locked' then

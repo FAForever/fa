@@ -27,6 +27,9 @@ function BrainsCompareNumCategory(aiBrain, targetBrains, numReq, category, compa
     local num = 0
     local targetBrainSet = {}
     local armySetup = ScenarioInfo.ArmySetup
+    if type(targetBrains) == "string" then
+        targetBrains = { targetBrains }
+    end
     for _, brain in targetBrains do
         if brain == 'HumanPlayers' then
             local tblArmy = ListArmies()
@@ -130,6 +133,6 @@ function FocusBrainBeingBuiltOrActiveCategoryCompare(aiBrain, numReq, categories
 end
 
 -- Moved unsed Imports to bottom for mod compatibilty
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/scenarioutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")

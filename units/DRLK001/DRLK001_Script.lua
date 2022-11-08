@@ -3,12 +3,11 @@
 -- Summary  :  Cybran T3 Mobile AA
 -- Copyright © 2008 Blade Braver!
 -----------------------------------
-
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
-local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaser
-local Effects = import('/lua/EffectTemplates.lua')
+local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaser
+local Effects = import("/lua/effecttemplates.lua")
 
 ---@class DRLK001 : CWalkingLandUnit
 DRLK001 = Class(CWalkingLandUnit) {

@@ -1,5 +1,5 @@
 function EngineerAttackChildCount(aiBrain, master, number)
-    local ScenarioFramework = import('/lua/scenarioframework.lua')
+    local ScenarioFramework = import("/lua/scenarioframework.lua")
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
 
     if counter < 1 then
@@ -10,7 +10,7 @@ function EngineerAttackChildCount(aiBrain, master, number)
 end
 
 function EngineerAttackMasterCount(aiBrain, master, number)
-    local ScenarioFramework = import('/lua/scenarioframework.lua')
+    local ScenarioFramework = import("/lua/scenarioframework.lua")
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
 
     if counter >= 1 then

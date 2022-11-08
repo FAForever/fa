@@ -73,7 +73,7 @@ end
 local function HSVtoHSLsimp(h, s, v)
     local lit = v * (1 - s / 2)
     local sat = 0
-    if v ~= 0 and v ~= 1 then
+    if lit ~= 0 and lit ~= 1 then
         sat = (v - lit) / math.min(lit, 1 - lit)
     end
     return h, sat, lit
@@ -159,24 +159,24 @@ luft.describe("Color functions", function()
             local ro, go, bo = col[1], col[2], col[3]
             local r, g, b = RGBtoFloat(ro, go, bo)
             local f1, f2, f3 = testForward(r, g, b)
-            luft.expect(f1, f2, f3).to.be.close.to(compareForward(r, g, b))
-            luft.expect(compareBackward(f1, f2, f3)).to.be.close.to(r, g, b)
+            luft.expect(f1, f2, f3).to.be.close(compareForward(r, g, b))
+            luft.expect(compareBackward(f1, f2, f3)).to.be.close(r, g, b)
         end)
         luft.test_all("Back conversion", testColors, function(col)
             local ro, go, bo = col[1], col[2], col[3]
             local r, g, b = RGBtoFloat(ro, go, bo)
             local f1, f2, f3 = testForward(r, g, b)
             local b1, b2, b3 = testBackward(f1, f2, f3)
-            luft.expect(b1, b2, b3).to.be.close.to(compareBackward(f1, f2, f3))
-            luft.expect(compareForward(b1, b2, b3)).to.be.close.to(f1, f2, f3)
+            luft.expect(b1, b2, b3).to.be.close(compareBackward(f1, f2, f3))
+            luft.expect(compareForward(b1, b2, b3)).to.be.close(f1, f2, f3)
         end)
         luft.test_all("Round conversion", testColors, function(col)
             local ro, go, bo = col[1], col[2], col[3]
             local r, g, b = RGBtoFloat(ro, go, bo)
             local r1, g1, b1 = testBackward(testForward(r, g, b))
-            luft.expect(r1, g1, b1).to.be.close.to(r, g, b)
+            luft.expect(r1, g1, b1).to.be.close(r, g, b)
             if ro > 1 or go > 1 or bo > 1 then
-                luft.expect(ColorRGB(r1, g1, b1)).to.equal(ro, go, bo)
+                luft.expect(ColorRGB(r1, g1, b1)).to.equal(("%02X%02X%02X"):format(ro, go, bo))
             end
         end)
     end)

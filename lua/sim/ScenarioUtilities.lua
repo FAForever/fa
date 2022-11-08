@@ -391,7 +391,7 @@ function CreateInitialArmyGroup(strArmy, createCommander)
 
     if createCommander and (tblGroup == nil or 0 == table.getn(tblGroup)) then
         local factionIndex = GetArmyBrain(strArmy):GetFactionIndex()
-        local initialUnitName = import('/lua/factions.lua').Factions[factionIndex].InitialUnit
+        local initialUnitName = import("/lua/factions.lua").Factions[factionIndex].InitialUnit
         cdrUnit = CreateInitialArmyUnit(strArmy, initialUnitName)
         if EntityCategoryContains(categories.COMMAND, cdrUnit) then
             if ScenarioInfo.Options['PrebuiltUnits'] == 'Off' then
@@ -698,11 +698,11 @@ function InitializeScenarioArmies()
     local scenarioArmies = Scenario.Armies
     local tblArmy = ListArmies()
     local shouldCreateInitial = ShouldCreateInitialArmyUnits()
-    local factionCount = table.getsize(import('/lua/factions.lua').Factions)
+    local factionCount = table.getsize(import("/lua/factions.lua").Factions)
 
     ScenarioInfo.CampaignMode = true
     Sync.CampaignMode = true
-    import('/lua/sim/simuistate.lua').IsCampaign(true)
+    import("/lua/sim/simuistate.lua").IsCampaign(true)
 
     local armies = {}
     for i, name in tblArmy do
@@ -1869,4 +1869,4 @@ end
 
 
 -- kept for mod backwards compatibility
-local Entity = import('/lua/sim/entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity

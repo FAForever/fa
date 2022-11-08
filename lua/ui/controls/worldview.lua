@@ -5,19 +5,19 @@
 --* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Control = import('/lua/maui/control.lua').Control
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Group = import('/lua/maui/group.lua').Group
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Ping = import('/lua/ui/game/ping.lua')
-local UserDecal = import('/lua/user/UserDecal.lua').UserDecal
-local WorldViewMgr = import('/lua/ui/game/worldview.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local OverchargeCanKill = import('/lua/ui/game/unitview.lua').OverchargeCanKill
-local CommandMode = import('/lua/ui/game/commandmode.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Control = import("/lua/maui/control.lua").Control
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local Group = import("/lua/maui/group.lua").Group
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Ping = import("/lua/ui/game/ping.lua")
+local UserDecal = import("/lua/user/userdecal.lua").UserDecal
+local WorldViewMgr = import("/lua/ui/game/worldview.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
+local CommandMode = import("/lua/ui/game/commandmode.lua")
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -53,13 +53,15 @@ local function GetSelectedWeaponsWithReticules(predicate)
     end
 
     -- find valid units
-    for i, u in selectedUnits do
-        local bp = u:GetBlueprint()
-        if bp.CategoriesHash['SHOWATTACKRETICLE'] and (not weapons[bp.BlueprintId]) then
-            for k, v in bp.Weapon do
-                if predicate(v) then
-                    weapons[bp.BlueprintId] = v
-                    break
+    if selectedUnits then
+        for i, u in selectedUnits do
+            local bp = u:GetBlueprint()
+            if bp.CategoriesHash['SHOWATTACKRETICLE'] and (not weapons[bp.BlueprintId]) then
+                for k, v in bp.Weapon do
+                    if predicate(v) then
+                        weapons[bp.BlueprintId] = v
+                        break
+                    end
                 end
             end
         end
@@ -112,18 +114,22 @@ local function NukeDecalFunc()
             outer = w.NukeOuterRingRadius
         end
 
-        if w.NukeInnerRinzgRadius > inner then
+        if w.NukeInnerRingRadius > inner then
             inner = w.NukeInnerRingRadius
         end
     end
 
-    if inner > 0 and outer > 0 then
-        local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
-        return {
-            { texture = prefix .. 'outer.dds', scale = outer * 2 },
-            { texture = prefix .. 'inner.dds', scale = inner* 2 }
-        }
+    local decals = { }
+    local prefix = '/textures/ui/common/game/AreaTargetDecal/nuke_icon_'
+    if inner > 0  then
+        table.insert(decals, { texture = prefix .. 'inner.dds', scale = inner * 2 } )
     end
+
+    if outer > 0 then
+        table.insert(decals, { texture = prefix .. 'outer.dds', scale = outer * 2 } )
+    end
+
+    return decals
 end
 
 --- A decal texture / size computation function for `RULEUCC_Tactical`
@@ -181,6 +187,7 @@ local orderToCursorCallback = {
 
     -- misc
     CommandHighlight = 'OnCursorCommandHover',
+    MESSAGE = 'OnCursorMessage',
 
     -- orders that are a one-click type of thing
     RULEUCC_Stop = nil,
@@ -779,6 +786,21 @@ WorldView = Class(moho.UIWorldView, Control) {
         end
     end,
 
+    --- Called when the order `MESSAGE` is being applied
+    ---@param self WorldView
+    ---@param identifier 'MESSAGE'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorMessage = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
     --- Called when the order `RULEUCC_Script` is being applied
     ---@param self WorldView
     ---@param identifier 'RULEUCC_Script'
@@ -937,7 +959,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             local toFlash
 
             -- Find the UI element we need to flash.
-            local scoreBoardControls = import('/lua/ui/game/score.lua').controls
+            local scoreBoardControls = import("/lua/ui/game/score.lua").controls
             for _, line in scoreBoardControls.armyLines or {} do
                 if line.armyID == pingOwnerIndex then
                     toFlash = line.faction
@@ -1312,7 +1334,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             self:EnableResourceRendering(Prefs.GetFromCurrentProfile(cameraName.."_resource_icons"))
         end
         if GetCamera(self._cameraName) then
-            GetCamera(self._cameraName):SetMaxZoomMult(import('/lua/ui/game/gamemain.lua').defaultZoom)
+            GetCamera(self._cameraName):SetMaxZoomMult(import("/lua/ui/game/gamemain.lua").defaultZoom)
         end
     end,
 

@@ -5,14 +5,14 @@
 -- Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CybranUnits = import('/lua/cybranunits.lua')
+local CybranUnits = import("/lua/cybranunits.lua")
 local CCommandUnit = CybranUnits.CCommandUnit
-local CWeapons = import('/lua/cybranweapons.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
+local CWeapons = import("/lua/cybranweapons.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
 local CAAMissileNaniteWeapon = CWeapons.CAAMissileNaniteWeapon
 local CDFLaserDisintegratorWeapon = CWeapons.CDFLaserDisintegratorWeapon02
-local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
+local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 
 ---@class URL0301 : CCommandUnit
 URL0301 = Class(CCommandUnit) {

@@ -1,9 +1,9 @@
 
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local lazyvar = import('/lua/lazyvar.lua')
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local lazyvar = import("/lua/lazyvar.lua")
 
 ---@class Slider : Group
 Slider = Class(Group) {

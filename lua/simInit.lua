@@ -20,7 +20,7 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
 WaitTicks = coroutine.yield
 
@@ -77,7 +77,7 @@ end
 --but before any armies are created.
 function SetupSession()
 
-    ScenarioInfo.TriggerManager = import('/lua/TriggerManager.lua').Manager
+    ScenarioInfo.TriggerManager = import("/lua/triggermanager.lua").Manager
     TriggerManager = ScenarioInfo.TriggerManager
 
     -- assume there are no AIs
@@ -121,11 +121,11 @@ function SetupSession()
     -- ScenarioInfo.Env is the environment that the save file and scenario script file
     -- are loaded into. We set it up here with some default functions that can be accessed
     -- from the scenario script.
-    ScenarioInfo.Env = import('/lua/scenarioEnvironment.lua')
+    ScenarioInfo.Env = import("/lua/scenarioenvironment.lua")
 
     --Check if ShareOption is valid, and if not then set it to ShareUntilDeath
     local shareOption = ScenarioInfo.Options.Share
-    local globalOptions = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
+    local globalOptions = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts
     local shareOptions = {}
     for _,globalOption in globalOptions do
         if globalOption.key == 'Share' then
@@ -145,7 +145,7 @@ function SetupSession()
     local restrictions = ScenarioInfo.Options.RestrictedCategories
     if restrictions then
         table.print(restrictions, 'RestrictedCategories')
-        local presets = import('/lua/ui/lobby/UnitsRestrictions.lua').GetPresetsData()
+        local presets = import("/lua/ui/lobby/unitsrestrictions.lua").GetPresetsData()
         for index, restriction in restrictions do
 
             local preset = presets[restriction]
@@ -182,15 +182,15 @@ function SetupSession()
 
     if buildRestrictions then
         LOG('restriction.build '.. buildRestrictions)
-        buildRestrictions = import('/lua/sim/Categoryutils.lua').ParseEntityCategoryProperly(buildRestrictions)
+        buildRestrictions = import("/lua/sim/categoryutils.lua").ParseEntityCategoryProperly(buildRestrictions)
         -- add global build restrictions for all armies
-        import('/lua/game.lua').AddRestriction(buildRestrictions)
+        import("/lua/game.lua").AddRestriction(buildRestrictions)
         ScenarioInfo.BuildRestrictions = buildRestrictions
     end
 
     if not table.empty(enhRestrictions) then
         --table.print(enhRestrictions, 'enhRestrictions ')
-        import('/lua/enhancementcommon.lua').RestrictList(enhRestrictions)
+        import("/lua/enhancementcommon.lua").RestrictList(enhRestrictions)
     end
 
     -- Loads the scenario saves and script files
@@ -263,7 +263,7 @@ end
 function BeginSession()
 
     -- make sure the hook happens before scripts start working
-    import ("/lua/sim/MarkerUtilities.lua")
+    import("/lua/sim/markerutilities.lua")
 
     ScenarioUtils.CreateProps()
     ScenarioUtils.CreateResources()
@@ -271,7 +271,7 @@ function BeginSession()
     -- brains can have adjusted this value by now, ready to sync
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
     if ScenarioInfo.GameHasAIs then
-        import("/lua/sim/NavGenerator.lua").Generate()
+        import("/lua/sim/navgenerator.lua").Generate()
     end
 
     SPEW('Active mods in sim: ', repr(__active_mods))
@@ -328,9 +328,9 @@ function BeginSession()
     end
 
     -- Create any effect markers on map
-    local markers = import('/lua/sim/ScenarioUtilities.lua').GetMarkers()
-    local Entity = import('/lua/sim/Entity.lua').Entity
-    local EffectTemplate = import ('/lua/EffectTemplates.lua')
+    local markers = import("/lua/sim/scenarioutilities.lua").GetMarkers()
+    local Entity = import("/lua/sim/entity.lua").Entity
+    local EffectTemplate = import("/lua/effecttemplates.lua")
     if markers then
         for k, v in markers do
             if v.type == 'Effect' then
@@ -344,9 +344,9 @@ function BeginSession()
         end
     end
 
-    Sync.EnhanceRestrict = import('/lua/enhancementcommon.lua').GetRestricted()
+    Sync.EnhanceRestrict = import("/lua/enhancementcommon.lua").GetRestricted()
 
-    Sync.Restrictions = import('/lua/game.lua').GetRestrictions()
+    Sync.Restrictions = import("/lua/game.lua").GetRestrictions()
 
     --for off-map prevention
     OnStartOffMapPreventionThread()
@@ -355,11 +355,11 @@ function BeginSession()
         Sync.StartPositions = syncStartPositions
     end
 
-    import('/lua/sim/score.lua').init()
-    import('/lua/sim/recall.lua').init()
+    import("/lua/sim/score.lua").init()
+    import("/lua/sim/recall.lua").init()
 
     --start watching for victory conditions
-    import('/lua/sim/matchstate.lua')
+    import("/lua/sim/matchstate.lua")
 
     if ScenarioInfo.Options.CommonArmy == 'Union' then
         local humanIndex = 0
@@ -437,20 +437,20 @@ end
 
 -- forks a thread that performs off-map prevention
 function OnStartOffMapPreventionThread()
-    OffMappingPreventThread = ForkThread(import('/lua/ScenarioFramework.lua').AntiOffMapMainThread)
+    OffMappingPreventThread = ForkThread(import("/lua/scenarioframework.lua").AntiOffMapMainThread)
     ScenarioInfo.OffMapPreventionThreadAllowed = true
     --WARN('success')
 end
 
 -- OnPostLoad called after loading a saved game
 function OnPostLoad()
-    import('/lua/ScenarioFramework.lua').OnPostLoad()
-    import('/lua/SimObjectives.lua').OnPostLoad()
-    import('/lua/sim/SimUIState.lua').OnPostLoad()
-    import('/lua/SimPing.lua').OnArmyChange()
-    import('/lua/SimPingGroup.lua').OnPostLoad()
-    import('/lua/SimDialogue.lua').OnPostLoad()
-    import('/lua/SimSync.lua').OnPostLoad()
+    import("/lua/scenarioframework.lua").OnPostLoad()
+    import("/lua/simobjectives.lua").OnPostLoad()
+    import("/lua/sim/simuistate.lua").OnPostLoad()
+    import("/lua/simping.lua").OnArmyChange()
+    import("/lua/simpinggroup.lua").OnPostLoad()
+    import("/lua/simdialogue.lua").OnPostLoad()
+    import("/lua/simsync.lua").OnPostLoad()
     if GetFocusArmy() ~= -1 then
         Sync.SetAlliedVictory = ArmyBrains[GetFocusArmy()].RequestingAlliedVictory or false
     end

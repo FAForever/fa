@@ -14,3 +14,6 @@ DALK003 = Class(AWalkingLandUnit) {
     },
 }
 TypeClass = DALK003
+
+-- Kept for Mod Support
+local EffectUtil = import("/lua/effectutilities.lua")

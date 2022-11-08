@@ -1,7 +1,7 @@
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
 
 ---@class Checkbox : Group
 ---@field checkBmp Bitmap

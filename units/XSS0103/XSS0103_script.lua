@@ -7,8 +7,8 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit
-local SWeapon = import('/lua/seraphimweapons.lua')
+local SSeaUnit = import("/lua/seraphimunits.lua").SSeaUnit
+local SWeapon = import("/lua/seraphimweapons.lua")
 
 ---@class XSS0103 : SSeaUnit
 XSS0103 = Class(SSeaUnit) {

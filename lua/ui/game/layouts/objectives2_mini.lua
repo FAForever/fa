@@ -1,6 +1,6 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local textures = {
     info = {
@@ -91,7 +91,7 @@ function SetLayout()
     end)
     controls.bg.Width:Set(function() return math.max(math.max(controls.infoContainer.Width(), controls.objectiveContainer.Width()), controls.squadContainer.Width()) end)
 
-    local avatarGroup = import('/lua/ui/game/avatars.lua').controls.avatarGroup
+    local avatarGroup = import("/lua/ui/game/avatars.lua").controls.avatarGroup
     LayoutHelpers.AnchorToBottom(avatarGroup, controls.bg.bracketBottom, 60)
 end
 

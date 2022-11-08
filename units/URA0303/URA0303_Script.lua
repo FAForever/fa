@@ -8,8 +8,8 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CAAMissileNaniteWeapon = import('/lua/cybranweapons.lua').CAAMissileNaniteWeapon
+local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
+local CAAMissileNaniteWeapon = import("/lua/cybranweapons.lua").CAAMissileNaniteWeapon
 
 ---@class URA0303 : CAirUnit
 URA0303 = Class(CAirUnit) {

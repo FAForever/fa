@@ -8,10 +8,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- function: LeftoverCleanupBC = BuildCondition   doc = "Please work function docs."

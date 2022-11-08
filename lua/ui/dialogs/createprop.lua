@@ -1,10 +1,10 @@
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Edit = import('/lua/maui/edit.lua').Edit
-local options = import('/lua/user/prefs.lua').GetFromCurrentProfile('options')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Edit = import("/lua/maui/edit.lua").Edit
+local options = import("/lua/user/prefs.lua").GetFromCurrentProfile('options')
 
 local dialog, nameDialog, defaultEditField
 local activeFilters, activeFilterTypes, specialFilterControls, filterSet = {}, {}, {}, {}
@@ -694,10 +694,10 @@ function NameSet(callback)
 end
 
 -- kept for mod backwards compatibility
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Text = import('/lua/maui/text.lua').Text
-local Border = import('/lua/maui/border.lua').Border
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Text = import("/lua/maui/text.lua").Text
+local Border = import("/lua/maui/border.lua").Border
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local RadioGroup = import("/lua/maui/mauiutil.lua").RadioGroup
 local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
 local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')

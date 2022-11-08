@@ -8,8 +8,8 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
-local WeaponsFile = import('/lua/terranweapons.lua')
+local TSeaUnit = import("/lua/terranunits.lua").TSeaUnit
+local WeaponsFile = import("/lua/terranweapons.lua")
 local TAALinkedRailgun = WeaponsFile.TAALinkedRailgun
 local TAMPhalanxWeapon = WeaponsFile.TAMPhalanxWeapon
 local TDFGaussCannonWeapon = WeaponsFile.TDFShipGaussCannonWeapon

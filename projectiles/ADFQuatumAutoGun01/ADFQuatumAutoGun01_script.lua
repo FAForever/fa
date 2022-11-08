@@ -8,6 +8,6 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-ADFQuatumAutoGun01 = Class(import('/lua/aeonprojectiles.lua').AQuantumAutogun) {
+ADFQuatumAutoGun01 = Class(import("/lua/aeonprojectiles.lua").AQuantumAutogun) {
 }
 TypeClass = ADFQuatumAutoGun01

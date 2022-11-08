@@ -9,8 +9,8 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
-local SSuthanusArtilleryShell = import('/lua/seraphimprojectiles.lua').SSuthanusArtilleryShell
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local SSuthanusArtilleryShell = import("/lua/seraphimprojectiles.lua").SSuthanusArtilleryShell
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 SIFSuthanusArtilleryShell02 = Class(SSuthanusArtilleryShell) {
     OnImpact = function(self, targetType, targetEntity)

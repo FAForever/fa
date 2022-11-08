@@ -3,16 +3,16 @@
 --* Author: Bob Berry
 --* Summary: Displays Engine Statistics
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
-local statusCluster = import('/lua/ui/game/gamemain.lua').GetStatusCluster()
-local controlCluster = import('/lua/ui/game/gamemain.lua').GetControlCluster()
-local gameParent = import('/lua/ui/game/gamemain.lua').GetGameParent()
-local UIUtil = import('/lua/ui/uiutil.lua')
+local statusCluster = import("/lua/ui/game/gamemain.lua").GetStatusCluster()
+local controlCluster = import("/lua/ui/game/gamemain.lua").GetControlCluster()
+local gameParent = import("/lua/ui/game/gamemain.lua").GetGameParent()
+local UIUtil = import("/lua/ui/uiutil.lua")
 
 local dialog = nil
 local filter = nil

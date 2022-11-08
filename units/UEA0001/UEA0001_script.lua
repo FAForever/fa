@@ -5,7 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
+local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
 
 ---@class UEA0001 : TConstructionUnit
 UEA0001 = Class(TConstructionUnit) {

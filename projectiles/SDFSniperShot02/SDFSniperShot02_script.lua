@@ -7,6 +7,6 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-SDFSniperShot02 = Class(import('/lua/seraphimprojectiles.lua').SDFSniperShot) {
+SDFSniperShot02 = Class(import("/lua/seraphimprojectiles.lua").SDFSniperShot) {
 }
 TypeClass = SDFSniperShot02

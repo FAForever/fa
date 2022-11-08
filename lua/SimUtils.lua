@@ -6,7 +6,7 @@
 -- Diplomacy
 -- ==============================================================================
 
-local CreateWreckage = import('/lua/wreckage.lua').CreateWreckage
+local CreateWreckage = import("/lua/wreckage.lua").CreateWreckage
 
 local transferUnbuiltCategory = categories.EXPERIMENTAL + categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
@@ -702,7 +702,7 @@ function BreakAlliance(data)
         end
         table.insert(Sync.BrokenAlliances, { From = data.From, To = data.To })
     end
-    import('/lua/SimPing.lua').OnAllianceChange()
+    import("/lua/simping.lua").OnAllianceChange()
 end
 
 ---@param resultData {From: number, To: number, ResultValue: DiplomacyActionType}
@@ -721,6 +721,6 @@ function OnAllianceResult(resultData)
             table.insert(Sync.FormedAlliances, { From = resultData.From, To = resultData.To })
         end
     end
-    import('/lua/simping.lua').OnAllianceChange()
+    import("/lua/simping.lua").OnAllianceChange()
 end
-import('/lua/simplayerquery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
+import("/lua/simplayerquery.lua").AddResultListener("OfferAlliance", OnAllianceResult)
