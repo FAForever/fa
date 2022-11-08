@@ -114,50 +114,43 @@ function EndCommandMode(isCancel)
     if ignoreSelection then
         return
     end
-
+    
     -- in case we want to end the command mode, without knowing it has already ended or not
-    if not modeData then
-        -- update our local state
-        commandMode = false
-        modeData = false
-        issuedOneCommand = false
+    if  modeData then
+        -- regain selection if we were cheating in units
+        if modeData.cheat then
+            if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
+                local modeData = table.deepcopy(modeData)
+                ForkThread(
+                    function()
+                        WaitSeconds(0.0001)
 
-        return
-    end
-
-    -- regain selection if we were cheating in units
-    if modeData.cheat then
-        if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
-            local modeData = table.deepcopy(modeData)
-            ForkThread(
-                function()
-                    WaitSeconds(0.0001)
-
-                    modeData.name = modeData.ids[modeData.index]
-                    modeData.bpId = modeData.ids[modeData.index]
-                    modeData.index = modeData.index + 1
-        
-                    StartCommandMode("build", modeData)
+                        modeData.name = modeData.ids[modeData.index]
+                        modeData.bpId = modeData.ids[modeData.index]
+                        modeData.index = modeData.index + 1
+            
+                        StartCommandMode("build", modeData)
+                    end
+                )
+            else 
+                if modeData.selection then
+                    SelectUnits(modeData.selection)
+                    return
                 end
-            )
-        else 
-            if modeData.selection then
-                SelectUnits(modeData.selection)
             end
         end
+
+        -- add information to modeData for end behavior
+        modeData.isCancel = isCancel or false
+
+        -- ???
+        if modeData.isCancel then
+            ClearBuildTemplates()
+        end
     end
-
-    -- add information to modeData for end behavior
-    modeData.isCancel = isCancel or false
-
     -- do end behaviors
     for i,v in endBehaviors do
         v(commandMode, modeData)
-    end
-
-    -- ???
-    if modeData.isCancel then
-        ClearBuildTemplates()
     end
 
     -- update our local state

@@ -185,4 +185,4 @@ local function DepthScanningThread()
     end
 end
 
-Trash:Add(ForkThread(DepthScanningThread))
+-- Trash:Add(ForkThread(DepthScanningThread))

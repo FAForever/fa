@@ -199,6 +199,7 @@ local function LayoutMajorAlliedEntry(entry, manualShare)
     Tooltip.AddButtonTooltip(giveResourcesBtn, 'dip_give_resources')
     entry.giveResourcesBtn = giveResourcesBtn
 
+    giveResourcesBtn:Disable()
     giveResourcesBtn.OnClick = function(self, modifiers)
         CreateShareResourcesDialog(entry)
     end

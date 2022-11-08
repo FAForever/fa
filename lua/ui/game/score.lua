@@ -44,6 +44,24 @@ local DisplayStorage = 0
 
 local created = false
 
+function updatePlayerName(line)
+    local playerName = line.name:GetText()
+    local playerRating = sessionInfo.Options.Ratings[playerName] or 0
+    local playerClan = sessionInfo.Options.ClanTags[playerName]
+
+    if playerClan and playerClan ~= "" then
+        playerClan = '[' .. playerClan .. '] '
+    else
+        playerClan = ""
+    end
+
+    if playerRating then
+        playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
+    end
+
+    line.name:SetText(playerClan .. playerName .. playerRating)
+end
+
 function armyGroupHeight()
     local height = 0
     for _, line in controls.armyLines do
@@ -489,21 +507,7 @@ function SetupPlayerLines()
     end
 
     for _, line in controls.armyLines do
-        local playerName = line.name:GetText()
-        local playerRating = sessionInfo.Options.Ratings[playerName] or 0
-        local playerClan = sessionInfo.Options.ClanTags[playerName]
-
-        if playerClan and playerClan ~= "" then
-            playerClan = '[' .. playerClan .. '] '
-        else
-            playerClan = ""
-        end
-
-        if playerRating then
-            playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
-        end
-
-        line.name:SetText(playerClan .. playerName .. playerRating)
+        updatePlayerName(line)
     end
 
     local mapData = {}
@@ -631,6 +635,7 @@ function _OnBeat()
                 if line.armyID == index then
                     if scoreData.name then
                         line.name:SetText(scoreData.name)
+                        updatePlayerName(line)
                     end
                     if scoreData.general.score >= 0 then
                         line.score:SetText(fmtnum(scoreData.general.score))
