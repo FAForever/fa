@@ -6,9 +6,9 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Slider = import('/lua/maui/slider.lua').Slider
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Slider = import("/lua/maui/slider.lua").Slider
 
 local ZOOM_INACTIVITY_TIMEOUT = 15  -- in seconds
 local zoomInactivityTime = 0

@@ -9,21 +9,21 @@
 -- current score will contain the most recent score update from the sync
 currentScores = false
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Text = import('/lua/maui/text.lua').Text
-local Grid = import('/lua/maui/Grid.lua').Grid
-local Prefs = import('/lua/user/prefs.lua')
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local FindClients = import('/lua/ui/game/chat.lua').FindClients
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Text = import("/lua/maui/text.lua").Text
+local Grid = import("/lua/maui/grid.lua").Grid
+local Prefs = import("/lua/user/prefs.lua")
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local FindClients = import("/lua/ui/game/chat.lua").FindClients
 local scoreMini = import(UIUtil.GetLayoutFilename('score'))
 
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
 
 savedParent = false
 local observerLine = false
@@ -43,6 +43,24 @@ local DisplayResMode = 0
 local DisplayStorage = 0
 
 local created = false
+
+function updatePlayerName(line)
+    local playerName = line.name:GetText()
+    local playerRating = sessionInfo.Options.Ratings[playerName] or 0
+    local playerClan = sessionInfo.Options.ClanTags[playerName]
+
+    if playerClan and playerClan ~= "" then
+        playerClan = '[' .. playerClan .. '] '
+    else
+        playerClan = ""
+    end
+
+    if playerRating then
+        playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
+    end
+
+    line.name:SetText(playerClan .. playerName .. playerRating)
+end
 
 function armyGroupHeight()
     local height = 0
@@ -489,21 +507,7 @@ function SetupPlayerLines()
     end
 
     for _, line in controls.armyLines do
-        local playerName = line.name:GetText()
-        local playerRating = sessionInfo.Options.Ratings[playerName] or 0
-        local playerClan = sessionInfo.Options.ClanTags[playerName]
-
-        if playerClan and playerClan ~= "" then
-            playerClan = '[' .. playerClan .. '] '
-        else
-            playerClan = ""
-        end
-
-        if playerRating then
-            playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
-        end
-
-        line.name:SetText(playerClan .. playerName .. playerRating)
+        updatePlayerName(line)
     end
 
     local mapData = {}
@@ -616,7 +620,7 @@ function _OnBeat()
             controls.time:SetText(LOCF('%02d:%02d:%02d', math.floor(time / 3600), math.floor(time/60), math.mod(time, 60)))
         end
         if not issuedNoRushWarning and norush == math.floor(GetGameTimeSeconds()) then
-            import('/lua/ui/game/announcement.lua').CreateAnnouncement('<LOC score_0001>No Rush Time Elapsed', controls.time)
+            import("/lua/ui/game/announcement.lua").CreateAnnouncement('<LOC score_0001>No Rush Time Elapsed', controls.time)
             local sound = Sound{ Bank = 'XGG', Cue = 'XGG_Computer_CV01_04766' }
             PlayVoice(sound)
             issuedNoRushWarning = true
@@ -631,6 +635,7 @@ function _OnBeat()
                 if line.armyID == index then
                     if scoreData.name then
                         line.name:SetText(scoreData.name)
+                        updatePlayerName(line)
                     end
                     if scoreData.general.score >= 0 then
                         line.score:SetText(fmtnum(scoreData.general.score))
@@ -755,7 +760,7 @@ function SetUnitText(current, cap)
     controls.units:SetText(string.format("%d/%d", current, cap))
     if current == cap then
         if (not lastUnitWarning or GameTime() - lastUnitWarning > 60) and not unitWarningUsed then
-            import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC('<LOC score_0002>Unit Cap Reached'), controls.units)
+            import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC score_0002>Unit Cap Reached'), controls.units)
             lastUnitWarning = GameTime()
             unitWarningUsed = true
         end
@@ -766,7 +771,7 @@ end
 
 function ToggleScoreControl(state)
     -- disable when in Screen Capture mode
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         return
     end
 
@@ -901,6 +906,6 @@ function ArmyAnnounce(army, text)
         end
     end
     if armyLine then
-        import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC(text), armyLine)
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC(text), armyLine)
     end
 end

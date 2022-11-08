@@ -7,10 +7,10 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtils = import('/lua/effectutilities.lua')
+local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtils = import("/lua/effectutilities.lua")
 
 ---@class DAA0206 : AAirUnit
 DAA0206 = Class(AAirUnit) {

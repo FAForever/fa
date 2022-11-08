@@ -5,13 +5,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local GameMain = import('/lua/ui/game/gamemain.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
-local SessionClients = import("/lua/ui/override/SessionClients.lua")
+local SessionClients = import("/lua/ui/override/sessionclients.lua")
 
 local parent = nil
 local myIndex = ''
@@ -27,8 +27,8 @@ end
 
 local function CreateDialog(clients)
     SessionClients.FastInterval()
-    import('/lua/ui/game/worldview.lua').UnlockInput()
-    import('/lua/ui/game/gamemain.lua').KillWaitingDialog()
+    import("/lua/ui/game/worldview.lua").UnlockInput()
+    import("/lua/ui/game/gamemain.lua").KillWaitingDialog()
 
     GetCursor():Show()
     DestroyDialog()
@@ -286,6 +286,6 @@ function CreateBorder(parent)
 end
 
 -- kept for mod backwards compatibility
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
-local LazyVar = import('/lua/lazyvar.lua').Create
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
+local LazyVar = import("/lua/lazyvar.lua").Create

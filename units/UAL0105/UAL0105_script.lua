@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AConstructionUnit = import('/lua/aeonunits.lua').AConstructionUnit
+local AConstructionUnit = import("/lua/aeonunits.lua").AConstructionUnit
 
 ---@class UAL0105 : AConstructionUnit
 UAL0105 = Class(AConstructionUnit) {

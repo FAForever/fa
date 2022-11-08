@@ -32,7 +32,7 @@ function MakeOpVars(thisID, factionKey, sequenceID)
 	
 	return {op_long_name = opStrings.OPERATION_NAME	,
 			op_num = sequenceID,
-			op_movies = import('/lua/ui/campaign/campaignmoviedata.lua').campaignData[thisID],
+			op_movies = import("/lua/ui/campaign/campaignmoviedata.lua").campaignData[thisID],
 			op_text = op_text,
 			op_map = '/maps/' .. thisID .. '/' .. thisID .. '_scenario.lua',
 			op_debrief_success = op_success,

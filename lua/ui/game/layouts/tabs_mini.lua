@@ -1,8 +1,8 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 function SetLayout()
-    local controls = import('/lua/ui/game/tabs.lua').controls
+    local controls = import("/lua/ui/game/tabs.lua").controls
 
     controls.collapseArrow:SetTexture(UIUtil.UIFile('/game/tab-t-btn/tab-close_btn_up.dds'))
     controls.collapseArrow:SetNewTextures(UIUtil.UIFile('/game/tab-t-btn/tab-close_btn_up.dds'),
@@ -76,7 +76,7 @@ function SetLayout()
 end
 
 function LayoutStretchBG()
-    local controls = import('/lua/ui/game/tabs.lua').controls
+    local controls = import("/lua/ui/game/tabs.lua").controls
 
     controls.bgBottomLeftGlow:SetTexture(UIUtil.UIFile('/game/options-panel/options_brd_vert_ll.dds'))
     controls.bgBottomLeftGlow.Bottom:Set(controls.bgBottom.Top)

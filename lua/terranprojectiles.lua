@@ -11,20 +11,20 @@
 --------------------------------------------------------------------------
 --  TERRAN PROJECTILES SCRIPTS
 --------------------------------------------------------------------------
-local Projectile = import('/lua/sim/projectile.lua').Projectile
-local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
+local Projectile = import("/lua/sim/projectile.lua").Projectile
+local DefaultProjectileFile = import("/lua/sim/defaultprojectiles.lua")
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
 local OnWaterEntryEmitterProjectile = DefaultProjectileFile.OnWaterEntryEmitterProjectile
 local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
 local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectile
 local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
 local SingleCompositeEmitterProjectile = DefaultProjectileFile.SingleCompositeEmitterProjectile
-local Explosion = import('defaultexplosions.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local DepthCharge = import('/lua/defaultantiprojectile.lua').DepthCharge
-local util = import('utilities.lua')
+local Explosion = import("/lua/defaultexplosions.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
+local util = import("/lua/utilities.lua")
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 ---@class TFragmentationGrenade : EmitterProjectile
 TFragmentationGrenade = Class(EmitterProjectile) {

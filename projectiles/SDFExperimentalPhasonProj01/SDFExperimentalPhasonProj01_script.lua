@@ -6,7 +6,7 @@
 --**  Summary  :  Experimental Phason Projectile script, XSL0401
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-local SDFExperimentalPhasonProjectile = import('/lua/seraphimprojectiles.lua').SDFExperimentalPhasonProjectile
+local SDFExperimentalPhasonProjectile = import("/lua/seraphimprojectiles.lua").SDFExperimentalPhasonProjectile
 SDFExperimentalPhasonProj01 = Class(SDFExperimentalPhasonProjectile) {}
 
 TypeClass = SDFExperimentalPhasonProj01

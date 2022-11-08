@@ -9,9 +9,9 @@
 --****************************************************************************
 
 --Below, changed from ALandUnit to AHoverLandUnit
-local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
-local AAATemporalFizzWeapon = import('/lua/aeonweapons.lua').AAATemporalFizzWeapon
-local SlowHover = import('/lua/defaultunits.lua').SlowHoverLandUnit
+local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
+local AAATemporalFizzWeapon = import("/lua/aeonweapons.lua").AAATemporalFizzWeapon
+local SlowHover = import("/lua/defaultunits.lua").SlowHoverLandUnit
 
 
 --Below, changed from ALandUnit to AHoverLandUnit
