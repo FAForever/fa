@@ -8,10 +8,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")
 
 ---@param aiBrain AIBrain
 ---@param numReq integer
@@ -1148,7 +1148,7 @@ end
 function CheckUnitRange(aiBrain, locationType, unitType, category, factionIndex)
 
     -- Find the unit's blueprint
-    local template = import('/lua/BuildingTemplates.lua').BuildingTemplates[factionIndex or aiBrain:GetFactionIndex()]
+    local template = import("/lua/buildingtemplates.lua").BuildingTemplates[factionIndex or aiBrain:GetFactionIndex()]
     local buildingId = false
     for k,v in template do
         if v[1] == unitType then
@@ -1428,6 +1428,23 @@ end
 ---@return boolean
 function CheckBuildPlattonDelay(aiBrain, PlatoonName)
     if aiBrain.DelayEqualBuildPlattons[PlatoonName] and aiBrain.DelayEqualBuildPlattons[PlatoonName] > GetGameTimeSeconds() then
+        return false
+    end
+    return true
+end
+
+--- Buildcondition to limit the number of factories 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCategory EntityCategory
+---@param pathType string
+---@param unitCount integer
+---@return boolean
+function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount)
+    local EnemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    local OwnIndex = aiBrain:GetArmyIndex()
+    if aiBrain.CanPathToEnemy[OwnIndex][EnemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
+        --LOG('ForcePathLimit has no path and is equal to or more than '..unitCount..' land factories')
         return false
     end
     return true

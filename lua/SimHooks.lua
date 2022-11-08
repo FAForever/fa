@@ -1,8 +1,10 @@
 
-
+do 
+    -- can only cause issues, like remote code exploit
+    _G.loadstring = nil
+end
 
 do
-
     -- upvalue for performance
     local EntityCategoryFilterDown = EntityCategoryFilterDown
     local CategoriesNoDummyUnits = categories.ALLUNITS - categories.DUMMYUNIT
@@ -36,7 +38,7 @@ do
     end
 end
 
-do 
+do
 
     -- upvalue for performance
     local Random = Random
@@ -44,8 +46,8 @@ do
     local oldDrawCircle = _G.DrawCircle
     _G.DrawCircle = function(position, diameter, color)
 
+        -- cause a desync when players during non-ai games try and call this function separate from other players
         if not ScenarioInfo.GameHasAIs then
-            -- cause a desync if only one player calls this function
             Random()
         end
 
@@ -55,8 +57,8 @@ do
     local oldDrawLine = _G.DrawLine
     _G.DrawLine = function(a, b, color)
 
+        -- cause a desync when players during non-ai games try and call this function separate from other players
         if not ScenarioInfo.GameHasAIs then
-            -- cause a desync if only one player calls this function
             Random()
         end
 
@@ -66,8 +68,8 @@ do
     local oldDrawLinePop = _G.DrawLinePop
     _G.DrawLinePop = function(a, b, color)
 
+        -- cause a desync when players during non-ai games try and call this function separate from other players
         if not ScenarioInfo.GameHasAIs then
-            -- cause a desync if only one player calls this function
             Random()
         end
 
@@ -76,7 +78,6 @@ do
 end
 
 do
-
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
     _G.ChangeUnitArmy = function(unit, army, noRestrictions)

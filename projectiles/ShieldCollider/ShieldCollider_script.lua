@@ -5,12 +5,12 @@
 -- Copyright c 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------
 
-local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local Projectile = import('/lua/sim/projectile.lua').Projectile
+local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local Projectile = import("/lua/sim/projectile.lua").Projectile
 local VectorCached = Vector(0, 0, 0)
 
 ShieldCollider = Class(Projectile) {
-    OnCreate = function(self)
+    OnCreate = function(self, inWater)
         Projectile.OnCreate(self)
 
         self.CrashingAirplaneShieldCollisionLogic = true 
@@ -21,6 +21,10 @@ ShieldCollider = Class(Projectile) {
         self:SetVizToEnemies('Never')
         self:SetStayUpright(false)
         self:SetCollision(true)
+
+        if inWater then
+            self:OnImpact('Water', nil)
+        end
     end,
 
     -- Shields only detect projectiles, so we attach one to keep track of the unit.
@@ -51,6 +55,10 @@ ShieldCollider = Class(Projectile) {
         if self.Trash then
             self.Trash:Destroy()
         end
+    end,
+
+    OnEnterWater = function(self)
+        self:OnImpact('Water', nil)
     end,
 
     -- Destroy the sinking unit when it hits the ground.

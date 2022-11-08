@@ -3,15 +3,15 @@
 --* Author: Ted Snook
 --* Summary: Front end display of the EULA
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local WrapText = import('/lua/maui/text.lua').WrapText
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local WrapText = import("/lua/maui/text.lua").WrapText
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
 function CreateEULA(inParent, callback)
     local parent = Group(inParent)
@@ -49,7 +49,7 @@ function CreateEULA(inParent, callback)
     eulaBody:SetFont(UIUtil.bodyFont, 12)
     UIUtil.CreateVertScrollbarFor(eulaBody)
 
-    local eulaText = import('/lua/ui/help/eula.lua').EULA
+    local eulaText = import("/lua/ui/help/eula.lua").EULA
     local textBoxWidth = eulaBody.Width()
 
     local tempTable = WrapText(LOC(eulaText), textBoxWidth,

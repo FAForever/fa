@@ -10,8 +10,8 @@
 --
 -- Terran Bomber Script : UEA0103
 --
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local TIFCarpetBombWeapon = import('/lua/terranweapons.lua').TIFCarpetBombWeapon
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local TIFCarpetBombWeapon = import("/lua/terranweapons.lua").TIFCarpetBombWeapon
 
 
 ---@class UEA0103 : TAirUnit

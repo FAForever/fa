@@ -1,7 +1,7 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 function SetLayout(gameParent)
-    local controls = import('/lua/ui/game/borders.lua').controls
+    local controls = import("/lua/ui/game/borders.lua").controls
 
     controls.bottom:Destroy()
     controls.top:Destroy()

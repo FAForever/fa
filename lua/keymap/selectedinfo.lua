@@ -15,7 +15,7 @@
 ---@field workProgress number
 
 
-local Prefs = import('/lua/user/prefs.lua')
+local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 
 local selectionOverlay = {

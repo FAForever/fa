@@ -213,7 +213,7 @@ function IsAlly(army1, army2)
 end
 
 --- Checks if the C-side of an object is destroyed / de-allocated
----@param entity InternalObject
+---@param entity? InternalObject
 ---@return boolean
 function IsDestroyed(entity)
 end

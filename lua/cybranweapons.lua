@@ -8,13 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local OverchargeWeapon = WeaponFile.OverchargeWeapon
-local CollisionBeamFile = import('defaultcollisionbeams.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class CDFBrackmanCrabHackPegLauncherWeapon : DefaultProjectileWeapon
 CDFBrackmanCrabHackPegLauncherWeapon = Class(DefaultProjectileWeapon) {
@@ -401,7 +401,7 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
         DefaultBeamWeapon.OnCreate(self)
 
         local bp = self:GetBlueprint()
-        self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
+        self.SphereEffectEntity = import("/lua/sim/entity.lua").Entity()
         self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
         self.SphereEffectEntity:SetDrawScale(0.6)
@@ -455,7 +455,7 @@ CAMZapperWeapon03 = Class(DefaultBeamWeapon) {
         DefaultBeamWeapon.OnCreate(self)
 
         local bp = self:GetBlueprint()
-        self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
+        self.SphereEffectEntity = import("/lua/sim/entity.lua").Entity()
         self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
         self.SphereEffectEntity:SetDrawScale(0.28)
@@ -529,5 +529,5 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
 
 -- kept for mod backwards compatibility
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
-local Explosion = import('defaultexplosions.lua')
-local Util = import('utilities.lua')
+local Explosion = import("/lua/defaultexplosions.lua")
+local Util = import("/lua/utilities.lua")

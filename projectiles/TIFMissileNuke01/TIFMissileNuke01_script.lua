@@ -1,7 +1,7 @@
 --
 -- Terran Nuke Missile
 --
-local TIFMissileNuke = import('/lua/terranprojectiles.lua').TIFMissileNuke
+local TIFMissileNuke = import("/lua/terranprojectiles.lua").TIFMissileNuke
 
 TIFMissileNuke01 = Class(TIFMissileNuke) {
 

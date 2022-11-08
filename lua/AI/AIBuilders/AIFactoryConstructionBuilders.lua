@@ -347,6 +347,7 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { EBC, 'GreaterThanEconEfficiencyCombined', { 1.0, 1.1} },
+            { UCBC, 'ForcePathLimit', {'LocationType', categories.FACTORY * categories.LAND, 'Land', 2}},
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
@@ -366,8 +367,9 @@ BuilderGroup {
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 900,
         BuilderConditions = {
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.8, 1.0} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.8, 1.0} },
+            { UCBC, 'ForcePathLimit', {'LocationType', categories.FACTORY * categories.LAND, 'Land', 2}},
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },

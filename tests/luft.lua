@@ -41,7 +41,7 @@ local Assertion = {}
 ---@field Alias? string
 ---@field NotName? string
 ---@field NotAlias? string
----@field Chain?  fun(a: LuftAssertion)  called after simple chaining e.g. a`.b`.c 
+---@field Chain?  fun(a: LuftAssertion)  called after simple chaining e.g. a`.b`.c
 ---@field ChainCall?  fun(a: LuftAssertion, ...)  called after chained calling e.g. a`.b()`.c
 ---@field Test?  fun(...): boolean        function to test with all arguments (from the starting values, calling arguments, and support values); expects both `FailString` formatters to be defined
 ---@field Parameters number               number of parameters the test function has
@@ -756,7 +756,7 @@ PathNode.Nodes = {}
 
 ---@param word string
 ---@return LuftPathNode
----@return string? next_word 
+---@return string? next_word
 function PathNode:GetNext(word)
     local pos = word:find('_', 1, true)
     local next_word
@@ -835,7 +835,7 @@ do
         NotFailString = strings.expectation1:format("$1", strings.condition_unnegated, strings.cond_fail),
     }
     nodes["to.equal"] = {
-        test = strict_eq,
+        Test = strict_eq,
         Parameters = 2,
         FailFormat = strings.expectation2be:format("$1", "$2", "%s", strings.cond_strict_eq),
     }

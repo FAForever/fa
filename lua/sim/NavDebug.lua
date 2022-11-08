@@ -21,9 +21,9 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Shared = import('/lua/shared/NavGenerator.lua')
-local NavGenerator = import('/lua/sim/NavGenerator.lua')
-local NavUtils = import('/lua/sim/NavUtils.lua')
+local Shared = import("/lua/shared/navgenerator.lua")
+local NavGenerator = import("/lua/sim/navgenerator.lua")
+local NavUtils = import("/lua/sim/navutils.lua")
 
 local ScanState = {
     LandLayer = false,
@@ -103,7 +103,7 @@ function Scan()
     while true do
 
         -- re-import it to catch disk ejections
-        local NavGenerator = import('/lua/sim/NavGenerator.lua')
+        local NavGenerator = import("/lua/sim/navgenerator.lua")
 
         -- we can only work with it once it is finished generating
         if NavGenerator.IsGenerated() then

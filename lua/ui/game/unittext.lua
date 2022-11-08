@@ -5,11 +5,11 @@
 --* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 function FloatingEntityText(entryData)
-    local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
+    local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
     for _, viewControl in views do
         local view = viewControl
         local text = UIUtil.CreateText(view, entryData.text, 18, UIUtil.bodyFont)
@@ -52,7 +52,7 @@ local timers = {}
 
 function StartCountdown(entryData)
     cdDuration = entryData['duration'] or 5
-    local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
+    local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
     for _, viewControl in views do
         local view = viewControl
         if not timers[view._cameraName] then
@@ -120,7 +120,7 @@ function StartCountdown(entryData)
 end
 
 function CancelCountdown(entryData)
-    local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
+    local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
     for _, viewControl in views do
         local view = viewControl
         if timers[view._cameraName][entryData.entity] then

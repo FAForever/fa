@@ -21,9 +21,15 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Shared = import('/lua/shared/NavGenerator.lua')
-local NavGenerator = import('/lua/sim/NavGenerator.lua')
-local NavDatastructures = import('/lua/sim/NavDatastructures.lua')
+local Shared = import("/lua/shared/navgenerator.lua")
+local NavGenerator = import("/lua/sim/navgenerator.lua")
+local NavDatastructures = import("/lua/sim/navdatastructures.lua")
+
+--- Returns true if the navigational mesh is generated
+---@return boolean
+function IsGenerated()
+    return NavGenerator.IsGenerated()
+end
 
 --- Returns true when you can path from the origin to the destination
 ---@param layer NavLayers

@@ -1,4 +1,4 @@
-local Entity = import('/lua/sim/Entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class ObjectiveArrow : Entity
 ObjectiveArrow = Class(Entity) {

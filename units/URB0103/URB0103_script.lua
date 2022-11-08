@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CSeaFactoryUnit = import('/lua/cybranunits.lua').CSeaFactoryUnit
+local CSeaFactoryUnit = import("/lua/cybranunits.lua").CSeaFactoryUnit
 ---@class URB0103 : CSeaFactoryUnit
 URB0103 = Class(CSeaFactoryUnit) {
 

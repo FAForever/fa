@@ -2,7 +2,11 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
 
 local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local ColorHSV = import("/lua/shared/color.lua").ColorHSV
+
+local Prefs = import("/lua/user/prefs.lua")
+local options = Prefs.GetFromCurrentProfile('options')
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 local Scale = LayoutHelpers.ScaleNumber
@@ -20,6 +24,9 @@ local TableSort = table.sort
 ---@field max number
 
 ---@alias InViewReclaimStruct table<UserReclaimData[]>
+
+---@type number
+local HeightRatio = 0.020
 
 ---@class ReclaimLabelGroup : Group
 ---@field view WorldView
@@ -844,6 +851,7 @@ function UpdateLabels(view, zoom)
     local dataPool, dataPoolUse = DataPool, DataPoolUse
     local labelPool, labelPoolUse = LabelPool, LabelPoolUse
 
+
     local dataSize = 0
 
     -- gathering
@@ -890,6 +898,11 @@ function UpdateLabels(view, zoom)
         LabelPoolSize = labelCount
     end
     LabelPoolUse = labelCount
+end
+
+function ToggleReclaim()
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
+    ShowReclaim(not view.ShowingReclaim)
 end
 
 
