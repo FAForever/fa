@@ -146,7 +146,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
             :Over(progressBarBG, 10)
             :End()
 
-        Tooltip.AddButtonTooltip(collapseArrow, "voting_collapse")
+        Tooltip.AddCheckboxTooltip(collapseArrow, "voting_collapse")
         Tooltip.AddButtonTooltip(buttonAccept, "dip_recall_request_accept")
         Tooltip.AddButtonTooltip(buttonVeto, "dip_recall_request_veto")
     end;
@@ -418,6 +418,9 @@ RecallPanel = Class(NinePatch.NinePatch) {
         if collapse then
             if supress or collapse:IsDisabled() then
                 collapse:Hide()
+                if not hide then
+                    supress = true
+                end
             else
                 collapse:Show()
             end

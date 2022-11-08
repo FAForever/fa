@@ -116,7 +116,7 @@ MassFabPanel = Class(Group) {
         Tooltip.AddControlTooltip(self._massProducedText, "mf_mass_income_display")
         Tooltip.AddControlTooltip(self._activeCountText, "mf_active_amount")
         Tooltip.AddControlTooltip(self._inactiveCountText, "mf_inactive_amount")
-        Tooltip.AddButtonTooltip(self._collapseArrow, "fabricator_collapse")
+        Tooltip.AddCheckboxTooltip(self._collapseArrow, "fabricator_collapse")
     
         self._energyRequiredText:SetColor("fff8c000")
         self._energyConsumedText:SetColor("fff8c000")
@@ -169,6 +169,11 @@ MassFabPanel = Class(Group) {
                     self:Hide()
                     self._collapseArrow:SetCheck(true, true)
                 end
+            end
+        end
+        self._collapseArrow.OnHide = function(collapse, hide)
+            if hide ~= collapse:IsDisabled() then
+                return true
             end
         end
     end,
@@ -229,12 +234,15 @@ MassFabPanel = Class(Group) {
         if collapse then
             if supress or collapse:IsDisabled() then
                 collapse:Hide()
+                if not hide then
+                    supress = true
+                end
             else
                 collapse:Show()
             end
         end
         return supress
-    end;
+    end,
 
 }
 

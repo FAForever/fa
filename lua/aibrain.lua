@@ -1260,22 +1260,11 @@ AIBrain = Class(moho.aibrain_methods) {
             TransferUnitsToHighestBrain(enemies)
         end
 
-        local toDestroy = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-        -- first halt all units
-        if toDestroy then
-            IssueStop(toDestroy)
-        end
-
-        -- then wait a bit; if we were the last team, the game will have ended and we get to see
-        -- the final game state
-        WaitSeconds(1)
-
-        -- otherwise, destroy all units
-        if toDestroy then
-            for _, unit in toDestroy do
-                if not unit.Dead then
-                    unit:Kill()
-                end
+       -- Kill all units left over
+       local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+       if tokill then
+            for _, unit in tokill do
+                unit:Kill()
             end
         end
 
