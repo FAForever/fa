@@ -5,8 +5,8 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local ASubUnit = import('/lua/aeonunits.lua').ASubUnit
-local WeaponFile = import('/lua/aeonweapons.lua')
+local ASubUnit = import("/lua/aeonunits.lua").ASubUnit
+local WeaponFile = import("/lua/aeonweapons.lua")
 local AIFMissileTacticalSerpentineWeapon = WeaponFile.AIFMissileTacticalSerpentineWeapon
 local AIFQuantumWarhead = WeaponFile.AIFQuantumWarhead
 

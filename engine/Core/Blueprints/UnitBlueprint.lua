@@ -26,6 +26,7 @@
 
 --- read more here: https://wiki.faforever.com/en/Blueprints
 ---@class UnitBlueprint: EntityBlueprint
+---@field CategoriesHash table<string, boolean>
 ---@field AI UnitBlueprintAI
 ---@field Air UnitBlueprintAir
 ---@field Adjacency UnitBlueprintAdjacency|string

@@ -121,7 +121,7 @@ luft.describe("Utils", function()
 
     luft.test("string.gmatch iterates over word pairs correctly", function()
         local iterator = test:gmatch("[^ ]+ [^ ]+")
-        luft.expect(iterator).to.be.a "function"
+        luft.expect(iterator).to.be_function()
         luft.expect(iterator()).to.equal "The quick"
         luft.expect(iterator()).to.equal "brown FOX745"
         luft.expect(iterator()).to.equal "JUMPS over"
@@ -131,7 +131,7 @@ luft.describe("Utils", function()
 
     luft.test("string.gmatch correctly returns multiple arguments", function()
         local iterator = test:gmatch("([^ ]+) ([^ ]+)")
-        luft.expect(iterator).to.be.a "function"
+        luft.expect(iterator).to.be_function()
         luft.expect(iterator()).to.equal("The", "quick")
         luft.expect(iterator()).to.equal("brown", "FOX745")
         luft.expect(iterator()).to.equal("JUMPS", "over")

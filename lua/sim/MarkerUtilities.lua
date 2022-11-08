@@ -17,7 +17,7 @@
 -- Supports crazyrush-like maps.
 -----------------------------------------------------------------
 
-local StringSplit = import('/lua/system/utils.lua').StringSplit
+local StringSplit = import("/lua/system/utils.lua").StringSplit
 local TableDeepCopy = table.deepcopy
 
 ---@class MarkerData
@@ -246,7 +246,7 @@ function ToggleDebugMarkersByType(type)
         thread = ForkThread(
             function()
 
-                local labelToColor = import('/lua/shared/NavGenerator.lua').LabelToColor
+                local labelToColor = import("/lua/shared/navgenerator.lua").LabelToColor
 
                 while true do
 
@@ -388,7 +388,7 @@ do
     local OldCreateResourceDeposit = _G.CreateResourceDeposit
     _G.CreateResourceDeposit = function(type, x, y, z, size)
 
-        local NavUtils = import('/lua/sim/NavUtils.lua')
+        local NavUtils = import("/lua/sim/navutils.lua")
 
         -- fix to terrain height
         y = GetTerrainHeight(x, z)

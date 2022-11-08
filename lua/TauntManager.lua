@@ -7,8 +7,8 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TriggerFile = import('/lua/scenariotriggers.lua')
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
+local TriggerFile = import("/lua/scenariotriggers.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 function CreateTauntManager(name, fileName)
     local tManager = {

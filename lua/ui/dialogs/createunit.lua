@@ -1,10 +1,10 @@
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Edit = import('/lua/maui/edit.lua').Edit
-local options = import('/lua/user/prefs.lua').GetFromCurrentProfile('options')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Edit = import("/lua/maui/edit.lua").Edit
+local options = import("/lua/user/prefs.lua").GetFromCurrentProfile('options')
 
 local ssub, gsub, upper, lower, find, slen, format = string.sub, string.gsub, string.upper, string.lower, string.find,
     string.len, string.format
@@ -164,7 +164,7 @@ local function FactionListTabs()
     local flisticle = {}
     local allFactionCats = {}
 
-    for i, faction in import('/lua/factions.lua').Factions do
+    for i, faction in import("/lua/factions.lua").Factions do
         local key = 'faction' .. faction.Category
         specialFilterControls[key] = faction.Category
         table.insert(allFactionCats, faction.Category)
@@ -699,7 +699,7 @@ function CreateDialog(x, y)
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
                 "build",
                 {
                     -- default information required
@@ -728,7 +728,7 @@ function CreateDialog(x, y)
             -- check if user wants to exit
             while not dialog do
                 if IsCancelKeyDown() then
-                    import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
+                    import("/lua/ui/game/commandmode.lua").EndCommandMode(true)
                     break
                 end
                 WaitSeconds(0.1)
@@ -1243,10 +1243,10 @@ function NameSet(callback)
 end
 
 -- kept for mod backwards compatibility
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Text = import('/lua/maui/text.lua').Text
-local Border = import('/lua/maui/border.lua').Border
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Text = import("/lua/maui/text.lua").Text
+local Border = import("/lua/maui/border.lua").Border
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local RadioGroup = import("/lua/maui/mauiutil.lua").RadioGroup
 local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
 local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')

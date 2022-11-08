@@ -1,6 +1,6 @@
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local TemplateNames = import('/lua/TemplateNames.lua').TemplateNames
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local TemplateNames = import("/lua/templatenames.lua").TemplateNames
 
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'

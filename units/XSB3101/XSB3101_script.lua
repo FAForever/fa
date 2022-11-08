@@ -8,7 +8,7 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SRadarUnit = import('/lua/seraphimunits.lua').SRadarUnit
+local SRadarUnit = import("/lua/seraphimunits.lua").SRadarUnit
 
 ---@class XSB3101 : SRadarUnit
 XSB3101 = Class(SRadarUnit) {

@@ -4,10 +4,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
+local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
 
@@ -357,7 +357,7 @@ EngineerManager = Class(BuilderManager) {
                         unit.BuilderManagerData.EngineerManager:RemoveUnit(unit)
                     end
 
-                    import('/lua/scenariotriggers.lua').CreateUnitDestroyedTrigger(deathFunction, unit)
+                    import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(deathFunction, unit)
 
                     local newlyCapturedFunction = function(unit, captor)
                         local aiBrain = captor:GetAIBrain()
@@ -370,7 +370,7 @@ EngineerManager = Class(BuilderManager) {
                         end
                     end
 
-                    import('/lua/scenariotriggers.lua').CreateUnitCapturedTrigger(nil, newlyCapturedFunction, unit)
+                    import("/lua/scenariotriggers.lua").CreateUnitCapturedTrigger(nil, newlyCapturedFunction, unit)
 
                     if EntityCategoryContains(categories.ENGINEER - categories.STATIONASSISTPOD, unit) then
                         local unitConstructionFinished = function(unit, finishedUnit)
@@ -381,7 +381,7 @@ EngineerManager = Class(BuilderManager) {
                                                         engManager:UnitConstructionFinished(unit, finishedUnit)
                                                     end
                         end
-                        import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(unitConstructionFinished, unit, categories.ALLUNITS)
+                        import("/lua/scenariotriggers.lua").CreateUnitBuiltTrigger(unitConstructionFinished, unit, categories.ALLUNITS)
 
                     end
                 end
@@ -497,7 +497,7 @@ EngineerManager = Class(BuilderManager) {
                 return self.Brain:DecideWhatToBuild(engineer, buildingType, self.Brain.CustomFactions[faction])
             end
         else
-            return self.Brain:DecideWhatToBuild(engineer, buildingType, import('/lua/BuildingTemplates.lua').BuildingTemplates[faction])
+            return self.Brain:DecideWhatToBuild(engineer, buildingType, import("/lua/buildingtemplates.lua").BuildingTemplates[faction])
         end
     end,
 
@@ -826,7 +826,7 @@ EngineerManager = Class(BuilderManager) {
 
             if builder:GetPlatoonAddBehaviors() then
                 for pafk, pafv in builder:GetPlatoonAddBehaviors() do
-                    hndl:ForkThread(import('/lua/ai/AIBehaviors.lua')[pafv])
+                    hndl:ForkThread(import("/lua/ai/aibehaviors.lua")[pafv])
                 end
             end
 
@@ -890,4 +890,4 @@ end
 
 
 -- kept for mod backwards compatibility
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")

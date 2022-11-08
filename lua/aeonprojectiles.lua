@@ -7,7 +7,7 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
-local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
+local DefaultProjectileFile = import("/lua/sim/defaultprojectiles.lua")
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
 local OnWaterEntryEmitterProjectile = DefaultProjectileFile.OnWaterEntryEmitterProjectile
 local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
@@ -16,8 +16,8 @@ local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
 local SingleCompositeEmitterProjectile = DefaultProjectileFile.SingleCompositeEmitterProjectile
 local MultiCompositeEmitterProjectile = DefaultProjectileFile.MultiCompositeEmitterProjectile
 local NullShell = DefaultProjectileFile.NullShell
-local DepthCharge = import('/lua/defaultantiprojectile.lua').DepthCharge
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
+local EffectTemplate = import("/lua/effecttemplates.lua")
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 
 --- AEON ANTI-NUKE PROJECTILES
@@ -888,4 +888,4 @@ AArtilleryFragmentationSensorShellProjectile03 = Class(AArtilleryFragmentationSe
 }
 
 -- kept for mod backwards compatibility
-local DefaultExplosion = import('defaultexplosions.lua')
+local DefaultExplosion = import("/lua/defaultexplosions.lua")

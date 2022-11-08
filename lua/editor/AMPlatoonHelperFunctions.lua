@@ -6,7 +6,6 @@
 ----------------------------------------------------------------------
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 
-
 -- === utility function === --
 
 ---@param time integer
@@ -131,5 +130,5 @@ function MasterCountDifficulty(aiBrain, master)
 end
 
 -- Unused Files but moved for Mod Support
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")

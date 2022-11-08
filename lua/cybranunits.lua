@@ -5,8 +5,8 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local DummyUnit = import('/lua/sim/unit.lua').DummyUnit
-local DefaultUnitsFile = import('defaultunits.lua')
+local DummyUnit = import("/lua/sim/unit.lua").DummyUnit
+local DefaultUnitsFile = import("/lua/defaultunits.lua")
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
 local AirUnit = DefaultUnitsFile.AirUnit
@@ -23,8 +23,8 @@ local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local CommandUnit = DefaultUnitsFile.CommandUnit
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateCybranBuildBeams = false
 
 -- upvalued effect utility functions for performance
@@ -994,4 +994,4 @@ CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
 }
 
 -- kept for mod backwards compatibility
-local Util = import('utilities.lua')
+local Util = import("/lua/utilities.lua")
