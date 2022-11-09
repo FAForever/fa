@@ -185,7 +185,6 @@ local BuildingCounterDefaultValues = {
 ---@field ConditionalBuildTable table[] --TODO
 ---@field LevelNames LevelName[]
 ---@field ConstructionEngineers Unit[]
----@field
 BaseManager = ClassSimple {
 
     --- Introduces all the relevant fields to the base manager, internally called by the engine
@@ -445,9 +444,9 @@ BaseManager = ClassSimple {
 
     --- Attaches an OpAI instance to the base manager that uses the base to build platoons.
     ---@param self BaseManager          # An instance of the BaseManager class
-    ---@param ptype SaveFile | UnitGroup            # Save file that is used to find child quantities
-    ---@param name string  |   AddUnitAIData           # A name set by you to allow you to retrieve the returned AI instance
-    ---@param data AddOpAIData?          # Parameters that describe the build conditions, the platoon function and the data of the platoon function
+    ---@param ptype SaveFile | UnitGroup         # Save file that is used to find child quantities
+    ---@param name string | AddUnitAIData        # A name set by you to allow you to retrieve the returned AI instance
+    ---@param data AddOpAIData?         # Parameters that describe the build conditions, the platoon function and the data of the platoon function
     ---@return OpAI | boolean           # An instance of the OpAI class or false
     AddOpAI = function(self, ptype, name, data)
         if not self.AIBrain then
@@ -476,7 +475,7 @@ BaseManager = ClassSimple {
     --- Retrieves a previously made OpAI instance
     ---@param self BaseManager  # An instance of the BaseManager class
     ---@param name string       # A name previously set by you to attach an OpAI instance to the base manager
-    ---@return OpAI | boolean    # An instance of the OpAI class or false
+    ---@return OpAI | boolean   # An instance of the OpAI class or false
     GetOpAI = function(self, name)
         if self.OpAITable[name] then
             return self.OpAITable[name]
@@ -617,28 +616,28 @@ BaseManager = ClassSimple {
 
     --- Add to the engineer count, useful when gifting the base engineers.
     ---@param self BaseManager  # An instance of the BaseManager class
-    ---@param num integer        # Amount to add to the engineer count.
+    ---@param num integer       # Amount to add to the engineer count.
     AddCurrentEngineer = function(self, num)
         self.CurrentEngineerCount = self.CurrentEngineerCount + (num or 1)
     end,
 
     --- Subtract from the engineer count
     ---@param self BaseManager  # An instance of the BaseManager class
-    ---@param num integer        # Amount to subtract from the engineer count.
+    ---@param num integer       # Amount to subtract from the engineer count.
     SubtractCurrentEngineer = function(self, num)
         self.CurrentEngineerCount = self.CurrentEngineerCount - (num or 1)
     end,
 
     --- Retrieve the engineer count
     ---@param self BaseManager      # An instance of the BaseManager class
-    ---@return integer               # Number of active engineers
+    ---@return integer              # Number of active engineers
     GetCurrentEngineerCount = function(self)
         return self.CurrentEngineerCount
     end,
 
     --- Retrieve the maximum number of engineers, the base manager won't build more engineers than this
     ---@param self BaseManager      # An instance of the BaseManager class
-    ---@return integer               # Maximum number of engineers for this base manager
+    ---@return integer              # Maximum number of engineers for this base manager
     GetMaximumEngineers = function(self)
         return self.EngineerQuantity
     end,
@@ -664,14 +663,14 @@ BaseManager = ClassSimple {
 
     --- Defines the maximum number of construction engineers
     ---@param self BaseManager      # An instance of the BaseManager class
-    ---@param num integer            # New maximum number of construction engineers
+    ---@param num integer           # New maximum number of construction engineers
     SetMaximumConstructionEngineers = function(self, num)
         self.MaximumConstructionEngineers = num
     end,
 
     --- Retrieves the maximum number of construction engineers
     ---@param self BaseManager      # An instance of the BaseManager class
-    ---@return integer               # Maximum number of construction engineers
+    ---@return integer              # Maximum number of construction engineers
     GetConstructionEngineerMaximum = function(self)
         return self.MaximumConstructionEngineers
     end,
@@ -823,7 +822,7 @@ BaseManager = ClassSimple {
 
     --- Defines the total engineer count of this base manager
     ---@param self BaseManager      # An instance of the BaseManager class
-    ---@param num integer            #
+    ---@param num integer           #
     SetTotalEngineerCount = function(self, num)
         self.EngineerQuantity = num
         ScenarioInfo.VarTable[self.BaseName .. '_EngineerNumber'] = num
@@ -831,14 +830,14 @@ BaseManager = ClassSimple {
 
     --- Retrieves the amount of engineers that are building
     ---@param self BaseManager      # An instance of the BaseManager class
-    ---@return integer               # Amount of engineers that are building
+    ---@return integer              # Amount of engineers that are building
     GetEngineersBuilding = function(self)
         return self.EngineersBuilding
     end,
 
     --- Adds or subtracts from the number of engineers that are building
     ---@param self BaseManager      # An instance of the BaseManager class
-    ---@param count integer          # Amount to add or subtract
+    ---@param count integer         # Amount to add or subtract
     SetEngineersBuilding = function(self, count)
         self.EngineersBuilding = self.EngineersBuilding + count
     end,
