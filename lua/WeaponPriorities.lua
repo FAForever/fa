@@ -30,11 +30,9 @@ function ParseTableOfCategories(inputString)
 
             full = { }
             for k, category in categories do
-                LOG(category)
                 if not (category == '') then
                     local parsed = cachedTablePriorities[category] or ParseEntityCategoryProperly(category)
                     cachedTablePriorities[category] = parsed
-                    LOG(parsed)
                     if parsed then
                         table.insert(full, parsed)
                     end
@@ -44,11 +42,9 @@ function ParseTableOfCategories(inputString)
             -- excludes the use of the COMMAND category, to prevent sniping with Mantis
             limited = { }
             for k, category in categories do
-                LOG(category)
                 if not (category == '' or string.find(category, 'COMMAND')) then
                     local parsed = cachedLimitedTablePriorities[category] or ParseEntityCategoryProperly(string.format('(%s) - COMMAND', category))
                     cachedLimitedTablePriorities[category] = parsed
-                    LOG(parsed)
                     if parsed then
                         table.insert(limited, parsed)
                     end
@@ -95,11 +91,7 @@ function SetWeaponPriorities(data)
     end
 
     if not editedPriorities[1] then
-        LOG("no entries, defaulting")
         default = true
-    end
-    for k,v in ipairs(editedPriorities) do
-        LOG(k,v)
     end
 
     --work out what message to send to the player for changing their priority list
