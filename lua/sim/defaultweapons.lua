@@ -366,7 +366,6 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Called on horizontal motion event
     ---@param self DefaultProjectileWeapon
     PackAndMove = function(self)
-        LOG("PackAndMove")
         ChangeState(self, self.WeaponPackingState)
     end,
 
@@ -634,8 +633,6 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Includes the manual selection of a new target, and the issuing of a move order
     ---@param self DefaultProjectileWeapon
     OnLostTarget = function(self)
-
-        LOG("OnLostTarget", GetGameTick())
         -- Issue 43
         -- Tell the owner this weapon has lost the target
         local unit = self.unit
@@ -847,7 +844,6 @@ DefaultProjectileWeapon = Class(Weapon) {
         end,
 
         OnFire = function(self)
-            -- LOG("OnFire", GetGameTick())
             if self.WeaponCanFire then
                 ChangeState(self, self.RackSalvoFiringState)
             end
@@ -1056,7 +1052,6 @@ DefaultProjectileWeapon = Class(Weapon) {
         WeaponAimWantEnabled = true,
 
         Main = function(self)
-            LOG("RackSalvoReloadState", GetGameTick())
             local unit = self.unit
             unit:SetBusy(true)
             self:PlayFxRackSalvoReloadSequence()
@@ -1097,7 +1092,6 @@ DefaultProjectileWeapon = Class(Weapon) {
         WeaponAimWantEnabled = false,
 
         Main = function(self)
-            LOG("WeaponUnpackingState", GetGameTick())
             local unit = self.unit
             unit:SetBusy(true)
 
@@ -1471,8 +1465,6 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     ---@param self DefaultBeamWeapon
     ---@param muzzle string
     PlayFxBeamStart = function(self, muzzle)
-        LOG("PlayFxBeamStart", GetGameTick())
-        reprsl(debug.traceback())
         local bp = self.Blueprint
         local beam
         self.BeamDestroyables = {}
@@ -1562,8 +1554,6 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     ---@param self DefaultBeamWeapon
     ---@param beam any
     PlayFxBeamEnd = function(self, beam)
-        LOG("PlayFxBeamEnd", GetGameTick())
-        reprsl(debug.traceback())
         if not self.unit.Dead then
             local audio = self.Blueprint.Audio
             local beamStop = audio.BeamStop
@@ -1618,7 +1608,6 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     IdleState = State (DefaultProjectileWeapon.IdleState) {
         Main = function(self)
-            LOG("IdleState", GetGameTick())
             DefaultProjectileWeapon.IdleState.Main(self)
             self:PlayFxBeamEnd()
             self:ForkThread(self.ContinuousBeamFlagThread)
@@ -1627,7 +1616,6 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     WeaponPackingState = State (DefaultProjectileWeapon.WeaponPackingState) {
         Main = function(self)
-            LOG("WeaponPackingState", GetGameTick())
             local bp = self.Blueprint
             if bp.BeamLifetime > 0 then
                 self:PlayFxBeamEnd()
@@ -1646,7 +1634,6 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     RackSalvoFireReadyState = State (DefaultProjectileWeapon.RackSalvoFireReadyState) {
         Main = function(self)
-            LOG("RackSalvoFireReadyState", GetGameTick())
             if not self:EconomySupportsBeam() then
                 self:PlayFxBeamEnd()
                 ChangeState(self, self.IdleState)
