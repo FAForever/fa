@@ -31,7 +31,7 @@ function ParseTableOfCategories(inputString)
             full = { }
             for k, category in categories do
                 if not (category == '') then
-                    local parsed = cachedTablePriorities[category] or ParseEntityCategory(category)
+                    local parsed = cachedTablePriorities[category] or ParseEntityCategoryProperly(category)
                     cachedTablePriorities[category] = parsed
                     if parsed then
                         table.insert(full, parsed)
