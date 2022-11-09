@@ -8,6 +8,6 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-SDFShieeihAutoCannon01 = Class(import('/lua/seraphimprojectiles.lua').SShriekerAutoCannon) {
+SDFShieeihAutoCannon01 = Class(import("/lua/seraphimprojectiles.lua").SShriekerAutoCannon) {
 }
 TypeClass = SDFShieeihAutoCannon01

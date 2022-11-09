@@ -7,7 +7,7 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CLandFactoryUnit = import('/lua/cybranunits.lua').CLandFactoryUnit
+local CLandFactoryUnit = import("/lua/cybranunits.lua").CLandFactoryUnit
 
 ---@class ZRB9601 : CLandFactoryUnit
 ZRB9601 = Class(CLandFactoryUnit) {}

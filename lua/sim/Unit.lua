@@ -6,24 +6,24 @@
 -----------------------------------------------------------------
 
 -- Imports. Localise commonly used subfunctions for speed
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Buff = import('/lua/sim/buff.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtilities = import('/lua/EffectUtilities.lua')
-local EnhancementCommon = import('/lua/enhancementcommon.lua')
-local Explosion = import('/lua/defaultexplosions.lua')
-local Game = import('/lua/game.lua')
-local Set = import('/lua/system/setutils.lua')
-local SimUtils = import('/lua/SimUtils.lua')
-local utilities = import('/lua/utilities.lua')
-local Wreckage = import('/lua/wreckage.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtilities = import("/lua/effectutilities.lua")
+local EnhancementCommon = import("/lua/enhancementcommon.lua")
+local Explosion = import("/lua/defaultexplosions.lua")
+local Game = import("/lua/game.lua")
+local Set = import("/lua/system/setutils.lua")
+local SimUtils = import("/lua/simutils.lua")
+local utilities = import("/lua/utilities.lua")
+local Wreckage = import("/lua/wreckage.lua")
 
-local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
-local PersonalBubble = import('/lua/shield.lua').PersonalBubble
-local PersonalShield = import('/lua/shield.lua').PersonalShield
-local Shield = import('/lua/shield.lua').Shield
-local TransportShield = import('/lua/shield.lua').TransportShield
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
+local AntiArtilleryShield = import("/lua/shield.lua").AntiArtilleryShield
+local PersonalBubble = import("/lua/shield.lua").PersonalBubble
+local PersonalShield = import("/lua/shield.lua").PersonalShield
+local Shield = import("/lua/shield.lua").Shield
+local TransportShield = import("/lua/shield.lua").TransportShield
+local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
@@ -104,6 +104,10 @@ local cUnit = moho.unit_methods
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
+---@field Blueprint UnitBlueprint
+---@field EngineFlags any
+---@field EngineCommandCap? table<string, boolean>
+---@field UnitBeingBuilt Unit?
 Unit = Class(moho.unit_methods) {
 
     Weapons = {},
@@ -129,6 +133,9 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
     EconomyProductionInitiallyActive = true,
+
+    EnergyModifier = 0,
+    MassModifier = 0,
 
     ---@param self Unit
     ---@return any
@@ -1397,6 +1404,7 @@ Unit = Class(moho.unit_methods) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
+
         local layer = self.Layer
         self.Dead = true
 
@@ -2003,7 +2011,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Start the sinking after a delay of the given number of seconds, attaching to a given bone
         -- and entity.
-        proj:Start(10 * math.max(2, math.min(7, scale)), self, bone, callback)
+        proj:Start(4 * math.max(2, math.min(7, scale)), self, bone, callback)
         self.Trash:Add(proj)
     end,
 
@@ -2039,7 +2047,6 @@ Unit = Class(moho.unit_methods) {
     DeathThread = function(self, overkillRatio, instigator)
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = self:ShallSink()
-
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
 
         if not self.BagsDestroyed then
@@ -2229,6 +2236,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Destroy everything added to the trash
         self.Trash:Destroy()
+
         -- Destroy all extra trashbags in case the DeathTread() has not already destroyed it (modded DeathThread etc.)
         if not self.BagsDestroyed then
             self:DestroyAllBuildEffects()
@@ -3334,7 +3342,6 @@ Unit = Class(moho.unit_methods) {
 
         local unitEnhancements = EnhancementCommon.GetEnhancements(self.EntityId)
         local tempEnhanceBp = self.Blueprint.Enhancements[work]
-        --LOG('ACU is ordering enhancement ['..repr(tempEnhanceBp.Name)..'] ' )
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
                 WARN('*WARNING: Ordered enhancement ['..tempEnhanceBp.Name..'] does not have the proper prerequisite. Slot ['..tempEnhanceBp.Slot..'] - Needed: ['..unitEnhancements[tempEnhanceBp.Slot]..'] - Installed: ['..tempEnhanceBp.Prerequisite..']')
@@ -4731,6 +4738,22 @@ Unit = Class(moho.unit_methods) {
     ---@param location Vector
     ---@param orientation Quaternion
     OnTeleportUnit = function(self, teleporter, location, orientation)
+
+        -- prevent cheats (teleporting while not having the upgrade)
+        if not self:TestCommandCaps('RULEUCC_Teleport') then
+            return
+        end
+
+        -- prevent cheats (teleport off map)
+        if location[1] < 1 or location[1] > ScenarioInfo.PlayableArea[3] - 1 then
+            return
+        end
+
+        -- prevent cheats (teleport off map)
+        if location[3] < 1 or location[3] > ScenarioInfo.PlayableArea[4] - 1 then
+            return
+        end
+
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)
             self.TeleportDrain = nil
@@ -4798,12 +4821,20 @@ Unit = Class(moho.unit_methods) {
         self:PlayTeleportOutEffects()
         self:CleanupTeleportChargeEffects()
         WaitSeconds(0.1)
+
+        -- prevent cheats (teleporting after transport, teleporting without having the enhancement)
+        if self:IsUnitState('Teleporting') and self:TestCommandCaps('RULEUCC_Teleport') then
+            Warp(self, location, orientation)
+            self:PlayTeleportInEffects()
+        else 
+            IssueClearCommands({self})
+        end
+        
         self:SetWorkProgress(0.0)
-        Warp(self, location, orientation)
-        self:PlayTeleportInEffects()
         self:CleanupRemainingTeleportChargeEffects()
 
-        WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
+        -- Perform cooldown Teleportation FX here
+        WaitSeconds(0.1)
 
         -- Landing Sound
         self:StopUnitAmbientSound('TeleportLoop')
@@ -4873,11 +4904,18 @@ Unit = Class(moho.unit_methods) {
     ---@param transport BaseTransport
     ---@param bone Bone
     OnDetachedFromTransport = function(self, transport, bone)
+        self.Trash:Add(ForkThread(self.OnDetachedFromTransportThread, self, transport, bone))
         self:MarkWeaponsOnTransport(false)
         self:EnableShield()
         self:EnableDefaultToggleCaps()
         self:TransportAnimation(-1)
         self:DoUnitCallbacks('OnDetachedFromTransport', transport, bone)
+    end,
+
+    OnDetachedFromTransportThread = function(self, transport, bone)
+        if IsDestroyed(transport) then
+            self:Destroy()
+        end
     end,
 
     -- Utility Functions
@@ -4949,6 +4987,41 @@ Unit = Class(moho.unit_methods) {
             self.EngineFlags['SetConsumptionActive'] = flag
         end
     end,
+
+    --- A work around because the engine function `TestCommandCaps` does not appear to be functional. Is
+    --- in particular used to prevent cheats related to teleportation. Stores the added command capabilities
+    --- in a table called `EngineCommandCap`, in the unit table.
+    ---@param self Unit
+    ---@param capName CommandCap
+    AddCommandCap = function(self, capName)
+        if not self.EngineCommandCap then
+            self.EngineCommandCap = { }
+        end
+
+        self.EngineCommandCap[capName] = true 
+        cUnit.AddCommandCap(self, capName)
+    end,
+
+    --- A work around because the engine function `TestCommandCaps` does not appear to be functional. Is
+    --- in particular used to prevent cheats related to teleportation.
+    ---@param self Unit
+    ---@param capName CommandCap
+    RemoveCommandCap = function(self, capName)
+        if self.EngineCommandCap then
+            self.EngineCommandCap[capName] = nil
+        end
+         
+        cUnit.RemoveCommandCap(self, capName)
+    end,
+
+    --- A work around because the engine function `TestCommandCaps` does not appear to be functional. Is
+    --- in particular used to prevent cheats related to teleportation.
+    ---@param self Unit
+    ---@param capName CommandCap
+    TestCommandCaps = function(self, capName)
+        return (self.EngineCommandCap and self.EngineCommandCap[capName]) or cUnit.TestCommandCaps(self, capName)
+    end,
+
 
     --- Determines the upgrade animation to use. Allows you to manage units (by hooking) that can upgrade to
     --- more than just one unit type, as an example tech 1 factories that can become HQs or

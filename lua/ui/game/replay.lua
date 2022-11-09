@@ -3,23 +3,23 @@
 --* Author: Chris Blackwell
 --* Summary: Unit orders UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Grid = import('/lua/maui/grid.lua').Grid
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Button = import('/lua/maui/button.lua').Button
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local TooltipInfo = import('/lua/ui/help/tooltips.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local Grid = import("/lua/maui/grid.lua").Grid
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Button = import("/lua/maui/button.lua").Button
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local TooltipInfo = import("/lua/ui/help/tooltips.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 
 controls =
 {

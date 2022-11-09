@@ -7,8 +7,8 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved. All lefts reserved too.
 --****************************************************************************
 
-local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
-local StrategyBuilder = import('/lua/sim/StrategyBuilder.lua')
+local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local StrategyBuilder = import("/lua/sim/strategybuilder.lua")
 
 ---@class StrategyManager : BuilderManager
 StrategyManager = Class(BuilderManager) {
@@ -128,9 +128,9 @@ end
 
 -- kept for mod backwards compatibility
 
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
---local StrategyList = import('/lua/ai/SkirmishStrategyList.lua').StrategyList
-local AIAddBuilderTable = import('/lua/ai/AIAddBuilderTable.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
+--local StrategyList = import("/lua/ai/skirmishstrategylist.lua").StrategyList
+local AIAddBuilderTable = import("/lua/ai/aiaddbuildertable.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Builder = import("/lua/sim/builder.lua")

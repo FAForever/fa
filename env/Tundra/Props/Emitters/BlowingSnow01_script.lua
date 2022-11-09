@@ -1,7 +1,7 @@
 --
 -- LavaSteam01
 --
-local Prop = import('/lua/sim/Prop.lua').Prop
+local Prop = import("/lua/sim/prop.lua").Prop
 
 BlowingSnow01 = Class(Prop) {
     OnCreate = function(self)

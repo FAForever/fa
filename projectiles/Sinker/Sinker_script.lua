@@ -1,5 +1,5 @@
-local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local Projectile = import('/lua/sim/projectile.lua').Projectile
+local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local Projectile = import("/lua/sim/projectile.lua").Projectile
 
 Sinker = Class(Projectile) {
     OnCreate = function(self)

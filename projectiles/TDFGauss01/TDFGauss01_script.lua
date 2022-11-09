@@ -1,7 +1,7 @@
 --
 -- Terran Gauss Cannon Projectile
 --
-local TDFGaussCannonProjectile = import('/lua/terranprojectiles.lua').TDFGaussCannonProjectile
+local TDFGaussCannonProjectile = import("/lua/terranprojectiles.lua").TDFGaussCannonProjectile
 TDFGauss01 = Class(TDFGaussCannonProjectile) {
     
     OnCreate = function(self, inWater)

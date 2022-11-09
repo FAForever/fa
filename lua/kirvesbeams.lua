@@ -1,8 +1,8 @@
-local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local CustomEffectTemplate = import('/lua/kirveseffects.lua')
-local SCCollisionBeam = import('/lua/defaultcollisionbeams.lua').SCCollisionBeam
-local Util = import('/lua/utilities.lua')
+local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local CustomEffectTemplate = import("/lua/kirveseffects.lua")
+local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
+local Util = import("/lua/utilities.lua")
 
 ---@class EmptyCollisionBeam : CollisionBeam
 EmptyCollisionBeam = Class(CollisionBeam) {

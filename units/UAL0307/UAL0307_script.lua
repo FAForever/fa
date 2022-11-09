@@ -8,8 +8,8 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AShieldHoverLandUnit = import('/lua/aeonunits.lua').AShieldHoverLandUnit
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local AShieldHoverLandUnit = import("/lua/aeonunits.lua").AShieldHoverLandUnit
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
 ---@class UAL0307 : AShieldHoverLandUnit
 UAL0307 = Class(AShieldHoverLandUnit) {

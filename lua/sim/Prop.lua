@@ -1,4 +1,4 @@
-local PlayReclaimEndEffects = import('/lua/EffectUtilities.lua').PlayReclaimEndEffects
+local PlayReclaimEndEffects = import("/lua/effectutilities.lua").PlayReclaimEndEffects
 
 local minimumLabelMass = 10
 
@@ -310,6 +310,18 @@ Prop = Class(moho.prop_methods) {
             EntitySetCollisionShape(self, shape, centerx, centery + sizey, centerz, sizex, sizey, sizez)
         end
     end,
+    
+    RevertCollisionShape = function(self)
+        local x, y, z = self.CollisionCenterX, self.CollisionCenterY, self.CollisionCenterZ
+        local radius = self.CollisionRadius
+        local shape = self.CollisionShape
+        if radius and shape == 'Sphere' then
+            EntitySetCollisionShape(self, shape, x, y, z, radius)
+        else
+            local sizeX, sizeY, sizeZ = self.CollisionSizeX, self.CollisionSizeY, self.CollisionSizeZ
+            EntitySetCollisionShape(self, shape, x, y + sizeY, z, sizeX, sizeY, sizeZ)
+        end
+    end;
 
     --- Computes how long it would take to reclaim this prop with the reclaimer.
     -- @param reclaimer The unit to compute the duration for.
@@ -479,6 +491,6 @@ Prop = Class(moho.prop_methods) {
 
 
 -- imports kept for backwards compatibility with mods
-local Entity = import('/lua/sim/Entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 local DeprecatedWarnings = { }
 local TrashAdd = TrashBag.Add

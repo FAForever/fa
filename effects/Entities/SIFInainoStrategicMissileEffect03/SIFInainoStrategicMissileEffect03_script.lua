@@ -7,9 +7,9 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-SIFInainoStrategicMissileEffect03 = Class(import('/lua/sim/defaultprojectiles.lua').EmitterProjectile) {
+SIFInainoStrategicMissileEffect03 = Class(import("/lua/sim/defaultprojectiles.lua").EmitterProjectile) {
     FxTrails = EffectTemplate.SIFInainoHitRingProjectileFxTrails01,
 }
 TypeClass = SIFInainoStrategicMissileEffect03

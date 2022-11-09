@@ -7,12 +7,12 @@
 --
 ----------------------------------------------------------------------------
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
-local Utils = import('/lua/utilities.lua')
-local Mods = import('/lua/mods.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local Utils = import("/lua/utilities.lua")
+local Mods = import("/lua/mods.lua")
 
-local AIChatText = import('/lua/AI/sorianlang.lua').AIChatText
+local AIChatText = import("/lua/ai/sorianlang.lua").AIChatText
 
 -- Table of AI taunts orginized by faction
 local AITaunts = {
@@ -592,7 +592,7 @@ function AISendPing(position, pingType, army)
    }
     local data = {Owner = army - 1, Type = pingType, Location = position}
     data = table.merged(data, PingTypes[pingType])
-    import('/lua/simping.lua').SpawnPing(data)
+    import("/lua/simping.lua").SpawnPing(data)
 end
 
 function AIDelayChat(aigroup, ainickname, aiaction, targetnickname, delaytime)
