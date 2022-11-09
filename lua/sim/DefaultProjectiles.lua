@@ -121,13 +121,15 @@ NukeProjectile = Class(NullShell) {
         WaitSeconds(2) -- Now set turn rate to zero so nuke flies straight
         self:SetTurnRate(0)
         self:SetAcceleration(0.001)
-        self.WaitTime = 0.5
+        self.WaitTime = 0.5 -- start at 0.5; `SetTurnRateByDist` will decrease this as we get closer
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
             WaitSeconds(self.WaitTime)
         end
     end,
 
+    --- Sets the turn rate to angle the nuke down if it gets close to the target (or stops turning
+    --- if too far). Otherwise, decreases `WaitTime` as it gets closer to the target.
     ---@param self NukeProjectile
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
@@ -136,10 +138,10 @@ NukeProjectile = Class(NullShell) {
             -- Freeze the turn rate as to prevent steep angles at long distance targets
             self:SetTurnRate(0)
         elseif dist > 75 and dist <= 150 then
-            -- Increase check intervals
+            -- Decrease check interval
             self.WaitTime = 0.3
         elseif dist > 32 and dist <= 75 then
-            -- Further increase check intervals
+            -- Further decrease check interval
             self.WaitTime = 0.1
         elseif dist < 32 then
             -- Turn the missile down
@@ -147,6 +149,7 @@ NukeProjectile = Class(NullShell) {
         end
     end,
 
+    --- Gets the horizontal distance from the nuke to the current target position
     ---@param self NukeProjectile
     ---@return number
     GetDistanceToTarget = function(self)
@@ -157,8 +160,8 @@ NukeProjectile = Class(NullShell) {
     end,
 
     ---@param self NukeProjectile
-    ---@param EffectTable table
-    ---@param army string
+    ---@param EffectTable FileName[]
+    ---@param army Army
     ---@param scale number
     CreateEffects = function(self, EffectTable, army, scale)
         if not EffectTable then return end
@@ -167,7 +170,7 @@ NukeProjectile = Class(NullShell) {
         end
     end,
 
-    ---@param self Unit
+    ---@param self NukeProjectile
     ForceThread = function(self)
         -- Knockdown force rings
         local position = self:GetPosition()
@@ -177,8 +180,8 @@ NukeProjectile = Class(NullShell) {
     end,
 
     ---@param self NukeProjectile
-    ---@param TargetType type
-    ---@param TargetEntity Unit
+    ---@param TargetType string
+    ---@param TargetEntity Unit | Prop
     OnImpact = function(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_THREE, TargetEntity) then
             -- Play the explosion sound
@@ -262,7 +265,6 @@ SinglePolyTrailProjectile = Class(EmitterProjectile) {
     end,
 }
 
---- upvalue for performance
 ---@class MultiPolyTrailProjectile : EmitterProjectile
 MultiPolyTrailProjectile = Class(EmitterProjectile) {
 
