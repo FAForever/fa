@@ -51,6 +51,11 @@ function ParseEntityCategoryProperly(categoryExpression)
         end
     end)
 
+    -- gsub tokenizer stops before end of string character, without a chance to add the last currentidentifier as a token. So need to check once at the end if there is a remaining identifier.
+    if currentIdentifier ~= "" then
+        table.insert(tokens, currentIdentifier)
+    end
+
     local numTokens = table.getn(tokens)
 
     local function explode(error)
