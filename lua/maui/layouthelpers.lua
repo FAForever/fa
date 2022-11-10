@@ -2295,7 +2295,9 @@ function ReusedLayoutFor(control)
             return reusedLayouter
         else
             -- uh-oh, someone is interlacing the default layouter!
-            WARN(_TRACEBACK(1, "Reused layouter is already in use by " .. tostring(control) .. "! (did you forget to call `End()` or use the non-reused version?)"))
+            if ValidateLayouter then
+                WARN(_TRACEBACK(1, "Reused layouter is already in use by " .. tostring(control) .. "! (did you forget to call `End()` or use the non-reused version?)"))
+            end
             return Layouter(control)
         end
     end
