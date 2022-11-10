@@ -319,9 +319,6 @@ float4 inPos : POSITION,
     
     // calculate the view vector
     result.mViewVec = inPos.xyz - ViewPosition;   
-    
-//    float3 SunPosition = float3(175, 100, 0);     
-//    result.mLightVector = inPos.xyz - SunPosition;
 
 	return result;
 }
@@ -331,46 +328,27 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 					   uniform int alphaFunc, 
 					   uniform int alphaRef ) : COLOR
 {
-    //
     // calculate the depth of water at this pixel, we use this to decide
     // how to shade and it should become lesser as we get shallower
     // so that we don't have a sharp line
-    //
     float4 waterTexture = tex2D( UtilitySamplerC, inV.mTexUV );
     float waterDepth =  waterTexture.g;
   
-    //waterDepth *= 50;
 
-//    if( waterDepth > 0 )
-//        waterDepth = 1;
-
-  //  return waterDepth;
-
-	//return waterTexture.r;
-
-
-    //
     // calculate the correct viewvector
-    //
     float3 viewVector = normalize(inV.mViewVec);
 
-    //
     // get perspective correct coordinate for sampling from the other textures
-    //
     float OneOverW = 1.0 / inV.mScreenPos.w;
     inV.mScreenPos.xyz *= OneOverW;
     float2 screenPos = inV.mScreenPos.xy * ViewportScaleOffset.xy;
     screenPos += ViewportScaleOffset.zw;
 
-    //
     // calculate the background pixel
-    //
     float4 backGroundPixels = tex2D( RefractionSampler, screenPos );
     float mask = saturate(backGroundPixels.a * 255);
 
-    //
     // calculate the normal we will be using for the water surface
-    //
     float4 W0 = tex2D( NormalSampler0, inV.mLayer0 );
 	float4 W1 = tex2D( NormalSampler1, inV.mLayer1 );
 	float4 W2 = tex2D( NormalSampler2, inV.mLayer2 );
@@ -387,93 +365,57 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     float3 up = float3(0,1,0);
     N = lerp(up, N, waterTexture.r);
         
-    // 
-    // calculate the reflection vector
-    //
 	float3 R = reflect( viewVector, N );
-
-    //
-    // calculate the sky reflection color
-    //
 	float4 skyReflection = texCUBE( SkySampler, R );
 
-    //
     // get the correct coordinate for sampling refraction and reflection
-    //
     float2 refractionPos = screenPos;
-//    refractionPos *= ViewportScaleOffset.xy;
-//    refractionPos += ViewportScaleOffset.zw;
     refractionPos -=  refractionScale * N.xz * OneOverW;
 
-    //
     // calculate the refract pixel, corrected for fetching a non-refractable pixel
-    //
     float4 refractedPixels = tex2D( RefractionSampler, refractionPos);
     // because the range of the alpha value that we use for the water is very small
     // we multiply by a large number and then saturate
     // this will also help in the case where we filter to an intermediate value
     refractedPixels.xyz = lerp(refractedPixels, backGroundPixels, saturate(refractedPixels.w * 255) ).xyz;
 
-
-    // 
     // calculate the reflected value at this pixel
-    //
 	float4 reflectedPixels = tex2D( ReflectionSampler, refractionPos);
 
-
-    //
     // calculate the fresnel term from a lookup texture
-    //
     float fresnel;    
     float  NDotL = saturate( dot(-viewVector, N) );
 	fresnel = tex2D( FresnelSampler, float2(waterDepth, NDotL ) ).r;
 
-
-    //
 	// figure out the sun reflection
-	//
 	// moved this to a texture and no speedup.. already texture bwidth bound I think
     float3 sunReflection = pow( saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
 
-
-    //
     // lerp the reflections together
-    //
     reflectedPixels = lerp( skyReflection, reflectedPixels, saturate(unitreflectionAmount * reflectedPixels.w));
 
-    //
     // we want to lerp in some of the water color based on depth, but
     // not totally on depth as it gets clamped
-    //
     float waterLerp = clamp(waterDepth, waterLerp.x, waterLerp.y);
 
-    //
     // lerp in the color
-    //
     refractedPixels.xyz = lerp( refractedPixels.xyz, waterColor, waterLerp);
    
     // implement the water depth into the reflection
     float depthReflectionAmount = 10;
     skyreflectionAmount *= saturate(waterDepth * depthReflectionAmount);
-   
-    //
-    // lerp the reflection into the refraction   
-    //        
+
+    // lerp the reflection into the refraction         
     refractedPixels = lerp( refractedPixels, reflectedPixels, saturate(skyreflectionAmount * fresnel));
 
-    //
     // add in the sky reflection
-    //
     sunReflection = sunReflection * fresnel;
     refractedPixels.xyz +=  sunReflection;
-
 
     // Lerp in a wave crest
     refractedPixels.xyz = lerp( refractedPixels.xyz, waveCrestColor, ( 1 - waterTexture.a ) * waveCrest);
 
-    //
     // return the pixels masked out by the water mask
-    //
 #if 1    
     // use alphablend, don't get any glow
     float4 returnPixels = refractedPixels;
