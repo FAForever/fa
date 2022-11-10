@@ -85,7 +85,7 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     ---@param self TAirFactoryUnit
-    ---@param unitBuilding boolean
+    ---@param unitBuilding Unit
     OnStopBuild = function(self, unitBuilding)
         AirFactoryUnit.OnStopBuild(self, unitBuilding)
         self:StopArmsMoving()
@@ -455,7 +455,7 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     ---@param self TPodTowerUnit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         TStructureUnit.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.FinishedBeingBuilt)
@@ -482,7 +482,7 @@ TPodTowerUnit = Class(TStructureUnit) {
     end,
 
     ---@param self TPodTowerUnit
-    ---@param captor any
+    ---@param captor Unit
     OnCaptured = function(self, captor)
         -- Iterate through pod data and set up callbacks for transfer of pods.
         -- We never get the handle to the new tower, so we set up a new unit capture trigger to do the same thing
@@ -559,7 +559,7 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     ---@param self TPodTowerUnit
     ---@param podName string
-    ---@return unknown
+    ---@return Unit
     CreatePod = function(self, podName)
         local location = self:GetPosition(self.PodData[podName].PodAttachpoint)
         self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self.Army, location[1], location[2], location[3], 0, 0, 0)
@@ -570,7 +570,7 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     ---@param self TPodTowerUnit
     ---@param bone Bone
-    ---@param attachee any
+    ---@param attachee Unit
     OnTransportAttach = function(self, bone, attachee)
         attachee:SetDoNotTarget(true)
         self:PlayUnitSound('Close')
@@ -595,7 +595,7 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     ---@param self TPodTowerUnit
     ---@param bone Bone
-    ---@param attachee any
+    ---@param attachee Unit
     OnTransportDetach = function(self, bone, attachee)
         self:PlayUnitSound('Open')
         self:RequestRefreshUI()

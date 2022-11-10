@@ -128,7 +128,7 @@ TAAFlakArtilleryCannon = Class(DefaultProjectileWeapon) {
     --- Custom over-ride for this weapon, so it passes data and damageTable
     ---@param self TAAFlakArtilleryCannon
     ---@param bone Bone
-    ---@return Projectile | nil
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -203,7 +203,7 @@ TANTorpedoAngler = Class(DefaultProjectileWeapon) {
 TIFSmartCharge = Class(DefaultProjectileWeapon) {
 
     ---@param self TIFSmartCharge
-    ---@param muzzle string
+    ---@param muzzle Bone
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
         local tbl = self:GetBlueprint().DepthCharge
@@ -285,7 +285,7 @@ TAMPhalanxWeapon = Class(DefaultProjectileWeapon) {
     FxShellEject  = EffectTemplate.TPhalanxGunShells,
 
     ---@param self TAMPhalanxWeapon
-    ---@param muzzle string
+    ---@param muzzle Bone
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         for k, v in self.FxShellEject do

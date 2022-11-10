@@ -15,7 +15,6 @@ local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectil
 local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
 local SingleCompositeEmitterProjectile = DefaultProjectileFile.SingleCompositeEmitterProjectile
 
-local NukeProjectile = DefaultProjectileFile.NukeProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
@@ -233,7 +232,7 @@ TDFBigShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
     
     ---@param self TDFBigShipGaussCannonProjectile
     ---@param targetType string
-    ---@param targetEntity Unit
+    ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
         MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
 
@@ -583,7 +582,7 @@ TTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
     FxEnterWater= EffectTemplate.WaterSplash01,
 
     ---@param self TTorpedoShipProjectile
-    ---@param inWater boolean
+    ---@param inWater? boolean
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self)
         -- if we are starting in the water then immediately switch to tracking in water and
@@ -627,7 +626,7 @@ TTorpedoSubProjectile = Class(EmitterProjectile) {
     FxImpactNone = {},
 
     ---@param self TTorpedoSubProjectile
-    ---@param inWater boolean
+    ---@param inWater? boolean unused
     OnCreate = function(self, inWater)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         EmitterProjectile.OnCreate(self, inWater)
