@@ -343,7 +343,7 @@ AAALightDisplacementAutocannonMissileProjectile = Class(MultiPolyTrailProjectile
 AGuidedMissileProjectile = Class(SinglePolyTrailProjectile) {
     FxTrails =  EffectTemplate.AMercyGuidedMissileFxTrails,
 
-    -- '/effects/emitters/aeon_missile_trail_02_emit.bp',
+    --'/effects/emitters/aeon_missile_trail_02_emit.bp',
     PolyTrail = EffectTemplate.AMercyGuidedMissilePolyTrail,
 
     FxImpactUnit = EffectTemplate.AMercyGuidedMissileSplitMissileHitUnit,

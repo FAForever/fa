@@ -135,9 +135,9 @@ ADFTractorClaw = Class(Weapon) {
 
     --- Attempts to retrieve the unit behind the target, can return false if the blip is too far away from the unit due to jamming
     ---@param self ADFTractorClaw
-    ---@param blip Blip | Unit
-    ---@return Blip | Unit | boolean
-    GetUnitBehindTarget = function(self, blip)
+    ---@param blip Blip
+    ---@return Unit | false | Blip --[[@as Unit]]
+        GetUnitBehindTarget = function(self, blip)
         if IsUnit(blip) then
             -- return the unit
             return blip
@@ -475,7 +475,7 @@ AIFArtilleryMiasmaShellWeapon = Class(DefaultProjectileWeapon) {
 
     ---@param self AIFArtilleryMiasmaShellWeapon
     ---@param bone Bone
-    ---@return Projectile | nil
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()

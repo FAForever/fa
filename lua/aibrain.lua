@@ -57,6 +57,7 @@ local TableGetn = table.getn
 ---@alias ReconTypes 'Radar' | 'Sonar' | 'Omni' | 'LOSNow'
 ---@alias PlatoonType 'Air' | 'Land' | 'Sea'
 ---@alias AllianceStatus 'Ally' | 'Enemy' | 'Neutral'
+
 ---@class AIBrain: moho.aibrain_methods
 ---@field AIPlansList string[][]
 ---@field AirAttackPoints? table
@@ -2712,7 +2713,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     ---@param loc Vector
-    ---@return boolean | table
+    ---@return Vector | false
     PBMGetLocationCoords = function(self, loc)
         if not loc then
             return false
@@ -2769,7 +2770,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     ---@param location Vector
-    ---@return boolean | table
+    ---@return FactoryUnit[] | false
     PBMGetAllFactories = function(self, location)
         if not location then
             return false
@@ -3144,13 +3145,10 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- ## Form platoons
     --- Extracted as it's own function so you can call this to try and form platoons to clean up the pool
-    --- - requireBuilding: `true` = platoon must have `'BUILDING'` has its handle, `false` = it'll form any platoon it can
-    --- - Platoontype is just `'Air'/'Land'/'Sea'`, those are found in the platoon build manager table template.
-    --- - Location/Radius are where to do this.  If they aren't specified they will grab from anywhere.
     ---@param self AIBrain
-    ---@param requireBuilding boolean
-    ---@param platoonType PlatoonType
-    ---@param location Vector
+    ---@param requireBuilding boolean `true` = platoon must have `'BUILDING'` has its handle, `false` = it'll form any platoon it can
+    ---@param platoonType PlatoonType Platoontype is just `'Air'/'Land'/'Sea'`, those are found in the platoon build manager table template.
+    ---@param location Vector Location/Radius are where to do this.  If they aren't specified they will grab from anywhere.
     PBMFormPlatoons = function(self, requireBuilding, platoonType, location)
         local platoonList = self.PBM.Platoons
         local personality = self:GetPersonality()

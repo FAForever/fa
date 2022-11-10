@@ -190,7 +190,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param pauseVal number
     ---@param unitCheckFunc any
     ---@param category EntityCategory
-    ---@return boolean | number
+    ---@return number | true
     DisableMassGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
             if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
@@ -672,7 +672,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param unit Unit
-    ---@param finishedUnit Unit|UserUnit
+    ---@param finishedUnit Unit
     UnitConstructionFinished = function(self, unit, finishedUnit)
         if EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit) and finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
             self.Brain.BuilderManagers[self.LocationType].FactoryManager:AddFactory(finishedUnit)

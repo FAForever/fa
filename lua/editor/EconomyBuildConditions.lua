@@ -457,9 +457,8 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
-
 --- Moved Imports that are unsed for modding support
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local BuildingTemplates = import('/lua/BuildingTemplates.lua')
+local ScenarioUtils = import('/lua/sim/scenarioutilities.lua')
+local BuildingTemplates = import('/lua/buildingtemplates.lua')
