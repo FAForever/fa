@@ -9,7 +9,7 @@
 --****************************************************************************
 
 local AirTransport = import("/lua/defaultunits.lua").AirTransport
-local explosion = import("/lua/defaultexplosions.lua")
+local Explosion = import("/lua/defaultexplosions.lua")
 local util = import("/lua/utilities.lua")
 local aWeapons = import("/lua/aeonweapons.lua")
 local AAASonicPulseBatteryWeapon = aWeapons.AAASonicPulseBatteryWeapon

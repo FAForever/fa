@@ -10,7 +10,6 @@
 
 local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local Explosion = import("/lua/defaultexplosions.lua")
-local explosion = import("/lua/defaultexplosions.lua")
 local util = import("/lua/utilities.lua")
 local DummyWeapon = import("/lua/aeonweapons.lua").AAASonicPulseBatteryWeapon
 
