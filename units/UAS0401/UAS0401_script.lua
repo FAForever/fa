@@ -12,7 +12,7 @@ local ADFCannonOblivionWeapon = WeaponsFile.ADFCannonOblivionWeapon02
 local AANChronoTorpedoWeapon = WeaponsFile.AANChronoTorpedoWeapon
 local AIFQuasarAntiTorpedoWeapon = WeaponsFile.AIFQuasarAntiTorpedoWeapon
 
-local CreateAeonTempestBuildingEffects = import("/lua/EffectUtilities.lua").CreateAeonTempestBuildingEffects
+local CreateAeonTempestBuildingEffects = import("/lua/effectutilities.lua").CreateAeonTempestBuildingEffects
 
 ---@class UAS0401 : ASeaUnit
 UAS0401 = Class(ASeaUnit) {

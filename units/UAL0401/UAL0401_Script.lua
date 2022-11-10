@@ -11,7 +11,7 @@ local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
 local utilities = import("/lua/utilities.lua")
 local explosion = import("/lua/defaultexplosions.lua")
-local CreateAeonColossusBuildingEffects = import("/lua/EffectUtilities.lua").CreateAeonColossusBuildingEffects
+local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
 
 -- upvalue for performance
 local MathSqrt = math.sqrt

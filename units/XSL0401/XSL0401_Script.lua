@@ -11,7 +11,7 @@ local SDFExperimentalPhasonProj = WeaponsFile.SDFExperimentalPhasonProj
 local SDFAireauWeapon = WeaponsFile.SDFAireauWeapon
 local SDFSinnuntheWeapon = WeaponsFile.SDFSinnuntheWeapon
 local SAAOlarisCannonWeapon = WeaponsFile.SAAOlarisCannonWeapon
-local Explosion = import('/lua/defaultexplosions.lua')
+local Explosion = import("/lua/defaultexplosions.lua")
 local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
 
 ---@class XSL0401 : SWalkingLandUnit

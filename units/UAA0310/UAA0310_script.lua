@@ -13,7 +13,7 @@ local AAATemporalFizzWeapon = aWeapons.AAATemporalFizzWeapon
 local explosion = import("/lua/defaultexplosions.lua")
 local CzarShield = import("/lua/shield.lua").CzarShield
 
-local CreateAeonCZARBuildingEffects = import("/lua/EffectUtilities.lua").CreateAeonCZARBuildingEffects
+local CreateAeonCZARBuildingEffects = import("/lua/effectutilities.lua").CreateAeonCZARBuildingEffects
 
 ---@class UAA0310 : AirTransport
 UAA0310 = Class(AirTransport) {
