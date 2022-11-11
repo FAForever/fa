@@ -543,7 +543,19 @@ WorldView = Class(moho.UIWorldView, Control) {
             end
         end
 
-        self:OnCursorDecals(identifier, enabled, changed, AttackDecalFunc)
+        local viaPrefs = Prefs.GetFromCurrentProfile('options.cursor_splash_damage') == 'on'
+        if viaPrefs then
+            self:OnCursorDecals(identifier, enabled, changed, AttackDecalFunc)
+        else
+            local commandData = CommandMode.GetCommandMode()
+            local viaCommandMode = commandData[1] and commandData[1] == 'order' and commandData[2].name == 'RULEUCC_Attack'
+            if viaCommandMode then
+                self:OnCursorDecals(identifier, enabled or (viaCommandMode != self.ViaCommandModeOld), changed  or (viaCommandMode != self.ViaCommandModeOld), AttackDecalFunc)
+            else 
+                self:OnCursorDecals(identifier, false, changed, AttackDecalFunc)
+            end
+            self.ViaCommandModeOld = viaCommandMode
+        end
     end,
 
     --- Called when the order `RULEUCC_Patrol` is being applied
