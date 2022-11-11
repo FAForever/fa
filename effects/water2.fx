@@ -318,7 +318,7 @@ float4 inPos : POSITION,
     result.mLayer3 = (inPos.xz + (normal4Movement * Time)) * normalRepeatRate.w;
     
     // calculate the view vector
-    result.mViewVec = inPos.xyz - ViewPosition;   
+    result.mViewVec = ViewPosition - inPos.xyz;  
 
 	return result;
 }
@@ -334,8 +334,6 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     float4 waterTexture = tex2D( UtilitySamplerC, inV.mTexUV );
     float waterDepth =  waterTexture.g;
   
-
-    // calculate the correct viewvector
     float3 viewVector = normalize(inV.mViewVec);
 
     // get perspective correct coordinate for sampling from the other textures
@@ -365,8 +363,8 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     float3 up = float3(0,1,0);
     N = lerp(up, N, waterTexture.r);
         
-	float3 R = reflect( viewVector, N );
-	float4 skyReflection = texCUBE( SkySampler, R );
+	float3 R = reflect(-viewVector, N);
+	float4 skyReflection = texCUBE(SkySampler, R);
 
     // get the correct coordinate for sampling refraction and reflection
     float2 refractionPos = screenPos;
@@ -388,8 +386,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	fresnel = tex2D( FresnelSampler, float2(waterDepth, NDotL ) ).r;
 
 	// figure out the sun reflection
-	// moved this to a texture and no speedup.. already texture bwidth bound I think
-    float3 sunReflection = pow( saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
+    float3 sunReflection = pow(saturate(dot(R, SunDirection)), SunShininess) * SunColor;
 
     // lerp the reflections together
     reflectedPixels = lerp( skyReflection, reflectedPixels, saturate(unitreflectionAmount * reflectedPixels.w));
