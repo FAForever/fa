@@ -2194,7 +2194,29 @@ Tooltips = {
         description = '<LOC OPTIONS_RECLAIMSIZEDESC>Scales the text of the reclaim label to its value',
     },
     options_reclaim_overview_batching = {
-        title = '<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching>',
+        title = '<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching',
         description = '<LOC OPTIONS_RECLAIMBATCHINGDESC>Batches nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more. \r\n\r\nSignificantly improves performance. Is recommended for lower end systems.',
+    },
+
+    options_selection_sets_add_behavior = {
+        title = "<LOC options_selection_sets_add_behavior> Unique control groups",
+        description = "<LOC options_selection_sets_add_behavior_desc> When enabled a unit can only be part of one control group, a unit is 'stolen' from previously assigned control groups.",
+    },
+    options_selection_sets_production_behavior = {
+        title= "<LOC options_selection_sets_production_behavior> Transitive control groups of factories",
+        description= "LOC options_selection_sets_add_behavior_desc> When enabled a unit inherits the control group of the factory it is produced from."
+    },
+    options_selection_sets_double_tap_behavior = {
+        title = "<LOC options_selection_sets_double_tap_behavior> Successive control group recall behavior",
+        description = "<LOC options_selection_sets_double_tap_behavior_desc> Defines the behavior when you successively recall the same control group."
+    },
+    options_selection_sets_double_tap_decay = {
+        title = "<LOC options_selection_sets_double_tap_decay> Threshold for successive control group recalls",
+        description = "<LOC options_selection_sets_double_tap_decay_desc> Threshold is in miliseconds. ",
+    },
+
+    options_cursor_splash_damage = {
+        title = "<LOC options_cursor_splash_damage> Splash damage indicator",
+        description = "<LOC options_cursor_splash_damage_desc> Is usually shown when you attempt to ground-fire with a unit, like a bomber. When enabled the splash damage indicator is always shown when an attack command is possible. Does not interfere with how the attack command is processed, this is merely a visual change.",
     }
 }

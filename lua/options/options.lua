@@ -391,7 +391,7 @@ options = {
 
             {
                 title = "<LOC selectionsets0001>Steal from other control groups",
-                key = 'selection-sets-add-behavior',
+                key = 'selection_sets_add_behavior',
                 type = 'toggle',
                 default = false,
                 custom = {
@@ -404,7 +404,7 @@ options = {
 
             {
                 title = "<LOC selectionsets0004>Add to factory control group",
-                key = 'selection-sets-production-behavior',
+                key = 'selection_sets_production_behavior',
                 type = 'toggle',
                 default = false,
                 custom = {
@@ -417,7 +417,7 @@ options = {
 
             {
                 title = "<LOC selectionsets0007>Double tap control group behavior",
-                key = 'selection-sets-double-tap-behavior',
+                key = 'selection_sets_double_tap_behavior',
                 type = 'toggle',
                 default = 'translate-zoom',
                 custom = {
@@ -432,7 +432,7 @@ options = {
 
             {
                 title = "<LOC selectionsets0001>Double tap control group decay (in ms)",
-                key = 'selection-sets-double-tap-decay',
+                key = 'selection_sets_double_tap_decay',
                 type = 'slider',
                 default = 1000,
                 custom = {
@@ -468,7 +468,7 @@ options = {
                 title = "<LOC OPTIONS_0273>Automated Structure Ringing",
                 key = 'structure_capping_feature_01',
                 type = 'toggle',
-                default = "full-suite",
+                default = "off",
                 custom = {
                     states = {
                         {text = "<LOC _Off>Off",                                            key = "off"},
@@ -481,7 +481,7 @@ options = {
                 title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
                 key = 'automex',
                 type = 'toggle',
-                default = 'onlyT1',
+                default = 'off',
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 'off'},
@@ -539,38 +539,35 @@ options = {
             },
             {
                 title = "Default selection threshold",
-                tip = "this is a tip",
                 key = 'selection_threshold_regular',
                 type = 'slider',
                 default = 10,
                 custom = {
-                    min = 10,
-                    max = 200,
-                    inc = 10,
+                    min = 8,
+                    max = 40,
+                    inc = 2,
                 },
             },
             {
                 title = "Reclaim selection threshold",
-                tip = "this is a tip",
                 key = 'selection_threshold_reclaim',
                 type = 'slider',
                 default = 10,
                 custom = {
-                    min = 10,
-                    max = 200,
-                    inc = 10,
+                    min = 8,
+                    max = 40,
+                    inc = 2,
                 },
             },
             {
                 title = "Replay selection threshold",
-                tip = "this is a tip",
                 key = 'selection_threshold_replay',
                 type = 'slider',
-                default = 7,
+                default = 20,
                 custom = {
-                    min = 10,
-                    max = 400,
-                    inc = 10,
+                    min = 8,
+                    max = 80,
+                    inc = 2,
                 },
             },
 

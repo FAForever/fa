@@ -235,7 +235,6 @@ sampler2D UtilitySamplerB = sampler_state
     AddressU  = CLAMP;
     AddressV  = CLAMP;
 };
-
 sampler2D UtilitySamplerC = sampler_state
 {
     Texture   = (UtilityTextureC);
