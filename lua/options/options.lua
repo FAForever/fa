@@ -597,6 +597,19 @@ options = {
                     },
                 },
             },
+
+            {
+                title = "Always show splash damage indicator",
+                key = 'cursor_splash_damage',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _On>", key = 'on'},
+                    },
+                },
+            },
         },
     },
     ui = {
