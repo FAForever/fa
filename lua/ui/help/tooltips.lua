@@ -2217,6 +2217,10 @@ Tooltips = {
 
     options_cursor_splash_damage = {
         title = "<LOC options_cursor_splash_damage> Splash damage indicator",
-        description = "<LOC options_cursor_splash_damage_desc> Is usually shown when you attempt to ground-fire with a unit, like a bomber. When enabled the splash damage indicator is always shown when an attack command is possible. Does not interfere with how the attack command is processed, this is merely a visual change.",
+        description = "<LOC options_cursor_splash_damage_desc> Is usually shown when you attempt to ground-fire with a unit, like a bomber. When enabled the splash damage indicator is always shown when an attack command is possible. \r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
+    },
+    options_cursor_depth_scanning = {
+        title = "<LOC options_cursor_depth_scanning> Depth scanning",
+        description = "<LOC options_cursor_depth_scanning_desc> When enabled the game will visualize the offset between the water surface and the ocean floor.",
     }
 }
