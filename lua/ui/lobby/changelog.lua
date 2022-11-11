@@ -66,7 +66,7 @@ Changelog = Class(Group) {
         LayoutHelpers.FillParent(self.Background, GetFrame(0))
 
         self.DialogBackground = Bitmap(self.CommonUI)
-        self.DialogBackground:SetSolidColor("ff111111")
+        self.DialogBackground:SetSolidColor("99111111")
         LayoutHelpers.FillParent(self.DialogBackground, self.CommonUI)
 
         -- header

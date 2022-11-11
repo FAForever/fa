@@ -199,7 +199,6 @@ local function LayoutMajorAlliedEntry(entry, manualShare)
     Tooltip.AddButtonTooltip(giveResourcesBtn, 'dip_give_resources')
     entry.giveResourcesBtn = giveResourcesBtn
 
-    giveResourcesBtn:Disable()
     giveResourcesBtn.OnClick = function(self, modifiers)
         CreateShareResourcesDialog(entry)
     end
@@ -598,6 +597,7 @@ function CreateShareResourcesDialog(control)
         giveResGroup.Width:Set(control.Width)
         LayoutHelpers.SetHeight(giveResGroup, 90)
         LayoutHelpers.AtLeftBottomIn(giveResGroup, control)
+        control.giveResourcesGroup = giveResGroup
 
         local okBtn = UIUtil.CreateButtonStd(giveResGroup,
             '/dialogs/toggle_btn/toggle-d',
