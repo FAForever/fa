@@ -383,12 +383,11 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	// so we have to resort to an approximation that is not physically accurate
 	float4 reflectedPixels = tex2D(ReflectionSampler, refractionPos);
 
-    // calculate the fresnel term from a lookup texture
-    float fresnel;    
-    float  NDotL = saturate( dot(-viewVector, N) );
-	fresnel = tex2D( FresnelSampler, float2(waterDepth, NDotL ) ).r;
+    // calculate the fresnel term from a lookup texture  
+    float NDotL = saturate(dot(viewVector, N));
+	float fresnel = tex2D(FresnelSampler, float2(waterDepth, NDotL)).r;
 
-    float3 sunReflection = pow(saturate(dot(R, SunDirection)), SunShininess) * SunColor;
+    float3 sunReflection = pow(saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
 
     // lerp the reflections together
     reflectedPixels = lerp(skyReflection, reflectedPixels, saturate(unitreflectionAmount * reflectedPixels.a));
