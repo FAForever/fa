@@ -371,7 +371,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	// so we have to resort to an approximation using the refractionPos
 	float4 reflectedPixels = tex2D(ReflectionSampler, refractionPos);
 
-	float4 skyReflection = texCUBE(SkySampler, R) * 0.7;
+	float4 skyReflection = texCUBE(SkySampler, R);
     // lerp the reflections together
     reflectedPixels = lerp(skyReflection, reflectedPixels, saturate(reflectedPixels.a));
    
