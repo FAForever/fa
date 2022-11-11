@@ -134,10 +134,6 @@ float3 waterColorLowFi = float3(0.7647,0.8784,0.9647);
 
 // these actually get overridden by the map
 float2 waterLerp = 0.3;
-
-//
-// scale of the refraction
-//
 float refractionScale = 0.015;
 
 //
@@ -146,11 +142,9 @@ float refractionScale = 0.015;
 float fresnelBias = 0.1;
 float fresnelPower = 1.5;
 
-
 // these actually get overridden by the map
 float unitreflectionAmount = 0.5;
 float skyreflectionAmount = 1.5;
-
 
 
 //
@@ -360,7 +354,6 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     N = lerp(up, N, waterTexture.r);
         
 	float3 R = reflect(-viewVector, N);
-	float4 skyReflection = texCUBE(SkySampler, R);
 
     // get the correct coordinate for sampling refraction and reflection
     float2 refractionPos = screenPos;
@@ -368,31 +361,28 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 
     float4 refractedPixels = tex2D(RefractionSampler, refractionPos);
 
+	// we want to lerp in some of the water color based on depth, but
+    // not totally on depth as it gets clamped
+    float waterLerp = clamp(waterDepth, waterLerp.x, waterLerp.y);
+    refractedPixels.xyz = lerp(refractedPixels.xyz, waterColor, waterLerp);
+
     // calculate reflections of units
 	// We can't compute wich part of the unit we would hit with our reflection vector,
 	// so we have to resort to an approximation using the refractionPos
 	float4 reflectedPixels = tex2D(ReflectionSampler, refractionPos);
 
-    // calculate the fresnel term from a lookup texture  
-    float NDotL = saturate(dot(viewVector, N));
-	float fresnel = tex2D(FresnelSampler, float2(waterDepth, NDotL)).r;
-
-    float3 sunReflection = pow(saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
-
+	float4 skyReflection = texCUBE(SkySampler, R) * 0.7;
     // lerp the reflections together
     reflectedPixels = lerp(skyReflection, reflectedPixels, saturate(reflectedPixels.a));
-
-    // we want to lerp in some of the water color based on depth, but
-    // not totally on depth as it gets clamped
-    float waterLerp = clamp(waterDepth, waterLerp.x, waterLerp.y);
-
-    // lerp in the color
-    refractedPixels.xyz = lerp(refractedPixels.xyz, waterColor, waterLerp);
    
-    // lerp the reflection into the refraction         
-    refractedPixels = lerp(refractedPixels, reflectedPixels, saturate(fresnel));
+   	//Schlick approximation for fresnel
+    float NDotV = saturate(dot(viewVector, N));
+	float F0 = 0.08;
+    float fresnel = F0 + (1.0 - F0) * pow(1.0 - NDotV, 5.0);         
+    refractedPixels = lerp(refractedPixels, reflectedPixels, fresnel);
 
     // add in the sun reflection
+	float3 sunReflection = pow(saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
     sunReflection = sunReflection * fresnel;
     refractedPixels.xyz +=  sunReflection;
 
