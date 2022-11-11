@@ -543,9 +543,12 @@ WorldView = Class(moho.UIWorldView, Control) {
             end
         end
 
+        -- if via prefs then we always show the splash indicator
         local viaPrefs = Prefs.GetFromCurrentProfile('options.cursor_splash_damage') == 'on'
         if viaPrefs then
             self:OnCursorDecals(identifier, enabled, changed, AttackDecalFunc)
+
+        -- otherwise we only show it if we're in command mode
         else
             local commandData = CommandMode.GetCommandMode()
             local viaCommandMode = commandData[1] and commandData[1] == 'order' and commandData[2].name == 'RULEUCC_Attack'
