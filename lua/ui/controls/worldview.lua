@@ -550,7 +550,8 @@ WorldView = Class(moho.UIWorldView, Control) {
             local commandData = CommandMode.GetCommandMode()
             local viaCommandMode = commandData[1] and commandData[1] == 'order' and commandData[2].name == 'RULEUCC_Attack'
             if viaCommandMode then
-                self:OnCursorDecals(identifier, enabled or (viaCommandMode != self.ViaCommandModeOld), changed  or (viaCommandMode != self.ViaCommandModeOld), AttackDecalFunc)
+                local commandModeChange = (viaCommandMode != self.ViaCommandModeOld)
+                self:OnCursorDecals(identifier, enabled or commandModeChange, changed or commandModeChange, AttackDecalFunc)
             else 
                 self:OnCursorDecals(identifier, false, changed, AttackDecalFunc)
             end
