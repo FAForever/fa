@@ -104,7 +104,6 @@ end
 ---@param info CastingMouseMessage
 local function ReceiveData(sender, info)
     Samples[info] = true
-    LOG(string.format("Number of samples in cache: %s", tostring(table.getsize(Samples))))
 end
 
 --- Cleans up previous received mouse data
