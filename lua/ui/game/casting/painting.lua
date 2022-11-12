@@ -1,6 +1,11 @@
 
+local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
+local WorldViewManager = import("/lua/ui/game/worldview.lua")
+local meshSphere = '/env/Common/Props/sphere_lod0.scm'
+
 local clients = GetSessionClients()
 local armies = GetArmiesTable().armiesTable
+local durationInTicks = 100
 
 ---@class CastingPaintMessage
 ---@field CastingMouse boolean 
@@ -44,18 +49,11 @@ local function GetObserverClients()
     return observers
 end
 
-local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
-local WorldViewManager = import("/lua/ui/game/worldview.lua")
-local meshSphere = '/env/Common/Props/sphere_lod0.scm'
-
 ---@type table<WorldMesh, boolean>
 local Unused = { }
 
 ---@type table<WorldMesh, CastingPaintMessage>
 local InUse = { }
-
----@type table<string, Vector>
-local LocationTarget = { }
 
 ---@type table<string, Vector>
 local Samples = { }
@@ -77,7 +75,7 @@ end
 local function SendData(Sync)
 
     -- only paint when we hold control (or some other key)
-    if not IsKeyDown('Ctrl') then
+    if not IsKeyDown(17) then
         return
     end
 
@@ -87,10 +85,10 @@ local function SendData(Sync)
         return
     end
 
-    ---@type CastingMouseMessage
+    ---@type CastingPaintMessage
     local msg = {
         -- identifier used to pass mouse information
-        CastingMouse = true,
+        CastingPaintingRegister = true,
 
         -- mouse information
         Position = position,
@@ -103,7 +101,7 @@ end
 
 --- Processes the mouse position send by players
 ---@param sender string
----@param info CastingMouseMessage
+---@param info CastingPaintMessage
 local function ReceiveData(sender, info)
     Samples[info] = true
 end
@@ -114,22 +112,34 @@ local function ProcessData(Sync)
 
     local tick = GameTick()
 
-    -- cull old data
+    -- remove old samples
     for sample, _ in Samples do
-        if tick - sample.Tick < 10 then
+        if tick - sample.Tick > 10 then
             Samples[sample] = nil
         end
     end
 
-    -- populate new data
-    for sample, _ in Samples do 
+    -- populate entities using samples
+    for sample, _ in Samples do
         if tick - sample.Tick == 5 then
             local entity = next(Unused)
             if not entity then
                 entity = AllocateEntity()
             end
 
+            entity:SetHidden(false)
+            entity:SetStance(sample.Position)
+            Unused[entity] = nil
             InUse[entity] = sample
+        end
+    end
+
+    -- remove old entities
+    for entity, sample in InUse do
+        if tick - sample.Tick > durationInTicks then
+            entity:SetHidden(true)
+            Unused[entity] = true
+            InUse[entity] = nil
         end
     end
 end
@@ -137,28 +147,10 @@ end
 --- Interpolates the mouse position between updates
 local function DisplayThread()
     while true do
-        for id, entity in Entities do
-            local next = LocationTarget[id]
-            local curr = LocationCurrent[id]
-
-            local x = next[1] * 0.1 + curr[1] * 0.9
-            local y = next[2] * 0.1 + curr[2] * 0.9
-            local z = next[3] * 0.1 + curr[3] * 0.9
-
-            local position = {x, y, z}
-            LocationCurrent[id] = position
-
-            -- update everything
-            if x and y and z then
-                entity:SetStance(position)
-
-                local label = Labels[id]
-                local screen = WorldViewManager.viewLeft:Project(position)
-                label.Left:Set(screen[1] - 0.5 * label.Width())
-                label.Top:Set(screen[2] - 30)
-            end
+        local tick = GameTick()
+        for entity, sample in InUse do
+            entity:SetFractionCompleteParameter(1 - ((tick - sample.Tick + 5) / durationInTicks))
         end
-
         WaitFrames(1)
     end
 end
@@ -166,8 +158,8 @@ end
 -- check conditions for sharing
 if clientCount > playerCount then
     LOG("Sharing is caring!")
-    AddOnSyncCallback(SendData, 'CastingSendPainting')
-    AddOnSyncCallback(ProcessData, 'CastingSend')
-    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveData, 'CastingPainting')
+    AddOnSyncCallback(SendData, 'CastingPaintingSend')
+    AddOnSyncCallback(ProcessData, 'CastingPaintingProcess')
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveData, 'CastingPaintingRegister')
     ForkThread(DisplayThread)
 end
