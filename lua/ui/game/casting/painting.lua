@@ -1,6 +1,6 @@
 
+local Prefs = import("/lua/user/prefs.lua")
 local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
-local WorldViewManager = import("/lua/ui/game/worldview.lua")
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
 local clients = GetSessionClients()
@@ -55,6 +55,8 @@ local function GetObserverClients()
     return observers
 end
 
+local Trash = TrashBag()
+
 ---@type table<WorldMesh, boolean>
 local Unused = { }
 
@@ -64,15 +66,16 @@ local InUse = { }
 ---@type table<string, Vector>
 local Samples = { }
 
+local EntityMesh = {
+    MeshName = meshSphere,
+    TextureName = '/meshes/game/Assist_albedo.dds',
+    ShaderName = 'FakeRings',
+    UniformScale = 1.5
+}
+
 local function AllocateEntity()
     local entity = WorldMesh()
-    entity:SetMesh({
-        MeshName = meshSphere,
-        TextureName = '/meshes/game/Assist_albedo.dds',
-        ShaderName = 'FakeRings',
-        UniformScale = 1.5
-    })
-
+    entity:SetMesh(EntityMesh)
     return entity
 end
 
@@ -86,27 +89,30 @@ local function SendData(Sync)
 
         WaitSeconds(0.01)
 
-        -- only paint when we hold control (or some other key)
-        local position = GetMouseWorldPos()
-        if IsKeyDown(KeyCodeAlt) and position and position[1] then
+        local key = Prefs.GetFromCurrentProfile('options.casting_painting')
+        if key then
 
-            local dx = lastPosition[1] - position[1]
-            local dz = lastPosition[3] - position[3]
-            if dx * dx + dz * dz > 1 then
-                lastPosition = position
+            -- only paint when we hold control (or some other key)
+            local position = GetMouseWorldPos()
+            if IsKeyDown(key) and position and position[1] then
+                local dx = lastPosition[1] - position[1]
+                local dz = lastPosition[3] - position[3]
+                if dx * dx + dz * dz > 1 then
+                    lastPosition = position
 
-                ---@type CastingPaintMessage
-                local msg = {
-                    -- identifier used to pass mouse information
-                    CastingPaintingRegister = true,
+                    ---@type CastingPaintMessage
+                    local msg = {
+                        -- identifier used to pass mouse information
+                        CastingPaintingRegister = true,
 
-                    -- mouse information
-                    Position = position,
-                    Time = CurrentTime() - offset
-                }
+                        -- mouse information
+                        Position = position,
+                        Time = CurrentTime() - offset
+                    }
 
-                local clients = GetObserverClients()
-                SessionSendChatMessage(clients, msg)
+                    local clients = GetObserverClients()
+                    SessionSendChatMessage(clients, msg)
+                end
             end
         end
     end
@@ -134,6 +140,7 @@ local function ProcessData(Sync)
             local entity = next(Unused)
             if not entity then
                 entity = AllocateEntity()
+                Trash:Add(entity)
             end
 
             entity:SetHidden(false)
@@ -164,4 +171,12 @@ if clientCount > playerCount then
     ForkThread(SendData)
     ForkThread(ProcessData)
     import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveData, 'CastingPaintingRegister')
+
+    local Exit = import("/lua/ui/override/exit.lua")
+    Exit.AddOnExitCallback(
+        'CastingPainting',
+        function()
+            Trash:Destroy()
+        end
+    )
 end
