@@ -5,12 +5,18 @@ local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
 local clients = GetSessionClients()
 local armies = GetArmiesTable().armiesTable
-local durationInTicks = 100
+local durationInSeconds = 10
+
+local KeyCodeAlt = 18
+local KeyCodeCtrl = 17
+local KeyCodeShift = 16
+
+local offset = CurrentTime()
 
 ---@class CastingPaintMessage
 ---@field CastingMouse boolean 
 ---@field Position Vector
----@field Tick number
+---@field Time number
 
 -- determine if there are observers
 local clientCount = table.getn(clients)
@@ -64,7 +70,7 @@ local function AllocateEntity()
         MeshName = meshSphere,
         TextureName = '/meshes/game/Assist_albedo.dds',
         ShaderName = 'FakeRings',
-        UniformScale = 1
+        UniformScale = 1.5
     })
 
     return entity
@@ -74,29 +80,36 @@ end
 ---@param Sync any
 local function SendData(Sync)
 
-    -- only paint when we hold control (or some other key)
-    if not IsKeyDown(17) then
-        return
+    local lastPosition = { 0, 0, 0 }
+
+    while true do 
+
+        WaitSeconds(0.01)
+
+        -- only paint when we hold control (or some other key)
+        local position = GetMouseWorldPos()
+        if IsKeyDown(KeyCodeAlt) and position and position[1] then
+
+            local dx = lastPosition[1] - position[1]
+            local dz = lastPosition[3] - position[3]
+            if dx * dx + dz * dz > 1 then
+                lastPosition = position
+
+                ---@type CastingPaintMessage
+                local msg = {
+                    -- identifier used to pass mouse information
+                    CastingPaintingRegister = true,
+
+                    -- mouse information
+                    Position = position,
+                    Time = CurrentTime() - offset
+                }
+
+                local clients = GetObserverClients()
+                SessionSendChatMessage(clients, msg)
+            end
+        end
     end
-
-    -- retrieve position and elevation
-    local position = GetMouseWorldPos()
-    if not (position and position[1]) then
-        return
-    end
-
-    ---@type CastingPaintMessage
-    local msg = {
-        -- identifier used to pass mouse information
-        CastingPaintingRegister = true,
-
-        -- mouse information
-        Position = position,
-        Tick = GameTick()
-    }
-
-    local clients = GetObserverClients()
-    SessionSendChatMessage(clients, msg)
 end
 
 --- Processes the mouse position send by players
@@ -110,18 +123,14 @@ end
 ---@param Sync any
 local function ProcessData(Sync)
 
-    local tick = GameTick()
+    while true do
 
-    -- remove old samples
-    for sample, _ in Samples do
-        if tick - sample.Tick > 10 then
-            Samples[sample] = nil
-        end
-    end
+        WaitSeconds(0.01)
 
-    -- populate entities using samples
-    for sample, _ in Samples do
-        if tick - sample.Tick == 5 then
+        local time = CurrentTime() - offset
+
+        -- populate entities using samples
+        for sample, _ in Samples do
             local entity = next(Unused)
             if not entity then
                 entity = AllocateEntity()
@@ -129,37 +138,30 @@ local function ProcessData(Sync)
 
             entity:SetHidden(false)
             entity:SetStance(sample.Position)
+            Samples[sample] = nil
             Unused[entity] = nil
             InUse[entity] = sample
         end
-    end
 
-    -- remove old entities
-    for entity, sample in InUse do
-        if tick - sample.Tick > durationInTicks then
-            entity:SetHidden(true)
-            Unused[entity] = true
-            InUse[entity] = nil
-        end
-    end
-end
-
---- Interpolates the mouse position between updates
-local function DisplayThread()
-    while true do
-        local tick = GameTick()
+        -- remove old entities
         for entity, sample in InUse do
-            entity:SetFractionCompleteParameter(1 - ((tick - sample.Tick + 5) / durationInTicks))
+            if time - sample.Time > durationInSeconds then
+                entity:SetHidden(true)
+                Unused[entity] = true
+                InUse[entity] = nil
+            end
         end
-        WaitFrames(1)
+
+        -- update entities
+        for entity, sample in InUse do
+            entity:SetFractionCompleteParameter(1 - ((time - sample.Time) / durationInSeconds))
+        end
     end
 end
 
 -- check conditions for sharing
 if clientCount > playerCount then
-    LOG("Sharing is caring!")
-    AddOnSyncCallback(SendData, 'CastingPaintingSend')
-    AddOnSyncCallback(ProcessData, 'CastingPaintingProcess')
+    ForkThread(SendData)
+    ForkThread(ProcessData)
     import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveData, 'CastingPaintingRegister')
-    ForkThread(DisplayThread)
 end
