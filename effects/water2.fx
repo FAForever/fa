@@ -380,6 +380,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	float F0 = 0.08;
     float fresnel = F0 + (1.0 - F0) * pow(1.0 - NDotV, 5.0);
 
+	// the default value of 1.5 is way to high, but we want to preserve manually set values in existing maps
 	if (skyreflectionAmount == 1.5)
 		skyreflectionAmount = 1.0;
     refractedPixels = lerp(refractedPixels, reflectedPixels, saturate(fresnel * skyreflectionAmount));
@@ -393,25 +394,9 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     refractedPixels.xyz = lerp(refractedPixels.xyz, waveCrestColor, (1 - waterTexture.a) * waveCrest);
 
     // return the pixels masked out by the water mask
-#if 1    
-    // use alphablend, don't get any glow
     float4 returnPixels = refractedPixels;
     returnPixels.a = 1 - mask;
-#ifdef DIRECT3D10
-	//if( alphaTestEnable )
-	//	AlphaTestD3D10( returnPixels.a, alphaFunc, alphaRef );
-#endif
     return returnPixels;
-#else    
-    // use lerp, do get glow
-    refractedPixels.w = sunReflection.r * SunGlow;
-    float4 returnPixels = lerp( refractedPixels, backGroundPixels, mask);
-#ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( returnPixels.a, alphaFunc, alphaRef );
-#endif
-    return returnPixels;    
-#endif    
 }
 
 float4 MediumFidelityPS0( LOWFIDELITY_VERTEX vertex) : COLOR
