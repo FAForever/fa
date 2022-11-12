@@ -378,8 +378,11 @@ float4 HighFidelityPS( VS_OUTPUT inV,
    	//Schlick approximation for fresnel
     float NDotV = saturate(dot(viewVector, N));
 	float F0 = 0.08;
-    float fresnel = F0 + (1.0 - F0) * pow(1.0 - NDotV, 5.0);         
-    refractedPixels = lerp(refractedPixels, reflectedPixels, fresnel);
+    float fresnel = F0 + (1.0 - F0) * pow(1.0 - NDotV, 5.0);
+
+	if (skyreflectionAmount == 1.5)
+		skyreflectionAmount = 1.0;
+    refractedPixels = lerp(refractedPixels, reflectedPixels, saturate(fresnel * skyreflectionAmount));
 
     // add in the sun reflection
 	float3 sunReflection = pow(saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
