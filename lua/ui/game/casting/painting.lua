@@ -27,13 +27,6 @@ for k, data in armies do
     end
 end
 
-local localName = ''
-for k, client in clients do
-    if client['local'] then
-        localName = client.name
-    end
-end
-
 --- Returns a list of clients that are considered observers
 ---@return number[]
 local function GetObserverClients()
@@ -47,7 +40,7 @@ local function GetObserverClients()
         end
 
         -- do not send to ourself or to players
-        if true then -- not isPlayer and client.name != localName
+        if not isPlayer then
             table.insert(observers, k)
         end
     end
@@ -85,7 +78,7 @@ local function SendData(Sync)
 
     local lastPosition = { 0, 0, 0 }
 
-    while true do 
+    while true do
 
         WaitSeconds(0.01)
 
@@ -167,7 +160,7 @@ local function ProcessData(Sync)
 end
 
 -- check conditions for sharing
-if clientCount > playerCount then
+if GetFocusArmy() == -1 then
     ForkThread(SendData)
     ForkThread(ProcessData)
     import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveData, 'CastingPaintingRegister')
