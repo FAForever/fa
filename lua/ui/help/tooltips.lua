@@ -2194,7 +2194,16 @@ Tooltips = {
         description = '<LOC OPTIONS_RECLAIMSIZEDESC>Scales the text of the reclaim label to its value',
     },
     options_reclaim_overview_batching = {
-        title = '<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching>',
+        title = '<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching',
         description = '<LOC OPTIONS_RECLAIMBATCHINGDESC>Batches nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more. \r\n\r\nSignificantly improves performance. Is recommended for lower end systems.',
+    },
+
+    options_casting_sharing_mouse = {
+        title = '<LOC casting_sharing_mouse_title>Show mouse locations for observers',
+        description = '<LOC casting_sharing_mouse_desc>If enabled, the mouse locations of players (and other observers) are shown as you observe a game. \r\nDoes not apply for (live) replays. Does not apply for defeated players.',
+    },
+    options_casting_painting = {
+        title = '<LOC casting_painting_title>Painting for observers',
+        description = '<LOC casting_painting_desc>If enabled, allows you to paint directly on the map using the assigned hotkey. \r\nDoes not apply for defeated players.',
     }
 }
