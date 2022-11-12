@@ -1,3 +1,6 @@
+--**************************************************************************************************
+--** Copyright © 2022 Forged Alliance Forever - shared under the MIT license
+--**************************************************************************************************
 
 --- ticks before a player can start the first recall vote (5 minutes)
 PlayerGateCooldown = 5 * 60 * 10

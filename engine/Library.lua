@@ -1,3 +1,6 @@
+--**************************************************************************************************
+--** Copyright © 2022 Forged Alliance Forever - shared under the MIT license
+--**************************************************************************************************
 ---@meta
 
 -- This file annotates the differences that our distribution of the Lua standard libary has with

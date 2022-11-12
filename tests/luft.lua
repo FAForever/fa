@@ -1,9 +1,12 @@
--- lust v0.1.0 - Lua test framework
--- https://github.com/bjornbytes/lust
--- MIT LICENSE
---
--- Modified by Askaholic for lua 5.0
--- Extended by Hdt80bro
+--**************************************************************************************************
+--** lust v0.1.0 - Lua test framework
+--** https://github.com/bjornbytes/lust - shared under the MIT license
+--**
+--** Modified by Askaholic for lua 5.0
+--**
+--** Extended by Hdt80bro from the "lust" version to the "luft" version and renamed for
+--** clarification
+--**************************************************************************************************
 
 -- Useful for better test output
 require "../lua/system/repr.lua"

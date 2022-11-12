@@ -1,5 +1,5 @@
 --**************************************************************************************************
---** Copyleft  2022 Forged Alliance Forever - shared under the GPL V3 license
+--** Copyright © 2022 Forged Alliance Forever - shared under the MIT license
 --**************************************************************************************************
 --
 -- Color library for Moho Lua (based on LuaPlus 5.0)

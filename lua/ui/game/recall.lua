@@ -1,3 +1,7 @@
+--**************************************************************************************************
+--** Copyright © 2022 Forged Alliance Forever - shared under the MIT license
+--**************************************************************************************************
+
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local Group = import("/lua/maui/group.lua").Group
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
