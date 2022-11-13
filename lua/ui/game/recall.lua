@@ -50,10 +50,10 @@ end
 
 function RequestHandler(data)
     if data.CannotRequest ~= nil then
-        import("/lua/ui/game/diplomacy.lua").UpdateCannotRequestRecall(data.CannotRequest)
+        import("/lua/ui/game/diplomacy.lua").SetCannotRequestRecallReason(data.CannotRequest)
     end
     if data.Open then
-        panel:StartVote(data.Blocks, data.Open, data.CanVote)
+        panel:StartVote(data.Blocks, data.Open, data.CanVote, data.StartTime)
     end
     local accept, veto = data.Accept, data.Veto
     if accept or veto then
@@ -61,6 +61,8 @@ function RequestHandler(data)
     end
     if data.Close ~= nil then
         panel:CloseVote(data.Close)
+    elseif data.Cancel then
+        panel:CancelVote()
     end
 end
 
@@ -257,10 +259,9 @@ RecallPanel = Class(NinePatch.NinePatch) {
         end
     end;
 
-    StartVote = function(self, blocks, duration, canVote)
-        SPEW("Recall voting!")
+    StartVote = function(self, blocks, duration, canVote, startingTime)
         self.duration = duration
-        self.startTime:Set(GetGameTimeSeconds())
+        self.startTime:Set(startingTime or GetGameTimeSeconds())
         self:SetCanVote(canVote)
         self:LayoutBlocks(blocks) -- can depend on `canVote`
         self.collapseArrow:Enable()
@@ -286,6 +287,16 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 self.reviewResultsThread = nil
             end, self)
         end
+    end;
+
+    CancelVote = function(self)
+        self:SetCanVote(false)
+        self.startTime:Set(-9999) -- make sure the OnFrame animation ends
+        if self.reviewResultsThread then
+            KillThread(self.reviewResultsThread)
+            self.reviewResultsThread = nil
+        end
+        self:OnResultsReviewed()
     end;
 
     CloseVote = function(self, accepted)
@@ -377,6 +388,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
             if time >= dur then
                 self.startTime:Set(-9999)
                 self.progressBar.Width:Set(0)
+                self.progressBar:Hide()
             else
                 self.progressBar.Width:Set((1 - time / dur) * nominalWidth)
             end
