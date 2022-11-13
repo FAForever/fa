@@ -1,17 +1,16 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2022  Willem 'Jip' Wijnia
---** 
+--**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
 --** in the Software without restriction, including without limitation the rights
 --** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 --** copies of the Software, and to permit persons to whom the Software is
 --** furnished to do so, subject to the following conditions:
---** 
+--**
 --** The above copyright notice and this permission notice shall be included in all
 --** copies or substantial portions of the Software.
---** 
+--**
 --** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 --** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 --** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,7 +27,7 @@ NavPathToHeap = ClassSimple {
 
     ---@param self NavPathToHeap
     __init = function(self)
-        self.Heap = { }
+        self.Heap = {}
         self.HeapSize = 0
     end,
 
@@ -63,59 +62,56 @@ NavPathToHeap = ClassSimple {
         self.HeapSize = self.HeapSize - 1
 
         -- fix its position.
-        self:Heapify(1)
+        self:Heapify()
 
         return value
     end,
 
     ---@param self NavPathToHeap
-    ---@param index number
-    Heapify = function(self, index)
-        -- find the left / right child and the parent.
-        local parent = index
+    Heapify = function(self)
+        local index = 1
+        -- find the left / right child
         local left = self:ToLeftChild(index)
         local right = self:ToRightChild(index)
+        -- if there is no left child it means we restored heap properties
+        while self.Heap[left] do
+            local min = left
 
-        -- find the best of the two, we assume the left child is.
-        local min = left
-
-        -- if there is a right child, then there always has to be a left child. Hence, we can now assume there's both a right and a left child.
-        -- compare the two: if right is smaller, then assign min = right. Else, keep min on left.
-        if self.Heap[right] then
-            if (self.Heap[right].AcquiredCosts + self.Heap[right].ExpectedCosts) < (self.Heap[left].AcquiredCosts + self.Heap[left].ExpectedCosts) then
+            -- if there is a right child, compare its value with the left one
+            -- if right is smaller, then assign min = right. Else, keep min on left.
+            if self.Heap[right] and (self.Heap[right].TotalCosts < self.Heap[left].TotalCosts) then
                 min = right
             end
-        end
-
-        -- if there is a child, compare the lowest child (is given due to code above) with our parent. 
-        -- If it's smaller, switch the parent and the lowest child.
-        if self.Heap[min] then
-            if (self.Heap[min].AcquiredCosts + self.Heap[min].ExpectedCosts ) < (self.Heap[parent].AcquiredCosts + self.Heap[parent].ExpectedCosts ) then
-                -- swap the two values.
-                self:Swap(parent, min)
-
-                -- check if the (parent) value that is now at the child position is at the correct position within the Heap.
-                self:Heapify(min)
+            
+            -- if min has higher value than the index it means we restored heap properties 
+            -- and can break the loop
+            if self.Heap[min].TotalCosts > self.Heap[index].TotalCosts then
+                return
             end
+            -- otherwise, swap the two values.
+            self:Swap(index, min)
+            -- and update index, left and right indexes.
+            index = min
+            left = self:ToLeftChild(index)
+            right = self:ToRightChild(index)
         end
     end,
 
     ---@param self NavPathToHeap
-    ---@param index number
-    Rootify = function(self, index)
+    Rootify = function(self)
+        local index = self.HeapSize
         local parent = self:ToParent(index)
-    
-        if  -- if we're the root
-            (index == 1) or
-
-            -- or we're at the correct place, cost-wise
-            self.Heap[parent].AcquiredCosts + self.Heap[parent].ExpectedCosts < self.Heap[index].AcquiredCosts + self.Heap[index].ExpectedCosts 
-        then
-            return
+        while parent >= 1 do
+            -- if parent value is smaller than index value it means we restored correct order of the elements
+            if self.Heap[parent].TotalCosts < self.Heap[index].TotalCosts then
+                return
+            end
+            -- otherwise, swap the values
+            self:Swap(parent, index)
+            -- and update index and parend indexes
+            index = parent
+            parent = self:ToParent(index)
         end
-    
-        self:Swap(parent, index)
-        self:Rootify(parent)
     end,
 
     ---@param self NavPathToHeap
@@ -133,7 +129,7 @@ NavPathToHeap = ClassSimple {
         if element then
             self.HeapSize = self.HeapSize + 1
             self.Heap[self.HeapSize] = element
-            self:Rootify(self.HeapSize)
+            self:Rootify()
         else
             WARN("given object to Heap was nil!")
         end
@@ -144,7 +140,7 @@ NavPathToHeap = ClassSimple {
     ---@return number
     ToParent = function(self, index)
         -- index / 2
-        return (0.5 * index ) ^ 0
+        return index >> 1
     end,
 
     ---@param self NavPathToHeap
@@ -158,7 +154,7 @@ NavPathToHeap = ClassSimple {
     ---@param self NavPathToHeap
     ---@param index number
     ---@return number
-    ToLeftChild = function (self, index)
+    ToLeftChild = function(self, index)
         -- 2 * index
         return 2 * index
     end,

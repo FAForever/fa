@@ -232,7 +232,7 @@ local CompressedLabelTree
 ---@field pz number                                         # z-coordinate of center in world space
 ---@field From CompressedLabelTreeLeaf
 ---@field AcquiredCosts number
----@field ExpectedCosts number
+---@field TotalCosts number
 ---@field Seen number   
 
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
