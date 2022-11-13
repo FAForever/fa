@@ -6,7 +6,6 @@ ObjectiveArrow = Class(Entity) {
     ---@param self ObjectiveArrow
     ---@param spec table
     OnCreate = function(self, spec)
-        self.BounceTime = 0.0
         self.Size = spec.Size or 1.0
         self:SetVizToFocusPlayer('Always')
         self:SetVizToEnemies('Intel')
@@ -35,10 +34,9 @@ ObjectiveArrow = Class(Entity) {
                 yOff = spec.Size / 2.0 + 0.5
             end
 
-            self.SavedOffset = yOff;
-            self.SavedVector = Vector(0, yOff, 0)
-            self:SetParentOffset(self.SavedVector)
-            ForkThread(self.BounceThread, self)
+            local vec = Vector(0, yOff, 0)
+            self:SetParentOffset(vec)
+            ForkThread(self.BounceThread, self, vec)
         end
 
         -- magic 0.4 scaling so spec.Size can be specified in OGrid units
@@ -46,19 +44,16 @@ ObjectiveArrow = Class(Entity) {
     end,
 
     ---@param self ObjectiveArrow
-    BounceThread = function(self)
-        while true do
-            if self:BeenDestroyed() then
-                return
-            end
-
-            --LOG('sin =',math.sin(self.BounceTime))
-            local yOff = self.SavedOffset + math.sin(self.BounceTime) / 4
-            self.SavedVector.y = yOff
-            self:SetParentOffset(self.SavedVector)
+    BounceThread = function(self, vec)
+        local offset = vec.y
+        local bounceTime = 0
+        while not self:BeenDestroyed() do
+            
+            vec.y = offset + math.sin(bounceTime) / 4
+            self:SetParentOffset(vec)
 
             WaitSeconds(0.1)
-            self.BounceTime = self.BounceTime + math.pi * 0.25
+            bounceTime = bounceTime + math.pi * 0.25
         end
     end,
 }
