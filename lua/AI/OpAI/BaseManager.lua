@@ -66,6 +66,9 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
+
+local TrashForkThreadable = import("/lua/shared/ForkThreadable.lua").TrashForkThreadable
+
 local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
 local RebuildStructuresTemplate = import("/lua/buildingtemplates.lua").RebuildStructuresTemplate
 local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
@@ -160,10 +163,9 @@ local BuildingCounterDefaultValues = {
     },
 }
 
----@class BaseManager
----@field Trash TrashBag
+---@class BaseManager : TrashForkThreadable
 ---@field AIBrain AIBrain
-BaseManager = ClassSimple {
+BaseManager = Class(TrashForkThreadable) {
 
     --- Introduces all the relevant fields to the base manager, internally called by the engine
     ---@param self BaseManager      # An instance of the BaseManager class
@@ -356,23 +358,6 @@ BaseManager = ClassSimple {
     ---@return nil
     InitializeDifficultyTables = function(self, brain, baseName, markerName, radius, levelTable)
         self:Initialize(brain, baseName, markerName, radius, levelTable, true)
-    end,
-
-    -- Auto trashbags all threads on a base manager
-
-    --- Allocates a thread running the function where the base manager is prepended as the first argument. The thread is inserted in the trashbag of the base manager
-    ---@param self BaseManager      # An instance of the BaseManager class
-    ---@param fn function           # A function to run on the forked thread
-    ---@param ... unknown           # Parameters of the function where the base manager is prepended as the first argument
-    ---@return thread               # An instance of the Thread class
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
-        end
     end,
 
     --- Instructs the base to attempt to build a specific unit group as defined in the map. These are usually experimentals
