@@ -2220,6 +2220,7 @@ Tooltips = {
     options_cursor_depth_scanning = {
         title = "<LOC options_cursor_depth_scanning_title>Depth scanning",
         description = "<LOC options_cursor_depth_scanning_desc>When enabled the game will visualize the height difference between the water surface and the ocean floor.",
+    },
     options_casting_sharing_mouse = {
         title = '<LOC casting_sharing_mouse_title>Show mouse locations for observers',
         description = '<LOC casting_sharing_mouse_desc>If enabled, the mouse locations of players (and other observers) are shown as you observe a game. \r\nDoes not apply for (live) replays. Does not apply for defeated players.',
