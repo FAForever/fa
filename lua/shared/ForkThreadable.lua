@@ -1,4 +1,6 @@
 
+local ForkThread = ForkThread
+local unpack = unpack
 
 ---@class ForkThreadable
 ForkThreadable = ClassSimple
