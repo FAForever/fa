@@ -22,6 +22,8 @@ local EngineerManager = import("/lua/sim/engineermanager.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local StratManager = import("/lua/sim/strategymanager.lua")
 
+local TrashForkThreadable = import("/lua/shared/ForkThreadable.lua").TrashForkThreadable
+
 local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
 local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
@@ -64,7 +66,7 @@ local Factions = import("/lua/factions.lua").GetFactions(true)
 ---@alias HqFaction "UEF" | "AEON" | "CYBRAN" | "SERAPHIM" | "NOMADS"
 ---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
 ---@alias BrainType "AI" | "Human"
----@class AIBrain: moho.aibrain_methods
+---@class AIBrain: moho.aibrain_methods, TrashForkThreadable
 ---@field AIPlansList string[][]
 ---@field AirAttackPoints? table
 ---@field AttackData AttackManager
@@ -108,7 +110,7 @@ local Factions = import("/lua/factions.lua").GetFactions(true)
 ---@field UnitBuiltTriggerList table
 ---@field UnitStats table<UnitId, table<string, number>>
 ---@field VeterancyTriggerList table
-AIBrain = Class(moho.aibrain_methods) {
+AIBrain = Class(moho.aibrain_methods, TrashForkThreadable) {
     -- The state of the brain in the match
     Status = 'InProgress',
 
@@ -795,20 +797,6 @@ AIBrain = Class(moho.aibrain_methods) {
     ImportScenarioArmyPlans = function(self, planName)
         if planName and planName ~= '' then
             return import(planName).AIPlansList
-        else
-            return nil
-        end
-    end,
-
-    ---@param self AIBrain
-    ---@param fn function
-    ---@param ... any
-    ---@return thread|nil
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
         else
             return nil
         end
