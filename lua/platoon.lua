@@ -20,14 +20,16 @@ local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local SPAI = import("/lua/scenarioplatoonai.lua")
 
+local TrashForkThreadable = import("/lua/shared/ForkThreadable.lua").TrashForkThreadable
+
 --for sorian AI
 local SUtils = import("/lua/ai/sorianutilities.lua")
 
 ---@alias PlatoonSquads 'Attack' | 'Artillery' | 'Guard' | 'None' | 'Scout' | 'Support' | 'Unassigned'
 
----@class Platoon : moho.platoon_methods
+---@class Platoon : moho.platoon_methods, TrashForkThreadable
 ---@field PlatoonData table
-Platoon = Class(moho.platoon_methods) {
+Platoon = Class(moho.platoon_methods, TrashForkThreadable) {
     NeedCoolDown = false,
     LastAttackDestination = {},
 
@@ -160,20 +162,6 @@ Platoon = Class(moho.platoon_methods) {
         self:DoDestroyCallbacks()
         if self.Trash then
             self.Trash:Destroy()
-        end
-    end,
-
-    ---@param self Platoon
-    ---@param fn function
-    ---@param ... any
-    ---@return thread
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
         end
     end,
 
