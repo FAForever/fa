@@ -10,6 +10,7 @@
 
 local Entity = import("/lua/sim/entity.lua").Entity
 local NukeDamage = import("/lua/sim/nukedamage.lua").NukeAOE
+local TrashForkThreadable = import("/lua/shared/ForkThreadable.lua").TrashForkThreadable
 local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEntityCategoryProperly
 local cachedPriorities = false
 local RecycledPriTable = {}
@@ -45,7 +46,7 @@ local function ParsePriorities()
     return finalPriorities
 end
 
----@class Weapon : moho.weapon_methods
+---@class Weapon : moho.weapon_methods, TrashForkThreadable
 ---@field AimControl? moho.AimManipulator
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
@@ -64,7 +65,7 @@ end
 ---@field TrashManipulators TrashBag
 ---@field TrashProjectiles TrashBag
 ---@field unit Unit
-Weapon = Class(moho.weapon_methods) {
+Weapon = Class(moho.weapon_methods, TrashForkThreadable) {
 
     -- stored here for mods compatibility, overridden in the inner table when written to
     DamageMod = 0,
@@ -570,20 +571,6 @@ Weapon = Class(moho.weapon_methods) {
     ---@param self Weapon
     WeaponUsesEnergy = function(self)
         return self.EnergyRequired and self.EnergyRequired > 0
-    end,
-
-    ---@param self Weapon
-    ---@param fn function
-    ---@param ... any
-    ---@return thread|nil
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
-        end
     end,
 
     ---@param self Weapon

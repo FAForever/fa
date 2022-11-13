@@ -6,11 +6,11 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-
+local TrashForkThreadable = import("/lua/shared/ForkThreadable.lua").TrashForkThreadable
 local Builder = import("/lua/sim/builder.lua")
 
----@class BuilderManager
-BuilderManager = ClassSimple {
+---@class BuilderManager : TrashForkThreadable
+BuilderManager = Class(TrashForkThreadable) {
     ---@param self BuilderManager
     ---@param brain AIBrain
     Create = function(self, brain)
@@ -34,21 +34,6 @@ BuilderManager = ClassSimple {
             end
         end
         self.Trash:Destroy()
-    end,
-
-    -- forking and storing a thread on the monitor
-    ---@param self BuilderManager
-    ---@param fn function
-    ---@param ... any
-    ---@return thread|nil
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
-        end
     end,
 
     ---@param self BuilderManager

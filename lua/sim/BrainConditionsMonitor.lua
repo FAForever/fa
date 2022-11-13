@@ -8,8 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
----@class BrainConditionsMonitor
-BrainConditionsMonitor = ClassSimple {
+local TrashForkThreadable = import("/lua/shared/ForkThreadable.lua").TrashForkThreadable
+
+
+---@class BrainConditionsMonitor : TrashForkThreadable
+BrainConditionsMonitor = Class(TrashForkThreadable) {
 
     ---@param self BrainConditionsMonitor
     ---@return boolean
@@ -232,21 +235,6 @@ BrainConditionsMonitor = ClassSimple {
             return self:GetConditionKeyFunction(cFilename, cFunctionName)
         end
         return self:GetConditionKey(cFilename, cFunctionName, cData)
-    end,
-
-    -- forking and storing a thread on the monitor
-    ---@param self BrainConditionsMonitor
-    ---@param fn function
-    ---@param ... any
-    ---@return thread
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
-        end
     end,
 }
 

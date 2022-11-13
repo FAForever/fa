@@ -1,5 +1,5 @@
 local Utilities = import("/lua/utilities.lua")
-
+local TrashForkThreadable = import("/lua/shared/ForkThreadable.lua").TrashForkThreadable
 -- ATTACK MANAGER SPEC
 --{
 --    AttackCheckInterval = interval,
@@ -26,8 +26,8 @@ local Utilities = import("/lua/utilities.lua")
 --     AMPlatoons = { AMPlatoonName, AMPlatoonName, etc },
 -- },
 
----@class AttackManager
-AttackManager = ClassSimple {
+---@class AttackManager : TrashForkThreadable
+AttackManager = Class(TrashForkThreadable) {
     brain = nil,
     NeedSort = false,
     PlatoonCount = { DefaultGroupAir = 0, DefaultGroupLand = 0, DefaultGroupSea = 0, },
@@ -36,16 +36,6 @@ AttackManager = ClassSimple {
         self.Trash = TrashBag()
         self.brain = brain
         self:Initialize(table)
-    end,
-
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
-        end
     end,
 
     Initialize = function(self, attackDataTable)
@@ -78,7 +68,8 @@ AttackManager = ClassSimple {
         local atckCond = {}
         if not AttackConds then
             AttackConds = {
-                { '/lua/editor/platooncountbuildconditions.lua', 'NumGreaterOrEqualAMPlatoons', {'default_brain', 'DefaultGroupAir', 3} },
+                { '/lua/editor/platooncountbuildconditions.lua', 'NumGreaterOrEqualAMPlatoons',
+                    { 'default_brain', 'DefaultGroupAir', 3 } },
             }
         end
 
@@ -113,7 +104,7 @@ AttackManager = ClassSimple {
     end,
 
     AddPlatoonsTable = function(self, platoons)
-        for k,v in platoons do
+        for k, v in platoons do
             self:AddPlatoon(v)
         end
     end,
@@ -163,7 +154,7 @@ AttackManager = ClassSimple {
                     return false
                 end
             else
-                if not import(v[1])[v[2]](self.brain, unpack(v[3])) then
+                if not import(v[1])[ v[2] ](self.brain, unpack(v[3])) then
                     return false
                 end
             end
@@ -172,7 +163,7 @@ AttackManager = ClassSimple {
     end,
 
     SetPriority = function(self, builderName, priority)
-        for k,v in self.Platoons do
+        for k, v in self.Platoons do
             if v.PlatoonName == builderName then
                 v.Priority = priority
             end
@@ -212,7 +203,7 @@ AttackManager = ClassSimple {
         if self.NeedSort then
             self:SortPlatoonsViaPriority()
         end
-        for k,v in self.Platoons do
+        for k, v in self.Platoons do
             if self:CheckAttackConditions(v) then
                 local combineList = {}
                 local platoonList = self.brain:GetPlatoonsList()
@@ -245,7 +236,8 @@ AttackManager = ClassSimple {
                         if v.PlatoonType == 'Air' then
                             checkCategory = categories.AIR * categories.MOBILE
                         elseif v.PlatoonType == 'Land' then
-                            checkCategory = categories.LAND * categories.MOBILE - categories.ENGINEER - categories.EXPERIMENTAL
+                            checkCategory = categories.LAND * categories.MOBILE - categories.ENGINEER -
+                                categories.EXPERIMENTAL
                         elseif v.PlatoonType == 'Sea' then
                             checkCategory = categories.NAVAL * categories.MOBILE
                         elseif v.PlatoonType == 'Any' then
@@ -266,17 +258,19 @@ AttackManager = ClassSimple {
                                 end
                             end
                             if not location then
-                                SPEW('*AI WARNING: No EngineerManager present at location - ' .. v.LocationType, '[FormAttackPlatoon]')
+                                SPEW('*AI WARNING: No EngineerManager present at location - ' .. v.LocationType,
+                                    '[FormAttackPlatoon]')
                                 break
                             end
-                            for i,unit in poolUnits do
-                                if Utilities.GetDistanceBetweenTwoVectors(unit:GetPosition(), location.Location) <= location.Radius
+                            for i, unit in poolUnits do
+                                if Utilities.GetDistanceBetweenTwoVectors(unit:GetPosition(), location.Location) <=
+                                    location.Radius
                                     and EntityCategoryContains(checkCategory, unit) then
-                                        table.insert(addUnits, unit)
+                                    table.insert(addUnits, unit)
                                 end
                             end
                         else
-                            for i,unit in poolUnits do
+                            for i, unit in poolUnits do
                                 if EntityCategoryContains(checkCategory, unit) then
                                     table.insert(addUnits, unit)
                                 end
@@ -293,12 +287,12 @@ AttackManager = ClassSimple {
                     --LOG('*AM DEBUG: AM Master Platoon Formed, Builder Named: ', repr(v.BuilderName))
                     --LOG('*AI DEBUG: ARMY ', repr(self:GetArmyIndex()),': AM Master Platoon formed - ',repr(v.BuilderName))
                     if v.AIThread then
-                        tempPlatoon:ForkAIThread(import(v.AIThread[1])[v.AIThread[2]])
+                        tempPlatoon:ForkAIThread(import(v.AIThread[1])[ v.AIThread[2] ])
                         --LOG('*AM DEBUG: AM Master Platoon using AI Thread: ', repr(v.AIThread[2]), ' Builder named: ', repr(v.BuilderName))
                     end
                     if v.DestroyCallbacks then
                         for dcbNum, destroyCallback in v.DestroyCallbacks do
-                            tempPlatoon:AddDestroyCallback(import(destroyCallback[1])[destroyCallback[2]])
+                            tempPlatoon:AddDestroyCallback(import(destroyCallback[1])[ destroyCallback[2] ])
                             --LOG('*AM DEBUG: AM Master Platoon adding destroy callback: ', destroyCallback[2], ' Builder named: ', repr(v.BuilderName))
                         end
                     end
@@ -307,7 +301,7 @@ AttackManager = ClassSimple {
                             if type(callback) == 'function' then
                                 self.Trash:Add(ForkThread(callback, tempPlatoon))
                             else
-                                self.Trash:Add(ForkThread(import(callback[1])[callback[2]], tempPlatoon))
+                                self.Trash:Add(ForkThread(import(callback[1])[ callback[2] ], tempPlatoon))
                             end
                             --LOG('*AM DEBUG: AM Master Platoon Form callback: ', repr(callback[2]), ' Builder Named: ', repr(v.BuilderName))
                         end
@@ -363,7 +357,7 @@ AttackManager = ClassSimple {
     DecrementCount = function(brain, platoon)
         local AM = brain.AttackManager
         local data = platoon.PlatoonData
-        for k,v in data.AMPlatoons do
+        for k, v in data.AMPlatoons do
             AM.PlatoonCount[v] = AM.PlatoonCount[v] - 1
         end
     end

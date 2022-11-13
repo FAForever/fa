@@ -96,8 +96,10 @@ SyncMeta = {
     end,
 }
 
+local TrashForkThreadable = import("/lua/shared/ForkThreadable.lua").TrashForkThreadable
+
 local cUnit = moho.unit_methods
----@class Unit : moho.unit_methods
+---@class Unit : moho.unit_methods, TrashForkThreadable
 ---@field Brain AIBrain
 ---@field Buffs {Affects: table<BuffEffectName, BlueprintBuff.Effect>, buffTable: table<string, table>}
 ---@field Army Army
@@ -108,7 +110,7 @@ local cUnit = moho.unit_methods
 ---@field EngineFlags any
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
-Unit = Class(moho.unit_methods) {
+Unit = Class(moho.unit_methods, TrashForkThreadable) {
 
     Weapons = {},
 
@@ -385,20 +387,6 @@ Unit = Class(moho.unit_methods) {
         local z = sinh * rx + cosh * rz
 
         return x, y, z
-    end,
-
-    ---@param self Unit
-    ---@param fn function
-    ---@param ... any
-    ---@return thread | nil
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
-        end
     end,
 
     ---@param self Unit

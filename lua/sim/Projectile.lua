@@ -74,8 +74,10 @@ local ForkThread = ForkThread
 local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
----@class Projectile : moho.projectile_methods
-Projectile = Class(moho.projectile_methods) {
+local TrashForkThreadable = import("/lua/shared/ForkThreadable.lua").TrashForkThreadable
+
+---@class Projectile : moho.projectile_methods, TrashForkThreadable
+Projectile = Class(moho.projectile_methods, TrashForkThreadable) {
 
     DestroyOnImpact = true,
     FxImpactTrajectoryAligned = true,
@@ -874,22 +876,6 @@ Projectile = Class(moho.projectile_methods) {
         self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
         self.DamageData.InitialDamageAmount = DamageData.InitialDamageAmount
         self.CollideFriendly = self.DamageData.CollideFriendly
-    end,
-
-    ---root of all performance evil
-    ---@deprecated
-    ---@param self Projectile
-    ---@param fn function
-    ---@param ... any
-    ---@return thread
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
-        end
     end,
 }
 

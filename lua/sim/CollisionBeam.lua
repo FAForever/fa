@@ -13,9 +13,10 @@
 --
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
+local TrashForkThreadable = import("/lua/shared/ForkThreadable.lua").TrashForkThreadable
 
----@class CollisionBeam : moho.CollisionBeamEntity
-CollisionBeam = Class(moho.CollisionBeamEntity) {
+---@class CollisionBeam : moho.CollisionBeamEntity, TrashForkThreadable
+CollisionBeam = Class(moho.CollisionBeamEntity, TrashForkThreadable) {
 
     FxBeam = {},
     FxBeamStartPoint = {},
@@ -378,20 +379,6 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
                     target:AddBuff(v)
                 end
             end
-        end
-    end,
-
-    ---@param self CollisionBeam
-    ---@param fn function
-    ---@param ... any
-    ---@return thread
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
         end
     end,
 }
