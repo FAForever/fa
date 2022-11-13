@@ -219,9 +219,9 @@ sampler2D ShadowSampler = sampler_state
 sampler2D UtilitySamplerA = sampler_state
 {
     Texture   = (UtilityTextureA);
-    MipFilter = POINT;
-    MinFilter = POINT;
-    MagFilter = POINT;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
     AddressU  = CLAMP;
     AddressV  = CLAMP;
 };
@@ -229,18 +229,18 @@ sampler2D UtilitySamplerA = sampler_state
 sampler2D UtilitySamplerB = sampler_state
 {
     Texture   = (UtilityTextureB);
-    MipFilter = POINT;
-    MinFilter = POINT;
-    MagFilter = POINT;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
     AddressU  = CLAMP;
     AddressV  = CLAMP;
 };
 sampler2D UtilitySamplerC = sampler_state
 {
     Texture   = (UtilityTextureC);
-    MipFilter = POINT;
-    MinFilter = POINT;
-    MagFilter = POINT;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
     AddressU  = CLAMP;
     AddressV  = CLAMP;
 };
