@@ -56,7 +56,7 @@ function updatePlayerName(line)
     end
 
     if playerRating then
-        playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
+        playerRating = ' [' .. math.floor(playerRating + 0.5) .. ']'
     end
 
     line.name:SetText(playerClan .. playerName .. playerRating)
@@ -128,13 +128,15 @@ function CreateScoreUI(parent)
         GameMain.RemoveBeatFunction(_OnBeat)
     end
 
+    import("/lua/ui/uimain.lua").gameSpeedObservable:AddObserver(NoteGameSpeedChanged)
+
     if contractOnCreate then
         Contract()
     end
 
     controls.bg:SetNeedsFrameUpdate(true)
     controls.bg.OnFrame = function(self, delta)
-        local newRight = self.Right() + (1000*delta)
+        local newRight = self.Right() + (1000 * delta)
         if newRight > savedParent.Right() + self.Width() then
             newRight = savedParent.Right() + self.Width()
             self:Hide()
@@ -151,13 +153,13 @@ local function blockOnHide(self, hidden)
 end
 
 local function fmtnum(ns)
-    if (math.abs(ns) < 1000) then        -- 0 to 999
+    if (math.abs(ns) < 1000) then -- 0 to 999
         return string.format("%01.0f", ns)
-    elseif (math.abs(ns) < 10000) then   -- 1.0K to 9.9K
+    elseif (math.abs(ns) < 10000) then -- 1.0K to 9.9K
         return string.format("%01.1fk", ns / 1000)
     elseif (math.abs(ns) < 1000000) then -- 10K to 999K
         return string.format("%01.0fk", ns / 1000)
-    else                                 -- 1.0M to ....
+    else -- 1.0M to ....
         return string.format("%01.1fm", ns / 1000000)
     end
 end
@@ -213,7 +215,7 @@ local function ResourceClickProcessing(self, event, uiGroup, resType)
         if event.Modifiers.Shift then
             if GetFocusArmy() == armyID then
                 SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
-                    to = 'allies', Chat = true, text = 'Who needs '..resType..'?' })
+                    to = 'allies', Chat = true, text = 'Who needs ' .. resType .. '?' })
                 return
             end
             local scoreData = ScoresCache[armyID]
@@ -221,39 +223,42 @@ local function ResourceClickProcessing(self, event, uiGroup, resType)
             local EconData = GetEconomyTotals()
             local ResVolume = EconData.stored[string.upper(resType)]
             if ResVolume <= 0 then return end
-            local SentValue = scoreData.resources.storage['max'..resType] - scoreData.resources.storage['stored'..resType]
+            local SentValue = scoreData.resources.storage['max' .. resType] -
+                scoreData.resources.storage['stored' .. resType]
             if SentValue <= 0 then return end
-            SentValue = math.min(SentValue,ResVolume * 0.25)
-            local Value = {Mass = 0, Energy = 0}
+            SentValue = math.min(SentValue, ResVolume * 0.25)
+            local Value = { Mass = 0, Energy = 0 }
             Value[resType] = SentValue / ResVolume
-            SimCallback( { Func = "GiveResourcesToPlayer",
-                           Args = { From = GetFocusArmy(), To = armyID,
-                           Mass = Value.Mass, Energy = Value.Energy, }} )
-            scoreData.resources.storage['stored'..resType] = scoreData.resources.storage['stored'..resType] + SentValue
-            uiGroup[string.lower(resType)..'_in']:SetText(fmtnum(scoreData.resources.storage['stored'..resType]))
-            SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name, to = 'allies', Chat = true,
-                text = 'Sent '..resType..' '..fmtnum(SentValue)..' to '..ScoresCache[armyID].name })
+            SimCallback({ Func = "GiveResourcesToPlayer",
+                Args = { From = GetFocusArmy(), To = armyID,
+                    Mass = Value.Mass, Energy = Value.Energy, } })
+            scoreData.resources.storage['stored' .. resType] = scoreData.resources.storage['stored' .. resType] +
+                SentValue
+            uiGroup[string.lower(resType) .. '_in']:SetText(fmtnum(scoreData.resources.storage['stored' .. resType]))
+            SessionSendChatMessage(FindClients(),
+                { from = ScoresCache[GetFocusArmy()].name, to = 'allies', Chat = true,
+                    text = 'Sent ' .. resType .. ' ' .. fmtnum(SentValue) .. ' to ' .. ScoresCache[armyID].name })
         elseif event.Modifiers.Ctrl then
             if GetFocusArmy() == armyID then
                 SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
-                    to = 'allies', Chat = true, text = 'Give me '..resType })
+                    to = 'allies', Chat = true, text = 'Give me ' .. resType })
             else
                 SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
-                    to = 'allies', Chat = true, text = ScoresCache[armyID].name..' give me '..resType })
+                    to = 'allies', Chat = true, text = ScoresCache[armyID].name .. ' give me ' .. resType })
             end
         end
     end
 end
 
 -- table to convert key to LOC value
-local ShareNameLookup = { }
+local ShareNameLookup = {}
 ShareNameLookup["FullShare"] = "lobui_0742"
 ShareNameLookup["ShareUntilDeath"] = "lobui_0744"
 ShareNameLookup["TransferToKiller"] = "lobui_0762"
 ShareNameLookup["Defectors"] = "lobui_0766"
 ShareNameLookup["CivilianDeserter"] = "lobui_0764"
 
-local ShareDescriptionLookup = { }
+local ShareDescriptionLookup = {}
 ShareDescriptionLookup["FullShare"] = "lobui_0743"
 ShareDescriptionLookup["ShareUntilDeath"] = "lobui_0745"
 ShareDescriptionLookup["TransferToKiller"] = "lobui_0763"
@@ -308,7 +313,7 @@ function SetupPlayerLines()
                 ResourceClickProcessing(self, event, group, 'Mass')
             end
             local bodyText = '<LOC tooltipui0716>By Ctrl+click request mass from this ally.\nBy Shift+click gives 25% mass to this ally.'
-            Tooltip.AddControlTooltip(group.mass, {text = '', body = bodyText}, 1)
+            Tooltip.AddControlTooltip(group.mass, { text = '', body = bodyText }, 1)
 
             group.mass_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
             LayoutHelpers.AtRightIn(group.mass_in, group, sw * 1 + 14 + 16)
@@ -327,7 +332,7 @@ function SetupPlayerLines()
                 ResourceClickProcessing(self, event, group, 'Energy')
             end
             local bodyText = '<LOC tooltipui0717>By Ctrl+click request energy from this ally.\nBy Shift+click gives 25% energy to this ally.'
-            Tooltip.AddControlTooltip(group.energy, {text = '', body = bodyText}, 1)
+            Tooltip.AddControlTooltip(group.energy, { text = '', body = bodyText }, 1)
 
             group.energy_in = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
             LayoutHelpers.AtRightIn(group.energy_in, group, sw * 0 + 14 + 16)
@@ -343,20 +348,23 @@ function SetupPlayerLines()
             LayoutHelpers.AtVerticalCenterIn(group.units, group)
             LayoutHelpers.SetDimensions(group.units, 14, 14)
             group.units.HandleEvent = function(self, event)
-                if (event.Type ~= 'ButtonPress') or (not event.Modifiers.Left) or (IsObserver()) or (GetFocusArmy() == group.armyID) then return end
+                if (event.Type ~= 'ButtonPress') or (not event.Modifiers.Left) or (IsObserver()) or
+                    (GetFocusArmy() == group.armyID) then return end
                 if event.Modifiers.Shift then
                     local SelUnits = GetSelectedUnits()
-                    if (not SelUnits) or ((table.getn(SelUnits) == 1) and EntityCategoryContains(categories.COMMAND, SelUnits[1])) then return end
-                    SimCallback( { Func = "GiveUnitsToPlayer", Args = { From = GetFocusArmy(), To = group.armyID }, }, true)
+                    if (not SelUnits) or
+                        ((table.getn(SelUnits) == 1) and EntityCategoryContains(categories.COMMAND, SelUnits[1])) then return end
+                    SimCallback({ Func = "GiveUnitsToPlayer", Args = { From = GetFocusArmy(), To = group.armyID }, },
+                        true)
                     SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
-                        to = 'allies', Chat = true, text = 'Sent units to '..ScoresCache[group.armyID].name })
+                        to = 'allies', Chat = true, text = 'Sent units to ' .. ScoresCache[group.armyID].name })
                 elseif event.Modifiers.Ctrl then
                     SessionSendChatMessage(FindClients(), { from = ScoresCache[GetFocusArmy()].name,
-                        to = 'allies', Chat = true, text = ScoresCache[group.armyID].name..' give me Engineer' })
+                        to = 'allies', Chat = true, text = ScoresCache[group.armyID].name .. ' give me Engineer' })
                 end
             end
             local bodyText = '<LOC tooltipui0718>By Ctrl+click request engineer from this ally.\nBy Shift+click gives selected units to this ally.'
-            Tooltip.AddControlTooltip(group.units, {text = '', body = bodyText}, 1)
+            Tooltip.AddControlTooltip(group.units, { text = '', body = bodyText }, 1)
         end
 
         group.Height:Set(group.faction.Height)
@@ -383,7 +391,7 @@ function SetupPlayerLines()
                     self.bg:SetAlpha(0)
                 end
             elseif (event.Type == 'ButtonPress') and (not event.Modifiers.Shift) and (not event.Modifiers.Ctrl) then
-                ConExecute('SetFocusArmy '..tostring(self.armyID - 1))
+                ConExecute('SetFocusArmy ' .. tostring(self.armyID - 1))
                 LinesColoring(self.armyID)
             end
         end
@@ -399,7 +407,7 @@ function SetupPlayerLines()
         index = index + 1
     end
 
-    observerLine = CreateArmyLine({color = 'ffffffff', nickname = LOC("<LOC score_0003>Observer")}, 0)
+    observerLine = CreateArmyLine({ color = 'ffffffff', nickname = LOC("<LOC score_0003>Observer") }, 0)
     observerLine:Hide()
     observerLine.OnHide = blockOnHide
     observerLine.name.Top:Set(observerLine.Top)
@@ -464,7 +472,8 @@ function SetupPlayerLines()
 
         -- ui for share conditions
         group.ShareConditions = UIUtil.CreateText(group, data.ShareConditionsTitle, 10, UIUtil.bodyFont)
-        Tooltip.AddForcedControlTooltipManual(group.ShareConditions, data.ShareConditionsTitle, data.ShareConditionsDescription)
+        Tooltip.AddForcedControlTooltipManual(group.ShareConditions, data.ShareConditionsTitle,
+            data.ShareConditionsDescription)
         LayoutHelpers.AtLeftIn(group.ShareConditions, group)
         LayoutHelpers.AtVerticalCenterIn(group.ShareConditions, group)
         group.ShareConditions:SetColor('ffffffff')
@@ -515,7 +524,9 @@ function SetupPlayerLines()
     -- add share information to the score board
     mapData.ShareConditionsTitle = LOC("<LOC " .. ShareNameLookup[sessionInfo.Options.Share] .. ">")
     mapData.ShareConditionsDescription = LOC("<LOC " .. ShareDescriptionLookup[sessionInfo.Options.Share] .. ">")
-    mapData.ShareConditionsDescription = mapData.ShareConditionsDescription .. "\r\n\r\n" .. LOC("<LOC info_game_settings_dialog>Other game settings can be found in the map information dialog (F12).")
+    mapData.ShareConditionsDescription = mapData.ShareConditionsDescription ..
+        "\r\n\r\n" ..
+        LOC("<LOC info_game_settings_dialog>Other game settings can be found in the map information dialog (F12).")
 
     -- add size to the score board
     local mapWidth = sessionInfo.size[1]
@@ -574,9 +585,9 @@ function SetupPlayerLines()
         end
         UpdResDisplay(DisplayResMode)
     end
-    local bodyText = 'I - '..LOC('<LOC tooltipui0714>Income')..'\n B - '..
-        LOC('<LOC tooltipui0715>Balance')..'\n S - '..LOC('<LOC uvd_0006>Storage')
-    Tooltip.AddControlTooltip(resModeSwitch.icon, {text = '', body = bodyText}, 1)
+    local bodyText = 'I - ' .. LOC('<LOC tooltipui0714>Income') .. '\n B - ' ..
+        LOC('<LOC tooltipui0715>Balance') .. '\n S - ' .. LOC('<LOC uvd_0006>Storage')
+    Tooltip.AddControlTooltip(resModeSwitch.icon, { text = '', body = bodyText }, 1)
 end
 
 function MapSizeText(width, height)
@@ -590,14 +601,15 @@ function DisplayResources(resources, line, mode)
     if resources then
         local Tmp = {}
         if mode == 0 then
-            Tmp = {Mass = resources.massin.rate, Energy = resources.energyin.rate}
+            Tmp = { Mass = resources.massin.rate, Energy = resources.energyin.rate }
         elseif mode == 1 then
-            Tmp = {Mass = resources.massin.rate - resources.massout.rate, Energy = resources.energyin.rate - resources.energyout.rate}
+            Tmp = { Mass = resources.massin.rate - resources.massout.rate,
+                Energy = resources.energyin.rate - resources.energyout.rate }
         elseif mode == 2 then
-            Tmp = {Mass = resources.storage.storedMass * 0.1, Energy = resources.storage.storedEnergy * 0.1}
+            Tmp = { Mass = resources.storage.storedMass * 0.1, Energy = resources.storage.storedEnergy * 0.1 }
         end
-        line.mass_in:SetText('  '..fmtnum(Tmp.Mass * 10))
-        line.energy_in:SetText('  '..fmtnum(Tmp.Energy * 10))
+        line.mass_in:SetText('  ' .. fmtnum(Tmp.Mass * 10))
+        line.energy_in:SetText('  ' .. fmtnum(Tmp.Energy * 10))
     else
         line.mass_in:SetText('')
         line.energy_in:SetText('')
@@ -617,11 +629,13 @@ function _OnBeat()
         local norush = tonumber(sessionInfo.Options.NoRushOption) * 60
         if norush > GetGameTimeSeconds() then
             local time = norush - GetGameTimeSeconds()
-            controls.time:SetText(LOCF('%02d:%02d:%02d', math.floor(time / 3600), math.floor(time/60), math.mod(time, 60)))
+            controls.time:SetText(LOCF('%02d:%02d:%02d', math.floor(time / 3600), math.floor(time / 60),
+                math.mod(time, 60)))
         end
         if not issuedNoRushWarning and norush == math.floor(GetGameTimeSeconds()) then
-            import("/lua/ui/game/announcement.lua").CreateAnnouncement('<LOC score_0001>No Rush Time Elapsed', controls.time)
-            local sound = Sound{ Bank = 'XGG', Cue = 'XGG_Computer_CV01_04766' }
+            import("/lua/ui/game/announcement.lua").CreateAnnouncement('<LOC score_0001>No Rush Time Elapsed',
+                controls.time)
+            local sound = Sound { Bank = 'XGG', Cue = 'XGG_Computer_CV01_04766' }
             PlayVoice(sound)
             issuedNoRushWarning = true
         end
@@ -760,7 +774,8 @@ function SetUnitText(current, cap)
     controls.units:SetText(string.format("%d/%d", current, cap))
     if current == cap then
         if (not lastUnitWarning or GameTime() - lastUnitWarning > 60) and not unitWarningUsed then
-            import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC score_0002>Unit Cap Reached'), controls.units)
+            import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC score_0002>Unit Cap Reached'),
+                controls.units)
             lastUnitWarning = GameTime()
             unitWarningUsed = true
         end
@@ -783,7 +798,7 @@ function ToggleScoreControl(state)
     if UIUtil.GetAnimationPrefs() then
         if state or controls.bg:IsHidden() then
             Prefs.SetToCurrentProfile("scoreoverlay", true)
-            local sound = Sound({Cue = "UI_Score_Window_Open", Bank = "Interface",})
+            local sound = Sound({ Cue = "UI_Score_Window_Open", Bank = "Interface", })
             PlaySound(sound)
             controls.collapseArrow:SetCheck(false, true)
             controls.bg:Show()
@@ -799,7 +814,7 @@ function ToggleScoreControl(state)
             end
         else
             Prefs.SetToCurrentProfile("scoreoverlay", false)
-            local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
+            local sound = Sound({ Cue = "UI_Score_Window_Close", Bank = "Interface", })
             PlaySound(sound)
             controls.bg:SetNeedsFrameUpdate(true)
             controls.bg.OnFrame = function(self, delta)
@@ -818,12 +833,12 @@ function ToggleScoreControl(state)
         if state or controls.bg:IsHidden() then
             Prefs.SetToCurrentProfile("scoreoverlay", true)
             controls.bg:Show()
-            local sound = Sound({Cue = "UI_Score_Window_Open", Bank = "Interface",})
+            local sound = Sound({ Cue = "UI_Score_Window_Open", Bank = "Interface", })
             PlaySound(sound)
             controls.collapseArrow:SetCheck(false, true)
         else
             Prefs.SetToCurrentProfile("scoreoverlay", false)
-            local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
+            local sound = Sound({ Cue = "UI_Score_Window_Close", Bank = "Interface", })
             PlaySound(sound)
             controls.bg:Hide()
             controls.collapseArrow:SetCheck(true, true)
@@ -836,7 +851,7 @@ function Expand()
         if needExpand then
             controls.bg:Show()
             controls.collapseArrow:Show()
-            local sound = Sound({Cue = "UI_Score_Window_Open", Bank = "Interface",})
+            local sound = Sound({ Cue = "UI_Score_Window_Open", Bank = "Interface", })
             PlaySound(sound)
             needExpand = false
         else
@@ -849,7 +864,7 @@ function Contract()
     if created then
         if controls.bg then
             if not controls.bg:IsHidden() then
-                local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
+                local sound = Sound({ Cue = "UI_Score_Window_Close", Bank = "Interface", })
                 PlaySound(sound)
                 controls.bg:Hide()
                 controls.collapseArrow:Hide()

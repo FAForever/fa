@@ -104,6 +104,8 @@ function CreateUI(inParent)
         GameMain.RemoveBeatFunction(_OnBeat)
     end
 
+    import("/lua/ui/uimain.lua").gameSpeedObservable:AddObserver(NoteGameSpeedChanged)
+
 end
 
 function GetCurrentObjectiveTable()

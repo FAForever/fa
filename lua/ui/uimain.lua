@@ -137,6 +137,8 @@ function UpdateDisconnectDialog()
     module.Update()
 end
 
+gameSpeedObservable = import("/lua/shared/observable.lua").Create()
+
 function NoteGameSpeedChanged(clientIndex, newSpeed)
     local clients = GetSessionClients()
     local client = clients[clientIndex]
@@ -145,8 +147,7 @@ function NoteGameSpeedChanged(clientIndex, newSpeed)
     -- deadline, I'd change to to be some UI loc tag.  But we are, so
     -- I'm not going to change it and risk the wrath of the producers.
     print(LOCF("<LOC Engine0006>%s: adjusting game speed to %+d", client.name, newSpeed))
-    import("/lua/ui/game/score.lua").NoteGameSpeedChanged(newSpeed)
-    import('/lua/ui/game/objectives2.lua').NoteGameSpeedChanged(newSpeed)
+    gameSpeedObservable:Set(newSpeed)
 end
 
 function NoteGameOver()
