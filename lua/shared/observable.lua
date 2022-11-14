@@ -24,6 +24,17 @@ function ObservableMeta:Set(value)
     end
 end
 
+---Removes callback from observable
+---@param callback function
+function ObservableMeta:RemoveObserver(callback)
+    for i, listener in self.Listeners do
+        if listener == callback then
+            table.remove(self.Listeners, i)
+            break
+        end
+    end
+end
+
 --- Constructs an observable as described by the observable pattern
 ---@return Observable
 function Create()
