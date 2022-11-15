@@ -273,7 +273,7 @@ options = {
                     max = 160,
                     inc = 1,
                 },
-            },   
+            },
 
             -- TODO: what to do with this?
             {
@@ -538,7 +538,7 @@ options = {
                 },
             },
             {
-                title = "Default selection threshold",
+                title = "<LOC OPTIONS_0314>Default selection threshold",
                 key = 'selection_threshold_regular',
                 type = 'slider',
                 default = 10,
@@ -549,7 +549,7 @@ options = {
                 },
             },
             {
-                title = "Reclaim selection threshold",
+                title = "<LOC OPTIONS_0313>Reclaim selection threshold",
                 key = 'selection_threshold_reclaim',
                 type = 'slider',
                 default = 10,
@@ -560,7 +560,7 @@ options = {
                 },
             },
             {
-                title = "Replay selection threshold",
+                title = "<LOC OPTIONS_0312>Replay selection threshold",
                 key = 'selection_threshold_replay',
                 type = 'slider',
                 default = 20,
@@ -572,7 +572,7 @@ options = {
             },
 
             {
-                title = 'Cursor features',
+                title = '<LOC OPTIONS_0311>Cursor features',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -910,7 +910,7 @@ options = {
 
 
             {
-                title = 'Additional Information',
+                title = '<LOC OPTIONS_0310>Additional Information',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -1074,7 +1074,7 @@ options = {
             },
 
             {
-                title = "<LOC options_casting_painting_title>Painting",
+                title = "<LOC OPTIONS_0309>Painting",
                 key = 'casting_painting',
                 type = 'toggle',
                 default = 18,
@@ -1088,8 +1088,8 @@ options = {
             },
 
             {
-                title = "<LOC options_casting_painting_title>Show mouse locations of players",
-                key = 'casting_sharing_mouse',
+                title = "<LOC OPTIONS_0310>Show mouse locations of players",
+                key = 'share_mouse',
                 type = 'toggle',
                 default = 'off',
                 custom = {

@@ -614,19 +614,19 @@ Tooltips = {
         title = "<LOC OPTIONS_0080>Reset Help Prompts",
         description = "<LOC OPTIONS_0081>Sets all In-game Help Prompts as unread",
     },
-     options_stratview = {
+    options_stratview = {
         title = "<LOC OPTIONS_0113>Strategic View",
         description = "<LOC OPTIONS_0114>Sets whether or not the mini-map is automatically on or off",
     },
-      options_strat_icons_always_on = {
+    options_strat_icons_always_on = {
         title = "<LOC OPTIONS_0115>Always Render Strategic Icons",
         description = "<LOC OPTIONS_0116>Strategic icons are always shown, regardless of zoom distance",
     },
-      options_uvd_format = {
+    options_uvd_format = {
         title = "<LOC OPTIONS_0107>Construction Tooltip Information",
         description = "<LOC OPTIONS_0118>Shows full, partial or no description when the unit icon is moused over",
     },
-     options_mp_taunt_head = {
+    options_mp_taunt_head = {
         title = "<LOC OPTIONS_0119>MP Taunt Head",
         description = "<LOC OPTIONS_0120>Select which 3D head is displayed when taunts are used in multiplayer",
     },
@@ -838,7 +838,7 @@ Tooltips = {
     },
     options_experimental_graphics = {
         title = "<LOC OPTIONS_EXP_GRAPHICS_01>Experimental graphics",
-        description = "<LOC OPTIONS_EXP_GRAPHICS_02>Requires fidelity set to 'High'. \r\n\r\nIntroduces experimental graphics that high-end hardware should be able to support. \r\n\r\nThis feature may be unstable - use at your own risk.",
+        description = "<LOC OPTIONS_EXP_GRAPHICS_02>Requires fidelity set to 'High'.\r\n\r\nIntroduces experimental graphics that high-end hardware should be able to support.\r\n\r\nThis feature may be unstable - use at your own risk.",
     },
     options_use_mydocuments = {
         title = "<LOC OPTIONS_0186>Save Games and Replays in My Documents",
@@ -862,7 +862,7 @@ Tooltips = {
     },
     options_show_attached_unit_lifebars = {
         title = "<LOC OPTIONS_0222>Show Lifebars of Attached Units",
-        description = "<LOC OPTIONS_0219>Toggle the visibility of lifebars of on screen units (lifebars will still show in tooltip information)",
+        description = "<LOC OPTIONS_0219>Toggles the visibility of lifebars of on screen units (lifebars will still show in tooltip information)",
     },
     options_skin_change_on_start = {
         title = "<LOC OPTIONS_0211>Use Factional UI Skin",
@@ -892,9 +892,7 @@ Tooltips = {
         title = "<LOC OPTIONS_0281>Hotkey Labels",
         description = "<LOC OPTIONS_0282>Displays associated keybindings on the buttons for commands and building units or structures"
     },
-    -- **********************
-    -- ** GazUI
-    -- **********************
+
     options_gui_bigger_strat_build_icons = {
         title = '<LOC OPTIONS_0228>Bigger Strategic Build Icons',
         description = '<LOC OPTIONS_0253>Replaces the default strategic build icons with something more visible.',
@@ -965,47 +963,47 @@ Tooltips = {
     },
     options_gui_zoom_pop_distance = {
         title = '<LOC OPTIONS_0236>Zoom Pop Distance',
-        description = '<LOC options_zoom_pop_dist_desc>Adjusts distance to which Zoom Pop zooms to.',
+        description = '<LOC OPTIONS_0288>Adjusts distance to which Zoom Pop zooms to.',
     },
     options_reclaim_overview_size_scale = {
-        title = '<LOC OPTIONS_RECLAIMSIZE>Reclaim label scaling factor',
-        description = '<LOC OPTIONS_RECLAIMSIZEDESC>Scales the text of the reclaim label to its value',
+        title = '<LOC OPTIONS_0289>Reclaim label scaling factor',
+        description = '<LOC OPTIONS_0290>Scales the text of the reclaim label to its value',
     },
     options_reclaim_overview_batching = {
-        title = '<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching',
-        description = '<LOC OPTIONS_RECLAIMBATCHINGDESC>Batches nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more. \r\n\r\nSignificantly improves performance. Is recommended for lower end systems.',
+        title = '<LOC OPTIONS_0291>Reclaim batching',
+        description = '<LOC OPTIONS_0292>Combines nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more.\r\n\r\nSignificantly improves performance. Recommended for lower end systems.',
     },
     options_selection_sets_add_behavior = {
-        title = "<LOC options_selection_sets_add_behavior_title>Unique control groups",
-        description = "<LOC options_selection_sets_add_behavior_desc>When enabled a unit can only be part of one control group, a unit is transferred from previously assigned control groups to the new control group.",
+        title = "<LOC OPTIONS_0293>Unique control groups",
+        description = "<LOC OPTIONS_0294>When on, a unit can only be part of one control group. A unit will be transferred from any previously assigned control groups to the new control group.",
     },
     options_selection_sets_production_behavior = {
-        title= "<LOC options_selection_sets_production_behavior_title>Transitive control groups of factories",
-        description= "<LOC options_selection_sets_production_behavior_desc>When enabled a unit inherits the control group of the factory it is produced by."
+        title= "<LOC OPTIONS_0295>Transitive control groups of factories",
+        description= "<LOC OPTIONS_0296>When on, a unit inherits the control group of the factory it is produced by."
     },
     options_selection_sets_double_tap_behavior = {
-        title = "<LOC options_selection_sets_double_tap_behavior_title>Successive control group select behavior",
-        description = "<LOC options_selection_sets_double_tap_behavior_desc>Defines the behavior when you successively select the same control group."
+        title = "<LOC OPTIONS_0297>Successive control group select behavior",
+        description = "<LOC OPTIONS_0298>Defines the behavior when you successively select the same control group."
     },
     options_selection_sets_double_tap_decay = {
-        title = "<LOC options_selection_sets_double_tap_decay_title>Threshold for successive control group selecting",
-        description = "<LOC options_selection_sets_double_tap_decay_desc>Time in milliseconds between selection calls.",
+        title = "<LOC OPTIONS_0299>Threshold for successive control group selecting",
+        description = "<LOC OPTIONS_0300>Time in milliseconds between selection calls.",
     },
     options_cursor_splash_damage = {
-        title = "<LOC options_splash_damage_indicator_title>Splash damage indicator",
-        description = "<LOC options_splash_damage_indicator_desc>Shows a splash damage indicator when an attack command is possible, usually when you attempt to ground-fire with a unit with splash damage, like a bomber.\r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
+        title = "<LOC OPTIONS_0301>Splash damage indicator",
+        description = "<LOC OPTIONS_0302>Shows a splash damage indicator when an attack command is possible, usually when you attempt to ground-fire with a unit with splash damage, like a bomber.\r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
     },
     options_cursor_depth_scanning = {
-        title = "<LOC options_cursor_depth_scanning_title>Depth scanning",
-        description = "<LOC options_cursor_depth_scanning_desc>Visualizes the height difference between the water surface and the ocean floor on the mouse cursor.",
+        title = "<LOC OPTIONS_0303>Depth scanning",
+        description = "<LOC OPTIONS_0304>Visualizes the height difference between the water surface and the ocean floor on the cursor cursor.",
     },
     options_share_mouse = {
-        title = '<LOC options_share_mouse_title>Show player mouse locations for observers',
-        description = '<LOC options_share_mouse_desc>Shows the mouse locations of alive players and other observers as you observe a game.\r\nDoes not apply for replays, including live ones.',
+        title = '<LOC OPTIONS_0305>Show player cursor locations for observers',
+        description = '<LOC OPTIONS_0306>Shows the cursor locations of alive players and other observers as you observe a game.\r\nDoes not apply for replays, including live ones.',
     },
     options_casting_painting = {
-        title = '<LOC casting_painting_title>Painting for observers',
-        description = '<LOC casting_painting_desc>Allows you to paint directly on the map using the assigned hotkey. \r\nDoes not apply for defeated players.',
+        title = '<LOC OPTIONS_0307>Painting for observers',
+        description = '<LOC OPTIONS_0308>Allows you to paint directly on the map using the assigned hotkey. \r\nDoes not apply for defeated players.',
     },
     -- **********************
     -- ** Lobby Strings
