@@ -2314,8 +2314,8 @@ local function UpdateGame()
             -- to have custom icon support over having a slightly faster loading
             -- time we skip the prefetching
 
-            -- local mods = Mods.GetGameMods(gameInfo.GameMods)
-            -- PrefetchSession(scenarioInfo.map, mods, true)
+            local mods = Mods.GetGameMods(gameInfo.GameMods)
+            PrefetchSession(scenarioInfo.map, mods, true)
 
         else
             AlertHostMapMissing()
