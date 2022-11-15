@@ -1675,7 +1675,7 @@ function DetermineBestAttackLocation(attackingBrain, targetBrain, relationship, 
     return attackLocation
 end
 
---- Returns a random entry from a table
+--- Returns a random entry from an array
 ---@generic T
 ---@param array T[]
 ---@return T
