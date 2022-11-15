@@ -396,8 +396,8 @@ options = {
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC selectionsets0002>No", key = false },
-                        {text = "<LOC selectionsets0003>Yes", key = true },
+                        {text = "<LOC _Yes>No", key = false },
+                        {text = "<LOC _No>Yes", key = true },
                     },
                 },
             },
@@ -409,8 +409,8 @@ options = {
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC selectionsets0005>No", key = true },
-                        {text = "<LOC selectionsets0006>Yes", key = false },
+                        {text = "<LOC _No>No", key = true },
+                        {text = "<LOC _Yes>Yes", key = false },
                     },
                 },
             },
