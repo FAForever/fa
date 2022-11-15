@@ -1,4 +1,4 @@
-last_version = 3746
+last_version = 3747
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -12,11 +12,18 @@ last_version = 3746
 ---@type PatchNotes[]
 gamePatches = {
     {
+        version = 3747,
+        name = 'Hotfix',
+        description = {
+
+        }
+    },
+    {
         version = 3746,
         name = 'Hotfix',
         description = {
             "",
-            "# Game version 3745 (6th of November, 2022)",
+            "# Game version 3746 (6th of November, 2022)",
             "",
             "I'd like to show my appreciation to those that made a friendly report on what was broken. We tackled",
             "the majority of the issues, with the exception of the resource button in the diplomacy tab. We disabled",

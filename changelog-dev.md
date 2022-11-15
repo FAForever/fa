@@ -1,62 +1,84 @@
 
-# Game version 3745 (6th of November, 2022)
-
-I'd like to show my appreciation to those that made a friendly report on what was broken. We tackled
-the majority of the issues, with the exception of the resource button in the diplomacy tab. We disabled
-that for now.
-
-As an alternative you can also share resources via the scoreboard. The default scoreboard supports
-this too by ctrl / shift clicking on the resources of an ally. See also the tooltips.
-
-I was also informed that the author of Economy Manager released a patch, it is now compatible again. For
-those that use the range ring preview you can download a UI mod called 'Build Range Preview' made by Sheikah.
-
-With thanks to 4z0t and Sheikah for their help in writing this hotfix,
-
-With kind regards,
-
-Jip
+# Game version 3747 (15th of November, 2022)
 
 ## Features
 
-- (#4358) Allow reclaim overview to be customizeable
-    You can now enable / disable batching via the game options. It is part of the
-    interface section. You can also scale the text of the labels. Note that
-    excessive scaling doesn't work properly with batching.
+- (#4377, #4380) Improve reclaim overview
+    Adjusts the colors, scaling and depth to better represent what is valuable.
 
-    It is highly recommended to enable batching for low-end systems.
+- (#4387) Add toggle to enable / disable always showing splash damage
+    It is off by default, you can find the toggle in the game options -> interface -> cursor features
+
+- (#4393) Paint feature for observers
+    Observers can now paint on the map and other observers can view each others paintings. Useful for
+    casting to communicate to your viewers and fellow casters.
+
+    Works by pressing the `ALT` key, can be adjusted in the game options.
+
+    This feature also works in replays.
+
+- (#4391) Improve rendering quality of water
+    Slightly adjusts how water looks like in-game to make it look better overall
+
+- (#4390) Add in missing tooltips for game options
+    All the game options should now have a proper tooltip.
+
+- (#4385) Change default aix multiplier values
+    Especially the AIs that can be found in the vault become complete beasts when they have
+    twice the resources and build time. The default multiplier is now set to 1.5
+
+    Note that you can change the AI multipliers in the lobby options
+
+- (#4406) Prefetch session and unit assets
+    Decreases the loading time when launching through the lobby. Assets of units are loaded
+    as you play to reduce stuttering of the game.
+
+    This is an experimental change.
+
+- (#4405) Tweak network parameters
+    Reduce the amount of lag that players experience by reducing the delay when messages are send.
+
+    This is an experimental change.
 
 ## Bug fixes
 
-- (#4348) Fix attack ping cursor being stuck
-    Occured when you tried to issue an attack ping.
+- (#4379) Fix weapon priorities not working for units that can snipe
 
-- (#4353) Update Nomad shaders to the latest version
-    As part of a series of steps to remove shaders from the Nomads repository. We can't
-    update our shaders unless we update theirs too. Instead, we now migrate the Nomads
-    shaders into the base repository and remove the version in Nomads.
+- (#4367) Fix the UEF factory unit build animations
 
-    This should fix graphics issues that people are experiencing.
+- (#4367) Fix the cheat window build preview hanging around
 
-- (#4354) Fix cursor for text message
-    Occured when you tried to issue a text ping
+- (#4370) Fix the resource sharing panel
+    The 'resources' button is now available again in the diplomacy panel
 
-- (#4354) Fix decals not showing for strategic launcher
+- (#4306) Fix SubtractCurrentEngineer and formatting in base manager
 
-- (#4352) Re-introduce the zoom pop hotkey
-    This was removed on accident
+- (#4388) Revert accidental footprint changes of Titan, Loya and Ilsa
 
-- (#4355) Rating now shows properly on the scoreboard again
+- (#4375) Fix TMDs trying to shoot down missiles that are too nearby
+    They now have a minimal firing range, it prevents them from trying to hit missiles
+    that they can't find a firing solution regardless
 
-- (#4359, #4363) Fix hotbuild being unable to reset the cycle properly
+- (#4398) Fix and update recall feature
+    In particular, fixes a few glitches that people could apply to influence the results.
 
-- (#4361) Fix error when spawning in units
+- (#4407) Scenario Framework GetRandomEntry fix
 
-- (#4362) Fix air units not sinking
-    This was not related to the patch, but we included it anyhow. Transports would sometimes be unable to sink
-    properly, especially when they are landed on water.
+- (#4408) Slightly reduce mods manager size
+    Fixes the overlap of the last mod in the list with the search bar
+
+## Other changes
+
+- (#4366) Add slight transparent background to changelog
+
+- (#4369) Add guard for validation of LayoutHelpers
+    It would otherwise spam the logs, causing a delay
 
 ## Contributors
 
-- 4z0t (#4363)
-- Jip (#4348, #4353, #4354, #4352, #4355, #4359, #4362, #4361, #4358)
+- ErikMekkes (#4379)
+- Relent0r (#4385)
+- BlackYps (#4391)
+- 4z0t (#4306, #4407)
+- Hdt80bro (#4377, #4370, #4369, #4398)
+- Jip (#4348, #4367, #4366, #4380, #4387, #4389, #4393, #4390, #4406, #4405, #4408, #4375, #4388)
