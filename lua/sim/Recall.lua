@@ -267,6 +267,7 @@ local function ArmyRequestRecall(army, teammates)
         -- it's just us; recall our army
         SPEW("Recalling " .. brain.Nickname)
         brain:RecallAllCommanders()
+
     end
 end
 

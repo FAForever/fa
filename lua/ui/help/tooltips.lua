@@ -1665,6 +1665,16 @@ Tooltips = {
         description = "",
         keyID = "toggle_score_screen",
     },
+    fabricator_collapse = {
+        title = "<LOC tooltipui0736>[Hide/Show] Mass Fabricator Panel",
+        description = "",
+        keyID = "toggle_mass_fabricator_panel",
+    },
+    voting_collapse = {
+        title = "<LOC tooltipui0737>[Hide/Show] Voting Panel",
+        description = "",
+        keyID = "toggle_voting_panel",
+    },
     econ_collapse = {
         title = "<LOC tooltipui0558>[Hide/Show] Resource Bar",
         description = "",
@@ -2197,7 +2207,30 @@ Tooltips = {
         title = '<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching',
         description = '<LOC OPTIONS_RECLAIMBATCHINGDESC>Batches nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more. \r\n\r\nSignificantly improves performance. Is recommended for lower end systems.',
     },
-
+    options_selection_sets_add_behavior = {
+        title = "<LOC options_selection_sets_add_behavior_title>Unique control groups",
+        description = "<LOC options_selection_sets_add_behavior_desc>When enabled a unit can only be part of one control group, a unit is transferred from previously assigned control groups to the new control group.",
+    },
+    options_selection_sets_production_behavior = {
+        title= "<LOC options_selection_sets_production_behavior_title>Transitive control groups of factories",
+        description= "LOC options_selection_sets_add_behavior_desc>When enabled a unit inherits the control group of the factory it is produced by."
+    },
+    options_selection_sets_double_tap_behavior = {
+        title = "<LOC options_selection_sets_double_tap_behavior_title>Successive control group select behavior",
+        description = "<LOC options_selection_sets_double_tap_behavior_desc>Defines the behavior when you successively select the same control group."
+    },
+    options_selection_sets_double_tap_decay = {
+        title = "<LOC options_selection_sets_double_tap_decay_title>Threshold for successive control group selecting",
+        description = "<LOC options_selection_sets_double_tap_decay_desc>Time in milliseconds between selection calls.",
+    },
+    options_cursor_splash_damage = {
+        title = "<LOC options_cursor_splash_damage_title>Splash damage indicator",
+        description = "<LOC options_cursor_splash_damage_desc>Is usually shown when you attempt to ground-fire with a unit with splash damage, like a bomber. When enabled the splash damage indicator is always shown when an attack command is possible. \r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
+    },
+    options_cursor_depth_scanning = {
+        title = "<LOC options_cursor_depth_scanning_title>Depth scanning",
+        description = "<LOC options_cursor_depth_scanning_desc>When enabled the game will visualize the height difference between the water surface and the ocean floor.",
+    },
     options_casting_sharing_mouse = {
         title = '<LOC casting_sharing_mouse_title>Show mouse locations for observers',
         description = '<LOC casting_sharing_mouse_desc>If enabled, the mouse locations of players (and other observers) are shown as you observe a game. \r\nDoes not apply for (live) replays. Does not apply for defeated players.',
