@@ -461,17 +461,17 @@ Prefetcher = CreatePrefetchSet()
 
 function DefaultPrefetchSet()
     local set = { models = {}, anims = {}, d3d_textures = {} }
---    for k,file in DiskFindFiles('/units/', '*.scm') do
---        table.insert(set.models,file)
---    end
+   for k,file in DiskFindFiles('/units/', '*.scm') do
+       table.insert(set.models,file)
+   end
 
---    for k,file in DiskFindFiles('/units/', '*.sca') do
---        table.insert(set.anims,file)
---    end
+   for k,file in DiskFindFiles('/units/', '*.sca') do
+       table.insert(set.anims,file)
+   end
 
---    for k,file in DiskFindFiles('/units/', '*.dds') do
---        table.insert(set.d3d_textures,file)
---    end
+   for k,file in DiskFindFiles('/units/', '*.dds') do
+       table.insert(set.d3d_textures,file)
+   end
 
     return set
 end
