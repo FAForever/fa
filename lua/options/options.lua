@@ -538,7 +538,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0314>Default selection threshold",
+                title = "<LOC OPTIONS_0312>Default Selection Threshold",
                 key = 'selection_threshold_regular',
                 type = 'slider',
                 default = 10,
@@ -549,7 +549,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0313>Reclaim selection threshold",
+                title = "<LOC OPTIONS_0313>Reclaim Mode Selection Threshold",
                 key = 'selection_threshold_reclaim',
                 type = 'slider',
                 default = 10,
@@ -560,7 +560,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0312>Replay selection threshold",
+                title = "<LOC OPTIONS_0314>Replay Selection Threshold",
                 key = 'selection_threshold_replay',
                 type = 'slider',
                 default = 20,
@@ -1088,7 +1088,7 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0310>Show mouse locations of players",
+                title = "<LOC OPTIONS_0315>Show mouse locations of players",
                 key = 'share_mouse',
                 type = 'toggle',
                 default = 'off',
