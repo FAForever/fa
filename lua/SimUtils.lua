@@ -703,6 +703,7 @@ function BreakAlliance(data)
         table.insert(Sync.BrokenAlliances, { From = data.From, To = data.To })
     end
     import("/lua/simping.lua").OnAllianceChange()
+    import("/lua/sim/recall.lua").OnAllianceChange(data)
 end
 
 ---@param resultData {From: number, To: number, ResultValue: DiplomacyActionType}
