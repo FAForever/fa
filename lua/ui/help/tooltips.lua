@@ -575,7 +575,7 @@ Tooltips = {
     -- **********************
 
     options_commands_ignore_mode = {
-        title = "<LOC OPTIONS_0319>Ignore mode",
+        title = "<LOC OPTIONS_0319>Ignore Mode",
         description = "<LOC OPTIONS_0320>When enabled, ignores any other command but move commands when you hold {i properkeyname_0123}. This can help to guarantee that you issue a move command, instead of (accidentally) starting a reclaim or attack command.\r\n\r\nThis is disabled when holding {i properkeyname_0009}.",
     },
 
@@ -877,7 +877,7 @@ Tooltips = {
         description = "<LOC OPTIONS_0248>When on, you can cycle the Hotbuild preview",
     },
     options_hotbuild_cycle_reset_time = {
-        title = "<LOC OPTIONS_0251>Cycle reset time",
+        title = "<LOC OPTIONS_0251>Cycle Reset Time",
         description = "<LOC OPTIONS_0252>Time in milliseconds until hotbuild cycle will reset",
     },
     options_maximum_reclaim_count = { -- unused
@@ -942,7 +942,7 @@ Tooltips = {
         description = '<LOC OPTIONS_0266>The first 7 characters are displayed (default). Number of characters omitted can be customized. (Needs restart for effects to be visible.)',
     },
     options_gui_detailed_unitview = {
-        title = '<LOC OPTIONS_0241>Display more Unit Stats',
+        title = '<LOC OPTIONS_0241>Display More Unit Stats',
         description = '<LOC OPTIONS_0267>Displays Shield Hp, Regen rate, Hp Regen rate and Build rate. Adapted from Total Veterancy by Eni.',
     },
     options_gui_render_custom_names = {
@@ -958,7 +958,7 @@ Tooltips = {
         description = '<LOC tooltipui0692>Shows detailed information about the weapons a unit has from the build menu',
     },
     options_gui_improved_unit_deselection = {
-        title = '<LOC OPTIONS_0245>Improved Unit deselection',
+        title = '<LOC OPTIONS_0245>Improved Unit Deselection',
         description = '<LOC OPTIONS_0270>Reduce the number of selected units by shift(-1) or ctrl(-5) or ctrl+shift(-10) right-click in group selection. Enabled by default',
     },
     options_gui_zoom_pop_distance = {
@@ -966,43 +966,43 @@ Tooltips = {
         description = '<LOC OPTIONS_0288>Adjusts distance to which Zoom Pop zooms to.',
     },
     options_reclaim_overview_size_scale = {
-        title = '<LOC OPTIONS_0289>Reclaim label scaling factor',
+        title = '<LOC OPTIONS_0289>Reclaim Label Scaling Factor',
         description = '<LOC OPTIONS_0290>Scales the text of the reclaim label to its value',
     },
     options_reclaim_overview_batching = {
-        title = '<LOC OPTIONS_0291>Reclaim batching',
+        title = '<LOC OPTIONS_0291>Reclaim Batching',
         description = '<LOC OPTIONS_0292>Combines nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more.\r\n\r\nSignificantly improves performance. Recommended for lower end systems.',
     },
     options_selection_sets_add_behavior = {
-        title = "<LOC OPTIONS_0293>Unique control groups",
+        title = "<LOC OPTIONS_0293>Unique Control Groups",
         description = "<LOC OPTIONS_0294>When on, a unit can only be part of one control group. A unit will be transferred from any previously assigned control groups to the new control group.",
     },
     options_selection_sets_production_behavior = {
-        title= "<LOC OPTIONS_0295>Transitive control groups of factories",
+        title= "<LOC OPTIONS_0295>Transitive Control Groups of Factories",
         description= "<LOC OPTIONS_0296>When on, a unit inherits the control group of the factory it is produced by."
     },
     options_selection_sets_double_tap_behavior = {
-        title = "<LOC OPTIONS_0297>Successive control group select behavior",
+        title = "<LOC OPTIONS_0297>Successive Control Group Select Behavior",
         description = "<LOC OPTIONS_0298>Defines the behavior when you successively select the same control group."
     },
     options_selection_sets_double_tap_decay = {
-        title = "<LOC OPTIONS_0299>Threshold for successive control group selecting",
+        title = "<LOC OPTIONS_0299>Threshold for Successive Control Group Selecting",
         description = "<LOC OPTIONS_0300>Time in milliseconds between selection calls.",
     },
     options_cursor_splash_damage = {
-        title = "<LOC OPTIONS_0301>Splash damage indicator",
+        title = "<LOC OPTIONS_0301>Splash Damage Indicator",
         description = "<LOC OPTIONS_0302>Shows a splash damage indicator when an attack command is possible, usually when you attempt to ground-fire with a unit with splash damage, like a bomber.\r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
     },
     options_cursor_depth_scanning = {
-        title = "<LOC OPTIONS_0303>Depth scanning",
+        title = "<LOC OPTIONS_0303>Depth Scanning",
         description = "<LOC OPTIONS_0304>Visualizes the height difference between the water surface and the ocean floor on the cursor cursor.",
     },
     options_share_mouse = {
-        title = '<LOC OPTIONS_0305>Show player cursor locations for observers',
+        title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',
         description = '<LOC OPTIONS_0306>Shows the cursor locations of alive players and other observers as you observe a game.\r\nDoes not apply for replays, including live ones.',
     },
     options_casting_painting = {
-        title = '<LOC OPTIONS_0307>Painting for observers',
+        title = '<LOC OPTIONS_0307>Painting for Observers',
         description = '<LOC OPTIONS_0308>Allows you to paint directly on the map using the assigned hotkey. \r\nDoes not apply for defeated players.',
     },
     -- **********************

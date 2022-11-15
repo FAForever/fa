@@ -169,7 +169,7 @@ options = {
         key = 'gameplay',
         items = {
             {
-                title = 'Camera controls',
+                title = '<LOC OPTIONS_0326>Camera controls',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -293,7 +293,7 @@ options = {
             },
 
             {
-                title = 'Build templates',
+                title = '<LOC OPTIONS_0325>Build templates',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -381,7 +381,7 @@ options = {
             },
 
             {
-                title = 'Control groups',
+                title = '<LOC OPTIONS_0324>Control groups',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -443,7 +443,7 @@ options = {
             },
 
             {
-                title = 'Commands',
+                title = '<LOC OPTIONS_0323>Commands',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -492,7 +492,7 @@ options = {
             },
 
             {
-                title = 'Selection',
+                title = '<LOC OPTIONS_0322>Selection',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -526,7 +526,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0245>Improved Unit deselection",
+                title = "<LOC OPTIONS_0245>Improved Unit Deselection",
                 key = 'gui_improved_unit_deselection',
                 type = 'toggle',
                 default = 0,
@@ -581,7 +581,7 @@ options = {
             },
 
             {
-                title = "Depth scanning",
+                title = "<LOC OPTIONS_0303>Depth Scanning",
                 key = 'cursor_depth_scanning',
                 type = 'toggle',
                 default = 'off',
@@ -596,7 +596,7 @@ options = {
             },
 
             {
-                title = "Always show splash damage indicator",
+                title = "<LOC OPTIONS_0321>Always Show Splash Damage Indicator",
                 key = 'cursor_splash_damage',
                 type = 'toggle',
                 default = 'off',
@@ -821,7 +821,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0227>Cycle reset time (ms)",
+                title = "<LOC OPTIONS_0227>Cycle Reset Time (ms)",
                 key = 'hotbuild_cycle_reset_time',
                 type = 'slider',
                 default = 1100,
@@ -919,7 +919,7 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0241>Display more Unit Stats",
+                title = "<LOC OPTIONS_0241>Display More Unit Stats",
                 key = 'gui_detailed_unitview',
                 type = 'toggle',
                 default = 0,
