@@ -20,8 +20,8 @@
 - (#4391) Improve rendering quality of water
     Slightly adjusts how water looks like in-game to make it look better overall
 
-- (#4390) Add in missing tooltips for game options
-    All the game options should now have a proper tooltip.
+- (#4390, #4409) Add in missing tooltips for game options
+    All the game options should now have a consistent tooltip.
 
 - (#4385) Change default aix multiplier values
     Especially the AIs that can be found in the vault become complete beasts when they have
@@ -80,5 +80,5 @@
 - Relent0r (#4385)
 - BlackYps (#4391)
 - 4z0t (#4306, #4407)
-- Hdt80bro (#4377, #4370, #4369, #4398)
+- Hdt80bro (#4377, #4370, #4369, #4398, #4409)
 - Jip (#4348, #4367, #4366, #4380, #4387, #4389, #4393, #4390, #4406, #4405, #4408, #4375, #4388)
