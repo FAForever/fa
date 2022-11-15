@@ -1,4 +1,8 @@
 
+--**************************************************************************************************
+--** Copyright © 2022 Forged Alliance Forever - shared under the MIT license
+--**************************************************************************************************
+
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 

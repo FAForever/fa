@@ -1,4 +1,8 @@
 
+--**************************************************************************************************
+--** Copyright © 2022 Forged Alliance Forever - shared under the MIT license
+--**************************************************************************************************
+
 --- Constructs an empty table that the profiler can populate.
 function CreateEmptyProfilerTable() 
     return {

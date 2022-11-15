@@ -1,3 +1,7 @@
+--**************************************************************************************************
+--** Copyright © 2022 Forged Alliance Forever - shared under the MIT license
+--**************************************************************************************************
+
 local Conditions = {
     demoralization = categories.COMMAND,
     domination = categories.STRUCTURE + categories.ENGINEER - categories.WALL,

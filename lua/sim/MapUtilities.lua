@@ -1,3 +1,7 @@
+--**************************************************************************************************
+--** Copyright © 2022 Forged Alliance Forever - shared under the MIT license
+--**************************************************************************************************
+
 local MarkerUtilities = import("/lua/sim/markerutilities.lua")
 local MapResourceCheckApplied = false
 

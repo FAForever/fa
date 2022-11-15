@@ -1,4 +1,8 @@
 
+--**************************************************************************************************
+--** Copyright © 2022 Forged Alliance Forever - shared under the MIT license
+--**************************************************************************************************
+
 --- A lookup table for various types of threat and their corresponding color, shared between the sim and the UI
 ThreatInformation = {
       { identifier = "Overall", color = "c0c0c0" }
