@@ -169,7 +169,7 @@ options = {
         key = 'gameplay',
         items = {
             {
-                title = 'Camera controls',
+                title = '<LOC OPTIONS_0326>Camera controls',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -273,7 +273,7 @@ options = {
                     max = 160,
                     inc = 1,
                 },
-            },   
+            },
 
             -- TODO: what to do with this?
             {
@@ -293,7 +293,7 @@ options = {
             },
 
             {
-                title = 'Build templates',
+                title = '<LOC OPTIONS_0325>Build templates',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -381,7 +381,7 @@ options = {
             },
 
             {
-                title = 'Control groups',
+                title = '<LOC OPTIONS_0324>Control groups',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -396,8 +396,8 @@ options = {
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC selectionsets0002>No", key = false },
-                        {text = "<LOC selectionsets0003>Yes", key = true },
+                        {text = "<LOC _Yes>No", key = false },
+                        {text = "<LOC _No>Yes", key = true },
                     },
                 },
             },
@@ -409,8 +409,8 @@ options = {
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC selectionsets0005>No", key = true },
-                        {text = "<LOC selectionsets0006>Yes", key = false },
+                        {text = "<LOC _No>No", key = true },
+                        {text = "<LOC _Yes>Yes", key = false },
                     },
                 },
             },
@@ -443,7 +443,7 @@ options = {
             },
 
             {
-                title = 'Commands',
+                title = '<LOC OPTIONS_0323>Commands',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -492,7 +492,7 @@ options = {
             },
 
             {
-                title = 'Selection',
+                title = '<LOC OPTIONS_0322>Selection',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -526,7 +526,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0245>Improved Unit deselection",
+                title = "<LOC OPTIONS_0245>Improved Unit Deselection",
                 key = 'gui_improved_unit_deselection',
                 type = 'toggle',
                 default = 0,
@@ -538,7 +538,7 @@ options = {
                 },
             },
             {
-                title = "Default selection threshold",
+                title = "<LOC OPTIONS_0312>Default Selection Threshold",
                 key = 'selection_threshold_regular',
                 type = 'slider',
                 default = 10,
@@ -549,7 +549,7 @@ options = {
                 },
             },
             {
-                title = "Reclaim selection threshold",
+                title = "<LOC OPTIONS_0313>Reclaim Mode Selection Threshold",
                 key = 'selection_threshold_reclaim',
                 type = 'slider',
                 default = 10,
@@ -560,7 +560,7 @@ options = {
                 },
             },
             {
-                title = "Replay selection threshold",
+                title = "<LOC OPTIONS_0314>Replay Selection Threshold",
                 key = 'selection_threshold_replay',
                 type = 'slider',
                 default = 20,
@@ -572,7 +572,7 @@ options = {
             },
 
             {
-                title = 'Cursor features',
+                title = '<LOC OPTIONS_0311>Cursor features',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -581,7 +581,7 @@ options = {
             },
 
             {
-                title = "Depth scanning",
+                title = "<LOC OPTIONS_0303>Depth Scanning",
                 key = 'cursor_depth_scanning',
                 type = 'toggle',
                 default = 'off',
@@ -596,7 +596,7 @@ options = {
             },
 
             {
-                title = "Always show splash damage indicator",
+                title = "<LOC OPTIONS_0321>Always Show Splash Damage Indicator",
                 key = 'cursor_splash_damage',
                 type = 'toggle',
                 default = 'off',
@@ -821,7 +821,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0227>Cycle reset time (ms)",
+                title = "<LOC OPTIONS_0227>Cycle Reset Time (ms)",
                 key = 'hotbuild_cycle_reset_time',
                 type = 'slider',
                 default = 1100,
@@ -910,7 +910,7 @@ options = {
 
 
             {
-                title = 'Additional Information',
+                title = '<LOC OPTIONS_0310>Additional Information',
                 type = 'header',
 
                 -- these are expected everywhere
@@ -919,7 +919,7 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0241>Display more Unit Stats",
+                title = "<LOC OPTIONS_0241>Display More Unit Stats",
                 key = 'gui_detailed_unitview',
                 type = 'toggle',
                 default = 0,
@@ -1074,7 +1074,7 @@ options = {
             },
 
             {
-                title = "<LOC options_casting_painting_title>Painting",
+                title = "<LOC OPTIONS_0309>Painting",
                 key = 'casting_painting',
                 type = 'toggle',
                 default = 18,
@@ -1088,8 +1088,8 @@ options = {
             },
 
             {
-                title = "<LOC options_casting_painting_title>Show mouse locations of players",
-                key = 'casting_sharing_mouse',
+                title = "<LOC OPTIONS_0315>Show mouse locations of players",
+                key = 'share_mouse',
                 type = 'toggle',
                 default = 'off',
                 custom = {
