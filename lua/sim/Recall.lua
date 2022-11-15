@@ -135,7 +135,7 @@ local function RecallVotingThread(requestingArmy)
     if recallAccepted then
         SPEW("Vote passed; recalling!")
         for army, brain in team do
-            brain:RecallAllCommanders(focus == army)
+            brain:RecallAllCommanders()
         end
     else
         brain.LastRecallRequestTime = gametick
@@ -202,7 +202,7 @@ local function ArmyRequestRecall(army, teammates, lastVote)
     elseif lastVote then
         -- if we're the first and last vote, it's just us; recall our army
         SPEW("Immediately recalling")
-        GetArmyBrain(army):RecallAllCommanders(army == GetFocusArmy())
+        GetArmyBrain(army):RecallAllCommanders()
     end
 end
 

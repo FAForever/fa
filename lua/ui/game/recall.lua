@@ -1,13 +1,15 @@
-local Dragger = import("/lua/maui/dragger.lua").Dragger
-local Group = import("/lua/maui/group.lua").Group
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-local Lazyvar = import("/lua/lazyvar.lua").Create
 local NinePatch = import("/lua/ui/controls/ninepatch.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
 
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Group = import("/lua/maui/group.lua").Group
+
+local Lazyvar = import("/lua/lazyvar.lua").Create
 local Layouter = LayoutHelpers.ReusedLayoutFor
+
 
 -- seconds to see recall voting results
 local reviewResultsDuration = 5
@@ -46,6 +48,12 @@ function SetLayout()
         :Hide()
         :End()
     panel.Top:Set(panel.parent.Top() - panel:TotalHeight())
+end
+
+function ToggleControl()
+    if panel and not panel.collapseArrow:IsDisabled() then
+        panel.collapseArrow:ToggleCheck()
+    end
 end
 
 function RequestHandler(data)
@@ -91,7 +99,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
     end;
 
     Layout = function(self)
-        Layouter(self.collapseArrow)
+        local collapseArrow = Layouter(self.collapseArrow)
             :Top(self.t.Top() - 7)
             :AtHorizontalCenterIn(self)
             :Over(self, 10)
@@ -134,10 +142,11 @@ RecallPanel = Class(NinePatch.NinePatch) {
             :AtHorizontalCenterIn(progressBarBG)
             :Top(progressBarBG.Top)
             :Bottom(progressBarBG.Bottom)
-            :Width(function() return (self.Width() - LayoutHelpers.ScaleNumber(16)) end)
+            :Width(function() return self.Width() - LayoutHelpers.ScaleNumber(16) end)
             :Over(progressBarBG, 10)
             :End()
 
+        Tooltip.AddCheckboxTooltip(collapseArrow, "voting_collapse")
         Tooltip.AddButtonTooltip(buttonAccept, "dip_recall_request_accept")
         Tooltip.AddButtonTooltip(buttonVeto, "dip_recall_request_veto")
     end;
@@ -211,11 +220,11 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 end
             end
         end
-        -- self.collapseArrow.OnHide = function(collapse, hide)
-        --     if hide ~= collapse:IsDisabled() then
-        --         return true
-        --     end
-        -- end
+        self.collapseArrow.OnHide = function(collapse, hide)
+            if hide ~= collapse:IsDisabled() then
+                return true
+            end
+        end
 
         local function ShowForVote(button, hide)
             return not hide and not self.canVote()
@@ -227,7 +236,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 Args = {
                     From = GetFocusArmy(),
                     Vote = true,
-                }
+                },
             })
             self:SetCanVote(false)
         end
@@ -238,7 +247,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 Args = {
                     From = GetFocusArmy(),
                     Vote = false,
-                }
+                },
             })
             self:SetCanVote(false)
         end
@@ -262,7 +271,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
         self.duration = duration
         self.startTime:Set(GetGameTimeSeconds())
         self:SetCanVote(canVote)
-        self:LayoutBlocks(blocks) -- can depend on `canVote`
+        self:LayoutBlocks(blocks) -- can depend on `canVote`, so put after it
         self.collapseArrow:Enable()
         self.collapseArrow:Show()
         self.collapseArrow:SetCheck(false)
@@ -409,6 +418,9 @@ RecallPanel = Class(NinePatch.NinePatch) {
         if collapse then
             if supress or collapse:IsDisabled() then
                 collapse:Hide()
+                if not hide then
+                    supress = true
+                end
             else
                 collapse:Show()
             end

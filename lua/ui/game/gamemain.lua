@@ -92,6 +92,7 @@ function SetLayout(layout)
     import("/lua/ui/game/controlgroups.lua").SetLayout()
     import("/lua/ui/game/chat.lua").SetLayout()
     import("/lua/ui/game/minimap.lua").SetLayout()
+    import("/lua/ui/game/massfabs.lua").SetLayout()
     import("/lua/ui/game/recall.lua").SetLayout()
 end
 
