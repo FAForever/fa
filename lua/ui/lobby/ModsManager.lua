@@ -50,7 +50,7 @@ local modInfoPosition = modIconSize + 20
 local modInfoHeight = modIconSize + 20
 local modInfoDesciptionMax = 235
 -- calculates how many number of mods to show per page based on dialog height
-local modsPerPage = math.floor((dialogHeight - 100) / modInfoHeight) -- - 1
+local modsPerPage = math.floor((dialogHeight - 100) / modInfoHeight)
 
 -- Counters for the benefit of the UI.
 local numEnabledUIMods = 0
@@ -167,7 +167,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     LoadPreferences() -- loading preference for favorite mods, mods sorting order, mod list expanded/collapsed
     LoadMods() -- loading mods before creating mod filters so they show correct count of mods
 
-    dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(80)
+    dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(120)
     dialogContent = Group(parent)
     LayoutHelpers.SetWidth(dialogContent, dialogWidth)
     dialogContent.Height:Set(dialogHeight)
