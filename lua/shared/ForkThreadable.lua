@@ -1,7 +1,9 @@
-
 local ForkThread = ForkThread
 local unpack = unpack
 
+---Class allowing creation of forked tasks of its instance.
+---
+---Unrecommended to use due to high performance impact.
 ---@class ForkThreadable
 ForkThreadable = ClassSimple
 {
@@ -18,16 +20,21 @@ ForkThreadable = ClassSimple
 }
 
 
+---Class allowing creation of forked tasks of its instance. Provided with Trash bag.
+---
+---Unrecommended to use due to high performance impact.
 ---@class TrashForkThreadable
 ---@field Trash TrashBag
 TrashForkThreadable = ClassSimple
 {
 
+    ---Initializes trah bag for fork threads
     ---@param self TrashForkThreadable
-    InitTrash = function (self)
+    InitTrash = function(self)
         self.Trash = TrashBag()
-    end, 
+    end,
 
+    ---ForkThreads task for the instance.
     ---@param self TrashForkThreadable
     ---@param fn function
     ---@param ... any
@@ -39,7 +46,10 @@ TrashForkThreadable = ClassSimple
             return thread
         end
     end,
+
+    ---Cleans trash bag
+    ---@param self TrashForkThreadable
+    CleanTrash = function(self)
+        self.Trash:Destroy()
+    end
 }
-
-
-
