@@ -39,6 +39,7 @@ BuilderGroup {
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}}, --DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL - categories.ORBITALSYSTEM} }, --DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
+            { EBC, 'GreaterThanMassStorageCurrent', { 150 }},
             { EBC, 'GreaterThanEconIncomeOverTime', {15, 750}},
             { EBC, 'GreaterThanEconEfficiency', { 0.9, 1.2}},
             { IBC, 'BrainNotLowPowerMode', {} },
@@ -65,6 +66,7 @@ BuilderGroup {
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}}, --DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL - categories.ORBITALSYSTEM} }, --DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.STRUCTURE * categories.TECH3 * categories.ANTIMISSILE}},
+            { EBC, 'GreaterThanMassStorageCurrent', { 150 }},
             { EBC, 'GreaterThanEconIncomeOverTime', {15, 750}},
             { EBC, 'GreaterThanEconEfficiency', { 0.9, 1.2}},
             { IBC, 'BrainNotLowPowerMode', {} },
@@ -118,6 +120,7 @@ BuilderGroup {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE } }, --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.NUKE * categories.STRUCTURE}}, --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE }},
+            { EBC, 'GreaterThanMassStorageCurrent', { 150 }},
             { EBC, 'GreaterThanEconIncomeOverTime', {30, 1000}},
             { EBC, 'GreaterThanEconEfficiency', { 0.9, 1.2}},
             { IBC, 'BrainNotLowPowerMode', {} },
@@ -172,6 +175,7 @@ BuilderGroup {
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TECH3 * categories.ARTILLERY * categories.STRUCTURE }},
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL } }, --DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3 } },
+            { EBC, 'GreaterThanMassStorageCurrent', { 150 }},
             { EBC, 'GreaterThanEconIncomeOverTime', {22, 1000}},
             { EBC, 'GreaterThanEconEfficiency', { 0.9, 1.2}},
             { IBC, 'BrainNotLowPowerMode', {} },
@@ -198,6 +202,7 @@ BuilderGroup {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * categories.TECH3 } }, --DUNCAN - was 3
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL } }, --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.NUKE * categories.STRUCTURE } }, --DUNCAN - added
+            { EBC, 'GreaterThanMassStorageCurrent', { 150 }},
             { EBC, 'GreaterThanEconIncomeOverTime', {22, 1000}},
             { EBC, 'GreaterThanEconEfficiency', { 0.9, 1.2}},
             { IBC, 'BrainNotLowPowerMode', {} },
