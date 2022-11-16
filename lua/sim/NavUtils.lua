@@ -165,7 +165,7 @@ function PathTo(layer, origin, destination, options)
                 neighbor.From = leaf
                 neighbor.Seen = seenIdentifier
                 neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf.neighborDistances[id] + 2 + preferLargeNeighbor
-                -- TotalCosts = AcquiredCosts * ExpectedCosts
+                -- TotalCosts = AcquiredCosts + ExpectedCosts
                 neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
 
                 PathToHeap:Insert(neighbor)
