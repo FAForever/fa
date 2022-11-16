@@ -126,7 +126,7 @@ UnitBlueprint {
         BuildCostEnergy = 5250,
         BuildCostMass = 840,
         BuildRate = 20,
-        BuildTime = 2000,
+        BuildTime = 2222,
         DifferentialUpgradeCostCalculation = true,
         EngineeringPods = {
             {

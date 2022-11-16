@@ -110,8 +110,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Light',
         EconomyThreatLevel = 1,
-        Health = 50,
-        MaxHealth = 50,
+        Health = 100,
+        MaxHealth = 100,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -135,10 +135,10 @@ UnitBlueprint {
         UniformScale = 0.011,
     },
     Economy = {
-        BuildCostEnergy = 1000,
-        BuildCostMass = 100,
-        BuildRate = 25,
-        BuildTime = 500,
+        BuildCostEnergy = 150,
+        BuildCostMass = 15,
+        BuildRate = 30,
+        BuildTime = 300,
     },
     General = {
         BuildBones = {
