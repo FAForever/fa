@@ -141,10 +141,10 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 6416.66,
         BuildCostMass = 1050,
-        BuildRate = 75,
-        BuildTime = 1171,
+        BuildRate = 51,
+        BuildTime = 1000,
         DifferentialUpgradeCostCalculation = true,
-        MaxBuildDistance = 25,
+        MaxBuildDistance = 22,
         RebuildBonusIds = {
             'xrb0104',
         },
