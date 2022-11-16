@@ -1,6 +1,22 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+
+# Game version 3748 (16th of November, 2022)
+
+## Bug fixes
+
+- (#4414) Revert changes to prefetching of assets
+    We thought we understood how prefetching worked, but we were wrong. As a result some
+    people ran out of memory. That results in an application crash.
+
+    We reverted the changes.
+
+## Contributors
+
+- Jip (#4414)
+
+
 # Game version 3747 (15th of November, 2022)
 
 ## Features
