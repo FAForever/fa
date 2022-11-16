@@ -69,58 +69,59 @@ NavPathToHeap = ClassSimple {
 
     ---@param self NavPathToHeap
     Heapify = function(self)
+        local heap = self.Heap
+        local heap_size = self.HeapSize
+
         local index = 1
         -- find the left / right child
-        local left = self:ToLeftChild(index)
-        local right = self:ToRightChild(index)
+        local left = 2 * index
+        local right = 2 * index + 1
         -- if there is no left child it means we restored heap properties
-        while self.Heap[left] do
+        while left <= heap_size do
             local min = left
 
             -- if there is a right child, compare its value with the left one
             -- if right is smaller, then assign min = right. Else, keep min on left.
-            if self.Heap[right] and (self.Heap[right].TotalCosts < self.Heap[left].TotalCosts) then
+            if heap[right] and (heap[right].TotalCosts < heap[left].TotalCosts) then
                 min = right
             end
-            
-            -- if min has higher value than the index it means we restored heap properties 
+
+            -- if min has higher value than the index it means we restored heap properties
             -- and can break the loop
-            if self.Heap[min].TotalCosts > self.Heap[index].TotalCosts then
+            if heap[min].TotalCosts > heap[index].TotalCosts then
                 return
             end
             -- otherwise, swap the two values.
-            self:Swap(index, min)
+            local tmp = heap[min]
+            heap[min] = heap[index]
+            heap[index] = tmp
             -- and update index, left and right indexes.
             index = min
-            left = self:ToLeftChild(index)
-            right = self:ToRightChild(index)
+            left = 2 * index
+            right = 2 * index + 1
         end
     end,
 
     ---@param self NavPathToHeap
     Rootify = function(self)
+        local heap = self.Heap
         local index = self.HeapSize
-        local parent = self:ToParent(index)
+        -- index / 2
+        local parent = index >> 1
         while parent >= 1 do
             -- if parent value is smaller than index value it means we restored correct order of the elements
-            if self.Heap[parent].TotalCosts < self.Heap[index].TotalCosts then
+            if heap[parent].TotalCosts < heap[index].TotalCosts then
                 return
             end
             -- otherwise, swap the values
-            self:Swap(parent, index)
-            -- and update index and parend indexes
+            local tmp = heap[parent]
+            heap[parent] = heap[index]
+            heap[index] = tmp
+            -- and update index and parent indexes
             index = parent
-            parent = self:ToParent(index)
+            -- parent / 2
+            parent = parent >> 1
         end
-    end,
-
-    ---@param self NavPathToHeap
-    ---@param a number
-    ---@param b number
-    Swap = function(self, a, b)
-        local l = self.Heap[a]
-        self.Heap[a] = self.Heap[b]
-        self.Heap[b] = l
     end,
 
     ---@param self NavPathToHeap
@@ -133,29 +134,5 @@ NavPathToHeap = ClassSimple {
         else
             WARN("given object to Heap was nil!")
         end
-    end,
-
-    ---@param self NavPathToHeap
-    ---@param index number
-    ---@return number
-    ToParent = function(self, index)
-        -- index / 2
-        return index >> 1
-    end,
-
-    ---@param self NavPathToHeap
-    ---@param index number
-    ---@return number
-    ToRightChild = function(self, index)
-        -- 2 * index + 1
-        return 2 * index + 1
-    end,
-
-    ---@param self NavPathToHeap
-    ---@param index number
-    ---@return number
-    ToLeftChild = function(self, index)
-        -- 2 * index
-        return 2 * index
     end,
 }
