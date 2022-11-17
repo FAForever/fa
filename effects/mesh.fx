@@ -452,12 +452,6 @@ float4 ComputeScrolledTexcoord( float4 texcoord, float4 material)
     return scrolled;
 }
 
-float logisticFn(float x, float x0, float k, float L, float m)
-{
-    float denom = 1 + pow(2.71828, -k * (m * x - x0));
-    return L / denom;
-}
-
 /// ComputeShadow
 ///
 /// Computes the "light attenuation factor" for a pixel given its shadow
@@ -2825,14 +2819,6 @@ float4 AeonPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
 
     return float4( color, alpha );
-}
-
-float mapRange(float value, float min1, float max1, float min2, float max2)
-{
-    // Convert the current value to a percentage
-    float perc = (value - min1) / (max1 - min1);
-    // Do the same operation backwards with min2 and max2
-    return perc * (max2 - min2) + min2;
 }
 
 //NewAeonPS
@@ -9270,9 +9256,23 @@ technique SeraphimStunned_LowFidelity
 
 /////////////////////////////////////////////////
 // Physically Based Rendering
-//
+/////////////////////////////////////////////////
 
 const float PI = 3.14159265359;
+
+float mapRange(float value, float min1, float max1, float min2, float max2)
+{
+    // Convert the current value to a percentage
+    float perc = (value - min1) / (max1 - min1);
+    // Do the same operation backwards with min2 and max2
+    return perc * (max2 - min2) + min2;
+}
+
+float logisticFn(float x, float x0, float k, float L, float m)
+{
+    float denom = 1 + pow(2.71828, -k * (m * x - x0));
+    return L / denom;
+}
 
 float3 FresnelSchlick(float hDotN, float3 F0)
 {
