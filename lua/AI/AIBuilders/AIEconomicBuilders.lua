@@ -1368,7 +1368,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = categories.MASSEXTRACTION * categories.TECH3 + categories.MASSEXTRACTION * categories.TECH2,
+                AdjacencyCategory = categories.MASSEXTRACTION * ( categories.TECH2 + categories.TECH3 ),
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 ThreatMin = -3,
