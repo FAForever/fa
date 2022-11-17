@@ -7,9 +7,9 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
+local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
 
@@ -250,7 +250,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                                             -- Call function on builder manager; let it handle death of factory
                                             self:FactoryDestroyed(v)
                                         end
-                import('/lua/ScenarioTriggers.lua').CreateUnitDestroyedTrigger(factoryDestroyed, v)
+                import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(factoryDestroyed, v)
 
                 local factoryNewlyCaptured = function(unit, captor)
                                             local aiBrain = captor:GetAIBrain()
@@ -262,13 +262,13 @@ FactoryBuilderManager = Class(BuilderManager) {
                                                 end
                                             end
                                         end
-                import('/lua/ScenarioTriggers.lua').CreateUnitCapturedTrigger(nil, factoryNewlyCaptured, v)
+                import("/lua/scenariotriggers.lua").CreateUnitCapturedTrigger(nil, factoryNewlyCaptured, v)
 
                 local factoryWorkFinish = function(v, finishedUnit)
                                             -- Call function on builder manager; let it handle the finish of work
                                             self:FactoryFinishBuilding(v, finishedUnit)
                                         end
-                import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(factoryWorkFinish, v, categories.ALLUNITS)
+                import("/lua/scenariotriggers.lua").CreateUnitBuiltTrigger(factoryWorkFinish, v, categories.ALLUNITS)
             end
             self:ForkThread(self.DelayBuildOrder, v, bType, 0.1)
         end
@@ -278,6 +278,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     ---@param factory Unit
     FactoryDestroyed = function(self, factory)
         local guards = factory:GetGuards()
+        local factoryDestroyed = false
         for k,v in guards do
             if not v.Dead and v.AssistPlatoon then
                 if self.Brain:PlatoonExists(v.AssistPlatoon) then
@@ -288,9 +289,13 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
         end
         for k,v in self.FactoryList do
-            if v == factory then
+            if IsDestroyed(v) then
                 self.FactoryList[k] = nil
+                factoryDestroyed = true
             end
+        end
+        if factoryDestroyed then
+            self.FactoryList = self:RebuildTable(self.FactoryList)
         end
         for k,v in self.FactoryList do
             if not v.Dead then
@@ -465,13 +470,18 @@ FactoryBuilderManager = Class(BuilderManager) {
 
     ---@param self FactoryBuilderManager
     ---@param factory Unit
-    ---@param finishedUnit boolean
+    ---@param finishedUnit Unit
     FactoryFinishBuilding = function(self,factory,finishedUnit)
         if EntityCategoryContains(categories.ENGINEER, finishedUnit) then
             self.Brain.BuilderManagers[self.LocationType].EngineerManager:AddUnit(finishedUnit)
-        elseif EntityCategoryContains(categories.FACTORY, finishedUnit) then
-            self:AddFactory(finishedUnit)
-        end
+        elseif EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit ) then
+			if finishedUnit:GetFractionComplete() == 1 then
+				self:AddFactory(finishedUnit )			
+				factory.Dead = true
+                factory.Trash:Destroy()
+				return self:FactoryDestroyed(factory)
+			end
+		end
         self:AssignBuildOrder(factory, factory.BuilderManagerData.BuilderType)
     end,
 
@@ -572,4 +582,4 @@ function CreateFactoryBuilderManager(brain, lType, location, radius, useCenterPo
 end
 
 --- Moved Unsused Imports to bottome for mod support 
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")

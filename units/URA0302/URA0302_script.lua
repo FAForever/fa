@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
+local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
 
 ---@class URA0302 : CAirUnit
 URA0302 = Class(CAirUnit) {

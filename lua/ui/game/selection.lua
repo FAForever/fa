@@ -1,5 +1,5 @@
 
-local Prefs = import('/lua/user/prefs.lua')
+local Prefs = import("/lua/user/prefs.lua")
 
 ---@alias SelectionSetDoubleTapBehavior
 --- | 'none'                        # When you double tap it will have no effect
@@ -119,7 +119,7 @@ end
 local function DoubleTapBehavior(name, units)
 
     ---@type SelectionSetDoubleTapBehavior
-    local doubleTapbehavior = Prefs.GetFromCurrentProfile('options.selection-sets-double-tap-behavior')
+    local doubleTapbehavior = Prefs.GetFromCurrentProfile('options.selection_sets_double_tap_behavior')
 
     -- don't do anything
     if doubleTapbehavior == 'none' then
@@ -129,7 +129,7 @@ local function DoubleTapBehavior(name, units)
     -- time window in which we consider it to be a double tab
     local curTime = GetSystemTimeSeconds()
     local diffTime = curTime - lastSelectionTime
-    if diffTime > 0.001 * Prefs.GetFromCurrentProfile('options.selection-sets-double-tap-decay') then
+    if diffTime > 0.001 * Prefs.GetFromCurrentProfile('options.selection_sets_double_tap_decay') then
         lastSelectionName = nil
     end
     lastSelectionTime = curTime
@@ -197,10 +197,10 @@ function AddUnitToSelectionSet(name, unit)
     -- bug where name is an index, not a key
     name = tostring(name)
 
-    if Prefs.GetFromCurrentProfile('options.selection-sets-production-behavior') then
+    if Prefs.GetFromCurrentProfile('options.selection_sets_production_behavior') then
 
         -- remove it from existing selection sets
-        if Prefs.GetFromCurrentProfile('options.selection-sets-add-behavior') then
+        if Prefs.GetFromCurrentProfile('options.selection_sets_add_behavior') then
             local others = unit:GetSelectionSets()
             for k, other in others do
                 if selectionSets[other] then
@@ -241,7 +241,7 @@ function AddSelectionSet(name, unitArray)
         for _, unit in unitArray do
 
             -- remove it from existing selection sets
-            if Prefs.GetFromCurrentProfile('options.selection-sets-add-behavior') then
+            if Prefs.GetFromCurrentProfile('options.selection_sets_add_behavior') then
                 local others = unit:GetSelectionSets()
                 for k, other in others do
                     unit:RemoveSelectionSet(other)
@@ -399,7 +399,7 @@ function IsHidden()
 end
 
 function Hidden(callback)
-    local CM = import('/lua/ui/game/commandmode.lua')
+    local CM = import("/lua/ui/game/commandmode.lua")
     local current_command = CM.GetCommandMode()
     local old_selection = GetSelectedUnits() or {}
 

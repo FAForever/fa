@@ -5,11 +5,11 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
-local SWeapons = import('/lua/seraphimweapons.lua')
-local Buff = import('/lua/sim/Buff.lua')
-local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
+local SWeapons = import("/lua/seraphimweapons.lua")
+local Buff = import("/lua/sim/buff.lua")
+local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
 local SDFLightChronotronCannonWeapon = SWeapons.SDFLightChronotronCannonWeapon
 local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher

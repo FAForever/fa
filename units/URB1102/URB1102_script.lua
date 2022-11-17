@@ -7,7 +7,7 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local CEnergyCreationUnit = import('/lua/cybranunits.lua').CEnergyCreationUnit
+local CEnergyCreationUnit = import("/lua/cybranunits.lua").CEnergyCreationUnit
 
 ---@class URB1102 : CEnergyCreationUnit
 URB1102 = Class(CEnergyCreationUnit) {

@@ -861,7 +861,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     LOG('Blueprints Loading... \'' .. tostring(pattern) .. '\' files')
 
     if not mods then
-        mods = __active_mods or import('/lua/mods.lua').GetGameMods()
+        mods = __active_mods or import("/lua/mods.lua").GetGameMods()
     end
     InitOriginalBlueprints()
 

@@ -1,16 +1,14 @@
 
-# Game version xyzw (day of month, year)
+# Game version 3748 (16th of November, 2022)
 
 ## Bug fixes
 
-## Features
+- (#4414) Revert changes to prefetching of assets
+    We thought we understood how prefetching worked, but we were wrong. As a result some
+    people ran out of memory. That results in an application crash.
 
-## Performance
-
-## Annotation
-
-## Campaign
-
-## Other changes
+    We reverted the changes.
 
 ## Contributors
+
+- Jip (#4414)

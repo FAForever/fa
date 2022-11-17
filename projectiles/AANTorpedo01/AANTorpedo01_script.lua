@@ -1,7 +1,7 @@
 --
 -- Sub-Based Torpedo Script
 --
-local ATorpedoSubProjectile = import('/lua/aeonprojectiles.lua').ATorpedoSubProjectile
+local ATorpedoSubProjectile = import("/lua/aeonprojectiles.lua").ATorpedoSubProjectile
 AANTorpedo01 = Class(ATorpedoSubProjectile) {
 
     --OnCreate = function(self)

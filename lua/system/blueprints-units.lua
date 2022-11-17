@@ -15,6 +15,8 @@ local function PostProcessUnit(unit)
         end
     end
 
+    unit.CategoriesHash[unit.BlueprintId] = true
+
     -- create hash tables for quick lookup
     unit.DoNotCollideListCount = 0
     unit.DoNotCollideListHash = {}

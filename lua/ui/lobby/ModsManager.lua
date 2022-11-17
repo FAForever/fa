@@ -3,28 +3,28 @@
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
 -- * Summary    : Contains UI for managing mods in FA lobby
 -- ==========================================================================================
-local Mods = import('/lua/mods.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Group  = import('/lua/maui/group.lua').Group
-local Text   = import('/lua/maui/text.lua').Text
-local Edit   = import('/lua/maui/edit.lua').Edit
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Combo  = import('/lua/ui/controls/combo.lua').Combo
+local Mods = import("/lua/mods.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Group  = import("/lua/maui/group.lua").Group
+local Text   = import("/lua/maui/text.lua").Text
+local Edit   = import("/lua/maui/edit.lua").Edit
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo  = import("/lua/ui/controls/combo.lua").Combo
 
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
-local Prefs = import('/lua/user/prefs.lua')
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
+local RadioButton = import("/lua/ui/controls/radiobutton.lua").RadioButton
+local Prefs = import("/lua/user/prefs.lua")
 -- this version of Checkbox allows scaling of checkboxes
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local ToggleButton = import('/lua/ui/controls/togglebutton.lua').ToggleButton
-local RestrictedData = import('/lua/ui/lobby/UnitsRestrictions.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local ToggleButton = import("/lua/ui/controls/togglebutton.lua").ToggleButton
+local RestrictedData = import("/lua/ui/lobby/unitsrestrictions.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
-local ModsBlacklist = import('/etc/faf/blacklist.lua').Blacklist
-local SetUtils = import('/lua/system/setutils.lua')
-local Links = import('/lua/system/utils.links.lua')
+local ModsBlacklist = import("/etc/faf/blacklist.lua").Blacklist
+local SetUtils = import("/lua/system/setutils.lua")
+local Links = import("/lua/system/utils.links.lua")
 
 local GUI = { 
     isOpen = false, 
@@ -50,7 +50,7 @@ local modInfoPosition = modIconSize + 20
 local modInfoHeight = modIconSize + 20
 local modInfoDesciptionMax = 235
 -- calculates how many number of mods to show per page based on dialog height
-local modsPerPage = math.floor((dialogHeight - 100) / modInfoHeight) -- - 1
+local modsPerPage = math.floor((dialogHeight - 100) / modInfoHeight)
 
 -- Counters for the benefit of the UI.
 local numEnabledUIMods = 0
@@ -167,7 +167,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     LoadPreferences() -- loading preference for favorite mods, mods sorting order, mod list expanded/collapsed
     LoadMods() -- loading mods before creating mod filters so they show correct count of mods
 
-    dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(80)
+    dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(120)
     dialogContent = Group(parent)
     LayoutHelpers.SetWidth(dialogContent, dialogWidth)
     dialogContent.Height:Set(dialogHeight)
@@ -286,7 +286,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     scrollGroup.Width:Set(function() return dialogContent.Width() - LayoutHelpers.ScaleNumber(30) end)
     scrollGroup.Height:Set(function() return scrollGroup.Bottom() - scrollGroup.Top() end)
 
-    modsPerPage = math.floor((scrollGroup.Height() - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
+    --modsPerPage = math.floor((scrollGroup.Height() - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
 
     UIUtil.CreateLobbyVertScrollbar(scrollGroup, 1, 0, 0, 10)
     scrollGroup.top = 1
@@ -308,26 +308,28 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
         local controlsCount = table.getsize(self:GetFilteredControls())
         top = math.floor(top)
         if top == self.top then return end
-        self.top = math.max(math.min(controlsCount - modsPerPage + 1 , top), 1)
+        self.top = math.max(math.min(controlsCount - modsPerPage + 1, top), 1)
         self:CalcVisible()
     end
 
     scrollGroup.CalcVisible = function(self)
         local top = self.top
-        local bottom = self.top + modsPerPage
+        local bottom = self.top + modsPerPage - 1
         local visibleIndex = 1
+        local lineIndex = 1
         for index, control in ipairs(controlList) do
             if control.filtered then
                 control:Hide()
-            elseif visibleIndex < top or visibleIndex >= bottom then
+            elseif visibleIndex < top or visibleIndex > bottom then
                 control:Hide()
                 visibleIndex = visibleIndex + 1
             else
                 control:Show()
-                local i = visibleIndex
                 local c = control
-                control.Top:Set(function() return self.Top() + ((i - top) * (c.Height() +2)) end)
+                local i = lineIndex
+                control.Top:Set(function() return self.Top() + ((i-1) * (c.Height() +2)) end)
                 visibleIndex = visibleIndex + 1
+                lineIndex = lineIndex + 1
             end
         end
     end
@@ -360,7 +362,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
             callback(mods.sim.active, mods.ui.active)
         else
-            import('/lua/mods.lua').SetSelectedMods(mods.activated)
+            import("/lua/mods.lua").SetSelectedMods(mods.activated)
         end
 
         return mods.activated
@@ -887,7 +889,7 @@ function RefreshModsList()
      end
 
     modsScrollableHeight = modSearch.Group.Top() - subtitle.Bottom()
-    modsPerPage = math.floor((modsScrollableHeight - 60) / modInfoHeight)
+    modsPerPage = math.floor((modsScrollableHeight - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
  
     -- Create entries for the list of interesting mods
     AppendMods(mods.sim.active, true, true)
@@ -1083,7 +1085,7 @@ function CreateListElement(parent, mod, index)
     group:EnableHitTest()
     LayoutHelpers.SetHeight(group, modInfoHeight)
     LayoutHelpers.SetWidth(group, dialogWidth - 40)
-    LayoutHelpers.AtLeftTopIn(group, parent, 8, group.Height() * (index - 1))
+    LayoutHelpers.AtLeftTopIn(group, parent, 8, modInfoHeight * (index - 1))
     group.Bottom:Set(function() return group.Top() + group.Height() end)
     
     -- creating a toggle for marking mods as favorite
@@ -1396,7 +1398,7 @@ end
 function AddTooltip(control, title, description, width, padding, fontSize, position)
     if not fontSize then fontSize = 14 end
     if not position then position = 'left' end
-    import('/lua/ui/game/tooltip.lua').AddControlTooltipManual(control, title, description, 0, width, 6, fontSize, fontSize, position)
+    import("/lua/ui/game/tooltip.lua").AddControlTooltipManual(control, title, description, 0, width, 6, fontSize, fontSize, position)
 end
 
 -- saves favorite mods, mods sorting order, mods expanded/collapsed

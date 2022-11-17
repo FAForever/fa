@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TTransportBeaconUnit = import('/lua/terranunits.lua').TTransportBeaconUnit
+local TTransportBeaconUnit = import("/lua/terranunits.lua").TTransportBeaconUnit
 
 ---@class UEB5102 : TTransportBeaconUnit
 UEB5102 = Class(TTransportBeaconUnit) {

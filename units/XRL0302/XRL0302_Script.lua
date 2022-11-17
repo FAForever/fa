@@ -4,12 +4,12 @@
 -- Summary  :  Cybran Mobile Bomb Script
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CMobileKamikazeBombWeapon = import('/lua/cybranweapons.lua').CMobileKamikazeBombWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local CMobileKamikazeBombWeapon = import("/lua/cybranweapons.lua").CMobileKamikazeBombWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
+local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 --- A unique death weapon for the Fire Beetle
 local DeathWeaponKamikaze = Class(Weapon) {

@@ -1,6 +1,6 @@
 
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Dragger = import('/lua/maui/dragger.lua').Dragger
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Dragger = import("/lua/maui/dragger.lua").Dragger
 
 ---@alias MauiCheckboxState "normal" | "over" | "disabled"
 

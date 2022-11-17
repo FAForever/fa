@@ -20,7 +20,7 @@
 ---@field Team number
 
 
-local WatchedValueTable = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua').WatchedValueTable
+local WatchedValueTable = import("/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua").WatchedValueTable
 
 -- The default values (and the only valid keyset) for a PlayerData object.
 local DEFAULT_MAPPING = {
@@ -31,7 +31,7 @@ local DEFAULT_MAPPING = {
     ArmyColor = 1,
     StartSpot = 1,
     Ready = false,
-    Faction = table.getn(import('/lua/factions.lua').Factions) + 1, -- Random faction
+    Faction = table.getn(import("/lua/factions.lua").Factions) + 1, -- Random faction
     PlayerClan = "",
     PlayerName = "player",
     AIPersonality = "",

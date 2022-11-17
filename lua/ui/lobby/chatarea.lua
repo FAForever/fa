@@ -1,9 +1,9 @@
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local LazyVar = import('/lua/lazyvar.lua')
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local LazyVar = import("/lua/lazyvar.lua")
 
 local defaultStyle = {
     message = {
