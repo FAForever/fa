@@ -5040,40 +5040,6 @@ AIBrain = Class(moho.aibrain_methods) {
             WaitTicks(100)
         end
     end,
-
-    -- TODO: where does this fit best?
-
-    ---@param self AIBrain
-    ---@param radar Unit
-    ShouldUpgradeRadar = function(self, radar)
-
-        -- determine what tech we'll be upgrading to
-        local oldTech = radar.Blueprint.TechCategory
-        local newTech = 'TECH2'
-        if oldTech == 'TECH2' then
-            newTech = 'TECH3'
-        end
-
-        -- loop over radars that are one tech higher
-        local rx, _, rz = radar:GetPositionXYZ()
-        local otherRadars = self.Radars[newTech]
-        for _, other in otherRadars do
-
-            -- determine if we're too close to higher tech radars
-            local range = other.Blueprint.Intel.RadarRadius
-            if range then
-                local squared = 0.64 * (range * range)
-                local ox, _, oz = other:GetPositionXYZ()
-                local dx = ox - rx
-                local dz = oz - rz
-                if dx * dx + dz * dz < squared then
-                    return false
-                end
-            end
-        end
-
-        return true
-    end,
 }
 
 -- kept for mod backwards compatibility

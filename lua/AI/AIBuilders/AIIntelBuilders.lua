@@ -403,6 +403,7 @@ BuilderGroup {
         BuilderConditions = {
             { EBC, 'GreaterThanEconIncomeOverTime',  { 4, 100 }},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
+            { UCBC, 'ShouldUpgradeRadar', {'LocationType', 'TECH2'}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.RADAR * categories.TECH2 * categories.STRUCTURE } },
         },
@@ -415,6 +416,7 @@ BuilderGroup {
         BuilderConditions = {
             { EBC, 'GreaterThanEconIncomeOverTime',  { 9, 500}},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
+            { UCBC, 'ShouldUpgradeRadar', {'LocationType', 'TECH3'}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.OMNI * categories.STRUCTURE } },
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.STRUCTURE * ( categories.RADAR + categories.OMNI ) } },
