@@ -1266,13 +1266,8 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1000,
         BuilderConditions = {
-                --DUNCAN - commented out
-                --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENGINEER * (categories.TECH2 + categories.TECH3) } },
-                --DUNCAN - Changed to 3
                 { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.HYDROCARBON}},
-                --DUNCAN - Added so doenst build before a few mass exs
-                --{ UCBC, 'HaveGreaterThanUnitsWithCategory', { 4, categories.MASSEXTRACTION}},
-                { MABC, 'MarkerLessThanDistance',  { 'Hydrocarbon', 160}}, --DUNCAN - was 150
+                { MABC, 'MarkerLessThanDistance',  { 'Hydrocarbon', 160}},
             },
         BuilderType = 'Any',
         BuilderData = {
@@ -1459,10 +1454,10 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 825,
         BuilderConditions = {
-            { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 2, categories.ENERGYPRODUCTION * categories.TECH3 }}, --DUNCAN - was 0
-            { UCBC, 'UnitCapCheckLess', { .7 } },
             { EBC, 'GreaterThanMassStorageCurrent', { 150 }},
             { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }},
+            { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 2, categories.ENERGYPRODUCTION * categories.TECH3 }}, --DUNCAN - was 0
+            { UCBC, 'UnitCapCheckLess', { .7 } },
             { UCBC, 'AdjacencyCheck', { 'LocationType', categories.ENERGYPRODUCTION * categories.TECH3, 100, 'ueb1105' } },
         },
         BuilderType = 'Any',
@@ -2034,7 +2029,6 @@ BuilderGroup {
         Priority = 1005,
         InstanceCount = 2,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 40, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
