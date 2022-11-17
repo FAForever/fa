@@ -413,7 +413,7 @@ BuilderGroup {
         PlatoonTemplate = 'T2RadarUpgrade',
         Priority = 1, --DUNCAN - changed to 1
         BuilderConditions = {
-            { EBC, 'GreaterThanEconIncomeOverTime',  { 9, 500}},
+            { EBC, 'GreaterThanEconIncomeOverTime',  { 9, 750}},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.OMNI * categories.STRUCTURE } },
