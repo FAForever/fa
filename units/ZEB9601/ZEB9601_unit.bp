@@ -81,6 +81,9 @@ UnitBlueprint {
                 {
                     LODCutoff = 200,
                     ShaderName = 'Unit',
+                    NormalsName = '/units/ueb0301/ueb0301_normalsts.dds',
+                    AlbedoName = '/units/ueb0301/ueb0301_albedo.dds',
+                    SpecularName = '/units/ueb0301/ueb0301_specteam.dds',
                 },
                 {
                     AlbedoName = 'zeb9601_lod1_albedo.dds',

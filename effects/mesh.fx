@@ -9425,7 +9425,7 @@ technique Unit_HighFidelity
         VertexShader = compile vs_1_1 NormalMappedVS();
 
         // PixelShader = compile ps_2_a AlbedoPreviewPS();
-        PixelShader = compile ps_2_a NormalsPreviewPS();
+        // PixelShader = compile ps_2_a NormalsPreviewPS();
         // PixelShader = compile ps_2_a SpecPreviewPS();
 
         // PixelShader = compile ps_2_a RSpecPreviewPS();
@@ -9433,7 +9433,7 @@ technique Unit_HighFidelity
         // PixelShader = compile ps_2_a BSpecPreviewPS();
         // PixelShader = compile ps_2_a ASpecPreviewPS();
 
-        // PixelShader = compile ps_2_a PBR_UEF_PS(true,true,false,0,0 );
+        PixelShader = compile ps_2_a PBR_UEF_PS(true,true,false,0,0 );
     }
 }
 
@@ -9460,12 +9460,12 @@ technique Insect_HighFidelity
         // PixelShader = compile ps_2_a NormalsPreviewPS();
         // PixelShader = compile ps_2_a SpecPreviewPS();
 
-        PixelShader = compile ps_2_a RSpecPreviewPS();
+        // PixelShader = compile ps_2_a RSpecPreviewPS();
         // PixelShader = compile ps_2_a GSpecPreviewPS();
         // PixelShader = compile ps_2_a BSpecPreviewPS();
         // PixelShader = compile ps_2_a ASpecPreviewPS();
 
-        // PixelShader = compile ps_2_a PBR_Cybran(true);
+        PixelShader = compile ps_2_a PBR_Cybran(true);
     }
 }
 
