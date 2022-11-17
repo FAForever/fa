@@ -2457,6 +2457,7 @@ float4 MapImagerPS1( NORMALMAPPED_VERTEX vertex) : COLOR0
 /// Used by the unit viewer to preview the albedo map.
 float4 AlbedoPreviewPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 {
+    if ( 1 == mirrored ) clip(vertex.depth.x);
     return tex2D( albedoSampler, vertex.texcoord0.xy);
 }
 
@@ -2465,6 +2466,7 @@ float4 AlbedoPreviewPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 /// Used by the unit viewer to preview the normal map.
 float4 NormalsPreviewPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 {
+    if ( 1 == mirrored ) clip(vertex.depth.x);
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     return float4( 0.5 * (normal + 1), 1);
@@ -2475,26 +2477,31 @@ float4 NormalsPreviewPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 /// Used by the unit viewer to preview the albedo map.
 float4 SpecPreviewPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 {
+    if ( 1 == mirrored ) clip(vertex.depth.x);
     return tex2D( specularSampler, vertex.texcoord0.xy);
 }
 
 float4 RSpecPreviewPS ( NORMALMAPPED_VERTEX vertex) : COLOR0 
 {
+    if ( 1 == mirrored ) clip(vertex.depth.x);
     return float4(tex2D( specularSampler, vertex.texcoord0.xy).rrr, 1);
 }
 
 float4 BSpecPreviewPS ( NORMALMAPPED_VERTEX vertex) : COLOR0 
 {
+    if ( 1 == mirrored ) clip(vertex.depth.x);
     return float4(tex2D( specularSampler, vertex.texcoord0.xy).bbb, 1);
 }
 
 float4 GSpecPreviewPS ( NORMALMAPPED_VERTEX vertex) : COLOR0 
 {
+    if ( 1 == mirrored ) clip(vertex.depth.x);
     return float4(tex2D( specularSampler, vertex.texcoord0.xy).ggg, 1);
 }
 
 float4 ASpecPreviewPS ( NORMALMAPPED_VERTEX vertex) : COLOR0 
 {
+    if ( 1 == mirrored ) clip(vertex.depth.x);
     return float4(tex2D( specularSampler, vertex.texcoord0.xy).aaa, 1);
 }
 
@@ -9418,7 +9425,7 @@ technique Unit_HighFidelity
         VertexShader = compile vs_1_1 NormalMappedVS();
 
         // PixelShader = compile ps_2_a AlbedoPreviewPS();
-        // PixelShader = compile ps_2_a NormalsPreviewPS();
+        PixelShader = compile ps_2_a NormalsPreviewPS();
         // PixelShader = compile ps_2_a SpecPreviewPS();
 
         // PixelShader = compile ps_2_a RSpecPreviewPS();
@@ -9426,7 +9433,7 @@ technique Unit_HighFidelity
         // PixelShader = compile ps_2_a BSpecPreviewPS();
         // PixelShader = compile ps_2_a ASpecPreviewPS();
 
-        PixelShader = compile ps_2_a PBR_UEF_PS(true,true,false,0,0 );
+        // PixelShader = compile ps_2_a PBR_UEF_PS(true,true,false,0,0 );
     }
 }
 
@@ -9453,12 +9460,12 @@ technique Insect_HighFidelity
         // PixelShader = compile ps_2_a NormalsPreviewPS();
         // PixelShader = compile ps_2_a SpecPreviewPS();
 
-        // PixelShader = compile ps_2_a RSpecPreviewPS();
+        PixelShader = compile ps_2_a RSpecPreviewPS();
         // PixelShader = compile ps_2_a GSpecPreviewPS();
         // PixelShader = compile ps_2_a BSpecPreviewPS();
         // PixelShader = compile ps_2_a ASpecPreviewPS();
 
-        PixelShader = compile ps_2_a PBR_Cybran(true);
+        // PixelShader = compile ps_2_a PBR_Cybran(true);
     }
 }
 
