@@ -110,7 +110,7 @@ BuilderGroup {
                     'T1AirFactory',
                 },
                 Location = 'LocationType',
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
             }
         }
     },
@@ -134,7 +134,7 @@ BuilderGroup {
                     'T1AirFactory',
                 },
                 Location = 'LocationType',
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
             }
         }
     },
@@ -183,7 +183,7 @@ BuilderGroup {
                     'T1LandFactory',
                 },
                 Location = 'LocationType',
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
             }
         }
     },
@@ -206,7 +206,7 @@ BuilderGroup {
                     'T1LandFactory',
                 },
                 Location = 'LocationType',
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
             }
         }
     },
@@ -257,7 +257,7 @@ BuilderGroup {
                     'T1LandFactory',
                 },
                 Location = 'LocationType',
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
             }
         }
     },
@@ -305,7 +305,7 @@ BuilderGroup {
                     'T1AirFactory',
                 },
                 Location = 'LocationType',
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
             }
         }
     },
@@ -340,6 +340,28 @@ BuilderGroup {
     --     Land Factory Builders
     -- =============================
     Builder {
+        BuilderName = 'T1 Land Factory Primary Builder',
+        PlatoonTemplate = 'EngineerBuilder',
+        Priority = 1000,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
+            { UCBC, 'FactoryLessAtLocation', { 'MAIN', 1, categories.STRUCTURE * categories.FACTORY * categories.LAND - categories.SUPPORTFACTORY }},
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.8, 0.8} },
+            { UCBC, 'UnitCapCheckLess', { .8 } },
+        },
+        BuilderType = 'Any',
+        BuilderData = {
+            Construction = {
+                BuildStructures = {
+                    'T1LandFactory',
+                },
+                Location = 'LocationType',
+                AdjacencyCategory = 'ENERGYPRODUCTION',
+            }
+        },
+    },
+    Builder {
         BuilderName = 'T1 Land Factory Builder',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 900,
@@ -358,7 +380,7 @@ BuilderGroup {
                     'T1LandFactory',
                 },
                 Location = 'LocationType',
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
             }
         },
     },
@@ -388,6 +410,28 @@ BuilderGroup {
     --     Air Factory Builders
     -- ============================
     Builder {
+        BuilderName = 'T1 Air Factory Primary Builder',
+        PlatoonTemplate = 'EngineerBuilder',
+        Priority = 1000,
+        BuilderConditions = {
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
+            { UCBC, 'FactoryLessAtLocation', { 'MAIN', 1, categories.STRUCTURE * categories.FACTORY * categories.AIR - categories.SUPPORTFACTORY }},
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.8, 0.8} },
+            { UCBC, 'UnitCapCheckLess', { .8 } },
+        },
+        BuilderType = 'Any',
+        BuilderData = {
+            Construction = {
+                BuildStructures = {
+                    'T1AirFactory',
+                },
+                Location = 'LocationType',
+                AdjacencyCategory = 'ENERGYPRODUCTION',
+            }
+        }
+    },
+    Builder {
         BuilderName = 'T1 Air Factory Builder',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 900,
@@ -405,7 +449,7 @@ BuilderGroup {
                     'T1AirFactory',
                 },
                 Location = 'LocationType',
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
             }
         }
     },
@@ -441,7 +485,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER * ( categories.TECH2 + categories.TECH3 ) } },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
-            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 3, categories.AIR * categories.FACTORY } },
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, categories.AIR * categories.FACTORY } },
             { MIBC, 'ArmyNeedsTransports', {} },
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'UnitCapCheckLess', { .8 } },
@@ -455,7 +499,7 @@ BuilderGroup {
                     'T1AirFactory',
                 },
                 Location = 'LocationType',
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
             }
         }
     },
@@ -484,7 +528,7 @@ BuilderGroup {
                     'T3QuantumGate',
                 },
                 Location = 'LocationType',
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
             }
         }
     },

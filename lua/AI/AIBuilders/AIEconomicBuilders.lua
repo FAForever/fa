@@ -43,6 +43,17 @@ BuilderGroup {
         BuilderType = 'All',
     },
     Builder {
+        BuilderName = 'T1 Engineer Power',
+        PlatoonTemplate = 'T1BuildEngineer',
+        Priority = 850,
+        BuilderConditions = {
+            { EBC, 'LessThanEnergyTrendOverTime', { 0.0 } },
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER * categories.TECH1 } },
+            { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech1' } },
+        },
+        BuilderType = 'All',
+    },
+    Builder {
         BuilderName = 'T1 Engineer Disband - Filler 1',
         PlatoonTemplate = 'T1BuildEngineer',
         Priority = 800,
@@ -563,7 +574,7 @@ BuilderGroup {
         BuilderData = {
             DesiresAssist = false,
             Construction = {
-                AdjacencyCategory = 'FACTORY',
+                AdjacencyCategory = categories.FACTORY,
                 BuildStructures = {
                     'T1EnergyProduction',
                 },
@@ -1251,6 +1262,23 @@ BuilderGroup {
     --     T1 Engineer Resource Builders
     -- =====================================
     Builder {
+        BuilderName = 'T1 Hydrocarbon Engineer Single',
+        PlatoonTemplate = 'EngineerBuilder',
+        Priority = 1000,
+        BuilderConditions = {
+                { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.HYDROCARBON}},
+                { MABC, 'MarkerLessThanDistance',  { 'Hydrocarbon', 160}},
+            },
+        BuilderType = 'Any',
+        BuilderData = {
+            Construction = {
+                BuildStructures = {
+                    'T1HydroCarbon',
+                }
+            }
+        }
+    },
+    Builder {
         BuilderName = 'T1 Hydrocarbon Engineer',
         PlatoonTemplate = 'EngineerBuilder',
         --DUNCAN - Changed from 850
@@ -1368,7 +1396,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'MASSEXTRACTION TECH3, MASSEXTRACTION TECH2',
+                AdjacencyCategory = categories.MASSEXTRACTION * ( categories.TECH2 + categories.TECH3 ),
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 ThreatMin = -3,
@@ -1426,15 +1454,16 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 825,
         BuilderConditions = {
+            { EBC, 'GreaterThanMassStorageCurrent', { 150 }},
+            { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }},
             { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 2, categories.ENERGYPRODUCTION * categories.TECH3 }}, --DUNCAN - was 0
             { UCBC, 'UnitCapCheckLess', { .7 } },
-            { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }},
             { UCBC, 'AdjacencyCheck', { 'LocationType', categories.ENERGYPRODUCTION * categories.TECH3, 100, 'ueb1105' } },
         },
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION TECH3',
+                AdjacencyCategory = categories.ENERGYPRODUCTION * categories.TECH3,
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 BuildStructures = {
@@ -1995,10 +2024,29 @@ BuilderGroup {
     BuilderGroupName = 'EngineerMassBuildersHighPri',
     BuildersType = 'EngineerBuilder',
     Builder {
+        BuilderName = 'T1ResourceEngineer 40',
+        PlatoonTemplate = 'EngineerBuilder',
+        Priority = 1005,
+        InstanceCount = 2,
+        BuilderConditions = {
+                { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 40, -500, 1, 0, 'AntiSurface', 1 }},
+            },
+        BuilderType = 'Any',
+        BuilderData = {
+            NeedGuard = true,
+            DesiresAssist = false,
+            Construction = {
+                BuildStructures = {
+                    'T1Resource',
+                }
+            }
+        }
+    },
+    Builder {
         BuilderName = 'T1ResourceEngineer 150',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1000,
-        InstanceCount = 4,
+        InstanceCount = 3,
         BuilderConditions = {
                 --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 150, -500, 1, 0, 'AntiSurface', 1 }},
@@ -2165,7 +2213,7 @@ BuilderGroup {
             NumAssistees = 2,
             Construction = {
                 BuildClose = false, --DUNCAN - seems to work better at placing next to power
-                AdjacencyCategory = 'ENERGYPRODUCTION TECH3, ENERGYPRODUCTION TECH2',
+                AdjacencyCategory = categories.ENERGYPRODUCTION * (categories.TECH3 + categories.TECH2),
                 BuildStructures = {
                     'T3MassCreation',
                 },
@@ -2351,7 +2399,7 @@ BuilderGroup {
             NumAssistees = 2,
             Construction = {
                 BuildClose = true,
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 BuildStructures = {
                     'T3MassCreation',
                 },
@@ -2600,7 +2648,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'FACTORY',
+                AdjacencyCategory = categories.FACTORY * categories.STRUCTURE - categories.NAVAL,
                 BuildStructures = {
                     'T1EnergyProduction',
                 },
@@ -2620,7 +2668,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'FACTORY',
+                AdjacencyCategory = categories.FACTORY * categories.STRUCTURE - categories.NAVAL,
                 BuildStructures = {
                     'T1EnergyProduction',
                 },
@@ -2641,10 +2689,10 @@ BuilderGroup {
         BuilderData = {
             Construction = {
                 BuildClose = true,
-                AvoidCategory = 'ENERGYPRODUCTION TECH2',
+                AvoidCategory = categories.ENERGYPRODUCTION * categories.TECH2,
                 maxUnits = 5,
                 maxRadius = 15,
-                AdjacencyCategory = 'SHIELD STUCTURE, FACTORY TECH3, FACTORY TECH2, FACTORY TECH1',
+                AdjacencyCategory = categories.SHIELD * categories.STRUCTURE + categories.FACTORY * categories.STRUCTURE - categories.NAVAL,
                 BuildStructures = {
                     'T2EnergyProduction',
                 },
@@ -2657,16 +2705,15 @@ BuilderGroup {
         Priority = 1000,
         BuilderType = 'Any',
         BuilderConditions = {
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.ENERGYPRODUCTION * categories.TECH2}}, --DUNCAN - Added
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.ENERGYPRODUCTION * categories.TECH3}}, --DUNCAN - Added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.ENERGYPRODUCTION * (categories.TECH2 + categories.TECH3)}},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.5, 0.1 }},
             { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }}, --DUNCAN - added
         },
         BuilderData = {
             Construction = {
                 BuildClose = true,
-                AdjacencyCategory = 'SHIELD STUCTURE, FACTORY TECH3, FACTORY TECH2, FACTORY TECH1',
-                AvoidCategory = 'ENERGYPRODUCTION TECH3',
+                AdjacencyCategory = categories.SHIELD * categories.STRUCTURE + categories.FACTORY * categories.STRUCTURE - categories.NAVAL,
+                AvoidCategory = categories.ENERGYPRODUCTION * categories.TECH3,
                 maxUnits = 5,
                 maxRadius = 15,
                 BuildStructures = {
@@ -2763,7 +2810,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 BuildClose = true,
                 FactionIndex = 1,
                 BuildStructures = {
@@ -2787,7 +2834,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 BuildClose = true,
                 FactionIndex = 3,
                 BuildStructures = {
@@ -2811,7 +2858,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 BuildClose = true,
                 FactionIndex = 1,
                 BuildStructures = {
@@ -2835,7 +2882,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 BuildClose = true,
                 FactionIndex = 3,
                 BuildStructures = {
