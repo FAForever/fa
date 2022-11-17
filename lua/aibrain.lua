@@ -94,6 +94,7 @@ local Factions = import("/lua/factions.lua").GetFactions(true)
 ---@field PBM AiPlatoonBuildManager
 ---@field PingCallbackList table
 ---@field PlatoonNameCounter? table<string, number>
+---@field Radars table<string, Unit[]>
 ---@field RepeatExecution boolean
 ---@field Result? AIResult
 ---@field SelfMonitor AiSelfMonitor
@@ -336,6 +337,14 @@ AIBrain = Class(moho.aibrain_methods) {
                 end 
             end
         end
+
+        -- keep track of radars
+        self.Radars = { 
+            TECH1 = { },
+            TECH2 = { },
+            TECH3 = { },
+            EXPERIMENTAL = { },
+        }
 
         -- restrict all support factories by default
         AddBuildRestriction(self:GetArmyIndex(), (categories.TECH3 + categories.TECH2) * categories.SUPPORTFACTORY)

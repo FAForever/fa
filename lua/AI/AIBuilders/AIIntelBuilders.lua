@@ -381,7 +381,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'FACTORY -NAVAL',
+                AdjacencyCategory = categories.FACTORY * categories.STRUCTURE - categories.NAVAL,
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 BuildStructures = {
@@ -403,6 +403,7 @@ BuilderGroup {
         BuilderConditions = {
             { EBC, 'GreaterThanEconIncomeOverTime',  { 4, 100 }},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
+            { UCBC, 'ShouldUpgradeRadar', {'LocationType', 'TECH2'}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.RADAR * categories.TECH2 * categories.STRUCTURE } },
         },
@@ -413,8 +414,9 @@ BuilderGroup {
         PlatoonTemplate = 'T2RadarUpgrade',
         Priority = 1, --DUNCAN - changed to 1
         BuilderConditions = {
-            { EBC, 'GreaterThanEconIncomeOverTime',  { 9, 500}},
+            { EBC, 'GreaterThanEconIncomeOverTime',  { 9, 750}},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
+            { UCBC, 'ShouldUpgradeRadar', {'LocationType', 'TECH3'}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.OMNI * categories.STRUCTURE } },
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.STRUCTURE * ( categories.RADAR + categories.OMNI ) } },
@@ -470,7 +472,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 BuildStructures = {
@@ -498,7 +500,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 BuildStructures = {
