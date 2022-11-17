@@ -2467,7 +2467,15 @@ float4 NormalsPreviewPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 {
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    return float4( normal, 1);
+    return float4( 0.5 * (normal + 1), 1);
+}
+
+/// SpecPreviewPS
+///
+/// Used by the unit viewer to preview the albedo map.
+float4 SpecPreviewPS( NORMALMAPPED_VERTEX vertex) : COLOR0
+{
+    return tex2D( specularSampler, vertex.texcoord0.xy);
 }
 
 /// LightingPreviewPS
@@ -9387,6 +9395,11 @@ technique Unit_HighFidelity
     {
         RasterizerState( Rasterizer_Cull_CW )
         VertexShader = compile vs_1_1 NormalMappedVS();
+
+        // PixelShader = compile ps_2_a AlbedoPreviewPS();
+        // PixelShader = compile ps_2_a NormalsPreviewPS();
+        // PixelShader = compile ps_2_a SpecPreviewPS();
+
         PixelShader = compile ps_2_a PBR_UEF_PS(true,true,false,0,0 );
     }
 }
@@ -9409,6 +9422,11 @@ technique Insect_HighFidelity
     {
         RasterizerState( Rasterizer_Cull_CW )
         VertexShader = compile vs_1_1 NormalMappedVS();
+
+        // PixelShader = compile ps_2_a AlbedoPreviewPS();
+        // PixelShader = compile ps_2_a NormalsPreviewPS();
+        // PixelShader = compile ps_2_a SpecPreviewPS();
+
         PixelShader = compile ps_2_a PBR_Cybran(true);
     }
 }
@@ -9433,6 +9451,11 @@ technique Aeon_HighFidelity
     {
         RasterizerState( Rasterizer_Cull_CW )
         VertexShader = compile vs_1_1 NormalMappedVS();
+
+        // PixelShader = compile ps_2_a AlbedoPreviewPS();
+        // PixelShader = compile ps_2_a NormalsPreviewPS();
+        // PixelShader = compile ps_2_a SpecPreviewPS();
+
         PixelShader = compile ps_2_a PBR_Aeon(true);
     }
 }
@@ -9460,6 +9483,11 @@ technique Seraphim_HighFidelity
     {
         RasterizerState( Rasterizer_Cull_CW )
         VertexShader = compile vs_1_1 UnitFalloffVS();
+
+        // PixelShader = compile ps_2_a AlbedoPreviewPS();
+        // PixelShader = compile ps_2_a NormalsPreviewPS();
+        // PixelShader = compile ps_2_a SpecPreviewPS();
+
         PixelShader = compile ps_2_a PBR_Seraphim(true);
     }
 }
