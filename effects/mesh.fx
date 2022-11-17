@@ -2563,7 +2563,7 @@ float4 WreckagePS( NORMALMAPPED_VERTEX vertex) : COLOR0
     float4 specular = tex2D( specularSampler, texcoord * 5.15);
 
     /// Wreckage should not receive shadows (the "random" crunchiness makes for bad artifacts.)
-    float3 color = albedo * ComputeLight( dotLightNormal, 1);
+    float3 color = albedo * ComputeLight( dotLightNormal, 0);
 
     if( specular.g < 0.22 )
         color *= (albedo + specular.r + specular.a) * specular.b * 2.5;

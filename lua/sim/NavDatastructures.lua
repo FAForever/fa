@@ -39,8 +39,10 @@ NavPathToHeap = ClassSimple {
 
     ---@param self NavPathToHeap
     Clear = function(self)
+        local heap = self.Heap
+
         for k = 1, self.HeapSize do
-            self.Heap[k] = nil
+            heap[k] = nil
         end
         self.HeapSize = 0
     end,
@@ -48,18 +50,21 @@ NavPathToHeap = ClassSimple {
     ---@param self NavPathToHeap
     ---@return CompressedLabelTreeLeaf?
     ExtractMin = function(self)
+        local heap = self.Heap
+        local heapSize = self.HeapSize
+
         -- if the Heap is empty, we got nothing to return!
-        if self.HeapSize == 0 then
+        if heapSize == 0 then
             return nil
         end
 
         -- keep a reference to the top value.
-        local value = self.Heap[1]
+        local value = heap[1]
 
         -- put our highest value at the top.
-        self.Heap[1] = self.Heap[self.HeapSize]
-        self.Heap[self.HeapSize] = nil
-        self.HeapSize = self.HeapSize - 1
+        heap[1] = heap[heapSize]
+        heap[heapSize] = nil
+        self.HeapSize = heapSize - 1
 
         -- fix its position.
         self:Heapify()
@@ -67,17 +72,19 @@ NavPathToHeap = ClassSimple {
         return value
     end,
 
+    --- 'Bubble down' operation, applied when we extract an element from the heap
     ---@param self NavPathToHeap
     Heapify = function(self)
         local heap = self.Heap
-        local heap_size = self.HeapSize
+        local heapSize = self.HeapSize
 
-        local index = 1
         -- find the left / right child
+        local index = 1
         local left = 2 * index
         local right = 2 * index + 1
+
         -- if there is no left child it means we restored heap properties
-        while left <= heap_size do
+        while left <= heapSize do
             local min = left
 
             -- if there is a right child, compare its value with the left one
@@ -91,10 +98,12 @@ NavPathToHeap = ClassSimple {
             if heap[min].TotalCosts > heap[index].TotalCosts then
                 return
             end
+
             -- otherwise, swap the two values.
             local tmp = heap[min]
             heap[min] = heap[index]
             heap[index] = tmp
+
             -- and update index, left and right indexes.
             index = min
             left = 2 * index
@@ -102,24 +111,30 @@ NavPathToHeap = ClassSimple {
         end
     end,
 
+    --- 'Bubble up' operation, applied when we insert a new element into the heap
     ---@param self NavPathToHeap
     Rootify = function(self)
         local heap = self.Heap
         local index = self.HeapSize
-        -- index / 2
+
+        -- math.floor(index / 2)
         local parent = index >> 1
         while parent >= 1 do
+
             -- if parent value is smaller than index value it means we restored correct order of the elements
             if heap[parent].TotalCosts < heap[index].TotalCosts then
                 return
             end
+
             -- otherwise, swap the values
             local tmp = heap[parent]
             heap[parent] = heap[index]
             heap[index] = tmp
+
             -- and update index and parent indexes
             index = parent
-            -- parent / 2
+
+            -- math.floor(parent / 2)
             parent = parent >> 1
         end
     end,
@@ -127,12 +142,8 @@ NavPathToHeap = ClassSimple {
     ---@param self NavPathToHeap
     ---@param element CompressedLabelTreeLeaf
     Insert = function(self, element)
-        if element then
-            self.HeapSize = self.HeapSize + 1
-            self.Heap[self.HeapSize] = element
-            self:Rootify()
-        else
-            WARN("given object to Heap was nil!")
-        end
+        self.HeapSize = self.HeapSize + 1
+        self.Heap[self.HeapSize] = element
+        self:Rootify()
     end,
 }
