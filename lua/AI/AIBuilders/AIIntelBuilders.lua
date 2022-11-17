@@ -381,7 +381,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'FACTORY -NAVAL',
+                AdjacencyCategory = categories.FACTORY * categories.STRUCTURE - categories.NAVAL,
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 BuildStructures = {
@@ -470,7 +470,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 BuildStructures = {
@@ -498,7 +498,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 BuildStructures = {

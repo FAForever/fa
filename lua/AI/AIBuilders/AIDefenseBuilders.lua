@@ -273,10 +273,10 @@ BuilderGroup {
             NumAssistees = 0, --DUNCAN - was 2
             Construction = {
                 BuildClose = true,
-                AvoidCategory = 'TECH3 ANTIAIR STRUCTURE',
+                AvoidCategory = categories.TECH3 * categories.ANTIAIR * categories.STRUCTURE,
                 maxUnits = 1,
                 maxRadius = 10,
-                AdjacencyCategory = 'SHIELD STUCTURE, FACTORY TECH3, FACTORY TECH2, FACTORY',
+                AdjacencyCategory = categories.SHIELD * categories.STRUCTURE + categories.FACTORY * (categories.TECH3 + categories.TECH2),
                 BuildStructures = {
                     'T3AADefense',
                 },
@@ -911,10 +911,10 @@ BuilderGroup {
         BuilderData = {
             NumAssistees = 2,
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION EXPERIMENTAL, ENERGYPRODUCTION TECH3, FACTORY TECH3, FACTORY TECH2, ENERGYPRODUCTION TECH2, FACTORY',
+                AdjacencyCategory = categories.ENERGYPRODUCTION * categories.EXPERIMENTAL + categories.ENERGYPRODUCTION * categories.TECH3 + categories.FACTORY * (categories.TECH2 + categories.TECH3) + categories.ENERGYPRODUCTION * categories.TECH2,
                 AdjacencyDistance = 60,
                 BuildClose = false,
-                AvoidCategory = 'SHIELD',
+                AvoidCategory = categories.SHIELD,
                 maxUnits = 1,
                 maxRadius = 10,
                 BuildStructures = {
@@ -1024,10 +1024,10 @@ BuilderGroup {
         BuilderData = {
             NumAssistees = 2,
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION EXPERIMENTAL, ENERGYPRODUCTION TECH3, FACTORY TECH3, FACTORY TECH2, ENERGYPRODUCTION TECH2, FACTORY',
+                AdjacencyCategory = categories.ENERGYPRODUCTION * categories.EXPERIMENTAL + categories.ENERGYPRODUCTION * categories.TECH3 + categories.FACTORY * (categories.TECH3 + categories.TECH2) - categories.NAVAL + categories.ENERGYPRODUCTION * categories.TECH2,
                 AdjacencyDistance = 60,
                 BuildClose = false,
-                AvoidCategory = 'SHIELD',
+                AvoidCategory = categories.SHIELD,
                 maxUnits = 1,
                 maxRadius = 10,
                 BuildStructures = {
@@ -1066,7 +1066,7 @@ BuilderGroup {
             NumAssistees = 5,
             Construction = {
                 BuildClose = false,
-                AdjacencyCategory = 'FACTORY - NAVAL',
+                AdjacencyCategory = categories.FACTORY - categories.NAVAL,
                 AdjacencyDistance = 100,
                 BuildStructures = {
                     'T3StrategicMissileDefense',
@@ -1399,7 +1399,7 @@ BuilderGroup {
         BuilderData = {
             NumAssistees = 2,
             Construction = {
-                AvoidCategory = 'SHIELD',
+                AvoidCategory = categories.SHIELD,
                 maxUnits = 1,
                 maxRadius = 10,
                 NearUnitCategory = 'COMMAND',
@@ -1434,7 +1434,7 @@ BuilderGroup {
         BuilderData = {
             NumAssistees = 2,
             Construction = {
-                AvoidCategory = 'SHIELD',
+                AvoidCategory = categories.SHIELD,
                 maxUnits = 1,
                 maxRadius = 10,
                 NearUnitCategory = 'COMMAND',
