@@ -5085,28 +5085,6 @@ technique NormalMappedTerrain
     }
 }
 
-/// Unit
-///
-/// Basic unit techniques.
-technique Unit_HighFidelity
-<
-    string abstractTechnique = "Unit";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_UEF(true,true,true,false,0,0 );
-    }
-}
-
 technique Unit_MedFidelity
 <
     string abstractTechnique = "Unit";
@@ -5507,27 +5485,7 @@ technique Metal_LowFidelity
     }
 }
 
-/// Insect
-///
-///
-technique Insect_HighFidelity
-<
-    string abstractTechnique = "Insect";
-    int fidelity = FIDELITY_HIGH;
 
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_Cybran(true);
-    }
-}
 
 technique Insect_MedFidelity
 <
@@ -5568,30 +5526,6 @@ technique Insect_LowFidelity
 
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
-    }
-}
-
-/// Aeon
-///
-///
-technique Aeon_HighFidelity
-<
-    string abstractTechnique = "Aeon";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-
-        string environment = "<aeon>";
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_Aeon(true);
     }
 }
 
@@ -5637,32 +5571,7 @@ technique Aeon_LowFidelity
     }
 }
 
-/// Seraphim
-///
-///
-technique Seraphim_HighFidelity
-<
-    string abstractTechnique = "Seraphim";
-    int fidelity = FIDELITY_HIGH;
 
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-
-    string environment = "<seraphim>";
-
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-        VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_a PBR_Seraphim(true);
-    }
-}
 
 technique Seraphim_MedFidelity
 <
@@ -9234,7 +9143,7 @@ float4 PBR_PS(
     return float4(color, 0);
 }
 
-float4 PBR_UEF(NORMALMAPPED_VERTEX vertex,
+float4 PBR_UEF_PS(NORMALMAPPED_VERTEX vertex,
                 uniform bool maskAlbedo,
                 uniform bool hiDefShadows,
                 uniform bool alphaTestEnable,
@@ -9374,9 +9283,9 @@ float4 PBR_Seraphim(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COL
     return float4(color, alpha);
 }
 
-technique PBR_UEF
+technique PBR_UEF_PS
 <
-    string abstractTechnique = "PBR_UEF";
+    string abstractTechnique = "PBR_UEF_PS";
     int fidelity = FIDELITY_HIGH;
 
     string cartographicTechnique = "CartographicUnit";
@@ -9390,7 +9299,7 @@ technique PBR_UEF
         RasterizerState(Rasterizer_Cull_CW)
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_UEF(true, true, false, 0, 0);
+        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
     }
 }
 
@@ -9456,6 +9365,100 @@ technique PBR_Seraphim
     {
         RasterizerState( Rasterizer_Cull_CW )
 
+        VertexShader = compile vs_1_1 UnitFalloffVS();
+        PixelShader = compile ps_2_a PBR_Seraphim(true);
+    }
+}
+
+// These should be placed back once we're merging
+
+technique Unit_HighFidelity
+<
+    string abstractTechnique = "Unit";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_UEF_PS(true,true,false,0,0 );
+    }
+}
+
+/// Insect
+///
+///
+technique Insect_HighFidelity
+<
+    string abstractTechnique = "Insect";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_Cybran(true);
+    }
+}
+
+/// Aeon
+///
+///
+technique Aeon_HighFidelity
+<
+    string abstractTechnique = "Aeon";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+
+        string environment = "<aeon>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_Aeon(true);
+    }
+}
+
+/// Seraphim
+///
+///
+technique Seraphim_HighFidelity
+<
+    string abstractTechnique = "Seraphim";
+    int fidelity = FIDELITY_HIGH;
+
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+
+    string environment = "<seraphim>";
+
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
         VertexShader = compile vs_1_1 UnitFalloffVS();
         PixelShader = compile ps_2_a PBR_Seraphim(true);
     }
