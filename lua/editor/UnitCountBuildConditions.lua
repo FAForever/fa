@@ -1450,9 +1450,6 @@ function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount
     return true
 end
 
-
--- TODO: where does this fit best?
-
 --- Buildcondition to decide if radars should upgrade based on other radar locations.
 ---@param aiBrain AIBrain
 ---@param locationType string
