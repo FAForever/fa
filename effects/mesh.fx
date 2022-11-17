@@ -5102,10 +5102,8 @@ technique Unit_HighFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-
         VertexShader = compile vs_1_1 NormalMappedVS();
-        //PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
-        PixelShader = compile ps_2_a NormalMappedPS_02(true,true,true,false,0,0 );
+        PixelShader = compile ps_2_a PBR_UEF(true,true,true,false,0,0 );
     }
 }
 
@@ -5526,10 +5524,8 @@ technique Insect_HighFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-
         VertexShader = compile vs_1_1 NormalMappedVS();
-        //PixelShader = compile ps_2_a NormalMappedInsectPS(true);
-        PixelShader = compile ps_2_a NormalMappedInsectPS_02(true);
+        PixelShader = compile ps_2_a PBR_Cybran(true);
     }
 }
 
@@ -5594,10 +5590,8 @@ technique Aeon_HighFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-
         VertexShader = compile vs_1_1 NormalMappedVS();
-        //PixelShader = compile ps_2_a AeonPS(true);
-        PixelShader = compile ps_2_a AeonPS_02(true);
+        PixelShader = compile ps_2_a PBR_Aeon(true);
     }
 }
 
@@ -5665,10 +5659,8 @@ technique Seraphim_HighFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        //PixelShader = compile ps_2_a UnitFalloffPS(true);
-        PixelShader = compile ps_2_a UnitFalloffPS_02(true);
+        PixelShader = compile ps_2_a PBR_Seraphim(true);
     }
 }
 
@@ -9089,9 +9081,9 @@ technique SeraphimStunned_LowFidelity
     }
 }
 
-/////////////////////////////////////////////////
-// Physically Based Rendering
-/////////////////////////////////////////////////
+////////////////////////////////
+// Physically Based Rendering //
+////////////////////////////////
 
 const float PI = 3.14159265359;
 
