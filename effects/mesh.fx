@@ -2478,6 +2478,27 @@ float4 SpecPreviewPS( NORMALMAPPED_VERTEX vertex) : COLOR0
     return tex2D( specularSampler, vertex.texcoord0.xy);
 }
 
+float4 RSpecPreviewPS ( NORMALMAPPED_VERTEX vertex) : COLOR0 
+{
+    return float4(tex2D( specularSampler, vertex.texcoord0.xy).rrr, 1);
+}
+
+float4 BSpecPreviewPS ( NORMALMAPPED_VERTEX vertex) : COLOR0 
+{
+    return float4(tex2D( specularSampler, vertex.texcoord0.xy).bbb, 1);
+}
+
+float4 GSpecPreviewPS ( NORMALMAPPED_VERTEX vertex) : COLOR0 
+{
+    return float4(tex2D( specularSampler, vertex.texcoord0.xy).ggg, 1);
+}
+
+float4 ASpecPreviewPS ( NORMALMAPPED_VERTEX vertex) : COLOR0 
+{
+    return float4(tex2D( specularSampler, vertex.texcoord0.xy).aaa, 1);
+}
+
+
 /// LightingPreviewPS
 ///
 /// Used by the unit viewer to preview a unit's lighting.
@@ -9400,6 +9421,11 @@ technique Unit_HighFidelity
         // PixelShader = compile ps_2_a NormalsPreviewPS();
         // PixelShader = compile ps_2_a SpecPreviewPS();
 
+        // PixelShader = compile ps_2_a RSpecPreviewPS();
+        // PixelShader = compile ps_2_a GSpecPreviewPS();
+        // PixelShader = compile ps_2_a BSpecPreviewPS();
+        // PixelShader = compile ps_2_a ASpecPreviewPS();
+
         PixelShader = compile ps_2_a PBR_UEF_PS(true,true,false,0,0 );
     }
 }
@@ -9426,6 +9452,11 @@ technique Insect_HighFidelity
         // PixelShader = compile ps_2_a AlbedoPreviewPS();
         // PixelShader = compile ps_2_a NormalsPreviewPS();
         // PixelShader = compile ps_2_a SpecPreviewPS();
+
+        // PixelShader = compile ps_2_a RSpecPreviewPS();
+        // PixelShader = compile ps_2_a GSpecPreviewPS();
+        // PixelShader = compile ps_2_a BSpecPreviewPS();
+        // PixelShader = compile ps_2_a ASpecPreviewPS();
 
         PixelShader = compile ps_2_a PBR_Cybran(true);
     }
@@ -9455,6 +9486,11 @@ technique Aeon_HighFidelity
         // PixelShader = compile ps_2_a AlbedoPreviewPS();
         // PixelShader = compile ps_2_a NormalsPreviewPS();
         // PixelShader = compile ps_2_a SpecPreviewPS();
+
+        // PixelShader = compile ps_2_a RSpecPreviewPS();
+        // PixelShader = compile ps_2_a GSpecPreviewPS();
+        // PixelShader = compile ps_2_a BSpecPreviewPS();
+        // PixelShader = compile ps_2_a ASpecPreviewPS();
 
         PixelShader = compile ps_2_a PBR_Aeon(true);
     }
@@ -9487,6 +9523,11 @@ technique Seraphim_HighFidelity
         // PixelShader = compile ps_2_a AlbedoPreviewPS();
         // PixelShader = compile ps_2_a NormalsPreviewPS();
         // PixelShader = compile ps_2_a SpecPreviewPS();
+
+        // PixelShader = compile ps_2_a RSpecPreviewPS();
+        // PixelShader = compile ps_2_a GSpecPreviewPS();
+        // PixelShader = compile ps_2_a BSpecPreviewPS();
+        // PixelShader = compile ps_2_a ASpecPreviewPS();
 
         PixelShader = compile ps_2_a PBR_Seraphim(true);
     }
