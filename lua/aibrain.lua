@@ -1564,6 +1564,11 @@ AIBrain = Class(moho.aibrain_methods) {
             plat:ForkThread(plat.BaseManagersDistressAI)
         end
 
+        if not self.Sorian then
+            self.StructureManager = StructureManager.CreateStructureManager(self)
+            self.StructureManager:Run()
+        end
+
         self.DeadBaseThread = self:ForkThread(self.DeadBaseMonitor)
         if self.Sorian then
             self.EnemyPickerThread = self:ForkThread(self.PickEnemySorian)

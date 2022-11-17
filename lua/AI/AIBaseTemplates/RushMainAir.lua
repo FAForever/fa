@@ -33,7 +33,7 @@ BaseBuilderTemplate {
         'EngineerMassBuildersHighPri',
 
         -- Extractors
-        'Time Exempt Extractor Upgrades',
+        --'Time Exempt Extractor Upgrades',
 
         -- ACU Builders
         'Air Rush Initial ACU Builders',

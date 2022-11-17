@@ -27,7 +27,7 @@ BaseBuilderTemplate {
         'EngineerMassBuildersLowerPri',
 
         -- Extractors
-        'Time Exempt Extractor Upgrades Expansion',
+        --'Time Exempt Extractor Upgrades Expansion',
 
         -- ==== EXPANSION ==== --
         --DUNCAN - expansions dont build more expansions!

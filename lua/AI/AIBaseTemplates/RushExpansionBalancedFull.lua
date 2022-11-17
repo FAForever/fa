@@ -44,7 +44,7 @@ BaseBuilderTemplate {
         'T3NukeDefenseBehaviors',
 
         -- Extractors
-        'Time Exempt Extractor Upgrades Expansion',
+        --'Time Exempt Extractor Upgrades Expansion',
 
         -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders',

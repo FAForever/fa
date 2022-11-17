@@ -32,7 +32,7 @@ BaseBuilderTemplate {
         'EngineerMassBuildersHighPri',
                 
         -- Extractors
-        'ExtractorUpgrades',
+        --'ExtractorUpgrades',
 
         -- ACU Builders
         'Default Initial ACU Builders',

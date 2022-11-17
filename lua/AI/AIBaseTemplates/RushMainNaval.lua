@@ -30,7 +30,7 @@ BaseBuilderTemplate {
         'EngineerMassBuilders - Naval',
 
         -- Extractors
-        'Time Exempt Extractor Upgrades',
+        --'Time Exempt Extractor Upgrades',
 
         -- ACU Builders
         'Naval Rush Initial ACU Builders',
