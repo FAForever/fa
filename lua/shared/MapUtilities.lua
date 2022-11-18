@@ -1,6 +1,6 @@
 
 --**************************************************************************************************
---** Copyright © 2022 Forged Alliance Forever - shared under the MIT license
+--** Shared under the MIT license
 --**************************************************************************************************
 
 --- A lookup table for various types of threat and their corresponding color, shared between the sim and the UI
