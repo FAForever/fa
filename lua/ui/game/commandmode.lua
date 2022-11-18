@@ -32,6 +32,9 @@ local TableGetN = table.getn
 local MathPi = math.pi
 local MathAtan = math.atan
 
+--import shadow order functions
+local MakeShadowCopyOrders = import('/lua/shadoworders.lua').MakeShadowCopyOrders
+
 ---@class MeshInfo
 ---@field Position Vector
 ---@field Blueprint string
@@ -116,7 +119,7 @@ function EndCommandMode(isCancel)
     end
     
     -- in case we want to end the command mode, without knowing it has already ended or not
-    if  modeData then
+    if modeData then
         -- regain selection if we were cheating in units
         if modeData.cheat then
             if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
@@ -554,7 +557,7 @@ function OnCommandIssued(command)
     end
 
     -- used by spread attack to keep track of the orders of units
-    import("/lua/spreadattack.lua").MakeShadowCopyOrders(command)
+    MakeShadowCopyOrders(command)
 end
 
 --- ???
