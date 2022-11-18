@@ -9,6 +9,9 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
+LOG("MarkerBuildConditions")
+reprsl(debug.traceback())
+
 local AIUtils = import("/lua/ai/aiutilities.lua")
 
 ---@param aiBrain AIBrain

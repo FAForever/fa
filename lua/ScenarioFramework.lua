@@ -27,7 +27,6 @@
 local CategoryToString = import("/lua/sim/categoryutils.lua").ToString
 local Cinematics = import("/lua/cinematics.lua")
 local Game = import("/lua/game.lua")
-local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local SimCamera = import("/lua/simcamera.lua").SimCamera
 local SimUIVars = import("/lua/sim/simuistate.lua")
@@ -1465,7 +1464,7 @@ function PlatoonAttackWithTransportsThread(platoon, landingChain, attackChain, i
 
     if instant then
         AttachUnitsToTransports(units, transports)
-        if moveChain and not ScenarioPlatoonAI.MoveAlongRoute(platoon, ScenarioUtils.ChainToPositions(moveChain)) then
+        if moveChain and not import("/lua/scenarioplatoonai.lua").MoveAlongRoute(platoon, ScenarioUtils.ChainToPositions(moveChain)) then
             return
         end
         IssueTransportUnload(transports, landingLocation)

@@ -7,6 +7,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
+LOG("HElloe, here!!")
+reprsl(debug.traceback())
+
 local BaseTmplFile = import("/lua/basetemplates.lua")
 local BaseTemplates = import("/lua/basetemplates.lua").BaseTemplates
 local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
