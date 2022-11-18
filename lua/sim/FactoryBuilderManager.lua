@@ -8,10 +8,25 @@
 -- ****************************************************************************
 
 local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local CreateFactoryBuilder = import('/lua/sim/Builder.lua').CreateFactoryBuilder
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
+local TableInsert = table.insert
+local builderTypesL = { 'Air', 'AirT1', 'AirT2', 'AirT3', 'Land', 'LandT1', 'LandT2', 'LandT3', 'Sea', 'SeaT1', 'SeaT2', 'SeaT3', 'Gate' }
+
+---@param brain AIBrain
+---@param lType string
+---@param location Vector
+---@param radius number
+---@param useCenterPoint boolean
+---@return FactoryBuilderManager
+function CreateFactoryBuilderManager(brain, lType, location, radius, useCenterPoint)
+    local fbm = FactoryBuilderManager()
+    fbm:Create(brain, lType, location, radius, useCenterPoint)
+    return fbm
+end
 
 ---@class FactoryBuilderManager : BuilderManager
 FactoryBuilderManager = Class(BuilderManager) {
@@ -30,7 +45,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             return false
         end
 
-        local builderTypes = { 'Air', 'Land', 'Sea', 'Gate', }
+        local builderTypes = builderTypesL
         for k,v in builderTypes do
             self:AddBuilderType(v)
         end
@@ -41,7 +56,8 @@ FactoryBuilderManager = Class(BuilderManager) {
         self.RallyPoint = false
 
         self.FactoryList = {}
-
+        
+        self.HasLayerTBuilders = nil
         self.LocationActive = false
 
         self.RandomSamePriority = true
@@ -52,57 +68,21 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    RallyPointMonitor = function(self)
-        while true do
-            if self.LocationActive and self.RallyPoint then
-                -- LOG('*AI DEBUG: Checking Active Rally Point')
-                local newRally = false
-                local bestDist = 99999
-                local rallyheight = GetTerrainHeight(self.RallyPoint[1], self.RallyPoint[3])
-                if self.Brain:GetNumUnitsAroundPoint(categories.STRUCTURE, self.RallyPoint, 15, 'Ally') > 0 then
-                    -- LOG('*AI DEBUG: Searching for a new Rally Point Location')
-                    for x = -30, 30, 5 do
-                        for z = -30, 30, 5 do
-                            local height = GetTerrainHeight(self.RallyPoint[1] + x, self.RallyPoint[3] + z)
-                            if GetSurfaceHeight(self.RallyPoint[1] + x, self.RallyPoint[3] + z) > height or rallyheight > height + 10 or rallyheight < height - 10 then
-                                continue
-                            end
-                            local tempPos = { self.RallyPoint[1] + x, height, self.RallyPoint[3] + z }
-                            if self.Brain:GetNumUnitsAroundPoint(categories.STRUCTURE, tempPos, 15, 'Ally') > 0 then
-                                continue
-                            end
-                            if not newRally or VDist2(tempPos[1], tempPos[3], self.RallyPoint[1], self.RallyPoint[3]) < bestDist then
-                                newRally = tempPos
-                                bestDist = VDist2(tempPos[1], tempPos[3], self.RallyPoint[1], self.RallyPoint[3])
-                            end
-                        end
-                    end
-                    if newRally then
-                        self.RallyPoint = newRally
-                        -- LOG('*AI DEBUG: Setting a new Rally Point Location')
-                        for k,v in self.FactoryList do
-                            IssueClearFactoryCommands({v})
-                            IssueFactoryRallyPoint({v}, self.RallyPoint)
-                        end
-                    end
-                end
-            end
-            WaitSeconds(300)
-        end
-    end,
-
-    ---@param self FactoryBuilderManager
     ---@param builderData table
     ---@param locationType string
     ---@return boolean
     AddBuilder = function(self, builderData, locationType)
-        local newBuilder = Builder.CreateFactoryBuilder(self.Brain, builderData, locationType)
-        if newBuilder:GetBuilderType() == 'All' then
-            for k,v in self.BuilderData do
-                self:AddInstancedBuilder(newBuilder, k)
+        local newBuilder = CreateFactoryBuilder(self.Brain, builderData, locationType)
+        local BT = Builders[newBuilder.BuilderName].BuilderType 
+        if type(BT) == 'string' then BT = {BT} end
+        for _,factorytype in BT do
+            if newBuilder:GetBuilderType() == 'All' then
+               for k,v in self.BuilderData do
+                    self:AddInstancedBuilder(newBuilder, k)
+               end
+            else
+                self:AddInstancedBuilder(newBuilder)
             end
-        else
-            self:AddInstancedBuilder(newBuilder)
         end
         return newBuilder
     end,
@@ -164,7 +144,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(units, v)
+            TableInsert(units, v)
         end
         return units
     end,
@@ -186,7 +166,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(retUnits, v)
+            TableInsert(retUnits, v)
         end
         return retUnits
     end,
@@ -201,18 +181,50 @@ FactoryBuilderManager = Class(BuilderManager) {
 
     ---@param self FactoryBuilderManager
     ---@param unit Unit
-    AddFactory = function(self,unit)
+    AddFactory = function(self, unit)
         if not self:FactoryAlreadyExists(unit) then
-            table.insert(self.FactoryList, unit)
+            TableInsert(self.FactoryList, unit)
             unit.DesiresAssist = true
-            if EntityCategoryContains(categories.LAND, unit) then
-                self:SetupNewFactory(unit, 'Land')
-            elseif EntityCategoryContains(categories.AIR, unit) then
-                self:SetupNewFactory(unit, 'Air')
-            elseif EntityCategoryContains(categories.NAVAL, unit) then
-                self:SetupNewFactory(unit, 'Sea')
-            else
-                self:SetupNewFactory(unit, 'Gate')
+
+            local layer = EntityCategoryContains(categories.LAND, unit) and 'Land'
+            or EntityCategoryContains(categories.AIR, unit) and 'Air'
+            or EntityCategoryContains(categories.NAVAL, unit) and 'Sea'   
+
+            --LOG('The Layer is ' .. repr(layer) .. ' and I am ' .. self.Brain.Nickname)
+            if self.Brain.HasLayerTBuilders and layer then 
+                if EntityCategoryContains(categories.TECH1, unit) and layer == 'Land' then
+                    self:SetupNewFactory(unit, 'LandT1')
+                elseif EntityCategoryContains(categories.TECH2, unit) and layer == 'Land' then
+                    self:SetupNewFactory(unit, 'LandT2')
+                elseif EntityCategoryContains(categories.TECH3, unit) and layer == 'Land' then
+                    self:SetupNewFactory(unit, 'LandT3')
+                elseif EntityCategoryContains(categories.TECH1, unit) and layer == 'Air' then
+                    self:SetupNewFactory(unit, 'AirT1')
+                elseif EntityCategoryContains(categories.TECH2, unit) and layer == 'Air' then
+                    self:SetupNewFactory(unit, 'AirT2')
+                elseif EntityCategoryContains(categories.TECH3, unit) and layer == 'Air' then
+                    self:SetupNewFactory(unit, 'AirT3')
+                elseif EntityCategoryContains(categories.TECH1, unit) and layer == 'Sea' then
+                    self:SetupNewFactory(unit, 'SeaT1')
+                elseif EntityCategoryContains(categories.TECH2, unit) and layer == 'Sea' then
+                    self:SetupNewFactory(unit, 'SeaT2')
+                elseif EntityCategoryContains(categories.TECH3, unit) and layer == 'Sea' then
+                    self:SetupNewFactory(unit, 'SeaT3')
+                else
+                    self:SetupNewFactory(unit, 'Gate') 
+                end
+            end 
+
+            if layer and not self.Brain.HasLayerTBuilders then
+                if EntityCategoryContains(categories.LAND, unit) then
+                    self:SetupNewFactory(unit, 'Land')
+                elseif EntityCategoryContains(categories.AIR, unit) then
+                    self:SetupNewFactory(unit, 'Air')
+                elseif EntityCategoryContains(categories.NAVAL, unit) then
+                    self:SetupNewFactory(unit, 'Sea')
+                else
+                    self:SetupNewFactory(unit, 'Gate') 
+                end
             end
             self.LocationActive = true
         end
@@ -386,12 +398,12 @@ FactoryBuilderManager = Class(BuilderManager) {
                     -- LOG('*AI DEBUG: Replacement unit found!')
                     local replacement = self:GetCustomReplacement(v, templateName, faction)
                     if replacement then
-                        table.insert(template, replacement)
+                        TableInsert(template, replacement)
                     else
-                        table.insert(template, v)
+                        TableInsert(template, v)
                     end
                 else
-                    table.insert(template, v)
+                    TableInsert(template, v)
                 end
             end
         elseif faction and customData and customData[faction] then
@@ -415,7 +427,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
             local replacement = self:GetCustomReplacement(Squad, templateName, faction)
             if replacement then
-                table.insert(template, replacement)
+                TableInsert(template, replacement)
             end
         end
         return template
@@ -436,7 +448,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             for k,v in templateData[faction] do
                 if rand <= v[2] or template[1] == 'NoOriginalUnit' then
                     -- LOG('*AI DEBUG: Insert possibility.')
-                    table.insert(possibles, v[1])
+                    TableInsert(possibles, v[1])
                 end
             end
             if not table.empty(possibles) then
@@ -567,19 +579,47 @@ FactoryBuilderManager = Class(BuilderManager) {
         self.RallyPoint = rally
         return true
     end,
-}
 
----@param brain AIBrain
----@param lType string
----@param location Vector
----@param radius number
----@param useCenterPoint boolean
----@return FactoryBuilderManager
-function CreateFactoryBuilderManager(brain, lType, location, radius, useCenterPoint)
-    local fbm = FactoryBuilderManager()
-    fbm:Create(brain, lType, location, radius, useCenterPoint)
-    return fbm
-end
+    ---@param self FactoryBuilderManager
+    RallyPointMonitor = function(self)
+        while true do
+            if self.LocationActive and self.RallyPoint then
+                -- LOG('*AI DEBUG: Checking Active Rally Point')
+                local newRally = false
+                local bestDist = 99999
+                local rallyheight = GetTerrainHeight(self.RallyPoint[1], self.RallyPoint[3])
+                if self.Brain:GetNumUnitsAroundPoint(categories.STRUCTURE, self.RallyPoint, 15, 'Ally') > 0 then
+                    -- LOG('*AI DEBUG: Searching for a new Rally Point Location')
+                    for x = -30, 30, 5 do
+                        for z = -30, 30, 5 do
+                            local height = GetTerrainHeight(self.RallyPoint[1] + x, self.RallyPoint[3] + z)
+                            if GetSurfaceHeight(self.RallyPoint[1] + x, self.RallyPoint[3] + z) > height or rallyheight > height + 10 or rallyheight < height - 10 then
+                                continue
+                            end
+                            local tempPos = { self.RallyPoint[1] + x, height, self.RallyPoint[3] + z }
+                            if self.Brain:GetNumUnitsAroundPoint(categories.STRUCTURE, tempPos, 15, 'Ally') > 0 then
+                                continue
+                            end
+                            if not newRally or VDist2(tempPos[1], tempPos[3], self.RallyPoint[1], self.RallyPoint[3]) < bestDist then
+                                newRally = tempPos
+                                bestDist = VDist2(tempPos[1], tempPos[3], self.RallyPoint[1], self.RallyPoint[3])
+                            end
+                        end
+                    end
+                    if newRally then
+                        self.RallyPoint = newRally
+                        -- LOG('*AI DEBUG: Setting a new Rally Point Location')
+                        for k,v in self.FactoryList do
+                            IssueClearFactoryCommands({v})
+                            IssueFactoryRallyPoint({v}, self.RallyPoint)
+                        end
+                    end
+                end
+            end
+            WaitSeconds(300)
+        end
+    end,
+}
 
 --- Moved Unsused Imports to bottome for mod support 
 local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
