@@ -11,7 +11,7 @@ Always [annotate](annotation.md) your code.
 If you are dealing with UI text, also familiarize yourself with the [localization guidelines](loc/guidelines.md).
 
 When in doubt, follow the style of code in the project known to be well-styled, or other Lua best-practices such as [Lua Style Guide](http://lua-users.org/wiki/LuaStyleGuide).
-Consistency is more important than "being correct" or readability as perceived by any one individual.
+Consistency is more important than "being correct", or readability as perceived by any one individual.
 
 ## General File Structure
 
@@ -25,18 +25,18 @@ Consistency is more important than "being correct" or readability as perceived b
 - Local functions
 - Module maintenance
 
-The general idea is that logic flow travels top to bottom in the file
+The general idea is that logic flow travels top to bottom in the file.
+The exception is local functions, which must be declared before they are used.
+In particular, helper functions of another should appear just before the function they are helping
 
 ### The header
 
 The header has the form
 
 ```lua
---------------------------------------------------------------------------------
---- <license>
----
---- By <author>
---------------------------------------------------------------------------------
+--******************************************************************************
+--** <license>
+--******************************************************************************
 
 -- a short summary of the file, if applicable
 -- ...
@@ -47,17 +47,17 @@ Future contributors to this file will be added here.
 
 ### In-file grouping
 
-A file can be grouped into logical subcomponents and aspects by inserting a comment header in the form
+A file can be grouped into logical subcomponents and aspects by inserting a comment heading in the form
 
 ```lua
  
 ----------
--- lowest level header
+-- lowest level heading
 ----------
 ```
 
 Note the preceding newline.
-To form higher-level headers, precede with another newline and add 10 more dashes `----------` to the box.
+To form higher-level headings, precede with another newline and add 10 more dashes `----------` to the box.
 Also consider a transition from `lower case` to `Sentence case` to `Title Case` or using three dashes `---` in the middle name for these.
 
 ### Imports
@@ -84,9 +84,9 @@ Aim for a maximum line width of 100 characters (up to the start of column 101 in
 ## Whitespace
 
 Whitespace in code should be condensed to a single space, except for:
-  - Leading whitespace in indentation
-  - Separating statements on the same line; prefer two spaces `  ` for this task
-  - Spaces inserted to align similar code to read better vertically (such as is common in assignments)
+- Leading whitespace in indentation
+- Separating statements on the same line; prefer two spaces <code>  </code> for this task
+- Spaces inserted to align similar code to read better vertically (such as is common in assignments)
 
 ### Where to not insert whitespace
 
@@ -97,17 +97,17 @@ Whitespace in code should be condensed to a single space, except for:
 
 - Between all operators (but not separators) and their argument(s), as well as in assignment
 - After all commas not at the end of a line
-  * In particular, *always* separate function parameters with a space
+    * In particular, *always* separate function parameters with a space
 - Anywhere that otherwise improves readability.
 Further guidance is subject to community consensus.
 
 ## Newlines
 
 - To break up long lines, start a new line and indent twice relative to the current indentation level (so that it doesn't get mistaken for starting a new scope)
-  * Prefer to place line breaks *before* operators (with higher preference at lower precedence) and the period in table accesses and *after* commas
+    * Prefer to place line breaks *before* operators (with higher preference at lower precedence) and the period in table accesses and *after* commas
 - Especially long lines can utilize **locally spaced indentation blocks** as though they describe a new scope
-  * Prefer to place line breaks *before* the period in table accesses and *after* operators (with higher preference at lower precedence) and commas
-  * Prefer to group indentation blocks by paired delimiters such as `{}`, `[]`, or `()`
+    * Prefer to place line breaks *before* the period in table accesses and *after* operators (with higher preference at lower precedence) and commas
+    * Prefer to group indentation blocks by paired delimiters such as `{}`, `[]`, or `()`
 
 ### Where to not insert newlines
 
@@ -117,25 +117,25 @@ Further guidance is subject to community consensus.
 ### Where to insert newlines
 
 - Place blank lines between functions, classes, and groups of imports or variable declarations
-  * More than one blank line can be used to group such items into further logical groups (such as for the general file structure described above)
-  * You may elect to not put blank lines between functions that are there purely for another function, e.g. local helpers functions to a global one or the thread function of its instantiator
+    * More than one blank line can be used to group such items into further logical groups (such as for the general file structure described above)
+    * You may elect to not put blank lines between functions that are there purely for another function, e.g. local helpers functions to a global one or the thread function of its instantiator
 - After logical breaks in code, e.g. to separate the setup, working, and cleanup code of a function
 
 ## Indentation
 
 - Use 4 (four) spaces for indentation, *not* 2 spaces, *not* the tab character
-  * If you find this eats up a lot of space for deeply nested code, *wonderful*.
+    * If you find this eats up a lot of space for deeply nested code, *wonderful*.
 That is discouraged: deeply nested code is hard to read and likely means that the function is doing more than one thing.
 Consider breaking up such code into smaller segments.
 - Indent each enclosed scope or mutli-line table constructor  
 - For **locally spaced indentation blocks**
-  * Prefer to place line breaks *after* operators, commas, and the period in table accesses
-  * Prefer to place new blocks to group subexpressions based on operator precedence
-  * Additional spaces can be placed to increase readability based on alignment and vertical spacing
-- If statements should always be block-indented unless it is part of an idiom such as fail-fast returning or loop breaking
-- Functions should be block-indented unless they are empty or a short single-line return
+    * Prefer to place line breaks *after* operators, commas, and the period in table accesses
+    * Prefer to place new blocks to group subexpressions based on operator precedence
+    * Additional spaces can be placed to increase readability based on alignment and vertical spacing
+ - If statements should always be block-indented unless it is part of an idiom such as fail-fast returning or loop breaking
+ - Functions should be block-indented unless they are empty or a short single-line return
 
-### Locally spaced indentation block example
+### Locally spaced indentation block examples
 
 ```lua
 if  var1 > minimum and var1  < maximum or
@@ -146,12 +146,22 @@ if  var1 > minimum and var1  < maximum or
 end
 ```
 
+```lua
+if var1 == 5
+    and var2 == 1
+    and var4 == 9
+    and var99 = 3902
+then
+    -- do something
+end
+```
+
 # Lexis
 
 ## Naming
 
 In general, a name should be about as long as it gets used: names in larger scopes or lower nesting structures will be more descriptive than those in local, smaller, deeply nested scopes.
-* for-loops have a tradition of using single-letter names for their iterators.
+* for-loops have a tradition of using single-letter names for their iterators; we encourage more descriptive names, but it's fine if you don't (until it becomes a mess of one-letter names when you get 3 for-loops deep)
 If this becomes confusing after several nestings of for-loops, you may be trying to do too much with them.
 Consider breaking them down into smaller chunks.
 
@@ -175,33 +185,33 @@ Are in `PascalCase`
 Are more vague. Generally:
 - In Sim code, fields tend to be `PascalCase`
 - In UI code
-  * object attributes tend to be lower `camelCase`
-  * UI components or other "private" data not meant to used outside of the file tend to be `_lowercase` (prefixed by that underscore `_`, and may or may not also be in `_snake_case`)
+    * object attributes tend to be lower `camelCase`
+    * UI components or other "private" data not meant to used outside of the file tend to be `_lowercase` (prefixed by that underscore `_`, and may or may not also be in `_snake_case`)
 - As usual, metafields (and only metafields) are prefixed by two underscores `__`
 
 ## Literals
 
 - Always precede decimals with a number. No hanging decimal points like `.1`.
 - Prefer double-quote strings to single-quote ones to increase recognizability
-  * Single-quote strings are fine when used to embed double-quote characters more easily in the string by not having to escaping them
-  * You are encouraged to use single quotes to enclose strings that represent a single character
-    * In particular, this helps differentiate `""`, `' '`, and `"  "` at a glance
-    * Note that `'\t'` is a single character
+    * Single-quote strings are fine when used to embed double-quote characters more easily in the string by not having to escaping them
+    * You are encouraged to use single quotes to enclose strings that represent a single character
+        * In particular, this helps differentiate `""`, `' '`, and `"  "` at a glance
+        * Note that `'\t'` is a single character
 
 # Syntax
 
 - The deprecated usage (by Lua 5.0) of not using an iterator like `pairs` or `ipairs` in a foreach loop is extensive in the codebase.
 Newly written foreach loops should explicitly use an iterator to document intention.
-  * Note that a ranged for-loop may be better suited than `ipairs` if the range is known beforehand
+    * Note that a ranged for-loop may be better suited than `ipairs` if the range is known beforehand
 - Moho accepts lines starting with `#` as comments; avoid this
 
 ## Empty statements
 
 - No superfluous semicolons `;` at the end of lines
-  * Use redundant semicolons to disambiguate potential function calls.
+    * Use redundant semicolons to disambiguate potential function calls.
 These go at the beginning of the statement.
-  * There may be occasions where it increases readability to have more than one statement on a line; separate these with a semicolon and two spaces `;  `
-  * Note that field separators that happen to be semicolons are syntaxically different objects than the empty statement
+    * There may be occasions where it increases readability to have more than one statement on a line; separate these with a semicolon and two spaces `;  `
+    * Note that field separators that happen to be semicolons are syntaxically different objects than the empty statement
 
 ## Functions
 
@@ -219,24 +229,24 @@ These go at the beginning of the statement.
 ## Tables
 
 - Table access in the form `table.key` is preferred over `table["key"]`
-  * Prefer to be consist in enumeration-like code however.
+    * Prefer to be consist in enumeration-like code however.
 This means that if you need to use `table["key with spaces"]`, similar items that counterpart it should do the same, even if `table.key` would suffice for them.
 - Place all unkeyed values before all key-value pairs and separate with a newline. Never interlace them.
-- The preferred field separator is a comma `,` after non-function values and a semicolon `;` after functions
-  * A semicolon `;` may be used after the final unkeyed value to signal the start of key-value pairs
+- The preferred field separator is a comma `,`
+    * A semicolon `;` may be used after the final unkeyed value to signal the start of key-value pairs
 
 ### One-line table constructors
 
 - Prefer for array-like tables
 - Do not add spaces padding the insides of the braces like ~~`{ 1 }`~~
-  * Empty tables look like `{}` with no spaces
+    * Empty tables look like `{}` with no spaces
 - Do not add a trailing field separator to the last item
 
 ### Multi-line table constructors
 
 - Prefer for dictionary-like tables
 - Format as an new indentation block starting immediately after the opening brace `{` and before the closing brace `}`
-  * Do not leave any fields after the opening brace, unless these are "pre-fields" that may not make sense to include with the rest of the data (such as a zero index or a few unkeyed values in an otherwise key-value paired table)
+    * Do not leave any fields after the opening brace, unless these are "pre-fields" that may not make sense to include with the rest of the data (such as a zero index or a few unkeyed values in an otherwise key-value paired table)
 - Put each item on a newline (unless it improves readability to do otherwise)
 - Leave a trailing field separator after the last item
 
@@ -244,12 +254,12 @@ This means that if you need to use `table["key with spaces"]`, similar items tha
 
 ## Classes
 
-- ***Annotate every class***
+- [***Annotate every class***](annotation.md)
 - For "fa-classes", the `Class` function is used:
-  * Use the form `ClassName = Class(Base) {...}` only when you have class bases
-  * Otherwise, use `ClassName = ClassSimple {...}`
-  * Each method is defined in the class specification *before* being passed to the `Class` function
-    * In particular, adding methods afterwards like `function ClassName:Method()` is discouraged for these 
+    * Use the form `ClassName = Class(Base) {...}` only when you have class bases
+    * Otherwise, use `ClassName = ClassSimple {...}`
+    * Each method is defined in the class specification *before* being passed to the `Class` function
+        * In particular, adding methods afterwards like `function ClassName:Method()` is discouraged for these 
 - For manual classes, the class metatable is directly handled
 
     ```lua
@@ -269,11 +279,11 @@ This means that if you need to use `table["key with spaces"]`, similar items tha
 
 - FA classes are preferred to manual classes
 - In either one, the following member order is observed:
-  * default class fields (note that fields are usually set in the initializer)
-  * `__init` and `__post_init` - or the equivalent creation function for a manual class
-  * Each getter & setter pair
-  * Main interfacing methods, grouped by aspect
-  * Helper methods
+    * default class fields (note that fields are usually set in the initializer)
+    * `__init` and `__post_init` - or the equivalent creation function for a manual class
+    * Each getter & setter pair
+    * Main interfacing methods, grouped by aspect
+    * Helper methods
 
 ## Library functions
 
@@ -288,7 +298,7 @@ If `x` is a raw string, you will need to do `(x):<fn>(...)` instead.
     ```lua
     local x = a.b.c.d
     if x then
-       local y = x
+        local y = x
     end
     ```
 
@@ -296,6 +306,6 @@ If `x` is a raw string, you will need to do `(x):<fn>(...)` instead.
 
     ```lua
     if a.b.c.d then
-       local y = a.b.c.d
+        local y = a.b.c.d
     end
     ```
