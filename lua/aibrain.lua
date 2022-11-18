@@ -1532,6 +1532,7 @@ AIBrain = Class(moho.aibrain_methods) {
         -- TURNING OFF AI POOL PLATOON, I MAY JUST REMOVE THAT PLATOON FUNCTIONALITY LATER
         local poolPlatoon = self:GetPlatoonUniquelyNamed('ArmyPool')
         if poolPlatoon then
+            poolPlatoon.ArmyPool = true
             poolPlatoon:TurnOffPoolAI()
         end
 
