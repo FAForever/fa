@@ -14,9 +14,9 @@ local OpAI = import("/lua/ai/opai/baseopai.lua").OpAI
 
 local GenerateNavalOSB = import("/lua/ai/opai/generatenaval.lua")
 
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
 local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
 
 ---@class NavalOpAI : OpAI
