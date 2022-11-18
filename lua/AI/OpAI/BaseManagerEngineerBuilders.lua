@@ -13,7 +13,7 @@ local MABC = '/lua/editor/markerbuildconditions.lua'
 local OAUBC = '/lua/editor/otherarmyunitcountbuildconditions.lua'
 local EBC = '/lua/editor/economybuildconditions.lua'
 local PCBC = '/lua/editor/platooncountbuildconditions.lua'
-local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
+local BMBC = '/lua/editor/basemanagerbuildconditions.lua'
 local SAI = '/lua/scenarioplatoonai.lua'
 local PlatoonFile = '/lua/platoon.lua'
 

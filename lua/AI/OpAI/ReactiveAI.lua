@@ -13,9 +13,9 @@ local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
 local OpAI = import("/lua/ai/opai/baseopai.lua").OpAI
 
 local UCBC = '/lua/editor/unitcountbuildconditions.lua'
-local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
+local BMBC = '/lua/editor/basemanagerbuildconditions.lua'
 local MIBC = '/lua/editor/miscbuildconditions.lua'
-local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
+local BMPT = '/lua/ai/opai/basemanagerplatoonthreads.lua'
 
 --[[
 Types usable in ReactiveAI
