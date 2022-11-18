@@ -135,13 +135,13 @@ function PathTo(layer, origin, destination, options)
 
     originLeaf.From = nil
     originLeaf.AcquiredCosts = 0
-    originLeaf.ExpectedCosts = originLeaf:DistanceTo(destinationLeaf)
+    originLeaf.TotalCosts = originLeaf:DistanceTo(destinationLeaf)
     originLeaf.Seen = seenIdentifier
     PathToHeap:Insert(originLeaf)
 
     destinationLeaf.From = nil
     destinationLeaf.AcquiredCosts = 0
-    destinationLeaf.ExpectedCosts = 0
+    destinationLeaf.TotalCosts = 0
     destinationLeaf.Seen = 0
 
     -- search iterations
@@ -165,7 +165,8 @@ function PathTo(layer, origin, destination, options)
                 neighbor.From = leaf
                 neighbor.Seen = seenIdentifier
                 neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf.neighborDistances[id] + 2 + preferLargeNeighbor
-                neighbor.ExpectedCosts = 0.25 * destinationLeaf:DistanceTo(neighbor)
+                -- TotalCosts = AcquiredCosts + ExpectedCosts
+                neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
 
                 PathToHeap:Insert(neighbor)
             else 

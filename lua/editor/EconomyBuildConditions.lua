@@ -190,6 +190,17 @@ function GreaterThanEconTrend(aiBrain, MassTrend, EnergyTrend)
     return false
 end
 
+---LessThanEnergyTrendOverTime = BuildCondition
+---@param aiBrain string
+---@param EnergyTrend integer
+---@return boolean
+function LessThanEnergyTrendOverTime(aiBrain, EnergyTrend)
+    if aiBrain.EconomyOverTimeCurrent.EnergyTrendOverTime < EnergyTrend then
+        return true
+    end
+    return false
+end
+
 ---GreaterThanEconIncome = BuildCondition
 ---@param aiBrain AIBrain
 ---@param MassIncome integer

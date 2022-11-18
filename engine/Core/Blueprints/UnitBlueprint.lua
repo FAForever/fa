@@ -26,6 +26,9 @@
 
 --- read more here: https://wiki.faforever.com/en/Blueprints
 ---@class UnitBlueprint: EntityBlueprint
+---@field TechCategory 'TECH1' | 'TECH2' | 'TECH3' | 'EXPERIMENTAL'
+---@field LayerCategory 'LAND' | 'AIR' | 'NAVAL'
+---@field FactionCategory 'UEF' | 'CYBRAN' | 'AEON' | 'SERAPHIM'
 ---@field CategoriesHash table<string, boolean>
 ---@field AI UnitBlueprintAI
 ---@field Air UnitBlueprintAir

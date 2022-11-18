@@ -63,12 +63,10 @@ BuilderGroup {
        PlatoonTemplate = 'T1LandDFBot',
        Priority = 825, --DUNCAN - was 925
        BuilderConditions = {
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 150, categories.MOBILE * categories.LAND * categories.TECH1 - categories.ENGINEER - categories.ANTIAIR } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY * categories.TECH3 } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY * categories.TECH2 } },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.TRANSPORTFOCUS * categories.TECH1 } },
-            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) }},
-            { IBC, 'BrainNotLowPowerMode', {} },
+        { UCBC, 'HaveLessThanUnitsWithCategory', { 8, categories.MOBILE * categories.LAND * categories.TECH1 * categories.BOT - categories.ENGINEER - categories.ANTIAIR } },
+        { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY * (categories.TECH2 + categories.TECH3) } },
+        { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.TRANSPORTFOCUS * categories.TECH1 } },
+        { IBC, 'BrainNotLowPowerMode', {} },
        },
        BuilderType = 'Land',
     },

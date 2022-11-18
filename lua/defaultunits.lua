@@ -1378,12 +1378,33 @@ MassStorageUnit = Class(StructureUnit) { }
 ---@class RadarUnit : StructureUnit
 RadarUnit = Class(StructureUnit) {
 
+    OnCreate = function(self)
+        StructureUnit.OnCreate(self)
+
+        -- keep track of radars
+        self.Brain.Radars[self.Blueprint.TechCategory][self.EntityId] = self
+    end,
+
     ---@param self RadarUnit
     ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
+    end,
+
+    OnKilled = function (self, instigator, type, overkillRatio)
+        StructureUnit.OnKilled(self, instigator, type, overkillRatio)
+
+        -- keep track of radars
+        self.Brain.Radars[self.Blueprint.TechCategory][self.EntityId] = nil
+    end,
+
+    OnDestroy = function (self)
+        StructureUnit.OnDestroy(self)
+
+        -- keep track of radars
+        self.Brain.Radars[self.Blueprint.TechCategory][self.EntityId] = nil
     end,
 
     ---@param self RadarUnit
