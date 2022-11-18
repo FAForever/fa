@@ -180,6 +180,7 @@ end
 --- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
 --- are expected to be numerically keyed (existing keys are discarded).
 --- e.g. table.cat({1, 2, 3}, {'A', 'House', 3.14})  ->  {1, 2, 3, 'A', 'House', 3.14}
+---@return table
 function table.cat(t1, t2)
     -- handling nil tables before lopping
     if not t1 then return table.copy(t2) end

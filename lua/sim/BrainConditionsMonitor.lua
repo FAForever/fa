@@ -8,6 +8,20 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+local instantBuildConditionsUpperCase = { }
+instantBuildConditionsUpperCase['/lua/editor/InstantBuildConditions.lua'] = true
+instantBuildConditionsUpperCase['/lua/editor/UnitCountBuildConditions.lua'] = true
+instantBuildConditionsUpperCase['/lua/editor/EconomyBuildConditions.lua'] = true
+instantBuildConditionsUpperCase['/lua/editor/SorianInstantBuildConditions.lua'] = true
+
+local instantBuildConditionsLowerCase = { }
+for file, _ in instantBuildConditionsUpperCase do
+    instantBuildConditionsLowerCase[file:lower()] = true
+end
+
+---@type table<FileReference, boolean>
+local instantBuildConditions = table.cat(instantBuildConditionsUpperCase, instantBuildConditionsLowerCase)
+
 ---@class BrainConditionsMonitor
 BrainConditionsMonitor = ClassSimple {
 
@@ -132,9 +146,7 @@ BrainConditionsMonitor = ClassSimple {
 
         -- No match found, so add the data to the table and return the key (same number as num items)
         local newCondition
-        if cFilename == '/lua/editor/InstantBuildConditions.lua'
-            or cFilename == '/lua/editor/UnitCountBuildConditions.lua' or cFilename == '/lua/editor/EconomyBuildConditions.lua'
-            or cFilename == '/lua/editor/SorianInstantBuildConditions.lua' then
+        if instantBuildConditions[cFilename] then
             newCondition = InstantImportCondition()
         else
             newCondition = ImportCondition()
