@@ -10,10 +10,8 @@
 
 local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local CollisionBeams = import("/lua/defaultcollisionbeams.lua")
-local BareBonesWeapon = WeaponFile.BareBonesWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
-local GinsuCollisionBeam = CollisionBeams.GinsuCollisionBeam
 local OrbitalDeathLaserCollisionBeam = CollisionBeams.OrbitalDeathLaserCollisionBeam
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
@@ -109,6 +107,7 @@ TDFHiroPlasmaCannon = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffects = {},
     FxUpackingChargeEffectScale = 1,
 
+    ---@param self TDFHiroPlasmaCannon
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local bp = self:GetBlueprint()
@@ -125,7 +124,11 @@ TDFHiroPlasmaCannon = Class(DefaultBeamWeapon) {
 ---@class TAAFlakArtilleryCannon : DefaultProjectileWeapon
 TAAFlakArtilleryCannon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TFlakCannonMuzzleFlash01,
-    -- Custom over-ride for this weapon, so it passes data and damageTable
+    
+    --- Custom over-ride for this weapon, so it passes data and damageTable
+    ---@param self TAAFlakArtilleryCannon
+    ---@param bone Bone
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -153,7 +156,6 @@ TAAFlakArtilleryCannon = Class(DefaultProjectileWeapon) {
 TAALinkedRailgun = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TRailGunMuzzleFlash01,
 }
-
 
 ---@class TAirToAirLinkedRailgun : DefaultProjectileWeapon
 TAirToAirLinkedRailgun = Class(DefaultProjectileWeapon) {
@@ -199,6 +201,9 @@ TANTorpedoAngler = Class(DefaultProjectileWeapon) {
 
 ---@class TIFSmartCharge : DefaultProjectileWeapon
 TIFSmartCharge = Class(DefaultProjectileWeapon) {
+
+    ---@param self TIFSmartCharge
+    ---@param muzzle Bone
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
         local tbl = self:GetBlueprint().DepthCharge
@@ -218,6 +223,9 @@ TIFArtilleryWeapon = Class(DefaultProjectileWeapon) {
 TIFCarpetBombWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
 
+    ---@param self TIFCarpetBombWeapon
+    ---@param bone Bone
+    ---@return Projectile | nil
     CreateProjectileForWeapon = function(self, bone)
         local projectile = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -238,8 +246,10 @@ TIFCarpetBombWeapon = Class(DefaultProjectileWeapon) {
         return projectile
     end,
 
-    -- This function creates the projectile, and happens when the unit is trying to fire
-    -- Called from inside RackSalvoFiringState
+    --- This function creates the projectile, and happens when the unit is trying to fire
+    --- Called from inside RackSalvoFiringState
+    ---@param self TIFCarpetBombWeapon
+    ---@param muzzle string
     CreateProjectileAtMuzzle = function(self, muzzle)
         -- Adapt this function to keep the correct target lock during carpet bombing
         local data = self.CurrentSalvoData
@@ -274,6 +284,8 @@ TAMPhalanxWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TPhalanxGunMuzzleFlash,
     FxShellEject  = EffectTemplate.TPhalanxGunShells,
 
+    ---@param self TAMPhalanxWeapon
+    ---@param muzzle Bone
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         for k, v in self.FxShellEject do
@@ -288,6 +300,7 @@ TOrbitalDeathLaserBeamWeapon = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffects = {},
     FxUpackingChargeEffectScale = 1,
 
+    ---@param self TOrbitalDeathLaserBeamWeapon
     PlayFxWeaponUnpackSequence = function(self)
         local bp = self:GetBlueprint()
         for k, v in self.FxUpackingChargeEffects do
@@ -298,3 +311,7 @@ TOrbitalDeathLaserBeamWeapon = Class(DefaultBeamWeapon) {
         DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
     end,
 }
+
+-- Kept for Mod backwards compatibility
+local BareBonesWeapon = WeaponFile.BareBonesWeapon
+local GinsuCollisionBeam = CollisionBeams.GinsuCollisionBeam
