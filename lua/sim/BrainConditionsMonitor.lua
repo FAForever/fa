@@ -14,13 +14,12 @@ instantBuildConditionsUpperCase['/lua/editor/UnitCountBuildConditions.lua'] = tr
 instantBuildConditionsUpperCase['/lua/editor/EconomyBuildConditions.lua'] = true
 instantBuildConditionsUpperCase['/lua/editor/SorianInstantBuildConditions.lua'] = true
 
-local instantBuildConditionsLowerCase = { }
-for file, _ in instantBuildConditionsUpperCase do
-    instantBuildConditionsLowerCase[file:lower()] = true
-end
-
 ---@type table<FileReference, boolean>
-local instantBuildConditions = table.cat(instantBuildConditionsUpperCase, instantBuildConditionsLowerCase)
+local instantBuildConditions = { }
+for file, _ in instantBuildConditionsUpperCase do
+    instantBuildConditions[file] = true
+    instantBuildConditions[file:lower()] = true
+end
 
 ---@class BrainConditionsMonitor
 BrainConditionsMonitor = ClassSimple {
