@@ -238,7 +238,7 @@ UnitBlueprint {
             },
         },
         ToggleCaps = {
-            RULEUTC_JammingToggle = false,
+            RULEUTC_JammingToggle = true,
         },
     },
     Intel = {
