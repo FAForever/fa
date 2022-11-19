@@ -314,20 +314,18 @@ function BeginSessionAI()
 
         import("/lua/sim/navgenerator.lua").Generate()
 
-        function AIModTemplatesPreloader()
-            local simMods = __active_mods or {}
-            for Index, ModData in simMods do
-                ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
-                if ModAIFiles[1] then
-                    for k,file in DiskFindFiles(ModData.location..'/lua/AI/PlatoonTemplates', '*.lua') do
-                        import(file)
-                    end
-                    for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBuilders', '*.lua') do
-                        import(file)
-                    end
-                    for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBaseTemplates', '*.lua') do
-                        import(file)
-                    end
+        local simMods = __active_mods or {}
+        for Index, ModData in simMods do
+            ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+            if ModAIFiles[1] then
+                for k,file in DiskFindFiles(ModData.location..'/lua/AI/PlatoonTemplates', '*.lua') do
+                    import(file)
+                end
+                for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBuilders', '*.lua') do
+                    import(file)
+                end
+                for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBaseTemplates', '*.lua') do
+                    import(file)
                 end
             end
         end
