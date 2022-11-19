@@ -77,7 +77,7 @@ StructureManager = Class {
                 self.CurrentEconomyUpgradeSpend = 0.30
             end
             local extractorTable = self:ExtractorsBeingUpgraded()
-            LOG('Total Spend is '..self.TotalExtractorSpend..' income with ratio is '..upgradeSpend)
+            --LOG('Total Spend is '..self.TotalExtractorSpend..' income with ratio is '..upgradeSpend)
             local massStorage = GetEconomyStored( self.Brain, 'MASS')
             local energyStorage = GetEconomyStored( self.Brain, 'ENERGY')
             -- We have alot of excess mass and no upgrading T2 extractors, lets upgrade one and dump the mass into that
