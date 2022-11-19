@@ -18,6 +18,7 @@ local FactoryManager = import("/lua/sim/factorybuildermanager.lua")
 local PlatoonFormManager = import("/lua/sim/platoonformmanager.lua")
 local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
 local EngineerManager = import("/lua/sim/engineermanager.lua")
+local StructureManager = import("/lua/sim/structuremanager.lua")
 
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local StratManager = import("/lua/sim/strategymanager.lua")
@@ -1564,7 +1565,7 @@ AIBrain = Class(moho.aibrain_methods) {
             plat:ForkThread(plat.BaseManagersDistressAI)
         end
 
-        if not self.Sorian then
+        if self:IsDefaultAI() then
             self.StructureManager = StructureManager.CreateStructureManager(self)
             self.StructureManager:Run()
         end
@@ -5047,6 +5048,18 @@ AIBrain = Class(moho.aibrain_methods) {
             end
             WaitTicks(100)
         end
+    end,
+
+    ---@param self AIBrain
+    IsDefaultAI = function(self)
+        local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
+        if per == 'easy' or per == 'easycheat' or per == 'medium' or per == 'mediumcheat'
+            or per == 'adaptive' or per == 'adaptivecheat' or per == 'rush' or per == 'rushcheat'
+            or per == 'turtle' or per == 'turtlecheat' or per == 'tech' or per == 'techcheat'
+            or per == 'random' or per == 'randomcheat' then
+            return true
+        end
+        return false
     end,
 }
 
