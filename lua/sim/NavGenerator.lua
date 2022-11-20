@@ -879,6 +879,9 @@ function ComputeAirPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     end
 end
 
+--- Generates the compression grids based on the heightmap
+---@param size number (square) size of each cell of the compression grid
+---@param threshold number (square) size of the smallest acceptable leafs, used for culling
 local function GenerateCompressionGrids(size, threshold)
 
     local navLand = NavGrids['Land']                --[[@as NavGrid]]
@@ -925,8 +928,8 @@ local function GenerateCompressionGrids(size, threshold)
     end
 end
 
+--- Generates graphs that we can traverse, based on the compression grids
 local function GenerateGraphs()
-
     local navLand = NavGrids['Land']                --[[@as NavGrid]]
     local navWater = NavGrids['Water']              --[[@as NavGrid]]
     local navHover = NavGrids['Hover']              --[[@as NavGrid]]
@@ -952,6 +955,7 @@ local function GenerateGraphs()
     navAir:Precompute()
 end
 
+--- Generates metadata for markers for quick access
 local function GenerateMarkerMetadata()
     local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
@@ -967,24 +971,22 @@ local function GenerateMarkerMetadata()
     end
 end
 
+--- Generates metadata for labels for quick access
 local function GenerateLabelMetadata()
 
 end
 
---- Generates the navigational mesh from `a` to `z`
+--- Generates a navigational mesh based on the heightmap
 function Generate()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
     print(string.format(" -- Navigational mesh generator -- "))
 
     NavLayerData = Shared.CreateEmptyNavLayerData()
-    
-    --- TODO: this approach does not support non-square maps
-    --- Total width / height of the map
+
     ---@type number
     local MapSize = ScenarioInfo.size[1]
-    
-    --- Number of cells per block
+
     ---@type number
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
