@@ -7,12 +7,13 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
-local FxAmbient = import('/lua/effecttemplates.lua').AResourceGenAmbient
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
+local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
+local FxAmbient = import("/lua/effecttemplates.lua").AResourceGenAmbient
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
 
 local CreateAeonParagonBuildingEffects = import("/lua/effectutilities.lua").CreateAeonParagonBuildingEffects
 
+---@class XAB1401 : AStructureUnit
 XAB1401 = Class(AStructureUnit) {
 
     Weapons = {

@@ -7,8 +7,9 @@
 --**
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local Unit = import('/lua/sim/Unit.lua').Unit
+local Unit = import("/lua/sim/unit.lua").Unit
 
+---@class OPC1001 : Unit
 OPC1001 = Class(Unit) {
 }
 

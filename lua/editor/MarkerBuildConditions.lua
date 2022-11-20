@@ -6,25 +6,22 @@
 -- **  Summary  : Generic AI Platoon Build Conditions
 -- **             Build conditions always return true or false
 -- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
---------------------------------------------------------------------------------------------------------------
--- function: MarkerGreaterThanDistance = BuildCondition doc = "Please work function docs."
---
--- parameter 0: string  aiBrain         = "default_brain"
--- parameter 1: string  markerType      = "Defensive_Point"     doc = "docs for param1"
--- parameter 2: float   distance        = 1.0                   doc = "docs for param1"
--- parameter 3: float   threatMin       = 1.0                   doc = "docs for param1"
--- parameter 4: float   threatMax       = 1.0                   doc = "docs for param1"
--- parameter 5: int threatRings         = 1                     doc = "docs for param1"
--- parameter 6: float   startX          = 1.0                   doc = "docs for param1"
--- parameter 7: float   startZ          = 1.0                   doc = "docs for param1"
---
---------------------------------------------------------------------------------------------------------------
-function MarkerGreaterThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType)
+---@param aiBrain AIBrain
+---@param markerType string
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings integer
+---@param threatType string
+---@param startX number
+---@param startZ number
+---@return boolean
+function MarkerGreaterThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType,startX,startZ)
     if not startX and not startZ then
          startX, startZ = aiBrain:GetArmyStartPos()
     end
@@ -40,19 +37,16 @@ function MarkerGreaterThanDistance(aiBrain, markerType, distance, threatMin, thr
     return false
 end
 
---------------------------------------------------------------------------------------------------------------
--- function: MarkerLessThanDistance = BuildCondition    doc = "Please work function docs."
---
--- parameter 0: string  aiBrain         = "default_brain"
--- parameter 1: string  markerType      = "Defensive_Point"     doc = "docs for param1"
--- parameter 2: float   distance        = 1.0                   doc = "docs for param1"
--- parameter 3: float   threatMin       = 1.0                   doc = "docs for param1"
--- parameter 4: float   threatMax       = 1.0                   doc = "docs for param1"
--- parameter 5: int threatRings         = 1                     doc = "docs for param1"
--- parameter 6: float   startX          = 1.0                   doc = "docs for param1"
--- parameter 7: float   startZ          = 1.0                   doc = "docs for param1"
---
---------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param markerType string
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings integer
+---@param threatType string
+---@param startX number
+---@param startZ number
+---@return boolean
 function MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType, startX, startZ)
     if not startX and not startZ then
          startX, startZ = aiBrain:GetArmyStartPos()
@@ -71,6 +65,15 @@ function MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threat
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings integer
+---@param threatType string
+---@param maxNum number
+---@return boolean
 function CanBuildOnMassLessThanDistance(aiBrain, locationType, distance, threatMin, threatMax, threatRings, threatType, maxNum )
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
@@ -85,6 +88,19 @@ function CanBuildOnMassLessThanDistance(aiBrain, locationType, distance, threatM
     return false
 end
 
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param radius number
+---@param markerType string
+---@param tMin number
+---@param tMax number
+---@param tRings number
+---@param tType string
+---@param maxUnits integer
+---@param unitCat any
+---@param markerRadius number
+---@return boolean
 function CanBuildFirebase( aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
     local ref, refName = AIUtils.AIFindFirebaseLocation( aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
     if not ref then

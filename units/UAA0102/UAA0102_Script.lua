@@ -7,10 +7,11 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
-local aWeapons = import('/lua/aeonweapons.lua')
+local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
+local aWeapons = import("/lua/aeonweapons.lua")
 local AAASonicPulseBatteryWeapon = aWeapons.AAASonicPulseBatteryWeapon
 
+---@class UAA0102 : AAirUnit
 UAA0102 = Class(AAirUnit) {
 
     Weapons = {

@@ -1,68 +1,82 @@
 ---@declare-global
-----------------------------------------------------------------------------
---
---  File     :  /lua/system/GlobalBuilderGroup.lua
---
---  Summary  :  Global builder group table and blueprint methods
---
---  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-----------------------------------------------------------------------------
 
--- Global list of all buffs found in the system.
+---@alias BuilderGroupNamesBase BuilderGroupsAirAttack | BuilderGroupsArtillery | BuilderGroupsDefense | BuilderGroupsEconomic | BuilderGroupsEconomicUpgrade | BuilderGroupsExpansion | BuildergroupsExperimentals | BuilderGroupsFactoryConstruction | BuilderGroupsIntel | BuilderGroupsLandAttack | BuilderGroupsNaval | BuilderGroupsSeaAttack | string
+---@alias BuilderGroupNamesSorian ''
+---@alias BuilderGroupNames BuilderGroupNamesBase | BuilderGroupNamesSorian | string
+
+---@class BuilderGroupSpec
+---@field BuilderGroupName string
+---@field BuildersType BuildersType
+---@field [1] BuilderGroupNames?
+---@field [2] BuilderGroupNames?
+---@field [3] BuilderGroupNames?
+---@field [4] BuilderGroupNames?
+---@field [5] BuilderGroupNames?
+---@field [6] BuilderGroupNames?
+---@field [7] BuilderGroupNames?
+---@field [8] BuilderGroupNames?
+---@field [9] BuilderGroupNames?
+---@field [10] BuilderGroupNames?
+---@field [11] BuilderGroupNames?
+---@field [12] BuilderGroupNames?
+---@field [13] BuilderGroupNames?
+---@field [14] BuilderGroupNames?
+---@field [15] BuilderGroupNames?
+
+--- Global list of all builder groups
+---@type table<string, BuilderGroupSpec>
 BuilderGroups = {}
 
--- Buff blueprints are created by invoking BuffBlueprint() with a table
--- as the buff data. Buffs can be defined in any module at any time.
--- e.g.
---
--- BuffBlueprint {
---    Name = HealingOverTime1,
---    DisplayName = 'Healing Over Time',
---    [...]
---    Affects = {
---        Health = {
---            Add = 10,
---        },
---    },
--- }
---
---
---
-BuilderGroup = {}
-BuilderGroupDefMeta = {}
+--- List of all valid builder group types
+local ValidBuildersType = {
+    EngineerBuilder = true,
+    FactoryBuilder = true,
+    PlatoonFormBuilder = true,
+    StrategyBuilder = true,
+}
 
-BuilderGroupDefMeta.__index = BuilderGroupDefMeta
-BuilderGroupDefMeta.__call = function(...)
-    if type(arg[2]) ~= 'table' then
-        LOG('Invalid BuilderGroup: ', repr(arg))
+---@alias BuildersType 'EngineerBuilder' | 'FactoryBuilder' | 'PlatoonFormBuilder' | 'StrategyBuilder'
+
+--- Register a builder group, or override an existing builder group
+---@param spec BuilderGroupSpec
+---@return string String reference to the builder group
+function BuilderGroup (spec)
+
+    -- it should be a table
+    if type(spec) ~= 'table' then
+        WARN('Invalid Builder group: ', repr(arg))
         return
     end
 
-    if not arg[2].BuilderGroupName then
-        WARN('Missing BuilderGroupName for BuilderGroup definition: ',repr(arg))
+    -- should have a name, as that is used as its identifier
+    if not spec.BuilderGroupName then 
+        WARN('Builder group excluded for missing BuilderGroupName in its specification: ', reprs(spec))
         return
     end
 
-    if not arg[2].BuildersType then
-        WARN('Missing BuildersType for BuilderGroup definition - BuilderGroupName = ' .. arg[2].BuilderGroupName)
+    -- should have a type
+    if not spec.BuildersType then 
+        WARN('Builder group excluded for missing BuildersType in its specification: ', reprs(spec))
         return
     end
 
-    if arg[2].BuildersType ~= 'EngineerBuilder' and arg[2].BuildersType ~= 'FactoryBuilder' and arg[2].BuildersType ~= 'PlatoonFormBuilder' and arg[2].BuildersType ~= 'StrategyBuilder' then
-        WARN('Invalid BuildersType for BuilderGroup definition - BuilderGroupName = ' .. arg[2].BuilderGroupName)
+    -- should have a valid type
+    if not ValidBuildersType[spec.BuildersType] then 
+        WARN('Builder group excluded for invalid BuildersType: ', reprs(spec.BuildersType))
         return
     end
 
-    if BuilderGroups[arg[2].BuilderGroupName] then
-        LOG('Hooked PlatoonTemplate: ', arg[2].BuilderGroupName)
-        for k,v in arg[2] do
-            BuilderGroups[arg[2].BuilderGroupName][k] = v
+    -- overwrite any existing definitions
+    if BuilderGroups[spec.BuilderGroupName] then
+        LOG(string.format('Overwriting builder group: %s', spec.BuilderGroupName))
+        for k,v in spec do
+            BuilderGroups[spec.BuilderGroupName][k] = v
         end
-    else
-        BuilderGroups[arg[2].BuilderGroupName] = arg[2]
-    end
-    --SPEW('BuilderGroup Registered: ', arg[2].BuilderGroupName)
-    return arg[2].BuilderGroupName
-end
 
-setmetatable(BuilderGroup, BuilderGroupDefMeta)
+    -- first one, we become the definition
+    else
+        BuilderGroups[spec.BuilderGroupName] = spec
+    end
+
+    return spec.BuilderGroupName
+end

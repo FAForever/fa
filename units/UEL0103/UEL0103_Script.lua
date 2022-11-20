@@ -7,9 +7,10 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local TLandUnit = import('/lua/terranunits.lua').TLandUnit
-local TIFHighBallisticMortarWeapon = import('/lua/terranweapons.lua').TIFHighBallisticMortarWeapon
+local TLandUnit = import("/lua/terranunits.lua").TLandUnit
+local TIFHighBallisticMortarWeapon = import("/lua/terranweapons.lua").TIFHighBallisticMortarWeapon
 
+---@class UEL0103 : TLandUnit
 UEL0103 = Class(TLandUnit) {
     Weapons = {
         MainGun = Class(TIFHighBallisticMortarWeapon) {

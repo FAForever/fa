@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CIFArtilleryWeapon = import('/lua/cybranweapons.lua').CIFArtilleryWeapon
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
+local CIFArtilleryWeapon = import("/lua/cybranweapons.lua").CIFArtilleryWeapon
 
+---@class URB2303 : CStructureUnit
 URB2303 = Class(CStructureUnit) {
     Weapons = {
         MainGun = Class(CIFArtilleryWeapon) {

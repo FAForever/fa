@@ -79,15 +79,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 15,
     Categories = {
         'PRODUCTFA',
@@ -244,7 +235,7 @@ UnitBlueprint {
     SelectionSizeX = 0.75,
     SelectionSizeZ = 1,
     SelectionThickness = 0.37,
-    SizeSphere = 1.6,
+    SizeSphere = 1.81,
     SizeX = 1,
     SizeY = 0.5,
     SizeZ = 1.1,
@@ -293,7 +284,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0.2,
             MuzzleSalvoSize = 3,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             ProjectileId = '/projectiles/AAALightDisplacementAutoCannonMissile01/AAALightDisplacementAutoCannonMissile01_proj.bp',
             ProjectileLifetime = 0.6,
             ProjectilesPerOnFire = 3,

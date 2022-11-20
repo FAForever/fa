@@ -24,14 +24,11 @@ PropBlueprint {
         ReclaimMassMax = 10,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
     Interface = {
         HelpText = 'Small Rock',
     },
     Physics = {
-        BlockPath = true,
+        BlockPath = false,
     },
     SizeX = 0.5,
     SizeY = 0.25,

@@ -5,15 +5,16 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
-local WeaponsFile = import ('/lua/seraphimweapons.lua')
+local SWalkingLandUnit = import("/lua/seraphimunits.lua").SWalkingLandUnit
+local WeaponsFile = import("/lua/seraphimweapons.lua")
 local SDFExperimentalPhasonProj = WeaponsFile.SDFExperimentalPhasonProj
 local SDFAireauWeapon = WeaponsFile.SDFAireauWeapon
 local SDFSinnuntheWeapon = WeaponsFile.SDFSinnuntheWeapon
 local SAAOlarisCannonWeapon = WeaponsFile.SAAOlarisCannonWeapon
-local CreateSeraphimExperimentalBuildBaseThread = import('/lua/EffectUtilitiesSeraphim.lua').CreateSeraphimExperimentalBuildBaseThread
-local explosion = import('/lua/defaultexplosions.lua')
+local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
+local explosion = import("/lua/defaultexplosions.lua")
 
+---@class XSL0401 : SWalkingLandUnit
 XSL0401 = Class(SWalkingLandUnit) {
     SpawnEffects = {
         '/effects/emitters/seraphim_othuy_spawn_01_emit.bp',
@@ -114,13 +115,13 @@ XSL0401 = Class(SWalkingLandUnit) {
         -- hopes that this will look better in the future.. =)
         if self.ShowUnitDestructionDebris and overkillRatio then
             if overkillRatio <= 1 then
-                self.CreateUnitDestructionDebris(self, true, true, false)
+                self:CreateUnitDestructionDebris(true, true, false)
             elseif overkillRatio <= 2 then
-                self.CreateUnitDestructionDebris(self, true, true, false)
+                self:CreateUnitDestructionDebris(true, true, false)
             elseif overkillRatio <= 3 then
-                self.CreateUnitDestructionDebris(self, true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
             else -- Vaporized
-                self.CreateUnitDestructionDebris(self, true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
             end
         end
 

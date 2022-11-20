@@ -4,17 +4,18 @@
 -- Summary  :  Aeon CZAR Script
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
-local aWeapons = import('/lua/aeonweapons.lua')
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local aWeapons = import("/lua/aeonweapons.lua")
 local AQuantumBeamGenerator = aWeapons.AQuantumBeamGenerator
 local AAAZealotMissileWeapon = aWeapons.AAAZealotMissileWeapon
 local AANDepthChargeBombWeapon = aWeapons.AANDepthChargeBombWeapon
 local AAATemporalFizzWeapon = aWeapons.AAATemporalFizzWeapon
-local explosion = import('/lua/defaultexplosions.lua')
-local CzarShield = import('/lua/shield.lua').CzarShield
+local explosion = import("/lua/defaultexplosions.lua")
+local CzarShield = import("/lua/shield.lua").CzarShield
 
 local CreateAeonCZARBuildingEffects = import("/lua/effectutilities.lua").CreateAeonCZARBuildingEffects
 
+---@class UAA0310 : AirTransport
 UAA0310 = Class(AirTransport) {
     DestroyNoFallRandomChance = 1.1,
     BuildAttachBone = 'UAA0310',

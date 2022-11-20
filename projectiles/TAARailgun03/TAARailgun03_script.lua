@@ -5,9 +5,9 @@
 --**
 --**  Summary  :  Terran Anti Air basic projectile, DEA0202
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-TAARailgun01 = Class(import('/lua/terranprojectiles.lua').TRailGunProjectile) {
+TAARailgun01 = Class(import("/lua/terranprojectiles.lua").TRailGunProjectile) {
     FxTrails = {},
 }
 

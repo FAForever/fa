@@ -5,17 +5,17 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------
 
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
-local CCommandUnit = import('/lua/cybranunits.lua').CCommandUnit
-local CWeapons = import('/lua/cybranweapons.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
+local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
+local CCommandUnit = import("/lua/cybranunits.lua").CCommandUnit
+local CWeapons = import("/lua/cybranweapons.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
 local CCannonMolecularWeapon = CWeapons.CCannonMolecularWeapon
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
 local CDFHeavyMicrowaveLaserGeneratorCom = CWeapons.CDFHeavyMicrowaveLaserGeneratorCom
 local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
-local Entity = import('/lua/sim/Entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 
 URL0001 = Class(ACUUnit, CCommandUnit) {
     Weapons = {
@@ -386,14 +386,14 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self:CreateTerrainTypeEffects(self.IntelEffects.Field, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
         end
     end,
@@ -409,23 +409,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         elseif self.StealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
             self:SetMaintenanceConsumptionInactive()
         end
-    end,
-
-    -- Death
-    OnKilled = function(self, instigator, type, overkillRatio)
-        local bp
-        for k, v in self:GetBlueprint().Buffs do
-            if v.Add.OnDeath then
-                bp = v
-            end
-        end
-        -- If we could find a blueprint with v.Add.OnDeath, then add the buff
-        if bp ~= nil then
-            -- Apply Buff
-            self:AddBuff(bp)
-        end
-        -- Otherwise, we should finish killing the unit
-        ACUUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     OnLayerChange = function(self, new, old)

@@ -7,10 +7,11 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CRadarUnit = import('/lua/cybranunits.lua').CRadarUnit
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
-local CSoothSayerAmbient = import('/lua/EffectTemplates.lua').CSoothSayerAmbient
+local CRadarUnit = import("/lua/cybranunits.lua").CRadarUnit
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
+local CSoothSayerAmbient = import("/lua/effecttemplates.lua").CSoothSayerAmbient
 
+---@class XRB3301 : CRadarUnit
 XRB3301 = Class(CRadarUnit) {
     IntelEffects = {
         {

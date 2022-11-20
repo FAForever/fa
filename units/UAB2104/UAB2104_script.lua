@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
-local AAASonicPulseBatteryWeapon = import('/lua/aeonweapons.lua').AAASonicPulseBatteryWeapon
+local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
+local AAASonicPulseBatteryWeapon = import("/lua/aeonweapons.lua").AAASonicPulseBatteryWeapon
 
+---@class UAB2104 : AStructureUnit
 UAB2104 = Class(AStructureUnit) {
 
     Weapons = {

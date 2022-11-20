@@ -8,10 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TSubUnit = import('/lua/terranunits.lua').TSubUnit
-local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
-local TDFLightPlasmaCannonWeapon = import('/lua/terranweapons.lua').TDFLightPlasmaCannonWeapon
+local TSubUnit = import("/lua/terranunits.lua").TSubUnit
+local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
+local TDFLightPlasmaCannonWeapon = import("/lua/terranweapons.lua").TDFLightPlasmaCannonWeapon
 
+---@class UES0203 : TSubUnit
 UES0203 = Class(TSubUnit) {
     PlayDestructionEffects = true,
     DeathThreadDestructionWaitTime = 0,

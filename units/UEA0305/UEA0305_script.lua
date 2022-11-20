@@ -5,12 +5,13 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local TWeapons = import('/lua/terranweapons.lua')
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local TWeapons = import("/lua/terranweapons.lua")
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local TAirToAirLinkedRailgun = TWeapons.TAirToAirLinkedRailgun
 
 
+---@class UEA0305 : TAirUnit
 UEA0305 = Class(TAirUnit) {
     
     EngineRotateBones = {'Jet_Front', 'Jet_Back',},

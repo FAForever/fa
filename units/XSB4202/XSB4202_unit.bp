@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Orb',
+        },
+    },
     Audio = {
         Destroyed = Sound {
             Bank = 'XSL_Destroy',
@@ -218,7 +223,7 @@ UnitBlueprint {
     SelectionSizeZ = 1.55,
     SelectionThickness = 0.45,
     SizeX = 1.75,
-    SizeY = 2.5,
+    SizeY = 3.0,
     SizeZ = 1.75,
     StrategicIconName = 'icon_structure2_shield',
     StrategicIconSortPriority = 200,

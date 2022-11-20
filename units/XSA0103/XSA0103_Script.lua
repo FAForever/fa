@@ -8,9 +8,10 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
-local SDFBombOtheWeapon = import('/lua/seraphimweapons.lua').SDFBombOtheWeapon
+local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
+local SDFBombOtheWeapon = import("/lua/seraphimweapons.lua").SDFBombOtheWeapon
 
+---@class XSA0103 : SAirUnit
 XSA0103 = Class(SAirUnit) {
     Weapons = {
         Bomb = Class(SDFBombOtheWeapon) {},

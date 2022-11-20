@@ -1,18 +1,21 @@
---- Class CMauiBorder
--- @classmod User.CMauiBorder
+---@meta
+
+---@class moho.border_methods : moho.control_methods
+local CMauiBorder = {}
+
+--- Sets the textures of the border. Will leave the border edge alone if `nil`.
+---@param vertical   string | nil
+---@param horizontal string | nil
+---@param upperLeft  string | nil
+---@param upperRight string | nil
+---@param lowerLeft  string | nil
+---@param lowerRight string | nil
+function CMauiBorder:SetNewTextures(vertical, horizontal, upperLeft, upperRight, lowerLeft, lowerRight)
+end
 
 ---
---  SetSolidColor(color)
+---@param color string
 function CMauiBorder:SetSolidColor(color)
 end
 
----
---  derived from CMauiControl
-function CMauiBorder:base()
-end
-
----
---
-function CMauiBorder:moho.border_methods()
-end
-
+return CMauiBorder

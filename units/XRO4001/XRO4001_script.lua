@@ -8,8 +8,9 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CWallStructureUnit = import('/lua/cybranunits.lua').CWallStructureUnit
+local CWallStructureUnit = import("/lua/cybranunits.lua").CWallStructureUnit
 
+---@class XRO4001 : CWallStructureUnit
 XRO4001 = Class(CWallStructureUnit) {
     FxDamage1 = {},
     FxDamage2 = {},

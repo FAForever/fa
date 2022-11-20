@@ -1,8 +1,5 @@
---- Class CFootPlantManipulator
--- @classmod Sim.CFootPlantManipulator
+---@declare-global
+---@class moho.FootPlantManipulator : moho.manipulator_methods
+local CFootPlantManipulator = {}
 
----
---
-function CFootPlantManipulator:moho.FootPlantManipulator()
-end
-
+return CFootPlantManipulator

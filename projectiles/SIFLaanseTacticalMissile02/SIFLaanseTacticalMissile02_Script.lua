@@ -5,10 +5,10 @@
 --**
 --**  Summary  :  Laanse Tactical Missile Projectile script, XSS0202
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SLaanseTacticalMissile = import('/lua/seraphimprojectiles.lua').SLaanseTacticalMissile
+local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
 
 SIFLaanseTacticalMissile02 = Class(SLaanseTacticalMissile) {
 

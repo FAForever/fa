@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
+local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
 
 
+---@class UEB0202 : TAirFactoryUnit
 UEB0202 = Class(TAirFactoryUnit) {
 
     StartArmsMoving = function(self)

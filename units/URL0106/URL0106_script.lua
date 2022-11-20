@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CDFLaserPulseLightWeapon = import('/lua/cybranweapons.lua').CDFLaserPulseLightWeapon
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local CDFLaserPulseLightWeapon = import("/lua/cybranweapons.lua").CDFLaserPulseLightWeapon
 
+---@class URL0106 : CWalkingLandUnit
 URL0106 = Class(CWalkingLandUnit) {
     Weapons = {
         MainGun = Class(CDFLaserPulseLightWeapon) {},

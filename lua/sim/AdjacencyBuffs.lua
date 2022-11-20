@@ -5,7 +5,19 @@
 --**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AdjBuffFuncs = import('/lua/sim/AdjacencyBuffFunctions.lua')
+---@alias AdjacencyBuffType
+---| 'T1PowerGeneratorBONUS'
+---| 'T2PowerGeneratorBONUS'
+---| 'T3PowerGeneratorBONUS'
+---| 'T1MassExtractorBONUS'
+---| 'T2MassExtractorBONUS'
+---| 'T3MassExtractorBONUS'
+---| 'T1MassFabricatorBONUS'
+---| 'T3MassFabricatorBONUS'
+---| 'T1EnergyStorageBONUS'
+---| 'T1MassStorageBONUS'
+
+local AdjBuffFuncs = import("/lua/sim/adjacencybufffunctions.lua")
 
 local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
     T1PowerGenerator={

@@ -7,9 +7,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TLandUnit = import('/lua/terranunits.lua').TLandUnit
-local TDFGaussCannonWeapon = import('/lua/terranweapons.lua').TDFGaussCannonWeapon
+local TLandUnit = import("/lua/terranunits.lua").TLandUnit
+local TDFGaussCannonWeapon = import("/lua/terranweapons.lua").TDFGaussCannonWeapon
 
+---@class UEL0202 : TLandUnit
 UEL0202 = Class(TLandUnit) {
     Weapons = {
         FrontTurret01 = Class(TDFGaussCannonWeapon) {

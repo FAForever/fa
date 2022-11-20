@@ -3,8 +3,20 @@
 -- Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-import('/lua/sim/AdjacencyBuffs.lua')
-import('/lua/sim/CheatBuffs.lua') -- Buffs for AI Cheating
+---@alias VeterancyBuffType
+---| 'VeterancyMaxHealth1'
+---| 'VeterancyMaxHealth2'
+---| 'VeterancyMaxHealth3'
+---| 'VeterancyMaxHealth4'
+---| 'VeterancyMaxHealth5'
+---| 'VeterancyRegen1'
+---| 'VeterancyRegen2'
+---| 'VeterancyRegen3'
+---| 'VeterancyRegen4'
+---| 'VeterancyRegen5'
+
+import("/lua/sim/adjacencybuffs.lua")
+import("/lua/sim/cheatbuffs.lua") -- Buffs for AI Cheating
 
 -- VETERANCY BUFFS - UNIT MAX HEALTH ONLY
 BuffBlueprint {

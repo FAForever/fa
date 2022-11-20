@@ -7,13 +7,14 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local ACivilianStructureUnit = import('/lua/aeonunits.lua').ACivilianStructureUnit
+local ACivilianStructureUnit = import("/lua/aeonunits.lua").ACivilianStructureUnit
 
+---@class UAC1901 : ACivilianStructureUnit
 UAC1901 = Class(ACivilianStructureUnit) {
 	OnCreate = function(self)
 		ACivilianStructureUnit.OnCreate(self)
 
-        self.DomeEntity = import('/lua/sim/Entity.lua').Entity({Owner = self,})
+        self.DomeEntity = import("/lua/sim/entity.lua").Entity({Owner = self,})
         self.DomeEntity:AttachBoneTo( -1, self, 'UAC1901' )
         self.DomeEntity:SetMesh('/effects/Entities/UAC1901-DOME/UAC1901-DOME_mesh')
         self.DomeEntity:SetDrawScale(0.1)

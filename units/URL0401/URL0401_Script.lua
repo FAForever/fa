@@ -8,14 +8,15 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
-local CIFArtilleryWeapon = import('/lua/cybranweapons.lua').CIFArtilleryWeapon
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local Util = import('/lua/utilities.lua')
+local CLandUnit = import("/lua/cybranunits.lua").CLandUnit
+local CIFArtilleryWeapon = import("/lua/cybranweapons.lua").CIFArtilleryWeapon
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local Util = import("/lua/utilities.lua")
 local barrelBones = { 'Turret_Barrel_F_B01', 'Turret_Barrel_E_B01', 'Turret_Barrel_D_B01', 'Turret_Barrel_C_B01', 'Turret_Barrel_B_B01', 'Turret_Barrel_A_B01' }
 local recoilBones = { 'Turret_Barrel_F_B02', 'Turret_Barrel_E_B02', 'Turret_Barrel_D_B02', 'Turret_Barrel_C_B02', 'Turret_Barrel_B_B02', 'Turret_Barrel_A_B02' }
 local muzzleBones = { 'Turret_Barrel_F_B03', 'Turret_Barrel_E_B03', 'Turret_Barrel_D_B03', 'Turret_Barrel_C_B03', 'Turret_Barrel_B_B03', 'Turret_Barrel_A_B03' }
 
+---@class URL0401 : CLandUnit
 URL0401 = Class(CLandUnit) {
    
     Weapons = {

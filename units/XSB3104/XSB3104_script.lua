@@ -8,8 +8,9 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SRadarUnit = import('/lua/seraphimunits.lua').SRadarUnit
+local SRadarUnit = import("/lua/seraphimunits.lua").SRadarUnit
 
+---@class XSB3104 : SRadarUnit
 XSB3104 = Class(SRadarUnit) {
     
     OnIntelDisabled = function(self)

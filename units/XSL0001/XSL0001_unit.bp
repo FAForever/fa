@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        InitialAutoMode = true,
         GuardRadius = 10,
         GuardScanRadius = 31.5, -- Hardcoded to keep a sensible 'attack while assisting'/stop far away ratio
         TargetBones = {
@@ -125,20 +126,12 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
         'SERAPHIM',
         'MOBILE',
+        'AMPHIBIOUS',
         'ECONOMIC',
         'COMMAND',
         'MASSPRODUCTION',

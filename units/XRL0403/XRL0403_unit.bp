@@ -60,15 +60,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 65,
-            Level3 = 120,
-            Level4 = 180,
-            Level5 = 235,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTFA',
@@ -84,8 +75,6 @@ UnitBlueprint {
         'FACTORY',
         'DIRECTFIRE',
         'AMPHIBIOUS',
-        'ANTIAIR',
-        'ANTINAVY',
         'SNIPER',
         'NEEDMOBILEBUILD',
         'SONAR',

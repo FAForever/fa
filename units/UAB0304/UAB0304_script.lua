@@ -7,9 +7,10 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local AQuantumGateUnit = import('/lua/aeonunits.lua').AQuantumGateUnit
-local AQuantumGateAmbient = import('/lua/EffectTemplates.lua').AQuantumGateAmbient
+local AQuantumGateUnit = import("/lua/aeonunits.lua").AQuantumGateUnit
+local AQuantumGateAmbient = import("/lua/effecttemplates.lua").AQuantumGateAmbient
 
+---@class UAB0304 : AQuantumGateUnit
 UAB0304 = Class(AQuantumGateUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)

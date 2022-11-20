@@ -6,35 +6,33 @@
 --* Copyright © :005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Text = import('/lua/maui/text.lua').Text
-local Movie = import('/lua/maui/movie.lua').Movie
-local WrapText = import('/lua/maui/text.lua').WrapText
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local hotstats = import('/lua/ui/dialogs/hotstats.lua')
-local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local Movie = import("/lua/maui/movie.lua").Movie
+local WrapText = import("/lua/maui/text.lua").WrapText
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local RadioGroup = import("/lua/maui/mauiutil.lua").RadioGroup
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Prefs = import("/lua/user/prefs.lua")
+local hotstats = import("/lua/ui/dialogs/hotstats.lua")
+local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
 dialog = false
-local currentPage = false
-local curGrid = false
-local curInfo = false
-local elapsedTime = false
-local curType = false
-local curSortCol = false
+local currentPage = nil
+local curGrid = nil
+local curInfo = nil
+local elapsedTime = nil
+local curType = nil
+local curSortCol = nil
 local curSortDescending = true
-local savedGameTime = false
-local curScore = false
+local savedGameTime = nil
+local curScore = nil
 
 local campaignScore = ''
 
@@ -229,7 +227,7 @@ function UpdateData()
         if not armyInfo.civilian and armyInfo.showScore then
             -- set basic info from armies table
             curInfo[index] = {}
-            curInfo[index].name = armyInfo.nickname
+            curInfo[index].name = hotstats.scoreData.current[i].name
             curInfo[index].faction = armyInfo.faction
             curInfo[index].color = armyInfo.color
             --curInfo[index].teamName = index --TODO we need to get team data in here
@@ -272,7 +270,7 @@ function CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
         end
         if operationVictoryTable.opData.opMovies.postOpMovies[successKey] then
             GetCursor():Hide()
-            local subtitleThread = false
+            local subtitleThread = nil
             function DisplaySubtitles(textControl,captions)
                 if subtitleThread then
                     KillThread(subtitleThread)
@@ -331,7 +329,7 @@ function CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
 
             movie:DisableHitTest()    -- get clicks to parent group
 
-            local subtitleSource = import('/lua/ui/game/vo_fmv.lua')
+            local subtitleSource = import("/lua/ui/game/vo_fmv.lua")
             movie.OnLoaded = function(self)
                 movie:Play()
                 GetCursor():Hide()
@@ -405,12 +403,11 @@ function CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
     end
 end
 
-
 function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     if dialog then return end
 
     GetCursor():Show()
-    local factions = import('/lua/factions.lua').Factions
+    local factions = import("/lua/factions.lua").Factions
     UIUtil.SetCurrentSkin(factions[1].DefaultSkin)
 
     -- create the dialog
@@ -668,7 +665,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 sortButtons[index].label[1] = UIUtil.CreateText(sortButtons[index].checkbox, '', 11, UIUtil.bodyFont)
                 sortButtons[index].label[1]:DisableHitTest()
 
-                local wrappedText = import('/lua/maui/text.lua').WrapText(LOC(colName.title),
+                local wrappedText = import("/lua/maui/text.lua").WrapText(LOC(colName.title),
                     80,
                     function(text)
                         return sortButtons[Index].label[1]:GetStringAdvance(text)
@@ -1167,7 +1164,6 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     hotstats.Set_graph(victory, showCampaign, operationVictoryTable, dialog, bg)
 end
 
-
 function CreateBorderGroup(parent)
     local group = Group(parent)
 
@@ -1210,3 +1206,7 @@ function CreateBorderGroup(parent)
 
     return group
 end
+
+-- kept for mod backwards compatibility
+local CampaignManager = import("/lua/ui/campaign/campaignmanager.lua")
+local Text = import("/lua/maui/text.lua").Text

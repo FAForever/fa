@@ -5,10 +5,10 @@
 --**
 --**  Summary  :  Inferno Experimental Stragetic Bomb, XSA0402
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SExperimentalStrategicBomb = import('/lua/seraphimprojectiles.lua').SExperimentalStrategicBomb
+local SExperimentalStrategicBomb = import("/lua/seraphimprojectiles.lua").SExperimentalStrategicBomb
 
 
 SBOInfernoExperimentalStrategicBomb01 = Class(SExperimentalStrategicBomb) {
