@@ -59,6 +59,22 @@ local MinWaterDepthNaval = 1.5
 ---@field Air? NavGrid
 NavGrids = { }
 
+---@class NavLabelMetadata
+---@field Area number
+---@field Layer NavLayers
+---@field NumberOfExtractors number
+---@field NumberOfHydrocarbons number
+---@field NumberOfSpawns number
+---@field ExtractorMarkers MarkerData[]
+---@field HydrocarbonMarkers MarkerData[]
+-- ---@field NumberOfExpansions number
+-- ---@field NumberOfDefensePoints number
+-- ---@field ExpansionMarkers MarkerData[]
+-- ---@field DefensePointMarkers MarkerData[]
+
+---@type table<number, NavLabelMetadata>
+NavLabels = { }
+
 local Generated = false
 ---@return boolean
 function IsGenerated()
@@ -863,110 +879,80 @@ function ComputeAirPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     end
 end
 
+local function GenerateCompressionGrids(size, threshold)
 
---- Generates the navigational mesh from `a` to `z`
-function Generate()
+    local navLand = NavGrids['Land']                --[[@as NavGrid]]
+    local navWater = NavGrids['Water']              --[[@as NavGrid]]
+    local navHover = NavGrids['Hover']              --[[@as NavGrid]]
+    local navAmphibious = NavGrids['Amphibious']    --[[@as NavGrid]]
+    local navAir = NavGrids['Air']                  --[[@as NavGrid]]
 
-    NavLayerData = Shared.CreateEmptyNavLayerData()
-    
-    --- TODO: this approach does not support non-square maps
-    --- Total width / height of the map
-    ---@type number
-    local MapSize = ScenarioInfo.size[1]
-    
-    --- Number of cells per block
-    ---@type number
-    local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
-
-    -------------------------------------------------
-    -- convert height map into a navigational mesh --
-    -------------------------------------------------
-
-    ---@type number
-    local compressionThreshold = 2
-
-    if MapSize > 1024 then
-        compressionThreshold = 4
-    end
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-    print(string.format(" -- Navigational mesh generator -- "))
-
-    local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(CompressionTreeSize)
-
-    local labelRootLand = NavGrid('Land', CompressionTreeSize)
-    local labelRootNaval = NavGrid('Water', CompressionTreeSize)
-    local labelRootHover = NavGrid('Hover', CompressionTreeSize)
-    local labelRootAmph = NavGrid('Amphibious', CompressionTreeSize)
-    local labelRootAir = NavGrid('Air', CompressionTreeSize)
-    NavGrids['Land'] = labelRootLand
-    NavGrids['Water'] = labelRootNaval
-    NavGrids['Hover'] = labelRootHover
-    NavGrids['Amphibious'] = labelRootAmph
-    NavGrids['Air'] = labelRootAir
+    local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(size)
 
     for z = 0, LabelCompressionTreesPerAxis - 1 do
-        local blockZ = z * CompressionTreeSize
+        local blockZ = z * size
         for x = 0, LabelCompressionTreesPerAxis - 1 do
-            local blockX = x * CompressionTreeSize
-            local labelTreeLand = CompressedLabelTree('Land', blockX, blockZ, CompressionTreeSize)
-            local labelTreeNaval = CompressedLabelTree('Water', blockX, blockZ, CompressionTreeSize)
-            local labelTreeHover = CompressedLabelTree('Hover', blockX, blockZ, CompressionTreeSize)
-            local labelTreeAmph = CompressedLabelTree('Amphibious', blockX, blockZ, CompressionTreeSize)
-            local labelTreeAir = CompressedLabelTree('Air', blockX, blockZ, CompressionTreeSize)
+            local blockX = x * size
+            local labelTreeLand = CompressedLabelTree('Land', blockX, blockZ, size)
+            local labelTreeNaval = CompressedLabelTree('Water', blockX, blockZ, size)
+            local labelTreeHover = CompressedLabelTree('Hover', blockX, blockZ, size)
+            local labelTreeAmph = CompressedLabelTree('Amphibious', blockX, blockZ, size)
+            local labelTreeAir = CompressedLabelTree('Air', blockX, blockZ, size)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
             PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
 
             ComputeLandPathingMatrix(labelTreeLand,        daCache,                    pCache, bCache, rCache)
-            labelTreeLand:Compress(rCache, compressionThreshold)
-            labelRootLand:AddTree(z, x, labelTreeLand)
+            labelTreeLand:Compress(rCache, threshold)
+            navLand:AddTree(z, x, labelTreeLand)
 
             ComputeNavalPathingMatrix(labelTreeNaval,      daCache,                    pCache, bCache, rCache)
-            labelTreeNaval:Compress(rCache, 2 * compressionThreshold)
-            labelRootNaval:AddTree(z, x, labelTreeNaval)
+            labelTreeNaval:Compress(rCache, 2 * threshold)
+            navWater:AddTree(z, x, labelTreeNaval)
 
             ComputeHoverPathingMatrix(labelTreeHover,      daCache,                    pCache, bCache, rCache)
-            labelTreeHover:Compress(rCache, compressionThreshold)
-            labelRootHover:AddTree(z, x, labelTreeHover)
+            labelTreeHover:Compress(rCache, threshold)
+            navHover:AddTree(z, x, labelTreeHover)
 
             ComputeAmphPathingMatrix(labelTreeAmph,        daCache,                    pCache, bCache, rCache)
-            labelTreeAmph:Compress(rCache, compressionThreshold)
-            labelRootAmph:AddTree(z, x, labelTreeAmph)
+            labelTreeAmph:Compress(rCache, threshold)
+            navAmphibious:AddTree(z, x, labelTreeAmph)
 
             ComputeAirPathingMatrix(labelTreeAir,          daCache,                    pCache, bCache, rCache)
-            labelTreeAir:Compress(rCache, compressionThreshold)
-            labelRootAir:AddTree(z, x, labelTreeAir)
+            labelTreeAir:Compress(rCache, threshold)
+            navAir:AddTree(z, x, labelTreeAir)
         end
     end
+end
 
-    print(string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+local function GenerateGraphs()
 
-    labelRootLand:GenerateNeighbors()
-    labelRootNaval:GenerateNeighbors()
-    labelRootHover:GenerateNeighbors()
-    labelRootAmph:GenerateNeighbors()
-    labelRootAir:GenerateNeighbors()
+    local navLand = NavGrids['Land']                --[[@as NavGrid]]
+    local navWater = NavGrids['Water']              --[[@as NavGrid]]
+    local navHover = NavGrids['Hover']              --[[@as NavGrid]]
+    local navAmphibious = NavGrids['Amphibious']    --[[@as NavGrid]]
+    local navAir = NavGrids['Air']                  --[[@as NavGrid]]
 
-    labelRootLand:GenerateLabels()
-    labelRootNaval:GenerateLabels()
-    labelRootAmph:GenerateLabels()
-    labelRootHover:GenerateLabels()
-    labelRootAir:GenerateLabels()
+    navLand:GenerateNeighbors()
+    navWater:GenerateNeighbors()
+    navHover:GenerateNeighbors()
+    navAmphibious:GenerateNeighbors()
+    navAir:GenerateNeighbors()
 
-    labelRootLand:Precompute()
-    labelRootNaval:Precompute()
-    labelRootHover:Precompute()
-    labelRootAmph:Precompute()
-    labelRootAir:Precompute()
+    navLand:GenerateLabels()
+    navWater:GenerateLabels()
+    navAmphibious:GenerateLabels()
+    navHover:GenerateLabels()
+    navAir:GenerateLabels()
 
-    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
-    SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    navLand:Precompute()
+    navWater:Precompute()
+    navHover:Precompute()
+    navAmphibious:Precompute()
+    navAir:Precompute()
+end
 
-    --------------------------------------------
-    -- post process markers to include labels --
-    --------------------------------------------
-
+local function GenerateMarkerMetadata()
     local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
 
@@ -979,10 +965,53 @@ function Generate()
         local hydro = hydrocarbons[k]
         hydro.NavLabel = NavGrids[hydro.NavLayer]:FindLeaf(hydro.position).label
     end
+end
 
-    ------------------
-    -- finishing up --
-    ------------------
+local function GenerateLabelMetadata()
+
+end
+
+--- Generates the navigational mesh from `a` to `z`
+function Generate()
+
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    print(string.format(" -- Navigational mesh generator -- "))
+
+    NavLayerData = Shared.CreateEmptyNavLayerData()
+    
+    --- TODO: this approach does not support non-square maps
+    --- Total width / height of the map
+    ---@type number
+    local MapSize = ScenarioInfo.size[1]
+    
+    --- Number of cells per block
+    ---@type number
+    local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
+
+    ---@type number
+    local compressionThreshold = 2
+
+    if MapSize > 1024 then
+        compressionThreshold = 4
+    end
+
+    NavGrids['Land'] = NavGrid('Land', CompressionTreeSize)
+    NavGrids['Water'] = NavGrid('Water', CompressionTreeSize)
+    NavGrids['Hover'] = NavGrid('Hover', CompressionTreeSize)
+    NavGrids['Amphibious'] = NavGrid('Amphibious', CompressionTreeSize)
+    NavGrids['Air'] = NavGrid('Air', CompressionTreeSize)
+
+    GenerateCompressionGrids(CompressionTreeSize, compressionThreshold)
+    print(string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateGraphs()
+    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateMarkerMetadata()
+    print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateLabelMetadata()
+    print(string.format("generated label metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
     -- allows debugging tools to function
     import("/lua/sim/navdebug.lua")
@@ -990,12 +1019,6 @@ function Generate()
     -- pass data to sync
     Sync.NavLayerData = NavLayerData
 
-    -- we're done :)!
+    SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
     Generated = true
 end
-
---- Called by the module manager when this module is dirty due to a disk change
-function __moduleinfo.OnDirty()
-end
-
-

@@ -255,3 +255,7 @@ function GetLabel(layer, position)
 
     return leaf.label, nil
 end
+
+function GetLabelMetadata(id)
+
+end
