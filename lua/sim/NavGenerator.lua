@@ -64,9 +64,9 @@ NavGrids = { }
 ---@field Layer NavLayers
 ---@field NumberOfExtractors number
 ---@field NumberOfHydrocarbons number
----@field NumberOfSpawns number
 ---@field ExtractorMarkers MarkerData[]
 ---@field HydrocarbonMarkers MarkerData[]
+-- ---@field NumberOfSpawns number
 -- ---@field NumberOfExpansions number
 -- ---@field NumberOfDefensePoints number
 -- ---@field ExpansionMarkers MarkerData[]
@@ -498,8 +498,20 @@ CompressedLabelTree = ClassSimple {
                 local free = 1
                 local label = GenerateLabelIdentifier()
 
+                NavLabels[label] = {
+                    Area = 0,
+                    Layer = self.layer,
+                    NumberOfExtractors = 0,
+                    NumberOfHydrocarbons = 0,
+                    ExtractorMarkers = { },
+                    HydrocarbonMarkers = { },
+                }
+
+                local metadata = NavLabels[label]
+
                 -- assign the label, and then search through our neighbors to assign the same label to them
                 self.label = label
+                metadata.Area = metadata.Area + self.ox * self.oz
 
                 -- add our pathable neighbors to the stack
                 for _, neighbor in self.neighbors do
@@ -520,8 +532,11 @@ CompressedLabelTree = ClassSimple {
                     local other = stack[free - 1]
                     free = free - 1
 
-                    -- assign label, and add unlabelled neighbors
+                    -- assign label, manage metadata
                     other.label = label
+                    metadata.Area = metadata.Area + self.ox * self.oz
+
+                    -- add unlabelled neighbors
                     for _, neighbor in other.neighbors do
                         if neighbor.label == 0 then
                             stack[free] = neighbor
@@ -957,23 +972,27 @@ end
 
 --- Generates metadata for markers for quick access
 local function GenerateMarkerMetadata()
-    local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
-    local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
+    local navLabels = NavLabels
 
+    local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     for k = 1, en do
         local extractor = extractors[k]
-        extractor.NavLabel = NavGrids[extractor.NavLayer]:FindLeaf(extractor.position).label
+        local label = NavGrids[extractor.NavLayer]:FindLeaf(extractor.position).label
+
+        extractor.NavLabel = label
+        navLabels[label].NumberOfExtractors = navLabels[label].NumberOfExtractors + 1
+        table.insert(navLabels[label].ExtractorMarkers, extractor)
     end
 
+    local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
     for k = 1, hn do
         local hydro = hydrocarbons[k]
-        hydro.NavLabel = NavGrids[hydro.NavLayer]:FindLeaf(hydro.position).label
+        local label = NavGrids[hydro.NavLayer]:FindLeaf(hydro.position).label
+
+        hydro.NavLabel = label
+        navLabels[label].NumberOfHydrocarbons = navLabels[label].NumberOfHydrocarbons + 1
+        table.insert(navLabels[label].HydrocarbonMarkers, hydro)
     end
-end
-
---- Generates metadata for labels for quick access
-local function GenerateLabelMetadata()
-
 end
 
 --- Generates a navigational mesh based on the heightmap
@@ -1011,9 +1030,6 @@ function Generate()
 
     GenerateMarkerMetadata()
     print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
-
-    GenerateLabelMetadata()
-    print(string.format("generated label metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
     -- allows debugging tools to function
     import("/lua/sim/navdebug.lua")
