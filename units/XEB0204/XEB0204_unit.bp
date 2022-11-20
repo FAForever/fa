@@ -123,10 +123,11 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 2500,
-        BuildCostMass = 500,
+        BuildCostEnergy = 5250,
+        BuildCostMass = 840,
         BuildRate = 20,
         BuildTime = 2000,
+        DifferentialUpgradeCostCalculation = true,
         EngineeringPods = {
             {
                 CreateWithUnit = true,

@@ -8,16 +8,17 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
-local AeonWeapons = import('/lua/aeonweapons.lua')
+local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
+local AeonWeapons = import("/lua/aeonweapons.lua")
 local AANDepthChargeBombWeapon02 = AeonWeapons.AANDepthChargeBombWeapon02
 local AANChronoTorpedoWeapon = AeonWeapons.AANChronoTorpedoWeapon
 local AIFQuasarAntiTorpedoWeapon = AeonWeapons.AIFQuasarAntiTorpedoWeapon
 
 --Custom files
-local NavalCannonOblivionWeapon = import('/lua/aeon_naval_weapons.lua').ADFCannonOblivionNaval
+local NavalCannonOblivionWeapon = import("/lua/aeon_naval_weapons.lua").ADFCannonOblivionNaval
 
 
+---@class UAS0201 : ASeaUnit
 UAS0201 = Class(ASeaUnit) {
     BackWakeEffect = {},
     Weapons = {

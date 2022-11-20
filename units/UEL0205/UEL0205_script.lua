@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TLandUnit = import('/lua/terranunits.lua').TLandUnit
-local TAAFlakArtilleryCannon = import('/lua/terranweapons.lua').TAAFlakArtilleryCannon
+local TLandUnit = import("/lua/terranunits.lua").TLandUnit
+local TAAFlakArtilleryCannon = import("/lua/terranweapons.lua").TAAFlakArtilleryCannon
 
+---@class UEL0205 : TLandUnit
 UEL0205 = Class(TLandUnit) {
     Weapons = {
         AAGun = Class(TAAFlakArtilleryCannon) {

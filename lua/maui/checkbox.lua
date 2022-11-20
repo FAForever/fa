@@ -1,9 +1,39 @@
 
-local Bitmap = import('bitmap.lua').Bitmap
-local Dragger = import('dragger.lua').Dragger
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Dragger = import("/lua/maui/dragger.lua").Dragger
 
-Checkbox = Class(Bitmap)
-{
+---@alias MauiCheckboxState "normal" | "over" | "disabled"
+
+---@class MauiCheckboxTexture
+---@field checked FileName
+---@field unchecked FileName
+
+---@class MauiCheckboxStateTextures
+---@field normal MauiCheckboxTexture
+---@field over MauiCheckboxTexture
+---@field disabled MauiCheckboxTexture
+
+---@alias CheckState "checked" | "unchecked"
+
+---@class MauiCheckbox : Bitmap
+---@field _checkState CheckState
+---@field _controlState MauiCheckboxState
+---@field _states MauiCheckboxStateTextures
+---
+---@field mRolloverCue? string
+---@field mClickCue? string
+Checkbox = Class(Bitmap) {
+    ---@param self MauiCheckbox
+    ---@param parent Control
+    ---@param normalUnchecked FileName
+    ---@param normalChecked FileName
+    ---@param overUnchecked FileName
+    ---@param overChecked FileName
+    ---@param disabledUnchecked FileName
+    ---@param disabledChecked FileName
+    ---@param clickCue? string 
+    ---@param rolloverCue? string
+    ---@param debugname? string defaults to `"checkbox"`
     __init = function(self, parent, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked, clickCue, rolloverCue, debugname)
         Bitmap.__init(self, parent, normalUnchecked, debugname or "checkbox")
         self._states =  {}
@@ -23,6 +53,13 @@ Checkbox = Class(Bitmap)
         self._controlState = "normal"
     end,
 
+    ---@param self MauiCheckbox
+    ---@param normalUnchecked FileName
+    ---@param normalChecked FileName
+    ---@param overUnchecked FileName
+    ---@param overChecked FileName
+    ---@param disabledUnchecked FileName
+    ---@param disabledChecked FileName
     SetNewTextures = function(self, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked)
         self._states.normal.checked = normalChecked
         self._states.normal.unchecked = normalUnchecked
@@ -34,6 +71,9 @@ Checkbox = Class(Bitmap)
         self:SetTexture(self._states[self._controlState][self._checkState])
     end,
 
+    ---@param self MauiCheckbox
+    ---@param isChecked boolean
+    ---@param skipEvent? boolean
     SetCheck = function(self, isChecked, skipEvent)
         if isChecked == true then
             self._checkState = "checked"
@@ -46,6 +86,7 @@ Checkbox = Class(Bitmap)
         end
     end,
 
+    ---@param self MauiCheckbox
     ToggleCheck = function(self)
         if self._checkState == "checked" then
             self:SetCheck(false)
@@ -54,10 +95,12 @@ Checkbox = Class(Bitmap)
         end
     end,
 
+    ---@param self MauiCheckbox
     IsChecked = function(self)
-        return (self._checkState == "checked")
+        return self._checkState == "checked"
     end,
 
+    ---@param self MauiCheckbox
     OnDisable = function(self)
         if self._controlState != "disabled" then
             self._controlState = "disabled"
@@ -65,24 +108,28 @@ Checkbox = Class(Bitmap)
         end
     end,
 
+    ---@param self MauiCheckbox
     OnEnable = function(self)
-        if self._controlState != "enabled" then
+        if self._controlState != "normal" then
             self._controlState = "normal"
             self:SetTexture(self._states[self._controlState][self._checkState])
         end
     end,
 
+    ---@param self MauiCheckbox
+    ---@param event KeyEvent
     HandleEvent = function(self, event)
         local eventHandled = false
         if event.Type == 'MouseEnter' then
             if self._controlState != "disabled" then
                 self._controlState = "over"
                 self:SetTexture(self._states[self._controlState][self._checkState])
-                if self.mRolloverCue != "NO_SOUND" then
-                    if self.mRolloverCue then
-                        local sound = Sound({Cue = self.mRolloverCue, Bank = "Interface",})
-                        PlaySound(sound)
-                    end
+                local rolloverCue = self.mRolloverCue
+                if rolloverCue and rolloverCue != "NO_SOUND" then
+                    PlaySound(Sound {
+                        Cue = rolloverCue,
+                        Bank = "Interface",
+                    })
                 end
                 eventHandled = true
             end
@@ -94,11 +141,12 @@ Checkbox = Class(Bitmap)
             end
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             self:OnClick(event.Modifiers)
-            if self.mClickCue != "NO_SOUND" then
-                if self.mClickCue then
-                    local sound = Sound({Cue = self.mClickCue, Bank = "Interface",})
-                    PlaySound(sound)
-                end
+            local clickCue = self.mClickCue
+            if clickCue and clickCue != "NO_SOUND" then
+                PlaySound(Sound {
+                    Cue = clickCue,
+                    Bank = "Interface",
+                })
             end
             eventHandled = true
         end
@@ -106,10 +154,14 @@ Checkbox = Class(Bitmap)
         return eventHandled
     end,
 
-    -- override this method to handle checks
+    --- Override this method to handle checks
+    ---@param self MauiCheckbox
+    ---@param checked boolean
     OnCheck = function(self, checked) end,
 
-    -- override this method to handle clicks differently than default (which is ToggleCheck)
+    --- Override this method to handle clicks differently than default (which is ToggleCheck)
+    ---@param self MauiCheckbox
+    ---@param modifiers EventModifiers
     OnClick = function(self, modifiers)
         self:ToggleCheck()
     end,

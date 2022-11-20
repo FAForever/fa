@@ -5,12 +5,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
-local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
-local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
+local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
+local TSAMLauncher = import("/lua/terranweapons.lua").TSAMLauncher
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 
+---@class UES0401 : AircraftCarrier
 UES0401 = Class(AircraftCarrier) {
     BuildAttachBone = 'UES0401',
 

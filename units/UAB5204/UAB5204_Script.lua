@@ -7,8 +7,9 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AConcreteStructureUnit = import('/lua/aeonunits.lua').AConcreteStructureUnit
+local AConcreteStructureUnit = import("/lua/aeonunits.lua").AConcreteStructureUnit
 
+---@class UAB5204 : AConcreteStructureUnit
 UAB5204 = Class(AConcreteStructureUnit) {
 }
 

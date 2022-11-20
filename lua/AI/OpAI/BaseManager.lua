@@ -62,18 +62,18 @@
 ---@field Retry boolean                         # Flag that allows the AI to retry
 ---@field PlatoonData PlatoonData               # Parameters of the platoon AI function
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local RebuildStructuresTemplate = import('/lua/BuildingTemplates.lua').RebuildStructuresTemplate
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local Buff = import('/lua/sim/Buff.lua')
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local RebuildStructuresTemplate = import("/lua/buildingtemplates.lua").RebuildStructuresTemplate
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local Buff = import("/lua/sim/buff.lua")
 
-local BaseOpAI = import('/lua/ai/opai/baseopai.lua')
-local ReactiveAI = import('/lua/ai/opai/ReactiveAI.lua')
-local NavalOpAI = import('/lua/ai/opai/NavalOpAI.lua')
+local BaseOpAI = import("/lua/ai/opai/baseopai.lua")
+local ReactiveAI = import("/lua/ai/opai/reactiveai.lua")
+local NavalOpAI = import("/lua/ai/opai/navalopai.lua")
 
 local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
@@ -99,29 +99,58 @@ local BuildingCounterDefaultValues = {
         T2Radar = 5,
         T3Radar = 5,
 
-        T1LandFactory = 5,
-        T2LandFactory = 5,
-        T3LandFactory = 5,
+        T2AirStagingPlatform = 3,
+
+        T2EngineerSupport = 5,
+
+        T1LandFactory = 10,
+        T2LandFactory = 10,
+        T3LandFactory = 10,
+        T2SupportLandFactory = 10,
+        T3SupportLandFactory = 10,
 
         T1AirFactory = 10,
         T2AirFactory = 10,
         T3AirFactory = 10,
+        T2SupportAirFactory = 10,
+        T3SupportAirFactory = 10,
 
         T1SeaFactory = 10,
         T2SeaFactory = 10,
         T3SeaFactory = 10,
+        T2SupportSeaFactory = 10,
+        T3SupportSeaFactory = 10,
 
-        T3QuantumGate = 10,
+        T3QuantumGate = 5,
 
         T1HydroCarbon = 10,
         T1EnergyProduction = 10,
         T2EnergyProduction = 10,
         T3EnergyProduction = 10,
 
-        T1MassExtraction = 10,
-        T2MassExtraction = 10,
-        T3MassExtraction = 10,
+        T1Resource = 10,
+        T2Resource = 10,
+        T3Resource = 10,
 
+        MassStorage = 5,
+        EnergyStorage = 5,
+
+        T1GroundDefense = 3,
+        T2GroundDefense = 3,
+        T3GroundDefense = 3,
+
+        T1AADefense = 3,
+        T2AADefense = 3,
+        T3AADefense = 3,
+
+        T1NavalDefense = 3,
+        T2NavalDefense = 3,
+        T3NavalDefense = 3,
+
+        T2ShieldDefense = 3,
+        T3ShieldDefense = 3,
+
+        T2MissileDefense = 3,
         T3StrategicMissileDefense = 1,
     },
 
@@ -970,7 +999,9 @@ BaseManager = ClassSimple {
                     local unit = ScenarioInfo.UnitNames[armyIndex][v.UnitName]
                     if unit and not unit.Dead then
                         -- Cybran engie stations are never in 'Idle' state but in 'AssistingCommander' state
-                        if not EntityCategoryContains(ParseEntityCategory(v.FinalUnit), unit) and (unit:IsIdleState() or unit:IsUnitState('AssistingCommander')) and not unit:IsBeingBuilt() then
+                        -- Factories are not in Idle state when assisting other factories (so gotta une unit.UnitBeingBuilt to make sure they're not building anything),
+                        -- so if the basemanager grabs the factory for assisting before this upgrade thread, then it would never get upgraded
+                        if unit.UnitId ~= v.FinalUnit and (unit:IsIdleState() or unit:IsUnitState('AssistingCommander') or not unit.UnitBeingBuilt) and not unit:IsBeingBuilt() then
                             self:ForkThread(self.BaseManagerUpgrade, unit, v.UnitName)
                         end
                     end
@@ -1020,7 +1051,6 @@ BaseManager = ClassSimple {
             if self.EngineerBuildRateBuff then
                 Buff.ApplyBuff(v, self.EngineerBuildRateBuff)
             end
-            self:DecrementUnitBuildCounter(v.UnitName)
             if uncapturable then
                 v:SetCapturable(false)
                 v:SetReclaimable(false)

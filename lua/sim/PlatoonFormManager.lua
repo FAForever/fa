@@ -7,13 +7,18 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Builder = import("/lua/sim/builder.lua")
 
 ---@class PlatoonFormManager : BuilderManager
 PlatoonFormManager = Class(BuilderManager) {
+    ---@param self PlatoonFormManager
+    ---@param brain AIBrain
+    ---@param lType any
+    ---@param location Vector
+    ---@param radius number
+    ---@return boolean
     Create = function(self, brain, lType, location, radius)
         BuilderManager.Create(self,brain)
 
@@ -31,12 +36,20 @@ PlatoonFormManager = Class(BuilderManager) {
         self.BuilderCheckInterval = 5
     end,
 
+    ---@param self PlatoonFormManager
+    ---@param builderData table
+    ---@param locationType Vector
+    ---@param builderType string
+    ---@return boolean
     AddBuilder = function(self, builderData, locationType, builderType)
         local newBuilder = Builder.CreatePlatoonBuilder(self.Brain, builderData, locationType)
         self:AddInstancedBuilder(newBuilder, builderType)
         return newBuilder
     end,
 
+    ---@param self PlatoonFormManager
+    ---@param templateName string
+    ---@return table
     GetPlatoonTemplate = function(self, templateName)
         local templateData = PlatoonTemplates[templateName]
         if not templateData then
@@ -61,6 +74,10 @@ PlatoonFormManager = Class(BuilderManager) {
         return template
     end,
 
+    ---@param self PlatoonFormManager
+    ---@param buildingCategory string
+    ---@param builderCategory string
+    ---@return table
     GetUnitsBeingBuilt = function(self, buildingCategory, builderCategory)
         local position = self.Location
         local radius = self.Radius
@@ -100,6 +117,9 @@ PlatoonFormManager = Class(BuilderManager) {
         return retUnits
     end,
 
+    ---@param self PlatoonFormManager
+    ---@param builder Unit
+    ---@param bType string
     ManagerLoopBody = function(self,builder,bType)
         BuilderManager.ManagerLoopBody(self,builder,bType)
         -- Try to form all builders that pass
@@ -152,7 +172,7 @@ PlatoonFormManager = Class(BuilderManager) {
 
                 if builder:GetPlatoonAddBehaviors() then
                     for pafk, pafv in builder:GetPlatoonAddBehaviors() do
-                        hndl:ForkThread(import('/lua/ai/AIBehaviors.lua')[pafv])
+                        hndl:ForkThread(import("/lua/ai/aibehaviors.lua")[pafv])
                     end
                 end
 
@@ -173,8 +193,16 @@ PlatoonFormManager = Class(BuilderManager) {
     end,
 }
 
+---@param brain AIBrain
+---@param lType any
+---@param location Vector
+---@param radius number
+---@return PlatoonFormManager
 function CreatePlatoonFormManager(brain, lType, location, radius)
     local pfm = PlatoonFormManager()
     pfm:Create(brain, lType, location, radius)
     return pfm
 end
+
+--- Moved Unsused imports to bottome for mod support
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")

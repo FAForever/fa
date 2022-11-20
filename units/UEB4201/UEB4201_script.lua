@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TAMPhalanxWeapon = import('/lua/terranweapons.lua').TAMPhalanxWeapon
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TAMPhalanxWeapon = import("/lua/terranweapons.lua").TAMPhalanxWeapon
 
+---@class UEB4201 : TStructureUnit
 UEB4201 = Class(TStructureUnit) {
     Weapons = {
         Turret01 = Class(TAMPhalanxWeapon) {

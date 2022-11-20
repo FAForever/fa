@@ -5,10 +5,11 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local SSonarUnit = import('/lua/seraphimunits.lua').SSonarUnit
-local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
-local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit
+local SSonarUnit = import("/lua/seraphimunits.lua").SSonarUnit
+local SSubUnit = import("/lua/seraphimunits.lua").SSubUnit
+local SSeaUnit = import("/lua/seraphimunits.lua").SSeaUnit
 
+---@class XSB3202 : SSubUnit
 XSB3202 = Class(SSubUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)

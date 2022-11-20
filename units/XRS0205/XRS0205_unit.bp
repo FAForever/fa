@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardReturnRadius = 30,
         TargetBones = {
             'point_midhigh',
             'point_midlow',

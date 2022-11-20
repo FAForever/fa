@@ -7,14 +7,15 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
-local WeaponFile = import('/lua/terranweapons.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local TSeaUnit = import("/lua/terranunits.lua").TSeaUnit
+local WeaponFile = import("/lua/terranweapons.lua")
 local TSAMLauncher = WeaponFile.TSAMLauncher
 local TDFGaussCannonWeapon = WeaponFile.TDFGaussCannonWeapon
 local TAMPhalanxWeapon = WeaponFile.TAMPhalanxWeapon
 local TIFCruiseMissileLauncher = WeaponFile.TIFCruiseMissileLauncher
 
+---@class UES0202 : TSeaUnit
 UES0202 = Class(TSeaUnit) {
     DestructionTicks = 200,
 

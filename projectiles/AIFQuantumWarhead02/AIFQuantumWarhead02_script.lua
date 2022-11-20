@@ -4,9 +4,9 @@
 -- Summary  :  EMP Flux Warhead Impact effects projectile
 -- Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 AIFQuantumWarhead02 = Class(NullShell) {
     NormalEffects = {'/effects/emitters/quantum_warhead_01_emit.bp',},

@@ -7,11 +7,12 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
-local Unit = import('/lua/sim/Unit.lua').Unit
-local TDFMachineGunWeapon = import('/lua/terranweapons.lua').TDFMachineGunWeapon
+local TWalkingLandUnit = import("/lua/terranunits.lua").TWalkingLandUnit
+local Unit = import("/lua/sim/unit.lua").Unit
+local TDFMachineGunWeapon = import("/lua/terranweapons.lua").TDFMachineGunWeapon
 
 
+---@class UEL0106 : TWalkingLandUnit
 UEL0106 = Class(TWalkingLandUnit) {
     Weapons = {
         ArmCannonTurret = Class(TDFMachineGunWeapon) {

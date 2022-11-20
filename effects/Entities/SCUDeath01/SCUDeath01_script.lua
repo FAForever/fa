@@ -8,9 +8,9 @@
 --**  Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local Util = import('/lua/utilities.lua')
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 
 SCUDeath01 = Class(NullShell) {
@@ -46,7 +46,9 @@ SCUDeath01 = Class(NullShell) {
     EffectThread = function(self)
         local army = self:GetArmy()
         local position = self:GetPosition()
-        self:ForkThread(self.CreateOuterRingWaveSmokeRing)
+        if position[2] + 2 > GetSurfaceHeight(position[1], position[3]) then
+            self:ForkThread(self.CreateOuterRingWaveSmokeRing)
+        end
 
         -- Create full-screen glow flash
         CreateLightParticle(self, -1, army, 10, 4, 'glow_02', 'ramp_red_02')

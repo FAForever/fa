@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
-local AIFMortarWeapon = import('/lua/aeonweapons.lua').AIFMortarWeapon
+local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
+local AIFMortarWeapon = import("/lua/aeonweapons.lua").AIFMortarWeapon
 
+---@class UAL0103 : AHoverLandUnit
 UAL0103 = Class(AHoverLandUnit) {
     Weapons = {
         MainGun = Class(AIFMortarWeapon) {

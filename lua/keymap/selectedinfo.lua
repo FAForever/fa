@@ -1,15 +1,32 @@
-local Prefs = import('/lua/user/prefs.lua')
+---@class RolloverInfo : EconData, MissileInfo
+---@field armyIndex number
+---@field blueprintId string
+---@field customName? string
+---@field entityId string
+---@field focus? RolloverInfo
+---@field focusUpgrade? RolloverInfo
+---@field fuelRatio number
+---@field health? number
+---@field kills number
+---@field maxHealth? number
+---@field shieldRatio number
+---@field teamColor string
+---@field userUnit? Unit
+---@field workProgress number
+
+
+local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 
 local selectionOverlay = {
-        key = 'selection',
-        Label = "<LOC map_options_0006>Selection",
-        Pref = 'range_RenderSelected',
-        Type = 3,
-        Tooltip = "overlay_selection",
+    key = 'selection',
+    Label = "<LOC map_options_0006>Selection",
+    Pref = 'range_RenderSelected',
+    Type = 3,
+    Tooltip = "overlay_selection",
 }
 
-function GetUnitRolloverInfo(unit)
+function GetUnitRolloverInfo(unit, skipFocus)
     local info = {}
 
     info.blueprintId = unit:GetBlueprint().BlueprintId
@@ -31,8 +48,22 @@ function GetUnitRolloverInfo(unit)
     info.shieldRatio = unit:GetShieldRatio()
     info.workProgress = unit:GetWorkProgress()
 
-    if unit:GetFocus() then
-        info.focus = GetUnitRolloverInfo(unit:GetFocus())
+    local focus = unit:GetFocus()
+    if focus and not skipFocus then
+        local visited = { [unit:GetEntityId()] = true }
+        local focusingInfo = info
+        while focus do
+            local id = focus:GetEntityId()
+            if visited[id] then
+                info.focus.focus = nil
+                break
+            end
+            visited[id] = true
+            local focusInfo = GetUnitRolloverInfo(focus, true)
+            focusingInfo.focus = focusInfo
+            focusingInfo = focusInfo
+            focus = focus:GetFocus()
+        end
     end
 
     local killStat = unit:GetStat('KILLS')
@@ -52,4 +83,3 @@ function GetUnitRolloverInfo(unit)
 
     return info
 end
-

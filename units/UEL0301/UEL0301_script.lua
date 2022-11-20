@@ -5,13 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local Shield = import('/lua/shield.lua').Shield
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
-local TWeapons = import('/lua/terranweapons.lua')
+local Shield = import("/lua/shield.lua").Shield
+local EffectUtil = import("/lua/effectutilities.lua")
+local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
+local TWeapons = import("/lua/terranweapons.lua")
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
-local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
+local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 
+---@class UEL0301 : CommandUnit
 UEL0301 = Class(CommandUnit) {
     IntelEffects = {
         {
@@ -179,7 +180,7 @@ UEL0301 = Class(CommandUnit) {
         if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['RadarJammer'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()

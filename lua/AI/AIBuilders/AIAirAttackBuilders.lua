@@ -23,6 +23,8 @@ local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
 local SAI = '/lua/ScenarioPlatoonAI.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
+---@alias BuilderGroupsAirAttack 'T1AirFactoryBuilders' | 'T1AntiAirBuilders' | 'T2AirFactoryBuilders' | 'T2AntiAirBuilders' | 'T3AirFactoryBuilders' | 'T3AntiAirBuilders' | 'TransportFactoryBuilders' | 'UnitCapAirAttackFormBuilders' | 'FrequentAirAttackFormBuilders' | 'BigAirAttackFormBuilders' | 'MassHunterAirFormBuilders' | 'BaseGuardAirFormBuildersNaval' | 'BaseGuardAirFormBuilders' | 'ACUHunterAirFormBuilders'
+
 function AirAttackCondition(aiBrain, locationType, targetNumber)
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
 
@@ -351,9 +353,9 @@ BuilderGroup {
             { MIBC, 'MapGreaterThan', { 256, 256 }},
             { MIBC, 'ArmyNeedsTransports', {} },
             { MIBC, 'LessThanGameTime', { 600 } },
-            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'TRANSPORTFOCUS' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, 'TRANSPORTFOCUS' } },
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.TRANSPORTFOCUS } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.TRANSPORTFOCUS } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
         },
@@ -366,9 +368,9 @@ BuilderGroup {
         BuilderConditions = {
             { MIBC, 'ArmyNeedsTransports', {} },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
-            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'TRANSPORTFOCUS' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, 'TRANSPORTFOCUS' } }, --DUNCAN - was 25
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.TRANSPORTFOCUS } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.TRANSPORTFOCUS } }, --DUNCAN - was 25
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
         },
@@ -380,11 +382,11 @@ BuilderGroup {
         Priority = 650,
         BuilderConditions = {
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH2, LAND TECH3' } }, --DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, categories.LAND * (categories.TECH2 + categories.TECH3) } }, --DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
-            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, 'TRANSPORTFOCUS' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, 'TRANSPORTFOCUS TECH2' } }, --DUNCAN - was 25
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.TRANSPORTFOCUS } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.TRANSPORTFOCUS * categories.TECH2 } }, --DUNCAN - was 25
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
         },
@@ -396,12 +398,12 @@ BuilderGroup {
         Priority = 750,
         BuilderConditions = {
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, --DUNCAN - added
-            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, 'TRANSPORTFOCUS' } },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, --DUNCAN - added
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'TRANSPORTFOCUS TECH2' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'TRANSPORTFOCUS TECH3' } }, --DUNCAN - was 25
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, categories.LAND * categories.TECH3 } }, --DUNCAN - added
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.TRANSPORTFOCUS } },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, categories.LAND *  categories.TECH3 } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, categories.TRANSPORTFOCUS * categories.TECH2 } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TRANSPORTFOCUS * categories.TECH3 } }, --DUNCAN - was 25
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
         },
@@ -414,9 +416,9 @@ BuilderGroup {
         Priority = 500,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 5 , 'TRANSPORTFOCUS'} },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 5 , categories.TRANSPORTFOCUS} },
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.TRANSPORTFOCUS } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
         },
@@ -428,10 +430,10 @@ BuilderGroup {
         Priority = 600,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, 'LAND TECH2, LAND TECH3' } }, --DUNCAN - added
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 3 , 'TRANSPORTFOCUS TECH2'} },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, categories.LAND * (categories.TECH2 + categories.TECH3) } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 3 , categories.TRANSPORTFOCUS * categories.TECH2} },
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.TRANSPORTFOCUS } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
         },
@@ -443,11 +445,11 @@ BuilderGroup {
         Priority = 700,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'TRANSPORTFOCUS TECH2' } }, --DUNCAN - Added
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 2 , 'TRANSPORTFOCUS TECH3'} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, categories.TRANSPORTFOCUS * categories.TECH2 } }, --DUNCAN - Added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2 , categories.TRANSPORTFOCUS * categories.TECH3} },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, categories.LAND * categories.TECH3 } }, --DUNCAN - added
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.TRANSPORTFOCUS } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
         },
@@ -461,10 +463,10 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
             { MIBC, 'TransportNeedGreater', { 7 } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 7, 'TRANSPORTFOCUS TECH1' } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 7, categories.TRANSPORTFOCUS * categories.TECH1 } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
         },
         BuilderType = 'Air',
     },
@@ -474,12 +476,12 @@ BuilderGroup {
         Priority = 800,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH2, LAND TECH3' } }, --DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, categories.LAND * (categories.TECH2 + categories.TECH3) } }, --DUNCAN - added
             { MIBC, 'TransportNeedGreater', { 7 } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, 'TRANSPORTFOCUS TECH2' } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.TRANSPORTFOCUS * categories.TECH2 } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
         },
         BuilderType = 'Air',
     },
@@ -489,13 +491,13 @@ BuilderGroup {
         Priority = 900,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, --DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, categories.LAND * categories.TECH3 } }, --DUNCAN - added
             { MIBC, 'TransportNeedGreater', { 7 } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'TRANSPORTFOCUS TECH2' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'TRANSPORTFOCUS TECH3' } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, categories.TRANSPORTFOCUS * categories.TECH2 } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TRANSPORTFOCUS * categories.TECH3 } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
         },
         BuilderType = 'Air',
     },
@@ -507,10 +509,10 @@ BuilderGroup {
         BuilderConditions = {
             { MIBC, 'IsIsland', { true } },
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 7 , 'TRANSPORTFOCUS TECH1'} },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 7 , categories.TRANSPORTFOCUS * categories.TECH1} },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
         },
         BuilderType = 'Air',
     },
@@ -521,11 +523,11 @@ BuilderGroup {
         BuilderConditions = {
             { MIBC, 'IsIsland', { true } },
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 3 , 'TRANSPORTFOCUS TECH2'} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH2, LAND TECH3' } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 3 , categories.TRANSPORTFOCUS * categories.TECH2} },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, categories.LAND * (categories.TECH2 + categories.TECH3) } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
         },
         BuilderType = 'Air',
     },
@@ -536,12 +538,12 @@ BuilderGroup {
         BuilderConditions = {
             { MIBC, 'IsIsland', { true } },
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'TRANSPORTFOCUS TECH2' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 2 , 'TRANSPORTFOCUS TECH3'} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, categories.TRANSPORTFOCUS * categories.TECH2 } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 2 , categories.TRANSPORTFOCUS * categories.TECH3} },
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, categories.LAND * categories.TECH3 } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
         },
         BuilderType = 'Air',
     },
@@ -613,8 +615,8 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, 'AIR MOBILE BOMBER' } },
-            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH2, MOBILE AIR TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, categories.AIR * categories.MOBILE * categories.BOMBER } },
+            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.AIR * categories.MOBILE * (categories.TECH2 + categories.TECH3) } },
         },
     },
     Builder {
@@ -624,8 +626,8 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, 'AIR MOBILE GROUNDATTACK' } },
-            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH2, AIR MOBILE TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, categories.AIR * categories.MOBILE * categories.GROUNDATTACK } },
+            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.AIR * categories.MOBILE * ( categories.TECH2 + categories.TECH3) } },
         },
     },
     Builder {
@@ -650,8 +652,8 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE BOMBER' } },
-            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, categories.AIR * categories.MOBILE * categories.BOMBER } },
+            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.AIR * categories.MOBILE * categories.TECH3 } },
         },
     },
     Builder {
@@ -661,8 +663,8 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 4, 'AIR MOBILE GROUNDATTACK' } },
-            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 4, categories.AIR * categories.MOBILE * categories.GROUNDATTACK } },
+            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.AIR * categories.MOBILE * categories.TECH3 } },
         },
     },
     Builder {
@@ -687,7 +689,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, 'AIR MOBILE BOMBER TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, categories.AIR * categories.MOBILE * categories.BOMBER * categories.TECH3 } },
         },
     },
     Builder {
@@ -697,7 +699,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 1, 'AIR MOBILE GROUNDATTACK TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 1, categories.AIR * categories.MOBILE * categories.GROUNDATTACK * categories.TECH3 } },
         },
     },
     Builder {
@@ -706,7 +708,7 @@ BuilderGroup {
         Priority = 100,
         InstanceCount = 5,
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 1, 'ANTINAVY AIR MOBILE' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 1, categories.ANTINAVY * categories.AIR * categories.MOBILE } },
         },
         BuilderData = {
             PrimaryTargetThreatType = 'Naval',
@@ -741,8 +743,8 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 9, 'AIR MOBILE BOMBER' } },
-            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH2, MOBILE AIR TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 9, categories.AIR * categories.MOBILE * categories.BOMBER } },
+            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.AIR * categories.MOBILE * (categories.TECH2 + categories.TECH3) } },
         },
     },
     Builder {
@@ -752,8 +754,8 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, 'AIR MOBILE GROUNDATTACK' } },
-            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH2, AIR MOBILE TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, categories.AIR * categories.MOBILE * categories.GROUNDATTACK } },
+            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.AIR * categories.MOBILE * (categories.TECH2 + categories.TECH3) } },
         },
     },
     Builder {
@@ -778,8 +780,8 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 8, 'AIR MOBILE BOMBER' } },
-            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 8, categories.AIR * categories.MOBILE * categories.BOMBER } },
+            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.AIR * categories.MOBILE * categories.TECH3 } },
         },
     },
     Builder {
@@ -789,8 +791,8 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 10, 'AIR MOBILE GROUNDATTACK' } },
-            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 10, categories.AIR * categories.MOBILE * categories.GROUNDATTACK } },
+            { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.AIR * categories.MOBILE * categories.TECH3 } },
         },
     },
     Builder {
@@ -815,7 +817,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE BOMBER TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, categories.AIR * categories.MOBILE * categories.BOMBER * categories.TECH3 } },
         },
     },
     Builder {
@@ -825,7 +827,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, 'AIR MOBILE GROUNDATTACK TECH3' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, categories.AIR * categories.MOBILE * categories.GROUNDATTACK * categories.TECH3 } },
         },
     },
     Builder {
@@ -834,7 +836,7 @@ BuilderGroup {
         Priority = 100,
         InstanceCount = 5,
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, 'ANTINAVY AIR MOBILE' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, categories.ANTINAVY * categories.AIR * categories.MOBILE } },
         },
         BuilderData = {
             PrimaryTargetThreatType = 'Naval',
@@ -870,7 +872,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE BOMBER' } },
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, categories.AIR * categories.MOBILE * categories.BOMBER } },
         },
     },
     Builder {

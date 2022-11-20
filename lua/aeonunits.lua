@@ -10,7 +10,7 @@
 ----------------------------------------------------------------------------
 -- AEON DEFAULT UNITS
 ----------------------------------------------------------------------------
-local DefaultUnitsFile = import('defaultunits.lua')
+local DefaultUnitsFile = import("/lua/defaultunits.lua")
 local FactoryUnit = DefaultUnitsFile.FactoryUnit
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -36,8 +36,8 @@ local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
 local WalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 local WallStructureUnit = DefaultUnitsFile.WallStructureUnit
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
 
 
@@ -46,11 +46,15 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 ---------------------------------------------------------------
 ---@class AFactoryUnit : FactoryUnit
 AFactoryUnit = Class(FactoryUnit) {
+
+    ---@param self AFactoryUnit
+    ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
 
+    ---@param self AFactoryUnit
     OnPaused = function(self)
         -- When factory is paused take some action
         if self:IsUnitState('Building') and self.UnitBeingBuilt then
@@ -60,6 +64,7 @@ AFactoryUnit = Class(FactoryUnit) {
         StructureUnit.OnPaused(self)
     end,
 
+    ---@param self AFactoryUnit
     OnUnpaused = function(self)
         FactoryUnit.OnUnpaused(self)
         if self:IsUnitState('Building') and self.UnitBeingBuilt then
@@ -74,14 +79,19 @@ AFactoryUnit = Class(FactoryUnit) {
 ---------------------------------------------------------------
 ---@class AAirFactoryUnit : AirFactoryUnit
 AAirFactoryUnit = Class(AirFactoryUnit) {
+
+    ---@param self AAirFactoryUnit
+    ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
         AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
     end,
 
+    ---@param self AAirFactoryUnit
     OnPaused = function(self)
         AFactoryUnit.OnPaused(self)
     end,
 
+    ---@param self AAirFactoryUnit
     OnUnpaused = function(self)
         AFactoryUnit.OnUnpaused(self)
     end,
@@ -112,6 +122,10 @@ AConcreteStructureUnit = Class(ConcreteStructureUnit) {
 ---------------------------------------------------------------
 ---@class AConstructionUnit : ConstructionUnit
 AConstructionUnit = Class(ConstructionUnit) {
+
+    ---@param self AConstructionUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, self.BuildEffectsBag)
     end,
@@ -122,11 +136,16 @@ AConstructionUnit = Class(ConstructionUnit) {
 ---------------------------------------------------------------
 ---@class AEnergyCreationUnit : EnergyCreationUnit
 AEnergyCreationUnit = Class(EnergyCreationUnit) {
+
+    ---@param self AEnergyCreationUnit
     OnCreate = function(self)
         EnergyCreationUnit.OnCreate(self)
         self.NumUsedAdjacentUnits = 0
     end,
 
+    ---@param self AEnergyCreationUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self,builder,layer)
         EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         if self.AmbientEffects then
@@ -146,6 +165,7 @@ AEnergyStorageUnit = Class(EnergyStorageUnit) {}
 ---------------------------------------------------------------
 --  HOVERING LAND UNITS
 ---------------------------------------------------------------
+---@class AHoverLandUnit : HoverLandUnit
 AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
     FxHoverScale = 1,
     HoverEffects = nil,
@@ -157,14 +177,20 @@ AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 ---------------------------------------------------------------
 ---@class ALandFactoryUnit : LandFactoryUnit
 ALandFactoryUnit = Class(LandFactoryUnit) {
+
+
+    ---@param self ALandFactoryUnit
+    ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
         AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
     end,
 
+    ---@param self ALandFactoryUnit
     OnPaused = function(self)
         AFactoryUnit.OnPaused(self)
     end,
 
+    ---@param self ALandFactoryUnit
     OnUnpaused = function(self)
         AFactoryUnit.OnUnpaused(self)
     end,
@@ -173,6 +199,7 @@ ALandFactoryUnit = Class(LandFactoryUnit) {
 ---------------------------------------------------------------
 --  LAND UNITS
 ---------------------------------------------------------------
+---@class ALandUnit : LandUnit
 ALandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 ---------------------------------------------------------------
@@ -210,15 +237,20 @@ ASonarUnit = Class(SonarUnit) {}
 ---------------------------------------------------------------
 ---@class ASeaFactoryUnit : SeaFactoryUnit
 ASeaFactoryUnit = Class(SeaFactoryUnit) {
+
+    ---@param self ASeaFactoryUnit
+    ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
 
+    ---@param self ASeaFactoryUnit
     OnPaused = function(self)
         AFactoryUnit.OnPaused(self)
     end,
 
+    ---@param self ASeaFactoryUnit
     OnUnpaused = function(self)
         AFactoryUnit.OnUnpaused(self)
     end,
@@ -227,6 +259,7 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
 ---------------------------------------------------------------
 --  SEA UNITS
 ---------------------------------------------------------------
+---@class ASeaUnit : SeaUnit
 ASeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
 
 ---------------------------------------------------------------
@@ -248,6 +281,7 @@ AShieldLandUnit = Class(ShieldLandUnit) {}
 AShieldStructureUnit = Class(ShieldStructureUnit) {
     RotateSpeed = 60,
 
+    ---@param self AShieldStructureUnit
     OnShieldEnabled = function(self)
         ShieldStructureUnit.OnShieldEnabled(self)
         if not self.Rotator then
@@ -258,6 +292,7 @@ AShieldStructureUnit = Class(ShieldStructureUnit) {
         self.Rotator:SetTargetSpeed(self.RotateSpeed)
     end,
 
+    ---@param self AShieldStructureUnit
     OnShieldDisabled = function(self)
         ShieldStructureUnit.OnShieldDisabled(self)
         if self.Rotator then
@@ -275,6 +310,7 @@ AStructureUnit = Class(StructureUnit) {}
 ---------------------------------------------------------------
 --  SUBMARINE UNITS
 ---------------------------------------------------------------
+---@class ASubUnit : SubUnit
 ASubUnit = Class(DefaultUnitsFile.SubUnit) {
     IdleSubBones = {},
     IdleSubEffects = {}
@@ -317,6 +353,9 @@ AQuantumGateUnit = Class(QuantumGateUnit) {}
 ARadarJammerUnit = Class(RadarJammerUnit) {
     RotateSpeed = 60,
 
+    ---@param self ARadarJammerUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         RadarJammerUnit.OnStopBeingBuilt(self, builder, layer)
         local bp = self:GetBlueprint()
@@ -333,6 +372,7 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
         end
     end,
 
+    ---@param self ARadarJammerUnit
     OnIntelEnabled = function(self)
         RadarJammerUnit.OnIntelEnabled(self)
         if self.OpenAnim then
@@ -346,6 +386,7 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
         self.Rotator:SetTargetSpeed(self.RotateSpeed)
     end,
 
+    ---@param self ARadarJammerUnit
     OnIntelDisabled = function(self)
         RadarJammerUnit.OnIntelDisabled(self)
         if self.OpenAnim then

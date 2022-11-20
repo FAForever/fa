@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SMassCollectionUnit = import('/lua/seraphimunits.lua').SMassCollectionUnit
+local SMassCollectionUnit = import("/lua/seraphimunits.lua").SMassCollectionUnit
 
+---@class XSB1103 : SMassCollectionUnit
 XSB1103 = Class(SMassCollectionUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)

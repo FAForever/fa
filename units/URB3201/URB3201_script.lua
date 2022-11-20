@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CRadarUnit = import('/lua/cybranunits.lua').CRadarUnit
+local CRadarUnit = import("/lua/cybranunits.lua").CRadarUnit
 
+---@class URB3201 : CRadarUnit
 URB3201 = Class(CRadarUnit) {    
     OnIntelDisabled = function(self)
         CRadarUnit.OnIntelDisabled(self)

@@ -10,6 +10,8 @@
 --
 -- Basic create formation scripts
 
+---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
+
 
 SurfaceFormations = {
     'AttackFormation',
@@ -30,6 +32,9 @@ local FormationPos = {} -- list to be returned
 local FormationCache = {}
 local MaxCacheSize = 30
 
+---@param formationUnits Unit[]
+---@param formationType UnitFormations
+---@return boolean
 function GetCachedResults(formationUnits, formationType)
     local cache = FormationCache[formationType]
     if not cache then
@@ -55,6 +60,9 @@ function GetCachedResults(formationUnits, formationType)
     return false
 end
 
+---@param results TLaserBotProjectile
+---@param formationUnits Unit[]
+---@param formationType UnitFormations
 function CacheResults(results, formationUnits, formationType)
     if not FormationCache[formationType] then
         FormationCache[formationType] = {}
@@ -674,6 +682,9 @@ local TenWideSubAttackFormation = {
 }
 
 -- ============ Formation Pickers ============
+---@param typeName string
+---@param distance Vector
+---@return number
 function PickBestTravelFormationIndex(typeName, distance)
     if typeName == 'AirFormations' then
         return 0;
@@ -682,14 +693,18 @@ function PickBestTravelFormationIndex(typeName, distance)
     end
 end
 
+---@param typeName string
+---@param distance Vector
+---@return number
 function PickBestFinalFormationIndex(typeName, distance)
     return -1;
 end
 
-
 -- ================ THE GUTS ====================
 -- ============ Formation Functions =============
 -- ==============================================
+---@param formationUnits Unit[]
+---@return table
 function AttackFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'AttackFormation')
     if cachedResults then
@@ -746,6 +761,8 @@ function AttackFormation(formationUnits)
     return FormationPos
 end
 
+---@param formationUnits Unit[]
+---@return table
 function GrowthFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'GrowthFormation')
     if cachedResults then
@@ -820,6 +837,8 @@ function GrowthFormation(formationUnits)
     return FormationPos
 end
 
+---@param formationUnits Unit[]
+---@return table
 function GuardFormation(formationUnits)
     -- Not worth caching GuardFormation because it's almost never called repeatedly with the same units.
     local FormationPos = {}
@@ -906,10 +925,12 @@ function GuardFormation(formationUnits)
     return FormationPos
 end
 
-
-
-
 -- =========== LAND BLOCK BUILDING =================
+---@param unitsList table
+---@param formationBlock any
+---@param categoryTable EntityCategory[]
+---@param spacing? number defaults to 1
+---@return table
 function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
     spacing = (spacing or 1) * unitsList.Scale
     local numRows = table.getn(formationBlock)
@@ -1033,6 +1054,10 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
     return FormationPos
 end
 
+---@param unitsList table
+---@param categoryTable EntityCategory[]
+---@param currRowLen number
+---@return number
 function GetLandRowModifer(unitsList, categoryTable, currRowLen)
     if unitsList.UnitTotal >= currRowLen or math.mod(unitsList.UnitTotal, 2) == math.mod(currRowLen, 2) then
         return 0
@@ -1051,6 +1076,13 @@ function GetLandRowModifer(unitsList, categoryTable, currRowLen)
     end
 end
 
+---@param occupiedSpaces boolean[][]
+---@param size number
+---@param rowNum number
+---@param whichCol number
+---@param currRowLen number
+---@param remainingUnits number
+---@return boolean
 function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, remainingUnits)
     local evenRowLen = math.mod(currRowLen, 2) == 0
     local evenSize = math.mod(size, 2) == 0
@@ -1083,6 +1115,11 @@ function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen,
     return false
 end
 
+---@param occupiedSpaces boolean[][]
+---@param size number
+---@param rowNum number
+---@param whichCol number
+---@param currRowLen number
 function OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
     local evenRowLen = math.mod(currRowLen, 2) == 0
     local evenSize = math.mod(size, 2) == 0
@@ -1104,6 +1141,9 @@ function OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
     end
 end
 
+---@param rowLen number
+---@param col number
+---@return number
 function GetColSpot(rowLen, col)
     local len = rowLen
     if math.mod(rowLen, 2) == 1 then
@@ -1122,11 +1162,11 @@ function GetColSpot(rowLen, col)
     end
 end
 
-
-
-
-
 -- ============ AIR BLOCK BUILDING =============
+---@param unitsList table
+---@param airBlock any
+---@param spacing? number defaults to 1
+---@return table
 function BlockBuilderAir(unitsList, airBlock, spacing)
     spacing = (spacing or 1) * unitsList.Scale
     local numRows = table.getn(airBlock)
@@ -1232,6 +1272,9 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
     return FormationPos
 end
 
+---@param unitsList table
+---@param spacing number? number defaults to 1
+---@return table
 function BlockBuilderAirT3Bombers(unitsList, spacing)
     --This is modified copy of BlockBuilderAir(). This function is used only for t3 bombers.
     --Some parts can be improved, but I just want stable and working version, so I did minimum adjustments and that's it.
@@ -1336,6 +1379,9 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
     return FormationPos
 end
 
+---@param unitsList table
+---@param airBlock any
+---@return table
 function GetLargeAirPositions(unitsList, airBlock)
     local sizeCounts = {}
     for fs, count in unitsList.FootprintCounts do
@@ -1407,6 +1453,11 @@ function GetLargeAirPositions(unitsList, airBlock)
     return results
 end
 
+---@param chevronPos Vector
+---@param currCol number
+---@param formationLen number
+---@return number xPos
+---@return number yPos
 function GetChevronPosition(chevronPos, currCol, formationLen)
     local offset = math.floor(chevronPos / 2)
     local xPos = offset * 0.5
@@ -1424,11 +1475,9 @@ function GetChevronPosition(chevronPos, currCol, formationLen)
     return xPos, yPos
 end
 
-
-
-
-
 -- ========= UNIT SORTING ==========
+---@param unitsList table
+---@return any
 function CalculateSizes(unitsList)
     local largestFootprint = 1
     local smallestFootprints = {}
@@ -1506,6 +1555,8 @@ function CalculateSizes(unitsList)
     return unitsList
 end
 
+---@param formationUnits Unit[]
+---@return table
 function CategorizeUnits(formationUnits)
     local unitsList = {
         Land = {

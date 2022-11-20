@@ -1,23 +1,25 @@
---- Class CMauiHistogram
--- @classmod User.CMauiHistogram
+-- This functionallity is unimplemented and will not work
+---@meta
+
+---@deprecated
+---@class moho.histogram_methods : moho.control_methods
+local CMauiHistogram = {}
 
 ---
---  SetXIncrement(int)
-function CMauiHistogram:SetXIncrement(int)
+---@param data {color: string, data: number[]}[]
+function CMauiHistogram:SetData(data)
 end
 
----
---  SetYIncrement(int)
-function CMauiHistogram:SetYIncrement(int)
+--- Sets the increment of the X-axis. If the axis needs to resize (e.g. a value comes in that's higher than
+--- the current maximum) then it will do so in increments of this value.
+---@param inc number
+function CMauiHistogram:SetXIncrement(inc)
 end
 
----
---  derived from CMauiControl
-function CMauiHistogram:base()
+--- Sets the increment of the Y-axis. If the axis needs to resize (e.g. a value comes in that's higher than
+--- the current maximum) then it will do so in increments of this value.
+---@param inc number
+function CMauiHistogram:SetYIncrement(inc)
 end
 
----
---
-function CMauiHistogram:moho.histogram_methods()
-end
-
+return CMauiHistogram

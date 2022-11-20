@@ -7,9 +7,10 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
-local AAATemporalFizzWeapon = import('/lua/aeonweapons.lua').AAATemporalFizzWeapon
+local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
+local AAATemporalFizzWeapon = import("/lua/aeonweapons.lua").AAATemporalFizzWeapon
 
+---@class UAB2204 : AStructureUnit
 UAB2204 = Class(AStructureUnit) {
     Weapons = {
         AAFizz = Class(AAATemporalFizzWeapon) {

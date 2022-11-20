@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AShieldHoverLandUnit = import('/lua/aeonunits.lua').AShieldHoverLandUnit
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local AShieldHoverLandUnit = import("/lua/aeonunits.lua").AShieldHoverLandUnit
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
+---@class UAL0307 : AShieldHoverLandUnit
 UAL0307 = Class(AShieldHoverLandUnit) {
     
     Weapons = {        
@@ -89,8 +90,11 @@ UAL0307 = Class(AShieldHoverLandUnit) {
     OnLayerChange = function(self, new, old)
         AShieldHoverLandUnit.OnLayerChange(self, new, old)
         
-        if self.PointerEnabled == false then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+        if not IsDestroyed(self.TargetPointer) then
+            if self.PointerEnabled == false then
+                -- since its reset on layer change we need to do this, unfortunate
+                self.TargetPointer:SetFireTargetLayerCaps('None') 
+            end
         end
     end,
 }

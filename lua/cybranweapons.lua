@@ -8,17 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
-local BareBonesWeapon = WeaponFile.BareBonesWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local OverchargeWeapon = WeaponFile.OverchargeWeapon
-
-local CollisionBeamFile = import('defaultcollisionbeams.lua')
-local Explosion = import('defaultexplosions.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local Util = import('utilities.lua')
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class CDFBrackmanCrabHackPegLauncherWeapon : DefaultProjectileWeapon
 CDFBrackmanCrabHackPegLauncherWeapon = Class(DefaultProjectileWeapon) {
@@ -58,6 +54,7 @@ CDFHeavyMicrowaveLaserGeneratorCom = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 
+    ---@param self CDFHeavyMicrowaveLaserGeneratorCom
     PlayFxWeaponUnpackSequence = function(self)
         if not self:EconomySupportsBeam() then return end
         local bp = self:GetBlueprint()
@@ -79,6 +76,8 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 
+    ---@param self CDFHeavyMicrowaveLaserGenerator
+    ---@param muzzle string
     PlayFxBeamStart = function(self, muzzle)
 
         -- create rotator if it doesn't exist
@@ -94,6 +93,8 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
         DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
     end,
 
+    ---@param self CDFHeavyMicrowaveLaserGenerator
+    ---@param beam string
     PlayFxBeamEnd = function(self, beam)
 
         -- if it exists, then stop rotating
@@ -105,6 +106,8 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
         DefaultBeamWeapon.PlayFxBeamEnd(self, beam)
     end,
 
+
+    ---@param self CDFHeavyMicrowaveLaserGenerator
     PlayFxWeaponUnpackSequence = function(self)
 
         if not self.ContBeamOn then
@@ -140,6 +143,10 @@ CDFHeavyElectronBolterWeapon = Class(DefaultProjectileWeapon) {
 ---@class CIFSmartCharge : DefaultProjectileWeapon
 CIFSmartCharge = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {},
+
+    ---@param self CDFHeavyMicrowaveLaserGenerator
+    ---@param muzzle string
+    ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
         if not proj or proj:BeenDestroyed() then
@@ -162,6 +169,9 @@ CANNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
         '/effects/emitters/torpedo_underwater_launch_01_emit.bp',
     },
 
+    ---@param self CANNaniteTorpedoWeapon
+    ---@param bone Bone
+    ---@return Projectile|nil
     CreateProjectileForWeapon = function(self, bone)
         local projectile = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -338,6 +348,9 @@ CIFBombNeutronWeapon = Class(DefaultProjectileWeapon) {
 CIFNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
 
+    ---@param self CIFNaniteTorpedoWeapon
+    ---@param bone Bone
+    ---@return Projectile|nil
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -383,11 +396,12 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
     SphereEffectBp = '/effects/emitters/zapper_electricity_01_emit.bp',
     SphereEffectBone = 'Turret_Muzzle',
 
+    ---@param self CAMZapperWeapon
     OnCreate = function(self)
         DefaultBeamWeapon.OnCreate(self)
 
         local bp = self:GetBlueprint()
-        self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
+        self.SphereEffectEntity = import("/lua/sim/entity.lua").Entity()
         self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
         self.SphereEffectEntity:SetDrawScale(0.6)
@@ -412,6 +426,7 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
         end,
     },
 
+    ---@param self CAMZapperWeapon
     OnLostTarget = function(self)
         DefaultBeamWeapon.OnLostTarget(self)
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
@@ -435,11 +450,12 @@ CAMZapperWeapon03 = Class(DefaultBeamWeapon) {
     SphereEffectBp = '/effects/emitters/zapper_electricity_02_emit.bp',
     SphereEffectBone = 'Turret_Muzzle',
 
+    ---@param self CAMZapperWeapon03
     OnCreate = function(self)
         DefaultBeamWeapon.OnCreate(self)
 
         local bp = self:GetBlueprint()
-        self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
+        self.SphereEffectEntity = import("/lua/sim/entity.lua").Entity()
         self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
         self.SphereEffectEntity:SetDrawScale(0.28)
@@ -464,6 +480,7 @@ CAMZapperWeapon03 = Class(DefaultBeamWeapon) {
         end,
     },
 
+    ---@param self CAMZapperWeapon03
     OnLostTarget = function(self)
         DefaultBeamWeapon.OnLostTarget(self)
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
@@ -488,6 +505,7 @@ CKrilTorpedoLauncherWeapon = Class(DefaultProjectileWeapon) {
 CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
+    ---@param self CMobileKamikazeBombWeapon
     OnFire = function(self)
         local army = self.unit.Army
         
@@ -508,3 +526,8 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
         KamikazeWeapon.OnFire(self)
     end,
 }
+
+-- kept for mod backwards compatibility
+local BareBonesWeapon = WeaponFile.BareBonesWeapon
+local Explosion = import("/lua/defaultexplosions.lua")
+local Util = import("/lua/utilities.lua")

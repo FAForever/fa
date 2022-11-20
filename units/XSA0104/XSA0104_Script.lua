@@ -8,14 +8,15 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local explosion = import('/lua/defaultexplosions.lua')
-local util = import('/lua/utilities.lua')
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
+local explosion = import("/lua/defaultexplosions.lua")
+local util = import("/lua/utilities.lua")
+local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SAAShleoCannonWeapon = SeraphimWeapons.SAAShleoCannonWeapon
 local SDFHeavyPhasicAutoGunWeapon = SeraphimWeapons.SDFHeavyPhasicAutoGunWeapon
 
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
 
+---@class XSA0104 : AirTransport
 XSA0104 = Class(AirTransport) {
 
     ContrailEffects = {'/effects/emitters/contrail_ser_polytrail_01_emit.bp',},

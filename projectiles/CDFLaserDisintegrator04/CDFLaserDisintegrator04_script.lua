@@ -5,9 +5,9 @@
 --**
 --**  Summary  :  Cybran Disintegrator projectile script, XRA0305
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CDisintegratorLaserProjectile = import('/lua/cybranprojectiles.lua').CDisintegratorLaserProjectile
+local CDisintegratorLaserProjectile = import("/lua/cybranprojectiles.lua").CDisintegratorLaserProjectile
 CDFLaserDisintegrator04 = Class(CDisintegratorLaserProjectile) {
 }
 TypeClass = CDFLaserDisintegrator04

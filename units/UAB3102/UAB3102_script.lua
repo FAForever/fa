@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ASonarUnit = import('/lua/aeonunits.lua').ASonarUnit
+local ASonarUnit = import("/lua/aeonunits.lua").ASonarUnit
 
+---@class UAB3102 : ASonarUnit
 UAB3102 = Class(ASonarUnit) {
     TimedSonarTTIdleEffects = {
         {

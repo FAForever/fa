@@ -7,8 +7,9 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SEnergyCreationUnit = import('/lua/seraphimunits.lua').SEnergyCreationUnit
+local SEnergyCreationUnit = import("/lua/seraphimunits.lua").SEnergyCreationUnit
 
+---@class XSB1301 : SEnergyCreationUnit
 XSB1301 = Class(SEnergyCreationUnit) {
     AmbientEffects = 'ST3PowerAmbient',
     

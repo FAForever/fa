@@ -7,11 +7,12 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
-local SANUallCavitationTorpedo = import('/lua/seraphimweapons.lua').SANUallCavitationTorpedo
-local SDFAjelluAntiTorpedoDefense = import('/lua/seraphimweapons.lua').SDFAjelluAntiTorpedoDefense
-local SAALosaareAutoCannonWeapon = import('/lua/seraphimweapons.lua').SAALosaareAutoCannonWeaponSeaUnit
+local SSubUnit = import("/lua/seraphimunits.lua").SSubUnit
+local SANUallCavitationTorpedo = import("/lua/seraphimweapons.lua").SANUallCavitationTorpedo
+local SDFAjelluAntiTorpedoDefense = import("/lua/seraphimweapons.lua").SDFAjelluAntiTorpedoDefense
+local SAALosaareAutoCannonWeapon = import("/lua/seraphimweapons.lua").SAALosaareAutoCannonWeaponSeaUnit
 
+---@class XSS0304 : SSubUnit
 XSS0304 = Class(SSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {

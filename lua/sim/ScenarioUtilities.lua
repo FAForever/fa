@@ -6,9 +6,14 @@
 ----[             Created from examples provided by Jeff Petkau.                  ]--
 ----[                                                                             ]--
 ----[  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.             ]--
-local Entity = import('/lua/sim/Entity.lua').Entity
 
-function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
+
+local TableGetn = table.getn
+
+--distributeTime
+---@param enabled boolean
+---@param unitThreshold any
+function EnableLoadBalance(enabled, unitThreshold)
     if not ScenarioInfo.LoadBalance then
         ScenarioInfo.LoadBalance =
         {
@@ -54,25 +59,31 @@ function GetMarkers()
     return Scenario.MasterChain._MASTERCHAIN_.Markers
 end
 
+---@param name MarkerChain
+---@return MarkerChain[]
 function GetMarker(name)
     return Scenario.MasterChain._MASTERCHAIN_.Markers[name]
 end
 
+---@param chainName MarkerChain
+---@return Vector[]
 function ChainToPositions(chainName)
     local chain = Scenario.Chains[chainName]
     if not chain then
         error('ERROR: Invalid Chain Named- ' .. chainName, 2)
     end
     local positionTable = {}
-    for num, marker in chain.Markers do
-        table.insert(positionTable, Scenario.MasterChain._MASTERCHAIN_.Markers[marker]['position'])
+    local markers = Scenario.MasterChain._MASTERCHAIN_.Markers
+    for i, marker in chain.Markers do
+        positionTable[i] = markers[marker]['position']
     end
     return positionTable
 end
 
-----[  FindParentChain                                                ]--
-----[                                                                      ]--
-----[  Gets the parent chain that the supplied marker belongs to           ]--
+---FindParentChain
+---Gets the parent chain that the supplied marker belongs to
+---@param markerName Marker
+---@return MarkerChain|nil
 function FindParentChain(markerName)
     for cName,chain in Scenario.Chains do
         for mNum,marker in chain.Markers do
@@ -84,6 +95,8 @@ function FindParentChain(markerName)
     return nil
 end
 
+---@param name MarkerChain
+---@return MarkerChain
 function GetMarkerChain(name)
     local chain = Scenario.Chains[name]
     if not chain then
@@ -92,37 +105,59 @@ function GetMarkerChain(name)
     return chain
 end
 
-----[  MarkerToPosition                                                           ]--
-----[                                                                             ]--
-----[  Converts a marker as specified in *_save.lua file to a position.           ]--
-function MarkerToPosition(strMarker)
-    local marker = GetMarker(strMarker)
-        if not marker then
-            error('ERROR: Invalid marker name- '..strMarker)
-        end
+--- Converts a marker as specified in `*_save.lua` file to a position
+---@param markerName Marker
+---@return Vector
+function MarkerToPosition(markerName)
+    local marker = GetMarker(markerName)
+    if not marker then
+        error('ERROR: Invalid marker name- ' .. markerName)
+    end
     return marker.position
 end
 
-----[  AreaToRect                                                                 ]--
-----[                                                                             ]--
-----[  Converts an area as specified in *_save.lua file to a rectangle.           ]--
-function AreaToRect(strArea)
-    local area = Scenario.Areas[strArea]
+--- Converts an area as specified in `*_save.lua` file to a rectangle
+---@param areaName Area
+---@return Rectangle
+function AreaToRect(areaName)
+    local area = Scenario.Areas[areaName]
+
     if not area then
         error('ERROR: Invalid area name')
     end
     local rectangle = area.rectangle
-    return Rect(rectangle[1],rectangle[2],rectangle[3],rectangle[4])
+    return Rect(rectangle[1], rectangle[2], rectangle[3], rectangle[4])
 end
 
+--- Converts an array of areas to a new array of rectangles, also transfering already well-formed
+--- rectangles
+---@param areas (Area | Rectangle)[]
+---@return Rectangle[]
+function MultiAreaToMultiRect(areas)
+    local rects = {}
+    for i, area in areas do
+        if type(area) == 'string' then
+            rects[i] = AreaToRect(area)
+        else
+            rects[i] = area
+        end
+    end
+    return rects
+end
+
+---@param vectorPos Vector
+---@param rect Rectangle
+---@return boolean
 function InRect(vectorPos, rect)
     return vectorPos[1] > rect.x0 and vectorPos[1] < rect.x1 and
            vectorPos[3] > rect.y0 and vectorPos[3] < rect.y1
 end
 
-----[  AssembleUnitGroup                                                          ]--
-----[                                                                             ]--
-----[  Returns all units (leaf nodes) under the specified group.                  ]--
+---AssembleUnitGroup
+---Returns all units (leaf nodes) under the specified group.
+---@param tblNode table
+---@param tblResult table
+---@return table
 function AssembleUnitGroup(tblNode,tblResult)
     tblResult = tblResult or {}
 
@@ -141,9 +176,11 @@ function AssembleUnitGroup(tblNode,tblResult)
     return tblResult
 end
 
-----[  AssemblePlatoons                                                           ]--
-----[                                                                             ]--
-----[  Returns all platoon template names specified under group.                  ]--
+---AssemblePlatoons
+---Returns all platoon template names specified under group.
+---@param tblNode table
+---@param tblResult table
+---@return table
 function AssemblePlatoons(tblNode,tblResult)
     tblResult = tblResult or {}
 
@@ -164,10 +201,12 @@ function AssemblePlatoons(tblNode,tblResult)
     return tblResult
 end
 
-----[  FindUnit                                                                   ]--
-----[                                                                             ]--
-----[  Finds the unit with the specified name.                                    ]--
-function FindUnit(strUnit,tblNode)
+---FindUnit
+---Finds the unit with the specified name.
+---@param strUnit string
+---@param tblNode table
+---@return table|nil
+function FindUnit(strUnit, tblNode)
     if nil == tblNode then
         return nil
     end
@@ -176,7 +215,7 @@ function FindUnit(strUnit,tblNode)
 
     for strName, tblData in pairs(tblNode.Units) do
         if 'GROUP' == tblData.type then
-            tblResult = FindUnit(strUnit,tblData)
+            tblResult = FindUnit(strUnit, tblData)
         elseif strName == strUnit then
             tblResult = tblData
         end
@@ -189,11 +228,15 @@ function FindUnit(strUnit,tblNode)
     return tblResult
 end
 
-----[  CreateArmyUnit                                                             ]--
-----[                                                                             ]--
-----[  Creates a named unit in an army.                                           ]--
-function CreateArmyUnit(strArmy,strUnit)
-    local tblUnit = FindUnit(strUnit,Scenario.Armies[strArmy].Units)
+---CreateArmyUnit
+---Creates a named unit in an army.
+---@param strArmy string
+---@param strUnit string
+---@return Unit|nil
+---@return Platoon|nil
+---@return table|nil
+function CreateArmyUnit(strArmy, strUnit)
+    local tblUnit = FindUnit(strUnit, Scenario.Armies[strArmy].Units)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
@@ -236,9 +279,11 @@ function CreateArmyUnit(strArmy,strUnit)
     return nil
 end
 
-----[  FindUnitGroup                                                              ]--
-----[                                                                             ]--
-----[  Finds the unit group with the specified name.                              ]--
+---FindUnitGroup
+---Finds the unit group with the specified name.
+---@param strGroup string
+---@param tblNode table
+---@return table|nil
 function FindUnitGroup(strGroup,tblNode)
     if nil == tblNode then
         return nil
@@ -262,16 +307,23 @@ function FindUnitGroup(strGroup,tblNode)
     return tblResult
 end
 
-----[  AssembleArmyGroup                                                          ]--
-----[                                                                             ]--
-----[  Returns a table of units in the group owned by the specified army.         ]--
+---AssembleArmyGroup
+---Returns a table of units in the group owned by the specified army.
+---@param strArmy string
+---@param strGroup string
+---@return any
 function AssembleArmyGroup(strArmy,strGroup)
     return AssembleUnitGroup(FindUnitGroup(strGroup,Scenario.Armies[strArmy].Units))
 end
 
-----[  CreateArmySubGroup                                                                      ]--
-----[                                                                                          ]--
-----[  Creates Army groups from a number of groups specified in order from the Units Hierarchy ]--
+---CreateArmySubGroup                                                                                        ]--
+---Creates Army groups from a number of groups specified in order from the Units Hierarchy
+---@param strArmy string
+---@param strGroup string
+---@param ... any
+---@return Unit[]
+---@return table
+---@return Platoon[]
 function CreateArmySubGroup(strArmy,strGroup,...)
     local tblNode = Scenario.Armies[strArmy].Units
     local tblResult = {}
@@ -301,9 +353,15 @@ function CreateArmySubGroup(strArmy,strGroup,...)
     return tblResult, treeResult, platoonList
 end
 
-----[  CreateSubGroup                                                                      ]--
-----[                                                                                      ]--
-----[  Used by CreateArmySubGroup                                                          ]--
+---CreateSubGroup
+---Used by CreateArmySubGroup
+---@param tblNode table
+---@param strArmy string
+---@param strGroup string
+---@param ... any
+---@return Unit[]
+---@return table
+---@return table
 function CreateSubGroup(tblNode, strArmy, strGroup, ...)
     local tblResult = {}
     local treeResult = {}
@@ -322,15 +380,18 @@ function CreateSubGroup(tblNode, strArmy, strGroup, ...)
     return platoonList, tblResult, treeResult
 end
 
-----[  CreateInitialArmyGroup                                                     ]--
-----[                                                                             ]--
+---CreateInitialArmyGroup
+---@param strArmy string
+---@param createCommander? boolean
+---@return Unit[]|nil
+---@return boolean|Unit
 function CreateInitialArmyGroup(strArmy, createCommander)
     local tblGroup = CreateArmyGroup(strArmy, 'INITIAL')
     local cdrUnit = false
 
     if createCommander and (tblGroup == nil or 0 == table.getn(tblGroup)) then
         local factionIndex = GetArmyBrain(strArmy):GetFactionIndex()
-        local initialUnitName = import('/lua/factions.lua').Factions[factionIndex].InitialUnit
+        local initialUnitName = import("/lua/factions.lua").Factions[factionIndex].InitialUnit
         cdrUnit = CreateInitialArmyUnit(strArmy, initialUnitName)
         if EntityCategoryContains(categories.COMMAND, cdrUnit) then
             if ScenarioInfo.Options['PrebuiltUnits'] == 'Off' then
@@ -354,6 +415,9 @@ function CreateInitialArmyGroup(strArmy, createCommander)
     return tblGroup, cdrUnit
 end
 
+---@param cdrUnit Unit
+---@param delay number
+---@param ArmyBrain AIBrain
 function CommanderWarpDelay(cdrUnit, delay, ArmyBrain)
     if ArmyBrain.BrainType == 'Human' then
         cdrUnit:SetBlockCommandQueue(true)
@@ -362,9 +426,7 @@ function CommanderWarpDelay(cdrUnit, delay, ArmyBrain)
     cdrUnit:PlayCommanderWarpInEffect()
 end
 
-----[  CreateProps                                                                ]--
-----[                                                                             ]--
-----[                                                                             ]--
+---CreateProps
 function CreateProps()
     for i, tblData in pairs(Scenario['Props']) do
         CreatePropHPR(
@@ -375,9 +437,7 @@ function CreateProps()
     end
 end
 
-----[  CreateResources                                                            ]--
-----[                                                                             ]--
-----[                                                                             ]--
+---CreateResources
 function CreateResources()
     local markers = GetMarkers()
     for i, tblData in pairs(markers) do
@@ -440,6 +500,8 @@ function CreateResources()
     end
 end
 
+---@param unit Unit
+---@param needToRotate number
 function CreateWreckage(unit, needToRotate)
     prop = unit:CreateWreckageProp(0)
     if needToRotate then -- Some units like naval and air need to rotate for effect like after death in game
@@ -462,6 +524,8 @@ function CreateWreckage(unit, needToRotate)
 end
 
 -- Animate unit death and skip it. Used for create wreckage like after death
+---@param unit Unit
+---@param deathAnim any
 function AnimateDeathThread(unit, deathAnim)
     local animBlock = unit:ChooseAnimBlock(deathAnim)
     local animator = CreateAnimator(unit)
@@ -469,7 +533,7 @@ function AnimateDeathThread(unit, deathAnim)
     local rate = unit.rate or 1
 
     if animBlock.AnimationRateMax and animBlock.AnimationRateMin then
-        rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) / 10
+        rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) * 0.1
     end
 
     animator:SetRate(rate)
@@ -483,6 +547,7 @@ function AnimateDeathThread(unit, deathAnim)
     CreateWreckage(unit, false)
 end
 
+---@param unit Unit
 function CreateWreckageUnit(unit)
 	local bp = unit:GetBlueprint()
 
@@ -510,97 +575,101 @@ function CreateWreckageUnit(unit)
 	end
 end
 
-----[  InitializeArmies                                                           ]--
-----[                                                                             ]--
-----[                                                                             ]--
+---InitializeArmies
 function InitializeArmies()
-    local tblGroups = {}
-    local tblArmy = ListArmies()
+    -- globals to locals
+    local GetArmyBrain = GetArmyBrain
+    local SetArmyEconomy = SetArmyEconomy
+    local SetArmyColor = SetArmyColor
+    local CreateInitialArmyGroup = CreateInitialArmyGroup
+    local FindUnitGroup = FindUnitGroup
+    local CreatePlatoons = CreatePlatoons
+    local CreateWreckageUnit = CreateWreckageUnit
+    local LocalSetAlliance = SetAlliance
 
+    local armySetups = ScenarioInfo.ArmySetup
     local civOpt = ScenarioInfo.Options.CivilianAlliance
+    local revealCivilians = ScenarioInfo.Options.RevealCivilians == "Yes"
+    local scenarioArmies = Scenario.Armies
+    local tblArmy = ListArmies()
+    local shouldCreateInitial = ShouldCreateInitialArmyUnits()
 
-    local bCreateInitial = ShouldCreateInitialArmyUnits()
+    local tblGroups = {}
 
-    for iArmy, strArmy in pairs(tblArmy) do
-        local tblData = Scenario.Armies[strArmy]
+    for iArmy, strArmy in tblArmy do
+        local tblData = scenarioArmies[strArmy]
 
-        tblGroups[ strArmy ] = {}
+        tblGroups[strArmy] = {}
 
         if tblData then
+            local setup = armySetups[strArmy]
+            local brain = GetArmyBrain(strArmy)
 
-            ----[ If an actual starting position is defined, overwrite the        ]--
-            ----[ randomly generated one.                                         ]--
+            local econ = tblData.Economy
+            SetArmyEconomy(strArmy, econ.mass, econ.energy)
 
-            --LOG('*DEBUG: InitializeArmies, army = ', strArmy)
-
-            SetArmyEconomy(strArmy, tblData.Economy.mass, tblData.Economy.energy)
-
-            --GetArmyBrain(strArmy):InitializePlatoonBuildManager()
-            --LoadArmyPBMBuilders(strArmy)
-            if GetArmyBrain(strArmy).SkirmishSystems then
-                GetArmyBrain(strArmy):InitializeSkirmishSystems()
+            -- If an actual starting position is defined, overwrite the randomly generated one
+            if brain.SkirmishSystems then
+                brain:InitializeSkirmishSystems()
             end
 
-            local armyIsCiv = ScenarioInfo.ArmySetup[strArmy].Civilian
+            local armyIsCiv = setup.Civilian
 
-            if armyIsCiv and civOpt ~= 'neutral' and strArmy ~= 'NEUTRAL_CIVILIAN' then -- give enemy civilians darker color
+            if armyIsCiv and civOpt ~= "neutral" and strArmy ~= "NEUTRAL_CIVILIAN" then -- give enemy civilians darker color
                 SetArmyColor(strArmy, 255, 48, 48) -- non-player red color for enemy civs
             end
 
-            if (not armyIsCiv and bCreateInitial) or (armyIsCiv and civOpt ~= 'removed') then
-                local commander = (not ScenarioInfo.ArmySetup[strArmy].Civilian)
+            if (not armyIsCiv and shouldCreateInitial) or (armyIsCiv and civOpt ~= "removed") then
+                local commander = not armyIsCiv
                 local cdrUnit
                 tblGroups[strArmy], cdrUnit = CreateInitialArmyGroup(strArmy, commander)
-                if commander and cdrUnit and ArmyBrains[iArmy].Nickname then
-                    cdrUnit:SetCustomName(ArmyBrains[iArmy].Nickname)
+                brain.CDR = cdrUnit
+                if commander and cdrUnit and brain.Nickname then
+                    cdrUnit:SetCustomName(brain.Nickname)
                 end
             end
 
-            local wreckageGroup = FindUnitGroup('WRECKAGE', Scenario.Armies[strArmy].Units)
+            local wreckageGroup = FindUnitGroup("WRECKAGE", tblData.Units)
             if wreckageGroup then
-			    local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup)
-				for num, unit in tblResult do
-					CreateWreckageUnit(unit)
-				end
+			    local _, tblResult = CreatePlatoons(strArmy, wreckageGroup)
+                for _, unit in tblResult do
+                    CreateWreckageUnit(unit)
+                end
             end
 
             ----[ irumsey                                                         ]--
             ----[ Temporary defaults.  Make sure some fighting will break out.    ]--
-            for iEnemy, strEnemy in tblArmy do
-                local enemyIsCiv = ScenarioInfo.ArmySetup[strEnemy].Civilian
-                local a, e = iArmy, iEnemy
-                local state = 'Enemy'
-
-                if a ~= e then
-                    if armyIsCiv or enemyIsCiv then
-                        if civOpt == 'neutral' or strArmy == 'NEUTRAL_CIVILIAN' or strEnemy == 'NEUTRAL_CIVILIAN' then
-                            state = 'Neutral'
-                        end
-
-                        if ScenarioInfo.Options['RevealCivilians'] == 'Yes' and ScenarioInfo.ArmySetup[strEnemy].Human then
-                            ForkThread(function()
-                                WaitSeconds(.1)
-                                local real_state = IsAlly(a, e) and 'Ally' or IsEnemy(a, e) and 'Enemy' or 'Neutral'
-
-                                GetArmyBrain(e):SetupArmyIntelTrigger({
-                                    Category=categories.ALLUNITS,
-                                    Type='LOSNow',
-                                    Value=true,
-                                    OnceOnly=true,
-                                    TargetAIBrain=GetArmyBrain(a),
-                                    CallbackFunction=function()
-                                        SetAlliance(a, e, real_state)
-                                    end,
-                                })
-                                SetAlliance(a, e, 'Ally')
-                            end)
-                        end
+            for iEnemy, _ in tblArmy do
+                -- only do it once for each pair
+                if iEnemy >= iArmy then
+                    continue
+                end
+                local state = "Enemy"
+                if armyIsCiv then
+                    if civOpt == "neutral" or strArmy == "NEUTRAL_CIVILIAN" then
+                        state = "Neutral"
                     end
 
-                    if state then
-                        SetAlliance(a, e, state)
+                    if revealCivilians then
+                        ForkThread(function(civ, army)
+                            WaitSeconds(0.1)
+
+                            local real_state = IsAlly(civ, army) and "Ally" or IsEnemy(civ, army) and "Enemy" or "Neutral"
+                            GetArmyBrain(army):SetupArmyIntelTrigger({
+                                Category = categories.ALLUNITS,
+                                Type = "LOSNow",
+                                Value = true,
+                                OnceOnly = true,
+                                TargetAIBrain = GetArmyBrain(civ),
+                                CallbackFunction = function()
+                                    SetAlliance(civ, army, real_state)
+                                end,
+                            })
+                            SetAlliance(civ, army, "Ally")
+                        end, iArmy, iEnemy)
                     end
                 end
+                LocalSetAlliance(iArmy, iEnemy, state)
             end
         end
     end
@@ -608,74 +677,100 @@ function InitializeArmies()
     return tblGroups
 end
 
-
-----[  InitializeScenarioArmies                                                   ]--
-----[                                                                             ]--
-----[                                                                             ]--
+---InitializeScenarioArmies
 function InitializeScenarioArmies()
-    local tblGroups = {}
+    -- globals to locals
+    local import = import
+    local GetArmyBrain = GetArmyBrain
+    local SetArmyEconomy = SetArmyEconomy
+    local StringStartsWith = StringStartsWith
+    local SetArmyFactionIndex = SetArmyFactionIndex
+    local SetArmyColorIndex = SetArmyColorIndex
+    local SetArmyAIPersonality = SetArmyAIPersonality
+    local CreateInitialArmyGroup = CreateInitialArmyGroup
+    local CreatePlatoons = CreatePlatoons
+    local CreateWreckageUnit = CreateWreckageUnit
+    local SetAllianceOneWay = SetAllianceOneWay
+    local MathClamp = math.clamp
+    local LoadArmyPBMBuilders = LoadArmyPBMBuilders
+
+    local armySetups = ScenarioInfo.ArmySetup
+    local scenarioArmies = Scenario.Armies
     local tblArmy = ListArmies()
-    local factions = import('/lua/factions.lua')
-    local bCreateInitial = ShouldCreateInitialArmyUnits()
+    local shouldCreateInitial = ShouldCreateInitialArmyUnits()
+    local factionCount = table.getsize(import("/lua/factions.lua").Factions)
+
+    ScenarioInfo.CampaignMode = true
+    Sync.CampaignMode = true
+    import("/lua/sim/simuistate.lua").IsCampaign(true)
+
     local armies = {}
     for i, name in tblArmy do
         armies[name] = i
     end
 
-    ScenarioInfo.CampaignMode = true
-    Sync.CampaignMode = true
-    import('/lua/sim/simuistate.lua').IsCampaign(true)
+    local tblGroups = {}
 
-    for iArmy, strArmy in tblArmy do
-        local tblData = Scenario.Armies[strArmy]
+    for _, strArmy in tblArmy do
+        local tblData = scenarioArmies[strArmy]
 
-        tblGroups[ strArmy ] = {}
+        tblGroups[strArmy] = {}
 
         if tblData then
-            LOG('*DEBUG: InitializeScenarioArmies, army = ', strArmy)
-            SetArmyEconomy(strArmy, tblData.Economy.mass, tblData.Economy.energy)
-            if tblData.faction ~= nil then
-                if ScenarioInfo.ArmySetup[strArmy].Human or StringStartsWith(strArmy, "Player") then
-                    local factionIndex = math.min(math.max(ScenarioInfo.ArmySetup[strArmy].Faction, 1), table.getsize(factions.Factions))
+            local setup = armySetups[strArmy]
+            local brain = GetArmyBrain(strArmy)
+
+            local econ = tblData.Economy
+            SetArmyEconomy(strArmy, econ.mass, econ.energy)
+
+            local faction = tblData.faction
+            if faction ~= nil then
+                if setup.Human or StringStartsWith(strArmy, "Player") then
+                    local factionIndex = MathClamp(setup.Faction, 1, factionCount)
                     SetArmyFactionIndex(strArmy, factionIndex - 1)
                 else
-                    local factionIndex = math.min(math.max(tblData.faction, 0), table.getsize(factions.Factions))
+                    local factionIndex = MathClamp(faction, 0, factionCount)
                     SetArmyFactionIndex(strArmy, factionIndex)
-                    GetArmyBrain(strArmy):SetCurrentPlan()
+                    brain:SetCurrentPlan()
                 end
             end
 
-            if tblData.color ~= nil then
-                SetArmyColorIndex(strArmy, tblData.color)
+            local color = tblData.color
+            if color ~= nil then
+                SetArmyColorIndex(strArmy, color)
             end
 
-            if tblData.personality ~= nil then
-                SetArmyAIPersonality(strArmy, tblData.personality)
+            local personality = tblData.personality
+            if personality ~= nil then
+                SetArmyAIPersonality(strArmy, personality)
             end
 
-            if bCreateInitial then
-                tblGroups[strArmy] = CreateInitialArmyGroup(strArmy)
+            local cdr
+            if shouldCreateInitial then
+                tblGroups[strArmy], cdr = CreateInitialArmyGroup(strArmy)
             end
 
-            local wreckageGroup = FindUnitGroup('WRECKAGE', Scenario.Armies[strArmy].Units)
+            local wreckageGroup = FindUnitGroup("WRECKAGE", tblData.Units)
             if wreckageGroup then
-			    local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, wreckageGroup)
-				for num, unit in tblResult do
-					CreateWreckageUnit(unit)
+                local _, tblResult = CreatePlatoons(strArmy, wreckageGroup)
+                for _, unit in tblResult do
+                    CreateWreckageUnit(unit)
 				end
             end
 
             ----[ eemerson                                                         ]--
             ----[ Override alliances with custom alliance settings                 ]--
-            if tblData.Alliances ~= nil then
-               for army_name, state in tblData.Alliances do
-                    if armies[army_name] and strArmy ~= army_name then
-                        SetAllianceOneWay(strArmy, army_name, state)
+            local alliances = tblData.Alliances
+            if alliances ~= nil then
+               for with, state in alliances do
+                    if armies[with] and strArmy ~= with then
+                        SetAllianceOneWay(strArmy, with, state)
                     end
                end
             end
 
-            GetArmyBrain(strArmy):InitializePlatoonBuildManager()
+            brain:InitializePlatoonBuildManager()
+            brain.CDR = cdr
             LoadArmyPBMBuilders(strArmy)
         end
     end
@@ -683,9 +778,10 @@ function InitializeScenarioArmies()
     return tblGroups
 end
 
-----[ AssignOrders                                                                ]--
-----[                                                                             ]--
-----[                                                                             ]--
+---AssignOrders
+---@param strQueue string
+---@param tblUnit table
+---@param target Unit
 function AssignOrders(strQueue, tblUnit, target)
     local tblOrder = Scenario.Orders[ strQueue ]
     for i, order in pairs(tblOrder) do
@@ -693,9 +789,14 @@ function AssignOrders(strQueue, tblUnit, target)
     end
 end
 
-
-----[ SpawnPlatoon                                                                ]--
-----[ Spawns unit group and assigns to platoon it is a part of                    ]--
+---SpawnPlatoon
+---Spawns unit group and assigns to platoon it is a part of
+---@param strArmy string
+---@param strGroup string
+---@return false|Platoon[]
+---@return false|Unit[]
+---@return false|table
+---@return false|table
 function SpawnPlatoon(strArmy, strGroup)
     local tblNode = FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units)
     if nil == tblNode then
@@ -722,6 +823,11 @@ function SpawnPlatoon(strArmy, strGroup)
     return platoonList[platoonName], platoonList, tblResult, treeResult
 end
 
+---@param strArmy string
+---@param strGroup string
+---@return Platoon[]
+---@return table|nil
+---@return table
 function SpawnTableOfPlatoons(strArmy, strGroup)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
@@ -738,6 +844,8 @@ function SpawnTableOfPlatoons(strArmy, strGroup)
     return platoonList, tblResult, treeResult
 end
 
+---@param tblNode table
+---@return number
 function CountChildUnits(tblNode)
     local count = 0
 
@@ -754,6 +862,16 @@ function CountChildUnits(tblNode)
     return count
 end
 
+---@param strArmy string
+---@param tblNode table
+---@param tblResult table
+---@param platoonList Platoon[]
+---@param currPlatoon Platoon
+---@param treeResult table
+---@param balance number
+---@return nil|Platoon
+---@return nil|Unit[]
+---@return nil|table
 function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, treeResult, balance)
     tblResult = tblResult or {}
     platoonList = platoonList or {}
@@ -783,7 +901,7 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
     end
     if currPlatoon then
         currTemplate = Scenario.Platoons[currPlatoon]
-        numRows = table.getn(currTemplate)
+        numRows = TableGetn(currTemplate)
     end
 
     local unit = nil
@@ -838,7 +956,7 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
                 end
                 currPlatoon = tblData.platoon
                 currTemplate = Scenario.Platoons[currPlatoon]
-                numRows = table.getn(currTemplate)
+                numRows = TableGetn(currTemplate)
             end
             if currPlatoon then
                 local i = 3
@@ -879,11 +997,15 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
     return platoonList, tblResult, treeResult
 end
 
-
-
-----[  CreateArmyGroup                                                            ]--
-----[                                                                             ]--
-----[  Creates the specified group in game.                                       ]--
+---CreateArmyGroup
+---Creates the specified group in game.
+---@param strArmy string
+---@param strGroup string
+---@param wreckage Wreckage
+---@param balance number
+---@return Unit[]|nil
+---@return table|nil
+---@return Platoon[]|nil
 function CreateArmyGroup(strArmy,strGroup,wreckage, balance)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
@@ -908,15 +1030,18 @@ function CreateArmyGroup(strArmy,strGroup,wreckage, balance)
 end
 
 -- CreateArmyTree
---
 -- Returns tree of units created by the editor. 2nd return is table of units
+---@param strArmy string
+---@param strGroup string
+---@return table|nil
+---@return Unit[]
+---@return Platoon[]|nil
 function CreateArmyTree(strArmy, strGroup)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
     end
-    local platoonList, tblResult, treeResult = CreatePlatoons(strArmy,
-                                                              FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units))
+    local platoonList, tblResult, treeResult = CreatePlatoons(strArmy,FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units))
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
     end
@@ -926,7 +1051,10 @@ function CreateArmyTree(strArmy, strGroup)
     return treeResult, tblResult, platoonList
 end
 
-
+---@param strArmy string
+---@param strGroup string
+---@param formation any
+---@param OnFinishedCallback any
 function CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, OnFinishedCallback)
     ScenarioInfo.LoadBalance.Accumulator = 0
     local units = CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, nil, nil, true)
@@ -935,8 +1063,14 @@ function CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, OnFinish
 end
 
 -- CreateArmyGroupAsPlatoon
---
 -- Returns a platoon that is created out of all units in a group and its sub groups.
+---@param strArmy string
+---@param strGroup string
+---@param formation any
+---@param tblNode table
+---@param platoon Platoon
+---@param balance any
+---@return Platoon|nil
 function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon, balance)
     if ScenarioInfo.LoadBalance.Enabled then
         --note that tblNode in this case is actually the callback function
@@ -997,6 +1131,11 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
 end
 
 -- Creates an army group at a certain veteran level
+---@param strArmy string
+---@param strGroup string
+---@param formation any
+---@param veteranLevel integer
+---@return Platoon|nil
 function CreateArmyGroupAsPlatoonVeteran(strArmy, strGroup, formation, veteranLevel)
     local plat = CreateArmyGroupAsPlatoon(strArmy, strGroup, formation)
     veteranLevel = veteranLevel or 5
@@ -1006,6 +1145,11 @@ function CreateArmyGroupAsPlatoonVeteran(strArmy, strGroup, formation, veteranLe
     return plat
 end
 
+---@param strArmy string
+---@param strGroup string
+---@param tblData table
+---@param unitGroup UnitGroup
+---@return UnitGroup
 function FlattenTreeGroup(strArmy, strGroup, tblData, unitGroup)
     tblData = tblData or FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units)
     unitGroup = unitGroup or {}
@@ -1019,9 +1163,9 @@ function FlattenTreeGroup(strArmy, strGroup, tblData, unitGroup)
     return unitGroup
 end
 
--- LoadArmyPBMBuilders
---
--- Loads an Army Brain's PBM Builders from the save file
+---LoadArmyPBMBuilders
+---Loads an Army Brain's PBM Builders from the save file
+---@param strArmy string
 function LoadArmyPBMBuilders(strArmy)
     local aiBrain = GetArmyBrain(strArmy)
     if Scenario.Armies[strArmy].PlatoonBuilders.Builders then
@@ -1105,6 +1249,8 @@ function LoadArmyPBMBuilders(strArmy)
     end
 end
 
+---@param table table
+---@return table
 function RebuildDataTable(table)
     local newTable = {}
     for k,v in table do
@@ -1118,6 +1264,7 @@ function RebuildDataTable(table)
     return newTable
 end
 
+---@param strArmy string
 function InitializeStartLocation(strArmy)
     local start = GetMarker(strArmy)
     if start then
@@ -1127,12 +1274,16 @@ function InitializeStartLocation(strArmy)
     end
 end
 
+---@param strArmy string
 function SetPlans(strArmy)
     if Scenario.Armies[strArmy] then
         SetArmyPlans(strArmy, Scenario.Armies[strArmy].plans)
     end
 end
 
+---@param buildName string
+---@param strArmy string
+---@param builderData table
 function UpdateOSB(buildName, strArmy, builderData)
 --    local buildNameNew, location, globalName, childPart = SplitUpdateOSBName(buildName)
     local aiBrain = GetArmyBrain(strArmy)
@@ -1159,6 +1310,8 @@ function UpdateOSB(buildName, strArmy, builderData)
     end
 end
 
+---@param builderEdit any
+---@param builderData table
 function UpdateGivenOSB(builderEdit, builderData)
     -- Update data in builder in brain
     for dName, data in builderData.PlatoonData do
@@ -1169,7 +1322,7 @@ function UpdateGivenOSB(builderEdit, builderData)
     if builderData.PlatoonData.PlatoonMultiplier and not builderEdit.PlatoonTemplate.MultiplierApplied then
         builderEdit.PlatoonTemplate.MultiplierApplied = true
         local squadNum = 3
-        while squadNum <= table.getn(builderEdit.PlatoonTemplate) do
+        while squadNum <= TableGetn(builderEdit.PlatoonTemplate) do
             if builderEdit.PlatoonTemplate[squadNum][2] < 0 then
                 local num = builderEdit.PlatoonTemplate[squadNum][2] * builderData.PlatoonData.PlatoonMultiplier
                 builderEdit.PlatoonTemplate[squadNum][2] = -(math.ceil(math.abs(num)))
@@ -1220,6 +1373,9 @@ function UpdateGivenOSB(builderEdit, builderData)
     end
 end
 
+---@param buildName string
+---@param strArmy string
+---@param builderData table
 function LoadOSB(buildName, strArmy, builderData)
     local buildNameNew, location, globalName, childPart
     local saveFile
@@ -1233,7 +1389,7 @@ function LoadOSB(buildName, strArmy, builderData)
         childPart = false
     else
         buildNameNew, location, globalName, childPart = SplitOSBName(buildName)
-        local fileName = '/lua/ai/OpAI/' .. globalName .. '_save.lua'
+        local fileName = '/lua/ai/opai/' .. globalName .. '_save.lua'
         saveFile = import(fileName)
     end
 
@@ -1505,9 +1661,12 @@ function LoadOSB(buildName, strArmy, builderData)
 end
 
 -- TODO: This really ought to be hooked.... this file needs to be made game agnostic as it's in mohodata
+---@param template any
+---@param factionIndex number
+---@return any
 function FactionConvert(template, factionIndex)
     local i = 3
-    while i <= table.getn(template) do
+    while i <= TableGetn(template) do
         if factionIndex == 2 then
             if template[i][1] == 'uel0203' then
                 template[i][1] = 'xal0203'
@@ -1517,6 +1676,8 @@ function FactionConvert(template, factionIndex)
                 template[i][1] = 'xaa0305'
             elseif template[i][1] == 'xel0305' then
                 template[i][1] = 'xal0305'
+            elseif template[i][1] == 'delk002' then
+                template[i][1] = 'dalk003'
             else
                 template[i][1] = string.gsub(template[i][1], 'ue', 'ua')
             end
@@ -1533,6 +1694,8 @@ function FactionConvert(template, factionIndex)
                 template[i][1] = 'url0306'
             elseif template[i][1] == 'del0204' then
                 template[i][1] = 'drl0204'
+            elseif template[i][1] == 'delk002' then
+                template[i][1] = 'drlk001'
             else
                 template[i][1] = string.gsub(template[i][1], 'ue', 'ur')
             end
@@ -1541,6 +1704,8 @@ function FactionConvert(template, factionIndex)
                 template[i][1] = 'xsl0201'
             elseif template[i][1] == 'xel0305' then
                 template[i][1] = 'xsl0305'
+            elseif template[i][1] == 'delk002' then
+                template[i][1] = 'dslk004'
             else
                 template[i][1] = string.gsub(template[i][1], 'ue', 'xs')
             end
@@ -1550,6 +1715,11 @@ function FactionConvert(template, factionIndex)
     return template
 end
 
+---@param buildName string
+---@return string retName
+---@return boolean|string location
+---@return string globName
+---@return boolean|string childPart
 function SplitUpdateOSBName(buildName)
     -- OSB_<bname>_location
     local startCheck = 5
@@ -1585,6 +1755,11 @@ function SplitUpdateOSBName(buildName)
     return retName, location, globName, childPart
 end
 
+---@param buildName string
+---@return string retName
+---@return boolean|string location
+---@return string globName
+---@return boolean|string childPart
 function SplitOSBName(buildName)
     -- OSB_<bname>_location
     local startCheck = 5
@@ -1620,6 +1795,9 @@ function SplitOSBName(buildName)
     return retName, location, globName, childPart
 end
 
+---@param tableOne table
+---@param tableTwo table
+---@return table
 function FilterFunctions(tableOne, tableTwo)
     for t2Num, t2Data in tableTwo do
         if t2Data[3][1] == 'Remove' then
@@ -1634,3 +1812,61 @@ function FilterFunctions(tableOne, tableTwo)
     end
     return tableOne
 end
+
+--- Gets the units in `rectangles` that belong to a category and how many. The units can
+--- optionally be required to belong to a brain or be fully built. If there are no units,
+--- it does not return `nil`; compare the second return value to 0 as needed. `rectangles`
+--- doesn't name accept named areas; use `MultiAreaToMultiRect` if you need.
+---@param rectangles Rectangle[]
+---@param category EntityCategory
+---@param aiBrain? AIBrain
+---@param requireBuilt? boolean
+---@return Unit[] units
+---@return number count
+function GetUnitsInMultiRect(category, rectangles, aiBrain, requireBuilt)
+    local entitiesInArea = {}
+    local entitiesInAreaCount = 0
+    for _, rect in rectangles do
+        local units = GetUnitsInRect(rect)
+        if units then
+            units = EntityCategoryFilterDown(category, units)
+            for _, unit in units do
+                if (aiBrain and unit:GetAIBrain() == aiBrain) and
+                    not (requireBuilt and unit:IsBeingBuilt())
+                then
+                    entitiesInAreaCount = entitiesInAreaCount + 1
+                    entitiesInArea[entitiesInAreaCount] = unit
+                end
+            end
+        end
+    end
+    return entitiesInArea, entitiesInAreaCount
+end
+
+--- Finds the first unit in `rectangles` that belongs to a category. The unit can optionally
+--- be required to belong to a brain or be fully built. `rectangles` doesn't name accept named
+--- areas; use `MultiAreaToMultiRect` if you need.
+---@param rectangles Rectangle[]
+---@param category EntityCategory
+---@param aiBrain? AIBrain
+---@param requireBuilt? boolean
+---@return Unit | nil unit
+function FindUnitInMultiRect(rectangles, category, aiBrain, requireBuilt)
+    for _, rect in rectangles do
+        local units = GetUnitsInRect(rect)
+        if units then
+            units = EntityCategoryFilterDown(category, units)
+            for _, unit in units do
+                if  (aiBrain and unit:GetAIBrain() == aiBrain) and
+                    not (requireBuilt and unit:IsBeingBuilt())
+                then
+                    return unit
+                end
+            end
+        end
+    end
+end
+
+
+-- kept for mod backwards compatibility
+local Entity = import("/lua/sim/entity.lua").Entity

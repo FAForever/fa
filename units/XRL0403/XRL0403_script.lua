@@ -8,23 +8,24 @@
 -- ****************************************************************************
 
 
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local MobileUnit = import('/lua/defaultunits.lua').MobileUnit
-local explosion = import('/lua/defaultexplosions.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local MobileUnit = import("/lua/defaultunits.lua").MobileUnit
+local explosion = import("/lua/defaultexplosions.lua")
 local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local utilities = import('/lua/Utilities.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local Entity = import('/lua/sim/Entity.lua').Entity
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local utilities = import("/lua/utilities.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
+local Entity = import("/lua/sim/entity.lua").Entity
 
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFHvyProtonCannonWeapon = CybranWeaponsFile.CDFHvyProtonCannonWeapon
 local CANNaniteTorpedoWeapon = CybranWeaponsFile.CANNaniteTorpedoWeapon
 local CIFSmartCharge = CybranWeaponsFile.CIFSmartCharge
 local CAABurstCloudFlakArtilleryWeapon = CybranWeaponsFile.CAABurstCloudFlakArtilleryWeapon
 local CDFBrackmanCrabHackPegLauncherWeapon = CybranWeaponsFile.CDFBrackmanCrabHackPegLauncherWeapon
 
+---@class XRL0403 : CWalkingLandUnit
 XRL0403 = Class(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
@@ -53,7 +54,7 @@ XRL0403 = Class(CWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('HackPegLauncher', true)   -- -- -- Enable and show hack-peg launcher.
     end,
 
-    OnCreate= function(self)
+    OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
         self:SetWeaponEnabledByLabel('HackPegLauncher', false)
         if self:IsValidBone('Missile_Turret') then
@@ -67,11 +68,34 @@ XRL0403 = Class(CWalkingLandUnit) {
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
+
         self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false):SetRate(0)
+
+        -- adjust collision box due to build animation
+        self:SetCollisionShape(
+            'Box', 
+            self.Blueprint.CollisionOffsetX,
+            self.Blueprint.CollisionOffsetY,
+            self.Blueprint.CollisionOffsetZ,
+            0.5 * self.Blueprint.SizeX,
+            0.5 * self.Blueprint.SizeY,
+            0.5 * self.Blueprint.SizeZ
+        )
+
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
         CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
+
+        -- adjust collision box due to build animation
+        self:SetCollisionShape('Box',
+            2 * self.Blueprint.CollisionOffsetX,
+            2 * self.Blueprint.CollisionOffsetY,
+            2 * self.Blueprint.CollisionOffsetZ,
+            0.5 * self.Blueprint.SizeX,
+            0.5 * self.Blueprint.SizeY,
+            0.5 * self.Blueprint.SizeZ
+        )
 
         if self:IsValidBone('Missile_Turret') then
             self:HideBone('Missile_Turret', true)
@@ -91,8 +115,6 @@ XRL0403 = Class(CWalkingLandUnit) {
 
     OnLayerChange = function(self, new, old)
         CWalkingLandUnit.OnLayerChange(self, new, old)
-
-        --LOG("Mega Layerchange from ", old, " to ", new)
 
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')

@@ -570,12 +570,30 @@ Tooltips = {
         description = "<LOC tooltipui1009>Amount of required energy for mass fabricators to work",
     },
 
-
-
-
     -- **********************
     -- ** Options Strings
     -- **********************
+
+    options_commands_ignore_mode = {
+        title = "Ignore mode",
+        description = "When enabled, ignore any other command but move commands when you hold left-ctrl. This can help to guarantee that you issue a move command, over (accidentally) starting a reclaim or attack command. \r\n\r\nThis is disabled when holding shift.",
+    },
+
+    options_selection_threshold_regular = {
+        title = "Default selection threshold",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This can help you select individual units or props, especially on displays with higher resolutions. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
+    options_selection_threshold_reclaim = {
+        title = "Default selection threshold",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when you are in reclaim mode. It makes it easier to hit all of your clicks, reducing the amount of fake reclaim orders. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
+    options_selection_threshold_replay = {
+        title = "Default selection threshold",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
     options_wheel_sensitivity = {
         title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
         description = "<LOC OPTIONS_0035>Sets the Zoom Speed when using the Mouse Wheel",
@@ -629,7 +647,7 @@ Tooltips = {
         description = "<LOC OPTIONS_0079>Sets the Delay before Tooltips are displayed",
     },
     options_loading_tips = {
-        title = "<LOC OPTIONS_0009>Display Loading Tips",
+        title = "<LOC OPTIONS_0009>Show Loading Tips",
         description = "<LOC OPTIONS_0011>Toggles whether or not tips are displayed on the loading screen",
     },
     options_persistent_built_mode = {
@@ -1577,6 +1595,42 @@ Tooltips = {
         title = "<LOC tooltipui0463>Propose Draw",
         description = "<LOC tooltipui0464>Propose ending the game in a draw.  All players must click this to accept.",
     },
+    dip_recall_request = {
+        title = "<LOC tooltipui0722>Activate Recall Beacon",
+        description = "<LOC tooltipui0723>Signal to your allies that you are ready to recall from battle.",
+    },
+    dip_recall_request_dis_active = {
+        title = "<LOC tooltipui0724>Recall Beacon Active",
+        description = "<LOC tooltipui0725>Your team has been notified of your request to recall from battle.",
+    },
+    dip_recall_request_dis_scenario = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0727>You cannot recall from battle in this scenario.",
+    },
+    dip_recall_request_dis_gate = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0728>You cannot recall from battle within 5 minutes of gating in.",
+    },
+    dip_recall_request_dis_ai = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0729>There are AI armies on your team that will not recall.",
+    },
+    dip_recall_request_dis_request = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0730>You have sent a recall request too recently.",
+    },
+    dip_recall_request_dis_vote = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0731>Your team has had a recall vote too recently.",
+    },
+    dip_recall_request_accept = {
+        title = "<LOC tooltipui0732>Accept Recall Request",
+        description = "<LOC tooltipui0733>Accept the request for your team to recall from battle.",
+    },
+    dip_recall_request_veto = {
+        title = "<LOC tooltipui0734>Veto Recall Request",
+        description = "<LOC tooltipui0735>Veto the request for your team to recall from battle.",
+    },
     dip_give_units = {
         title = "<LOC tooltipui0465>Give Units",
         description = "<LOC tooltipui0466>Give currently selected units to specified player",
@@ -2084,7 +2138,7 @@ Tooltips = {
         description = '<LOC OPTIONS_0259>Allows middle clicking idle engineer avatars to select all idle engineers on screen.',
     },
     options_gui_all_race_templates = {
-        title = '<LOC OPTIONS_0233>All Race Templates',
+        title = '<LOC OPTIONS_0233>All Faction Templates',
         description = '<LOC OPTIONS_0260>Allows build templates to be used across all 4 factions.',
     },
     options_gui_enhanced_unitview = {
@@ -2100,7 +2154,7 @@ Tooltips = {
         description = '<LOC OPTIONS_0263>Allows creation of factory build queue templates.',
     },
     options_gui_seperate_idle_builders = {
-        title = '<LOC OPTIONS_0238>Seperate Idle Builders',
+        title = '<LOC OPTIONS_0238>Separate Idle Builders',
         description = '<LOC OPTIONS_0264>Use a seperate icon for idle Engineers and other builders.',
     },
     options_gui_visible_template_names = {
@@ -2116,11 +2170,11 @@ Tooltips = {
         description = '<LOC OPTIONS_0267>Displays Shield Hp, Regen rate, Hp Regen rate and Build rate. Adapted from Total Veterancy by Eni.',
     },
     options_gui_render_custom_names = {
-        title = '<LOC OPTIONS_0242>Always Render Custom Names',
+        title = '<LOC OPTIONS_0242>Always Show Custom Names',
         description = '<LOC OPTIONS_0268>Toggle display of custom names. Enabled by default.',
     },
     options_gui_render_enemy_lifebars = {
-        title = '<LOC OPTIONS_0243>Force Render Enemy Lifebars',
+        title = '<LOC OPTIONS_0243>Always Show Enemy Lifebars',
         description = '<LOC OPTIONS_0269>Force rendering enemy lifebars. Disabled by default',
     },
     options_gui_render_armament_detail = {
@@ -2135,4 +2189,12 @@ Tooltips = {
         title = '<LOC OPTIONS_0236>Zoom Pop Distance',
         description = '<LOC OPTIONS_0272>Adjusts distance to which Zoom Pop zooms to.',
     },
+    options_reclaim_overview_size_scale = {
+        title = '<LOC OPTIONS_RECLAIMSIZE>Reclaim label scaling factor',
+        description = '<LOC OPTIONS_RECLAIMSIZEDESC>Scales the text of the reclaim label to its value',
+    },
+    options_reclaim_overview_batching = {
+        title = '<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching>',
+        description = '<LOC OPTIONS_RECLAIMBATCHINGDESC>Batches nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more. \r\n\r\nSignificantly improves performance. Is recommended for lower end systems.',
+    }
 }

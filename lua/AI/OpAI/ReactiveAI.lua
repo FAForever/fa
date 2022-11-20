@@ -6,11 +6,11 @@
 ----**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-local OpAI = import('/lua/ai/OpAI/BaseOpAI.lua').OpAI
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
+local OpAI = import("/lua/ai/opai/baseopai.lua").OpAI
 
 local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
 local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
@@ -49,7 +49,7 @@ TrackingCategories = {
     MassedAir = { categories.AIR * categories.MOBILE * ( categories.TECH2 + categories.TECH3 ), },
 }
 
-
+---@class ReactiveAI : OpAI
 ReactiveAI = Class(OpAI) {
     Create = function(self, brain, location, triggeringEventType, reactionType, name, data)
         -- With the actionType and responseType, we must create a builderType with proper builderData to create

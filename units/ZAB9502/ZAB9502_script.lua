@@ -7,7 +7,8 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AAirFactoryUnit = import('/lua/aeonunits.lua').AAirFactoryUnit
+local AAirFactoryUnit = import("/lua/aeonunits.lua").AAirFactoryUnit
+---@class ZAB9502 : AAirFactoryUnit
 ZAB9502 = Class(AAirFactoryUnit) {}
 
 TypeClass = ZAB9502

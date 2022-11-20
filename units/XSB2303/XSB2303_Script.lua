@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
-local SIFZthuthaamArtilleryCannon = import('/lua/seraphimweapons.lua').SIFZthuthaamArtilleryCannon
+local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
+local SIFZthuthaamArtilleryCannon = import("/lua/seraphimweapons.lua").SIFZthuthaamArtilleryCannon
 
+---@class XSB2303 : SStructureUnit
 XSB2303 = Class(SStructureUnit) {
 
     Weapons = {

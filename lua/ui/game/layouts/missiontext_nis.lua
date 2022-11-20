@@ -1,9 +1,9 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 function SetLayout()
-    local controls = import('/lua/ui/game/missiontext.lua').controls
+    local controls = import("/lua/ui/game/missiontext.lua").controls
     
     if controls.movieBrackets then
         LayoutHelpers.AtLeftTopIn(controls.movieBrackets, GetFrame(0), 20, 100)

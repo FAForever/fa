@@ -8,13 +8,14 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
-local AeonWeapons = import('/lua/aeonweapons.lua')
+local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
+local AeonWeapons = import("/lua/aeonweapons.lua")
 local ADFCannonQuantumWeapon = AeonWeapons.ADFCannonQuantumWeapon
 local AIFQuasarAntiTorpedoWeapon = AeonWeapons.AIFQuasarAntiTorpedoWeapon
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 
+---@class UAS0103 : ASeaUnit
 UAS0103 = Class(ASeaUnit) {
 
     Weapons = {

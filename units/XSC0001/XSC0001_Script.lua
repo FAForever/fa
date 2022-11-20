@@ -7,8 +7,9 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
+local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
 
+---@class XSC0001 : SLandUnit
 XSC0001 = Class(SLandUnit) {
 
 }

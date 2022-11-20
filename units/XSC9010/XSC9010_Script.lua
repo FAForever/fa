@@ -6,10 +6,11 @@
 --** 
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
-local SSJammerCrystalAmbient = import('/lua/EffectTemplates.lua').SJammerCrystalAmbient
+local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+local SSJammerCrystalAmbient = import("/lua/effecttemplates.lua").SJammerCrystalAmbient
 
 
+---@class XSC9010 : SLandUnit
 XSC9010 = Class(SLandUnit) {
 
     OnCreate = function(self, builder, layer)

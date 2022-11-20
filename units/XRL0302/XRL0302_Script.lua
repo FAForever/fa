@@ -4,12 +4,12 @@
 -- Summary  :  Cybran Mobile Bomb Script
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CMobileKamikazeBombWeapon = import('/lua/cybranweapons.lua').CMobileKamikazeBombWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local CMobileKamikazeBombWeapon = import("/lua/cybranweapons.lua").CMobileKamikazeBombWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
+local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 --- A unique death weapon for the Fire Beetle
 local DeathWeaponKamikaze = Class(Weapon) {
@@ -61,6 +61,7 @@ local DeathWeaponEMP = Class(Weapon) {
     end,
 }
 
+---@class XRL0302 : CWalkingLandUnit
 XRL0302 = Class(CWalkingLandUnit) {
 
     IntelEffects = {
@@ -94,7 +95,7 @@ XRL0302 = Class(CWalkingLandUnit) {
 
         self.EffectsBagXRL = TrashBag()
         self.AmbientExhaustEffectsBagXRL = TrashBag()
-        self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
+        self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
         self.PeriodicFXThread = self:ForkThread(self.EmitPeriodicEffects)
     end,
 

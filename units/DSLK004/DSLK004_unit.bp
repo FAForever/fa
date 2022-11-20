@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'AttachPoint'
+        }
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -26,15 +31,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 35,
     Categories = {
         'PRODUCTDL',
@@ -51,7 +47,8 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'OVERLAYDIRECTFIRE',
     },
-    CollisionOffsetZ = 0,
+    CollisionOffsetX = -0.05,
+    CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 27,
         ArmorType = 'Normal',
@@ -215,9 +212,9 @@ UnitBlueprint {
     SelectionSizeX = 0.8,
     SelectionSizeZ = 0.8,
     SelectionThickness = 0.3,
-    SizeX = 0.8,
-    SizeY = 0.3,
-    SizeZ = 1.0,
+    SizeX = 0.7,
+    SizeY = 0.5,
+    SizeZ = 1.5,
     StrategicIconName = 'icon_land3_antiair',
     StrategicIconSortPriority = 115,
     Transport = {
@@ -309,6 +306,9 @@ UnitBlueprint {
             WeaponUnpacks = true,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {

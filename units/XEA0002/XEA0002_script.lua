@@ -5,9 +5,10 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local TOrbitalDeathLaserBeamWeapon = import('/lua/terranweapons.lua').TOrbitalDeathLaserBeamWeapon
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local TOrbitalDeathLaserBeamWeapon = import("/lua/terranweapons.lua").TOrbitalDeathLaserBeamWeapon
 
+---@class XEA0002 : TAirUnit
 XEA0002 = Class(TAirUnit) {
     DestroyNoFallRandomChance = 1.1,
 

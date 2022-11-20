@@ -5,8 +5,9 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
+local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
 
+---@class XAC0101 : ASeaUnit
 XAC0101 = Class(ASeaUnit) {
 }
 

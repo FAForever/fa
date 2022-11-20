@@ -6,9 +6,10 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CCivilianStructureUnit = import('/lua/cybranunits.lua').CCivilianStructureUnit
-local SSQuantumJammerTowerAmbient = import('/lua/EffectTemplates.lua').SJammerTowerAmbient
+local CCivilianStructureUnit = import("/lua/cybranunits.lua").CCivilianStructureUnit
+local SSQuantumJammerTowerAmbient = import("/lua/effecttemplates.lua").SJammerTowerAmbient
 
+---@class XRC1101 : CCivilianStructureUnit
 XRC1101 = Class(CCivilianStructureUnit) 
 
 {

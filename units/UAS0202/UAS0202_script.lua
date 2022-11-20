@@ -8,12 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AeonWeapons = import('/lua/aeonweapons.lua')
-local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
+local AeonWeapons = import("/lua/aeonweapons.lua")
+local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
 local AAAZealotMissileWeapon = AeonWeapons.AAAZealotMissileWeapon
 local ADFCannonQuantumWeapon = AeonWeapons.ADFCannonQuantumWeapon
 local AAMWillOWisp = AeonWeapons.AAMWillOWisp
 
+---@class UAS0202 : ASeaUnit
 UAS0202 = Class(ASeaUnit) {
     Weapons = {
         FrontTurret = Class(ADFCannonQuantumWeapon) {},

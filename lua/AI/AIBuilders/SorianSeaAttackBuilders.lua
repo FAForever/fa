@@ -7,28 +7,16 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local BBTmplFile = '/lua/basetemplates.lua'
-local BuildingTmpl = 'BuildingTemplates'
-local BaseTmpl = 'BaseTemplates'
-local ExBaseTmpl = 'ExpansionBaseTemplates'
-local Adj2x2Tmpl = 'Adjacency2x2'
 local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local MABC = '/lua/editor/MarkerBuildConditions.lua'
 local IBC = '/lua/editor/InstantBuildConditions.lua'
-local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
-local EBC = '/lua/editor/EconomyBuildConditions.lua'
-local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
 local TBC = '/lua/editor/ThreatBuildConditions.lua'
-local SAI = '/lua/ScenarioPlatoonAI.lua'
-local PlatoonFile = '/lua/platoon.lua'
 local SBC = '/lua/editor/SorianBuildConditions.lua'
 local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 function SeaAttackCondition(aiBrain, locationType, targetNumber)
-    local UC = import('/lua/editor/UnitCountBuildConditions.lua')
+    local UC = import("/lua/editor/unitcountbuildconditions.lua")
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
@@ -352,9 +340,6 @@ BuilderGroup {
         Priority = 100,
         InstanceCount = 5,
         BuilderType = 'Any',
-        BuilderData = {
-        UseFormation = 'AttackFormation',
-        },
         BuilderConditions = {
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, 'MOBILE TECH2 NAVAL' } },
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 1, categories.STRUCTURE * categories.DEFENSE * categories.ANTINAVY, 'Enemy'}},
@@ -362,6 +347,7 @@ BuilderGroup {
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderData = {
+            UseFormation = 'AttackFormation',
             SearchRadius = 6000,
             PrioritizedCategories = {
                 'STRUCTURE DEFENSE ANTINAVY TECH2',
@@ -553,3 +539,18 @@ BuilderGroup {
     BuilderGroupName = 'SorianMassHunterSeaFormBuilders',
     BuildersType = 'PlatoonFormBuilder',
 }
+
+
+-- kept for mod compatibility, as they may depend on these
+local BBTmplFile = '/lua/basetemplates.lua'
+local BuildingTmpl = 'BuildingTemplates'
+local BaseTmpl = 'BaseTemplates'
+local ExBaseTmpl = 'ExpansionBaseTemplates'
+local Adj2x2Tmpl = 'Adjacency2x2'
+local MIBC = '/lua/editor/MiscBuildConditions.lua'
+local MABC = '/lua/editor/MarkerBuildConditions.lua'
+local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
+local EBC = '/lua/editor/EconomyBuildConditions.lua'
+local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
+local SAI = '/lua/ScenarioPlatoonAI.lua'
+local PlatoonFile = '/lua/platoon.lua'

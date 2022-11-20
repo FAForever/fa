@@ -8,15 +8,16 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
-local AWeapons = import('/lua/aeonweapons.lua')
+local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
+local AWeapons = import("/lua/aeonweapons.lua")
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
 local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
-local Buff = import('/lua/sim/Buff.lua')
+local Buff = import("/lua/sim/buff.lua")
 
+---@class UAL0001 : ACUUnit
 UAL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(DeathNukeWeapon) {},

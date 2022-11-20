@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TLandUnit = import('/lua/terranunits.lua').TLandUnit
-local TIFCruiseMissileUnpackingLauncher = import('/lua/terranweapons.lua').TIFCruiseMissileUnpackingLauncher
+local TLandUnit = import("/lua/terranunits.lua").TLandUnit
+local TIFCruiseMissileUnpackingLauncher = import("/lua/terranweapons.lua").TIFCruiseMissileUnpackingLauncher
 
+---@class UEL0111 : TLandUnit
 UEL0111 = Class(TLandUnit) {
     Weapons = {
         MissileWeapon = Class(TIFCruiseMissileUnpackingLauncher) 
