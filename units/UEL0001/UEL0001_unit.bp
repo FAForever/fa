@@ -603,7 +603,7 @@ UnitBlueprint {
             },
         },
         ShieldGeneratorField = {
-            BuildCostEnergy = 450000,
+            BuildCostEnergy = 225000,
             BuildCostMass = 3600,
             BuildTime = 3400,
             Icon = 'sgf',
@@ -613,14 +613,13 @@ UnitBlueprint {
             Mesh = '/effects/entities/Shield01/Shield01_mesh',
             MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
             Name = '<LOC enhancements_0050>Shield Generator Field',
-            Prerequisite = 'Shield',
             ShieldEnergyDrainRechargeTime = 5,
             ShieldEnhancementNumber = 5,
-            ShieldMaxHealth = 36000,
+            ShieldMaxHealth = 25000,
             ShieldRechargeTime = 175,
             ShieldRegenRate = 42,
             ShieldRegenStartTime = 1,
-            ShieldSize = 16,
+            ShieldSize = 20,
             ShieldSpillOverDamageMod = 0, -- we will keep it at 0 to keep this upgrade efficient / special
             ShieldVerticalOffset = -3,
             Slot = 'Back',
@@ -629,6 +628,9 @@ UnitBlueprint {
             },
             UpgradeUnitAmbientBones = {
                 'UEL0001',
+            },
+            ShowBones = {
+                'Back_Upgrade_B01',
             },
         },
         ShieldGeneratorFieldRemove = {
@@ -642,7 +644,6 @@ UnitBlueprint {
             Name = '<LOC enhancements_0051>Remove Shields',
             Prerequisite = 'ShieldGeneratorField',
             RemoveEnhancements = {
-                'Shield',
                 'ShieldGeneratorField',
                 'ShieldGeneratorFieldRemove',
             },
