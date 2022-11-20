@@ -220,10 +220,10 @@ UnitBlueprint {
         RadarRadius = 96,
         VisionRadius = 64,
         JamRadius = {
-            Max = 18,
-            Min = 18,
+            Max = 25,
+            Min = 10,
         },
-        JammerBlips = 5,
+        JammerBlips = 4,
     },
     Interface = {
         HelpText = '<LOC uea0302_help>Spy Plane',

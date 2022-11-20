@@ -246,10 +246,10 @@ UnitBlueprint {
         RadarRadius = 65,
         VisionRadius = 32,
         JamRadius = {
-            Max = 18,
-            Min = 18,
+            Max = 40,
+            Min = 20,
         },
-        JammerBlips = 5,
+        JammerBlips = 4,
     },
     Interface = {
         HelpText = '<LOC uea0304_help>Strategic Bomber',
