@@ -151,6 +151,62 @@ NavUIGetLabel = Class(Group) {
 }
 
 ---@class NavUIPathTo : Group
+---@field State NavDebugGetLabelState
+NavUIGetLabelMetadata = Class(Group) {
+    __init = function (self, parent)
+        local name = 'NavUIGetLabel'
+        Group.__init(self, parent, name)
+
+        self.State = { }
+
+        self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
+            :Fill(self)
+            :Color('77000000')
+            :DisableHitTest(true)
+            :End()
+
+        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'GetLabel\'', 10, UIUtil.bodyFont))
+            :AtLeftTopIn(self, 10, 10)
+            :Over(self, 1)
+            :End() --[[@as Text]]
+
+        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 10, UIUtil.bodyFont))
+            :RightOf(self.ButtonPosition)
+            :Top(function() return self.ButtonPosition.Top() + LayoutHelpers.ScaleNumber(6) end)
+            :Over(self, 1)
+            :End()
+
+        self.ComboLayer = LayoutHelpers.LayoutFor(Combo(self, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01"))
+            :RightOf(self.ButtonPosition)
+            :Top(function() return self.ButtonPosition.Top() + LayoutHelpers.ScaleNumber(18) end)
+            :Width(100)
+            :End() --[[@as Combo]]
+
+        self.ComboLayer:AddItems(Shared.Layers)
+        self.ComboLayer:SetItem(1)
+        self.State.Layer = Shared.Layers[1]
+        self.ComboLayer.OnClick = function(combo, index, text)
+            self.State.Layer = Shared.Layers[index]
+            SimCallback({Func = 'NavDebugGetLabelMetadata', Args = self.State })
+        end
+
+        AddOnSyncCallback(
+            function(Sync)
+                if Sync.NavDebugGetLabelMetadata then
+                    local data = Sync.NavDebugGetLabelMetadata
+
+                    if data.Label then
+                        self.Title:SetText(string.format('Debug \'GetLabel\': %s', tostring(data.Label)))
+                    else
+                        self.Title:SetText(string.format('Debug \'GetLabel\': %s (%s)', tostring(data.Label), data.Msg))
+                    end
+                end
+            end, name
+        )
+    end,
+}
+
+---@class NavUIPathTo : Group
 ---@field State NavDebugCanPathToState
 NavUIPathTo = Class(Group) {
     __init = function (self, parent)
