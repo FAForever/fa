@@ -198,8 +198,8 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER2ENGINEER DEFENSE UEF',
             'BUILTBYTIER2ENGINEER INDIRECTFIRE UEF',
-            'BUILTBYTIER2ENGINEER RADAR UEF',
-            'BUILTBYTIER2ENGINEER SONAR UEF',
+            'BUILTBYTIER2ENGINEER INTELLIGENCE UEF',
+            'BUILTBYTIER1ENGINEER FACTORY UEF',
         },
         MaintenanceConsumptionPerSecondEnergy = 15,
         StorageEnergy = 200,
