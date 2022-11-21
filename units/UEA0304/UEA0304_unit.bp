@@ -116,6 +116,7 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
             '<LOC ability_radar>Radar',
+            '<LOC ability_jamming>Jamming',
         },
         LayerChangeEffects = {
             AirLand = {
@@ -192,6 +193,7 @@ UnitBlueprint {
         BuildCostEnergy = 144000,--105000
         BuildCostMass = 2100,
         BuildTime = 9600,
+        MaintenanceConsumptionPerSecondEnergy = 25,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -221,10 +223,24 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC uea0304_name>Ambassador',
         UnitWeight = 1,
+        OrderOverrides = {
+            RULEUTC_JammingToggle = {
+                bitmapId = 'jamming',
+                helpText = 'toggle_jamming',
+            },
+        },
+        ToggleCaps = {
+            RULEUTC_JammingToggle = true,
+        },
     },
     Intel = {
         RadarRadius = 65,
         VisionRadius = 32,
+        JamRadius = {
+            Max = 40,
+            Min = 20,
+        },
+        JammerBlips = 4,
     },
     Interface = {
         HelpText = '<LOC uea0304_help>Strategic Bomber',
