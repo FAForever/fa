@@ -21,7 +21,6 @@ BaseBuilderTemplate {
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerFactoryConstruction',
-        'EngineerFactoryConstructionLandHigherPriority',
 
         -- Engineer Support buildings
         'EngineeringSupportBuilder',
@@ -164,8 +163,8 @@ BaseBuilderTemplate {
             Gate = 1,
         },
         MassToFactoryValues = {
-            T1Value = 6,
-            T2Value = 15,
+            T1Value = 5,
+            T2Value = 14,
             T3Value = 22.5
         },
     },
