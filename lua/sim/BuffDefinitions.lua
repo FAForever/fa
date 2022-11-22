@@ -4,16 +4,26 @@
 -----------------------------------------------------------------
 
 ---@alias VeterancyBuffType
----| 'VeterancyMaxHealth1'
----| 'VeterancyMaxHealth2'
----| 'VeterancyMaxHealth3'
----| 'VeterancyMaxHealth4'
----| 'VeterancyMaxHealth5'
----| 'VeterancyRegen1'
----| 'VeterancyRegen2'
----| 'VeterancyRegen3'
----| 'VeterancyRegen4'
----| 'VeterancyRegen5'
+---| "VETERANCYHEALTH"
+---| "VETERANCYREGEN"
+
+---@alias VeterancyBuffName
+---| VeterancyMaxHealthBuffName
+---| VeterancyRegenBuffName
+
+---@alias VeterancyMaxHealthBuffName
+---| "VeterancyMaxHealth1"
+---| "VeterancyMaxHealth2"
+---| "VeterancyMaxHealth3"
+---| "VeterancyMaxHealth4"
+---| "VeterancyMaxHealth5"
+
+---@alias VeterancyRegenBuffName
+---| "VeterancyRegen1"
+---| "VeterancyRegen2"
+---| "VeterancyRegen3"
+---| "VeterancyRegen4"
+---| "VeterancyRegen5"
 
 import("/lua/sim/adjacencybuffs.lua")
 import("/lua/sim/cheatbuffs.lua") -- Buffs for AI Cheating

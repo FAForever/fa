@@ -5,6 +5,11 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@alias SeraphimSCUEnhancementBuffName      # BuffType
+---| "SeraphimSCUDamageStabilization"         # SCUUPGRADEDMG
+---| "SeraphimSCUBuildRate"                   # SCUBUILDRATE
+
+
 local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
 local SWeapons = import("/lua/seraphimweapons.lua")
 local Buff = import("/lua/sim/buff.lua")

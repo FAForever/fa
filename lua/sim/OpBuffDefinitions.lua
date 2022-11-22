@@ -8,8 +8,12 @@
 --****************************************************************************
 
 ---@alias OpBuffType
+---| "AIBUILDRATE"
+
+---@alias OpBuffName
 ---| "BaseManagerFactoryDefaultBuildRate"
 ---| "BaseManagerEngineerDefaultBuildRate"
+
 
 BuffBlueprint {
     Name = 'BaseManagerFactoryDefaultBuildRate',

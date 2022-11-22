@@ -5,6 +5,11 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@alias AeonSCUEnhancementBuffName          # BuffType
+---| "AeonSCUBuildRate"                       # SCUBUILDRATE
+---| "AeonSCURegenRate"                       # SCUREGENRATE
+
+
 local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
 local AWeapons = import("/lua/aeonweapons.lua")
 local ADFReactonCannon = AWeapons.ADFReactonCannon

@@ -7,6 +7,18 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
+---@alias SeraphimACUEnhancementBuffName      # BuffType
+---| "SeraphimACUDamageStabilization"         # ACUUPGRADEDMG
+---| "SeraphimACUDamageStabilizationAdv"      # ACUUPGRADEDMG
+---| "SeraphimACUAdvancedRegenAura"           # COMMANDERAURA
+---| "SeraphimACUAdvancedRegenAuraSelfBuff"   # COMMANDERAURAFORSELF
+---| "SeraphimACURegenAura"                   # COMMANDERAURA
+---| "SeraphimACURegenAuraSelfBuff"           # COMMANDERAURAFORSELF
+---| "SeraphimACUT2BuildRate"                 # ACUBUILDRATE
+---| "SeraphimACUT3BuildRate"                 # ACUBUILDRATE
+
+
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local Buff = import("/lua/sim/buff.lua")
 local SWeapons = import("/lua/seraphimweapons.lua")
@@ -94,40 +106,42 @@ XSL0001 = Class(ACUUnit) {
 
         -- Regenerative Aura
         if enh == 'RegenAura' or enh == 'AdvancedRegenAura' then
-            local buff
-            local type
-
-            buff = 'SeraphimACU' .. enh
+            local buff = 'SeraphimACU' .. enh
 
             if not Buffs[buff] then
                 local buff_bp = {
                     Name = buff,
                     DisplayName = buff,
-                    BuffType = 'COMMANDERAURA_' .. enh,
+                    BuffType = 'COMMANDERAURA',
                     Stacks = 'REPLACE',
                     Duration = 5,
                     Effects = {'/effects/emitters/seraphim_regenerative_aura_02_emit.bp'},
                     Affects = {
                         Regen = {
                             Add = 0,
-                            Mult = bp.RegenPerSecond,
-                            Floor = bp.RegenFloor,
+                            InterpMult = bp.RegenPerSecond,
+                            Floor = bp.RegenFloor or 3,
                             BPCeilings = {
-                                TECH1 = bp.RegenCeilingT1,
-                                TECH2 = bp.RegenCeilingT2,
-                                TECH3 = bp.RegenCeilingT3,
-                                EXPERIMENTAL = bp.RegenCeilingT4,
-                                SUBCOMMANDER = bp.RegenCeilingSCU,
+                                TECH1 = bp.RegenCeilingT1 or 10,
+                                TECH2 = bp.RegenCeilingT2 or 15,
+                                TECH3 = bp.RegenCeilingT3 or 25,
+                                EXPERIMENTAL = bp.RegenCeilingT4 or 40,
+                                SUBCOMMANDER = bp.RegenCeilingSCU or 30,
                             },
+                        },
+                        MaxHealth = {
+                            Add = 0,
+                            Mult = bp.MaxHealthFactor,
+                            DoNotFill = true,
                         },
                     },
                 }
-
-                buff_bp.Affects.MaxHealth = {
-                    Add = 0,
-                    Mult = bp.MaxHealthFactor,
-                    DoNotFill = true,
-                }
+                -- Make the Advanced version always replace the regular version's buff
+                if enh == 'AdvancedRegenAura' then
+                    buff_bp.ReplacePriority = 1
+                else
+                    buff_bp.ReplacePriority = 0
+                end
 
                 BuffBlueprint(buff_bp)
             end

@@ -5,6 +5,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------
 
+---@alias CybranACUEnhancementBuffName           # BuffType
+---| "CybranACUCloakBonus"                    # ACUCLOAKBONUS
+---| "CybranACUStealthBonus"                  # ACUSTEALTHBONUS
+---| "CybranACUT2BuildRate"                   # ACUBUILDRATE
+---| "CybranACUT3BuildRate"                   # ACUBUILDRATE
+
+
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local CCommandUnit = import("/lua/cybranunits.lua").CCommandUnit
 local CWeapons = import("/lua/cybranweapons.lua")

@@ -8,6 +8,12 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@alias AeonACUEnhancementBuffName          # BuffType
+---| "AeonACUChronoDampener"                  # DamageStabilization
+---| "AeonACUT2BuildRate"                     # ACUBUILDRATE
+---| "AeonACUT3BuildRate"                     # ACUBUILDRATE
+
+
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local AWeapons = import("/lua/aeonweapons.lua")
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
