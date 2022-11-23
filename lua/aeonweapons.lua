@@ -127,7 +127,7 @@ ADFTractorClaw = Class(Weapon) {
     OnInvalidTargetThread = function(self)
         self:ResetTarget()
         self:SetEnabled(false)
-        WaitSeconds(0.4)
+        WaitSeconds(10)
         if not IsDestroyed(self) then
             self:SetEnabled(true)
         end
