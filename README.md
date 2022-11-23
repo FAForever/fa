@@ -17,7 +17,7 @@ You can download the client on our [website](https://faforever.com/). In order t
 Changelog
 ---------
 
-THere is the complete [changelog](changelog.md). There is an [alternative changelog](http://patchnotes.faforever.com/) for balance patches in a user-friendly format. 
+There is the complete [changelog](changelog.md). There is an [alternative changelog](http://patchnotes.faforever.com/) for balance patches in a user-friendly format. 
 
 Contributing
 ------------
