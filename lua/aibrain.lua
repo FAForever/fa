@@ -5028,7 +5028,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 elseif self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Amphibious' then
                     WaitTicks(5)
                     continue
-                elseif self.CanPathToEnemyRNG[OwnIndex][EnemyIndex][k] == 'Air' then
+                elseif self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Air' then
                     WaitTicks(5)
                     continue
                 end

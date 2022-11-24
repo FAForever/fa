@@ -292,7 +292,7 @@ function CAiBrain:GetNumPlatoonsTemplateNamed()
 end
 
 --- TODO.
----@return Number
+---@return number
 function CAiBrain:GetNumPlatoonsWithAI()
 end
 

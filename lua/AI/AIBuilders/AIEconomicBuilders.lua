@@ -12,15 +12,15 @@ local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
 local ExBaseTmpl = 'ExpansionBaseTemplates'
 local Adj2x2Tmpl = 'Adjacency2x2'
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local MABC = '/lua/editor/MarkerBuildConditions.lua'
-local IBC = '/lua/editor/InstantBuildConditions.lua'
-local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
-local EBC = '/lua/editor/EconomyBuildConditions.lua'
-local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
-local SAI = '/lua/ScenarioPlatoonAI.lua'
-local TBC = '/lua/editor/ThreatBuildConditions.lua'
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
+local MABC = '/lua/editor/markerbuildconditions.lua'
+local IBC = '/lua/editor/instantbuildconditions.lua'
+local OAUBC = '/lua/editor/otherarmyunitcountbuildconditions.lua'
+local EBC = '/lua/editor/economybuildconditions.lua'
+local PCBC = '/lua/editor/platooncountbuildconditions.lua'
+local SAI = '/lua/scenarioplatoonai.lua'
+local TBC = '/lua/editor/threatbuildconditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
 ---@alias BuilderGroupsEconomic 'EngineerFactoryBuilders' | 'Engineer Transfers' | 'Land Rush Initial ACU Builders' | 'Balanced Rush Initial ACU Builders' | 'Air Rush Initial ACU Builders' | 'Naval Rush Initial ACU Builders' | 'Default Initial ACU Builders' | 'ACUBuilders' | 'ACUUpgrades - Gun improvements' | 'ACUUpgrades - Tech 2 Engineering' | 'ACUUpgrades - Shields' | 'ACUUpgrades' | 'T1EngineerBuilders' | 'T2EngineerBuilders' | 'T3EngineerBuilders' | 'EngineerMassBuildersHighPri' | 'EngineerMassBuilders - Naval' | 'EngineerMassBuildersLowerPri' | 'EngineerMassBuildersMidPriSingle' | 'EngineerEnergyBuilders' | 'EngineerEnergyBuildersExpansions' | 'EngineeringSupportBuilder'
@@ -48,7 +48,7 @@ BuilderGroup {
         Priority = 850,
         BuilderConditions = {
             { EBC, 'LessThanEnergyTrendOverTime', { 0.0 } },
-            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER * categories.TECH1 } },
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER } },
             { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech1' } },
         },
         BuilderType = 'All',
@@ -94,6 +94,17 @@ BuilderGroup {
         BuilderType = 'All',
     },
     Builder {
+        BuilderName = 'T2 Engineer Power',
+        PlatoonTemplate = 'T2BuildEngineer',
+        Priority = 851,
+        BuilderConditions = {
+            { EBC, 'LessThanEnergyTrendOverTime', { 0.0 } },
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER  } },
+            { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech2' } },
+        },
+        BuilderType = 'All',
+    },
+    Builder {
         BuilderName = 'T2 Engineer Disband - Filler 1',
         PlatoonTemplate = 'T2BuildEngineer',
         Priority = 800,
@@ -130,6 +141,17 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC,'EngineerLessAtLocation', { 'LocationType', 6, categories.ENGINEER * categories.TECH3 }},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER * categories.TECH3 } },
+            { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech3' } },
+        },
+        BuilderType = 'All',
+    },
+    Builder {
+        BuilderName = 'T3 Engineer Power',
+        PlatoonTemplate = 'T3BuildEngineer',
+        Priority = 852,
+        BuilderConditions = {
+            { EBC, 'LessThanEnergyTrendOverTime', { 0.0 } },
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER  } },
             { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech3' } },
         },
         BuilderType = 'All',
@@ -1582,27 +1604,29 @@ BuilderGroup {
     --        },
     --    }
     --},
-    --Builder {
-    --    BuilderName = 'T1 Engineer Assist Power',
-    --    PlatoonTemplate = 'EngineerAssist',
-    --    Priority = 900,
-    --    BuilderConditions = {
-    --        { UCBC, 'LocationEngineersBuildingAssistanceGreater', { 'LocationType', 0, 'ENERGYPRODUCTION' }},
-    --        { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 0.8 }},
-    --        { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.4 }},
-    --    },
-    --    InstanceCount = 2,
-    --    BuilderType = 'Any',
-    --    BuilderData = {
-    --        Assist = {
-    --            AssistLocation = 'LocationType',
-    --            PermanentAssist = true,
-    --            BeingBuiltCategories = {'ENERGYPRODUCTION TECH3', 'ENERGYPRODUCTION TECH2', 'ENERGYPRODUCTION'},
-    --            AssisteeType = 'Engineer',
-    --            Time = 60,
-    --        },
-    --    }
-    --},
+    Builder {
+        BuilderName = 'T1 Engineer Assist Power',
+        PlatoonTemplate = 'EngineerAssist',
+        Priority = 900,
+        BuilderConditions = {
+            { UCBC, 'LocationEngineersBuildingAssistanceGreater', { 'LocationType', 0, categories.ENERGYPRODUCTION }},
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 0.8 }},
+            { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.4 }},
+        },
+        InstanceCount = 2,
+        BuilderType = 'Any',
+        BuilderData = {
+            Assist = {
+                AssistLocation = 'LocationType',
+                AssistRange = 65,
+                AssistUntilFinished = true,
+                AssistClosestUnit = true,
+                BeingBuiltCategories = {'ENERGYPRODUCTION TECH3', 'ENERGYPRODUCTION TECH2', 'ENERGYPRODUCTION'},
+                AssisteeType = 'Engineer',
+                AssisteeCategory = categories.ENGINEER,
+            },
+        }
+    },
     --Builder {
     --    BuilderName = 'T1 Engineer Assist Transport',
     --    PlatoonTemplate = 'EngineerAssist',
@@ -1752,10 +1776,12 @@ BuilderGroup {
         BuilderData = {
             Assist = {
                 AssistLocation = 'LocationType',
-                PermanentAssist = true,
-                BeingBuiltCategories = { 'ENERGYPRODUCTION TECH3', 'ENERGYPRODUCTION TECH2', },
+                AssistRange = 65,
+                AssistUntilFinished = true,
+                AssistClosestUnit = true,
+                BeingBuiltCategories = {'ENERGYPRODUCTION TECH3', 'ENERGYPRODUCTION TECH2'},
                 AssisteeType = 'Engineer',
-                Time = 60,
+                AssisteeCategory = categories.ENGINEER,
             },
         }
     },
@@ -1883,10 +1909,12 @@ BuilderGroup {
         BuilderData = {
             Assist = {
                 AssistLocation = 'LocationType',
-                PermanentAssist = true,
+                AssistRange = 65,
+                AssistUntilFinished = true,
+                AssistClosestUnit = true,
                 BeingBuiltCategories = {'ENERGYPRODUCTION TECH3'},
                 AssisteeType = 'Engineer',
-                Time = 60,
+                AssisteeCategory = categories.ENGINEER,
             },
         }
     },
@@ -2659,12 +2687,12 @@ BuilderGroup {
         BuilderName = 'T1 Power Engineer',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1000,
+        InstanceCount = 2,
         BuilderConditions = {
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) } },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.8, 0.5 }},
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.7, 0.1 }},
             { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.35 }},
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * (categories.TECH2 + categories.TECH3) }},
         },
-        --InstanceCount = 2,
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
