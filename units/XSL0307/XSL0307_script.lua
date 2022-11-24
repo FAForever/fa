@@ -7,8 +7,8 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SShieldHoverLandUnit = import('/lua/seraphimunits.lua').SShieldHoverLandUnit
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local SShieldHoverLandUnit = import("/lua/seraphimunits.lua").SShieldHoverLandUnit
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
 ---@class XSL0307 : SShieldHoverLandUnit
 XSL0307 = Class(SShieldHoverLandUnit) {
@@ -80,7 +80,7 @@ XSL0307 = Class(SShieldHoverLandUnit) {
     OnLayerChange = function(self, new, old)
         SShieldHoverLandUnit.OnLayerChange(self, new, old)
         
-        if not IsDestroyed(self) then 
+        if not IsDestroyed(self.TargetPointer) then
             if self.PointerEnabled == false then
                 self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
             end

@@ -5,9 +5,9 @@
 --**
 --**  Summary  :  Aeon Heavy Disruptor Cannon Projectile script, XAL0305
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-ADFHeavyDisruptorCannon01 = Class(import('/lua/aeonprojectiles.lua').AHeavyDisruptorCannonShell) {
+ADFHeavyDisruptorCannon01 = Class(import("/lua/aeonprojectiles.lua").AHeavyDisruptorCannonShell) {
 }
 TypeClass = ADFHeavyDisruptorCannon01

@@ -1,6 +1,6 @@
 -- This functionallity is unimplemented and will not work
+---@meta
 
----@declare-global
 ---@deprecated
 ---@class moho.histogram_methods : moho.control_methods
 local CMauiHistogram = {}

@@ -7,17 +7,17 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved. All lefts reserved too.
 --****************************************************************************
 
-local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
-local StrategyBuilder = import('/lua/sim/StrategyBuilder.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
---local StrategyList = import('/lua/ai/SkirmishStrategyList.lua').StrategyList
-local AIAddBuilderTable = import('/lua/ai/AIAddBuilderTable.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local StrategyBuilder = import("/lua/sim/strategybuilder.lua")
 
 ---@class StrategyManager : BuilderManager
 StrategyManager = Class(BuilderManager) {
+    ---@param self StrategyManager
+    ---@param brain AIBrain
+    ---@param lType any
+    ---@param location Vector
+    ---@param radius number
+    ---@param useCenterPoint boolean
     Create = function(self, brain, lType, location, radius, useCenterPoint)
         BuilderManager.Create(self,brain)
 
@@ -38,6 +38,11 @@ StrategyManager = Class(BuilderManager) {
         --self:LoadStrategies()
     end,
 
+    ---@param self StrategyManager
+    ---@param builderData table
+    ---@param locationType string
+    ---@param builderType string
+    ---@return string|false
     AddBuilder = function(self, builderData, locationType, builderType)
         local newBuilder = StrategyBuilder.CreateStrategy(self.Brain, builderData, locationType)
         self:AddInstancedBuilder(newBuilder, builderType)
@@ -45,12 +50,15 @@ StrategyManager = Class(BuilderManager) {
     end,
 
     -- Load all strategies in the Strategy List table
+    ---@param self StrategyManager
     LoadStrategies = function(self)
         for i,v in StrategyList do
             self:AddBuilder(v)
         end
     end,
 
+    ---@param self StrategyManager
+    ---@param builder Builder
     ExecuteChanges = function(self, builder)
         local turnOff = builder:GetRemoveBuilders()
         local turnOn = builder:GetActivateBuilders()
@@ -70,6 +78,8 @@ StrategyManager = Class(BuilderManager) {
         builder:SetStrategyActive(true)
     end,
 
+    ---@param self StrategyManager
+    ---@param builder Builder
     UndoChanges = function(self, builder)
         local turnOn = builder:GetRemoveBuilders()
         local turnOff = builder:GetActivateBuilders()
@@ -88,6 +98,9 @@ StrategyManager = Class(BuilderManager) {
         builder:SetStrategyActive(false)
     end,
 
+    ---@param self StrategyManager
+    ---@param builder Builder
+    ---@param bType any
     ManagerLoopBody = function(self,builder,bType)
         BuilderManager.ManagerLoopBody(self,builder,bType)
 
@@ -101,8 +114,23 @@ StrategyManager = Class(BuilderManager) {
     end,
 }
 
+---@param brain AIBrain
+---@param lType any
+---@param location Vector
+---@param radius number
+---@param useCenterPoint boolean
+---@return StrategyManager
 function CreateStrategyManager(brain, lType, location, radius, useCenterPoint)
     local stratman = StrategyManager()
     stratman:Create(brain, lType, location, radius, useCenterPoint)
     return stratman
 end
+
+-- kept for mod backwards compatibility
+
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
+--local StrategyList = import("/lua/ai/skirmishstrategylist.lua").StrategyList
+local AIAddBuilderTable = import("/lua/ai/aiaddbuildertable.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Builder = import("/lua/sim/builder.lua")

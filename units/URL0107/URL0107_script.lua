@@ -8,11 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFLaserHeavyWeapon = CybranWeaponsFile.CDFLaserHeavyWeapon
 --local CDFRocketIridiumWeapon = CybranWeaponsFile.CDFRocketIridiumWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectUtil = import("/lua/effectutilities.lua")
 
 
 ---@class URL0107 : CWalkingLandUnit

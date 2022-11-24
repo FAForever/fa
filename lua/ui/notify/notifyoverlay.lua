@@ -1,11 +1,11 @@
 -- This file contains the functions which deal with creating and updating ETA overlay for ACU upgrades
 
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local defaultMessages = import("/lua/ui/notify/defaultmessages.lua").defaultMessages
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local AddChatCommand = import("/lua/ui/notify/commands.lua").AddChatCommand
 
 local overlayDisabled
 local overlayLockedOut
@@ -13,7 +13,7 @@ local customMessagesDisabled
 overlays = {}
 
 function init()
-    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(processNotification, 'NotifyOverlay') -- Imported here to avoid loading the file before the game is fully initialized
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(processNotification, 'NotifyOverlay') -- Imported here to avoid loading the file before the game is fully initialized
     AddChatCommand('enablenotifyoverlay', toggleOverlayTemporary)
     AddChatCommand('disablenotifyoverlay', toggleOverlayTemporary)
 
@@ -124,7 +124,7 @@ function createEnhancementOverlay(args)
             return
         end
 
-        local worldView = import('/lua/ui/game/worldview.lua').viewLeft
+        local worldView = import("/lua/ui/game/worldview.lua").viewLeft
         local pos = worldView:Project(overlay.pos)
 
         if pos.x < 0 or pos.y < 0 or pos.x > worldView.Width() or pos.y > worldView:Height() then
@@ -217,7 +217,7 @@ function generateEnhancementMessage(data)
             data.pos = pos
             data.last_message = seconds
             msg.data = table.merged(msg.data, {progress = percent, eta = eta, pos = pos})
-            import('/lua/ui/notify/notify.lua').sendMessage(msg)
+            import("/lua/ui/notify/notify.lua").sendMessage(msg)
         end
     end
 
@@ -228,5 +228,5 @@ end
 
 function sendDestroyOverlayMessage(id)
     local msg = {to = 'allies', NotifyOverlay = true, data = {id = id, destroy = true}}
-    import('/lua/ui/notify/notify.lua').sendMessage(msg)
+    import("/lua/ui/notify/notify.lua").sendMessage(msg)
 end

@@ -8,8 +8,8 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CSubUnit = import('/lua/cybranunits.lua').CSubUnit
-local WeaponsFile = import('/lua/cybranweapons.lua')
+local CSubUnit = import("/lua/cybranunits.lua").CSubUnit
+local WeaponsFile = import("/lua/cybranweapons.lua")
 local CANNaniteTorpedoWeapon = WeaponsFile.CANNaniteTorpedoWeapon
 local CIFSmartCharge = WeaponsFile.CIFSmartCharge
 

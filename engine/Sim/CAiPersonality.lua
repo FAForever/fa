@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.aipersonality_methods
 local CAiPersonality = {}
 

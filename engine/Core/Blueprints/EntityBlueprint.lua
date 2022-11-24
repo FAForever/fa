@@ -1,0 +1,43 @@
+---@meta
+
+---@class EntityBlueprint : Blueprint
+---@field Categories CategoryName[]  Named categories that this entity belongs to
+---@field ScriptModule string    Module defining entity's class.
+---@field ScriptClass string Name of entity's class.
+---@field CollisionShape CollisionShape  Shape to use for collision db, 'None' for no collision.
+---@field SizeX number                       Unit size X
+---@field SizeY number                       Unit size Y
+---@field SizeZ number                       Unit size Z
+---@field AverageDensity number              Unit average density in tons / m^3. (Default is 0.49)
+---@field InertiaTensorX number              Component X,X of inertia tensor
+---@field InertiaTensorY number              Component Y,Y of inertia tensor
+---@field InertiaTensorZ number              Component Z,Z of inertia tensor
+---@field CollisionOffsetX number            Offset collision by this much on the X Axis
+---@field CollisionOffsetY number            Offset collision by this much on the Y Axis
+---@field CollisionOffsetZ number            Offset collision by this much on the Z Axis
+---@field Footprint FootprintBlueprint       Unit footprint
+---@field AltFootprint FootprintBlueprint    Alternate Unit footprint
+---@field DesiredShooterCap number           Set the desired maximum number of shooters taking shots at me
+---@field StrategicIconName string           Name of strategic icon to use for this unit
+---@field LifeBarRender boolean              Should render life bar or not.
+---@field LifeBarOffset number               Vertical offset from unit for lifebar.
+---@field LifeBarSize number                 size of lifebar in OGrids.
+---@field LifeBarHeight number               height of lifebar in OGrids.
+---@field SelectionSizeX number              X Size of selection box
+---@field SelectionSizeY number              Y Size of selection box
+---@field SelectionSizeZ number              Z Size of selection box
+---@field SelectionCenterOffsetX number      X center offset of selection box
+---@field SelectionCenterOffsetY number      Y center offset of selection box
+---@field SelectionCenterOffsetZ number      Z center offset of selection box
+---@field SelectionYOffset number            How far to reduce top of collision box for selection (default 0.5 (half))
+---@field SelectionMeshScaleX number         Scale the mesh on the X axis by this much when we perform our mouse over entity test
+---@field SelectionMeshScaleY number         Scale the mesh on the Y axis by this much when we perform our mouse over entity test
+---@field SelectionMeshScaleZ number         Scale the mesh on the Z axis by this much when we perform our mouse over entity test
+---@field SelectionMeshUseTopAmount number   Use this much of the top portion of our mesh for intersection test. Useful for naval stuctures that go deep into water
+---@field SelectionThickness number          Use this to modify the thickness of the rendered selection indicator for the unit
+---@field UseOOBTestZoom number              Use OOB hit test for this unit when camera is below this zoom level
+---@field StrategicIconSortPriority number   0 renders on top, 255 on bottom
+
+---@class FootprintBlueprint
+---@field SizeX number
+---@field SizeZ number

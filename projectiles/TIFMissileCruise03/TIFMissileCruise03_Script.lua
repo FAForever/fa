@@ -2,8 +2,8 @@
 -- Terran Land-Based Cruise Missile : UEL0111 (UEF T2 MML)
 --
 
-local TMissileCruiseProjectile = import('/lua/terranprojectiles.lua').TMissileCruiseProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 TIFMissileCruise03 = Class(TMissileCruiseProjectile) {
 

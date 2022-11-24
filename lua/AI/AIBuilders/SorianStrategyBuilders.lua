@@ -12,23 +12,23 @@ local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
 local ExBaseTmpl = 'ExpansionBaseTemplates'
 local Adj2x2Tmpl = 'Adjacency2x2'
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local MABC = '/lua/editor/MarkerBuildConditions.lua'
-local IBC = '/lua/editor/InstantBuildConditions.lua'
-local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
-local EBC = '/lua/editor/EconomyBuildConditions.lua'
-local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
-local SAI = '/lua/ScenarioPlatoonAI.lua'
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
+local MABC = '/lua/editor/markerbuildconditions.lua'
+local IBC = '/lua/editor/instantbuildconditions.lua'
+local OAUBC = '/lua/editor/otherarmyunitcountbuildconditions.lua'
+local EBC = '/lua/editor/economybuildconditions.lua'
+local PCBC = '/lua/editor/platooncountbuildconditions.lua'
+local SAI = '/lua/scenarioplatoonai.lua'
 local PlatoonFile = '/lua/platoon.lua'
 local SBC = '/lua/editor/SorianBuildConditions.lua'
 local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Behaviors = import('/lua/ai/aibehaviors.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
-local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Behaviors = import("/lua/ai/aibehaviors.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 local econThread
 

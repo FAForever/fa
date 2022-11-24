@@ -3,14 +3,14 @@
 --* Author: Chris Blackwell
 --* Summary: game creation UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Edit = import('/lua/maui/edit.lua').Edit
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Edit = import("/lua/maui/edit.lua").Edit
+local Prefs = import("/lua/user/prefs.lua")
 
 local unselectedCheckboxFile = UIUtil.SkinnableFile('/widgets/rad_un.dds')
 local selectedCheckboxFile = UIUtil.SkinnableFile('/widgets/rad_sel.dds')
@@ -42,7 +42,7 @@ function CreateUI(playerName, over, exitBehavior)
 	LayoutHelpers.AtRightIn(exitButton, panel, 38)
 	LayoutHelpers.AtBottomIn(exitButton, panel, 34)
 
-    import('/lua/ui/uimain.lua').SetEscapeHandler(function() exitButton.OnClick(exitButton) end)
+    import("/lua/ui/uimain.lua").SetEscapeHandler(function() exitButton.OnClick(exitButton) end)
 
     local panelTitle = UIUtil.CreateText(panel, "<LOC _Create_LAN_Game>", 22)
     LayoutHelpers.AtHorizontalCenterIn(panelTitle, panel)
@@ -123,7 +123,7 @@ function CreateUI(playerName, over, exitBehavior)
     --  control behvaior
     exitButton.OnClick = function(self)
    		panel:Destroy()
-    	import('/lua/ui/lobby/gameselect.lua').CreateUI(over, exitBehavior)
+    	import("/lua/ui/lobby/gameselect.lua").CreateUI(over, exitBehavior)
     end
 
     gameNameEdit.OnEnterPressed = function(self, text)
@@ -166,7 +166,7 @@ function CreateUI(playerName, over, exitBehavior)
         local protocol = "UDP"
 
         local function StartLobby(scenarioFileName)
-            local lobby = import('/lua/ui/lobby/lobby.lua')
+            local lobby = import("/lua/ui/lobby/lobby.lua")
             lobby.CreateLobby(protocol, port, playerName, nil, nil, over, exitBehavior)
             Prefs.SetToCurrentProfile('last_game_name', gameName)
             lobby.HostGame(gameName, scenarioFileName, false)
@@ -196,7 +196,7 @@ function QuickHost()
     local playerName = Prefs.GetFromCurrentProfile('NetName') or Prefs.GetFromCurrentProfile('Name')
     local lastGameName = Prefs.GetFromCurrentProfile('last_game_name')
 
-    local lobby = import('/lua/ui/lobby/lobby.lua')
+    local lobby = import("/lua/ui/lobby/lobby.lua")
     lobby.CreateLobby("UDP", lastPort, playerName, nil, nil)
     lobby.HostGame(lastGameName, lastScenario, false)
 end

@@ -3,14 +3,14 @@
 --* Author: Chris Blackwell
 --* Summary: Allows you to choose replays
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local FilePicker = import('/lua/ui/controls/filepicker.lua').FilePicker
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local FilePicker = import("/lua/ui/controls/filepicker.lua").FilePicker
 
 local forbiddenSaveNames = {
     [LOC("<LOC Engine0030>")] = true,   -- LastGame forbidden

@@ -6,9 +6,8 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local Utils = import('/lua/system/utils.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
 local quickDialog = false
 
@@ -87,9 +86,12 @@ function HandleEsc(quit_game)
         else
             CreateYesNoDialog()
         end
-    elseif import('/lua/ui/game/commandmode.lua').GetCommandMode()[1] ~= false then
-        import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
+    elseif import("/lua/ui/game/commandmode.lua").GetCommandMode()[1] ~= false then
+        import("/lua/ui/game/commandmode.lua").EndCommandMode(true)
     elseif GetSelectedUnits() then
         SelectUnits(nil)
     end
 end
+
+-- kept for mod backwards compatibility
+local Utils = import("/lua/system/utils.lua")

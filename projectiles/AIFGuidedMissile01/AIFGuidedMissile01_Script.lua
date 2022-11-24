@@ -5,11 +5,11 @@
 --**
 --**  Summary  :  Aeon Guided Missile, DAA0206
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AGuidedMissileProjectile = import('/lua/aeonprojectiles.lua').AGuidedMissileProjectile
-local RandF = import('/lua/utilities.lua').GetRandomFloat
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissileProjectile
+local RandF = import("/lua/utilities.lua").GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 AIFGuidedMissile = Class(AGuidedMissileProjectile) {
     OnCreate = function(self)

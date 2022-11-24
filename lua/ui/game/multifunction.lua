@@ -6,32 +6,32 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Button = import('/lua/maui/button.lua').Button
-local Grid = import('/lua/maui/grid.lua').Grid
-local Text = import('/lua/maui/text.lua').Text
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Button = import("/lua/maui/button.lua").Button
+local Grid = import("/lua/maui/grid.lua").Grid
+local Text = import("/lua/maui/text.lua").Text
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 local econ = import("/lua/ui/game/economy.lua")
-local cmdMode = import('/lua/ui/game/commandmode.lua')
-local UIPing = import('/lua/ui/game/ping.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local miniMap = import('/lua/ui/game/minimap.lua')
-local UIMain = import('/lua/ui/uimain.lua')
-local Borders = import('/lua/ui/game/borders.lua')
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
-local ColumnLayout = import('/lua/ui/controls/columnlayout.lua').ColumnLayout
+local cmdMode = import("/lua/ui/game/commandmode.lua")
+local UIPing = import("/lua/ui/game/ping.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local miniMap = import("/lua/ui/game/minimap.lua")
+local UIMain = import("/lua/ui/uimain.lua")
+local Borders = import("/lua/ui/game/borders.lua")
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
+local ColumnLayout = import("/lua/ui/controls/columnlayout.lua").ColumnLayout
 
-local filters = import('/lua/ui/game/rangeoverlayparams.lua').RangeOverlayParams
-local worldView = import('/lua/ui/game/borders.lua').GetMapGroup()
+local filters = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
+local worldView = import("/lua/ui/game/borders.lua").GetMapGroup()
 savedParent = false
 
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
 controls.overlayBtns = controls.overlayBtns or {}
 controls.pingBtns = controls.pingBtns or {}
 
@@ -82,8 +82,10 @@ local buttons = {
             tooltip = 'mfd_defense',
             bitmap = 'team-color',
             id = 'teamcolor',
+            disableInReplay = true,
             OnClick = function(self, modifiers)
                 TeamColorHandler(self, modifiers)
+                self:ToggleCheck()
             end,
         },
         {
@@ -238,6 +240,10 @@ function Create(parent)
             Tooltip.AddCheckboxTooltip(btn.dropout, buttonData.dropout_tooltip)
         end
 
+        if btn and buttonData.disableInReplay and SessionIsReplay() then
+            btn:Disable()
+        end
+
         return btn
     end
 
@@ -255,6 +261,7 @@ function Create(parent)
 
     for index, buttonData in buttons.overlays do
         controls.overlayBtns[index] = CreateOverlayBtn(buttonData)
+        
     end
 
     for index, buttonData in buttons.pings do
@@ -343,7 +350,9 @@ function ToggleMilitary()
 end
 
 function ToggleDefense()
-    GetButton('teamcolor'):ToggleCheck()
+    local btn = GetButton('teamcolor')
+    TeamColorHandler(btn, { })
+    btn:ToggleCheck()
 end
 
 function ToggleEconomy()
@@ -362,7 +371,7 @@ function OnDropoutChecked(self, checked)
 end
 
 function CreateMapDropout(parent)
-    import('/lua/ui/game/chat.lua').CloseChatConfig()
+    import("/lua/ui/game/chat.lua").CloseChatConfig()
     local bg = CreateDropoutBG(false)
 
     local function CreateMapOptions(inMapControl)
@@ -494,7 +503,7 @@ function CreateMapDropout(parent)
         return group
     end
 
-    local viewControls = import('/lua/ui/game/worldview.lua').GetWorldViews()
+    local viewControls = import("/lua/ui/game/worldview.lua").GetWorldViews()
     local Views = {}
     for _, control in viewControls do
         table.insert(Views, control)
@@ -1044,7 +1053,7 @@ function CreateDropoutBG(createConnector)
 end
 
 function ToggleMFDPanel(state)
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         return
     end
     if UIUtil.GetAnimationPrefs() then
@@ -1155,9 +1164,9 @@ end
 local function changeScoreboardColors(colorsTbl)
     local armyLines
     if exists('/mods/SupremeScoreBoard/modules/score_board.lua') then
-        armyLines = import('/mods/SupremeScoreBoard/modules/score_board.lua').controls.armyLines or import('/lua/ui/game/score.lua').controls.armyLines
+        armyLines = import("/mods/supremescoreboard/modules/score_board.lua").controls.armyLines or import("/lua/ui/game/score.lua").controls.armyLines
     else
-        armyLines = import('/lua/ui/game/score.lua').controls.armyLines
+        armyLines = import("/lua/ui/game/score.lua").controls.armyLines
     end
     if colorsTbl then
         for key,line in armyLines do
@@ -1384,7 +1393,6 @@ function TeamColorHandler(self, modifiers)
             TeamColorMode(calculateTeamColors())
             TeamColorMode(true)
         end    
-        self:ToggleCheck()
     end
 end
 

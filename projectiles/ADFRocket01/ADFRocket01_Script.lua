@@ -1,7 +1,7 @@
 --
 -- Aeon Rocket
 --
-local ARocketProjectile = import('/lua/aeonprojectiles.lua').ARocketProjectile
+local ARocketProjectile = import("/lua/aeonprojectiles.lua").ARocketProjectile
 ADFRocket01 = Class(ARocketProjectile) {
 }
 

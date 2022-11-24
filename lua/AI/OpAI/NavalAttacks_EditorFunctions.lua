@@ -7,7 +7,7 @@
 -- --**             Build conditions always return true or false
 -- --**
 -- --****************************************************************************
-local ScenarioFramework = import('/lua/scenarioframework.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 -- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- -- function: NavalAttacksChildCountDifficulty = BuildCondition   doc = "Please work function docs."

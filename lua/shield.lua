@@ -27,9 +27,9 @@
 -- - EnergyDrainedState
 -- - DeadState
 
-local Entity = import('/lua/sim/Entity.lua').Entity
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local Util = import('utilities.lua')
+local Entity = import("/lua/sim/entity.lua").Entity
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local Util = import("/lua/utilities.lua")
 
 local DeprecatedWarnings = { }
 
@@ -254,7 +254,7 @@ Shield = Class(moho.shield_methods, Entity) {
         local EntityGetMaxHealth = EntityGetMaxHealth
         local EntityAdjustHealth = EntityAdjustHealth
 
-        while true do
+        while not IsDestroyed(self) do
 
             -- gather some information
             local fromSuspension = false
@@ -1390,3 +1390,6 @@ CzarShield = Class(PersonalShield) {
         self:SetCollisionShape('None')
     end,
 }
+
+-- kept for mod backwards compatibility
+UnitShield = PersonalShield

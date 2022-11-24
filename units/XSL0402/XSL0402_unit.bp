@@ -39,7 +39,7 @@ UnitBlueprint {
         'EXPERIMENTAL',
         'HOVER',
         'VISIBLETORECON',
-        'UNSELECTABLE',
+        'SELECTABLE',
         'UNTARGETABLE',
     },
     CollisionOffsetY = -0.25,
@@ -196,6 +196,14 @@ UnitBlueprint {
     SizeZ = 0.5,
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 105,
+    Veteran = {
+        Level1 = 70,
+        Level2 = 140,
+        Level3 = 210,
+        Level4 = 280,
+        Level5 = 350,
+    },
+    VeteranMassMult = 13250,
     Weapon = {
         {
             AboveWaterTargetsOnly = true,

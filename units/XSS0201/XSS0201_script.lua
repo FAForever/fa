@@ -7,8 +7,8 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
+local SSubUnit = import("/lua/seraphimunits.lua").SSubUnit
+local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SDFUltraChromaticBeamGenerator = SeraphimWeapons.SDFUltraChromaticBeamGenerator02
 local SANAnaitTorpedo = SeraphimWeapons.SANAnaitTorpedo
 local SDFAjelluAntiTorpedoDefense = SeraphimWeapons.SDFAjelluAntiTorpedoDefense

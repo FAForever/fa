@@ -5,10 +5,10 @@
 --**
 --**  Summary  :  Losaare AA AutoCannon Projectile script, XSA0401
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SLosaareAAAutoCannon = import('/lua/seraphimprojectiles.lua').SLosaareAAAutoCannon
+local SLosaareAAAutoCannon = import("/lua/seraphimprojectiles.lua").SLosaareAAAutoCannon
 
 SAALosaareAutoCannon02 = Class(SLosaareAAAutoCannon) {
 

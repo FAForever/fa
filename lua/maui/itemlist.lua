@@ -15,11 +15,11 @@
 -- ShowItem(index)
 -- int GetRowHeight()
 
-local Control = import('control.lua').Control
-local Dragger = import('dragger.lua').Dragger
-local ScaleNumber = import('layouthelpers.lua').ScaleNumber
+local Control = import("/lua/maui/control.lua").Control
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 
----@class ItemList : moho.item_list_methods, Control
+---@class ItemList : moho.item_list_methods, Control, InternalObject
 ItemList = Class(moho.item_list_methods, Control) {
 
     __init = function(self, parent, debugname)
@@ -28,7 +28,7 @@ ItemList = Class(moho.item_list_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import('/lua/lazyvar.lua')
+        local LazyVar = import("/lua/lazyvar.lua")
         self._lockFontChanges = false
         self._font = {_family = LazyVar.Create(), _pointsize = LazyVar.Create()}
         self._font._family.OnDirty = function(var)

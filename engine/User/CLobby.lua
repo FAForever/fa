@@ -1,5 +1,6 @@
----@declare-global
----@class moho.lobby_methods
+---@meta
+
+---@class moho.lobby_methods : Destroyable
 local CLobby = {}
 
 ---@alias GPGNetAddress string | number

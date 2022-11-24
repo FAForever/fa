@@ -1,26 +1,25 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Text = import('/lua/maui/text.lua').Text
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local gamemain = import('/lua/ui/game/gamemain.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local gamemain = import("/lua/ui/game/gamemain.lua")
 scoreData = {}
 
 local noData = nil
-local page_active = false
-local page_active_graph = false
-local page_active_graph2 = false
-local create_anime_graph = false
-local create_anime_graph2 = false
+local page_active = nil
+local page_active_graph = nil
+local page_active_graph2 = nil
+local create_anime_graph = nil
+local create_anime_graph2 = nil
 local graph_pos={Left=function() return 110 end, Top=function() return 120 end, Right=function() return GetFrame(0).Right()-100 end, Bottom=function() return GetFrame(0).Bottom()-160 end}
 local bar_pos={Left=function() return 90 end, Top=function() return 140 end, Right=function() return GetFrame(0).Right()-60 end, Bottom=function() return GetFrame(0).Bottom()-150 end}
 
-local SCAEffect = import('/lua/ui/dialogs/myeffecthelpers.lua')
-local chartInfoText = false
+local SCAEffect = import("/lua/ui/dialogs/myeffecthelpers.lua")
+local chartInfoText = nil
+local Title_score = nil
 
 local info_dialog = {
     {name="<LOC SCORE_0079>Total Units Built", path={"general","built","count"},key=1},
@@ -133,8 +132,9 @@ local histo={
         [3]={name="units built",icon=UIUtil.UIFile("/hotstats/score/ship-icon.dds"),label1="naval",label2="",Tooltip="<LOC SCORE_0070>Naval units.",link="main_histo",
             data={{name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","built"},color="000080",Tooltip="<LOC SCORE_0070>Naval units."}}},
         [4]={name="units built",icon=UIUtil.UIFile("/hotstats/score/experimental-icon.dds"),label1="xp",label2="",Tooltip="<LOC SCORE_0066>Experimentals.",link="main_histo",
-            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="<LOC SCORE_0067>ACUs."}},
             data={{name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","built"},color="641a5e",Tooltip="<LOC SCORE_0066>Experimentals."}}},
+        [5]={name="units built",icon=UIUtil.UIFile("/hotstats/score/commander-icon.dds"),label1="cdr",label2="",Tooltip="<LOC SCORE_0067>Command unit.",link="main_histo",
+            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="<LOC SCORE_0067>ACUs."}}},
         [6]={name="units built",icon=UIUtil.UIFile("/hotstats/score/factory-icon.dds"),label1="struct",label2="",Tooltip="<LOC SCORE_0065>Structures.",link="main_histo",
             data={{name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","built"},color="3b3b3b",Tooltip="<LOC SCORE_0065>Structures."} }}
     },
@@ -146,8 +146,9 @@ local histo={
         [3]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/ship-icon.dds"),label1="naval",label2="",Tooltip="<LOC SCORE_0070>Naval units.",link="main_histo",
             data={{name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","kills"},color="000080",Tooltip="<LOC SCORE_0070>Naval units."}}},
         [4]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/experimental-icon.dds"),label1="xp",label2="",Tooltip="<LOC SCORE_0066>Experimentals.",link="main_histo",
-            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","kills"},color="white",Tooltip="<LOC SCORE_0067>ACUs."}},
             data={{name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","kills"},color="641a5e",Tooltip="<LOC SCORE_0066>Experimentals."}}},
+        [5]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/commander-icon.dds"),label1="cdr",label2="",Tooltip="<LOC SCORE_0067>Command unit.",link="main_histo",
+            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="<LOC SCORE_0067>ACUs."}}},
         [6]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/factory-icon.dds"),label1="struct",label2="",Tooltip="<LOC SCORE_0065>Structures.",link="main_histo",
             data={{name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","kills"},color="3b3b3b",Tooltip="<LOC SCORE_0065>Structures."} }}
     },
@@ -215,7 +216,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
         if not v.civilian and v.nickname != nil then
             player_nbr=player_nbr+1
             player[player_nbr]={}
-            player[player_nbr].name=v.nickname
+            player[player_nbr].name=scoreData.history[1][player_nbr].name
             player[player_nbr].color=v.color
             player[player_nbr].index=m
             player[player_nbr].faction=v.faction
@@ -506,8 +507,8 @@ function page_graph(parent)
     page_active_graph=create_graph(parent,info_dialog[5].path,graph_pos.Left(),graph_pos.Top(),graph_pos.Right(),graph_pos.Bottom())
     -- build the list box
     local graph_list={}
-    local Combo = import('/lua/ui/controls/combo.lua').Combo
-    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
+    local Combo = import("/lua/ui/controls/combo.lua").Combo
+    local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
     combo_graph=Combo(page_active, 17, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     combo_graph.Right:Set(function() return graph_pos.Right() end) --function() return 300 end)
     combo_graph.Top:Set(function() return graph_pos.Top()-25 end) --function() return 300 end)
@@ -635,14 +636,14 @@ function create_graph(parent,path,x1,y1,x2,y2)
         m=m+1
         if not v.civilian and v.nickname != nil then
             player[i]={}
-            player[i].name=v.nickname
+            player[i].name=scoreData.history[1][i].name
             player[i].color=v.color
             player[i].index=m
-            player[i].title_label=UIUtil.CreateText(grp,v.nickname, 14, UIUtil.titleFont)
+            player[i].title_label=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
             player[i].title_label.Left:Set(x1+5)
             player[i].title_label.Top:Set(y1 +23*(i-1)+5)
             player[i].title_label:SetColor("black")
-            player[i].title_label2=UIUtil.CreateText(grp,v.nickname, 14, UIUtil.titleFont)
+            player[i].title_label2=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
             player[i].title_label2.Left:Set(x1+4)
             player[i].title_label2.Top:Set(y1 +23*(i-1)+4)
             player[i].title_label2:SetColor(v.color)
@@ -1115,7 +1116,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             ConExecute("ren_Oblivion false")
             if HasCommandLineArg("/gpgnet") then
                 -- Quit to desktop
-                import('/lua/ui/dialogs/eschandler.lua').SafeQuit()
+                import("/lua/ui/dialogs/eschandler.lua").SafeQuit()
             else
                 -- Back to main menu
                 ExitGame()
@@ -1131,3 +1132,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
     beta:SetTexture(mySkinnableFile(UIUtil.UIFile('/hotstats/bt_sca.dds')))
     LayoutHelpers.AtRightTopIn(beta,GetFrame(0),99,67)
 end
+
+-- kept for mod backwards compatibility
+local Button = import("/lua/maui/button.lua").Button
+local Text = import("/lua/maui/text.lua").Text

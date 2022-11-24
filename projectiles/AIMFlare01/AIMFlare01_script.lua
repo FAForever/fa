@@ -5,10 +5,10 @@
 --**
 --**  Summary  : Aeon Flare
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local Flare = import('/lua/defaultantiprojectile.lua').Flare
-local AIMFlareProjectile = import('/lua/aeonprojectiles.lua').AIMFlareProjectile
+local Flare = import("/lua/defaultantiprojectile.lua").Flare
+local AIMFlareProjectile = import("/lua/aeonprojectiles.lua").AIMFlareProjectile
 
 AIMFlare01 = Class(AIMFlareProjectile) {
 

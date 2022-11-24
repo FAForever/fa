@@ -6,15 +6,15 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Movie = import('/lua/maui/movie.lua').Movie
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local Button = import('/lua/maui/button.lua').Button
-local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
+local UIUtil = import("/lua/ui/uiutil.lua")
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Movie = import("/lua/maui/movie.lua").Movie
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local Button = import("/lua/maui/button.lua").Button
+local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
 
 function CreateUI()
 
@@ -37,7 +37,7 @@ function CreateUI()
     exitButton.OnClick = function(self, modifiers)
     	StopMovie()
         parent:Destroy()
-        import('../menus/main.lua').CreateUI()
+        import("/lua/ui/menus/main.lua").CreateUI()
     end
 
 	-- STOP MOVIE BUTTON
@@ -152,7 +152,7 @@ end
 
 function CreateVertScrollbarFor(attachto)
     local tempfaction = ""
-    local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Vert)
+    local scrollbar = Scrollbar(attachto, import("/lua/maui/scrollbar.lua").ScrollAxis.Vert)
     scrollbar:SetTextures(  UIUtil.UIFile('/small-vert_scroll'..tempfaction..'/back_scr_mid.dds')
                             ,UIUtil.UIFile('/small-vert_scroll/bar-mid_scr_over.dds')
                             ,UIUtil.UIFile('/small-vert_scroll/bar-top_scr_up.dds')

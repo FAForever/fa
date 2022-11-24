@@ -3,15 +3,15 @@
 ----------------------------------------------------------------------------------------------------
 
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
 -- default style set
 styles = {
@@ -69,7 +69,7 @@ styles = {
     cursorFunc = UIUtil.GetCursor,
 }
 
----@class Window
+---@class Window : Group
 Window = Class(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
         Group.__init(self, parent, tostring(title) .. "-window")
@@ -280,7 +280,7 @@ Window = Class(Group) {
         end
 
         self.ClientGroup = Group(self, 'window client group')
-        LayoutHelpers.ReusedLayoutFor(self.ClientGroup)
+        LayoutHelpers.Layouter(self.ClientGroup)
             :Top(self.TitleGroup.Bottom)
             :Left(self.ml.Right)
             :Height(function() return self.bm.Top() - self.TitleGroup.Bottom() end)

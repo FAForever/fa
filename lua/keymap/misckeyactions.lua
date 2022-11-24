@@ -1,6 +1,7 @@
 -- This file contains key bindable actions that don't fit elsewhere
 
-local Prefs = import('/lua/user/prefs.lua')
+local Prefs = import("/lua/user/prefs.lua")
+local SelectionUtils = import("/lua/ui/game/selection.lua")
 
 local lockZoomEnable = false
 function lockZoom()
@@ -109,7 +110,7 @@ function toggleOverlay(type)
     end
 
     Prefs.SetToCurrentProfile('activeFilters', currentFilters)
-    import('/lua/ui/game/multifunction.lua').UpdateActiveFilters()
+    import("/lua/ui/game/multifunction.lua").UpdateActiveFilters()
 end
 
 --- Function builder for "Get next factory of type" functions
@@ -161,7 +162,7 @@ end
 
 -- This function might be too slow in larger games, needs testing
 function GetSimilarUnits()
-    local enhance = import('/lua/enhancementcommon.lua')
+    local enhance = import("/lua/enhancementcommon.lua")
     local curSelection = GetSelectedUnits()
     if curSelection then
         -- Find out what enhancements the current unit has
@@ -211,7 +212,7 @@ function ACUAppendCG()
     AddSelectUnits(selection)
 end
 
-local GetDistanceBetweenTwoVectors = import('/lua/utilities.lua').GetDistanceBetweenTwoVectors
+local GetDistanceBetweenTwoVectors = import("/lua/utilities.lua").GetDistanceBetweenTwoVectors
 function GetNearestIdleEngineerNotACU()
     local idleEngineers = GetIdleEngineers()
     if not idleEngineers then
@@ -372,7 +373,7 @@ function CreateTemplateFactory()
     if selection and table.getn(selection) == 1 and selection[1]:IsInCategory('FACTORY') then
         currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
     end
-    import('/lua/ui/templates_factory.lua').CreateBuildTemplate(currentCommandQueue)
+    import("/lua/ui/templates_factory.lua").CreateBuildTemplate(currentCommandQueue)
 end
 
 function SetWeaponPriorities(prioritiesString, name, exclusive)
@@ -392,4 +393,73 @@ end
 
 function RecheckTargetsOfWeapons()
     SimCallback({Func = 'RecheckTargetsOfWeapons', Args = { }}, true)
+end
+
+function SelectAllUpgradingExtractors()
+
+    -- by default, hide playing the selection sound
+    SelectionUtils.EnableSelectionSound(false)
+
+    -- try and find extractors
+    local oldSelection = GetSelectedUnits()
+    UISelectionByCategory("MASSEXTRACTION", false, false, false, false)
+    local selection = GetSelectedUnits()
+    if selection then
+
+        -- try and find extractors that are upgrading
+        local upgrading = { }
+        for k, unit in selection do
+            if unit:GetWorkProgress() > 0 then
+                table.insert(upgrading, unit)
+            end
+        end
+
+        if next(upgrading) then
+            SelectionUtils.EnableSelectionSound(true)
+            SelectUnits(upgrading)
+        end
+    else 
+        SelectUnits(oldSelection)
+    end
+
+    SelectionUtils.EnableSelectionSound(true)
+end
+
+function SelectHighestEngineerAndAssist()
+    local selection = GetSelectedUnits()
+
+    if selection then
+
+        local tech1 = EntityCategoryFilterDown(categories.TECH1 - categories.COMMAND, selection)
+        local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
+        local tech3 = EntityCategoryFilterDown(categories.TECH3 - categories.COMMAND, selection)
+        local sACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER - categories.COMMAND, selection)
+
+        if next(sACUs) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = sACUs[1]:GetEntityId() }}, true)
+            SelectUnits({sACUs[1]})
+        elseif next(tech3) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech3[1]:GetEntityId() }}, true)
+            SelectUnits({tech3[1]})
+        elseif next(tech2) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech2[1]:GetEntityId() }}, true)
+            SelectUnits({tech2[1]})
+        else
+            -- do nothing
+        end
+    end
+end
+
+function LoadIntoTransports()
+
+    local selection = GetSelectedUnits()
+    if selection then
+
+        local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
+        local others = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
+        if transports[1] and others[1] then
+            SimCallback({Func= 'LoadIntoTransports', Args = { }}, true)
+            SelectUnits(transports)
+        end
+    end
 end

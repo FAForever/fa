@@ -3,21 +3,17 @@
 --* Author: Chris Blackwell
 --* Summary: command console
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
-local Border = import('/lua/maui/border.lua').Border
-local Edit = import('/lua/maui/edit.lua').Edit
-local Control = import('/lua/maui/control.lua').Control
-local Window = import('/lua/maui/window.lua').Window
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Edit = import("/lua/maui/edit.lua").Edit
+local Control = import("/lua/maui/control.lua").Control
+local Window = import("/lua/maui/window.lua").Window
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local Prefs = import("/lua/user/prefs.lua")
 
 local commandDeque = {}
 local maxCommandDequeSize = 10
@@ -27,6 +23,8 @@ local consoleFontName = UIUtil.fixedFont
 local consoleFontSize = 12
 local window = false
 local parent = false
+
+local TableGetN = table.getn
 
 local windowTexture = {
     bl = '/textures/ui/uef/game/options_brd/options_brd_ll.dds',
@@ -43,10 +41,10 @@ local windowTexture = {
 
 local function InsertCommand(text)
     table.insert(commandDeque, text)
-    if table.getn(commandDeque) > maxCommandDequeSize then
+    if TableGetN(commandDeque) > maxCommandDequeSize then
         table.remove(commandDeque, 1)
     end
-    currentCommandDequeIndex = table.getn(commandDeque)
+    currentCommandDequeIndex = TableGetN(commandDeque)
 end
 
 function ConfigWindow(parent)
@@ -138,7 +136,7 @@ function CreateDialog()
                 conFuncsList = false
             end
             local matches = ConTextMatches(newText)
-            local numMatches = table.getn(matches)
+            local numMatches = TableGetN(matches)
             if (numMatches > 0) then
                 conFuncsList = ItemList(consoleOutput)
                 conFuncsList:SetFont(consoleFontName, consoleFontSize)
@@ -189,7 +187,7 @@ function CreateDialog()
                 ChangeConFuncSelection(-1)
             else
                 -- store off the current text if this is the first press
-                local commandDequeSize = table.getn(commandDeque)
+                local commandDequeSize = TableGetN(commandDeque)
                 if commandDequeSize > 0 then
                     if currentCommandDequeIndex == commandDequeSize then currentText = edit:GetText() end
                     edit:SetText(commandDeque[currentCommandDequeIndex])
@@ -202,8 +200,8 @@ function CreateDialog()
                 ChangeConFuncSelection(1)
             else
                 currentCommandDequeIndex = currentCommandDequeIndex + 1
-                if currentCommandDequeIndex > table.getn(commandDeque) then
-                    currentCommandDequeIndex = table.getn(commandDeque)
+                if currentCommandDequeIndex > TableGetN(commandDeque) then
+                    currentCommandDequeIndex = TableGetN(commandDeque)
                     edit:SetText(currentText)
                 else
                     edit:SetText(commandDeque[currentCommandDequeIndex])
@@ -249,3 +247,9 @@ function CreateDialog()
     parent:SetAlpha(tempalpha, true)
     return parent
 end
+
+-- kept for mod backwards compatibility
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
+local Border = import("/lua/maui/border.lua").Border

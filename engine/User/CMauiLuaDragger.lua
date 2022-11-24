@@ -1,5 +1,6 @@
----@declare-global
----@class moho.dragger_methods
+---@meta
+
+---@class moho.dragger_methods : Destroyable
 local CMauiLuaDragger = {}
 
 ---

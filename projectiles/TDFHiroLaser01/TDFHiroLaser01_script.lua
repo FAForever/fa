@@ -5,9 +5,9 @@
 --**
 --**  Summary  :  UEF Hiro Laser Projectile script, XES0307
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-TDFHiroLaser01 = Class(import('/lua/terranprojectiles.lua').THiroLaser) {
+TDFHiroLaser01 = Class(import("/lua/terranprojectiles.lua").THiroLaser) {
 }
 TypeClass = TDFHiroLaser01

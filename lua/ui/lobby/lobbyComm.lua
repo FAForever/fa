@@ -39,7 +39,7 @@ function GetDefaultPlayerOptions(playerName)
         ArmyColor = 1,
         StartSpot = 1,
         Ready = false,
-        Faction = table.getn(import('/lua/factions.lua').Factions) + 1, -- max faction + 1 tells lobby to pick random faction
+        Faction = table.getn(import("/lua/factions.lua").Factions) + 1, -- max faction + 1 tells lobby to pick random faction
         PlayerName = playerName or "player",
         AIPersonality = "",
         Human = true,
@@ -47,7 +47,7 @@ function GetDefaultPlayerOptions(playerName)
     }
 end
 
----@class DiscoveryService
+---@class DiscoveryService : moho.discovery_service_methods
 DiscoveryService = Class(moho.discovery_service_methods) {
     RemoveGame = function(self, index)
         LOG('DiscoveryService.RemoveGame(' .. tostring(index) .. ')')

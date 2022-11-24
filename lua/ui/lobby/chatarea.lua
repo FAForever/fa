@@ -1,9 +1,9 @@
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local LazyVar = import('/lua/lazyvar.lua')
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local LazyVar = import("/lua/lazyvar.lua")
 
 local defaultStyle = {
     message = {
@@ -77,7 +77,7 @@ ChatArea = Class(Group) {
 
         local chatText = authorName .. messageText
         local customAdvanceFunction = function(chatText)
-            return self.AdvanceFunction(self, chatText, messageStyle)
+            return self:AdvanceFunction(chatText, messageStyle)
         end
 
         local wrapLines = Text.WrapText(chatText, self.Width() - self.Style.padding.left - self.Style.padding.right,
