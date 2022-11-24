@@ -28,6 +28,7 @@ local Window = import("/lua/maui/window.lua").Window
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Combo = import("/lua/ui/controls/combo.lua").Combo
+local Edit = import("/lua/maui/edit.lua").Edit
 
 local Shared = import("/lua/shared/navgenerator.lua")
 
@@ -138,7 +139,6 @@ NavUIGetLabel = Class(Group) {
             function(Sync)
                 if Sync.NavDebugGetLabel then
                     local data = Sync.NavDebugGetLabel
-
                     if data.Label then
                         self.Title:SetText(string.format('Debug \'GetLabel\': %s', tostring(data.Label)))
                     else
@@ -154,10 +154,10 @@ NavUIGetLabel = Class(Group) {
 ---@field State NavDebugGetLabelState
 NavUIGetLabelMetadata = Class(Group) {
     __init = function (self, parent)
-        local name = 'NavUIGetLabel'
+        local name = 'NavUIGetLabelMetadata'
         Group.__init(self, parent, name)
 
-        self.State = { }
+        self.State = { Id = 1.0 }
 
         self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
             :Fill(self)
@@ -165,40 +165,79 @@ NavUIGetLabelMetadata = Class(Group) {
             :DisableHitTest(true)
             :End()
 
-        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'GetLabel\'', 10, UIUtil.bodyFont))
+        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'GetLabelMetadata\'', 10, UIUtil.bodyFont))
             :AtLeftTopIn(self, 10, 10)
             :Over(self, 1)
             :End() --[[@as Text]]
 
-        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 10, UIUtil.bodyFont))
-            :RightOf(self.ButtonPosition)
-            :Top(function() return self.ButtonPosition.Top() + LayoutHelpers.ScaleNumber(6) end)
+        self.ButtonPosition = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Query for label"))
+            :AtLeftBottomIn(self.Background, -5, 5)
             :Over(self, 1)
             :End()
 
-        self.ComboLayer = LayoutHelpers.LayoutFor(Combo(self, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01"))
-            :RightOf(self.ButtonPosition)
-            :Top(function() return self.ButtonPosition.Top() + LayoutHelpers.ScaleNumber(18) end)
-            :Width(100)
-            :End() --[[@as Combo]]
-
-        self.ComboLayer:AddItems(Shared.Layers)
-        self.ComboLayer:SetItem(1)
-        self.State.Layer = Shared.Layers[1]
-        self.ComboLayer.OnClick = function(combo, index, text)
-            self.State.Layer = Shared.Layers[index]
-            SimCallback({Func = 'NavDebugGetLabelMetadata', Args = self.State })
+        self.ButtonPosition.OnClick = function()
+            SimCallback({ Func = 'NavDebugGetLabelMetadata', Args = self.State })
         end
+
+        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 10, UIUtil.bodyFont))
+            :RightOf(self.ButtonPosition)
+            :Top(function() return self.ButtonPosition.Top() - LayoutHelpers.ScaleNumber(4) end)
+            :Over(self, 1)
+        :End()
+
+        self.Edit = LayoutHelpers.LayoutFor(Edit(self))
+            :RightOf(self.ButtonPosition)
+            :Top(function() return self.ButtonPosition.Top() + LayoutHelpers.ScaleNumber(14) end)
+            :Width(50)
+            :Height(20)
+            :End() --[[@as Edit]]
+
+        self.Edit.OnTextChanged = function (_, new, old)
+            self.State.Id = tonumber(new) or -1
+        end
+
+        self.Group = LayoutHelpers.LayoutFor(Group(self))
+            :Left(function() return self.Edit.Right() + LayoutHelpers.ScaleNumber(10) end)
+            :Right(function() return self.Background.Right() - LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.Background.Top() + LayoutHelpers.ScaleNumber(10) end)
+            :Bottom(function() return self.Background.Bottom() - LayoutHelpers.ScaleNumber(10) end)
+            :End() --[[@as Group]]
+
+        self.TextArea = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Area: ', 10, UIUtil.bodyFont))
+            :Left(function() return self.Group.Left() + LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.Group.Top() + LayoutHelpers.ScaleNumber(14) end)
+            :End() --[[@as Text]]
+
+        self.TextLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Layer: ', 10, UIUtil.bodyFont))
+            :Left(function() return self.Group.Left() + LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.TextArea.Bottom() + LayoutHelpers.ScaleNumber(4) end)
+            :End() --[[@as Text]]
+
+        self.TextNumberOfExtractors = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Number of extractors: ', 10, UIUtil.bodyFont))
+            :Left(function() return self.Group.Left() + LayoutHelpers.ScaleNumber(100) end)
+            :Top(function() return self.Group.Top() + LayoutHelpers.ScaleNumber(14) end)
+            :End() --[[@as Text]]
+
+        self.TextNumberOfHydrocarbons = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Number of hydrocarbons: ', 10, UIUtil.bodyFont))
+            :Left(function() return self.Group.Left() + LayoutHelpers.ScaleNumber(100) end)
+            :Top(function() return self.TextNumberOfExtractors.Bottom() + LayoutHelpers.ScaleNumber(4) end)
+            :End() --[[@as Text]]
 
         AddOnSyncCallback(
             function(Sync)
                 if Sync.NavDebugGetLabelMetadata then
-                    local data = Sync.NavDebugGetLabelMetadata
+                    local response = Sync.NavDebugGetLabelMetadata
 
-                    if data.Label then
-                        self.Title:SetText(string.format('Debug \'GetLabel\': %s', tostring(data.Label)))
-                    else
-                        self.Title:SetText(string.format('Debug \'GetLabel\': %s (%s)', tostring(data.Label), data.Msg))
+                    ---@type NavLabelMetadata
+                    local data = response.data
+                    if data then
+                        self.Title:SetText(string.format('Debug \'GetLabelMetadata\': %s', 'ok'))
+                        self.TextArea:SetText(string.format('Area: %f', data.Area))
+                        self.TextLayer:SetText(string.format('Layer: %s', data.Layer))
+                        self.TextNumberOfExtractors:SetText(string.format('Number of extractors: %d', data.NumberOfExtractors))
+                        self.TextNumberOfHydrocarbons:SetText(string.format('Number of hydrocarbons: %d', data.NumberOfHydrocarbons))
+                    else 
+                        self.Title:SetText(string.format('Debug \'GetLabelMetadata\': %s', response.msg))
                     end
                 end
             end, name
@@ -326,20 +365,6 @@ NavUIPathTo = Class(Group) {
             self.State.Destination = nil
             SimCallback({Func = 'NavDebugPathTo', Args = self.State})
         end
-
-        -- AddOnSyncCallback(
-        --     function(Sync)
-        --         if Sync.NavCanPathToDebug then
-        --             local data = Sync.NavCanPathToDebug
-
-        --             if data.Ok then
-        --                 self.Title:SetText(string.format('Debug \'CanPathTo\': %s', tostring(data.Ok)))
-        --             else 
-        --                 self.Title:SetText(string.format('Debug \'CanPathTo\': %s (%s)', tostring(data.Ok), data.Msg))
-        --             end
-        --         end
-        --     end, name
-        -- )
     end,
 }
 
@@ -672,6 +697,13 @@ NavUIActions = Class(Group) {
             :Right(function() return self.BodyDebug.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.NavUIPathTo.Bottom() + LayoutHelpers.ScaleNumber(10) end)
             :Bottom(function() return self.NavUIPathTo.Bottom() + LayoutHelpers.ScaleNumber(85) end)
+            :End()
+
+        self.NavUIGetLabelMetadata = LayoutHelpers.LayoutFor(NavUIGetLabelMetadata(self))
+            :Left(function() return self.BodyDebug.Left() + LayoutHelpers.ScaleNumber(10) end)
+            :Right(function() return self.BodyDebug.Right() - LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.NavUIGetLabel.Bottom() + LayoutHelpers.ScaleNumber(10) end)
+            :Bottom(function() return self.NavUIGetLabel.Bottom() + LayoutHelpers.ScaleNumber(85) end)
             :End()
 
         self.Debug:DisableHitTest(true)

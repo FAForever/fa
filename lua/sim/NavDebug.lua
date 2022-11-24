@@ -74,6 +74,17 @@ function GetLabel(data)
     GetLabelState = data
 end
 
+---@param data NavDebugGetLabelMetadataState
+---@return unknown
+function GetLabelMeta(data)
+    local NavUtils = import("/lua/sim/navutils.lua")
+    local content, msg = NavUtils.GetLabelMetadata(data.Id)
+    Sync.NavDebugGetLabelMetadata = {
+        data = content,
+        msg = msg
+    }
+end
+
 function ScanOver(mouse, layer)
     if mouse then
         local over = NavGenerator.NavGrids[layer]:FindLeaf(mouse)
