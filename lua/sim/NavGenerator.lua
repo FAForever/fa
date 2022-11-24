@@ -511,7 +511,7 @@ CompressedLabelTree = ClassSimple {
 
                 -- assign the label, and then search through our neighbors to assign the same label to them
                 self.label = label
-                metadata.Area = metadata.Area + ((0.0009765625 * self.ox) * (0.0009765625 * self.oz))
+                metadata.Area = metadata.Area + (( 0.01 * self.c) * ( 0.01 * self.c))
 
                 -- add our pathable neighbors to the stack
                 for _, neighbor in self.neighbors do
@@ -534,7 +534,7 @@ CompressedLabelTree = ClassSimple {
 
                     -- assign label, manage metadata
                     other.label = label
-                    metadata.Area = metadata.Area + ((0.0009765625 * self.ox) * (0.0009765625 * self.oz))
+                    metadata.Area = metadata.Area + (( 0.01 * other.c) * ( 0.01 * other.c))
 
                     -- add unlabelled neighbors
                     for _, neighbor in other.neighbors do
