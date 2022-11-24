@@ -21,23 +21,12 @@ SANHeavyCavitationTorpedo03 = Class(SHeavyCavitationTorpedo) {
 
     PauseUntilTrack = function(self)
         local distance = self:GetDistanceToTarget()
-        local waittime
         local turnrate = 360
-        -- The pause time needs to scale down depending on how far away the target is, otherwise
-        -- the torpedoes will initially shoot past their target.
-        if distance > 6 then
-            waittime = .1--.45
-            if distance > 12 then
-                waittime = .1--.7
-                if distance > 18 then
-                        waittime = 0.1--1
-                end
-            end
-        else
-            waittime = .1
+        
+        if distance < 6 then
             turnrate = 720
         end
-        WaitSeconds(waittime)
+        WaitSeconds(0.1)
         self:SetMaxSpeed(20)
         self:TrackTarget(true)
         self:SetTurnRate(turnrate)
