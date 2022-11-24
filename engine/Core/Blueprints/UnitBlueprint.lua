@@ -26,6 +26,10 @@
 
 --- read more here: https://wiki.faforever.com/en/Blueprints
 ---@class UnitBlueprint: EntityBlueprint
+---@field SizeX number
+---@field SizeY number
+---@field SizeZ number
+---@field SizeVolume number
 ---@field TechCategory 'TECH1' | 'TECH2' | 'TECH3' | 'EXPERIMENTAL'
 ---@field LayerCategory 'LAND' | 'AIR' | 'NAVAL'
 ---@field FactionCategory 'UEF' | 'CYBRAN' | 'AEON' | 'SERAPHIM'
