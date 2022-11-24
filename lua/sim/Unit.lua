@@ -40,8 +40,8 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 
 local DeprecatedWarnings = { }
 
----Structures that are reused for performance reasons
----Maps unit.techCategory to a number so we can do math on it for naval units
+--- Structures that are reused for performance reasons
+--- Maps unit.techCategory to a number so we can do math on it for naval units
 local veterancyTechLevels = {
     TECH1 = 1,
     TECH2 = 2,
@@ -132,7 +132,10 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsHighToss = {},
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
-    EconomyProductionInitiallyActive = true,
+
+    -- kept for backwards compatibility, these default to true
+    CanTakeDamage = true,
+    CanBeKilled = true,
 
     EnergyModifier = 0,
     MassModifier = 0,
@@ -215,9 +218,6 @@ Unit = Class(moho.unit_methods) {
         -- cache often accessed values into inner table
         self.Blueprint = bp
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
-        self.techCategory = bp.TechCategory
-        self.layerCategory = bp.LayerCategory
-        self.factionCategory = bp.FactionCategory
         self.MovementEffects = bp.Display.MovementEffects
         self.Audio = bp.Audio
 
@@ -232,6 +232,16 @@ Unit = Class(moho.unit_methods) {
 
         -- used to fix engine related bugs
         self.EngineFlags = { }
+
+        -- used for rebuilding mechanic
+        self.Repairers = {}
+
+        -- used by almost all unit types, sadly some are even used for structures in rare occasions
+        self.MovementEffectsBag = TrashBag()
+        self.TopSpeedEffectsBag = TrashBag()
+        self.BeamExhaustEffectsBag = TrashBag()
+        self.IdleEffectsBag = TrashBag()
+        self.OnBeingBuiltEffectsBag = TrashBag()
 
         -- Store size information for performance
         self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
@@ -265,15 +275,7 @@ Unit = Class(moho.unit_methods) {
             {},
         }
 
-        -- Set up effect emitter bags
-        self.MovementEffectsBag = TrashBag()
-        self.IdleEffectsBag = TrashBag()
-        self.TopSpeedEffectsBag = TrashBag()
-        self.BeamExhaustEffectsBag = TrashBag()
-        self.OnBeingBuiltEffectsBag = TrashBag()
-
         -- Set up veterancy
-        self.xp = 0
         self.Instigators = {}
         self.totalDamageTaken = 0
 
@@ -292,10 +294,7 @@ Unit = Class(moho.unit_methods) {
         self:SetConsumptionPerSecondMass(bpEcon.MaintenanceConsumptionPerSecondMass or 0)
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
         self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-
-        if self.EconomyProductionInitiallyActive then
-            self:SetProductionActive(true)
-        end
+        self:SetProductionActive(true)
 
         self.Buffs = {
             BuffTable = {},
@@ -304,27 +303,16 @@ Unit = Class(moho.unit_methods) {
 
         self:SetIntelRadius('Vision', bp.Intel.VisionRadius or 0)
 
-        self.CanTakeDamage = true
-        self.CanBeKilled = true
 
         local bpDeathAnim = bp.Display.AnimationDeath
         if bpDeathAnim and not table.empty(bpDeathAnim) then
             self.PlayDeathAnimation = true
         end
 
-        -- Used for keeping track of resource consumption
-        self.MaintenanceConsumption = false
-        self.ActiveConsumption = false
-        self.ProductionEnabled = true
-
-        self.Repairers = {}
-
         -- Cheating
         if self.Brain.CheatEnabled then
             AIUtils.ApplyCheatBuffs(self)
         end
-        -- Flags for scripts
-        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
@@ -333,11 +321,15 @@ Unit = Class(moho.unit_methods) {
             self:GetStat("ReclaimedMass", 0)
             self:GetStat("ReclaimedEnergy", 0)
         end
-
+        
+        -- Jamming functionality
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
             self.ResetJammer = -1
         end
+
+        -- Flags for scripts
+        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
     end,
 
     -------------------------------------------------------------------------------------------
@@ -428,8 +420,8 @@ Unit = Class(moho.unit_methods) {
     UpdateBuildRestrictions = function(self)
 
         -- retrieve info of factory
-        local faction = self.factionCategory
-        local layer = self.layerCategory
+        local faction = self.Blueprint.FactionCategory
+        local layer = self.Blueprint.LayerCategory
         local aiBrain = self:GetAIBrain()
 
         -- the pessimists we are, remove all the units!
@@ -1323,6 +1315,7 @@ Unit = Class(moho.unit_methods) {
     ---@param newHealth number
     ---@param oldHealth number
     ManageDamageEffects = function(self, newHealth, oldHealth)
+        -- LOG(string.format("%s: %f -> %f", self.UnitId, newHealth, oldHealth))
         -- Health values come in at fixed 25% intervals
         if newHealth < oldHealth then
             if oldHealth == 0.75 then
@@ -1640,7 +1633,7 @@ Unit = Class(moho.unit_methods) {
 
         if not Buffs[regenBuffName] then
             -- Get techLevel as a number to do math on it
-            local techLevel = veterancyTechLevels[self.techCategory] or 1
+            local techLevel = veterancyTechLevels[self.Blueprint.TechCategory] or 1
 
             -- Treat naval units as one level higher
             if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
@@ -2192,11 +2185,22 @@ Unit = Class(moho.unit_methods) {
                 v:Destroy()
             end
         end
-        
-        TrashDestroy(self.MovementEffectsBag)
-        TrashDestroy(self.IdleEffectsBag)
-        TrashDestroy(self.TopSpeedEffectsBag)
-        TrashDestroy(self.BeamExhaustEffectsBag)
+    
+        if self.MovementEffectsBag then 
+            self.MovementEffectsBag:Destroy()
+        end
+
+        if self.IdleEffectsBag then 
+            self.IdleEffectsBag:Destroy()
+        end
+
+        if self.TopSpeedEffectsBag then 
+            self.TopSpeedEffectsBag:Destroy()
+        end
+
+        if self.BeamExhaustEffectsBag then
+            self.BeamExhaustEffectsBag:Destroy()
+        end
 
         if self.TransportBeamEffectsBag then 
             self.TransportBeamEffectsBag:Destroy()
@@ -2480,7 +2484,7 @@ Unit = Class(moho.unit_methods) {
                     EXPERIMENTAL = 2,
                     COMMAND = 2,
                 }
-                local defaultMult = techMultipliers[self.techCategory] or 2
+                local defaultMult = techMultipliers[self.Blueprint.TechCategory] or 2
 
                 self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
             end
@@ -2581,7 +2585,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Don't try sending a Notify message from here if we're an ACU
-        if self.techCategory ~= 'COMMAND' then
+        if self.Blueprint.TechCategory ~= 'COMMAND' then
             self:SendNotifyMessage('completed')
         end
 
@@ -4930,7 +4934,7 @@ Unit = Class(moho.unit_methods) {
             if not source then
                 local bp = self.Blueprint
                 if bp.CategoriesHash.RESEARCH then
-                    unitType = string.lower('research' .. self.layerCategory .. self.techCategory)
+                    unitType = string.lower('research' .. self.Blueprint.LayerCategory .. self.Blueprint.TechCategory)
                     category = 'tech'
                 elseif EntityCategoryContains(categories.NUKE * categories.STRUCTURE - categories.EXPERIMENTAL, self) then -- Ensure to exclude Yolona Oss, which gets its own message
                     unitType = 'nuke'
@@ -4938,7 +4942,7 @@ Unit = Class(moho.unit_methods) {
                 elseif EntityCategoryContains(categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY, self) then
                     unitType = 'arty'
                     category = 'other'
-                elseif self.techCategory == 'EXPERIMENTAL' then
+                elseif self.Blueprint.TechCategory == 'EXPERIMENTAL' then
                     unitType = bp.BlueprintId
                     category = 'experimentals'
                 else
@@ -4946,7 +4950,7 @@ Unit = Class(moho.unit_methods) {
                 end
             else -- We are being called from the Enhancements chain (ACUs)
                 id = self.EntityId
-                category = string.lower(self.factionCategory)
+                category = string.lower(self.Blueprint.FactionCategory)
             end
 
             if trigger == 'transferred' then
@@ -5424,15 +5428,8 @@ Unit = Class(moho.unit_methods) {
     end,
 }
 
--- upvalued math functions for performance
-local MathMax = math.max
-
--- upvalued globals for performance
-local EntityCategoryContains = EntityCategoryContains
-
 -- upvalued moho functions for performance
 local EntityGetArmy = _G.moho.entity_methods.GetArmy
-local EntityGetBlueprint = _G.moho.entity_methods.GetBlueprint
 local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
 
 local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
