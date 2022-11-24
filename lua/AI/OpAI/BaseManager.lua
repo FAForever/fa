@@ -75,8 +75,8 @@ local BaseOpAI = import("/lua/ai/opai/baseopai.lua")
 local ReactiveAI = import("/lua/ai/opai/reactiveai.lua")
 local NavalOpAI = import("/lua/ai/opai/navalopai.lua")
 
-local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
-local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
+local BMBC = '/lua/editor/basemanagerbuildconditions.lua'
+local BMPT = '/lua/ai/opai/basemanagerplatoonthreads.lua'
 
 -- Default rebuild numbers for buildings based on type; -1 is infinite
 local BuildingCounterDefaultValues = {
