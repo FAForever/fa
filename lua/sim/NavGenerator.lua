@@ -719,9 +719,9 @@ function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pC
 
     -- scan / cache terrain and depth
     for z = 1, size + 1 do
-        local absZ = bz + z
+        local absZ = bz + z - 1
         for x = 1, size + 1 do
-            local absX = bx + x
+            local absX = bx + x - 1
             local terrain = GetTerrainHeight(absX, absZ)
             local surface = GetSurfaceHeight(absX, absZ)
 
