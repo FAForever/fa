@@ -32,6 +32,10 @@ local Shared = import("/lua/shared/navgenerator.lua")
 ---@alias NavTerrainBlockCache boolean[][]
 ---@alias NavLabelCache number[][]
 
+local Statistics = {
+    CulledLabels = 0
+}
+
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
 ---@type number
@@ -60,6 +64,7 @@ local MinWaterDepthNaval = 1.5
 NavGrids = { }
 
 ---@class NavLabelMetadata
+---@field Node CompressedLabelTreeLeaf
 ---@field Area number
 ---@field Layer NavLayers
 ---@field NumberOfExtractors number
@@ -139,6 +144,14 @@ NavGrid = ClassSimple {
 
         self.TreeSize = treeSize
         self.Layer = layer
+    end,
+
+    Simplify = function(self)
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
+                self.Trees[z][x]:Simplify()
+            end
+        end
     end,
 
     --- Adds a compressed label tree to the navigational grid
@@ -472,6 +485,7 @@ CompressedLabelTree = ClassSimple {
 
                 NavLabels[label] = {
                     Area = 0,
+                    Node = self --[[@as CompressedLabelTreeLeaf]],
                     Layer = self.layer,
                     NumberOfExtractors = 0,
                     NumberOfHydrocarbons = 0,
@@ -943,6 +957,44 @@ local function GenerateGraphs()
     navAir:Precompute()
 end
 
+local function GenerateCullLabels()
+    local navLabels = NavLabels
+
+    local culledLabels = 0
+
+    ---@type CompressedLabelTreeLeaf[]
+    local stack = { }
+    local count = 1
+    for k, _ in navLabels do
+        local metadata = navLabels[k]
+        if metadata.Area < 0.2 and metadata.NumberOfExtractors == 0 and metadata.NumberOfHydrocarbons == 0 then
+            culledLabels = culledLabels + 1
+
+            -- cull node
+            local node = metadata.Node
+            node.label = -1
+
+            -- find all neighbors and cull those too
+            count = 1
+            stack[1] = metadata.Node
+            while count > 0 do
+                node = stack[count]
+                count = count - 1
+                for k, neighbor in node.neighbors do
+                    if neighbor.label > 0 then
+                        neighbor.label = -1
+                        count = count + 1
+                        stack[count] = neighbor
+                    end
+                end
+            end
+        end
+    end
+
+    Statistics.CulledLabels = culledLabels
+    SPEW(string.format("NavGenerator - culled %d labels", culledLabels))
+end
+
 --- Generates metadata for markers for quick access
 local function GenerateMarkerMetadata()
     local navLabels = NavLabels
@@ -1005,9 +1057,12 @@ function Generate()
 
     GenerateGraphs()
     print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
-
+    
     GenerateMarkerMetadata()
     print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateCullLabels()
+    print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
     -- allows debugging tools to function
     import("/lua/sim/navdebug.lua")

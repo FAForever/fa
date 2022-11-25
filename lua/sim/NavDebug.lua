@@ -79,10 +79,23 @@ end
 function GetLabelMeta(data)
     local NavUtils = import("/lua/sim/navutils.lua")
     local content, msg = NavUtils.GetLabelMetadata(data.Id)
-    Sync.NavDebugGetLabelMetadata = {
-        data = content,
-        msg = msg
-    }
+
+    if content then
+        Sync.NavDebugGetLabelMetadata = {
+            data = {
+                Area = content.Area,
+                Layer = content.Layer,
+                NumberOfExtractors = content.NumberOfExtractors,
+                NumberOfHydrocarbons = content.NumberOfHydrocarbons,
+            },
+            msg = msg
+        }
+    else 
+        Sync.NavDebugGetLabelMetadata = {
+            data = nil,
+            msg = msg,
+        }
+    end
 end
 
 function ScanOver(mouse, layer)
