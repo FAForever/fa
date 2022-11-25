@@ -21,6 +21,7 @@ local EBC = '/lua/editor/economybuildconditions.lua'
 local PCBC = '/lua/editor/platooncountbuildconditions.lua'
 local SAI = '/lua/scenarioplatoonai.lua'
 local TBC = '/lua/editor/threatbuildconditions.lua'
+local SBC = '/lua/editor/SorianBuildConditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
 ---@alias BuilderGroupsEconomic 'EngineerFactoryBuilders' | 'Engineer Transfers' | 'Land Rush Initial ACU Builders' | 'Balanced Rush Initial ACU Builders' | 'Air Rush Initial ACU Builders' | 'Naval Rush Initial ACU Builders' | 'Default Initial ACU Builders' | 'ACUBuilders' | 'ACUUpgrades - Gun improvements' | 'ACUUpgrades - Tech 2 Engineering' | 'ACUUpgrades - Shields' | 'ACUUpgrades' | 'T1EngineerBuilders' | 'T2EngineerBuilders' | 'T3EngineerBuilders' | 'EngineerMassBuildersHighPri' | 'EngineerMassBuilders - Naval' | 'EngineerMassBuildersLowerPri' | 'EngineerMassBuildersMidPriSingle' | 'EngineerEnergyBuilders' | 'EngineerEnergyBuildersExpansions' | 'EngineeringSupportBuilder'
@@ -1289,7 +1290,7 @@ BuilderGroup {
         Priority = 1000,
         BuilderConditions = {
                 { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.HYDROCARBON}},
-                { MABC, 'MarkerLessThanDistance',  { 'Hydrocarbon', 160}},
+                { SBC, 'CanBuildOnHydroLessThanDistance', { 'LocationType', 160, -500, 0, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
         BuilderData = {
@@ -1304,15 +1305,11 @@ BuilderGroup {
         BuilderName = 'T1 Hydrocarbon Engineer',
         PlatoonTemplate = 'EngineerBuilder',
         --DUNCAN - Changed from 850
-        Priority = 980,
+        Priority = 950,
         BuilderConditions = {
-                --DUNCAN - commented out
-                --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENGINEER * (categories.TECH2 + categories.TECH3) } },
-                --DUNCAN - Changed to 3
                 { UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.HYDROCARBON}},
-                --DUNCAN - Added so doenst build before a few mass exs
                 { UCBC, 'HaveGreaterThanUnitsWithCategory', { 4, categories.MASSEXTRACTION}},
-                { MABC, 'MarkerLessThanDistance',  { 'Hydrocarbon', 200}}, --DUNCAN - was 150
+                { SBC, 'CanBuildOnHydroLessThanDistance', { 'LocationType', 200, -500, 0, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
         BuilderData = {
