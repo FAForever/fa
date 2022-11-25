@@ -394,7 +394,7 @@ CompressedLabelTree = ClassSimple {
         self.neighbors = neighbors
 
         -- scan top-left -> top-right
-        for k = x1, x2 do
+        for k = x1, x2 - 1 do
             local x = k + 0.5
             -- DrawCircle({x, GetSurfaceHeight(x, z1Outside), z1Outside}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x, z1Outside)
@@ -409,7 +409,7 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- scan bottom-left -> bottom-right
-        for k = x1, x2 do
+        for k = x1, x2 - 1 do
             local x = k + 0.5
             -- DrawCircle({x, GetSurfaceHeight(x, z2Outside), z2Outside}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x, z2Outside)
@@ -424,7 +424,7 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- scan left-top -> left-bottom
-        for k = z1, z2 do
+        for k = z1, z2 - 1 do
             z = k + 0.5
             -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x1Outside, z)
@@ -439,7 +439,7 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- scan right-top -> right-bottom
-        for k = z1, z2 do
+        for k = z1, z2 - 1 do
             z = k + 0.5
             -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x2Outside, z)
@@ -451,34 +451,6 @@ CompressedLabelTree = ClassSimple {
             else 
                 break
             end
-        end
-
-        -- scan top-left
-        local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
-        -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
-        if neighbor and neighbor.label >= 0 then
-            neighbors[neighbor.identifier] = neighbor
-        end
-
-        -- scan top-right
-        neighbor = root:FindLeafXZ(x2Outside, z1Outside)
-        -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
-        if neighbor and neighbor.label >= 0 then
-            neighbors[neighbor.identifier] = neighbor
-        end
-
-        -- scan bottom-left
-        -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
-        neighbor = root:FindLeafXZ(x1Outside, z2Outside)
-        if neighbor and neighbor.label >= 0 then
-            neighbors[neighbor.identifier] = neighbor
-        end
-
-        -- scan bottom-right
-        -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
-        neighbor = root:FindLeafXZ(x2Outside, z2Outside)
-        if neighbor and neighbor.label >= 0 then
-            neighbors[neighbor.identifier] = neighbor
         end
 
         NavLayerData[self.layer].Neighbors = NavLayerData[self.layer].Neighbors + table.getsize(neighbors)
@@ -737,6 +709,7 @@ end
 ---@param bCache NavTerrainBlockCache
 function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pCache, bCache)
     local MathAbs = math.abs
+    local Mathmax = math.max
     local GetTerrainHeight = GetTerrainHeight
     local GetSurfaceHeight = GetSurfaceHeight
     local GetTerrainType = GetTerrainType
@@ -779,7 +752,7 @@ function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pC
         local absZ = bz + z
         for x = 1, size do
             local absX = bx + x
-            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z][x + 1] and pzCache[z + 1][x]
+            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
             daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
             bCache[z][x] = not GetTerrainType(absX, absZ).Blocking
 
