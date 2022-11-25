@@ -1,5 +1,5 @@
 --- Post process a unit
----@param unit Unit
+---@param unit UnitBlueprint
 local function PostProcessUnit(unit)
     if table.find(unit.Categories, "SUBCOMMANDER") then
         table.insert(unit.Categories, "SACU_BEHAVIOR")
@@ -185,6 +185,22 @@ local function PostProcessUnit(unit)
     else
         unit.General = {CommandCapsHash = {}}
     end
+
+    -- Pre-compute various elements
+    unit.SizeVolume = (unit.SizeX or 1) * (unit.SizeY or 1) * (unit.SizeZ or 1)
+    unit.SizeDamageEffects = 1
+    unit.SizeDamageEffectsScale = 1
+    if unit.SizeVolume > 10 then
+        unit.SizeDamageEffects = 2
+        unit.SizeDamageEffectsScale = 1.5
+        if unit.SizeVolume > 20 then
+            unit.SizeDamageEffects = 3
+            unit.SizeDamageEffectsScale = 2.0
+        end
+    end
+
+    unit.Footprint = unit.Footprint or { }
+    unit.Footprint.SizeMax = math.max(unit.Footprint.SizeX or 1, unit.Footprint.SizeZ or 1)
 end
 
 --- Post-processes all units

@@ -1935,11 +1935,11 @@ AirUnit = Class(MobileUnit) {
     ---@param scale number
     CreateUnitAirDestructionEffects = function(self, scale)
         local scale = explosion.GetAverageBoundingXZRadius(self)
-        local size = self.Size
+        local blueprint = self.Blueprint
         explosion.CreateDefaultHitExplosion(self, scale)
 
         if self.ShowUnitDestructionDebris then
-            explosion.CreateDebrisProjectiles(self, scale, {size.SizeX, size.SizeY, size.SizeZ})
+            explosion.CreateDebrisProjectiles(self, scale, {blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ})
         end
     end,
 

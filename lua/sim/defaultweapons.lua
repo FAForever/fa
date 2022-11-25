@@ -866,7 +866,6 @@ DefaultProjectileWeapon = Class(Weapon) {
                 unit:SetWorkProgress(1 - clockTime / totalTime)
                 clockTime = clockTime - 1
                 WaitSeconds(0.1)
-
             end
         end,
 
