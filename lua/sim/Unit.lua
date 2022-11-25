@@ -329,8 +329,7 @@ Unit = Class(moho.unit_methods) {
     ---@return number Z
     GetRandomOffset = function(self, scalar)
         local bp = self.blueprint
-        local size = self.Size
-        local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
+        local sx, sy, sz = bp.SizeX, bp.SizeY, bp.SizeZ
         local heading = self:GetHeading()
 
         sx = sx * scalar
@@ -1350,13 +1349,8 @@ Unit = Class(moho.unit_methods) {
             return
         end
 
-
-
         -- create the effects
         local blueprint = self.Blueprint
-        LOG(blueprint.SizeDamageEffects)
-        LOG(blueprint.SizeDamageEffectsScale)
-
         local totalBones = self:GetBoneCount()
         local bone = Random(1, totalBones) - 1
         local bpDE = self.Blueprint.Display.DamageEffects
@@ -1938,9 +1932,8 @@ Unit = Class(moho.unit_methods) {
 
     ---@param self Unit
     SinkDestructionEffects = function(self)
-        local size = self.Size
-        local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
-        local vol = sx * sy * sz
+        local blueprint = self.Blueprint
+        local vol = blueprint.SizeVolume
         local numBones = self:GetBoneCount() - 1
         local pos = self:GetPosition()
         local surfaceHeight = GetSurfaceHeight(pos[1], pos[3])
@@ -5375,3 +5368,28 @@ DummyUnit = Class(moho.unit_methods) {
     ---@param self DummyUnit
     UpdateAssistersConsumption = function (self) end,
 }
+
+-- Backwards compatibility with mods
+
+-- As we try to improve the performance of the base game we do
+-- our best to keep compatible with (unmaintained) mods. This is
+-- our approach to that when we remove values of the unit table
+-- to preserve more memory: the moment we detect a sim mod we 
+-- add back in the fields that mods rely on.
+
+if next(__active_mods) then
+
+    SPEW("Sim mod detected - adding in missing fields to the unit class to improve compatibility")
+
+    local oldUnit = Unit
+    Unit = Class(oldUnit) {
+        ---@param self Unit
+        OnCreate = function(self)
+            oldUnit.OnCreate(self)
+
+            self.factionCategory = self.Blueprint.FactionCategory
+            self.layerCategory = self.Blueprint.LayerCategory
+            self.factionCategory = self.Blueprint.FactionCategory
+        end,
+    }
+end
