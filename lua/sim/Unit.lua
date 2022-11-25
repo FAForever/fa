@@ -99,6 +99,7 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods
 ---@field Brain AIBrain
+---@field Trash TrashBag
 ---@field Buffs {Affects: table<BuffEffectName, BlueprintBuff.Effect>, buffTable: table<string, table>}
 ---@field Army Army
 ---@field UnitId UnitId
@@ -1300,11 +1301,15 @@ Unit = Class(moho.unit_methods) {
                 TrashBag(),
                 TrashBag(),
             }
+
+            self.Trash:Add(self.DamageEffectsBag[1])
+            self.Trash:Add(self.DamageEffectsBag[2])
+            self.Trash:Add(self.DamageEffectsBag[3])
         end
 
         local damageEffectsBags = self.DamageEffectsBag
         if newHealth < oldHealth then
-            local amount = self.Blueprint.SizeVolume
+            local amount = self.Blueprint.SizeDamageEffects
             if oldHealth == 0.75 then
                 for i = 1, amount do
                     self:PlayDamageEffect(self.FxDamage1, damageEffectsBags[1])
@@ -1335,22 +1340,40 @@ Unit = Class(moho.unit_methods) {
     ---@param fxTable FileName[][]
     ---@param fxBag TrashBag
     PlayDamageEffect = function(self, fxTable, fxBag)
-        local effects = fxTable[Random(1, table.getn(fxTable))]
-        if not effects then return end
+        -- cache for performance
+        local TableGetn = table.getn
+        local Random = Random
+
+        -- retrieve an effect, which can be nil
+        local effects = fxTable[Random(1, TableGetn(fxTable))]
+        if not effects then
+            return
+        end
+
+
+
+        -- create the effects
+        local blueprint = self.Blueprint
+        LOG(blueprint.SizeDamageEffects)
+        LOG(blueprint.SizeDamageEffectsScale)
 
         local totalBones = self:GetBoneCount()
         local bone = Random(1, totalBones) - 1
         local bpDE = self.Blueprint.Display.DamageEffects
         for _, v in effects do
             local fx
+
+            -- version where a unit has very few bones, and therefore we add a pre-defined offset
             if bpDE then
-                local num = Random(1, table.getsize(bpDE))
+                local num = Random(1, TableGetn(bpDE))
                 local bpFx = bpDE[num]
-                fx = CreateAttachedEmitter(self, bpFx.Bone or 0, self.Army, v):ScaleEmitter(self.FxDamageScale):OffsetEmitter(bpFx.OffsetX or 0, bpFx.OffsetY or 0, bpFx.OffsetZ or 0)
+                fx = CreateAttachedEmitter(self, bpFx.Bone or 0, self.Army, v):ScaleEmitter(blueprint.SizeDamageEffectsScale):OffsetEmitter(bpFx.OffsetX or 0, bpFx.OffsetY or 0, bpFx.OffsetZ or 0)
+            -- version where a unit has sufficient bones and we just use that
             else
-                fx = CreateAttachedEmitter(self, bone, self.Army, v):ScaleEmitter(self.FxDamageScale)
+                fx = CreateAttachedEmitter(self, bone, self.Army, v):ScaleEmitter(blueprint.SizeDamageEffectsScale)
             end
-            fxBag:add(fx)
+
+            fxBag:Add(fx)
         end
     end,
 

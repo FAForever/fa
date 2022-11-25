@@ -26,10 +26,12 @@
 
 --- read more here: https://wiki.faforever.com/en/Blueprints
 ---@class UnitBlueprint: EntityBlueprint
----@field SizeX number
+---@field SizeX number 
 ---@field SizeY number
 ---@field SizeZ number
----@field SizeVolume number
+---@field SizeVolume number                 Volume based on SizeX, SizeY and SizeZ
+---@field SizeDamageEffects number          Number of damage effects based on volume
+---@field SizeDamageEffectsScale number     Scale of damage effects based on volume
 ---@field TechCategory 'TECH1' | 'TECH2' | 'TECH3' | 'EXPERIMENTAL'
 ---@field LayerCategory 'LAND' | 'AIR' | 'NAVAL'
 ---@field FactionCategory 'UEF' | 'CYBRAN' | 'AEON' | 'SERAPHIM'
