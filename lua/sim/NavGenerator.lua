@@ -812,7 +812,7 @@ function ComputeHoverPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     for z = 1, size do
         for x = 1, size do
             if bCache[z][x] and (        -- should have accessible terrain type
-                daCache[z][x] >= 0.01 or -- can either be on water
+                daCache[z][x] >= 1 or -- can either be on water
                 pCache[z][x]             -- or on flat enough terrain
             ) then
                 rCache[z][x] = 0
@@ -1002,21 +1002,37 @@ local function GenerateMarkerMetadata()
     local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     for k = 1, en do
         local extractor = extractors[k]
-        local label = NavGrids[extractor.NavLayer]:FindLeaf(extractor.position).label
+        for layer, grid in NavGrids do 
+            local label = grid:FindLeaf(extractor.position).label
 
-        extractor.NavLabel = label
-        navLabels[label].NumberOfExtractors = navLabels[label].NumberOfExtractors + 1
-        table.insert(navLabels[label].ExtractorMarkers, extractor)
+            if label > 0 then
+                navLabels[label].NumberOfExtractors = navLabels[label].NumberOfExtractors + 1
+                table.insert(navLabels[label].ExtractorMarkers, extractor)
+
+                if not extractor.NavLabel then
+                    extractor.NavLabel = label
+                    extractor.NavLayer = layer
+                end
+            end
+        end
     end
 
     local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
     for k = 1, hn do
         local hydro = hydrocarbons[k]
-        local label = NavGrids[hydro.NavLayer]:FindLeaf(hydro.position).label
+        for layer, grid in NavGrids do 
+            local label = grid:FindLeaf(hydro.position).label
 
-        hydro.NavLabel = label
-        navLabels[label].NumberOfHydrocarbons = navLabels[label].NumberOfHydrocarbons + 1
-        table.insert(navLabels[label].HydrocarbonMarkers, hydro)
+            if label > 0 then
+                navLabels[label].NumberOfExtractors = navLabels[label].NumberOfExtractors + 1
+                table.insert(navLabels[label].ExtractorMarkers, hydro)
+
+                if not hydro.NavLabel then
+                    hydro.NavLabel = label
+                    hydro.NavLayer = layer
+                end
+            end
+        end
     end
 end
 
