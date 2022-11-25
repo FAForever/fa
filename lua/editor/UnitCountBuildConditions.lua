@@ -1433,6 +1433,26 @@ function CheckBuildPlattonDelay(aiBrain, PlatoonName)
     return true
 end
 
+--- Buildcondition to limit the number of factories 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCategory EntityCategory
+---@param pathType string
+---@param unitCount integer
+---@return boolean
+function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount)
+    local currentEnemy = aiBrain:GetCurrentEnemy()
+    if not currentEnemy then
+        return true
+    end
+    local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    local selfIndex = aiBrain:GetArmyIndex()
+    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
+        return false
+    end
+    return true
+end
+
 --- Buildcondition to decide if radars should upgrade based on other radar locations.
 ---@param aiBrain AIBrain
 ---@param locationType string
