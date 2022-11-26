@@ -248,7 +248,7 @@ local function CreateUI()
 
     local background = MenuCommon.SetupBackground(GetFrame(0))
 
-    SetDialog(parent, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
+    SetDialog(parent, "<LOC lobui_0201>Setting up automatch...")
 
     -- construct the connection status GUI and position it right below the dialog
     connectionStatusGUI = ConnectionStatus(GetFrame(0))
