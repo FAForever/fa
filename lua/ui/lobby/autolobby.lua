@@ -388,15 +388,9 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     if not parent then parent = UIUtil.CreateScreenGroup(GetFrame(0), "CreateLobby ScreenGroup") end
     -- don't parent background to screen group so it doesn't get destroyed until we leave the menus
     local background = MenuCommon.SetupBackground(GetFrame(0))
-    local function OnAbort()
-        MenuCommon.MenuCleanup()
-        parent:Destroy()
-        parent = false
-        ExitApplication()
-    end
 
     -- construct the initial dialog
-    SetDialog(parent, Strings.TryingToConnect, Strings.AbortConnect, OnAbort)
+    SetDialog(parent, Strings.TryingToConnect)
 
     InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
