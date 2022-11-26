@@ -196,6 +196,12 @@ NavGrid = ClassSimple {
                 self.Trees[z][x]:GenerateNeighbors(self)
             end
         end
+
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
+                self.Trees[z][x]:GenerateCornerNeighbors(self)
+            end
+        end
     end,
 
     ---@param self NavGrid
@@ -463,6 +469,83 @@ CompressedLabelTree = ClassSimple {
                 end
             else 
                 break
+            end
+        end
+    end,
+
+    ---@param self CompressedLabelTree
+    ---@param root NavGrid
+    GenerateCornerNeighbors = function(self, root)
+        -- we are not valid :(
+        local label = self.label
+        if label == -1 then
+            return
+        end
+
+        -- if we have children then we're a node, only leafs can have neighbors
+        if self.children then
+            for _, child in self.children do
+                child:GenerateCornerNeighbors(root)
+            end
+            return
+        end
+
+        -- we are a leaf, so find those neighbors!
+        local neighbors = self.neighbors
+        local x1 = self.bx + self.ox
+        local z1 = self.bz + self.oz
+        local size = self.c
+        local x2 = x1 + size
+        local z2 = z1 + size
+        local x1Outside, z1Outside = x1 - 0.5, z1 - 0.5
+        local x2Outside, z2Outside = x2 + 0.5, z2 + 0.5
+
+        -- scan top-left
+        local a, b
+        local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
+        -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
+        if neighbor and neighbor.label >= 0 then
+            a = root:FindLeafXZ(x1Outside + 1, z1Outside)
+            b = root:FindLeafXZ(x1Outside, z1Outside + 1)
+
+            if a and b and label == a.label and label == b.label then
+                neighbors[neighbor.identifier] = neighbor
+            end
+        end
+
+        -- scan top-right
+        neighbor = root:FindLeafXZ(x2Outside, z1Outside)
+        -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
+        if neighbor and neighbor.label >= 0 then
+            a = root:FindLeafXZ(x2Outside -1, z1Outside)
+            b = root:FindLeafXZ(x2Outside, z1Outside + 1)
+
+            if a and b and label == a.label and label == b.label then
+                neighbors[neighbor.identifier] = neighbor
+            end
+        end
+
+        -- scan bottom-left
+        -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
+        neighbor = root:FindLeafXZ(x1Outside, z2Outside)
+        if neighbor and neighbor.label >= 0 then
+            a = root:FindLeafXZ(x1Outside + 1, z2Outside)
+            b = root:FindLeafXZ(x1Outside, z2Outside - 1)
+
+            if a and b and label == a.label and label == b.label then
+                neighbors[neighbor.identifier] = neighbor
+            end
+        end
+
+        -- scan bottom-right
+        -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
+        neighbor = root:FindLeafXZ(x2Outside, z2Outside)
+        if neighbor and neighbor.label >= 0 then
+            a = root:FindLeafXZ(x2Outside - 1, z2Outside)
+            b = root:FindLeafXZ(x2Outside, z2Outside - 1)
+
+            if a and b and label == a.label and label == b.label then
+                neighbors[neighbor.identifier] = neighbor
             end
         end
 
@@ -957,6 +1040,7 @@ local function GenerateGraphs()
     navAir:Precompute()
 end
 
+--- Culls generated labels that are too small and have no meaning
 local function GenerateCullLabels()
     local navLabels = NavLabels
 
