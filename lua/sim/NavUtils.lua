@@ -255,3 +255,25 @@ function GetLabel(layer, position)
 
     return leaf.label, nil
 end
+
+--- Returns the metadata of a label.
+---@param id number
+---@return NavLabelMetadata?
+---@return string?
+function GetLabelMetadata(id)
+    -- check id argument
+    if id == 0 then 
+        return nil, 'Invalid layer id - this should not be possible'
+    end
+
+    if id == -1 then 
+        return nil, 'Position is unpathable'
+    end
+
+    local meta = NavGenerator.NavLabels[id]
+    if not meta then 
+        return nil, 'Invalid layer id - no metadata is assigned to this label'
+    end
+
+    return meta, nil
+end
