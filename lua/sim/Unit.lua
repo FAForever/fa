@@ -328,7 +328,7 @@ Unit = Class(moho.unit_methods) {
     ---@return number Y
     ---@return number Z
     GetRandomOffset = function(self, scalar)
-        local bp = self.blueprint
+        local bp = self.Blueprint
         local sx, sy, sz = bp.SizeX, bp.SizeY, bp.SizeZ
         local heading = self:GetHeading()
 

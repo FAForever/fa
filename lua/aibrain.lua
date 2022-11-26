@@ -2133,25 +2133,14 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@return table
     GetEconomyOverTime = function(self)
-        local eIncome = 0
-        local mIncome = 0
-        local eRequested = 0
-        local mRequested = 0
-        local num = 0
-        for k, v in self.EconomyData do
-            num = k
-            eIncome = eIncome + v.EnergyIncome
-            mIncome = mIncome + v.MassIncome
-            eRequested = eRequested + v.EnergyRequested
-            mRequested = mRequested + v.MassRequested
-        end
 
         local retTable = {}
-        retTable.EnergyIncome = eIncome / num
-        retTable.MassIncome = mIncome / num
-        retTable.EnergyRequested = eRequested / num
-        retTable.MassRequested = mRequested / num
+        retTable.EnergyIncome = self.EconomyOverTimeCurrent.EnergyIncome or 0
+        retTable.MassIncome = self.EconomyOverTimeCurrent.MassIncome or 0
+        retTable.EnergyRequested = self.EconomyOverTimeCurrent.EnergyRequested or 0
+        retTable.MassRequested = self.EconomyOverTimeCurrent.MassRequested or 0
 
         return retTable
     end,
