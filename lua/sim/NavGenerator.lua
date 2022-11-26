@@ -193,7 +193,7 @@ NavGrid = ClassSimple {
     GenerateNeighbors = function(self)
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:GenerateNeighbors(self)
+                self.Trees[z][x]:GenerateDirectNeighbors(self)
             end
         end
 
@@ -314,7 +314,6 @@ CompressedLabelTree = ClassSimple {
     ---@param self CompressedLabelTree
     ---@param rCache NavLabelCache
     Compress = function(self, rCache, compressionThreshold)
-
         -- base case, if we're a square of 4 then we skip the children and become very pessimistic
         if self.c <= compressionThreshold then
             local value = rCache[self.oz + 1][self.ox + 1]
@@ -383,19 +382,24 @@ CompressedLabelTree = ClassSimple {
         end
     end,
 
-    ---
+    --- Generates the following neighbors, when they are valid:
+    --- ```
+    --- 0 | 1 | 0
+    --- 1 | x | 1
+    --- 0 | 1 | 0
+    --- ```
     ---@param self CompressedLabelTree
     ---@param root NavGrid
-    GenerateNeighbors = function(self, root)
-        -- we are not valid :(
+    GenerateDirectNeighbors = function(self, root)
+        -- do not generate neighbors for non-pathable cells to save memory
         if self.label == -1 then
             return
         end
 
-        -- if we have children then we're a node, only leafs can have neighbors
+        -- nodes do not have neighbors, only leafs do
         if self.children then
             for _, child in self.children do
-                child:GenerateNeighbors(root)
+                child:GenerateDirectNeighbors(root)
             end
             return
         end
@@ -473,16 +477,22 @@ CompressedLabelTree = ClassSimple {
         end
     end,
 
+    --- Generates the following neighbors, when they are valid:
+    --- ```
+    --- 1 | 0 | 1
+    --- 0 | x | 0
+    --- 1 | 0 | 1
+    --- ```
     ---@param self CompressedLabelTree
     ---@param root NavGrid
     GenerateCornerNeighbors = function(self, root)
-        -- we are not valid :(
+        -- do not generate neighbors for non-pathable cells to save memory
         local label = self.label
         if label == -1 then
             return
         end
 
-        -- if we have children then we're a node, only leafs can have neighbors
+        -- nodes do not have neighbors, only leafs do
         if self.children then
             for _, child in self.children do
                 child:GenerateCornerNeighbors(root)
