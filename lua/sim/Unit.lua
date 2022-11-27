@@ -301,14 +301,6 @@ Unit = Class(moho.unit_methods) {
 
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
-
-        ForkThread(
-            function()
-                WaitSeconds(10.0)
-                reprsl(self)
-            end
-
-        )
     end,
 
     -------------------------------------------------------------------------------------------
