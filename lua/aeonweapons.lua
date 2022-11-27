@@ -51,9 +51,9 @@ ADFTractorClaw = Class(Weapon) {
     BeamFx = { EffectTemplate.ACollossusTractorBeam01 },
 
     SliderVelocity = {
-        TECH3 = 10,
-        TECH2 = 13,
-        TECH1 = 16,
+        TECH3 = 1,
+        TECH2 = 7,
+        TECH1 = 13,
     },
 
     --- Adds logic to catch edge cases
@@ -127,7 +127,7 @@ ADFTractorClaw = Class(Weapon) {
     OnInvalidTargetThread = function(self)
         self:ResetTarget()
         self:SetEnabled(false)
-        WaitSeconds(10)
+        WaitSeconds(0.4)
         if not IsDestroyed(self) then
             self:SetEnabled(true)
         end
