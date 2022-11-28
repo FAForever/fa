@@ -5020,7 +5020,12 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
     ---@param unitBeingBuilt Unit A flag to determine whether our consumption should be active
     GetUpgradeAnimation = function(self, unitBeingBuilt)
-        return self.Blueprint.Display.AnimationUpgrade
+        local display = self.Blueprint.Display
+        if display.AnimationUpgradeTable and display.AnimationUpgradeTable[unitBeingBuilt.Blueprint.BlueprintId] then
+            return display.AnimationUpgradeTable[unitBeingBuilt.Blueprint.BlueprintId]
+        end
+
+        return display.AnimationUpgrade
     end,
 
     --- Called when a missile launched by this unit is intercepted
