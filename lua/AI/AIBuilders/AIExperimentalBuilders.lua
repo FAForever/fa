@@ -157,9 +157,9 @@ BuilderGroup {
         BuilderName = 'T4 Exp Land',
         PlatoonAddPlans = {'NameUnits'},
         PlatoonTemplate = 'T4ExperimentalLand',
-        Priority = 10001,
+        Priority = 1000,
         FormRadius = 10000,
-        InstanceCount = 50,
+        InstanceCount = 10,
         BuilderConditions = {
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 1, categories.NUKE * categories.STRUCTURE, 'Enemy'}},
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 2, categories.TACTICALMISSILEPLATFORM, 'Enemy'}},
@@ -177,9 +177,9 @@ BuilderGroup {
         BuilderName = 'T4 Exp Land Group',
         PlatoonAddPlans = {'NameUnits'},
         PlatoonTemplate = 'T4ExperimentalLandGroup',
-        Priority = 10000,
+        Priority = 1000,
         FormRadius = 10000,
-        InstanceCount = 50,
+        InstanceCount = 10,
         BuilderType = 'Any',
         BuilderData = {
             ThreatWeights = {
