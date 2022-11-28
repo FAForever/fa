@@ -3253,6 +3253,7 @@ Platoon = Class(moho.platoon_methods) {
         local bestBaseName = ""
         local bestDistSq = 999999999
         local platPos = self:GetPlatoonPosition()
+        local returnPos
 
         for baseName, base in aiBrain.BuilderManagers do
             local distSq = VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3])
@@ -3266,7 +3267,12 @@ Platoon = Class(moho.platoon_methods) {
 
         if bestBase then
             AIAttackUtils.GetMostRestrictiveLayer(self)
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
+            if bestBase.FactoryManager.RallyPoint then
+                returnPos = bestBase.FactoryManager.RallyPoint
+            else
+                returnPos = bestBase.Position
+            end
+            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), returnPos, 200)
             -- remove any formation settings to ensure a quick return to base.
             self:SetPlatoonFormationOverride('NoFormation')
             self:Stop()
@@ -3277,13 +3283,13 @@ Platoon = Class(moho.platoon_methods) {
                     self:MoveToLocation(path[i], false)
                 end
             end
-            self:MoveToLocation(bestBase.Position, false)
+            self:MoveToLocation(returnPos, false)
 
             local oldDistSq = 0
             while aiBrain:PlatoonExists(self) do
-                WaitSeconds(10)
+                WaitTicks(100)
                 platPos = self:GetPlatoonPosition()
-                local distSq = VDist2Sq(platPos[1], platPos[3], bestBase.Position[1], bestBase.Position[3])
+                local distSq = VDist2Sq(platPos[1], platPos[3], returnPos[1], returnPos[3])
                 if distSq < 100 then
                     self:PlatoonDisband()
                     return
