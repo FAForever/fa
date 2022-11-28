@@ -540,7 +540,6 @@ FactoryBuilderManager = Class(BuilderManager) {
             -- DUNCAN - added to try and vary the rally points.
             local locationType = self.LocationType
             local factoryPos = self.Brain.BuilderManagers[locationType].Position
-            local startDistance = VDist3(self.Brain.MapCenterPoint, factoryPos)
             position = AIUtils.ShiftPosition(factoryPos, self.Brain.MapCenterPoint, 25)
             rally = position
         end
