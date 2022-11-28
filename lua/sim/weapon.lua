@@ -444,7 +444,7 @@ Weapon = Class(moho.weapon_methods) {
 
     damageTableCache = false,
     ---@param self Weapon
-    ---@return table
+    ---@return table | boolean
     GetDamageTable = function(self)
         if not self.damageTableCache then
             self.damageTableCache = self:GetDamageTableInternal()

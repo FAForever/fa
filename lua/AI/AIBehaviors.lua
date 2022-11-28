@@ -341,7 +341,7 @@ function CommanderThreadImproved(cdr, platoon)
         WaitTicks(1)
 
         if not cdr.Dead and not cdr.Combat and cdr.UnitBeingBuiltBehavior then
-            cdr:ForkThread(CDRFinishUnit)
+            CDRFinishUnit(cdr)
         end
 
         -- Call platoon resume building deal...

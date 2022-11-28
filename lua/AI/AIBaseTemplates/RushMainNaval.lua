@@ -21,7 +21,6 @@ BaseBuilderTemplate {
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerFactoryConstruction',
-        'EngineerFactoryConstructionAirHigherPriority',
 
         -- Build energy at this base
         'EngineerEnergyBuilders',
@@ -132,7 +131,7 @@ BaseBuilderTemplate {
             Gate = 1,
         },
         MassToFactoryValues = {
-            T1Value = 8,
+            T1Value = 6,
             T2Value = 20,
             T3Value = 40,
         },

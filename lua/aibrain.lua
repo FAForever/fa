@@ -1532,6 +1532,7 @@ AIBrain = Class(moho.aibrain_methods) {
         -- TURNING OFF AI POOL PLATOON, I MAY JUST REMOVE THAT PLATOON FUNCTIONALITY LATER
         local poolPlatoon = self:GetPlatoonUniquelyNamed('ArmyPool')
         if poolPlatoon then
+            poolPlatoon.ArmyPool = true
             poolPlatoon:TurnOffPoolAI()
         end
 
@@ -1579,6 +1580,14 @@ AIBrain = Class(moho.aibrain_methods) {
         else
             self.EnemyPickerThread = self:ForkThread(self.PickEnemy)
         end
+        
+        self.IMAPConfig = {
+            OgridRadius = 0,
+            IMAPSize = 0,
+            Rings = 0,
+        }
+
+        self:IMAPConfiguration()
     end,
 
     ---@param self AIBrain
@@ -2124,25 +2133,14 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@return table
     GetEconomyOverTime = function(self)
-        local eIncome = 0
-        local mIncome = 0
-        local eRequested = 0
-        local mRequested = 0
-        local num = 0
-        for k, v in self.EconomyData do
-            num = k
-            eIncome = eIncome + v.EnergyIncome
-            mIncome = mIncome + v.MassIncome
-            eRequested = eRequested + v.EnergyRequested
-            mRequested = mRequested + v.MassRequested
-        end
 
         local retTable = {}
-        retTable.EnergyIncome = eIncome / num
-        retTable.MassIncome = mIncome / num
-        retTable.EnergyRequested = eRequested / num
-        retTable.MassRequested = mRequested / num
+        retTable.EnergyIncome = self.EconomyOverTimeCurrent.EnergyIncome or 0
+        retTable.MassIncome = self.EconomyOverTimeCurrent.MassIncome or 0
+        retTable.EnergyRequested = self.EconomyOverTimeCurrent.EnergyRequested or 0
+        retTable.MassRequested = self.EconomyOverTimeCurrent.MassRequested or 0
 
         return retTable
     end,
@@ -5027,7 +5025,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 elseif self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Amphibious' then
                     WaitTicks(5)
                     continue
-                elseif self.CanPathToEnemyRNG[OwnIndex][EnemyIndex][k] == 'Air' then
+                elseif self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Air' then
                     WaitTicks(5)
                     continue
                 end
@@ -5050,6 +5048,33 @@ AIBrain = Class(moho.aibrain_methods) {
                 WaitTicks(5)
             end
             WaitTicks(100)
+        end
+    end,
+
+    IMAPConfiguration = function(self)
+        -- Used to configure imap values, used for setting threat ring sizes depending on map size to try and get a somewhat decent radius
+        local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
+
+        if maxmapdimension == 256 then
+            self.IMAPConfig.OgridRadius = 22.5
+            self.IMAPConfig.IMAPSize = 32
+            self.IMAPConfig.Rings = 2
+        elseif maxmapdimension == 512 then
+            self.IMAPConfig.OgridRadius = 22.5
+            self.IMAPConfig.IMAPSize = 32
+            self.IMAPConfig.Rings = 2
+        elseif maxmapdimension == 1024 then
+            self.IMAPConfig.OgridRadius = 45.0
+            self.IMAPConfig.IMAPSize = 64
+            self.IMAPConfig.Rings = 1
+        elseif maxmapdimension == 2048 then
+            self.IMAPConfig.OgridRadius = 89.5
+            self.IMAPConfig.IMAPSize = 128
+            self.IMAPConfig.Rings = 0
+        else
+            self.IMAPConfig.OgridRadius = 180.0
+            self.IMAPConfig.IMAPSize = 256
+            self.IMAPConfig.Rings = 0
         end
     end,
 }

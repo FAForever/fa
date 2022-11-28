@@ -12,15 +12,15 @@ local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
 local ExBaseTmpl = 'ExpansionBaseTemplates'
 local Adj2x2Tmpl = 'Adjacency2x2'
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local MABC = '/lua/editor/MarkerBuildConditions.lua'
-local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
-local EBC = '/lua/editor/EconomyBuildConditions.lua'
-local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
-local SAI = '/lua/ScenarioPlatoonAI.lua'
-local IBC = '/lua/editor/InstantBuildConditions.lua'
-local TBC = '/lua/editor/ThreatBuildConditions.lua'
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
+local MABC = '/lua/editor/markerbuildconditions.lua'
+local OAUBC = '/lua/editor/otherarmyunitcountbuildconditions.lua'
+local EBC = '/lua/editor/economybuildconditions.lua'
+local PCBC = '/lua/editor/platooncountbuildconditions.lua'
+local SAI = '/lua/scenarioplatoonai.lua'
+local IBC = '/lua/editor/instantbuildconditions.lua'
+local TBC = '/lua/editor/threatbuildconditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
 local AIAddBuilderTable = import("/lua/ai/aiaddbuildertable.lua")
@@ -157,9 +157,9 @@ BuilderGroup {
         BuilderName = 'T4 Exp Land',
         PlatoonAddPlans = {'NameUnits'},
         PlatoonTemplate = 'T4ExperimentalLand',
-        Priority = 10001,
+        Priority = 1000,
         FormRadius = 10000,
-        InstanceCount = 50,
+        InstanceCount = 10,
         BuilderConditions = {
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 1, categories.NUKE * categories.STRUCTURE, 'Enemy'}},
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 2, categories.TACTICALMISSILEPLATFORM, 'Enemy'}},
@@ -177,9 +177,9 @@ BuilderGroup {
         BuilderName = 'T4 Exp Land Group',
         PlatoonAddPlans = {'NameUnits'},
         PlatoonTemplate = 'T4ExperimentalLandGroup',
-        Priority = 10000,
+        Priority = 1000,
         FormRadius = 10000,
-        InstanceCount = 50,
+        InstanceCount = 10,
         BuilderType = 'Any',
         BuilderData = {
             ThreatWeights = {

@@ -247,6 +247,11 @@ Platoon = Class(moho.platoon_methods) {
 
     ---@param self Platoon
     PlatoonDisband = function(self)
+        if self.ArmyPool then
+            WARN('AI WARNING: Platoon trying to disband ArmyPool')
+            --LOG(reprsl(debug.traceback()))
+            return
+        end
         local aiBrain = self:GetBrain()
         if self.BuilderHandle then
             self.BuilderHandle:RemoveHandle(self)
@@ -2180,7 +2185,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         local FactionToIndex  = { UEF = 1, AEON = 2, CYBRAN = 3, SERAPHIM = 4, NOMADS = 5}
-        local factionIndex = cons.FactionIndex or FactionToIndex[eng.factionCategory]
+        local factionIndex = cons.FactionIndex or FactionToIndex[eng.Blueprint.FactionCategory]
 
         buildingTmplFile = import(cons.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
         baseTmplFile = import(cons.BaseTemplateFile or '/lua/BaseTemplates.lua')
@@ -2492,10 +2497,10 @@ Platoon = Class(moho.platoon_methods) {
         self:Stop()
         --LOG('* UnitUpgradeAI: PlatoonName:'..repr(self.BuilderName))
         for k, v in platoonUnits do
-            --LOG('* UnitUpgradeAI: Upgrading unit '..v.UnitId..' ('..v.factionCategory..')')
+            --LOG('* UnitUpgradeAI: Upgrading unit '..v.UnitId..' ('..v.Blueprint.FactionCategory..')')
             local upgradeID
             -- Get the factionindex from the unit to get the right update (in case we have captured this unit from another faction)
-            UnitBeingUpgradeFactionIndex = FactionToIndex[v.factionCategory] or factionIndex
+            UnitBeingUpgradeFactionIndex = FactionToIndex[v.Blueprint.FactionCategory] or factionIndex
             --LOG('* UnitUpgradeAI: UnitBeingUpgradeFactionIndex '..UnitBeingUpgradeFactionIndex)
             if self.PlatoonData.OverideUpgradeBlueprint then
                 local tempUpgradeID = self.PlatoonData.OverideUpgradeBlueprint[UnitBeingUpgradeFactionIndex]
@@ -2525,7 +2530,7 @@ Platoon = Class(moho.platoon_methods) {
                 -- if we can't find a StructureUpgradeTemplate for this unit, warn the programmer
                 if not upgradeID then
                     -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ABC1234
-                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ' .. repr(v.UnitId) .. '  faction: ' .. repr(v.factionCategory) )
+                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ' .. repr(v.UnitId) .. '  faction: ' .. repr(v.Blueprint.FactionCategory) )
                 end
             end
             if upgradeID and EntityCategoryContains(categories.STRUCTURE, v) and not v:CanBuild(upgradeID) then
@@ -2537,7 +2542,7 @@ Platoon = Class(moho.platoon_methods) {
             if upgradeID then
                 upgradeIssued = true
                 IssueUpgrade({v}, upgradeID)
-                --LOG('-- Upgrading unit '..v.UnitId..' ('..v.factionCategory..') with '..upgradeID)
+                --LOG('-- Upgrading unit '..v.UnitId..' ('..v.Blueprint.FactionCategory..') with '..upgradeID)
             end
         end
         if not upgradeIssued then
@@ -6031,7 +6036,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         local FactionToIndex  = { UEF = 1, AEON = 2, CYBRAN = 3, SERAPHIM = 4, NOMADS = 5}
-        local factionIndex = cons.FactionIndex or FactionToIndex[eng.factionCategory]
+        local factionIndex = cons.FactionIndex or FactionToIndex[eng.Blueprint.FactionCategory]
 
         if not SUtils.CheckForMapMarkers(aiBrain) and cons.NearMarkerType and (cons.NearMarkerType == 'Rally Point' or
         cons.NearMarkerType == 'Protected Experimental Construction') then
