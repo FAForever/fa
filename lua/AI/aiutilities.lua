@@ -2971,7 +2971,7 @@ function ShiftPosition(pos1, pos2, dist, reverse)
     --if the reverse bool is set it will go in the oposite direction e.g towards/away
     --It is multipurpose, used for simple vector3 lerps and enemy avoidence logic
     if not pos1 or not pos2 then
-        WARN('*AI WARNING: ShiftPosition Missing positions')
+        WARN('*AI WARNING: ShiftPosition missing positions')
     end
     local delta
     if reverse then
