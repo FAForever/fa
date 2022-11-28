@@ -538,7 +538,10 @@ FactoryBuilderManager = Class(BuilderManager) {
         -- Use factory location if no other rally or if rally point is far away
         if not rally or VDist2(rally[1], rally[3], position[1], position[3]) > 75 then
             -- DUNCAN - added to try and vary the rally points.
-            position = AIUtils.RandomLocation(position[1],position[3])
+            local locationType = self.LocationType
+            local factoryPos = self.Brain.BuilderManagers[locationType].Position
+            local startDistance = VDist3(self.Brain.MapCenterPoint, factoryPos)
+            position = AIUtils.ShiftPosition(factoryPos, self.Brain.MapCenterPoint, 25)
             rally = position
         end
 

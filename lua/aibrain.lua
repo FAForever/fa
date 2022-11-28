@@ -1551,6 +1551,9 @@ AIBrain = Class(moho.aibrain_methods) {
 
         -- Add default main location and setup the builder managers
         self.NumBases = 0 -- AddBuilderManagers will increase the number
+        
+        -- Set the map center point
+        self.MapCenterPoint = { (ScenarioInfo.size[1] / 2), GetSurfaceHeight((ScenarioInfo.size[1] / 2), (ScenarioInfo.size[2] / 2)) ,(ScenarioInfo.size[2] / 2) }
 
         self.BuilderManagers = {}
         SUtils.AddCustomUnitSupport(self)
