@@ -3269,10 +3269,8 @@ Platoon = Class(moho.platoon_methods) {
             AIAttackUtils.GetMostRestrictiveLayer(self)
             if bestBase.FactoryManager.RallyPoint then
                 returnPos = bestBase.FactoryManager.RallyPoint
-                LOG('Return to base using rally point of '..repr(returnPos))
             else
                 returnPos = bestBase.Position
-                LOG('Return to base using base position '..repr(returnPos))
             end
             local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), returnPos, 200)
             -- remove any formation settings to ensure a quick return to base.
