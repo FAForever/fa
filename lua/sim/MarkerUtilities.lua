@@ -66,8 +66,6 @@ for k, marker in AllMarkers do
     end
 end
 
-reprsl(MarkerCache)
-
 --- Retrieves all markers of a given type. This is a shallow copy,
 -- which means the reference is copied but the values are not. If you
 -- need a copy with unique values use GetMarkerByTypeDeep instead.
