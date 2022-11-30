@@ -11,9 +11,6 @@ SimUnitEnhancements = {}
 
 function ResetSyncTable()
     Sync = {
-        -- A list of camera control operations that we'd like the user layer to perform.
-        AIChat = {},
-
         -- Table of army indices set to "victory" or "defeat".
         -- It's the user layer's job to determine if any UI needs to be shown
         -- for the focus army.
