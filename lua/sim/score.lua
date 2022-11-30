@@ -238,6 +238,7 @@ local function ScoreThread()
         local myArmyIndex = GetFocusArmy()
         local observer = myArmyIndex == -1
 
+        Sync.Score = { }
         if observer or SessionIsReplay() then
             Sync.Score = ArmyScore
         else

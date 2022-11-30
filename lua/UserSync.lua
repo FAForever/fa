@@ -236,7 +236,7 @@ function OnSync()
         import("/lua/ui/game/ping.lua").MaxMarkers = Sync.MaxPingMarkers
     end
 
-    if not table.empty(Sync.Score) then
+    if Sync.Score and not table.empty(Sync.Score) then
         import("/lua/ui/game/score.lua").currentScores = Sync.Score
     end
 
@@ -406,7 +406,7 @@ function OnSync()
         import("/lua/ui/game/gamemain.lua").SimChangeCameraZoom(Sync.ChangeCameraZoom)
     end
 
-    if not table.empty(Sync.ScoreAccum) then
+    if Sync.ScoreAccum and not table.empty(Sync.ScoreAccum) then
         LOG("Score data received!")
         import("/lua/ui/dialogs/hotstats.lua").scoreData = Sync.ScoreAccum
     end

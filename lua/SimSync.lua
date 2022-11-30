@@ -1,7 +1,18 @@
 ---@declare-global
 -- The global sync table is copied to the user layer every time the main and sim threads are
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
-Sync = {}
+
+Sync = { }
+
+local SyncDefaults = {
+    UnitData = true,
+    ReleaseIds = true,
+    Reclaim = true,
+}
+
+for k, value in SyncDefaults do
+    Sync[k] = { }
+end
 
 -- UnitData that has been synced. We keep a separate copy of this so when we change
 -- focus army we can resync the data.
@@ -10,19 +21,21 @@ UnitData = {}
 SimUnitEnhancements = {}
 
 function ResetSyncTable()
-    Sync = {
-        -- Contain operation data when op is complete
-        OperationComplete = nil,
+    local sync = Sync
+    for k, v in sync do
+        -- clean up persistent tables
+        local defaultTable = SyncDefaults[k]
+        if defaultTable then
+            local innerTable = sync[k]
+            for l, o in innerTable do
+                innerTable[l] = nil
+            end
 
-        UnitData = {},
-        ReleaseIds = {},
-
-        -- contains the current score for each army
-        Score = {},
-        ScoreAccum = {},
-
-        Reclaim = {}
-    }
+        -- clean up everything else
+        else
+            sync[k] = nil
+        end
+    end
 end
 
 function AddUnitEnhancement(unit, enhancement, slot)
