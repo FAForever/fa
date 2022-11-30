@@ -242,7 +242,9 @@ local function ScoreThread()
             Sync.Score = ArmyScore
         else
             for index, brain in ArmyBrains do
-                if ArmyIsCivilian(index) then continue end
+                if ArmyIsCivilian(index) then
+                    continue
+                end
                 if brain:IsDefeated() then
                     Sync.Score[index] = {Defeated = true, general = {}}
                 else

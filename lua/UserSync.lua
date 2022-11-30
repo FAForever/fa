@@ -84,13 +84,17 @@ function OnSync()
         UnitData = table.merged(UnitData,Sync.UnitData)
     end
 
-    for id, v in Sync.ReleaseIds do
-        UnitData[id] = nil
+    if Sync.ReleaseIds then 
+        for id, v in Sync.ReleaseIds do
+            UnitData[id] = nil
+        end
     end
 
     --Play Sounds
-    for k, v in Sync.Sounds do
-        PlaySound(Sound{ Bank=v.Bank, Cue=v.Cue })
+    if Sync.Sounds then
+        for k, v in Sync.Sounds do
+            PlaySound(Sound{ Bank=v.Bank, Cue=v.Cue })
+        end
     end
 
     if Sync.ToggleGamePanels then
@@ -148,7 +152,9 @@ function OnSync()
         import("/lua/ui/game/massfabs.lua").Update(table.deepcopy(Sync.MassFabs))
     end
 
-    import("/lua/usercamera.lua").ProcessCameraRequests(Sync.CameraRequests)
+    if Sync.CameraRequests then 
+        import("/lua/usercamera.lua").ProcessCameraRequests(Sync.CameraRequests)
+    end
 
     if Sync.FocusArmyChanged then
         import("/lua/ui/game/avatars.lua").FocusArmyChanged()
@@ -184,9 +190,11 @@ function OnSync()
     end
 
     --Play Voices
-    if not import("/lua/ui/game/missiontext.lua").IsHeadPlaying() then
-        for k, v in Sync.Voice do
-            PlayVoice(Sound{ Bank=v.Bank, Cue=v.Cue }, true)
+    if Sync.Voice then
+        if not import("/lua/ui/game/missiontext.lua").IsHeadPlaying() then
+            for k, v in Sync.Voice do
+                PlayVoice(Sound{ Bank=v.Bank, Cue=v.Cue }, true)
+            end
         end
     end
 
@@ -410,18 +418,22 @@ function OnSync()
     -- - https://www.faforever.com/rules
 
     --- Processes game results to adjust UI capabilities
-    for _, gameResult in Sync.GameResult do
-        local armyIndex, result = unpack(gameResult)
-        import("/lua/ui/game/gameresult.lua").DoGameResult(armyIndex, result)
+    if Sync.GameResult then
+        for _, gameResult in Sync.GameResult do
+            local armyIndex, result = unpack(gameResult)
+            import("/lua/ui/game/gameresult.lua").DoGameResult(armyIndex, result)
+        end
     end
 
     if not SessionIsReplay() then
 
         --- Sends the defeat / victory / draw game results over to the server
-        for _, gameResult in Sync.GameResult do
-            local armyIndex, result = unpack(gameResult)
-            SPEW(string.format("(%s) Sending game result: %s %s", tostring(GameTick()), armyIndex, result))
-            GpgNetSend('GameResult', armyIndex, result)
+        if Sync.GameResult then
+            for _, gameResult in Sync.GameResult do
+                local armyIndex, result = unpack(gameResult)
+                SPEW(string.format("(%s) Sending game result: %s %s", tostring(GameTick()), armyIndex, result))
+                GpgNetSend('GameResult', armyIndex, result)
+            end
         end
 
         --- Sends the (unit) statistics over to the server
