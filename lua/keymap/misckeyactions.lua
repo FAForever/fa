@@ -17,7 +17,9 @@ function lockZoom()
     end
 end
 
-
+function navalNoSonar()
+    UISelectionByCategory("NAVAL + MOBILE", false, false, false, false) SelectUnits(EntityCategoryFilterDown(categories.ALLUNITS - categories.MOBILESONAR, GetSelectedUnits()))
+end
 function airNoTransports()
     UISelectionByCategory("AIR + MOBILE", false, false, false, false) SelectUnits(EntityCategoryFilterDown(categories.ALLUNITS - categories.TRANSPORTATION, GetSelectedUnits()))
 end
