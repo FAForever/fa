@@ -11,10 +11,6 @@ SimUnitEnhancements = {}
 
 function ResetSyncTable()
     Sync = {
-        -- Player to player queries that can affect the Sim
-        PlayerQueries = {},
-        QueryResults = {},
-
         -- Contain operation data when op is complete
         OperationComplete = nil,
 

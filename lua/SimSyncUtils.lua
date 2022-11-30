@@ -24,3 +24,15 @@ function SyncGameResult(data)
     Sync.GameResult = Sync.GameResult or { }
     table.insert(Sync.GameResult, data)
 end
+
+function SyncPlayerQuery(data)
+    local Sync = Sync
+    Sync.PlayerQueries = Sync.PlayerQueries or { }
+    table.insert(Sync.PlayerQueries, data)
+end
+
+function SyncQueryResult(data)
+    local Sync = Sync
+    Sync.QueryResults = Sync.QueryResults or { }
+    table.insert(Sync.QueryResults, data)
+end
