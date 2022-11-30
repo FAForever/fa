@@ -11,11 +11,6 @@ SimUnitEnhancements = {}
 
 function ResetSyncTable()
     Sync = {
-        -- Table of army indices set to "victory" or "defeat".
-        -- It's the user layer's job to determine if any UI needs to be shown
-        -- for the focus army.
-        GameResult = {},
-
         -- Player to player queries that can affect the Sim
         PlayerQueries = {},
         QueryResults = {},

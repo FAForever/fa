@@ -16,5 +16,11 @@ end
 function SyncAIChat(data)
     local Sync = Sync
     Sync.AIChat = Sync.AIChat or { }
-    table.insert(Sync.AIChat, )
+    table.insert(Sync.AIChat, data)
+end
+
+function SyncGameResult(data)
+    local Sync = Sync
+    Sync.GameResult = Sync.GameResult or { }
+    table.insert(Sync.GameResult, data)
 end
