@@ -23,7 +23,7 @@
 ---@field [3] string cue
 ---@field [4] string faction
 
-
+local SyncVoice = import("/lua/simsyncutils.lua").SyncVoice
 local CategoryToString = import("/lua/sim/categoryutils.lua").ToString
 local Cinematics = import("/lua/cinematics.lua")
 local Game = import("/lua/game.lua")
@@ -683,7 +683,7 @@ function PlayDialogue()
                     local text = dialogue.text
                     local vid = dialogue.vid
                     if not vid and bank and cue then
-                        table.insert(Sync.Voice, {Cue = cue, Bank = bank})
+                        SyncVoice({Cue = cue, Bank = bank})
                         if not delay then
                             WaitSeconds(5)
                         end
@@ -729,9 +729,9 @@ end
 ---
 function PlayUnlockDialogue()
     if Random(1, 2) == 1 then
-        table.insert(Sync.Voice, {Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01370'})
+        SyncVoice({Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01370'})
     else
-        table.insert(Sync.Voice, {Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01372'})
+        SyncVoice({Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01372'})
     end
 end
 
@@ -797,7 +797,7 @@ end
 --- Plays an XACT sound if needed--currently all VOs are videos
 ---@param voSound SoundBlueprint
 function PlayVoiceOver(voSound)
-    table.insert(Sync.Voice, voSound)
+    SyncVoice(voSound)
 end
 
 --- Sets enhancement restrictions from the names of the enhancements you do not want the player to build
@@ -1237,7 +1237,7 @@ function SetPlayableArea(rect, voFlag)
     SetPlayableRect(x0, y0, x1, y1)
     if voFlag then
         ForkThread(PlayableRectCameraThread, rect)
-        table.insert(Sync.Voice, {Cue = 'Computer_Computer_MapExpansion_01380', Bank = 'XGG'})
+        SyncVoice({Cue = 'Computer_Computer_MapExpansion_01380', Bank = 'XGG'})
     end
 
     import("/lua/simsync.lua").SyncPlayableRect(rect)
