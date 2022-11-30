@@ -16,7 +16,7 @@
 ---@param rings integer
 ---@return boolean
 function EnemyThreatGreaterThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
-    local testRings = rings or aiBrain.IMAPConfig.Rings
+    local testRings = rings or aiBrain.IMAPConfig.Rings + 1
     local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     if not FactoryManager then
         return false
