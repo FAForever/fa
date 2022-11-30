@@ -12,8 +12,6 @@ SimUnitEnhancements = {}
 function ResetSyncTable()
     Sync = {
         -- A list of camera control operations that we'd like the user layer to perform.
-        CameraRequests = {},
-        Sounds = {},
         Voice = {},
         AIChat = {},
 
