@@ -579,7 +579,7 @@ keyActions = {
         category = 'hotbuildingExtra', order = 1208,},
     ['mass_storage'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Mass_Storage")',
         category = 'hotbuildingExtra', order = 1209,},
-    ['point_defense'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Point_Defenssonare")',
+    ['point_defense'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Point_Defense")',
         category = 'hotbuildingExtra', order = 1210,},
     ['anti_air'] = {action= 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Anti_Air")',
         category = 'hotbuildingExtra', order = 1211,},
