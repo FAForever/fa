@@ -1,5 +1,5 @@
-historyInterval = 10
-scoreInterval = 1
+historyInterval = 30
+scoreInterval = 10
 alliesScore = true
 
 local GameIsOver = false
@@ -13,14 +13,8 @@ local categoriesToCollect = {
     air = categories.AIR,
     naval = categories.NAVAL,
     cdr = categories.COMMAND,
-    sacu = categories.SUBCOMMANDER,
-    engineer = categories.ENGINEER,
-    tech1 = categories.TECH1,
-    tech2 = categories.TECH2,
-    tech3 = categories.TECH3,
     experimental = categories.EXPERIMENTAL,
-    structures = categories.STRUCTURE,
-    transportation = categories.TRANSPORTATION
+    structures = categories.STRUCTURE
 }
 
 ---@param brain AIBrain
@@ -133,7 +127,6 @@ local function ScoreThread()
                 currentunits = 0,
                 currentcap = 0
             },
-            blueprints = {}, -- filled dynamically below
             units = {},      -- filled dynamically below
             resources = {
                 massin = {
@@ -217,16 +210,6 @@ local function ScoreThread()
             Score.general.lost.count = brain:GetArmyStat("Units_Killed", 0).Value
             Score.general.lost.mass = brain:GetArmyStat("Units_MassValue_Lost", 0).Value
             Score.general.lost.energy = brain:GetArmyStat("Units_EnergyValue_Lost", 0).Value
-
-            for unitId, stats in brain.UnitStats do
-                if Score.blueprints[unitId] == nil then
-                    Score.blueprints[unitId] = {}
-                end
-
-                for statName, value in stats do
-                    Score.blueprints[unitId][statName] = value
-                end
-            end
 
             for categoryName, category in categoriesToCollect do
                 Score.units[categoryName]['kills'] = brain:GetBlueprintStat("Enemies_Killed", category)

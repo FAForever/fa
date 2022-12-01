@@ -37,6 +37,12 @@ end
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
 
+    -- better access pattern (global -> local)
+    local Sync = Sync
+    local PreviousSync = PreviousSync
+
+    -- clean callbacks --
+
     for k, callback in SyncCallbacks do 
         local ok, msg = pcall(callback, Sync)
 
@@ -46,6 +52,8 @@ function OnSync()
             WARN(msg)
         end
     end
+
+    -- everything else --
 
     if Sync.ArmyTransfer then 
         local army = GetFocusArmy()
