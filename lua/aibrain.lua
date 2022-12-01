@@ -4111,27 +4111,23 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@return boolean
     GetAllianceEnemy = function(self, strengthTable)
         local returnEnemy = false
-
-        local highStrength = self:GetHighestThreatPosition(2, true, 'Structures', self:GetArmyIndex())
-        for _, v in strengthTable do
+        local myIndex = self:GetArmyIndex()
+        local highStrength = strengthTable[myIndex].Strength
+        for k, v in strengthTable do
             -- It's an enemy, ignore
-            if v.Enemy then
-                continue
-            end
-
-            -- Ally too weak
-            if v.Strength < highStrength then
-                continue
-            end
-
-            -- If the brain has an enemy, it's our new enemy
-            local enemy = v.Brain:GetCurrentEnemy()
-            if enemy and not enemy:IsDefeated() then
-                highStrength = v.Strength
-                returnEnemy = v.Brain:GetCurrentEnemy()
+            if not v.Enemy and not ArmyIsCivilian(k) and v.Brain.Result ~= 'defeat' then
+                -- Ally too weak
+                if v.Strength < highStrength then
+                    continue
+                end
+                -- If the brain has an enemy, it's our new enemy
+                local enemy = v.Brain:GetCurrentEnemy()
+                if enemy and not enemy:IsDefeated() then
+                    highStrength = v.Strength
+                    returnEnemy = v.Brain:GetCurrentEnemy()
+                end
             end
         end
-
         return returnEnemy
     end,
 
@@ -4146,16 +4142,28 @@ AIBrain = Class(moho.aibrain_methods) {
                 Position = false,
                 Brain = v,
             }
+            local armyIndex = v:GetArmyIndex()
             -- Share resources with friends but don't regard their strength
-            if IsAlly(selfIndex, v:GetArmyIndex()) then
+            if IsAlly(selfIndex, armyIndex) then
                 self:SetResourceSharing(true)
                 insertTable.Enemy = false
-            elseif not IsEnemy(selfIndex, v:GetArmyIndex()) then
+            elseif not IsEnemy(selfIndex, armyIndex) then
                 insertTable.Enemy = false
             end
 
-            insertTable.Position, insertTable.Strength = self:GetHighestThreatPosition(2, true, 'Structures', v:GetArmyIndex())
-            armyStrengthTable[v:GetArmyIndex()] = insertTable
+            if insertTable.Enemy then
+                insertTable.Position, insertTable.Strength = self:GetHighestThreatPosition(self.IMAPConfig.Rings, true, 'Structures', armyIndex)
+            else
+                local startX, startZ = v:GetArmyStartPos()
+                local ecoStructures = self:GetUnitsAroundPoint(categories.STRUCTURE * (categories.MASSEXTRACTION + categories.MASSPRODUCTION), {startX, 0 ,startZ}, 120, 'Ally')
+                local ecoThreat = 0
+                for _, v in ecoStructures do
+                    ecoThreat = ecoThreat + v.Blueprint.Defense.EconomyThreatLevel
+                end
+                insertTable.Position = {startX, 0, startZ}
+                insertTable.Strength = ecoThreat
+            end
+            armyStrengthTable[armyIndex] = insertTable
         end
 
         local allyEnemy = self:GetAllianceEnemy(armyStrengthTable)
@@ -4177,28 +4185,22 @@ AIBrain = Class(moho.aibrain_methods) {
                 local enemy = false
 
                 for k, v in armyStrengthTable do
-                    -- Dont' target self
-                    if k == selfIndex then
-                        continue
-                    end
+                    -- Dont' target self and ignore allies
+                    if k ~= selfIndex and v.Enemy and v.Brain.Result ~= 'defeat' then
+                        
+                        -- If we have a better candidate; ignore really weak enemies
+                        if enemy and v.Strength < 20 then
+                            continue
+                        end
 
-                    -- Ignore allies
-                    if not v.Enemy then
-                        continue
-                    end
+                        -- The closer targets are worth more because then we get their mass spots
+                        local distanceWeight = 0.1
+                        local distance = VDist3(self:GetStartVector3f(), v.Position)
+                        local threatWeight = (1 / (distance * distanceWeight)) * v.Strength
 
-                    -- If we have a better candidate; ignore really weak enemies
-                    if enemy and v.Strength < 20 then
-                        continue
-                    end
-
-                    -- The closer targets are worth more because then we get their mass spots
-                    local distanceWeight = 0.1
-                    local distance = VDist3(self:GetStartVector3f(), v.Position)
-                    local threatWeight = (1 / (distance * distanceWeight)) * v.Strength
-
-                    if not enemy or threatWeight > enemyStrength then
-                        enemy = v.Brain
+                        if not enemy or threatWeight > enemyStrength then
+                            enemy = v.Brain
+                        end
                     end
                 end
 
