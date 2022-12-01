@@ -1,5 +1,5 @@
 historyInterval = 30
-scoreInterval = 10
+scoreInterval = 2
 alliesScore = true
 
 local GameIsOver = false
