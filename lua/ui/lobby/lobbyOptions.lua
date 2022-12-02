@@ -590,7 +590,7 @@ globalOpts = {
 ---@type ScenarioOption[]
 AIOpts = {
    {
-        default = 11,
+        default = 6,
         label = "<LOC aisettings_0001>>AIx Cheat Multiplier",
         help = "<LOC aisettings_0002>Set the cheat multiplier for the cheating AIs.",
         key = 'CheatMult',
@@ -603,7 +603,7 @@ AIOpts = {
         },
    },
    {
-        default = 11,
+        default = 6,
         label = "<LOC aisettings_0054>AIx Build Multiplier",
         help = "<LOC aisettings_0055>Set the build rate multiplier for the cheating AIs.",
         key = 'BuildMult',

@@ -21,17 +21,12 @@ BaseBuilderTemplate {
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerFactoryConstruction',
-        'EngineerFactoryConstructionAirHigherPriority',
 
         -- Build Mass high pri at this base
         'EngineerMassBuildersLowerPri',
 
         -- Extractors
         'Time Exempt Extractor Upgrades Expansion',
-
-        -- ==== EXPANSION ==== --
-        --DUNCAN - expansions dont build more expansions!
-        --'EngineerExpansionBuildersFull - Naval',
 
         -- ==== DEFENSES ==== --
         'T2MissileDefenses',

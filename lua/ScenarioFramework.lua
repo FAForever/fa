@@ -1675,12 +1675,12 @@ function DetermineBestAttackLocation(attackingBrain, targetBrain, relationship, 
     return attackLocation
 end
 
---- Returns a random entry from a table
+--- Returns a random entry from an array
 ---@generic T
----@param table table<T>
+---@param array T[]
 ---@return T
-function GetRandomEntry(table)
-    return table[Random(1, table.getn(table))]
+function GetRandomEntry(array)
+    return array[Random(1, table.getn(array))]
 end
 
 ---

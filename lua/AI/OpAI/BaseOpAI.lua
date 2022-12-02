@@ -16,10 +16,10 @@ local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
 local RebuildStructuresTemplate = import("/lua/buildingtemplates.lua").RebuildStructuresTemplate
 local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
 
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local BMBC = '/lua/editor/basemanagerbuildconditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
+local BMPT = '/lua/ai/opai/basemanagerplatoonthreads.lua'
 
 ---@class OpAI
 OpAI = ClassSimple {

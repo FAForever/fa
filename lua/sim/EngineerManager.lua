@@ -606,18 +606,6 @@ EngineerManager = Class(BuilderManager) {
     ---@param self EngineerManager
     ---@param unit Unit
     RemoveUnit = function(self, unit)
-        local guards = unit:GetGuards()
-        for k,v in guards do
-            if not v.Dead and v.AssistPlatoon then
-                if self.Brain.Sorian and self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.SorianEconAssistBody)
-                elseif self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
-                else
-                    v.AssistPlatoon = nil
-                end
-            end
-        end
 
         local found = false
         for k,v in self.ConsumptionUnits do
@@ -679,18 +667,6 @@ EngineerManager = Class(BuilderManager) {
         end
         if finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
             self:AddUnit(finishedUnit)
-        end
-        local guards = unit:GetGuards()
-        for k,v in guards do
-            if not v.Dead and v.AssistPlatoon then
-                if self.Brain.Sorian and self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.SorianEconAssistBody)
-                elseif self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
-                else
-                    v.AssistPlatoon = nil
-                end
-            end
         end
     end,
 

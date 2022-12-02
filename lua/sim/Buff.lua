@@ -541,12 +541,12 @@ local BuffRegenFieldCalculate = function (unit, buffName, affectType, initialVal
                     floors[k_] = v.BPFloors[k_]
                 end
             end
-            floor = floors[unit.techCategory] or 0
+            floor = floors[unit.Blueprint.TechCategory] or 0
         elseif v.Floor then
             floor = v.Floor
         end
 
-        ceil = ceilings[unit.techCategory] or 99999
+        ceil = ceilings[unit.Blueprint.TechCategory] or 99999
 
         if v.Mult then
             if affectType == 'Regen' then
@@ -641,7 +641,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
             end
         end
 
-        ceil = ceilings[unit.techCategory]
+        ceil = ceilings[unit.Blueprint.TechCategory]
 
         if v.Mult then
             if affectType == 'Regen' then

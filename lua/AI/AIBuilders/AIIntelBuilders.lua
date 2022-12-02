@@ -12,15 +12,15 @@ local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
 local ExBaseTmpl = 'ExpansionBaseTemplates'
 local Adj2x2Tmpl = 'Adjacency2x2'
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local MABC = '/lua/editor/MarkerBuildConditions.lua'
-local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
-local EBC = '/lua/editor/EconomyBuildConditions.lua'
-local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
-local SAI = '/lua/ScenarioPlatoonAI.lua'
-local TBC = '/lua/editor/ThreatBuildConditions.lua'
-local IBC = '/lua/editor/InstantBuildConditions.lua'
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
+local MABC = '/lua/editor/markerbuildconditions.lua'
+local OAUBC = '/lua/editor/otherarmyunitcountbuildconditions.lua'
+local EBC = '/lua/editor/economybuildconditions.lua'
+local PCBC = '/lua/editor/platooncountbuildconditions.lua'
+local SAI = '/lua/scenarioplatoonai.lua'
+local TBC = '/lua/editor/threatbuildconditions.lua'
+local IBC = '/lua/editor/instantbuildconditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
 ---@alias BuilderGroupsIntel 'AirScoutFactoryBuilders' | 'AirScoutFormBuilders' | 'LandScoutFactoryBuilders' | 'LandScoutFormBuilders' | 'RadarEngineerBuilders' | 'RadarUpgradeBuildersMain' | 'SonarEngineerBuilders' | 'SonarUpgradeBuilders' | 'CounterIntelBuilders' | 'RadarUpgradeBuildersExpansion' | 'SonarUpgradeBuildersSmall' | 'AeonOpticsEngineerBuilders' | 'CybranOpticsEngineerBuilders' | 
@@ -381,7 +381,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'FACTORY -NAVAL',
+                AdjacencyCategory = categories.FACTORY * categories.STRUCTURE - categories.NAVAL,
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 BuildStructures = {
@@ -403,6 +403,7 @@ BuilderGroup {
         BuilderConditions = {
             { EBC, 'GreaterThanEconIncomeOverTime',  { 4, 100 }},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
+            { UCBC, 'ShouldUpgradeRadar', {'LocationType', 'TECH2'}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.RADAR * categories.TECH2 * categories.STRUCTURE } },
         },
@@ -413,8 +414,9 @@ BuilderGroup {
         PlatoonTemplate = 'T2RadarUpgrade',
         Priority = 1, --DUNCAN - changed to 1
         BuilderConditions = {
-            { EBC, 'GreaterThanEconIncomeOverTime',  { 9, 500}},
+            { EBC, 'GreaterThanEconIncomeOverTime',  { 9, 750}},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
+            { UCBC, 'ShouldUpgradeRadar', {'LocationType', 'TECH3'}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.OMNI * categories.STRUCTURE } },
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.STRUCTURE * ( categories.RADAR + categories.OMNI ) } },
@@ -470,7 +472,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 BuildStructures = {
@@ -498,7 +500,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                AdjacencyCategory = 'ENERGYPRODUCTION',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
                 AdjacencyDistance = 100,
                 BuildClose = false,
                 BuildStructures = {
