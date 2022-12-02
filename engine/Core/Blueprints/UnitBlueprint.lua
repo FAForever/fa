@@ -229,6 +229,7 @@
 ---@field AnimationPermOpen any     The animation that is played when the unit is done building
 ---@field AnimationSurface any      The animation that is played when the unit surfaces.
 ---@field AnimationUpgrade string   The animation that is played when the unit is upgraded
+---@field AnimationUpgradeTable? table<string, string>
 ---@field AnimationWalk string      Animation walk file is linked here: '/units/UnitID/UnitID_??.sca'
 ---@field AnimationWalkRate number  Controls the speed of the animation. Adjusting this number can cause or prevent "skating".
 ---@field BlinkingLights any
