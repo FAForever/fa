@@ -2603,7 +2603,7 @@ Unit = Class(moho.unit_methods) {
                 local pos = self:GetPosition()
                 local terrainType = GetTerrainType(pos[1], pos[3])
                 if bpTM[terrainType.Style] then
-                    self:SetMesh(bpTM[terrainType.Style])
+                    self:SetMesh(bpTM[terrainType.Style], true)
                     useTerrainType = true
                 end
             end
