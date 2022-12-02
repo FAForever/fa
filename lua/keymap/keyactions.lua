@@ -200,7 +200,7 @@ keyActions = {
         category = 'selection', order = 41,},
     ['select_naval'] = {action = 'UI_SelectByCategory +excludeengineers NAVAL MOBILE',
         category = 'selection', order = 42,},
-    ['select_naval_no_sonar'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").navalNoSonar()',
+    ['select_naval_no_mobile_sonar'] = {action = 'UI_Lua import("/lua/keymap/smartselection.lua").smartSelect("NAVAL MOBILE -MOBILESONAR")',
         category = 'selection', order = 42,},
     ['select_land'] = {action = 'UI_SelectByCategory +excludeengineers LAND MOBILE',
         category = 'selection', order = 43,},
