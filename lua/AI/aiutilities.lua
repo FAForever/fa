@@ -2959,3 +2959,30 @@ function AIFindFurthestExpansionAreaNeedsEngineer(aiBrain, locationType, radius,
 
     return retPos, retName
 end
+
+---@param table pos1
+---@param table pos2
+---@param integer dist
+---@param bool reverse
+---@return table
+function ShiftPosition(pos1, pos2, dist, reverse)
+    --This function will lerp a position in two ways
+    --By default it will shift from pos2 to pos1 at the specified distance    
+    --if the reverse bool is set it will go in the oposite direction e.g towards/away
+    --It is multipurpose, used for simple vector3 lerps and enemy avoidence logic
+    if not pos1 or not pos2 then
+        WARN('*AI WARNING: ShiftPosition missing positions')
+    end
+    local delta
+    if reverse then
+        delta = VDiff(pos1,pos2)
+    else
+        delta = VDiff(pos2,pos1)
+    end
+    local norm = math.max(VDist2(delta[1],delta[3],0,0),1)
+    local x = pos1[1]+dist*delta[1]/norm
+    local z = pos1[3]+dist*delta[3]/norm
+    x = math.min(ScenarioInfo.size[1]-5,math.max(5,x))
+    z = math.min(ScenarioInfo.size[2]-5,math.max(5,z))
+    return {x,GetSurfaceHeight(x,z),z}
+end
