@@ -470,6 +470,12 @@ WorldView = Class(moho.UIWorldView, Control) {
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
+
+                self:EnableIgnoreMode(true)
+            end
+        else
+            if not self.IgnoreMode then
+                self:EnableIgnoreMode(false)
             end
         end
     end,
@@ -548,11 +554,11 @@ WorldView = Class(moho.UIWorldView, Control) {
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('RULEUCC_Attack')
                 self:ApplyCursor()
 
-                self:SetIgnoreSelectTolerance()
+                self:EnableIgnoreMode(true)
             end
         else
             if not self.IgnoreMode then
-                self:SetDefaultSelectTolerance(false)
+                self:EnableIgnoreMode(false)
             end
         end
     end,
