@@ -290,6 +290,8 @@ function ApplySelectionSet(name)
     SelectUnits(aSelection)
     DoubleTapBehavior(name, aSelection)
 
+    import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
+
     -- perform callbacks
     for i, v in selectionSetCallbacks do
         v(name, aSelection, true)
