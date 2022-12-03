@@ -171,6 +171,7 @@ local orderToCursorCallback = {
     RULEUCC_Repair = 'OnCursorRepair',
     RULEUCC_Attack = 'OnCursorAttack',
     RULEUCC_AttackAlt = 'OnCursorAttackAlt',
+    RULEUCC_AttackGround = 'OnCursorAttackGround',
     RULEUCC_Patrol = 'OnCursorPatrol',
     RULEUCC_Teleport = 'OnCursorTeleport',
     RULEUCC_Tactical = 'OnCursorTactical',
@@ -345,6 +346,10 @@ WorldView = Class(moho.UIWorldView, Control) {
                 order = 'RULEUCC_AttackAlt'
             elseif command_mode then
                 order = command_data.cursor or command_data.name
+
+                if order == 'RULEUCC_Attack' then 
+                    order = 'RULEUCC_AttackGround'
+                end
             -- then command highlighting
             elseif self:HasHighlightCommand() then
                 order = 'CommandHighlight'
@@ -561,6 +566,28 @@ WorldView = Class(moho.UIWorldView, Control) {
                 self:EnableIgnoreMode(false)
             end
         end
+    end,
+
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_AttackGround'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorAttackGround = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('RULEUCC_Attack')
+                self:ApplyCursor()
+
+                self:EnableIgnoreMode(true)
+            end
+        else
+            if not self.IgnoreMode then
+                self:EnableIgnoreMode(false)
+            end
+        end
+
+        self:OnCursorDecals(identifier, enabled, changed, AttackDecalFunc)
     end,
 
     --- Called when the order `RULEUCC_Patrol` is being applied
