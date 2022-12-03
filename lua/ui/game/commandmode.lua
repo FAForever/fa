@@ -93,19 +93,6 @@ function SetIgnoreSelection(ignore)
     ignoreSelection = ignore
 end
 
---- Caches the command mode, allows us to restore it
-function CacheCommandMode()
-    cachedCommandMode = commandMode
-    cachedModeData = modeData
-end
-
---- Restores the cached command mode
-function RestoreCommandMode()
-    if cachedCommandMode and cachedModeData then 
-        StartCommandMode(cachedCommandMode, cachedModeData)
-    end
-end
-
 --- Called when the command mode starts and initialises all the data.
 ---@param newCommandMode CommandMode
 ---@param data CommandModeData
@@ -126,14 +113,14 @@ function StartCommandMode(newCommandMode, data)
     end
 end
 
---- Called when the command mode should end, but there are occasions where that is not the case.
----@param isCancel boolean set to true when we're not holding shift
+--- Called when the command mode ends and deconstructs all the data.
+---@param isCancel boolean set when we're at the end of (a sequence of) order(s), is usually always true
 function EndCommandMode(isCancel)
 
     if ignoreSelection then
         return
     end
-
+    
     -- in case we want to end the command mode, without knowing it has already ended or not
     if modeData then
         -- regain selection if we were cheating in units
@@ -181,6 +168,19 @@ function EndCommandMode(isCancel)
     commandMode = false
     modeData = false
     issuedOneCommand = false
+end
+
+--- Caches the command mode, allows us to restore it
+function CacheCommandMode()
+    cachedCommandMode = commandMode
+    cachedModeData = modeData
+end
+
+--- Restores the cached command mode
+function RestoreCommandMode()
+    if cachedCommandMode and cachedModeData then 
+        StartCommandMode(cachedCommandMode, cachedModeData)
+    end
 end
 
 -- allocate the table once for performance
