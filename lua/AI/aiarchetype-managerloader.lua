@@ -7,10 +7,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
-local AIAddBuilderTable = import('/lua/ai/AIAddBuilderTable.lua')
+local AIAddBuilderTable = import("/lua/ai/aiaddbuildertable.lua")
 
 function GetHighestBuilder(aiBrain)
     local returnVal = -1
@@ -47,7 +47,7 @@ end
 
 function ExecutePlan(aiBrain)
     aiBrain:SetConstantEvaluate(false)
-    local behaviors = import('/lua/ai/AIBehaviors.lua')
+    local behaviors = import("/lua/ai/aibehaviors.lua")
     WaitSeconds(1)
     if not aiBrain.BuilderManagers.MAIN.FactoryManager:HasBuilderList() then
         aiBrain:SetResourceSharing(true)

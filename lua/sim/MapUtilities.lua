@@ -1,4 +1,4 @@
-local MarkerUtilities = import("/lua/sim/MarkerUtilities.lua")
+local MarkerUtilities = import("/lua/sim/markerutilities.lua")
 local MapResourceCheckApplied = false
 
 --- Attempts to spawn in extractors and hydrocarbons on each marker that is enabled in the game. Attempts 
@@ -114,7 +114,7 @@ local DebugThreads = { }
 local DebugSuspend = { }
 
 --- Various threat identifiers and corresponding colors, shared between the UI and the sim
-local ThreatInformation = import("/lua/shared/MapUtilities.lua").ThreatInformation
+local ThreatInformation = import("/lua/shared/maputilities.lua").ThreatInformation
 
 --- If the key of a threat identifier has a truthy value in this table it will be rendered
 local ThreatRendering = { }

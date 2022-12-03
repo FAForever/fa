@@ -15,7 +15,7 @@ local BuilderArmManipulatorSetPrecedence = _G.moho.BuilderArmManipulator.SetPrec
 -- upvalued trashbag functions for performance
 local TrashBagAdd = _G.TrashBag.Add
 
-local CBuildBotUnit = import('/lua/cybranunits.lua').CBuildBotUnit
+local CBuildBotUnit = import("/lua/cybranunits.lua").CBuildBotUnit
 URA0002O = Class(CBuildBotUnit) { 
 
     OnCreate = function(self)

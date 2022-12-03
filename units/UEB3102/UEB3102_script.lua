@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TSonarUnit = import('/lua/terranunits.lua').TSonarUnit
+local TSonarUnit = import("/lua/terranunits.lua").TSonarUnit
 
 ---@class UEB3102 : TSonarUnit
 UEB3102 = Class(TSonarUnit) {

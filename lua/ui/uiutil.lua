@@ -6,26 +6,26 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local LazyVar = import('/lua/lazyvar.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local Button = import('/lua/maui/button.lua').Button
-local Edit = import('/lua/maui/edit.lua').Edit
-local Checkbox = import('/lua/ui/controls/Checkbox.lua').Checkbox
-local RadioButtons = import('/lua/maui/radiobuttons.lua').RadioButtons
-local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Cursor = import('/lua/maui/cursor.lua').Cursor
-local Prefs = import('/lua/user/prefs.lua')
-local Border = import('/lua/ui/controls/border.lua').Border
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Layouts = import('/lua/skins/layouts.lua')
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
-local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
-local skins = import('/lua/skins/skins.lua').skins
+local LazyVar = import("/lua/lazyvar.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua").Text
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+local Button = import("/lua/maui/button.lua").Button
+local Edit = import("/lua/maui/edit.lua").Edit
+local Checkbox = import("/lua/ui/controls/checkbox.lua").Checkbox
+local RadioButtons = import("/lua/maui/radiobuttons.lua").RadioButtons
+local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Cursor = import("/lua/maui/cursor.lua").Cursor
+local Prefs = import("/lua/user/prefs.lua")
+local Border = import("/lua/ui/controls/border.lua").Border
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Layouts = import("/lua/skins/layouts.lua")
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
+local NinePatch = import("/lua/ui/controls/ninepatch.lua").NinePatch
+local InputDialog = import("/lua/ui/controls/popups/inputdialog.lua").InputDialog
+local skins = import("/lua/skins/skins.lua").skins
 
 local Layouter = LayoutHelpers.LayoutFor
 
@@ -220,7 +220,7 @@ function UpdateWorldBorderState(skin, isOn)
             isOn = Prefs.GetOption('world_border')
         end
         if isOn then
-            local skins = import('/lua/skins/skins.lua').skins
+            local skins = import("/lua/skins/skins.lua").skins
             if skins[skin].imagerMesh then
                 MapBorderClear()
                 --Set the world mesh to the skins world mesh
@@ -348,11 +348,11 @@ end
 --- Cycles through all available skins
 ---@param direction? "+" | "-"
 function RotateSkin(direction)
-    if not SessionIsActive() or import('/lua/ui/game/gamemain.lua').IsNISMode() then
+    if not SessionIsActive() or import("/lua/ui/game/gamemain.lua").IsNISMode() then
         return
     end
 
-    local skins = import('/lua/skins/skins.lua').skins
+    local skins = import("/lua/skins/skins.lua").skins
 
     -- build an array of skin names
     local skinNames = {}
@@ -392,7 +392,7 @@ end
 ---@param direction? "+" | "-"
 function RotateLayout(direction)
     -- disable when in Screen Capture mode
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         return
     end
 
@@ -421,7 +421,7 @@ end
 ---@return FileName
 function UIFile(filespec, checkMods)
     if UIFileBlacklist[filespec] then return filespec end
-    local skins = import('/lua/skins/skins.lua').skins
+    local skins = import("/lua/skins/skins.lua").skins
     local useSkin = currentSkin()
     local currentPath = skins[useSkin].texturesPath
     local origPath = currentPath
@@ -514,7 +514,7 @@ end
 ---@return number? numFrames
 ---@return number? fps
 function GetCursor(id)
-    local skins = import('/lua/skins/skins.lua').skins
+    local skins = import("/lua/skins/skins.lua").skins
     ---@type CursorDefinition[]
     local cursors = skins[currentSkin()].cursors or skins['default'].cursors
     local cursor = cursors[id]
@@ -857,11 +857,18 @@ function CreateCheckbox(parent, texturePath, label, labelRight, labelSize, click
     )
 end
 
---- Creates a collapse arrow in one of the directions (note that the bottom is not supported)
+--- Creates a collapse arrow in one of the directions (note that the bottom is not supported).
+--- Note that the control passed in should be the parent of the control you want to have collapsed
+--- (so that the collapse arrow isn't hidden with it).
 ---@param parent Control
----@param position "l" | "t" | "r"
+---@param position 'l' | 't' | 'r'
 ---@return Checkbox
 function CreateCollapseArrow(parent, position)
+    -- make sure the filename will be well-formed (also, someone's going to think that `position`
+    -- is optional, so let's disillusion them of that idea)
+    if position ~= 't' and position ~= 'r' and position ~= 'l' then
+        error("Collapse arrow position must be one of: 'l', 't', 'r'", 2)
+    end
     local prefix = "/game/tab-" .. position .. "-btn/tab-"
     return Checkbox(parent,
         SkinnableFile(prefix .. "close_btn_up.dds"),
@@ -926,7 +933,7 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
         scrollbartop = textureName..'bar-top_scr_up.dds'
         scrollbarbot = textureName..'bar-bot_scr_up.dds'
     end
-    local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Vert)
+    local scrollbar = Scrollbar(attachto, import("/lua/maui/scrollbar.lua").ScrollAxis.Vert)
     scrollbar:SetTextures(   SkinnableFile(scrollbg)
                             ,SkinnableFile(scrollbarmid)
                             ,SkinnableFile(scrollbartop)
@@ -1037,7 +1044,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
 
     LayoutHelpers.SetWidth(dialog, 428)
     local textBoxWidth = dialog.Width() - LayoutHelpers.ScaleNumber(80)
-    local tempTable = import('/lua/maui/text.lua').WrapText(LOC(dialogText), textBoxWidth,
+    local tempTable = import("/lua/maui/text.lua").WrapText(LOC(dialogText), textBoxWidth,
         function(text)
             return textLine[1]:GetStringAdvance(text)
         end
@@ -1235,7 +1242,7 @@ end
 ---@param factionIndex number
 ---@return FileName
 function GetFactionIcon(factionIndex)
-    return import('/lua/factions.lua').Factions[factionIndex + 1].Icon
+    return import("/lua/factions.lua").Factions[factionIndex + 1].Icon
 end
 
 ---@param parent Control
@@ -1356,13 +1363,13 @@ end
 ---@param text UnlocalizedString
 function SetTextBoxText(textBox, text)
     textBox:DeleteAllItems()
-    local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), textBox.Width(), function(curText) return textBox:GetStringAdvance(curText) end)
+    local wrapped = import("/lua/maui/text.lua").WrapText(LOC(text), textBox.Width(), function(curText) return textBox:GetStringAdvance(curText) end)
     for i, line in wrapped do
         textBox:AddItem(line)
     end
 end
 
-local Window = import('/lua/maui/window.lua').Window
+local Window = import("/lua/maui/window.lua").Window
 local windowTextures = {
     tl = UIFile('/game/mini-map-brd/mini-map_brd_ul.dds'),
     tr = UIFile('/game/mini-map-brd/mini-map_brd_ur.dds'),
@@ -1424,7 +1431,7 @@ function CreateAnnouncementStd(primary, secondary, control)
     end
 
     -- create the announcement accordingly
-    import('/lua/ui/game/announcement.lua').CreateAnnouncement(
+    import("/lua/ui/game/announcement.lua").CreateAnnouncement(
         primary,
         control,
         secondary

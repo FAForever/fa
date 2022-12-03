@@ -5,17 +5,17 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 
-local Entity = import('/lua/sim/Entity.lua').Entity
-local Weapon = import('/lua/sim/weapon.lua').Weapon
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
-local CollisionBeamFile = import('defaultcollisionbeams.lua')
+local Entity = import("/lua/sim/entity.lua").Entity
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
 local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
-local Explosion = import('defaultexplosions.lua')
+local Explosion = import("/lua/defaultexplosions.lua")
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class AIFBallisticMortarWeapon : DefaultProjectileWeapon
 AIFBallisticMortarWeapon = Class(DefaultProjectileWeapon) {
@@ -98,9 +98,12 @@ ADFTractorClaw = Class(Weapon) {
 
         ---@type Blip | Unit
         local blipOrUnit = self:GetCurrentTarget()
-        local target = self:GetUnitBehindTarget(blipOrUnit)
+        if not blipOrUnit then
+            return
+        end
 
         -- only tractor actual units
+        local target = self:GetUnitBehindTarget(blipOrUnit)
         if not target then
             self:ForkThread(self.OnInvalidTargetThread)
             return
@@ -274,7 +277,7 @@ ADFTractorClaw = Class(Weapon) {
         end
 
         -- if the unit is magically already destroyed, then just return - nothing we can do,
-        --  we'll likely end up with a flying wreck :)
+        -- we'll likely end up with a flying wreck :)
         if IsDestroyed(target) then
             return
         end
@@ -295,18 +298,15 @@ ADFTractorClaw = Class(Weapon) {
             projectile:SetVelocity(10 * vx, 10 * vy, 10 * vz)
             Warp(projectile, target:GetPosition(), target:GetOrientation())
 
+            -- happens when the projectile is created underwater
+            if IsDestroyed(projectile) then
+                target:Kill()
+            end
+
             projectile.OnImpact = function(projectile)
                 if not IsDestroyed(target) then
                     target.CanTakeDamage = true
-                    if not IsDestroyed(self.unit) then
-                        if target.MyShield and target.MyShield:IsOn() then
-                            Damage(self.unit, self.unit:GetPosition(muzzle), target.MyShield, target.MyShield:GetHealth() + 1, 'Disintegrate')
-                        end
-                        Damage(self.unit, self.unit:GetPosition(muzzle), target, target:GetHealth() + 1, 'Disintegrate')
-                        
-                    else
-                        target:Kill()
-                    end
+                    target:Kill()
 
                     CreateLightParticle(target, 0, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
 
@@ -345,6 +345,7 @@ ADFTractorClaw = Class(Weapon) {
             target:SetDoNotTarget(false)
             target.CanTakeDamage = true
             target.DisallowCollisions = false
+            target.Tractored = nil
         end
     end,
 }
@@ -779,4 +780,4 @@ AIFQuanticArtillery = Class(DefaultProjectileWeapon) {
 local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
-local EffectUtil = import('EffectUtilities.lua')
+local EffectUtil = import("/lua/effectutilities.lua")

@@ -7,10 +7,10 @@
 --**             Build conditions always return true or false
 --**
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local MABC = import('/lua/editor/MarkerBuildConditions.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local MABC = import("/lua/editor/markerbuildconditions.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 
 ---@param aiBrain AIBrain
 ---@param bool boolean
@@ -790,6 +790,6 @@ end
 
 
 -- Moved Unused Imports to bottom for mod support
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")

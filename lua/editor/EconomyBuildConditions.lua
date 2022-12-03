@@ -16,7 +16,7 @@ local GetEconomyRequested = moho.aibrain_methods.GetEconomyRequested
 local GetEconomyStored = moho.aibrain_methods.GetEconomyStored
 local ParagonCat = categories.STRUCTURE * categories.EXPERIMENTAL * categories.ECONOMIC * categories.ENERGYPRODUCTION * categories.MASSPRODUCTION
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
 ---GreaterThanEconStorageRatio = BuildCondition
 ---@param aiBrain string
@@ -185,6 +185,17 @@ end
 ---@return boolean
 function GreaterThanEconTrend(aiBrain, MassTrend, EnergyTrend)
     if GetEconomyTrend(aiBrain, 'MASS') >= MassTrend and GetEconomyTrend(aiBrain, 'ENERGY') >= EnergyTrend then
+        return true
+    end
+    return false
+end
+
+---LessThanEnergyTrendOverTime = BuildCondition
+---@param aiBrain string
+---@param EnergyTrend integer
+---@return boolean
+function LessThanEnergyTrendOverTime(aiBrain, EnergyTrend)
+    if aiBrain.EconomyOverTimeCurrent.EnergyTrendOverTime < EnergyTrend then
         return true
     end
     return false
@@ -462,6 +473,6 @@ end
 
 --- Moved Imports that are unsed for modding support
 
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local BuildingTemplates = import('/lua/BuildingTemplates.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local BuildingTemplates = import("/lua/buildingtemplates.lua")

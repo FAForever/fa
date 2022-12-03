@@ -21,9 +21,15 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Shared = import('/lua/shared/NavGenerator.lua')
-local NavGenerator = import('/lua/sim/NavGenerator.lua')
-local NavDatastructures = import('/lua/sim/NavDatastructures.lua')
+local Shared = import("/lua/shared/navgenerator.lua")
+local NavGenerator = import("/lua/sim/navgenerator.lua")
+local NavDatastructures = import("/lua/sim/navdatastructures.lua")
+
+--- Returns true if the navigational mesh is generated
+---@return boolean
+function IsGenerated()
+    return NavGenerator.IsGenerated()
+end
 
 --- Returns true when you can path from the origin to the destination
 ---@param layer NavLayers
@@ -129,13 +135,13 @@ function PathTo(layer, origin, destination, options)
 
     originLeaf.From = nil
     originLeaf.AcquiredCosts = 0
-    originLeaf.ExpectedCosts = originLeaf:DistanceTo(destinationLeaf)
+    originLeaf.TotalCosts = originLeaf:DistanceTo(destinationLeaf)
     originLeaf.Seen = seenIdentifier
     PathToHeap:Insert(originLeaf)
 
     destinationLeaf.From = nil
     destinationLeaf.AcquiredCosts = 0
-    destinationLeaf.ExpectedCosts = 0
+    destinationLeaf.TotalCosts = 0
     destinationLeaf.Seen = 0
 
     -- search iterations
@@ -159,7 +165,8 @@ function PathTo(layer, origin, destination, options)
                 neighbor.From = leaf
                 neighbor.Seen = seenIdentifier
                 neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf.neighborDistances[id] + 2 + preferLargeNeighbor
-                neighbor.ExpectedCosts = 0.25 * destinationLeaf:DistanceTo(neighbor)
+                -- TotalCosts = AcquiredCosts + ExpectedCosts
+                neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
 
                 PathToHeap:Insert(neighbor)
             else 
@@ -218,4 +225,55 @@ function PathTo(layer, origin, destination, options)
     -- return all the goodies!!
 
     return path, head, distance
+end
+
+--- Returns a label that indicates to what sub-graph it belongs to, these graphs can be visualised using the Nav UI
+---@param layer NavLayers
+---@param position Vector
+---@return number? 
+---@return string?
+function GetLabel(layer, position)
+    -- check layer argument
+    local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
+    if not root then
+        return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
+    end
+
+    -- check position argument
+    local leaf = root:FindLeafXZ(position[1], position[3])
+    if not leaf then
+        return nil, 'Position is not inside the map'
+    end
+
+    if leaf.label == 0 then
+        return nil, 'Position has no label assigned, report to the maintainers. This should not be possible'
+    end
+
+    if leaf.label == -1 then
+        return nil, 'Position is unpathable'
+    end
+
+    return leaf.label, nil
+end
+
+--- Returns the metadata of a label.
+---@param id number
+---@return NavLabelMetadata?
+---@return string?
+function GetLabelMetadata(id)
+    -- check id argument
+    if id == 0 then 
+        return nil, 'Invalid layer id - this should not be possible'
+    end
+
+    if id == -1 then 
+        return nil, 'Position is unpathable'
+    end
+
+    local meta = NavGenerator.NavLabels[id]
+    if not meta then 
+        return nil, 'Invalid layer id - no metadata is assigned to this label'
+    end
+
+    return meta, nil
 end

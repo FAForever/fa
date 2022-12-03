@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
+local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
 ---@class UEB1301 : TEnergyCreationUnit
 UEB1301 = Class(TEnergyCreationUnit) {

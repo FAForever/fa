@@ -1,4 +1,4 @@
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 
 ---@class ASDCannonOblivionNaval : DefaultProjectileWeapon

@@ -1,4 +1,4 @@
-local Utilities = import('/lua/utilities.lua')
+local Utilities = import("/lua/utilities.lua")
 
 -- ATTACK MANAGER SPEC
 --{

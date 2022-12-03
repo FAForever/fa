@@ -1,7 +1,7 @@
-local Text = import('/lua/maui/text.lua')
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Text = import("/lua/maui/text.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 --- A multi-line textfield
 --

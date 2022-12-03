@@ -8,6 +8,6 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-SDFAireauBolter02 = Class(import('/lua/seraphimprojectiles.lua').SAireauBolter) {
+SDFAireauBolter02 = Class(import("/lua/seraphimprojectiles.lua").SAireauBolter) {
 }
 TypeClass = SDFAireauBolter02

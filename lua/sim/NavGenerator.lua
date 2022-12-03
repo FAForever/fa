@@ -21,7 +21,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Shared = import('/lua/shared/NavGenerator.lua')
+local Shared = import("/lua/shared/navgenerator.lua")
 
 ---@alias NavTerrainCache number[][]
 ---@alias NavDepthCache number[][]
@@ -32,7 +32,9 @@ local Shared = import('/lua/shared/NavGenerator.lua')
 ---@alias NavTerrainBlockCache boolean[][]
 ---@alias NavLabelCache number[][]
 
-local LabelCompressionThreshold = 4
+local Statistics = {
+    CulledLabels = 0
+}
 
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
@@ -61,6 +63,23 @@ local MinWaterDepthNaval = 1.5
 ---@field Air? NavGrid
 NavGrids = { }
 
+---@class NavLabelMetadata
+---@field Node CompressedLabelTreeLeaf
+---@field Area number
+---@field Layer NavLayers
+---@field NumberOfExtractors number
+---@field NumberOfHydrocarbons number
+---@field ExtractorMarkers MarkerData[]
+---@field HydrocarbonMarkers MarkerData[]
+-- ---@field NumberOfSpawns number
+-- ---@field NumberOfExpansions number
+-- ---@field NumberOfDefensePoints number
+-- ---@field ExpansionMarkers MarkerData[]
+-- ---@field DefensePointMarkers MarkerData[]
+
+---@type table<number, NavLabelMetadata>
+NavLabels = { }
+
 local Generated = false
 ---@return boolean
 function IsGenerated()
@@ -72,6 +91,13 @@ local CompressedTreeIdentifier = 0
 local function GenerateCompressedTreeIdentifier()
     CompressedTreeIdentifier = CompressedTreeIdentifier + 1
     return CompressedTreeIdentifier
+end
+
+local LabelIdentifier = 0
+---@return number
+local function GenerateLabelIdentifier()
+    LabelIdentifier = LabelIdentifier + 1
+    return LabelIdentifier
 end
 
 -- Shared data with UI
@@ -106,7 +132,6 @@ end
 ---@field Layer NavLayers
 ---@field TreeSize number
 ---@field Trees CompressedLabelTree[][]
----@field FreeLabel number
 NavGrid = ClassSimple {
 
     ---@param self NavGrid
@@ -119,7 +144,14 @@ NavGrid = ClassSimple {
 
         self.TreeSize = treeSize
         self.Layer = layer
-        self.FreeLabel = 1
+    end,
+
+    Simplify = function(self)
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
+                self.Trees[z][x]:Simplify()
+            end
+        end
     end,
 
     --- Adds a compressed label tree to the navigational grid
@@ -161,29 +193,29 @@ NavGrid = ClassSimple {
     GenerateNeighbors = function(self)
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:GenerateNeighbors(self)
+                self.Trees[z][x]:GenerateDirectNeighbors(self)
             end
         end
-    end,
 
-    --- Generates a unique label for an enclosed area
-    ---@param self NavGrid
-    ---@return number
-    GenerateUniqueLabel = function(self)
-        self.FreeLabel = self.FreeLabel + 1
-        return self.FreeLabel
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
+                self.Trees[z][x]:GenerateCornerNeighbors(self)
+            end
+        end
     end,
 
     ---@param self NavGrid
     GenerateLabels = function(self)
+        local labelStart = LabelIdentifier
         local stack = { }
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:GenerateLabels(self, stack)
+                self.Trees[z][x]:GenerateLabels(stack)
             end
         end
 
-        NavLayerData[self.Layer].Labels = self.FreeLabel - 1
+        local labelEnd = LabelIdentifier
+        NavLayerData[self.Layer].Labels = labelEnd - labelStart
     end,
 
     ---@param self NavGrid
@@ -235,7 +267,7 @@ local CompressedLabelTree
 ---@field pz number                                         # z-coordinate of center in world space
 ---@field From CompressedLabelTreeLeaf
 ---@field AcquiredCosts number
----@field ExpectedCosts number
+---@field TotalCosts number
 ---@field Seen number   
 
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
@@ -281,10 +313,9 @@ CompressedLabelTree = ClassSimple {
     --- the label cache only exists of 0s and -1s
     ---@param self CompressedLabelTree
     ---@param rCache NavLabelCache
-    Compress = function(self, rCache)
-
+    Compress = function(self, rCache, compressionThreshold)
         -- base case, if we're a square of 4 then we skip the children and become very pessimistic
-        if self.c <= LabelCompressionThreshold then
+        if self.c <= compressionThreshold then
             local value = rCache[self.oz + 1][self.ox + 1]
             local uniform = true
             for z = self.oz + 1, self.oz + self.c do
@@ -344,26 +375,31 @@ CompressedLabelTree = ClassSimple {
             }
 
             for k, child in self.children do
-                child:Compress(rCache)
+                child:Compress(rCache, compressionThreshold)
             end
 
             NavLayerData[self.layer].Subdivisions = NavLayerData[self.layer].Subdivisions + 1
         end
     end,
 
-    ---
+    --- Generates the following neighbors, when they are valid:
+    --- ```
+    --- 0 | 1 | 0
+    --- 1 | x | 1
+    --- 0 | 1 | 0
+    --- ```
     ---@param self CompressedLabelTree
     ---@param root NavGrid
-    GenerateNeighbors = function(self, root)
-        -- we are not valid :(
+    GenerateDirectNeighbors = function(self, root)
+        -- do not generate neighbors for non-pathable cells to save memory
         if self.label == -1 then
             return
         end
 
-        -- if we have children then we're a node, only leafs can have neighbors
+        -- nodes do not have neighbors, only leafs do
         if self.children then
             for _, child in self.children do
-                child:GenerateNeighbors(root)
+                child:GenerateDirectNeighbors(root)
             end
             return
         end
@@ -381,7 +417,7 @@ CompressedLabelTree = ClassSimple {
         self.neighbors = neighbors
 
         -- scan top-left -> top-right
-        for k = x1, x2 do
+        for k = x1, x2 - 1 do
             local x = k + 0.5
             -- DrawCircle({x, GetSurfaceHeight(x, z1Outside), z1Outside}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x, z1Outside)
@@ -396,7 +432,7 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- scan bottom-left -> bottom-right
-        for k = x1, x2 do
+        for k = x1, x2 - 1 do
             local x = k + 0.5
             -- DrawCircle({x, GetSurfaceHeight(x, z2Outside), z2Outside}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x, z2Outside)
@@ -411,7 +447,7 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- scan left-top -> left-bottom
-        for k = z1, z2 do
+        for k = z1, z2 - 1 do
             z = k + 0.5
             -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x1Outside, z)
@@ -426,7 +462,7 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- scan right-top -> right-bottom
-        for k = z1, z2 do
+        for k = z1, z2 - 1 do
             z = k + 0.5
             -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x2Outside, z)
@@ -439,42 +475,96 @@ CompressedLabelTree = ClassSimple {
                 break
             end
         end
+    end,
+
+    --- Generates the following neighbors, when they are valid:
+    --- ```
+    --- 1 | 0 | 1
+    --- 0 | x | 0
+    --- 1 | 0 | 1
+    --- ```
+    ---@param self CompressedLabelTree
+    ---@param root NavGrid
+    GenerateCornerNeighbors = function(self, root)
+        -- do not generate neighbors for non-pathable cells to save memory
+        local label = self.label
+        if label == -1 then
+            return
+        end
+
+        -- nodes do not have neighbors, only leafs do
+        if self.children then
+            for _, child in self.children do
+                child:GenerateCornerNeighbors(root)
+            end
+            return
+        end
+
+        -- we are a leaf, so find those neighbors!
+        local neighbors = self.neighbors
+        local x1 = self.bx + self.ox
+        local z1 = self.bz + self.oz
+        local size = self.c
+        local x2 = x1 + size
+        local z2 = z1 + size
+        local x1Outside, z1Outside = x1 - 0.5, z1 - 0.5
+        local x2Outside, z2Outside = x2 + 0.5, z2 + 0.5
 
         -- scan top-left
+        local a, b
         local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
         if neighbor and neighbor.label >= 0 then
-            neighbors[neighbor.identifier] = neighbor
+            a = root:FindLeafXZ(x1Outside + 1, z1Outside)
+            b = root:FindLeafXZ(x1Outside, z1Outside + 1)
+
+            if a and b and label == a.label and label == b.label then
+                neighbors[neighbor.identifier] = neighbor
+            end
         end
 
         -- scan top-right
         neighbor = root:FindLeafXZ(x2Outside, z1Outside)
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
         if neighbor and neighbor.label >= 0 then
-            neighbors[neighbor.identifier] = neighbor
+            a = root:FindLeafXZ(x2Outside -1, z1Outside)
+            b = root:FindLeafXZ(x2Outside, z1Outside + 1)
+
+            if a and b and label == a.label and label == b.label then
+                neighbors[neighbor.identifier] = neighbor
+            end
         end
 
         -- scan bottom-left
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x1Outside, z2Outside)
         if neighbor and neighbor.label >= 0 then
-            neighbors[neighbor.identifier] = neighbor
+            a = root:FindLeafXZ(x1Outside + 1, z2Outside)
+            b = root:FindLeafXZ(x1Outside, z2Outside - 1)
+
+            if a and b and label == a.label and label == b.label then
+                neighbors[neighbor.identifier] = neighbor
+            end
         end
 
         -- scan bottom-right
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x2Outside, z2Outside)
         if neighbor and neighbor.label >= 0 then
-            neighbors[neighbor.identifier] = neighbor
+            a = root:FindLeafXZ(x2Outside - 1, z2Outside)
+            b = root:FindLeafXZ(x2Outside, z2Outside - 1)
+
+            if a and b and label == a.label and label == b.label then
+                neighbors[neighbor.identifier] = neighbor
+            end
         end
 
         NavLayerData[self.layer].Neighbors = NavLayerData[self.layer].Neighbors + table.getsize(neighbors)
     end,
 
     ---@param self CompressedLabelTree
-    ---@param root NavGrid
     ---@param stack table
-    GenerateLabels = function(self, root, stack)
+    GenerateLabels = function(self, stack)
         -- leaf case
         if self.label then
 
@@ -483,11 +573,24 @@ CompressedLabelTree = ClassSimple {
 
                 -- we can hit a stack overflow if we do this recursively, therefore we do a 
                 -- depth first search using a stack that we re-use for better performance
-                local free = 1 
-                local label = root:GenerateUniqueLabel()
+                local free = 1
+                local label = GenerateLabelIdentifier()
+
+                NavLabels[label] = {
+                    Area = 0,
+                    Node = self --[[@as CompressedLabelTreeLeaf]],
+                    Layer = self.layer,
+                    NumberOfExtractors = 0,
+                    NumberOfHydrocarbons = 0,
+                    ExtractorMarkers = { },
+                    HydrocarbonMarkers = { },
+                }
+
+                local metadata = NavLabels[label]
 
                 -- assign the label, and then search through our neighbors to assign the same label to them
                 self.label = label
+                metadata.Area = metadata.Area + (( 0.01 * self.c) * ( 0.01 * self.c))
 
                 -- add our pathable neighbors to the stack
                 for _, neighbor in self.neighbors do
@@ -508,8 +611,11 @@ CompressedLabelTree = ClassSimple {
                     local other = stack[free - 1]
                     free = free - 1
 
-                    -- assign label, and add unlabelled neighbors
+                    -- assign label, manage metadata
                     other.label = label
+                    metadata.Area = metadata.Area + (( 0.01 * other.c) * ( 0.01 * other.c))
+
+                    -- add unlabelled neighbors
                     for _, neighbor in other.neighbors do
                         if neighbor.label == 0 then
                             stack[free] = neighbor
@@ -524,7 +630,7 @@ CompressedLabelTree = ClassSimple {
 
         -- node case
         for _, child in self.children do
-            child:GenerateLabels(root, stack)
+            child:GenerateLabels(stack)
         end
     end,
 
@@ -710,6 +816,7 @@ end
 ---@param bCache NavTerrainBlockCache
 function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pCache, bCache)
     local MathAbs = math.abs
+    local Mathmax = math.max
     local GetTerrainHeight = GetTerrainHeight
     local GetSurfaceHeight = GetSurfaceHeight
     local GetTerrainType = GetTerrainType
@@ -719,9 +826,9 @@ function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pC
 
     -- scan / cache terrain and depth
     for z = 1, size + 1 do
-        local absZ = bz + z
+        local absZ = bz + z - 1
         for x = 1, size + 1 do
-            local absX = bx + x
+            local absX = bx + x - 1
             local terrain = GetTerrainHeight(absX, absZ)
             local surface = GetSurfaceHeight(absX, absZ)
 
@@ -749,10 +856,12 @@ function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pC
     -- compute average depth
     -- compute terrain type
     for z = 1, size do
+        local absZ = bz + z
         for x = 1, size do
-            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z][x + 1] and pzCache[z + 1][x]
+            local absX = bx + x
+            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
             daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
-            bCache[z][x] = not GetTerrainType(x, z).Blocking
+            bCache[z][x] = not GetTerrainType(absX, absZ).Blocking
 
             -- local color = 'ff0000'
             -- if pCache[lz][lx] == 0 then
@@ -796,7 +905,7 @@ function ComputeHoverPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     for z = 1, size do
         for x = 1, size do
             if bCache[z][x] and (        -- should have accessible terrain type
-                daCache[z][x] >= 0.01 or -- can either be on water
+                daCache[z][x] >= 1 or -- can either be on water
                 pCache[z][x]             -- or on flat enough terrain
             ) then
                 rCache[z][x] = 0
@@ -865,107 +974,212 @@ function ComputeAirPathingMatrix(labelTree, daCache, pCache, bCache, rCache)
     end
 end
 
+--- Generates the compression grids based on the heightmap
+---@param size number (square) size of each cell of the compression grid
+---@param threshold number (square) size of the smallest acceptable leafs, used for culling
+local function GenerateCompressionGrids(size, threshold)
 
---- Generates the navigational mesh from `a` to `z`
-function Generate()
+    local navLand = NavGrids['Land']                --[[@as NavGrid]]
+    local navWater = NavGrids['Water']              --[[@as NavGrid]]
+    local navHover = NavGrids['Hover']              --[[@as NavGrid]]
+    local navAmphibious = NavGrids['Amphibious']    --[[@as NavGrid]]
+    local navAir = NavGrids['Air']                  --[[@as NavGrid]]
 
-    NavLayerData = Shared.CreateEmptyNavLayerData()
-    
-    --- TODO: this approach does not support non-square maps
-    --- Total width / height of the map
-    ---@type number
-    local MapSize = ScenarioInfo.size[1]
-    
-    --- Number of cells per block
-    ---@type number
-    local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-    print(string.format(" -- Navigational mesh generator -- "))
-
-    local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(CompressionTreeSize)
-
-    local labelRootLand = NavGrid('Land', CompressionTreeSize)
-    local labelRootNaval = NavGrid('Water', CompressionTreeSize)
-    local labelRootHover = NavGrid('Hover', CompressionTreeSize)
-    local labelRootAmph = NavGrid('Amphibious', CompressionTreeSize)
-    local labelRootAir = NavGrid('Air', CompressionTreeSize)
-    NavGrids['Land'] = labelRootLand
-    NavGrids['Water'] = labelRootNaval
-    NavGrids['Hover'] = labelRootHover
-    NavGrids['Amphibious'] = labelRootAmph
-    NavGrids['Air'] = labelRootAir
+    local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(size)
 
     for z = 0, LabelCompressionTreesPerAxis - 1 do
-        local blockZ = z * CompressionTreeSize
+        local blockZ = z * size
         for x = 0, LabelCompressionTreesPerAxis - 1 do
-            local blockX = x * CompressionTreeSize
-            local labelTreeLand = CompressedLabelTree('Land', blockX, blockZ, CompressionTreeSize)
-            local labelTreeNaval = CompressedLabelTree('Water', blockX, blockZ, CompressionTreeSize)
-            local labelTreeHover = CompressedLabelTree('Hover', blockX, blockZ, CompressionTreeSize)
-            local labelTreeAmph = CompressedLabelTree('Amphibious', blockX, blockZ, CompressionTreeSize)
-            local labelTreeAir = CompressedLabelTree('Air', blockX, blockZ, CompressionTreeSize)
+            local blockX = x * size
+            local labelTreeLand = CompressedLabelTree('Land', blockX, blockZ, size)
+            local labelTreeNaval = CompressedLabelTree('Water', blockX, blockZ, size)
+            local labelTreeHover = CompressedLabelTree('Hover', blockX, blockZ, size)
+            local labelTreeAmph = CompressedLabelTree('Amphibious', blockX, blockZ, size)
+            local labelTreeAir = CompressedLabelTree('Air', blockX, blockZ, size)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
             PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
 
             ComputeLandPathingMatrix(labelTreeLand,        daCache,                    pCache, bCache, rCache)
-            labelTreeLand:Compress(rCache)
-            labelRootLand:AddTree(z, x, labelTreeLand)
+            labelTreeLand:Compress(rCache, threshold)
+            navLand:AddTree(z, x, labelTreeLand)
 
             ComputeNavalPathingMatrix(labelTreeNaval,      daCache,                    pCache, bCache, rCache)
-            labelTreeNaval:Compress(rCache)
-            labelRootNaval:AddTree(z, x, labelTreeNaval)
+            labelTreeNaval:Compress(rCache, 2 * threshold)
+            navWater:AddTree(z, x, labelTreeNaval)
 
             ComputeHoverPathingMatrix(labelTreeHover,      daCache,                    pCache, bCache, rCache)
-            labelTreeHover:Compress(rCache)
-            labelRootHover:AddTree(z, x, labelTreeHover)
+            labelTreeHover:Compress(rCache, threshold)
+            navHover:AddTree(z, x, labelTreeHover)
 
             ComputeAmphPathingMatrix(labelTreeAmph,        daCache,                    pCache, bCache, rCache)
-            labelTreeAmph:Compress(rCache)
-            labelRootAmph:AddTree(z, x, labelTreeAmph)
+            labelTreeAmph:Compress(rCache, threshold)
+            navAmphibious:AddTree(z, x, labelTreeAmph)
 
             ComputeAirPathingMatrix(labelTreeAir,          daCache,                    pCache, bCache, rCache)
-            labelTreeAir:Compress(rCache)
-            labelRootAir:AddTree(z, x, labelTreeAir)
+            labelTreeAir:Compress(rCache, threshold)
+            navAir:AddTree(z, x, labelTreeAir)
+        end
+    end
+end
+
+--- Generates graphs that we can traverse, based on the compression grids
+local function GenerateGraphs()
+    local navLand = NavGrids['Land']                --[[@as NavGrid]]
+    local navWater = NavGrids['Water']              --[[@as NavGrid]]
+    local navHover = NavGrids['Hover']              --[[@as NavGrid]]
+    local navAmphibious = NavGrids['Amphibious']    --[[@as NavGrid]]
+    local navAir = NavGrids['Air']                  --[[@as NavGrid]]
+
+    navLand:GenerateNeighbors()
+    navWater:GenerateNeighbors()
+    navHover:GenerateNeighbors()
+    navAmphibious:GenerateNeighbors()
+    navAir:GenerateNeighbors()
+
+    navLand:GenerateLabels()
+    navWater:GenerateLabels()
+    navAmphibious:GenerateLabels()
+    navHover:GenerateLabels()
+    navAir:GenerateLabels()
+
+    navLand:Precompute()
+    navWater:Precompute()
+    navHover:Precompute()
+    navAmphibious:Precompute()
+    navAir:Precompute()
+end
+
+--- Culls generated labels that are too small and have no meaning
+local function GenerateCullLabels()
+    local navLabels = NavLabels
+
+    local culledLabels = 0
+
+    ---@type CompressedLabelTreeLeaf[]
+    local stack = { }
+    local count = 1
+    for k, _ in navLabels do
+        local metadata = navLabels[k]
+        if metadata.Area < 0.2 and metadata.NumberOfExtractors == 0 and metadata.NumberOfHydrocarbons == 0 then
+            culledLabels = culledLabels + 1
+
+            -- cull node
+            local node = metadata.Node
+            node.label = -1
+
+            -- find all neighbors and cull those too
+            count = 1
+            stack[1] = metadata.Node
+            while count > 0 do
+                node = stack[count]
+                count = count - 1
+                for k, neighbor in node.neighbors do
+                    if neighbor.label > 0 then
+                        neighbor.label = -1
+                        count = count + 1
+                        stack[count] = neighbor
+                    end
+                end
+            end
         end
     end
 
+    Statistics.CulledLabels = culledLabels
+    SPEW(string.format("NavGenerator - culled %d labels", culledLabels))
+end
+
+--- Generates metadata for markers for quick access
+local function GenerateMarkerMetadata()
+    local navLabels = NavLabels
+
+    local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    for k = 1, en do
+        local extractor = extractors[k]
+        for layer, grid in NavGrids do 
+            local label = grid:FindLeaf(extractor.position).label
+
+            if label > 0 then
+                navLabels[label].NumberOfExtractors = navLabels[label].NumberOfExtractors + 1
+                table.insert(navLabels[label].ExtractorMarkers, extractor)
+
+                if not extractor.NavLabel then
+                    extractor.NavLabel = label
+                    extractor.NavLayer = layer
+                end
+            end
+        end
+    end
+
+    local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
+    for k = 1, hn do
+        local hydro = hydrocarbons[k]
+        for layer, grid in NavGrids do 
+            local label = grid:FindLeaf(hydro.position).label
+
+            if label > 0 then
+                navLabels[label].NumberOfExtractors = navLabels[label].NumberOfExtractors + 1
+                table.insert(navLabels[label].ExtractorMarkers, hydro)
+
+                if not hydro.NavLabel then
+                    hydro.NavLabel = label
+                    hydro.NavLayer = layer
+                end
+            end
+        end
+    end
+end
+
+--- Generates a navigational mesh based on the heightmap
+function Generate()
+
+    -- reset state
+    NavGrids = { }
+    NavLabels = { }
+    LabelIdentifier = 0
+
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    print(string.format(" -- Navigational mesh generator -- "))
+
+    NavLayerData = Shared.CreateEmptyNavLayerData()
+
+    ---@type number
+    local MapSize = ScenarioInfo.size[1]
+
+    ---@type number
+    local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
+
+    ---@type number
+    local compressionThreshold = 2
+
+    if MapSize > 1024 then
+        compressionThreshold = 4
+    end
+
+    NavGrids['Land'] = NavGrid('Land', CompressionTreeSize)
+    NavGrids['Water'] = NavGrid('Water', CompressionTreeSize)
+    NavGrids['Hover'] = NavGrid('Hover', CompressionTreeSize)
+    NavGrids['Amphibious'] = NavGrid('Amphibious', CompressionTreeSize)
+    NavGrids['Air'] = NavGrid('Air', CompressionTreeSize)
+
+    GenerateCompressionGrids(CompressionTreeSize, compressionThreshold)
     print(string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    labelRootLand:GenerateNeighbors()
-    labelRootNaval:GenerateNeighbors()
-    labelRootHover:GenerateNeighbors()
-    labelRootAmph:GenerateNeighbors()
-    labelRootAir:GenerateNeighbors()
-
-    labelRootLand:GenerateLabels()
-    labelRootNaval:GenerateLabels()
-    labelRootAmph:GenerateLabels()
-    labelRootHover:GenerateLabels()
-    labelRootAir:GenerateLabels()
-
-    labelRootLand:Precompute()
-    labelRootNaval:Precompute()
-    labelRootHover:Precompute()
-    labelRootAmph:Precompute()
-    labelRootAir:Precompute()
-
+    GenerateGraphs()
     print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
-    SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
     
+    GenerateMarkerMetadata()
+    print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateCullLabels()
+    print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
     -- allows debugging tools to function
-    import("/lua/sim/NavDebug.lua")
+    import("/lua/sim/navdebug.lua")
 
     -- pass data to sync
     Sync.NavLayerData = NavLayerData
 
-    -- we're done :)!
+    SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
     Generated = true
 end
-
---- Called by the module manager when this module is dirty due to a disk change
-function __moduleinfo.OnDirty()
-end
-
-

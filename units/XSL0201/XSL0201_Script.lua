@@ -8,8 +8,8 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
-local SDFOhCannon = import('/lua/seraphimweapons.lua').SDFOhCannon
+local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+local SDFOhCannon = import("/lua/seraphimweapons.lua").SDFOhCannon
 
 ---@class XSL0201 : SLandUnit
 XSL0201 = Class(SLandUnit) {

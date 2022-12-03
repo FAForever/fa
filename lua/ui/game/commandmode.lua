@@ -6,15 +6,15 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
-local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMeshResources
-local Prefs = import('/lua/user/prefs.lua')
+local commandMeshResources = import("/lua/ui/game/commandmeshes.lua").commandMeshResources
+local Prefs = import("/lua/user/prefs.lua")
 
-local watchForQueueChange = import('/lua/ui/game/construction.lua').watchForQueueChange
-local checkBadClean = import('/lua/ui/game/construction.lua').checkBadClean
-local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
+local watchForQueueChange = import("/lua/ui/game/construction.lua").watchForQueueChange
+local checkBadClean = import("/lua/ui/game/construction.lua").checkBadClean
+local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
-local WorldView = import('/lua/ui/controls/worldview.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
+local WorldView = import("/lua/ui/controls/worldview.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
 -- upvalue globals for performance
 local IsKeyDown = IsKeyDown
@@ -114,50 +114,48 @@ function EndCommandMode(isCancel)
     if ignoreSelection then
         return
     end
-
+    
     -- in case we want to end the command mode, without knowing it has already ended or not
-    if not modeData then
-        -- update our local state
-        commandMode = false
-        modeData = false
-        issuedOneCommand = false
+    if  modeData then
+        -- regain selection if we were cheating in units
+        if modeData.cheat then
+            if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
+                local modeData = table.deepcopy(modeData)
+                ForkThread(
+                    function()
+                        WaitSeconds(0.0001)
 
-        return
-    end
-
-    -- regain selection if we were cheating in units
-    if modeData.cheat then
-        if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
-            local modeData = table.deepcopy(modeData)
-            ForkThread(
-                function()
-                    WaitSeconds(0.0001)
-
-                    modeData.name = modeData.ids[modeData.index]
-                    modeData.bpId = modeData.ids[modeData.index]
-                    modeData.index = modeData.index + 1
-        
-                    StartCommandMode("build", modeData)
+                        modeData.name = modeData.ids[modeData.index]
+                        modeData.bpId = modeData.ids[modeData.index]
+                        modeData.index = modeData.index + 1
+            
+                        StartCommandMode("build", modeData)
+                    end
+                )
+            else 
+                if modeData.selection then
+                    SelectUnits(modeData.selection)
                 end
-            )
-        else 
-            if modeData.selection then
-                SelectUnits(modeData.selection)
+            end
+
+            -- we can end up here because we re-start the command mode
+            if not modeData then
+                return
             end
         end
-    end
 
-    -- add information to modeData for end behavior
-    modeData.isCancel = isCancel or false
+        -- add information to modeData for end behavior
+        modeData.isCancel = isCancel or false
+
+        -- ???
+        if modeData.isCancel then
+            ClearBuildTemplates()
+        end
+    end
 
     -- do end behaviors
     for i,v in endBehaviors do
         v(commandMode, modeData)
-    end
-
-    -- ???
-    if modeData.isCancel then
-        ClearBuildTemplates()
     end
 
     -- update our local state
@@ -431,7 +429,6 @@ local categoriesStructure = categories.STRUCTURE
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
-
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
     if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then 
         if not IsKeyDown('Shift') then 
@@ -557,7 +554,7 @@ function OnCommandIssued(command)
     end
 
     -- used by spread attack to keep track of the orders of units
-    import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
+    import("/lua/spreadattack.lua").MakeShadowCopyOrders(command)
 end
 
 --- ???
@@ -571,7 +568,7 @@ end
 GameMain.AddBeatFunction(OnCommandModeBeat)
 
 -- kept for mod backwards compatibility
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Construction = import('/lua/ui/game/construction.lua')
-local UIMain = import('/lua/ui/uimain.lua')
-local Orders = import('/lua/ui/game/orders.lua')
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Construction = import("/lua/ui/game/construction.lua")
+local UIMain = import("/lua/ui/uimain.lua")
+local Orders = import("/lua/ui/game/orders.lua")

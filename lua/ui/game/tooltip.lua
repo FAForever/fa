@@ -6,16 +6,16 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local TooltipInfo = import('/lua/ui/help/tooltips.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local Button = import('/lua/maui/button.lua').Button
-local Edit = import('/lua/maui/edit.lua').Edit
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Keymapping = import('/lua/keymap/defaultKeyMap.lua').defaultKeyMap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local TooltipInfo = import("/lua/ui/help/tooltips.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local Button = import("/lua/maui/button.lua").Button
+local Edit = import("/lua/maui/edit.lua").Edit
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Keymapping = import("/lua/keymap/defaultkeymap.lua").defaultKeyMap
 
 local mouseoverDisplay = false
 local createThread = false
@@ -63,7 +63,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extended, width, forced, padd
             if TooltipInfo['Tooltips'][ID]['keyID'] and TooltipInfo['Tooltips'][ID]['keyID'] ~= "" then
                 for i, v in Keymapping do
                     if v == TooltipInfo['Tooltips'][ID]['keyID'] then
-                        local properkeyname = import('/lua/ui/dialogs/keybindings.lua').FormatKeyName(i)
+                        local properkeyname = import("/lua/ui/dialogs/keybindings.lua").FormatKeyName(i)
                         text = LOCF("%s (%s)", text, properkeyname)
                         break
                     end
@@ -263,7 +263,7 @@ function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize,
             else
                 textBoxWidth = LayoutHelpers.ScaleNumber(width - padding - padding)
             end
-            tempTable = import('/lua/maui/text.lua').WrapText(desc, textBoxWidth,
+            tempTable = import("/lua/maui/text.lua").WrapText(desc, textBoxWidth,
             function(text)
                 return tooltip.desc[1]:GetStringAdvance(text)
             end)
@@ -472,7 +472,7 @@ end
 -- Add tooltips from every AI mod to TooltipInfo table
 function AddModAILobbyTooltips()
     -- get all sim mods installed in /mods/
-    local simMods = import('/lua/mods.lua').AllMods()
+    local simMods = import("/lua/mods.lua").AllMods()
     local TooltipData
     -- loop over all installed mods
     for Index, ModData in simMods do

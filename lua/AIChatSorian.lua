@@ -6,15 +6,15 @@
 --**  Summary  : AI Chat Functions
 --**  Version  : 0.1
 --****************************************************************************
-local Chat = import('/lua/ui/game/chat.lua')
-local ChatTo = import('/lua/lazyvar.lua').Create()
+local Chat = import("/lua/ui/game/chat.lua")
+local ChatTo = import("/lua/lazyvar.lua").Create()
 
 ---@param group any
 ---@param text string
 ---@param sender any
 function AIChat(group, text, sender)
     if text then
-        if import('/lua/ui/game/taunt.lua').CheckForAndHandleTaunt(text, sender) then
+        if import("/lua/ui/game/taunt.lua").CheckForAndHandleTaunt(text, sender) then
             return
         end
         ChatTo:Set(group)
@@ -69,14 +69,14 @@ function AISendChatMessage(towho, msg)
         if towho then
             for k,v in towho do
                 if v == focus then
-                    import('/lua/ui/game/chat.lua').ReceiveChat(msg.aisender, msg)
+                    import("/lua/ui/game/chat.lua").ReceiveChat(msg.aisender, msg)
                 end
             end
         else
-            import('/lua/ui/game/chat.lua').ReceiveChat(msg.aisender, msg)
+            import("/lua/ui/game/chat.lua").ReceiveChat(msg.aisender, msg)
         end
     elseif msg.Taunt then
-        import('/lua/ui/game/taunt.lua').RecieveAITaunt(msg.aisender, msg)
+        import("/lua/ui/game/taunt.lua").RecieveAITaunt(msg.aisender, msg)
     end
 end
 

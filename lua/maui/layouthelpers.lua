@@ -2199,14 +2199,13 @@ Layouter = Class(LayouterAttributeControl, LayouterAttributeDropShadow, Layouter
     ---@param control Control
     __init = function(self, control)
         if not control then
-            self.layoutControl = false
             return
         end
-        self.layoutControl = GetLayoutControl(control)
         local onLayout = control.OnLayout
         if onLayout then
             onLayout(control)
         end
+        self.layoutControl = GetLayoutControl(control)
     end;
 
     OnLayout = function(self)
@@ -2257,11 +2256,11 @@ Layouter = Class(LayouterAttributeControl, LayouterAttributeDropShadow, Layouter
             end
         end
 
-        local layout = control.Layout or self.L
+        self.layoutControl = nil
+        local layout = control.Layout
         if layout then
             layout(control)
         end
-        self.layoutControl = false
 
         return control
     end;
@@ -2296,7 +2295,9 @@ function ReusedLayoutFor(control)
             return reusedLayouter
         else
             -- uh-oh, someone is interlacing the default layouter!
-            WARN(_TRACEBACK(1, "Reused layouter is already in use! (did you forget to call `End()` or use the non-reused version?)"))
+            if ValidateLayouter then
+                WARN(_TRACEBACK(1, "Reused layouter is already in use by " .. tostring(control) .. "! (did you forget to call `End()` or use the non-reused version?)"))
+            end
             return Layouter(control)
         end
     end

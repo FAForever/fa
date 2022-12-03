@@ -6,16 +6,16 @@
 --* Copyright  2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Button = import('/lua/maui/button.lua').Button
-local Text = import('/lua/maui/text.lua').Text
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Window = import('/lua/maui/window.lua').Window
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Button = import("/lua/maui/button.lua").Button
+local Text = import("/lua/maui/text.lua").Text
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Window = import("/lua/maui/window.lua").Window
+local Prefs = import("/lua/user/prefs.lua")
 
 local minimap = Prefs.GetFromCurrentProfile('stratview') or false
 local minimap_resources = Prefs.GetFromCurrentProfile('MiniMap_resource_icons') or false
@@ -43,7 +43,7 @@ function CommonLogic()
 
     controls.displayGroup.RolloverHandler = function(control, event, xControl, yControl, cursor, controlID)
         if controls.displayGroup._lockSize then return end
-        local styles = import('/lua/maui/window.lua').styles
+        local styles = import("/lua/maui/window.lua").styles
         if not controls.displayGroup._sizeLock then
             if event.Type == 'MouseEnter' then
                 if controlMap[controlID] then
@@ -84,7 +84,7 @@ function CommonLogic()
     end
     controls.displayGroup.OnClose = function(self)
         ToggleMinimap()
-        import('/lua/ui/game/multifunction.lua').UpdateMinimapState()
+        import("/lua/ui/game/multifunction.lua").UpdateMinimapState()
     end
     if not minimap then
         controls.displayGroup:Hide()
@@ -113,7 +113,7 @@ function CreateMinimap(parent)
     controls.displayGroup.window_m:SetRenderPass(UIUtil.UIRP_UnderWorld)
     controls.displayGroup:SetMinimumResize(150, 150)
     ConExecute("cam_DefaultMiniLOD 1.8") -- make sure minimap is created with normal LOD value as we change it later
-    controls.miniMap = import('/lua/ui/controls/worldview.lua').WorldView(controls.displayGroup:GetClientGroup(), 'MiniMap', 2, true, 'WorldCamera')    -- depth value is above minimap
+    controls.miniMap = import("/lua/ui/controls/worldview.lua").WorldView(controls.displayGroup:GetClientGroup(), 'MiniMap', 2, true, 'WorldCamera')    -- depth value is above minimap
     controls.miniMap:SetName("Minimap")
     controls.miniMap:Register('MiniMap', true, '<LOC map_view_0001>MiniMap', 1)
     controls.miniMap:SetCartographic(true)
@@ -189,7 +189,7 @@ end
 
 function ToggleMinimap()
     ---- disable when in Screen Capture mode
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         return
     end
 
