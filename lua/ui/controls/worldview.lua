@@ -459,30 +459,6 @@ WorldView = Class(moho.UIWorldView, Control) {
         self:ApplyCursor()
     end,
 
-    --- Called when the user starts dragging a command
-    ---@param self WorldView
-    ---@param identifier CommandCap
-    ---@param enabled boolean
-    ---@param changed boolean
-    OnCursorCommandDragStart = function(self, identifier, enabled, changed)
-        if enabled then
-            if changed then
-                local cursor = self.Cursor
-                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor("DRAGCOMMAND")
-                self:ApplyCursor()
-            end
-        end
-    end,
-
-    --- Called when the user stops dragging a command
-    ---@param self WorldView
-    ---@param identifier CommandCap
-    ---@param enabled boolean
-    ---@param changed boolean
-    OnCursorCommandDragEnd = function(self, identifier, enabled, changed)
-        self:OnUpdateCursor()
-    end,
-
     --- Called when the order `RULEUCC_Move` is being applied
     ---@param self WorldView
     ---@param identifier 'RULEUCC_Move'
