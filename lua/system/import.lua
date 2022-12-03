@@ -35,7 +35,9 @@ __module_metatable = {
 -- these values can be adjusted by hooking into this file
 local informDevOfLoad = false
 
-
+---Load a module
+---@param module Module
+---@return Module
 local function LoadModule(module)
     local modules = __modules
 
@@ -160,7 +162,9 @@ function import(name, isLazy)
     return module
 end
 
-
+---Returns the lazy module instance which is gonna be loaded when being indexed
+---@param name FileName
+---@return Module
 function lazyimport(name)
     return import(name, true)
 end
