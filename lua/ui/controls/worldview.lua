@@ -170,6 +170,7 @@ local orderToCursorCallback = {
     RULEUCC_Guard = 'OnCursorGuard',
     RULEUCC_Repair = 'OnCursorRepair',
     RULEUCC_Attack = 'OnCursorAttack',
+    RULEUCC_AttackAlt = 'OnCursorAttackAlt',
     RULEUCC_Patrol = 'OnCursorPatrol',
     RULEUCC_Teleport = 'OnCursorTeleport',
     RULEUCC_Tactical = 'OnCursorTactical',
@@ -333,17 +334,17 @@ WorldView = Class(moho.UIWorldView, Control) {
         -- if toggled, we ignore everything but move and attack move
         if self.IgnoreMode then
             if orderViaMouse == 'RULEUCC_Move' and IsKeyDown(KeyCodeAlt) and selection then
-                order = 'RULEUCC_Attack'
+                order = 'RULEUCC_AttackAlt'
             else
                 order = 'RULEUCC_Move'
             end
 
         -- otherwise, process as usual
         else
-            -- first command mode
-            if command_mode then
+            if IsKeyDown(KeyCodeAlt) and selection then
+                order = 'RULEUCC_AttackAlt'
+            elseif command_mode then
                 order = command_data.cursor or command_data.name
-
             -- then command highlighting
             elseif self:HasHighlightCommand() then
                 order = 'CommandHighlight'
@@ -351,9 +352,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             -- then commands inherited by what the mouse is hovering over
             else
                 -- check for right click, then it becomes an attack move order
-                if orderViaMouse == 'RULEUCC_Move' and IsKeyDown(KeyCodeAlt) and selection then
-                    order = 'RULEUCC_Attack'
-                elseif orderViaMouse ~= 'RULEUCC_Move' then
+                if orderViaMouse ~= 'RULEUCC_Move' then
                     order = orderViaMouse
                 end
             end
@@ -559,6 +558,26 @@ WorldView = Class(moho.UIWorldView, Control) {
                 self:OnCursorDecals(identifier, false, changed, AttackDecalFunc)
             end
             self.ViaCommandModeOld = viaCommandMode
+        end
+    end,
+
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_AttackAlt'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorAttackAlt = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('RULEUCC_Attack')
+                self:ApplyCursor()
+
+                self:SetIgnoreSelectTolerance()
+            end
+        else
+            if not self.IgnoreMode then
+                self:SetDefaultSelectTolerance(false)
+            end
         end
     end,
 
