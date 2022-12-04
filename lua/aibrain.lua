@@ -65,6 +65,7 @@ local Factions = import("/lua/factions.lua").GetFactions(true)
 ---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
 ---@alias BrainType "AI" | "Human"
 ---@class AIBrain: moho.aibrain_methods
+---@field Army number
 ---@field AIPlansList string[][]
 ---@field AirAttackPoints? table
 ---@field AttackData AttackManager
@@ -1286,7 +1287,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     IsDefeated = function(self)
         local status = self.Status
-        return status == "Defeat" or status == "Recalled"
+        return status == "Defeat" or status == "Recalled" or ArmyIsOutOfGame(self.Army)
     end,
 
     ---@param self AIBrain
