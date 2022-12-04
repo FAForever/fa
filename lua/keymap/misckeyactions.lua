@@ -17,7 +17,6 @@ function lockZoom()
     end
 end
 
-
 function airNoTransports()
     UISelectionByCategory("AIR + MOBILE", false, false, false, false) SelectUnits(EntityCategoryFilterDown(categories.ALLUNITS - categories.TRANSPORTATION, GetSelectedUnits()))
 end
