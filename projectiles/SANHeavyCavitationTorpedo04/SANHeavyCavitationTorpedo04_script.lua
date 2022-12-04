@@ -8,9 +8,9 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SHeavyCavitationTorpedo = import('/lua/seraphimprojectiles.lua').SHeavyCavitationTorpedo
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 SANHeavyCavitationTorpedo04 = Class(SHeavyCavitationTorpedo) {
         OnCreate = function(self)
@@ -22,23 +22,11 @@ SANHeavyCavitationTorpedo04 = Class(SHeavyCavitationTorpedo) {
 
         PauseUntilTrack = function(self)
                 local distance = self:GetDistanceToTarget()
-                local waittime
                 local turnrate = 360
-                -- The pause time needs to scale down depending on how far away the target is, otherwise
-                -- the torpedoes will initially shoot past their target.
-                if distance > 6 then
-                        waittime = .1 --0.45
-                        if distance > 12 then
-                                waittime = .1--0.7
-                                if distance > 18 then
-                                        waittime = 0.1--1
-                                end
-                        end
-                else
-                        waittime = .2
+                if distance < 6 then
                         turnrate = 720
                 end
-                WaitSeconds(waittime)
+                WaitSeconds(0.1)
                 self:SetMaxSpeed(14)
                 self:TrackTarget(true)
                 self:SetTurnRate(turnrate)
@@ -49,6 +37,6 @@ SANHeavyCavitationTorpedo04 = Class(SHeavyCavitationTorpedo) {
         local mpos = self:GetPosition()
         local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
         return dist
-    end,
+        end,
 }
 TypeClass = SANHeavyCavitationTorpedo04

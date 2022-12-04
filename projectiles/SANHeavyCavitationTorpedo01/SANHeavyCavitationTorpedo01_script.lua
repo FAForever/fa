@@ -8,12 +8,12 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SHeavyCavitationTorpedo = import('/lua/seraphimprojectiles.lua').SHeavyCavitationTorpedo
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
-    FxSplashScale = .4,
+    FxSplashScale = 0.4,
     FxEnterWaterEmitter = {
         '/effects/emitters/destruction_water_splash_ripples_01_emit.bp',
         '/effects/emitters/destruction_water_splash_wash_01_emit.bp',
@@ -55,7 +55,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
 
         -- Randomization of the spread
         local angleVariation = angle * 0.3 -- Adjusts angle variance spread
-        local spreadMul = .4 -- Adjusts the width of the dispersal
+        local spreadMul = 0.4 -- Adjusts the width of the dispersal
         local xVec = 0
         local yVec = vy
         local zVec = 0
@@ -64,6 +64,8 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
         -- damage, in case the torpedo hits something before it splits.
         local DividedDamageData = self.DamageData
         DividedDamageData.DamageAmount = DividedDamageData.DamageAmount / numProjectiles
+        self.DamageData = nil
+
 
         local FxFragEffect = EffectTemplate.SHeavyCavitationTorpedoSplit
 

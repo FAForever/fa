@@ -5,10 +5,10 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CLandUnit = import("/lua/cybranunits.lua").CLandUnit
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
-local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaserInvisible
+local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaserInvisible
 
 ---@class URL0104 : CLandUnit
 URL0104 = Class(CLandUnit) {

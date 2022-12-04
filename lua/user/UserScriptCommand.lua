@@ -4,7 +4,7 @@
 --*
 --* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
-local CM = import('/lua/ui/game/commandmode.lua')
+local CM = import("/lua/ui/game/commandmode.lua")
 
 -- The user wants to issue an ability order in the current command mode. This
 -- function validates the request. If the request is valid we set 

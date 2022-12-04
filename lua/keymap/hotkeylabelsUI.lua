@@ -1,10 +1,10 @@
 -- This is a helper file that creates the little UI label for a key binding on a construction or order button
 -- It is called from construction.lua and orders.lua respectively
 
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Prefs = import('/lua/user/prefs.lua')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Prefs = import("/lua/user/prefs.lua")
 
 function addLabel(control, parent, key)
     if not Prefs.GetFromCurrentProfile('options').show_hotkeylabels then

@@ -12,11 +12,11 @@
 ---@field Func string
 ---@field Args table
 
-local SimUtils = import('/lua/simutils.lua')
-local SimPing = import('/lua/simping.lua')
-local SimTriggers = import('/lua/scenariotriggers.lua')
-local SUtils = import('/lua/ai/sorianutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
+local SimUtils = import("/lua/simutils.lua")
+local SimPing = import("/lua/simping.lua")
+local SimTriggers = import("/lua/scenariotriggers.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -24,8 +24,6 @@ local TableEmpty = table.empty
 local TableGetn = table.getn
 local TableRemove = table.remove
 local TableMerged = table.merged
-
-local MathAbs = math.abs
 
 -- upvalue globals for performance
 local type = type
@@ -63,7 +61,7 @@ function DoCallback(name, data, units)
 end
 
 --- Common utility function to retrieve the actual units.
-local function SecureUnits(units)
+function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
         units = {units}
@@ -233,7 +231,7 @@ Callbacks.CapStructure = function(data, units)
         -- make sure we're allowed to mess with this unit, if not we exclude
         if unit.Army and OkayToMessWithArmy(unit.Army) then 
             -- compute blueprint id
-            local faction = unit.factionCategory
+            local faction = unit.Blueprint.FactionCategory
             local blueprintID = ConstructBlueprintID(faction, data.id)
 
             -- check if this unit can build it
@@ -465,15 +463,15 @@ Callbacks.UpdateMarker = SimPing.UpdateMarker
 
 Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect
 
-Callbacks.ToggleSelfDestruct = import('/lua/selfdestruct.lua').ToggleSelfDestruct
+Callbacks.ToggleSelfDestruct = import("/lua/selfdestruct.lua").ToggleSelfDestruct
 
-Callbacks.MarkerOnScreen = import('/lua/simcameramarkers.lua').MarkerOnScreen
+Callbacks.MarkerOnScreen = import("/lua/simcameramarkers.lua").MarkerOnScreen
 
-Callbacks.SimDialogueButtonPress = import('/lua/simdialogue.lua').OnButtonPress
+Callbacks.SimDialogueButtonPress = import("/lua/simdialogue.lua").OnButtonPress
 
 Callbacks.AIChat = SUtils.FinishAIChat
 
-Callbacks.DiplomacyHandler = import('/lua/simdiplomacy.lua').DiplomacyHandler
+Callbacks.DiplomacyHandler = import("/lua/simdiplomacy.lua").DiplomacyHandler
 
 Callbacks.Rebuild = function(data, units)
     local wreck = GetEntityById(data.entity)
@@ -487,7 +485,7 @@ Callbacks.Rebuild = function(data, units)
     wreck:Rebuild(units)
 end
 
---Callbacks.GetUnitHandle = import('/lua/debugai.lua').GetHandle
+--Callbacks.GetUnitHandle = import("/lua/debugai.lua").GetHandle
 
 function Callbacks.OnMovieFinished(name)
     ScenarioInfo.DialogueFinished[name] = true
@@ -525,19 +523,19 @@ Callbacks.OnControlGroupAssign = function(units)
     end
 end
 
-local SimCamera = import('/lua/simcamera.lua')
+local SimCamera = import("/lua/simcamera.lua")
 
 Callbacks.OnCameraFinish = SimCamera.OnCameraFinish
 
-local SimPlayerQuery = import('/lua/simplayerquery.lua')
+local SimPlayerQuery = import("/lua/simplayerquery.lua")
 
 Callbacks.OnPlayerQuery = SimPlayerQuery.OnPlayerQuery
 
 Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
-Callbacks.PingGroupClick = import('/lua/simpinggroup.lua').OnClickCallback
+Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
-Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
+Callbacks.GiveOrders = import("/lua/spreadattack.lua").GiveOrders
 
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
@@ -586,7 +584,7 @@ Callbacks.FlagShield = function(data, units)
     end
 end
 
-Callbacks.WeaponPriorities = import('/lua/weaponpriorities.lua').SetWeaponPriorities
+Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriorities
 
 Callbacks.ToggleDebugChainByName = function (data, units)
     LOG("ToggleDebugChainByName")
@@ -740,3 +738,94 @@ end
 Callbacks.iMapToggleThreat = function(data)
     import("/lua/sim/maputilities.lua").iMapToggleThreat(data.Identifier)
 end
+
+Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
+    if selection then
+
+        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
+
+        ---@type Unit
+        local target = GetEntityById(data.TargetId)
+
+        IssueClearCommands(noACU)
+        IssueGuard(noACU, target)
+    end
+end
+
+---@class CargoSlots
+---@field Large number 
+---@field Medium number 
+---@field Small number
+
+---@type CargoSlots[]
+local GetCargoSlotsCache = {}
+
+---@param unit Unit
+---@return CargoSlots
+local function GetCargoSlots(unit)
+
+    -- try the cache first
+    if GetCargoSlotsCache[unit.UnitId] then 
+        return GetCargoSlotsCache[unit.UnitId]
+    end
+
+    ---@type CargoSlots
+    local slots = {
+        Large = 0,
+        Medium = 0,
+        Small = 0,
+    }
+
+    -- based on attachment points
+    for i = 1, unit:GetBoneCount() do
+        if unit:GetBoneName(i) ~= nil then
+            if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
+                slots.Large = slots.Large + 1
+            elseif string.find(unit:GetBoneName(i), 'Attachpoint_Med') then
+                slots.Medium = slots.Medium + 1
+            elseif string.find(unit:GetBoneName(i), 'Attachpoint') then
+                slots.Small = slots.Small + 1
+            end
+        end
+    end
+
+    -- based on blueprint definitions
+    slots.Large = math.min(slots.Large, unit.Blueprint.Transport.SlotsLarge or slots.Large)
+    slots.Medium = math.min(slots.Medium, unit.Blueprint.Transport.SlotsMedium or slots.Medium)
+    slots.Small = math.min(slots.Small, unit.Blueprint.Transport.SlotsSmall or slots.Small)
+
+    -- cache it and return
+    GetCargoSlotsCache[unit.UnitId] = slots
+    return slots
+end
+
+Callbacks.LoadIntoTransports = function(data, selection)
+    if selection then
+
+        local uTransports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
+
+        -- retrieve usable data about transports
+        local dTransports = { }
+        for k, transport in uTransports do
+            local cargoSlots = GetCargoSlots(transport)
+            table.insert(dTransports, {
+                Transport = transport,
+                Cargo = { },
+                Small = cargoSlots.Small,
+                Medium = cargoSlots.Medium,
+                Large = cargoSlots.Large,
+            })
+        end
+
+        local uCargo = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
+
+    end
+end
+
+Callbacks.NavGenerate = import("/lua/sim/navgenerator.lua").Generate
+Callbacks.NavToggleScanLayer = import("/lua/sim/navdebug.lua").ToggleScanLayer
+Callbacks.NavToggleScanLabels = import("/lua/sim/navdebug.lua").ToggleScanLabels
+Callbacks.NavDebugCanPathTo = import("/lua/sim/navdebug.lua").CanPathTo
+Callbacks.NavDebugPathTo = import("/lua/sim/navdebug.lua").PathTo
+Callbacks.NavDebugGetLabel = import("/lua/sim/navdebug.lua").GetLabel
+Callbacks.NavDebugGetLabelMetadata = import("/lua/sim/navdebug.lua").GetLabelMeta

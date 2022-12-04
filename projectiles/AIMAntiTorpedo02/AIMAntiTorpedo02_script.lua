@@ -1,7 +1,7 @@
 --
 -- Ship-based Anti-Torpedo Script
 --
-local ATorpedoSubProjectile = import('/lua/aeonprojectiles.lua').QuasarAntiTorpedoChargeSubProjectile
+local ATorpedoSubProjectile = import("/lua/aeonprojectiles.lua").QuasarAntiTorpedoChargeSubProjectile
 
 AIMAntiTorpedo02 = Class(ATorpedoSubProjectile) 
 {

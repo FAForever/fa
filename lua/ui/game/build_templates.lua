@@ -2,12 +2,12 @@
 -- File: lua/modules/ui/game/build_templates.lua
 -- Author: Ted Snook
 -- Summary: Build Templates UI
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
-local Prefs = import('/lua/user/prefs.lua')
+local Prefs = import("/lua/user/prefs.lua")
 local templates = Prefs.GetFromCurrentProfile('build_templates') or {}
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
 
 function CreateBuildTemplate()
     GenerateBuildTemplateFromSelection()
@@ -19,14 +19,14 @@ function CreateBuildTemplate()
 end
 
 function Init()
-    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(ReceiveTemplate, 'Template')
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveTemplate, 'Template')
 end
 
 function ReceiveTemplate(sender, msg)
     if Prefs.GetOption('accept_build_templates') ~= 'yes' then return end
-    local tab = import('/lua/ui/game/construction.lua').GetTabByID('templates')
+    local tab = import("/lua/ui/game/construction.lua").GetTabByID('templates')
     if tab then
-        import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC('<LOC template_0000>Build Template Received'), tab, LOCF('<LOC template_0001>From %s', sender))
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC template_0000>Build Template Received'), tab, LOCF('<LOC template_0001>From %s', sender))
     end
     AddTemplate(msg.data)
 end

@@ -152,7 +152,9 @@ keyDescriptions = {
     ['select_nearest_naval_factory'] = '<LOC key_desc_0078>Select the nearest Naval Factory',
     ['toggle_build_mode'] = '<LOC key_desc_0102>Toggles keyboard build command mode on and off',
     ['toggle_reclaim_labels'] = '<LOC key_desc_0103>Toggles reclaim labels on and off',
-
+    ['select_upgrading_extractors'] = '<LOC key_desc_select_upgrading_extractors>Select all extractors that are upgrading',
+    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
+    ['select_all_radars'] = '<LOC key_desc_select_all_radars>Select all radars',
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
     ['reset_game_speed'] = '<LOC key_desc_0081>Reset game speed to 0 (Normal Speed)',
@@ -324,6 +326,7 @@ keyDescriptions = {
     ['select_air_no_transport'] = '<LOC key_desc_0253>Select air but no transports',
     ['select_air_transport'] = '<LOC key_desc_0254>Select only transports',
     ['lock_zoom'] = '<LOC key_desc_0255>Lock the zoom to current level',
+    ['select_naval_no_mobile_sonar'] = 'Select all Naval units without sonar platforms',
 
     -- Hotbuild
     ['builders'] = '<LOC key_desc_0256>build builders (factories, Quantum Gate & T1 engineers)',

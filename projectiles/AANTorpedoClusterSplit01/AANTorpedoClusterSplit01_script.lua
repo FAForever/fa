@@ -8,8 +8,8 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ATorpedoCluster = import('/lua/aeonprojectiles.lua').ATorpedoCluster
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
 AANTorpedoCluster01 = Class(ATorpedoCluster) {
 
@@ -22,7 +22,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
         self.HasImpacted = false
         self:ForkThread(self.CountdownExplosion)
 
-		CreateTrail(self, -1, self:GetArmy(), import('/lua/EffectTemplates.lua').ATorpedoPolyTrails01)
+		CreateTrail(self, -1, self:GetArmy(), import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
         
     end,
 

@@ -6,7 +6,7 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local optionsLogic = import('/lua/options/optionsLogic.lua')
+local optionsLogic = import("/lua/options/optionslogic.lua")
 
 -- do not run any code in the scope of the file for mod compatibility with Alliance of Heroes and others
 

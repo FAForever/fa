@@ -7,8 +7,8 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local Entity = import('/lua/sim/Entity.lua').Entity
-local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local Entity = import("/lua/sim/entity.lua").Entity
+local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 ---@class FlareSpec
 ---@field Army Army

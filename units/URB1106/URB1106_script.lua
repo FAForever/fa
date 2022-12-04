@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CMassStorageUnit = import('/lua/cybranunits.lua').CMassStorageUnit
+local CMassStorageUnit = import("/lua/cybranunits.lua").CMassStorageUnit
 
 ---@class URB1106 : CMassStorageUnit
 URB1106 = Class(CMassStorageUnit) {

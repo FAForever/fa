@@ -8,8 +8,8 @@
 -- This file is called on game start from gamemain.lua to fetch keybindings from prefs, or generate them from defaults
 -- It is also used by hotbuild.lua to fetch existing mappings
 
-local Prefs = import('/lua/user/prefs.lua')
-local KeyDescriptions = import('/lua/keymap/keydescriptions.lua').keyDescriptions
+local Prefs = import("/lua/user/prefs.lua")
+local KeyDescriptions = import("/lua/keymap/keydescriptions.lua").keyDescriptions
 
 function GetActionName(action)
     local name = ''
@@ -26,7 +26,7 @@ function GetActionName(action)
 end
 
 function GetDefaultKeyMapName()
-    return Prefs.GetFromCurrentProfile("UserKeyMapName") or 'defaultKeyMap.lua'
+    return Prefs.GetFromCurrentProfile("UserKeyMapName") or "/lua/keymap/defaultkeymap.lua"
 end
 
 -- stores preset name of UserKeyMap: 'defaultKeyMap.lua' (GPG) or 'hotbuildKeyMap.lua' (FAF) or 'alternatehotbuildKeyMap.lua' (FAF)
@@ -146,10 +146,10 @@ function SetUserKeyMapping(key, oldKey, action)
         end
     end
 
-    if IsActionInMap(action, newUserMap) or IsActionInMap(action, import('defaultKeyMap.lua').defaultKeyMap) then
+    if IsActionInMap(action, newUserMap) or IsActionInMap(action, import("/lua/keymap/defaultkeymap.lua").defaultKeyMap) then
         LOG('Keybindings adding key "'..key .. '" in user map for action: ' .. action)
         newUserMap[key] = action
-    elseif IsActionInMap(action, newDebugMap) or IsActionInMap(action, import('defaultKeyMap.lua').debugKeyMap) then
+    elseif IsActionInMap(action, newDebugMap) or IsActionInMap(action, import("/lua/keymap/defaultkeymap.lua").debugKeyMap) then
         LOG('Keybindings adding key "'..key .. '" in debug map for action: ' .. action)
         newDebugMap[key] = action
     else
@@ -194,8 +194,8 @@ end
 function GetKeyActions()
     local ret = {}
 
-    local keyActions = import('/lua/keymap/keyactions.lua').keyActions
-    local debugKeyActions = import('/lua/keymap/debugKeyActions.lua').debugKeyActions
+    local keyActions = import("/lua/keymap/keyactions.lua").keyActions
+    local debugKeyActions = import("/lua/keymap/debugkeyactions.lua").debugKeyActions
 
     for k,v in keyActions do
         ret[k] = v
@@ -316,7 +316,7 @@ end
 -- Returns a table of raw (windows) key codes mapped to key names
 function GetKeyCodeLookup()
     local ret = {}
-    local keyCodeTable = import('/lua/keymap/keynames.lua').keyNames
+    local keyCodeTable = import("/lua/keymap/keynames.lua").keyNames
     for k, v in keyCodeTable do
         local codeInt = STR_xtoi(k)
         ret[codeInt] = v
@@ -375,6 +375,7 @@ function NormalizeKey(inKey)
     return norm
 end
 
+-- TODO: reconcile with `/lua/ui/dialogs/keybindings.lua#FormatKeyName`
 function LocalizeKeyName(inKey)
     local ctrl, alt, shift = false, false, false
     local norm = ""
@@ -390,7 +391,7 @@ function LocalizeKeyName(inKey)
         end
     end)
     -- build backwards
-    local properKeyNames = import('/lua/keymap/properKeyNames.lua').properKeyNames
+    local properKeyNames = import("/lua/keymap/properkeynames.lua").properKeyNames
     if norm ~= "Alt" and alt then
         norm = LOC(properKeyNames.Alt) .. "+" .. norm
     end

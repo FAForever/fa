@@ -6,32 +6,32 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import('/lua/maui/text.lua').Text
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Edit = import('/lua/maui/edit.lua').Edit
-local Button = import('/lua/maui/button.lua').Button
-local Group = import('/lua/maui/group.lua').Group
-local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-local Prefs = import('/lua/user/prefs.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local lobby = import('/lua/ui/lobby/lobby.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Text = import("/lua/maui/text.lua").Text
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Edit = import("/lua/maui/edit.lua").Edit
+local Button = import("/lua/maui/button.lua").Button
+local Group = import("/lua/maui/group.lua").Group
+local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
+local Prefs = import("/lua/user/prefs.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local lobby = import("/lua/ui/lobby/lobby.lua")
 
 local errorDialog = false
 
 local editInFocus = nil
 
-local MapUtil = import('/lua/ui/maputil.lua')
+local MapUtil = import("/lua/ui/maputil.lua")
 local scenarios = MapUtil.EnumerateSkirmishScenarios()
 local gameOptions = {}
-gameOptions[1] = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
-gameOptions[2] = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
+gameOptions[1] = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions
+gameOptions[2] = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts
 
 --- A noop for the purpose of the FAF binary not containing this definition
 --
@@ -163,7 +163,7 @@ function CreateEditField(parent, width, maxChars)
 end
 
 function CreateUI(over, exitBehavior)
-    local discovery = import('/lua/ui/lobby/lobbyComm.lua').CreateDiscoveryService()
+    local discovery = import("/lua/ui/lobby/lobbycomm.lua").CreateDiscoveryService()
 	local parent = over
 	-- panel and title
     local panel = Bitmap(parent, UIUtil.SkinnableFile('/scx_menu/gameselect/panel_bmp.dds'))
@@ -198,7 +198,7 @@ function CreateUI(over, exitBehavior)
         Button.HandleEvent(self, event)
     end
 
-    import('/lua/ui/uimain.lua').SetEscapeHandler(function() exitButton.OnClick() end)
+    import("/lua/ui/uimain.lua").SetEscapeHandler(function() exitButton.OnClick() end)
 
     local createButton = UIUtil.CreateButtonStd(panel, '/scx_menu/large-no-bracket-btn/large', "<LOC _Create>Create", 18, 2)
     LayoutHelpers.AtRightTopIn(createButton, panel, -17, 645)
@@ -258,7 +258,7 @@ function CreateUI(over, exitBehavior)
            	panel:Destroy()
             discovery:Destroy()
             discovery = false
-            import('/lua/ui/lobby/gamecreate.lua').CreateUI(name, over, exitBehavior)
+            import("/lua/ui/lobby/gamecreate.lua").CreateUI(name, over, exitBehavior)
         else
             if errorDialog then errorDialog:Destroy() end
             errorDialog = UIUtil.ShowInfoDialog(parent, "<LOC GAMESEL_0003>Please fill in your nickname", "<LOC _OK>")
@@ -778,8 +778,8 @@ function CreateUI(over, exitBehavior)
     function formatData()
         formattedData = {}
         for i, gameData in games do
-            if gameData.ProductCode == nil or gameData.ProductCode ~= import('/lua/productcode.lua').productCode then continue end
-            gameData.wrappedName = import('/lua/maui/text.lua').WrapText(gameData.GameName,
+            if gameData.ProductCode == nil or gameData.ProductCode ~= import("/lua/productcode.lua").productCode then continue end
+            gameData.wrappedName = import("/lua/maui/text.lua").WrapText(gameData.GameName,
                 gameList._tabs[2].Right() - gameList._tabs[2].Left(),
                 function(curText) return gameListObjects[1].name1:GetStringAdvance(curText) end)
 

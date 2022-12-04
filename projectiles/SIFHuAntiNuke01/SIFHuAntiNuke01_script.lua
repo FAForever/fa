@@ -10,10 +10,10 @@
 
 
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local SIFHuAntiNuke = import('/lua/seraphimprojectiles.lua').SIFHuAntiNuke
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local RandomInt = import('/lua/utilities.lua').GetRandomInt
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local SIFHuAntiNuke = import("/lua/seraphimprojectiles.lua").SIFHuAntiNuke
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local RandomInt = import("/lua/utilities.lua").GetRandomInt
 SIFHuAntiNuke01 = Class(SIFHuAntiNuke) {
 
      ------This is a custom impact to maeke the seraphim hit look really good, like some kind of tendrilled explosion.

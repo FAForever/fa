@@ -10,18 +10,18 @@
 ----------------------------------------------------------------------------------
 -- Platoon Lua Module                    --
 ----------------------------------------------------------------------------------
-local AIUtils = import('ai/aiutilities.lua')
-local Utilities = import('/lua/utilities.lua')
-local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
-local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local Behaviors = import('/lua/ai/aibehaviors.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local SPAI = import('/lua/ScenarioPlatoonAI.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Utilities = import("/lua/utilities.lua")
+local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
+local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local Behaviors = import("/lua/ai/aibehaviors.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local SPAI = import("/lua/scenarioplatoonai.lua")
 
 --for sorian AI
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 ---@alias PlatoonSquads 'Attack' | 'Artillery' | 'Guard' | 'None' | 'Scout' | 'Support' | 'Unassigned'
 
@@ -247,6 +247,11 @@ Platoon = Class(moho.platoon_methods) {
 
     ---@param self Platoon
     PlatoonDisband = function(self)
+        if self.ArmyPool then
+            WARN('AI WARNING: Platoon trying to disband ArmyPool')
+            --LOG(reprsl(debug.traceback()))
+            return
+        end
         local aiBrain = self:GetBrain()
         if self.BuilderHandle then
             self.BuilderHandle:RemoveHandle(self)
@@ -505,7 +510,7 @@ Platoon = Class(moho.platoon_methods) {
                     end
                 end
 
-                nukePos = import('/lua/ai/aibehaviors.lua').GetHighestThreatClusterLocation(aiBrain, unit)
+                nukePos = import("/lua/ai/aibehaviors.lua").GetHighestThreatClusterLocation(aiBrain, unit)
                 if nukePos then
                    IssueNuke({unit}, nukePos)
                    WaitSeconds(12)
@@ -558,7 +563,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@return nil
     ExperimentalAIHub = function(self)
 
-        local behaviors = import('/lua/ai/AIBehaviors.lua')
+        local behaviors = import("/lua/ai/aibehaviors.lua")
 
         local experimental = self:GetPlatoonUnits()[1]
         if not experimental then
@@ -639,7 +644,7 @@ Platoon = Class(moho.platoon_methods) {
             if bestBase and bestDefense < threshold then
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
 
-                IssueClearCommands(self)
+                IssueClearCommands(self:GetPlatoonUnits())
 
                 if path then
                     local pathLength = table.getn(path)
@@ -1010,8 +1015,7 @@ Platoon = Class(moho.platoon_methods) {
             if moveNext == 'None' then
                 -- this won't be 0... see above
                 WaitSeconds(guardTimer)
-                self:PlatoonDisband()
-                return
+                return self:ReturnToBaseAI()
             end
 
             if moveNext == 'Guard Base' then
@@ -1141,7 +1145,7 @@ Platoon = Class(moho.platoon_methods) {
                 --Can we get there safely?
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 400) --DUNCAN - Increase threatwieght from 100
 
-                IssueClearCommands(self)
+                IssueClearCommands(self:GetPlatoonUnits())
 
                 if path then
                     local pathLength = table.getn(path)
@@ -2181,7 +2185,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         local FactionToIndex  = { UEF = 1, AEON = 2, CYBRAN = 3, SERAPHIM = 4, NOMADS = 5}
-        local factionIndex = cons.FactionIndex or FactionToIndex[eng.factionCategory]
+        local factionIndex = cons.FactionIndex or FactionToIndex[eng.Blueprint.FactionCategory]
 
         buildingTmplFile = import(cons.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
         baseTmplFile = import(cons.BaseTemplateFile or '/lua/BaseTemplates.lua')
@@ -2493,10 +2497,10 @@ Platoon = Class(moho.platoon_methods) {
         self:Stop()
         --LOG('* UnitUpgradeAI: PlatoonName:'..repr(self.BuilderName))
         for k, v in platoonUnits do
-            --LOG('* UnitUpgradeAI: Upgrading unit '..v.UnitId..' ('..v.factionCategory..')')
+            --LOG('* UnitUpgradeAI: Upgrading unit '..v.UnitId..' ('..v.Blueprint.FactionCategory..')')
             local upgradeID
             -- Get the factionindex from the unit to get the right update (in case we have captured this unit from another faction)
-            UnitBeingUpgradeFactionIndex = FactionToIndex[v.factionCategory] or factionIndex
+            UnitBeingUpgradeFactionIndex = FactionToIndex[v.Blueprint.FactionCategory] or factionIndex
             --LOG('* UnitUpgradeAI: UnitBeingUpgradeFactionIndex '..UnitBeingUpgradeFactionIndex)
             if self.PlatoonData.OverideUpgradeBlueprint then
                 local tempUpgradeID = self.PlatoonData.OverideUpgradeBlueprint[UnitBeingUpgradeFactionIndex]
@@ -2526,7 +2530,7 @@ Platoon = Class(moho.platoon_methods) {
                 -- if we can't find a StructureUpgradeTemplate for this unit, warn the programmer
                 if not upgradeID then
                     -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ABC1234
-                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ' .. repr(v.UnitId) .. '  faction: ' .. repr(v.factionCategory) )
+                    WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ' .. repr(v.UnitId) .. '  faction: ' .. repr(v.Blueprint.FactionCategory) )
                 end
             end
             if upgradeID and EntityCategoryContains(categories.STRUCTURE, v) and not v:CanBuild(upgradeID) then
@@ -2538,7 +2542,7 @@ Platoon = Class(moho.platoon_methods) {
             if upgradeID then
                 upgradeIssued = true
                 IssueUpgrade({v}, upgradeID)
-                --LOG('-- Upgrading unit '..v.UnitId..' ('..v.factionCategory..') with '..upgradeID)
+                --LOG('-- Upgrading unit '..v.UnitId..' ('..v.Blueprint.FactionCategory..') with '..upgradeID)
             end
         end
         if not upgradeIssued then
@@ -3074,6 +3078,7 @@ Platoon = Class(moho.platoon_methods) {
         local numberOfUnitsInPlatoon = table.getn(platoonUnits)
         local oldNumberOfUnitsInPlatoon = numberOfUnitsInPlatoon
         local stuckCount = 0
+        local maxPlatoonSize = self.PlatoonData.MaxPlatoonSize or 40
 
         self.PlatoonAttackForce = true
         -- formations have penalty for taking time to form up... not worth it here
@@ -3103,7 +3108,12 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- merge with nearby platoons
-            self:MergeWithNearbyPlatoons('AttackForceAI', 10)
+            if numberOfUnitsInPlatoon < self.PlatoonData.MaxPlatoonSize then
+                self.PlatoonFull = false
+                self:MergeWithNearbyPlatoons('AttackForceAI', 10, maxPlatoonSize)
+            else
+                self.PlatoonFull = true
+            end
 
             -- rebuild formation
             platoonUnits = self:GetPlatoonUnits()
@@ -3243,6 +3253,7 @@ Platoon = Class(moho.platoon_methods) {
         local bestBaseName = ""
         local bestDistSq = 999999999
         local platPos = self:GetPlatoonPosition()
+        local returnPos
 
         for baseName, base in aiBrain.BuilderManagers do
             local distSq = VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3])
@@ -3256,8 +3267,15 @@ Platoon = Class(moho.platoon_methods) {
 
         if bestBase then
             AIAttackUtils.GetMostRestrictiveLayer(self)
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
-            IssueClearCommands(self)
+            if bestBase.FactoryManager.RallyPoint then
+                returnPos = bestBase.FactoryManager.RallyPoint
+            else
+                returnPos = bestBase.Position
+            end
+            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), returnPos, 200)
+            -- remove any formation settings to ensure a quick return to base.
+            self:SetPlatoonFormationOverride('NoFormation')
+            self:Stop()
 
             if path then
                 local pathLength = table.getn(path)
@@ -3265,14 +3283,14 @@ Platoon = Class(moho.platoon_methods) {
                     self:MoveToLocation(path[i], false)
                 end
             end
-            self:MoveToLocation(bestBase.Position, false)
+            self:MoveToLocation(returnPos, false)
 
             local oldDistSq = 0
             while aiBrain:PlatoonExists(self) do
-                WaitSeconds(10)
+                WaitTicks(100)
                 platPos = self:GetPlatoonPosition()
-                local distSq = VDist2Sq(platPos[1], platPos[3], bestBase.Position[1], bestBase.Position[3])
-                if distSq < 10 then
+                local distSq = VDist2Sq(platPos[1], platPos[3], returnPos[1], returnPos[3])
+                if distSq < 100 then
                     self:PlatoonDisband()
                     return
                 end
@@ -3336,7 +3354,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param planName string
     ---@param radius number
     ---@return nil
-    MergeWithNearbyPlatoons = function(self, planName, radius)
+    MergeWithNearbyPlatoons = function(self, planName, radius, maxPlatoonCount)
         -- check to see we're not near an ally base
         local aiBrain = self:GetBrain()
         if not aiBrain then
@@ -3351,6 +3369,18 @@ Platoon = Class(moho.platoon_methods) {
         if not platPos then
             return
         end
+
+        -- Count platoon units so that we have adhere to maximums to avoid platoons that are too big to move correctly
+        local platUnits = self:GetPlatoonUnits()
+        local platCount = 0
+        for _, u in platUnits do
+            if not u.Dead then
+                platCount = platCount + 1
+            end
+        end
+        if (maxPlatoonCount and platCount > maxPlatoonCount) or platCount < 1 then
+            return 
+        end 
 
         local radiusSq = radius*radius
         -- if we're too close to a base, forget it
@@ -3376,13 +3406,21 @@ Platoon = Class(moho.platoon_methods) {
                 continue
             end
 
+            if aPlat.PlatoonFull then
+                continue
+            end
+
             local allyPlatPos = aPlat:GetPlatoonPosition()
             if not allyPlatPos or not aiBrain:PlatoonExists(aPlat) then
                 continue
             end
 
-            AIAttackUtils.GetMostRestrictiveLayer(self)
-            AIAttackUtils.GetMostRestrictiveLayer(aPlat)
+            if not self.MovementLayer then
+                AIAttackUtils.GetMostRestrictiveLayer(self)
+            end
+            if not aPlat.MovementLayer then
+                AIAttackUtils.GetMostRestrictiveLayer(aPlat)
+            end
 
             -- make sure we're the same movement layer type to avoid hamstringing air of amphibious
             if self.MovementLayer != aPlat.MovementLayer then
@@ -3488,19 +3526,19 @@ Platoon = Class(moho.platoon_methods) {
     ---@param eng EngineerBuilder
     SetupEngineerCallbacks = function(eng)
         if eng and not eng.Dead and not eng.BuildDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDone, eng, categories.ALLUNITS)
+            import("/lua/scenariotriggers.lua").CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDone, eng, categories.ALLUNITS)
             eng.BuildDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.CaptureDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDone, eng)
+            import("/lua/scenariotriggers.lua").CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDone, eng)
             eng.CaptureDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.ReclaimDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDone, eng)
+            import("/lua/scenariotriggers.lua").CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDone, eng)
             eng.ReclaimDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.FailedToBuildCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuild, eng)
+            import("/lua/scenariotriggers.lua").CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuild, eng)
             eng.FailedToBuildCallbackSet = true
         end
     end,
@@ -3825,7 +3863,7 @@ Platoon = Class(moho.platoon_methods) {
                     end
                 end
 
-                nukePos = import('/lua/ai/aibehaviors.lua').GetHighestThreatClusterLocation(aiBrain, unit)
+                nukePos = import("/lua/ai/aibehaviors.lua").GetHighestThreatClusterLocation(aiBrain, unit)
                 if nukePos then
                     IssueNuke({unit}, nukePos)
                     WaitSeconds(12)
@@ -3841,7 +3879,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@return nil
     ExperimentalAIHubSorian = function(self)
         local aiBrain = self:GetBrain()
-        local behaviors = import('/lua/ai/AIBehaviors.lua')
+        local behaviors = import("/lua/ai/aibehaviors.lua")
 
         local experimental = self:GetPlatoonUnits()[1]
         if not experimental or experimental.Dead then
@@ -5211,7 +5249,7 @@ Platoon = Class(moho.platoon_methods) {
                 --Can we get there safely?
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 100)
 
-                IssueClearCommands(self)
+                IssueClearCommands(self:GetPlatoonUnits())
 
                 if path then
                     local pathLength = table.getn(path)
@@ -5807,7 +5845,7 @@ Platoon = Class(moho.platoon_methods) {
         if bestBase then
             AIAttackUtils.GetMostRestrictiveLayer(self)
             local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
-            IssueClearCommands(self)
+            IssueClearCommands(self:GetPlatoonUnits())
 
             if path then
                 local pathLength = table.getn(path)
@@ -6004,7 +6042,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         local FactionToIndex  = { UEF = 1, AEON = 2, CYBRAN = 3, SERAPHIM = 4, NOMADS = 5}
-        local factionIndex = cons.FactionIndex or FactionToIndex[eng.factionCategory]
+        local factionIndex = cons.FactionIndex or FactionToIndex[eng.Blueprint.FactionCategory]
 
         if not SUtils.CheckForMapMarkers(aiBrain) and cons.NearMarkerType and (cons.NearMarkerType == 'Rally Point' or
         cons.NearMarkerType == 'Protected Experimental Construction') then
@@ -6298,19 +6336,19 @@ Platoon = Class(moho.platoon_methods) {
     ---@param eng EngineerBuilder
     SetupEngineerCallbacksSorian = function(eng)
         if eng and not eng.Dead and not eng.BuildDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDoneSorian, eng, categories.ALLUNITS)
+            import("/lua/scenariotriggers.lua").CreateUnitBuiltTrigger(eng.PlatoonHandle.EngineerBuildDoneSorian, eng, categories.ALLUNITS)
             eng.BuildDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.CaptureDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDoneSorian, eng)
+            import("/lua/scenariotriggers.lua").CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDoneSorian, eng)
             eng.CaptureDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.ReclaimDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDoneSorian, eng)
+            import("/lua/scenariotriggers.lua").CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDoneSorian, eng)
             eng.ReclaimDoneCallbackSet = true
         end
         if eng and not eng.Dead and not eng.FailedToBuildCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import('/lua/ScenarioTriggers.lua').CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuildSorian, eng)
+            import("/lua/scenariotriggers.lua").CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuildSorian, eng)
             eng.FailedToBuildCallbackSet = true
         end
     end,
@@ -6318,19 +6356,19 @@ Platoon = Class(moho.platoon_methods) {
     ---@param eng EngineerBuilder
     RemoveEngineerCallbacksSorian = function(eng)
         if eng.BuildDoneCallbackSet then
-            import('/lua/ScenarioTriggers.lua')RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerBuildDoneSorian)
+            import("/lua/scenariotriggers.lua")RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerBuildDoneSorian)
             eng.BuildDoneCallbackSet = false
         end
         if eng.CaptureDoneCallbackSet then
-            import('/lua/ScenarioTriggers.lua')RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerCaptureDoneSorian)
+            import("/lua/scenariotriggers.lua")RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerCaptureDoneSorian)
             eng.CaptureDoneCallbackSet = false
         end
         if eng.ReclaimDoneCallbackSet then
-            import('/lua/ScenarioTriggers.lua')RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerReclaimDoneSorian)
+            import("/lua/scenariotriggers.lua")RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerReclaimDoneSorian)
             eng.ReclaimDoneCallbackSet = false
         end
         if eng.FailedToBuildCallbackSet then
-            import('/lua/ScenarioTriggers.lua')RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerFailedToBuildSorian)
+            import("/lua/scenariotriggers.lua")RemoveUnitTrigger(eng, eng.PlatoonHandle.EngineerFailedToBuildSorian)
             eng.FailedToBuildCallbackSet = false
         end
     end,
@@ -6634,7 +6672,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     NameUnitsSorian = function(self)
         local units = self:GetPlatoonUnits()
-        local AINames = import('/lua/AI/sorianlang.lua').AINames
+        local AINames = import("/lua/ai/sorianlang.lua").AINames
         if units and not table.empty(units) then
             for k, v in units do
                 local ID = v.UnitId
@@ -6808,7 +6846,7 @@ Platoon = Class(moho.platoon_methods) {
         -- move over the path, store the commands
         local units = self:GetPlatoonUnits()
 
-        for k = fi1rst, count do
+        for k = 1, count do
             local point = path[k]
             local angle = angles[k]
             local command = IssueFormAggressiveMove(units, point, formation, angle)
@@ -6894,12 +6932,15 @@ Platoon = Class(moho.platoon_methods) {
         -- move over the path, store the commands
         local units = self:GetPlatoonUnits()
 
-        for k = 1, count do
+        for k = 1, count -1 do
             local point = path[k]
             local angle = angles[k]
             local command = IssueFormMove(units, point, formation, angle)
             table.insert(commands, command)
         end
+
+        -- aggressive move for the final path node
+        table.insert(commands, IssueFormAggressiveMove(units, path[count], formation, angles[count]))
 
         return commands
     end,

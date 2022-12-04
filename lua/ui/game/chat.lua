@@ -1,27 +1,27 @@
-local UiUtilsS = import('/lua/UiUtilsSorian.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Checkbox = import('/lua/ui/controls/checkbox.lua').Checkbox
-local Button = import('/lua/maui/button.lua').Button
-local Text = import('/lua/maui/text.lua').Text
-local Edit = import('/lua/maui/edit.lua').Edit
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Window = import('/lua/maui/window.lua').Window
-local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
-local Prefs = import('/lua/user/prefs.lua')
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local UIMain = import('/lua/ui/uimain.lua')
+local UiUtilsS = import("/lua/uiutilssorian.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Checkbox = import("/lua/ui/controls/checkbox.lua").Checkbox
+local Button = import("/lua/maui/button.lua").Button
+local Text = import("/lua/maui/text.lua").Text
+local Edit = import("/lua/maui/edit.lua").Edit
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Window = import("/lua/maui/window.lua").Window
+local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local Prefs = import("/lua/user/prefs.lua")
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local UIMain = import("/lua/ui/uimain.lua")
 --[[ LOC Strings
 <LOC chat_win_0001>To %s:
 <LOC chat_win_0002>Chat (%d - %d of %d lines)
 --]]
 
-local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
+local AddUnicodeCharToEditText = import("/lua/utf.lua").AddUnicodeCharToEditText
 
 local CHAT_INACTIVITY_TIMEOUT = 15  -- in seconds
 local savedParent = false
@@ -29,7 +29,7 @@ local chatHistory = {}
 
 local commandHistory = {}
 
-local ChatTo = import('/lua/lazyvar.lua').Create()
+local ChatTo = import("/lua/lazyvar.lua").Create()
 
 local defOptions = { all_color = 1,
         allies_color = 2,
@@ -49,11 +49,11 @@ for option, value in defOptions do
     end
 end
 
-GUI = import('/lua/ui/controls.lua').Get()
+GUI = import("/lua/ui/controls.lua").Get()
 GUI.chatLines = GUI.chatLines or {}
 
 local FactionsIcon = {}
-local Factions = import('/lua/factions.lua').Factions
+local Factions = import("/lua/factions.lua").Factions
 for k, FactionData in Factions do
     table.insert(FactionsIcon, FactionData.Icon)
 end
@@ -100,7 +100,7 @@ function CreateChatBackground()
 
     bg.RolloverHandler = function(control, event, xControl, yControl, cursor, controlID)
         if bg._lockSize then return end
-        local styles = import('/lua/maui/window.lua').styles
+        local styles = import("/lua/maui/window.lua").styles
         if not bg._sizeLock then
             if event.Type == 'MouseEnter' then
                 if controlMap[controlID] then
@@ -420,12 +420,12 @@ function SetupChatScroll()
                         line.camIcon = Bitmap(line.text, UIUtil.UIFile('/game/camera-btn/pinned_btn_up.dds'))
                         LayoutHelpers.SetDimensions(line.camIcon, 20, 16)
                         LayoutHelpers.AtVerticalCenterIn(line.camIcon, line.teamColor)
-                        LayoutHelpers.AnchorToRightline(line.camIcon, line.name, 4)
-                        LayoutHelpers.AnchorToRightline(line.text, line.camIcon, 4)
+                        LayoutHelpers.RightOf(line.camIcon, line.name, 4)
+                        LayoutHelpers.RightOf(line.text, line.camIcon, 4)
                     elseif not chatHistory[curEntry].camera and line.camIcon then
                         line.camIcon:Destroy()
                         line.camIcon = false
-                        LayoutHelpers.AnchorToRightline(line.text, line.name, 2)
+                        LayoutHelpers.RightOf(line.text, line.name, 2)
                     end
                 else
                     line.name:Disable()
@@ -437,7 +437,7 @@ function SetupChatScroll()
                     if line.camIcon then
                         line.camIcon:Destroy()
                         line.camIcon = false
-                        LayoutHelpers.AnchorToRightline(line.text, line.name, 2)
+                        LayoutHelpers.RightOf(line.text, line.name, 2)
                     end
                 end
                 if chatHistory[curEntry].camera then
@@ -560,7 +560,7 @@ function FindClients(id)
     return result
 end
 
-local RunChatCommand = import('/lua/ui/notify/commands.lua').RunChatCommand
+local RunChatCommand = import("/lua/ui/notify/commands.lua").RunChatCommand
 function CreateChatEdit()
     local parent = GUI.bg:GetClientGroup()
     local group = Group(parent)
@@ -742,7 +742,7 @@ function CreateChatEdit()
             if gnBegin and (gnBegin == 1 and gnEnd == string.len(text)) then
                 return
             end
-            if import('/lua/ui/game/taunt.lua').CheckForAndHandleTaunt(text) then
+            if import("/lua/ui/game/taunt.lua").CheckForAndHandleTaunt(text) then
                 return
             end
 
@@ -826,7 +826,7 @@ function ReceiveChatFromSim(sender, msg)
         return
     end
 
-    if msg.to == 'notify' and not import('/lua/ui/notify/notify.lua').processIncomingMessage(sender, msg) then
+    if msg.to == 'notify' and not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
         return
     end
 
@@ -1068,7 +1068,7 @@ end
 function SetupChatLayout(mapGroup)
     savedParent = mapGroup
     CreateChat()
-    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(ReceiveChat, 'Chat')
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveChat, 'Chat')
 end
 
 function CreateChat()
@@ -1170,7 +1170,7 @@ function CreateChat()
     GUI.bg.OldHandleEvent = GUI.bg.HandleEvent
     GUI.bg.HandleEvent = function(self, event)
         if event.Type == "WheelRotation" and self:IsHidden() then
-            import('/lua/ui/game/worldview.lua').ForwardMouseWheelInput(event)
+            import("/lua/ui/game/worldview.lua").ForwardMouseWheelInput(event)
             return true
         else
             return GUI.bg.OldHandleEvent(self, event)
@@ -1201,7 +1201,7 @@ function RewrapLog()
 end
 
 function WrapText(data)
-    return import('/lua/maui/text.lua').WrapText(data.text,
+    return import("/lua/maui/text.lua").WrapText(data.text,
             function(line)
                 local firstLine = GUI.chatLines[1]
                 if line == 1 then
@@ -1245,7 +1245,7 @@ function CloseChat()
 end
 
 function CreateConfigWindow()
-    import('/lua/ui/game/multifunction.lua').CloseMapDialog()
+    import("/lua/ui/game/multifunction.lua").CloseMapDialog()
     local windowTextures = {
         tl = UIUtil.SkinnableFile('/game/panel/panel_brd_ul.dds'),
         tr = UIUtil.SkinnableFile('/game/panel/panel_brd_ur.dds'),

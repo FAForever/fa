@@ -1,8 +1,8 @@
-local Group = import('/lua/maui/group.lua').Group
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
+local Group = import("/lua/maui/group.lua").Group
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
 --- Base class for popups. A popup appears on top of other UI content, darkens the content behind it,
 -- and draws a standard background behind its content. You'll probably want to extend it to do

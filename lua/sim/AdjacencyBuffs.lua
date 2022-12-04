@@ -17,7 +17,7 @@
 ---| 'T1EnergyStorageBONUS'
 ---| 'T1MassStorageBONUS'
 
-local AdjBuffFuncs = import('/lua/sim/AdjacencyBuffFunctions.lua')
+local AdjBuffFuncs = import("/lua/sim/adjacencybufffunctions.lua")
 
 local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
     T1PowerGenerator={

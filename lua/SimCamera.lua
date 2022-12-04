@@ -10,7 +10,7 @@
 --
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 
-SingleEvent = import('/lua/system/SingleEvent.lua').SingleEvent
+SingleEvent = import("/lua/system/singleevent.lua").SingleEvent
 
 -- Name / Object table for cameras
 Cameras = {}

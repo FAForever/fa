@@ -5,8 +5,8 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
-local SLaanseMissileWeapon = import('/lua/seraphimweapons.lua').SLaanseMissileWeapon
+local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
+local SLaanseMissileWeapon = import("/lua/seraphimweapons.lua").SLaanseMissileWeapon
 
 ---@class XSB2108 : SStructureUnit
 XSB2108 = Class(SStructureUnit) {

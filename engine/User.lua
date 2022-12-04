@@ -601,7 +601,8 @@ end
 function InternalCreateScrollbar(scrollBar, parent, axis)
 end
 
---- For internal use by `Text.__init()`
+--- For internal use by `Text.__init()`. This adds the engine lazyvars
+--- `FontAscent`, `FontDescent`, `FontExternalLeading`, and `TextAdvance`.
 ---@param text Text
 ---@param parent Control
 function InternalCreateText(text, parent)
@@ -810,7 +811,7 @@ function SavePreferences()
 end
 
 --- Select the specified units
----@param units UserUnit[]
+---@param units UserUnit[]?
 function SelectUnits(units)
 end
 

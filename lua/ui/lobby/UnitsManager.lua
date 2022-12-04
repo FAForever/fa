@@ -3,19 +3,19 @@
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
 -- * Summary    : Contains UI for managing unit and enhancement restrictions
 -- ==========================================================================================
-local Mods     = import('/lua/mods.lua')
-local UIUtil   = import('/lua/ui/uiutil.lua')
-local Utils    = import('/lua/system/utils.lua')
-local Tooltip  = import('/lua/ui/game/tooltip.lua')
-local Group    = import('/lua/maui/group.lua').Group
-local Popup    = import('/lua/ui/controls/popups/popup.lua').Popup
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Bitmap   = import('/lua/maui/bitmap.lua').Bitmap
-local Grid     = import('/lua/maui/grid.lua').Grid
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local UnitsAnalyzer   = import('/lua/ui/lobby/UnitsAnalyzer.lua')
-local UnitsRestrictions = import('/lua/ui/lobby/UnitsRestrictions.lua')
+local Mods     = import("/lua/mods.lua")
+local UIUtil   = import("/lua/ui/uiutil.lua")
+local Utils    = import("/lua/system/utils.lua")
+local Tooltip  = import("/lua/ui/game/tooltip.lua")
+local Group    = import("/lua/maui/group.lua").Group
+local Popup    = import("/lua/ui/controls/popups/popup.lua").Popup
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Bitmap   = import("/lua/maui/bitmap.lua").Bitmap
+local Grid     = import("/lua/maui/grid.lua").Grid
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local UnitsAnalyzer   = import("/lua/ui/lobby/unitsanalyzer.lua")
+local UnitsRestrictions = import("/lua/ui/lobby/unitsrestrictions.lua")
 
 -- Stores unit blueprints for all factions
 local blueprints = { All = {}, Original = {}, Modified = {}, Skipped = {} }
@@ -199,7 +199,7 @@ local sortBy = {
     },
 }
 
-local taskNotifier = import('/lua/ui/lobby/TaskNotifier.lua').Create()
+local taskNotifier = import("/lua/ui/lobby/tasknotifier.lua").Create()
 local timer = CreateTimer()
 --==============================================================================
 -- Create a dialog allowing the user to select categories of unit to disable
@@ -280,7 +280,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     taskNotifier.OnProgressCallback = OnBlueprintsProgress
     taskNotifier.OnCompleteCallback = OnBlueprintsLoaded
 
-    import('/lua/ui/lobby/UnitsAnalyzer.lua').FetchBlueprints(Mods.GetGameMods(), false, taskNotifier)
+    import("/lua/ui/lobby/unitsanalyzer.lua").FetchBlueprints(Mods.GetGameMods(), false, taskNotifier)
 
 end
 
@@ -300,7 +300,7 @@ function OnBlueprintsLoaded()
     GUI.progressBar:Hide()
     GUI.progressTxt:Hide()
 
-    blueprints = import('/lua/ui/lobby/UnitsAnalyzer.lua').GetBlueprintsList()
+    blueprints = import("/lua/ui/lobby/unitsanalyzer.lua").GetBlueprintsList()
     local blueprintsCount = table.getsize(blueprints.All)
 
     if blueprintsCount > 0 then
@@ -503,7 +503,7 @@ end
 function CloseDialog()
 
     -- stop loading of blueprints in case they are still loading
-    import('/lua/ui/lobby/UnitsAnalyzer.lua').StopBlueprints()
+    import("/lua/ui/lobby/unitsanalyzer.lua").StopBlueprints()
 
     for id, control in GUI.controls or {} do
         if control then
@@ -586,7 +586,7 @@ function UpdateRestrictionsStats()
     return restrictions.Stats
 end
 
-local UnitsTooltip = import('/lua/ui/lobby/UnitsTooltip.lua')
+local UnitsTooltip = import("/lua/ui/lobby/unitstooltip.lua")
 
 function CreateUnitIcon(parent, bp, faction)
     local colors = {}

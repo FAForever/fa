@@ -6,33 +6,36 @@
 -----------------------------------------------------------------
 
 -- AIBrain Lua Module
-local AIDefaultPlansList = import('/lua/aibrainplans.lua').AIPlansList
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIDefaultPlansList = import("/lua/aibrainplans.lua").AIPlansList
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
-local Utilities = import('/lua/utilities.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Behaviors = import('/lua/ai/aibehaviors.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local Utilities = import("/lua/utilities.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Behaviors = import("/lua/ai/aibehaviors.lua")
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
 
-local FactoryManager = import('/lua/sim/FactoryBuilderManager.lua')
-local PlatoonFormManager = import('/lua/sim/PlatoonFormManager.lua')
-local BrainConditionsMonitor = import('/lua/sim/BrainConditionsMonitor.lua')
-local EngineerManager = import('/lua/sim/EngineerManager.lua')
+local FactoryManager = import("/lua/sim/factorybuildermanager.lua")
+local PlatoonFormManager = import("/lua/sim/platoonformmanager.lua")
+local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
+local EngineerManager = import("/lua/sim/engineermanager.lua")
 
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local StratManager = import('/lua/sim/StrategyManager.lua')
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local StratManager = import("/lua/sim/strategymanager.lua")
 
-local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnership
-local TransferUnfinishedUnitsAfterDeath = import('/lua/SimUtils.lua').TransferUnfinishedUnitsAfterDeath
-local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
+local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
+local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
+local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 
 -- upvalue for performance
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local GetEconomyIncome = moho.aibrain_methods.GetEconomyIncome
+local GetEconomyRequested = moho.aibrain_methods.GetEconomyRequested
+local GetEconomyTrend = moho.aibrain_methods.GetEconomyTrend
 local CategoriesDummyUnit = categories.DUMMYUNIT
 local CoroutineYield = coroutine.yield
 
-local Factions = import('/lua/factions.lua').GetFactions(true)
+local Factions = import("/lua/factions.lua").GetFactions(true)
 
 ---@alias AIResult "defeat"|"draw"|"victor"
 ---@alias HqTech "TECH2"|"TECH3"
@@ -91,6 +94,7 @@ local Factions = import('/lua/factions.lua').GetFactions(true)
 ---@field PBM AiPlatoonBuildManager
 ---@field PingCallbackList table
 ---@field PlatoonNameCounter? table<string, number>
+---@field Radars table<string, Unit[]>
 ---@field RepeatExecution boolean
 ---@field Result? AIResult
 ---@field SelfMonitor AiSelfMonitor
@@ -334,6 +338,14 @@ AIBrain = Class(moho.aibrain_methods) {
             end
         end
 
+        -- keep track of radars
+        self.Radars = { 
+            TECH1 = { },
+            TECH2 = { },
+            TECH3 = { },
+            EXPERIMENTAL = { },
+        }
+
         -- restrict all support factories by default
         AddBuildRestriction(self:GetArmyIndex(), (categories.TECH3 + categories.TECH2) * categories.SUPPORTFACTORY)
 
@@ -510,7 +522,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local function ProtectedOnNoExcessEnergy(unitToProcess)
             unitToProcess:OnNoExcessEnergy()
         end
-        local fabricatorParameters = import('/lua/shared/FabricatorBehaviorParams.lua')
+        local fabricatorParameters = import("/lua/shared/fabricatorbehaviorparams.lua")
         local disableRatio = fabricatorParameters.DisableRatio
         local disableStorage = fabricatorParameters.DisableStorage
         
@@ -525,13 +537,24 @@ AIBrain = Class(moho.aibrain_methods) {
         
         local ok, msg
 
-        local energyRequired
+        
+        -- Instead of creating a new sync table each tick, we'll reuse two tables as a double
+        -- buffer: one table represents the data from the current tick, the other the data last
+        -- synced. We only send the data when one field in the current tick differs from the last
+        -- data synced, and then swap the two tables when that happens. 
         local syncTable = {
             on = 0,
             off = 0,
             totalEnergyConsumed = 0,
             totalEnergyRequired = 0,
-            totalMassProduced = 0
+            totalMassProduced = 0,
+        }
+        local lastSyncTable = {
+            on = 0,
+            off = 0,
+            totalEnergyConsumed = 0,
+            totalEnergyRequired = 0,
+            totalMassProduced = 0,
         }
 
         local EnergyExcessUnitsDisabled = self.EnergyExcessUnitsDisabled
@@ -605,8 +628,17 @@ AIBrain = Class(moho.aibrain_methods) {
                 syncTable.totalEnergyConsumed = self.EnergyExcessConsumed
                 syncTable.totalEnergyRequired = self.EnergyExcessRequired
                 syncTable.totalMassProduced = self.EnergyExcessConverted
-                
-                Sync.MassFabs = syncTable
+                -- only send new data
+                if lastSyncTable.on ~= syncTable.on
+                    or lastSyncTable.off ~= syncTable.off
+                    or lastSyncTable.totalEnergyConsumed ~= syncTable.totalEnergyConsumed
+                    or lastSyncTable.totalEnergyRequired ~= syncTable.totalEnergyRequired
+                    or lastSyncTable.totalMassProduced ~= syncTable.totalMassProduced
+                then
+                    Sync.MassFabs = syncTable
+                    -- swap the data buffers
+                    syncTable, lastSyncTable = lastSyncTable, syncTable
+                end
             end
             CoroutineYield(1)
         end
@@ -845,8 +877,8 @@ AIBrain = Class(moho.aibrain_methods) {
     OnDefeat = function(self)
         self.Status = 'Defeat'
 
-        import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
-        import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
+        import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
+        import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
 
         local function KillArmy()
             local shareOption = ScenarioInfo.Options.Share
@@ -1009,7 +1041,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
 
-            local KillSharedUnits = import('/lua/SimUtils.lua').KillSharedUnits
+            local KillSharedUnits = import("/lua/simutils.lua").KillSharedUnits
 
             -- This part determines the share condition
             if shareOption == 'ShareUntilDeath' then
@@ -1249,9 +1281,9 @@ AIBrain = Class(moho.aibrain_methods) {
             TransferUnitsToHighestBrain(enemies)
         end
 
-        -- Kill all units left over
-        local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-        if tokill then
+       -- Kill all units left over
+       local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+       if tokill then
             for _, unit in tokill do
                 unit:Kill()
             end
@@ -1270,25 +1302,17 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    RecallAllCommanders = function(self, camera)
+    RecallAllCommanders = function(self)
         local commandCat = categories.COMMAND + categories.SUBCOMMANDER
-        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false), camera)
+        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false))
     end;
 
     ---@param self AIBrain
     ---@param recallingUnits Unit[]
-    RecallArmyThread = function(self, recallingUnits, camera)
+    RecallArmyThread = function(self, recallingUnits)
         if recallingUnits then
-            local ScenarioFramework = import("/lua/scenarioframework.lua")
-            -- if camera then
-            --     local cdr = self:GetCommander()
-            --     if cdr then
-            --         ScenarioFramework.EndOperationCamera(cdr, true, 3.5)
-            --     end
-            -- end
-            ScenarioFramework.FakeTeleportUnits(recallingUnits, true)
+            import("/lua/scenarioframework.lua").FakeTeleportUnits(recallingUnits, true)
         end
-        --SPEW("Recalling army brain " .. self.Nickname .. " (" .. (camera and "with camera)" or "no camera)"))
         self:OnRecalled()
     end;
 
@@ -1520,6 +1544,7 @@ AIBrain = Class(moho.aibrain_methods) {
         -- TURNING OFF AI POOL PLATOON, I MAY JUST REMOVE THAT PLATOON FUNCTIONALITY LATER
         local poolPlatoon = self:GetPlatoonUniquelyNamed('ArmyPool')
         if poolPlatoon then
+            poolPlatoon.ArmyPool = true
             poolPlatoon:TurnOffPoolAI()
         end
 
@@ -1531,13 +1556,16 @@ AIBrain = Class(moho.aibrain_methods) {
 
         -- Economy monitor for new skirmish - stores out econ over time to get trend over 10 seconds
         self.EconomyData = {}
-        self.EconomyTicksMonitor = 50
-        self.EconomyCurrentTick = 1
+        self.EconomyOverTimeCurrent = {}
+        self.EconomyTicksMonitor = 300
         self.EconomyMonitorThread = self:ForkThread(self.EconomyMonitor)
         self.LowEnergyMode = false
 
         -- Add default main location and setup the builder managers
         self.NumBases = 0 -- AddBuilderManagers will increase the number
+        
+        -- Set the map center point
+        self.MapCenterPoint = { (ScenarioInfo.size[1] / 2), GetSurfaceHeight((ScenarioInfo.size[1] / 2), (ScenarioInfo.size[2] / 2)) ,(ScenarioInfo.size[2] / 2) }
 
         self.BuilderManagers = {}
         SUtils.AddCustomUnitSupport(self)
@@ -1567,6 +1595,14 @@ AIBrain = Class(moho.aibrain_methods) {
         else
             self.EnemyPickerThread = self:ForkThread(self.PickEnemy)
         end
+        
+        self.IMAPConfig = {
+            OgridRadius = 0,
+            IMAPSize = 0,
+            Rings = 0,
+        }
+
+        self:IMAPConfiguration()
     end,
 
     ---@param self AIBrain
@@ -1913,7 +1949,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupUnderEnergyStatTrigger = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderEnergyThreshold, self, 'SkirmishUnderEnergyThreshold',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderEnergyThreshold, self, 'SkirmishUnderEnergyThreshold',
             {
                 {
                     StatType = 'Economy_Ratio_Energy',
@@ -1927,7 +1963,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupOverEnergyStatTrigger = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverEnergyThreshold, self, 'SkirmishOverEnergyThreshold',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverEnergyThreshold, self, 'SkirmishOverEnergyThreshold',
             {
                 {
                     StatType = 'Economy_Ratio_Energy',
@@ -1941,7 +1977,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupUnderMassStatTrigger = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderMassThreshold, self, 'SkirmishUnderMassThreshold',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderMassThreshold, self, 'SkirmishUnderMassThreshold',
             {
                 {
                     StatType = 'Economy_Ratio_Mass',
@@ -1955,7 +1991,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupOverMassStatTrigger = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverMassThreshold, self, 'SkirmishOverMassThreshold',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverMassThreshold, self, 'SkirmishOverMassThreshold',
             {
                 {
                     StatType = 'Economy_Ratio_Mass',
@@ -2009,48 +2045,117 @@ AIBrain = Class(moho.aibrain_methods) {
     ---Monitors the economy over time for skirmish; allows better trend analysis
     ---@param self AIBrain
     EconomyMonitor = function(self)
-        -- build "eco trend over time" table
-        for i = 1, self.EconomyTicksMonitor do
-            self.EconomyData[i] = { EnergyIncome=0, EnergyRequested=0, MassIncome=0, MassRequested=0 }
-        end
-        -- make counters local (they are not used anywhere else)
-        local EconomyTicksMonitor = self.EconomyTicksMonitor
-        local EconomyCurrentTick = self.EconomyCurrentTick
-        -- loop until the AI is dead
-        while self.Result ~= "defeat" do
-            self.EconomyData[EconomyCurrentTick].EnergyIncome = self:GetEconomyIncome('ENERGY')
-            self.EconomyData[EconomyCurrentTick].MassIncome = self:GetEconomyIncome('MASS')
-            self.EconomyData[EconomyCurrentTick].EnergyRequested = self:GetEconomyRequested('ENERGY')
-            self.EconomyData[EconomyCurrentTick].MassRequested = self:GetEconomyRequested('MASS')
-            -- store eco trend for the last 50 ticks (5 seconds)
-            EconomyCurrentTick = EconomyCurrentTick + 1
-            if EconomyCurrentTick > EconomyTicksMonitor then
-                EconomyCurrentTick = 1
-            end
-            WaitTicks(1)
-        end
-    end,
+        -- This over time thread is based on Sprouto's LOUD AI.
+        self.EconomyData = { ['EnergyIncome'] = {}, ['EnergyRequested'] = {}, ['EnergyStorage'] = {}, ['EnergyTrend'] = {}, ['MassIncome'] = {}, ['MassRequested'] = {}, ['MassStorage'] = {}, ['MassTrend'] = {}, ['Period'] = self.EconomyTicksMonitor }
+        -- number of sample points
+        -- local point
+        local samplerate = 10
+        local samples = self.EconomyData['Period'] / samplerate
 
-    ---@param self AIBrain
-    GetEconomyOverTime = function(self)
+        -- create the table to store the samples
+        for point = 1, samples do
+            self.EconomyData['EnergyIncome'][point] = 0
+            self.EconomyData['EnergyRequested'][point] = 0
+            self.EconomyData['EnergyStorage'][point] = 0
+            self.EconomyData['EnergyTrend'][point] = 0
+            self.EconomyData['MassIncome'][point] = 0
+            self.EconomyData['MassRequested'][point] = 0
+            self.EconomyData['MassStorage'][point] = 0
+            self.EconomyData['MassTrend'][point] = 0
+        end    
+
+        -- array totals
         local eIncome = 0
         local mIncome = 0
         local eRequested = 0
         local mRequested = 0
-        local num = 0
-        for k, v in self.EconomyData do
-            num = k
-            eIncome = eIncome + v.EnergyIncome
-            mIncome = mIncome + v.MassIncome
-            eRequested = eRequested + v.EnergyRequested
-            mRequested = mRequested + v.MassRequested
+        local eStorage = 0
+        local mStorage = 0
+        local eTrend = 0
+        local mTrend = 0
+
+        -- this will be used to multiply the totals
+        -- to arrive at the averages
+        local samplefactor = 1/samples
+
+        local EcoData = self.EconomyData
+
+        local EcoDataEnergyIncome = EcoData['EnergyIncome']
+        local EcoDataMassIncome = EcoData['MassIncome']
+        local EcoDataEnergyRequested = EcoData['EnergyRequested']
+        local EcoDataMassRequested = EcoData['MassRequested']
+        local EcoDataEnergyTrend = EcoData['EnergyTrend']
+        local EcoDataMassTrend = EcoData['MassTrend']
+        local EcoDataEnergyStorage = EcoData['EnergyStorage']
+        local EcoDataMassStorage = EcoData['MassStorage']
+
+        local e,m
+
+        while true do
+
+            for point = 1, samples do
+
+                -- remove this point from the totals
+                eIncome = eIncome - EcoDataEnergyIncome[point]
+                mIncome = mIncome - EcoDataMassIncome[point]
+                eRequested = eRequested - EcoDataEnergyRequested[point]
+                mRequested = mRequested - EcoDataMassRequested[point]
+                eTrend = eTrend - EcoDataEnergyTrend[point]
+                mTrend = mTrend - EcoDataMassTrend[point]
+
+                -- insert the new data --
+                EcoDataEnergyIncome[point] = GetEconomyIncome( self, 'ENERGY')
+                EcoDataMassIncome[point] = GetEconomyIncome( self, 'MASS')
+                EcoDataEnergyRequested[point] = GetEconomyRequested( self, 'ENERGY')
+                EcoDataMassRequested[point] = GetEconomyRequested( self, 'MASS')
+
+                e = GetEconomyTrend( self, 'ENERGY')
+                m = GetEconomyTrend( self, 'MASS')
+
+                if e then
+                    EcoDataEnergyTrend[point] = e
+                else
+                    EcoDataEnergyTrend[point] = 0.1
+                end
+
+                if m then
+                    EcoDataMassTrend[point] = m
+                else
+                    EcoDataMassTrend[point] = 0.1
+                end
+
+                -- add the new data to totals
+                eIncome = eIncome + EcoDataEnergyIncome[point]
+                mIncome = mIncome + EcoDataMassIncome[point]
+                eRequested = eRequested + EcoDataEnergyRequested[point]
+                mRequested = mRequested + EcoDataMassRequested[point]
+                eTrend = eTrend + EcoDataEnergyTrend[point]
+                mTrend = mTrend + EcoDataMassTrend[point]
+
+                -- calculate new OverTime values --
+                self.EconomyOverTimeCurrent.EnergyIncome = eIncome * samplefactor
+                self.EconomyOverTimeCurrent.MassIncome = mIncome * samplefactor
+                self.EconomyOverTimeCurrent.EnergyRequested = eRequested * samplefactor
+                self.EconomyOverTimeCurrent.MassRequested = mRequested * samplefactor
+                self.EconomyOverTimeCurrent.EnergyEfficiencyOverTime = math.min( (eIncome * samplefactor) / (eRequested * samplefactor), 2)
+                self.EconomyOverTimeCurrent.MassEfficiencyOverTime = math.min( (mIncome * samplefactor) / (mRequested * samplefactor), 2)
+                self.EconomyOverTimeCurrent.EnergyTrendOverTime = eTrend * samplefactor
+                self.EconomyOverTimeCurrent.MassTrendOverTime = mTrend * samplefactor
+
+                coroutine.yield(samplerate)
+            end
         end
+    end,
+
+    ---@param self AIBrain
+    ---@return table
+    GetEconomyOverTime = function(self)
 
         local retTable = {}
-        retTable.EnergyIncome = eIncome / num
-        retTable.MassIncome = mIncome / num
-        retTable.EnergyRequested = eRequested / num
-        retTable.MassRequested = mRequested / num
+        retTable.EnergyIncome = self.EconomyOverTimeCurrent.EnergyIncome or 0
+        retTable.MassIncome = self.EconomyOverTimeCurrent.MassIncome or 0
+        retTable.EnergyRequested = self.EconomyOverTimeCurrent.EnergyRequested or 0
+        retTable.MassRequested = self.EconomyOverTimeCurrent.MassRequested or 0
 
         return retTable
     end,
@@ -2058,7 +2163,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param attackDataTable table
     InitializeAttackManager = function(self, attackDataTable)
-        self.AttackManager = import('/lua/AI/attackmanager.lua').AttackManager(self, attackDataTable)
+        self.AttackManager = import("/lua/ai/attackmanager.lua").AttackManager(self, attackDataTable)
         self.AttackData = self.AttackManager
     end,
 
@@ -3564,6 +3669,7 @@ AIBrain = Class(moho.aibrain_methods) {
             PlatoonAlertSounded = false,
         }
         self:ForkThread(self.BaseMonitorThread)
+        self:ForkThread(self.CanPathToCurrentEnemy)
     end,
 
     ---@param self AIBrain
@@ -4020,27 +4126,23 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@return boolean
     GetAllianceEnemy = function(self, strengthTable)
         local returnEnemy = false
-
-        local highStrength = self:GetHighestThreatPosition(2, true, 'Structures', self:GetArmyIndex())
-        for _, v in strengthTable do
+        local myIndex = self:GetArmyIndex()
+        local highStrength = strengthTable[myIndex].Strength
+        for k, v in strengthTable do
             -- It's an enemy, ignore
-            if v.Enemy then
-                continue
-            end
-
-            -- Ally too weak
-            if v.Strength < highStrength then
-                continue
-            end
-
-            -- If the brain has an enemy, it's our new enemy
-            local enemy = v.Brain:GetCurrentEnemy()
-            if enemy and not enemy:IsDefeated() then
-                highStrength = v.Strength
-                returnEnemy = v.Brain:GetCurrentEnemy()
+            if not v.Enemy and not ArmyIsCivilian(k) and v.Brain.Result ~= 'defeat' then
+                -- Ally too weak
+                if v.Strength < highStrength then
+                    continue
+                end
+                -- If the brain has an enemy, it's our new enemy
+                local enemy = v.Brain:GetCurrentEnemy()
+                if enemy and not enemy:IsDefeated() then
+                    highStrength = v.Strength
+                    returnEnemy = v.Brain:GetCurrentEnemy()
+                end
             end
         end
-
         return returnEnemy
     end,
 
@@ -4055,16 +4157,28 @@ AIBrain = Class(moho.aibrain_methods) {
                 Position = false,
                 Brain = v,
             }
+            local armyIndex = v:GetArmyIndex()
             -- Share resources with friends but don't regard their strength
-            if IsAlly(selfIndex, v:GetArmyIndex()) then
+            if IsAlly(selfIndex, armyIndex) then
                 self:SetResourceSharing(true)
                 insertTable.Enemy = false
-            elseif not IsEnemy(selfIndex, v:GetArmyIndex()) then
+            elseif not IsEnemy(selfIndex, armyIndex) then
                 insertTable.Enemy = false
             end
 
-            insertTable.Position, insertTable.Strength = self:GetHighestThreatPosition(2, true, 'Structures', v:GetArmyIndex())
-            armyStrengthTable[v:GetArmyIndex()] = insertTable
+            if insertTable.Enemy then
+                insertTable.Position, insertTable.Strength = self:GetHighestThreatPosition(self.IMAPConfig.Rings, true, 'Structures', armyIndex)
+            else
+                local startX, startZ = v:GetArmyStartPos()
+                local ecoStructures = self:GetUnitsAroundPoint(categories.STRUCTURE * (categories.MASSEXTRACTION + categories.MASSPRODUCTION), {startX, 0 ,startZ}, 120, 'Ally')
+                local ecoThreat = 0
+                for _, v in ecoStructures do
+                    ecoThreat = ecoThreat + v.Blueprint.Defense.EconomyThreatLevel
+                end
+                insertTable.Position = {startX, 0, startZ}
+                insertTable.Strength = ecoThreat
+            end
+            armyStrengthTable[armyIndex] = insertTable
         end
 
         local allyEnemy = self:GetAllianceEnemy(armyStrengthTable)
@@ -4086,28 +4200,22 @@ AIBrain = Class(moho.aibrain_methods) {
                 local enemy = false
 
                 for k, v in armyStrengthTable do
-                    -- Dont' target self
-                    if k == selfIndex then
-                        continue
-                    end
+                    -- Dont' target self and ignore allies
+                    if k ~= selfIndex and v.Enemy and v.Brain.Result ~= 'defeat' then
+                        
+                        -- If we have a better candidate; ignore really weak enemies
+                        if enemy and v.Strength < 20 then
+                            continue
+                        end
 
-                    -- Ignore allies
-                    if not v.Enemy then
-                        continue
-                    end
+                        -- The closer targets are worth more because then we get their mass spots
+                        local distanceWeight = 0.1
+                        local distance = VDist3(self:GetStartVector3f(), v.Position)
+                        local threatWeight = (1 / (distance * distanceWeight)) * v.Strength
 
-                    -- If we have a better candidate; ignore really weak enemies
-                    if enemy and v.Strength < 20 then
-                        continue
-                    end
-
-                    -- The closer targets are worth more because then we get their mass spots
-                    local distanceWeight = 0.1
-                    local distance = VDist3(self:GetStartVector3f(), v.Position)
-                    local threatWeight = (1 / (distance * distanceWeight)) * v.Strength
-
-                    if not enemy or threatWeight > enemyStrength then
-                        enemy = v.Brain
+                        if not enemy or threatWeight > enemyStrength then
+                            enemy = v.Brain
+                        end
                     end
                 end
 
@@ -4739,7 +4847,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupUnderEnergyStatTriggerSorian = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderEnergyThresholdSorian, self, 'SkirmishUnderEnergyThresholdSorian',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderEnergyThresholdSorian, self, 'SkirmishUnderEnergyThresholdSorian',
             {
                 {
                     StatType = 'Economy_Ratio_Energy',
@@ -4753,7 +4861,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupOverEnergyStatTriggerSorian = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverEnergyThresholdSorian, self, 'SkirmishOverEnergyThresholdSorian',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverEnergyThresholdSorian, self, 'SkirmishOverEnergyThresholdSorian',
             {
                 {
                     StatType = 'Economy_Ratio_Energy',
@@ -4767,7 +4875,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupUnderMassStatTriggerSorian = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.UnderMassThresholdSorian, self, 'SkirmishUnderMassThresholdSorian',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderMassThresholdSorian, self, 'SkirmishUnderMassThresholdSorian',
             {
                 {
                     StatType = 'Economy_Ratio_Mass',
@@ -4781,7 +4889,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param threshold number
     SetupOverMassStatTriggerSorian = function(self, threshold)
-        import('/lua/scenariotriggers.lua').CreateArmyStatTrigger(self.OverMassThresholdSorian, self, 'SkirmishOverMassThresholdSorian',
+        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverMassThresholdSorian, self, 'SkirmishOverMassThresholdSorian',
             {
                 {
                     StatType = 'Economy_Ratio_Mass',
@@ -4861,7 +4969,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param cats EntityCategory Unit's category, example: categories.TECH2 .
     ---@param needToBeIdle boolean true/false Unit has to be idle (appears to be not functional).
-    ---@param requireBuilt boolean true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
+    ---@param requireBuilt? boolean true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
     ---@return table 
     GetListOfUnits = function(self, cats, needToBeIdle, requireBuilt)
         -- defaults to false, prevent sending nil
@@ -4889,9 +4997,105 @@ AIBrain = Class(moho.aibrain_methods) {
             end
         end
         return cdr
-    end;
+    end,
+
+    --- Monitors pathing from each AI base to the current enemy start position. Used for determining which movement layers can attack an enemy.
+    ---@param self AIBrain
+    CanPathToCurrentEnemy = function(self)
+        -- Validate Pathing to enemies based on navmesh queries
+        -- Removed from build conditions so it can run on a slower loop
+        -- added amphib vs air results so we can tell when we are trapped on a plateu
+        WaitTicks(Random(5,20))
+        local NavUtils = import("/lua/sim/navutils.lua")
+        if not self.CanPathToEnemy then
+            self.CanPathToEnemy = {}
+        end
+
+        while true do
+            --We are getting the current base position rather than the start position so we can use this for expansions.
+            for k, v in self.BuilderManagers do
+                local locPos = v.Position 
+                -- added this incase the position came back nil
+                local enemyX, enemyZ
+                if self:GetCurrentEnemy() then
+                    enemyX, enemyZ = self:GetCurrentEnemy():GetArmyStartPos()
+                    -- if we don't have an enemy position then we can't search for a path. Return until we have an enemy position
+                    if not enemyX then
+                        WaitTicks(30)
+                        break
+                    end
+                else
+                    WaitTicks(30)
+                    break
+                end
+
+                -- Get the armyindex from the enemy
+                local EnemyIndex = self:GetCurrentEnemy():GetArmyIndex()
+                local OwnIndex = self:GetArmyIndex()
+                -- create a table for the enemy index in case it's nil
+                self.CanPathToEnemy[OwnIndex] = self.CanPathToEnemy[OwnIndex] or {}
+                self.CanPathToEnemy[OwnIndex][EnemyIndex] = self.CanPathToEnemy[OwnIndex][EnemyIndex] or {}
+                -- Check if we have already done a path search to the current enemy
+                if self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Land' then
+                    WaitTicks(5)
+                    continue
+                elseif self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Amphibious' then
+                    WaitTicks(5)
+                    continue
+                elseif self.CanPathToEnemy[OwnIndex][EnemyIndex][k] == 'Air' then
+                    WaitTicks(5)
+                    continue
+                end
+                -- Check land path to current enemy
+                local path, reason = NavUtils.CanPathTo('Land', locPos, {enemyX,0,enemyZ})
+                
+                -- if we have a true path from the nav mesh....
+                if path then
+                    self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Land'
+                else
+                    -- we have no path from the nav mesh....
+                    local amphibPath, amphibReason = NavUtils.CanPathTo('Amphibious', locPos, {enemyX,0,enemyZ})
+                    if not amphibPath then
+                        -- No land or amphib path, we are likely on a plateu and cant go anywhere without transports.
+                        self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Air'
+                    else
+                        self.CanPathToEnemy[OwnIndex][EnemyIndex][k] = 'Amphibious'
+                    end
+                end
+                WaitTicks(5)
+            end
+            WaitTicks(100)
+        end
+    end,
+
+    IMAPConfiguration = function(self)
+        -- Used to configure imap values, used for setting threat ring sizes depending on map size to try and get a somewhat decent radius
+        local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
+
+        if maxmapdimension == 256 then
+            self.IMAPConfig.OgridRadius = 22.5
+            self.IMAPConfig.IMAPSize = 32
+            self.IMAPConfig.Rings = 2
+        elseif maxmapdimension == 512 then
+            self.IMAPConfig.OgridRadius = 22.5
+            self.IMAPConfig.IMAPSize = 32
+            self.IMAPConfig.Rings = 2
+        elseif maxmapdimension == 1024 then
+            self.IMAPConfig.OgridRadius = 45.0
+            self.IMAPConfig.IMAPSize = 64
+            self.IMAPConfig.Rings = 1
+        elseif maxmapdimension == 2048 then
+            self.IMAPConfig.OgridRadius = 89.5
+            self.IMAPConfig.IMAPSize = 128
+            self.IMAPConfig.Rings = 0
+        else
+            self.IMAPConfig.OgridRadius = 180.0
+            self.IMAPConfig.IMAPSize = 256
+            self.IMAPConfig.Rings = 0
+        end
+    end,
 }
 
 -- kept for mod backwards compatibility
-local PCBC = import('/lua/editor/platooncountbuildconditions.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
+local PCBC = import("/lua/editor/platooncountbuildconditions.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")

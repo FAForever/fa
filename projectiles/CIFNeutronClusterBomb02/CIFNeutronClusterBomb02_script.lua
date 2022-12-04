@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-CIFNeutronClusterBomb02 = Class(import('/lua/cybranprojectiles.lua').CNeutronClusterBombChildProjectile) {
+CIFNeutronClusterBomb02 = Class(import("/lua/cybranprojectiles.lua").CNeutronClusterBombChildProjectile) {
 
 }
 

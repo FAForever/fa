@@ -70,8 +70,8 @@
 ---@field PlayableAreaHeight number
 
 
-local OutdatedMaps = import('/etc/faf/mapblacklist.lua').MapBlacklist
-local Utils = import('/lua/system/utils.lua')
+local OutdatedMaps = import("/etc/faf/mapblacklist.lua").MapBlacklist
+local Utils = import("/lua/system/utils.lua")
 
 -- load a scenario based on a scenario file name
 ---@param scenName string

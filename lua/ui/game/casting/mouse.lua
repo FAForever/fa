@@ -23,28 +23,6 @@ for k, client in clients do
     end
 end
 
---- Returns the terrain elevation on the mouse position, hefty function at the moment
----@return number
-local function GetMouseElevation ()
-    if __EngineStats and __EngineStats.Children then
-        for _, a in __EngineStats.Children do
-            if a.Name == 'Camera' then
-                for _, b in a.Children do
-                    if b.Name == 'Cursor' then
-                        for _, c in b.Children do
-                            if c.Name == 'Elevation' then
-                                return c.Value
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    return 0
-end
-
 --- Returns a list of clients that are considered observers
 ---@return number[]
 local function GetObserverClients()
@@ -67,9 +45,9 @@ local function GetObserverClients()
     return observers
 end
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
-local WorldViewManager = import('/lua/ui/game/worldview.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
+local WorldViewManager = import("/lua/ui/game/worldview.lua")
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
 ---@type WorldMesh[]
@@ -215,6 +193,6 @@ if clientCount > playerCount then
     LOG("Sharing is caring!")
     AddOnSyncCallback(SendData, 'SendingCastingMouse')
     AddOnSyncCallback(CleanupData, 'ProcessingCastingMouse')
-    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(ProcessData, 'CastingMouse')
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ProcessData, 'CastingMouse')
     ForkThread(DisplayThread)
 end

@@ -7,7 +7,7 @@
 --
 --    Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AReactonCannonAOEProjectile = import('/lua/aeonprojectiles.lua').AReactonCannonAOEProjectile
+local AReactonCannonAOEProjectile = import("/lua/aeonprojectiles.lua").AReactonCannonAOEProjectile
 
 ADFReactonCannon02 = Class(AReactonCannonAOEProjectile) {}
 TypeClass = ADFReactonCannon02
