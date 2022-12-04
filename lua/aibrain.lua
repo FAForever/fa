@@ -4115,7 +4115,7 @@ AIBrain = Class(moho.aibrain_methods) {
         local highStrength = strengthTable[myIndex].Strength
         for k, v in strengthTable do
             -- It's an enemy, ignore
-            if not v.Enemy and not ArmyIsCivilian(k) and v.Brain.Result ~= 'defeat' then
+            if not v.Enemy and not ArmyIsCivilian(k) and v.Brain.Status ~= 'Defeat' then
                 -- Ally too weak
                 if v.Strength < highStrength then
                     continue
@@ -4186,7 +4186,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
                 for k, v in armyStrengthTable do
                     -- Dont' target self and ignore allies
-                    if k ~= selfIndex and v.Enemy and v.Brain.Result ~= 'defeat' then
+                    if k ~= selfIndex and v.Enemy and v.Brain.Status ~= 'Defeat' then
                         
                         -- If we have a better candidate; ignore really weak enemies
                         if enemy and v.Strength < 20 then
