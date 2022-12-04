@@ -49,16 +49,13 @@ local function LoadModule(module)
         SPEW("Loading module '", name, "'")
     end
 
-     -- make any old data available to the new one while it reloads
-     local oldMod = oldModules[name]
-     if oldMod then
-         moduleinfo.old = oldMod
-     end
+    -- make any old data available to the new one while it reloads
+    local oldMod = oldModules[name]
+    if oldMod then
+        moduleinfo.old = oldMod
+    end
 
-     setmetatable(module, __module_metatable)
-
-    -- add ourselves to prevent loops
-    modules[name] = module
+    setmetatable(module, __module_metatable)
 
     -- try to add content to the environment
     local ok, msg = pcall(doscript, name, module)
@@ -152,7 +149,12 @@ function import(name, isLazy)
             end
             return module2
         end,
+    
     }
+
+    -- add ourselves to prevent loops
+    modules[name] = module
+
     if isLazy then
         setmetatable(module, __lazyimport_metatable)
     else
