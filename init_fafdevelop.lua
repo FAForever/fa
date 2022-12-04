@@ -174,7 +174,7 @@ local function MountAllowedContent(dir, pattern, allowedAssets)
     for _,entry in IoDir(dir .. pattern) do
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
-            if allowedAssets[mp] then 
+            if (not allowedAssets) or allowedAssets[mp] then
                 LOG("mounting content: " .. entry)
                 MountDirectory(dir .. "/" .. entry, '/')
             end
@@ -366,7 +366,7 @@ end
 ---@param modinfo FileName
 ---@return string|nil | false
 local function GetModVersion(modinfo)
-    local handle = io.open(modinfo, 'r')
+    local handle = io.open(modinfo, 'rb')
     if not handle then
         return false -- can't read file
     end
