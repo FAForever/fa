@@ -449,6 +449,7 @@ function OnCommandIssued(command)
     if not command.Clear then
         issuedOneCommand = true
     else
+        --reprsl(command)
         EndCommandMode(true)
     end
 

@@ -76,7 +76,7 @@ local function LoadModule(module)
         error("Error importing '" .. name .. "'", 2)
     end
 
-      -- Once we've imported successfully, stop tracking dependencies. This means that importing from
+    -- Once we've imported successfully, stop tracking dependencies. This means that importing from
     -- within a function will not create a dependency, which is usually what you want. (You can
     -- explicitly set __moduleinfo.track_imports = true to switch tracking back on.)
     moduleinfo.track_imports = false
@@ -98,7 +98,7 @@ local __lazyimport_metatable = {
 }
 
 
---- The global import function used to keep track of modules
+---The global import function used to keep track of modules
 ---@param name FileName path to the module to load
 ---@param isLazy boolean?
 ---@return Module
