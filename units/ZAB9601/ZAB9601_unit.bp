@@ -136,6 +136,7 @@ UnitBlueprint {
                 'Tier2_Arm_Refpoint',
                 'Tier3_Arm_Refpoint',
             },
+        },
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
