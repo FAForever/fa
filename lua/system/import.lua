@@ -69,6 +69,7 @@ local function LoadModule(module)
             onReload(module)
         end
     end
+
     if not ok then
         -- we failed: report back
         modules[name] = nil
@@ -84,7 +85,6 @@ local function LoadModule(module)
 
 end
 
-
 local __lazyimport_metatable = {
     __index = function(tbl, key)
         LoadModule(tbl)
@@ -96,7 +96,6 @@ local __lazyimport_metatable = {
          tbl[key]=val
     end,
 }
-
 
 ---The global import function used to keep track of modules
 ---@param name FileName path to the module to load
@@ -123,7 +122,7 @@ function import(name, isLazy)
         used_by = {},
         track_imports = true,
     }
-    
+
     -- Define a new 'import' function customized for the module, to track import dependencies
     local _import = function(name2, isLazy)
         if name2:sub(1, 1) != '/' then
