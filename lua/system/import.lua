@@ -123,41 +123,36 @@ function import(name, isLazy)
         used_by = {},
         track_imports = true,
     }
+    
+    -- Define a new 'import' function customized for the module, to track import dependencies
+    local _import = function(name2, isLazy)
+        if name2:sub(1, 1) != '/' then
+            name2 = FileCollapsePath(name .. '/../' .. name2)
+        end
+        local module2 = import(name2, isLazy) -- this will use the global import
+        if __modules[name].__moduleinfo.track_imports then
+            module2.__moduleinfo.used_by[name] = true
+        end
+        return module2
+    end
+
     -- set up an environment for the new module
     ---@type Module
-    local module
-    module = {
+    local module = {
         __moduleinfo = moduleinfo,
-        lazyimport = function(name2)
-            if name2:sub(1, 1) != '/' then
-                name2 = FileCollapsePath(name .. '/../' .. name2)
-            end
-            local module2 = import(name2, true) -- this will use the global import
-            if __modules[name].__moduleinfo.track_imports then
-                module2.__moduleinfo.used_by[name] = true
-            end
-            return module2
-        end,
-        -- Define a new 'import' function customized for the module, to track import dependencies
-        import = function(name2)
-            if name2:sub(1, 1) != '/' then
-                name2 = FileCollapsePath(name .. '/../' .. name2)
-            end
-            local module2 = import(name2) -- this will use the global import
-            if __modules[name].__moduleinfo.track_imports then
-                module2.__moduleinfo.used_by[name] = true
-            end
-            return module2
-        end,
-    
+        import = _import,
+        lazyimport = function (name2)
+            return _import(name2, true)
+        end
     }
-
     -- add ourselves to prevent loops
     modules[name] = module
 
     if isLazy then
+        -- make lazy
         setmetatable(module, __lazyimport_metatable)
     else
+        -- load immediately if said so
         LoadModule(module)
     end
     
