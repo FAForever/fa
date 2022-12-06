@@ -458,13 +458,6 @@ Platoon = Class(moho.platoon_methods) {
                 WaitSeconds(7)
                 target = false
                 while not target do
-
-                    --DUNCAN - Commented out
-                    --if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Status == "Defeat" then
-                    --    aiBrain:PickEnemyLogic()
-                    --end
-                    --target = AIUtils.AIFindBrainTargetInRange(aiBrain, self, 'Attack', maxRadius, atkPri, aiBrain:GetCurrentEnemy())
-
                     if not target then
                         target = self:FindPrioritizedUnit('Attack', 'Enemy', true, unit:GetPosition(), maxRadius)
                     end
@@ -2707,7 +2700,7 @@ Platoon = Class(moho.platoon_methods) {
         local movingToScout = false
         while aiBrain:PlatoonExists(self) do
             if not target or target.Dead then
-                if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Status == "Defeat" then
+                if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
                     aiBrain:PickEnemyLogic()
                 end
                 local mult = { 1,10,25 }
@@ -2946,7 +2939,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- pick out the enemy
-            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Status == "Defeat" then
+            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
                 aiBrain:PickEnemyLogic()
             end
 
@@ -3103,7 +3096,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- pick out the enemy
-            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Status == "Defeat" then
+            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
                 aiBrain:PickEnemyLogic()
             end
 
@@ -4278,10 +4271,6 @@ Platoon = Class(moho.platoon_methods) {
                 WaitSeconds(7)
                 target = false
                 while not target do
-                    --if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Status == "Defeat" then
-                    --    aiBrain:PickEnemyLogic()
-                    --end
-
                     target = AIUtils.AIFindBrainTargetInRangeSorian(aiBrain, self, 'Attack', maxRadius, atkPri, true)
                     local newtarget = false
                     if aiBrain.AttackPoints and not table.empty(aiBrain.AttackPoints) then
@@ -4847,7 +4836,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- pick out the enemy
-            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Status == "Defeat" then
+            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
                 aiBrain:PickEnemyLogicSorian()
             end
 
@@ -5651,7 +5640,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- pick out the enemy
-            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Status == "Defeat" then
+            if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
                 aiBrain:PickEnemyLogicSorian()
             end
 
@@ -5913,7 +5902,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
             end
             if not target or target.Dead or not target:GetPosition() then
-                if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy().Status == "Defeat" then
+                if aiBrain:GetCurrentEnemy() and aiBrain:GetCurrentEnemy():IsDefeated() then
                     aiBrain:PickEnemyLogicSorian()
                 end
                 --local mult = { 1,10,25 }
@@ -6659,7 +6648,7 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
         for k,v in ArmyBrains do
-            if v.Status ~= "Defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+            if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
                 local startX, startZ = v:GetArmyStartPos()
                 if VDist2Sq(markerPos[1], markerPos[3], startX, startZ) < baseRadius * baseRadius then
                     return false

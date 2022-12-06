@@ -4116,14 +4116,14 @@ AIBrain = Class(moho.aibrain_methods) {
         local highStrength = strengthTable[myIndex].Strength
         for k, v in strengthTable do
             -- It's an enemy, ignore
-            if not v.Enemy and not ArmyIsCivilian(k) and v.Brain.Status ~= 'Defeat' then
+            if k ~= myIndex and not v.Enemy and not ArmyIsCivilian(k) and not v.Brain:IsDefeated() then
                 -- Ally too weak
                 if v.Strength < highStrength then
                     continue
                 end
                 -- If the brain has an enemy, it's our new enemy
                 local enemy = v.Brain:GetCurrentEnemy()
-                if enemy and not enemy:IsDefeated() then
+                if enemy then
                     highStrength = v.Strength
                     returnEnemy = v.Brain:GetCurrentEnemy()
                 end
@@ -4187,7 +4187,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
                 for k, v in armyStrengthTable do
                     -- Dont' target self and ignore allies
-                    if k ~= selfIndex and v.Enemy and v.Brain.Status ~= 'Defeat' then
+                    if k ~= selfIndex and v.Enemy and not v.Brain:IsDefeated() then
                         
                         -- If we have a better candidate; ignore really weak enemies
                         if enemy and v.Strength < 20 then
