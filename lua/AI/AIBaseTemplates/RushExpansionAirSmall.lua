@@ -20,8 +20,7 @@ BaseBuilderTemplate {
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
-        'EngineerFactoryConstruction',
-        'EngineerFactoryConstructionAirHigherPriority',
+        'EngineerFactoryConstructionExpansion',
         'AirInitialFactoryConstruction',
 
         -- Build Mass low pri at this base

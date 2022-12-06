@@ -33,6 +33,7 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 190,
     Categories = {
+        'NAVAL',
         'PRODUCTFA',
         'SELECTABLE',
         'SERAPHIM',

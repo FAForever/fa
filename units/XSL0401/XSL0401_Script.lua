@@ -80,7 +80,7 @@ XSL0401 = Class(SWalkingLandUnit) {
     end,
 
     DeathThread = function(self, overkillRatio , instigator)
-        local size = self.Size
+        local blueprint = self.Blueprint
         local bigExplosionBones = {'Torso', 'Head', 'pelvis'}
         local explosionBones = {'Right_Arm_B07', 'Right_Arm_B03',
                                 'Left_Arm_B10', 'Left_Arm_B07',
@@ -89,7 +89,7 @@ XSL0401 = Class(SWalkingLandUnit) {
                                 'Left_Leg_B17', 'Left_Leg_B14', 'Left_Leg_B15'}
         
         explosion.CreateDefaultHitExplosionAtBone(self, bigExplosionBones[Random(1, 3)], 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ})
         WaitSeconds(2)
 
         local RandBoneIter = RandomIter(explosionBones)

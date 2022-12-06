@@ -1441,10 +1441,13 @@ end
 ---@param unitCount integer
 ---@return boolean
 function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount)
-    local EnemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
-    local OwnIndex = aiBrain:GetArmyIndex()
-    if aiBrain.CanPathToEnemy[OwnIndex][EnemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
-        --LOG('ForcePathLimit has no path and is equal to or more than '..unitCount..' land factories')
+    local currentEnemy = aiBrain:GetCurrentEnemy()
+    if not currentEnemy then
+        return true
+    end
+    local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    local selfIndex = aiBrain:GetArmyIndex()
+    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
         return false
     end
     return true

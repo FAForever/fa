@@ -26,6 +26,12 @@
 
 --- read more here: https://wiki.faforever.com/en/Blueprints
 ---@class UnitBlueprint: EntityBlueprint
+---@field SizeX number 
+---@field SizeY number
+---@field SizeZ number
+---@field SizeVolume number                 Volume based on SizeX, SizeY and SizeZ
+---@field SizeDamageEffects number          Number of damage effects based on volume
+---@field SizeDamageEffectsScale number     Scale of damage effects based on volume
 ---@field TechCategory 'TECH1' | 'TECH2' | 'TECH3' | 'EXPERIMENTAL'
 ---@field LayerCategory 'LAND' | 'AIR' | 'NAVAL'
 ---@field FactionCategory 'UEF' | 'CYBRAN' | 'AEON' | 'SERAPHIM'
@@ -223,6 +229,7 @@
 ---@field AnimationPermOpen any     The animation that is played when the unit is done building
 ---@field AnimationSurface any      The animation that is played when the unit surfaces.
 ---@field AnimationUpgrade string   The animation that is played when the unit is upgraded
+---@field AnimationUpgradeTable? table<string, string>
 ---@field AnimationWalk string      Animation walk file is linked here: '/units/UnitID/UnitID_??.sca'
 ---@field AnimationWalkRate number  Controls the speed of the animation. Adjusting this number can cause or prevent "skating".
 ---@field BlinkingLights any

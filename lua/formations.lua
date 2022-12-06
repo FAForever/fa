@@ -853,7 +853,7 @@ function GuardFormation(formationUnits)
             remainingShields = remainingShields + 1
         end
 
-        local fs = u.FootPrintSize
+        local fs = u:GetBlueprint().Footprint.SizeMax
         footprintCounts[fs] = (footprintCounts[fs] or 0) + 1
     end
 
