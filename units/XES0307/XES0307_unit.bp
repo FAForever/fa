@@ -243,6 +243,9 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = false,
             Audio = {
@@ -317,6 +320,9 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = false,
             Audio = {
@@ -474,6 +480,7 @@ UnitBlueprint {
             FiringTolerance = 5,
             Label = 'PhalanxGun',
             MaxRadius = 50,
+            MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 100,

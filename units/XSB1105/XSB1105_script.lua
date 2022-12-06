@@ -7,7 +7,7 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SEnergyStorageUnit = import('/lua/seraphimunits.lua').SEnergyStorageUnit
+local SEnergyStorageUnit = import("/lua/seraphimunits.lua").SEnergyStorageUnit
 
 ---@class XSB1105 : SEnergyStorageUnit
 XSB1105 = Class(SEnergyStorageUnit) {

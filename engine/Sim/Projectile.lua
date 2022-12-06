@@ -1,11 +1,7 @@
----@declare-global
+---@meta
+
 ---@class moho.projectile_methods : moho.entity_methods
 local Projectile = {}
-
---- Change the detonate above height for the projectile
----@param height number
-function Projectile:ChangeDetonateAboveHeight(height)
-end
 
 --- Change the detonate above height for the projectile, relative to the terrain
 ---@param height number
@@ -39,7 +35,7 @@ function Projectile:GetCurrentSpeed()
 end
 
 ---
----@return Position
+---@return Vector
 function Projectile:GetCurrentTargetPosition()
 end
 
@@ -118,7 +114,7 @@ function Projectile:SetNewTarget(object)
 end
 
 ---
----@param location Position
+---@param location Vector
 function Projectile:SetNewTargetGround(location)
 end
 

@@ -55,6 +55,7 @@ UnitBlueprint {
         'BOT',
         'OVERLAYDIRECTFIRE',
         'PERSONALSHIELD',
+        'SACU_BEHAVIOR', -- used to get Attack-Move to work properly since the harbinger can reclaim
     },
     CollisionOffsetY = 0,
     Defense = {

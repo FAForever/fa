@@ -1,14 +1,11 @@
----@declare-global
+---@meta
+
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 
 ---
 ---@return boolean
 function UnitWeapon:BeenDestroyed()
-end
-
----@return WeaponBlueprint
-function UnitWeapon:GetBlueprint()
 end
 
 ---
@@ -89,7 +86,7 @@ function UnitWeapon:GetBlueprint()
 end
 
 ---
----@return Entity | Unit | nil
+---@return Blip | Unit | nil
 function UnitWeapon:GetCurrentTarget()
 end
 
@@ -120,7 +117,7 @@ function UnitWeapon:IsFireControl(label)
 end
 
 ---
----@param params BpSoundResult
+---@param params SoundHandle
 function UnitWeapon:PlaySound(params)
 end
 

@@ -1,5 +1,6 @@
----@declare-global
----@class moho.manipulator_methods
+---@meta
+
+---@class moho.manipulator_methods : Destroyable
 local IAniManipulator = {}
 
 ---

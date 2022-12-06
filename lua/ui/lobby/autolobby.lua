@@ -12,13 +12,13 @@
 --* through command line arguments.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
-local gameColors = import('/lua/gameColors.lua').GameColors
-local utils = import('/lua/system/utils.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local LobbyComm = import("/lua/ui/lobby/lobbycomm.lua")
+local gameColors = import("/lua/gamecolors.lua").GameColors
+local utils = import("/lua/system/utils.lua")
 
 local ConnectionStatus = import("/lua/ui/lobby/autolobby-classes.lua").ConnectionStatus
 
@@ -92,7 +92,7 @@ local function MakeLocalPlayerInfo(name)
     local result = LobbyComm.GetDefaultPlayerOptions(name)
     result.Human = true
 
-    local factionData = import('/lua/factions.lua')
+    local factionData = import("/lua/factions.lua")
 
     for index, tbl in factionData.Factions do
         if HasCommandLineArg("/" .. tbl.Key) then
@@ -259,7 +259,7 @@ end
 
 --  LobbyComm Callbacks
 local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-    local LobCreateFunc = import('/lua/ui/lobby/lobbyComm.lua').CreateLobbyComm
+    local LobCreateFunc = import("/lua/ui/lobby/lobbycomm.lua").CreateLobbyComm
     local lob = LobCreateFunc(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     if not lob then
         error('Creating lobby using protocol ' .. repr(protocol) .. ' and port ' .. tostring(localPort) .. ' failed.')

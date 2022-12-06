@@ -1,8 +1,8 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Prefs = import("/lua/user/prefs.lua")
 
 function CreateResourceGroup(parent, groupLabel)
     local group = Group(parent)
@@ -90,11 +90,11 @@ function CreateTextbox(parent, label, bigBG)
 end
 
 function Create(parent)
-    if not import('/lua/ui/game/unitviewDetail.lua').View then
-        import('/lua/ui/game/unitviewDetail.lua').View = Group(parent)
+    if not import("/lua/ui/game/unitviewdetail.lua").View then
+        import("/lua/ui/game/unitviewdetail.lua").View = Group(parent)
     end
 
-    local View = import('/lua/ui/game/unitviewDetail.lua').View
+    local View = import("/lua/ui/game/unitviewdetail.lua").View
 
     if not View.BG then
         View.BG = Bitmap(View)
@@ -164,16 +164,16 @@ function Create(parent)
 end
 
 function SetLayout()
-    local mapGroup = import('/lua/ui/game/unitviewDetail.lua').MapView
-    import('/lua/ui/game/unitviewDetail.lua').ViewState = Prefs.GetOption('uvd_format')
+    local mapGroup = import("/lua/ui/game/unitviewdetail.lua").MapView
+    import("/lua/ui/game/unitviewdetail.lua").ViewState = Prefs.GetOption('uvd_format')
 
     Create(mapGroup)
 
-    local control = import('/lua/ui/game/unitviewDetail.lua').View
+    local control = import("/lua/ui/game/unitviewdetail.lua").View
 
     local OrderGroup = false
     if not SessionIsReplay() then
-        OrderGroup = import('/lua/ui/game/orders.lua').controls.bg
+        OrderGroup = import("/lua/ui/game/orders.lua").controls.bg
     end
 
     LayoutHelpers.AtBottomIn(control, control:GetParent(), 0)

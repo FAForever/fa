@@ -6,11 +6,11 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local Factions = import('/lua/factions.lua').Factions
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local Factions = import("/lua/factions.lua").Factions
 
 MapControls = {}
 
@@ -145,14 +145,14 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
     end
     if mapGroupRight then
         parentForFrame = parent
-        viewLeft = import('/lua/ui/controls/worldview.lua').WorldView(mapGroup, 'WorldCamera', 1, false) -- depth value should be below minimap
+        viewLeft = import("/lua/ui/controls/worldview.lua").WorldView(mapGroup, 'WorldCamera', 1, false) -- depth value should be below minimap
         viewLeft:Register('WorldCamera', nil, '<LOC map_view_0004>Split View Left', 2)
         -- Note: UIRP values need to be a bitwise OR of flags. The lines below originally used the | operator but Travis CI doesn't like it. In these cases + works instead as long as the values never change.
         viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
         LayoutHelpers.FillParent(viewLeft, mapGroup)
         viewLeft:GetsGlobalCameraCommands(true)
 
-        viewRight = import('/lua/ui/controls/worldview.lua').WorldView(mapGroupRight, 'WorldCamera2', 1, false) -- depth value should be below minimap
+        viewRight = import("/lua/ui/controls/worldview.lua").WorldView(mapGroupRight, 'WorldCamera2', 1, false) -- depth value should be below minimap
         viewRight:Register('WorldCamera2', nil, '<LOC map_view_0005>Split View Right', 2)
         viewRight:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
         LayoutHelpers.FillParent(viewRight, mapGroupRight)
@@ -165,7 +165,7 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         view:DisableHitTest()
     else
         parentForFrame = parent
-        viewLeft = import('/lua/ui/controls/worldview.lua').WorldView(mapGroup, 'WorldCamera', 1, false) -- depth value should be below minimap
+        viewLeft = import("/lua/ui/controls/worldview.lua").WorldView(mapGroup, 'WorldCamera', 1, false) -- depth value should be below minimap
         viewLeft:Register('WorldCamera', nil, '<LOC map_view_0006>Main View', 2)
         viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
         LayoutHelpers.FillParent(viewLeft, mapGroup)
@@ -175,7 +175,7 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         view:DisableHitTest()
         LayoutHelpers.FillParent(view, viewLeft)
     end
-    import('/lua/ui/game/multifunction.lua').RefreshMapDialog()
+    import("/lua/ui/game/multifunction.lua").RefreshMapDialog()
 end
 
 -- these two functions will cause the world view to fill the screen or go back to its original settings

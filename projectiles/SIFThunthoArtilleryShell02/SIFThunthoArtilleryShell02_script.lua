@@ -18,7 +18,7 @@ local CreateDecal = CreateDecal
 
 local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 
-local SThunthoArtilleryShell2 = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShell2
+local SThunthoArtilleryShell2 = import("/lua/seraphimprojectiles.lua").SThunthoArtilleryShell2
 
 SIFThunthoArtilleryShell02 = Class(SThunthoArtilleryShell2) { }
 TypeClass = SIFThunthoArtilleryShell02

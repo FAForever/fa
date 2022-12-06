@@ -1,4 +1,3 @@
-
 local Conditions = {
     demoralization = categories.COMMAND,
     domination = categories.STRUCTURE + categories.ENGINEER - categories.WALL,
@@ -20,14 +19,14 @@ end
 
 --- Finds and collectors the brains that are defeated
 ---@param aliveBrains AIBrain[]         # Table of brains that are relevant to check for defeat
----@param condition EntityCategory # Categories to check for units that are required to remain in the game
+---@param condition EntityCategory      # Categories to check for units that are required to remain in the game
 ---@param delay number                  # Delay between each brain to spread the load over various ticks
 ---@return AIBrain[]                    # Table of brains that are considered defeated, can be empty
 local function CollectDefeatedBrains(aliveBrains, condition, delay)
     local defeatedBrains = { }
     for k, brain in aliveBrains do
         local criticalUnits = brain:GetListOfUnits(condition)
-        if criticalUnits then
+        if (not brain:IsDefeated()) and (criticalUnits) then
             -- critical units found, make sure they all exist properly
             local oneCriticalUnitAlive = false
             for _, unit in criticalUnits do
@@ -38,12 +37,12 @@ local function CollectDefeatedBrains(aliveBrains, condition, delay)
             end
 
             -- no critical units alive or finished, brain is defeated
-            if not oneCriticalUnitAlive then 
+            if not oneCriticalUnitAlive then
                 defeatedBrains[k] = brain
             end
 
         -- no critical units found, brain is defeated
-        else 
+        else
             defeatedBrains[k] = brain
         end
 
@@ -83,12 +82,12 @@ local function MatchStateThread()
 
     -- determine game conditions
     local condition = Conditions[ScenarioInfo.Options.Victory]
-    
+
     if not condition then
         if ScenarioInfo.Options.Victory ~= 'sandbox' then
             SPEW("Unknown victory condition supplied: " .. ScenarioInfo.Options.Victory .. ", victory condition defaults to sandbox.")
         end
-        
+
         return
     end
 
@@ -96,7 +95,7 @@ local function MatchStateThread()
     local aliveBrains = { }
     for _, brain in ArmyBrains do
         local index = brain:GetArmyIndex()
-        if not ArmyIsCivilian(index) then
+        if (not ArmyIsCivilian(index)) and (not ArmyIsOutOfGame(index)) then
             aliveBrains[index] = brain
         end
     end
@@ -104,15 +103,13 @@ local function MatchStateThread()
     -- keep scanning the gamestate for changes in alliances and brain state
     while true do
         -- check for defeat
-        local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 4)
+        local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 1)
         local defeatedBrainsCount = table.getsize(defeatedBrains)
         if defeatedBrainsCount > 0 then
 
             -- take into account cascading effects
             local lastDefeatedBrainsCount
-            repeat 
-                WaitTicks(4)
-                
+            repeat
                 lastDefeatedBrainsCount = defeatedBrainsCount
 
                 -- re-compute the defeated brains until it no longer increases
@@ -128,6 +125,7 @@ local function MatchStateThread()
 
                 -- process on defeat logic of brain
                 brain:OnDefeat()
+                SPEW("Matchstate - defeated: " .. brain.Nickname)
 
                 -- communicate to the server that this brain has been defeated
                 table.insert(Sync.GameResult, { k, "defeat -10" })
@@ -139,7 +137,7 @@ local function MatchStateThread()
 
         -- loop through the brains that are still alive to check for alliance differences
 
-        if table.getsize(aliveBrains) > 0 then 
+        if table.getsize(aliveBrains) > 0 then
 
             -- check for draw
             local draw = true
@@ -155,6 +153,7 @@ local function MatchStateThread()
 
                     -- process on draw logic of brain
                     brain:OnDraw()
+                    SPEW("Matchstate - drawed: " .. brain.Nickname)
 
                     -- communicate to the server that this brain has been defeated
                     table.insert(Sync.GameResult, { k, "draw 0" })
@@ -168,7 +167,7 @@ local function MatchStateThread()
             end
 
             -- check for win
-            local win = true 
+            local win = true
             for k, brain in aliveBrains do
                 for l, _ in aliveBrains do
                     if k ~= l then
@@ -177,7 +176,7 @@ local function MatchStateThread()
                 end
             end
 
-            if win then 
+            if win then
                 for k, brain in aliveBrains do
                     -- take the army out of the game, adjust command sources
                     SetArmyOutOfGame(k)
@@ -185,6 +184,7 @@ local function MatchStateThread()
 
                     -- process on draw logic of brain
                     brain:OnVictory()
+                    SPEW("Matchstate - won: " .. brain.Nickname)
 
                     -- communicate to the server that this brain has been defeated
                     table.insert(Sync.GameResult, { k, "victory 10" })
@@ -203,7 +203,7 @@ local function MatchStateThread()
             break
         end
 
-        WaitTicks(10)
+        WaitTicks(4)
     end
 
 end

@@ -5,11 +5,11 @@
 --**
 --**  Summary  :  Ohwalli Strategic Bomb effect script, non-damaging
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-SBOOhwalliBombESIFInainoStrategicMissileEffect01ffect01 = Class(import('/lua/sim/defaultprojectiles.lua').EmitterProjectile) {
+SBOOhwalliBombESIFInainoStrategicMissileEffect01ffect01 = Class(import("/lua/sim/defaultprojectiles.lua").EmitterProjectile) {
 	FxTrails = EffectTemplate.SIFInainoPlumeFxTrails01,
 }
 TypeClass = SIFInainoStrategicMissileEffect01

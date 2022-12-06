@@ -1,7 +1,7 @@
 --
 -- TestProjectile
 --
-local Projectile = import('/lua/sim/Projectile.lua').Projectile
+local Projectile = import("/lua/sim/projectile.lua").Projectile
 
 TestProjectile01 = Class(Projectile)
 {

@@ -8,7 +8,7 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SConstructionUnit = import('/lua/seraphimunits.lua').SConstructionUnit
+local SConstructionUnit = import("/lua/seraphimunits.lua").SConstructionUnit
 
 ---@class XSL0105 : SConstructionUnit
 XSL0105 = Class(SConstructionUnit) {}

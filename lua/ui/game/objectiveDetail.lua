@@ -1,17 +1,17 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Button = import('/lua/maui/button.lua').Button
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Grid = import('/lua/maui/grid.lua').Grid
-local WinMgr = import('/lua/ui/game/windowmanager.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Button = import("/lua/maui/button.lua").Button
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Grid = import("/lua/maui/grid.lua").Grid
+local WinMgr = import("/lua/ui/game/windowmanager.lua")
 
 local WIN_ID = 'Objectives_Log'
-local lobbyoptions = import('/lua/ui/lobby/lobbyOptions.lua')
+local lobbyoptions = import("/lua/ui/lobby/lobbyoptions.lua")
 
-local isCampaign = import('/lua/ui/campaign/campaignmanager.lua').campaignMode
+local isCampaign = import("/lua/ui/campaign/campaignmanager.lua").campaignMode
 local savedParent = false
 local DetailWindow = false
 
@@ -403,7 +403,7 @@ end
 
 function WrapText(intext)
     local textBoxWidth = GUI.detailsContainer.Right() - GUI.detailsContainer.Left()
-    local retText = import('/lua/maui/text.lua').WrapText(intext, textBoxWidth,
+    local retText = import("/lua/maui/text.lua").WrapText(intext, textBoxWidth,
     function(text)
         return GUI.detailEntries[1].Text:GetStringAdvance(text)
     end)
@@ -599,7 +599,7 @@ function Refresh()
     else
         ObjectiveLogData[1] = {type = 'title', title = mapinfo, color = 'ff5fbde9'}
         local mapinfo = SessionGetScenarioInfo()
-        local mapsizes = import('/lua/ui/dialogs/mapselect.lua').mapFilters[2].Options
+        local mapsizes = import("/lua/ui/dialogs/mapselect.lua").mapFilters[2].Options
         local retText = ''
         for i, v in mapsizes do
             if v.key == mapinfo.size[1] then

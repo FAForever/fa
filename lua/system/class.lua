@@ -42,15 +42,15 @@
 -- function: 1DE7E1C0 (BuilderParamCheck, id = 1) = { base instance }
 
 -- It allows us to track a function back to the base instance.
-local Hierarchy = {}
+Hierarchy = {}
 
 --- Debug utilities
 
 local enableDebugging = false
 
-local HierarchyDebugLookup = {}
-local HierarchyDebugLookupCFunctions = {}
-local HierarchyDebugLookupCount = {}
+HierarchyDebugLookup = {}
+HierarchyDebugLookupCFunctions = {}
+HierarchyDebugLookupCount = {}
 
 local function PrintHierarchy()
     -- cache for performance
@@ -117,14 +117,20 @@ local function IsSimpleClass(arg)
     return arg.n == 1 and getmetatable(arg[1]) == emptyMetaTable
 end
 
----@class fa-class: table
+---@class fa-class : function
+---@operator call(...): table
 ---@field __init? fun(self, ...)
 ---@field __post_init? fun(self, ...)
----@field __static_init? fun(self)
+
+---@class State
+
+---@class fa-class-state : fa-class
+---@field __State true
+---@field __StateIdentifier number
 
 --- Prepares the construction of a state, , referring to the paragraphs of text at the top of this file.
 local StateIdentifier = 0
----@generic T: fa-class
+---@generic T: fa-class-state
 ---@param ... T
 ---@return T
 function State(...)
@@ -157,12 +163,12 @@ function State(...)
     end
 end
 
----@overload fun(specs: fa-class): fa-class
 --- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
 ---construct a class
 ---@generic T: fa-class
----@param ... fa-class
----@return fun(specs: T): T
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
 function Class(...)
     -- arg = { 
     --     { 
@@ -176,10 +182,9 @@ function Class(...)
 
     -- Class ({ field=value, field=value, ... })
     if IsSimpleClass(arg) then
-        ---@type fa-class
-        local class = arg[1]
+        local class = arg[1] --[[@as fa-class]]
         setmetatable(class, ClassFactory)
-        return ConstructClass(nil, class)
+        return ConstructClass(nil, class) --[[@as unknown]]
     -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
     else
         local bases = { unpack (arg) }
@@ -429,15 +434,12 @@ ClassFactory = {
 
         -- call class initialisation functions, if they exist
         local initfn = self.__init
+        if initfn then
+            initfn(instance, unpack(arg))
+        end
         local postinitfn = self.__post_init
-        if initfn or postinitfn then
-            if initfn then
-                initfn(instance, unpack(arg))
-            end
-
-            if postinitfn then
-                postinitfn(instance, unpack(arg))
-            end
+        if postinitfn then
+            postinitfn(instance, unpack(arg))
         end
 
         return instance
@@ -447,11 +449,11 @@ ClassFactory = {
 --- Switches up the sate of a class instance by inserting the new state between the instance and its class
 ---@param instance table The current instance we want to switch states for
 ---@param newState State the state we want to insert between the instance and its base class
-function ChangeState(instance, newstate)
+function ChangeState(instance, newState)
 
     -- call on-exit function
     if instance.OnExitState then
-        instance.OnExitState(instance)
+        instance:OnExitState()
     end
 
     -- keep track of the original thread and forget about it inside the object
@@ -462,11 +464,11 @@ function ChangeState(instance, newstate)
     -- - entity
     -- - state      <-- introduced as an intermediate, prevents a lot of duplicated values and tables
     -- - class
-    setmetatable(instance, newstate)
+    setmetatable(instance, newState)
 
     -- call on-enter function
     if instance.OnEnterState then
-        instance.OnEnterState(instance)
+        instance:OnEnterState()
     end
 
     -- start the new main thread if it wasn't already created during an OnEnterState

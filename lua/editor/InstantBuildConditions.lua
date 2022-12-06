@@ -5,17 +5,9 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: PreBuiltBase = BuildCondition  doc = "Please work function docs."
---
--- parameter 0: string   aiBrain         = "default_brain"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@return boolean
 function PreBuiltBase(aiBrain)
     if aiBrain.PreBuilt then
         return true
@@ -24,12 +16,8 @@ function PreBuiltBase(aiBrain)
     end
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: NotPreBuilt = BuildCondition  doc = "Please work function docs."
---
--- parameter 0: string   aiBrain         = "default_brain"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@return boolean
 function NotPreBuilt(aiBrain)
     if not aiBrain.PreBuilt then
         return true
@@ -38,15 +26,11 @@ function NotPreBuilt(aiBrain)
     end
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveEqualToUnitsWithCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: int      numReq     	= 0					doc = "docs for param1"
--- parameter 2: expr   category        = categories.ALLUNITS			doc = "param2 docs"
--- parameter 3: bool   idleReq       = false         doc = "docs for param3"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param numReq integer
+---@param category EntityCategory
+---@param idleReq boolean
+---@return boolean
 function HaveEqualToUnitsWithCategory(aiBrain, numReq, category, idleReq)
     local numUnits
     if not idleReq then
@@ -60,15 +44,11 @@ function HaveEqualToUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveGreaterThanUnitsWithCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string   aiBrain		    = "default_brain"
--- parameter 1: int      numReq     = 0					doc = "docs for param1"
--- parameter 2: expr   category        = categories.ALLUNITS		doc = "param2 docs"
--- parameter 3: expr   idleReq       = false         doc = "docs for param3"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param numReq integer
+---@param category EntityCategory
+---@param idleReq EntityCategory
+---@return boolean
 function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     local numUnits
     if not idleReq then
@@ -82,15 +62,11 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveLessThanUnitsWithCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: int	numReq          = 0				doc = "docs for param1"
--- parameter 2: expr   category        = categories.ALLUNITS		doc = "param2 docs"
--- parameter 3: expr   idleReq       = false         doc = "docs for param3"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param numReq integer
+---@param category EntityCategory
+---@param idleReq EntityCategory
+---@return boolean
 function HaveLessThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     local numUnits
     if not idleReq then
@@ -104,6 +80,8 @@ function HaveLessThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
+---@param aiBrain AIBrain
+---@return boolean
 function BrainNotLowPowerMode(aiBrain)
     if not aiBrain.LowEnergyMode then
         return true
@@ -111,9 +89,17 @@ function BrainNotLowPowerMode(aiBrain)
     return false
 end
 
+---@param aiBrain AIBrain
+---@return boolean
 function BrainNotLowMassMode(aiBrain)
     if not aiBrain.LowMassMode then
         return true
     end
     return false
 end
+
+-- Moved Unused Imports to bottom for mod support
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")

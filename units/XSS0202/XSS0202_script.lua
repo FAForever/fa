@@ -8,8 +8,8 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
-local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit
+local SeraphimWeapons = import("/lua/seraphimweapons.lua")
+local SSeaUnit = import("/lua/seraphimunits.lua").SSeaUnit
 local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
 local SAAOlarisCannonWeapon = SeraphimWeapons.SAAOlarisCannonWeapon
 local SAAShleoCannonWeapon = SeraphimWeapons.SAAShleoCannonWeapon

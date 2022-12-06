@@ -1,26 +1,64 @@
 local parsedPriorities
-local ParseEntityCategoryProperly = import('/lua/sim/CategoryUtils.lua').ParseEntityCategoryProperly
 
---we are loading an arbitrary string that a user can send to us on the sim side.
---in order to not break things, we sanitize the input first before doing anything with it.
-function HandleInputString(inputString)
-    local inputTable = false
-    --we check that its a table by its first character
-    --we also check that it doesnt contain any functions that would have been run, by looking for "("
-    if string.sub(inputString, 1, 1) == "{" and not string.find(inputString,"%(") then
-        --this checks for syntax errors in the string so we can continue onwards.
-        --for some reason the compiling also works out if the categories even exist? well whatever that just makes this work better i guess.
-        if pcall(loadstring("return "..inputString)) then
-            --WARN('would have totally run this string just now: '..inputString)
-            inputTable = loadstring("return "..inputString)()
-            inputTableLimited = categoryLimiter(inputString, "categories.COMMAND")
-        else
-            WARN('Syntax error in target priorities string, was discarded: '..inputString)
+
+local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEntityCategoryProperly
+
+local cachedTablePriorities = { }
+local cachedLimitedTablePriorities = { }
+
+--- We can't serialize categories, therefore the UI sends us a string of categories. We manually
+--- parse the string here into categories. 
+---@param inputString string
+---@return EntityCategory[] | nil
+---@return EntityCategory[] | nil
+function ParseTableOfCategories(inputString)
+
+    local full, limited = nil, nil
+
+    local ok, msg = pcall(
+        function()
+            local categories = StringSplit(inputString, ',')
+
+            for k, category in categories do
+                local clean = category
+                clean = string.gsub(clean, '{', '')
+                clean = string.gsub(clean, '}', '')
+                clean = string.gsub(clean, ' ', '')
+                clean = string.gsub(clean, 'categories.', '')
+                categories[k] = clean
+            end
+
+            full = { }
+            for k, category in categories do
+                if not (category == '') then
+                    local parsed = cachedTablePriorities[category] or ParseEntityCategoryProperly(category)
+                    cachedTablePriorities[category] = parsed
+                    if parsed then
+                        table.insert(full, parsed)
+                    end
+                end
+            end
+
+            -- excludes the use of the COMMAND category, to prevent sniping with Mantis
+            limited = { }
+            for k, category in categories do
+                if not (category == '' or string.find(category, 'COMMAND')) then
+                    local parsed = cachedLimitedTablePriorities[category] or ParseEntityCategoryProperly(string.format('(%s) - COMMAND', category))
+                    cachedLimitedTablePriorities[category] = parsed
+                    if parsed then
+                        table.insert(limited, parsed)
+                    end
+                end
+            end
         end
-    else
-        WARN('Target priorities string contained improper content, so was discarded: '..inputString)
+    )
+
+    if not ok then
+        WARN(msg)
+        WARN(inputString)
     end
-    return inputTable, inputTableLimited
+
+    return full, limited
 end
 
 function SetWeaponPriorities(data)
@@ -40,7 +78,7 @@ function SetWeaponPriorities(data)
     if not selectedUnits[1] then return end
 
     if data.prioritiesTable then
-        prioritiesTable, prioritiesTableLimited = HandleInputString(data.prioritiesTable)
+        prioritiesTable, prioritiesTableLimited = ParseTableOfCategories(data.prioritiesTable)
 
         --this is needed to prevent crashes when there is a mistake in the middle of input string
         --and priTable has such structure: {[1] = userdata: EntityCategory, [2] = empty!, [3] = userdata: EntityCategory}
@@ -184,35 +222,4 @@ function parseDefaultPriorities()
         end
     end
     return finalPriorities
-end
-
-function categoryLimiter(inputStr, filterStr)
-    local priorityStrings = {}
-    local initIndex = 1
-    local modifiedString = ""
-
-    while initIndex do
-        local startIndex, endIndex, priority = string.find(inputStr, "([^,{}]+)", initIndex)
-        if endIndex then
-            initIndex = endIndex + 1
-            local categoryStart, categoryEnd = string.find(priority, filterStr)
-
-            -- exclude priority that contains given category if there is no "-" in front of it.
-            if not categoryStart or string.sub(priority, categoryStart - 1, categoryStart - 1) == "-"
-                                 or string.sub(priority, categoryStart - 2, categoryStart - 2) == "-" then
-                table.insert(priorityStrings, priority)
-            end
-        else
-            initIndex = nil
-        end
-    end
-
-    -- also subtract given category from every priority expression,
-    -- so it's impossible to trick this limiter using combination of allowed categories
-    for k,cat in priorityStrings do
-        modifiedString = modifiedString .. cat .. " - ".. filterStr .. ","
-    end
-    modifiedString = "{"..modifiedString.."}"
-
-    return loadstring("return "..modifiedString)()
 end

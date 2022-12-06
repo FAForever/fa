@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.BuilderArmManipulator : moho.manipulator_methods
 local CBuilderArmManipulator = {}
 
@@ -7,12 +8,6 @@ local CBuilderArmManipulator = {}
 function CBuilderArmManipulator:GetHeadingPitch()
 end
 
----
---  BuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
-function CBuilderArmManipulator:SetAimingArc(minHeading,  maxHeading,  headingMaxSlew,  minPitch,  maxPitch,  pitchMaxSlew)
-end
-
----
 ---@param minHeading number
 ---@param maxHeading number
 ---@param headingMaxSlew number

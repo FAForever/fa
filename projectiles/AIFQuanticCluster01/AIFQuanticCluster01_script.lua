@@ -5,13 +5,13 @@
 --**
 --**  Summary  :  Quantic Cluster Projectile script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
-AIFQuanticCluster01 = Class(import('/lua/aeonprojectiles.lua').AQuantumCluster) {
+AIFQuanticCluster01 = Class(import("/lua/aeonprojectiles.lua").AQuantumCluster) {
 
     OnImpact = function(self, TargetType, TargetEntity)
 

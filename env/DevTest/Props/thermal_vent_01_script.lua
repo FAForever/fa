@@ -1,7 +1,7 @@
 --
 -- Thermal Vent
 --
-local Prop = import('/lua/sim/Prop.lua').Prop
+local Prop = import("/lua/sim/prop.lua").Prop
 
 ThermalVent01 = Class(Prop) {
     OnCreate = function(self)

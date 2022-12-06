@@ -5,16 +5,16 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local AMPlatoonHelperFunctions = import('/lua/editor/AMPlatoonHelperFunctions.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local TriggerFile = import('/lua/scenariotriggers.lua')
-local Buff = import('/lua/sim/Buff.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local AMPlatoonHelperFunctions = import("/lua/editor/amplatoonhelperfunctions.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local TriggerFile = import("/lua/scenariotriggers.lua")
+local Buff = import("/lua/sim/buff.lua")
 
-local BMBC = import('/lua/editor/basemanagerbuildconditions.lua')
-local MIBC = import('/lua/editor/MiscBuildConditions.lua')
+local BMBC = import("/lua/editor/basemanagerbuildconditions.lua")
+local MIBC = import("/lua/editor/miscbuildconditions.lua")
 
 -- Split the platoon into single unit platoons
 function BaseManagerEngineerPlatoonSplit(platoon)
@@ -1275,4 +1275,4 @@ function UnitUpgradeThread(unit)
 end
 
 -- kept for mod compatibility, as they may depend on these
-local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")

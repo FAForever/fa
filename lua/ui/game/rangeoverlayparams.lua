@@ -38,9 +38,9 @@ local glowIntelOver = '10'
 ---@field key string
 ---@field Label string
 ---@field Categories moho.EntityCategory
----@field NormalColor string
----@field SelectColor string
----@field RolloverColor string
+---@field NormalColor Color
+---@field SelectColor Color
+---@field RolloverColor Color
 ---@field Inner number[]
 ---@field Outer number[]
 ---@field Type number

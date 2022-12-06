@@ -1,6 +1,6 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local locations = {
     lefttop = {'AtLeftIn', 'AtTopIn'},
@@ -15,7 +15,7 @@ local locations = {
 }
 
 local controls = {}
-local worldView = import('/lua/ui/game/borders.lua').GetMapGroup()
+local worldView = import("/lua/ui/game/borders.lua").GetMapGroup()
 
 function PrintToScreen(textData)
     if not locations[textData.location] then

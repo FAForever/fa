@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.BoneEntityManipulator : moho.manipulator_methods
 local CBoneEntityManipulator = {}
 

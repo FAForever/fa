@@ -5,14 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- --------------------------------------------------------------
 
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local AIBehaviors = import('/lua/ai/AIBehaviors.lua')
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local UnitTemplates = import("/lua/unittemplates.lua").UnitTemplates
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local AIBehaviors = import("/lua/ai/aibehaviors.lua")
 
 ---@param aiBrain AIBrain
 function AIGetEconomyNumbers(aiBrain)
@@ -34,16 +34,12 @@ function AIGetEconomyNumbers(aiBrain)
     econ.MassStorage = aiBrain:GetEconomyStored('MASS')
 
     if aiBrain.EconomyMonitorThread then
-        local econTime = aiBrain:GetEconomyOverTime()
-
-        econ.EnergyRequestOverTime = econTime.EnergyRequested
-        econ.MassRequestOverTime = econTime.MassRequested
-
-        econ.EnergyIncomeOverTime = SUtils.Round(econTime.EnergyIncome, 2)
-        econ.MassIncomeOverTime = SUtils.Round(econTime.MassIncome, 2)
-
-        econ.EnergyEfficiencyOverTime = math.min(econTime.EnergyIncome / econTime.EnergyRequested, 2)
-        econ.MassEfficiencyOverTime = math.min(econTime.MassIncome / econTime.MassRequested, 2)
+        econ.EnergyRequestOverTime = aiBrain.EconomyOverTimeCurrent.EnergyRequested
+        econ.MassRequestOverTime = aiBrain.EconomyOverTimeCurrent.MassRequested
+        econ.EnergyIncomeOverTime = aiBrain.EconomyOverTimeCurrent.EnergyIncome
+        econ.MassIncomeOverTime = aiBrain.EconomyOverTimeCurrent.MassIncome
+        econ.EnergyEfficiencyOverTime = aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime
+        econ.MassEfficiencyOverTime = aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime
     end
 
     if econ.MassStorageRatio ~= 0 then
@@ -2962,4 +2958,31 @@ function AIFindFurthestExpansionAreaNeedsEngineer(aiBrain, locationType, radius,
     end
 
     return retPos, retName
+end
+
+---@param table pos1
+---@param table pos2
+---@param integer dist
+---@param bool reverse
+---@return table
+function ShiftPosition(pos1, pos2, dist, reverse)
+    --This function will lerp a position in two ways
+    --By default it will shift from pos2 to pos1 at the specified distance    
+    --if the reverse bool is set it will go in the oposite direction e.g towards/away
+    --It is multipurpose, used for simple vector3 lerps and enemy avoidence logic
+    if not pos1 or not pos2 then
+        WARN('*AI WARNING: ShiftPosition missing positions')
+    end
+    local delta
+    if reverse then
+        delta = VDiff(pos1,pos2)
+    else
+        delta = VDiff(pos2,pos1)
+    end
+    local norm = math.max(VDist2(delta[1],delta[3],0,0),1)
+    local x = pos1[1]+dist*delta[1]/norm
+    local z = pos1[3]+dist*delta[3]/norm
+    x = math.min(ScenarioInfo.size[1]-5,math.max(5,x))
+    z = math.min(ScenarioInfo.size[2]-5,math.max(5,z))
+    return {x,GetSurfaceHeight(x,z),z}
 end

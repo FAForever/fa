@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.RotateManipulator : moho.manipulator_methods
 local CRotateManipulator = {}
 

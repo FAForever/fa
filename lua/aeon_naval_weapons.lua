@@ -1,6 +1,7 @@
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 
+---@class ASDCannonOblivionNaval : DefaultProjectileWeapon
 ADFCannonOblivionNaval = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
         '/effects/emitters/oblivion_cannon_naval_01_emit.bp',  -- Stream effect

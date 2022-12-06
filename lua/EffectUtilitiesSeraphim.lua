@@ -1,5 +1,5 @@
 -- imports for functionality
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 -- globals as upvalues for performance
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
@@ -70,7 +70,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
 
     -- do not apply offsets for subs and air units
     local offset = 0
-    if unitBeingBuilt.Cache.HashedCats["HOVER"] then
+    if unitBeingBuilt.Blueprint.CategoriesHash["HOVER"] then
         offset = bp.Elevation or 0
     end
 

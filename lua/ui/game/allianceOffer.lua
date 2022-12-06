@@ -2,13 +2,13 @@
 --* File: lua/modules/ui/game/allianceOffer.lua
 --* Summary: Dialog when an incoming alliance offer is received
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Text = import('/lua/maui/text.lua').Text
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Text = import("/lua/maui/text.lua").Text
 
 local dialog = nil
 local pendingOffers = {}
@@ -22,7 +22,7 @@ local function ShowOffer( query, callback )
     
     local layout = UIUtil.SkinnableFile('/dialogs/diplomacy-team-alliance/diplomacy-team-alliance_layout.lua')
 
-    local worldView = import('/lua/ui/game/worldview.lua').view
+    local worldView = import("/lua/ui/game/worldview.lua").view
     dialog = Bitmap(worldView, UIUtil.SkinnableFile('/dialogs/diplomacy-team-alliance/team-panel_bmp.dds'))
     dialog:SetRenderPass(UIUtil.UIRP_PostGlow)  -- just in case our parent is the map
     dialog:SetName("Alliance Offer")

@@ -2,7 +2,7 @@
 -- Cybran T2 Artillery Projectile : urb2303
 --
 
-local CIFMolecularResonanceShell = import('/lua/cybranprojectiles.lua').CIFMolecularResonanceShell
+local CIFMolecularResonanceShell = import("/lua/cybranprojectiles.lua").CIFMolecularResonanceShell
 CIFMolecularResonanceShell01 = Class(CIFMolecularResonanceShell) {
 	OnImpact = function(self, targetType, targetEntity)       
 		CIFMolecularResonanceShell.OnImpact(self, targetType, targetEntity)  

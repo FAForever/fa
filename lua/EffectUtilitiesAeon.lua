@@ -1,6 +1,6 @@
 -- imports for functionality
-local AeonBuildBeams01 = import('/lua/EffectTemplates.lua').AeonBuildBeams01
-local AeonBuildBeams02 = import('/lua/EffectTemplates.lua').AeonBuildBeams02
+local AeonBuildBeams01 = import("/lua/effecttemplates.lua").AeonBuildBeams01
+local AeonBuildBeams02 = import("/lua/effecttemplates.lua").AeonBuildBeams02
 
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateAttachedEmitter = CreateAttachedEmitter
@@ -61,7 +61,7 @@ end
 --- Creates an Aeon mercury pool build effect
 ---@param unitBeingBuilt Unit Unit to attach mercury pool to
 ---@param army integer
----@param bone string Bone to place pool at
+---@param bone Bone Bone to place pool at
 ---@param sx number Size x of the pool
 ---@param sy number Size y of the pool
 ---@param sz number Size z of the pool
@@ -181,7 +181,7 @@ local function SharedBuildThread(pool, unitBeingBuilt, trash, onStopBeingBuiltTr
     -- -- Determine offset for hover units
     local offset = 0
     local slider = nil
-    if unitBeingBuilt.Cache.HashedCats["HOVER"] then
+    if unitBeingBuilt.Blueprint.CategoriesHash["HOVER"] then
         -- set elevation offset
         offset = unitBeingBuilt.Blueprint.Elevation or 0
         -- create a slider
