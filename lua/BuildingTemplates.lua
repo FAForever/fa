@@ -11,6 +11,10 @@
 ---- Base Templates                       --
 ----------------------------------------------------------------------------------
 
+if not ScenarioInfo.GameHasAIs then
+    WARN("Building templates loaded in a non-ai game from:" .. reprs(debug.traceback()))
+end
+
 BuildingTemplates =
 {
     -- UEF Building List

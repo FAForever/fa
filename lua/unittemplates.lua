@@ -8,6 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+if not ScenarioInfo.GameHasAIs then
+    WARN("Unit templates loaded in a non-ai game:" .. reprs(debug.traceback()))
+end
+
 UnitTemplates =
 {
     -- Earth Unit List

@@ -11,8 +11,9 @@
 -- Base Templates                       --
 --------------------------------------------------------------------------------
 
-SPEW("Base templates loaded")
-reprsl(debug.traceback())
+if not ScenarioInfo.GameHasAIs then
+    WARN("Base templates loaded in a non-ai game: " .. reprs(debug.traceback()))
+end
 
 BaseTemplates =
 {
