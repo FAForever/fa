@@ -1,6 +1,13 @@
 ---@meta
 
 ---@class moho.control_methods : Destroyable
+---@field Left LazyVar<number>
+---@field Width LazyVar<number>
+---@field Right LazyVar<number>
+---@field Top LazyVar<number>
+---@field Height LazyVar<number>
+---@field Bottom LazyVar<number>
+---@field Depth LazyVar<number>
 local CMauiControl = {}
 
 ---
@@ -93,12 +100,13 @@ end
 
 --- Sets the alpha of a given control, if children is true, also set children's alpha
 ---@param alpha number
----@param children boolean
+---@param children? boolean
 function CMauiControl:SetAlpha(alpha, children)
 end
 
 --- Sets the hidden state of the control
-function CMauiControl:SetHidden()
+---@param hidden boolean
+function CMauiControl:SetHidden(hidden)
 end
 
 ---

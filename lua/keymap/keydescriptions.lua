@@ -326,6 +326,7 @@ keyDescriptions = {
     ['select_air_no_transport'] = '<LOC key_desc_0253>Select air but no transports',
     ['select_air_transport'] = '<LOC key_desc_0254>Select only transports',
     ['lock_zoom'] = '<LOC key_desc_0255>Lock the zoom to current level',
+    ['select_naval_no_mobile_sonar'] = 'Select all Naval units without sonar platforms',
 
     -- Hotbuild
     ['builders'] = '<LOC key_desc_0256>build builders (factories, Quantum Gate & T1 engineers)',
