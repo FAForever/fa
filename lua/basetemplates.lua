@@ -10,6 +10,10 @@
 --------------------------------------------------------------------------------
 -- Base Templates                       --
 --------------------------------------------------------------------------------
+
+SPEW("Base templates loaded")
+reprsl(debug.traceback())
+
 BaseTemplates =
 {
 -- UEF BaseTemplates Building List
