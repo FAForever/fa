@@ -9,10 +9,9 @@
 --****************************************************************************
 
 local BaseTmplFile = lazyimport("/lua/basetemplates.lua")
-local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local StructureTemplates = lazyimport("/lua/buildingtemplates.lua")
 local Utils = import("/lua/utilities.lua")
 local AIUtils = import("/lua/ai/aiutilities.lua")
-local RebuildStructuresTemplate = import("/lua/buildingtemplates.lua").RebuildStructuresTemplate
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 local aiEconomy
@@ -639,7 +638,7 @@ function CreateBuildingTemplate(brain, army, name)
         LOG('*ERROR AIBUILDSTRUCTURES - Group: ', repr(name), ' not found for Army: ', repr(army))
     else
         for i,unit in tblUnit do
-            for k, unitId in RebuildStructuresTemplate[factionIndex] do
+            for k, unitId in StructureTemplates.RebuildStructuresTemplate[factionIndex] do
                 if unit.type == unitId[1] then
                     unit.buildtype = unitId[2]
                     break
@@ -650,7 +649,7 @@ function CreateBuildingTemplate(brain, army, name)
             end
         end
         for i, unit in tblUnit do
-            for j,buildList in BuildingTemplates[factionIndex] do
+            for j,buildList in StructureTemplates.BuildingTemplates[factionIndex] do
                 local unitPos = { unit.Position[1], unit.Position[3], 0 }
                 if unit.buildtype == buildList[2] and buildList[1] ~= 'T3Sonar' then
                     local inserted = false
@@ -690,7 +689,7 @@ function AppendBuildingTemplate(brain, army, name, templateName)
     else
         -- Convert building to the proper type to be built if needed (ex: T2 and T3 factories to T1)
         for i,unit in tblUnit do
-            for k, unitId in RebuildStructuresTemplate[factionIndex] do
+            for k, unitId in StructureTemplates.RebuildStructuresTemplate[factionIndex] do
                 if unit.type == unitId[1] then
                     unit.buildtype = unitId[2]
                     break
@@ -701,7 +700,7 @@ function AppendBuildingTemplate(brain, army, name, templateName)
             end
         end
         for i, unit in tblUnit do
-            for j,buildList in BuildingTemplates[factionIndex] do -- buildList[1] is type ("T1LandFactory"); buildList[2] is unitId (ueb0101)
+            for j,buildList in StructureTemplates.BuildingTemplates[factionIndex] do -- buildList[1] is type ("T1LandFactory"); buildList[2] is unitId (ueb0101)
                 local unitPos = { unit.Position[1], unit.Position[3], 0 }
                 if unit.buildtype == buildList[2] and buildList[1] ~= 'T3Sonar' then -- if unit to be built is the same id as the buildList unit it needs to be added
                     local inserted = false
@@ -738,7 +737,7 @@ end
 
 function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTemplate)
     if not buildingTemplate then
-        buildingTemplate = BuildingTemplates[aiBrain:GetFactionIndex()]
+        buildingTemplate = StructureTemplates.BuildingTemplates[aiBrain:GetFactionIndex()]
     end
     for k,v in brainBaseTemplate.List do
         if builder:CanBuild(v.StructureCategory) then

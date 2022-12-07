@@ -8,14 +8,10 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
-local UnitTemplates = import("/lua/unittemplates.lua").UnitTemplates
+
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local AIUtils = import("/lua/ai/aiutilities.lua")
-
---for sorian ai
 local SUtils = import("/lua/ai/sorianutilities.lua")
---end sorian ai import
 
 -- types of threat to look at based on composition of platoon
 local ThreatTable =
