@@ -13,8 +13,7 @@
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local Utilities = import("/lua/utilities.lua")
 local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
-local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
-local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local UpgradeTemplates = lazyimport("/lua/upgradetemplates.lua")
 local Behaviors = import("/lua/ai/aibehaviors.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
@@ -2512,14 +2511,14 @@ Platoon = Class(moho.platoon_methods) {
                 end
             end
             if not upgradeID and EntityCategoryContains(categories.MOBILE, v) then
-                upgradeID = aiBrain:FindUpgradeBP(v.UnitId, UnitUpgradeTemplates[UnitBeingUpgradeFactionIndex])
+                upgradeID = aiBrain:FindUpgradeBP(v.UnitId, UpgradeTemplates.UpgradeTemplates[UnitBeingUpgradeFactionIndex])
                 -- if we can't find a UnitUpgradeTemplate for this unit, warn the programmer
                 if not upgradeID then
                     -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: Can\'t find UnitUpgradeTemplate for mobile unit: ABC1234
                     WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *UnitUpgradeAI ERROR: Can\'t find UnitUpgradeTemplate for mobile unit: ' .. repr(v.UnitId) )
                 end
             elseif not upgradeID then
-                upgradeID = aiBrain:FindUpgradeBP(v.UnitId, StructureUpgradeTemplates[UnitBeingUpgradeFactionIndex])
+                upgradeID = aiBrain:FindUpgradeBP(v.UnitId, UpgradeTemplates.StructureUpgradeTemplates[UnitBeingUpgradeFactionIndex])
                 -- if we can't find a StructureUpgradeTemplate for this unit, warn the programmer
                 if not upgradeID then
                     -- Output: WARNING: [platoon.lua, line:xxx] *UnitUpgradeAI ERROR: Can\'t find StructureUpgradeTemplate for structure: ABC1234

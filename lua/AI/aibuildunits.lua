@@ -84,5 +84,3 @@ end
 
 --- used for backwards compatibility
 local Utils = import("/lua/utilities.lua")
-local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
-local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
