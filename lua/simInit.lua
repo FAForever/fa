@@ -258,8 +258,7 @@ end
 -- the initial units and any other gameplay state we need.
 function BeginSession()
 
-    SPEW('Active mods in sim: ', repr(__active_mods))
-
+    -- imported for side effects
     import("/lua/sim/matchstate.lua")
     import("/lua/sim/markerutilities.lua")
 
@@ -288,9 +287,8 @@ function BeginSession()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
         LocGlobals.PlayerName = ArmyBrains[focusarmy].Nickname
     end
-    
-    -- add on game over callbacks
 
+    -- add on game over callbacks
     ForkThread(function()
         while not IsGameOver() do
             WaitTicks(1)
@@ -359,7 +357,6 @@ end
 
 --- Setup for team manangement
 function BeginSessionTeams()
-
     -- Look for teams
     local teams = {}
     for name,army in ScenarioInfo.ArmySetup do

@@ -1,6 +1,4 @@
 
-LOG("HAH!")
-
 --[[                                                                           ]]--
 --[[  Automatically generated code (do not edit)                               ]]--
 --[[                                                                           ]]--
