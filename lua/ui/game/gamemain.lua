@@ -16,6 +16,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Movie = import("/lua/maui/movie.lua").Movie
 local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
+local CM =  lazyimport("/lua/ui/game/commandmode.lua")
 
 local controls = import("/lua/ui/controls.lua").Get()
 
@@ -39,7 +40,7 @@ local lastObserving
 local ignoreSelection = false
 function SetIgnoreSelection(ignore)
     ignoreSelection = ignore
-    import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(ignore)
+    CM.SetIgnoreSelection(ignore)
 end
 
 -- generating hotbuild modifier shortcuts on the fly
@@ -57,9 +58,6 @@ end
 gameUIHidden = false
 PostScoreVideo = false
 IsSavedGame = false
-
--- Lobby options as set by the host in the lobby
-LobbyOptions = false
 
 -- The focus army as set at the start of the game. Allows us to detect whether someone was originally an observer or a player
 OriginalFocusArmy = -1
@@ -672,7 +670,6 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
         -- if something died in selection, restore command mode
         if n > 0 and not table.empty(removed) and table.empty(added) then
-            local CM = import("/lua/ui/game/commandmode.lua")
             local mode, data = unpack(CM.GetCommandMode())
 
             if mode then

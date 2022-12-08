@@ -7,6 +7,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+if not ScenarioInfo.GameHasAIs then
+    WARN("SorianAirAttackBuilders loaded in a non-ai game from:" .. reprs(debug.traceback()))
+end
+
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
@@ -376,7 +380,7 @@ BuilderGroup {
             { SBC, 'NoRushTimeCheck', { 600 }},
             { UCBC, 'HaveLessThanUnitsWithCategory', { 10, categories.AIR * categories.ANTINAVY * categories.TECH2 } },
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.AIR * categories.TECH2 } },
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Naval' } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Naval', 10 } },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 5, 'FACTORY TECH3' }},
         },
     },
@@ -576,7 +580,7 @@ BuilderGroup {
             { SBC, 'NoRushTimeCheck', { 600 }},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.AIR * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.85, 1.05 }},
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Naval' } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Naval', 10 } },
         },
     }
 }

@@ -35,10 +35,73 @@ __module_metatable = {
 -- these values can be adjusted by hooking into this file
 local informDevOfLoad = false
 
---- The global import function used to keep track of modules
----@param name FileName path to the module to load
+---Load a module
+---@param module Module
 ---@return Module
-function import(name)
+local function LoadModule(module)
+    local modules = __modules
+
+    local moduleinfo = module.__moduleinfo
+    local name = moduleinfo.name
+
+    -- inform the devs that we're loading this module for the first time
+    if informDevOfLoad then
+        SPEW("Loading module '", name, "'")
+    end
+
+    -- make any old data available to the new one while it reloads
+    local oldMod = oldModules[name]
+    if oldMod then
+        moduleinfo.old = oldMod
+    end
+
+    setmetatable(module, __module_metatable)
+
+    -- try to add content to the environment
+    local ok, msg = pcall(doscript, name, module)
+    if oldMod then
+        -- now clear the old module
+        oldModules[name] = nil
+        moduleinfo.old = nil
+        -- let the old module load data into the new one, if they'd prefer to do it that way
+        local onReload = oldMod.__moduleinfo.OnReload
+        if onReload then
+            onReload(module)
+        end
+    end
+
+    if not ok then
+        -- we failed: report back
+        modules[name] = nil
+        WARN(msg)
+        error("Error importing '" .. name .. "'", 2)
+    end
+
+    -- Once we've imported successfully, stop tracking dependencies. This means that importing from
+    -- within a function will not create a dependency, which is usually what you want. (You can
+    -- explicitly set __moduleinfo.track_imports = true to switch tracking back on.)
+    moduleinfo.track_imports = false
+    return module
+
+end
+
+local __lazyimport_metatable = {
+    __index = function(tbl, key)
+        LoadModule(tbl)
+        return tbl[key]
+    end,
+
+    __newindex = function(tbl, key, val)
+        LoadModule(tbl)
+         tbl[key]=val
+    end,
+}
+
+---The global import function used to keep track of modules
+---@param name FileName path to the module to load
+---@param isLazy boolean?
+---@return Module
+function import(name, isLazy)
     local modules = __modules -- global to local
 
     -- attempt to find the module without lowering the string
@@ -53,75 +116,54 @@ function import(name)
     if existing then
         return existing
     end
-
-    -- inform the devs that we're loading this module for the first time
-    if informDevOfLoad then
-        SPEW("Loading module '", name, "'")
-    end
-
     ---@type ModuleInfo
     local moduleinfo = {
         name = name,
         used_by = {},
         track_imports = true,
     }
-    -- make any old data available to the new one while it reloads
-    local oldMod = oldModules[name]
-    if oldMod then
-        moduleinfo.old = oldMod
+
+    -- Define a new 'import' function customized for the module, to track import dependencies
+    local _import = function(name2, isLazy)
+        if name2:sub(1, 1) != '/' then
+            name2 = FileCollapsePath(name .. '/../' .. name2)
+        end
+        local module2 = import(name2, isLazy) -- this will use the global import
+        if __modules[name].__moduleinfo.track_imports then
+            module2.__moduleinfo.used_by[name] = true
+        end
+        return module2
     end
 
     -- set up an environment for the new module
     ---@type Module
-    local module
-    module = {
+    local module = {
         __moduleinfo = moduleinfo,
-
-        -- Define a new 'import' function customized for the module, to track import dependencies
-        import = function(name2)
-            if name2:sub(1, 1) != '/' then
-                name2 = FileCollapsePath(name .. '/../' .. name2)
-            end
-            local module2 = import(name2) -- this will use the global import
-            if __modules[name].__moduleinfo.track_imports then
-                module2.__moduleinfo.used_by[name] = true
-            end
-            return module2
-        end,
+        import = _import,
+        lazyimport = function (name2)
+            return _import(name2, true)
+        end
     }
-
-    -- set the meta table so that if it can't find an index it searches in _G
-    setmetatable(module, __module_metatable)
-
     -- add ourselves to prevent loops
     modules[name] = module
 
-    -- try to add content to the environment
-    local ok, msg = pcall(doscript, name, module)
-    if oldMod then
-        -- now clear the old module
-        oldModules[name] = nil
-        moduleinfo.old = nil
-        -- let the old module load data into the new one, if they'd prefer to do it that way
-        local onReload = oldMod.__moduleinfo.OnReload
-        if onReload then
-            onReload(module)
-        end
+    if isLazy then
+        -- make lazy
+        setmetatable(module, __lazyimport_metatable)
+    else
+        -- load immediately if said so
+        LoadModule(module)
     end
-    if not ok then
-        -- we failed: report back
-        modules[name] = nil
-        WARN(msg)
-        error("Error importing '" .. name .. "'", 2)
-    end
-
-    -- Once we've imported successfully, stop tracking dependencies. This means that importing from
-    -- within a function will not create a dependency, which is usually what you want. (You can
-    -- explicitly set __moduleinfo.track_imports = true to switch tracking back on.)
-    moduleinfo.track_imports = false
+    
     return module
 end
 
+---Returns the lazy module instance which is gonna be loaded when being indexed
+---@param name FileName
+---@return Module
+function lazyimport(name)
+    return import(name, true)
+end
 
 -- Clear out a module from the table of loaded modules, so that on the next import attempt it will
 -- get reloaded from scratch

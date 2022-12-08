@@ -77,6 +77,10 @@ UnitBlueprint {
         },
         AnimationBuild = '/units/urb0101/urb0101_abuild.sca',
         AnimationUpgrade = '/units/urb0101/urb0101_aopen.sca',
+        AnimationUpgradeTable = {
+            urb0201 = '/units/urb0101/urb0101_aopen.sca',
+            zrb9501 = '/units/urb0101/urb0101_aopen_sup.sca'
+        },
         BuildAttachBone = 'Attachpoint',
         Mesh = {
             IconFadeInZoom = 130,

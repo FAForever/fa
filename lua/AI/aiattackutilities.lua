@@ -8,14 +8,10 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
-local UnitTemplates = import("/lua/unittemplates.lua").UnitTemplates
+
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local AIUtils = import("/lua/ai/aiutilities.lua")
-
---for sorian ai
 local SUtils = import("/lua/ai/sorianutilities.lua")
---end sorian ai import
 
 -- types of threat to look at based on composition of platoon
 local ThreatTable =
@@ -203,9 +199,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
     -- is less than this level, then just outright ignore it as a threat
     local IgnoreThreatLessThan = 15
     -- if the platoon is stronger than this threat level, then ignore weaker targets if the platoon is stronger
-    -- by the given ratio
     local IgnoreWeakerTargetsIfStrongerThan = 20
-    local IgnoreWeakerTargetsRatio = 5
 
     -- When evaluating threat, how many rings in the threat grid do we look at
     local EnemyThreatRings = 1
@@ -237,7 +231,6 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
         SecondaryTargetThreatType = SecondaryTargetThreatType or ThreatWeights.SecondaryTargetThreatType
         IgnoreCommanderStrength = IgnoreCommanderStrength or ThreatWeights.IgnoreCommanderStrength
         IgnoreWeakerTargetsIfStrongerThan = ThreatWeights.IgnoreWeakerTargetsIfStrongerThan or IgnoreWeakerTargetsIfStrongerThan
-        IgnoreWeakerTargetsRatio = ThreatWeights.IgnoreWeakerTargetsRatio or IgnoreWeakerTargetsRatio
         IgnoreThreatLessThan = ThreatWeights.IgnoreThreatLessThan or IgnoreThreatLessThan
         PrimaryTargetThreatType = ThreatWeights.PrimaryTargetThreatType or PrimaryTargetThreatType
         SecondaryTargetThreatType = ThreatWeights.SecondaryTargetThreatType or SecondaryTargetThreatType
@@ -355,7 +348,6 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
         if myThreat <= IgnoreStrongerTargetsIfWeakerThan
                 and (myThreat == 0 or enemyThreat / (myThreat + friendlyThreat) > IgnoreStrongerTargetsRatio)
                 and unitCapRatio < IgnoreStrongerUnitCap then
-            --LOG('*AI DEBUG: Skipping threat')
             continue
         end
 
@@ -364,7 +356,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
             threat[3] = threat[3] + threatDiff * WeakAttackThreatWeight
         else
             -- ignore overall threats that are really low, otherwise we want to defeat the enemy wherever they are
-            if (baseThreat <= IgnoreThreatLessThan) or (myThreat >= IgnoreWeakerTargetsIfStrongerThan and (enemyThreat == 0 or myThreat / enemyThreat > IgnoreWeakerTargetsRatio)) then
+            if (baseThreat <= IgnoreThreatLessThan) then
                 continue
             end
             threat[3] = threat[3] + threatDiff * StrongAttackThreatWeight

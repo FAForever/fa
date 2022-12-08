@@ -7,6 +7,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+if not ScenarioInfo.GameHasAIs then
+    WARN("SorianStrategyBuilders loaded in a non-ai game from:" .. reprs(debug.traceback()))
+end
+
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
@@ -26,8 +30,7 @@ local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local Behaviors = import("/lua/ai/aibehaviors.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
-local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
-local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local UpgradeTemplates = lazyimport("/lua/upgradetemplates.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 
 local econThread
@@ -50,9 +53,9 @@ function EconWatch(aiBrain)
                 if unit.Dead then continue end
                 local upgradeID
                 if EntityCategoryContains(categories.MOBILE, unit) then
-                    upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, UnitUpgradeTemplates[factionIndex])
+                    upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, UpgradeTemplates.UnitUpgradeTemplates[factionIndex])
                 else
-                    upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, StructureUpgradeTemplates[factionIndex])
+                    upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, UpgradeTemplates.StructureUpgradeTemplates[factionIndex])
                 end
                 if upgradeID and EntityCategoryContains(categories.STRUCTURE, unit) and not unit:CanBuild(upgradeID) then
                     continue
@@ -867,9 +870,9 @@ BuilderGroup {
             local enemies = 0
             local allies = 0
             for k,v in ArmyBrains do
-                if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+                if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
                     enemies = enemies + 1
-                elseif v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+                elseif not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
                     allies = allies + 1
                 end
             end

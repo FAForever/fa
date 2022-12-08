@@ -911,7 +911,7 @@ function SetupOptionsPanel(parent, curOptions)
                 end
                 --
                 if optData.default then realDefValue = optData.default end
-                line.combo:AddItems(itemArray, defValue, realDefValue, true) -- For all (true for enable (default) label)
+                line.combo:AddItems(itemArray, defValue, realDefValue)
                 line.combo.OnClick = function(self, index, text)
                     local value = optData.values[index].key
                     if value == nil then value = optData.values[index] end

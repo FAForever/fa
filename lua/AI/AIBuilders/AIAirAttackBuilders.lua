@@ -7,6 +7,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+if not ScenarioInfo.GameHasAIs then
+    WARN("AIAirAttackBuilders loaded in a non-ai game from:" .. reprs(debug.traceback()))
+end
+
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
@@ -208,7 +212,7 @@ BuilderGroup {
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Naval' } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Naval', 10 } },
         },
     },
 }
@@ -306,7 +310,7 @@ BuilderGroup {
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Naval' } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Naval', 10 } },
         },
     }
 }
