@@ -176,6 +176,12 @@ function CacheCommandMode()
     cachedModeData = modeData
 end
 
+function CacheAndClearCommandMode()
+    CacheCommandMode()
+    commandMode = false
+    modeData = false
+end
+
 --- Restores the cached command mode
 function RestoreCommandMode()
     if cachedCommandMode and cachedModeData then 
