@@ -18,136 +18,135 @@ local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
 
 function CreateUI()
 
-	local opTable = {
-		{ 'X1CA_TUT', 'X1CA_001', 'X1CA_002', 'X1CA_003', 'X1CA_004', 'X1CA_005', 'X1CA_006' },
-	}
-	local currentOp = nil
-	local movTable = {}
+    local opTable = {
+        { 'X1CA_TUT', 'X1CA_001', 'X1CA_002', 'X1CA_003', 'X1CA_004', 'X1CA_005', 'X1CA_006' },
+    }
+    local currentOp = nil
+    local movTable = {}
 
-	-- parent/background
-	local parent = UIUtil.CreateScreenGroup(GetFrame(0), "head test group")
-	local background = Bitmap(parent)
-	background:SetSolidColor('black')
-	LayoutHelpers.FillParent(background, parent)
+    -- parent/background
+    local parent = UIUtil.CreateScreenGroup(GetFrame(0), "head test group")
+    local background = Bitmap(parent)
+    background:SetSolidColor('black')
+    LayoutHelpers.FillParent(background, parent)
 
-	-- BACK BUTTON
-	local exitButton = MenuCommon.CreateExitMenuButton(parent, background, "<LOC _Back>")
-	LayoutHelpers.AtLeftIn(exitButton, parent, 10)
-	LayoutHelpers.AtBottomIn(exitButton, parent, 10)
+    -- BACK BUTTON
+    local exitButton = MenuCommon.CreateExitMenuButton(parent, background, "<LOC _Back>")
+    LayoutHelpers.AtLeftIn(exitButton, parent, 10)
+    LayoutHelpers.AtBottomIn(exitButton, parent, 10)
     exitButton.OnClick = function(self, modifiers)
-    	StopMovie()
+        StopMovie()
         parent:Destroy()
         import("/lua/ui/menus/main.lua").CreateUI()
     end
 
-	-- STOP MOVIE BUTTON
-	local stopButton = UIUtil.CreateButtonStd(parent, '/widgets/small', "Stop Movie", 15)
-	LayoutHelpers.AtRightIn(stopButton, parent, 10)
-	LayoutHelpers.AtBottomIn(stopButton, parent, 10)
-	stopButton.Depth:Set(1000)
+    -- STOP MOVIE BUTTON
+    local stopButton = UIUtil.CreateButtonStd(parent, '/widgets/small', "Stop Movie", 15)
+    LayoutHelpers.AtRightIn(stopButton, parent, 10)
+    LayoutHelpers.AtBottomIn(stopButton, parent, 10)
+    stopButton.Depth:Set(1000)
     stopButton.OnClick = function(self, modifiers)
-    	StopMovie()
+        StopMovie()
     end
 
-	-- OPERATION LIST
-	local opList = ItemList(background, "opList")
-	LayoutHelpers.SetWidth(opList, 100)
-	opList.Height:Set(function() return parent.Height() - LayoutHelpers.ScaleNumber(70) end)
-	LayoutHelpers.AtLeftTopIn(opList, background, 10, 10)
-	opList:SetFont(UIUtil.bodyFont, 14)
+    -- OPERATION LIST
+    local opList = ItemList(background, "opList")
+    LayoutHelpers.SetWidth(opList, 100)
+    opList.Height:Set(function() return parent.Height() - LayoutHelpers.ScaleNumber(70) end)
+    LayoutHelpers.AtLeftTopIn(opList, background, 10, 10)
+    opList:SetFont(UIUtil.bodyFont, 14)
 
-	for k, v in opTable do
-		for k2, v2 in v do
-			opList:AddItem(v2)
-		end
-	end
+    for k, v in opTable do
+        for k2, v2 in v do
+            opList:AddItem(v2)
+        end
+    end
 
-	opList.OnClick = function(self, row)
-		self:SetSelection(row)
-		currentOp = opList:GetItem(row)
-		AddMovies(currentOp)
-		--LOG('currentOp = ' , currentOp)
-	end
+    opList.OnClick = function(self, row)
+        self:SetSelection(row)
+        currentOp = opList:GetItem(row)
+        AddMovies(currentOp)
+    end
 
-	-- MOVIE LIST
-	local movList = ItemList(background, 'movList')
-	LayoutHelpers.SetWidth(movList, 250)
-	movList.Height:Set(opList.Height)
-	LayoutHelpers.AnchorToRight(movList, opList, 10)
-	movList.Top:Set(opList.Top)
-	movList:SetFont(UIUtil.bodyFont, 14)
+    -- MOVIE LIST
+    local movList = ItemList(background, 'movList')
+    LayoutHelpers.SetWidth(movList, 250)
+    movList.Height:Set(opList.Height)
+    LayoutHelpers.AnchorToRight(movList, opList, 10)
+    movList.Top:Set(opList.Top)
+    movList:SetFont(UIUtil.bodyFont, 14)
 
-	CreateVertScrollbarFor(movList)
+    CreateVertScrollbarFor(movList)
 
-	function AddMovies(opName)
-	    if DiskGetFileInfo('/maps/'..opName..'/'..opName..'_strings.lua') then
-	        local strings = import('/maps/'..opName..'/'..opName..'_strings.lua')
-		    movList:DeleteAllItems()
-		    movTable = {}
-		    local tempTable = {}
-		    for i, v in strings do
-		        if type(v) == 'table' then
-		            for _, line in v do
-		                if line.vid then
-		                    if DiskGetFileInfo('/movies/'..line.vid) then
-		                        table.insert(tempTable, {vid = '/movies/'..line.vid, cue = line.cue, bank = line.bank})
-		                    else
-		                        WARN("FMV head script: Can't find video! Entry details: ", i, ": ", line.vid)
-		                    end
-		                end
-		            end
-		        end
-		    end
-		    table.sort(tempTable, function(a,b)
-		        return a.cue <= b.cue
-		    end)
-		    for i, v in tempTable do
+    function AddMovies(opName)
+        if DiskGetFileInfo('/maps/'..opName..'/'..opName..'_strings.lua') then
+            local strings = import('/maps/'..opName..'/'..opName..'_strings.lua')
+            movList:DeleteAllItems()
+            movTable = {}
+            local tempTable = {}
+            for i, v in strings do
+                if type(v) == 'table' then
+                    for _, line in v do
+                        if line.vid then
+                            if DiskGetFileInfo('/movies/'..line.vid) then
+                                table.insert(tempTable, {vid = '/movies/'..line.vid, cue = line.cue, bank = line.bank})
+                            else
+                                WARN("FMV head script: Can't find video! Entry details: ", i, ": ", line.vid)
+                            end
+                        end
+                    end
+                end
+            end
+            table.sort(tempTable, function(a,b)
+                return a.cue <= b.cue
+            end)
+            for i, v in tempTable do
                 movList:AddItem(v.cue)
                 movTable[v.cue] = {vid = v.vid, cue = v.cue, bank = v.bank}
-		    end
-		end
-	end
+            end
+        end
+    end
 
-	-- movie control
-	local movieBack = Bitmap(background)
-	LayoutHelpers.SetDimensions(movieBack, 1, 1)
-	LayoutHelpers.AtLeftTopIn(movieBack, background)
-	movieBack:SetSolidColor('black')
-	movieBack.Depth:Set(10)
-	
-	local movie = Movie(background)
-	LayoutHelpers.AtCenterIn(movie, parent)
-	movie.Depth:Set(11)
-	
-	movie.OnFinished = function(self)
-		StopMovie()
-	end
+    -- movie control
+    local movieBack = Bitmap(background)
+    LayoutHelpers.SetDimensions(movieBack, 1, 1)
+    LayoutHelpers.AtLeftTopIn(movieBack, background)
+    movieBack:SetSolidColor('black')
+    movieBack.Depth:Set(10)
+    
+    local movie = Movie(background)
+    LayoutHelpers.AtCenterIn(movie, parent)
+    movie.Depth:Set(11)
+    
+    movie.OnFinished = function(self)
+        StopMovie()
+    end
 
-	-- play movie
-	movList.OnClick = function(self, row)
-		self:SetSelection(row)
-		StopMovie()
-		local movID = movList:GetItem(row)
-		movie:Set(movTable[movID].vid)
+    -- play movie
+    movList.OnClick = function(self, row)
+        self:SetSelection(row)
+        StopMovie()
+        local movID = movList:GetItem(row)
+        movie:Set(movTable[movID].vid)
 
-		LayoutHelpers.FillParent(movieBack, movie)
+        LayoutHelpers.FillParent(movieBack, movie)
 
-		local sound = Sound( {Cue = movTable[movID].cue, Bank = movTable[movID].bank} )
-		movie:Show()
-		movieBack:Show()
-		movie.OnLoaded = function(self)
-			movie:Play()
-			movie.voiceHandle = PlayVoice(sound)
-		end
-	end
+        local sound = Sound( {Cue = movTable[movID].cue, Bank = movTable[movID].bank} )
+        movie:Show()
+        movieBack:Show()
+        movie.OnLoaded = function(self)
+            movie:Play()
+            movie.voiceHandle = PlayVoice(sound)
+        end
+    end
 
-	-- FUNCTIONS
-	function StopMovie()
-		movie:Stop()
-		movie:Hide()
-		movieBack:Hide()
-		StopSound(movie.voiceHandle,true)
-	end
+    -- FUNCTIONS
+    function StopMovie()
+        movie:Stop()
+        movie:Hide()
+        movieBack:Hide()
+        StopSound(movie.voiceHandle,true)
+    end
 end
 
 function CreateVertScrollbarFor(attachto)
