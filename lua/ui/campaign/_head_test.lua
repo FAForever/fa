@@ -51,9 +51,10 @@ function CreateUI()
 
 	-- OPERATION LIST
 	local opList = ItemList(background, "opList")
-	opList.Width:Set(100)
-	opList.Height:Set(function() return parent.Height() - 70 end)
+	LayoutHelpers.SetWidth(opList, 100)
+	opList.Height:Set(function() return parent.Height() - LayoutHelpers.ScaleNumber(70) end)
 	LayoutHelpers.AtLeftTopIn(opList, background, 10, 10)
+	opList:SetFont(UIUtil.bodyFont, 14)
 
 	for k, v in opTable do
 		for k2, v2 in v do
@@ -70,9 +71,9 @@ function CreateUI()
 
 	-- MOVIE LIST
 	local movList = ItemList(background, 'movList')
-	movList.Width:Set(250)
+	LayoutHelpers.SetWidth(movList, 250)
 	movList.Height:Set(opList.Height)
-	movList.Left:Set(function() return opList.Right() + 10 end)
+	LayoutHelpers.AnchorToRight(movList, opList, 10)
 	movList.Top:Set(opList.Top)
 	movList:SetFont(UIUtil.bodyFont, 14)
 
@@ -109,8 +110,7 @@ function CreateUI()
 
 	-- movie control
 	local movieBack = Bitmap(background)
-	movieBack.Width:Set(1)
-	movieBack.Height:Set(1)
+	LayoutHelpers.SetDimensions(movieBack, 1, 1)
 	LayoutHelpers.AtLeftTopIn(movieBack, background)
 	movieBack:SetSolidColor('black')
 	movieBack.Depth:Set(10)
