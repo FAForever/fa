@@ -626,7 +626,7 @@ function InternalSaveGame(filename, friendlyname, oncompletion)
 end
 
 ---
----@param keyCode string
+---@param keyCode string | number
 ---@return boolean
 function IsKeyDown(keyCode)
 end

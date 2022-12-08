@@ -573,6 +573,7 @@ ObserveSelection = import("/lua/shared/observable.lua").Create()
 local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
+
     if ignoreSelection then
         return
     end
