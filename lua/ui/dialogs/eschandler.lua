@@ -87,7 +87,7 @@ function HandleEsc(quit_game)
             CreateYesNoDialog()
         end
     elseif import("/lua/ui/game/commandmode.lua").GetCommandMode()[1] ~= false then
-        import("/lua/ui/game/commandmode.lua").EndCommandMode(true, true)
+        import("/lua/ui/game/commandmode.lua").EndCommandMode(true)
     elseif GetSelectedUnits() then
         SelectUnits(nil)
     end
