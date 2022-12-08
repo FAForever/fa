@@ -475,4 +475,3 @@ end
 
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
-local BuildingTemplates = import("/lua/buildingtemplates.lua")

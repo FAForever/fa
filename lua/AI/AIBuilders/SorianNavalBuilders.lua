@@ -7,6 +7,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+if not ScenarioInfo.GameHasAIs then
+    WARN("SorianNavalBuilders loaded in a non-ai game from:" .. reprs(debug.traceback()))
+end
+
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
