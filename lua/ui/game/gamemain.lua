@@ -574,8 +574,6 @@ local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
-    import("/lua/ui/game/commandmode.lua").CacheCommandMode()
-
     if ignoreSelection then
         return
     end
@@ -583,8 +581,6 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if import("/lua/ui/game/selection.lua").IsHidden() then
         return
     end
-
-
 
     -- populate observable and send out a notification
     cachedSelection.oldSelection = oldSelection
@@ -664,7 +660,6 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         import("/lua/ui/game/rallypoint.lua").OnSelectionChanged(newSelection)
     end
 
-    LOG("Gamemain")
     if newSelection then
         local n = table.getn(newSelection)
 
