@@ -325,10 +325,6 @@ WorldView = Class(moho.UIWorldView, Control) {
         if IsKeyDown(KeyCodeAlt) and selection then
             order = 'RULEUCC_AttackAlt'
 
-        -- regular move that ignores everything
-        elseif IsKeyDown(KeyCodeCtrl) and selection then
-            order = 'RULEUCC_MoveAlt'
-
         -- usual order structure
         else
             -- 1. command mode
