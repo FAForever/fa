@@ -263,9 +263,9 @@ function BeginSession()
     import("/lua/sim/markerutilities.lua")
 
     BeginSessionAI()
-    BeginSessionTeams()
     BeginSessionMapSetup()
     BeginSessionEffects()
+    BeginSessionTeams()
 
     import("/lua/sim/scenarioutilities.lua").CreateProps()
     import("/lua/sim/scenarioutilities.lua").CreateResources()
