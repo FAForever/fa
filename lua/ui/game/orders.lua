@@ -714,10 +714,6 @@ local function CreateFirestatePopup(parent, selected)
             else
                 LayoutHelpers.Above(bg.buttons[i], bg.buttons[i-1])
             end
-            if index == 0 then
-                bg.buttons[i]:Disable()
-            end
-
             i = i + 1
         end
     end
