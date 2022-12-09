@@ -17,10 +17,6 @@ local Button = import("/lua/maui/button.lua").Button
 local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
 
 function CreateUI()
-
-    local opTable = {
-        { 'X1CA_TUT', 'X1CA_001', 'X1CA_002', 'X1CA_003', 'X1CA_004', 'X1CA_005', 'X1CA_006' },
-    }
     local currentOp = nil
     local movTable = {}
 
@@ -51,15 +47,16 @@ function CreateUI()
 
     -- OPERATION LIST
     local opList = ItemList(background, "opList")
-    LayoutHelpers.SetWidth(opList, 100)
+    LayoutHelpers.SetWidth(opList, 250)
     opList.Height:Set(function() return parent.Height() - LayoutHelpers.ScaleNumber(70) end)
     LayoutHelpers.AtLeftTopIn(opList, background, 10, 10)
-    opList:SetFont(UIUtil.bodyFont, 14)
+    opList:SetFont(UIUtil.bodyFont, 12)
 
-    for k, v in opTable do
-        for k2, v2 in v do
-            opList:AddItem(v2)
-        end
+    -- Load the maps containing '_strings.lua' file
+    local scenFiles = DiskFindFiles('/maps', '*_strings.lua')
+    for i, fileName in scenFiles do
+        local opName = string.gsub(string.match(fileName, '[^/]+$'), '_strings.lua', '')
+        opList:AddItem(opName)
     end
 
     opList.OnClick = function(self, row)
@@ -70,13 +67,13 @@ function CreateUI()
 
     -- MOVIE LIST
     local movList = ItemList(background, 'movList')
-    LayoutHelpers.SetWidth(movList, 250)
+    LayoutHelpers.SetWidth(movList, 300)
     movList.Height:Set(opList.Height)
     LayoutHelpers.AnchorToRight(movList, opList, 10)
     movList.Top:Set(opList.Top)
-    movList:SetFont(UIUtil.bodyFont, 14)
+    movList:SetFont(UIUtil.bodyFont, 12)
 
-    CreateVertScrollbarFor(movList)
+    UIUtil.CreateVertScrollbarFor(movList)
 
     function AddMovies(opName)
         if DiskGetFileInfo('/maps/'..opName..'/'..opName..'_strings.lua') then
@@ -84,14 +81,36 @@ function CreateUI()
             movList:DeleteAllItems()
             movTable = {}
             local tempTable = {}
+            local cueTable = {}
             for i, v in strings do
                 if type(v) == 'table' then
-                    for _, line in v do
-                        if line.vid then
-                            if DiskGetFileInfo('/movies/'..line.vid) then
-                                table.insert(tempTable, {vid = '/movies/'..line.vid, cue = line.cue, bank = line.bank})
-                            else
-                                WARN("FMV head script: Can't find video! Entry details: ", i, ": ", line.vid)
+                    if v.movies then -- Briefing data have different structure
+                        for movieIndex, movie in v.movies do
+                            if DiskGetFileInfo('/movies/'..movie) then
+                                table.insert(tempTable,
+                                    {
+                                        vid = '/movies/'..movie,
+                                        cue = v.voice[movieIndex].Cue,
+                                        bank = v.voice[movieIndex].Bank,
+                                        bgCue = v.bgsound[movieIndex].Cue,
+                                        bgBank = v.bgsound[movieIndex].Bank
+                                    }
+                                )
+                            end
+                        end
+                    else
+                        for _, line in v do
+                            if line.vid then
+                                if line.cue and cueTable[line.cue] then
+                                    -- the sort function breaks if there are more duplicates cues, as it using it for sorting the list
+                                    -- a lot of the custom missions don't have the cues set properly
+                                    WARN("FMV head script: Duplicate cue name, for video: ", i, ": ", line.vid)
+                                elseif line.vid ~= '' and DiskGetFileInfo('/movies/'..line.vid) and line.cue and line.cue ~= '' then
+                                    table.insert(tempTable, {vid = '/movies/'..line.vid, cue = line.cue, bank = line.bank})
+                                    cueTable[line.cue] = true
+                                else
+                                    WARN("FMV head script: Can't find video! Entry details: ", i, ": ", line.vid)
+                                end
                             end
                         end
                     end
@@ -102,7 +121,7 @@ function CreateUI()
             end)
             for i, v in tempTable do
                 movList:AddItem(v.cue)
-                movTable[v.cue] = {vid = v.vid, cue = v.cue, bank = v.bank}
+                movTable[v.cue] = {vid = v.vid, cue = v.cue, bank = v.bank, bgCue = v.bgCue, bgBank = v.bgBank}
             end
         end
     end
@@ -132,11 +151,19 @@ function CreateUI()
         LayoutHelpers.FillParent(movieBack, movie)
 
         local sound = Sound( {Cue = movTable[movID].cue, Bank = movTable[movID].bank} )
+        local bgSound
+        if movTable[movID].bgCue then
+            bgSound = Sound( {Cue = movTable[movID].bgCue, Bank = movTable[movID].bgBank} )
+        end
+
         movie:Show()
         movieBack:Show()
         movie.OnLoaded = function(self)
             movie:Play()
             movie.voiceHandle = PlayVoice(sound)
+            if bgSound then
+                movie.bgHandle = PlaySound(bgSound)
+            end
         end
     end
 
@@ -145,43 +172,7 @@ function CreateUI()
         movie:Stop()
         movie:Hide()
         movieBack:Hide()
-        StopSound(movie.voiceHandle,true)
+        StopSound(movie.voiceHandle, true)
+        StopSound(movie.bgHandle, true)
     end
-end
-
-function CreateVertScrollbarFor(attachto)
-    local tempfaction = ""
-    local scrollbar = Scrollbar(attachto, import("/lua/maui/scrollbar.lua").ScrollAxis.Vert)
-    scrollbar:SetTextures(  UIUtil.UIFile('/small-vert_scroll'..tempfaction..'/back_scr_mid.dds')
-                            ,UIUtil.UIFile('/small-vert_scroll/bar-mid_scr_over.dds')
-                            ,UIUtil.UIFile('/small-vert_scroll/bar-top_scr_up.dds')
-                            ,UIUtil.UIFile('/small-vert_scroll/bar-bot_scr_up.dds'))
-
-    local scrollUpButton = Button(  scrollbar
-                                    , UIUtil.UIFile('/small-vert_scroll'..tempfaction..'/arrow-up_scr_up.dds')
-                                    , UIUtil.UIFile('/small-vert_scroll'..tempfaction..'/arrow-up_scr_over.dds')
-                                    , UIUtil.UIFile('/small-vert_scroll'..tempfaction..'/arrow-up_scr_down.dds')
-                                    , UIUtil.UIFile('/small-vert_scroll'..tempfaction..'/arrow-up_scr_dis.dds'))
-
-    local scrollDownButton = Button(  scrollbar
-                                    , UIUtil.UIFile('/small-vert_scroll'..tempfaction..'/arrow-down_scr_up.dds')
-                                    , UIUtil.UIFile('/small-vert_scroll'..tempfaction..'/arrow-down_scr_over.dds')
-                                    , UIUtil.UIFile('/small-vert_scroll'..tempfaction..'/arrow-down_scr_down.dds')
-                                    , UIUtil.UIFile('/small-vert_scroll'..tempfaction..'/arrow-down_scr_dis.dds'))
-
-    scrollbar.Left:Set(function() return attachto.Right() end)
-    scrollbar.Top:Set(scrollUpButton.Bottom)
-    scrollbar.Bottom:Set(scrollDownButton.Top)
-
-    scrollUpButton.Left:Set(scrollbar.Left)
-    scrollUpButton.Top:Set(function() return attachto.Top() end)
-    scrollDownButton.Left:Set(scrollbar.Left)
-    scrollDownButton.Bottom:Set(function() return attachto.Bottom() end)
-
-    scrollbar.Right:Set(scrollUpButton.Right)
-
-    scrollbar:AddButtons(scrollUpButton, scrollDownButton)
-    scrollbar:SetScrollable(attachto)
-
-    return scrollbar
 end
