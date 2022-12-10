@@ -31,7 +31,7 @@ function IsGenerated()
     return NavGenerator.IsGenerated()
 end
 
---- Generates the navigational mesh if it has not been generated yet. 
+--- Generates the navigational mesh if it is not generated yet
 function Generate()
     if not IsGenerated() then
         NavGenerator.Generate()
@@ -39,8 +39,8 @@ function Generate()
 end
 
 --- Produces various warning messages in the logs to inform the developer
-local function WarnNoMesh()
-    WARN("Navigational utilities are used without a generated navigational mesh.")
+local function WarnNoNavMesh()
+    WARN("Navigational utilities are used without a generated navigational mesh")
     WARN("For AI development: ")
     WARN(" - Add in the field `requiresNavMesh = true` to each of your AI entries in  `lua/AI/CustomAIs_v2`")
     WARN("For map or regular mod development: ")
@@ -56,8 +56,8 @@ end
 function CanPathTo(layer, origin, destination)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoMesh()
-        return nil, 'Navigational mesh is not generated.'
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
     end
 
     -- check layer argument
@@ -140,8 +140,8 @@ end
 function PathTo(layer, origin, destination, options)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoMesh()
-        return nil, 'Navigational mesh is not generated.'
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
     end
 
     -- check if we can path
@@ -252,8 +252,8 @@ end
 function GetLabel(layer, position)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoMesh()
-        return nil, 'Navigational mesh is not generated.'
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
     end
 
     -- check layer argument
@@ -286,8 +286,8 @@ end
 function GetLabelMetadata(id)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoMesh()
-        return nil, 'Navigational mesh is not generated.'
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
     end
 
     -- check id argument
