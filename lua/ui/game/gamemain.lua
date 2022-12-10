@@ -16,7 +16,6 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Movie = import("/lua/maui/movie.lua").Movie
 local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
-local CM =  lazyimport("/lua/ui/game/commandmode.lua")
 
 local controls = import("/lua/ui/controls.lua").Get()
 
@@ -40,7 +39,7 @@ local lastObserving
 local ignoreSelection = false
 function SetIgnoreSelection(ignore)
     ignoreSelection = ignore
-    CM.SetIgnoreSelection(ignore)
+    import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(ignore)
 end
 
 -- generating hotbuild modifier shortcuts on the fly
@@ -328,7 +327,6 @@ function CreateUI(isReplay)
     import("/lua/keymap/hotkeylabels.lua").init()
     import("/lua/ui/notify/customiser.lua").init(isReplay, import("/lua/ui/game/borders.lua").GetMapGroup())
     import("/lua/ui/game/reclaim.lua").SetMapSize()
-    import("/lua/ui/game/commandmode.lua")
 end
 
 -- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
