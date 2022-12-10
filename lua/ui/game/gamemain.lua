@@ -16,7 +16,6 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Movie = import("/lua/maui/movie.lua").Movie
 local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
-local CM =  lazyimport("/lua/ui/game/commandmode.lua")
 
 local controls = import("/lua/ui/controls.lua").Get()
 
@@ -40,7 +39,7 @@ local lastObserving
 local ignoreSelection = false
 function SetIgnoreSelection(ignore)
     ignoreSelection = ignore
-    CM.SetIgnoreSelection(ignore)
+    import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(ignore)
 end
 
 -- generating hotbuild modifier shortcuts on the fly
