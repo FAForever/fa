@@ -473,6 +473,14 @@ function GetAIPlayerData(name, AIPersonality, slot)
     if not AIColor then
         AIColor = GetAvailableColor()
     end
+
+    local requiresNavMesh = false
+    for k, entry in aitypes do 
+        if entry.key == AIPersonality then
+            requiresNavMesh = requiresNavMesh or entry.requiresNavMesh
+        end
+    end
+
     return PlayerData(
         {
             OwnerID = hostID,
@@ -482,6 +490,7 @@ function GetAIPlayerData(name, AIPersonality, slot)
             AIPersonality = AIPersonality,
             PlayerColor = AIColor,
             ArmyColor = AIColor,
+            RequiresNavMesh = requiresNavMesh
         }
 )
 end

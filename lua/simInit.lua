@@ -310,7 +310,12 @@ function BeginSessionAI()
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
     if ScenarioInfo.GameHasAIs then
 
-        import("/lua/sim/navgenerator.lua").Generate()
+        for k, brain in ArmyBrains do
+            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
+                import('/lua/sim/navgenerator.lua').Generate()
+                break
+            end
+        end
 
         local simMods = __active_mods or {}
         for Index, ModData in simMods do
