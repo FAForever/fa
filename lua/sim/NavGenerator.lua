@@ -1131,12 +1131,7 @@ local function GenerateMarkerMetadata()
 end
 
 --- Generates a navigational mesh based on the heightmap
-function Generate(force)
-
-    -- do not run multiple times
-    if not force and IsGenerated() then
-        return
-    end
+function Generate()
 
     -- reset state
     NavGrids = { }

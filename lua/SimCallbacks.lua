@@ -828,6 +828,4 @@ Callbacks.NavDebugCanPathTo = import("/lua/sim/navdebug.lua").CanPathTo
 Callbacks.NavDebugPathTo = import("/lua/sim/navdebug.lua").PathTo
 Callbacks.NavDebugGetLabel = import("/lua/sim/navdebug.lua").GetLabel
 Callbacks.NavDebugGetLabelMetadata = import("/lua/sim/navdebug.lua").GetLabelMeta
-Callbacks.NavGenerate = function()
-    import("/lua/sim/navgenerator.lua").Generate(true)
-end
+Callbacks.NavGenerate = import("/lua/sim/navgenerator.lua").Generate

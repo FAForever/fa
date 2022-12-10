@@ -31,6 +31,22 @@ function IsGenerated()
     return NavGenerator.IsGenerated()
 end
 
+--- Generates the navigational mesh if it has not been generated yet. 
+function Generate()
+    if not IsGenerated() then
+        NavGenerator.Generate()
+    end
+end
+
+--- Produces various warning messages in the logs to inform the developer
+local function WarnNoMesh()
+    WARN("Navigational utilities are used without a generated navigational mesh.")
+    WARN("For AI development: ")
+    WARN(" - Add in the field `requiresNavMesh = true` to each of your AI entries in  `lua/AI/CustomAIs_v2`")
+    WARN("For map or regular mod development: ")
+    WARN(" - Call the Generate function of NavUtils before calling any other function")
+end
+
 --- Returns true when you can path from the origin to the destination
 ---@param layer NavLayers
 ---@param origin Vector
@@ -38,6 +54,11 @@ end
 ---@return boolean?
 ---@return string?
 function CanPathTo(layer, origin, destination)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoMesh()
+        return nil, 'Navigational mesh is not generated.'
+    end
 
     -- check layer argument
     local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
@@ -117,6 +138,11 @@ end
 ---@return (string | number)?   # Error message, or the number of positions
 ---@return number?              # Length of path
 function PathTo(layer, origin, destination, options)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoMesh()
+        return nil, 'Navigational mesh is not generated.'
+    end
 
     -- check if we can path
     local ok, msg = CanPathTo(layer, origin, destination)
@@ -125,14 +151,12 @@ function PathTo(layer, origin, destination, options)
     end
 
     -- setup pathing
-
     local seenIdentifier = PathToGetUniqueIdentifier()
     local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
     local originLeaf = root:FindLeafXZ(origin[1], origin[3]) --[[@as CompressedLabelTreeLeaf]]
     local destinationLeaf = root:FindLeafXZ(destination[1], destination[3]) --[[@as CompressedLabelTreeLeaf]]
 
     -- 0th iteration of search
-
     originLeaf.From = nil
     originLeaf.AcquiredCosts = 0
     originLeaf.TotalCosts = originLeaf:DistanceTo(destinationLeaf)
@@ -145,7 +169,6 @@ function PathTo(layer, origin, destination, options)
     destinationLeaf.Seen = 0
 
     -- search iterations
-
     while not PathToHeap:IsEmpty() do
 
         local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
@@ -178,13 +201,11 @@ function PathTo(layer, origin, destination, options)
     end
 
     -- check if we found a path
-
     if not destinationLeaf.Seen == seenIdentifier then
         return nil, 'Did not manage to find the destination'
     end
 
     -- construct current path
-
     local head = 1
     local path = { }
     local distance = 0
@@ -207,7 +228,6 @@ function PathTo(layer, origin, destination, options)
     end
 
     -- reverse the path
-
     for k = 1, (0.5 * head) ^ 0 do
         local temp = path[k]
         path[k] = path[head - k]
@@ -215,15 +235,12 @@ function PathTo(layer, origin, destination, options)
     end
 
     -- add destination to the path
-
     path[head] = destination
 
     -- clear up after ourselves
-
     PathToHeap:Clear()
 
     -- return all the goodies!!
-
     return path, head, distance
 end
 
@@ -233,6 +250,12 @@ end
 ---@return number? 
 ---@return string?
 function GetLabel(layer, position)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoMesh()
+        return nil, 'Navigational mesh is not generated.'
+    end
+
     -- check layer argument
     local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
     if not root then
@@ -261,6 +284,12 @@ end
 ---@return NavLabelMetadata?
 ---@return string?
 function GetLabelMetadata(id)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoMesh()
+        return nil, 'Navigational mesh is not generated.'
+    end
+
     -- check id argument
     if id == 0 then 
         return nil, 'Invalid layer id - this should not be possible'
