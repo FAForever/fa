@@ -223,6 +223,10 @@ AIBrain = Class(moho.aibrain_methods) {
         self.BrainType = 'AI'
     end,
 
+    IsBaseAI = function(self)
+        return ScenarioInfo.ArmySetup[self.Name].BaseAI
+    end,
+
     --- Adds a HQ so that the engi mod knows we have it
     ---@param self AIBrain
     ---@param faction HqFaction 

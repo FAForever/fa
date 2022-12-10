@@ -11,31 +11,45 @@ function GetAItypes()
     local aitypes = {
         {
             key = 'easy',
-            name = "<LOC lobui_0347>AI: Easy"
+            name = "<LOC lobui_0347>AI: Easy",
+            requiresNavMesh = true,
+            baseAI = true,
         },
         {
             key = 'medium',
-            name = "<LOC lobui_0349>AI: Normal"
+            name = "<LOC lobui_0349>AI: Normal",
+            requiresNavMesh = true,
+            baseAI = true,
         },
         {
             key = 'adaptive',
-            name = "<LOC lobui_0368>AI: Adaptive"
+            name = "<LOC lobui_0368>AI: Adaptive",
+            requiresNavMesh = true,
+            baseAI = true,
         },
         {
             key = 'rush',
-            name = "<LOC lobui_0360>AI: Rush"
+            name = "<LOC lobui_0360>AI: Rush",
+            requiresNavMesh = true,
+            baseAI = true,
         },
         {
             key = 'turtle',
-            name = "<LOC lobui_0372>AI: Turtle"
+            name = "<LOC lobui_0372>AI: Turtle",
+            requiresNavMesh = true,
+            baseAI = true,
         },
         {
             key = 'tech',
-            name = "<LOC lobui_0370>AI: Tech"
+            name = "<LOC lobui_0370>AI: Tech",
+            requiresNavMesh = true,
+            baseAI = true,
         },
         {
             key = 'random',
-            name = "<LOC lobui_0374>AI: Random"
+            name = "<LOC lobui_0374>AI: Random",
+            requiresNavMesh = true,
+            baseAI = true,
         }
     }
 
@@ -92,11 +106,11 @@ function GetAItypes()
     end
 
     --Default GPG Cheating AIs
-    table.insert(aitypes, { key = 'adaptivecheat', name = "<LOC lobui_0379>AIx: Adaptive" })
-    table.insert(aitypes, { key = 'rushcheat', name = "<LOC lobui_0380>AIx: Rush" })
-    table.insert(aitypes, { key = 'turtlecheat', name = "<LOC lobui_0384>AIx: Turtle" })
-    table.insert(aitypes, { key = 'techcheat', name = "<LOC lobui_0385>AIx: Tech" })
-    table.insert(aitypes, { key = 'randomcheat', name = "<LOC lobui_0395>AIx: Random" })
+    table.insert(aitypes, { key = 'adaptivecheat', name = "<LOC lobui_0379>AIx: Adaptive", requiresNavMesh = true, baseAI = true })
+    table.insert(aitypes, { key = 'rushcheat', name = "<LOC lobui_0380>AIx: Rush", requiresNavMesh = true, baseAI = true })
+    table.insert(aitypes, { key = 'turtlecheat', name = "<LOC lobui_0384>AIx: Turtle", requiresNavMesh = true,  baseAI = true})
+    table.insert(aitypes, { key = 'techcheat', name = "<LOC lobui_0385>AIx: Tech", requiresNavMesh = true, baseAI = true })
+    table.insert(aitypes, { key = 'randomcheat', name = "<LOC lobui_0395>AIx: Random", requiresNavMesh = true, baseAI = true })
 
     --Load Custom Cheating AIs - old style
     for i, v in AIFilesold do

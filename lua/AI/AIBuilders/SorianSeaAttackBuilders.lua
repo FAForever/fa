@@ -7,10 +7,6 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-if not ScenarioInfo.GameHasAIs then
-    WARN("SorianSeaAttackBuilders loaded in a non-ai game from:" .. reprs(debug.traceback()))
-end
-
 local UCBC = '/lua/editor/unitcountbuildconditions.lua'
 local IBC = '/lua/editor/instantbuildconditions.lua'
 local TBC = '/lua/editor/threatbuildconditions.lua'
