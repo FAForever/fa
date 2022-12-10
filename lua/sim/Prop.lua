@@ -159,12 +159,14 @@ Prop = Class(moho.prop_methods) {
     end,
 
     --- Constructs reclaim effects. Separate function for mod compatibility.
-    -- @param target The entity that reclaimed the prop.
+    ---@param self Prop
+    ---@param target Unit
     CreateReclaimEndEffects = function(self, target)
         PlayReclaimEndEffects(target, self)
     end,
 
     --- Syncs the mass label to the UI.
+    ---@param self Prop
     SyncMassLabel = function(self)
 
         -- check if prop has sufficient amount of reclaim to begin with
@@ -199,6 +201,7 @@ Prop = Class(moho.prop_methods) {
     end,
 
     --- Called by the engine when the prop is destroyed.
+    ---@param self Prop
     OnDestroy = function(self)
         self.Dead = true
         self:UpdateReclaimLeft()
@@ -206,10 +209,11 @@ Prop = Class(moho.prop_methods) {
     end,
 
     --- Called by the engine when the prop receives damage.
-    -- @param instigator The source of the damage.
-    -- @param amount The amount of damage.
-    -- @param direction The direction the damage is coming from.
-    -- @param damageType The type of damage ('Normal', 'Fire', ...)
+    ---@param self Prop
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param direction Vector
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, direction, damageType)
 
         -- only applies to trees
@@ -248,17 +252,15 @@ Prop = Class(moho.prop_methods) {
             self:UpdateReclaimLeft()
         end
     end,
-
-    --- Called by the engine when the prop collides with a projectile.
-    -- @param other The projectile we're colliding with.
-    OnCollisionCheck = function(self, other)
-        return true
-    end,
-
+    
     --- Set the mass/energy value of this wreck when at full health, and the time coefficient
     -- that determine how quickly it can be reclaimed.
     -- These values are used to set the real reclaim values as fractions of the health as the wreck
     -- takes damage.
+    ---@param self Prop
+    ---@param time number
+    ---@param mass number
+    ---@param energy number
     SetMaxReclaimValues = function(self, time, mass, energy)
         self.MaxMassReclaim = mass
         self.MaxEnergyReclaim = energy
@@ -267,7 +269,8 @@ Prop = Class(moho.prop_methods) {
         self:UpdateReclaimLeft()
     end,
 
-    --- Mimics the engine behavior when calculating the reclaim value of a prop.
+    --- Mimics the engine behavior when calculating the reclaim value of a prop
+    ---@param self Prop
     UpdateReclaimLeft = function(self)
         if not self.Dead then
             local max = EntityGetMaxHealth(self)
@@ -283,34 +286,32 @@ Prop = Class(moho.prop_methods) {
     end,
 
     --- Sets the collision box of the prop.
-    -- @param shape The shape of the collider: 'Sphere', 'Box' or 'None'
-    -- @param centerX The x-coordinate of the center of the sphere or of a point on the box
-    -- @param centerY The x-coordinate of the center of the sphere or of a point on the box
-    -- @param centerZ The x-coordinate of the center of the sphere or of a point on the box
-    -- @param sizex The width of the box.
-    -- @param sizey The height of the box.
-    -- @param sizez The length of the box.
-    -- @param radius The radius of the sphere.
+    ---@param self Prop
+    ---@param shape 'Sphere' | 'Box' | 'None'
+    ---@param centerx number The x-coordinate of the center of the sphere or of a point on the box
+    ---@param centery number The Y-coordinate of the center of the sphere or of a point on the box
+    ---@param centerz number The Z-coordinate of the center of the sphere or of a point on the box
+    ---@param sizex number The width of the box.
+    ---@param sizey number The height of the box.
+    ---@param sizez number The length of the box.
+    ---@param radius number The radius of the sphere.
     SetPropCollision = function(self, shape, centerx, centery, centerz, sizex, sizey, sizez, radius)
-
-        -- only store this for wreckages, it is used to restore the collision box when armies are shared 
-        -- upon death, see '/lua/simutils.lua' and then the function TransferUnfinishedUnitsAfterDeath.
-        self.CollisionRadius = radius
-        self.CollisionSizeX = sizex
-        self.CollisionSizeY = sizey
-        self.CollisionSizeZ = sizez
-        self.CollisionCenterX = centerx
-        self.CollisionCenterY = centery
-        self.CollisionCenterZ = centerz
-        self.CollisionShape = shape
-
         if radius and shape == 'Sphere' then
             EntitySetCollisionShape(self, shape, centerx, centery, centerz, radius)
         else
             EntitySetCollisionShape(self, shape, centerx, centery + sizey, centerz, sizex, sizey, sizez)
         end
     end,
-    
+
+    -- TODO
+    ---@param self Prop
+    CacheCollisionShape = function(self)
+        -- only store this for wreckages, it is used to restore the collision box when armies are shared 
+        -- upon death, see '/lua/simutils.lua' and then the function TransferUnfinishedUnitsAfterDeath.
+    end,
+
+    --- Similar to `unit.RevertCollisionShape`, but then in Lua
+    ---@param self Prop
     RevertCollisionShape = function(self)
         local x, y, z = self.CollisionCenterX, self.CollisionCenterY, self.CollisionCenterZ
         local radius = self.CollisionRadius
@@ -324,8 +325,11 @@ Prop = Class(moho.prop_methods) {
     end;
 
     --- Computes how long it would take to reclaim this prop with the reclaimer.
-    -- @param reclaimer The unit to compute the duration for.
-    -- @return The time it takes and the amount of energy and mass reclaim.
+    ---@param self Prop
+    ---@param reclaimer Unit The unit to compute the duration for.
+    ---@return number time it takes to reclaim
+    ---@return number energy to reclaim
+    ---@return number mass to reclaim
     GetReclaimCosts = function(self, reclaimer)
         local maxValue = self.MaxMassReclaim
         if self.MaxEnergyReclaim > maxValue then
@@ -343,19 +347,22 @@ Prop = Class(moho.prop_methods) {
         return time, self.MaxEnergyReclaim, self.MaxMassReclaim
     end,
 
-    -- Split this prop into multiple sub-props, placing one at each of our bone locations.
-    -- The child prop names are taken from the names of the bones of this prop.
-    --
-    -- If this prop has bones named
-    --           "one", "two", "two_01", "two_02"
-    --
-    -- We will create props named
-    --           "../one_prop.bp", "../two_prop.bp", "../two_prop.bp", "../two_prop.bp"
-    --
-    -- Note that the optional _01, _02, _03 ending to the bone name is stripped off.
-    --
-    -- You can pass an optional 'dirprefix' arg saying where to look for the child props.
-    -- If not given, it defaults to one directory up from this prop's blueprint location.
+    --- Split this prop into multiple sub-props, placing one at each of our bone locations.
+    --- The child prop names are taken from the names of the bones of this prop.
+    ---
+    --- If this prop has bones named
+    ---           "one", "two", "two_01", "two_02"
+    ---
+    --- We will create props named
+    ---           "../one_prop.bp", "../two_prop.bp", "../two_prop.bp", "../two_prop.bp"
+    ---
+    --- Note that the optional _01, _02, _03 ending to the bone name is stripped off.
+    ---
+    --- You can pass an optional 'dirprefix' arg saying where to look for the child props.
+    --- If not given, it defaults to one directory up from this prop's blueprint location.
+    ---@param self Prop
+    ---@param dirprefix string
+    ---@return table
     SplitOnBonesByName = function(self, dirprefix)
 
         -- compute reclaim time of props
@@ -412,7 +419,8 @@ Prop = Class(moho.prop_methods) {
     end,
 
     --- Plays a sound with the prop as source.
-    -- @param sound The identifier in the prop blueprint.
+    ---@param self Prop
+    ---@param sound string The identifier in the prop blueprint.
     PlayPropSound = function(self, sound)
         local bp = self.Blueprint.Audio
         if bp and bp[sound] then
@@ -421,8 +429,9 @@ Prop = Class(moho.prop_methods) {
     end,
 
     --- Plays an ambient sound with the prop as source. When the sound
-    -- parameter is not provided the current ambient sound is removed.
-    -- @param sound The identifier in the prop blueprint.
+    --- parameter is not provided the current ambient sound is removed.
+    ---@param self Prop
+    ---@param sound string
     PlayPropAmbientSound = function(self, sound)
 
         -- if there is no identifier then remove the ambient sound
@@ -438,53 +447,35 @@ Prop = Class(moho.prop_methods) {
         end
     end,
 
-    -- DEPRECATED --
-
-    -- This should never be called - use the actual value.
+    ---@see use `prop.CachePosition` directly instead
+    ---@deprecated
+    ---@param self Prop
+    ---@return Vector
     GetCachePosition = function(self)
-
-        -- if not DeprecatedWarnings.GetCachePosition then 
-        --     DeprecatedWarnings.GetCachePosition = true 
-        --     SPEW("GetCachePosition is deprecated: use self.CachePosition instead")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
-
         return self.CachePosition
     end,
 
-    -- This should never be called - use the actual value. When set to false the prop can't take damage.
+    ---@see use `prop.CanTakeDamage` directly instead
+    ---@deprecated
+    ---@param self Prop
+    ---@param val boolean
     SetCanTakeDamage = function(self, val)
-
-        -- if not DeprecatedWarnings.SetCanTakeDamage then 
-        --     DeprecatedWarnings.SetCanTakeDamage = true 
-        --     SPEW("SetCanTakeDamage is deprecated: set self.CanTakeDamage instead")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
-
         self.CanTakeDamage = val
     end,
 
-    -- This should never be called - use the actual value. When set to false the prop can't be killed.
+    ---@see use `prop.CanBeKilled` directly instead
+    ---@deprecated
+    ---@param self Prop
+    ---@param val any
     SetCanBeKilled = function(self, val)
-
-        -- if not DeprecatedWarnings.SetCanBeKilled then 
-        --     DeprecatedWarnings.SetCanBeKilled = true 
-        --     SPEW("SetCanBeKilled is deprecated: set self.SetCanBeKilled instead")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
-
         self.CanBeKilled = val
     end,
 
-    -- This should never be called - use the actual value. Retrieves whether the prop can be killed.
-    CheckCanBeKilled = function(self, other)
-
-        -- if not DeprecatedWarnings.CheckCanBeKilled then 
-        --     DeprecatedWarnings.CheckCanBeKilled = true 
-        --     SPEW("CheckCanBeKilled is deprecated: use self.CheckCanBeKilled instead")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
-
+    ---@see compare with `prop.CanBeKilled` directly instead
+    ---@deprecated
+    ---@param self Prop
+    ---@return boolean
+    CheckCanBeKilled = function(self)
         return self.CanBeKilled
     end,
 }
@@ -492,5 +483,4 @@ Prop = Class(moho.prop_methods) {
 
 -- imports kept for backwards compatibility with mods
 local Entity = import("/lua/sim/entity.lua").Entity
-local DeprecatedWarnings = { }
 local TrashAdd = TrashBag.Add
