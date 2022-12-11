@@ -282,6 +282,9 @@ Unit = Class(moho.unit_methods) {
             AIUtils.ApplyCheatBuffs(self)
         end
 
+        -- for syncing data to UI
+        self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate)
+
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
             self.ReclaimedMass = 0
@@ -289,7 +292,7 @@ Unit = Class(moho.unit_methods) {
             self:GetStat("ReclaimedMass", 0)
             self:GetStat("ReclaimedEnergy", 0)
         end
-        
+
         -- add support for automated jamming reset
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
@@ -4521,7 +4524,7 @@ Unit = Class(moho.unit_methods) {
     ---@param value number
     SetRegen = function(self, value)
         self:SetRegenRate(value)
-        self.Sync.regen = value
+        self:SetStat("HitpointsRegeneration", value)
     end,
 
     -------------------------------------------------------------------------------------------

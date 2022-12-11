@@ -59,6 +59,7 @@ local TableGetn = table.getn
 ---@alias AllianceStatus 'Ally' | 'Enemy' | 'Neutral'
 
 ---@class AIBrain: moho.aibrain_methods
+---@field Army number
 ---@field AIPlansList string[][]
 ---@field AirAttackPoints? table
 ---@field AttackData AttackManager
@@ -221,6 +222,10 @@ AIBrain = Class(moho.aibrain_methods) {
         self.FactoryAssistList = {}
         self.DelayEqualBuildPlattons = {}
         self.BrainType = 'AI'
+    end,
+
+    IsBaseAI = function(self)
+        return ScenarioInfo.ArmySetup[self.Name].BaseAI
     end,
 
     --- Adds a HQ so that the engi mod knows we have it
@@ -921,19 +926,25 @@ AIBrain = Class(moho.aibrain_methods) {
             end
 
             -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
-            local function TransferUnitsToBrain(brains)
+            -- Optional Categories input (defaults to all units except wall and command)
+            local function TransferUnitsToBrain(brains, categoriesToTransfer)
                 if not table.empty(brains) then
+                    local units
                     if shareOption == 'FullShare' then
                         local indexes = {}
                         for _, brain in brains do
                             table.insert(indexes, brain.index)
                         end
-                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         TransferUnfinishedUnitsAfterDeath(units, indexes)
                     end
 
                     for k, brain in brains do
-                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        if categoriesToTransfer then
+                            units = self:GetListOfUnits(categoriesToTransfer, false)
+                        else
+                            units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        end
                         if units and not table.empty(units) then
                             local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
 
@@ -949,7 +960,8 @@ AIBrain = Class(moho.aibrain_methods) {
             end
 
             -- Sort the destiniation brains (armies/players) by rating (and if rating does not exist (such as with regular AI's), by score, after players with positive rating)
-            local function TransferUnitsToHighestBrain(brains)
+            -- optional category input (default of everything but walls and command)
+            local function TransferUnitsToHighestBrain(brains, categoriesToTransfer)
                 if not table.empty(brains) then
                     local ratings = ScenarioInfo.Options.Ratings
                     for i, brain in brains do 
@@ -962,7 +974,7 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
                     -- sort brains by rating
                     table.sort(brains, function(a, b) return a.rating > b.rating end)
-                    TransferUnitsToBrain(brains)
+                    TransferUnitsToBrain(brains, categoriesToTransfer)
                 end
             end
 
@@ -1044,7 +1056,12 @@ AIBrain = Class(moho.aibrain_methods) {
                 KillSharedUnits(self:GetArmyIndex()) -- Kill things I gave away
                 ReturnBorrowedUnits() -- Give back things I was given by others
             elseif shareOption == 'FullShare' then
-                TransferUnitsToHighestBrain(BrainCategories.Allies) -- Transfer things to allies, highest score first
+                TransferUnitsToHighestBrain(BrainCategories.Allies) -- Transfer things to allies, highest rating first
+                TransferOwnershipOfBorrowedUnits(BrainCategories.Allies) -- Give stuff away permanently
+            elseif shareOption == 'PartialShare' then
+                KillSharedUnits(self:GetArmyIndex(), categories.ALLUNITS - categories.STRUCTURE - categories.ENGINEER) -- Kill some things I gave away
+                ReturnBorrowedUnits() -- Give back things I was given by others
+                TransferUnitsToHighestBrain(BrainCategories.Allies, categories.STRUCTURE + categories.ENGINEER) -- Transfer some things to allies, highest rating first
                 TransferOwnershipOfBorrowedUnits(BrainCategories.Allies) -- Give stuff away permanently
             else
                 GetBackUnits(BrainCategories.Allies) -- Get back units I gave away
@@ -1289,7 +1306,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     IsDefeated = function(self)
         local status = self.Status
-        return status == "Defeat" or status == "Recalled"
+        return status == "Defeat" or status == "Recalled" or ArmyIsOutOfGame(self.Army)
     end,
 
     ---@param self AIBrain
@@ -1467,7 +1484,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         self.VOTable[string] = true
-        table.insert(Sync.Voice, {Cue = cue, Bank = bank})
+        import('/lua/SimSyncUtils.lua').SyncVoice({Cue = cue, Bank = bank})
 
         local timeout = VO['timeout']
         ForkThread(function()
@@ -4117,14 +4134,14 @@ AIBrain = Class(moho.aibrain_methods) {
         local highStrength = strengthTable[myIndex].Strength
         for k, v in strengthTable do
             -- It's an enemy, ignore
-            if not v.Enemy and not ArmyIsCivilian(k) and v.Brain.Result ~= 'defeat' then
+            if k ~= myIndex and not v.Enemy and not ArmyIsCivilian(k) and not v.Brain:IsDefeated() then
                 -- Ally too weak
                 if v.Strength < highStrength then
                     continue
                 end
                 -- If the brain has an enemy, it's our new enemy
                 local enemy = v.Brain:GetCurrentEnemy()
-                if enemy and not enemy:IsDefeated() then
+                if enemy then
                     highStrength = v.Strength
                     returnEnemy = v.Brain:GetCurrentEnemy()
                 end
@@ -4188,7 +4205,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
                 for k, v in armyStrengthTable do
                     -- Dont' target self and ignore allies
-                    if k ~= selfIndex and v.Enemy and v.Brain.Result ~= 'defeat' then
+                    if k ~= selfIndex and v.Enemy and not v.Brain:IsDefeated() then
                         
                         -- If we have a better candidate; ignore really weak enemies
                         if enemy and v.Strength < 20 then

@@ -7,14 +7,8 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import("/lua/ai/aiutilities.lua")
-local ScenarioFramework = import("/lua/scenarioframework.lua")
+
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
-local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
-local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
-local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
-local RebuildStructuresTemplate = import("/lua/buildingtemplates.lua").RebuildStructuresTemplate
-local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
 
 local UCBC = '/lua/editor/unitcountbuildconditions.lua'
 local BMBC = '/lua/editor/basemanagerbuildconditions.lua'

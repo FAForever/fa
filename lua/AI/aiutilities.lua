@@ -5,8 +5,8 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- --------------------------------------------------------------
 
-local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
-local UnitTemplates = import("/lua/unittemplates.lua").UnitTemplates
+local StructureTemplates = lazyimport("/lua/buildingtemplates.lua")
+local UnitTemplates = lazyimport("/lua/unittemplates.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local Utils = import("/lua/utilities.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
@@ -59,7 +59,7 @@ end
 
 function AIGetStructureUnitId(aiBrain, structureType)
     local unitId
-    for _, v in BuildingTemplates[aiBrain:GetFactionIndex()] do
+    for _, v in StructureTemplates.BuildingTemplates[aiBrain:GetFactionIndex()] do
         if v[1] == structureType then
             unitId = v[2]
             break
@@ -71,7 +71,7 @@ end
 
 function AIGetMobileUnitId(aiBrain, unitType)
     local unitId
-    for _, v in UnitTemplates[aiBrain:GetFactionIndex()] do
+    for _, v in UnitTemplates.UnitTemplates[aiBrain:GetFactionIndex()] do
         if v[1] == unitType then
             unitId = v[2]
             break

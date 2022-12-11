@@ -27,14 +27,6 @@
 
 ---@class Control : moho.control_methods
 ---@field _isDisabled boolean
----
----@field Left LazyVar
----@field Width LazyVar
----@field Right LazyVar
----@field Top LazyVar
----@field Height LazyVar
----@field Bottom LazyVar
----@field Depth LazyVar
 Control = Class(moho.control_methods) {
     --- Resets the control's layout to the defaults, in this case
     --- makes a circular dependency where you must have at least 4 defined.
