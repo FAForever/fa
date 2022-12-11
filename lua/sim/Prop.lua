@@ -398,7 +398,7 @@ Prop = Class(moho.prop_methods) {
         return self.CachePosition
     end,
 
-    ---@see no alternative, value is no longer used
+    ---@see no alternative, value is no longer in use
     ---@deprecated
     ---@param self Prop
     ---@param val boolean
