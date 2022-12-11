@@ -67,6 +67,7 @@ doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
 doscript("/lua/system/blueprints-projectiles.lua")
 doscript("/lua/system/blueprints-units.lua")
+doscript("/lua/system/blueprints-props.lua")
 doscript("/lua/system/blueprints-weapons.lua")
 
 ---@class PreGameData
@@ -830,6 +831,7 @@ function PostModBlueprints(all_bps)
     -- post process units and projectiles for easier access to information and sanitizing some fields
     PostProcessProjectiles(all_bps.Projectile)
     PostProcessUnits(all_bps.Unit)
+    PostProcessProps(all_bps.Prop)
 end
 
 

@@ -369,7 +369,7 @@ Prop = Class(moho.prop_methods) {
         if data then
             data.mass = nil
             data.position = nil
-            Sync.Reclaim[self.EntityId] = data
+            Sync.Reclaim[self.EntityId] = false
 
             self.SyncData = nil
         end
@@ -426,9 +426,11 @@ Prop = Class(moho.prop_methods) {
 PropInvulnerable = Class(Prop) {
     OnDamage = function() end,
     OnKilled = function() end,
+    SetupUILabel = function() end,
+    CleanupUILabel = function() end,
+    UpdateUILabel = function() end,
 }
 
 
 -- imports kept for backwards compatibility with mods
 local Entity = import("/lua/sim/entity.lua").Entity
-local TrashAdd = TrashBag.Add
