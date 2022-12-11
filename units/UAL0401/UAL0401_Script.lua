@@ -180,3 +180,4 @@ TypeClass = UAL0401
 
 -- Kept for Mod Backwards Compatability
 local Utilities = import("/lua/utilities.lua")
+local explosion = Explosion
