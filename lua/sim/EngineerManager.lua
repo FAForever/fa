@@ -226,7 +226,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param pauseVal number
     ---@param unitCheckFunc any
     ---@param category EntityCategory
-    ---@return boolean | number
+    ---@return number | true
     DisableEnergyGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
             if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
@@ -313,7 +313,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param econ any unused
     ---@param pauseVal number
-    ---@return boolean | number
+    ---@return number | true
     MassDrainCheck = function(unit, econ, pauseVal)
         if econ.MassIncome > econ.MassRequestOverTime then
             return true

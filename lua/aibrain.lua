@@ -3485,7 +3485,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@param platoon Unit
+    ---@param platoon any
     PBMPlatoonTimeOutThread = function(self, platoon)
         local minWait = 5 -- 240 CAMPAIGNS
         if platoon.BuildTimeOut and platoon.BuildTimeOut < minWait then

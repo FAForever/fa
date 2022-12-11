@@ -135,8 +135,8 @@ ADFTractorClaw = Class(Weapon) {
 
     --- Attempts to retrieve the unit behind the target, can return false if the blip is too far away from the unit due to jamming
     ---@param self ADFTractorClaw
-    ---@param blip Blip
-    ---@return Unit | false | Blip --[[@as Unit]]
+    ---@param blip Blip | Unit
+    ---@return Unit | false
         GetUnitBehindTarget = function(self, blip)
         if IsUnit(blip) then
             -- return the unit
@@ -519,7 +519,7 @@ AANDepthChargeBombWeapon = Class(DefaultProjectileWeapon) {
 
     ---@param self AANDepthChargeBombWeapon
     ---@param bone Bone
-    ---@return Projectile | nil
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -551,7 +551,7 @@ AANDepthChargeBombWeapon02 = Class(DefaultProjectileWeapon) {
 
     ---@param self AANDepthChargeBombWeapon02
     ---@param bone Bone
-    ---@return Projectile | nil
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
@@ -583,7 +583,7 @@ AANTorpedoCluster = Class(DefaultProjectileWeapon) {
 
     ---@param self AANTorpedoCluster
     ---@param bone Bone
-    ---@return Projectile | nil
+    ---@return Projectile
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
