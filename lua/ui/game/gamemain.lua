@@ -58,9 +58,6 @@ gameUIHidden = false
 PostScoreVideo = false
 IsSavedGame = false
 
--- Lobby options as set by the host in the lobby
-LobbyOptions = false
-
 -- The focus army as set at the start of the game. Allows us to detect whether someone was originally an observer or a player
 OriginalFocusArmy = -1
 
@@ -92,6 +89,7 @@ function SetLayout(layout)
     import("/lua/ui/game/controlgroups.lua").SetLayout()
     import("/lua/ui/game/chat.lua").SetLayout()
     import("/lua/ui/game/minimap.lua").SetLayout()
+    import("/lua/ui/game/massfabs.lua").SetLayout()
     import("/lua/ui/game/recall.lua").SetLayout()
 end
 
@@ -165,6 +163,7 @@ function CreateUI(isReplay)
     -- casting tools 
 
     import("/lua/ui/game/casting/mouse.lua")
+    import("/lua/ui/game/casting/painting.lua")
 
     -- overwrite some globals for performance / safety
 
@@ -182,6 +181,16 @@ function CreateUI(isReplay)
 
     -- prevents the nvidia stuttering bug with their more recent drivers
     ConExecute('d3d_WindowsCursor on')
+
+    -- tweak networking parameters
+    ConExecute('net_MinResendDelay 100')
+    ConExecute('net_MaxResendDelay 1000')
+
+    ConExecute('net_MaxSendRate 8192')
+    ConExecute('net_MaxBacklog 8192')
+
+    ConExecute('net_SendDelay 5')
+    ConExecute('net_AckDelay 5')
 
     -- enable experimental graphics
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
@@ -204,6 +213,7 @@ function CreateUI(isReplay)
             end
         end)
     end
+
     local focusArmy = GetFocusArmy()
 
     -- keep track of the original focus army
@@ -562,6 +572,7 @@ ObserveSelection = import("/lua/shared/observable.lua").Create()
 local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
+
     if ignoreSelection then
         return
     end
@@ -653,7 +664,6 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
         -- if something died in selection, restore command mode
         if n > 0 and not table.empty(removed) and table.empty(added) then
-            local CM = import("/lua/ui/game/commandmode.lua")
             local mode, data = unpack(CM.GetCommandMode())
 
             if mode then

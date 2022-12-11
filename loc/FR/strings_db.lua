@@ -7633,6 +7633,7 @@ MAPSEL_0047="16"
 gameui_0001 = "Dommages: %d, Cad. de tir: %0.2f (DPS: %d)  Portée: %d" --[[ r: "Rate" traduit de la façon la plus courte possible en << Cad.(ence) de tir >> --]]
 gameui_0002 = "Vitesse: %0.2f, Braquage: %0.2f" --[[ r: << (rayon de) Braquage >>, plus courte traduction possible de "Turning" --]]
 gameui_0003 = "Vitesse: %0.2f, Accélération: %0.2f, Braquage: %d"
+gameui_0010="%s (défaut)"
 OPTIONS_0226 = "Afficher le menu des prédéfinis" --[[ r: Toutes les options et tooltips d'option sont traduits à l'infinitif --]]
 OPTIONS_0227 = "Durée d'affichage du menu des predéf."
 OPTIONS_0228 = "Icônes stratégiques agrandis"

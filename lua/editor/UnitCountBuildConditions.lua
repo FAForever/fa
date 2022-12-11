@@ -1441,11 +1441,40 @@ end
 ---@param unitCount integer
 ---@return boolean
 function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount)
-    local EnemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
-    local OwnIndex = aiBrain:GetArmyIndex()
-    if aiBrain.CanPathToEnemy[OwnIndex][EnemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
-        --LOG('ForcePathLimit has no path and is equal to or more than '..unitCount..' land factories')
+    local currentEnemy = aiBrain:GetCurrentEnemy()
+    if not currentEnemy then
+        return true
+    end
+    local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    local selfIndex = aiBrain:GetArmyIndex()
+    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
         return false
+    end
+    return true
+end
+
+--- Buildcondition to decide if radars should upgrade based on other radar locations.
+---@param aiBrain AIBrain
+---@param locationType string
+---@param radarTech string
+---@return boolean
+function ShouldUpgradeRadar(aiBrain, locationType, radarTech)
+
+    -- loop over radars that are one tech higher
+    local basePos = aiBrain.BuilderManagers[locationType].Position
+    local otherRadars = aiBrain.Radars[radarTech]
+    for _, other in otherRadars do
+        -- determine if we're too close to higher tech radars
+        local range = other.Blueprint.Intel.RadarRadius
+        if range then
+            local squared = 0.64 * (range * range)
+            local ox, _, oz = other:GetPositionXYZ()
+            local dx = ox - basePos[1]
+            local dz = oz - basePos[3]
+            if dx * dx + dz * dz < squared then
+                return false
+            end
+        end
     end
     return true
 end

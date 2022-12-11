@@ -45,7 +45,7 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
     end,
 
     ProjectileSplit = function(self)
-        WaitSeconds(.1)
+        WaitSeconds(0.1)
         local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo03/SANHeavyCavitationTorpedo03_proj.bp'
         local vx, vy, vz = self:GetVelocity()
         local velocity = 7
@@ -57,7 +57,7 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
 
         -- Randomization of the spread
         local angleVariation = angle * 0.4 -- Adjusts angle variance spread
-        local spreadMul = .4 -- Adjusts the width of the dispersal
+        local spreadMul = 0.4 -- Adjusts the width of the dispersal
         local xVec = 0
         local yVec = vy
         local zVec = 0
@@ -66,6 +66,7 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
         -- damage, in case the torpedo hits something before it splits.
         local DividedDamageData = self.DamageData
         DividedDamageData.DamageAmount = DividedDamageData.DamageAmount / numProjectiles
+        self.DamageData = nil
 
         local FxFragEffect = EffectTemplate.SHeavyCavitationTorpedoSplit
 

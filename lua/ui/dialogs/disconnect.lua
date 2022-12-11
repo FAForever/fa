@@ -12,6 +12,7 @@ local Group = import("/lua/maui/group.lua").Group
 local GameMain = import("/lua/ui/game/gamemain.lua")
 
 local SessionClients = import("/lua/ui/override/sessionclients.lua")
+local scenario = SessionGetScenarioInfo()
 
 local parent = nil
 local myIndex = ''
@@ -101,8 +102,8 @@ local function CreateDialog(clients)
 
     -- retrieve disconnection delay and reduce it by five (that is how long it takes for the window to show)
     local disconnectionDelay = 85
-    if GameMain.LobbyOptions.DisconnectionDelay02 then 
-        disconnectionDelay = tonumber(GameMain.LobbyOptions.DisconnectionDelay02) - 5
+    if scenario.Options.DisconnectionDelay02 then 
+        disconnectionDelay = tonumber(scenario.Options.DisconnectionDelay02) - 5
     end
 
     local canEject = false

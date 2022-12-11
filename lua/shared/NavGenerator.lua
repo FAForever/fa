@@ -18,6 +18,9 @@ LayerColors = {
 ---@field Position Vector 
 ---@field Layer NavLayers
 
+---@class NavDebugGetLabelMetadataState
+---@field Id number
+
 ---@class NavDebugPathToState
 ---@field Origin Vector 
 ---@field Destination Vector 

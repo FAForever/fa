@@ -606,6 +606,7 @@ local function CreateNameFilter(data)
 end
 
 function CreateDialog(x, y)
+    
     if dialog then
         dialog:Destroy()
         dialog = nil

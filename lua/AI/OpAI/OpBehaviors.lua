@@ -10,16 +10,8 @@
 ----------------------------------------------------------------------------------
 -- Platoon Lua Module                    --
 ----------------------------------------------------------------------------------
-local AIUtils = import("/lua/ai/aiutilities.lua")
 local Utilities = import("/lua/utilities.lua")
-local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
-local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
-local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
-local ScenarioFramework = import("/lua/scenarioframework.lua")
-local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
-
-
 
 -- ===== CDR ADD BEHAVIORS ===== --
 function CDROverchargeBehavior(platoon)

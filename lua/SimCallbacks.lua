@@ -231,7 +231,7 @@ Callbacks.CapStructure = function(data, units)
         -- make sure we're allowed to mess with this unit, if not we exclude
         if unit.Army and OkayToMessWithArmy(unit.Army) then 
             -- compute blueprint id
-            local faction = unit.factionCategory
+            local faction = unit.Blueprint.FactionCategory
             local blueprintID = ConstructBlueprintID(faction, data.id)
 
             -- check if this unit can build it
@@ -822,26 +822,10 @@ Callbacks.LoadIntoTransports = function(data, selection)
     end
 end
 
-Callbacks.NavGenerate = function(data)
-    import("/lua/sim/navgenerator.lua").Generate()
-end
-
-Callbacks.NavToggleScanLayer = function(data)
-    import("/lua/sim/navdebug.lua").ToggleScanLayer(data)
-end
-
-Callbacks.NavToggleScanLabels = function(data)
-    import("/lua/sim/navdebug.lua").ToggleScanLabels(data)
-end
-
-Callbacks.NavDebugCanPathTo = function(data)
-    import("/lua/sim/navdebug.lua").CanPathTo(data)
-end
-
-Callbacks.NavDebugPathTo = function(data)
-    import("/lua/sim/navdebug.lua").PathTo(data)
-end
-
-Callbacks.NavDebugGetLabel = function(data)
-    import("/lua/sim/navdebug.lua").GetLabel(data)
-end
+Callbacks.NavToggleScanLayer = import("/lua/sim/navdebug.lua").ToggleScanLayer
+Callbacks.NavToggleScanLabels = import("/lua/sim/navdebug.lua").ToggleScanLabels
+Callbacks.NavDebugCanPathTo = import("/lua/sim/navdebug.lua").CanPathTo
+Callbacks.NavDebugPathTo = import("/lua/sim/navdebug.lua").PathTo
+Callbacks.NavDebugGetLabel = import("/lua/sim/navdebug.lua").GetLabel
+Callbacks.NavDebugGetLabelMetadata = import("/lua/sim/navdebug.lua").GetLabelMeta
+Callbacks.NavGenerate = import("/lua/sim/navgenerator.lua").Generate

@@ -80,7 +80,7 @@ XSL0401 = Class(SWalkingLandUnit) {
     end,
 
     DeathThread = function(self, overkillRatio , instigator)
-        local size = self.Size
+        local blueprint = self.Blueprint
         local bigExplosionBones = {'Torso', 'Head', 'pelvis'}
         local explosionBones = {'Right_Arm_B07', 'Right_Arm_B03',
                                 'Left_Arm_B10', 'Left_Arm_B07',

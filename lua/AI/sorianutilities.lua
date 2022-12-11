@@ -7,6 +7,7 @@
 --
 ----------------------------------------------------------------------------
 
+local SyncAIChat = import('/lua/simsyncutils.lua').SyncAIChat
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 local Utils = import("/lua/utilities.lua")
@@ -627,9 +628,10 @@ function AISendChat(aigroup, ainickname, aiaction, targetnickname, extrachat)
             else
                 chattext = AIChatText[aiaction][ranchat]
             end
-            table.insert(Sync.AIChat, {group=aigroup, text=chattext, sender=ainickname})
+
+            SyncAIChat({group=aigroup, text=chattext, sender=ainickname})
         else
-            table.insert(Sync.AIChat, {group=aigroup, text=aiaction, sender=ainickname})
+            SyncAIChat({group=aigroup, text=aiaction, sender=ainickname})
         end
     end
 end

@@ -5,8 +5,8 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- --------------------------------------------------------------
 
-local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
-local UnitTemplates = import("/lua/unittemplates.lua").UnitTemplates
+local StructureTemplates = lazyimport("/lua/buildingtemplates.lua")
+local UnitTemplates = lazyimport("/lua/unittemplates.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local Utils = import("/lua/utilities.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
@@ -59,7 +59,7 @@ end
 
 function AIGetStructureUnitId(aiBrain, structureType)
     local unitId
-    for _, v in BuildingTemplates[aiBrain:GetFactionIndex()] do
+    for _, v in StructureTemplates.BuildingTemplates[aiBrain:GetFactionIndex()] do
         if v[1] == structureType then
             unitId = v[2]
             break
@@ -71,7 +71,7 @@ end
 
 function AIGetMobileUnitId(aiBrain, unitType)
     local unitId
-    for _, v in UnitTemplates[aiBrain:GetFactionIndex()] do
+    for _, v in UnitTemplates.UnitTemplates[aiBrain:GetFactionIndex()] do
         if v[1] == unitType then
             unitId = v[2]
             break
@@ -2958,4 +2958,31 @@ function AIFindFurthestExpansionAreaNeedsEngineer(aiBrain, locationType, radius,
     end
 
     return retPos, retName
+end
+
+---@param table pos1
+---@param table pos2
+---@param integer dist
+---@param bool reverse
+---@return table
+function ShiftPosition(pos1, pos2, dist, reverse)
+    --This function will lerp a position in two ways
+    --By default it will shift from pos2 to pos1 at the specified distance    
+    --if the reverse bool is set it will go in the oposite direction e.g towards/away
+    --It is multipurpose, used for simple vector3 lerps and enemy avoidence logic
+    if not pos1 or not pos2 then
+        WARN('*AI WARNING: ShiftPosition missing positions')
+    end
+    local delta
+    if reverse then
+        delta = VDiff(pos1,pos2)
+    else
+        delta = VDiff(pos2,pos1)
+    end
+    local norm = math.max(VDist2(delta[1],delta[3],0,0),1)
+    local x = pos1[1]+dist*delta[1]/norm
+    local z = pos1[3]+dist*delta[3]/norm
+    x = math.min(ScenarioInfo.size[1]-5,math.max(5,x))
+    z = math.min(ScenarioInfo.size[2]-5,math.max(5,z))
+    return {x,GetSurfaceHeight(x,z),z}
 end

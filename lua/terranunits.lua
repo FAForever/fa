@@ -42,13 +42,16 @@ local AmphibiousLandUnit = DefaultUnitsFile.AmphibiousLandUnit
 
 local EffectUtil = import("/lua/effectutilities.lua")
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
-local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
 --------------------------------------------------------------
 --  AIR FACTORY STRUCTURES
 --------------------------------------------------------------
 ---@class TAirFactoryUnit : AirFactoryUnit
 TAirFactoryUnit = Class(AirFactoryUnit) {
+
+    ---@param self TAirFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
         for _, v in self.BuildEffectBones do
@@ -57,11 +60,13 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
         end
     end,
 
+    ---@param self TAirFactoryUnit
     OnPaused = function(self)
         AirFactoryUnit.OnPaused(self)
         self:StopArmsMoving()
     end,
 
+    ---@param self TAirFactoryUnit
     OnUnpaused = function(self)
         AirFactoryUnit.OnUnpaused(self)
         if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') then
@@ -69,6 +74,9 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
         end
     end,
 
+    ---@param self TAirFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         AirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         if order  ~= 'Upgrade' then
@@ -76,25 +84,31 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
         end
     end,
 
+    ---@param self TAirFactoryUnit
+    ---@param unitBuilding Unit
     OnStopBuild = function(self, unitBuilding)
         AirFactoryUnit.OnStopBuild(self, unitBuilding)
         self:StopArmsMoving()
     end,
 
+    ---@param self TAirFactoryUnit
     OnFailedToBuild = function(self)
         AirFactoryUnit.OnFailedToBuild(self)
         self:StopArmsMoving()
     end,
 
+    ---@param self TAirFactoryUnit
     StartArmsMoving = function(self)
         if not self.ArmsThread then
             self.ArmsThread = self:ForkThread(self.MovingArmsThread)
         end
     end,
 
+    ---@param self TAirFactoryUnit
     MovingArmsThread = function(self)
     end,
 
+    ---@param self TAirFactoryUnit
     StopArmsMoving = function(self)
         if self.ArmsThread then
             KillThread(self.ArmsThread)
@@ -127,6 +141,9 @@ TConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 ---@class TConstructionUnit : ConstructionUnit
 TConstructionUnit = Class(ConstructionUnit) {
 
+    ---@param self TConstructionUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
         if self.Layer == 'Water' then
@@ -134,6 +151,9 @@ TConstructionUnit = Class(ConstructionUnit) {
         end
     end,
 
+    ---@param self TConstructionUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
@@ -143,6 +163,9 @@ TConstructionUnit = Class(ConstructionUnit) {
         end
     end,
 
+    ---@param self TConstructionUnit
+    ---@param new any
+    ---@param old any
     LayerChangeTrigger = function(self, new, old)
         if self.Blueprint.Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
@@ -155,6 +178,8 @@ TConstructionUnit = Class(ConstructionUnit) {
         end
     end,
 
+    ---@param self TConstructionUnit
+    ---@param water boolean
     TransformThread = function(self, water)
         if not self.TransformManipulator then
             self.TransformManipulator = CreateAnimator(self)
@@ -198,6 +223,9 @@ THoverLandUnit = Class(HoverLandUnit) {}
 --------------------------------------------------------------
 ---@class TLandFactoryUnit : LandFactoryUnit
 TLandFactoryUnit = Class(LandFactoryUnit) {
+    ---@param self TConstructionUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
         for _, v in self.BuildEffectBones do
@@ -236,6 +264,9 @@ TMassStorageUnit = Class(MassStorageUnit) {}
 --------------------------------------------------------------
 ---@class TMobileFactoryUnit : AmphibiousLandUnit
 TMobileFactoryUnit = Class(AmphibiousLandUnit) {
+    ---@param self TConstructionUnit
+    ---@param builder Unit
+    ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder.UnitId then
@@ -262,6 +293,9 @@ TSonarUnit = Class(SonarUnit) {}
 --------------------------------------------------------------
 ---@class TSeaFactoryUnit : SeaFactoryUnit
 TSeaFactoryUnit = Class(SeaFactoryUnit) {
+    ---@param self TSeaFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
         for _, v in self.BuildEffectBones do
@@ -270,11 +304,13 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
         end
     end,
 
+    ---@param self TSeaFactoryUnit
     OnPaused = function(self)
         SeaFactoryUnit.OnPaused(self)
         self:StopArmsMoving()
     end,
 
+    ---@param self TSeaFactoryUnit
     OnUnpaused = function(self)
         SeaFactoryUnit.OnUnpaused(self)
         if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') then
@@ -282,6 +318,9 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
         end
     end,
 
+    ---@param self TSeaFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         if order  ~= 'Upgrade' then
@@ -289,25 +328,31 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
         end
     end,
 
+    ---@param self TSeaFactoryUnit
+    ---@param unitBuilding boolean
     OnStopBuild = function(self, unitBuilding)
         SeaFactoryUnit.OnStopBuild(self, unitBuilding)
         self:StopArmsMoving()
     end,
 
+    ---@param self TSeaFactoryUnit
     OnFailedToBuild = function(self)
         SeaFactoryUnit.OnFailedToBuild(self)
         self:StopArmsMoving()
     end,
 
+    ---@param self TSeaFactoryUnit
     StartArmsMoving = function(self)
         if not self.ArmsThread then
             self.ArmsThread = self:ForkThread(self.MovingArmsThread)
         end
     end,
 
+    ---@param self TSeaFactoryUnit
     MovingArmsThread = function(self)
     end,
 
+    ---@param self TSeaFactoryUnit
     StopArmsMoving = function(self)
         if self.ArmsThread then
             KillThread(self.ArmsThread)
@@ -342,6 +387,8 @@ TStructureUnit = Class(StructureUnit) {}
 
 ---@class TRadarJammerUnit : RadarJammerUnit
 TRadarJammerUnit = Class(RadarJammerUnit) {
+
+    ---@param self TRadarJammerUnit
     OnIntelEnabled = function(self)
         if not self.MySpinner then
             self.MySpinner = CreateRotator(self, 'Spinner', 'y', nil, 0, 45, 180)
@@ -351,6 +398,7 @@ TRadarJammerUnit = Class(RadarJammerUnit) {
         self.MySpinner:SetTargetSpeed(180)
     end,
 
+    ---@param self TRadarJammerUnit
     OnIntelDisabled = function(self)
         RadarJammerUnit.OnIntelDisabled(self)
         self.MySpinner:SetTargetSpeed(0)
@@ -404,11 +452,18 @@ TShieldSeaUnit = Class(ShieldSeaUnit) {}
 --------------------------------------------------------------
 ---@class TPodTowerUnit : TStructureUnit
 TPodTowerUnit = Class(TStructureUnit) {
+
+    ---@param self TPodTowerUnit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         TStructureUnit.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.FinishedBeingBuilt)
     end,
 
+    ---@param self TPodTowerUnit
+    ---@param pod any
+    ---@param podData any
     PodTransfer = function(self, pod, podData)
         -- Set the pod as active, set new parent and creator for the pod, store the pod handle
         if not self.PodData[pod.PodName].Active then
@@ -426,6 +481,8 @@ TPodTowerUnit = Class(TStructureUnit) {
         end
     end,
 
+    ---@param self TPodTowerUnit
+    ---@param captor Unit
     OnCaptured = function(self, captor)
         -- Iterate through pod data and set up callbacks for transfer of pods.
         -- We never get the handle to the new tower, so we set up a new unit capture trigger to do the same thing
@@ -453,6 +510,7 @@ TPodTowerUnit = Class(TStructureUnit) {
         TStructureUnit.OnCaptured(self, captor)
     end,
 
+    ---@param self TPodTowerUnit
     OnDestroy = function(self)
         TStructureUnit.OnDestroy(self)
         -- Iterate through pod data, kill all the pods and set them inactive
@@ -465,6 +523,9 @@ TPodTowerUnit = Class(TStructureUnit) {
         end
     end,
 
+    ---@param self TPodTowerUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         TStructureUnit.OnStartBuild(self,unitBeingBuilt,order)
         local unitid = self:GetBlueprint().General.UpgradesTo
@@ -474,10 +535,14 @@ TPodTowerUnit = Class(TStructureUnit) {
         end
     end,
 
+    ---@param self TPodTowerUnit
+    ---@param podName string
     NotifyOfPodDeath = function(self,podName)
         self.PodData[podName].Active = false
     end,
 
+    ---@param self TPodTowerUnit
+    ---@param podData any
     SetPodConsumptionRebuildRate = function(self, podData)
         local bp = self:GetBlueprint()
         -- Get build rate of tower
@@ -492,6 +557,9 @@ TPodTowerUnit = Class(TStructureUnit) {
         self:SetConsumptionActive(true)
     end,
 
+    ---@param self TPodTowerUnit
+    ---@param podName string
+    ---@return Unit
     CreatePod = function(self, podName)
         local location = self:GetPosition(self.PodData[podName].PodAttachpoint)
         self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self.Army, location[1], location[2], location[3], 0, 0, 0)
@@ -500,6 +568,9 @@ TPodTowerUnit = Class(TStructureUnit) {
         return self.PodData[podName].PodHandle
     end,
 
+    ---@param self TPodTowerUnit
+    ---@param bone Bone
+    ---@param attachee Unit
     OnTransportAttach = function(self, bone, attachee)
         attachee:SetDoNotTarget(true)
         self:PlayUnitSound('Close')
@@ -522,6 +593,9 @@ TPodTowerUnit = Class(TStructureUnit) {
         end
     end,
 
+    ---@param self TPodTowerUnit
+    ---@param bone Bone
+    ---@param attachee Unit
     OnTransportDetach = function(self, bone, attachee)
         self:PlayUnitSound('Open')
         self:RequestRefreshUI()
@@ -541,6 +615,8 @@ TPodTowerUnit = Class(TStructureUnit) {
         end
     end,
 
+    ---@param self TPodTowerUnit
+    ---@param forceAnimation boolean
     InitializeTower = function(self, forceAnimation)
         -- Create the pod for the kennel.  DO NOT ADD TO TRASH.
         -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
@@ -735,3 +811,6 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     },
 }
+
+-- kept for mod compatiablilty
+local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams

@@ -40,8 +40,8 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 
 local DeprecatedWarnings = { }
 
----Structures that are reused for performance reasons
----Maps unit.techCategory to a number so we can do math on it for naval units
+--- Structures that are reused for performance reasons
+--- Maps unit.techCategory to a number so we can do math on it for naval units
 local veterancyTechLevels = {
     TECH1 = 1,
     TECH2 = 2,
@@ -99,6 +99,7 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods
 ---@field Brain AIBrain
+---@field Trash TrashBag
 ---@field Buffs {Affects: table<BuffEffectName, BlueprintBuff.Effect>, buffTable: table<string, table>}
 ---@field Army Army
 ---@field UnitId UnitId
@@ -132,7 +133,10 @@ Unit = Class(moho.unit_methods) {
     DestructionPartsHighToss = {},
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
-    EconomyProductionInitiallyActive = true,
+
+    -- kept for backwards compatibility, these default to true
+    CanTakeDamage = true,
+    CanBeKilled = true,
 
     EnergyModifier = 0,
     MassModifier = 0,
@@ -214,10 +218,6 @@ Unit = Class(moho.unit_methods) {
 
         -- cache often accessed values into inner table
         self.Blueprint = bp
-        self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
-        self.techCategory = bp.TechCategory
-        self.layerCategory = bp.LayerCategory
-        self.factionCategory = bp.FactionCategory
         self.MovementEffects = bp.Display.MovementEffects
         self.Audio = bp.Audio
 
@@ -233,47 +233,17 @@ Unit = Class(moho.unit_methods) {
         -- used to fix engine related bugs
         self.EngineFlags = { }
 
-        -- Store size information for performance
-        self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
-        self.SkirtOffset = { OffsetX = bp.Physics.SkirtOffsetX, OffsetZ = bp.Physics.SkirtOffsetZ }
-        self.SkirtSize = { SizeX = bp.Physics.SkirtSizeX, SizeZ = bp.Physics.SkirtSizeZ }
-        self.Size = { SizeX = bp.SizeX, SizeY = bp.SizeY, SizeZ = bp.SizeZ }
+        -- used for rebuilding mechanic
+        self.Repairers = {}
 
-        -- Set number of effects per damage depending on its volume
-        local x, y, z = self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
-        local vol = x * y * z
-
-        self:ShowPresetEnhancementBones()
-
-        local damageamounts = 1
-        if vol >= 20 then
-            damageamounts = 6
-            self.FxDamageScale = 2
-        elseif vol >= 10 then
-            damageamounts = 4
-            self.FxDamageScale = 1.5
-        elseif vol >= 0.5 then
-            damageamounts = 2
-        end
-
-        self.FxDamage1Amount = self.FxDamage1Amount or damageamounts
-        self.FxDamage2Amount = self.FxDamage2Amount or damageamounts
-        self.FxDamage3Amount = self.FxDamage3Amount or damageamounts
-        self.DamageEffectsBag = {
-            {},
-            {},
-            {},
-        }
-
-        -- Set up effect emitter bags
+        -- used by almost all unit types, sadly some are even used for structures in rare occasions
         self.MovementEffectsBag = TrashBag()
-        self.IdleEffectsBag = TrashBag()
         self.TopSpeedEffectsBag = TrashBag()
         self.BeamExhaustEffectsBag = TrashBag()
+        self.IdleEffectsBag = TrashBag()
         self.OnBeingBuiltEffectsBag = TrashBag()
 
         -- Set up veterancy
-        self.xp = 0
         self.Instigators = {}
         self.totalDamageTaken = 0
 
@@ -292,39 +262,28 @@ Unit = Class(moho.unit_methods) {
         self:SetConsumptionPerSecondMass(bpEcon.MaintenanceConsumptionPerSecondMass or 0)
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
         self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-
-        if self.EconomyProductionInitiallyActive then
-            self:SetProductionActive(true)
-        end
+        self:SetProductionActive(true)
 
         self.Buffs = {
             BuffTable = {},
             Affects = {},
         }
 
+        self:ShowPresetEnhancementBones()
         self:SetIntelRadius('Vision', bp.Intel.VisionRadius or 0)
 
-        self.CanTakeDamage = true
-        self.CanBeKilled = true
 
         local bpDeathAnim = bp.Display.AnimationDeath
         if bpDeathAnim and not table.empty(bpDeathAnim) then
             self.PlayDeathAnimation = true
         end
 
-        -- Used for keeping track of resource consumption
-        self.MaintenanceConsumption = false
-        self.ActiveConsumption = false
-        self.ProductionEnabled = true
-
-        self.Repairers = {}
-
-        -- Cheating
         if self.Brain.CheatEnabled then
             AIUtils.ApplyCheatBuffs(self)
         end
-        -- Flags for scripts
-        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
+
+        -- for syncing data to UI
+        self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
@@ -334,10 +293,14 @@ Unit = Class(moho.unit_methods) {
             self:GetStat("ReclaimedEnergy", 0)
         end
 
+        -- add support for automated jamming reset
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
             self.ResetJammer = -1
         end
+
+        -- Flags for scripts
+        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
     end,
 
     -------------------------------------------------------------------------------------------
@@ -350,13 +313,16 @@ Unit = Class(moho.unit_methods) {
     ---@return number x1
     ---@return number z1
     GetSkirtRect = function(self)
-        local x, y, z = self:GetPositionXYZ()
-        local fx = x - self.Footprint.SizeX * .5
-        local fz = z - self.Footprint.SizeZ * .5
-        local sx = fx + self.SkirtOffset.OffsetX
-        local sz = fz + self.SkirtOffset.OffsetZ
+        local blueprint = self.Blueprint
+        local physics = blueprint.Physics
+        local footprint = blueprint.Footprint
+        local x, _, z = self:GetPositionXYZ()
+        local fx = x - footprint.SizeX * .5
+        local fz = z - footprint.SizeZ * .5
+        local sx = fx + physics.SkirtOffsetX
+        local sz = fz + physics.SkirtOffsetZ
 
-        return sx, sz, sx + self.SkirtSize.SizeX, sz + self.SkirtSize.SizeZ
+        return sx, sz, sx + blueprint.Physics.SkirtSizeX, sz + blueprint.Physics.SkirtSizeZ
     end,
 
     ---@param self Unit
@@ -365,9 +331,8 @@ Unit = Class(moho.unit_methods) {
     ---@return number Y
     ---@return number Z
     GetRandomOffset = function(self, scalar)
-        local bp = self.blueprint
-        local size = self.Size
-        local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
+        local bp = self.Blueprint
+        local sx, sy, sz = bp.SizeX, bp.SizeY, bp.SizeZ
         local heading = self:GetHeading()
 
         sx = sx * scalar
@@ -428,8 +393,8 @@ Unit = Class(moho.unit_methods) {
     UpdateBuildRestrictions = function(self)
 
         -- retrieve info of factory
-        local faction = self.factionCategory
-        local layer = self.layerCategory
+        local faction = self.Blueprint.FactionCategory
+        local layer = self.Blueprint.LayerCategory
         local aiBrain = self:GetAIBrain()
 
         -- the pessimists we are, remove all the units!
@@ -1319,67 +1284,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    ---@param self Unit
-    ---@param newHealth number
-    ---@param oldHealth number
-    ManageDamageEffects = function(self, newHealth, oldHealth)
-        -- Health values come in at fixed 25% intervals
-        if newHealth < oldHealth then
-            if oldHealth == 0.75 then
-                for i = 1, self.FxDamage1Amount do
-                    self:PlayDamageEffect(self.FxDamage1, self.DamageEffectsBag[1])
-                end
-            elseif oldHealth == 0.5 then
-                for i = 1, self.FxDamage2Amount do
-                    self:PlayDamageEffect(self.FxDamage2, self.DamageEffectsBag[2])
-                end
-            elseif oldHealth == 0.25 then
-                for i = 1, self.FxDamage3Amount do
-                    self:PlayDamageEffect(self.FxDamage3, self.DamageEffectsBag[3])
-                end
-            end
-        else
-            if newHealth <= 0.25 and newHealth > 0 then
-                for _, v in self.DamageEffectsBag[3] do
-                    v:Destroy()
-                end
-            elseif newHealth <= 0.5 and newHealth > 0.25 then
-                for _, v in self.DamageEffectsBag[2] do
-                    v:Destroy()
-                end
-            elseif newHealth <= 0.75 and newHealth > 0.5 then
-                for _, v in self.DamageEffectsBag[1] do
-                    v:Destroy()
-                end
-            elseif newHealth > 0.75 then
-                self:DestroyAllDamageEffects()
-            end
-        end
-    end,
-
-    ---@param self Unit
-    ---@param fxTable FileName[][]
-    ---@param fxBag any[]
-    PlayDamageEffect = function(self, fxTable, fxBag)
-        local effects = fxTable[Random(1, table.getn(fxTable))]
-        if not effects then return end
-
-        local totalBones = self:GetBoneCount()
-        local bone = Random(1, totalBones) - 1
-        local bpDE = self.Blueprint.Display.DamageEffects
-        for _, v in effects do
-            local fx
-            if bpDE then
-                local num = Random(1, table.getsize(bpDE))
-                local bpFx = bpDE[num]
-                fx = CreateAttachedEmitter(self, bpFx.Bone or 0, self.Army, v):ScaleEmitter(self.FxDamageScale):OffsetEmitter(bpFx.OffsetX or 0, bpFx.OffsetY or 0, bpFx.OffsetZ or 0)
-            else
-                fx = CreateAttachedEmitter(self, bone, self.Army, v):ScaleEmitter(self.FxDamageScale)
-            end
-            table.insert(fxBag, fx)
-        end
-    end,
-
+    --- Health values come in at fixed 25% intervals
     ---@param self Unit
     ---@param new number
     ---@param old number
@@ -1388,12 +1293,93 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    DestroyAllDamageEffects = function(self)
-        for kb, vb in self.DamageEffectsBag do
-            for ke, ve in vb do
-                ve:Destroy()
+    ---@param newHealth number
+    ---@param oldHealth number
+    ManageDamageEffects = function(self, newHealth, oldHealth)
+
+        if not self.DamageEffectsBag then
+            self.DamageEffectsBag = {
+                TrashBag(),
+                TrashBag(),
+                TrashBag(),
+            }
+
+            self.Trash:Add(self.DamageEffectsBag[1])
+            self.Trash:Add(self.DamageEffectsBag[2])
+            self.Trash:Add(self.DamageEffectsBag[3])
+        end
+
+        local damageEffectsBags = self.DamageEffectsBag
+        if newHealth < oldHealth then
+            local amount = self.Blueprint.SizeDamageEffects
+            if oldHealth == 0.75 then
+                for i = 1, amount do
+                    self:PlayDamageEffect(self.FxDamage1, damageEffectsBags[1])
+                end
+            elseif oldHealth == 0.5 then
+                for i = 1, amount do
+                    self:PlayDamageEffect(self.FxDamage2, damageEffectsBags[2])
+                end
+            elseif oldHealth == 0.25 then
+                for i = 1, amount do
+                    self:PlayDamageEffect(self.FxDamage3, damageEffectsBags[3])
+                end
+            end
+        else
+            if newHealth <= 0.25 and newHealth > 0 then
+                damageEffectsBags[3]:Destroy()
+            elseif newHealth <= 0.5 and newHealth > 0.25 then
+                damageEffectsBags[2]:Destroy()
+            elseif newHealth <= 0.75 and newHealth > 0.5 then
+                damageEffectsBags[1]:Destroy()
+            elseif newHealth > 0.75 then
+                self:DestroyAllDamageEffects()
             end
         end
+    end,
+
+    ---@param self Unit
+    ---@param fxTable FileName[][]
+    ---@param fxBag TrashBag
+    PlayDamageEffect = function(self, fxTable, fxBag)
+        -- cache for performance
+        local TableGetn = table.getn
+        local Random = Random
+
+        -- retrieve an effect, which can be nil
+        local effects = fxTable[Random(1, TableGetn(fxTable))]
+        if not effects then
+            return
+        end
+
+        -- create the effects
+        local blueprint = self.Blueprint
+        local totalBones = self:GetBoneCount()
+        local bone = Random(1, totalBones) - 1
+        local bpDE = self.Blueprint.Display.DamageEffects
+        for _, v in effects do
+            local fx
+
+            -- version where a unit has very few bones, and therefore we add a pre-defined offset
+            if bpDE then
+                local num = Random(1, TableGetn(bpDE))
+                local bpFx = bpDE[num]
+                fx = CreateAttachedEmitter(self, bpFx.Bone or 0, self.Army, v):ScaleEmitter(blueprint.SizeDamageEffectsScale):OffsetEmitter(bpFx.OffsetX or 0, bpFx.OffsetY or 0, bpFx.OffsetZ or 0)
+            -- version where a unit has sufficient bones and we just use that
+            else
+                fx = CreateAttachedEmitter(self, bone, self.Army, v):ScaleEmitter(blueprint.SizeDamageEffectsScale)
+            end
+
+            fxBag:Add(fx)
+        end
+    end,
+
+    ---@param self Unit
+    DestroyAllDamageEffects = function(self)
+        local damageEffectsBags = self.DamageEffectsBag
+        damageEffectsBags[1]:Destroy()
+        damageEffectsBags[2]:Destroy()
+        damageEffectsBags[3]:Destroy()
     end,
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
@@ -1640,7 +1626,7 @@ Unit = Class(moho.unit_methods) {
 
         if not Buffs[regenBuffName] then
             -- Get techLevel as a number to do math on it
-            local techLevel = veterancyTechLevels[self.techCategory] or 1
+            local techLevel = veterancyTechLevels[self.Blueprint.TechCategory] or 1
 
             -- Treat naval units as one level higher
             if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
@@ -1949,9 +1935,8 @@ Unit = Class(moho.unit_methods) {
 
     ---@param self Unit
     SinkDestructionEffects = function(self)
-        local size = self.Size
-        local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
-        local vol = sx * sy * sz
+        local blueprint = self.Blueprint
+        local vol = blueprint.SizeVolume
         local numBones = self:GetBoneCount() - 1
         local pos = self:GetPosition()
         local surfaceHeight = GetSurfaceHeight(pos[1], pos[3])
@@ -2192,11 +2177,22 @@ Unit = Class(moho.unit_methods) {
                 v:Destroy()
             end
         end
-        
-        TrashDestroy(self.MovementEffectsBag)
-        TrashDestroy(self.IdleEffectsBag)
-        TrashDestroy(self.TopSpeedEffectsBag)
-        TrashDestroy(self.BeamExhaustEffectsBag)
+    
+        if self.MovementEffectsBag then 
+            self.MovementEffectsBag:Destroy()
+        end
+
+        if self.IdleEffectsBag then 
+            self.IdleEffectsBag:Destroy()
+        end
+
+        if self.TopSpeedEffectsBag then 
+            self.TopSpeedEffectsBag:Destroy()
+        end
+
+        if self.BeamExhaustEffectsBag then
+            self.BeamExhaustEffectsBag:Destroy()
+        end
 
         if self.TransportBeamEffectsBag then 
             self.TransportBeamEffectsBag:Destroy()
@@ -2480,7 +2476,7 @@ Unit = Class(moho.unit_methods) {
                     EXPERIMENTAL = 2,
                     COMMAND = 2,
                 }
-                local defaultMult = techMultipliers[self.techCategory] or 2
+                local defaultMult = techMultipliers[self.Blueprint.TechCategory] or 2
 
                 self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
             end
@@ -2581,7 +2577,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Don't try sending a Notify message from here if we're an ACU
-        if self.techCategory ~= 'COMMAND' then
+        if self.Blueprint.TechCategory ~= 'COMMAND' then
             self:SendNotifyMessage('completed')
         end
 
@@ -2610,7 +2606,7 @@ Unit = Class(moho.unit_methods) {
                 local pos = self:GetPosition()
                 local terrainType = GetTerrainType(pos[1], pos[3])
                 if bpTM[terrainType.Style] then
-                    self:SetMesh(bpTM[terrainType.Style])
+                    self:SetMesh(bpTM[terrainType.Style], true)
                     useTerrainType = true
                 end
             end
@@ -4528,7 +4524,7 @@ Unit = Class(moho.unit_methods) {
     ---@param value number
     SetRegen = function(self, value)
         self:SetRegenRate(value)
-        self.Sync.regen = value
+        self:SetStat("HitpointsRegeneration", value)
     end,
 
     -------------------------------------------------------------------------------------------
@@ -4930,7 +4926,7 @@ Unit = Class(moho.unit_methods) {
             if not source then
                 local bp = self.Blueprint
                 if bp.CategoriesHash.RESEARCH then
-                    unitType = string.lower('research' .. self.layerCategory .. self.techCategory)
+                    unitType = string.lower('research' .. self.Blueprint.LayerCategory .. self.Blueprint.TechCategory)
                     category = 'tech'
                 elseif EntityCategoryContains(categories.NUKE * categories.STRUCTURE - categories.EXPERIMENTAL, self) then -- Ensure to exclude Yolona Oss, which gets its own message
                     unitType = 'nuke'
@@ -4938,7 +4934,7 @@ Unit = Class(moho.unit_methods) {
                 elseif EntityCategoryContains(categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY, self) then
                     unitType = 'arty'
                     category = 'other'
-                elseif self.techCategory == 'EXPERIMENTAL' then
+                elseif self.Blueprint.TechCategory == 'EXPERIMENTAL' then
                     unitType = bp.BlueprintId
                     category = 'experimentals'
                 else
@@ -4946,7 +4942,7 @@ Unit = Class(moho.unit_methods) {
                 end
             else -- We are being called from the Enhancements chain (ACUs)
                 id = self.EntityId
-                category = string.lower(self.factionCategory)
+                category = string.lower(self.Blueprint.FactionCategory)
             end
 
             if trigger == 'transferred' then
@@ -5027,7 +5023,12 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
     ---@param unitBeingBuilt Unit A flag to determine whether our consumption should be active
     GetUpgradeAnimation = function(self, unitBeingBuilt)
-        return self.Blueprint.Display.AnimationUpgrade
+        local display = self.Blueprint.Display
+        if display.AnimationUpgradeTable and display.AnimationUpgradeTable[unitBeingBuilt.Blueprint.BlueprintId] then
+            return display.AnimationUpgradeTable[unitBeingBuilt.Blueprint.BlueprintId]
+        end
+
+        return display.AnimationUpgrade
     end,
 
     --- Called when a missile launched by this unit is intercepted
@@ -5118,7 +5119,6 @@ Unit = Class(moho.unit_methods) {
     OnConsumptionInActive = function(self) end,
 
     -- Called when the C function unit.SetProductionActive is called
-
     OnProductionActive = function(self) end,
     OnProductionInActive = function(self) end,
 
@@ -5167,28 +5167,17 @@ Unit = Class(moho.unit_methods) {
 
     --- Deprecated functionality
 
+    ---@deprecated
     ---@param self Unit
     ---@param fn function
     AddOnHorizontalStartMoveCallback = function(self, fn)
-
-        if not DeprecatedWarnings.AddOnHorizontalStartMoveCallback then 
-            DeprecatedWarnings.AddOnHorizontalStartMoveCallback = true 
-            WARN("AddOnHorizontalStartMoveCallback is deprecated and no longer functional. There is no alternative.")
-            WARN("Stacktrace: " .. repr(debug.traceback()))
-        end
-
     end,
 
     --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
     ---@param self Unit
+    ---@deprecated
     StartRocking = function(self)
-
-        -- if not DeprecatedWarnings.StartRocking then 
-        --     DeprecatedWarnings.StartRocking = true 
-        --     SPEW("StartRocking is deprecated.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
 
         local bp = self.Blueprint.Display
         local speed = bp.MaxRockSpeed
@@ -5207,13 +5196,8 @@ Unit = Class(moho.unit_methods) {
     --- Stops the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
     ---@param self Unit
+    ---@deprecated
     StopRocking = function(self)
-
-        -- if not DeprecatedWarnings.StopRocking then 
-        --     DeprecatedWarnings.StopRocking = true 
-        --     SPEW("StopRocking is deprecated.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
 
         if self.StartRockThread then
             -- clear it so that GC can take it
@@ -5230,13 +5214,8 @@ Unit = Class(moho.unit_methods) {
     --- Rocking thread to move a unit when it is on the water.
     ---@param self Unit
     ---@param speed number
+    ---@deprecated
     RockingThread = function(self, speed)
-
-        -- if not DeprecatedWarnings.RockingThread then 
-        --     DeprecatedWarnings.RockingThread = true 
-        --     SPEW("RockingThread is deprecated.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
 
         -- default value
         speed = speed or 1.5
@@ -5259,18 +5238,13 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+
     --- Stopping of the rocking thread, allowing it to gracefully end instead of suddenly
-    -- warping to the original position.
+    --- warping to the original position.
+    ---@deprecated
     ---@param self Unit
     ---@param speed number
     EndRockingThread = function(self, speed)
-
-        -- if not DeprecatedWarnings.EndRockingThread then 
-        --     DeprecatedWarnings.EndRockingThread = true 
-        --     SPEW("EndRockingThread is deprecated.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
-
         if self.RockManip then
 
             -- default value
@@ -5287,159 +5261,98 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    ---@deprecated
     ---@param self Unit
     updateBuildRestrictions = function(self)
-        -- if not DeprecatedWarnings.updateBuildRestrictions then 
-        --     SPEW("updateBuildRestrictions is deprecated. Call unit.UpdateBuildRestrictions instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        --     DeprecatedWarnings.updateBuildRestrictions = true 
-        -- end
-
-        -- call the old function
         self:UpdateBuildRestrictions()
     end,
 
+    ---@deprecated
     ---@param aiBrain AIBrain
     ---@param category EntityCategory
     FindHQType = function(aiBrain, category)
-        if not DeprecatedWarnings.FindHQType then 
-            DeprecatedWarnings.FindHQType = true 
-            WARN("FindHQType is deprecated and is no longer functional. There is no alternative.")
-            WARN("Stacktrace: " .. repr(debug.traceback()))
-        end
     end,
 
+    ---@deprecated
     ---@param self Unit
     SetDead = function(self)
-        -- if not DeprecatedWarnings.SetDead then 
-        --     DeprecatedWarnings.SetDead = true 
-        --     SPEW("SetDead is deprecated: use unit.Dead = true instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
         self.Dead = true
     end,
 
+    ---@deprecated
     ---@param self Unit
     ---@return boolean
     IsDead = function(self)
-        -- if not DeprecatedWarnings.IsDead then 
-        --     DeprecatedWarnings.IsDead = true 
-        --     SPEW("IsDead is deprecated: use unit.Dead instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
-
         return self.Dead
     end,
 
+    ---@deprecated
     ---@param self Unit
     ---@return Vector
     GetCachePosition = function(self)
-        -- if not DeprecatedWarnings.GetCachePosition then 
-        --     DeprecatedWarnings.GetCachePosition = true 
-        --     SPEW("GetCachePosition is deprecated: use unit:GetPosition() instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
         return self:GetPosition()
     end,
     
+    ---@deprecated
     ---@param self Unit
     ---@return number
     GetFootPrintSize = function(self)
-        -- if not DeprecatedWarnings.GetFootPrintSize then 
-        --     DeprecatedWarnings.GetFootPrintSize = true 
-        --     SPEW("GetFootPrintSize is deprecated: use unit.FootPrintSize instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
         return self.FootPrintSize
     end,
     
+    ---@deprecated
     ---@param self Unit
     ---@return number sizeX
     ---@return number sizeY
     ---@return number sizeZ
     GetUnitSizes = function(self)
-        -- if not DeprecatedWarnings.GetUnitSizes then 
-        --     DeprecatedWarnings.GetUnitSizes = true 
-        --     SPEW("GetUnitSizes is deprecated: use unit.Size.SizeX, unit.Size.SizeY, unit.Size.SizeZ instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
-        return self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
+        local blueprint = self.Blueprint
+        return blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ
     end,
 
+    ---@deprecated
     ---@param self Unit
     ---@param val number
     SetCanTakeDamage = function(self, val)
-        -- if not DeprecatedWarnings.SetCanTakeDamage then 
-        --     DeprecatedWarnings.SetCanTakeDamage = true 
-        --     SPEW("SetCanTakeDamage is deprecated: use unit.CanTakeDamage = val instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
         self.CanTakeDamage = val
     end,
 
+    ---@deprecated
     ---@param self Unit
     ---@return boolean
     CheckCanTakeDamage = function(self)
-        -- if not DeprecatedWarnings.CheckCanTakeDamage then 
-        --     DeprecatedWarnings.CheckCanTakeDamage = true 
-        --     SPEW("CheckCanTakeDamage is deprecated: use unit.CanTakeDamage instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
         return self.CanTakeDamage
     end,
 
+    ---@deprecated
     ---@param self Unit
     ---@param other any
     ---@return boolean
     CheckCanBeKilled = function(self, other)
-        -- if not DeprecatedWarnings.CheckCanBeKilled then 
-        --     DeprecatedWarnings.CheckCanBeKilled = true 
-        --     SPEW("CheckCanBeKilled is deprecated: use unit.CanBeKilled instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
         return self.CanBeKilled
     end,
     
+    ---@deprecated
     ---@param self Unit
     ---@param val number
     SetCanBeKilled = function(self, val)
-        -- if not DeprecatedWarnings.SetCanBeKilled then 
-        --     DeprecatedWarnings.SetCanBeKilled = true 
-        --     SPEW("SetCanBeKilled is deprecated: use unit.CanBeKilled = val instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
         self.CanBeKilled = val
     end,
 
+    ---@deprecated
     ---@param self Unit
     ---@return boolean
     GetUnitBeingBuilt = function(self)
-        -- if not DeprecatedWarnings.GetUnitBeingBuilt then
-        --     DeprecatedWarnings.GetUnitBeingBuilt = true
-        --     SPEW("GetUnitBeingBuilt is deprecated: use unit.UnitBeingBuilt instead.")
-        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
-        -- end
-
         return self.UnitBeingBuilt
     end,
 }
 
--- upvalued math functions for performance
-local MathMax = math.max
-
--- upvalued globals for performance
-local EntityCategoryContains = EntityCategoryContains
-
 -- upvalued moho functions for performance
 local EntityGetArmy = _G.moho.entity_methods.GetArmy
-local EntityGetBlueprint = _G.moho.entity_methods.GetBlueprint
 local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
 
 local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
-
--- upvalued categories for performance
-local CategoriesDummyUnit = categories.DUMMYUNIT
 
 ---@class DummyUnit : moho.unit_methods
 DummyUnit = Class(moho.unit_methods) {
@@ -5454,7 +5367,6 @@ DummyUnit = Class(moho.unit_methods) {
 
         -- cache often accessed values into inner table
         self.Blueprint = self:GetBlueprint()
-        self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
     end,
 
     --- Typically called by functions
@@ -5464,3 +5376,28 @@ DummyUnit = Class(moho.unit_methods) {
     ---@param self DummyUnit
     UpdateAssistersConsumption = function (self) end,
 }
+
+-- Backwards compatibility with mods
+
+-- As we try to improve the performance of the base game we do
+-- our best to keep compatible with (unmaintained) mods. This is
+-- our approach to that when we remove values of the unit table
+-- to preserve more memory: the moment we detect a sim mod we 
+-- add back in the fields that mods rely on.
+
+if next(__active_mods) then
+
+    SPEW("Sim mod detected - adding in missing fields to the unit class to improve compatibility")
+
+    local oldUnit = Unit
+    Unit = Class(oldUnit) {
+        ---@param self Unit
+        OnCreate = function(self)
+            oldUnit.OnCreate(self)
+
+            self.factionCategory = self.Blueprint.FactionCategory
+            self.layerCategory = self.Blueprint.LayerCategory
+            self.factionCategory = self.Blueprint.FactionCategory
+        end,
+    }
+end

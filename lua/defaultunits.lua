@@ -816,8 +816,8 @@ FactoryUnit = Class(StructureUnit) {
         if self.Blueprint.CategoriesHash["RESEARCH"] and self:GetFractionComplete() == 1.0 then
 
             -- update internal state
-            self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-            self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+            self.Brain:RemoveHQ(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, self.Blueprint.TechCategory)
+            self.Brain:SetHQSupportFactoryRestrictions(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory)
 
             -- update all units affected by this
             local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
@@ -892,8 +892,8 @@ FactoryUnit = Class(StructureUnit) {
 
         if self.Blueprint.CategoriesHash["RESEARCH"] then
             -- update internal state
-            self.Brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
-            self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+            self.Brain:AddHQ(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, self.Blueprint.TechCategory)
+            self.Brain:SetHQSupportFactoryRestrictions(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory)
 
             -- update all units affected by this
             local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
@@ -1378,12 +1378,33 @@ MassStorageUnit = Class(StructureUnit) { }
 ---@class RadarUnit : StructureUnit
 RadarUnit = Class(StructureUnit) {
 
+    OnCreate = function(self)
+        StructureUnit.OnCreate(self)
+
+        -- keep track of radars
+        self.Brain.Radars[self.Blueprint.TechCategory][self.EntityId] = self
+    end,
+
     ---@param self RadarUnit
     ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
+    end,
+
+    OnKilled = function (self, instigator, type, overkillRatio)
+        StructureUnit.OnKilled(self, instigator, type, overkillRatio)
+
+        -- keep track of radars
+        self.Brain.Radars[self.Blueprint.TechCategory][self.EntityId] = nil
+    end,
+
+    OnDestroy = function (self)
+        StructureUnit.OnDestroy(self)
+
+        -- keep track of radars
+        self.Brain.Radars[self.Blueprint.TechCategory][self.EntityId] = nil
     end,
 
     ---@param self RadarUnit
@@ -1624,14 +1645,12 @@ QuantumGateUnit = Class(FactoryUnit) { }
 ---@class MobileUnit : Unit
 MobileUnit = Class(Unit) {
 
-    -- Added for engymod. When created, units must re-check their build restrictions
     ---@param self MobileUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:SetFireState(FireState.GROUND_FIRE)
     end,
 
-    ---comment
     ---@param self MobileUnit
     ---@param instigator Unit
     ---@param type string
@@ -1645,13 +1664,12 @@ MobileUnit = Class(Unit) {
         end
     end,
 
-    ---comment
     ---@param self MobileUnit
     ---@param builder Unit
     ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         Unit.StartBeingBuiltEffects(self, builder, layer)
-        if self.factionCategory == 'UEF' then
+        if self.Blueprint.FactionCategory == 'UEF' then
             EffectUtil.CreateUEFUnitBeingBuiltEffects(self, builder, self.OnBeingBuiltEffectsBag)
         end
     end,
@@ -1917,11 +1935,11 @@ AirUnit = Class(MobileUnit) {
     ---@param scale number
     CreateUnitAirDestructionEffects = function(self, scale)
         local scale = explosion.GetAverageBoundingXZRadius(self)
-        local size = self.Size
+        local blueprint = self.Blueprint
         explosion.CreateDefaultHitExplosion(self, scale)
 
         if self.ShowUnitDestructionDebris then
-            explosion.CreateDebrisProjectiles(self, scale, {size.SizeX, size.SizeY, size.SizeZ})
+            explosion.CreateDebrisProjectiles(self, scale, {blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ})
         end
     end,
 

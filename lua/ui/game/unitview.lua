@@ -665,8 +665,7 @@ function UpdateWindow(info)
             controls.shieldText:Hide()
 
             if info.userUnit ~= nil then
-                local bp = info.userUnit:GetBlueprint()
-                local regen = UnitData[info.entityId].regen or bp.Defense.RegenRate
+                local regen = info.userUnit:GetStat("HitpointsRegeneration", 0).Value or 0
                 controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth, regen))
             end
 

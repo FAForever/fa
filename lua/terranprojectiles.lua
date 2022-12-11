@@ -1,17 +1,12 @@
 ------------------------------------------------------------
---
 --  File     : /lua/terranprojectiles.lua
 --  Author(s): John Comes, Gordon Duclos, Matt Vainio
---
---  Summary  :
---
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 --------------------------------------------------------------------------
 --  TERRAN PROJECTILES SCRIPTS
 --------------------------------------------------------------------------
-local Projectile = import("/lua/sim/projectile.lua").Projectile
 local DefaultProjectileFile = import("/lua/sim/defaultprojectiles.lua")
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
 local OnWaterEntryEmitterProjectile = DefaultProjectileFile.OnWaterEntryEmitterProjectile
@@ -19,12 +14,10 @@ local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
 local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectile
 local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
 local SingleCompositeEmitterProjectile = DefaultProjectileFile.SingleCompositeEmitterProjectile
-local Explosion = import("/lua/defaultexplosions.lua")
+
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
-local util = import("/lua/utilities.lua")
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
-local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 ---@class TFragmentationGrenade : EmitterProjectile
 TFragmentationGrenade = Class(EmitterProjectile) {
@@ -168,11 +161,14 @@ TDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
     FxImpactNone = {},
     FxEnterWater= EffectTemplate.WaterSplash01,
 
+    ---@param self TDepthChargeProjectile
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self)
         self:TrackTarget(false)
     end,
 
+    ---@param self TDepthChargeProjectile
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
 
@@ -184,6 +180,8 @@ TDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
         -- self:SetVelocity(0.25)
     end,
 
+    ---@param self TDepthChargeProjectile
+    ---@param tbl table
     AddDepthCharge = function(self, tbl)
         if not tbl then return end
         if not tbl.Radius then return end
@@ -194,8 +192,6 @@ TDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
         self.Trash:Add(self.MyDepthCharge)
     end,
 }
-
-
 
 --------------------------------------------------------------------------
 --  TERRAN GAUSS CANNON PROJECTILES
@@ -209,27 +205,34 @@ TDFGeneralGaussCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactUnderWater = {},
 }
 
+---(UEB2301) UEF Triad and (UES0103) UEF Frigate and (UES0202) UEF Cruiser and (UEl0201) UEF Striker and (UEL0202) UEF Pillar
 ---@class TDFGaussCannonProjectile : TDFGeneralGaussCannonProjectile
-TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- (UEB2301) UEF Triad and (UES0103) UEF Frigate and (UES0202) UEF Cruiser and (UEl0201) UEF Striker and (UEL0202) UEF Pillar
+TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
     FxImpactUnit = EffectTemplate.TGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TGaussCannonHitUnit01,
     FxImpactLand = EffectTemplate.TGaussCannonHitLand01,
 }
 
+---(UES0201) UEF Destroyer
 ---@class TDFMediumShipGaussCannonProjectile : TDFGeneralGaussCannonProjectile
-TDFMediumShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- (UES0201) UEF Destroyer
+TDFMediumShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.TMediumShipGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TMediumShipGaussCannonHit01,
     FxImpactLand = EffectTemplate.TMediumShipGaussCannonHit01,
 }
 
+--- UES0302 (UEF Battleship)
 ---@class TDFBigShipGaussCannonProjectile : TDFGeneralGaussCannonProjectile
-TDFBigShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES0302 (UEF Battleship)
+TDFBigShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.TShipGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TShipGaussCannonHit01,
     FxImpactLand = EffectTemplate.TShipGaussCannonHit01,
+    
+    ---@param self TDFBigShipGaussCannonProjectile
+    ---@param targetType string
+    ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
         MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
 
@@ -238,16 +241,18 @@ TDFBigShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UE
     end,
 }
 
+--- Triad (T2 PD)
 ---@class TDFMediumLandGaussCannonProjectile : TDFGeneralGaussCannonProjectile
-TDFMediumLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- Triad (T2 PD)
+TDFMediumLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.TMediumLandGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TMediumLandGaussCannonHit01,
     FxImpactLand = EffectTemplate.TMediumLandGaussCannonHit01,
 }
 
+--- Fatboy
 ---@class TDFBigLandGaussCannonProjectile : TDFGeneralGaussCannonProjectile
-TDFBigLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- Fatboy
+TDFBigLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.TBigLandGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TBigLandGaussCannonHit01,
@@ -257,8 +262,10 @@ TDFBigLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- Fa
 --------------------------------------------------------------------------
 --  TERRAN HEAVY PLASMA CANNON PROJECTILES
 --------------------------------------------------------------------------
+
+--- SACU, titan, T3 gunship and T3 transport
 ---@class THeavyPlasmaCannonProjectile : MultiPolyTrailProjectile
-THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) { -- SACU, titan, T3 gunship and T3 transport
+THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxTrails = EffectTemplate.TPlasmaCannonHeavyMunition,
     RandomPolyTrails = 1,
     PolyTrailOffset = {0,0,0},
@@ -268,12 +275,13 @@ THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) { -- SACU, titan,
     FxImpactLand = EffectTemplate.TPlasmaCannonHeavyHit01,
 }
 
-
 --------------------------------
 --  UEF SMALL YIELD NUCLEAR BOMB
 --------------------------------
+
+--- strategic bomber
 ---@class TIFSmallYieldNuclearBombProjectile : EmitterProjectile
-TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) { -- strategic bomber
+TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) {
     -- FxTrails = {},
     -- FxImpactUnit = EffectTemplate.TSmallYieldNuclearBombHit01,
     -- FxImpactProp = EffectTemplate.TSmallYieldNuclearBombHit01,
@@ -295,8 +303,10 @@ TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) { -- strategic bom
 --------------------------------------------------------------------------
 --  TERRAN BOT LASER PROJECTILES
 --------------------------------------------------------------------------
+
+--- ACU
 ---@class TLaserBotProjectile : MultiPolyTrailProjectile
-TLaserBotProjectile = Class(MultiPolyTrailProjectile) { -- ACU
+TLaserBotProjectile = Class(MultiPolyTrailProjectile) {
     PolyTrails = EffectTemplate.TLaserPolytrail01,
     PolyTrailOffset = {0,0,0},
     FxTrails = EffectTemplate.TLaserFxtrail01,
@@ -340,7 +350,6 @@ TMachineGunProjectile = Class(SinglePolyTrailProjectile) {
     },
 }
 
-
 --------------------------------------------------------------------------
 --  TERRAN AA MISSILE PROJECTILES - Air Targets
 --------------------------------------------------------------------------
@@ -375,7 +384,6 @@ TAntiNukeInterceptorProjectile = Class(SingleBeamProjectile) {
     FxProjectileHitScale = 5,
     FxImpactUnderWater = {},
 }
-
 
 --------------------------------------------------------------------------
 --  TERRAN CRUISE MISSILE PROJECTILES - Surface Targets
@@ -479,7 +487,6 @@ TNapalmHvyCarpetBombProjectile = Class(SinglePolyTrailProjectile) {
     PolyTrail = '/effects/emitters/default_polytrail_01_emit.bp',
 }
 
-
 --------------------------------------------------------------------------
 --  TERRAN PLASMA CANNON PROJECTILES
 --------------------------------------------------------------------------
@@ -574,6 +581,8 @@ TTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
     FxImpactNone = {},
     FxEnterWater= EffectTemplate.WaterSplash01,
 
+    ---@param self TTorpedoShipProjectile
+    ---@param inWater? boolean
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self)
         -- if we are starting in the water then immediately switch to tracking in water and
@@ -584,6 +593,7 @@ TTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
         end
     end,
 
+    ---@param self TTorpedoShipProjectile
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
@@ -596,6 +606,7 @@ TTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
         self:ForkThread(self.MovementThread)
     end,
 
+    ---@param self TTorpedoShipProjectile
     MovementThread = function(self)
         WaitTicks(1)
         self:SetVelocity(3)
@@ -613,6 +624,9 @@ TTorpedoSubProjectile = Class(EmitterProjectile) {
     FxImpactProp = EffectTemplate.TTorpedoHitUnit01,
     FxImpactUnderWater = EffectTemplate.TTorpedoHitUnit01,
     FxImpactNone = {},
+
+    ---@param self TTorpedoSubProjectile
+    ---@param inWater? boolean unused
     OnCreate = function(self, inWater)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         EmitterProjectile.OnCreate(self, inWater)
@@ -637,7 +651,6 @@ TBaseTempProjectile = Class(SinglePolyTrailProjectile) {
     PolyTrail = '/effects/emitters/aeon_laser_trail_01_emit.bp',
 }
 
-
 --------------------------------------------------------------------------
 --  UEF PLASMA GATLING CANNON PROJECTILE
 --------------------------------------------------------------------------
@@ -655,12 +668,13 @@ TGatlingPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) {
     PolyTrails = EffectTemplate.TPlasmaGatlingCannonPolyTrails,
 }
 
-
 --------------------------------------------------------------------------
 --  UEF IONIZED PLASMA GATLING CANNON PROJECTILE
 --------------------------------------------------------------------------
+
+--- percival
 ---@class TIonizedPlasmaGatlingCannon : SinglePolyTrailProjectile
-TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- percival
+TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) {
     FxImpactWater = EffectTemplate.TIonizedPlasmaGatlingCannonHit,
     FxImpactLand = EffectTemplate.TIonizedPlasmaGatlingCannonHit,
     FxImpactNone = EffectTemplate.TIonizedPlasmaGatlingCannonHit,
@@ -672,12 +686,13 @@ TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- percival
     FxImpactUnderWater = {},
 }
 
-
 --------------------------------------------------------------------------
 --  UEF HEAVY PLASMA GATLING CANNON PROJECTILE
 --------------------------------------------------------------------------
+
+--- ravager
 ---@class THeavyPlasmaGatlingCannon : SinglePolyTrailProjectile
-THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- ravager
+THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.THeavyPlasmaGatlingCannonHit,
     FxImpactProp = EffectTemplate.THeavyPlasmaGatlingCannonHit,
@@ -687,7 +702,6 @@ THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- ravager
     FxTrails = EffectTemplate.THeavyPlasmaGatlingCannonFxTrails,
     PolyTrail = EffectTemplate.THeavyPlasmaGatlingCannonPolyTrail,
 }
-
 
 -- this used to be the tri barelled hiro cannon.
 ---@class THiroLaser : SinglePolyTrailProjectile
@@ -704,4 +718,8 @@ THiroLaser = Class(SinglePolyTrailProjectile) {
     PolyTrail = EffectTemplate.THiroLaserPolytrail,
 }
 
-
+-- kept for mod backwards compatability
+local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local util = import('utilities.lua')
+local Explosion = import('defaultexplosions.lua')
+local Projectile = import('/lua/sim/projectile.lua').Projectile

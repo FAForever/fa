@@ -29,7 +29,7 @@
 ---@field RevealCivilians 'No' | 'Yes'
 ---@field RandomMap 'Off' | 'Official' | 'All'
 ---@field Score 'no' | 'yes'
----@field Share 'FullShare' | 'ShareUntilDeath' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@field Share 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
 ---@field Timeouts '0' | '3'| '-1'
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
@@ -204,6 +204,11 @@ globalOpts = {
                  text = "<LOC lobui_0744>Share Until Death",
                  help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
                  key = 'ShareUntilDeath',
+             },
+             {
+                 text = "<LOC lobui_0796>Partial Share",
+                 help = "<LOC lobui_0797>Your buildings and engineers will be transferred to your highest rated ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy.",
+                 key = 'PartialShare',
              },
              {
                  text = "<LOC lobui_0762>Traitors",
@@ -590,7 +595,7 @@ globalOpts = {
 ---@type ScenarioOption[]
 AIOpts = {
    {
-        default = 11,
+        default = 6,
         label = "<LOC aisettings_0001>>AIx Cheat Multiplier",
         help = "<LOC aisettings_0002>Set the cheat multiplier for the cheating AIs.",
         key = 'CheatMult',
@@ -603,7 +608,7 @@ AIOpts = {
         },
    },
    {
-        default = 11,
+        default = 6,
         label = "<LOC aisettings_0054>AIx Build Multiplier",
         help = "<LOC aisettings_0055>Set the build rate multiplier for the cheating AIs.",
         key = 'BuildMult',

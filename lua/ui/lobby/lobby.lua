@@ -473,6 +473,17 @@ function GetAIPlayerData(name, AIPersonality, slot)
     if not AIColor then
         AIColor = GetAvailableColor()
     end
+
+    -- retrieve properties from AI table
+    local baseAI = false
+    local requiresNavMesh = false
+    for k, entry in aitypes do 
+        if entry.key == AIPersonality then
+            requiresNavMesh = requiresNavMesh or entry.requiresNavMesh
+            baseAI = baseAI or entry.baseAI
+        end
+    end
+
     return PlayerData(
         {
             OwnerID = hostID,
@@ -482,6 +493,10 @@ function GetAIPlayerData(name, AIPersonality, slot)
             AIPersonality = AIPersonality,
             PlayerColor = AIColor,
             ArmyColor = AIColor,
+
+            -- properties from AI table
+            RequiresNavMesh = requiresNavMesh,
+            BaseAI = baseAI
         }
 )
 end
@@ -2308,14 +2323,12 @@ local function UpdateGame()
 
             -- PREFETCHING --
 
-            -- we can't prefetch in combination with PreGameData as the prefs file
-            -- is not updated accordingly, as a result when it is retrieved in
-            -- blueprints.lua it may use the old values. As it is more relevant
-            -- to have custom icon support over having a slightly faster loading
-            -- time we skip the prefetching
+            -- Note that the PreGameData is not properly updated,
+            -- hence we can not rely on mod and / or lobby option
+            -- changes to be present.
 
-            -- local mods = Mods.GetGameMods(gameInfo.GameMods)
-            -- PrefetchSession(scenarioInfo.map, mods, true)
+            local mods = Mods.GetGameMods(gameInfo.GameMods)
+            PrefetchSession(scenarioInfo.map, mods, true)
 
         else
             AlertHostMapMissing()
