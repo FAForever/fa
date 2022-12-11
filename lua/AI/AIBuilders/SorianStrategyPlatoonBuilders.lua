@@ -7,10 +7,6 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-if not ScenarioInfo.GameHasAIs then
-    WARN("SorianStrategyPlatoonBuilders loaded in a non-ai game from:" .. reprs(debug.traceback()))
-end
-
 local ExBaseTmpl = 'ExpansionBaseTemplates'
 local UCBC = '/lua/editor/unitcountbuildconditions.lua'
 local MIBC = '/lua/editor/miscbuildconditions.lua'
