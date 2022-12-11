@@ -7,7 +7,7 @@
 -- ==============================================================================
 
 local CreateWreckage = import("/lua/wreckage.lua").CreateWreckage
-local UnitsAnalyzer   = import("/lua/ui/lobby/unitsanalyzer.lua")
+local UnitsAnalyzer = import("/lua/ui/lobby/unitsanalyzer.lua")
 
 local transferUnbuiltCategory = categories.EXPERIMENTAL + categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
