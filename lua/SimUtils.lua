@@ -19,11 +19,11 @@ local sharedUnits = {}
 function KillSharedUnits(owner, categoriesToKill)
     local sharedUnitOwner = sharedUnits[owner]
     if sharedUnitOwner and not table.empty(sharedUnitOwner) then
-        for _, unit in sharedUnitOwner do
+        for i, unit in sharedUnitOwner do
             if not unit.Dead and unit.oldowner == owner then
                 if categoriesToKill then
                     if EntityCategoryContains(categoriesToKill, unit) then
-                        table.remove(sharedUnits[owner], unit)
+                        table.remove(sharedUnits[owner], i)
                         unit:Kill()
                     end
                 else
