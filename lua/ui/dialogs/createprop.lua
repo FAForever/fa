@@ -9,7 +9,6 @@ local options = import("/lua/user/prefs.lua").GetFromCurrentProfile('options')
 local dialog, nameDialog, defaultEditField
 local activeFilters, activeFilterTypes, specialFilterControls, filterSet = {}, {}, {}, {}
 local UnitList, CreationList = {}, {}
-local __blueprints
 
 local TableGetN = table.getn
 

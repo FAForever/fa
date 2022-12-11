@@ -119,7 +119,7 @@ Wreckage = Class(Prop) {
 ---@param mass number
 ---@param energy number
 ---@param time number
----@param deathHitBox table
+---@param deathHitBox? table
 ---@return Prop
 function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitBox)
     local prop = CreateProp(position, bp.Wreckage.Blueprint)

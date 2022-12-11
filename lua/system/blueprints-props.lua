@@ -5,7 +5,6 @@ local function PostProcessProp(prop)
         if table.find(prop.Categories, 'INVULNERABLE') then
             prop.ScriptClass = 'PropInvulnerable'
             prop.ScriptModule = '/lua/sim/prop.lua'
-            reprsl(prop)
         end
     end
 end

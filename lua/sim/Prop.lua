@@ -23,6 +23,7 @@ local minimumLabelMass = 10
 ---@field TimeReclaim number
 ---@field ReclaimLeft number
 ---@field SyncData? table
+---@field Extents? table
 Prop = Class(moho.prop_methods) {
 
     IsProp = true,
@@ -62,6 +63,10 @@ Prop = Class(moho.prop_methods) {
 
         self:SetMaxHealth(maxHealth)
         self:SetHealth(self, maxHealth)
+
+        self:CacheAndRemoveCollisionExtents()
+        self:ApplyCachedCollisionExtents()
+
     end,
 
     ---@param self Prop 
@@ -218,28 +223,27 @@ Prop = Class(moho.prop_methods) {
         end
     end,
 
-    -- TODO
     ---@param self Prop
-    CacheCollisionShape = function(self)
-        -- only store this for wreckages, it is used to restore the collision box when armies are shared 
-        -- upon death, see '/lua/simutils.lua' and then the function TransferUnfinishedUnitsAfterDeath.
+    CacheAndRemoveCollisionExtents = function(self)
+        self.Extents = self:GetCollisionExtents()
+        self:SetCollisionShape('None')
     end,
 
-    --- Similar to `unit.RevertCollisionShape`, but then in Lua
     ---@param self Prop
-    RevertCollisionShape = function(self)
-        local x, y, z = self.CollisionCenterX, self.CollisionCenterY, self.CollisionCenterZ
-        local radius = self.CollisionRadius
-        local shape = self.CollisionShape
-        if radius and shape == 'Sphere' then
-            self:SetCollisionShape(shape, x, y, z, radius)
-        else
-            local sizeX, sizeY, sizeZ = self.CollisionSizeX, self.CollisionSizeY, self.CollisionSizeZ
-            self:SetCollisionShape(shape, x, y + sizeY, z, sizeX, sizeY, sizeZ)
-        end
-    end;
+    ApplyCachedCollisionExtents = function(self)
+        if self.Extents then
+            local pos = self.CachePosition
+            local min = self.Extents.Min
+            local max = self.Extents.Max
+            self.Extents = nil
 
-    --- Computes how long it would take to reclaim this prop with the reclaimer.
+            local x, y, z = min[1] - pos[1], min[2] - pos[2], min[3] - pos[3]
+            local sx, sy, sz = 0.5 * (max[1] - min[1]), 0.5 * (max[2] - min[2]), 0.5 * (max[3] - min[3])
+
+            self:SetCollisionShape("Box", x + sx, y + sy, z + sz, sx, sy, sz)
+        end
+    end,
+
     ---@param self Prop
     ---@param reclaimer Unit The unit to compute the duration for.
     ---@return number time it takes to reclaim
@@ -258,7 +262,7 @@ Prop = Class(moho.prop_methods) {
         if time < 0 then
             time = 0.0001
         end
-        
+
         return time, self.MaxEnergyReclaim, self.MaxMassReclaim
     end,
 
@@ -430,7 +434,6 @@ PropInvulnerable = Class(Prop) {
     CleanupUILabel = function() end,
     UpdateUILabel = function() end,
 }
-
 
 -- imports kept for backwards compatibility with mods
 local Entity = import("/lua/sim/entity.lua").Entity

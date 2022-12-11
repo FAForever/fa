@@ -466,7 +466,7 @@ function CreateRebuildTracker(unit, blockingEntities)
         for _, reclaim in wrecks do
             if reclaim.IsWreckage then
                 -- collision shape to none to prevent it from blocking, keep track to revert later
-                reclaim:SetCollisionShape('None')
+                reclaim:CacheAndRemoveCollisionExtents()
                 table.insert(blockingEntities, reclaim)
             end
         end
@@ -561,7 +561,7 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
     -- revert collision shapes of any blocking units or wreckage
     for _, entity in blockingEntities do
         if not entity:BeenDestroyed() then
-            entity:RevertCollisionShape()
+            entity:ApplyCachedCollisionExtents()
         end
     end
 end
