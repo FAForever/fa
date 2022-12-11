@@ -22,7 +22,6 @@ Wreckage = Class(Prop) {
         self.EntityId = self:GetEntityId()
         self.Blueprint = self:GetBlueprint()
         self.CachePosition = self:GetPosition()
-        self.SyncData = { }
     end,
 
     ---@param self Wreckage
