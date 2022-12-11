@@ -9,8 +9,6 @@ local GetTerrainHeight = GetTerrainHeight
 local StringGsub = string.gsub
 local TableInsert = table.insert
 
-local minimumLabelMass = 10
-
 ---@alias PropCallbackTypes 'OnKilled' | 'OnReclaimed'
 
 ---@class Prop : moho.prop_methods
@@ -41,7 +39,7 @@ Prop = Class(moho.prop_methods) {
         local economy = self.Blueprint.Economy
         local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1
         self:SetMaxReclaimValues(
-            economy.ReclaimTimeMultiplier,
+            economy.ReclaimTimeMultiplier or 1,
             (economy.ReclaimMassMax * modifier),
             (economy.ReclaimEnergyMax * modifier)
         )
@@ -63,10 +61,6 @@ Prop = Class(moho.prop_methods) {
 
         self:SetMaxHealth(maxHealth)
         self:SetHealth(self, maxHealth)
-
-        self:CacheAndRemoveCollisionExtents()
-        self:ApplyCachedCollisionExtents()
-
     end,
 
     ---@param self Prop 
@@ -223,12 +217,14 @@ Prop = Class(moho.prop_methods) {
         end
     end,
 
+    ---@see prop.ApplyCachedCollisionExtents for applying the cached extents
     ---@param self Prop
     CacheAndRemoveCollisionExtents = function(self)
         self.Extents = self:GetCollisionExtents()
         self:SetCollisionShape('None')
     end,
 
+    ---@see prop.CacheAndRemoveCollisionExtents for caching the extents
     ---@param self Prop
     ApplyCachedCollisionExtents = function(self)
         if self.Extents then
