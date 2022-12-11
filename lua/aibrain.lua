@@ -1481,7 +1481,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         self.VOTable[string] = true
-        table.insert(Sync.Voice, {Cue = cue, Bank = bank})
+        import('/lua/SimSyncUtils.lua').SyncVoice({Cue = cue, Bank = bank})
 
         local timeout = VO['timeout']
         ForkThread(function()
