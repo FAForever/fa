@@ -14,7 +14,6 @@ local CreateProp = CreateProp
 Wreckage = Class(Prop) {
 
     IsWreckage = true,
-    CanTakeDamage = true,
 
     ---@param self Wreckage
     OnCreate = function(self)
@@ -30,9 +29,7 @@ Wreckage = Class(Prop) {
     ---@param vector Vector
     ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if self.CanTakeDamage then
-            self:DoTakeDamage(instigator, amount, vector, damageType)
-        end
+        self:DoTakeDamage(instigator, amount, vector, damageType)
     end,
 
     ---@param self Wreckage

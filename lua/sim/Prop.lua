@@ -398,7 +398,7 @@ Prop = Class(moho.prop_methods) {
         return self.CachePosition
     end,
 
-    ---@see use `prop.CanTakeDamage` directly instead
+    ---@see no alternative, value is no longer used
     ---@deprecated
     ---@param self Prop
     ---@param val boolean
