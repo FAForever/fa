@@ -7,6 +7,7 @@
 -- ==============================================================================
 
 local CreateWreckage = import("/lua/wreckage.lua").CreateWreckage
+local UnitsAnalyzer   = import("/lua/ui/lobby/unitsanalyzer.lua")
 
 local transferUnbuiltCategory = categories.EXPERIMENTAL + categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
@@ -22,7 +23,7 @@ function KillSharedUnits(owner, categoriesToKill)
         for _, unit in sharedUnitOwner do
             if not unit.Dead and unit.oldowner == owner then
                 if categoriesToKill then
-                    if ContainsCategory(unit, categoriesToKill) then
+                    if UnitsAnalyzer.ContainsCategory(unit, categoriesToKill) then
                         table.remove(sharedUnits[owner], unit)
                         unit:Kill()
                     end
