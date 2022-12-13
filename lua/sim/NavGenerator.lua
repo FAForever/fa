@@ -1093,10 +1093,15 @@ end
 local function GenerateMarkerMetadata()
     local navLabels = NavLabels
 
+    local grids = {
+        Land = NavGrids['Land'],
+        Amphibious = NavGrids['Amphibious']
+    }
+    
     local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     for k = 1, en do
         local extractor = extractors[k]
-        for layer, grid in NavGrids do 
+        for layer, grid in grids do
             local label = grid:FindLeaf(extractor.position).label
 
             if label > 0 then
@@ -1114,7 +1119,7 @@ local function GenerateMarkerMetadata()
     local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
     for k = 1, hn do
         local hydro = hydrocarbons[k]
-        for layer, grid in NavGrids do 
+        for layer, grid in grids do
             local label = grid:FindLeaf(hydro.position).label
 
             if label > 0 then
