@@ -249,6 +249,7 @@ end
 local ShareNameLookup = { }
 ShareNameLookup["FullShare"] = "lobui_0742"
 ShareNameLookup["ShareUntilDeath"] = "lobui_0744"
+ShareNameLookup["PartialShare"] = "lobui_0796"
 ShareNameLookup["TransferToKiller"] = "lobui_0762"
 ShareNameLookup["Defectors"] = "lobui_0766"
 ShareNameLookup["CivilianDeserter"] = "lobui_0764"
@@ -256,6 +257,7 @@ ShareNameLookup["CivilianDeserter"] = "lobui_0764"
 local ShareDescriptionLookup = { }
 ShareDescriptionLookup["FullShare"] = "lobui_0743"
 ShareDescriptionLookup["ShareUntilDeath"] = "lobui_0745"
+ShareDescriptionLookup["PartialShare"] = "lobui_0797"
 ShareDescriptionLookup["TransferToKiller"] = "lobui_0763"
 ShareDescriptionLookup["Defectors"] = "lobui_0767"
 ShareDescriptionLookup["CivilianDeserter"] = "lobui_0765"

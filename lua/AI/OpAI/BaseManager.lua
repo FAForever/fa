@@ -66,9 +66,8 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
-local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
-local RebuildStructuresTemplate = import("/lua/buildingtemplates.lua").RebuildStructuresTemplate
-local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local StructureTemplates = lazyimport("/lua/buildingtemplates.lua")
+local UpgradeTemplates = lazyimport("/lua/upgradetemplates.lua")
 local Buff = import("/lua/sim/buff.lua")
 
 local BaseOpAI = import("/lua/ai/opai/baseopai.lua")
@@ -1160,7 +1159,7 @@ BaseManager = ClassSimple {
         local aiBrain = unit:GetAIBrain()
         local factionIndex = aiBrain:GetFactionIndex()
         local armyIndex = aiBrain:GetArmyIndex()
-        local upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, StructureUpgradeTemplates[factionIndex])
+        local upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, UpgradeTemplates.StructureUpgradeTemplates[factionIndex])
         if upgradeID then
             IssueClearCommands({ unit })
             IssueUpgrade({ unit }, upgradeID)
@@ -1201,7 +1200,7 @@ BaseManager = ClassSimple {
         else
             -- Convert building to the proper type to be built if needed (ex: T2 and T3 factories to T1)
             for i, unit in tblUnit do
-                for k, unitId in RebuildStructuresTemplate[factionIndex] do
+                for k, unitId in StructureTemplates.RebuildStructuresTemplate[factionIndex] do
                     if unit.type == unitId[1] then
                         table.insert(self.UpgradeTable, { FinalUnit = unit.type, UnitName = i, })
                         unit.buildtype = unitId[2]
@@ -1214,7 +1213,7 @@ BaseManager = ClassSimple {
             end
             for i, unit in tblUnit do
                 self:StoreStructureName(i, unit, unitNames)
-                for j, buildList in BuildingTemplates[factionIndex] do -- BuildList[1] is type ("T1LandFactory"); buildList[2] is unitId (ueb0101)
+                for j, buildList in StructureTemplates.BuildingTemplates[factionIndex] do -- BuildList[1] is type ("T1LandFactory"); buildList[2] is unitId (ueb0101)
                     local unitPos = { unit.Position[1], unit.Position[3], 0 }
                     if unit.buildtype == buildList[2] and buildList[1] ~= 'T3Sonar' then -- If unit to be built is the same id as the buildList unit it needs to be added
                         self:StoreBuildCounter(buildCounter, buildList[1], buildList[2], unitPos, i)

@@ -167,9 +167,12 @@ local orderToCursorCallback = {
 
     -- orders that have use of a cursors
     RULEUCC_Move = 'OnCursorMove',
+    RULEUCC_MoveAlt = 'OnCursorMoveAlt',
     RULEUCC_Guard = 'OnCursorGuard',
     RULEUCC_Repair = 'OnCursorRepair',
     RULEUCC_Attack = 'OnCursorAttack',
+    RULEUCC_AttackAlt = 'OnCursorAttackAlt',
+    RULEUCC_AttackGround = 'OnCursorAttackGround',
     RULEUCC_Patrol = 'OnCursorPatrol',
     RULEUCC_Teleport = 'OnCursorTeleport',
     RULEUCC_Tactical = 'OnCursorTactical',
@@ -233,9 +236,6 @@ WorldView = Class(moho.UIWorldView, Control) {
         --- Flag that indicates whether the cursor is over the world (instead of the UI)
         self.CursorOverWorld = false
 
-        --- Flag that indicates whether we ignore a lot of the processing and focus only on move and attack move commands
-        self.IgnoreMode = false
-
         self.Trash = TrashBag()
     end,
 
@@ -244,6 +244,7 @@ WorldView = Class(moho.UIWorldView, Control) {
     SetIgnoreSelectTolerance = function(self)
         local tolerance = -1000
         if tolerance != self.SelectionTolerance then
+            LOG('Tolerance set to: ' .. tolerance)
             ConExecute(string.format("ui_SelectTolerance %i", tolerance))
             self.SelectionTolerance = tolerance
         end
@@ -260,6 +261,7 @@ WorldView = Class(moho.UIWorldView, Control) {
         end
 
         if tolerance != self.SelectionTolerance then
+            LOG('Tolerance set to: ' .. tolerance)
             ConExecute(string.format("ui_SelectTolerance %i", tolerance))
             self.SelectionTolerance = tolerance
         end
@@ -271,6 +273,7 @@ WorldView = Class(moho.UIWorldView, Control) {
         local tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_reclaim')
 
         if tolerance != self.SelectionTolerance then
+            LOG('Tolerance set to: ' .. tolerance)
             ConExecute(string.format("ui_SelectTolerance %i", tolerance))
             self.SelectionTolerance = tolerance
         end
@@ -314,48 +317,29 @@ WorldView = Class(moho.UIWorldView, Control) {
         local command_mode, command_data = unpack(CommandMode.GetCommandMode())     -- is set when we issue orders manually, try to build something, etc
         local orderViaMouse = self:GetRightMouseButtonOrder()                       -- is set when our mouse is over a hostile unit, reclaim, etc and not in command mode
 
-        -- check if ignore mode is enabled
-        local ignoreMode = self:CheckIgnoreMode()
-        if ignoreMode ~= self.IgnoreMode then
-            if ignoreMode then
-                self:EnableIgnoreMode(true)
-            else
-                self:EnableIgnoreMode(false)
-            end
-
-            self.IgnoreMode = ignoreMode
-        end
-
         -- process precedence hierarchy
         ---@type CommandCap | 'CommandHighlight'
         local order
 
-        -- if toggled, we ignore everything but move and attack move
-        if self.IgnoreMode then
-            if orderViaMouse == 'RULEUCC_Move' and IsKeyDown(KeyCodeAlt) and selection then
-                order = 'RULEUCC_Attack'
-            else
-                order = 'RULEUCC_Move'
-            end
+        -- attack move that ignores everything
+        if IsKeyDown(KeyCodeAlt) and selection then
+            order = 'RULEUCC_AttackAlt'
 
-        -- otherwise, process as usual
+        -- usual order structure
         else
-            -- first command mode
+            -- 1. command mode
             if command_mode then
                 order = command_data.cursor or command_data.name
 
-            -- then command highlighting
+                if order == 'RULEUCC_Attack' then
+                    order = 'RULEUCC_AttackGround'
+                end
+            -- 2. then command highlighting
             elseif self:HasHighlightCommand() then
                 order = 'CommandHighlight'
-
-            -- then commands inherited by what the mouse is hovering over
-            else
-                -- check for right click, then it becomes an attack move order
-                if orderViaMouse == 'RULEUCC_Move' and IsKeyDown(KeyCodeAlt) and selection then
-                    order = 'RULEUCC_Attack'
-                elseif orderViaMouse ~= 'RULEUCC_Move' then
-                    order = orderViaMouse
-                end
+            -- 3. then whatever is below the mouse
+            elseif orderViaMouse and orderViaMouse != 'RULEUCC_Move' then
+                order = orderViaMouse
             end
         end
 
@@ -379,6 +363,9 @@ WorldView = Class(moho.UIWorldView, Control) {
         -- attempt to create a new cursor
         if event and self[event] then
             self[event](self, identifier, true, event ~= self.CursorLastEvent)
+            if (event ~= self.CursorLastEvent) then
+                LOG(event)
+            end
         else
             self:OnCursorReset(identifier, true, event ~= self.CursorLastEvent)
         end
@@ -460,30 +447,6 @@ WorldView = Class(moho.UIWorldView, Control) {
         self:ApplyCursor()
     end,
 
-    --- Called when the user starts dragging a command
-    ---@param self WorldView
-    ---@param identifier CommandCap
-    ---@param enabled boolean
-    ---@param changed boolean
-    OnCursorCommandDragStart = function(self, identifier, enabled, changed)
-        if enabled then
-            if changed then
-                local cursor = self.Cursor
-                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor("DRAGCOMMAND")
-                self:ApplyCursor()
-            end
-        end
-    end,
-
-    --- Called when the user stops dragging a command
-    ---@param self WorldView
-    ---@param identifier CommandCap
-    ---@param enabled boolean
-    ---@param changed boolean
-    OnCursorCommandDragEnd = function(self, identifier, enabled, changed)
-        self:OnUpdateCursor()
-    end,
-
     --- Called when the order `RULEUCC_Move` is being applied
     ---@param self WorldView
     ---@param identifier 'RULEUCC_Move'
@@ -495,7 +458,32 @@ WorldView = Class(moho.UIWorldView, Control) {
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
+
+                self:EnableIgnoreMode(true)
             end
+        else
+            self:EnableIgnoreMode(false)
+        end
+    end,
+
+    --- Called when we hold control
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_MoveAlt'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorMoveAlt = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('RULEUCC_Move')
+                self:ApplyCursor()
+
+                self:EnableIgnoreMode(true)
+                CommandMode.CacheAndClearCommandMode()
+            end
+        else
+            self:EnableIgnoreMode(false)
+            CommandMode.RestoreCommandMode()
         end
     end,
 
@@ -562,6 +550,47 @@ WorldView = Class(moho.UIWorldView, Control) {
         end
     end,
 
+    --- Called when we hold alt
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_AttackAlt'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorAttackAlt = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('RULEUCC_Attack')
+                self:ApplyCursor()
+
+                self:EnableIgnoreMode(true)
+                CommandMode.CacheAndClearCommandMode()
+            end
+        else
+            self:EnableIgnoreMode(false)
+            CommandMode.RestoreCommandMode()
+        end
+    end,
+
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_AttackGround'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorAttackGround = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('RULEUCC_Attack')
+                self:ApplyCursor()
+
+                self:EnableIgnoreMode(true)
+            end
+        else
+            self:EnableIgnoreMode(false)
+        end
+
+        self:OnCursorDecals(identifier, enabled, changed, AttackDecalFunc)
+    end,
+
     --- Called when the order `RULEUCC_Patrol` is being applied
     ---@param self WorldView
     ---@param identifier 'RULEUCC_Attack'
@@ -607,9 +636,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                 self:EnableIgnoreMode(true)
             end
         else
-            if not self.IgnoreMode then
-                self:EnableIgnoreMode(false)
-            end
+            self:EnableIgnoreMode(false)
         end
 
         self:OnCursorDecals(identifier, enabled, changed, TacticalDecalFunc)
@@ -630,9 +657,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                 self:EnableIgnoreMode(true)
             end
         else
-            if not self.IgnoreMode then
-                self:EnableIgnoreMode(false)
-            end
+            self:EnableIgnoreMode(false)
         end
 
         self:OnCursorDecals(identifier, enabled, changed, NukeDecalFunc)
@@ -696,9 +721,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                 end
             end
         else
-            if not self.IgnoreMode then
-                self:SetDefaultSelectTolerance()
-            end
+            self:SetDefaultSelectTolerance()
         end
     end,
 

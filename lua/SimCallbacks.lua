@@ -822,10 +822,10 @@ Callbacks.LoadIntoTransports = function(data, selection)
     end
 end
 
-Callbacks.NavGenerate = import("/lua/sim/navgenerator.lua").Generate
 Callbacks.NavToggleScanLayer = import("/lua/sim/navdebug.lua").ToggleScanLayer
 Callbacks.NavToggleScanLabels = import("/lua/sim/navdebug.lua").ToggleScanLabels
 Callbacks.NavDebugCanPathTo = import("/lua/sim/navdebug.lua").CanPathTo
 Callbacks.NavDebugPathTo = import("/lua/sim/navdebug.lua").PathTo
 Callbacks.NavDebugGetLabel = import("/lua/sim/navdebug.lua").GetLabel
 Callbacks.NavDebugGetLabelMetadata = import("/lua/sim/navdebug.lua").GetLabelMeta
+Callbacks.NavGenerate = import("/lua/sim/navgenerator.lua").Generate

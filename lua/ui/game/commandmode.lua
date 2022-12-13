@@ -59,10 +59,16 @@ local MathAtan = math.atan
 ---@alias CommandModeData CommandModeDataOrder | CommandModeDataBuild | CommandModeDataBuildAnchored | false
 
 ---@type CommandMode
+local cachedCommandMode = false
+
+---@type CommandMode
 local commandMode = false
 
 ---@type CommandModeData
 local modeData = false
+
+---@type CommandModeData
+local cachedModeData = false
 
 --- Auto-disable command mode right after one command - used when shift is not pressed down.
 local issuedOneCommand = false
@@ -108,7 +114,7 @@ function StartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
--- @param isCancel Is set to true when it cancels a current command mode for a new one.
+---@param isCancel boolean set when we're at the end of (a sequence of) order(s), is usually always true
 function EndCommandMode(isCancel)
 
     if ignoreSelection then
@@ -116,7 +122,7 @@ function EndCommandMode(isCancel)
     end
     
     -- in case we want to end the command mode, without knowing it has already ended or not
-    if  modeData then
+    if modeData then
         -- regain selection if we were cheating in units
         if modeData.cheat then
             if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
@@ -162,6 +168,25 @@ function EndCommandMode(isCancel)
     commandMode = false
     modeData = false
     issuedOneCommand = false
+end
+
+--- Caches the command mode, allows us to restore it
+function CacheCommandMode()
+    cachedCommandMode = commandMode
+    cachedModeData = modeData
+end
+
+function CacheAndClearCommandMode()
+    CacheCommandMode()
+    commandMode = false
+    modeData = false
+end
+
+--- Restores the cached command mode
+function RestoreCommandMode()
+    if cachedCommandMode and cachedModeData then 
+        StartCommandMode(cachedCommandMode, cachedModeData)
+    end
 end
 
 -- allocate the table once for performance
@@ -449,7 +474,7 @@ function OnCommandIssued(command)
         return false
     end
 
-    -- unknown when set, do not understand when this applies yet. In other words: ???
+    -- is set when we hold shift, to queue up multiple commands. This is where the command mode stops
     if not command.Clear then
         issuedOneCommand = true
     else
