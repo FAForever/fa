@@ -391,26 +391,26 @@ options = {
 
             {
                 title = "<LOC selectionsets0001>Steal from other control groups",
-                key = 'selection_sets_add_behavior',
+                key = 'steal_from_other_control_groups',
                 type = 'toggle',
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC _Yes>No", key = false },
-                        {text = "<LOC _No>Yes", key = true },
+                        {text = "<LOC _No>No", key = false },
+                        {text = "<LOC _yes>Yes", key = true },
                     },
                 },
             },
 
             {
                 title = "<LOC selectionsets0004>Add to factory control group",
-                key = 'selection_sets_production_behavior',
+                key = 'add_to_factory_control_group',
                 type = 'toggle',
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC _No>No", key = true },
-                        {text = "<LOC _Yes>Yes", key = false },
+                        {text = "<LOC _No>No", key = false },
+                        {text = "<LOC _Yes>Yes", key = true },
                     },
                 },
             },
