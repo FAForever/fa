@@ -484,6 +484,11 @@ function GetAIPlayerData(name, AIPersonality, slot)
         end
     end
 
+    reprsl(aitypes)
+
+    LOG(baseAI)
+    LOG(requiresNavMesh)
+
     return PlayerData(
         {
             OwnerID = hostID,
