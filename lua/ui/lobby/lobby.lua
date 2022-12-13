@@ -3189,7 +3189,7 @@ function CreateUI(maxPlayers)
     else
         tooltipText['body'] = LOC("<LOC lobui_0771>Left click ACU icon to move yourself.")
     end
-    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText, 0,198)
+    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText)
 
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 813, 325)
