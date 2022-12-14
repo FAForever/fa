@@ -323,7 +323,7 @@ end
 function UpdateReclaim(reclaimPoints)
     ReclaimChanged = true
     for id, reclaimPoint in reclaimPoints do
-        if not reclaimPoint.mass then
+        if not reclaimPoint then
             Reclaim[id] = nil
             OutsidePlayableAreaReclaim[id] = nil
         else
