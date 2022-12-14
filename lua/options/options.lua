@@ -397,7 +397,7 @@ options = {
                 custom = {
                     states = {
                         {text = "<LOC _No>No", key = false },
-                        {text = "<LOC _yes>Yes", key = true },
+                        {text = "<LOC _Yes>Yes", key = true },
                     },
                 },
             },
