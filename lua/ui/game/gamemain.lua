@@ -664,6 +664,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
         -- if something died in selection, restore command mode
         if n > 0 and not table.empty(removed) and table.empty(added) then
+            local CM = import("/lua/ui/game/commandmode.lua")
             local mode, data = unpack(CM.GetCommandMode())
 
             if mode then
