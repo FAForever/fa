@@ -1904,6 +1904,7 @@ AIBrain = Class(moho.aibrain_methods) {
             BuilderHandles = {},
             Position = position,
             BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
+            Layer = baseLayer,
         }
         self.NumBases = self.NumBases + 1
     end,
