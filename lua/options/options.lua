@@ -751,6 +751,18 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE>Reclaim Batching Distance Threshold",
+                key = 'reclaim_batching_distance_treshold',
+                type = 'slider',
+                default = 150,
+                custom = {
+                    min = 150,
+                    max = 600,
+                    inc = 10,
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_RECLAIMSIZE>Reclaim label scaling factor",
                 key = 'reclaim_overview_size_scale',
                 type = 'slider',

@@ -377,7 +377,7 @@ local function _CombineReclaim(reclaim)
 
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
 
-    if zoom < ZoomThreshold then
+    if zoom < (Prefs.GetFromCurrentProfile('options.reclaim_batching_distance_treshold') or ZoomThreshold) then
         return false
     end
 
