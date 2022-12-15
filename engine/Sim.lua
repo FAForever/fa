@@ -4,7 +4,6 @@
 ---@class SimCommand
 
 -- TODO : Needs Definision
----@alias TerrainType any
 ---@alias Task table
 ---@alias CSimSoundManager any
 ---@alias EconomyEvent moho.EconomyEvent
@@ -100,7 +99,7 @@ end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
 ---@param object BoneObject
----@return moho.manipulator_methods
+---@return moho.AnimationManipulator
 function CreateAnimator(object)
 end
 
@@ -312,7 +311,7 @@ end
 
 --- Creates a manipulator which rotates on a unit's bone
 ---@param object BoneObject
----@param bone string
+---@param bone Bone
 ---@param axis "x" | "y" | "z
 ---@param goal? unknown
 ---@param speed? number
@@ -1228,7 +1227,7 @@ end
 --- Instantly moves an entity to a location
 ---@param object Object
 ---@param location Vector
----@param orientation? Vector
+---@param orientation? Quaternion
 function Warp(object, location, orientation)
 end
 
