@@ -2360,7 +2360,6 @@ function NavalAttackCheck(aiBrain)
             -- Check for underwater mass points, can subs hit mass points
             -- We could also do this by pre-populating which mass markers are under water in the marker cache
             if v.NavLayer == 'Amphibious' then
-                table.insert( underWaterMarkers, v )
                 markersUnderWater = markersUnderWater + 1
             else
                 local checkPoints = DrawCirclePoints(6, 26, v.position)
