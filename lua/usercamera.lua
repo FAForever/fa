@@ -1,25 +1,21 @@
 
+---@type table<number, UserCameraSettings>
 StoredCameraSettings = { }
-OldCameraSettings = false
+
+---@type table<number, EntityId>
+local UnitsBeingTracked = { }
+
+---@type UserCameraSettings?
+OldCameraSettings = nil
 
 local cameraToManipulate = 'WorldCamera'
 
-local saveCameraPositionSound = Sound({Bank = 'Interface', Cue = 'UI_Camera_Save_Position'})
-local restoreCameraPositionSound = Sound({Bank = 'Interface', Cue = 'UI_Camera_Recall_Position'})
-
-function Test2()
-    import("/lua/ui/game/commandmode.lua").StartCommandMode('build', { name = 'uel0105'})
-end
-
---- Stores the camera settings, allowing you to restore it at a later moment
 ---@param id number
 function SaveCameraPosition(id)
     local camera = GetCamera(cameraToManipulate)
     StoredCameraSettings[id] = camera:SaveSettings()
-    PlaySound(saveCameraPositionSound)
 end
 
---- Restores the camera settings while keeping track where the camera was, allowing you to toggle in between
 ---@param id number
 function RestoreCameraPosition(id)
     if StoredCameraSettings[id] then
@@ -27,8 +23,26 @@ function RestoreCameraPosition(id)
 
         OldCameraSettings = camera:SaveSettings()
         camera:RestoreSettings(StoredCameraSettings[id])
+    end
+end
 
-        PlaySound(restoreCameraPositionSound)
+---@param id number
+function TrackUnit(id)
+    local selection = GetSelectedUnits()
+    UnitsBeingTracked[id] = selection[1]:GetEntityId()
+end
+
+---@param id any
+function ToTrackedUnit(id)
+    local unitId = UnitsBeingTracked[id]
+    local unit = GetUnitById(unitId)
+    if unit then
+        local camera = GetCamera(cameraToManipulate)
+        local position = unit:GetPosition()
+        OldCameraSettings = camera:SaveSettings()
+        local settings = camera:SaveSettings()
+        settings.Focus = position
+        camera:RestoreSettings(settings)
     end
 end
 
@@ -37,9 +51,7 @@ function RestorePreviousCameraPosition()
     if OldCameraSettings then
         local camera = GetCamera(cameraToManipulate)
         camera:RestoreSettings(OldCameraSettings)
-        OldCameraSettings = false
-
-        PlaySound(restoreCameraPositionSound)
+        OldCameraSettings = nil
     end
 end
 

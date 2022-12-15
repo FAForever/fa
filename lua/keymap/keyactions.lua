@@ -790,6 +790,11 @@ keyActions = {
     ['RestorePreviousCameraPosition'] = {action = 'UI_Lua import("/lua/usercamera.lua").RestorePreviousCameraPosition()',
         category = 'camera', order = 0,},
 
+    ['TrackUnitForCamera1'] = {action = 'UI_Lua import("/lua/usercamera.lua").TrackUnit(1)',
+        category = 'camera', order = 1,},
+    ['ToTrackedUnitForCamera1'] = {action = 'UI_Lua import("/lua/usercamera.lua").ToTrackedUnit(1)',
+        category = 'camera', order = 2,},
+
     ['SaveCameraPosition1'] = {action = 'UI_Lua import("/lua/usercamera.lua").SaveCameraPosition(1)',
         category = 'camera', order = 1,},
     ['SaveCameraPosition2'] = {action = 'UI_Lua import("/lua/usercamera.lua").SaveCameraPosition(2)',

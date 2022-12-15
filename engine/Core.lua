@@ -178,7 +178,7 @@ function GetMovieDuration(localFileName)
 end
 
 ---
----@param id UnitId
+---@param id UnitId | EntityId
 ---@return UserUnit | Unit
 function GetUnitById(id)
 end

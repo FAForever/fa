@@ -61,7 +61,7 @@ function UserUnit:GetEconData()
 end
 
 ---
----@return string
+---@return number
 function UserUnit:GetEntityId()
 end
 
