@@ -838,7 +838,7 @@ Platoon = Class(moho.platoon_methods) {
 
         AIAttackUtils.GetMostRestrictiveLayer(self)
         self:SetPlatoonFormationOverride(PlatoonFormation)
-        local markerLocations = AIUtils.AIGetMarkerLocations(aiBrain, markerType)
+        local markerLocations, en = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
 
         local bestMarker = false
 
@@ -853,19 +853,21 @@ Platoon = Class(moho.platoon_methods) {
                 self.LastMarker[2] = nil
             end
             for _,marker in RandomIter(markerLocations) do
-                if table.getn(markerLocations) <= 2 then
-                    self.LastMarker[1] = nil
-                    self.LastMarker[2] = nil
-                end
-                if self:AvoidsBases(marker.Position, bAvoidBases, avoidBasesRadius) then
-                    if self.LastMarker[1] and marker.Position[1] == self.LastMarker[1][1] and marker.Position[3] == self.LastMarker[1][3] then
-                        continue
+                if (self.MovementLayer == 'Land' and marker.NavLayer ~= 'Amphibious') or (self.MovementLayer == 'Water' and marker.NavLayer == 'Amphibious') then
+                    if table.getn(markerLocations) <= 2 then
+                        self.LastMarker[1] = nil
+                        self.LastMarker[2] = nil
                     end
-                    if self.LastMarker[2] and marker.Position[1] == self.LastMarker[2][1] and marker.Position[3] == self.LastMarker[2][3] then
-                        continue
+                    if self:AvoidsBases(marker.position, bAvoidBases, avoidBasesRadius) then
+                        if self.LastMarker[1] and marker.position[1] == self.LastMarker[1][1] and marker.position[3] == self.LastMarker[1][3] then
+                            continue
+                        end
+                        if self.LastMarker[2] and marker.position[1] == self.LastMarker[2][1] and marker.position[3] == self.LastMarker[2][3] then
+                            continue
+                        end
+                        bestMarker = marker
+                        break
                     end
-                    bestMarker = marker
-                    break
                 end
             end
         elseif moveFirst == 'Threat' then
@@ -880,29 +882,31 @@ Platoon = Class(moho.platoon_methods) {
 
             -- find best threat at the closest distance
             for _,marker in markerLocations do
-                local markerThreat
-                if bSelfThreat then
-                    markerThreat = aiBrain:GetThreatAtPosition(marker.Position, 0, true, threatType, aiBrain:GetArmyIndex())
-                else
-                    markerThreat = aiBrain:GetThreatAtPosition(marker.Position, 0, true, threatType)
-                end
-                local distSq = VDist2Sq(marker.Position[1], marker.Position[3], platLoc[1], platLoc[3])
+                if (self.MovementLayer == 'Land' and marker.NavLayer ~= 'Amphibious') or (self.MovementLayer == 'Water' and marker.NavLayer == 'Amphibious') then
+                    local markerThreat
+                    if bSelfThreat then
+                        markerThreat = aiBrain:GetThreatAtPosition(marker.position, 0, true, threatType, aiBrain:GetArmyIndex())
+                    else
+                        markerThreat = aiBrain:GetThreatAtPosition(marker.position, 0, true, threatType)
+                    end
+                    local distSq = VDist2Sq(marker.position[1], marker.position[3], platLoc[1], platLoc[3])
 
-                if markerThreat >= minThreatThreshold and markerThreat <= maxThreatThreshold then
-                    if self:AvoidsBases(marker.Position, bAvoidBases, avoidBasesRadius) then
-                        if self.IsBetterThreat(bFindHighestThreat, markerThreat, bestMarkerThreat) then
-                            bestDistSq = distSq
-                            bestMarker = marker
-                            bestMarkerThreat = markerThreat
-                        elseif markerThreat == bestMarkerThreat then
-                            if distSq < bestDistSq then
+                    if markerThreat >= minThreatThreshold and markerThreat <= maxThreatThreshold then
+                        if self:AvoidsBases(marker.position, bAvoidBases, avoidBasesRadius) then
+                            if self.IsBetterThreat(bFindHighestThreat, markerThreat, bestMarkerThreat) then
                                 bestDistSq = distSq
                                 bestMarker = marker
                                 bestMarkerThreat = markerThreat
+                            elseif markerThreat == bestMarkerThreat then
+                                if distSq < bestDistSq then
+                                    bestDistSq = distSq
+                                    bestMarker = marker
+                                    bestMarkerThreat = markerThreat
+                                end
                             end
                         end
-                     end
-                 end
+                    end
+                end
             end
 
         else
@@ -913,17 +917,19 @@ Platoon = Class(moho.platoon_methods) {
                 self.LastMarker[2] = nil
             end
             for _,marker in markerLocations do
-                local distSq = VDist2Sq(marker.Position[1], marker.Position[3], platLoc[1], platLoc[3])
-                if self:AvoidsBases(marker.Position, bAvoidBases, avoidBasesRadius) and distSq > (avoidClosestRadius * avoidClosestRadius) then
-                    if distSq < bestDistSq then
-                        if self.LastMarker[1] and marker.Position[1] == self.LastMarker[1][1] and marker.Position[3] == self.LastMarker[1][3] then
-                            continue
+                if (self.MovementLayer == 'Land' and marker.NavLayer ~= 'Amphibious') or (self.MovementLayer == 'Water' and marker.NavLayer == 'Amphibious') then
+                    local distSq = VDist2Sq(marker.position[1], marker.position[3], platLoc[1], platLoc[3])
+                    if self:AvoidsBases(marker.position, bAvoidBases, avoidBasesRadius) and distSq > (avoidClosestRadius * avoidClosestRadius) then
+                        if distSq < bestDistSq then
+                            if self.LastMarker[1] and marker.position[1] == self.LastMarker[1][1] and marker.position[3] == self.LastMarker[1][3] then
+                                continue
+                            end
+                            if self.LastMarker[2] and marker.position[1] == self.LastMarker[2][1] and marker.position[3] == self.LastMarker[2][3] then
+                                continue
+                            end
+                            bestDistSq = distSq
+                            bestMarker = marker
                         end
-                        if self.LastMarker[2] and marker.Position[1] == self.LastMarker[2][1] and marker.Position[3] == self.LastMarker[2][3] then
-                            continue
-                        end
-                        bestDistSq = distSq
-                        bestMarker = marker
                     end
                 end
             end
@@ -934,17 +940,17 @@ Platoon = Class(moho.platoon_methods) {
         local usedTransports = false
         if bestMarker then
             self.LastMarker[2] = self.LastMarker[1]
-            self.LastMarker[1] = bestMarker.Position
+            self.LastMarker[1] = bestMarker.position
             --LOG("GuardMarker: Attacking " .. bestMarker.Name)
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestMarker.Position, 200)
-            local success, bestGoalPos = AIAttackUtils.CheckPlatoonPathingEx(self, bestMarker.Position)
+            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestMarker.position, 200)
+            local success, bestGoalPos = AIAttackUtils.CheckPlatoonPathingEx(self, bestMarker.position)
             IssueClearCommands(self:GetPlatoonUnits())
             if path then
                 local position = self:GetPlatoonPosition()
-                if not success or VDist2(position[1], position[3], bestMarker.Position[1], bestMarker.Position[3]) > 512 then
-                    usedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.Position, true)
-                elseif VDist2(position[1], position[3], bestMarker.Position[1], bestMarker.Position[3]) > 256 then
-                    usedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.Position, false)
+                if not success or VDist2(position[1], position[3], bestMarker.position[1], bestMarker.position[3]) > 512 then
+                    usedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, true)
+                elseif VDist2(position[1], position[3], bestMarker.position[1], bestMarker.position[3]) > 256 then
+                    usedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, false)
                 end
                 if not usedTransports then
                     local pathLength = table.getn(path)
@@ -956,9 +962,9 @@ Platoon = Class(moho.platoon_methods) {
                         end
                     end
                 end
-            elseif (not path and reason == 'NoPath') then
+            elseif (not path and reason == 'NoPath') and self.MovementLayer ~= 'Water' then
                 --LOG('Guardmarker requesting transports')
-                local foundTransport = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.Position, true)
+                local foundTransport = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, true)
                 --DUNCAN - if we need a transport and we cant get one the disband
                 if not foundTransport then
                     --LOG('Guardmarker no transports')
@@ -978,12 +984,12 @@ Platoon = Class(moho.platoon_methods) {
 
             if moveNext == 'None' then
                 -- guard
-                IssueGuard(self:GetPlatoonUnits(), bestMarker.Position)
+                IssueGuard(self:GetPlatoonUnits(), bestMarker.position)
                 -- guard forever
                 if guardTimer <= 0 then return end
             else
                 -- otherwise, we're moving to the location
-                self:AggressiveMoveToLocation(bestMarker.Position)
+                self:AggressiveMoveToLocation(bestMarker.position)
             end
 
             -- wait till we get there
@@ -1001,7 +1007,7 @@ Platoon = Class(moho.platoon_methods) {
                     return self:GuardMarker()
                 end
                 oldPlatPos = platLoc
-            until VDist2Sq(platLoc[1], platLoc[3], bestMarker.Position[1], bestMarker.Position[3]) < 64 or not aiBrain:PlatoonExists(self)
+            until VDist2Sq(platLoc[1], platLoc[3], bestMarker.position[1], bestMarker.position[3]) < 64 or not aiBrain:PlatoonExists(self)
 
             -- if we're supposed to guard for some time
             if moveNext == 'None' then
@@ -1015,10 +1021,10 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             -- we're there... wait here until we're done
-            local numGround = aiBrain:GetNumUnitsAroundPoint((categories.LAND + categories.NAVAL + categories.STRUCTURE), bestMarker.Position, 15, 'Enemy')
+            local numGround = aiBrain:GetNumUnitsAroundPoint((categories.LAND + categories.NAVAL + categories.STRUCTURE), bestMarker.position, 15, 'Enemy')
             while numGround > 0 and aiBrain:PlatoonExists(self) do
                 WaitSeconds(Random(5,10))
-                numGround = aiBrain:GetNumUnitsAroundPoint((categories.LAND + categories.NAVAL + categories.STRUCTURE), bestMarker.Position, 15, 'Enemy')
+                numGround = aiBrain:GetNumUnitsAroundPoint((categories.LAND + categories.NAVAL + categories.STRUCTURE), bestMarker.position, 15, 'Enemy')
             end
 
             if not aiBrain:PlatoonExists(self) then
@@ -1029,8 +1035,9 @@ Platoon = Class(moho.platoon_methods) {
             self.PlatoonData.MoveFirst = moveNext
             return self:GuardMarker()
         else
-            -- no marker found, disband!
-            self:PlatoonDisband()
+            -- no marker found, return to base!
+            WaitTicks(20)
+            return self:ReturnToBaseAI()
         end
     end,
 

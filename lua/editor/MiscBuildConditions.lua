@@ -347,5 +347,12 @@ function PathToEnemy(aiBrain, locationType, pathType)
     return false
 end
 
+function WaterMassMarkersPresent(aiBrain)
+    if aiBrain.IntelData.WaterMassMarkersPresent then
+        return true
+    end
+    return false
+end
+
 -- unused imports kept for mod support
 local Utils = import("/lua/utilities.lua")
