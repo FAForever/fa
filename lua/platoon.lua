@@ -3255,7 +3255,7 @@ Platoon = Class(moho.platoon_methods) {
         local returnPos
 
         for baseName, base in aiBrain.BuilderManagers do
-            if self.MovementLayer == 'Water' and base.Layer ~= 'Water' then
+            if (self.MovementLayer == 'Water' and base.Layer ~= 'Water') or (self.MovementLayer == 'Land' and base.Layer == 'Water') then
                 continue
             end
             local distSq = VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3])
