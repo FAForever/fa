@@ -19,11 +19,13 @@ local sharedUnits = {}
 function KillSharedUnits(owner, categoriesToKill)
     local sharedUnitOwner = sharedUnits[owner]
     if sharedUnitOwner and not table.empty(sharedUnitOwner) then
-        for _, unit in sharedUnitOwner do
+        local sharedUnitOwnerSize = table.getn(sharedUnitOwner)
+        for i = sharedUnitOwnerSize, 1, -1 do
+            local unit = sharedUnitOwner[i]
             if not unit.Dead and unit.oldowner == owner then
                 if categoriesToKill then
-                    if ContainsCategory(unit, categoriesToKill) then
-                        table.remove(sharedUnits[owner], unit)
+                    if EntityCategoryContains(categoriesToKill, unit) then
+                        table.remove(sharedUnits[owner], i)
                         unit:Kill()
                     end
                 else
@@ -466,7 +468,7 @@ function CreateRebuildTracker(unit, blockingEntities)
         for _, reclaim in wrecks do
             if reclaim.IsWreckage then
                 -- collision shape to none to prevent it from blocking, keep track to revert later
-                reclaim:SetCollisionShape('None')
+                reclaim:CacheAndRemoveCollisionExtents()
                 table.insert(blockingEntities, reclaim)
             end
         end
@@ -561,7 +563,7 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
     -- revert collision shapes of any blocking units or wreckage
     for _, entity in blockingEntities do
         if not entity:BeenDestroyed() then
-            entity:RevertCollisionShape()
+            entity:ApplyCachedCollisionExtents()
         end
     end
 end

@@ -1,8 +1,12 @@
 ---@meta
 
 ---@class PropBlueprint : EntityBlueprint
+---@field Audio PropBlueprintAudio
 ---@field Display PropBlueprintDisplay Display information for the unit
 ---@field Defense PropBlueprintDefense Defense information for the unit
+---@field Economy PropBlueprintEconomy 
+
+---@class PropBlueprintAudio
 
 ---@class PropBlueprintDisplay
 ---@field MeshBlueprint string Name of mesh blueprint to use. Leave blank to use default mesh.
@@ -14,3 +18,4 @@
 ---@class PropBlueprintEconomy
 ---@field ReclaimMassMax number    Max Reclaimable mass resource.
 ---@field ReclaimEnergyMax number  Max Reclaimable Energy resource.
+---@field ReclaimTimeMultiplier number

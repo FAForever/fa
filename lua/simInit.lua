@@ -512,3 +512,8 @@ function OnPostLoad()
         Sync.SetAlliedVictory = ArmyBrains[GetFocusArmy()].RequestingAlliedVictory or false
     end
 end
+
+-- due to cyclic dependencies we need to import these files to break the cycle them
+
+import('/lua/ScenarioFramework.lua')
+import('/lua/sim/ScenarioUtilities.lua')

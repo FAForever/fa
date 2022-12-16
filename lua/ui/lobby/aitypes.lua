@@ -62,7 +62,7 @@ function GetAItypes()
     for i, v in AIFilesold do
         local tempfile = import(v).AIList
         for s, t in tempfile do
-            table.insert(aitypes, { key = t.key, name = t.name })
+            table.insert(aitypes, t)
         end
     end
 
@@ -71,7 +71,7 @@ function GetAItypes()
         local tempfile = import(v).AI
         if tempfile.AIList then
             for s, t in tempfile.AIList do
-                table.insert(aitypes, { key = t.key, name = t.name })
+                table.insert(aitypes, t)
             end
         end
     end
@@ -97,7 +97,7 @@ function GetAItypes()
                     if CustomAIfile.AIList then
                         -- insert every AI into aitypes
                         for s, t in CustomAIfile.AIList do
-                            table.insert(aitypes, { key = t.key, name = t.name })
+                            table.insert(aitypes, t)
                         end
                     end
                 end
@@ -116,7 +116,7 @@ function GetAItypes()
     for i, v in AIFilesold do
         local tempfile = import(v).CheatAIList
         for s, t in tempfile do
-            table.insert(aitypes, { key = t.key, name = t.name })
+            table.insert(aitypes, t)
         end
     end
 
@@ -125,7 +125,7 @@ function GetAItypes()
         local tempfile = import(v).AI
         if tempfile.CheatAIList then
             for s, t in tempfile.CheatAIList do
-                table.insert(aitypes, { key = t.key, name = t.name })
+                table.insert(aitypes, t)
             end
         end
     end
@@ -148,7 +148,7 @@ function GetAItypes()
                     if CustomAIfile.CheatAIList then
                         -- insert every AI into aitypes
                         for s, t in CustomAIfile.CheatAIList do
-                            table.insert(aitypes, { key = t.key, name = t.name })
+                            table.insert(aitypes, t)
                         end
                     end
                 end
