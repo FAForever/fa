@@ -100,7 +100,7 @@ end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
 ---@param object BoneObject
----@return moho.manipulator_methods
+---@return moho.AnimationManipulator
 function CreateAnimator(object)
 end
 
