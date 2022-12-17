@@ -16,8 +16,6 @@ local GetEconomyRequested = moho.aibrain_methods.GetEconomyRequested
 local GetEconomyStored = moho.aibrain_methods.GetEconomyStored
 local ParagonCat = categories.STRUCTURE * categories.EXPERIMENTAL * categories.ECONOMIC * categories.ENERGYPRODUCTION * categories.MASSPRODUCTION
 
-local AIUtils = import("/lua/ai/aiutilities.lua")
-
 ---GreaterThanEconStorageRatio = BuildCondition
 ---@param aiBrain string
 ---@param mStorageRatio number
@@ -470,9 +468,8 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
-
 --- Moved Imports that are unsed for modding support
-
-local ScenarioFramework = import("/lua/scenarioframework.lua")
-local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
-local BuildingTemplates = import("/lua/buildingtemplates.lua")
+local AIUtils = import('/lua/ai/aiutilities.lua')
+local ScenarioFramework = import('/lua/scenarioframework.lua')
+local ScenarioUtils = import('/lua/sim/scenarioutilities.lua')
+local BuildingTemplates = import('/lua/buildingtemplates.lua')

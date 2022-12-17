@@ -58,9 +58,6 @@ gameUIHidden = false
 PostScoreVideo = false
 IsSavedGame = false
 
--- Lobby options as set by the host in the lobby
-LobbyOptions = false
-
 -- The focus army as set at the start of the game. Allows us to detect whether someone was originally an observer or a player
 OriginalFocusArmy = -1
 
@@ -575,6 +572,7 @@ ObserveSelection = import("/lua/shared/observable.lua").Create()
 local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
+
     if ignoreSelection then
         return
     end

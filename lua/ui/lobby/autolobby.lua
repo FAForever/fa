@@ -248,7 +248,7 @@ local function CreateUI()
 
     local background = MenuCommon.SetupBackground(GetFrame(0))
 
-    SetDialog(parent, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
+    SetDialog(parent, "<LOC lobui_0201>Setting up automatch...")
 
     -- construct the connection status GUI and position it right below the dialog
     connectionStatusGUI = ConnectionStatus(GetFrame(0))
@@ -388,15 +388,9 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     if not parent then parent = UIUtil.CreateScreenGroup(GetFrame(0), "CreateLobby ScreenGroup") end
     -- don't parent background to screen group so it doesn't get destroyed until we leave the menus
     local background = MenuCommon.SetupBackground(GetFrame(0))
-    local function OnAbort()
-        MenuCommon.MenuCleanup()
-        parent:Destroy()
-        parent = false
-        ExitApplication()
-    end
 
     -- construct the initial dialog
-    SetDialog(parent, Strings.TryingToConnect, Strings.AbortConnect, OnAbort)
+    SetDialog(parent, Strings.TryingToConnect)
 
     InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 

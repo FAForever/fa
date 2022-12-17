@@ -136,8 +136,8 @@ ADFTractorClaw = Class(Weapon) {
     --- Attempts to retrieve the unit behind the target, can return false if the blip is too far away from the unit due to jamming
     ---@param self ADFTractorClaw
     ---@param blip Blip | Unit
-    ---@return Unit | boolean
-    GetUnitBehindTarget = function(self, blip)
+    ---@return Unit | false
+        GetUnitBehindTarget = function(self, blip)
         if IsUnit(blip) then
             -- return the unit
             return blip

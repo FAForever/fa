@@ -282,6 +282,9 @@ Unit = Class(moho.unit_methods) {
             AIUtils.ApplyCheatBuffs(self)
         end
 
+        -- for syncing data to UI
+        self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate)
+
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
             self.ReclaimedMass = 0
@@ -289,7 +292,7 @@ Unit = Class(moho.unit_methods) {
             self:GetStat("ReclaimedMass", 0)
             self:GetStat("ReclaimedEnergy", 0)
         end
-        
+
         -- add support for automated jamming reset
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
@@ -2603,7 +2606,7 @@ Unit = Class(moho.unit_methods) {
                 local pos = self:GetPosition()
                 local terrainType = GetTerrainType(pos[1], pos[3])
                 if bpTM[terrainType.Style] then
-                    self:SetMesh(bpTM[terrainType.Style])
+                    self:SetMesh(bpTM[terrainType.Style], true)
                     useTerrainType = true
                 end
             end
@@ -4521,7 +4524,7 @@ Unit = Class(moho.unit_methods) {
     ---@param value number
     SetRegen = function(self, value)
         self:SetRegenRate(value)
-        self.Sync.regen = value
+        self:SetStat("HitpointsRegeneration", value)
     end,
 
     -------------------------------------------------------------------------------------------
@@ -5020,7 +5023,12 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
     ---@param unitBeingBuilt Unit A flag to determine whether our consumption should be active
     GetUpgradeAnimation = function(self, unitBeingBuilt)
-        return self.Blueprint.Display.AnimationUpgrade
+        local display = self.Blueprint.Display
+        if display.AnimationUpgradeTable and display.AnimationUpgradeTable[unitBeingBuilt.Blueprint.BlueprintId] then
+            return display.AnimationUpgradeTable[unitBeingBuilt.Blueprint.BlueprintId]
+        end
+
+        return display.AnimationUpgrade
     end,
 
     --- Called when a missile launched by this unit is intercepted
