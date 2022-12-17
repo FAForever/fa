@@ -36,17 +36,12 @@ UEA0107 = Class(AirTransport) {
 
         OnStopBeingBuilt = function(self,builder,layer)
             AirTransport.OnStopBeingBuilt(self,builder,layer)
-            self.EngineManipulators = {}
 
-            --  create the engine thrust manipulators
-            for k, v in self.EngineRotateBones do
-                table.insert(self.EngineManipulators, CreateThrustController(self, "thruster", v))
-            end
-
-            -- set up the thursting arcs for the engines
-            for keys,values in self.EngineManipulators do
-                --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
-                values:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
+            -- create the engine thrust manipulators
+            for _, bone in self.EngineRotateBones do
+                local controller = CreateThrustController(self, 'Thruster', bone)
+                controller:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
+                self.Trash:Add(controller)
             end
 
             self.LandingAnimManip = CreateAnimator(self)
