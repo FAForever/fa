@@ -8,12 +8,13 @@
 ----**  Copyright © 20010 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local TShieldStructureUnit = import("/lua/terranunits.lua").TShieldStructureUnit
+local ManageShieldEffects = import("/lua/defaultunits.lua").ManageShieldEffects
 
 ---@class UEB4202 : TShieldStructureUnit
 ---@field Rotator1? moho.RotateManipulator
 ---@field Rotator2? moho.RotateManipulator
 ---@field ShieldEffectsBag TrashBag
-UEB4202 = Class(TShieldStructureUnit) {
+UEB4202 = Class(TShieldStructureUnit, ManageShieldEffects) {
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_t2_01_emit.bp',
         '/effects/emitters/terran_shield_generator_t2_02_emit.bp',
@@ -23,8 +24,7 @@ UEB4202 = Class(TShieldStructureUnit) {
     ---@param self UEB4202
     OnCreate = function(self)
         TShieldStructureUnit.OnCreate(self)
-        self.ShieldEffectsBag = TrashBag()
-        self.Trash:Add(self.ShieldEffectsBag)
+        ManageShieldEffects.OnCreate(self)
     end,
 
     ---@param self UEB4202
@@ -41,6 +41,7 @@ UEB4202 = Class(TShieldStructureUnit) {
     ---@param self UEB4202
     OnShieldEnabled = function(self)
         TShieldStructureUnit.OnShieldEnabled(self)
+        ManageShieldEffects.OnShieldEnabled(self)
 
         if self.Rotator1 then
             self.Rotator1:SetTargetSpeed(10)
@@ -48,19 +49,14 @@ UEB4202 = Class(TShieldStructureUnit) {
         if self.Rotator2 then
             self.Rotator2:SetTargetSpeed(-10)
         end
-
-        self.ShieldEffectsBag:Destroy()
-        for k, v in self.ShieldEffects do
-            self.ShieldEffectsBag:Add(CreateAttachedEmitter(self, 0, self.Army, v))
-        end
     end,
 
     ---@param self UEB4202
     OnShieldDisabled = function(self)
         TShieldStructureUnit.OnShieldDisabled(self)
+        ManageShieldEffects.OnShieldDisabled(self)
         self.Rotator1:SetTargetSpeed(0)
         self.Rotator2:SetTargetSpeed(0)
-        self.ShieldEffectsBag:Destroy()
     end,
 
     UpgradingState = State(TShieldStructureUnit.UpgradingState) {
