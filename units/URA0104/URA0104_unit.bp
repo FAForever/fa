@@ -291,7 +291,6 @@ UnitBlueprint {
                     TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND',
                 },
             },
-            ChargeDelay = 1,
             CollideFriendly = false,
             Damage = 4,
             DamageType = 'Normal',

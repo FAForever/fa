@@ -2,105 +2,371 @@
 
 ---@alias FireTargetCategory string
 
---- read more here: https://wiki.faforever.com/en/Blueprints
--- according to the wiki, `WeaponBlueprint` might inherit `BpRackBone`
+---@alias WeaponCategory
+---| "Anti Air"
+---| "Anti Navy"
+---| "Artillery"
+---| "Bomb"
+---| "Death"
+---| "Defense"
+---| "Direct Fire"
+---| "Experimental"
+---| "Indirect Fire"
+---| "Kamikaze"
+---| "Missile"
+---| "Teleport"
+
+
+-- read more here: https://wiki.faforever.com/en/Blueprints
 
 ---@class WeaponBlueprint: Blueprint
----@field Audio SoundBlueprint               Informations about the audio files used by the weapon
----@field AutoInitiateAttackCommand boolean  If the unit has no issued commands and has a weapon that has AutoInitiateAttackCommand set, then if it finds a suitable target it will issue an attack command to go after the target.
----@field BallisticArc WeaponBallisticArc    Ballistic arcs that should be used on the projectile
----@field BeamCollisionDelay number    Every X +.1 seconds, this beam will collide and do damage - use 0 so that beams will cause their damage every .1 second
----@field BeamLifetime number          The amount of time the beam exists
----@field Buffs BlueprintBuff[]        Information about the bonuses added to the unit's weapon when it reaches a specific veteran level.
----@field CameraShakeDuration number   time to maintain the camera shake
----@field CameraShakeMax number        Max size of the camera shake
----@field CameraShakeMin number        Minimum size of the camera shake
----@field CameraShakeRadius number     How far from the unit should the camera shake
----@field CollideFriendly boolean      Should the unit collide against friendly meshes
----@field ContinuousBeam boolean       Beam fires without stopping - overrides RateOfFire
----@field Damage number                Damage value
----@field DamageFriendly boolean       Should we damage friendly units
----@field DamageRadius number          Blast Radius
----@field DamageType string            The type of damage the unit will do. 'Normal' will affect all units
----@field DisplayName string           Just for debugging. "dbg weapons" on the console shows the weapon names. Also some errors that we detect in script code will print the name of the weapon to help track down the issue.
----@field DoTPulses number             The number of times the damage will be dealt
----@field DoTTime number               Length of Time the Damage over Time (DoT) will last in seconds.
----@field DummyWeapon boolean          This instructs the engine not to create a C++ weapon object that is usually linked with the script object. This is for purely script driven weapons (like death weapons).
----@field EnergyDrainPerSecond number  How much energy this weapon will drain per second
----@field EnergyRequired number        How much energy is required to fire this weapon
----@field FireTargetLayerCapsTable table<Layer, FireTargetCategory>  FireTargetLayerCapsTable allows you to pick which layers you can target in relation to the layer that you are currently at
----@field FiringRandomness number    How much random inaccuracy should we be from the target
----@field FiringTolerance number     How much misalignment can the barrel be before starting to fire. Used when you are trying to target ammo that does not require lots of accuracy due to the size of their damage radius or because the ammo does automatic targetting
----@field HeadingArcCenter number    Controls what the weapon is allowed to target in reference to the heading of the unit
----@field HeadingArcRange number     Controls what the weapon is allowed to target in reference to the arc center, this is degrees on either side
----@field Label string  Label is linking the blueprints (unitid_unit.bp) weapon information with the script (unitid_script.lua) weapon information. For example: blueprint: Weapon { Label = 'FrontTurret01', } script: Weapons = { FrontTurret01 = Class(TDFGaussCannonWeapon) {} }. If the Label doeas not match the weapon will not be workable.
----@field MaxRadius number           How far does the target need to be before we start firing
----@field MetaImpactAmount unknown   Deprecated attribute (Changing these will do nothing to the weapon)
----@field MetaImpactRadius unknown   Deprecated attribute (Changing these will do nothing to the weapon)
----@field MuzzleChargeDelay number   The time that the muzzle will wait between playing the FxMuzzleFlash table and the creation of the projectile. Note: This will delay the firing of the projectile. So if you set the rate of fire to fire quickly, this will throttle it
----@field MuzzleSalvoDelay number    Time in between muzzles firing. Setting to 0 = all muzzle fire together
----@field MuzzleSalvoSize number     Number of times the muzzle will fire during a rack firing
----@field MuzzleVelocity number      Speed in which the projectile comes out of the muzzle. This speed is used in the ballistics calculations. If you weapon doesn't fire at its max radius, this may be too low
----@field MuzzleVelocityReduceDistance number  MuzzleVelocityReduceDistance was put there so weapons that have a high muzzle velocity because they have a huge range, like an artillery piece, wouldn't point right at something that's close, it'll slow down it's shot and still have a nice arc to it
----@field NeedPrep boolean             If NeedProp is true then whenever the unit aquires a new target and is ready to attack it it will first run the OnGotTarget script on the weapon.
----@field ProjectileId string          Blueprint of the projectile to fire
----@field ProjectileLifetime number    How long the projectile lives
----@field ProjectilesPerOnFire number  Deprecated attribute (Changing these will do nothing to the weapon)
----@field RackBones RackBoneBlueprint  Bone Used for Rack Recoil
----@field RackFireTogether boolean     Do all racks fire simultaneously?
----@field RackRecoilDistance number    Distance racks will recoil, Z axis, local coords
----@field RackReloadTimeout number     Seconds before the weapon will reload when it didn't go through all its racks
----@field RackSalvoChargeTime number   Time before the racks start firing
----@field RackSalvoFiresAfterCharge boolean     Does the racks immediately fire when charge is done or wait until next OnFire event?
----@field RackSalvoReloadTime number  Time the racks will reload before starting its next charge/salve cycle
----@field RackSalvoSize number        Number of times the racks will fire before its reload period
----@field RackSlavedToTurret boolean  All rack bones are slaved to the turret pitch bone?
----@field RateOfFire number           Rack firings per second. You can use decimals for fire rates that are longer than a second
----@field TargetCheckInterval number                Interval of time between looking for a target
----@field TargetPriorities UnparsedCategory[]       Table of category strings that define the targetting order of this weapon.
----@field TargetRestrictDisallow UnparsedCategory   The categories that we will not allow to target
----@field TargetRestrictOnlyAllow UnparsedCategory  Exclusive categories that we will allow to target
----@field TrackingRadius number        The radius that the weapon start tracking the target. This does not mean that the weapon will fire. The weapon will only fire when a target enters the maxradius. This is a multi of the weapons MaxRadius.
----@field TurretBoneDualMuzzle string  The second muzzle bone for a turret, used for arms on bots as weapons
----@field TurretBoneDualPitch string   The second pitch bone for a turret, used for arms on bots as weapons
----@field TurretBoneMuzzle string      The bone used as the muzzle bone for turrets. This is used for aiming as where the projectile would come out
----@field TurretBonePitch string       Bone name that will determine the pitch rotation (rotation along the X axis)
----@field TurretBoneYaw string         Bone name that will determine the yaw rotation (rotation along the Y axis)
----@field TurretDualManipulators boolean  Do we need two manipulators? Used for bots with arms
----@field Turreted boolean             Does this have a turret?
----@field TurretPitch number           The center angle for determining pitch, based off the rest pose of the art
----@field TurretPitchRange number      The angle +/- off the pitch that is a valid angle to turn to
----@field TurretPitchSpeed number      The speed at which the turret can pitch
----@field TurretYaw number             The center angle for determining yaw, based off the rest pose of the art
----@field TurretYawRange number        The angle +/- off the yaw that is a valid angle to turn to
----@field TurretYawSpeed number        The speed at which the turret can yaw
----@field WeaponCategory string
----@field WeaponRepackTimeout number        Amount of time after the unit has lost its target that it will wait before repacking the weapon
----@field WeaponUnpackAnimation string      Animation name of the unpack animation
----@field WeaponUnpackAnimationRate number  How fast the unpack animation runs
----@field WeaponUnpackLocksMotion boolean   Halts all unit motion while this weapon is active and locks out all other weapons not flagged as NotExclusive = true. This is useful when a unit must the stationary to fire such as a moble artillery unit or when a unit is required to be stationary during an unpack / repack sequence.
----@field WeaponUnpackTimeout number        Time the unit will take to unpack the weapon
----@field WeaponUnpacks boolean             Weapon must unpack before ready to fire
----@field AimsStraightOnDisable boolean     This weapon will aim straight ahead when disabled.
----
----@field AlwaysRecheckTarget boolean  Always recheck for better target regardless of whether you already have one or not.
----@field CountedProjectile boolean    This projectile needs to be built and stored before the weapon can fire.
----@field EffectiveRadius number       The effective range that this weapon really is.
----@field FiringRandomnessWhileMoving number  the firing randomness that this weapon has while the pparent unit is moving
----@field LeadTarget boolean           True if weapon should lead its target when aiming.
----@field ManualFire boolean           Never fires automatically.
----@field MaxProjectileStorage number  This weapon can only hold this many counted projectiles.
----@field MinRadius number             The minimum range we must be to fire at our target.
----@field MuzzleVelocityRandom number  Random variation for muzzle velocity (gaussian).
----@field NoPause boolean
----@field NukeWeapon boolean           Nuke weapon flag.
----@field OverchargeWeapon boolean     Overcharge weapon flag.
----@field SlavedToBody boolean         Flag to specify if the weapon is slaved to the unit body, thus requiring unit to face target to fire.
----@field TargetType WeaponTargetType  The type of entity this unit can target
+---@field AboveWaterFireOnly? boolean
+---@field AboveWaterTargetsOnly? boolean
+--- If a turret, sets the aim control precedence of the manipulators. See
+--- `moho.manipulator_methods:SetPrecedence(precedence)`. Treated as `10` when absent.
+---@field AimControlPrecedence? number
+--- this weapon will aim straight ahead when disabled
+---@field AimsStraightOnDisable boolean
+--- always recheck for better target regardless of whether you already have one or not
+---@field AlwaysRecheckTarget boolean
+--- used by the Omen's script
+---@field AnimationOpen? FileName
+--- animation played by the weapon's Rack Salvo Reload Sequence
+---@field AnimationReload? FileName
+--- if an anti-artillery shield will block this projectile
+---@field ArtilleryShieldBlocks? boolean
+--- information about the audio files used by the weapon
+---@field Audio WeaponBlueprintAudio
+--- if the unit has no issued commands and has a weapon that has `AutoInitiateAttackCommand` set,
+--- then if it finds a suitable target it will issue an attack command to go after the target
+---@field AutoInitiateAttackCommand? boolean
+--- Ballistic arcs that should be used on the projectile
+---@field BallisticArc? WeaponBallisticArc
+--- every `X/10+1` game ticks, this beam will collide and do damage - using `0` will cause beams to
+--- damage every tick
+---@field BeamCollisionDelay number
+--- the amount of time the beam exists
+---@field BeamLifetime number
+--- if the weapon will only fire when underwater
+---@field BelowWaterFireOnly? boolean
+---@field BombDropThreshold? number
+--- information about the bonuses added to the weapon when it reaches a specific veterancy level
+---@field Buffs BlueprintBuff[]
+--- used by the Lobo script to pass the lifetime of the vision marker created upon landing
+---@field CameraLifetime? number
+--- time to maintain the camera shake
+---@field CameraShakeDuration? number
+--- maximum size of the camera shake
+---@field CameraShakeMax? number
+--- minimum size of the camera shake
+---@field CameraShakeMin? number
+--- used by the Lobo script to pass the radius of the vision marker created upon landing
+---@field CameraVisionRadius? number
+--- how far from the unit should the camera shake
+---@field CameraShakeRadius number
+--- if the weapon cannot attack ground positions
+---@field CannotAttackGround? boolean
+--- should the unit collide against friendly meshes
+---@field CollideFriendly boolean
+--- beams fire without stopping - overrides `RateOfFire`
+---@field ContinuousBeam boolean
+--- this projectile needs to be built and stored before the weapon can fire
+---@field CountedProjectile? boolean
+--- damage value of the projectile fired from the weapon
+---@field Damage number
+--- if friendly units collide with and are damaged by this weapon's projectile
+---@field DamageFriendly boolean
+--- blast radius
+---@field DamageRadius number
+--- used by the Absolver script to pass how much damage is done to shields, instead of `Damage`
+---@field DamageToShields? number
+--- the type of damage the unit will do
+---@field DamageType DamageType
+--- used by some projectile scripts to pass depth charge information
+---@field DepthCharge? {Radius: number}
+--- If true, will set the projectile launched from this weapon to detonate once it pass the height
+--- of the target it was launched at.
+--- See `moho.projectile_methods:ChangeDetonateAboveHeight(height)`
+---@field DetonatesAtTargetHeight? boolean
+--- Name of the weapon. Used for lobby restrictions and for debugging:
+--- `dbg weapons` in the console shows the weapon names.
+---@field DisplayName string
+--- Use the `DoNotCollideList` in the projectile blueprint instead--this table is only used
+--- by anti-artillery shields
+---@field DoNotCollideList? UnparsedCategory[]
+--- number of times the Damage over Time damage will be dealt
+---@field DoTPulses number
+--- duration that the Damage over Time will last in seconds
+---@field DoTTime number
+--- If `FixBombTrajectory` is set, then bombs dropped with this weapon will be aimed at the position
+--- this fraction of the distance between the target and where it dropped. This may only be useful
+--- for torpedo bombers.
+---@field DropBombShort? number
+--- This instructs the engine not to create a C++ weapon object that is usually linked with the
+--- script object. This is for purely script driven weapons (like death weapons).
+---@field DummyWeapon boolean
+--- the effective range that this weapon really has
+---@field EffectiveRadius number
+--- if defined, will skip automatic threat level generation
+---@field EnabledByEnhancement? Enhancement
+--- if `false`, the first shot out of this weapon will not create an economy drain event
+---@field EnergyChargeForFirstShot? false
+--- how much power this weapon consumes when fired, until it meets its goal of `EnergyRequired`
+---@field EnergyDrainPerSecond? number
+--- how much energy is required to fire this weapon, drained according to `EnergyDrainPerSecond`
+---@field EnergyRequired? number
+--- If the weapon has the label `"DeathWeapon"`, then this flag determines if the death weapon is
+--- fired as a weapon rather than being applied as a damage area using its stats as a dummy weapon
+---@field FireOnDeath? boolean
+--- allows you to pick which layers you can target in relation to the layer that you are currently at
+---@field FireTargetLayerCapsTable? table<Layer, FireTargetCategory>
+--- how much random inaccuracy should we be from the target
+---@field FiringRandomness? number
+--- the firing randomness that this weapon has while the unit is moving
+---@field FiringRandomnessWhileMoving? number
+--- How much misaligned can the barrel be before starting to fire. Used when you are trying to
+--- target ammo that does not require lots of accuracy due to the size of their damage radius or
+--- because the ammo does automatic targeting
+---@field FiringTolerance? number
+--- if the ballistic trajectory of the bomb is precisely calculated in Lua rather than being handled
+--- by the engine
+---@field FixBombTrajectory? boolean
+--- if present, firing randomness will not scale with distance but have a fixed spread radius of
+--- this value
+---@field FixedSpreadRadius? number
+--- flares that this weapons launches
+---@field Flare WeaponBlueprintFlare
+--- if the weapon doesn't unpack (used for all counted projectiles)
+---@field ForceSingleFire? boolean
+--- controls what the weapon is allowed to target in reference to the heading of the unit
+---@field HeadingArcCenter number
+--- controls what the weapon is allowed to target in reference to the arc center,
+--- this is degrees on either side
+---@field HeadingArcRange number
+--- does not consider the weapon when attacking targets if it is disabled
+---@field IgnoreIfDisabled? boolean
+--- the intial damage done on impact for a Damage over Time weapon
+--- (where `Damage` is applied every pulse)
+---@field InitialDamage? number
+--- the number of counted projectiles the unit starts with
+--- (is clamped to the max projectile storage)
+---@field InitialProjectileStorage? number
+--- label is linking the blueprints (<unitid>_unit.bp) weapon information with the script
+--- (unitid_script.lua) weapon information. For example:
+--- blueprint:  Weapon { Label = 'FrontTurret01', }`
+--- script: `Weapons = { FrontTurret01 = Class(TDFGaussCannonWeapon) {} }`
+--- If the Label does not match the weapon will not be workable
+---@field Label string
+--- for tracking weapons, if the weapon should lead its target when aiming
+---@field LeadTarget? boolean
+--- never fires automatically
+---@field ManualFire? boolean
+--- changes the weapon range from spherical to cylindrical, where the cylinder has a height of
+--- this twice this value
+---@field MaxHeightDiff? number
+--- this weapon can only hold this many counted projectiles
+---@field MaxProjectileStorage number
+--- How far does the target need to be before we start firing
+---@field MaxRadius number
+---@field MaximumBeamLength
+---@field MetaImpactAmount any unused
+---@field MetaImpactRadius any unused
+--- the minimum range we must be to fire at our target
+---@field MinRadius number
+--- The time that the muzzle will wait between playing the FxMuzzleFlash table and the creation of
+--- the projectile. Note: This will delay the firing of the projectile. So if you set the rate of
+--- fire to fire quickly, this will throttle it.
+---@field MuzzleChargeDelay number
+--- Time in between muzzles firing. Setting to 0 = all muzzle fire together
+---@field MuzzleSalvoDelay number
+--- Number of times the muzzle will fire during a rack firing
+---@field MuzzleSalvoSize number
+--- Speed in which the projectile comes out of the muzzle. This speed is used in the ballistics
+--- calculations. If you weapon doesn't fire at its max radius, this may be too low
+---@field MuzzleChargeStart
+---@field MuzzleSalvoChargeDelay
+---@field MuzzleSalvoDelay
+---@field MuzzleSalvoSize
+---@field MuzzleSpecial
+---@field MuzzleVelocity number
+--- random variation in the weapon's muzzle velocity (gaussian)
+---@field MuzzleVelocityRandom number
+---@field MuzzleVelocityRandomness
+--- MuzzleVelocityReduceDistance was put there so weapons that have a high muzzle velocity because
+--- they have a huge range, like an artillery piece, wouldn't point right at something that's close,
+--- it'll slow down it's shot and still have a nice arc to it
+---@field MuzzleVelocityReduceDistance number
+--- if `NeedProp` is true then whenever the unit aquires a new target and is ready to attack it, it
+--- will first run the `OnGotTarget` script on the weapon
+---@field NeedPrep? boolean
+---@field NeedToComputeBombDrop
+---@field NotExclusive
+---@field NoPause any unused
+---@field NukeInnerRingDamage,
+---@field NukeInnerRingRadius,
+---@field NukeInnerRingTicks,
+---@field NukeInnerRingTotalTime,
+---@field NukeOuterRingDamage,
+---@field NukeOuterRingRadius,
+---@field NukeOuterRingTicks,
+---@field NukeOuterRingTotalTime,
+--- nuke weapon flag
+---@field NukeWeapon? boolean
+---@field Overcharge? WeaponBlueprintOvercharge
+--- overcharge weapon flag
+---@field OverchargeWeapon? boolean
+---@field PreferPrimaryWeaponTarget
+---@field PrefersPrimaryWeaponTarget
+--- blueprint of the projectile to fire
+---@field ProjectileId string
+--- Lifetime for projectile in seconds.
+--- If 0, the projectile will use the lifetime from its own blueprint.
+---@field ProjectileLifetime number
+--- Sets the lifetime for the projectile to use the lifetime equation of
+--- `ProjectileLifetimeUsesMultiplier * MaxRadius / MuzzleVelocity`
+---@field ProjectileLifetimeUsesMultiplier? number
+---@field ProjectilesPerOnFire any unused
+--- list of weapon racks this weapon uses
+---@field RackBones WeaponRacksBlueprint
+--- if all racks fire simultaneously
+---@field RackFireTogether boolean
+--- distance racks will recoil along the weapon's z-axis (local coords)
+---@field RackRecoilDistance number
+---@field RackRecoilReturnSpeed
+--- seconds before the weapon will reload when it didn't go through all its racks
+---@field RackReloadTimeout number
+--- time before the racks start firing
+---@field RackSalvoChargeTime number
+--- if the racks immediately fire when done charging or if they wait until next `OnFire` event
+---@field RackSalvoFiresAfterCharge boolean
+--- time the racks will reload before starting its next charge/salve cycle
+---@field RackSalvoReloadTime number
+--- number of times the racks will fire before its reload period
+---@field RackSalvoSize number
+--- if all rack bones are "slaved" to the turret pitch bone
+---@field RackSlavedToTurret boolean
+---@field RangeCategory? WeaponRangeCategory
+--- Rack firings per second. You can use decimals for fire rates that are longer than a second.
+---@field RateOfFire number
+---@field ReTargetOnMiss
+---@field RenderFireClock
+---@field RequireTime
+---@field SalvoShotDelay
+---@field SalvoSize
+---@field SkipReadyState
+--- if the weapon is "slaved" to the unit's body, thus requiring it to face its target to fire
+---@field SlavedToBody? boolean
+---@field SlavedToBodyArcRange
+---@field StopOnPrimaryWeaponBusy
+--- interval of time between looking for a target
+---@field TargetCheckInterval number
+--- table of category strings that define the targetting order of this weapon
+---@field TargetPriorities UnparsedCategory[]
+--- the categories that we will not allow to target
+---@field TargetRestrictDisallow UnparsedCategory
+--- exclusive categories that we will allow to target
+---@field TargetRestrictOnlyAllow UnparsedCategory
+--- the type of entity this unit can target
+---@field TargetType WeaponTargetType
+---@field ToggleWeapon
+--- The radius that the weapon start tracking the target. This does not mean that the weapon will
+--- fire. The weapon will only fire when a target enters the maxradius. This is a multi of
+--- the weapon's `MaxRadius`
+---@field TrackingRadius number
+--- the second muzzle bone for a turret, used for arms on bots as weapons
+---@field TurretBoneDualMuzzle Bone
+--- the second pitch bone for a turret, used for arms on bots as weapons
+---@field TurretBoneDualPitch Bone
+--- The bone used as the muzzle bone for turrets. This is used for aiming as where the projectile
+--- would come out
+---@field TurretBoneMuzzle Bone
+--- bone name that will determine the pitch rotation (rotation along the X axis)
+---@field TurretBonePitch Bone
+--- bone name that will determine the yaw rotation (rotation along the Y axis)
+---@field TurretBoneYaw string
+--- If two manipulators are needed for this weapon. Used for bots with arms.
+---@field TurretDualManipulators boolean
+--- if this weapon has a turret
+---@field Turreted boolean
+--- the center angle for determining pitch, based off the rest pose of the model
+---@field TurretPitch number
+--- the angle +/- off the pitch that is a valid angle to turn to
+---@field TurretPitchRange number
+--- the speed at which the turret can pitch
+---@field TurretPitchSpeed number
+--- the center angle for determining yaw, based off the rest pose of the model
+---@field TurretYaw number
+--- the angle +/- off the yaw that is a valid angle to turn to
+---@field TurretYawRange number
+--- the speed at which the turret can turn in its yaw direction
+---@field TurretYawSpeed number
+---@field UseFiringSolutionInsteadOfAimBone
+---@field WeaponCategory WeaponCategory
+--- amount of time after the unit has lost its target that it will wait before repacking the weapon
+---@field WeaponRepackTimeout? number
+--- path of the unpack animation
+---@field WeaponUnpackAnimation? FileName
+--- how fast the unpack animation runs
+---@field WeaponUnpackAnimationRate? number
+---@field WeaponUnpackAnimatorPrecedence
+--- If all unit motion is halted while this weapon is active and all other weapons not flagged with
+--- `NotExclusive = true` are locked out. This is useful when a unit must be stationary to fire such
+--- as a moble artillery unit or when a unit is required to be stationary during an unpack / repack
+--- sequence.
+---@field WeaponUnpackLocksMotion? boolean
+--- time the unit will take to unpack the weapon
+---@field WeaponUnpackTimeout? number
+--- if the weapon must unpack before it's ready to fire
+---@field WeaponUnpacks? boolean
+---@field YawOnlyOnTarget
+
+---@class WeaponBlueprintFlare
+--- the category of projectiles this flare will attract
+---@field Category UnparsedCategory
+--- if `Stack` is set, then two additionals flares will be created on the Z axis
+--- at an offset of this value multiplied by the `Radius`
+---@field OffsetMult? number
+--- The collision sphere treated as `5` if absent
+---@field Radius? number
+--- if two additional flares should be created on the Z axis, each offset by
+--- `OffsetMult * Radius` for its collision center
+---@field Stack? boolean
+
+---@class WeaponBlueprintOvercharge
+--- flat damage applied to commanders, regardless of energy storage
+---@field commandDamage number
+--- What fraction of current energy storage can be spent. This energy (shared among all
+--- overcharging units) is what is converted to damage, and then clamped.
+---@field energyMult number
+--- minimum damage the energy can convert to
+---@field maxDamage number
+--- minimum damage the energy can convert to 
+---@field minDamage number
+--- flat damage applied to structures, regardless of energy storage
+---@field structureDamage number
+
+---@class WeaponRacksBlueprint : RackBoneBlueprint[]
 
 ---@class RackBoneBlueprint
----@field RackBone string
----@field MuzzleBones string[]
----@field TelescopeBone? string
+--- the rack's bone that all of the child muzzle bones are attached to
+---@field RackBone Bone
+--- the list of muzzle bones that are attached to the rack
+---@field MuzzleBones Bone[]
+--- the 
+---@field TelescopeBone? Bone
 ---@field TelescopeRecoilDistance? number
 ---@field HideMuzzle? boolean
+
+---@class WeaponBlueprintAudio
+---@field BarrelLoop? SoundHandle
+---@field BarrelStart? SoundHandle
+---@field BarrelStop? SoundHandle
+---@field BeamLoop? SoundHandle
+---@field BeamStart? SoundHandle
+---@field BeamStop? SoundHandle
+---@field ChargeStart? SoundHandle
+---@field Fire? SoundHandle
+---@field FireUnderWater? SoundHandle
+---@field MuzzleChargeStart? SoundHandle
+---@field Open? SoundHandle
+---@field Unpack? SoundHandle

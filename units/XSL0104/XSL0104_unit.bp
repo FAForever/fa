@@ -4,7 +4,6 @@ UnitBlueprint {
             'Turret'
         },
     },
-    ResolvePath = true,
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',

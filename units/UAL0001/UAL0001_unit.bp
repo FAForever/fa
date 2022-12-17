@@ -1129,7 +1129,6 @@ UnitBlueprint {
                     TargetDisallow = 'EXPERIMENTAL, COMMAND',
                 },
             },
-            CanFireFromTransport = true,
             CollideFriendly = false,
             Damage = 1,
             DamageRadius = 0,

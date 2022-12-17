@@ -247,7 +247,7 @@ UnitBlueprint {
     StrategicIconName = 'icon_ship2_antiair',
     StrategicIconSortPriority = 155,
     Transport = {
-        Class1AttachSize = 1,
+        Class1Capacity = 1,
         Class2AttachSize = 1,
         Class3AttachSize = 1,
         DockingSlots = 1,
