@@ -8,25 +8,10 @@
 local DefaultUnitsFile = import('defaultunits.lua')
 local FactoryUnit = DefaultUnitsFile.FactoryUnit
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
-local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
-local AirUnit = DefaultUnitsFile.AirUnit
-local ConcreteStructureUnit = DefaultUnitsFile.ConcreteStructureUnit
 local ConstructionUnit = DefaultUnitsFile.ConstructionUnit
-local EnergyCreationUnit = DefaultUnitsFile.EnergyCreationUnit
-local EnergyStorageUnit = DefaultUnitsFile.EnergyStorageUnit
 local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
-local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
-local MassFabricationUnit = DefaultUnitsFile.MassFabricationUnit
-local MassStorageUnit = DefaultUnitsFile.MassStorageUnit
-local RadarUnit = DefaultUnitsFile.RadarUnit
 local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
-local ShieldHoverLandUnit = DefaultUnitsFile.ShieldHoverLandUnit
-local ShieldLandUnit = DefaultUnitsFile.ShieldLandUnit
 local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
-local SonarUnit = DefaultUnitsFile.SonarUnit
-local StructureUnit = DefaultUnitsFile.StructureUnit
-local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
-local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
@@ -68,13 +53,10 @@ SFactoryUnit = Class(FactoryUnit) {
 
 -- AIR STRUCTURES
 SAirFactoryUnit = Class(AirFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    StartBuildFxUnpause = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
-    end,
+    StartBuildFx = SFactoryUnit.StartBuildFx,
+    StartBuildFxUnpause = SFactoryUnit.StartBuildFxUnpause,
+    OnPaused = SFactoryUnit.OnPaused,
+    OnUnpaused = SFactoryUnit.OnUnpaused,
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
@@ -221,28 +203,18 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
            end
         end,
     },
-
-    OnPaused = function(self)
-        SFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        SFactoryUnit.OnUnpaused(self)
-    end,
 }
 
 -- AIR UNITS
-SAirUnit = Class(AirUnit) {
+SAirUnit = Class(DefaultUnitsFile.AirUnit) {
     ContrailEffects = {'/effects/emitters/contrail_ser_polytrail_01_emit.bp'}
 }
 
 --  AIR STAGING STRUCTURES
-SAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
+SAirStagingPlatformUnit = Class(DefaultUnitsFile.AirStagingPlatformUnit) {}
 
 -- WALL  STRUCTURES
-SConcreteStructureUnit = Class(ConcreteStructureUnit) {
-    AdjacencyBeam = false,
-}
+SConcreteStructureUnit = Class(DefaultUnitsFile.ConcreteStructureUnit) { }
 
 -- Construction Units
 SConstructionUnit = Class(ConstructionUnit) {
@@ -307,41 +279,20 @@ SConstructionUnit = Class(ConstructionUnit) {
 }
 
 -- ENERGY CREATION UNITS
-SEnergyCreationUnit = Class(EnergyCreationUnit) {
-    OnCreate = function(self)
-        EnergyCreationUnit.OnCreate(self)
-        self.NumUsedAdjacentUnits = 0
-    end,
-
-    OnStopBeingBuilt = function(self, builder, layer)
-        EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
-        if self.AmbientEffects then
-            for k, v in EffectTemplate[self.AmbientEffects] do
-                CreateAttachedEmitter(self, 0, self.Army, v)
-            end
-        end
-    end,
-}
+SEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) { }
 
 -- ENERGY STORAGE STRUCTURES
-SEnergyStorageUnit = Class(EnergyStorageUnit) {}
+SEnergyStorageUnit = Class(DefaultUnitsFile.EnergyStorageUnit) {}
 
 -- HOVERING LAND UNITS
-SHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
-    FxHoverScale = 1,
-    HoverEffects = nil,
-    HoverEffectBones = nil,
-}
+SHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) { }
 
 -- LAND FACTORY STRUCTURES
 SLandFactoryUnit = Class(LandFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    StartBuildFxUnpause = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
-    end,
+    StartBuildFx = SFactoryUnit.StartBuildFx,
+    StartBuildFxUnpause = SFactoryUnit.StartBuildFxUnpause,
+    OnPaused = SFactoryUnit.OnPaused,
+    OnUnpaused = SFactoryUnit.OnUnpaused,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
@@ -402,43 +353,32 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
            end
         end,
     },
-
-    OnPaused = function(self)
-        SFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        SFactoryUnit.OnUnpaused(self)
-    end,
 }
 
 -- LAND UNITS
 SLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
-SMassCollectionUnit = Class(MassCollectionUnit) {}
+SMassCollectionUnit = Class(DefaultUnitsFile.MassCollectionUnit) {}
 
 -- MASS FABRICATION STRUCTURES
-SMassFabricationUnit = Class(MassFabricationUnit) {}
+SMassFabricationUnit = Class(DefaultUnitsFile.MassFabricationUnit) {}
 
 -- MASS STORAGE UNITS
-SMassStorageUnit = Class(MassStorageUnit) {}
+SMassStorageUnit = Class(DefaultUnitsFile.MassStorageUnit) {}
 
 -- RADAR STRUCTURES
-SRadarUnit = Class(RadarUnit) {}
+SRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
 
 -- RADAR STRUCTURES
-SSonarUnit = Class(SonarUnit) {}
+SSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
 SSeaFactoryUnit = Class(SeaFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    StartBuildFxUnpause = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
-    end,
+    StartBuildFx = SFactoryUnit.StartBuildFx,
+    StartBuildFxUnpause = SFactoryUnit.StartBuildFxUnpause,
+    OnPaused = SFactoryUnit.OnPaused,
+    OnUnpaused = SFactoryUnit.OnUnpaused,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
@@ -499,24 +439,16 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
            end
         end,
     },
-
-    OnPaused = function(self)
-        SFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        SFactoryUnit.OnUnpaused(self)
-    end,
 }
 
 -- SEA UNITS
 SSeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
 
 -- SHIELD LAND UNITS
-SShieldHoverLandUnit = Class(ShieldHoverLandUnit) {}
+SShieldHoverLandUnit = Class(DefaultUnitsFile.ShieldHoverLandUnit) {}
 
 -- SHIELD LAND UNITS
-SShieldLandUnit = Class(ShieldLandUnit) {}
+SShieldLandUnit = Class(DefaultUnitsFile.ShieldLandUnit) {}
 
 -- SHIELD STRUCTURES
 SShieldStructureUnit = Class(ShieldStructureUnit) {
@@ -540,13 +472,10 @@ SShieldStructureUnit = Class(ShieldStructureUnit) {
 }
 
 -- STRUCTURES
-SStructureUnit = Class(StructureUnit) {}
+SStructureUnit = Class(DefaultUnitsFile.StructureUnit) {}
 
 -- SUBMARINE UNITS
-SSubUnit = Class(DefaultUnitsFile.SubUnit) {
-    IdleSubBones = {},
-    IdleSubEffects = {}
-}
+SSubUnit = Class(DefaultUnitsFile.SubUnit) { }
 
 -- TRANSPORT BEACON UNITS
 STransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
@@ -561,15 +490,13 @@ SWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 SCivilianStructureUnit = Class(SStructureUnit) {}
 
 -- QUANTUM GATE UNITS
-SQuantumGateUnit = Class(QuantumGateUnit) {}
+SQuantumGateUnit = Class(DefaultUnitsFile.QuantumGateUnit) {}
 
 -- RADAR JAMMER UNITS
-SRadarJammerUnit = Class(RadarJammerUnit) {}
+SRadarJammerUnit = Class(DefaultUnitsFile.RadarJammerUnit) {}
 
 -- Seraphim energy ball units
 SEnergyBallUnit = Class(SHoverLandUnit) {
-    timeAlive = 0,
-
     OnCreate = function(self)
         SHoverLandUnit.OnCreate(self)
         self:SetCanTakeDamage(false)

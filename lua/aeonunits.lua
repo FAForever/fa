@@ -98,9 +98,7 @@ AAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 ---------------------------------------------------------------
 --  WALL  STRUCTURES
 ---------------------------------------------------------------
-AConcreteStructureUnit = Class(ConcreteStructureUnit) {
-    AdjacencyBeam = false,
-}
+AConcreteStructureUnit = Class(ConcreteStructureUnit) { }
 
 ---------------------------------------------------------------
 --  Construction Units
@@ -115,11 +113,6 @@ AConstructionUnit = Class(ConstructionUnit) {
 --  ENERGY CREATION UNITS
 ---------------------------------------------------------------
 AEnergyCreationUnit = Class(EnergyCreationUnit) {
-    OnCreate = function(self)
-        EnergyCreationUnit.OnCreate(self)
-        self.NumUsedAdjacentUnits = 0
-    end,
-
     OnStopBeingBuilt = function(self,builder,layer)
         EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         if self.AmbientEffects then
@@ -138,11 +131,7 @@ AEnergyStorageUnit = Class(EnergyStorageUnit) {}
 ---------------------------------------------------------------
 --  HOVERING LAND UNITS
 ---------------------------------------------------------------
-AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
-    FxHoverScale = 1,
-    HoverEffects = nil,
-    HoverEffectBones = nil,
-}
+AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) { }
 
 ---------------------------------------------------------------
 --  LAND FACTORY STRUCTURES
@@ -256,10 +245,7 @@ AStructureUnit = Class(StructureUnit) {}
 ---------------------------------------------------------------
 --  SUBMARINE UNITS
 ---------------------------------------------------------------
-ASubUnit = Class(DefaultUnitsFile.SubUnit) {
-    IdleSubBones = {},
-    IdleSubEffects = {}
-}
+ASubUnit = Class(DefaultUnitsFile.SubUnit) {}
 
 ---------------------------------------------------------------
 --  TRANSPORT BEACON UNITS
