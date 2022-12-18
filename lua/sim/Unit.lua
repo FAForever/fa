@@ -113,8 +113,6 @@ Unit = Class(moho.unit_methods) {
 
     Weapons = {},
 
-    FxScale = 1,
-    FxDamageScale = 1,
     -- FX Damage tables. A random damage effect table of emitters is chosen out of this table
     FxDamage1 = {EffectTemplate.DamageSmoke01, EffectTemplate.DamageSparks01},
     FxDamage2 = {EffectTemplate.DamageFireSmoke01, EffectTemplate.DamageSparks01},

@@ -16,9 +16,6 @@ local NavalCannonOblivionWeapon = import("/lua/aeon_naval_weapons.lua").ADFCanno
 
 ---@class UAS0302 : ASeaUnit
 UAS0302 = Class(ASeaUnit) {
-    FxDamageScale = 2,
-    DestructionTicks = 400,
-
     Weapons = {
         BackTurret = Class(NavalCannonOblivionWeapon) {},
         FrontTurret = Class(NavalCannonOblivionWeapon) {},

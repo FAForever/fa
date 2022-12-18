@@ -33,7 +33,6 @@ UEA0104 = Class(AirTransport) {
         BackRiotGun = Class(TDFRiotWeapon) {},
     },
 
-    DestructionTicks = 250,
     EngineRotateBones = {'Front_Right_Engine', 'Front_Left_Engine', 'Back_Left_Engine', 'Back_Right_Engine', },
 
     OnStopBeingBuilt = function(self,builder,layer)

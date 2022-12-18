@@ -17,8 +17,6 @@ local TIFSmartCharge = WeaponFile.TIFSmartCharge
 
 ---@class UES0201 : TSeaUnit
 UES0201 = Class(TSeaUnit) {
-    DestructionTicks = 200,
-
     Weapons = {
         FrontTurret01 = Class(TDFGaussCannonWeapon) {},
         BackTurret01 = Class(TDFGaussCannonWeapon) {},

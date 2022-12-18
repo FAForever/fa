@@ -17,8 +17,6 @@ local TIFCruiseMissileLauncher = WeaponFile.TIFCruiseMissileLauncher
 
 ---@class UES0202 : TSeaUnit
 UES0202 = Class(TSeaUnit) {
-    DestructionTicks = 200,
-
     Weapons = {
         FrontTurret01 = Class(TDFGaussCannonWeapon) {},
         BackTurret02 = Class(TSAMLauncher) {

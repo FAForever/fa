@@ -26,13 +26,9 @@ UEA0107 = Class(AirTransport) {
 
         BeamExhaustCruise = '/effects/emitters/transport_thruster_beam_01_emit.bp',
         BeamExhaustIdle = '/effects/emitters/transport_thruster_beam_02_emit.bp',
-
-        DestructionTicks = 250,
         EngineRotateBones = {'Front_Right_Engine', 'Front_Left_Engine', 'Back_Left_Engine', 'Back_Right_Engine', },
 
         PlayDestructionEffects = true,
-        DamageEffectPullback = 0.25,
-        DestroySeconds = 7.5,
 
         OnStopBeingBuilt = function(self,builder,layer)
             AirTransport.OnStopBeingBuilt(self,builder,layer)
