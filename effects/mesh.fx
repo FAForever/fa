@@ -9363,10 +9363,10 @@ float4 PBR_Seraphim(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COL
     // There are also white highlights in the albedo texture in some models
     float3 whiteness = saturate(albedo.rgb - float3 (0.4,0.4,0.4));
 
-    albedo.rgb = albedo.rgb + float3(0.4, 0.43, 0.47) * 1.5;
+    albedo.rgb = (albedo.rgb + float3(0.4, 0.43, 0.47)) * 0.6;
     albedo.rgb = lerp(albedo.rgb, teamColor, albedo.a);
 
-    float metallic = 1;
+    float metallic = 0.8;
     float roughness = saturate((1 - pow(specular.g, 0.5) + 0.15) * 0.6);
     float ao = 1;
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows).rgb;
