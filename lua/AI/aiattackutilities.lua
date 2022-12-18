@@ -1,13 +1,10 @@
---****************************************************************************
---**
---**  File     :  /lua/AI/aiattackutilities.lua
---**  Author(s): John Comes, Dru Staltman, Robert Oates, Gautam Vasudevan
---**
---**  Summary  : This file was completely rewritten to best take advantage of
---**             the new influence map stuff Daniel provided.
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------------------------------------------------
+-- File     :  /lua/AI/aiattackutilities.lua
+-- Author(s): John Comes, Dru Staltman, Robert Oates, Gautam Vasudevan
+-- Summary  : This file was completely rewritten to best take advantage of the new influence map stuff Daniel provided.
+--
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------------------------------------------------
 
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local AIUtils = import("/lua/ai/aiutilities.lua")
@@ -396,7 +393,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param platoon Platoon
----@param location string
+---@param location Vector
 ---@param maxRange number
 ---@param selectedWeaponArc any
 ---@param turretPitch any
@@ -524,7 +521,7 @@ end
 --- Finds if the platoon can move to the location given, or close enough to bombard
 ---@param aiBrain AIBrain aiBrain to use
 ---@param platoon Platoon platoon to find best target for
----@param location string spot we want to get to
+---@param location Vector spot we want to get to
 ---@param maxRange number maximum range of the platoon (can bombard from water)
 ---@param selectedWeaponArc any # Need Descriptor
 ---@return boolean # Bool
@@ -601,7 +598,7 @@ end
 --- Gets the path to a random naval marker.
 ---@param aiBrain AIBrain aiBrain to use
 ---@param platoon Platoon platoon to find best target for
----@return table[] # A table representing the path
+---@return Vector[] # A table representing the path
 function AINavalPlanB(aiBrain, platoon)
     --Get a random naval area and issue a movement thar.
     local navalAreas = AIUtils.AIGetMarkerLocations(aiBrain, 'Naval Area')
@@ -798,7 +795,7 @@ end
 --- wait 60 seconds for transports before failing
 ---@param aiBrain AIBrain aiBrain to use
 ---@param platoon Platoon platoon to find best target for
----@param destination string table representing the destination location
+---@param destination Vector table representing the destination location
 ---@param bRequired boolean wait for transports if there aren't any, since it's required to use them
 ---@param bSkipLastMove any don't do the final move... useful for when engineers use this function
 ---@param waitLonger any Neeed Descriptor
@@ -976,7 +973,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param platoon Platoon
----@param destination string
+---@param destination Vector
 ---@param bRequired any
 ---@param bSkipLastMove any
 ---@return boolean
@@ -1209,8 +1206,8 @@ end
 --- can be generated while avoiding other high threat areas along the way.
 ---@param aiBrain AIBrain aiBrain to use
 ---@param platoonLayer Platoon layer to use to generate safe path... e.g. 'Air', 'Land', etc.
----@param start table table representing starting location
----@param destination table table representing the destination location
+---@param start Vector table representing starting location
+---@param destination Vector table representing the destination location
 ---@param optThreatWeight any the importance of threat when choosing a path. High weight generates longer, safer paths.
 ---@param optMaxMarkerDist any the maximum distance away a platoon should look for a pathing marker
 ---@param testPathDist any Descriptor needed
@@ -1314,7 +1311,7 @@ end
 --- ## Function: GetClosestPathNodeInRadiusByLayer
 --- ### Description:
 --- Gets the name of the closest pathing node (within radius distance of location) on the layer we specify.
----@param location string location to search around
+---@param location Vector location to search around
 ---@param radius number radius around location to search in
 ---@param layer string layer to use to generate safe path... e.g. 'Air', 'Land', etc.
 ---@return boolean # Closest pathing node's name else false
@@ -1344,7 +1341,7 @@ end
 --- ## Function: GetClosestPathNodeInRadiusByGraph
 --- ### Description:
 --- If there is a node from a specific graph within radius distance of location, this function will get its name.
----@param location string location to search around
+---@param location Vector location to search around
 ---@param radius number radius around location to search in
 ---@param graphName string name of graph to use to find closest path
 ---@return boolean # The closest node's name else false
@@ -1410,7 +1407,7 @@ end
 ---@param threatType any type of threat to path around
 ---@param threatWeight any weight applied for heuristic when avoiding threat
 ---@param destination table
----@param location table
+---@param location Vector
 ---@return unknown # A list of positions of path nodes from beginning to end of the selected path
 function GeneratePathSorian(aiBrain, startNode, endNode, threatType, threatWeight, destination, location)
     if not aiBrain.PathCache then
@@ -1522,9 +1519,9 @@ end
 ---@param startNode any
 ---@param endNode any
 ---@param threatType any
----@param threatWeight any
----@param endPos any
----@param startPos any
+---@param threatWeight number
+---@param endPos Vector
+---@param startPos Vector
 ---@return boolean
 function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, endPos, startPos)
     threatWeight = threatWeight or 1
