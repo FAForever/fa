@@ -50,14 +50,23 @@ function StartFrontEndUI()
     if not DebugFacilitiesEnabled() then
         local keyMap = import("/lua/keymap/defaultkeymap.lua")
         IN_RemoveKeyMapTable(keyMap.debugKeyMap)                
-    end    
+    end
     
     -- if there is an auto continue state, then launch op immediately
     if GetFrontEndData('NextOpBriefing') then
         CampaignManager.LaunchBriefing(GetFrontEndData('NextOpBriefing'))
+    end
+
+    if HasCommandLineArg("/offline") then
+        local mapFolderName = GetCommandLineArg("/mapFolderName", 1)
+        if not mapFolderName then
+            error("No /mapFolderName arg")
+        end
+        import("/lua/ui/skirmish/skirmish.lua").openOfflineLobby(mapFolderName[1])
     else
         import("/lua/ui/menus/main.lua").CreateUI()
     end
+
     if GetNumRootFrames() > 1 then
         import("/lua/ui/game/multihead.lua").ShowLogoInHead1()
     end
