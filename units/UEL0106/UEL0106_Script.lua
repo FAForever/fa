@@ -16,7 +16,7 @@ local TDFMachineGunWeapon = import("/lua/terranweapons.lua").TDFMachineGunWeapon
 UEL0106 = Class(TWalkingLandUnit) {
     Weapons = {
         ArmCannonTurret = Class(TDFMachineGunWeapon) {
-            DisabledFiringBones = { 'Torso', },
+            DisabledFiringBones = { 'Torso' },
         },
     },
 }

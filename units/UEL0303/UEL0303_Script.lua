@@ -18,9 +18,7 @@ UEL0303 = Class(TWalkingLandUnit) {
 
     Weapons = {
         HeavyPlasma01 = Class(TDFHeavyPlasmaCannonWeapon) {
-            DisabledFiringBones = { 'Torso', },
-        },
-        AntiAirMissiles = Class(TSAMLauncher) {
+            DisabledFiringBones = { 'Torso' },
         },
     },
 }

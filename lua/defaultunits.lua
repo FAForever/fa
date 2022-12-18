@@ -2825,4 +2825,3 @@ ShieldLandUnit = Class(LandUnit) {}
 -- SHIELD SEA UNITS
 ---@class ShieldSeaUnit : SeaUnit
 ShieldSeaUnit = Class(SeaUnit) {}
-

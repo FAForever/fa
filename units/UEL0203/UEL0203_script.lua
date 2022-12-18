@@ -18,12 +18,6 @@ UEL0203 = Class(THoverLandUnit, SlowHover) {
         Riotgun01 = Class(TDFRiotWeapon) {
             FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFxTank
         },
-        --Riotgun02 = Class(TDFRiotWeapon)
-        --{
-        --    --FxMuzzleFlash = {'/effects/emitters/riotgun_muzzle_fire_01_emit.bp',
-        --    --                 '/effects/emitters/riot_gun_shells_02_emit.bp',},
-        --    FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFxTank
-        --},
     },
 }
 

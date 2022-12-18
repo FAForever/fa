@@ -27,21 +27,10 @@ UES0201 = Class(TSeaUnit) {
         AntiTorpedo = Class(TIFSmartCharge) {},
     },
 
-    RadarThread = function(self)
-        local spinner = CreateRotator(self, 'Spinner02', 'x', nil, 0, 90, -90)
-        self.Trash:Add(spinner)
-        while true do
-            WaitFor(spinner)
-            spinner:SetTargetSpeed(90)
-            WaitFor(spinner)
-            spinner:SetTargetSpeed(-90)
-        end
-    end,
-
     OnStopBeingBuilt = function(self,builder,layer)
         TSeaUnit.OnStopBeingBuilt(self,builder,layer)
         self.Trash:Add(CreateRotator(self, 'Spinner01', 'y', nil, 180, 0, 180))
-        self:ForkThread(self.RadarThread)
+        self.Trash:Add(CreateRotator(self, 'Spinner02', 'y', nil, 180, 0, 180))
         self:HideBone( 'Back_Turret02', true )
     end,
 }

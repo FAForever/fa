@@ -28,5 +28,4 @@ ShieldEffectsComponent = ClassSimple {
     OnShieldDisabled = function(self)
         self.ShieldEffectsBag:Destroy()
     end,
-
 }
