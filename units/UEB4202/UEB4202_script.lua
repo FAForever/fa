@@ -8,13 +8,13 @@
 ----**  Copyright © 20010 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local TShieldStructureUnit = import("/lua/terranunits.lua").TShieldStructureUnit
-local ManageShieldEffects = import("/lua/defaultcomponents.lua").ManageShieldEffects
+local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
 ---@class UEB4202 : TShieldStructureUnit
 ---@field Rotator1? moho.RotateManipulator
 ---@field Rotator2? moho.RotateManipulator
 ---@field ShieldEffectsBag TrashBag
-UEB4202 = Class(TShieldStructureUnit, ManageShieldEffects) {
+UEB4202 = Class(TShieldStructureUnit, ShieldEffectsComponent) {
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_t2_01_emit.bp',
         '/effects/emitters/terran_shield_generator_t2_02_emit.bp',
@@ -24,7 +24,7 @@ UEB4202 = Class(TShieldStructureUnit, ManageShieldEffects) {
     ---@param self UEB4202
     OnCreate = function(self)
         TShieldStructureUnit.OnCreate(self)
-        ManageShieldEffects.OnCreate(self)
+        ShieldEffectsComponent.OnCreate(self)
     end,
 
     ---@param self UEB4202
@@ -41,7 +41,7 @@ UEB4202 = Class(TShieldStructureUnit, ManageShieldEffects) {
     ---@param self UEB4202
     OnShieldEnabled = function(self)
         TShieldStructureUnit.OnShieldEnabled(self)
-        ManageShieldEffects.OnShieldEnabled(self)
+        ShieldEffectsComponent.OnShieldEnabled(self)
 
         if self.Rotator1 then
             self.Rotator1:SetTargetSpeed(10)
@@ -54,7 +54,7 @@ UEB4202 = Class(TShieldStructureUnit, ManageShieldEffects) {
     ---@param self UEB4202
     OnShieldDisabled = function(self)
         TShieldStructureUnit.OnShieldDisabled(self)
-        ManageShieldEffects.OnShieldDisabled(self)
+        ShieldEffectsComponent.OnShieldDisabled(self)
         self.Rotator1:SetTargetSpeed(0)
         self.Rotator2:SetTargetSpeed(0)
     end,

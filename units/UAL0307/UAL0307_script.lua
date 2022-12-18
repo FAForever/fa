@@ -10,10 +10,10 @@
 
 local AShieldHoverLandUnit = import("/lua/aeonunits.lua").AShieldHoverLandUnit
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
-local ManageShieldEffects = import("/lua/defaultcomponents.lua").ManageShieldEffects
+local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
 ---@class UAL0307 : AShieldHoverLandUnit
-UAL0307 = Class(AShieldHoverLandUnit, ManageShieldEffects) {
+UAL0307 = Class(AShieldHoverLandUnit, ShieldEffectsComponent) {
     
     Weapons = {        
         TargetPointer = Class(DefaultProjectileWeapon) {},
@@ -25,7 +25,7 @@ UAL0307 = Class(AShieldHoverLandUnit, ManageShieldEffects) {
 
     OnCreate = function(self)
         AShieldHoverLandUnit.OnCreate(self)
-        ManageShieldEffects.OnCreate(self)
+        ShieldEffectsComponent.OnCreate(self)
     end,
     
     OnStopBeingBuilt = function(self,builder,layer)
@@ -38,7 +38,7 @@ UAL0307 = Class(AShieldHoverLandUnit, ManageShieldEffects) {
     
     OnShieldEnabled = function(self)
         AShieldHoverLandUnit.OnShieldEnabled(self)
-        ManageShieldEffects.OnShieldEnabled(self)
+        ShieldEffectsComponent.OnShieldEnabled(self)
 
         if not self.Animator then
             self.Animator = CreateAnimator(self)
@@ -50,7 +50,7 @@ UAL0307 = Class(AShieldHoverLandUnit, ManageShieldEffects) {
 
     OnShieldDisabled = function(self)
         AShieldHoverLandUnit.OnShieldDisabled(self)
-        ManageShieldEffects.OnShieldDisabled(self)
+        ShieldEffectsComponent.OnShieldDisabled(self)
         
         if self.Animator then
             self.Animator:SetRate(-1)

@@ -8,10 +8,10 @@
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local AShieldStructureUnit = import("/lua/aeonunits.lua").AShieldStructureUnit
-local ManageShieldEffects = import("/lua/defaultcomponents.lua").ManageShieldEffects
+local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
 ---@class UAB4301 : AShieldStructureUnit
-UAB4301 = Class(AShieldStructureUnit, ManageShieldEffects) {
+UAB4301 = Class(AShieldStructureUnit, ShieldEffectsComponent) {
     ShieldEffects = {
         '/effects/emitters/aeon_shield_generator_t2_01_emit.bp',
         '/effects/emitters/aeon_shield_generator_t3_02_emit.bp',
@@ -21,12 +21,12 @@ UAB4301 = Class(AShieldStructureUnit, ManageShieldEffects) {
 
     OnCreate = function(self)
         AShieldStructureUnit.OnCreate(self)
-        ManageShieldEffects.OnCreate(self)
+        ShieldEffectsComponent.OnCreate(self)
     end,
 
     OnShieldEnabled = function(self)
         AShieldStructureUnit.OnShieldEnabled(self)
-        ManageShieldEffects.OnShieldEnabled(self)
+        ShieldEffectsComponent.OnShieldEnabled(self)
 
         if not self.OrbManip1 then
             self.OrbManip1 = CreateRotator(self, 'Orb', 'y', nil, 0, 45, -45)
@@ -42,7 +42,7 @@ UAB4301 = Class(AShieldStructureUnit, ManageShieldEffects) {
 
     OnShieldDisabled = function(self)
         AShieldStructureUnit.OnShieldDisabled(self)
-        ManageShieldEffects.OnShieldDisabled(self)
+        ShieldEffectsComponent.OnShieldDisabled(self)
 
         if self.OrbManip1 then
             self.OrbManip1:SetSpinDown(true)

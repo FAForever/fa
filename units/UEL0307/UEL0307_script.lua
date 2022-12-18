@@ -9,11 +9,11 @@
 --****************************************************************************
 
 local TShieldLandUnit = import("/lua/terranunits.lua").TShieldLandUnit
-local ManageShieldEffects = import("/lua/defaultcomponents.lua").ManageShieldEffects
+local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
 ---@class UEL0307 : TShieldLandUnit
-UEL0307 = Class(TShieldLandUnit, ManageShieldEffects) {
+UEL0307 = Class(TShieldLandUnit, ShieldEffectsComponent) {
 
     Weapons = {        
         TargetPointer = Class(DefaultProjectileWeapon) {},
@@ -26,7 +26,7 @@ UEL0307 = Class(TShieldLandUnit, ManageShieldEffects) {
 
     OnCreate = function(self)
         TShieldLandUnit.OnCreate(self)
-        ManageShieldEffects.OnCreate(self)
+        ShieldEffectsComponent.OnCreate(self)
     end,
     
     OnStopBeingBuilt = function(self,builder,layer)
@@ -39,7 +39,7 @@ UEL0307 = Class(TShieldLandUnit, ManageShieldEffects) {
     
     OnShieldEnabled = function(self)
         TShieldLandUnit.OnShieldEnabled(self)
-        ManageShieldEffects.OnShieldDisabled(self)
+        ShieldEffectsComponent.OnShieldDisabled(self)
 
         KillThread( self.DestroyManipulatorsThread )
         if not self.RotatorManipulator then
@@ -60,7 +60,7 @@ UEL0307 = Class(TShieldLandUnit, ManageShieldEffects) {
 
     OnShieldDisabled = function(self)
         TShieldLandUnit.OnShieldDisabled(self)
-        ManageShieldEffects.OnShieldDisabled(self)
+        ShieldEffectsComponent.OnShieldDisabled(self)
         KillThread( self.DestroyManipulatorsThread )
         self.DestroyManipulatorsThread = self:ForkThread( self.DestroyManipulators )
     end,

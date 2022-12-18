@@ -832,6 +832,8 @@ function PostModBlueprints(all_bps)
     PostProcessProjectiles(all_bps.Projectile)
     PostProcessUnits(all_bps.Unit)
     PostProcessProps(all_bps.Prop)
+
+    all_bps.Unit['ueb4202'] = nil
 end
 
 
