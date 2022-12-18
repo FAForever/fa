@@ -1,19 +1,15 @@
---****************************************************************************
---**
---**  File     :  /lua/OpBehaviors.lua
---**  Author(s): DFS
---**
---**  Summary  :
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-----------------------------------------------------------------------------------
--- Platoon Lua Module                    --
-----------------------------------------------------------------------------------
+---------------------------------------------------------------------
+-- File     :  /lua/OpBehaviors.lua
+-- Author(s): DFS
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+---------------------------------------------------------------------
+
+-- Platoon Lua Module --
 local Utilities = import("/lua/utilities.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
 -- ===== CDR ADD BEHAVIORS ===== --
+---@param platoon Platoon
 function CDROverchargeBehavior(platoon)
     local cdr = platoon:GetPlatoonUnits()[1]
     if platoon.CDRData then
@@ -30,6 +26,7 @@ function CDROverchargeBehavior(platoon)
     end
 end
 
+---@param cdr CommandUnit
 function CDROverChargeThread( cdr )
     local aiBrain = cdr:GetAIBrain()
     local weapBPs = cdr:GetBlueprint().Weapon
@@ -137,6 +134,8 @@ function CDROverChargeThread( cdr )
     end
 end
 
+---@param cdr CommandUnit
+---@param plat Platoon
 function CDRRepairBuildingUnit( cdr, plat )
     local aiBrain = cdr:GetAIBrain()
     if cdr.UnitBeingBuiltBehavior and not cdr.UnitBeingBuiltBehavior:BeenDestroyed() then
@@ -156,6 +155,7 @@ function CDRRepairBuildingUnit( cdr, plat )
     end
 end
 
+---@param cdr CommandUnit
 function CDRLeashThread(cdr)
     -- if no radius specified return out of function
     local rad
@@ -197,6 +197,7 @@ function CDRLeashThread(cdr)
     end
 end
 
+---@param cdr CommandUnit
 function CDRRunAwayThread( cdr )
     local aiBrain = cdr:GetAIBrain()
     local runSpotX, runSpotZ = aiBrain:GetArmyStartPos()

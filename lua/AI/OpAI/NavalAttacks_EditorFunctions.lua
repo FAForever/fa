@@ -1,11 +1,8 @@
---****************************************************************************
---**
---**  File     :  /lua/ai/OpAI/NavalAttacks_EditorFunctions
---**  Author(s): speed2
---**
---**  Summary  : Generic AI Platoon Build Conditions. Build conditions always return true or false
---**
---****************************************************************************
+----------------------------------------------------------------------------------------------------
+-- File     :  /lua/ai/OpAI/NavalAttacks_EditorFunctions
+-- Author(s): speed2
+-- Summary  : Generic AI Platoon Build Conditions. Build conditions always return true or false
+----------------------------------------------------------------------------------------------------
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 --- NavalAttacksChildCountDifficulty = BuildCondition   doc = "Please work function docs."

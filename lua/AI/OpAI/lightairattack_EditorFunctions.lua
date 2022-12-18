@@ -1,13 +1,9 @@
---****************************************************************************
---**
---**  File     :  /lua/ai/OpAI/lightairattack_EditorFunctions
---**  Author(s): Dru Staltman
---**
---**  Summary  : Generic AI Platoon Build Conditions
---**             Build conditions always return true or false
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+---------------------------------------------------------------------------------------------------
+-- File     :  /lua/ai/OpAI/lightairattack_EditorFunctions
+-- Author(s): Dru Staltman
+-- Summary  : Generic AI Platoon Build Conditions Build conditions always return true or false
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+---------------------------------------------------------------------------------------------------
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 --- LightAirChildCountDifficulty = BuildCondition   doc = "Please work function docs."
@@ -49,8 +45,3 @@ function LightAirMasterCountDifficulty(aiBrain, master)
         return false        
     end
 end
-
--- Kept for Mod Support 
-local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
-local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
-local AIUtils = import("/lua/ai/aiutilities.lua")

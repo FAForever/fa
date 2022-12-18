@@ -1,12 +1,9 @@
---****************************************************************************
---**
---**  File     :  /lua/ai/OpAI/LandAssault_EditorFunctions
---**  Author(s): Dru Staltman
---**
---**  Summary  : Generic AI Platoon Build Conditions. Build conditions always return true or false
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+----------------------------------------------------------------------------------------------------
+-- File     :  /lua/ai/OpAI/LandAssault_EditorFunctions
+-- Author(s): Dru Staltman
+-- Summary  : Generic AI Platoon Build Conditions. Build conditions always return true or false
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+----------------------------------------------------------------------------------------------------
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
 
@@ -112,8 +109,3 @@ function LandAssaultTransportThread(platoon)
     end
     ScenarioPlatoonAI.TransportPool(platoon)
 end
-
-
--- Kept for Mod Support
-local AIUtils = import("/lua/ai/aiutilities.lua")
-local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
