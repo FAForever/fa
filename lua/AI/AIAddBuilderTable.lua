@@ -1,5 +1,4 @@
 --***************************************************************************
---*
 --**  File     :  /lua/ai/AIAddBuilderTable.lua
 --**
 --**  Summary  : Default economic builders for skirmish
@@ -7,6 +6,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param baseBuilderName string
 function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
     if not BaseBuilderTemplates[baseBuilderName] then
         error('*AI ERROR: Invalid BaseBuilderTemplate: none found named - ' .. baseBuilderName)
@@ -27,6 +29,9 @@ function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
     aiBrain.BuilderManagers[locationType].BaseSettings = BaseBuilderTemplates[baseBuilderName].BaseSettings
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param builderGroupName string
 function AddGlobalBuilderGroup(aiBrain, locationType, builderGroupName)
     if BuilderGroups[builderGroupName] then
         AddBuilderTable(aiBrain, locationType, BuilderGroups[builderGroupName], builderGroupName)
@@ -35,6 +40,10 @@ function AddGlobalBuilderGroup(aiBrain, locationType, builderGroupName)
     end
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param builderTable table
+---@param tableName string
 function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
     aiBrain.BuilderManagers[locationType].BuilderHandles = aiBrain.BuilderManagers[locationType].BuilderHandles or {}
     aiBrain.BuilderManagers[locationType].BuilderHandles[tableName] = {}
