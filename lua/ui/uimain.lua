@@ -58,11 +58,7 @@ function StartFrontEndUI()
     end
 
     if HasCommandLineArg("/offline") then
-        local mapFolderName = GetCommandLineArg("/mapFolderName", 1)
-        if not mapFolderName then
-            error("No /mapFolderName arg")
-        end
-        import("/lua/ui/skirmish/skirmish.lua").openOfflineLobby(mapFolderName[1])
+        import("/lua/ui/skirmish/skirmish.lua").OpenOfflineLobby()
     else
         import("/lua/ui/menus/main.lua").CreateUI()
     end
