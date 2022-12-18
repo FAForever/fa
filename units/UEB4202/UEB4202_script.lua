@@ -8,7 +8,7 @@
 ----**  Copyright © 20010 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local TShieldStructureUnit = import("/lua/terranunits.lua").TShieldStructureUnit
-local ManageShieldEffects = import("/lua/defaultunits.lua").ManageShieldEffects
+local ManageShieldEffects = import("/lua/defaultcomponents.lua").ManageShieldEffects
 
 ---@class UEB4202 : TShieldStructureUnit
 ---@field Rotator1? moho.RotateManipulator

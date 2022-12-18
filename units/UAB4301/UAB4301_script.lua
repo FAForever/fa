@@ -8,7 +8,7 @@
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local AShieldStructureUnit = import("/lua/aeonunits.lua").AShieldStructureUnit
-local ManageShieldEffects = import("/lua/defaultunits.lua").ManageShieldEffects
+local ManageShieldEffects = import("/lua/defaultcomponents.lua").ManageShieldEffects
 
 ---@class UAB4301 : AShieldStructureUnit
 UAB4301 = Class(AShieldStructureUnit, ManageShieldEffects) {

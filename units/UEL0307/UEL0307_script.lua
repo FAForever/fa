@@ -9,7 +9,7 @@
 --****************************************************************************
 
 local TShieldLandUnit = import("/lua/terranunits.lua").TShieldLandUnit
-local ManageShieldEffects = import("/lua/defaultunits.lua").ManageShieldEffects
+local ManageShieldEffects = import("/lua/defaultcomponents.lua").ManageShieldEffects
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
 ---@class UEL0307 : TShieldLandUnit

@@ -10,7 +10,7 @@
 
 local AShieldHoverLandUnit = import("/lua/aeonunits.lua").AShieldHoverLandUnit
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
-local ManageShieldEffects = import("/lua/defaultunits.lua").ManageShieldEffects
+local ManageShieldEffects = import("/lua/defaultcomponents.lua").ManageShieldEffects
 
 ---@class UAL0307 : AShieldHoverLandUnit
 UAL0307 = Class(AShieldHoverLandUnit, ManageShieldEffects) {
