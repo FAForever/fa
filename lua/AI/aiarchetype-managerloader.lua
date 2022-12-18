@@ -1,5 +1,4 @@
 --****************************************************************************
---**
 --**  File     :  /lua/AI/aiarchetype-rushland.lua
 --**
 --**  Summary  : Rush AI
@@ -7,11 +6,12 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
-local AIUtils = import("/lua/ai/aiutilities.lua")
-
 local AIAddBuilderTable = import("/lua/ai/aiaddbuildertable.lua")
 
+---@param aiBrain AIBrain
+---@return unknown
+---@return integer
+---@return boolean
 function GetHighestBuilder(aiBrain)
     local returnVal = -1
     local base = false
@@ -38,13 +38,14 @@ function GetHighestBuilder(aiBrain)
     return false
 end
 
+---@param aiBrain AIBrain
+---@return integer
 function EvaluatePlan(aiBrain)
     local base, returnVal = GetHighestBuilder(aiBrain)
-
     return returnVal
 end
 
-
+---@param aiBrain AIBrain
 function ExecutePlan(aiBrain)
     aiBrain:SetConstantEvaluate(false)
     local behaviors = import("/lua/ai/aibehaviors.lua")
@@ -86,6 +87,7 @@ function ExecutePlan(aiBrain)
     end
 end
 
+---@param aiBrain AIBrain
 function SetupMainBase(aiBrain)
     local base, returnVal, baseType = GetHighestBuilder(aiBrain)
 
@@ -100,9 +102,9 @@ function SetupMainBase(aiBrain)
     aiBrain:ForceManagerSort()
 end
 
---Modeled after GPGs LowMass and LowEnergy functions.
---Runs the whole game and kills off units when the AI hits unit cap.
-
+--- Modeled after GPGs LowMass and LowEnergy functions.
+--- Runs the whole game and kills off units when the AI hits unit cap.
+---@param aiBrain AIBrain
 function UnitCapWatchThread(aiBrain)
     --DUNCAN - Added T1 kill and check every 30 seconds and within 10 of the unit cap
     KillPD = false
@@ -139,6 +141,7 @@ function UnitCapWatchThread(aiBrain)
     end
 end
 
+---@param aiBrain AIBrain
 function UnitCapWatchThreadSorian(aiBrain)
     --LOG('*AI DEBUG: UnitCapWatchThreadSorian started')
     while true do
@@ -182,6 +185,11 @@ function UnitCapWatchThreadSorian(aiBrain)
     end
 end
 
+---@param aiBrain AIBrain
+---@param num number
+---@param checkCat any
+---@param killCat any
+---@return boolean
 function GetAIUnderUnitCap(aiBrain, num, checkCat, killCat)
     if aiBrain:GetCurrentUnits(checkCat) > num then
         local units = aiBrain:GetListOfUnits(killCat, true)
@@ -197,3 +205,7 @@ function GetAIUnderUnitCap(aiBrain, num, checkCat, killCat)
     WaitTicks(1)
     return false
 end
+
+-- Kept For Mod Support
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")

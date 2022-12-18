@@ -8,18 +8,12 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import("/lua/ai/aiutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
-local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: LightAirChildCountDifficulty = BuildCondition   doc = "Please work function docs."
--- 
--- parameter 0: string   aiBrain     = "default_brain"     
--- parameter 1: string   master     = "default_master"
--- 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- LightAirChildCountDifficulty = BuildCondition   doc = "Please work function docs."
+---@param aiBrain AIBrain
+---@param master string
+---@return boolean
 function LightAirChildCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
     local d1Num = ScenarioInfo.OSPlatoonCounter[master..'_D1'] or 1
@@ -36,13 +30,10 @@ function LightAirChildCountDifficulty(aiBrain, master)
     end
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: LightAirMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
--- 
--- parameter 0: string   aiBrain     = "default_brain"       
--- parameter 1: string   master     = "default_master"
--- 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- LightAirMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
+---@param aiBrain AIBrain
+---@param master string
+---@return boolean
 function LightAirMasterCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
     local d1Num = ScenarioInfo.OSPlatoonCounter[master..'_D1'] or 1
@@ -58,3 +49,8 @@ function LightAirMasterCountDifficulty(aiBrain, master)
         return false        
     end
 end
+
+-- Kept for Mod Support 
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
