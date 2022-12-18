@@ -7,33 +7,29 @@ local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
 TIFFragmentationSensorShell01 = Class(TArtilleryProjectile) {
-               
     OnImpact = function(self, TargetType, TargetEntity) 
-
         local FxFragEffect = EffectTemplate.TFragmentationSensorShellFrag 
         local bp = self:GetBlueprint().Physics
-              
-        
+
         -- Split effects
         for k, v in FxFragEffect do
             CreateEmitterAtEntity( self, self:GetArmy(), v )
         end
-        
+
         local vx, vy, vz = self:GetVelocity()
         local velocity = 6
-    
-		-- One initial projectile following same directional path as the original
+
+        -- One initial projectile following same directional path as the original
         self:CreateChildProjectile(bp.FragmentId):SetVelocity(vx, vy, vz):SetVelocity(velocity):PassDamageData(self.DamageData)
-   		
+
 		-- Create several other projectiles in a dispersal pattern
         local numProjectiles = bp.Fragments - 1
         local angle = (2 * math.pi) / numProjectiles
         local angleInitial = RandomFloat( 0, angle )
-        
+
         -- Randomization of the spread
         local angleVariation = angle * 0.35 -- Adjusts angle variance spread
         local spreadMul = 0.5 -- Adjusts the width of the dispersal        
-        
         local xVec = 0 
         local yVec = vy
         local zVec = 0
@@ -61,9 +57,5 @@ TIFFragmentationSensorShell01 = Class(TArtilleryProjectile) {
         local vizEntity = VizMarker(spec)
         self:Destroy()
     end,
-    
-    
-
 }
-
 TypeClass = TIFFragmentationSensorShell01

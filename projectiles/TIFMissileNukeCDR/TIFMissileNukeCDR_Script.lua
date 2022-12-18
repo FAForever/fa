@@ -1,11 +1,7 @@
---
 -- Terran CDR Nuke
---
 
 local TIFMissileNuke = import("/lua/terranprojectiles.lua").TIFMissileNuke
-
 TIFMissileNukeCDR = Class(TIFMissileNuke) {
-
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',
     InitialEffects = {'/effects/emitters/nuke_munition_launch_trail_02_emit.bp',},
     LaunchEffects = {
@@ -13,7 +9,6 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
         '/effects/emitters/nuke_munition_launch_trail_05_emit.bp',
     },
     ThrustEffects = {'/effects/emitters/nuke_munition_launch_trail_04_emit.bp',},
-
     OnCreate = function(self)
         TIFMissileNuke.OnCreate(self)
         self.effectEntityPath = '/effects/Entities/UEFNukeEffectController02/UEFNukeEffectController02_proj.bp'
@@ -24,16 +19,12 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
         if EntityCategoryContains(categories.AEON * categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_TWO, TargetEntity) then
             self:Destroy()
         else
-
             TIFMissileNuke.OnImpact(self, TargetType, TargetEntity)
         end
     end,
 
-    
     -- Tactical nuke has different flight path
     MovementThread = function(self)
-        local target = self:GetTrackingTarget()
-        local launcher = self:GetLauncher()
         self:CreateEffects(self.InitialEffects, self.Army, 1)
         self.WaitTime = 0.1
         self:SetTurnRate(8)
@@ -52,7 +43,6 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
                 DamageArea(instigator, pos, self.Radius, self.Damage, (damageType or 'Nuke'), true, true)
             end
         end
-
         self.InnerRing.DoNukeDamage = nukeDamage
         self.OuterRing.DoNukeDamage = nukeDamage
         TIFMissileNuke.DoDamage(self, instigator, DamageData, targetEntity)

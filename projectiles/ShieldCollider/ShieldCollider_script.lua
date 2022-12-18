@@ -4,8 +4,6 @@
 -- Summary  : Companion projectile enabling air units to hit shields
 -- Copyright c 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------
-
-local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 local VectorCached = Vector(0, 0, 0)
 
@@ -14,7 +12,6 @@ ShieldCollider = Class(Projectile) {
         Projectile.OnCreate(self)
 
         self.CrashingAirplaneShieldCollisionLogic = true 
-
         self:SetVizToFocusPlayer('Never') -- Set to 'Always' to see a nice box
         self:SetVizToAllies('Never')
         self:SetVizToNeutrals('Never')
@@ -26,17 +23,14 @@ ShieldCollider = Class(Projectile) {
             self:OnImpact('Water', nil)
         end
     end,
-
     -- Shields only detect projectiles, so we attach one to keep track of the unit.
     Start = function(self, parent, bone)
         self.PlaneBone = bone
         self.Plane = parent
         self:StartFalling()
     end,
-
     StartFalling = function(self)
         local vx, vy, vz = self.Plane:GetVelocity()
-
         -- For now we just follow the plane along, not attaching so it can rotate
         self:SetVelocity(10 * vx, 10 * vy, 10 * vz)
         Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
@@ -190,5 +184,4 @@ ShieldCollider = Class(Projectile) {
         self:SetVelocity(forceScalar * vx, forceScalar * vy, forceScalar * vz)
     end,
 }
-
 TypeClass = ShieldCollider

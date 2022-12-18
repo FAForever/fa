@@ -17,11 +17,10 @@ TDFOverCharge01 = Class(ALaserBotProjectile, OverchargeProjectile) {
         OverchargeProjectile.OnImpact(self, targetType, targetEntity)
         ALaserBotProjectile.OnImpact(self, targetType, targetEntity)
     end,
-    
+
     OnCreate = function(self)
         OverchargeProjectile.OnCreate(self)
         ALaserBotProjectile.OnCreate(self)
     end,
 }
-
 TypeClass = TDFOverCharge01

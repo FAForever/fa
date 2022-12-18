@@ -5,13 +5,10 @@ local TMissileCruiseSubProjectile = import("/lua/terranprojectiles.lua").TMissil
 
 MissileCruiseSubTerran01 = Class(TMissileCruiseSubProjectile) {
     FxSplashScale = 0.5,
-
-
     OnCreate = function(self)
         TMissileCruiseSubProjectile.OnCreate(self)
         self:SetScale(0.6)
     end,
-
 
     Thread = function(self)
         local posY = 1
@@ -59,6 +56,4 @@ MissileCruiseSubTerran01 = Class(TMissileCruiseSubProjectile) {
         self:SetAcceleration(50)
     end,
 }
-
 TypeClass = MissileCruiseSubTerran01
-
