@@ -1,27 +1,16 @@
---****************************************************************************
---**
---**  File     :  /lua/ai/OpAI/BasicLandAttack_EditorFunctions
---**  Author(s): Dru Staltman
---**
---**  Summary  : Generic AI Platoon Build Conditions
---**             Build conditions always return true or false
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+----------------------------------------------------------------------------------------------------
+-- File     :  /lua/ai/OpAI/BasicLandAttack_EditorFunctions
+-- Author(s): Dru Staltman
+-- Summary  : Generic AI Platoon Build Conditions. Build conditions always return true or false
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+----------------------------------------------------------------------------------------------------
 
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
-
-----------------------------------------------------------------------------------------------------
--- function: BasicLandAttackChildCountDifficulty = BuildCondition   doc = "Please work function docs."
---
--- parameter 0: string   aiBrain    = "default_brain"
--- parameter 1: string   master     = "default_master"
---
-----------------------------------------------------------------------------------------------------
----@param aiBrain AIBrain
----@param master string
+--- BasicLandAttackChildCountDifficulty = BuildCondition   doc = "Please work function docs."
+---@param aiBrain AIBrain default_brain
+---@param master string default_master
 ---@return boolean
 function BasicLandAttackChildCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
@@ -30,15 +19,9 @@ function BasicLandAttackChildCountDifficulty(aiBrain, master)
     return counter < number
 end
 
-----------------------------------------------------------------------------------------------------
--- function: BasicLandAttackMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
---
--- parameter 0: string   aiBrain    = "default_brain"
--- parameter 1: string   master     = "default_master"
---
-----------------------------------------------------------------------------------------------------
----@param aiBrain AIBrain
----@param master string
+--- BasicLandAttackMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
+---@param aiBrain AIBrain default_brain
+---@param master string default_master
 ---@return boolean
 function BasicLandAttackMasterCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
@@ -49,7 +32,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param masterName string
----@param locationName string
+---@param locationName Vector
 ---@return boolean
 function NeedTransports(aiBrain, masterName, locationName)
     if not ScenarioInfo.OSPlatoonCounter[masterName .. "_Transports"] then
@@ -60,7 +43,3 @@ function NeedTransports(aiBrain, masterName, locationName)
     local units = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.TRANSPORTATION, pos, radius)
     return table.getn(units) < 5
 end
-
-
-local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
-local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")

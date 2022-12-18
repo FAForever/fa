@@ -1,13 +1,10 @@
---****************************************************************************
---**
---**  File     :  /lua/AI/aiattackutilities.lua
---**  Author(s): John Comes, Dru Staltman, Robert Oates, Gautam Vasudevan
---**
---**  Summary  : This file was completely rewritten to best take advantage of
---**             the new influence map stuff Daniel provided.
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------------------------------------------------
+-- File     :  /lua/AI/aiattackutilities.lua
+-- Author(s): John Comes, Dru Staltman, Robert Oates, Gautam Vasudevan
+-- Summary  : This file was completely rewritten to best take advantage of the new influence map stuff Daniel provided.
+--
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------------------------------------------------
 
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local AIUtils = import("/lua/ai/aiutilities.lua")
@@ -22,16 +19,12 @@ local ThreatTable =
     Air = 'AntiAir',
 }
 
--------------------------------------------------------
---   Function: GetThreatOfUnits
---   Args:
---       platoon - platoon to evaluate
---   Description:
---       Gets the sum of the threat of the units based on each unit's movement layer
---       Must have calculated platoon's movement layer first
---   Returns:
---       the sum of the threats of the units passed in
--------------------------------------------------------
+--- ## Function: GetThreatOfUnits
+--- ###  Description:
+--- Gets the sum of the threat of the units based on each unit's movement layer
+--- Must have calculated platoon's movement layer first
+---@param platoon Platoon platoon to evaluate
+---@return integer # the sum of the threats of the units passed in
 function GetThreatOfUnits(platoon)
     local totalThreat = 0
     local bpThreat = 0
@@ -61,15 +54,11 @@ function GetThreatOfUnits(platoon)
     return totalThreat
 end
 
--------------------------------------------------------
---   Function: GetSurfaceThreatOfUnits
---   Args:
---       platoon - units to evaluate
---   Description:
---       Gets a platoon's total surface threat.
---   Returns:
---       the sum of the surface threats of the units passed in
--------------------------------------------------------
+--- ## Function: GetSurfaceThreatOfUnits
+--- ### Description:
+--- Gets a platoon's total surface threat.
+---@param platoon Platoon units to evaluate
+---@return integer # the sum of the surface threats of the units passed in
 function GetSurfaceThreatOfUnits(platoon)
     local totalThreat = 0
     local bpThreat = 0
@@ -84,16 +73,11 @@ function GetSurfaceThreatOfUnits(platoon)
     return totalThreat
 end
 
--------------------------------------------------------
---   Function: GetAirThreatOfUnits
---   Args:
---       platoon - units to evaluate
---   Description:
---       Gets a platoon's total air threat.
---   Returns:
---       the sum of the air threats of the units passed in
---   Blame: Robert
--------------------------------------------------------
+--- ## Function: GetAirThreatOfUnits
+--- ### Description:
+--- Gets a platoon's total air threat.
+---@param platoon Platoon units to evaluate
+---@return integer # the sum of the air threats of the units passed in
 function GetAirThreatOfUnits(platoon)
     local totalThreat = 0
     local bpThreat = 0
@@ -108,18 +92,14 @@ function GetAirThreatOfUnits(platoon)
     return totalThreat
 end
 
--------------------------------------------------------
---   Function: GetBestThreatTarget
---   Args:
---       aiBrain - aiBrain to use
---       platoon - platoon to find best target for
---       bSkipPathability - skip check to see if platoon can path to destination
---   Description:
---       Get the best target on a map based on platoon location
---       uses threat map and returns the center of one of the grids in the threat map
---   Returns:
---       A table representing the location of the best threat target
--------------------------------------------------------
+--- ## Function: GetBestThreatTarget
+--- ### Description:
+--- Get the best target on a map based on platoon location
+--- uses threat map and returns the center of one of the grids in the threat map
+---@param aiBrain AIBrain aiBrain to use
+---@param platoon Platoon platoon to find best target for
+---@param bSkipPathability any skip check to see if platoon can path to destination
+---@return table[] # A table representing the location of the best threat target
 function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
 
     -----------------------------------------------------------------------------------
@@ -411,6 +391,13 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
 
 end
 
+---@param aiBrain AIBrain
+---@param platoon Platoon
+---@param location Vector
+---@param maxRange number
+---@param selectedWeaponArc any
+---@param turretPitch any
+---@return any
 function CheckNavalPathingSorian(aiBrain, platoon, location, maxRange, selectedWeaponArc, turretPitch)
     local platoonUnits = platoon:GetPlatoonUnits()
     local platoonPosition = platoon:GetPlatoonPosition()
@@ -479,16 +466,13 @@ function CheckNavalPathingSorian(aiBrain, platoon, location, maxRange, selectedW
     return bestGoalPos
 end
 
--------------------------------------------------------
---   Function: GetNavalPlatoonMaxRange
---   Args:
---       aiBrain - aiBrain to use
---       platoon - platoon to find range for
---   Description:
---       Finds the maximum range of the platoon, returns false if T1 or no range
---   Returns:
---       number or bool
--------------------------------------------------------
+--- ## Function: GetNavalPlatoonMaxRange
+--- ### Description:
+--- Finds the maximum range of the platoon, returns false if T1 or no range
+---@param aiBrain AIBrain aiBrain to use
+---@param platoon Platoon platoon to find range for
+---@return number # Number
+---@return boolean # Bool
 function GetNavalPlatoonMaxRange(aiBrain, platoon)
     local maxRange = 0
     local platoonUnits = platoon:GetPlatoonUnits()
@@ -532,18 +516,15 @@ function GetNavalPlatoonMaxRange(aiBrain, platoon)
     return maxRange, selectedWeaponArc
 end
 
--------------------------------------------------------
---   Function: CheckNavalPathing
---   Args:
---       aiBrain - aiBrain to use
---       platoon - platoon to find best target for
---       location - spot we want to get to
---       maxRange - maximum range of the platoon (can bombard from water)
---   Description:
---       Finds if the platoon can move to the location given, or close enough to bombard
---   Returns:
---       bool
--------------------------------------------------------
+--- ## Function: CheckNavalPathing
+--- ### Description:
+--- Finds if the platoon can move to the location given, or close enough to bombard
+---@param aiBrain AIBrain aiBrain to use
+---@param platoon Platoon platoon to find best target for
+---@param location Vector spot we want to get to
+---@param maxRange number maximum range of the platoon (can bombard from water)
+---@param selectedWeaponArc any # Need Descriptor
+---@return boolean # Bool
 function CheckNavalPathing(aiBrain, platoon, location, maxRange, selectedWeaponArc)
     local platoonUnits = platoon:GetPlatoonUnits()
     local platoonPosition = platoon:GetPlatoonPosition()
@@ -612,16 +593,12 @@ function CheckNavalPathing(aiBrain, platoon, location, maxRange, selectedWeaponA
     return bestGoalPos
 end
 
--------------------------------------------------------
---   Function: AINavalPlanB
---   Args:
---       aiBrain - aiBrain to use
---       platoon - platoon to find best target for
---   Description:
---       Gets the path to a random naval marker.
---   Returns:
---       A table representing the path
--------------------------------------------------------
+--- ## Function: AINavalPlanB
+--- ### Description:
+--- Gets the path to a random naval marker.
+---@param aiBrain AIBrain aiBrain to use
+---@param platoon Platoon platoon to find best target for
+---@return Vector[] # A table representing the path
 function AINavalPlanB(aiBrain, platoon)
     --Get a random naval area and issue a movement thar.
     local navalAreas = AIUtils.AIGetMarkerLocations(aiBrain, 'Naval Area')
@@ -641,19 +618,14 @@ function AINavalPlanB(aiBrain, platoon)
     end
 end
 
--------------------------------------------------------
---   Function: AIPlatoonNavalAttackVector
---   Args:
---       aiBrain - aiBrain to use
---       platoon - platoon to find best target for
---   Description:
---       Generate the attack vector by picking a good place to attack
---       returns the current command queue of all the units in the platoon if it worked
---       or an empty queue if it didn't. Simpler than the land version of this.
---   Returns:
---       a table of every command in every command queue for every unit in the platoon
---       or an empty table if it fails
--------------------------------------------------------
+--- ## Function: AIPlatoonNavalAttackVector
+--- ### Description:
+--- Generate the attack vector by picking a good place to attack
+--- returns the current command queue of all the units in the platoon if it worked
+--- or an empty queue if it didn't. Simpler than the land version of this.
+---@param aiBrain AIBrain aiBrain to use
+---@param platoon Platoon platoon to find best target for
+---@return table # a table of every command in every command queue for every unit in the platoon or an empty table if it fails
 function AIPlatoonNavalAttackVector(aiBrain, platoon)
 
     GetMostRestrictiveLayer(platoon)
@@ -705,21 +677,15 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
     return cmd
 end
 
-
--------------------------------------------------------
---   Function: AIPlatoonSquadAttackVector
---   Args:
---       aiBrain - aiBrain to use
---       platoon - platoon to find best target for
---   Description:
---       Generate the attack vector by picking a good place to attack
---       returns the current command queue of all the units in the platoon if it worked
---       or an empty queue if it didn't
---   Returns:
---       a table of every command in every command queue for every unit in the platoon
---       or an empty table if it fails
--------------------------------------------------------
-
+--- ## Function: AIPlatoonSquadAttackVector
+--- ### Description:
+--- Generate the attack vector by picking a good place to attack
+--- returns the current command queue of all the units in the platoon if it worked
+--- or an empty queue if it didn't
+---@param aiBrain AIBrain aiBrain to use
+---@param platoon Platoon platoon to find best target for
+---@param bAggro any # Descriptor needed
+---@return table # a table of every command in every command queue for every unit in the platoon or an empty table if it fails
 function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
 
     --Engine handles whether or not we can occupy our vector now, so this should always be a valid, occupiable spot.
@@ -822,21 +788,18 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
     end
     return cmd
 end
--------------------------------------------------------
---   Function: SendPlatoonWithTransports
---   Args:
---       aiBrain - aiBrain to use
---       platoon - platoon to find best target for
---       destination - table representing the destination location
---       bRequired - wait for transports if there aren't any, since it's required to use them
---       bSkipLastMove - don't do the final move... useful for when engineers use this function
---   Description:
---       Find transports and use them to move platoon.  If bRequired is set, then have platoon
---       wait 60 seconds for transports before failing
---   Returns:
---       true if successful, false if couldn't use transports
--------------------------------------------------------
 
+--- ## Function: SendPlatoonWithTransports
+--- ### Description:
+--- Find transports and use them to move platoon.  If bRequired is set, then have platoon
+--- wait 60 seconds for transports before failing
+---@param aiBrain AIBrain aiBrain to use
+---@param platoon Platoon platoon to find best target for
+---@param destination Vector table representing the destination location
+---@param bRequired boolean wait for transports if there aren't any, since it's required to use them
+---@param bSkipLastMove any don't do the final move... useful for when engineers use this function
+---@param waitLonger any Neeed Descriptor
+---@return boolean # true if successful, false if couldn't use transports
 function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSkipLastMove, waitLonger)
 
     GetMostRestrictiveLayer(platoon)
@@ -1008,6 +971,12 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
     return true
 end
 
+---@param aiBrain AIBrain
+---@param platoon Platoon
+---@param destination Vector
+---@param bRequired any
+---@param bSkipLastMove any
+---@return boolean
 function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequired, bSkipLastMove)
 
     GetMostRestrictiveLayer(platoon)
@@ -1194,19 +1163,12 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
     return true
 end
 
-
-
--------------------------------------------------------
---   Function: GetMostRestrictiveLayer
---   Args:
---       platoon - platoon to find best target for
---   Description:
---       set platoon.MovementLayer to the most restrictive movement layer
---       of a given platoon, and return a representative unit
---   Returns:
---       The most restrictive layer of movement for a given platoon (string)
--------------------------------------------------------
-
+--- ## Function: GetMostRestrictiveLayer
+--- ### Description:
+--- set platoon.MovementLayer to the most restrictive movement layer
+--- of a given platoon, and return a representative unit
+---@param platoon Platoon platoon to find best target for
+---@return boolean # The most restrictive layer of movement for a given platoon (string)
 function GetMostRestrictiveLayer(platoon)
     -- in case the platoon is already destroyed return false.
     if not platoon then
@@ -1238,22 +1200,20 @@ function GetMostRestrictiveLayer(platoon)
     return unit
 end
 
--------------------------------------------------------
---   Function: PlatoonGenerateSafePathTo
---   Args:
---       aiBrain - aiBrain to use
---       platoonLayer - layer to use to generate safe path... e.g. 'Air', 'Land', etc.
---       start - table representing starting location
---       destination - table representing the destination location
---       optMaxMarkerDist - the maximum distance away a platoon should look for a pathing marker
---       optThreatWeight - the importance of threat when choosing a path. High weight generates longer, safer paths.
---   Description:
---       If there are pathing nodes available to this platoon's most restrictive movement type, then a path to the destination
---       can be generated while avoiding other high threat areas along the way.
---   Returns:
---       a table of locations representing the safest path to get to the specified destination
--------------------------------------------------------
-
+--- ## Function: PlatoonGenerateSafePathTo
+--- ### Description:
+--- If there are pathing nodes available to this platoon's most restrictive movement type, then a path to the destination
+--- can be generated while avoiding other high threat areas along the way.
+---@param aiBrain AIBrain aiBrain to use
+---@param platoonLayer Platoon layer to use to generate safe path... e.g. 'Air', 'Land', etc.
+---@param start Vector table representing starting location
+---@param destination Vector table representing the destination location
+---@param optThreatWeight any the importance of threat when choosing a path. High weight generates longer, safer paths.
+---@param optMaxMarkerDist any the maximum distance away a platoon should look for a pathing marker
+---@param testPathDist any Descriptor needed
+---@return boolean
+---@return string
+---@return table # a table of locations representing the safest path to get to the specified destination
 function PlatoonGenerateSafePathTo(aiBrain, platoonLayer, start, destination, optThreatWeight, optMaxMarkerDist, testPathDist)
     -- if we don't have markers for the platoonLayer, then we can't build a path.
     if not GetPathGraphs()[platoonLayer] then
@@ -1312,15 +1272,10 @@ function PlatoonGenerateSafePathTo(aiBrain, platoonLayer, start, destination, op
     return finalPath
 end
 
--------------------------------------------------------
---   Function: GetPathGraphs
---   Args:
---   Description:
---       This function uses Graph Node markers in the map to generate a coarse pathfinding graph
---   Returns: A table of graphs. Table format is:
---           ScenarioInfo.PathGraphs -> Graph Layer -> Graph Name -> Marker Name -> Marker Data
--------------------------------------------------------
-
+--- ## Function: GetPathGraphs
+--- ### Description:
+--- This function uses Graph Node markers in the map to generate a coarse pathfinding graph
+---@return table[] # A table of graphs. Table format is: ScenarioInfo.PathGraphs -> Graph Layer -> Graph Name -> Marker Name -> Marker Data
 function GetPathGraphs()
     if ScenarioInfo.PathGraphs then
         return ScenarioInfo.PathGraphs
@@ -1353,19 +1308,13 @@ function GetPathGraphs()
     return ScenarioInfo.PathGraphs or {}
 end
 
-
--------------------------------------------------------
---   Function: GetClosestPathNodeInRadiusByLayer
---   Args:
---       location - location to search around
---       radius - radius around location to search in
---       layer - layer to use to generate safe path... e.g. 'Air', 'Land', etc.
---   Description:
---       Gets the name of the closest pathing node (within radius distance of location) on the layer we specify.
---   Returns:
---        Closest pathing node's name else false
--------------------------------------------------------
-
+--- ## Function: GetClosestPathNodeInRadiusByLayer
+--- ### Description:
+--- Gets the name of the closest pathing node (within radius distance of location) on the layer we specify.
+---@param location Vector location to search around
+---@param radius number radius around location to search in
+---@param layer string layer to use to generate safe path... e.g. 'Air', 'Land', etc.
+---@return boolean # Closest pathing node's name else false
 function GetClosestPathNodeInRadiusByLayer(location, radius, layer)
 
     local bestDist = radius*radius
@@ -1389,18 +1338,13 @@ function GetClosestPathNodeInRadiusByLayer(location, radius, layer)
     return bestMarker
 end
 
--------------------------------------------------------
---   Function: GetClosestPathNodeInRadiusByGraph
---   Args:
---       location - location to search around
---       radius - radius around location to search in
---       graphName - name of graph to use to find closest path
---   Description:
---       If there is a node from a specific graph within radius distance of location, this function will get its name.
---   Returns:
---       The closest node's name else false
--------------------------------------------------------
-
+--- ## Function: GetClosestPathNodeInRadiusByGraph
+--- ### Description:
+--- If there is a node from a specific graph within radius distance of location, this function will get its name.
+---@param location Vector location to search around
+---@param radius number radius around location to search in
+---@param graphName string name of graph to use to find closest path
+---@return boolean # The closest node's name else false
 function GetClosestPathNodeInRadiusByGraph(location, radius, graphName)
     local bestDist = radius*radius
     local bestMarker = false
@@ -1423,13 +1367,11 @@ function GetClosestPathNodeInRadiusByGraph(location, radius, graphName)
     return bestMarker
 end
 
--------------------------------------------------------
---   Function: DrawPathGraph
---   Args:
---   Description:
---       render graph on screen to verify correctness
---    Returns: nothing
--------------------------------------------------------
+--- ## Function: DrawPathGraph
+--- ### Description:
+--- render graph on screen to verify correctness
+--- ### Returns:
+--- nothing
 function DrawPathGraph()
 
     -- Render the connection between the path nodes for the specific graph
@@ -1455,21 +1397,18 @@ function DrawPathGraph()
 
 end
 
--------------------------------------------------------
---   Function: GeneratePath
---   Args:
---       aiBrain - aiBrain to use
---       startNode - starting path node
---       endNode - ending path node
---       threatType - type of threat to path around
---       threatWeight - weight applied for heuristic when avoiding threat
---   Description:
---       Generates a path between two supplied pathing nodes, taking threat into account. The influence of threat on the
---       search heuristic can be adjusted with the threatWeight multiplier.
---   Returns:
---       A list of positions of path nodes from beginning to end of the selected path
--------------------------------------------------------
-
+--- ## Function: GeneratePath
+--- ### Description:
+--- Generates a path between two supplied pathing nodes, taking threat into account. The influence of threat on the
+--- search heuristic can be adjusted with the threatWeight multiplier.
+---@param aiBrain AIBrain aiBrain to use
+---@param startNode any starting path node
+---@param endNode any ending path node
+---@param threatType any type of threat to path around
+---@param threatWeight any weight applied for heuristic when avoiding threat
+---@param destination table
+---@param location Vector
+---@return unknown # A list of positions of path nodes from beginning to end of the selected path
 function GeneratePathSorian(aiBrain, startNode, endNode, threatType, threatWeight, destination, location)
     if not aiBrain.PathCache then
         --Create path cache table. Paths are stored in this table and saved for 1 minute so
@@ -1576,6 +1515,14 @@ function GeneratePathSorian(aiBrain, startNode, endNode, threatType, threatWeigh
     return queue
 end
 
+---@param aiBrain AIBrain
+---@param startNode any
+---@param endNode any
+---@param threatType any
+---@param threatWeight number
+---@param endPos Vector
+---@param startPos Vector
+---@return boolean
 function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, endPos, startPos)
     threatWeight = threatWeight or 1
     -- Check if we have this path already cached.
@@ -1712,16 +1659,17 @@ function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, end
 end
 
 -------------------------------------------------------
---   Function: CanGraphTo
---   Args:
---       unit - platoon to check pathing for
---       destPos - destination of platoon
---       layer - layer name to check for pathing on.
---   Description:
---       Checks to see if platoon can path to destination using path graphs. Used to save precious precious CPU cycles compared to CanPathTo
+--- ## Function: CanGraphTo
+--- ### Description:
+--- Checks to see if platoon can path to destination using path graphs. Used to save precious precious CPU cycles compared to CanPathTo
 --   Returns:
 --       true, end node position if successful. nil otherwise
 -------------------------------------------------------
+---@param unit Unit platoon to check pathing for
+---@param destPos number destination of platoon
+---@param layer Layer layer name to check for pathing on.
+---@return boolean
+---@return unknown
 function CanGraphTo(unit, destPos, layer)
     local position = unit:GetPosition()
     local startNode = GetClosestPathNodeInRadiusByLayer(position, 100, layer)
