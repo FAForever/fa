@@ -9,21 +9,16 @@
 --****************************************************************************
 
 local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
-local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
+local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 AANTorpedoCluster01 = Class(ATorpedoCluster) {
-
-    CountdownLength = 10,
-    FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
-                    '/effects/emitters/water_splash_plume_01_emit.bp',},
+    CountdownLength = 101,
 
     OnCreate = function(self)
         ATorpedoCluster.OnCreate(self)
         self.HasImpacted = false
         self:ForkThread(self.CountdownExplosion)
-
 		CreateTrail(self, -1, self:GetArmy(), import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
-        
     end,
 
     CountdownExplosion = function(self)

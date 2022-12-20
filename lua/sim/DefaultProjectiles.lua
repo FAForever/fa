@@ -366,6 +366,10 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
     PolyTrailOffset = 0,
     TrailDelay = 5,
     EnterWaterSound = 'Torpedo_Enter_Water_01',
+    FxEnterWater= {
+        '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
+        '/effects/emitters/water_splash_plume_01_emit.bp',
+    },
 
     ---@param self OnWaterEntryEmitterProjectile
     ---@param inWater boolean
@@ -433,9 +437,17 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
     ---@param self OnWaterEntryEmitterProjectile
     OnEnterWater = function(self)
         Projectile.OnEnterWater(self)
+        local army = self.Army
+        for i in self.FxEnterWater do
+            CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
+        end
+
+        self:SetVelocityAlign(true)
+        self:SetStayUpright(false)
         self:TrackTarget(true)
         self:StayUnderwater(true)
-        self.TTT1 = self:ForkThread(self.EnterWaterThread)
+        self:SetVelocity(0.5)
+        self:ForkThread(self.EnterWaterThread)
     end,
 
     ---@param self OnWaterEntryEmitterProjectile

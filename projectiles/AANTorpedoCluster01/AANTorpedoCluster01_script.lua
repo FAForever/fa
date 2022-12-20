@@ -9,30 +9,13 @@
 --****************************************************************************
 
 local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
-local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
-
--- cache specification table 
-local CachedSpecifications = {
-    X = 0,
-    Z = 0,
-    Radius = 30,
-    LifeTime = 10,
-    Omni = false,
-    Vision = false,
-    Army = 0,
-}
+local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 -- upvalue scope for performance
 local CreateTrail = CreateTrail
 
 AANTorpedoCluster01 = Class(ATorpedoCluster) {
-
     FxTrail = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01,
-
-    FxEnterWater= { 
-        '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
-        '/effects/emitters/water_splash_plume_01_emit.bp',
-    },
 
     OnCreate = function(self)
         ATorpedoCluster.OnCreate(self)
@@ -41,25 +24,18 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
 
     OnEnterWater = function(self) 
         ATorpedoCluster.OnEnterWater(self)
-        
         -- create two child projectiles
         for i = 0, 1 do
             proj = self:CreateChildProjectile('/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_proj.bp' )
             proj:PassDamageData(self.DamageData)
-        end            
-        
-        local pos = self:GetPosition()
-        local spec = CachedSpecifications
-        spec.X = pos[1] 
-        spec.Z = pos[3]
-        spec.Army = self.Army 
+        end
 
-        local vizEntity = VizMarker(spec)
-
+        local px, _,pz = self:GetPositionXYZ()
+        local marker = VisionMarkerOpti({Owner = self})
+        marker:UpdatePosition(px,pz)
+        marker:UpdateDuration(10)
+        marker:UpdateIntel(self.Army,5,'Vision',true)
         self:Destroy()
     end,
 }
 TypeClass = AANTorpedoCluster01
-
--- kept for mod backwards compatibility
-local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
