@@ -2366,7 +2366,7 @@ function NavalAttackCheck(aiBrain)
                 if checkPoints then
                     for _, m in checkPoints do
                         -- Check if the position within weapon range is in water
-                        if GetTerrainHeight(m[1], m[3]) < GetSurfaceHeight(m[1], m[3]) then
+                        if (GetTerrainHeight(m[1], m[3]) + 1.1) < GetSurfaceHeight(m[1], m[3]) then
                             local pointSurfaceHeight = GetSurfaceHeight(m[1], m[3]) + 0.36
                             markerCount = markerCount + 1
                             -- Check if any terrain is blocking position
