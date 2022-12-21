@@ -14,32 +14,32 @@ AANDepthCharge01 = Class(ADepthChargeProjectile) {
     OnCreate = function(self)
         ADepthChargeProjectile.OnCreate(self)
         self.HasImpacted = false
-        self.ForkThread(self.CountdownExplosion)
+        self:ForkThread(self.CountdownExplosion)
     end,
 
     CountdownExplosion = function(self)
         WaitTicks(self.CountdownLengthInTicks)
         if not self.HasImpacted then
-            self.OnImpact('Underwater', nil)
+            self:OnImpact('Underwater', nil)
         end
     end,
 
     EnterWaterMovementThread = function(self)
         WaitTicks(1)
-        self.SetVelocity(0.5)
+        self:SetVelocity(0.5)
     end,
 
     OnLostTarget = function(self)
-        self.SetMaxSpeed(2)
-        self.SetAcceleration(-0.6)
-        self.ForkThread(self.CountdownMovement)
+        self:SetMaxSpeed(2)
+        self:SetAcceleration(-0.6)
+        self:ForkThread(self.CountdownMovement)
     end,
 
     CountdownMovement = function(self)
         WaitTicks(30)
-        self.SetMaxSpeed(0)
-        self.SetAcceleration(0)
-        self.SetVelocity(0)
+        self:SetMaxSpeed(0)
+        self:SetAcceleration(0)
+        self:SetVelocity(0)
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
