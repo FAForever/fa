@@ -10,8 +10,6 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile03
-local EffectTemplate = import("/lua/effecttemplates.lua")
-local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 AIFFragmentationSensorShell03 = Class(AArtilleryFragmentationSensorShellProjectile) {
     OnImpact = function(self, targetType, targetEntity)       

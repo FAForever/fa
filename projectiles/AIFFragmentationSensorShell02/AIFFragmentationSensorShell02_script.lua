@@ -17,7 +17,7 @@ AIFFragmentationSensorShell02 = Class(AArtilleryFragmentationSensorShellProjecti
     OnImpact = function(self, TargetType, TargetEntity) 
         if TargetType != 'Shield' then
 	        local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag02 
-            local bp = self:GetBlueprint().Physics
+            local bp = self.Blueprint.Physics
 	        
 	        -- Split effects
 	        for k, v in FxFragEffect do

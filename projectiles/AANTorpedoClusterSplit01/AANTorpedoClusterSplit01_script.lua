@@ -32,18 +32,14 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     OnEnterWater = function(self)
         ATorpedoCluster.OnEnterWater(self)
         local army = self:GetArmy()
-        for i in self.FxEnterWater do --splash
+        for i in self.FxEnterWater do
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
         end
         self:ForkThread(self.EnterWaterMovementThread)
     end,
-    
+
     EnterWaterMovementThread = function(self)
-        --self:SetMaxSpeed(20)
-        --self:SetVelocity(1)
-        --WaitSeconds(0.1)
         self:SetAcceleration(2.5)
-		    --self:SetVelocity(2)
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetTurnRate(180)
@@ -65,17 +61,11 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
 
     OnImpact = function(self, TargetType, TargetEntity)
         self.HasImpacted = true
-        local pos = self:GetPosition()
-        local spec = {
-            X = pos[1],
-            Z = pos[3],
-            Radius = 30,
-            LifeTime = 10,
-            Omni = false,
-            Vision = false,
-            Army = self:GetArmy(),
-        }
-        local vizEntity = VizMarker(spec)
+        local px,_,pz = self:GetPositionXYZ()
+        local marker = VisionMarkerOpti({Owner = self})
+        marker:UpdatePosition(px,pz)
+        marker:UpdateDuration(5)
+        marker:UpdateIntel(self.Army, 5,'Vision',true)
         ATorpedoCluster.OnImpact(self, TargetType, TargetEntity)
     end,
 }
