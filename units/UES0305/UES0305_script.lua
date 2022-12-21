@@ -33,7 +33,7 @@ UES0305 = Class(TSeaUnit) {
 
     CreateIdleEffects = function(self)
         TSeaUnit.CreateIdleEffects(self)
-        -- self.TimedSonarEffectsThread = self:ForkThread(self.TimedIdleSonarEffects)
+        self.TimedSonarEffectsThread = self:ForkThread(self.TimedIdleSonarEffects)
     end,
 
     TimedIdleSonarEffects = function(self)
