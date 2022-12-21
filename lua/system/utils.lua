@@ -20,6 +20,44 @@ local TableGetn = table.getn
 local TableRemove = table.remove 
 local TableSort = table.sort
 
+--- Determines the size in bytes of the given element
+---@param element any
+---@param ignore table<string, boolean>     # List of key names to ignore of all (referenced) tables
+---@param seen? table<table, any>           # List of strings and / or tables that we've seen so far. Should be nil by default
+---@return integer
+function ToBytes(element, ignore, seen)
+
+    -- if we're seen this string or table before, then return 0. The bytes are already taken into account
+    local seen = seen or { }
+    if seen[element] then
+        return 0
+    end
+
+    -- determine type of element
+    local t = type(element)
+    if t == 'string' then
+
+        -- strings are special snowflakes, but the debug function works on them just fine :+1:
+        seen[element] = true
+        return debug.allocatedsize(element)
+    elseif t != 'table' then
+
+        -- all other non-table types are by default 8 bytes
+        return 8
+    end
+
+    -- at this point we know it is a table
+    seen[element] = true
+    local allocated = debug.allocatedsize(element)
+    for k, v in element do
+        if not ignore[k] then
+            allocated = allocated + toBytes(v, ignore, seen)
+        end
+    end
+
+    return allocated
+end
+
 --- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
 --- Each element of the table will be returned once. This is essentially for "shuffling" sets.
 function RandomIter(someSet)
