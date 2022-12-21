@@ -7,6 +7,7 @@ local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import("/lua/user/prefs.lua")
+local Lazyvar = import("/lua/lazyvar.lua").Create
 
 
 local snowFlakesGroup
@@ -15,38 +16,53 @@ local snowFlakeWidth = 10
 local snowFlakeHeight = 10
 local snowFlakeCount
 
-function CreateSnowFlake(parent, speed, scale, xPos, yPos)
-    local snowFlake = Bitmap(parent, snowFlakePath)
-    snowFlake.parent = parent
-    -- local snowFlake = Bitmap(self.ClientGroup)
-    -- snowFlake:SetSolidColor('ffffffff')
-    LayoutHelpers.AtLeftTopIn(snowFlake, snowFlake.parent, xPos, yPos)
-    LayoutHelpers.SetDimensions(snowFlake, snowFlakeWidth * scale, snowFlakeHeight * scale)
-    snowFlake:SetAlpha(math.random())
-    snowFlake.speed = speed
-    snowFlake.xPos = xPos
-    snowFlake.yPos = yPos
-    snowFlake.scale = scale
+local SnowFlake = Class(Bitmap)
+{
+    __init = function(self, parent, speed, scale, xPos, yPos)
+        Bitmap.__init(self, parent, snowFlakePath)
+        self.parent = parent
 
-    snowFlake.counter = math.random() * 10
-    snowFlake.sign = math.random() < 0.5 and 1 or -1
-    snowFlake:DisableHitTest()
-    snowFlake:SetNeedsFrameUpdate(true)
-    snowFlake.OnFrame = function(control, delta)
-        control.counter = control.counter + control.speed / 5000;
+        self.XScale = Lazyvar(scale)
+        self.YScale = Lazyvar(scale)
+        self.PosX = Lazyvar(xPos)
+        self.PosY = Lazyvar(yPos)
+
+        self:SetAlpha(Math_Random())
+
+        self.Left:Set(function() return parent.Left() + Math_Floor(self.PosX()) end)
+        self.Top:Set(function() return parent.Top() + Math_Floor(self.PosY()) end)
+        self.Rotation = Lazyvar()
+        self.sign = Math_Random() < 0.5 and 1 or -1
+
+        if self.sign > 0 then
+            self.Width:Set(function() return snowFlakeWidth * self.XScale() * self.Rotation() end)
+            self.Height:Set(function() return snowFlakeHeight * self.YScale() end)
+        else
+            self.Width:Set(function() return snowFlakeWidth * self.XScale() end)
+            self.Height:Set(function() return snowFlakeHeight * self.YScale() * self.Rotation() end)
+        end
+
+
+        self.speed = speed
+        self.counter = Math_Random() * 10
+        self:DisableHitTest()
+        self:SetNeedsFrameUpdate(true)
+    end,
+
+    OnFrame = function(control, delta)
+        control.counter = control.counter + delta
         local counterCos = Math_Cos(control.counter)
         local counterSin = Math_Sin(control.counter)
-        control.xPos = control.xPos + control.sign * control.speed * counterCos / 200;
-        control.yPos = control.yPos + counterSin / 100 + control.speed / 100;
-        control.scale = control.scale + counterCos / 100;
 
-        LayoutHelpers.AtLeftTopIn(control, control.parent, Math_Floor(control.xPos), Math_Floor(control.yPos))
+        control.PosX:Set(control.PosX() + control.sign * control.speed * counterCos / 200)
+        control.PosY:Set(control.PosY() + counterSin / 100 + control.speed / 100)
+        control.XScale:Set(control.XScale() + counterCos / 100)
+        control.YScale:Set(control.YScale() + counterCos / 100)
+
         if control.sign > 0 then
-            LayoutHelpers.SetDimensions(snowFlake, snowFlakeWidth * control.scale,
-                snowFlakeHeight * control.scale * counterCos)
+            control.Rotation:Set(counterCos)
         else
-            LayoutHelpers.SetDimensions(snowFlake, snowFlakeWidth * control.scale * counterSin,
-                snowFlakeHeight * control.scale)
+            control.Rotation:Set(counterSin)
         end
 
         control:Show()
@@ -54,12 +70,14 @@ function CreateSnowFlake(parent, speed, scale, xPos, yPos)
         if (control.Left() < control.parent.Left() or control.Right() > control.parent.Right()) then
             control:Hide()
         end
-        if (control.yPos > control.parent.Height()) then
-            control.yPos = -10
-            control.xPos = Math_Random(control.parent.Width())
+        if (control.PosY() > control.parent.Height()) then
+            control.PosY:Set(-10)
+            control.PosX:Set(Math_Random(control.parent.Width()))
         end
     end
-end
+
+}
+
 
 function CreateSnowFlakes(parent, count)
     if IsDestroyed(snowFlakesGroup) then
@@ -69,7 +87,7 @@ function CreateSnowFlakes(parent, count)
     end
     snowFlakeCount = count or Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
     for i = 1, snowFlakeCount do
-        CreateSnowFlake(snowFlakesGroup, 100, math.random() * 2, math.random(snowFlakesGroup.Width()),
+        SnowFlake(snowFlakesGroup, 100, math.random() * 2, math.random(snowFlakesGroup.Width()),
             math.random(snowFlakesGroup.Height()))
     end
 end
