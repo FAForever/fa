@@ -24,6 +24,23 @@ local PlatoonFile = '/lua/platoon.lua'
 
 ---@alias BuilderGroupsNaval 'NavalExpansionBuilders' | 'NavalExpansionBuilders HighPri' | 'EngineerNavalFactoryBuilder'
 
+local NavalExpansionPriorityAdjust = function(self, aiBrain, builderManager)
+    if aiBrain.IntelData.FrigateRaid then
+        return 1000
+    end
+    if aiBrain.IntelData.MapWaterRatio < 0.20 and not aiBrain.IntelData.MassMarkersInWater then
+        return 0
+    elseif aiBrain.IntelData.MapWaterRatio < 0.30 then
+        return 200
+    elseif aiBrain.IntelData.MapWaterRatio < 0.40 then
+        return 400
+    elseif aiBrain.IntelData.MapWaterRatio < 0.60 then
+        return 675
+    else
+        return 922
+    end
+end
+
 -- For everything but Naval Rush
 BuilderGroup {
     BuilderGroupName = 'NavalExpansionBuilders',
@@ -32,13 +49,14 @@ BuilderGroup {
         BuilderName = 'T1 Naval Builder',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 922,
+        PriorityFunction = NavalExpansionPriorityAdjust,
         InstanceCount = 1,
         BuilderConditions = {
             { UCBC, 'NavalBaseCheck', { } }, -- related to ScenarioInfo.Options.NavalExpansionsAllowed
             --DUNCAN - Added to limit expansions
             { UCBC, 'NavalBaseCount', { '<', 1 } },
             { UCBC, 'NavalAreaNeedsEngineer', { 'LocationType', 250, -1000, 10, 1, 'AntiSurface' } },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.8, 1.0 }},
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
         },
@@ -58,11 +76,6 @@ BuilderGroup {
                 ExpansionRadius = 50,
                 BuildStructures = {
                     'T1SeaFactory',
-                    'T1SeaFactory',
-                    'T1AADefense',
-                    'T1SeaFactory',
-                    'T1Sonar',
-                    --'T1NavalDefense',
                 }
             }
         }

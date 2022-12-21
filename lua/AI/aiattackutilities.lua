@@ -2281,6 +2281,65 @@ function InWaterCheck(platoon)
     return inWater
 end
 
+function NavalAttackCheck(aiBrain)
+    -- This function will check if there are mass markers that can be hit by frigates. This can trigger faster naval factory builds initially.
+    -- points = number of points around the extractor, doesn't need to have too many.
+    -- radius = the radius that the points will be, be set this a little lower than a frigates max weapon range
+    -- center = the x,y values for the position of the mass extractor. e.g {x = 0, y = 0} 
+    local function DrawCirclePoints(points, radius, center)
+        local extractorPoints = {}
+        local slice = 2 * math.pi / points
+        for i=1, points do
+            local angle = slice * i
+            local newX = center[1] + radius * math.cos(angle)
+            local newY = center[3] + radius * math.sin(angle)
+            table.insert(extractorPoints, { newX, 0 , newY})
+        end
+        return extractorPoints
+    end
+    local frigateRaidMarkers = {}
+    local markers, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    if markers then
+        local markerCount = 0
+        local markerCountNotBlocked = 0
+        local markerCountBlocked = 0
+        local markersUnderWater = 0
+        for _, v in markers do 
+            -- Check for underwater mass points, can subs hit mass points
+            -- We could also do this by pre-populating which mass markers are under water in the marker cache
+            if v.NavLayer == 'Amphibious' then
+                markersUnderWater = markersUnderWater + 1
+            else
+                local checkPoints = DrawCirclePoints(6, 26, v.position)
+                if checkPoints then
+                    for _, m in checkPoints do
+                        -- Check if the position within weapon range is in water
+                        if (GetTerrainHeight(m[1], m[3]) + 1.1) < GetSurfaceHeight(m[1], m[3]) then
+                            local pointSurfaceHeight = GetSurfaceHeight(m[1], m[3]) + 0.36
+                            markerCount = markerCount + 1
+                            -- Check if any terrain is blocking position
+                            if not aiBrain:CheckBlockingTerrain({m[1], pointSurfaceHeight, m[3]}, v.position, 'low') then
+                                markerCountNotBlocked = markerCountNotBlocked + 1
+                                table.insert( frigateRaidMarkers, { Position=v.position, Name=v.name } )
+                            else
+                                markerCountBlocked = markerCountBlocked + 1
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        if markerCountNotBlocked > 8 then
+            aiBrain.IntelData.FrigateRaid = true
+        end
+        if markersUnderWater > 0 then
+            aiBrain.IntelData.WaterMassMarkersPresent = true
+        end
+        aiBrain.IntelData.FrigateRaidMassMarkers = frigateRaidMarkers
+    end
+end
+
 -- Deprecated functions / unused
 function GraphExists(layer)
     WARN('[aiattackutilities.lua '..debug.getinfo(1).currentline..'] - Deprecated function GraphExists(layer) called. Use GetPathGraphs()[layer] instead.')
