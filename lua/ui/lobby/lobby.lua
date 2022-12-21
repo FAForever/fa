@@ -29,9 +29,7 @@ local LobbyComm = import("/lua/ui/lobby/lobbycomm.lua")
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 local Mods = import("/lua/mods.lua")
 local FactionData = import("/lua/factions.lua")
-local Text = import("/lua/maui/text.lua").Text
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
-local Border = import("/lua/ui/controls/border.lua").Border
 
 local utils = import("/lua/system/utils.lua")
 
@@ -53,7 +51,6 @@ local aitypes
 local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
-
 
 
 
@@ -4300,75 +4297,8 @@ function CreateUI(maxPlayers)
             WaitSeconds(1)
         end
     end)
-    CreateSnowFlakes ()
-end
-
-local snowFlakesGroup
-local snowFlakePath = "/textures/ui/events/snow/snowflake.dds"
-local snowFlakeWidth = 10
-local snowFlakeHeight = 10
-local snowFlakeCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
-local Math_Random = math.random
-local Math_Cos = math.cos
-local Math_Sin = math.sin
-local Math_Floor = math.floor
-
-function CreateSnowFlakes()
-    if not snowFlakesGroup then
-        snowFlakesGroup = Group(GUI)
-        LayoutHelpers.FillParent(snowFlakesGroup,GUI)
-        snowFlakesGroup:DisableHitTest()
-    end
-    local parent = snowFlakesGroup
-    for i = 1, snowFlakeCount do
-        CreateSnowFlake(parent, 100, math.random() * 2, math.random(parent.Width()),
-            math.random(parent.Height()))
-    end
-end
-
-function CreateSnowFlake(parent, speed, scale, xPos, yPos)
-    local snowFlake = Bitmap(parent, snowFlakePath)
-    snowFlake.parent = parent
-    -- local snowFlake = Bitmap(self.ClientGroup)
-    -- snowFlake:SetSolidColor('ffffffff')
-    LayoutHelpers.AtLeftTopIn(snowFlake, snowFlake.parent, xPos, yPos)
-    LayoutHelpers.SetDimensions(snowFlake, snowFlakeWidth * scale, snowFlakeHeight * scale)
-    snowFlake:SetAlpha(math.random())
-    snowFlake.speed = speed;
-    snowFlake.xPos = xPos;
-    snowFlake.yPos = yPos;
-    snowFlake.scale = scale
-
-    snowFlake.counter = math.random() * 10;
-    snowFlake.sign = math.random() < 0.5 and 1 or -1
-    snowFlake:DisableHitTest()
-    snowFlake:SetNeedsFrameUpdate(true)
-    snowFlake.OnFrame = function(control, delta)
-        control.counter = control.counter + control.speed / 5000;
-        local counterCos = Math_Cos(control.counter)
-        local counterSin = Math_Sin(control.counter)
-        control.xPos = control.xPos + control.sign * control.speed * counterCos / 200;
-        control.yPos = control.yPos + counterSin / 100 + control.speed / 100;
-        control.scale = control.scale + counterCos / 100;
-
-        LayoutHelpers.AtLeftTopIn(control, control.parent, Math_Floor(control.xPos), Math_Floor(control.yPos))
-        if control.sign > 0 then
-            LayoutHelpers.SetDimensions(snowFlake, snowFlakeWidth * control.scale,
-                snowFlakeHeight * control.scale * counterCos)
-        else
-            LayoutHelpers.SetDimensions(snowFlake, snowFlakeWidth * control.scale * counterSin,
-                snowFlakeHeight * control.scale)
-        end
-
-        control:Show()
-
-        if (control.Left() < control.parent.Left() or control.Right() > control.parent.Right()) then
-            control:Hide()
-        end
-        if (control.yPos > control.parent.Height()) then
-            control.yPos = -10
-            control.xPos = Math_Random(control.parent.Width())
-        end
+    if true then
+        import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
     end
 end
 
@@ -6432,26 +6362,27 @@ function ShowLobbyOptionsDialog()
             GUI.chatPanel:ScrollToBottom()
         end
     end
-    --snowflakes count
-    local currentSnowFlakesCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
-    local slider_SnowFlakes_Count_TEXT = UIUtil.CreateText(dialogContent,'Snowflakes count '.. currentSnowFlakesCount, 14, 'Arial', true)
-    LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count_TEXT, dialogContent, 27, 202)
+    if true then
+        --snowflakes count
+        local currentSnowFlakesCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
+        local slider_SnowFlakes_Count_TEXT = UIUtil.CreateText(dialogContent,'Snowflakes count '.. currentSnowFlakesCount, 14, 'Arial', true)
+        LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count_TEXT, dialogContent, 27, 202)
 
-    -- slider for changing chat font size
-    local slider_SnowFlakes_Count = Slider(dialogContent, false, 100, 1000,
-        UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
-        UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
-        UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
-        UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
-        LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count, dialogContent, 20, 222)
-    slider_SnowFlakes_Count:SetValue(currentSnowFlakesCount)
-    slider_SnowFlakes_Count.OnValueChanged = function(self, newValue)
-        local sliderValue = math.floor(newValue)
-        slider_SnowFlakes_Count_TEXT:SetText('Snowflakes count '.. sliderValue)
-        Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
-        snowFlakesGroup:ClearChildren()
-        snowFlakeCount = sliderValue
-        CreateSnowFlakes()
+        -- slider for changing chat font size
+        local slider_SnowFlakes_Count = Slider(dialogContent, false, 100, 1000,
+            UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
+            UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+            LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count, dialogContent, 20, 222)
+        slider_SnowFlakes_Count:SetValue(currentSnowFlakesCount)
+        slider_SnowFlakes_Count.OnValueChanged = function(self, newValue)
+            local sliderValue = math.floor(newValue)
+            slider_SnowFlakes_Count_TEXT:SetText('Snowflakes count '.. sliderValue)
+            Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
+            import("/lua/ui/events/SnowFlake.lua").Clear()
+            import("/lua/ui/events/SnowFlake.lua").CreateSnowFlakes(GUI, sliderValue)
+        end
     end
 
 
