@@ -67,23 +67,26 @@ doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
 doscript("/lua/system/blueprints-projectiles.lua")
 doscript("/lua/system/blueprints-units.lua")
+doscript("/lua/system/blueprints-props.lua")
 doscript("/lua/system/blueprints-weapons.lua")
 
 ---@class PreGameData
+---@field CurrentMapDir string          ## is obsolete, set for removal
 ---@field IconReplacements ModInfo[]
 
 --- Load in the pre game data that is defined in the lobby through the preference file.
----@return PreGameData | nil
+---@return PreGameData?
 local function LoadPreGameData()
     -- load in the prefs file
     local file = DiskFindFiles("/preferences", "Game.prefs")[1]
     if not file then
         WARN('Blueprints.lua - Preferences file is not found. Skipping pre game data.')
-        return
+        return nil
     end
 
     -- try and load the pre game data of prefs file
-    local preGameData = false
+    ---@type PreGameData
+    local preGameData
     local ok, msg = pcall(
         function()
             local data = {}
@@ -828,6 +831,7 @@ function PostModBlueprints(all_bps)
     -- post process units and projectiles for easier access to information and sanitizing some fields
     PostProcessProjectiles(all_bps.Projectile)
     PostProcessUnits(all_bps.Unit)
+    PostProcessProps(all_bps.Prop)
 end
 
 
@@ -859,7 +863,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     LOG('Blueprints Loading... \'' .. tostring(pattern) .. '\' files')
 
     if not mods then
-        mods = __active_mods or import('/lua/mods.lua').GetGameMods()
+        mods = __active_mods or import("/lua/mods.lua").GetGameMods()
     end
     InitOriginalBlueprints()
 

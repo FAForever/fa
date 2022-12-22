@@ -1,13 +1,13 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Statistics = import("/lua/shared/statistics.lua")
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
 local Layouter = LayoutHelpers.ReusedLayoutFor
---local ScrollPolicy = import('/lua/maui/scrollbar.lua').ScrollPolicy
+--local ScrollPolicy = import("/lua/maui/scrollbar.lua").ScrollPolicy
 
 ---@class ProfilerElementRow : Group
 ---@field name Text

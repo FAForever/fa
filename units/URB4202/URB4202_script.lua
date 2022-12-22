@@ -7,7 +7,7 @@
 ----**
 ----**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local CShieldStructureUnit = import('/lua/cybranunits.lua').CShieldStructureUnit
+local CShieldStructureUnit = import("/lua/cybranunits.lua").CShieldStructureUnit
 
 ---@class URB4202 : CShieldStructureUnit
 URB4202 = Class(CShieldStructureUnit) {

@@ -1,16 +1,15 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local Movie = import('/lua/maui/movie.lua').Movie
-local WrapText = import('/lua/maui/text.lua').WrapText
-local Button = import('/lua/maui/button.lua').Button
-local Prefs = import('/lua/user/prefs.lua')
-local PlayCampaignMovie = import('campaignmovies.lua').PlayCampaignMovie
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local Movie = import("/lua/maui/movie.lua").Movie
+local WrapText = import("/lua/maui/text.lua").WrapText
+local Button = import("/lua/maui/button.lua").Button
+local Prefs = import("/lua/user/prefs.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
-local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
+local CampaignManager = import("/lua/ui/campaign/campaignmanager.lua")
 
 local factionData = {
     {name = '<LOC _Cybran>', icon = '/dialogs/logo-btn/logo-cybran', key = 'cybran', color = 'ffff0000', sound = 'UI_Cybran_Rollover'},
@@ -80,14 +79,14 @@ function CreateUI()
     LayoutHelpers.AtBottomIn(GUI.backBtn, GUI.backgrounds.bottom, -4)
     GUI.backBtn.OnClick = function(self)
         GUI.parent:Destroy()
-        import('/lua/ui/menus/main.lua').CreateUI()
+        import("/lua/ui/menus/main.lua").CreateUI()
     end
 
     GUI.title = UIUtil.CreateText(GUI.backgrounds.top, LOC('<LOC sel_campaign_0018>Select Operation'), 24)
     LayoutHelpers.AtHorizontalCenterIn(GUI.title, GUI.backgrounds.top)
     LayoutHelpers.AtTopIn(GUI.title, GUI.backgrounds.top, 10)
 
-    import('/lua/ui/uimain.lua').SetEscapeHandler(function() GUI.backBtn.OnClick() end)
+    import("/lua/ui/uimain.lua").SetEscapeHandler(function() GUI.backBtn.OnClick() end)
 
     GUI.selectBtn = UIUtil.CreateButtonStd(GUI.parent, '/scx_menu/medium-no-br-btn/medium-uef', "<LOC sel_campaign_0013>Select", 20, 2)
     LayoutHelpers.AtRightIn(GUI.selectBtn, GUI.backgrounds.bottom, 20)
@@ -97,7 +96,7 @@ function CreateUI()
     LayoutHelpers.AtLeftIn(GUI.loadBtn, GUI.backgrounds.bottom, 232)
     LayoutHelpers.AtBottomIn(GUI.loadBtn, GUI.backgrounds.bottom, -4)
     GUI.loadBtn.OnClick = function(self, modifiers)
-        import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI.parent, nil, 'CampaignSave')
+        import("/lua/ui/dialogs/saveload.lua").CreateLoadDialog(GUI.parent, nil, 'CampaignSave')
     end
     Tooltip.AddButtonTooltip(GUI.loadBtn, 'campaignselect_load')
 
@@ -482,7 +481,7 @@ function SelectOperation(opData)
     if desc == '' then
         desc = 'This is where the description for this operation would go if this operation\'s operation file had one defined!'
     end
-    local text = import('/lua/maui/text.lua').WrapText(desc, GUI.selOpDescription.Width(),
+    local text = import("/lua/maui/text.lua").WrapText(desc, GUI.selOpDescription.Width(),
         function(text)
             return GUI.selOpDescription:GetStringAdvance(text)
         end)
@@ -499,7 +498,7 @@ function SelectOperation(opData)
         GUI.selectBtn.label:SetText(LOC("<LOC sel_campaign_0015>Select"))
         GUI.selectBtn.OnClick = function(self)
             GUI.parent:Destroy()
-            import('/lua/ui/campaign/operationbriefing.lua').CreateUI(opData.id, opData.briefingData)
+            import("/lua/ui/campaign/operationbriefing.lua").CreateUI(opData.id, opData.briefingData)
         end
         Tooltip.AddButtonTooltip(GUI.selectBtn, 'campaignselect_select')
     elseif opData.launchType == 'movie' then
@@ -516,11 +515,11 @@ function SelectOperation(opData)
         else
             GUI.selectBtn.OnClick = function(self)
                 GUI.parent:Destroy()
-                import('campaignmovies.lua').PlayCampaignMovie(
+                import("/lua/ui/campaign/campaignmovies.lua").PlayCampaignMovie(
                     opData.fmvName,
                     GetFrame(0),
                     function()
-                    	import('/lua/ui/campaign/selectcampaign.lua').CreateUI()
+                    	import("/lua/ui/campaign/selectcampaign.lua").CreateUI()
                     end,
                     opData.cueName,
                     opData.voiceName)
@@ -534,8 +533,8 @@ function SelectOperation(opData)
             GUI.parent:Destroy()
             Prefs.SetToCurrentProfile('LoadingFaction', 1)
             LaunchSinglePlayerSession(
-                import('/lua/SinglePlayerLaunch.lua').SetupCampaignSession(
-                    import('/lua/ui/maputil.lua').LoadScenario('/maps/X1CA_TUT/X1CA_TUT_scenario.lua'),
+                import("/lua/singleplayerlaunch.lua").SetupCampaignSession(
+                    import("/lua/ui/maputil.lua").LoadScenario('/maps/X1CA_TUT/X1CA_TUT_scenario.lua'),
                     2, nil, nil, true
                 )
             )
@@ -580,11 +579,11 @@ function CreditsChooser()
         button.OnClick = function(self)
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Menu_MouseDown'}))
             GUI.parent:Destroy()
-            import('campaignmovies.lua').PlayCampaignMovie(
+            import("/lua/ui/campaign/campaignmovies.lua").PlayCampaignMovie(
                 factionCredits[self.faction].fmv,
                 GetFrame(0),
                 function()
-                	import('/lua/ui/campaign/selectcampaign.lua').CreateUI()
+                	import("/lua/ui/campaign/selectcampaign.lua").CreateUI()
                 end,
                 factionCredits[self.faction].cue,
                 factionCredits[self.faction].voice)
@@ -594,11 +593,11 @@ function CreditsChooser()
         end
     end
 
-    import('/lua/ui/uimain.lua').SetEscapeHandler(function()
+    import("/lua/ui/uimain.lua").SetEscapeHandler(function()
         bg:Destroy()
-        import('/lua/ui/uimain.lua').SetEscapeHandler(function()
+        import("/lua/ui/uimain.lua").SetEscapeHandler(function()
             GUI.parent:Destroy()
-            import('/lua/ui/menus/main.lua').CreateUI()
+            import("/lua/ui/menus/main.lua").CreateUI()
         end)
     end)
 end
@@ -646,7 +645,7 @@ function TimelineFMV(toOpSelect)
     textArea:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor,  UIUtil.highlightColor)
     textArea.Depth:Set(100000)
 
-    local strings = import('/lua/ui/game/fmv_timeline.lua').timeline_captions
+    local strings = import("/lua/ui/game/fmv_timeline.lua").timeline_captions
     AddInputCapture(nis)
 
     local loading = true
@@ -678,7 +677,7 @@ function TimelineFMV(toOpSelect)
             CreateUI()
         else
             local opData = import('/maps/X1CA_001/X1CA_001_operation.lua').operationData
-            import('/lua/ui/campaign/operationbriefing.lua').CreateUI('X1CA_001', opData)
+            import("/lua/ui/campaign/operationbriefing.lua").CreateUI('X1CA_001', opData)
         end
     end
 
@@ -701,3 +700,6 @@ function TimelineFMV(toOpSelect)
         end
     end
 end
+
+-- kept for mod backwards compatibility
+local PlayCampaignMovie = import("/lua/ui/campaign/campaignmovies.lua").PlayCampaignMovie

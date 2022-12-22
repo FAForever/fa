@@ -1,4 +1,4 @@
-local WatchedValue = import('/lua/ui/lobby/data/watchedvalue/watchedvalue.lua')
+local WatchedValue = import("/lua/ui/lobby/data/watchedvalue/watchedvalue.lua")
 
 -- A version of the builtin "next" function that unboxes WatchedValues. Useful for making iteration
 -- over WatchedValueTables work.
@@ -42,14 +42,16 @@ WatchedValueTable = ClassSimple {
         local WatchedMetaTable = {
             -- Get a value from a WatchedValueTable
             __index = function(wvt, key)
-                local msg = 'WatchedValueTable __index function(wvt, '
-                            .. repr(key).. ') '  .. tostring(_store[key])
                 -- limit logging only to changes of the WatchedValueTable
-                if LoggingEnabled and not LoggedChanges[msg] then
-                    LoggedChanges[msg] = true
-                    LOG(msg)
+                local value = _store[key]
+                if LoggingEnabled then
+                    local msg = 'WatchedValueTable __index function(wvt, ' .. repr(key) .. ') '  .. tostring(value)
+                    if not LoggedChanges[msg] then
+                        LoggedChanges[msg] = true
+                        LOG(msg)
+                    end
                 end
-                return _store[key]()
+                return value()
             end,
 
             -- Insert to a wvt. Triggers the event listener on the WatchedValue.

@@ -8,10 +8,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")
 
 ---@param aiBrain AIBrain
 ---@param numReq integer
@@ -1148,7 +1148,7 @@ end
 function CheckUnitRange(aiBrain, locationType, unitType, category, factionIndex)
 
     -- Find the unit's blueprint
-    local template = import('/lua/BuildingTemplates.lua').BuildingTemplates[factionIndex or aiBrain:GetFactionIndex()]
+    local template = import("/lua/buildingtemplates.lua").BuildingTemplates[factionIndex or aiBrain:GetFactionIndex()]
     local buildingId = false
     for k,v in template do
         if v[1] == unitType then
@@ -1429,6 +1429,52 @@ end
 function CheckBuildPlattonDelay(aiBrain, PlatoonName)
     if aiBrain.DelayEqualBuildPlattons[PlatoonName] and aiBrain.DelayEqualBuildPlattons[PlatoonName] > GetGameTimeSeconds() then
         return false
+    end
+    return true
+end
+
+--- Buildcondition to limit the number of factories 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCategory EntityCategory
+---@param pathType string
+---@param unitCount integer
+---@return boolean
+function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount)
+    local currentEnemy = aiBrain:GetCurrentEnemy()
+    if not currentEnemy then
+        return true
+    end
+    local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    local selfIndex = aiBrain:GetArmyIndex()
+    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
+        return false
+    end
+    return true
+end
+
+--- Buildcondition to decide if radars should upgrade based on other radar locations.
+---@param aiBrain AIBrain
+---@param locationType string
+---@param radarTech string
+---@return boolean
+function ShouldUpgradeRadar(aiBrain, locationType, radarTech)
+
+    -- loop over radars that are one tech higher
+    local basePos = aiBrain.BuilderManagers[locationType].Position
+    local otherRadars = aiBrain.Radars[radarTech]
+    for _, other in otherRadars do
+        -- determine if we're too close to higher tech radars
+        local range = other.Blueprint.Intel.RadarRadius
+        if range then
+            local squared = 0.64 * (range * range)
+            local ox, _, oz = other:GetPositionXYZ()
+            local dx = ox - basePos[1]
+            local dz = oz - basePos[3]
+            if dx * dx + dz * dz < squared then
+                return false
+            end
+        end
     end
     return true
 end

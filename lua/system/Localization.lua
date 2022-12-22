@@ -1,10 +1,28 @@
 ---@declare-global
-local loc_table
+---@diagnostic disable:lowercase-global
+
+-- upvalue globals for performance
+local AudioSetLanguage = AudioSetLanguage
+local DiskFindFiles = DiskFindFiles
+local doscript = doscript
+local exists = exists
+local type = type
+local unpack = unpack
+
+local StringFormat = string.format
+local StringGsub = string.gsub
+local StringSub = string.sub
+
 
 ---@alias LocalizedString string
----@alias UnlocalizedString string
+---@alias UnlocalizedString string | number
 
--- Special tokens that can be included in a loc string via {g Player} etc. The
+---@type table<string, UnlocalizedString>
+local loc_table
+---@type table<string, UnlocalizedString>
+local usdb = {}
+
+-- Special tokens that can be included in a loc string via `{g Player}` etc. The
 -- Player name gets replaced with the current selected player name.
 local UpLocGlobals = {
     PlayerName = "Player",
@@ -15,17 +33,6 @@ local UpLocGlobals = {
 }
 LocGlobals = UpLocGlobals
 
--- upvalue globals for performance
-local type = type
-local unpack = unpack
-local exists = exists
-local doscript = doscript
-local DiskFindFiles = DiskFindFiles
-local AudioSetLanguage = AudioSetLanguage
-
--- upvalue string operations for performance
-local StringFormat = string.format
-
 ---@param la Language
 ---@return FileName
 local function dbFilename(la)
@@ -33,7 +40,7 @@ local function dbFilename(la)
 end
 
 -- Check whether the given language is installed; if so, return it;
--- otherwise return some language that is installed.
+-- otherwise, return some language that is installed.
 ---@param la Language
 ---@return Language
 local function okLanguage(la)
@@ -50,18 +57,12 @@ local function okLanguage(la)
     return la
 end
 
-local usdb = {}
-if okLanguage("us") then
-    doscript(dbFilename("us"), usdb)
-end
-
 ---@param la Language
 local function loadLanguage(la)
     la = okLanguage(la)
 
     -- reload strings file...
 
-    ---@type table<string, string>
     loc_table = {}
     doscript(dbFilename(la), loc_table)
 
@@ -107,29 +108,38 @@ function LocalisationAILobby()
     end
 end
 
---- Called from `string.gsub` in `LocExpand()` to expand a single `{op ident}` element
+--- Called from `string.gsub` in `LocExpand()` to expand a single `{op ident}` directive
 ---@param op string
 ---@param ident string
 ---@return string
 local function LocSubFn(op, ident)
     if op == 'i' then
-        local s = loc_table[ident]
-        if s then
-            return LocExpand(s)
+        local loc = loc_table[ident]
+        if loc then
+            return LocExpand(loc)
         else
             WARN("missing localization key for include: " .. ident)
             return "{unknown key: " .. ident .. '}'
         end
     elseif op == 'g' then
-        local s = UpLocGlobals[ident]
-        if iscallable(s) then
-            s = s()
+        local glob = UpLocGlobals[ident]
+        if iscallable(glob) then
+            glob = glob()
         end
-        if s then
-            return s
+        if glob then
+            return glob
         else
             WARN("missing localization global: " .. ident)
             return "{unknown global: " .. ident .. '}'
+        end
+    elseif op == 'k' then
+        local keymapper = import("/lua/keymap/keymapper.lua")
+        local keybind = keymapper.GetCurrentKeyBinding(ident)
+        if keybind then
+            return keymapper.LocalizeKeyName(keybind)
+        else
+            WARN("missing localization key for action: " .. ident)
+            return "{unknown action: " .. ident .. '}'
         end
     else
         WARN("unknown localization directive: " .. op .. ':' .. ident)
@@ -138,14 +148,15 @@ local function LocSubFn(op, ident)
 end
 
 --- Given some text from the loc DB, recursively apply formatting directives
----@param s string
+---@param s string | number
 ---@return LocalizedString
 function LocExpand(s)
     -- Look for braces {} in text
-    return (s:gsub("{(%w+) ([^{}]*)}", LocSubFn))
+    return (StringGsub(s --[[@as string]], "{(%w+) ([^{}]*)}", LocSubFn))
 end
 
---- If `str` is a string with a localization tag, like "<LOC HW1234>Hello World",
+---@overload fun(str: nil): nil
+--- If `str` is a string with a localization tag, like `<LOC HW1234>Hello World`,
 --- returns a localized version of it
 ---@param str UnlocalizedString
 ---@return LocalizedString
@@ -153,21 +164,18 @@ function LOC(str)
     -- Note - we use [[foo]] string syntax here instead of "foo", so the localizing
     -- script won't try to mess with *our* strings.
     if str == nil then
-        ---@diagnostic disable-next-line: return-type-mismatch
         return str
     end
-    if type(str) == "number" then
-        return tostring(str + 0.3)
-    end
-    if str:sub(1, 5) ~= [[<LOC ]] then
+
+    if StringSub(str --[[@as string]], 1, 5) ~= [[<LOC ]] then
         return LocExpand(str)
     end
 
     local pos = str:find('>')
     if not pos then
         -- Missing the closing angle bracket of <LOC> tag
-        WARN(_TRACEBACK(2, "String has malformed loc tag: ", str))
-        return str
+        WARN(_TRACEBACK(2, "String has malformed loc tag: " .. str))
+        return str --[[@as string]]
     end
 
     local key = str:sub(6, pos - 1)
@@ -182,7 +190,7 @@ function LOC(str)
     return LocExpand(result)
 end
 
---- Like `string.format`, but applies LOC() to all string args first.
+--- Like `string.format`, but applies LOC() to all string args first
 ---@param ... any
 ---@return LocalizedString
 function LOCF(...)
@@ -194,9 +202,9 @@ function LOCF(...)
     return StringFormat(unpack(arg))
 end
 
---- Call `LOC()` on all elements of a table
----@param tbl table<UnlocalizedString, LocalizedString>
----@return table<UnlocalizedString, LocalizedString>
+--- Calls `LOC()` on all elements of a table
+---@param tbl table<UnlocalizedString>
+---@return table<LocalizedString>
 function LOC_ALL(tbl)
     local r = {}
     for key, v in tbl do
@@ -205,11 +213,18 @@ function LOC_ALL(tbl)
     return r
 end
 
---- Change the current language
+--- Changes the current language
 ---@param la Language
 function language(la)
     loadLanguage(la)
     SetPreference("options_overrides.language", __language)
 end
 
-loadLanguage(__language)
+
+do
+    local us = dbFilename "us"
+    if exists(us) then
+        doscript(us, usdb)
+    end
+    loadLanguage(__language)
+end

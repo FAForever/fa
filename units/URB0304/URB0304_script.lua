@@ -7,8 +7,8 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local CQuantumGateUnit = import('/lua/cybranunits.lua').CQuantumGateUnit
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local CQuantumGateUnit = import("/lua/cybranunits.lua").CQuantumGateUnit
+local EffectUtil = import("/lua/effectutilities.lua")
 
 ---@class URB0304 : CQuantumGateUnit
 URB0304 = Class(CQuantumGateUnit) {

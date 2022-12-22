@@ -1,21 +1,15 @@
---***************************************************************************
---*
---**  File     :  /lua/ai/OpAI/ReactiveAI.lua
---**
---**  Summary  : OpAI that reacts to certain defaulted events
-----**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-local OpAI = import('/lua/ai/OpAI/BaseOpAI.lua').OpAI
+------------------------------------------------------------------
+-- File     :  /lua/ai/OpAI/ReactiveAI.lua
+-- Summary  : OpAI that reacts to certain defaulted events
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
+local OpAI = import("/lua/ai/opai/baseopai.lua").OpAI
+
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local BMBC = '/lua/editor/basemanagerbuildconditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
+local BMPT = '/lua/ai/opai/basemanagerplatoonthreads.lua'
 
 --[[
 Types usable in ReactiveAI
@@ -51,6 +45,14 @@ TrackingCategories = {
 
 ---@class ReactiveAI : OpAI
 ReactiveAI = Class(OpAI) {
+
+    ---@param self OpAI
+    ---@param brain AIBrain
+    ---@param location Vector
+    ---@param triggeringEventType any
+    ---@param reactionType any
+    ---@param name string
+    ---@param data any
     Create = function(self, brain, location, triggeringEventType, reactionType, name, data)
         -- With the actionType and responseType, we must create a builderType with proper builderData to create
         --   the OpAI
@@ -85,7 +87,7 @@ ReactiveAI = Class(OpAI) {
             self:AddBuildCondition( unpack(v) )
         end
     end,
-    
+
     ReactionData = {
         -- This uses purely air to respond.  It is the easiest to implement and has the least chance of breaking
         AirRetaliation = {
@@ -176,10 +178,20 @@ ReactiveAI = Class(OpAI) {
         },
         -- End of AirRetaliation block
     },
-        
+
+    ---@param self OpAI
+    ---@param builderData any
+    ---@param typeData any
+    ---@param builderType any
+    ---@param triggeringEventType any
+    ---@param reactionType any
     GetBuilderData = function( self, builderData, typeData, builderType, triggeringEventType, reactionType )
     end,
-    
+
+    ---@param self OpAI
+    ---@param triggeringEventType any
+    ---@param reactionType any
+    ---@return any
     GetBuilderType = function( self, triggeringEventType, reactionType )
         local retData = self.ReactionData[reactionType][triggeringEventType]
         if not retData then
@@ -190,12 +202,17 @@ ReactiveAI = Class(OpAI) {
         end
         return retData
     end,
-    
-    ReactionDatas = {
-        
-    },
+
+    ReactionDatas = {},
 }
 
+---@param brain AIBrain
+---@param location Vector
+---@param triggeringEventType any
+---@param reactionType any
+---@param name string
+---@param data any
+---@return any
 function CreateReactiveAI(brain, location, triggeringEventType, reactionType, name, data)
     local reactAI = ReactiveAI()
     reactAI:Create(brain, location, triggeringEventType, reactionType, name, data)

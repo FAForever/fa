@@ -52,8 +52,7 @@ function BlueprintLoaderUpdateProgress()
 end
 
 --- Create an empty prefetch set
----@unknown
----@return userdata
+---@return moho.CPrefetchSet
 function CreatePrefetchSet()
 end
 
@@ -63,8 +62,8 @@ function CurrentThread()
 end
 
 --- Returns the directory name
----@param fullPath any
----@result string
+---@param fullPath FileName
+---@return string
 function Dirname(fullPath)
 end
 
@@ -77,7 +76,7 @@ end
 
 --- Returns a table of information for the given file, or false if the file doesn't exist 
 ---@param filename FileName
----@return any | boolean
+---@return table | false
 function DiskGetFileInfo(filename)
 end
 
@@ -94,14 +93,14 @@ end
 
 --- Return true if a unit category contains this unit
 ---@param category EntityCategory
----@param unit UserUnit
+---@param unit Unit | UserUnit
 function EntityCategoryContains(category, unit)
 end
 
 --- Checks for the empty category
----@param categories Color
+---@param category EntityCategory
 ---@return boolean
-function EntityCategoryEmpty(categories)
+function EntityCategoryEmpty(category)
 end
 
 ---@overload fun(units: UserUnit[]): UserUnit[]
@@ -113,9 +112,9 @@ function EntityCategoryFilterDown(category, units)
 end
 
 --- Computes a list of unit blueprint names that match the categories
----@param categories EntityCategory
+---@param category EntityCategory
 ---@return string[]
-function EntityCategoryGetUnitList(categories)
+function EntityCategoryGetUnitList(category)
 end
 
 --- Returns an ordered list of named colors available for a `Color` instead of using a hexcode
@@ -132,8 +131,8 @@ function EulerToQuaternion(roll, pitch, yaw)
 end
 
 --- Collapse all intermediate `/./` or `/../` directory names from a path
----@param fullPath string
----@return string
+---@param fullPath FileName
+---@return FileName
 function FileCollapsePath(fullPath)
 end
 
@@ -145,7 +144,7 @@ function ForkThread(callback, ...)
 end
 
 --- Get the blueprint of an object
----@overload fun(weapon: Entity): EntityBlueprint
+---@overload fun(entity: Entity): EntityBlueprint
 ---@overload fun(mesh: Mesh): MeshBlueprint
 ---@overload fun(effect: moho.IEffect): EffectBlueprint
 ---@overload fun(projectile: Projectile): ProjectileBlueprint
@@ -173,19 +172,19 @@ function GetGameTimeSeconds()
 end
 
 --- Retrieves the movie duration
----@param localFileName string
+---@param localFileName FileName
 ---@return number
 function GetMovieDuration(localFileName)
 end
 
 ---
----@param id string
----@return UserUnit
+---@param id UnitId
+---@return UserUnit | Unit
 function GetUnitById(id)
 end
 
 --- Retrieves the game version, as set by `version.lua`
----@return string
+---@return VERSION
 function GetVersion()
 end
 
@@ -202,7 +201,7 @@ function IsAlly(army1, army2)
 end
 
 --- Checks if the C-side of an object is destroyed / de-allocated
----@param entity Entity | Unit | Prop | Weapon
+---@param entity? InternalObject
 ---@return boolean
 function IsDestroyed(entity)
 end
@@ -284,8 +283,8 @@ function PointVector(px, py, pz, vx, vy, vz)
 end
 
 --- Generate a random number between `min` and `max`
----@param min number defaults to 0
----@param max number defaults to 1
+---@param min number defaults to `0`
+---@param max number defaults to `1`
 ---@return number
 ---@overload fun(max: number): number
 ---@overload fun(): number
@@ -451,6 +450,7 @@ end
 ---@param y1 number
 ---@param x2 number
 ---@param y2 number
+---@return number
 function VDist2Sq(x1, y1, x2, y2)
 end
 
@@ -512,7 +512,7 @@ function WARN(out, ...)
 end
 
 --- Suspends the thread until the manipulator reaches its goal
----@param manipulator moho.manipulator_methods | moho.EconomyEvent
+---@param manipulator moho.manipulator_methods | EconomyEvent
 function WaitFor(manipulator)
 end
 

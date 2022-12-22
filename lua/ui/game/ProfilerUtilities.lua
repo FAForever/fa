@@ -1,6 +1,7 @@
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 
 local cache = {}
+
 --- Flattens the profiler data in a single list, can be tweaked using filter parameters
 ---@param data ProfilerData data as described at the top of this file
 ---@param growth? ProfilerGrowth

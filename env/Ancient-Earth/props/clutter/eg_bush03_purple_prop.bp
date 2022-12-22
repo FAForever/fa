@@ -44,9 +44,6 @@ PropBlueprint {
     Interface = {
         HelpText = 'Small Bush',
     },
-    Physics = {
-        BlockPath = true,
-    },
     SizeX = 0.3,
     SizeY = 0.25,
     SizeZ = 0.3,

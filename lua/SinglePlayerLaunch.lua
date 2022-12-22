@@ -1,12 +1,12 @@
 -- Logic and defaults for launching non-skirmish sessions
-local Prefs = import('/lua/user/prefs.lua')
-local MapUtils = import('/lua/ui/maputil.lua')
-local aiTypes = import('/lua/ui/lobby/aitypes.lua').aitypes
+local Prefs = import("/lua/user/prefs.lua")
+local MapUtils = import("/lua/ui/maputil.lua")
+local aiTypes = import("/lua/ui/lobby/aitypes.lua").aitypes
 
 function GetRandomName(faction, aiKey)
     WARN('GRN: ',faction)
-    local aiNames = import('/lua/ui/lobby/ainames.lua').ainames
-    local factions = import('/lua/factions.lua').Factions
+    local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
+    local factions = import("/lua/factions.lua").Factions
 
     faction = faction or (math.random(table.getn(factions)))
 
@@ -26,7 +26,7 @@ function GetRandomName(faction, aiKey)
 end
 
 function GetRandomFaction()
-    return math.random(table.getn(import('/lua/factions.lua').Factions))
+    return math.random(table.getn(import("/lua/factions.lua").Factions))
 end
 
 function VerifyScenarioConfiguration(scenarioInfo)
@@ -51,7 +51,7 @@ end
 
 -- Note that the map name must include the full path, it won't try to guess the path based on name
 function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo, isTutorial)
-    local factions = import('/lua/factions.lua').Factions
+    local factions = import("/lua/factions.lua").Factions
     local faction = inFaction or 1
     if not scenario then
         error("SetupCampaignSession - scenario required")
@@ -73,7 +73,7 @@ function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo,
     sessionInfo.teamInfo = {}
 
     for index, name in armies do
-        sessionInfo.teamInfo[index] = import('/lua/ui/lobby/lobbyComm.lua').GetDefaultPlayerOptions(sessionInfo.playerName)
+        sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions(sessionInfo.playerName)
         if index == 1 then
             sessionInfo.teamInfo[index].PlayerName = sessionInfo.playerName
             sessionInfo.teamInfo[index].Faction = faction
@@ -104,7 +104,7 @@ function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo,
 
     Prefs.SetToCurrentProfile('LoadingFaction', faction)
 
-    sessionInfo.scenarioMods = import('/lua/mods.lua').GetCampaignMods(sessionInfo.scenarioInfo)
+    sessionInfo.scenarioMods = import("/lua/mods.lua").GetCampaignMods(sessionInfo.scenarioInfo)
     LOG('sessioninfo: ', repr(sessionInfo.teamInfo))
     return sessionInfo
 end
@@ -178,7 +178,7 @@ function SetupBotSession(mapName)
     sessionInfo.playerName = Prefs.GetFromCurrentProfile('Name') or 'Player'
     sessionInfo.createReplay = false
 
-    sessionInfo.scenarioInfo = import('/lua/ui/maputil.lua').LoadScenario(mapName)
+    sessionInfo.scenarioInfo = import("/lua/ui/maputil.lua").LoadScenario(mapName)
     if not sessionInfo.scenarioInfo then
         error("Unable to load map " .. mapName)
     end
@@ -189,7 +189,7 @@ function SetupBotSession(mapName)
 
     sessionInfo.teamInfo = {}
 
-    local numColors = table.getn(import('/lua/gameColors.lua').GameColors.PlayerColors)
+    local numColors = table.getn(import("/lua/gamecolors.lua").GameColors.PlayerColors)
 
     local ai
     local aiopt = GetCommandLineArg("/ai", 1)
@@ -202,7 +202,7 @@ function SetupBotSession(mapName)
     LOG('ai=' .. repr(ai))
 
     for index, name in armies do
-        sessionInfo.teamInfo[index] = import('/lua/ui/lobby/lobbyComm.lua').GetDefaultPlayerOptions(sessionInfo.playerName)
+        sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions(sessionInfo.playerName)
         sessionInfo.teamInfo[index].PlayerName = name
         sessionInfo.teamInfo[index].ArmyName = name
         sessionInfo.teamInfo[index].Faction = GetRandomFaction()
@@ -213,7 +213,7 @@ function SetupBotSession(mapName)
     end
 
     sessionInfo.scenarioInfo.Options = GetCommandLineOptions(false)
-    sessionInfo.scenarioMods = import('/lua/mods.lua').GetCampaignMods(sessionInfo.scenarioInfo)
+    sessionInfo.scenarioMods = import("/lua/mods.lua").GetCampaignMods(sessionInfo.scenarioInfo)
 
     local seed = GetCommandLineArg("/seed", 1)
     if seed then
@@ -229,7 +229,7 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
     local faction
     if HasCommandLineArg("/faction") then
         faction = tonumber(GetCommandLineArg("/faction", 1)[1])
-        local maxFaction = table.getn(import('/lua/factions.lua').Factions)
+        local maxFaction = table.getn(import("/lua/factions.lua").Factions)
         if faction < 1 or faction > maxFaction then
             error("SetupCommandLineSession - selected faction index " .. faction .. " must be between 1 and " ..  maxFaction)
         end
@@ -246,7 +246,7 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
     sessionInfo.createReplay = true
     sessionInfo.scenarioInfo = scenario
     sessionInfo.teamInfo = {}
-    sessionInfo.scenarioMods = import('/lua/mods.lua').GetCampaignMods(scenario)
+    sessionInfo.scenarioMods = import("/lua/mods.lua").GetCampaignMods(scenario)
 
     local seed = GetCommandLineArg("/seed", 1)
     if seed then
@@ -257,10 +257,10 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
 
     local armies = sessionInfo.scenarioInfo.Configurations.standard.teams[1].armies
 
-    local numColors = table.getn(import('/lua/gameColors.lua').GameColors.PlayerColors)
+    local numColors = table.getn(import("/lua/gamecolors.lua").GameColors.PlayerColors)
 
     for index, name in armies do
-        sessionInfo.teamInfo[index] = import('/lua/ui/lobby/lobbyComm.lua').GetDefaultPlayerOptions(sessionInfo.playerName)
+        sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions(sessionInfo.playerName)
         if index == 1 then
             sessionInfo.teamInfo[index].PlayerName = sessionInfo.playerName
             sessionInfo.teamInfo[index].Faction = faction
@@ -280,7 +280,7 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
     if extras then
         for k,armyName in extras do
             local index = table.getn(sessionInfo.teamInfo) + 1
-            sessionInfo.teamInfo[index] = import('/lua/ui/lobby/lobbyComm.lua').GetDefaultPlayerOptions("civilian")
+            sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions("civilian")
             sessionInfo.teamInfo[index].PlayerName = 'civilian'
             sessionInfo.teamInfo[index].Civilian = true
             sessionInfo.teamInfo[index].ArmyName = armyName
@@ -300,7 +300,7 @@ function StartCommandLineSession(mapName, isPerfTest)
 
     mapName = FixupMapName(mapName)
 
-    local scenario = import('/lua/ui/maputil.lua').LoadScenario(mapName)
+    local scenario = import("/lua/ui/maputil.lua").LoadScenario(mapName)
     if not scenario then
         error("Unable to load map " .. mapName)
     end

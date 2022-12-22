@@ -1,6 +1,6 @@
 
-local Window = import('/lua/maui/window.lua')
-local Group = import('/lua/maui/group.lua')
+local Window = import("/lua/maui/window.lua")
+local Group = import("/lua/maui/group.lua")
 
 ---@class PerformanceGraph : Group
 local PerformanceGraph = Class(Group) {

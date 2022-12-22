@@ -7,10 +7,10 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CIFArtilleryWeapon = import('/lua/cybranweapons.lua').CIFArtilleryWeapon
-local DefaultProjectileWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultProjectileWeapon
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
+local CIFArtilleryWeapon = import("/lua/cybranweapons.lua").CIFArtilleryWeapon
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 
 ---@class URB2302 : CStructureUnit
 URB2302 = Class(CStructureUnit) {

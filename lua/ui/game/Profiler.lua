@@ -5,25 +5,26 @@
 
 ---@alias ProfilerTab "Overview" | "Timers" | "Stamps" | "Benchmarks" | "Options"
 
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local ProfilerElements = import("/lua/ui/game/profilerelements.lua")
 local ProfilerUtilities = import("/lua/ui/game/profilerutilities.lua")
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
 
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Combo = import('/lua/ui/controls/combo.lua').Combo
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo = import("/lua/ui/controls/combo.lua").Combo
 local DebugFunction = import("/lua/shared/debugfunction.lua").DebugFunction
-local Edit = import('/lua/maui/edit.lua').Edit
-local Group = import('/lua/maui/group.lua').Group
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Window = import('/lua/maui/window.lua').Window
+local Edit = import("/lua/maui/edit.lua").Edit
+local Group = import("/lua/maui/group.lua").Group
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Window = import("/lua/maui/window.lua").Window
 
 local ObservableCreate = import("/lua/shared/observable.lua").Create
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 local Layouter = LayoutHelpers.ReusedLayoutFor
 local PlayerIsDev = import("/lua/shared/profiler.lua").PlayerIsDev
+
 
 
 local sessionInfo = SessionGetScenarioInfo()

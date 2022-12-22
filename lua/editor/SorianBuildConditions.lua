@@ -7,10 +7,10 @@
 --**             Build conditions always return true or false
 --**
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local MABC = import('/lua/editor/MarkerBuildConditions.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local MABC = import("/lua/editor/markerbuildconditions.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 
 ---@param aiBrain AIBrain
 ---@param bool boolean
@@ -148,9 +148,9 @@ function EnemyToAllyRatioLessOrEqual(aiBrain, num)
     local enemies = 0
     local allies = 0
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             enemies = enemies + 1
-        elseif v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        elseif not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             allies = allies + 1
         end
     end
@@ -212,7 +212,7 @@ function ClosestEnemyLessThan(aiBrain, distance)
     local startX, startZ = aiBrain:GetArmyStartPos()
     local closest
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             local estartX, estartZ = v:GetArmyStartPos()
             local tempDistance = VDist2Sq(startX, startZ, estartX, estartZ)
             if not closest or tempDistance < closest then
@@ -729,7 +729,7 @@ function EnemyInT3ArtilleryRange(aiBrain, locationtype, inrange)
         radius = 825 + offset
     end
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             local estartX, estartZ = v:GetArmyStartPos()
             if (VDist2Sq(start[1], start[3], estartX, estartZ) <= radius * radius) and inrange then
                 return true
@@ -760,7 +760,7 @@ function AIOutnumbered(aiBrain, bool)
     end
 
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
+        if not v:IsDefeated() and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
             local armyTeam = ScenarioInfo.ArmySetup[v.Name].Team
             --LOG('*AI DEBUG: '..v.Nickname..' is on team '..armyTeam)
             if v.CheatEnabled then
@@ -790,6 +790,6 @@ end
 
 
 -- Moved Unused Imports to bottom for mod support
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")

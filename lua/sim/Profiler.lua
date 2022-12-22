@@ -3,10 +3,12 @@
 -- - https://www.lua.org/pil/23.1.html
 
 local Statistics = import("/lua/shared/statistics.lua")
+
 local CollapseDebugInfo = import("/lua/shared/debugfunction.lua").CollapseDebugInfo
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 local GetDebugFunctionInfo = import("/lua/shared/debugfunction.lua").GetDebugFunctionInfo
 local PlayerIsDev = import("/lua/shared/profiler.lua").PlayerIsDev
+
 
 -- upvalue for performance
 local sethook = debug.sethook

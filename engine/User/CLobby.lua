@@ -1,6 +1,6 @@
 ---@meta
 
----@class moho.lobby_methods
+---@class moho.lobby_methods : Destroyable
 local CLobby = {}
 
 ---@alias GPGNetAddress string | number

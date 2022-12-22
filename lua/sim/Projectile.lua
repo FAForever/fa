@@ -5,8 +5,8 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
-local DefaultDamage = import('/lua/sim/defaultdamage.lua')
-local Flare = import('/lua/defaultantiprojectile.lua').Flare
+local DefaultDamage = import("/lua/sim/defaultdamage.lua")
+local Flare = import("/lua/defaultantiprojectile.lua").Flare
 
 local TableGetn = table.getn
 
@@ -266,7 +266,7 @@ Projectile = Class(moho.projectile_methods) {
 
         -- callbacks for launcher to have an idea what is going on for AIs
         local categoriesHash = self.Blueprint.CategoriesHash
-        if categoriesHash['TACTICAL'] or categoriesHash['STRATEGICAL'] then
+        if categoriesHash['TACTICAL'] or categoriesHash['STRATEGIC'] then
             -- we have a target, but got caught by terrain
             if targetType == 'Terrain' then
                 if not IsDestroyed(self.Launcher) then
@@ -916,5 +916,5 @@ DummyProjectile = Class(moho.projectile_methods) {
 
 -- imports kept for backwards compatibility with mods
 
-local Explosion = import('/lua/defaultexplosions.lua')
-local Entity = import('/lua/sim/entity.lua').Entity
+local Explosion = import("/lua/defaultexplosions.lua")
+local Entity = import("/lua/sim/entity.lua").Entity

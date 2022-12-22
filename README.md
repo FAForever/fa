@@ -14,6 +14,18 @@ Forged Alliance Forever is a community-driven [project](https://github.com/FAFor
 
 You can download the client on our [website](https://faforever.com/). In order to play you will need to sync your account with Steam to prove you own a copy of [Supreme Commander: Forged Aliance](https://store.steampowered.com/app/9420/Supreme_Commander_Forged_Alliance/). You can get in touch with the community through the [forums](https://forum.faforever.com/) and the official [Discord server](https://discord.gg/mXahVSKGVb). The developers chat can be found on [Zulip](https://zulip.com/) - you can ask for access from the admin of this repository. The project is kept alive by donations to our [Patreon](https://www.patreon.com/faf).
 
+Changelog
+---------
+
+There is the complete [changelog](changelog.md). There is an [alternative changelog](http://patchnotes.faforever.com/) for balance patches in a user-friendly format. 
+
+Contributing
+------------
+
+There are instructions [in English](setup/setup-english.md) and [in Russian](setup/setup-russian.md) to help you set up a development environment. It is important that you discuss your contributions beforehand. You can do this by making a comment on an existing issue or, if it doesn't exist yet, by opening a new issue. Not all pull requests are merged by default. It is important that the changes align with the vision of the project. 
+
+Before contributing, make yourself aware of the [contribution guidelines](contributing.md), the [annotation guidelines](annotation.md) and the [translation guidelines](loc/guidelines.md).
+
 About this repository
 ---------------------
 
@@ -50,17 +62,6 @@ Repositories that are directly related to the game:
  - [FA Lua intellisense extension](https://github.com/FAForever/fa-lua-vscode-extension)
  - [FA Lua intellisense langauge server](https://github.com/FAForever/fa-lua-language-server)
 
-Changelog
----------
-
-Here is the complete [changelog](changelog.md). There is an [alternative changelog](http://patchnotes.faforever.com/) for balance patches in a user-friendly format. 
-
-Contributing
-------------
-
-There are instructions [in English](setup/setup-english.md) and [in Russian](setup/setup-russian.md) to help you set up a development environment. It is important that you discuss your contributions beforehand. You can do this by making a comment on an existing issue or, if it doesn't exist yet, by opening a new issue. Not all pull requests are merged by default. It is important that the changes align with the vision of the project. 
-
-In general, before contributing, please read the [contribution guidelines](CONTRIBUTING.md) and the [translation guidelines](loc/guidelines.md)
 
 
 

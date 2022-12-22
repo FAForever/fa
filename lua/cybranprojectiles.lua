@@ -1,30 +1,25 @@
 ------------------------------------------------------------
---
 --  File     :  /data/lua/cybranprojectiles.lua
 --  Author(s): John Comes, Gordon Duclos
---
 --  Summary  :
---
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 --------------------------------------------------------------------------
 --  CYBRAN PROJECILES SCRIPTS
 --------------------------------------------------------------------------
-local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
+local DefaultProjectileFile = import("/lua/sim/defaultprojectiles.lua")
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
 local OnWaterEntryEmitterProjectile = DefaultProjectileFile.OnWaterEntryEmitterProjectile
 local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
-local MultiBeamProjectile = DefaultProjectileFile.MultiBeamProjectile
 local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectile
 local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
 local SingleCompositeEmitterProjectile = DefaultProjectileFile.SingleCompositeEmitterProjectile
-local DepthCharge = import('/lua/defaultantiprojectile.lua').DepthCharge
+local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 local NullShell = DefaultProjectileFile.NullShell
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
-local DefaultExplosion = import('defaultexplosions.lua')
+
 
 --------------------------------------------------------------------------
 --  CYBRAN BRACKMAN "HACK PEG-POD" PROJECTILE
@@ -72,11 +67,14 @@ CIFProtonBombProjectile = Class(NullShell) {
     FxImpactProp = EffectTemplate.CProtonBombHit01,
     FxImpactLand = EffectTemplate.CProtonBombHit01,
 
+    ---@param self CIFProtonBombProjectile
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
-        
+
         CreateLightParticle(self, -1, self.Army, 12, 28, 'glow_03', 'ramp_proton_flash_02')
         CreateLightParticle(self, -1, self.Army, 8, 22, 'glow_03', 'ramp_antimatter_02')
-    
+
         local blanketSides = 12
         local blanketAngle = (2*math.pi) / blanketSides
         local blanketStrength = 1
@@ -247,6 +245,9 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactLand = EffectTemplate.CProtonArtilleryHit01,
     FxImpactUnderWater = {},
 
+    ---@param self CArtilleryProjectile
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
 
@@ -462,17 +463,22 @@ CIFMolecularResonanceShell = Class(SinglePolyTrailProjectile) {
     FxImpactUnderWater = {},
     DestroyOnImpact = false,
 
+    ---@param self CIFMolecularResonanceShell
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
         self.Impacted = false
     end,
 
+    ---@param self CIFMolecularResonanceShell
     DelayedDestroyThread = function(self)
         WaitSeconds(0.3)
-        self.CreateImpactEffects(self, self.Army, self.FxImpactUnit, self.FxUnitHitScale)
+        self:CreateImpactEffects(self.Army, self.FxImpactUnit, self.FxUnitHitScale)
         self:Destroy()
     end,
 
+    ---@param self CIFMolecularResonanceShell
+    ---@param TargetType string
+    ---@param TargetEntity Unit
     OnImpact = function(self, TargetType, TargetEntity)
         if self.Impacted == false then
             self.Impacted = true
@@ -627,6 +633,10 @@ CNeutronClusterBombChildProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactUnderWater = {},
 
     -- No damage dealt by this child.
+    ---@param self CNeutronClusterBombChildProjectile
+    ---@param instigator Weapon
+    ---@param damageData table
+    ---@param targetEntity Unit
     DoDamage = function(self, instigator, damageData, targetEntity)
     end,
 }
@@ -643,15 +653,17 @@ CNeutronClusterBombProjectile = Class(SinglePolyTrailProjectile) {
 
     ChildProjectile = '/projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02_proj.bp',
 
+    ---@param self CNeutronClusterBombProjectile
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
         self.Impacted = false
     end,
 
-    ---------------------------------------------------------------------------
-    -- Note: Damage is done once in AOE by main projectile. Secondary projectiles
-    -- are just visual.
-    ---------------------------------------------------------------------------
+    --- Note: Damage is done once in AOE by main projectile. Secondary projectiles
+    --- are just visual.
+    ---@param self CNeutronClusterBombProjectile
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
         if self.Impacted == false and targetType ~= 'Air' then
             self.Impacted = true
@@ -667,11 +679,15 @@ CNeutronClusterBombProjectile = Class(SinglePolyTrailProjectile) {
         end
     end,
 
-    -- Overiding Destruction
+    --- Overiding Destruction
+    ---@param self CNeutronClusterBombProjectile
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpactDestroy = function(self, targetType, targetEntity)
         self:ForkThread(self.DelayedDestroyThread)
     end,
 
+    ---@param self CNeutronClusterBombProjectile
     DelayedDestroyThread = function(self)
         WaitSeconds(0.5)
         self:Destroy()
@@ -760,16 +776,24 @@ CLOATacticalChildMissileProjectile = Class(SingleBeamProjectile) {
     FxWaterHitScale = 0.375,
     FxOnKilledScale = 0.375,
 
+    ---@param self CLOATacticalChildMissileProjectile
     OnCreate = function(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         SingleBeamProjectile.OnCreate(self)
     end,
 
+    ---@param self CLOATacticalChildMissileProjectile
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
         CreateLightParticle(self, -1, self.Army, 1, 7, 'glow_03', 'ramp_fire_11')
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
+    ---@param self CLOATacticalChildMissileProjectile
+    ---@param army number
+    ---@param EffectTable table
+    ---@param EffectScale? number
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for k, v in EffectTable do
@@ -836,6 +860,8 @@ CTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
     FxImpactLand = {},
     FxImpactNone = {},
 
+    ---@param self CTorpedoShipProjectile
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self, inWater)
         -- if we are starting in the water then immediately switch to tracking in water
@@ -845,7 +871,7 @@ CTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
         end
     end,
 
-
+    ---@param self CTorpedoShipProjectile
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
@@ -869,6 +895,9 @@ CTorpedoSubProjectile = Class(EmitterProjectile) {
     FxLandHitScale = 0.25,
     FxNoneHitScale = 1,
     FxImpactNone = {},
+
+    ---@param self CTorpedoSubProjectile
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         EmitterProjectile.OnCreate(self, inWater)
@@ -896,6 +925,8 @@ CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
     FxOnKilled = EffectTemplate.CAntiTorpedoHit01,
     FxEnterWater= EffectTemplate.WaterSplash01,
 
+    ---@param self CDepthChargeProjectile
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self)
         if inWater then
@@ -907,6 +938,7 @@ CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
         self:TrackTarget(false)
     end,
 
+    ---@param self CDepthChargeProjectile
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
 
@@ -918,6 +950,8 @@ CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
         self:SetVelocity(0.25)
     end,
 
+    ---@param self CDepthChargeProjectile
+    ---@param tbl table
     AddDepthCharge = function(self, tbl)
         if not tbl then return end
         if not tbl.Radius then return end
@@ -958,3 +992,8 @@ CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) {
 ---@class CKrilTorpedo : OnWaterEntryEmitterProjectile
 CKrilTorpedo = Class(OnWaterEntryEmitterProjectile) {
 }
+
+-- kept for mod backwards compatibility
+local DefaultExplosion = import("/lua/defaultexplosions.lua")
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local MultiBeamProjectile = DefaultProjectileFile.MultiBeamProjectile

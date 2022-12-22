@@ -8,9 +8,9 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local Entity = import('/lua/sim/Entity.lua').Entity
-local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
-local ParseEntityCategoryProperly = import('/lua/sim/CategoryUtils.lua').ParseEntityCategoryProperly
+local Entity = import("/lua/sim/entity.lua").Entity
+local NukeDamage = import("/lua/sim/nukedamage.lua").NukeAOE
+local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEntityCategoryProperly
 local cachedPriorities = false
 local RecycledPriTable = {}
 
@@ -444,7 +444,7 @@ Weapon = Class(moho.weapon_methods) {
 
     damageTableCache = false,
     ---@param self Weapon
-    ---@return table
+    ---@return table | boolean
     GetDamageTable = function(self)
         if not self.damageTableCache then
             self.damageTableCache = self:GetDamageTableInternal()

@@ -21,8 +21,8 @@
 
 -- variables set from the engine
 
-LaunchDir = "" -- filled with whatever directory the exe is in
-
+LaunchDir = ""      -- filled with whatever directory the exe is in
+__EngineStats = { } -- populated by the engine, each frame in the UI thread
 
 --- Returns the bitwise XOR of a and b, coercing to integers. Returns `4294967296` (2^^32) if the
 --- signs don't match.
@@ -45,6 +45,11 @@ end
 ---@param path FileName
 ---@return Module
 function import(path)
+end
+
+---@param path FileName
+---@return Module
+function lazyimport(path)
 end
 
 --- Print a message to the moho logger, this shouldn't be used in production code

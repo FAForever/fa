@@ -180,6 +180,7 @@ end
 --- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
 --- are expected to be numerically keyed (existing keys are discarded).
 --- e.g. table.cat({1, 2, 3}, {'A', 'House', 3.14})  ->  {1, 2, 3, 'A', 'House', 3.14}
+---@return table
 function table.cat(t1, t2)
     -- handling nil tables before lopping
     if not t1 then return table.copy(t2) end
@@ -476,9 +477,9 @@ function printField(k, v, tblName, printer)
 end
 
 --- Prints keys and values of a table and sub-tables if present
---- @param tbl specifies a table to print
---- @param tblPrefix specifies optional table prefix/name
---- @param printer specifies optional message printer: LOG, WARN, error, etc.
+--- @param tbl? table specifies a table to print
+--- @param tblPrefix? string specifies optional table prefix/name
+--- @param printer? function specifies optional message printer: LOG, WARN, error, etc.
 --- e.g. table.print(categories)
 ---      table.print(categories, 'categories')
 ---      table.print(categories, 'categories', 'WARN')
@@ -610,7 +611,7 @@ end
 function StringSplitCamel(str)
     local first = str:sub(1, 1)
     local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
-    return split:gsub("^.", string.upper)
+    return (split:gsub("^.", string.upper))
 end
 
 --- Reverses order of letters for specified string

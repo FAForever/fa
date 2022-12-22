@@ -7,18 +7,16 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
----- Root builder class
--- Builder Sped
--- {
---        Priority = integer,
---        BuilderName = string,
---        BuilderType = string,
---        BuilderData = table,
---        BuilderConditions = list of functions that return true/false, list of args,  { < function>, {<args>}}
--- }
-
 ---@class Builder
+---@field Brain AIBrain
+---@field Priority number
+---@field OriginalPriority number
+---@field BuilderName string 
+---@field BuilderType string 
+---@field BuilderData table 
+---@field BuilderConditions function[]
 Builder = ClassSimple {
+    
     ---@param self Builder
     ---@param brain AIBrain
     ---@param data table
@@ -478,4 +476,4 @@ end
 
 -- Unsused Imports move for mod support
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")

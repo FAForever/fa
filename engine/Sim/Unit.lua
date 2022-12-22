@@ -95,7 +95,7 @@ end
 --- Returns if the unit can path to the goal
 ---@param position Vector
 ---@return boolean result if false, returns the closest position, else the original position
----@return Position bestGoal
+---@return Vector bestGoal
 function Unit:CanPathTo(position)
 end
 
@@ -137,7 +137,7 @@ function Unit:GetBlueprint()
 end
 
 --- Returns the build rate of a unit
---- @return rate
+--- @return number
 function Unit:GetBuildRate()
 end
 
@@ -169,7 +169,7 @@ function Unit:GetCurrentLayer()
 end
 
 --- Returns the current move location of the unit
----@return Position
+---@return Vector
 function Unit:GetCurrentMoveLocation()
 end
 
@@ -209,7 +209,7 @@ function Unit:GetHealth()
 end
 
 --- Returns the navigator object of this unit
----@return Nagivator
+---@return Navigator
 function Unit:GetNavigator()
 end
 
@@ -236,7 +236,7 @@ function Unit:GetProductionPerSecondMass()
 end
 
 --- Returns the rally point for the factory
----@return Position
+---@return Vector
 function Unit:GetRallyPoint()
 end
 
@@ -558,7 +558,7 @@ function Unit:SetFireState(fireState)
 end
 
 ---
----@param focus moho.entity_methods
+---@param focus Entity | Unit | Prop | Projectile
 function Unit:SetFocusEntity(focus)
 end
 
