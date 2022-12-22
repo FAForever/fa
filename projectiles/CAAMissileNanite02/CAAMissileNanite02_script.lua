@@ -6,7 +6,7 @@ CAAMissileNanite02 = Class(CAAMissileNaniteProjectile) {
 
     OnCreate = function(self)
         CAAMissileNaniteProjectile.OnCreate(self)
-        self:ForkThread(self.UpdateThread)
+        self.Trash:Add(ForkThread(self.UpdateThread))
     end,
 
     UpdateThread = function(self)

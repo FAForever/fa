@@ -8,12 +8,12 @@ CAANanoDart01 = Class(CAANanoDartProjectile) {
 
    OnCreate = function(self)
         CAANanoDartProjectile.OnCreate(self)
-        self:ForkThread(self.UpdateThread)
+        self.Thread:Add(ForkThread(self.UpdateThread))
    end,
 
 
     UpdateThread = function(self)
-        WaitSeconds(0.25)
+        WaitTicks(3)
         self:SetMaxSpeed(10)
         self:SetBallisticAcceleration(-0.2)
 
@@ -26,7 +26,7 @@ CAANanoDart01 = Class(CAANanoDartProjectile) {
         self:SetMaxSpeed(60)
         self:SetAcceleration(20 + Random() * 5)
 
-        WaitSeconds(0.3)
+        WaitTicks(3)
         self:SetTurnRate(360)
 
     end,

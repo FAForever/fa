@@ -8,23 +8,22 @@ AIFMissileTactical02 = Class(AMissileSerpentineProjectile) {
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self:ForkThread( self.MovementThread )
+        self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
     MovementThread = function(self)
-        local army = self:GetArmy()
         self:TrackTarget(false)
         self:SetCollision(true)
-        WaitSeconds(2)
+        WaitTicks(21)
         self:SetTurnRate(5)
-        WaitSeconds(0.5)
+        WaitTicks(5)
         self:TrackTarget(true)
         self:TrackTarget(true)
         self:SetTurnRate(10)
-        WaitSeconds(0.5)
+        WaitTicks(5)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(0.5)
+            WaitTicks(5)
         end
     end,
 

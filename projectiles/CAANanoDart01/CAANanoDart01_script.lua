@@ -8,26 +8,25 @@ CAANanoDart01 = Class(CAANanoDartProjectile03) {
 
    OnCreate = function(self)
         CAANanoDartProjectile03.OnCreate(self)
-        self:ForkThread(self.UpdateThread)
+        self.Trash:Add(ForkThread(self.UpdateThread))
    end,
 
 
     UpdateThread = function(self)
-        WaitSeconds(0.35)
+        WaitTicks(4)
         self:SetMaxSpeed(2)
         self:SetBallisticAcceleration(-0.5)
-        local army = self:GetArmy()
+        local army = self.Army
 
         for i in self.FxTrails do
             CreateEmitterOnEntity(self,army,self.FxTrails[i])
         end
 
-        WaitSeconds(0.5)
+        WaitTicks(5)
         self:SetMesh('/projectiles/CAANanoDart01/CAANanoDartUnPacked01_mesh')
         self:SetMaxSpeed(60)
         self:SetAcceleration(16 + Random() * 5)
-
-        WaitSeconds(0.3)
+        WaitTicks(3)
         self:SetTurnRate(360)
 
     end,

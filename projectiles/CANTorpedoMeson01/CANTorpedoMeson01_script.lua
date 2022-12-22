@@ -14,7 +14,7 @@ CANTorpedoMeson01 = Class(CTorpedoShipProjectile) {
 
     OnEnterWater = function(self)
         CTorpedoShipProjectile.OnEnterWater(self)
-        local army = self:GetArmy()
+        local army = self.Army
 
         for i in self.FxExitWaterEmitter do --splash
             CreateEmitterAtEntity(self,army,self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
@@ -26,11 +26,11 @@ CANTorpedoMeson01 = Class(CTorpedoShipProjectile) {
         self:SetTurnRate(120)
         self:SetMaxSpeed(18)
         self:SetVelocity(3)
-        self:ForkThread(self.SpinUpThread)
+        self.Trash:Add(ForkThread(self.SpinUpThread))
     end,
 
 	SpinUpThread = function(self)
-        WaitSeconds(2)
+        WaitTicks(21)
         self:TrackTarget(false)
         self:SetTurnRate(0)
 	end,
