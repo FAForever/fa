@@ -9,7 +9,7 @@ AANTorpedo02 = Class(ATorpedoShipProjectile) {
     OnCreate = function(self, inWater)
         ATorpedoShipProjectile.OnCreate(self, inWater)
         self:SetMaxSpeed(8)
-        self:ForkThread( self.MotionThread ) 
+        self.Trash:Add(ForkThread( self.MotionThread,self))
     end,
 
     MotionThread = function(self)

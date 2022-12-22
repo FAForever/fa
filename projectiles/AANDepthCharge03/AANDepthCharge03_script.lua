@@ -3,11 +3,10 @@ local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargePr
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 AANDepthCharge03 = Class(ADepthChargeProjectile) {
-    
     OnCreate = function(self)
         ADepthChargeProjectile.OnCreate(self)
         self.HasImpacted = false
-        self:ForkThread(self.CountdownExplosion)
+        self.Trash:Add(ForkThread(self.CountdownExplosion,self))
     end,
 
     CountdownExplosion = function(self)
@@ -25,7 +24,7 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
     OnLostTarget = function(self)
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
-        self:ForkThread(self.CountdownMovement)
+        self.Trash:Add(ForkThread(self.CountdownMovement,self))
     end,
 
     CountdownMovement = function(self)

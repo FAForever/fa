@@ -17,8 +17,8 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     OnCreate = function(self)
         ATorpedoCluster.OnCreate(self)
         self.HasImpacted = false
-        self:ForkThread(self.CountdownExplosion)
-		CreateTrail(self, -1, self:GetArmy(), import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
+        self.Trash:Add(ForkThread(self.CountdownExplosion,self))
+		CreateTrail(self, -1, self.Army, import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
     end,
 
     CountdownExplosion = function(self)
@@ -31,11 +31,11 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
 
     OnEnterWater = function(self)
         ATorpedoCluster.OnEnterWater(self)
-        local army = self:GetArmy()
+        local army = self.Army
         for i in self.FxEnterWater do
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
         end
-        self:ForkThread(self.EnterWaterMovementThread)
+        self.Trash:Add(ForkThread(self.EnterWaterMovementThread,self))
     end,
 
     EnterWaterMovementThread = function(self)
@@ -49,11 +49,11 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     OnLostTarget = function(self)
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
-        self:ForkThread(self.CountdownMovement)
+        self.Trash:Add(ForkThread(self.CountdownMovement,self))
     end,
 
     CountdownMovement = function(self)
-        WaitSeconds(3)
+        WaitTicks(31)
         self:SetMaxSpeed(0)
         self:SetAcceleration(0)
         self:SetVelocity(0)
