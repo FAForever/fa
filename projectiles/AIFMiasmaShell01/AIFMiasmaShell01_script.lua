@@ -7,12 +7,8 @@ local utilities = import("/lua/utilities.lua")
 
 AIFMiasmaShell01 = Class(AMiasmaProjectile) {
     OnImpact = function(self, targetType, targetEntity) 
-        -- Sounds for all other impacts, ie: Impact<targetTypeName>
         local bp = self:GetBlueprint().Audio
         local snd = bp['Impact'.. targetType]
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-		local FriendlyFire = self.DamageData.DamageFriendly
         
         if snd then
             self:PlaySound(snd)

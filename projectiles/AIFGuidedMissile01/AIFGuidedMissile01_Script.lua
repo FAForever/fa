@@ -14,23 +14,22 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 AIFGuidedMissile = Class(AGuidedMissileProjectile) {
     OnCreate = function(self)
 		AGuidedMissileProjectile.OnCreate(self)
-        local launcher = self:GetLauncher()
+        local launcher = self.Launcher
         if launcher and not launcher:IsDead() then
             launcher:ProjectileFired()
         end		
-		self:ForkThread( self.SplitThread )
+		self.Trash:Add(ForkThread( self.SplitThread,self ))
     end,
 
     SplitThread = function(self)
-		
+
         ------Create/play the split effects.
 		for k,v in EffectTemplate.AMercyGuidedMissileSplit do
-            CreateEmitterOnEntity(self,self:GetArmy(),v)
+            CreateEmitterOnEntity(self,self.Army,v)
         end
-        
-        
-		WaitSeconds( 0.1 )
-		-- Create several other projectiles in a dispersal pattern
+        WaitTicks(1)
+
+        -- Create several other projectiles in a dispersal pattern
         local vx, vy, vz = self:GetVelocity()
         local velocity = 16		
         local numProjectiles = 8
@@ -42,9 +41,6 @@ AIFGuidedMissile = Class(AGuidedMissileProjectile) {
         local xVec = 0 
         local yVec = vy*0.8
         local zVec = 0
-        
-        
-       
         
         -- Adjust damage by number of split projectiles
         self.DamageData.DamageAmount = self.DamageData.DamageAmount / numProjectiles

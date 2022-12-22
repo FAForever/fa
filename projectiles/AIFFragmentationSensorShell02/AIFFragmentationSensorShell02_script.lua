@@ -21,7 +21,7 @@ AIFFragmentationSensorShell02 = Class(AArtilleryFragmentationSensorShellProjecti
 	        
 	        -- Split effects
 	        for k, v in FxFragEffect do
-	            CreateEmitterAtBone( self, -1, self:GetArmy(), v )
+	            CreateEmitterAtBone( self, -1, self.Army, v )
 	        end
 	        
 	        local vx, vy, vz = self:GetVelocity()
