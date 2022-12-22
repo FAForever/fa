@@ -14,7 +14,7 @@ AANDepthCharge01 = Class(ADepthChargeProjectile) {
     OnCreate = function(self)
         ADepthChargeProjectile.OnCreate(self)
         self.HasImpacted = false
-        self:ForkThread(self.CountdownExplosion)
+        self.Trash:Add(ForkThread(self.CountdownExplosion, self))
     end,
 
     CountdownExplosion = function(self)
@@ -24,15 +24,10 @@ AANDepthCharge01 = Class(ADepthChargeProjectile) {
         end
     end,
 
-    EnterWaterMovementThread = function(self)
-        WaitTicks(1)
-        self:SetVelocity(0.5)
-    end,
-
     OnLostTarget = function(self)
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
-        self:ForkThread(self.CountdownMovement)
+        self.Trash:Add(ForkThread(self.CountdownMovement, self))
     end,
 
     CountdownMovement = function(self)
