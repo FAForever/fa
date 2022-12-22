@@ -160,7 +160,7 @@ function CreateUI(isReplay)
     import("/lua/ui/game/cursor/depth.lua")
     import("/lua/ui/game/cursor/hover.lua")
 
-    -- casting tools 
+    -- casting tools
 
     import("/lua/ui/game/casting/mouse.lua")
     import("/lua/ui/game/casting/painting.lua")
@@ -607,7 +607,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             return
         end
 
-        -- This bit is for the Hotbuild labels. See the buildActionUpgrade() function in hotbuild.lua for a bit more 
+        -- This bit is for the Hotbuild labels. See the buildActionUpgrade() function in hotbuild.lua for a bit more
         -- documentation
         local bp = newSelection[1]:GetBlueprint()
         local upgradesTo = nil
@@ -621,9 +621,9 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
                 end
                 local nextSuccessiveUpgrade = __blueprints[upgr].General.UpgradesTo
                 while nextSuccessiveUpgrade do
-                    -- Note: Should we ever add a structure that has different upgrade path choices on a non-base 
-                    -- version of the structure, e.g. different choices for the 4th cybran shield upgrade or something 
-                    -- like it, the way we find the correct icon to put the hotbuild upgrade keybind label using this 
+                    -- Note: Should we ever add a structure that has different upgrade path choices on a non-base
+                    -- version of the structure, e.g. different choices for the 4th cybran shield upgrade or something
+                    -- like it, the way we find the correct icon to put the hotbuild upgrade keybind label using this
                     -- while loop will break. As there currently is no such structure in the game, and I don't know how
                     -- the general case of finding that correct icon should work in such an imaginary case, I'll leave
                     -- it at this, currently working, code.
@@ -657,6 +657,18 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if not isOldSelection then
         import("/lua/ui/game/selection.lua").PlaySelectionSound(added)
         import("/lua/ui/game/rallypoint.lua").OnSelectionChanged(newSelection)
+        if options.repeatbuild then
+            local factories = EntityCategoryFilterDown(categories.STRUCTURE * categories.FACTORY, added) -- find all newly selected factories
+            if not table.empty(factories) then
+                for _, factory in factories do
+                    if not factory.HasBeenSelected then
+                        factory:ProcessInfo('SetRepeatQueue','true')
+                        factory.HasBeenSelected = true
+                    end
+                end
+            end
+        end
+
     end
 
     if newSelection then
