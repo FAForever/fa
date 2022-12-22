@@ -57,8 +57,8 @@ function StartFrontEndUI()
         CampaignManager.LaunchBriefing(GetFrontEndData('NextOpBriefing'))
     end
 
-    if HasCommandLineArg("/offline") then
-        import("/lua/ui/skirmish/skirmish.lua").OpenOfflineLobby()
+    if HasCommandLineArg("/skirmish") then
+        import("/lua/ui/skirmish/skirmish.lua").OpenSkirmish()
     else
         import("/lua/ui/menus/main.lua").CreateUI()
     end
