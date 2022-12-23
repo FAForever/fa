@@ -10,5 +10,4 @@ AIFQuantumWarhead01 = Class(AQuantumWarheadProjectile) {
         self:LauncherCallbacks()
     end,
 }
-
 TypeClass = AIFQuantumWarhead01

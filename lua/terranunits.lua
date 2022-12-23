@@ -53,7 +53,7 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     ---@param self TAirFactoryUnit
-    ---@param unitBeingBuilt Unit
+    ---@param unitBeingBuilt boolean
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         AirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
@@ -63,7 +63,7 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     ---@param self TAirFactoryUnit
-    ---@param unitBuilding Unit
+    ---@param unitBuilding boolean
     OnStopBuild = function(self, unitBuilding)
         AirFactoryUnit.OnStopBuild(self, unitBuilding)
         self:StopArmsMoving()

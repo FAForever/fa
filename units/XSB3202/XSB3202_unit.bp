@@ -126,9 +126,6 @@ UnitBlueprint {
         BuildCostMass = 400,
         BuildTime = 600,
         MaintenanceConsumptionPerSecondEnergy = 200,
-        RebuildBonusIds = {
-            'xsb3202',
-        },
     },
     Footprint = {
         MinWaterDepth = 1.5,

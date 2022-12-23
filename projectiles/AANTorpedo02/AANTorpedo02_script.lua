@@ -1,6 +1,5 @@
---
 -- Aeon Torpedo Bomb
---
+
 local ATorpedoShipProjectile= import("/lua/aeonprojectiles.lua").ATorpedoShipProjectile
 
 AANTorpedo02 = Class(ATorpedoShipProjectile) {
@@ -30,5 +29,4 @@ AANTorpedo02 = Class(ATorpedoShipProjectile) {
         self:SetVelocity(3)
     end,
 }
-
 TypeClass = AANTorpedo02

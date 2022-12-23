@@ -1,18 +1,13 @@
---****************************************************************************
---**
---**  File     :  /data/projectiles/AIFQuanticCluster02/AIFQuanticCluster02_script.lua
---**  Author(s):  Drew Staltman, Gordon Duclos
---**
---**  Summary  :  Quantic Cluster Projectile script
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+----------------------------------------------------------------------------------
+-- File     :  /data/projectiles/AIFQuanticCluster02/AIFQuanticCluster02_script.lua
+-- Author(s):  Drew Staltman, Gordon Duclos
+-- Summary  :  Quantic Cluster Projectile script
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+----------------------------------------------------------------------------------
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 AIFQuanticCluster02 = Class(import("/lua/aeonprojectiles.lua").AQuantumCluster) {
-
     OnImpact = function(self, TargetType, TargetEntity)
 
         local FxFragEffect = EffectTemplate.TFragmentationSensorShellFrag
@@ -37,7 +32,6 @@ AIFQuanticCluster02 = Class(import("/lua/aeonprojectiles.lua").AQuantumCluster) 
         -- Randomization of the spread
         local angleVariation = angle * 0.35 -- Adjusts angle variance spread
         local spreadMul = 5 -- Adjusts the width of the dispersal
-
         local xVec = 0
         local yVec = vy
         local zVec = 0
@@ -51,9 +45,7 @@ AIFQuanticCluster02 = Class(import("/lua/aeonprojectiles.lua").AQuantumCluster) 
             proj:SetVelocity(velocity)
             proj:PassDamageData(self.DamageData)
         end
-        local pos = self:GetPosition()
         self:Destroy()
     end,
 }
-
 TypeClass = AIFQuanticCluster02

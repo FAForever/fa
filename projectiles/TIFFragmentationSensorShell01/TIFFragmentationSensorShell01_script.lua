@@ -13,7 +13,6 @@ local MathCos = math.cos
 local TFragmentationSensorShellFrag = import("/lua/effecttemplates.lua").TFragmentationSensorShellFrag 
 
 TIFFragmentationSensorShell01 = Class(TArtilleryProjectile) {
-
     OnImpact = function(self, TargetType, TargetEntity)
         -- the split fx
         CreateEmitterAtEntity( self, self.Army, TFragmentationSensorShellFrag[1])
@@ -69,5 +68,4 @@ TIFFragmentationSensorShell01 = Class(TArtilleryProjectile) {
         self:Destroy()
     end,
 }
-
 TypeClass = TIFFragmentationSensorShell01
