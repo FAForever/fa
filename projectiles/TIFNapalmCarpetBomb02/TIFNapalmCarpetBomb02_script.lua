@@ -15,7 +15,3 @@ local TNapalmHvyCarpetBombProjectile = import("/lua/terranprojectiles.lua").TNap
 TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile) { }
 
 TypeClass = TIFNapalmCarpetBomb02
-
--- kept for backwards compatibility with mods
-local EffectTemplate = import("/lua/effecttemplates.lua")
-local RandomFloat = import("/lua/utilities.lua").GetRandomFloat

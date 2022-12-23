@@ -13,8 +13,7 @@ local TDFGaussCannonWeapon = import("/lua/terranweapons.lua").TDFGaussCannonWeap
 ---@class UEL0202 : TLandUnit
 UEL0202 = Class(TLandUnit) {
     Weapons = {
-        FrontTurret01 = Class(TDFGaussCannonWeapon) {
-        }
+        FrontTurret01 = Class(TDFGaussCannonWeapon) {}
     },
 }
 

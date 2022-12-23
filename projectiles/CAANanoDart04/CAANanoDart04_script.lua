@@ -1,22 +1,16 @@
 
 --****************************************************************************
---**
 --**  File     :  /data/projectiles/CAANanoDart04/CAANanoDart04_script.lua
 --**  Author(s):  Greg Kohne
---**
 --**  Summary  :  Cybran Anti Air Projectile, on unit DRA0202
---**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-
 import("/lua/utilities.lua")
 CAANanoDartProjectile = import("/lua/cybranprojectiles.lua").CAANanoDartProjectile02
 
 CAANanoDart04 = Class(CAANanoDartProjectile) {
-
-   OnCreate = function(self)
+    OnCreate = function(self)
         CAANanoDartProjectile.OnCreate(self)
-
         --Set the orientation of this thing to facing the target from the beginning.
         local ourPos= self:GetPosition()
         local targetPos= self:GetCurrentTargetPosition()
@@ -36,7 +30,7 @@ CAANanoDart04 = Class(CAANanoDartProjectile) {
         for i in self.FxTrails do
             CreateEmitterOnEntity(self,army,self.FxTrails[i])
         end
-           
+
         --Set the mesh for the unfolded-fins missile now.
         self:SetMesh('/projectiles/CAANanoDart01/CAANanoDartUnPacked01_mesh')
         self:SetAcceleration(8 + Random() * 5)
@@ -45,8 +39,6 @@ CAANanoDart04 = Class(CAANanoDartProjectile) {
         -- in its tracking.
         WaitTicks(3)
         self:SetTurnRate(360)
-
     end,
 }
-
 TypeClass = CAANanoDart04

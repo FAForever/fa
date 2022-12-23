@@ -17,7 +17,6 @@ local TrashBagAdd = _G.TrashBag.Add
 
 local CBuildBotUnit = import("/lua/cybranunits.lua").CBuildBotUnit
 URA0002O = Class(CBuildBotUnit) { 
-
     OnCreate = function(self)
         CBuildBotUnit.OnCreate(self)
 
@@ -30,6 +29,5 @@ URA0002O = Class(CBuildBotUnit) {
         BuilderArmManipulatorSetPrecedence(BuildArmManipulator, 5)
         TrashBagAdd(self.Trash, BuildArmManipulator)
     end,
-
 }
 TypeClass = URA0002O

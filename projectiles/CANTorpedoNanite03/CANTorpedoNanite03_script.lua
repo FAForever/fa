@@ -9,15 +9,12 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local CTorpedoShipProjectile = import("/lua/cybranprojectiles.lua").CTorpedoShipProjectile
-
 CANTorpedoNanite03 = Class(CTorpedoShipProjectile) {
-
     TrailDelay = 0,
     OnCreate = function(self, inWater)
         CTorpedoShipProjectile.OnCreate(self, inWater)
         self.Trash:Add(ForkThread( self.MovementThread ))
     end,   
-    
     MovementThread = function(self)
         while not self:BeenDestroyed() and (self:GetDistanceToTarget() > 8) do
             WaitTicks(3)
@@ -27,22 +24,17 @@ CANTorpedoNanite03 = Class(CTorpedoShipProjectile) {
 			self:ChangeZigZagFrequency(0)	      
 		end
     end,
-    
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
         local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
         return dist
     end,     
-         
-
     OnEnterWater = function(self)
         self:CreateImpactEffects(self.Army, self.FxEnterWater, self.FxSplashScale )
         self:StayUnderwater(true)
         self:TrackTarget(true)
         self:SetTurnRate(240)
     end,
-
 }
-
 TypeClass = CANTorpedoNanite03

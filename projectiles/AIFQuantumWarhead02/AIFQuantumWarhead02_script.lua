@@ -27,7 +27,6 @@ AIFQuantumWarhead02 = Class(NullShell) {
     ShakeAndBurnMe = function(self, army)
         self:ShakeCamera(75, 3, 0, 10)
         WaitTicks(5)
-        -- CreateDecal(position, heading, textureName, type, sizeX, sizeZ, lodParam, duration, army)");
         local orientation = RandomFloat(0,2*math.pi)
         CreateDecal(self:GetPosition(), orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, army)
         CreateDecal(self:GetPosition(), orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, army)
@@ -41,8 +40,8 @@ AIFQuantumWarhead02 = Class(NullShell) {
         local angle = (2*math.pi) / numFlares
         local angleInitial = 0.0
         local angleVariation = (2*math.pi)
-
         local emit, x, y, z = nil,nil,nil,nil
+
         local DirectionMul = 0.02
         local OffsetMul = 4
         local army = self.Army
@@ -67,7 +66,6 @@ AIFQuantumWarhead02 = Class(NullShell) {
             --TODO
             WaitSeconds(RandomFloat(0.05, 0.15))
         end
-
         CreateLightParticle(self, -1, army, 13, 3, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
         CreateEmitterAtEntity(self, army, '/effects/emitters/quantum_warhead_ring_01_emit.bp')
     end,
@@ -81,5 +79,4 @@ AIFQuantumWarhead02 = Class(NullShell) {
         proj:SetScaleVelocity(0.01 * scale,0.01 * scale,0.01 * scale)
     end,
 }
-
 TypeClass = AIFQuantumWarhead02

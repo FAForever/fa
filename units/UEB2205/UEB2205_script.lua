@@ -13,14 +13,10 @@ local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
 
 ---@class UEB2205 : TStructureUnit
 UEB2205 = Class(TStructureUnit) {
-
-    UpsideDown = false,
-
     Weapons = {
          Torpedo = Class(TANTorpedoAngler) {
        },
     },
-
 }
 
 TypeClass = UEB2205

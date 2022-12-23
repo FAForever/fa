@@ -1,6 +1,5 @@
---
 -- Depth Charge Script
---
+
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
 local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
@@ -9,7 +8,6 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
     CountdownLength = 10,
     FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
                     '/effects/emitters/water_splash_plume_01_emit.bp',},
-
 
     OnCreate = function(self)
         ADepthChargeProjectile.OnCreate(self)
@@ -26,21 +24,15 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
     end,
 
     OnEnterWater = function(self)
-        --ADepthChargeProjectile.OnEnterWater(self)
-
         for i in self.FxEnterWater do --splash
             CreateEmitterAtEntity(self, self.Army, self.FxEnterWater[i])
         end
 
-        --self:SetMaxSpeed(20)
-        --self:SetVelocity(0)
-        --self:SetAcceleration(5)
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetTurnRate(360)
         self:SetVelocityAlign(true)
         self:SetStayUpright(false)
-        --self:ForkThread(self.EnterWaterMovementThread)
     end,
 
     EnterWaterMovementThread = function(self)
@@ -62,7 +54,6 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
-        --LOG('Projectile impacted with: ' .. TargetType)
         self.HasImpacted = true
         local pos = self:GetPosition()
         local spec = {
@@ -78,5 +69,4 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
         ADepthChargeProjectile.OnImpact(self, TargetType, TargetEntity)
     end,
 }
-
 TypeClass = AANDepthCharge03

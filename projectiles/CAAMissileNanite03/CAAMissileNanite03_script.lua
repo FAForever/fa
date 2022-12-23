@@ -21,6 +21,4 @@ CAAMissileNanite03 = Class(CAAMissileNaniteProjectile) {
         CAAMissileNaniteProjectile.OnImpact(self, TargetType, TargetEntity)
     end,
 }
-
 TypeClass = CAAMissileNanite03
-
