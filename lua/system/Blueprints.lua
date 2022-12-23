@@ -832,11 +832,7 @@ function PostModBlueprints(all_bps)
     PostProcessProjectiles(all_bps.Projectile)
     PostProcessUnits(all_bps.Unit)
     PostProcessProps(all_bps.Prop)
-
-    all_bps.Unit['ueb4202'] = nil
 end
-
-
 
 --- Loads all blueprints with optional parameters  
 --- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side  
