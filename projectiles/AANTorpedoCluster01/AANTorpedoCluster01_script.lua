@@ -24,7 +24,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
 -- create two child projectiles
         for i = 0, 1 do
             proj = self:CreateChildProjectile('/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_proj.bp' )
-            proj:PassDamageData(self.DamageData)
+            proj.DamageData = self.DamageData
         end
         local px, _,pz = self:GetPositionXYZ()
         local marker = VisionMarkerOpti({Owner = self})

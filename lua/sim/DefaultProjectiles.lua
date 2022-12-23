@@ -447,7 +447,7 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetVelocity(0.5)
-        self:ForkThread(self.EnterWaterThread)
+        self.Trash:Add(ForkThread(self.EnterWaterThread, self))
     end,
 
     ---@param self OnWaterEntryEmitterProjectile

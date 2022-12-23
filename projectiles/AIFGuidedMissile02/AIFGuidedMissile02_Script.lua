@@ -8,11 +8,11 @@ local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissi
 AIFGuidedMissile02 = Class(AGuidedMissileProjectile) {
     OnCreate = function(self)
 		AGuidedMissileProjectile.OnCreate(self)
-		self.Trash:Add(ForkThread( self.MovementThread))
+		self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
 	MovementThread = function(self)
-		WaitTicks(6)
+		WaitTicks(7)
 		self:TrackTarget(true)
 	end,
 }

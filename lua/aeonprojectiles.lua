@@ -136,8 +136,7 @@ ADepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
     FxTrails = {'/effects/emitters/torpedo_munition_trail_01_emit.bp',},
     TrailDelay = 0,
     TrackTime = 0,
-    CountdownLength = 101,
-
+    
     FxImpactLand = {},
     FxImpactUnit = EffectTemplate.ADepthChargeHitUnit01,
     FxImpactProp = EffectTemplate.ADepthChargeHitUnit01,
