@@ -973,11 +973,11 @@ Tooltips = {
         title = '<LOC OPTIONS_0291>Reclaim Batching',
         description = '<LOC OPTIONS_0292>Combines nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more.\r\n\r\nSignificantly improves performance. Recommended for lower end systems.',
     },
-    options_selection_sets_add_behavior = {
+    options_steal_from_other_control_groups = {
         title = "<LOC OPTIONS_0293>Unique Control Groups",
         description = "<LOC OPTIONS_0294>When on, a unit can only be part of one control group. A unit will be transferred from any previously assigned control groups to the new control group.",
     },
-    options_selection_sets_production_behavior = {
+    options_add_to_factory_control_group = {
         title= "<LOC OPTIONS_0295>Transitive Control Groups of Factories",
         description= "<LOC OPTIONS_0296>When on, a unit inherits the control group of the factory it is produced by."
     },

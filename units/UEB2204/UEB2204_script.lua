@@ -15,7 +15,6 @@ local TAAFlakArtilleryCannon = import("/lua/terranweapons.lua").TAAFlakArtillery
 UEB2204 = Class(TStructureUnit) {
     Weapons = {
         AAGun = Class(TAAFlakArtilleryCannon) {},
-           
     },
 }
 

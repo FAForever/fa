@@ -27,7 +27,6 @@ UXL0021 = Class(TLandUnit) {
     KickupBones = {},
     DestructionPartsLowToss = {'Turret', 'Turret_Barrel', 'Turret_Muzzle'},
     DestructionPartsChassisToss = {'UEL0103',},
-    DestructionTicks = 75,
 }
 
 TypeClass = UXL0021

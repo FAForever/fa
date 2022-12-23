@@ -14,9 +14,6 @@ local SIFInainoWeapon = SeraphimWeapons.SIFInainoWeapon
 
 ---@class XSS0302 : SSeaUnit
 XSS0302 = Class(SSeaUnit) {
-    FxDamageScale = 2,
-    DestructionTicks = 400,
-
     Weapons = {
         BackTurret = Class(SDFHeavyQuarnonCannon) {},
         FrontTurret = Class(SDFHeavyQuarnonCannon) {},

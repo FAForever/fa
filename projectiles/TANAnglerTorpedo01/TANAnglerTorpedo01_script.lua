@@ -5,7 +5,6 @@ local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShip
 
 TANAnglerTorpedo01 = Class(TTorpedoShipProjectile) 
 {
-
     OnEnterWater = function(self)
         TTorpedoShipProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
@@ -18,10 +17,8 @@ TANAnglerTorpedo01 = Class(TTorpedoShipProjectile)
         self:StayUnderwater(true)
         self:SetTurnRate(120)
         self:SetMaxSpeed(18)
-        --self:SetVelocity(0)
         self:ForkThread(self.MovementThread)
     end,
-
 }
 
 TypeClass = TANAnglerTorpedo01

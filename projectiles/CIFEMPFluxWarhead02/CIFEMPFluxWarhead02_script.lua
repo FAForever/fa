@@ -8,7 +8,6 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 CIFEMPFluxWarhead02 = Class(NullShell) {
-
     -- Effects attached to moving nuke projectile plume
     PlumeEffects = {'/effects/emitters/empfluxwarhead_concussion_ring_02_emit.bp',
                     '/effects/emitters/empfluxwarhead_01_emit.bp',
@@ -196,5 +195,4 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
         plume:SetScaleVelocity(0.001 * scale,0.001 * scale,0.001 * scale)
     end,
 }
-
 TypeClass = CIFEMPFluxWarhead02

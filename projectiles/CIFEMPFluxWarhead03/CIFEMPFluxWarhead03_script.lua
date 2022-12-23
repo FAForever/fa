@@ -11,6 +11,4 @@ CIFEMPFluxWarhead03 = Class(EmitterProjectile) {
     FxImpactUnderWater = {},
     FxImpactNone = {},
 }
-
 TypeClass = CIFEMPFluxWarhead03
-
