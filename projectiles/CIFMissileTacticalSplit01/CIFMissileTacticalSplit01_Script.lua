@@ -11,13 +11,13 @@ CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile) {
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.5)
         self:SetDamage(25)
         self.invincible = true
-        self:ForkThread(self.DelayForDestruction)
+        self.Trash:Add(ForkThread(self.DelayForDestruction,self))
     end,
 
     -- Give the projectile enough time to get out of the explosion
     DelayForDestruction = function(self)
         self.CanTakeDamage = false
-        WaitTicks(3)
+        WaitTicks(4)
         self.invincible = false
         self.CanTakeDamage = true
         self:SetDestroyOnWater(true)

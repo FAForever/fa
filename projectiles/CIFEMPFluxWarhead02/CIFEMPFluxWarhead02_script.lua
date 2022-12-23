@@ -27,16 +27,16 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
 
         -- Mesh effects
         self.Plumeproj = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect01_proj.bp')
-        self.Trash:Add(ForkThread(self.PlumeThread, self.Plumeproj, self.Plumeproj.Blueprint.Display.UniformScale))
-        self.Trash:Add(ForkThread(self.PlumeVelocityThread, self.Plumeproj))
+        self.Trash:Add(ForkThread(self.PlumeThread, self, self.Plumeproj, self.Plumeproj.Blueprint.Display.UniformScale))
+        self.Trash:Add(ForkThread(self.PlumeVelocityThread, self, self.Plumeproj))
 
         self.Plumeproj2 = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect02_proj.bp')
-        self.Trash:Add(ForkThread(self.PlumeThread, self.Plumeproj2, self.Plumeproj2.Blueprint.Display.UniformScale))
-        self.Trash:Add(ForkThread(self.PlumeVelocityThread, self.Plumeproj2))
+        self.Trash:Add(ForkThread(self.PlumeThread, self, self.Plumeproj2, self.Plumeproj2.Blueprint.Display.UniformScale))
+        self.Trash:Add(ForkThread(self.PlumeVelocityThread, self, self.Plumeproj2))
 
         self.Plumeproj3 = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect03_proj.bp')
-        self.Trash:Add(ForkThread(self.PlumeThread, self.Plumeproj3, self.Plumeproj3.Blueprint.Display.UniformScale))
-        self.Trash:Add(ForkThread(self.PlumeVelocityThread, self.Plumeproj3))
+        self.Trash:Add(ForkThread(self.PlumeThread, self, self.Plumeproj3, self.Plumeproj3.Blueprint.Display.UniformScale))
+        self.Trash:Add(ForkThread(self.PlumeVelocityThread, self, self.Plumeproj3))
 
         CreateDecal(self:GetPosition(), RandomFloat(0,2*math.pi), 'nuke_scorch_001_albedo', '', 'Albedo', 28, 28, 500, 0, self.Army)
 
@@ -68,10 +68,6 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
         local zVec = 0
         local velocity = 0
 
-        -- yVec -0.2, requires 2 initial velocity to start
-        -- yVec 0.3, requires 3 initial velocity to start
-        -- yVec 1.8, requires 8.5 initial velocity to start
-
         -- Launch projectiles at semi-random angles away from the sphere, with enough
         -- initial velocity to escape sphere core
         for i = 0, (numProjectiles -1) do
@@ -81,9 +77,7 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
             velocity = 2.4 + (yVec * 3)
             table.insert(projectiles, self:CreateProjectile('/projectiles/CIFEMPFluxWarhead03/CIFEMPFluxWarhead03_proj.bp', 0, 0, 0, xVec, yVec, zVec):SetVelocity(velocity):SetBallisticAcceleration(1.0))
         end
-
         WaitTicks(31)
-
         -- Slow projectiles down to normal speed
         for k, v in projectiles do
             v:SetVelocity(2):SetBallisticAcceleration(-0.15)
@@ -92,11 +86,11 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
 
     PlumeVelocityThread = function(self, plume)
         plume:SetVelocity(0,5.35 * self.PlumeVelocityScale,0)
-        WaitTicks(5)
+        WaitTicks(6)
         plume:SetVelocity(0,23 * self.PlumeVelocityScale,0)
-        WaitTicks(5)
+        WaitTicks(6)
         plume:SetVelocity(0,45 * self.PlumeVelocityScale,0)
-        WaitTicks(13)
+        WaitTicks(14)
         plume:SetVelocity(0,27 * self.PlumeVelocityScale,0)
     end,
 
@@ -105,11 +99,11 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
         -- Anim Time : 1.0 sec
         plume:SetScale(0.229 * scale,0.229 * scale,0.229 * scale)
         plume:SetScaleVelocity(0.223 * scale,0.223 * scale,0.223 * scale)
-        WaitTicks(23)
+        WaitTicks(24)
 
         -- Anim Time : 6.333 sec
         plume:SetScaleVelocity(0.086 * scale,0.086 * scale,0.086 * scale)
-        WaitTicks(7)
+        WaitTicks(8)
 
         -- Anim Time : 7.0 sec
         plume:SetScaleVelocity(0.119 * scale,0.119 * scale,0.119 * scale)
@@ -133,11 +127,11 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
 
         -- Anim Time : 12.0 sec
         plume:SetScaleVelocity(0.016 * scale,0.016 * scale,0.016 * scale)
-        WaitTicks(3)
+        WaitTicks(4)
 
         -- Anim Time : 12.333 sec
         plume:SetScaleVelocity(0.03 * scale,0.03 * scale,0.03 * scale)
-        WaitTicks(7)
+        WaitTicks(8)
 
         -- Anim Time : 13.0 sec
         plume:SetScaleVelocity(0.043 * scale,0.043 * scale,0.043 * scale)

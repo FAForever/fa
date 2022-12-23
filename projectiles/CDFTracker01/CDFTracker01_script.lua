@@ -13,5 +13,4 @@ CDFTracker01 = Class(CDFTrackerProjectile) {
         CDFTrackerProjectile.OnImpact(self, TargetType, TargetEntity)
     end,
 }
-
 TypeClass = CDFTracker01

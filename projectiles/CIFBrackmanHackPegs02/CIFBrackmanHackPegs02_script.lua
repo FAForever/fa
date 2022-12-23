@@ -14,11 +14,11 @@ CIFBrackmanHackPegs02 = Class(import("/lua/cybranprojectiles.lua").CDFBrackmanHa
     OnImpact = function(self, TargetType, TargetEntity)
         self:SetVelocity(0)
         self:SetBallisticAcceleration(0)
-        self.Trash:Add(ForkThread(self.WaitingForDeath))
+        self.Trash:Add(ForkThread(self.WaitingForDeath,self))
         self:CreateImpactEffects(self.Army, self.FxImpactLand, 1 )
         for k, v in EffectTemplate.CBrackmanCrabPegAmbient01 do
 			CreateEmitterOnEntity( self, self.Army, v )
-		end			
+		end
     end,
 
     SetTargetPosition= function(self, NewPosition) 

@@ -6,7 +6,7 @@ CDFRocketMeson01 = Class(CRocketProjectile) {
     PolyTrail = '/effects/emitters/default_polytrail_06_emit.bp',
     OnCreate = function(self)
         CRocketProjectile.OnCreate(self)
-        self.Trash:Add(ForkThread(self.UpdateThread))
+        self.Trash:Add(ForkThread(self.UpdateThread,self))
    end,
 
     UpdateThread = function(self)

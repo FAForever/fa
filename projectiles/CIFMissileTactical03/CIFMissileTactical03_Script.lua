@@ -14,17 +14,15 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Split = false
         self.MovementTurnLevel = 1
-        self.Trash:Add(ForkThread( self.MovementThread ))
+        self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
     OnImpact = function(self, targetType, targetEntity)      
         CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
-
         -- if I collide with terrain dont split
         if targetType != 'Projectile' then
             self.Split = true
         end
-
         CLOATacticalMissileProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
@@ -48,7 +46,7 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
                 local proj = self:CreateChildProjectile(ChildProjectileBP)
                 proj:SetVelocity(xVec,yVec,zVec)
                 proj:SetVelocity(velocity)
-                proj:PassDamageData(self.DamageData)
+                proj.DamageData = self.DamageData
             end
         end
         CLOATacticalMissileProjectile.OnDamage(self, instigator, amount, vector, damageType)
@@ -57,7 +55,7 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
     MovementThread = function(self)
         self.WaitTime = 11
         self:SetTurnRate(8)
-        WaitTicks(3)
+        WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
             WaitTicks(self.WaitTime)
@@ -78,14 +76,14 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
             self:SetTurnRate(30)
         elseif dist > 43 and dist <= 128 then
             -- Further increase check intervals
-            WaitTicks(3)
+            WaitTicks(4)
             self:SetTurnRate(50)
         elseif dist > 0 and dist <= 43 then
             -- Further increase check intervals            
             self:SetTurnRate(100)
             KillThread(self.MoveThread)
         end
-    end,        
+    end,
 
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()

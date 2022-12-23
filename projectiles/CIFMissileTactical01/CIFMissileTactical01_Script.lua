@@ -10,14 +10,14 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
         CLOATacticalMissileProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
         self.Split = false
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread))
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 1
+        self.WaitTime = 2
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
-        WaitTicks(3)
+        WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
             WaitTicks(self.WaitTime)
@@ -38,10 +38,10 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
             self:SetTurnRate(10)
         elseif dist > 30 and dist <= 50 then
             self:SetTurnRate(12)
-            WaitTicks(15)
+            WaitTicks(16)
             self:SetTurnRate(12)
         elseif dist > 10 and dist <= 30 then
-            WaitTicks(3)
+            WaitTicks(4)
             self:SetTurnRate(50)
         elseif dist > 0 and dist <= 10 then
             self:SetTurnRate(100)
@@ -55,18 +55,17 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
         local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
         return dist
     end,
-    
+
     OnImpact = function(self, targetType, targetEntity)       
         CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
-            
         -- if it collide with terrain dont split
         if targetType != 'Projectile' then
             self.Split = true
         end
-        
+
         CLOATacticalMissileProjectile.OnImpact(self, targetType, targetEntity)
     end,
-    
+
     OnDamage = function(self, instigator, amount, vector, damageType)
         if not self.Split and (amount >= self.Health) then
             self.Split = true
@@ -87,7 +86,7 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
                 local proj = self:CreateChildProjectile(ChildProjectileBP)
                 proj:SetVelocity(xVec,yVec,zVec)
                 proj:SetVelocity(velocity)
-                proj:PassDamageData(self.DamageData)
+                proj.DamageData = self.DamageData
             end
         end
         CLOATacticalMissileProjectile.OnDamage(self, instigator, amount, vector, damageType)
