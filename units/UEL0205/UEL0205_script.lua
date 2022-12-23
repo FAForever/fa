@@ -14,9 +14,7 @@ local TAAFlakArtilleryCannon = import("/lua/terranweapons.lua").TAAFlakArtillery
 ---@class UEL0205 : TLandUnit
 UEL0205 = Class(TLandUnit) {
     Weapons = {
-        AAGun = Class(TAAFlakArtilleryCannon) {
-            PlayOnlyOneSoundCue = true,
-        },
+        AAGun = Class(TAAFlakArtilleryCannon) {},
     },
 }
 

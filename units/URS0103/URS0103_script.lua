@@ -15,8 +15,6 @@ local CDFProtonCannonWeapon = CybranWeaponsFile.CDFProtonCannonWeapon
 
 ---@class URS0103 : CSeaUnit
 URS0103 = Class(CSeaUnit) {
-    DestructionTicks = 200,
-
     Weapons = {
         ProtonCannon = Class(CDFProtonCannonWeapon) {},
         AAGun = Class(CAAAutocannon) {},
