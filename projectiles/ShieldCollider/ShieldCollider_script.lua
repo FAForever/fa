@@ -11,7 +11,7 @@ ShieldCollider = Class(Projectile) {
     OnCreate = function(self, inWater)
         Projectile.OnCreate(self)
 
-        self.CrashingAirplaneShieldCollisionLogic = true 
+        self.CrashingAirplaneShieldCollisionLogic = true
         self:SetVizToFocusPlayer('Never') -- Set to 'Always' to see a nice box
         self:SetVizToAllies('Never')
         self:SetVizToNeutrals('Never')
@@ -132,7 +132,7 @@ ShieldCollider = Class(Projectile) {
 
     -- Lets do some maths that will make the units bounce off shields
     ShieldBounce = function(self, shield, vector)
-        local bp = self.Plane:GetBlueprint()
+        local bp = self.Plane.Blueprint
         local volume = bp.SizeX * bp.SizeY * bp.SizeZ -- We will use this to *guess* how much force to apply
 
         local spin = math.min (4 / volume, 2) -- Less for larger planes; also 2 is a nice number

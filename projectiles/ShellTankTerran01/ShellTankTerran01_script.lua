@@ -1,8 +1,6 @@
---
 -- script for projectile TankShell
---
-local Projectile = import("/lua/sim/projectile.lua").Projectile
-ShellTankTerran01 = Class(Projectile) {
+local TankProjectile = import("/lua/sim/projectile.lua").Projectile
+ShellTankTerran01 = Class(TankProjectile) {
     FxUnitHitScale = 1,
     FxImpactUnit = {},
     FxLandHitScale = 1,
@@ -27,8 +25,8 @@ ShellTankTerran01 = Class(Projectile) {
                     '/effects/emitters/destruction_explosion_debris_05_emit.bp',},
 
     OnCreate = function(self)
-        Projectile.OnCreate(self)
-        self:ForkThread(self.Thread)
+        TankProjectile.OnCreate(self)
+        self.Trash:Add(ForkThread(self.Thread,self))
     end,
 
     Thread = function(self)
@@ -38,7 +36,7 @@ ShellTankTerran01 = Class(Projectile) {
 
             local x, y, z = unpack(self:GetPosition())
             MetaImpact(self, Vector(x, y, z), 2, 2)
-            local army = self:GetArmy()
+            local army = self.Army
             for k, v in self.FxMeta do
                 CreateEmitterAtEntity(self,army,v):ScaleEmitter(0.4)
             end
@@ -47,6 +45,4 @@ ShellTankTerran01 = Class(Projectile) {
         end
     end,
 }
-
 TypeClass = ShellTankTerran01
-
