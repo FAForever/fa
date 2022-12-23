@@ -27,35 +27,35 @@ local TableSort = table.sort
 ---@return integer
 function ToBytes(element, ignore, seen)
 
-    -- if we're seen this string or table before, then return 0. The bytes are already taken into account
+    -- has no allocated bytes
+    if element == nil then
+        return 0
+    end
+
+    -- applies to tables and strings, to prevent counting them multiple times
     local seen = seen or { }
     if seen[element] then
         return 0
     end
 
-    -- determine type of element
-    local t = type(element)
-    if t == 'string' then
-
-        -- strings are special snowflakes, but the debug function works on them just fine :+1:
-        seen[element] = true
-        return debug.allocatedsize(element)
-    elseif t != 'table' then
-
-        -- all other non-table types are by default 8 bytes
+    -- determine size
+    local allocatedSize = debug.allocatedsize(element)
+    if allocatedSize == 0 then
         return 8
+    elseif type(element) ~= 'table' then
+        seen[element] = true
+        return allocatedSize
     end
 
     -- at this point we know it is a table
     seen[element] = true
-    local allocated = debug.allocatedsize(element)
     for k, v in element do
         if not ignore[k] then
-            allocated = allocated + toBytes(v, ignore, seen)
+            allocatedSize = allocatedSize + ToBytes(v, ignore, seen)
         end
     end
 
-    return allocated
+    return allocatedSize
 end
 
 --- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
