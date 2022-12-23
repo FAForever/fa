@@ -13,7 +13,7 @@ AANTorpedo02 = Class(ATorpedoShipProjectile) {
     end,
 
     MotionThread = function(self)
-        WaitTicks(3)
+        WaitTicks(4)
         self:SetTurnRate(80)
         self:SetMaxSpeed(3)
         self:SetVelocity(3)

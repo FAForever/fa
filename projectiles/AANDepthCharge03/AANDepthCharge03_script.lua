@@ -13,7 +13,6 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
 
     CountdownExplosion = function(self)
         WaitTicks(self.CountdownLength)
-
         if not self.HasImpacted then
             self:OnImpact('Underwater', nil)
         end
@@ -37,7 +36,6 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
-        self.HasImpacted = true
         local px,_,pz = self:GetPositionXYZ()
         local marker = VisionMarkerOpti({Owner = self})
         marker:UpdatePostion(px,pz)

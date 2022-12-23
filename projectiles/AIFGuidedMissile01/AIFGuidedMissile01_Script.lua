@@ -23,7 +23,7 @@ AIFGuidedMissile = Class(AGuidedMissileProjectile) {
 		for k,v in EffectTemplate.AMercyGuidedMissileSplit do
             CreateEmitterOnEntity(self,self.Army,v)
         end
-        WaitTicks(1)
+        WaitTicks(2)
         -- Create several other projectiles in a dispersal pattern
         local vx, vy, vz = self:GetVelocity()
         local velocity = 16		
@@ -45,7 +45,7 @@ AIFGuidedMissile = Class(AGuidedMissileProjectile) {
             local proj = self:CreateChildProjectile(ChildProjectileBP)
             proj:SetVelocity( xVec, yVec, zVec )
             proj:SetVelocity( velocity * RandF( 0.8, 1.2 ) )
-            proj:PassDamageData(self.DamageData)                        
+            proj.DamageData = self.DamageData
         end
         self:Destroy()
     end,

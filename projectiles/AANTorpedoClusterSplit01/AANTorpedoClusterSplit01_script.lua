@@ -13,14 +13,13 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     OnCreate = function(self)
         ATorpedoCluster.OnCreate(self)
         self.HasImpacted = false
-        self.Trash:Add(ForkThread(self.CountdownExplosion))
+        self.Trash:Add(ForkThread(self.CountdownExplosion,self))
 		CreateTrail(self, -1, self.Army, import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
 
     end,
 
     CountdownExplosion = function(self)
         WaitTicks(self.CountdownLength)
-
         if not self.HasImpacted then
             self:OnImpact('Underwater', nil)
         end
@@ -32,7 +31,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
         for i in self.FxEnterWater do
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
         end
-        self.Trash:Add(ForkThread(self.EnterWaterMovementThread))
+        self.Trash:Add(ForkThread(self.EnterWaterMovementThread,self))
     end,
 
     EnterWaterMovementThread = function(self)
@@ -46,7 +45,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     OnLostTarget = function(self)
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
-        self.Trash:Add(ForkThread(self.CountdownMovement))
+        self.Trash:Add(ForkThread(self.CountdownMovement,self))
     end,
 
     CountdownMovement = function(self)
@@ -57,7 +56,6 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
-        self.HasImpacted = true
         local px,_,pz = self:GetPositionXYZ()
         local marker = VisionMarkerOpti({Owner = self})
         marker:UpdatePosition(px,pz)

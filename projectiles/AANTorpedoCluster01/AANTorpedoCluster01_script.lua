@@ -21,7 +21,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     OnEnterWater = function(self) 
         ATorpedoCluster.OnEnterWater(self)
 
--- create two child projectiles
+        -- create two child projectiles
         for i = 0, 1 do
             proj = self:CreateChildProjectile('/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_proj.bp' )
             proj.DamageData = self.DamageData

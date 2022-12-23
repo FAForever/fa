@@ -43,7 +43,7 @@ AIFFragmentationSensorShell02 = Class(AArtilleryFragmentationSensorShellProjecti
                 local proj = self:CreateChildProjectile(bp.FragmentId)
 	            proj:SetVelocity(xVec,yVec,zVec)
 	            proj:SetVelocity(velocity)
-	            proj:PassDamageData(self.DamageData)                        
+	            proj.DamageData = self.DamageData
 	        end
 	        local pos = self:GetPosition()
 	        local spec = {
