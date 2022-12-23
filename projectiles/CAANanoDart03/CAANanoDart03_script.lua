@@ -16,16 +16,10 @@ CAANanoDart01 = Class(CAANanoDartProjectile) {
         WaitTicks(3)
         self:SetMaxSpeed(10)
         self:SetBallisticAcceleration(-0.2)
-
-        for i in self.FxTrails do
-            CreateEmitterOnEntity(self, self.Army, self.FxTrails[i])
-        end
-
-        WaitSeconds(0.25)
+        WaitTicks(3)
         self:SetMesh('/projectiles/CAANanoDart01/CAANanoDartUnPacked01_mesh')
         self:SetMaxSpeed(60)
         self:SetAcceleration(20 + Random() * 5)
-
         WaitTicks(3)
         self:SetTurnRate(360)
 

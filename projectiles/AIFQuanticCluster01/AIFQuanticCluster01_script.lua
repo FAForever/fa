@@ -43,7 +43,7 @@ AIFQuanticCluster01 = Class(import("/lua/aeonprojectiles.lua").AQuantumCluster) 
             local proj = self:CreateChildProjectile(ChildProjectileBP)
             proj:SetVelocity(xVec,yVec,zVec)
             proj:SetVelocity(velocity)
-            proj:PassDamageData(self.DamageData)
+            proj.DamageData = self.DamageData
         end
         self:Destroy()
     end,

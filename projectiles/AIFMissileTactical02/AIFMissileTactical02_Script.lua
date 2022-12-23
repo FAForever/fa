@@ -1,10 +1,7 @@
---
 -- Aeon Land-Based Tactical Missile
---
+
 local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
-
 AIFMissileTactical02 = Class(AMissileSerpentineProjectile) {
-
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
@@ -16,14 +13,14 @@ AIFMissileTactical02 = Class(AMissileSerpentineProjectile) {
         self:SetCollision(true)
         WaitTicks(21)
         self:SetTurnRate(5)
-        WaitTicks(5)
+        WaitTicks(6)
         self:TrackTarget(true)
         self:TrackTarget(true)
         self:SetTurnRate(10)
-        WaitTicks(5)
+        WaitTicks(6)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitTicks(5)
+            WaitTicks(6)
         end
     end,
 

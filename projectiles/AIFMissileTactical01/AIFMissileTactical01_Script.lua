@@ -11,10 +11,10 @@ AIFMissileTactical01 = Class(AMissileSerpentineProjectile) {
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
-    MovementThread = function(self)        
-        self.WaitTime = 1
+    MovementThread = function(self)
+        self.WaitTime = 2
         self:SetTurnRate(8)
-        WaitTicks(3)        
+        WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
             WaitTicks(self.WaitTime)
@@ -24,25 +24,25 @@ AIFMissileTactical01 = Class(AMissileSerpentineProjectile) {
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         --Get the nuke as close to 90 deg as possible
-        if dist > 50 then        
+        if dist > 50 then
             --Freeze the turn rate as to prevent steep angles at long distance targets
             WaitTicks(21)
             self:SetTurnRate(20)
         elseif dist > 128 and dist <= 213 then
 						-- Increase check intervals
 						self:SetTurnRate(30)
-						WaitTicks(12)
+						WaitTicks(16)
             self:SetTurnRate(30)
         elseif dist > 43 and dist <= 107 then
 						-- Further increase check intervals
-            WaitTicks(3)
+            WaitTicks(4)
             self:SetTurnRate(50)
 				elseif dist > 0 and dist <= 43 then
 						-- Further increase check intervals            
-            self:SetTurnRate(100)   
-            KillThread(self.MoveThread)         
+            self:SetTurnRate(100)
+            KillThread(self.MoveThread)
         end
-    end,        
+    end,
 
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()

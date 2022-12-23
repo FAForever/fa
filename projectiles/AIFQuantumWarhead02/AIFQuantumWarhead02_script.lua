@@ -15,8 +15,8 @@ AIFQuantumWarhead02 = Class(NullShell) {
     EffectThread = function(self)
         CreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
 
-        self.Trash:Add(ForkThread(self.ShakeAndBurnMe, self.Army,self))
-        self.Trash:Add(ForkThread(self.InnerCloudFlares, self.Army,self))
+        self.Trash:Add(ForkThread(self.ShakeAndBurnMe,self, self.Army))
+        self.Trash:Add(ForkThread(self.InnerCloudFlares,self, self.Army))
         self.Trash:Add(ForkThread(self.DistortionField,self))
 
         for k, v in self.NormalEffects do
@@ -26,7 +26,7 @@ AIFQuantumWarhead02 = Class(NullShell) {
 
     ShakeAndBurnMe = function(self, army)
         self:ShakeCamera(75, 3, 0, 10)
-        WaitTicks(5)
+        WaitTicks(6)
         local orientation = RandomFloat(0,2*math.pi)
         CreateDecal(self:GetPosition(), orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, army)
         CreateDecal(self:GetPosition(), orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, army)
