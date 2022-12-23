@@ -657,14 +657,12 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if not isOldSelection then
         import("/lua/ui/game/selection.lua").PlaySelectionSound(added)
         import("/lua/ui/game/rallypoint.lua").OnSelectionChanged(newSelection)
-        if options.repeatbuild then
+        if Prefs.GetFromCurrentProfile('repeatbuild') then
             local factories = EntityCategoryFilterDown(categories.STRUCTURE * categories.FACTORY, added) -- find all newly selected factories
-            if not table.empty(factories) then
-                for _, factory in factories do
-                    if not factory.HasBeenSelected then
-                        factory:ProcessInfo('SetRepeatQueue','true')
-                        factory.HasBeenSelected = true
-                    end
+            for _, factory in factories do
+                if not factory.HasBeenSelected then
+                    factory:ProcessInfo('SetRepeatQueue','true')
+                    factory.HasBeenSelected = true
                 end
             end
         end
