@@ -722,12 +722,10 @@ StructureUnit = Class(Unit) {
 ---@field BuildBoneRotator moho.RotateManipulator
 ---@field BuildEffectBones string[]
 FactoryUnit = Class(StructureUnit) {
-    HasBeenSelected = nil,
 
     ---@param self FactoryUnit
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
-        self.HasBeenSelected = false
 
         -- if we're a support factory, make sure our build restrictions are correct
         if self.Blueprint.CategoriesHash["SUPPORTFACTORY"] then
