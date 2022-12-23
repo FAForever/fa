@@ -41,11 +41,7 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 local DeprecatedWarnings = { }
 
 local DefaultTerrainType = GetTerrainType(-1, -1)
-local EmptyTable = {}
-setmetatable(EmptyTable, {__newindex = function()
-    WARN("Attempt to set field of the empty table")
-end})
-WARN("Default terrain type: " .. tostring(DefaultTerrainType))
+
 
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
