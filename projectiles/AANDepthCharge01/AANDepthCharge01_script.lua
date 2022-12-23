@@ -1,19 +1,24 @@
 -- Depth Charge Script
 
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
-local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
+local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
 
 AANDepthCharge01 = Class(ADepthChargeProjectile) {
-    
+
+    CountdownLengthInTicks = 100,
+    FxEnterWater= {
+        '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
+        '/effects/emitters/water_splash_plume_01_emit.bp',
+    },
+
     OnCreate = function(self)
         ADepthChargeProjectile.OnCreate(self)
         self.HasImpacted = false
-        self:ForkThread(self.CountdownExplosion)
+        self.Trash:Add(ForkThread(self.CountdownExplosion, self))
     end,
 
     CountdownExplosion = function(self)
-        WaitSeconds(self.CountdownLength)
-
+        WaitTicks(self.CountdownLengthInTicks)
         if not self.HasImpacted then
             self:OnImpact('Underwater', nil)
         end
@@ -25,30 +30,28 @@ AANDepthCharge01 = Class(ADepthChargeProjectile) {
         self:SetAcceleration(5)
         self:SetTurnRate(180)
     end,
-    
+
     OnLostTarget = function(self)
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
-        self:ForkThread(self.CountdownMovement)
+        self.Trash:Add(ForkThread(self.CountdownMovement, self))
     end,
 
     CountdownMovement = function(self)
-        WaitSeconds(3)
+        WaitTicks(30)
         self:SetMaxSpeed(0)
         self:SetAcceleration(0)
         self:SetVelocity(0)
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
-        --LOG('Projectile impacted with: ' .. TargetType)
         self.HasImpacted = true
-        local px,_,pz = self:GetPositionXYZ()
+        local px, _, pz = self:GetPositionXYZ()
         local marker = VisionMarkerOpti({Owner = self})
-        marker:UpdatePostion(px,pz)
+        marker:UpdatePosition(px, pz)
         marker:UpdateDuration(5)
         marker:UpdateIntel(self.Army, 5, 'Vision', true)
         ADepthChargeProjectile.OnImpact(self, TargetType, TargetEntity)
     end,
 }
-
 TypeClass = AANDepthCharge01

@@ -3,6 +3,8 @@ local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargePr
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 AANDepthCharge03 = Class(ADepthChargeProjectile) {
+    CountdownLength = 101,
+
     OnCreate = function(self)
         ADepthChargeProjectile.OnCreate(self)
         self.HasImpacted = false

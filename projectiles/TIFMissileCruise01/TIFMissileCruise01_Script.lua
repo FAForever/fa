@@ -2,7 +2,6 @@
 -- Terran Land-Based Cruise Missile
 --
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile02
-local Explosion = import("/lua/defaultexplosions.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 TIFMissileCruise01 = Class(TMissileCruiseProjectile) {
@@ -69,4 +68,3 @@ TIFMissileCruise01 = Class(TMissileCruiseProjectile) {
     end,
 }
 TypeClass = TIFMissileCruise01
-

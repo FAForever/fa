@@ -10,22 +10,5 @@
 
 local SLosaareAAAutoCannon = import("/lua/seraphimprojectiles.lua").SLosaareAAAutoCannon
 
-SAALosaareAutoCannon02 = Class(SLosaareAAAutoCannon) {
-
-  OnImpact = function(self, TargetType, TargetEntity)
-      SLosaareAAAutoCannon.OnImpact(self, TargetType, TargetEntity)
-      if TargetType == 'UnitAir' then
-        if TargetEntity then
-          local fueluse = TargetEntity:GetFuelUseTime()
-          local fuelratio = TargetEntity:GetFuelRatio()
-          local currentfuel = fueluse * fuelratio
-          if currentfuel > 0 then
-              --local newfuelvalue = ((fuelratio * fueluse) - self.Data.FuelDrainSec) -- FuelDrainSec is a value in Seconds
-              --TargetEntity:SetFuelRatio(newfuelvalue / fueluse)
-          end
-        end
-      end
-  end,
-
-}
+SAALosaareAutoCannon02 = Class(SLosaareAAAutoCannon) {}
 TypeClass = SAALosaareAutoCannon02

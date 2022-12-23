@@ -1,12 +1,9 @@
---****************************************************************************
---**
---**  File     :  /data/projectiles/AIFFragmentationSensorShell01/AIFFragmentationSensorShell01_script.lua
---**  Author(s):  Drew Staltman, Gordon Duclos
---**
---**  Summary  :  Aeon Quantic Cluster Fragmentation Sensor shell script,XAB2307
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------------------------------------
+-- File     :  /data/projectiles/AIFFragmentationSensorShell01/AIFFragmentationSensorShell01_script.lua
+-- Author(s):  Drew Staltman, Gordon Duclos
+-- Summary  :  Aeon Quantic Cluster Fragmentation Sensor shell script,XAB2307
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------------------------------------
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
@@ -22,21 +19,21 @@ AIFFragmentationSensorShell01 = Class(AArtilleryFragmentationSensorShellProjecti
             CreateEmitterAtBone( self, -1, self.Army, v )
         end
 
-        local vx, vy, vz = self.Velocity()
+        local vx, vy, vz = self:GetVelocity()
         local velocity = 16
 
 		-- One initial projectile following same directional path as the original
         self:CreateChildProjectile(bp.FragmentId):SetVelocity(vx,0.8*vy, vz):SetVelocity(velocity):PassDamageData(self.DamageData)
-   		
+
 		-- Create several other projectiles in a dispersal pattern
         local numProjectiles = bp.Fragments - 1
         local angle = (2 * math.pi) / numProjectiles
         local angleInitial = RandomFloat( 0, angle )
-        
+
         -- Randomization of the spread
         local angleVariation = angle * 8 -- Adjusts angle variance spread
         local spreadMul = 0.8 -- Adjusts the width of the dispersal        
-       
+
         local xVec = 0 
         local yVec = vy*0.8
         local zVec = 0

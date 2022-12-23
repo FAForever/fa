@@ -5,12 +5,10 @@ local AQuantumWarheadProjectile = import("/lua/aeonprojectiles.lua").AQuantumWar
 
 AIFQuantumWarhead03 = Class(AQuantumWarheadProjectile) {
     Beams = {'/effects/emitters/aeon_nuke_exhaust_beam_02_emit.bp',},
-
     OnCreate = function(self)
         AQuantumWarheadProjectile.OnCreate(self)
         self.effectEntityPath = '/projectiles/AIFQuantumWarhead02/AIFQuantumWarhead02_proj.bp'
         self:LauncherCallbacks()
     end,
 }
-
 TypeClass = AIFQuantumWarhead03

@@ -834,8 +834,6 @@ function PostModBlueprints(all_bps)
     PostProcessProps(all_bps.Prop)
 end
 
-
-
 --- Loads all blueprints with optional parameters  
 --- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side  
 --- `Sim -> LoadBlueprints() - no arguments, no changes!`  

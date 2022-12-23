@@ -13,7 +13,7 @@ BaseBuilderTemplate {
         -- ==== ECONOMY ==== --
         -- Factory upgrades
         'T1BalancedUpgradeBuildersExpansion',
-        'T1BalancedUpgradeBuildersExpansion',
+        'T2BalancedUpgradeBuildersExpansion',
 
         -- Engineer Builders
         'EngineerFactoryBuilders',

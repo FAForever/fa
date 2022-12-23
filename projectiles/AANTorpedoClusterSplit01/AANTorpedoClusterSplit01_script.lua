@@ -1,13 +1,9 @@
---****************************************************************************
---**
---**  File     :  /data/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+------------------------------------------------------------------------------------------------
+-- File     :  /data/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------------------------------------
 local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
@@ -17,12 +13,13 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     OnCreate = function(self)
         ATorpedoCluster.OnCreate(self)
         self.HasImpacted = false
-        self.Trash:Add(ForkThread(self.CountdownExplosion,self))
+        self.Trash:Add(ForkThread(self.CountdownExplosion))
 		CreateTrail(self, -1, self.Army, import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
+
     end,
 
     CountdownExplosion = function(self)
-        WaitSeconds(self.CountdownLength)
+        WaitTicks(self.CountdownLength)
 
         if not self.HasImpacted then
             self:OnImpact('Underwater', nil)
@@ -35,7 +32,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
         for i in self.FxEnterWater do
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
         end
-        self.Trash:Add(ForkThread(self.EnterWaterMovementThread,self))
+        self.Trash:Add(ForkThread(self.EnterWaterMovementThread))
     end,
 
     EnterWaterMovementThread = function(self)
@@ -49,7 +46,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     OnLostTarget = function(self)
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
-        self.Trash:Add(ForkThread(self.CountdownMovement,self))
+        self.Trash:Add(ForkThread(self.CountdownMovement))
     end,
 
     CountdownMovement = function(self)
