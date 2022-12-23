@@ -22,5 +22,4 @@ CIFEMPFluxWarhead04 = Class(CEMPFluxWarheadProjectile) {
         self:LauncherCallbacks()
     end,
 }
-
 TypeClass = CIFEMPFluxWarhead04

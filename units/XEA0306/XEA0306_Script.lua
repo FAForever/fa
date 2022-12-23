@@ -34,7 +34,6 @@ XEA0306 = Class(AirTransport) {
         PlasmaRight = Class(TDFHeavyPlasmaCannonWeapon) {},
     },
 
-    DestructionTicks = 250,
     EngineRotateBones = {'FrontRight_Engine', 'FrontLeft_Engine', 'BackRight_Engine', 'BackLeft_Engine', },
 
     OnCreate = function(self)

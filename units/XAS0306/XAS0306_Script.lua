@@ -13,9 +13,6 @@ local AIFQuasarAntiTorpedoWeapon = import("/lua/aeonweapons.lua").AIFQuasarAntiT
 
 ---@class XAS0306 : ASeaUnit
 XAS0306 = Class(ASeaUnit) {
-    FxDamageScale = 2,
-    DestructionTicks = 400,
-
     Weapons = {
         AntiTorpedoRight1 = Class(AIFQuasarAntiTorpedoWeapon) {},
         AntiTorpedoRight2 = Class(AIFQuasarAntiTorpedoWeapon) {},

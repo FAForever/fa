@@ -13,21 +13,7 @@ local TIFHighBallisticMortarWeapon = import("/lua/terranweapons.lua").TIFHighBal
 ---@class UEL0103 : TLandUnit
 UEL0103 = Class(TLandUnit) {
     Weapons = {
-        MainGun = Class(TIFHighBallisticMortarWeapon) {
-            CreateProjectileAtMuzzle = function(self, muzzle)
-                local proj = TIFHighBallisticMortarWeapon.CreateProjectileAtMuzzle(self, muzzle)
-                local bp = self:GetBlueprint()
-                local data = {
-                    Radius = bp.CameraVisionRadius or 5,
-                    Lifetime = bp.CameraLifetime or 5,
-                    Army = self.unit.Army,
-                }
-
-                if proj and not proj:BeenDestroyed() then
-                    proj:PassData(data)
-                end
-            end,
-        },
+        MainGun = Class(TIFHighBallisticMortarWeapon) {}
     },
 }
 
