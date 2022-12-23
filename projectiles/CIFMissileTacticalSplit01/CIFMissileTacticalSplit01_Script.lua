@@ -17,14 +17,14 @@ CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile) {
     -- Give the projectile enough time to get out of the explosion
     DelayForDestruction = function(self)
         self.CanTakeDamage = false
-        WaitSeconds(0.3)
+        WaitTicks(3)
         self.invincible = false
         self.CanTakeDamage = true
         self:SetDestroyOnWater(true)
         self:TrackTarget(true)
         self:SetTurnRate(80)
-        self:SetMaxSpeed(15)--25
-        self:SetAcceleration(6)--25
+        self:SetMaxSpeed(15)
+        self:SetAcceleration(6)
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)

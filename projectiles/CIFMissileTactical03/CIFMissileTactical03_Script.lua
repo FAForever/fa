@@ -7,7 +7,6 @@
 local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
 
 CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
-
     NumChildMissiles = 3,
 
     OnCreate = function(self)
@@ -16,19 +15,19 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
         self.Split = false
         self.MovementTurnLevel = 1
         self.Trash:Add(ForkThread( self.MovementThread ))
-    end, 
-    
+    end,
+
     OnImpact = function(self, targetType, targetEntity)      
         CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
-        
+
         -- if I collide with terrain dont split
         if targetType != 'Projectile' then
             self.Split = true
         end
-        
+
         CLOATacticalMissileProjectile.OnImpact(self, targetType, targetEntity)
-    end,   
-    
+    end,
+
     OnDamage = function(self, instigator, amount, vector, damageType)
         if not self.Split and (amount >= self.Health) then
             self.Split = true
@@ -56,12 +55,12 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 0.1
+        self.WaitTime = 11
         self:SetTurnRate(8)
-        WaitSeconds(0.3)
+        WaitTicks(3)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(self.WaitTime)
         end
     end,
 
@@ -70,16 +69,16 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
         -- Get the nuke as close to 90 deg as possible
         if dist > 50 then
             -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+            WaitTicks(21)
             self:SetTurnRate(20)
         elseif dist > 128 and dist <= 213 then
             -- Increase check intervals
             self:SetTurnRate(30)
-            WaitSeconds(1.5)
+            WaitTicks(16)
             self:SetTurnRate(30)
         elseif dist > 43 and dist <= 128 then
             -- Further increase check intervals
-            WaitSeconds(0.3)
+            WaitTicks(3)
             self:SetTurnRate(50)
         elseif dist > 0 and dist <= 43 then
             -- Further increase check intervals            
@@ -96,4 +95,3 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
     end,
 }
 TypeClass = CIFMissileTactical03
-
