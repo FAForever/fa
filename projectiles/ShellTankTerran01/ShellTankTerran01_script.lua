@@ -37,13 +37,10 @@ ShellTankTerran01 = Class(Projectile) {
             WaitTicks(Random(3,4))
 
             local x, y, z = unpack(self:GetPosition())
-            --y = y - 1
-            --local offsetx = Random(1.0, 2.0) - 1
-            --x = x + offsetx
             MetaImpact(self, Vector(x, y, z), 2, 2)
             local army = self:GetArmy()
             for k, v in self.FxMeta do
-                CreateEmitterAtEntity(self,army,v):ScaleEmitter(0.4)--:OffsetEmitter(0, 0, offsetx)
+                CreateEmitterAtEntity(self,army,v):ScaleEmitter(0.4)
             end
             self:ShakeCamera(5, 1, 0, 0.1)
             CreateSplat(self:GetPosition(),0,'scorch_001_albedo', 1, 1, 200, 500, army)
