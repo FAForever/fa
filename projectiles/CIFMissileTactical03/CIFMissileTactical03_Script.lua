@@ -15,7 +15,7 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Split = false
         self.MovementTurnLevel = 1
-        self:ForkThread( self.MovementThread )
+        self.Trash:Add(ForkThread( self.MovementThread ))
     end, 
     
     OnImpact = function(self, targetType, targetEntity)      
@@ -30,7 +30,7 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
     end,   
     
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not self.Split and (amount >= self:GetHealth()) then
+        if not self.Split and (amount >= self.Health) then
             self.Split = true
             local vx, vy, vz = self:GetVelocity()
             local velocity = 7

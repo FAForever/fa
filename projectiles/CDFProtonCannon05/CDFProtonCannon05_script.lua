@@ -11,7 +11,6 @@
 local CDFHvyProtonCannonProjectile = import("/lua/cybranprojectiles.lua").CDFHvyProtonCannonProjectile
 CDFProtonCannon05 = Class(CDFHvyProtonCannonProjectile) {
 	OnImpact = function(self, TargetType, TargetEntity) 
-		------self:ShakeCamera( radius, maxShakeEpicenter, minShakeAtRadius, interval )
 		self:ShakeCamera( 15, 0.25, 0, 0.2 )
 		CDFHvyProtonCannonProjectile.OnImpact (self, TargetType, TargetEntity)
 	end,

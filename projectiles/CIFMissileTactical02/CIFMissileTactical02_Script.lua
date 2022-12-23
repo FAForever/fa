@@ -16,7 +16,7 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Split = false
         self.MovementTurnLevel = 1
-        self:ForkThread( self.MovementThread )        
+        self.Trash:Add(ForkThread( self.MovementThread ))
     end,
     
     OnImpact = function(self, targetType, targetEntity)
@@ -31,7 +31,7 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
     end,
     
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not self.Split and (amount >= self:GetHealth()) then
+        if not self.Split and (amount >= self.Health) then
             self.Split = true
             local vx, vy, vz = self:GetVelocity()
             local velocity = 7
@@ -57,12 +57,12 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 0.1
+        self.WaitTime = 1
         self:SetTurnRate(8)
-        WaitSeconds(0.3)
+        WaitTicks(3)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(self.WaitTime)
         end
     end,
 
@@ -71,16 +71,16 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
         -- Get the nuke as close to 90 deg as possible
         if dist > 50 then
             -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+            WaitTicks(21)
             self:SetTurnRate(20)
         elseif dist > 64 and dist <= 107 then
             -- Increase check intervals
             self:SetTurnRate(30)
-            WaitSeconds(1.5)
+            WaitTicks(15)
             self:SetTurnRate(30)
         elseif dist > 21 and dist <= 64 then
             -- Further increase check intervals
-            WaitSeconds(0.3)
+            WaitTicks(3)
             self:SetTurnRate(50)
         elseif dist > 0 and dist <= 21 then
             -- Further increase check intervals            

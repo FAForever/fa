@@ -21,10 +21,10 @@ CIFBrackmanHackPegs02 = Class(import("/lua/cybranprojectiles.lua").CDFBrackmanHa
         ------CDFBrackmanHackPegProjectile02.OnImpact(TargetType,TargetEntity) 
         self:SetVelocity(0)
         self:SetBallisticAcceleration(0)
-        self:ForkThread(self.WaitingForDeath)
-        self:CreateImpactEffects(self:GetArmy(), self.FxImpactLand, 1 )
+        self.Trash:Add(ForkThread(self.WaitingForDeath))
+        self:CreateImpactEffects(self.Army, self.FxImpactLand, 1 )
         for k, v in EffectTemplate.CBrackmanCrabPegAmbient01 do
-			CreateEmitterOnEntity( self, self:GetArmy(), v )
+			CreateEmitterOnEntity( self, self.Army, v )
 		end			
     end,
     
@@ -41,8 +41,8 @@ CIFBrackmanHackPegs02 = Class(import("/lua/cybranprojectiles.lua").CDFBrackmanHa
         }
         local num_projectiles= 50
         for i = 0, num_projectiles do
-            WaitTime= ( 0.4+RandomFloat(-0.2,0.2) )  ------Get how long to wait before launching the next one.
-            WaitSeconds( WaitTime )
+            WaitTime= ( 0.4+RandomFloat(-0.2,0.2)*10+1 )  ------Get how long to wait before launching the next one.
+            WaitTicks( WaitTime )
             local pos = self:GetPosition()
             
             local vel_x= (TargetPos[1]-pos[1])

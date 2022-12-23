@@ -14,17 +14,17 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
         CLOATacticalMissileProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
         self.Split = false
-        self.MoveThread = self:ForkThread(self.MovementThread)
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread))
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 0.1
+        self.WaitTime = 1
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
-        WaitSeconds(0.3)
+        WaitTicks(3)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(self.WaitTime)
         end
     end,
 
@@ -32,20 +32,20 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
         local dist = self:GetDistanceToTarget()
         if dist > self.Distance then
             self:SetTurnRate(75)
-            WaitSeconds(3)
+            WaitTicks(31)
             self:SetTurnRate(8)
             self.Distance = self:GetDistanceToTarget()
         end
         if dist > 50 then
             -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+            WaitTicks(21)
             self:SetTurnRate(10)
         elseif dist > 30 and dist <= 50 then
             self:SetTurnRate(12)
-            WaitSeconds(1.5)
+            WaitTicks(15)
             self:SetTurnRate(12)
         elseif dist > 10 and dist <= 30 then
-            WaitSeconds(0.3)
+            WaitTicks(3)
             self:SetTurnRate(50)
         elseif dist > 0 and dist <= 10 then
             self:SetTurnRate(100)
@@ -72,7 +72,7 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
     end,
     
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not self.Split and (amount >= self:GetHealth()) then
+        if not self.Split and (amount >= self.Health) then
             self.Split = true
             local vx, vy, vz = self:GetVelocity()
             local velocity = 10
