@@ -4,7 +4,6 @@ local Projectile = import("/lua/sim/projectile.lua").Projectile
 Sinker = Class(Projectile) {
     OnCreate = function(self)
         Projectile.OnCreate(self)
-
         self:SetVizToFocusPlayer('Never')
         self:SetVizToAllies('Never')
         self:SetVizToNeutrals('Never')

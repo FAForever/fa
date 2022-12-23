@@ -17,7 +17,6 @@ local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
 ---@class UEL0401 : TMobileFactoryUnit
 UEL0401 = Class(TMobileFactoryUnit) {
-    FxDamageScale = 2.5,
     PrepareToBuildAnimRate = 5,
     BuildAttachBone = 'Build_Attachpoint',
     RollOffBones = {'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter', },

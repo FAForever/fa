@@ -8,8 +8,5 @@ CIMAntiTorpedo02 = Class(CDepthChargeProjectile) {
         CDepthChargeProjectile.OnCreate(self, inWater)
         self:SetBallisticAcceleration(2)
     end,
-
-
 }
-
 TypeClass = CIMAntiTorpedo02

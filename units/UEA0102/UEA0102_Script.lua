@@ -14,12 +14,9 @@ local TAirToAirLinkedRailgun = import("/lua/terranweapons.lua").TAirToAirLinkedR
 ---@class UEA0102 : TAirUnit
 UEA0102 = Class(TAirUnit) {
     PlayDestructionEffects = true,
-    DamageEffectPullback = 0.25,
-    DestroySeconds = 7.5,
 
     Weapons = {
-        LinkedRailGun = Class(TAirToAirLinkedRailgun) {
-        },
+        LinkedRailGun = Class(TAirToAirLinkedRailgun) {},
     },
 }
 

@@ -10,10 +10,7 @@
 
 local SExperimentalStrategicBomb = import("/lua/seraphimprojectiles.lua").SExperimentalStrategicBomb
 
-
 SBOInfernoExperimentalStrategicBomb01 = Class(SExperimentalStrategicBomb) {
-
-
     OnImpact = function(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
             -- Play the explosion sound
@@ -21,7 +18,6 @@ SBOInfernoExperimentalStrategicBomb01 = Class(SExperimentalStrategicBomb) {
             if myBlueprint.Audio.Explosion then
                 self:PlaySound(myBlueprint.Audio.Explosion)
             end
-    
             nukeProjectile = self:CreateProjectile('/effects/entities/SeraphimNukeEffectController01/SeraphimNukeEffectController01_proj.bp', 0, 0, 0, nil, nil, nil):SetCollision(false)
             local pos = self:GetPosition()
             pos[2] = pos[2] + 20
@@ -30,6 +26,5 @@ SBOInfernoExperimentalStrategicBomb01 = Class(SExperimentalStrategicBomb) {
         end
         SExperimentalStrategicBomb.OnImpact(self, TargetType, TargetEntity)
     end,
-
 }
 TypeClass = SBOInfernoExperimentalStrategicBomb01

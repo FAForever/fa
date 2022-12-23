@@ -15,10 +15,8 @@ local Entity = import("/lua/sim/entity.lua").Entity
 ---@class UES0103 : TSeaUnit
 UES0103 = Class(TSeaUnit) {
     Weapons = {
-        MainGun = Class(TDFGaussCannonWeapon) {
-        },
-        AAGun = Class(TAALinkedRailgun) {
-        },
+        MainGun = Class(TDFGaussCannonWeapon) {},
+        AAGun = Class(TAALinkedRailgun) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)

@@ -1,15 +1,11 @@
---
 -- URL0111 : cybran MML
 -- Cybran "Loa" Tactical Missile, mobile unit launcher variant of this missile, lower and straighter trajectory. 
 -- Splits into child projectile if it takes enough damage.
---
 
 local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
 
 CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
-
     NumChildMissiles = 3,
-
     OnCreate = function(self)
         CLOATacticalMissileProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)

@@ -1,9 +1,6 @@
---
 -- Terran Land-Based Cruise Missile : UES0202 (UEF cruiser)
---
 
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
-local Explosion = import("/lua/defaultexplosions.lua")
 
 TIFMissileCruise04 = Class(TMissileCruiseProjectile) {
 
