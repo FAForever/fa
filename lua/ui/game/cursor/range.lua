@@ -56,12 +56,14 @@ local function FindReclaimRange()
         local radius = blueprint.Economy.MaxBuildDistance
         if radius then
             if not largest then
-                largets = radius
+                largest = radius
             elseif radius > largest then
-                largets = radius
+                largest = radius
             end
         end
     end
+
+    return largest
 end
 
 ---@return number?
@@ -85,9 +87,7 @@ local function ComputeTransparency(camera, distance, terrainHeight, surfaceHeigh
     local zoom = camera:GetZoom()
     local f1 = math.max(0, 1 - (zoom / distance))
 
-    -- visibility based on terrain difference
-    local f2 = math.clamp(surfaceHeight - terrainHeight - 1, 0, 1)
-    return f1 * f2
+    return f1
 end
 
 --- Runs a depth scanning process to help the player understand where his cursor 
@@ -111,7 +111,7 @@ local function Thread()
         MeshName = meshSphere,
         TextureName = '/meshes/game/Assist_albedo.dds',
         ShaderName = 'FakeRingsNoDepth',
-        UniformScale = 0.3,
+        UniformScale = 1.0,
         LODCutoff = MeshFadeDistance
     })
 
@@ -120,7 +120,7 @@ local function Thread()
         MeshName = meshSphere,
         TextureName = '/meshes/game/Assist_albedo.dds',
         ShaderName = 'FakeRingsNoDepth',
-        UniformScale = 0.3,
+        UniformScale = 1.0,
         LODCutoff = MeshFadeDistance
     })
 
@@ -137,9 +137,12 @@ local function Thread()
         cursor = GetCursorInformation()
         elevation = cursor.Elevation
 
-        -- check if we have all the data required
-        if surface and surface[1] and cursor and cursor.Elevation then -- and CheckConditions(CommandMode)
+        local reclaimRange = FindReclaimRange();
 
+        -- check if we have all the data required
+        if reclaimRange and surface and surface[1] and cursor and cursor.Elevation then -- and CheckConditions(CommandMode)
+
+            reclaimRange = 0.035 * (reclaimRange + 2)
             transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, surface[2])
 
             surface[1] = math.clamp(surface[1], 0, scenario.size[1])
@@ -154,10 +157,12 @@ local function Thread()
                 MeshOnTerrain:SetHidden(false)
                 MeshOnTerrain:SetStance(terrain)
                 MeshOnTerrain:SetFractionCompleteParameter(transparency)
+                MeshOnTerrain:SetScale({reclaimRange, 1, reclaimRange})
 
                 MeshOnSurface:SetHidden(false)
                 MeshOnSurface:SetStance(surface)
                 MeshOnSurface:SetFractionCompleteParameter(transparency)
+                MeshOnSurface:SetScale({reclaimRange, 1, reclaimRange})
             else
                 MeshOnTerrain:SetHidden(true)
                 MeshOnSurface:SetHidden(true)
