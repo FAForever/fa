@@ -187,15 +187,17 @@ NavGrid = ClassSimple {
 
     ---@param self NavGrid
     GenerateNeighbors = function(self)
+        local size = self.TreeSize
+        local trees = self.Trees
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:GenerateDirectNeighbors(self)
+                trees[z][x]:GenerateDirectNeighbors(x * size, z * size, 0, 0, self)
             end
         end
 
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:GenerateCornerNeighbors(self, self.Layer)
+                trees[z][x]:GenerateCornerNeighbors(x * size, z * size, 0, 0, self, self.Layer)
             end
         end
     end,
@@ -372,7 +374,7 @@ CompressedLabelTree = ClassSimple {
     --- ```
     ---@param self CompressedLabelTree
     ---@param root NavGrid
-    GenerateDirectNeighbors = function(self, root)
+    GenerateDirectNeighbors = function(self, bx, bz, ox, oz, root)
         -- do not generate neighbors for non-pathable cells to save memory
         if self.label == -1 then
             return
@@ -380,16 +382,17 @@ CompressedLabelTree = ClassSimple {
 
         -- nodes do not have neighbors, only leafs do
         if not self.label then
-            self[1]:GenerateDirectNeighbors(root)
-            self[2]:GenerateDirectNeighbors(root)
-            self[3]:GenerateDirectNeighbors(root)
-            self[4]:GenerateDirectNeighbors(root)
+            local hc = 0.5 * self.c
+            self[1]:GenerateDirectNeighbors(bx, bz, ox,      oz     , root)
+            self[2]:GenerateDirectNeighbors(bx, bz, ox + hc, oz     , root)
+            self[3]:GenerateDirectNeighbors(bx, bz, ox,      oz + hc, root)
+            self[4]:GenerateDirectNeighbors(bx, bz, ox + hc, oz + hc, root)
             return
         end
 
         -- we are a leaf, so find those neighbors!
-        local x1 = self.bx + self.ox
-        local z1 = self.bz + self.oz
+        local x1 = bx + ox
+        local z1 = bz + oz
         local size = self.c
         local x2 = x1 + size
         local z2 = z1 + size
@@ -468,7 +471,7 @@ CompressedLabelTree = ClassSimple {
     --- ```
     ---@param self CompressedLabelTree
     ---@param root NavGrid
-    GenerateCornerNeighbors = function(self, root, layer)
+    GenerateCornerNeighbors = function(self, bx, bz, ox, oz, root, layer)
         -- do not generate neighbors for non-pathable cells to save memory
         local label = self.label
         if label == -1 then
@@ -477,17 +480,18 @@ CompressedLabelTree = ClassSimple {
 
         -- nodes do not have neighbors, only leafs do
         if not self.label then
-            self[1]:GenerateCornerNeighbors(root, layer)
-            self[2]:GenerateCornerNeighbors(root, layer)
-            self[3]:GenerateCornerNeighbors(root, layer)
-            self[4]:GenerateCornerNeighbors(root, layer)
+            local hc = 0.5 * self.c
+            self[1]:GenerateCornerNeighbors(bx, bz, ox,      oz     , root, layer)
+            self[2]:GenerateCornerNeighbors(bx, bz, ox + hc, oz     , root, layer)
+            self[3]:GenerateCornerNeighbors(bx, bz, ox,      oz + hc, root, layer)
+            self[4]:GenerateCornerNeighbors(bx, bz, ox + hc, oz + hc, root, layer)
             return
         end
 
         -- we are a leaf, so find those neighbors!
         local neighbors = self.neighbors
-        local x1 = self.bx + self.ox
-        local z1 = self.bz + self.oz
+        local x1 = bx + ox
+        local z1 = bz + oz
         local size = self.c
         local x2 = x1 + size
         local z2 = z1 + size

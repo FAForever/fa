@@ -187,7 +187,7 @@ function PathTo(layer, origin, destination, options)
                 end
                 neighbor.From = leaf
                 neighbor.Seen = seenIdentifier
-                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf.DistanceTo[neighbor] + 2 + preferLargeNeighbor
+                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor) + 2 + preferLargeNeighbor
                 neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
 
                 PathToHeap:Insert(neighbor)
@@ -220,7 +220,7 @@ function PathTo(layer, origin, destination, options)
         head = head + 1
 
         -- keep track of distance
-        distance = distance + leaf.From.neighborDistances[leaf.identifier]
+        distance = distance + leaf:DistanceTo(leaf.From)
         
         -- continue down the tree
         leaf = leaf.From
