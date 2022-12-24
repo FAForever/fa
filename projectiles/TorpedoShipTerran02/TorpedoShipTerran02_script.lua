@@ -20,9 +20,9 @@ TorpedoShipTerran02 = Class(TTorpedoShipProjectile) {
 
         for i in self.FxExitWaterEmitter do --splash
             if self.FxSplashScale ~= 1 then
-                CreateEmitterAtEntity(self, self:GetArmy(), self.FxExitWaterEmitter[i])
+                CreateEmitterAtEntity(self, self.Army, self.FxExitWaterEmitter[i])
             else
-                CreateEmitterAtEntity(self, self:GetArmy(), self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
+                CreateEmitterAtEntity(self, self.Army, self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
             end
         end
 
