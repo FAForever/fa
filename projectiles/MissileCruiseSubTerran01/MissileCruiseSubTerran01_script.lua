@@ -47,7 +47,7 @@ MissileCruiseSubTerran01 = Class(TMissileCruiseSubProjectile) {
         end
         self:SetTurnRate(10)
         self:TrackTarget(true)
-        WaitTicks(5)
+        WaitTicks(6)
         self:SetTurnRate(30)
         self:SetMaxSpeed(50)
         self:SetAcceleration(50)

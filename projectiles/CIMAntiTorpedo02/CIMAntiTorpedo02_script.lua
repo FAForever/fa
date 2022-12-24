@@ -5,7 +5,7 @@ CIMAntiTorpedo02 = Class(CDepthChargeProjectile) {
 	OnCreate = function(self, inWater)
         CDepthChargeProjectile.OnCreate(self, inWater)
         self:SetBallisticAcceleration(0)
-        self.Trash:Add(ForkThread( self.MotionThread ))
+        self.Trash:Add(ForkThread( self.MotionThread,self))
     end,
 
     MotionThread = function(self)

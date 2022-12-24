@@ -78,7 +78,7 @@ MissileCruiseTerran01 = Class(Projectile) {
         end
         self:SetTurnRate(20)
         self:TrackTarget(true)
-        WaitTicks(5)
+        WaitTicks(6)
         self:SetTurnRate(400)
         self:SetMaxSpeed(25)
         self:SetAcceleration(25)
