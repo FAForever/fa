@@ -31,7 +31,7 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not self.Split and (amount >= self.Health) then
+        if not self.Split and (amount >= self:GetHealth()) then
             self.Split = true
             local vx, vy, vz = self:GetVelocity()
             local velocity = 7

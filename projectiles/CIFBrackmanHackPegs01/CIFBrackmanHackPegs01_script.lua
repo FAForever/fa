@@ -17,7 +17,7 @@ CIFBrackmanHackPegs01 = Class(CDFBrackmanHackPegProjectile01) {
         for k, v in FxFragEffect do
             CreateEmitterAtEntity( self, self.Army, v )
         end
-        local vx, _, vz = self:GetVelocity()
+        local vx, vz = self:GetVelocity()
         local velocity = 18
 		-- Create several other projectiles in a dispersal pattern
         local numProjectiles = 9

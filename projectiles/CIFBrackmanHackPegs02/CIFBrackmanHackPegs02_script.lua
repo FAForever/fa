@@ -6,7 +6,6 @@
 ------------------------------------------------------------------------------
 local TargetPos
 local RandomInt = import("/lua/utilities.lua").GetRandomInt
-local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 --This one should just like be something kind of new compared to the older version
@@ -34,7 +33,7 @@ CIFBrackmanHackPegs02 = Class(import("/lua/cybranprojectiles.lua").CDFBrackmanHa
         }
         local num_projectiles= 50
         for i = 0, num_projectiles do
-            WaitTime= ( 0.4+RandomFloat(-0.2,0.2)*10+1 )  ------Get how long to wait before launching the next one.
+            WaitTime= 5 + ((Random() * 3) ^0)  ------Get how long to wait before launching the next one.
             WaitTicks( WaitTime )
             local pos = self:GetPosition()
             local vel_x= (TargetPos[1]-pos[1])
