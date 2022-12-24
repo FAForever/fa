@@ -678,6 +678,14 @@ CompressedLabelTree = ClassSimple {
         return math.sqrt(dx * dx + dz * dz)
     end,
 
+    ---@param self CompressedLabelTreeLeaf
+    ---@param other CompressedLabelTreeLeaf
+    ---@return number
+    ---@return number
+    DirectionTo = function(self, other)
+        return self.px - other.px, self.pz - other.pz
+    end,
+
     --- Returns the leaf that encompasses the position, or nil if no leaf does
     ---@param self CompressedLabelTree
     ---@param position Vector A position in world space
@@ -1186,5 +1194,12 @@ function Generate()
     Sync.NavLayerData = NavLayerData
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids)  / (1024 * 1024)
+    local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true })  / (1024 * 1024)
+
+    SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
+    SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
+
     Generated = true
 end
