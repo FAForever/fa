@@ -656,15 +656,15 @@ CompressedLabelTree = ClassSimple {
             end
         else 
             if self.neighbors then
-                -- self.neighborDirections = { }
-                -- self.neighborDistances = { }
+                self.neighborDirections = { }
+                self.neighborDistances = { }
 
-                -- for k, neighbor in self.neighbors do
-                --     local dx = neighbor.px - self.px
-                --     local dz = neighbor.pz - self.pz
-                --     self.neighborDirections[k] = { dx, dz}
-                --     self.neighborDistances[k] = math.sqrt(dx * dx + dz * dz)
-                -- end
+                for k, neighbor in self.neighbors do
+                    local dx = neighbor.px - self.px
+                    local dz = neighbor.pz - self.pz
+                    self.neighborDirections[k] = { dx, dz}
+                    self.neighborDistances[k] = math.sqrt(dx * dx + dz * dz)
+                end
             end
         end
     end,
