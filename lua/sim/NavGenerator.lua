@@ -296,13 +296,13 @@ CompressedLabelTree = ClassSimple {
     ---@param self CompressedLabelTree
     ---@param rCache NavLabelCache
     ---@param layer NavLayers
-    Compress = function(self, rCache, compressionThreshold, layer)
+    Compress = function(self, rCache, bx, bz, ox, oz, compressionThreshold, layer)
         -- base case, if we're a square of 4 then we skip the children and become very pessimistic
         if self.c <= compressionThreshold then
-            local value = rCache[self.oz + 1][self.ox + 1]
+            local value = rCache[oz + 1][ox + 1]
             local uniform = true
-            for z = self.oz + 1, self.oz + self.c do
-                for x = self.ox + 1, self.ox + self.c do
+            for z = oz + 1, oz + self.c do
+                for x = ox + 1, ox + self.c do
                     uniform = uniform and (value == rCache[z][x])
                     if not uniform  then
                         break
@@ -327,10 +327,10 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- recursive case where we do make children
-        local value = rCache[self.oz + 1][self.ox + 1]
+        local value = rCache[oz + 1][ox + 1]
         local uniform = true 
-        for z = self.oz + 1, self.oz + self.c do
-            for x = self.ox + 1, self.ox + self.c do
+        for z = oz + 1, oz + self.c do
+            for x = ox + 1, ox + self.c do
                 uniform = uniform and (value == rCache[z][x])
                 if not uniform then
                     break
@@ -350,15 +350,15 @@ CompressedLabelTree = ClassSimple {
         else
             -- we're not uniform, split up to children
             local hc = 0.5 * self.c
-            self[1] = CompressedLabelTree(self.bx, self.bz, hc, self.ox, self.oz)
-            self[2] = CompressedLabelTree(self.bx, self.bz, hc, self.ox + hc, self.oz)
-            self[3] = CompressedLabelTree(self.bx, self.bz, hc, self.ox, self.oz + hc)
-            self[4] = CompressedLabelTree(self.bx, self.bz, hc, self.ox + hc, self.oz + hc)
+            self[1] = CompressedLabelTree(bx, bz, hc, ox, oz)
+            self[2] = CompressedLabelTree(bx, bz, hc, ox + hc, oz)
+            self[3] = CompressedLabelTree(bx, bz, hc, ox, oz + hc)
+            self[4] = CompressedLabelTree(bx, bz, hc, ox + hc, oz + hc)
 
-            self[1]:Compress(rCache, compressionThreshold, layer)
-            self[2]:Compress(rCache, compressionThreshold, layer)
-            self[3]:Compress(rCache, compressionThreshold, layer)
-            self[4]:Compress(rCache, compressionThreshold, layer)
+            self[1]:Compress(rCache, bx, bz, ox, oz, compressionThreshold, layer)
+            self[2]:Compress(rCache, bx, bz, ox + hc, oz, compressionThreshold, layer)
+            self[3]:Compress(rCache, bx, bz, ox, oz + hc, compressionThreshold, layer)
+            self[4]:Compress(rCache, bx, bz, ox + hc, oz + hc, compressionThreshold, layer)
 
             NavLayerData[layer].Subdivisions = NavLayerData[layer].Subdivisions + 1
         end
@@ -454,7 +454,7 @@ CompressedLabelTree = ClassSimple {
                 if neighbor.label >= 0 then
                     neighbors[neighbor.identifier] = neighbor
                 end
-            else 
+            else
                 break
             end
         end
@@ -964,36 +964,36 @@ local function GenerateCompressionGrids(size, threshold)
     local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(size)
 
     for z = 0, LabelCompressionTreesPerAxis - 1 do
-        local blockZ = z * size
+        local bz = z * size
         for x = 0, LabelCompressionTreesPerAxis - 1 do
-            local blockX = x * size
-            local labelTreeLand = CompressedLabelTree(blockX, blockZ, size)
-            local labelTreeNaval = CompressedLabelTree(blockX, blockZ, size)
-            local labelTreeHover = CompressedLabelTree(blockX, blockZ, size)
-            local labelTreeAmph = CompressedLabelTree(blockX, blockZ, size)
-            local labelTreeAir = CompressedLabelTree(blockX, blockZ, size)
+            local bx = x * size
+            local labelTreeLand = CompressedLabelTree(bx, bz, size)
+            local labelTreeNaval = CompressedLabelTree(bx, bz, size)
+            local labelTreeHover = CompressedLabelTree(bx, bz, size)
+            local labelTreeAmph = CompressedLabelTree(bx, bz, size)
+            local labelTreeAir = CompressedLabelTree(bx, bz, size)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
             PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
 
             ComputeLandPathingMatrix(labelTreeLand,        daCache,                    pCache, bCache, rCache)
-            labelTreeLand:Compress(rCache, threshold, 'Land')
+            labelTreeLand:Compress(rCache, bx, bz, 0, 0, threshold, 'Land')
             navLand:AddTree(z, x, labelTreeLand)
 
             ComputeNavalPathingMatrix(labelTreeNaval,      daCache,                    pCache, bCache, rCache)
-            labelTreeNaval:Compress(rCache, 2 * threshold, 'Water')
+            labelTreeNaval:Compress(rCache, bx, bz, 0, 0, 2 * threshold, 'Water')
             navWater:AddTree(z, x, labelTreeNaval)
 
             ComputeHoverPathingMatrix(labelTreeHover,      daCache,                    pCache, bCache, rCache)
-            labelTreeHover:Compress(rCache, threshold, 'Hover')
+            labelTreeHover:Compress(rCache, bx, bz, 0, 0, threshold, 'Hover')
             navHover:AddTree(z, x, labelTreeHover)
 
             ComputeAmphPathingMatrix(labelTreeAmph,        daCache,                    pCache, bCache, rCache)
-            labelTreeAmph:Compress(rCache, threshold, 'Amphibious')
+            labelTreeAmph:Compress(rCache, bx, bz, 0, 0, threshold, 'Amphibious')
             navAmphibious:AddTree(z, x, labelTreeAmph)
 
             ComputeAirPathingMatrix(labelTreeAir,          daCache,                    pCache, bCache, rCache)
-            labelTreeAir:Compress(rCache, threshold, 'Air')
+            labelTreeAir:Compress(rCache, bx, bz, 0, 0, threshold, 'Air')
             navAir:AddTree(z, x, labelTreeAir)
         end
     end
