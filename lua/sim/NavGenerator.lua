@@ -230,9 +230,10 @@ NavGrid = ClassSimple {
     --- Draws all trees with the correct layer color
     ---@param self NavGrid
     Draw = function(self)
+        local size = self.TreeSize
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:Draw(Shared.LayerColors[self.Layer])
+                self.Trees[z][x]:Draw(Shared.LayerColors[self.Layer], 0, x * size, z * size, 0, 0)
             end
         end
     end,
@@ -240,9 +241,10 @@ NavGrid = ClassSimple {
     --- Draws all trees with their corresponding labels
     ---@param self NavGrid
     DrawLabels = function(self, inset)
+        local size = self.TreeSize
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:DrawLabels(inset)
+                self.Trees[z][x]:DrawLabels(inset, x * size, z * size, 0, 0)
             end
         end
     end,
@@ -267,7 +269,6 @@ local CompressedLabelTree
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class CompressedLabelTree
 ---@field identifier number     # Unique number used for table operations
----@field layer NavLayers       # Layer that this label tree is operating on, used for debugging
 ---@field bx number             # Location of top-left corner, in world space
 ---@field bz number             # Location of top-left corner, in world space
 ---@field ox number             # Offset of top-left corner, in world space
@@ -709,28 +710,34 @@ CompressedLabelTree = ClassSimple {
 
     ---@param self CompressedLabelTree
     ---@param color Color
-    Draw = function(self, color, inset)
+    Draw = function(self, color, inset, bx, bz, ox, oz)
         if self.label != nil then
             if self.label >= 0 then
-                DrawSquare(self.bx + self.ox, self.bz + self.oz, self.c, color, inset)
+                DrawSquare(bx + ox, bz + oz, self.c, color, inset)
             end
         else
-            for _, child in self.children do
-                child:Draw(color, inset)
-            end
+            local hc = 0.5 * self.c
+            local children = self.children --[[@as table<number, CompressedLabelTree>]]
+            children[1]:Draw(color, inset, bx, bz, ox,      oz     )
+            children[2]:Draw(color, inset, bx, bz, ox + hc, oz     )
+            children[3]:Draw(color, inset, bx, bz, ox,      oz + hc)
+            children[4]:Draw(color, inset, bx, bz, ox + hc, oz + hc)
         end
     end,
 
     ---@param self CompressedLabelTree
-    DrawLabels = function(self, inset)
+    DrawLabels = function(self, inset, bx, bz, ox, oz)
         if self.label != nil then
             if self.label >= 0 then
-                DrawSquare(self.bx + self.ox, self.bz + self.oz, self.c, Shared.LabelToColor(self.label), inset)
+                DrawSquare(bx + ox, bz + oz, self.c, Shared.LabelToColor(self.label), inset)
             end
         else
-            for _, child in self.children do
-                child:DrawLabels(inset)
-            end
+            local hc = 0.5 * self.c
+            local children = self.children --[[@as table<number, CompressedLabelTree>]]
+            children[1]:DrawLabels(inset, bx, bz, ox,      oz     )
+            children[2]:DrawLabels(inset, bx, bz, ox + hc, oz     )
+            children[3]:DrawLabels(inset, bx, bz, ox,      oz + hc)
+            children[4]:DrawLabels(inset, bx, bz, ox + hc, oz + hc)
         end
     end,
 }
