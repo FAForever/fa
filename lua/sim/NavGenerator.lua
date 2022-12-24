@@ -199,7 +199,7 @@ NavGrid = ClassSimple {
 
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:GenerateCornerNeighbors(self)
+                self.Trees[z][x]:GenerateCornerNeighbors(self, self.Layer)
             end
         end
     end,
@@ -210,7 +210,7 @@ NavGrid = ClassSimple {
         local stack = { }
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:GenerateLabels(stack)
+                self.Trees[z][x]:GenerateLabels(stack, self.Layer)
             end
         end
 
@@ -223,12 +223,6 @@ NavGrid = ClassSimple {
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
                 self.Trees[z][x]:PrecomputePhase1()
-            end
-        end
-
-        for z = 0, LabelCompressionTreesPerAxis - 1 do
-            for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:PrecomputePhase2()
             end
         end
     end,
@@ -282,8 +276,6 @@ local CompressedLabelTree
 ---@field children? CompressedLabelTree[]                   # Is populated if we are a node
 ---@field label? number                                     # Is populated if we are a leaf
 ---@field neighbors? table<number, CompressedLabelTree>     # Is populated if we are a leaf
----@field neighborDistances? table<number, number>          # Is populated if we are a leaf
----@field neighborDirections? table<number, any>            # Is populated if we are a leaf
 ---@field px? number                                        # Is populated if we are a leaf
 ---@field pz? number                                        # Is populated if we are a leaf
 CompressedLabelTree = ClassSimple {
@@ -292,28 +284,23 @@ CompressedLabelTree = ClassSimple {
     ---@param bx number
     ---@param bz number
     ---@param c number
-    __init = function(self, layer, bx, bz, c, ox, oz)
+    __init = function(self, bx, bz, c, ox, oz)
         self.identifier = GenerateCompressedTreeIdentifier()
 
-        self.layer = layer
         self.bx = bx
         self.bz = bz
         self.c = c
 
         self.ox = ox or 0
         self.oz = oz or 0
-
-        -- these are technically obsolete, but are here for code readability
-        self.children = nil
-        self.label = nil
-        self.neighbors = nil
     end,
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
     --- the label cache only exists of 0s and -1s
     ---@param self CompressedLabelTree
     ---@param rCache NavLabelCache
-    Compress = function(self, rCache, compressionThreshold)
+    ---@param layer NavLayers
+    Compress = function(self, rCache, compressionThreshold, layer)
         -- base case, if we're a square of 4 then we skip the children and become very pessimistic
         if self.c <= compressionThreshold then
             local value = rCache[self.oz + 1][self.ox + 1]
@@ -331,13 +318,13 @@ CompressedLabelTree = ClassSimple {
                 self.label = value
 
                 if self.label >= 0 then 
-                    NavLayerData[self.layer].PathableLeafs = NavLayerData[self.layer].PathableLeafs + 1
+                    NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
                 else 
-                    NavLayerData[self.layer].UnpathableLeafs = NavLayerData[self.layer].UnpathableLeafs + 1
+                    NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
                 end
             else 
                 self.label = -1
-                NavLayerData[self.layer].UnpathableLeafs = NavLayerData[self.layer].UnpathableLeafs + 1
+                NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
             end
 
             return
@@ -360,25 +347,25 @@ CompressedLabelTree = ClassSimple {
             self.label = value
 
             if self.label >= 0 then 
-                NavLayerData[self.layer].PathableLeafs = NavLayerData[self.layer].PathableLeafs + 1
+                NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
             else
-                NavLayerData[self.layer].UnpathableLeafs = NavLayerData[self.layer].UnpathableLeafs + 1
+                NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
             end
         else
             -- we're not uniform, split up to children
             local hc = 0.5 * self.c
             self.children = {
-                CompressedLabelTree(self.layer, self.bx, self.bz, hc, self.ox, self.oz),
-                CompressedLabelTree(self.layer, self.bx, self.bz, hc, self.ox + hc, self.oz),
-                CompressedLabelTree(self.layer, self.bx, self.bz, hc, self.ox, self.oz + hc),
-                CompressedLabelTree(self.layer, self.bx, self.bz, hc, self.ox + hc, self.oz + hc)
+                CompressedLabelTree(self.bx, self.bz, hc, self.ox, self.oz),
+                CompressedLabelTree(self.bx, self.bz, hc, self.ox + hc, self.oz),
+                CompressedLabelTree(self.bx, self.bz, hc, self.ox, self.oz + hc),
+                CompressedLabelTree(self.bx, self.bz, hc, self.ox + hc, self.oz + hc)
             }
 
             for k, child in self.children do
-                child:Compress(rCache, compressionThreshold)
+                child:Compress(rCache, compressionThreshold, layer)
             end
 
-            NavLayerData[self.layer].Subdivisions = NavLayerData[self.layer].Subdivisions + 1
+            NavLayerData[layer].Subdivisions = NavLayerData[layer].Subdivisions + 1
         end
     end,
 
@@ -485,7 +472,7 @@ CompressedLabelTree = ClassSimple {
     --- ```
     ---@param self CompressedLabelTree
     ---@param root NavGrid
-    GenerateCornerNeighbors = function(self, root)
+    GenerateCornerNeighbors = function(self, root, layer)
         -- do not generate neighbors for non-pathable cells to save memory
         local label = self.label
         if label == -1 then
@@ -495,7 +482,7 @@ CompressedLabelTree = ClassSimple {
         -- nodes do not have neighbors, only leafs do
         if self.children then
             for _, child in self.children do
-                child:GenerateCornerNeighbors(root)
+                child:GenerateCornerNeighbors(root, layer)
             end
             return
         end
@@ -559,12 +546,12 @@ CompressedLabelTree = ClassSimple {
             end
         end
 
-        NavLayerData[self.layer].Neighbors = NavLayerData[self.layer].Neighbors + table.getsize(neighbors)
+        NavLayerData[layer].Neighbors = NavLayerData[layer].Neighbors + table.getsize(neighbors)
     end,
 
     ---@param self CompressedLabelTree
     ---@param stack table
-    GenerateLabels = function(self, stack)
+    GenerateLabels = function(self, stack, layer)
         -- leaf case
         if self.label then
 
@@ -579,7 +566,7 @@ CompressedLabelTree = ClassSimple {
                 NavLabels[label] = {
                     Area = 0,
                     Node = self --[[@as CompressedLabelTreeLeaf]],
-                    Layer = self.layer,
+                    Layer = layer,
                     NumberOfExtractors = 0,
                     NumberOfHydrocarbons = 0,
                     ExtractorMarkers = { },
@@ -644,27 +631,6 @@ CompressedLabelTree = ClassSimple {
             if self.neighbors then
                 self.px = self.bx + self.ox + 0.5 * self.c
                 self.pz = self.bz + self.oz + 0.5 * self.c
-            end
-        end
-    end,
-
-    ---@param self CompressedLabelTreeLeaf
-    PrecomputePhase2 = function(self)
-        if self.children then 
-            for k, child in self.children do
-                child:PrecomputePhase2()
-            end
-        else 
-            if self.neighbors then
-                self.neighborDirections = { }
-                self.neighborDistances = { }
-
-                for k, neighbor in self.neighbors do
-                    local dx = neighbor.px - self.px
-                    local dz = neighbor.pz - self.pz
-                    self.neighborDirections[k] = { dx, dz}
-                    self.neighborDistances[k] = math.sqrt(dx * dx + dz * dz)
-                end
             end
         end
     end,
@@ -999,33 +965,33 @@ local function GenerateCompressionGrids(size, threshold)
         local blockZ = z * size
         for x = 0, LabelCompressionTreesPerAxis - 1 do
             local blockX = x * size
-            local labelTreeLand = CompressedLabelTree('Land', blockX, blockZ, size)
-            local labelTreeNaval = CompressedLabelTree('Water', blockX, blockZ, size)
-            local labelTreeHover = CompressedLabelTree('Hover', blockX, blockZ, size)
-            local labelTreeAmph = CompressedLabelTree('Amphibious', blockX, blockZ, size)
-            local labelTreeAir = CompressedLabelTree('Air', blockX, blockZ, size)
+            local labelTreeLand = CompressedLabelTree(blockX, blockZ, size)
+            local labelTreeNaval = CompressedLabelTree(blockX, blockZ, size)
+            local labelTreeHover = CompressedLabelTree(blockX, blockZ, size)
+            local labelTreeAmph = CompressedLabelTree(blockX, blockZ, size)
+            local labelTreeAir = CompressedLabelTree(blockX, blockZ, size)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
             PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
 
             ComputeLandPathingMatrix(labelTreeLand,        daCache,                    pCache, bCache, rCache)
-            labelTreeLand:Compress(rCache, threshold)
+            labelTreeLand:Compress(rCache, threshold, 'Land')
             navLand:AddTree(z, x, labelTreeLand)
 
             ComputeNavalPathingMatrix(labelTreeNaval,      daCache,                    pCache, bCache, rCache)
-            labelTreeNaval:Compress(rCache, 2 * threshold)
+            labelTreeNaval:Compress(rCache, 2 * threshold, 'Water')
             navWater:AddTree(z, x, labelTreeNaval)
 
             ComputeHoverPathingMatrix(labelTreeHover,      daCache,                    pCache, bCache, rCache)
-            labelTreeHover:Compress(rCache, threshold)
+            labelTreeHover:Compress(rCache, threshold, 'Hover')
             navHover:AddTree(z, x, labelTreeHover)
 
             ComputeAmphPathingMatrix(labelTreeAmph,        daCache,                    pCache, bCache, rCache)
-            labelTreeAmph:Compress(rCache, threshold)
+            labelTreeAmph:Compress(rCache, threshold, 'Amphibious')
             navAmphibious:AddTree(z, x, labelTreeAmph)
 
             ComputeAirPathingMatrix(labelTreeAir,          daCache,                    pCache, bCache, rCache)
-            labelTreeAir:Compress(rCache, threshold)
+            labelTreeAir:Compress(rCache, threshold, 'Air')
             navAir:AddTree(z, x, labelTreeAir)
         end
     end
