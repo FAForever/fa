@@ -355,16 +355,15 @@ CompressedLabelTree = ClassSimple {
         else
             -- we're not uniform, split up to children
             local hc = 0.5 * self.c
-            self.children = {
-                CompressedLabelTree(self.bx, self.bz, hc, self.ox, self.oz),
-                CompressedLabelTree(self.bx, self.bz, hc, self.ox + hc, self.oz),
-                CompressedLabelTree(self.bx, self.bz, hc, self.ox, self.oz + hc),
-                CompressedLabelTree(self.bx, self.bz, hc, self.ox + hc, self.oz + hc)
-            }
+            self[1] = CompressedLabelTree(self.bx, self.bz, hc, self.ox, self.oz)
+            self[2] = CompressedLabelTree(self.bx, self.bz, hc, self.ox + hc, self.oz)
+            self[3] = CompressedLabelTree(self.bx, self.bz, hc, self.ox, self.oz + hc)
+            self[4] = CompressedLabelTree(self.bx, self.bz, hc, self.ox + hc, self.oz + hc)
 
-            for k, child in self.children do
-                child:Compress(rCache, compressionThreshold, layer)
-            end
+            self[1]:Compress(rCache, compressionThreshold, layer)
+            self[2]:Compress(rCache, compressionThreshold, layer)
+            self[3]:Compress(rCache, compressionThreshold, layer)
+            self[4]:Compress(rCache, compressionThreshold, layer)
 
             NavLayerData[layer].Subdivisions = NavLayerData[layer].Subdivisions + 1
         end
@@ -385,10 +384,11 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- nodes do not have neighbors, only leafs do
-        if self.children then
-            for _, child in self.children do
-                child:GenerateDirectNeighbors(root)
-            end
+        if not self.label then
+            self[1]:GenerateDirectNeighbors(root)
+            self[2]:GenerateDirectNeighbors(root)
+            self[3]:GenerateDirectNeighbors(root)
+            self[4]:GenerateDirectNeighbors(root)
             return
         end
 
@@ -481,10 +481,11 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- nodes do not have neighbors, only leafs do
-        if self.children then
-            for _, child in self.children do
-                child:GenerateCornerNeighbors(root, layer)
-            end
+        if not self.label then
+            self[1]:GenerateCornerNeighbors(root, layer)
+            self[2]:GenerateCornerNeighbors(root, layer)
+            self[3]:GenerateCornerNeighbors(root, layer)
+            self[4]:GenerateCornerNeighbors(root, layer)
             return
         end
 
@@ -617,17 +618,19 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- node case
-        for _, child in self.children do
-            child:GenerateLabels(stack)
-        end
+        self[1]:GenerateLabels(stack)
+        self[2]:GenerateLabels(stack)
+        self[3]:GenerateLabels(stack)
+        self[4]:GenerateLabels(stack)
     end,
 
     ---@param self CompressedLabelTreeLeaf
     PrecomputePhase1 = function(self)
-        if self.children then 
-            for k, child in self.children do
-                child:PrecomputePhase1()
-            end
+        if not self.label then
+            self[1]:PrecomputePhase1()
+            self[2]:PrecomputePhase1()
+            self[3]:PrecomputePhase1()
+            self[4]:PrecomputePhase1()
         else 
             if self.neighbors then
                 self.px = self.bx + self.ox + 0.5 * self.c
@@ -682,22 +685,21 @@ CompressedLabelTree = ClassSimple {
     ---@param z number
     ---@return CompressedLabelTreeLeaf?
     _FindLeafXZ = function(self, x, z)
-        local children = self.children
-        if children then
+        if not self.label then
             local hsize = self.c * 0.5
             local hx, hz = self.ox + hsize, self.oz + hsize
             local child
             if z < hz then
                 if x < hx then
-                    child = children[1] -- top left
+                    child = self[1] -- top left
                 else
-                    child = children[2] -- top right
+                    child = self[2] -- top right
                 end
             else
                 if x < hx then
-                    child = children[3] -- bottom left
+                    child = self[3] -- bottom left
                 else
-                    child = children[4] -- bottom right
+                    child = self[4] -- bottom right
                 end
             end
             if child then
@@ -711,33 +713,31 @@ CompressedLabelTree = ClassSimple {
     ---@param self CompressedLabelTree
     ---@param color Color
     Draw = function(self, color, inset, bx, bz, ox, oz)
-        if self.label != nil then
+        if self.label then
             if self.label >= 0 then
                 DrawSquare(bx + ox, bz + oz, self.c, color, inset)
             end
         else
             local hc = 0.5 * self.c
-            local children = self.children --[[@as table<number, CompressedLabelTree>]]
-            children[1]:Draw(color, inset, bx, bz, ox,      oz     )
-            children[2]:Draw(color, inset, bx, bz, ox + hc, oz     )
-            children[3]:Draw(color, inset, bx, bz, ox,      oz + hc)
-            children[4]:Draw(color, inset, bx, bz, ox + hc, oz + hc)
+            self[1]:Draw(color, inset, bx, bz, ox,      oz     )
+            self[2]:Draw(color, inset, bx, bz, ox + hc, oz     )
+            self[3]:Draw(color, inset, bx, bz, ox,      oz + hc)
+            self[4]:Draw(color, inset, bx, bz, ox + hc, oz + hc)
         end
     end,
 
     ---@param self CompressedLabelTree
     DrawLabels = function(self, inset, bx, bz, ox, oz)
-        if self.label != nil then
+        if self.label then
             if self.label >= 0 then
                 DrawSquare(bx + ox, bz + oz, self.c, Shared.LabelToColor(self.label), inset)
             end
         else
             local hc = 0.5 * self.c
-            local children = self.children --[[@as table<number, CompressedLabelTree>]]
-            children[1]:DrawLabels(inset, bx, bz, ox,      oz     )
-            children[2]:DrawLabels(inset, bx, bz, ox + hc, oz     )
-            children[3]:DrawLabels(inset, bx, bz, ox,      oz + hc)
-            children[4]:DrawLabels(inset, bx, bz, ox + hc, oz + hc)
+            self[1]:DrawLabels(inset, bx, bz, ox,      oz     )
+            self[2]:DrawLabels(inset, bx, bz, ox + hc, oz     )
+            self[3]:DrawLabels(inset, bx, bz, ox,      oz + hc)
+            self[4]:DrawLabels(inset, bx, bz, ox + hc, oz + hc)
         end
     end,
 }
