@@ -270,7 +270,6 @@ local CompressedLabelTree
 ---@field ox number             # Offset of top-left corner, in world space
 ---@field oz number             # Offset of top-left corner, in world space
 ---@field c number              # Element count starting at { bx + ox, bz + oz } that describes the square that is covered
----@field children? CompressedLabelTree[]                   # Is populated if we are a node
 ---@field label? number                                     # Is populated if we are a leaf
 ---@field neighbors? table<number, CompressedLabelTree>     # Is populated if we are a leaf
 ---@field px? number                                        # Is populated if we are a leaf
@@ -286,10 +285,10 @@ CompressedLabelTree = ClassSimple {
 
         self.bx = bx
         self.bz = bz
-        self.c = c
-
         self.ox = ox or 0
         self.oz = oz or 0
+
+        self.c = c
     end,
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
