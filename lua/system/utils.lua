@@ -33,7 +33,7 @@ function ToBytes(element, ignore, seen)
     end
 
     -- applies to tables and strings, to prevent counting them multiple times
-    local seen = seen or { }
+    seen = seen or { }
     if seen[element] then
         return 0
     end
