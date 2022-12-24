@@ -96,45 +96,6 @@ SyncMeta = {
     end,
 }
 
---- Determines the size in bytes of the given element
----@param element any
----@param ignore table<string, boolean>     # List of key names to ignore of all (referenced) tables
----@param seen? table<table, any>           # List of strings and / or tables that we've seen so far. Should be nil by default
----@return integer
-function ToBytes(element, ignore, seen)
-
-    -- has no allocated bytes
-    if element == nil then
-        return 0
-    end
-
-    -- applies to tables and strings, to prevent counting them multiple times
-    local seen = seen or { }
-    if seen[element] then
-        return 0
-    end
-
-    -- determine size
-    local allocatedSize = debug.allocatedsize(element)
-    if allocatedSize == 0 then
-        return 8
-    elseif type(element) ~= 'table' then
-        seen[element] = true
-        return allocatedSize
-    end
-
-    -- at this point we know it is a table
-    seen[element] = true
-    for k, v in element do
-        if not ignore[k] then
-            allocatedSize = allocatedSize + ToBytes(v, ignore, seen)
-        end
-    end
-
-    return allocatedSize
-end
-
-
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods
 ---@field Brain AIBrain
@@ -254,14 +215,6 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     OnCreate = function(self)
         local bp = self:GetBlueprint()
-
-        ForkThread(
-            function()
-                WaitSeconds(1.0)
-                LOG(ToBytes(self, { Blueprint = true, Brain = true, Audio = true, MovementEffects = true }))
-                LOG(ToBytes(__blueprints))
-            end
-        )
 
         -- cache often accessed values into inner table
         self.Blueprint = bp
