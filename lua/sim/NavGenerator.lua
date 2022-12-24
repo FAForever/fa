@@ -32,10 +32,6 @@ local Shared = import("/lua/shared/navgenerator.lua")
 ---@alias NavTerrainBlockCache boolean[][]
 ---@alias NavLabelCache number[][]
 
-local Statistics = {
-    CulledLabels = 0
-}
-
 --- TODO: should this be dynamic, based on playable area?
 --- Number of blocks that encompass the map, per axis
 ---@type number
@@ -1066,7 +1062,6 @@ local function GenerateCullLabels()
         end
     end
 
-    Statistics.CulledLabels = culledLabels
     SPEW(string.format("NavGenerator - culled %d labels", culledLabels))
 end
 
