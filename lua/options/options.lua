@@ -465,6 +465,18 @@ options = {
             -- },
 
             {
+                title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
+                key = 'repeatbuild',
+                type = 'toggle',
+                default = false,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0273>Automated Structure Ringing",
                 key = 'structure_capping_feature_01',
                 type = 'toggle',
@@ -829,18 +841,6 @@ options = {
                   min = 100,
                   max = 5000,
                   inc = 100,
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0287>Factories Default Repeat Build",
-                key = 'repeatbuild',
-                type = 'toggle',
-                default = false,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
-                    },
                 },
             },
 
