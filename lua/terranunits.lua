@@ -12,32 +12,10 @@
 ---------------------------------------------------------------------------
 local DefaultUnitsFile = import("/lua/defaultunits.lua")
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
-local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
-local AirUnit = DefaultUnitsFile.AirUnit
-local ConcreteStructureUnit = DefaultUnitsFile.ConcreteStructureUnit
 local ConstructionUnit = DefaultUnitsFile.ConstructionUnit
-local EnergyCreationUnit = DefaultUnitsFile.EnergyCreationUnit
-local EnergyStorageUnit = DefaultUnitsFile.EnergyStorageUnit
 local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
-local LandUnit = DefaultUnitsFile.LandUnit
-local HoverLandUnit = DefaultUnitsFile.HoverLandUnit
-local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
-local MassFabricationUnit = DefaultUnitsFile.MassFabricationUnit
-local MassStorageUnit = DefaultUnitsFile.MassStorageUnit
-local RadarUnit = DefaultUnitsFile.RadarUnit
-local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
-local SeaUnit = DefaultUnitsFile.SeaUnit
-local ShieldLandUnit = DefaultUnitsFile.ShieldLandUnit
-local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
-local SonarUnit = DefaultUnitsFile.SonarUnit
-local StructureUnit = DefaultUnitsFile.StructureUnit
-local SubUnit = DefaultUnitsFile.SubUnit
-local WalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
-local WallStructureUnit = DefaultUnitsFile.WallStructureUnit
-local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
-local ShieldSeaUnit = DefaultUnitsFile.ShieldSeaUnit
-local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
+local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
 local AmphibiousLandUnit = DefaultUnitsFile.AmphibiousLandUnit
 
 local EffectUtil = import("/lua/effectutilities.lua")
@@ -75,7 +53,7 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     ---@param self TAirFactoryUnit
-    ---@param unitBeingBuilt Unit
+    ---@param unitBeingBuilt boolean
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         AirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
@@ -85,7 +63,7 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     ---@param self TAirFactoryUnit
-    ---@param unitBuilding Unit
+    ---@param unitBuilding boolean
     OnStopBuild = function(self, unitBuilding)
         AirFactoryUnit.OnStopBuild(self, unitBuilding)
         self:StopArmsMoving()
@@ -121,19 +99,19 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
 --  AIR STAGING STRUCTURES
 --------------------------------------------------------------
 ---@class TAirStagingPlatformUnit : AirStagingPlatformUnit
-TAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
+TAirStagingPlatformUnit = Class(DefaultUnitsFile.AirStagingPlatformUnit) {}
 
 --------------------------------------------------------------
 --  AIR UNITS
 --------------------------------------------------------------
 ---@class TAirUnit : AirUnit
-TAirUnit = Class(AirUnit) {}
+TAirUnit = Class(DefaultUnitsFile.AirUnit) {}
 
 --------------------------------------------------------------
 --  WALL  STRUCTURES
 --------------------------------------------------------------
 ---@class TConcreteStructureUnit : ConcreteStructureUnit
-TConcreteStructureUnit = Class(ConcreteStructureUnit) {}
+TConcreteStructureUnit = Class(DefaultUnitsFile.ConcreteStructureUnit) {}
 
 --------------------------------------------------------------
 --  Construction Units
@@ -204,19 +182,19 @@ TConstructionUnit = Class(ConstructionUnit) {
 -- ENERGY CREATION STRUCTURES
 --------------------------------------------------------------
 ---@class TEnergyCreationUnit : EnergyCreationUnit
-TEnergyCreationUnit = Class(EnergyCreationUnit) {}
+TEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {}
 
 --------------------------------------------------------------
 -- ENERGY STORAGE STRUCTURES
 --------------------------------------------------------------
 ---@class TEnergyStorageUnit : EnergyStorageUnit
-TEnergyStorageUnit = Class(EnergyStorageUnit) {}
+TEnergyStorageUnit = Class(DefaultUnitsFile.EnergyStorageUnit) {}
 
 --------------------------------------------------------------
 --  HOVER LAND UNITS
 --------------------------------------------------------------
 ---@class THoverLandUnit : HoverLandUnit
-THoverLandUnit = Class(HoverLandUnit) {}
+THoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {}
 
 --------------------------------------------------------------
 --  LAND FACTORY STRUCTURES
@@ -239,25 +217,25 @@ TLandFactoryUnit = Class(LandFactoryUnit) {
 --  LAND UNITS
 --------------------------------------------------------------
 ---@class TLandUnit : LandUnit
-TLandUnit = Class(LandUnit) {}
+TLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 --------------------------------------------------------------
 --  MASS COLLECTION UNITS
 --------------------------------------------------------------
 ---@class TMassCollectionUnit : MassCollectionUnit
-TMassCollectionUnit = Class(MassCollectionUnit) {}
+TMassCollectionUnit = Class(DefaultUnitsFile.MassCollectionUnit) {}
 
 --------------------------------------------------------------
 -- MASS FABRICATION STRUCTURES
 --------------------------------------------------------------
 ---@class TMassFabricationUnit : MassFabricationUnit
-TMassFabricationUnit = Class(MassFabricationUnit) {}
+TMassFabricationUnit = Class(DefaultUnitsFile.MassFabricationUnit) {}
 
 --------------------------------------------------------------
 -- MASS STORAGE STRUCTURES
 --------------------------------------------------------------
 ---@class TMassStorageUnit : MassStorageUnit
-TMassStorageUnit = Class(MassStorageUnit) {}
+TMassStorageUnit = Class(DefaultUnitsFile.MassStorageUnit) {}
 
 --------------------------------------------------------------
 --  MOBILE FACTORY UNIT
@@ -280,13 +258,13 @@ TMobileFactoryUnit = Class(AmphibiousLandUnit) {
 --  RADAR STRUCTURES
 --------------------------------------------------------------
 ---@class TRadarUnit : RadarUnit
-TRadarUnit = Class(RadarUnit) {}
+TRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
 
 --------------------------------------------------------------
 --  SONAR STRUCTURES
 --------------------------------------------------------------
 ---@class TSonarUnit : SonarUnit
-TSonarUnit = Class(SonarUnit) {}
+TSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 
 --------------------------------------------------------------
 --  SEA FACTORY STRUCTURES
@@ -365,28 +343,29 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
 --  SEA UNITS
 --------------------------------------------------------------
 ---@class TSeaUnit : SeaUnit
-TSeaUnit = Class(SeaUnit) {}
+TSeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
 
 --------------------------------------------------------------
 --  SHIELD LAND UNITS
 --------------------------------------------------------------
 ---@class TShieldLandUnit : ShieldLandUnit
-TShieldLandUnit = Class(ShieldLandUnit) {}
+TShieldLandUnit = Class(DefaultUnitsFile.ShieldLandUnit) {}
 
 --------------------------------------------------------------
 --  SHIELD STRUCTURES
 --------------------------------------------------------------
 ---@class TShieldStructureUnit : ShieldStructureUnit
-TShieldStructureUnit = Class(ShieldStructureUnit) {}
+TShieldStructureUnit = Class(DefaultUnitsFile.ShieldStructureUnit) {}
 
 --------------------------------------------------------------
 --  STRUCTURES
 --------------------------------------------------------------
 ---@class TStructureUnit : StructureUnit
-TStructureUnit = Class(StructureUnit) {}
+TStructureUnit = Class(DefaultUnitsFile.StructureUnit) {}
 
 ---@class TRadarJammerUnit : RadarJammerUnit
-TRadarJammerUnit = Class(RadarJammerUnit) {
+---@field MySpinner? moho.RotateManipulator
+TRadarJammerUnit = Class() {
 
     ---@param self TRadarJammerUnit
     OnIntelEnabled = function(self)
@@ -409,43 +388,43 @@ TRadarJammerUnit = Class(RadarJammerUnit) {
 --  SUBMARINE UNITS
 --------------------------------------------------------------
 ---@class TSubUnit : SubUnit
-TSubUnit = Class(SubUnit) {}
+TSubUnit = Class(DefaultUnitsFile.SubUnit) {}
 
 --------------------------------------------------------------
 --  TRANSPORT BEACON UNITS
 --------------------------------------------------------------
 ---@class TTransportBeaconUnit : TransportBeaconUnit
-TTransportBeaconUnit = Class(TransportBeaconUnit) {}
+TTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 
 --------------------------------------------------------------
 --  WALKING LAND UNITS
 --------------------------------------------------------------
 ---@class TWalkingLandUnit : WalkingLandUnit
-TWalkingLandUnit = Class(WalkingLandUnit) { }
+TWalkingLandUnit = Class(DefaultUnitsFile.WalkingLandUnit) { }
 
 --------------------------------------------------------------
 --  WALL  STRUCTURES
 --------------------------------------------------------------
 ---@class TWallStructureUnit : WallStructureUnit
-TWallStructureUnit = Class(WallStructureUnit) {}
+TWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 --------------------------------------------------------------
 --  CIVILIAN STRUCTURES
 --------------------------------------------------------------
 ---@class TCivilianStructureUnit : StructureUnit
-TCivilianStructureUnit = Class(StructureUnit) {}
+TCivilianStructureUnit = Class(DefaultUnitsFile.StructureUnit) {}
 
 --------------------------------------------------------------
 --  QUANTUM GATE UNITS
 --------------------------------------------------------------
 ---@class TQuantumGateUnit : QuantumGateUnit
-TQuantumGateUnit = Class(QuantumGateUnit) {}
+TQuantumGateUnit = Class(DefaultUnitsFile.QuantumGateUnit) {}
 
 --------------------------------------------------------------
 --  SHIELD SEA UNITS
 --------------------------------------------------------------
 ---@class TShieldSeaUnit : ShieldSeaUnit
-TShieldSeaUnit = Class(ShieldSeaUnit) {}
+TShieldSeaUnit = Class(DefaultUnitsFile.ShieldSeaUnit) {}
 
 --------------------------------------------------------------
 --  Pod Tower Unit (Kennels)

@@ -9,7 +9,6 @@
 --****************************************************************************
 
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
-local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 SANHeavyCavitationTorpedo04 = Class(SHeavyCavitationTorpedo) {
