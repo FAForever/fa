@@ -218,9 +218,11 @@ NavGrid = ClassSimple {
 
     ---@param self NavGrid
     Precompute = function(self)
+        local size = self.TreeSize
+        local trees = self.Trees
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:PrecomputePhase1()
+                trees[z][x]:ComputeCenter(x * size, z * size, 0, 0)
             end
         end
     end,
@@ -624,16 +626,17 @@ CompressedLabelTree = ClassSimple {
     end,
 
     ---@param self CompressedLabelTreeLeaf
-    PrecomputePhase1 = function(self)
+    ComputeCenter = function(self, bx, bz, ox, oz)
         if not self.label then
-            self[1]:PrecomputePhase1()
-            self[2]:PrecomputePhase1()
-            self[3]:PrecomputePhase1()
-            self[4]:PrecomputePhase1()
+            local hc = 0.5 * self.c
+            self[1]:ComputeCenter(bx, bz, ox,      oz     )
+            self[2]:ComputeCenter(bx, bz, ox + hc, oz     )
+            self[3]:ComputeCenter(bx, bz, ox,      oz + hc)
+            self[4]:ComputeCenter(bx, bz, ox + hc, oz + hc)
         else 
             if self.neighbors then
-                self.px = self.bx + self.ox + 0.5 * self.c
-                self.pz = self.bz + self.oz + 0.5 * self.c
+                self.px = bx + ox + 0.5 * self.c
+                self.pz = bz + oz + 0.5 * self.c
             end
         end
     end,
