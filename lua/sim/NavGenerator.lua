@@ -174,11 +174,15 @@ NavGrid = ClassSimple {
     ---@return CompressedLabelTreeLeaf?
     FindLeafXZ = function(self, x, z)
         if x > 0 and z > 0 then
-            local bx = (x / self.TreeSize) ^ 0
-            local bz = (z / self.TreeSize) ^ 0
-            local labelTree = self.Trees[bz][bx]
+
+            local size = self.TreeSize
+            local trees = self.Trees
+
+            local bx = (x / size) ^ 0
+            local bz = (z / size) ^ 0
+            local labelTree = trees[bz][bx]
             if labelTree then
-                return labelTree:FindLeafXZ(x, z)
+                return labelTree:FindLeafXZ(bx * size, bz * size, 0, 0, x, z)
             end
         end
 
@@ -281,17 +285,9 @@ local CompressedLabelTree
 CompressedLabelTree = ClassSimple {
 
     ---@param self CompressedLabelTree
-    ---@param bx number
-    ---@param bz number
     ---@param c number
-    __init = function(self, bx, bz, c, ox, oz)
+    __init = function(self, c)
         self.identifier = GenerateCompressedTreeIdentifier()
-
-        self.bx = bx
-        self.bz = bz
-        self.ox = ox or 0
-        self.oz = oz or 0
-
         self.c = c
     end,
 
@@ -354,10 +350,10 @@ CompressedLabelTree = ClassSimple {
         else
             -- we're not uniform, split up to children
             local hc = 0.5 * self.c
-            self[1] = CompressedLabelTree(bx, bz, hc, ox, oz)
-            self[2] = CompressedLabelTree(bx, bz, hc, ox + hc, oz)
-            self[3] = CompressedLabelTree(bx, bz, hc, ox, oz + hc)
-            self[4] = CompressedLabelTree(bx, bz, hc, ox + hc, oz + hc)
+            self[1] = CompressedLabelTree(hc)
+            self[2] = CompressedLabelTree(hc)
+            self[3] = CompressedLabelTree(hc)
+            self[4] = CompressedLabelTree(hc)
 
             self[1]:Compress(rCache, bx, bz, ox, oz, compressionThreshold, layer)
             self[2]:Compress(rCache, bx, bz, ox + hc, oz, compressionThreshold, layer)
@@ -662,8 +658,8 @@ CompressedLabelTree = ClassSimple {
     ---@param self CompressedLabelTree
     ---@param position Vector A position in world space
     ---@return CompressedLabelTreeLeaf?
-    FindLeaf = function(self, position)
-        return self:FindLeafXZ(position[1], position[3])
+    FindLeaf = function(self, bx, bz, ox, oz, position)
+        return self:FindLeafXZ(bx, bz, ox, oz, position[1], position[3])
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
@@ -671,41 +667,37 @@ CompressedLabelTree = ClassSimple {
     ---@param x number x-coordinate, in world space
     ---@param z number z-coordinate, in world space
     ---@return CompressedLabelTreeLeaf?
-    FindLeafXZ = function(self, x, z)
-        local x1 = self.bx + self.ox
-        local z1 = self.bz + self.oz
+    FindLeafXZ = function(self, bx, bz, ox, oz, x, z)
+        local x1 = bx + ox
+        local z1 = bz + oz
         local size = self.c
         -- Check if it's inside our rectangle the first time only
         if x < x1 or x1 + size < x or z < z1 or z1 + size < z then
             return nil
         end
-        return self:_FindLeafXZ(x - self.bx, z - self.bz)
+        return self:_FindLeafXZ(bx, bz, ox, oz, x - bx, z - bz)
     end;
 
     ---@param self CompressedLabelTree
     ---@param x number
     ---@param z number
     ---@return CompressedLabelTreeLeaf?
-    _FindLeafXZ = function(self, x, z)
+    _FindLeafXZ = function(self, bx, bz, ox, oz, x, z)
         if not self.label then
-            local hsize = self.c * 0.5
-            local hx, hz = self.ox + hsize, self.oz + hsize
-            local child
+            local hc = self.c * 0.5
+            local hx, hz = ox + hc, oz + hc
             if z < hz then
                 if x < hx then
-                    child = self[1] -- top left
+                    return self[1]:_FindLeafXZ(bx, bz, ox,      oz     , x, z) -- top left
                 else
-                    child = self[2] -- top right
+                    return self[2]:_FindLeafXZ(bx, bz, ox + hc, oz     , x, z) -- top right
                 end
             else
                 if x < hx then
-                    child = self[3] -- bottom left
+                    return self[3]:_FindLeafXZ(bx, bz, ox,      oz + hc, x, z) -- bottom left
                 else
-                    child = self[4] -- bottom right
+                    return self[4]:_FindLeafXZ(bx, bz, ox + hc, oz + hc, x, z) -- bottom right
                 end
-            end
-            if child then
-                return child:_FindLeafXZ(x, z)
             end
         else
             return self --[[@as CompressedLabelTreeLeaf]]
@@ -797,20 +789,17 @@ end
 ---@param pzCache NavVerticalPathCache
 ---@param pCache NavPathCache
 ---@param bCache NavTerrainBlockCache
-function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pCache, bCache)
+function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, c)
     local MathAbs = math.abs
     local Mathmax = math.max
     local GetTerrainHeight = GetTerrainHeight
     local GetSurfaceHeight = GetSurfaceHeight
     local GetTerrainType = GetTerrainType
 
-    local size = labelTree.c
-    local bx, bz = labelTree.bx, labelTree.bz
-
     -- scan / cache terrain and depth
-    for z = 1, size + 1 do
+    for z = 1, c + 1 do
         local absZ = bz + z - 1
-        for x = 1, size + 1 do
+        for x = 1, c + 1 do
             local absX = bx + x - 1
             local terrain = GetTerrainHeight(absX, absZ)
             local surface = GetSurfaceHeight(absX, absZ)
@@ -823,14 +812,14 @@ function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pC
     end
 
     -- scan / cache cliff walkability
-    for z = 1, size + 1 do
-        for x = 1, size do
+    for z = 1, c + 1 do
+        for x = 1, c do
             pxCache[z][x] = MathAbs(tCache[z][x] - tCache[z][x + 1]) < MaxHeightDifference
         end
     end
 
-    for z = 1, size do
-        for x = 1, size + 1 do
+    for z = 1, c do
+        for x = 1, c + 1 do
             pzCache[z][x] = MathAbs(tCache[z][x] - tCache[z + 1][x]) < MaxHeightDifference
         end
     end
@@ -838,20 +827,15 @@ function PopulateCaches(labelTree, tCache, dCache, daCache, pxCache, pzCache, pC
     -- compute cliff walkability
     -- compute average depth
     -- compute terrain type
-    for z = 1, size do
+    for z = 1, c do
         local absZ = bz + z
-        for x = 1, size do
+        for x = 1, c do
             local absX = bx + x
             pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
             daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
             bCache[z][x] = not GetTerrainType(absX, absZ).Blocking
 
-            -- local color = 'ff0000'
-            -- if pCache[lz][lx] == 0 then
-            --     color = '00ff00'
-            -- end
 
-            -- DrawSquare(labelTree.bx + x + 0.35, labelTree.bz + z + 0.35, 0.3, color)
         end
     end
 end
@@ -974,14 +958,14 @@ local function GenerateCompressionGrids(size, threshold)
         local bz = z * size
         for x = 0, LabelCompressionTreesPerAxis - 1 do
             local bx = x * size
-            local labelTreeLand = CompressedLabelTree(bx, bz, size)
-            local labelTreeNaval = CompressedLabelTree(bx, bz, size)
-            local labelTreeHover = CompressedLabelTree(bx, bz, size)
-            local labelTreeAmph = CompressedLabelTree(bx, bz, size)
-            local labelTreeAir = CompressedLabelTree(bx, bz, size)
+            local labelTreeLand = CompressedLabelTree(size)
+            local labelTreeNaval = CompressedLabelTree(size)
+            local labelTreeHover = CompressedLabelTree(size)
+            local labelTreeAmph = CompressedLabelTree(size)
+            local labelTreeAir = CompressedLabelTree(size)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
-            PopulateCaches(labelTreeLand, tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache)
+            PopulateCaches(tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache, bx, bz, size)
 
             ComputeLandPathingMatrix(labelTreeLand,        daCache,                    pCache, bCache, rCache)
             labelTreeLand:Compress(rCache, bx, bz, 0, 0, threshold, 'Land')
