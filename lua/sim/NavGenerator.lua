@@ -1,17 +1,16 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2022  Willem 'Jip' Wijnia
---** 
+--**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
 --** in the Software without restriction, including without limitation the rights
 --** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 --** copies of the Software, and to permit persons to whom the Software is
 --** furnished to do so, subject to the following conditions:
---** 
+--**
 --** The above copyright notice and this permission notice shall be included in all
 --** copies or substantial portions of the Software.
---** 
+--**
 --** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 --** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 --** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -50,7 +49,7 @@ local MaxWaterDepthAmphibious = 25
 local MinWaterDepthNaval = 1.5
 
 local TableInsert = table.insert
-local HashCache = { }
+local HashCache = {}
 
 -- Generated data
 
@@ -60,7 +59,7 @@ local HashCache = { }
 ---@field Hover? NavGrid
 ---@field Amphibious? NavGrid
 ---@field Air? NavGrid
-NavGrids = { }
+NavGrids = {}
 
 ---@class NavLabelMetadata
 ---@field Node CompressedLabelTreeLeaf
@@ -77,7 +76,7 @@ NavGrids = { }
 -- ---@field DefensePointMarkers MarkerData[]
 
 ---@type table<number, NavLabelMetadata>
-NavLabels = { }
+NavLabels = {}
 
 local Generated = false
 ---@return boolean
@@ -138,9 +137,9 @@ NavGrid = ClassSimple {
     __init = function(self, layer, treeSize)
         self.Layer = layer
         self.TreeSize = treeSize
-        self.Trees = { }
+        self.Trees = {}
         for z = 0, LabelCompressionTreesPerAxis - 1 do
-            self.Trees[z] = { }
+            self.Trees[z] = {}
         end
     end,
 
@@ -157,7 +156,7 @@ NavGrid = ClassSimple {
     ---@param z number index
     ---@param x number index
     ---@param labelTree CompressedLabelTreeNode
-    AddTree = function (self, z, x, labelTree)
+    AddTree = function(self, z, x, labelTree)
         self.Trees[z][x] = labelTree
     end,
 
@@ -205,7 +204,7 @@ NavGrid = ClassSimple {
     ---@param self NavGrid
     GenerateLabels = function(self)
         local labelStart = LabelIdentifier
-        local stack = { }
+        local stack = {}
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
                 self.Trees[z][x]:GenerateLabels(stack, self.Layer)
@@ -296,7 +295,7 @@ CompressedLabelTree = ClassSimple {
             for z = oz + 1, oz + size do
                 for x = ox + 1, ox + size do
                     uniform = uniform and (value == rCache[z][x])
-                    if not uniform  then
+                    if not uniform then
                         break
                     end
                 end
@@ -307,7 +306,7 @@ CompressedLabelTree = ClassSimple {
                 self.Size = size
                 if self.Label >= 0 then
                     NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
-                else 
+                else
                     NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
                 end
             else
@@ -321,7 +320,7 @@ CompressedLabelTree = ClassSimple {
 
         -- recursive case where we do make children
         local value = rCache[oz + 1][ox + 1]
-        local uniform = true 
+        local uniform = true
         for z = oz + 1, oz + size do
             for x = ox + 1, ox + size do
                 uniform = uniform and (value == rCache[z][x])
@@ -336,7 +335,7 @@ CompressedLabelTree = ClassSimple {
             self.Label = value
             self.Size = size
 
-            if self.Label >= 0 then 
+            if self.Label >= 0 then
                 NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
             else
                 NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
@@ -368,9 +367,9 @@ CompressedLabelTree = ClassSimple {
         -- nodes do not have neighbors, only leafs do
         if not label then
             local hc = 0.5 * size
-            self[1]:GenerateDirectNeighbors(bx, bz, ox,      oz     , hc, root, layer)
-            self[2]:GenerateDirectNeighbors(bx, bz, ox + hc, oz     , hc, root, layer)
-            self[3]:GenerateDirectNeighbors(bx, bz, ox,      oz + hc, hc, root, layer)
+            self[1]:GenerateDirectNeighbors(bx, bz, ox, oz, hc, root, layer)
+            self[2]:GenerateDirectNeighbors(bx, bz, ox + hc, oz, hc, root, layer)
+            self[3]:GenerateDirectNeighbors(bx, bz, ox, oz + hc, hc, root, layer)
             self[4]:GenerateDirectNeighbors(bx, bz, ox + hc, oz + hc, hc, root, layer)
             return
         end
@@ -405,11 +404,11 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x, z1Outside)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label >= 0 and not seen[neighbor] then
+                if neighbor.Label == 0 and not seen[neighbor] then
                     seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
-            else 
+            else
                 break
             end
         end
@@ -421,11 +420,11 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x, z2Outside)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label >= 0 and not seen[neighbor] then
+                if neighbor.Label == 0 and not seen[neighbor] then
                     seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
-            else 
+            else
                 break
             end
         end
@@ -437,11 +436,11 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x1Outside, z)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label >= 0 and not seen[neighbor] then
+                if neighbor.Label == 0 and not seen[neighbor] then
                     seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
-            else 
+            else
                 break
             end
         end
@@ -453,7 +452,7 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x2Outside, z)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label >= 0 and not seen[neighbor] then
+                if neighbor.Label == 0 and not seen[neighbor] then
                     seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
@@ -470,12 +469,12 @@ CompressedLabelTree = ClassSimple {
         local a, b
         local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
-        if neighbor and neighbor.Label >= 0 and not seen[neighbor] then
+        if neighbor and neighbor.Label == 0 and not seen[neighbor] then
             seen[neighbor] = true
             a = root:FindLeafXZ(x1Outside + 1, z1Outside)
             b = root:FindLeafXZ(x1Outside, z1Outside + 1)
 
-            if a and b and a.Label >= 0 and b.Label >= 0 then
+            if a and b and a.Label == 0 and b.Label == 0 then
                 TableInsert(self, neighbor)
             end
         end
@@ -483,12 +482,12 @@ CompressedLabelTree = ClassSimple {
         -- scan top-right
         neighbor = root:FindLeafXZ(x2Outside, z1Outside)
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
-        if neighbor and neighbor.Label >= 0 and not seen[neighbor] then
+        if neighbor and neighbor.Label == 0 and not seen[neighbor] then
             seen[neighbor] = true
-            a = root:FindLeafXZ(x2Outside -1, z1Outside)
+            a = root:FindLeafXZ(x2Outside - 1, z1Outside)
             b = root:FindLeafXZ(x2Outside, z1Outside + 1)
 
-            if a and b and a.Label >= 0 and b.Label >= 0 then
+            if a and b and a.Label == 0 and b.Label == 0 then
                 TableInsert(self, neighbor)
             end
         end
@@ -496,12 +495,12 @@ CompressedLabelTree = ClassSimple {
         -- scan bottom-left
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x1Outside, z2Outside)
-        if neighbor and neighbor.Label >= 0 and not seen[neighbor] then
+        if neighbor and neighbor.Label == 0 and not seen[neighbor] then
             seen[neighbor] = true
             a = root:FindLeafXZ(x1Outside + 1, z2Outside)
             b = root:FindLeafXZ(x1Outside, z2Outside - 1)
 
-            if a and b and a.Label >= 0 and b.Label >= 0 then
+            if a and b and a.Label == 0 and b.Label == 0 then
                 TableInsert(self, neighbor)
             end
         end
@@ -509,12 +508,12 @@ CompressedLabelTree = ClassSimple {
         -- scan bottom-right
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x2Outside, z2Outside)
-        if neighbor and neighbor.Label >= 0 and not seen[neighbor] then
+        if neighbor and neighbor.Label == 0 and not seen[neighbor] then
             seen[neighbor] = true
             a = root:FindLeafXZ(x2Outside - 1, z2Outside)
             b = root:FindLeafXZ(x2Outside, z2Outside - 1)
 
-            if a and b and a.Label >= 0 and b.Label >= 0 then
+            if a and b and a.Label == 0 and b.Label == 0 then
                 TableInsert(self, neighbor)
             end
         end
@@ -531,26 +530,26 @@ CompressedLabelTree = ClassSimple {
             -- check if we are unassigned (labels start at 1)
             if self.Label == 0 then
 
-                -- we can hit a stack overflow if we do this recursively, therefore we do a 
+                -- we can hit a stack overflow if we do this recursively, therefore we do a
                 -- depth first search using a stack that we re-use for better performance
                 local free = 1
                 local label = GenerateLabelIdentifier()
 
                 NavLabels[label] = {
                     Area = 0,
-                    Node = self --[[@as CompressedLabelTreeLeaf]],
+                    Node = self --[[@as CompressedLabelTreeLeaf]] ,
                     Layer = layer,
                     NumberOfExtractors = 0,
                     NumberOfHydrocarbons = 0,
-                    ExtractorMarkers = { },
-                    HydrocarbonMarkers = { },
+                    ExtractorMarkers = {},
+                    HydrocarbonMarkers = {},
                 }
 
                 local metadata = NavLabels[label]
 
                 -- assign the label, and then search through our neighbors to assign the same label to them
                 self.Label = label
-                metadata.Area = metadata.Area + (( 0.01 * self.Size) * ( 0.01 * self.Size))
+                metadata.Area = metadata.Area + ((0.01 * self.Size) * (0.01 * self.Size))
 
                 -- add our pathable neighbors to the stack
                 for k = 1, table.getn(self) do
@@ -560,7 +559,7 @@ CompressedLabelTree = ClassSimple {
                         free = free + 1
                     end
 
-                    if neighbor.Label > 0 then 
+                    if neighbor.Label > 0 then
                         WARN("Something fishy happened")
                     end
                 end
@@ -574,7 +573,7 @@ CompressedLabelTree = ClassSimple {
 
                     -- assign label, manage metadata
                     other.Label = label
-                    metadata.Area = metadata.Area + (( 0.01 * other.Size) * ( 0.01 * other.Size))
+                    metadata.Area = metadata.Area + ((0.01 * other.Size) * (0.01 * other.Size))
 
                     -- add unlabelled neighbors
                     for k = 1, table.getn(other) do
@@ -601,11 +600,11 @@ CompressedLabelTree = ClassSimple {
     ComputeCenter = function(self, bx, bz, ox, oz, size)
         if not self.Label then
             local hc = 0.5 * size
-            self[1]:ComputeCenter(bx, bz, ox,      oz     , hc)
-            self[2]:ComputeCenter(bx, bz, ox + hc, oz     , hc)
-            self[3]:ComputeCenter(bx, bz, ox,      oz + hc, hc)
+            self[1]:ComputeCenter(bx, bz, ox, oz, hc)
+            self[2]:ComputeCenter(bx, bz, ox + hc, oz, hc)
+            self[3]:ComputeCenter(bx, bz, ox, oz + hc, hc)
             self[4]:ComputeCenter(bx, bz, ox + hc, oz + hc, hc)
-        else 
+        else
             if self[1] then -- TODO: bad neighbor check here
                 self.px = bx + ox + 0.5 * size
                 self.pz = bz + oz + 0.5 * size
@@ -663,13 +662,13 @@ CompressedLabelTree = ClassSimple {
             local hx, hz = ox + hc, oz + hc
             if z < hz then
                 if x < hx then
-                    return self[1]:_FindLeafXZ(bx, bz, ox,      oz     , hc, x, z) -- top left
+                    return self[1]:_FindLeafXZ(bx, bz, ox, oz, hc, x, z) -- top left
                 else
-                    return self[2]:_FindLeafXZ(bx, bz, ox + hc, oz     , hc, x, z) -- top right
+                    return self[2]:_FindLeafXZ(bx, bz, ox + hc, oz, hc, x, z) -- top right
                 end
             else
                 if x < hx then
-                    return self[3]:_FindLeafXZ(bx, bz, ox,      oz + hc, hc, x, z) -- bottom left
+                    return self[3]:_FindLeafXZ(bx, bz, ox, oz + hc, hc, x, z) -- bottom left
                 else
                     return self[4]:_FindLeafXZ(bx, bz, ox + hc, oz + hc, hc, x, z) -- bottom right
                 end
@@ -688,9 +687,9 @@ CompressedLabelTree = ClassSimple {
             end
         else
             local hc = 0.5 * size
-            self[1]:Draw(color, inset, bx, bz, ox,      oz     , hc)
-            self[2]:Draw(color, inset, bx, bz, ox + hc, oz     , hc)
-            self[3]:Draw(color, inset, bx, bz, ox,      oz + hc, hc)
+            self[1]:Draw(color, inset, bx, bz, ox, oz, hc)
+            self[2]:Draw(color, inset, bx, bz, ox + hc, oz, hc)
+            self[3]:Draw(color, inset, bx, bz, ox, oz + hc, hc)
             self[4]:Draw(color, inset, bx, bz, ox + hc, oz + hc, hc)
         end
     end,
@@ -703,9 +702,9 @@ CompressedLabelTree = ClassSimple {
             end
         else
             local hc = 0.5 * size
-            self[1]:DrawLabels(inset, bx, bz, ox,      oz     , hc)
-            self[2]:DrawLabels(inset, bx, bz, ox + hc, oz     , hc)
-            self[3]:DrawLabels(inset, bx, bz, ox,      oz + hc, hc)
+            self[1]:DrawLabels(inset, bx, bz, ox, oz, hc)
+            self[2]:DrawLabels(inset, bx, bz, ox + hc, oz, hc)
+            self[3]:DrawLabels(inset, bx, bz, ox, oz + hc, hc)
             self[4]:DrawLabels(inset, bx, bz, ox + hc, oz + hc, hc)
         end
     end,
@@ -823,9 +822,9 @@ end
 function ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
     for z = 1, size do
         for x = 1, size do
-            if  daCache[z][x] <= 0 and -- should be on land
-                bCache[z][x] and       -- should have accessible terrain type
-                pCache[z][x]           -- should be flat enough
+            if daCache[z][x] <= 0 and -- should be on land
+                bCache[z][x] and -- should have accessible terrain type
+                pCache[z][x] -- should be flat enough
             then
                 rCache[z][x] = 0
                 --DrawSquare(labelTree.bx + x + 0.3, labelTree.bz + z + 0.3, 0.4, '00ff00')
@@ -844,10 +843,10 @@ end
 function ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
     for z = 1, size do
         for x = 1, size do
-            if bCache[z][x] and (        -- should have accessible terrain type
+            if bCache[z][x] and (-- should have accessible terrain type
                 daCache[z][x] >= 1 or -- can either be on water
-                pCache[z][x]             -- or on flat enough terrain
-            ) then
+                    pCache[z][x]-- or on flat enough terrain
+                ) then
                 rCache[z][x] = 0
                 --DrawSquare(labelTree.bx + x + 0.4, labelTree.bz + z + 0.4, 0.2, '00b3b3')
             else
@@ -916,11 +915,11 @@ end
 ---@param threshold number (square) size of the smallest acceptable leafs, used for culling
 local function GenerateCompressionGrids(size, threshold)
 
-    local navLand = NavGrids['Land']                --[[@as NavGrid]]
-    local navWater = NavGrids['Water']              --[[@as NavGrid]]
-    local navHover = NavGrids['Hover']              --[[@as NavGrid]]
-    local navAmphibious = NavGrids['Amphibious']    --[[@as NavGrid]]
-    local navAir = NavGrids['Air']                  --[[@as NavGrid]]
+    local navLand = NavGrids['Land'] --[[@as NavGrid]]
+    local navWater = NavGrids['Water'] --[[@as NavGrid]]
+    local navHover = NavGrids['Hover'] --[[@as NavGrid]]
+    local navAmphibious = NavGrids['Amphibious'] --[[@as NavGrid]]
+    local navAir = NavGrids['Air'] --[[@as NavGrid]]
 
     local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(size)
 
@@ -935,25 +934,25 @@ local function GenerateCompressionGrids(size, threshold)
             local labelTreeAir = CompressedLabelTree(size)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
-            PopulateCaches(tCache, dCache,  daCache, pxCache, pzCache,  pCache, bCache, bx, bz, size)
+            PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, size)
 
-            ComputeLandPathingMatrix(size,        daCache,                    pCache, bCache, rCache)
+            ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
             labelTreeLand:Compress(bx, bz, 0, 0, size, rCache, threshold, 'Land')
             navLand:AddTree(z, x, labelTreeLand)
 
-            ComputeNavalPathingMatrix(size,      daCache,                    pCache, bCache, rCache)
+            ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
             labelTreeNaval:Compress(bx, bz, 0, 0, size, rCache, 2 * threshold, 'Water')
             navWater:AddTree(z, x, labelTreeNaval)
 
-            ComputeHoverPathingMatrix(size,      daCache,                    pCache, bCache, rCache)
+            ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
             labelTreeHover:Compress(bx, bz, 0, 0, size, rCache, threshold, 'Hover')
             navHover:AddTree(z, x, labelTreeHover)
 
-            ComputeAmphPathingMatrix(size,        daCache,                    pCache, bCache, rCache)
+            ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
             labelTreeAmph:Compress(bx, bz, 0, 0, size, rCache, threshold, 'Amphibious')
             navAmphibious:AddTree(z, x, labelTreeAmph)
 
-            ComputeAirPathingMatrix(size,          daCache,                    pCache, bCache, rCache)
+            ComputeAirPathingMatrix(size, daCache, pCache, bCache, rCache)
             labelTreeAir:Compress(bx, bz, 0, 0, size, rCache, threshold, 'Air')
             navAir:AddTree(z, x, labelTreeAir)
         end
@@ -962,11 +961,11 @@ end
 
 --- Generates graphs that we can traverse, based on the compression grids
 local function GenerateGraphs()
-    local navLand = NavGrids['Land']                --[[@as NavGrid]]
-    local navWater = NavGrids['Water']              --[[@as NavGrid]]
-    local navHover = NavGrids['Hover']              --[[@as NavGrid]]
-    local navAmphibious = NavGrids['Amphibious']    --[[@as NavGrid]]
-    local navAir = NavGrids['Air']                  --[[@as NavGrid]]
+    local navLand = NavGrids['Land'] --[[@as NavGrid]]
+    local navWater = NavGrids['Water'] --[[@as NavGrid]]
+    local navHover = NavGrids['Hover'] --[[@as NavGrid]]
+    local navAmphibious = NavGrids['Amphibious'] --[[@as NavGrid]]
+    local navAir = NavGrids['Air'] --[[@as NavGrid]]
 
     navLand:GenerateNeighbors()
     navWater:GenerateNeighbors()
@@ -994,7 +993,7 @@ local function GenerateCullLabels()
     local culledLabels = 0
 
     ---@type CompressedLabelTreeLeaf[]
-    local stack = { }
+    local stack = {}
     local count = 1
     for k, _ in navLabels do
         local metadata = navLabels[k]
@@ -1034,7 +1033,7 @@ local function GenerateMarkerMetadata()
         Land = NavGrids['Land'],
         Amphibious = NavGrids['Amphibious']
     }
-    
+
     local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     for k = 1, en do
         local extractor = extractors[k]
@@ -1076,8 +1075,8 @@ end
 function Generate()
 
     -- reset state
-    NavGrids = { }
-    NavLabels = { }
+    NavGrids = {}
+    NavLabels = {}
     LabelIdentifier = 0
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
@@ -1109,7 +1108,7 @@ function Generate()
 
     GenerateGraphs()
     print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
-    
+
     GenerateMarkerMetadata()
     print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
@@ -1127,8 +1126,8 @@ function Generate()
     -- NavGrids['Hover'] = NavGrids['Land']
     -- NavGrids['Amphibious'] = NavGrids['Land']
 
-    local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids)  / (1024 * 1024)
-    local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true })  / (1024 * 1024)
+    local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
+    local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
 
 
     SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
