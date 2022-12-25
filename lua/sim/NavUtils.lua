@@ -179,7 +179,8 @@ function PathTo(layer, origin, destination, options)
         end
 
         -- continue state
-        for id, neighbor in leaf.neighbors do
+        for k = 1, table.getn(leaf) do
+            local neighbor = leaf[k]
             if neighbor.Seen != seenIdentifier then
                 local preferLargeNeighbor = 0
                 if leaf.Size > neighbor.Size then

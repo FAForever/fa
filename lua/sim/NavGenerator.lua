@@ -49,6 +49,8 @@ local MaxWaterDepthAmphibious = 25
 ---@type number
 local MinWaterDepthNaval = 1.5
 
+local TableInsert = table.insert
+
 -- Generated data
 
 ---@class NavGrids
@@ -258,22 +260,26 @@ local CompressedLabelTree
 
 --- The leaf of the compression tree, with additional properties used during path finding
 ---@class CompressedLabelTreeLeaf : CompressedLabelTreeNode
----@field Label number                                      # Label for efficient `CanPathTo` check
----@field neighbors table<number, CompressedLabelTreeLeaf>  # Neighbors of this leaf that acts like a graph
----@field px number                                         # x-coordinate of center in world space
----@field pz number                                         # z-coordinate of center in world space
----@field From CompressedLabelTreeLeaf
----@field AcquiredCosts number
----@field TotalCosts number
----@field Seen number   
+---@field [1] CompressedLabelTreeLeaf | CompressedLabelTreeNode?
+---@field [2] CompressedLabelTreeLeaf | CompressedLabelTreeNode?
+---@field [3] CompressedLabelTreeLeaf | CompressedLabelTreeNode?
+---@field [4] CompressedLabelTreeLeaf | CompressedLabelTreeNode?
+---@field [5] CompressedLabelTreeLeaf?
+---@field [6] CompressedLabelTreeLeaf?
+---@field [7] CompressedLabelTreeLeaf?
+---@field [8] CompressedLabelTreeLeaf?
+---@field [9] CompressedLabelTreeLeaf?
+---@field Size number                       # Element count starting at { bx + ox, bz + oz }, used as a parameter during path finding to determine if a unit can pass
+---@field Label number                      # Label for efficient `CanPathTo` check
+---@field px number                         # x-coordinate of center in world space
+---@field pz number                         # z-coordinate of center in world space
+---@field From CompressedLabelTreeLeaf      # Populated during path finding
+---@field AcquiredCosts number              # Populated during path finding
+---@field TotalCosts number                 # Populated during path finding
+---@field Seen number                       # Populated during path
 
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class CompressedLabelTreeNode
----@field identifier number     # Unique number used for table operations
----@field Size number           # Element count starting at { bx + ox, bz + oz }, used as a parameter during path finding to determine if a unit can pass
----@field neighbors? table<number, CompressedLabelTreeNode>     # Is populated if we are a leaf
----@field px? number                                        # Is populated if we are a leaf
----@field pz? number                                        # Is populated if we are a leaf
 CompressedLabelTree = ClassSimple {
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
@@ -301,12 +307,9 @@ CompressedLabelTree = ClassSimple {
                 end
             end
 
-            self.identifier = GenerateCompressedTreeIdentifier()
-            self.Size = size
-
             if uniform then
                 self.Label = value
-
+                self.Size = size
                 if self.Label >= 0 then
                     NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
                 else 
@@ -314,6 +317,7 @@ CompressedLabelTree = ClassSimple {
                 end
             else
                 self.Label = -1
+                self.Size = size
                 NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
             end
 
@@ -335,7 +339,6 @@ CompressedLabelTree = ClassSimple {
         if uniform then
             -- we're uniform, so we're good
             self.Label = value
-            self.identifier = GenerateCompressedTreeIdentifier()
             self.Size = size
 
             if self.Label >= 0 then 
@@ -394,8 +397,6 @@ CompressedLabelTree = ClassSimple {
         local x1Outside, z1Outside = x1 - 0.5, z1 - 0.5
         local x2Outside, z2Outside = x2 + 0.5, z2 + 0.5
 
-        local neighbors = {}
-        self.neighbors = neighbors
 
         -- scan top-left -> top-right
         for k = x1, x2 - 1 do
@@ -405,7 +406,7 @@ CompressedLabelTree = ClassSimple {
             if neighbor then
                 k = k + neighbor.Size - 1
                 if neighbor.Label >= 0 then
-                    neighbors[neighbor.identifier] = neighbor
+                    TableInsert(self, neighbor)
                 end
             else 
                 break
@@ -420,7 +421,7 @@ CompressedLabelTree = ClassSimple {
             if neighbor then
                 k = k + neighbor.Size - 1
                 if neighbor.Label >= 0 then
-                    neighbors[neighbor.identifier] = neighbor
+                    TableInsert(self, neighbor)
                 end
             else 
                 break
@@ -435,7 +436,7 @@ CompressedLabelTree = ClassSimple {
             if neighbor then
                 k = k + neighbor.Size - 1
                 if neighbor.Label >= 0 then
-                    neighbors[neighbor.identifier] = neighbor
+                    TableInsert(self, neighbor)
                 end
             else 
                 break
@@ -450,7 +451,7 @@ CompressedLabelTree = ClassSimple {
             if neighbor then
                 k = k + neighbor.Size - 1
                 if neighbor.Label >= 0 then
-                    neighbors[neighbor.identifier] = neighbor
+                    TableInsert(self, neighbor)
                 end
             else
                 break
@@ -484,7 +485,6 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- we are a leaf, so find those neighbors!
-        local neighbors = self.neighbors
         local x1 = bx + ox
         local z1 = bz + oz
         local x2 = x1 + size
@@ -496,52 +496,52 @@ CompressedLabelTree = ClassSimple {
         local a, b
         local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
-        if neighbor and neighbor.Label >= 0 then
+        if neighbor and neighbor.Label == 0 then
             a = root:FindLeafXZ(x1Outside + 1, z1Outside)
             b = root:FindLeafXZ(x1Outside, z1Outside + 1)
 
             if a and b and label == a.Label and label == b.Label then
-                neighbors[neighbor.identifier] = neighbor
+                TableInsert(self, neighbor)
             end
         end
 
         -- scan top-right
         neighbor = root:FindLeafXZ(x2Outside, z1Outside)
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
-        if neighbor and neighbor.Label >= 0 then
+        if neighbor and neighbor.Label == 0 then
             a = root:FindLeafXZ(x2Outside -1, z1Outside)
             b = root:FindLeafXZ(x2Outside, z1Outside + 1)
 
             if a and b and label == a.Label and label == b.Label then
-                neighbors[neighbor.identifier] = neighbor
+                TableInsert(self, neighbor)
             end
         end
 
         -- scan bottom-left
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x1Outside, z2Outside)
-        if neighbor and neighbor.Label >= 0 then
+        if neighbor and neighbor.Label == 0 then
             a = root:FindLeafXZ(x1Outside + 1, z2Outside)
             b = root:FindLeafXZ(x1Outside, z2Outside - 1)
 
             if a and b and label == a.Label and label == b.Label then
-                neighbors[neighbor.identifier] = neighbor
+                TableInsert(self, neighbor)
             end
         end
 
         -- scan bottom-right
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x2Outside, z2Outside)
-        if neighbor and neighbor.Label >= 0 then
+        if neighbor and neighbor.Label == 0 then
             a = root:FindLeafXZ(x2Outside - 1, z2Outside)
             b = root:FindLeafXZ(x2Outside, z2Outside - 1)
 
             if a and b and label == a.Label and label == b.Label then
-                neighbors[neighbor.identifier] = neighbor
+                TableInsert(self, neighbor)
             end
         end
 
-        NavLayerData[layer].Neighbors = NavLayerData[layer].Neighbors + table.getsize(neighbors)
+        NavLayerData[layer].Neighbors = NavLayerData[layer].Neighbors + table.getn(self)
     end,
 
     ---@param self CompressedLabelTreeNode
@@ -575,7 +575,8 @@ CompressedLabelTree = ClassSimple {
                 metadata.Area = metadata.Area + (( 0.01 * self.Size) * ( 0.01 * self.Size))
 
                 -- add our pathable neighbors to the stack
-                for _, neighbor in self.neighbors do
+                for k = 1, table.getn(self) do
+                    local neighbor = self[k]
                     if neighbor.Label == 0 then
                         stack[free] = neighbor
                         free = free + 1
@@ -598,7 +599,8 @@ CompressedLabelTree = ClassSimple {
                     metadata.Area = metadata.Area + (( 0.01 * other.Size) * ( 0.01 * other.Size))
 
                     -- add unlabelled neighbors
-                    for _, neighbor in other.neighbors do
+                    for k = 1, table.getn(other) do
+                        local neighbor = other[k]
                         if neighbor.Label == 0 then
                             stack[free] = neighbor
                             free = free + 1
@@ -626,7 +628,7 @@ CompressedLabelTree = ClassSimple {
             self[3]:ComputeCenter(bx, bz, ox,      oz + hc, hc)
             self[4]:ComputeCenter(bx, bz, ox + hc, oz + hc, hc)
         else 
-            if self.neighbors then
+            if self[1] then -- TODO: bad neighbor check here
                 self.px = bx + ox + 0.5 * size
                 self.pz = bz + oz + 0.5 * size
             end
@@ -1031,7 +1033,8 @@ local function GenerateCullLabels()
             while count > 0 do
                 node = stack[count]
                 count = count - 1
-                for k, neighbor in node.neighbors do
+                for k = 1, table.getn(node) do
+                    local neighbor = node[k]
                     if neighbor.Label > 0 then
                         neighbor.Label = -1
                         count = count + 1
@@ -1143,8 +1146,12 @@ function Generate()
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
+    -- NavGrids['Hover'] = NavGrids['Land']
+    -- NavGrids['Amphibious'] = NavGrids['Land']
+
     local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids)  / (1024 * 1024)
     local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true })  / (1024 * 1024)
+
 
     SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
     SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))

@@ -108,10 +108,9 @@ function ScanOver(mouse, layer)
         --         over:Draw(color, 0.15)
         --         over:Draw(color, 0.2)
 
-        --         if over.neighbors then
-        --             for _, neighbor in over.neighbors do
-        --                 neighbor:Draw(color, 0.25)
-        --             end
+        --         for k = 1, table.getn(over) do
+        --              local neighbor = over[k]
+        --              neighbor:Draw(color, 0.25)
         --         end
         --     else
         --         over:Draw('ff0000', 0.1)
