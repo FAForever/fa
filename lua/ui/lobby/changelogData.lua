@@ -1,4 +1,4 @@
-last_version = 3748
+last_version = 3749
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -11,6 +11,24 @@ last_version = 3748
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3749,
+        name = 'Developers patch',
+        description = {
+            "",
+            "## Bug fixes",
+            "",
+            "- (#4414) Revert changes to prefetching of assets",
+            "    We thought we understood how prefetching worked, but we were wrong. As a result some",
+            "    people ran out of memory. That results in an application crash.",
+            "",
+            "    We reverted the changes.",
+            "",
+            "## Contributors",
+            "",
+            "- Jip (#4414)",
+        }
+    },
     {
         version = 3748,
         name = 'Hotfix',
