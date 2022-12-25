@@ -254,10 +254,10 @@ local CompressedLabelTree
 
 --- The leaf of the compression tree, with additional properties used during path finding
 ---@class CompressedLabelTreeLeaf : CompressedLabelTreeNode
----@field [1] CompressedLabelTreeLeaf | CompressedLabelTreeNode?
----@field [2] CompressedLabelTreeLeaf | CompressedLabelTreeNode?
----@field [3] CompressedLabelTreeLeaf | CompressedLabelTreeNode?
----@field [4] CompressedLabelTreeLeaf | CompressedLabelTreeNode?
+---@field [1] CompressedLabelTreeLeaf?
+---@field [2] CompressedLabelTreeLeaf?
+---@field [3] CompressedLabelTreeLeaf?
+---@field [4] CompressedLabelTreeLeaf?
 ---@field [5] CompressedLabelTreeLeaf?
 ---@field [6] CompressedLabelTreeLeaf?
 ---@field [7] CompressedLabelTreeLeaf?
@@ -274,6 +274,10 @@ local CompressedLabelTree
 
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class CompressedLabelTreeNode
+---@field [1] CompressedLabelTreeNode?
+---@field [2] CompressedLabelTreeNode?
+---@field [3] CompressedLabelTreeNode?
+---@field [4] CompressedLabelTreeNode?
 CompressedLabelTree = ClassSimple {
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
@@ -283,7 +287,7 @@ CompressedLabelTree = ClassSimple {
     ---@param bz number             # Location of top-left corner, in world space
     ---@param ox number             # Offset from top-left corner, in local space
     ---@param oz number             # Offset from top-left corner, in local space
-    ---@param size number
+    ---@param size number           # Element count starting at { bx + ox, bz + oz }
     ---@param rCache NavLabelCache
     ---@param compressionThreshold number
     ---@param layer NavLayers
@@ -359,7 +363,13 @@ CompressedLabelTree = ClassSimple {
 
     --- Generates the following neighbors, when they are valid:
     ---@param self CompressedLabelTreeLeaf
+    ---@param bx number             # Location of top-left corner, in world space
+    ---@param bz number             # Location of top-left corner, in world space
+    ---@param ox number             # Offset from top-left corner, in local space
+    ---@param oz number             # Offset from top-left corner, in local space
+    ---@param size number           # Element count starting at { bx + ox, bz + oz }
     ---@param root NavGrid
+    ---@param layer NavLayers
     GenerateDirectNeighbors = function(self, bx, bz, ox, oz, size, root, layer)
 
         local label = self.Label
@@ -523,6 +533,7 @@ CompressedLabelTree = ClassSimple {
 
     ---@param self CompressedLabelTreeNode
     ---@param stack table
+    ---@param layer NavLayers
     GenerateLabels = function(self, stack, layer)
         -- leaf case
         if self.Label then
@@ -597,6 +608,11 @@ CompressedLabelTree = ClassSimple {
     end,
 
     ---@param self CompressedLabelTreeLeaf
+    ---@param bx number             # Location of top-left corner, in world space
+    ---@param bz number             # Location of top-left corner, in world space
+    ---@param ox number             # Offset from top-left corner, in local space
+    ---@param oz number             # Offset from top-left corner, in local space
+    ---@param size number           # Element count starting at { bx + ox, bz + oz }
     ComputeCenter = function(self, bx, bz, ox, oz, size)
         if not self.Label then
             local hc = 0.5 * size
@@ -631,7 +647,12 @@ CompressedLabelTree = ClassSimple {
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
     ---@param self CompressedLabelTreeNode
-    ---@param position Vector A position in world space
+    ---@param bx number             # Location of top-left corner, in world space
+    ---@param bz number             # Location of top-left corner, in world space
+    ---@param ox number             # Offset from top-left corner, in local space
+    ---@param oz number             # Offset from top-left corner, in local space
+    ---@param size number           # Element count starting at { bx + ox, bz + oz }
+    ---@param position Vector       # A position in world space
     ---@return CompressedLabelTreeLeaf?
     FindLeaf = function(self, bx, bz, ox, oz, size, position)
         return self:FindLeafXZ(bx, bz, ox, oz, size, position[1], position[3])
@@ -639,8 +660,13 @@ CompressedLabelTree = ClassSimple {
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
     ---@param self CompressedLabelTreeNode
-    ---@param x number x-coordinate, in world space
-    ---@param z number z-coordinate, in world space
+    ---@param bx number             # Location of top-left corner, in world space
+    ---@param bz number             # Location of top-left corner, in world space
+    ---@param ox number             # Offset from top-left corner, in local space
+    ---@param oz number             # Offset from top-left corner, in local space
+    ---@param size number           # Element count starting at { bx + ox, bz + oz }
+    ---@param x number              # x-coordinate, in world space
+    ---@param z number              # z-coordinate, in world space
     ---@return CompressedLabelTreeLeaf?
     FindLeafXZ = function(self, bx, bz, ox, oz, size, x, z)
         local x1 = bx + ox
@@ -653,8 +679,13 @@ CompressedLabelTree = ClassSimple {
     end;
 
     ---@param self CompressedLabelTreeNode
-    ---@param x number
-    ---@param z number
+    ---@param bx number             # Location of top-left corner, in world space
+    ---@param bz number             # Location of top-left corner, in world space
+    ---@param ox number             # Offset from top-left corner, in local space
+    ---@param oz number             # Offset from top-left corner, in local space
+    ---@param size number           # Element count starting at { bx + ox, bz + oz }
+    ---@param x number              # x-coordinate, in world space
+    ---@param z number              # z-coordinate, in world space
     ---@return CompressedLabelTreeLeaf?
     _FindLeafXZ = function(self, bx, bz, ox, oz, size, x, z)
         if not self.Label then
