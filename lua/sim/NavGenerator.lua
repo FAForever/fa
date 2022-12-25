@@ -50,6 +50,7 @@ local MaxWaterDepthAmphibious = 25
 local MinWaterDepthNaval = 1.5
 
 local TableInsert = table.insert
+local HashCache = { }
 
 -- Generated data
 
@@ -196,13 +197,7 @@ NavGrid = ClassSimple {
         local trees = self.Trees
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                trees[z][x]:GenerateDirectNeighbors(x * size, z * size, 0, 0, size, self)
-            end
-        end
-
-        for z = 0, LabelCompressionTreesPerAxis - 1 do
-            for x = 0, LabelCompressionTreesPerAxis - 1 do
-                trees[z][x]:GenerateCornerNeighbors(x * size, z * size, 0, 0, size, self, self.Layer)
+                trees[z][x]:GenerateDirectNeighbors(x * size, z * size, 0, 0, size, self, self.Layer)
             end
         end
     end,
@@ -364,27 +359,24 @@ CompressedLabelTree = ClassSimple {
     end,
 
     --- Generates the following neighbors, when they are valid:
-    --- ```
-    --- 0 | 1 | 0
-    --- 1 | x | 1
-    --- 0 | 1 | 0
-    --- ```
     ---@param self CompressedLabelTreeLeaf
     ---@param root NavGrid
-    GenerateDirectNeighbors = function(self, bx, bz, ox, oz, size, root)
+    GenerateDirectNeighbors = function(self, bx, bz, ox, oz, size, root, layer)
+
+        local label = self.Label
 
         -- nodes do not have neighbors, only leafs do
-        if not self.Label then
+        if not label then
             local hc = 0.5 * size
-            self[1]:GenerateDirectNeighbors(bx, bz, ox,      oz     , hc, root)
-            self[2]:GenerateDirectNeighbors(bx, bz, ox + hc, oz     , hc, root)
-            self[3]:GenerateDirectNeighbors(bx, bz, ox,      oz + hc, hc, root)
-            self[4]:GenerateDirectNeighbors(bx, bz, ox + hc, oz + hc, hc, root)
+            self[1]:GenerateDirectNeighbors(bx, bz, ox,      oz     , hc, root, layer)
+            self[2]:GenerateDirectNeighbors(bx, bz, ox + hc, oz     , hc, root, layer)
+            self[3]:GenerateDirectNeighbors(bx, bz, ox,      oz + hc, hc, root, layer)
+            self[4]:GenerateDirectNeighbors(bx, bz, ox + hc, oz + hc, hc, root, layer)
             return
         end
 
         -- do not generate neighbors for non-pathable cells to save memory
-        if self.Label == -1 then
+        if label == -1 then
             return
         end
 
@@ -397,6 +389,14 @@ CompressedLabelTree = ClassSimple {
         local x1Outside, z1Outside = x1 - 0.5, z1 - 0.5
         local x2Outside, z2Outside = x2 + 0.5, z2 + 0.5
 
+        local seen = HashCache
+        for k, v in seen do
+            seen[k] = nil
+        end
+
+        --- 0 | 1 | 0
+        --- 1 | x | 1
+        --- 0 | 1 | 0
 
         -- scan top-left -> top-right
         for k = x1, x2 - 1 do
@@ -405,7 +405,8 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x, z1Outside)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label >= 0 then
+                if neighbor.Label >= 0 and not seen[neighbor] then
+                    seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
             else 
@@ -420,7 +421,8 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x, z2Outside)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label >= 0 then
+                if neighbor.Label >= 0 and not seen[neighbor] then
+                    seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
             else 
@@ -435,7 +437,8 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x1Outside, z)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label >= 0 then
+                if neighbor.Label >= 0 and not seen[neighbor] then
+                    seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
             else 
@@ -450,57 +453,29 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x2Outside, z)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label >= 0 then
+                if neighbor.Label >= 0 and not seen[neighbor] then
+                    seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
             else
                 break
             end
         end
-    end,
 
-    --- Generates the following neighbors, when they are valid:
-    --- ```
-    --- 1 | 0 | 1
-    --- 0 | x | 0
-    --- 1 | 0 | 1
-    --- ```
-    ---@param self CompressedLabelTreeNode
-    ---@param root NavGrid
-    GenerateCornerNeighbors = function(self, bx, bz, ox, oz, size, root, layer)
-        -- do not generate neighbors for non-pathable cells to save memory
-        local label = self.Label
-        if label == -1 then
-            return
-        end
-
-        -- nodes do not have neighbors, only leafs do
-        if not self.Label then
-            local hc = 0.5 * size
-            self[1]:GenerateCornerNeighbors(bx, bz, ox,      oz     , hc, root, layer)
-            self[2]:GenerateCornerNeighbors(bx, bz, ox + hc, oz     , hc, root, layer)
-            self[3]:GenerateCornerNeighbors(bx, bz, ox,      oz + hc, hc, root, layer)
-            self[4]:GenerateCornerNeighbors(bx, bz, ox + hc, oz + hc, hc, root, layer)
-            return
-        end
-
-        -- we are a leaf, so find those neighbors!
-        local x1 = bx + ox
-        local z1 = bz + oz
-        local x2 = x1 + size
-        local z2 = z1 + size
-        local x1Outside, z1Outside = x1 - 0.5, z1 - 0.5
-        local x2Outside, z2Outside = x2 + 0.5, z2 + 0.5
+        --- 1 | 0 | 1
+        --- 0 | x | 0
+        --- 1 | 0 | 1
 
         -- scan top-left
         local a, b
         local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
-        if neighbor and neighbor.Label == 0 then
+        if neighbor and neighbor.Label >= 0 and not seen[neighbor] then
+            seen[neighbor] = true
             a = root:FindLeafXZ(x1Outside + 1, z1Outside)
             b = root:FindLeafXZ(x1Outside, z1Outside + 1)
 
-            if a and b and label == a.Label and label == b.Label then
+            if a and b and a.Label >= 0 and b.Label >= 0 then
                 TableInsert(self, neighbor)
             end
         end
@@ -508,11 +483,12 @@ CompressedLabelTree = ClassSimple {
         -- scan top-right
         neighbor = root:FindLeafXZ(x2Outside, z1Outside)
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
-        if neighbor and neighbor.Label == 0 then
+        if neighbor and neighbor.Label >= 0 and not seen[neighbor] then
+            seen[neighbor] = true
             a = root:FindLeafXZ(x2Outside -1, z1Outside)
             b = root:FindLeafXZ(x2Outside, z1Outside + 1)
 
-            if a and b and label == a.Label and label == b.Label then
+            if a and b and a.Label >= 0 and b.Label >= 0 then
                 TableInsert(self, neighbor)
             end
         end
@@ -520,11 +496,12 @@ CompressedLabelTree = ClassSimple {
         -- scan bottom-left
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x1Outside, z2Outside)
-        if neighbor and neighbor.Label == 0 then
+        if neighbor and neighbor.Label >= 0 and not seen[neighbor] then
+            seen[neighbor] = true
             a = root:FindLeafXZ(x1Outside + 1, z2Outside)
             b = root:FindLeafXZ(x1Outside, z2Outside - 1)
 
-            if a and b and label == a.Label and label == b.Label then
+            if a and b and a.Label >= 0 and b.Label >= 0 then
                 TableInsert(self, neighbor)
             end
         end
@@ -532,11 +509,12 @@ CompressedLabelTree = ClassSimple {
         -- scan bottom-right
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x2Outside, z2Outside)
-        if neighbor and neighbor.Label == 0 then
+        if neighbor and neighbor.Label >= 0 and not seen[neighbor] then
+            seen[neighbor] = true
             a = root:FindLeafXZ(x2Outside - 1, z2Outside)
             b = root:FindLeafXZ(x2Outside, z2Outside - 1)
 
-            if a and b and label == a.Label and label == b.Label then
+            if a and b and a.Label >= 0 and b.Label >= 0 then
                 TableInsert(self, neighbor)
             end
         end
