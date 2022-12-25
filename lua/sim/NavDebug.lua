@@ -102,8 +102,8 @@ function ScanOver(mouse, layer)
     if mouse then
         -- local over = NavGenerator.NavGrids[layer]:FindLeaf(mouse)
         -- if over then 
-        --     if over.label > 0 then
-        --         local color = Shared.LabelToColor(over.label)
+        --     if over.Label > 0 then
+        --         local color = Shared.LabelToColor(over.Label)
         --         over:Draw(color, 0.1)
         --         over:Draw(color, 0.15)
         --         over:Draw(color, 0.2)
