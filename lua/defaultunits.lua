@@ -209,7 +209,7 @@ StructureUnit = Class(Unit) {
         local orient = orientation
         if not orientation then
             if tarmac.Orientations and not table.empty(tarmac.Orientations) then
-                orient = tarmac.Orientations[Random(1, table.getn(tarmac.Orientations))]
+                orient = table.random(tarmac.Orientations)
                 orient = (0.01745 * orient)
             else
                 orient = 0
