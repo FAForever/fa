@@ -542,6 +542,16 @@ function table.unique(t)
     return unique
 end
 
+
+---Returns a random entry from an array
+---@generic T
+---@param array T[]
+---@return T
+function table.random(array)
+    return array[Random(1, TableGetn(array))]
+end
+
+
 -- Lua 5.0 implementation of the Lua 5.1 function string.match
 -- Returns a regex match
 -- optional param init defines where to start searching. Can be negative to search from the end.
