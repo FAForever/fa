@@ -1,6 +1,6 @@
 -- script for projectile TankShell
-local TankProjectile = import("/lua/sim/projectile.lua").Projectile
-ShellTankTerran01 = Class(TankProjectile) {
+local Projectile = import("/lua/sim/projectile.lua").Projectile
+ShellTankTerran01 = Class(Projectile) {
     FxUnitHitScale = 1,
     FxImpactUnit = {},
     FxLandHitScale = 1,
@@ -25,7 +25,7 @@ ShellTankTerran01 = Class(TankProjectile) {
                     '/effects/emitters/destruction_explosion_debris_05_emit.bp',},
 
     OnCreate = function(self)
-        TankProjectile.OnCreate(self)
+        Projectile.OnCreate(self)
         self.Trash:Add(ForkThread(self.Thread,self))
     end,
 
