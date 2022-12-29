@@ -461,14 +461,14 @@ function ConstructClass(bases, specs)
 end
 
 --- Instantiation of a class, referring to the paragraphs of text at the top of this file
-ProjectileFactory = {
+ClassFactory = {
     __call = function(self, ...)
         -- create the new entity with us as its meta table
         local instance = {}
         setmetatable(instance, self)
 
         if instance.IsProjectile then
-            LOG("ProjectileFactory")
+            LOG("ClassFactory")
             reprsl(debug.traceback())
         end
 
