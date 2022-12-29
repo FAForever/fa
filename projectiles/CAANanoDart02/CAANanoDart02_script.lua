@@ -4,7 +4,7 @@
 
 CAANanoDartProjectile = import("/lua/cybranprojectiles.lua").CAANanoDartProjectile
 
-CAANanoDart02 = Class(CAANanoDartProjectile) {
+CAANanoDart02 = ClassProjectile(CAANanoDartProjectile) {
 
    OnCreate = function(self)
         CAANanoDartProjectile.OnCreate(self)

@@ -2,7 +2,7 @@
 
 local AMissileSerpentine02Projectile = import("/lua/aeonprojectiles.lua").AMissileSerpentine02Projectile
 
-AIFMissileTactical02 = Class(AMissileSerpentine02Projectile) {
+AIFMissileTactical02 = ClassProjectile(AMissileSerpentine02Projectile) {
 
     OnCreate = function(self)
         AMissileSerpentine02Projectile.OnCreate(self)

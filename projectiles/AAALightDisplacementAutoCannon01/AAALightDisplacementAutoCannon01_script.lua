@@ -6,5 +6,5 @@
 -----------------------------------------------------------------------------------------------------------------
 
 local AAALightDisplacementAutocannonMissileProjectile = import("/lua/aeonprojectiles.lua").AAALightDisplacementAutocannonMissileProjectile
-AAALightDisplacementAutoCannon01 = Class(AAALightDisplacementAutocannonMissileProjectile) { }
+AAALightDisplacementAutoCannon01 = ClassProjectile(AAALightDisplacementAutocannonMissileProjectile) { }
 TypeClass = AAALightDisplacementAutoCannon01

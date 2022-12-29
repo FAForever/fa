@@ -4,5 +4,5 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------
 local SDFAireauProjectile = import("/lua/seraphimprojectiles.lua").SDFAireauProjectile
-SDFAireauWeapon01 = Class(SDFAireauProjectile) {}
+SDFAireauWeapon01 = ClassProjectile(SDFAireauProjectile) {}
 TypeClass = SDFAireauWeapon01

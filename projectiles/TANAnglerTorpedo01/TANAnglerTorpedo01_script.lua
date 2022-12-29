@@ -3,7 +3,7 @@
 --
 local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
 
-TANAnglerTorpedo01 = Class(TTorpedoShipProjectile) 
+TANAnglerTorpedo01 = ClassProjectile(TTorpedoShipProjectile) 
 {
     OnEnterWater = function(self)
         TTorpedoShipProjectile.OnEnterWater(self)

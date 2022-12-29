@@ -4,7 +4,7 @@ local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShip
 
 --- Unused
 ---@class TorpedoShipTerran02 : TTorpedoShipProjectile
-TorpedoShipTerran02 = Class(TTorpedoShipProjectile) {
+TorpedoShipTerran02 = ClassProjectile(TTorpedoShipProjectile) {
     FxSplashScale = 1,
 
     -- copied from terran projectiles, TMissileCruiseSubProjectile

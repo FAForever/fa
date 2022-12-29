@@ -2,7 +2,7 @@
 -- Terran Gauss Cannon Projectile
 --
 local TDFGaussCannonProjectile = import("/lua/terranprojectiles.lua").TDFMediumShipGaussCannonProjectile
-TDFGauss05 = Class(TDFGaussCannonProjectile) {
+TDFGauss05 = ClassProjectile(TDFGaussCannonProjectile) {
     
     FxUnitHitScale = 1.6,
     FxLandHitScale = 1.6,

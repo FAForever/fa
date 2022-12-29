@@ -8,7 +8,7 @@ local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissi
 local RandF = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-AIFGuidedMissile = Class(AGuidedMissileProjectile) {
+AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
     OnCreate = function(self)
 		AGuidedMissileProjectile.OnCreate(self)
         local launcher = self.Launcher

@@ -4,5 +4,5 @@
 -- Summary  :  Seraphim Sih Sniper Energy Rifle script, XSL0305
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
-SDFSniperShot01 = Class(import("/lua/seraphimprojectiles.lua").SDFSniperShotNormal) {}
+SDFSniperShot01 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SDFSniperShotNormal) {}
 TypeClass = SDFSniperShot01

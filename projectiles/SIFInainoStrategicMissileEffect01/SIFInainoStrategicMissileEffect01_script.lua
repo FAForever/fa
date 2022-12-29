@@ -5,7 +5,7 @@
 ----------------------------------------------------------------------------------------------------------------
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-SIFInainoStrategicMissileEffect01 = Class(import("/lua/sim/defaultprojectiles.lua").EmitterProjectile) {
+SIFInainoStrategicMissileEffect01 = ClassProjectile(import("/lua/sim/defaultprojectiles.lua").EmitterProjectile) {
 	FxTrails = EffectTemplate.SIFInainoPlumeFxTrails01,
 }
 TypeClass = SIFInainoStrategicMissileEffect01

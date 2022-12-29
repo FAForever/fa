@@ -10,7 +10,7 @@ local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 -- upvalue scope for performance
 local CreateTrail = CreateTrail
 
-AANTorpedoCluster01 = Class(ATorpedoCluster) {
+AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
     FxTrail = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01,
 
     OnCreate = function(self)

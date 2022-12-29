@@ -8,7 +8,7 @@
 import("/lua/utilities.lua")
 CAANanoDartProjectile = import("/lua/cybranprojectiles.lua").CAANanoDartProjectile02
 
-CAANanoDart04 = Class(CAANanoDartProjectile) {
+CAANanoDart04 = ClassProjectile(CAANanoDartProjectile) {
     OnCreate = function(self)
         CAANanoDartProjectile.OnCreate(self)
         --Set the orientation of this thing to facing the target from the beginning.

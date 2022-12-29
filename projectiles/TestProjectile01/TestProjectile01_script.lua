@@ -3,7 +3,7 @@
 --
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
-TestProjectile01 = Class(Projectile)
+TestProjectile01 = ClassProjectile(Projectile)
 {
     BeamName = '/effects/emitters/test_beam_01_emit.bp',
     PolyTrail = '/effects/emitters/test_polytrail_01_emit.bp',

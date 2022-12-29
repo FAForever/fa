@@ -5,7 +5,7 @@
 -------------------------------------------------------------------------------
 local SOhwalliStrategicBombProjectile = import("/lua/seraphimprojectiles.lua").SOhwalliStrategicBombProjectile
 
-SBOOhwalliStategicBomb01 = Class(SOhwalliStrategicBombProjectile){
+SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile){
     OnImpact = function(self, targetType, targetEntity)
         SOhwalliStrategicBombProjectile.OnImpact(self, targetType, targetEntity)
 

@@ -2,7 +2,7 @@
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
 local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
 
-AANDepthCharge01 = Class(ADepthChargeProjectile) {
+AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
     CountdownLengthInTicks = 101,
 
     OnCreate = function(self)

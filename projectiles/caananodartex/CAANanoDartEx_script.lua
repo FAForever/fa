@@ -1,6 +1,6 @@
 -- Cybran Anti Air Projectile
 CAANanoDartProjectile = import("/lua/cybranprojectiles.lua").CAANanoDartProjectile
-CAANanoDart01 = Class(CAANanoDartProjectile) {
+CAANanoDart01 = ClassProjectile(CAANanoDartProjectile) {
    OnCreate = function(self)
         CAANanoDartProjectile.OnCreate(self)
         self.Trash:Add(ForkThread(self.UpdateThread,self))

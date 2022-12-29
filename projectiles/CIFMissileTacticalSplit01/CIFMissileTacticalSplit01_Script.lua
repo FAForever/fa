@@ -4,7 +4,7 @@
 --
 local CLOATacticalChildMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalChildMissileProjectile
 
-CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile) {
+CIFMissileTacticalSplit01 = ClassProjectile(CLOATacticalChildMissileProjectile) {
 
     OnCreate = function(self)
         CLOATacticalChildMissileProjectile.OnCreate(self)

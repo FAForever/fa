@@ -1,7 +1,7 @@
 -- Aeon Serpentine Missile
 
 local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
-AIFMissileSerpentine01 = Class(AMissileSerpentineProjectile) {
+AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)

@@ -5,7 +5,7 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissileProjectile
-AIFGuidedMissile02 = Class(AGuidedMissileProjectile) {
+AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
     OnCreate = function(self)
 		AGuidedMissileProjectile.OnCreate(self)
 		self.Trash:Add(ForkThread(self.MovementThread, self))

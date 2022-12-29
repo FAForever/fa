@@ -2,7 +2,7 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-SIFExperimentalStrategicDeath01 = Class(NullShell) {
+SIFExperimentalStrategicDeath01 = ClassProjectile(NullShell) {
     NormalEffects = {'/effects/emitters/quantum_warhead_01_emit.bp',},
     CloudFlareEffects = EffectTemplate.CloudFlareEffects01,
 

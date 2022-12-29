@@ -7,7 +7,7 @@ local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShip
 
 -- unused
 ---@class TIMSonarBuoyCreator01 : TTorpedoShipProjectile
-TIMSonarBuoyCreator01 = Class(TTorpedoShipProjectile) {
+TIMSonarBuoyCreator01 = ClassProjectile(TTorpedoShipProjectile) {
     FxSplashScale = 0.2,
     FxTrailScale = 3,
     FxExitWaterEmitter = {

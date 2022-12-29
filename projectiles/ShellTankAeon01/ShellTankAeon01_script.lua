@@ -1,3 +1,3 @@
 -- script for projectile TankShell
-ShellTankAeon01 = Class(import("/lua/aeonprojectiles.lua").ACannonTankProjectile) {}
+ShellTankAeon01 = ClassProjectile(import("/lua/aeonprojectiles.lua").ACannonTankProjectile) {}
 TypeClass = ShellTankAeon01

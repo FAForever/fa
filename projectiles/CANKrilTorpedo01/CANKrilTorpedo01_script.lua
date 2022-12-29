@@ -6,7 +6,7 @@
 ---------------------------------------------------------------------------------
 local CKrilTorpedo = import("/lua/cybranprojectiles.lua").CKrilTorpedo
 
-CANKrilTorpedo01 = Class(CKrilTorpedo) {
+CANKrilTorpedo01 = ClassProjectile(CKrilTorpedo) {
     FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
                     '/effects/emitters/water_splash_plume_01_emit.bp',},
 	TrailDelay = 2,

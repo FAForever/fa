@@ -5,7 +5,7 @@
 ------------------------------------------------------------
 local SSuthanusArtilleryShell = import("/lua/seraphimprojectiles.lua").SSuthanusArtilleryShell
 
-SIFSuthanusArtilleryShell02 = Class(SSuthanusArtilleryShell) {
+SIFSuthanusArtilleryShell02 = ClassProjectile(SSuthanusArtilleryShell) {
     OnImpact = function(self, targetType, targetEntity)
         SSuthanusArtilleryShell.OnImpact(self, targetType, targetEntity)
         self:ShakeCamera(20, 2, 0, 1)

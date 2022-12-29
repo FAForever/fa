@@ -1,7 +1,7 @@
 -- Terran CDR Nuke
 
 local TIFMissileNuke = import("/lua/terranprojectiles.lua").TIFMissileNuke
-TIFMissileNukeCDR = Class(TIFMissileNuke) {
+TIFMissileNukeCDR = ClassProjectile(TIFMissileNuke) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',
     InitialEffects = {'/effects/emitters/nuke_munition_launch_trail_02_emit.bp',},
     LaunchEffects = {
