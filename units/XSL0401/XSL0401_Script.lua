@@ -11,7 +11,7 @@ local SDFExperimentalPhasonProj = WeaponsFile.SDFExperimentalPhasonProj
 local SDFAireauWeapon = WeaponsFile.SDFAireauWeapon
 local SDFSinnuntheWeapon = WeaponsFile.SDFSinnuntheWeapon
 local SAAOlarisCannonWeapon = WeaponsFile.SAAOlarisCannonWeapon
-local Explosion = import("/lua/defaultexplosions.lua")
+local explosion = import("/lua/defaultexplosions.lua")
 local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
 
 ---@class XSL0401 : SWalkingLandUnit
@@ -87,19 +87,19 @@ XSL0401 = Class(SWalkingLandUnit) {
                                 'Chest_B01', 'Chest_B03',
                                 'Right_Leg_B01', 'Right_Leg_B02', 'Right_Leg_B03',
                                 'Left_Leg_B17', 'Left_Leg_B14', 'Left_Leg_B15'}
-        Explosion.CreateDefaultHitExplosionAtBone(self, bigExplosionBones[Random(1, 3)], 4.0)
-        Explosion.CreateDebrisProjectiles(self, Explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
+        explosion.CreateDefaultHitExplosionAtBone(self, bigExplosionBones[Random(1, 3)], 4.0)
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
         WaitSeconds(2)
 
         local RandBoneIter = RandomIter(explosionBones)
         for i = 1, Random(4, 6) do
             local bone = RandBoneIter()
-            Explosion.CreateDefaultHitExplosionAtBone(self, bone, 1.0)
+            explosion.CreateDefaultHitExplosionAtBone(self, bone, 1.0)
             WaitTicks(Random(1, 4))
         end
 
         WaitSeconds(3.5)
-        Explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
 
         if self.DeathAnimManip then
             WaitFor(self.DeathAnimManip)

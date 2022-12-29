@@ -9,7 +9,7 @@ local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
 local WeaponsFile = import("/lua/aeonweapons.lua")
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
-local Explosion = import("/lua/defaultexplosions.lua")
+local explosion = import("/lua/defaultexplosions.lua")
 local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
 
 -- upvalue for performance
@@ -115,20 +115,20 @@ UAL0401 = Class(AWalkingLandUnit) {
     DeathThread = function(self, overkillRatio , instigator)
         local size = self.Size
         self:PlayUnitSound('Destroyed')
-        Explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
-        Explosion.CreateDebrisProjectiles(self, Explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
         WaitSeconds(2)
-        Explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         WaitSeconds(0.1)
-        Explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
         WaitSeconds(0.1)
-        Explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Arm_B02', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Arm_B02', 1.0)
         WaitSeconds(0.3)
-        Explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
-        Explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
 
         WaitSeconds(3.5)
-        Explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
 
         if self.DeathAnimManip then
             WaitFor(self.DeathAnimManip)
@@ -180,4 +180,3 @@ TypeClass = UAL0401
 
 -- Kept for Mod Backwards Compatability
 local Utilities = import("/lua/utilities.lua")
-local explosion = Explosion
