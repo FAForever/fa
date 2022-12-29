@@ -345,7 +345,7 @@ SThunthoArtilleryShell = Class(MultiPolyTrailProjectile) {
 }
 
 ---@class SThunthoArtilleryShell2 : MultiPolyTrailProjectile
-SThunthoArtilleryShell2 = Class(MultiPolyTrailProjectile) {
+SThunthoArtilleryShell2 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
     FxImpactLand = EffectTemplate.SThunderStormCannonLandHit,
     FxImpactWater= EffectTemplate.SThunderStormCannonLandHit,

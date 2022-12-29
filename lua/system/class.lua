@@ -602,7 +602,7 @@ ProjectileFactory = {
     ---@param self any
     ---@return table
     __call = function (self)
-        LOG(string.format("%s -> %s", "ProjectileFactory", tostring(self.__name)))
+        -- LOG(string.format("%s -> %s", "ProjectileFactory", tostring(self.__name)))
         -- needs a hash part of one for the _c_object field
         local instance = {&8 &0}
         return setmetatable(instance, self)

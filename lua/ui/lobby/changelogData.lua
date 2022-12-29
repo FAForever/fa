@@ -5797,7 +5797,7 @@ gamePatches = {
             '- Fixed the Cybran ACU wandering off long distance when told to assist various buildings with an enemy in the rough vicinity. It will still happen if the unit is much closer, but we should no longer ',
             '      have ACUs walking across the map to go kill themselves on enemy PD',
             '- Fixed Seraphim ACU weapon trail showing when zoomed out',
-            '- Fixed Neptune ClassUI weapon getting stuck on during death sequence',
+            '- Fixed Neptune Class weapon getting stuck on during death sequence',
             '- Fixed a large number of projectiles showing the trails through fog of war',
             '- Fixed T3 Mobile Artillery not quite being able to fire to the edge of their radius in some circumstances',
             '- Fixed Siren ground toggle weapon using air weapon target priorities',
