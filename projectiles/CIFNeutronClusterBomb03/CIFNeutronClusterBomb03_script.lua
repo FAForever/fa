@@ -3,5 +3,5 @@
 -- Summary  :  Cybran Neutron Cluster bomb
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------
-CIFNeutronClusterBomb03 = Class(import("/lua/cybranprojectiles.lua").CNeutronClusterBombProjectile) {}
+CIFNeutronClusterBomb03 = ClassProjectile(import("/lua/cybranprojectiles.lua").CNeutronClusterBombProjectile) {}
 TypeClass = CIFNeutronClusterBomb03

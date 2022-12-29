@@ -5,7 +5,7 @@
 --------------------------------------------------------------------------------------------------
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
 
-SIFLaanseTacticalMissile02 = Class(SLaanseTacticalMissile) {
+SIFLaanseTacticalMissile02 = ClassProjectile(SLaanseTacticalMissile) {
 
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)

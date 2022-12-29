@@ -2,7 +2,7 @@
 -- AA Missile for Cybrans
 --
 local CAAMissileNaniteProjectile = import("/lua/cybranprojectiles.lua").CAAMissileNaniteProjectile
-CAAMissileNanite02 = Class(CAAMissileNaniteProjectile) {
+CAAMissileNanite02 = ClassProjectile(CAAMissileNaniteProjectile) {
 
     OnCreate = function(self)
         CAAMissileNaniteProjectile.OnCreate(self)

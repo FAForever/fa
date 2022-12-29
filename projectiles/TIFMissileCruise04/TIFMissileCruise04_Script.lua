@@ -2,7 +2,7 @@
 
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
 
-TIFMissileCruise04 = Class(TMissileCruiseProjectile) {
+TIFMissileCruise04 = ClassProjectile(TMissileCruiseProjectile) {
 
     FxAirUnitHitScale = 1.5,
     FxLandHitScale = 1.5,

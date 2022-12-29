@@ -5,7 +5,7 @@
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-TIFMissileCruise03 = Class(TMissileCruiseProjectile) {
+TIFMissileCruise03 = ClassProjectile(TMissileCruiseProjectile) {
 
     FxTrails = EffectTemplate.TMissileExhaust01,
     FxTrailOffset = -0.85,

@@ -8,7 +8,7 @@
 ---@field _hotspotY number
 ---@field _filename LazyVar<FileName>
 ---@field _animThread? thread
-Cursor = Class(moho.cursor_methods) {
+Cursor = ClassUI(moho.cursor_methods) {
     ---@param self Cursor
     ---@param defaultTexture FileName
     ---@param defaultHotspotX number

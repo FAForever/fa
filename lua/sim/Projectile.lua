@@ -75,8 +75,8 @@ local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categor
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
 ---@class Projectile : moho.projectile_methods
-Projectile = Class(moho.projectile_methods) {
-
+Projectile = ClassProjectile(moho.projectile_methods) {
+    IsProjectile = true,
     DestroyOnImpact = true,
     FxImpactTrajectoryAligned = true,
 
@@ -120,6 +120,7 @@ Projectile = Class(moho.projectile_methods) {
         self.Army = EntityGetArmy(self)
         self.Launcher = ProjectileGetLauncher(self)
         self.Trash = TrashBag()
+
 
         -- set some health, if we have some
         if self.Blueprint.Defense and self.Blueprint.Defense.MaxHealth then
@@ -458,6 +459,11 @@ Projectile = Class(moho.projectile_methods) {
                 self:CreateTerrainEffects(self.Army, TerrainEffects, bp.Display.ImpactEffects.Scale or 1)
             end
         end
+
+        -- for k, v in self do 
+        --     LOG(k)
+        -- end
+        -- LOG(debug.allocatedsize(self))
 
         -- in case we die slightly later
         local timeout = bp.Physics.ImpactTimeout

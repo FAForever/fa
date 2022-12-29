@@ -7,7 +7,7 @@
 local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
-AANTorpedoCluster01 = Class(ATorpedoCluster) {
+AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
     CountdownLength = 101,
 
     OnCreate = function(self)

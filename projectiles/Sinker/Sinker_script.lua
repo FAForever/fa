@@ -1,7 +1,7 @@
 local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
-Sinker = Class(Projectile) {
+Sinker = ClassProjectile(Projectile) {
     OnCreate = function(self)
         Projectile.OnCreate(self)
         self:SetVizToFocusPlayer('Never')

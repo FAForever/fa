@@ -10,7 +10,7 @@
 
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-AIFQuanticCluster03 = Class(import("/lua/aeonprojectiles.lua").AQuantumCluster) {
+AIFQuanticCluster03 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantumCluster) {
     FxTrails     = EffectTemplate.TFragmentationSensorShellTrail,
     FxImpactUnit = EffectTemplate.TFragmentationSensorShellHit,
     FxImpactLand = EffectTemplate.TFragmentationSensorShellHit,

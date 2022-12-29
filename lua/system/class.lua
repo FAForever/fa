@@ -93,6 +93,7 @@ local TableGetn = table.getn
 local Exclusions = {
     __index = true,
     n = true,
+    __name = true,
 }
 
 local function Deepcopy(other)
@@ -196,6 +197,107 @@ function Class(...)
     end
 end
 
+--- Prepares the construction of a UI class, referring to the paragraphs of text at the top of this file.
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
+function ClassUI(...)
+    -- arg = { 
+    --     { 
+    --         -- { table with information of base 1 } OR { specifications }
+    --         -- { table with information of base 2 }
+    --         -- ...
+    --         -- { table with information of base n }
+    --     }, 
+    --     n=1 -- number of bases
+    -- }
+
+    -- Class ({ field=value, field=value, ... })
+    if IsSimpleClass(arg) then
+        local class = arg[1] --[[@as fa-class]]
+        setmetatable(class, UIFactory)
+        return ConstructClass(nil, class) --[[@as unknown]]
+    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
+    else
+        local bases = { unpack (arg) }
+        return function(specs)
+            local class = specs
+            setmetatable(class, UIFactory)
+            return ConstructClass(bases, class)
+        end
+    end
+end
+
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
+function ClassShield(...)
+    -- arg = { 
+    --     { 
+    --         -- { table with information of base 1 } OR { specifications }
+    --         -- { table with information of base 2 }
+    --         -- ...
+    --         -- { table with information of base n }
+    --     }, 
+    --     n=1 -- number of bases
+    -- }
+
+    -- Class ({ field=value, field=value, ... })
+    if IsSimpleClass(arg) then
+        local class = arg[1] --[[@as fa-class]]
+        setmetatable(class, ShieldFactory)
+        return ConstructClass(nil, class) --[[@as unknown]]
+    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
+    else
+        local bases = { unpack (arg) }
+        return function(specs)
+            local class = specs
+            setmetatable(class, ShieldFactory)
+            return ConstructClass(bases, class)
+        end
+    end
+end
+
+--- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
+---construct a class
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
+function ClassProjectile(...)
+    -- arg = { 
+    --     { 
+    --         -- { table with information of base 1 } OR { specifications }
+    --         -- { table with information of base 2 }
+    --         -- ...
+    --         -- { table with information of base n }
+    --     }, 
+    --     n=1 -- number of bases
+    -- }
+
+    -- Class ({ field=value, field=value, ... })
+    if IsSimpleClass(arg) then
+        local class = arg[1] --[[@as fa-class]]
+        setmetatable(class, ProjectileFactory)
+        return ConstructClass(nil, class) --[[@as unknown]]
+    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
+    else
+        local bases = { unpack (arg) }
+        return function(specs)
+            local class = specs
+            setmetatable(class, ProjectileFactory)
+            return ConstructClass(bases, class)
+        end
+    end
+end
+
+function ClassTrashBag(specs)
+    setmetatable(specs, TrashBagFactory)
+    return ConstructClass(nil, specs)
+end
+
 ---create a simple class which does not inherit from anything
 ---@generic T
 ---@param specs T
@@ -267,6 +369,7 @@ local function CheckHierarchy(a, b)
 end
 
 local Seen = { }
+
 --- Constructs a class or state, referring to the paragraphs of text at the top of this file
 ---@generic Base: table, T:table
 ---@param bases Base
@@ -428,8 +531,11 @@ end
 --- Instantiation of a class, referring to the paragraphs of text at the top of this file
 ClassFactory = {
     __call = function(self, ...)
+
+        -- LOG(string.format("%s -> %s", "ClassFactory", tostring(self.__name)))
+
         -- create the new entity with us as its meta table
-        local instance = {}
+        local instance = {&1 &0}
         setmetatable(instance, self)
 
         -- call class initialisation functions, if they exist
@@ -444,6 +550,159 @@ ClassFactory = {
 
         return instance
     end
+}
+
+UIFactory = {
+    ---@param self any
+    ---@param ... any
+    ---@return table
+    __call = function (self, ...)
+        -- LOG(string.format("%s -> %s", "UIFactory", tostring(self.__name)))
+        -- needs a hash part of atleast 8 for all the lazy var fields, the _c_object reference and the _disabled field
+
+        local instance = {&15 &0}
+        setmetatable(instance, self)
+
+        local initfn = self.__init
+        if initfn then
+            initfn(instance, unpack(arg))
+        end
+        local postinitfn = self.__post_init
+        if postinitfn then
+            postinitfn(instance, unpack(arg))
+        end
+
+        return instance
+    end
+}
+
+CFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "CFactory", tostring(self.__name)))
+        -- needs a hash part of one for the _c_object field
+        local instance = {&1 &0}
+        return setmetatable(instance, self)
+    end
+}
+
+TrashBagFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "PropFactory", tostring(self.__name)))
+        local instance = {&0 &2}
+        return setmetatable(instance, self)
+    end
+}
+
+PropFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "PropFactory", tostring(self.__name)))
+        local instance = {&7 &0}
+        return setmetatable(instance, self)
+    end
+}
+
+EntityFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self, ...)
+        -- LOG(string.format("%s -> %s", "EntityFactory", tostring(self.__name)))
+
+        local instance = {&1 &0}
+        setmetatable(instance, self)
+
+        -- call class initialisation functions, if they exist
+        local initfn = self.__init
+        if initfn then
+            initfn(instance, unpack(arg))
+        end
+        local postinitfn = self.__post_init
+        if postinitfn then
+            postinitfn(instance, unpack(arg))
+        end
+
+        return instance
+    end
+}
+
+ProjectileFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "ProjectileFactory", tostring(self.__name)))
+        -- needs a hash part of one for the _c_object field
+        local instance = {&15 &0}
+        return setmetatable(instance, self)
+    end
+}
+
+UnitFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "UnitFactory", tostring(self.__name)))
+        -- needs a hash part of one for the _c_object field
+        local instance = {&31 &0}
+        return setmetatable(instance, self)
+    end
+}
+
+WeaponFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "WeaponFactory", tostring(self.__name)))
+        -- needs a hash part of one for the _c_object field
+        local instance = {&15 &0}
+        return setmetatable(instance, self)
+    end
+}
+
+ShieldFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self, spec, owner)
+        -- LOG(string.format("%s -> %s", "ShieldFactory", tostring(self.__name)))
+
+        local instance = {&63 &0}
+        setmetatable(instance, self)
+
+        local initfn = self.__init
+        if initfn then
+            initfn(instance, spec, owner)
+        end
+        local postinitfn = self.__post_init
+        if postinitfn then
+            postinitfn(instance, spec, owner)
+        end
+
+        return instance
+    end
+}
+
+BlipFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "BlipFactory", tostring(self.__name)))
+        local instance = {&1 &0}
+        return setmetatable(instance, self)
+    end
+}
+
+EffectFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "EffectFactory", tostring(self.__name)))
+        local instance = {&1 &0}
+        return setmetatable(instance, self)
+    end 
 }
 
 --- Switches up the sate of a class instance by inserting the new state between the instance and its class
@@ -502,14 +761,79 @@ local function Flatten(flattee, hierarchy, seen)
     end
 end
 
+Factory = {
+
+    -- are created via a (c) function, they either have no Lua 
+    SlaveManipulator = CFactory,
+    ThrustManipulator = CFactory,
+    BoneEntityManipulator = CFactory,
+    SlideManipulator = CFactory,
+    BuilderArmManipulator = CFactory,
+    RotateManipulator = CFactory,
+    StorageManipulator = CFactory,
+    FootPlantManipulator = CFactory,
+    CollisionManipulator = CFactory,
+    AnimationManipulator = CFactory,
+    AimManipulator = CFactory,
+    manipulator_methods = CFactory,
+
+    CDamage = CFactory,
+    sound_methods = CFactory,
+    CPrefetchSet = CFactory,
+    CDecalHandle = CFactory,
+    EconomyEvent = CFactory,
+    EntityCategory = CFactory,
+    navigator_methods = CFactory,
+    MotorFallDown = CFactory,
+    ScriptTask_Methods = CFactory,
+    aipersonality_methods = CFactory,
+    userDecal_methods = CFactory,
+
+    -- are instantiated by calling the class
+    scrollbar_methods = UIFactory,
+    cursor_methods = UIFactory,
+    bitmap_methods = UIFactory,
+    dragger_methods = UIFactory,
+    control_methods = UIFactory,
+    item_list_methods = UIFactory,
+    movie_methods = UIFactory,
+    border_methods = UIFactory,
+    edit_methods = UIFactory,
+    histogram_methods = UIFactory,
+    frame_methods = UIFactory,
+    group_methods = UIFactory,
+    ui_map_preview_methods = UIFactory,
+    UIWorldView = UIFactory,
+    text_methods = UIFactory,
+
+    -- are created via a (c) function,
+    IEffect = EffectFactory,
+    platoon_methods = nil,
+    projectile_methods = ProjectileFactory,
+    blip_methods = BlipFactory,
+    entity_methods = EntityFactory,
+    weapon_methods = WeaponFactory,
+    unit_methods = UnitFactory,
+    shield_methods = ShieldFactory,
+    prop_methods = PropFactory,
+    CollisionBeamEntity = nil,
+
+    -- other classes that are not that relevant as they are not instantiated frequently during gameplay
+    aibrain_methods = nil,
+    discovery_service_methods = nil,
+    WldUIProvider_methods = nil,
+    lobby_methods = nil,
+    mesh_methods = nil,
+    world_mesh_methods = nil,
+    PathDebugger_methods = nil,
+
+    -- unused
+    CAiAttackerImpl_methods = nil,
+}
+
 --- Converts a C class into a simplified Lua class with no bases. This must adjust the cclass in place as the reference
 -- to the table appears to be hardcoded in the engine.
-function ConvertCClassToLuaSimplifiedClass(cclass)
-    if getmetatable(cclass) == ClassFactory then
-        LOG("Already populated class: " .. tostring(cclass))
-        return
-    end
-
+function ConvertCClassToLuaSimplifiedClass(cclass, name)
     local seen = {}
     local flatten = {}
     Flatten(flatten, cclass, seen)
@@ -525,6 +849,7 @@ function ConvertCClassToLuaSimplifiedClass(cclass)
     -- re-populate it
     for k, val in flatten do
         cclass[k] = val
+        cclass.__name = name
 
         -- allow us to print it out
         if enableDebugging then
@@ -534,5 +859,5 @@ function ConvertCClassToLuaSimplifiedClass(cclass)
 
     -- allow tables to search the meta table
     cclass.__index = cclass
-    setmetatable(cclass, ClassFactory)
+    setmetatable(cclass, Factory[name] or ClassFactory)
 end

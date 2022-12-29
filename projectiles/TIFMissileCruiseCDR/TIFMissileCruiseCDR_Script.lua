@@ -5,7 +5,7 @@ local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCr
 local Explosion = import("/lua/defaultexplosions.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-TIFMissileCruiseCDR = Class(TMissileCruiseProjectile) {
+TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
 
     FxAirUnitHitScale = 1.65,
     FxLandHitScale = 1.65,

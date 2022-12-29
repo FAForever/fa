@@ -9,7 +9,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local CTorpedoShipProjectile = import("/lua/cybranprojectiles.lua").CTorpedoShipProjectile
-CANTorpedoNanite03 = Class(CTorpedoShipProjectile) {
+CANTorpedoNanite03 = ClassProjectile(CTorpedoShipProjectile) {
     TrailDelay = 0,
     OnCreate = function(self, inWater)
         CTorpedoShipProjectile.OnCreate(self, inWater)

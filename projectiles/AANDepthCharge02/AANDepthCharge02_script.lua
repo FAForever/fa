@@ -2,7 +2,7 @@
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
-AANDepthCharge01 = Class(ADepthChargeProjectile) {
+AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
     OnImpact = function(self, TargetType, TargetEntity)
         local px,_,pz = self:GetPositionXYZ()
         local marker = VisionMarkerOpti({Owner = self})

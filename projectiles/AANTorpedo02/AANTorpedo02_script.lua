@@ -2,7 +2,7 @@
 
 local ATorpedoShipProjectile= import("/lua/aeonprojectiles.lua").ATorpedoShipProjectile
 
-AANTorpedo02 = Class(ATorpedoShipProjectile) {
+AANTorpedo02 = ClassProjectile(ATorpedoShipProjectile) {
     FxSplashScale = 1,
     FxTrailScale = 0.75,
 

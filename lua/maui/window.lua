@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------------------------------
-----   Generic Window Class
+----   Generic Window ClassUI
 ----------------------------------------------------------------------------------------------------
 
 
@@ -70,7 +70,7 @@ styles = {
 }
 
 ---@class Window : Group
-Window = Class(Group) {
+Window = ClassUI(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
         Group.__init(self, parent, tostring(title) .. "-window")
 

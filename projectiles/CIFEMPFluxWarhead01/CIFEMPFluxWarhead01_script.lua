@@ -3,7 +3,7 @@
 --
 local CEMPFluxWarheadProjectile = import("/lua/cybranprojectiles.lua").CEMPFluxWarheadProjectile
 
-CIFEMPFluxWarhead01 = Class(CEMPFluxWarheadProjectile) {
+CIFEMPFluxWarhead01 = ClassProjectile(CEMPFluxWarheadProjectile) {
     FxSplashScale = 0.5,
     FxTrails = { },
     LaunchSound = 'Nuke_Launch',

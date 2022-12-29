@@ -11,6 +11,6 @@
 local TDepthChargeProjectile = import("/lua/terranprojectiles.lua").TDepthChargeProjectile
 
 ---@class TIMAntiTorpedo02 : TDepthChargeProjectile
-TIMAntiTorpedo02 = Class(TDepthChargeProjectile) {}
+TIMAntiTorpedo02 = ClassProjectile(TDepthChargeProjectile) {}
 
 TypeClass = TIMAntiTorpedo02

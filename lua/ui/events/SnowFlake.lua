@@ -16,7 +16,7 @@ local snowFlakeWidth = 10
 local snowFlakeHeight = 10
 local snowFlakeCount
 
-local SnowFlake = Class(Bitmap)
+local SnowFlake = ClassUI(Bitmap)
 {
     __init = function(self, parent, speed, scale, xPos, yPos)
         Bitmap.__init(self, parent, snowFlakePath)

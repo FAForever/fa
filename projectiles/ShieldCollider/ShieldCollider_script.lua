@@ -7,7 +7,7 @@
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 local VectorCached = Vector(0, 0, 0)
 
-ShieldCollider = Class(Projectile) {
+ShieldCollider = ClassProjectile(Projectile) {
     OnCreate = function(self, inWater)
         Projectile.OnCreate(self)
 

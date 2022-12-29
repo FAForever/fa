@@ -1,6 +1,6 @@
 -- Ship-based Anti-Torpedo Script
 local ATorpedoSubProjectile = import("/lua/aeonprojectiles.lua").QuasarAntiTorpedoChargeSubProjectile
-AIMAntiTorpedo02 = Class(ATorpedoSubProjectile) 
+AIMAntiTorpedo02 = ClassProjectile(ATorpedoSubProjectile) 
 {
     OnLostTarget = function(self)
         --Slow this thing down and make it start moving downward.

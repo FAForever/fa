@@ -3,5 +3,5 @@
 -- Summary  :  Ana-it Torpedo Projectile script, XSS0201
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------
-SANAnaitTorpedo01 = Class(import("/lua/seraphimprojectiles.lua").SAnaitTorpedo) {}
+SANAnaitTorpedo01 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SAnaitTorpedo) {}
 TypeClass = SANAnaitTorpedo01

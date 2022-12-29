@@ -2,7 +2,7 @@
 
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
-MissileCruiseTerran01 = Class(Projectile) {
+MissileCruiseTerran01 = ClassProjectile(Projectile) {
     MissileExhaust = {},
 
     -- LAUNCH BEAM

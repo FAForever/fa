@@ -8,7 +8,7 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-AIFQuantumWarhead02 = Class(NullShell) {
+AIFQuantumWarhead02 = ClassProjectile(NullShell) {
     NormalEffects = {'/effects/emitters/quantum_warhead_01_emit.bp',},
     CloudFlareEffects = EffectTemplate.CloudFlareEffects01,
 

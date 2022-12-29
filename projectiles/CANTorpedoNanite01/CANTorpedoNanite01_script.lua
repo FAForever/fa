@@ -3,7 +3,7 @@
 --
 local CTorpedoSubProjectile = import("/lua/cybranprojectiles.lua").CTorpedoSubProjectile
 
-CANTorpedoNanite01 = Class(CTorpedoSubProjectile) {
+CANTorpedoNanite01 = ClassProjectile(CTorpedoSubProjectile) {
 
 	OnCreate = function(self, inWater)
         CTorpedoSubProjectile.OnCreate(self, inWater)

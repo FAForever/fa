@@ -8,7 +8,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
-AIFFragmentationSensorShell01 = Class(AArtilleryFragmentationSensorShellProjectile) {
+AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShellProjectile) {
 
     OnImpact = function(self, TargetType, TargetEntity)
         local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag01

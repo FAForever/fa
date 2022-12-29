@@ -5,7 +5,7 @@
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------------------
 local AReactonCannonProjectile = import("/lua/aeonprojectiles.lua").AReactonCannonProjectile
-ADFReactonCannon01 = Class(AReactonCannonProjectile) {
+ADFReactonCannon01 = ClassProjectile(AReactonCannonProjectile) {
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local launcher = self.Launcher
         if launcher and launcher:HasEnhancement('StabilitySuppressant') then

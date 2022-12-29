@@ -7,7 +7,7 @@ local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCav
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
+SANHeavyCavitationTorpedo02 = ClassProjectile(SHeavyCavitationTorpedo) {
     FxSplashScale = .4,
     FxEnterWaterEmitter = {
         '/effects/emitters/destruction_water_splash_ripples_01_emit.bp',

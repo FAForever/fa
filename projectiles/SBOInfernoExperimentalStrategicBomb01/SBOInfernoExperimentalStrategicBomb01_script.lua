@@ -6,7 +6,7 @@
 
 local SExperimentalStrategicBomb = import("/lua/seraphimprojectiles.lua").SExperimentalStrategicBomb
 
-SBOInfernoExperimentalStrategicBomb01 = Class(SExperimentalStrategicBomb) {
+SBOInfernoExperimentalStrategicBomb01 = ClassProjectile(SExperimentalStrategicBomb) {
     OnImpact = function(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
             -- Play the explosion sound

@@ -3,7 +3,7 @@
 local AMiasmaProjectile = import("/lua/aeonprojectiles.lua").AMiasmaProjectile
 local utilities = import("/lua/utilities.lua")
 
-AIFMiasmaShell01 = Class(AMiasmaProjectile) {
+AIFMiasmaShell01 = ClassProjectile(AMiasmaProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local bp = self.Blueprint.Audio
         local snd = bp['Impact'.. targetType]

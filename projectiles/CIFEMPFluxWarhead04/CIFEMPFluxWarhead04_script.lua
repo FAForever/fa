@@ -3,7 +3,7 @@
 --
 local CEMPFluxWarheadProjectile = import("/lua/cybranprojectiles.lua").CEMPFluxWarheadProjectile
 
-CIFEMPFluxWarhead04 = Class(CEMPFluxWarheadProjectile) {
+CIFEMPFluxWarhead04 = ClassProjectile(CEMPFluxWarheadProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',
     FxTrails = { },
     

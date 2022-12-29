@@ -3,7 +3,7 @@
 --
 local CDFTrackerProjectile = import("/lua/cybranprojectiles.lua").CDFTrackerProjectile
 
-CDFTracker01 = Class(CDFTrackerProjectile) {
+CDFTracker01 = ClassProjectile(CDFTrackerProjectile) {
     OnImpact = function(self, TargetType, TargetEntity)
         if TargetEntity then
             local x,y,z = unpack(TargetEntity:GetPosition())

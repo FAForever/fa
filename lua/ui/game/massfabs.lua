@@ -35,7 +35,7 @@ function ToggleControl()
 end
 
 ---@class MassFabPanel : Group
-MassFabPanel = Class(Group) {
+MassFabPanel = ClassUI(Group) {
 
     DefaultHeight = 72,
     DefaultWidth = 104,

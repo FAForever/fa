@@ -6,7 +6,7 @@
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-SANHeavyCavitationTorpedo03 = Class(SHeavyCavitationTorpedo) {
+SANHeavyCavitationTorpedo03 = ClassProjectile(SHeavyCavitationTorpedo) {
     OnCreate = function(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
         SHeavyCavitationTorpedo.OnCreate(self)

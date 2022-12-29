@@ -31,14 +31,14 @@ local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 -----------------------------------------------------------------
 
 ---@class NullShell : Projectile
-NullShell = Class(Projectile) {}
+NullShell = ClassProjectile(Projectile) {}
 
 -----------------------------------------------------------------
 -- PROJECTILE WITH ATTACHED EFFECT EMITTERS
 -----------------------------------------------------------------
 
 ---@class EmitterProjectile : Projectile
-EmitterProjectile = Class(Projectile) {
+EmitterProjectile = ClassProjectile(Projectile) {
     FxTrails = {'/effects/emitters/missile_munition_trail_01_emit.bp',},
     FxTrailScale = 1,
     FxTrailOffset = 0,
@@ -68,7 +68,7 @@ EmitterProjectile = Class(Projectile) {
 -----------------------------------------------------------------
 
 ---@class SingleBeamProjectile : EmitterProjectile
-SingleBeamProjectile = Class(EmitterProjectile) {
+SingleBeamProjectile = ClassProjectile(EmitterProjectile) {
 
     BeamName = '/effects/emitters/default_beam_01_emit.bp',
     FxTrails = {},
@@ -84,7 +84,7 @@ SingleBeamProjectile = Class(EmitterProjectile) {
 }
 
 ---@class MultiBeamProjectile : EmitterProjectile
-MultiBeamProjectile = Class(EmitterProjectile) {
+MultiBeamProjectile = ClassProjectile(EmitterProjectile) {
 
     Beams = {'/effects/emitters/default_beam_01_emit.bp',},
     FxTrails = {},
@@ -102,7 +102,7 @@ MultiBeamProjectile = Class(EmitterProjectile) {
 
 --- Nukes
 ---@class NukeProjectile : NullShell
-NukeProjectile = Class(NullShell) {
+NukeProjectile = ClassProjectile(NullShell) {
     ---@param self NukeProjectile
     MovementThread = function(self)
         local launcher = self:GetLauncher()
@@ -244,7 +244,7 @@ NukeProjectile = Class(NullShell) {
 -----------------------------------------------------------------
 
 ---@class SinglePolyTrailProjectile : EmitterProjectile
-SinglePolyTrailProjectile = Class(EmitterProjectile) {
+SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     PolyTrail = '/effects/emitters/test_missile_trail_emit.bp',
     PolyTrailOffset = 0,
@@ -266,7 +266,7 @@ SinglePolyTrailProjectile = Class(EmitterProjectile) {
 }
 
 ---@class MultiPolyTrailProjectile : EmitterProjectile
-MultiPolyTrailProjectile = Class(EmitterProjectile) {
+MultiPolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
     PolyTrailOffset = {0},
@@ -316,7 +316,7 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
 
 --- Lightweight Version That Limits Use To 1 Beam, polytrail and standard emitters
 ---@class SingleCompositeEmitterProjectile : SinglePolyTrailProjectile
-SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
+SingleCompositeEmitterProjectile = ClassProjectile(SinglePolyTrailProjectile) {
 
     BeamName = '/effects/emitters/default_beam_01_emit.bp',
     FxTrails = {},
@@ -333,7 +333,7 @@ SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
 
 --- Heavyweight Version, Allows for multiple beams, polytrails and standard emmiters
 ---@class MultiCompositeEmitterProjectile : MultiPolyTrailProjectile
-MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
+MultiCompositeEmitterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
 
     Beams = {'/effects/emitters/default_beam_01_emit.bp',},
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
@@ -358,7 +358,7 @@ MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
 -----------------------------------------------------------------
 
 ---@class OnWaterEntryEmitterProjectile : Projectile
-OnWaterEntryEmitterProjectile = Class(Projectile) {
+OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     FxTrails = {'/effects/emitters/torpedo_munition_trail_01_emit.bp',},
     FxTrailScale = 1,
     FxTrailOffset = 0,
@@ -482,7 +482,7 @@ local EmitterMethods = _G.moho.IEffect
 local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
 
 ---@class BaseGenericDebris : DummyProjectile
-BaseGenericDebris = Class(DummyProjectile) {
+BaseGenericDebris = ClassProjectile(DummyProjectile) {
 
     ---@param self BaseGenericDebris
     ---@param targetType string

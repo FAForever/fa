@@ -3,7 +3,7 @@
 --
 local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
 
-TANAnglerTorpedo06 = Class(TTorpedoShipProjectile) 
+TANAnglerTorpedo06 = ClassProjectile(TTorpedoShipProjectile) 
 {
     OnEnterWater = function(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
