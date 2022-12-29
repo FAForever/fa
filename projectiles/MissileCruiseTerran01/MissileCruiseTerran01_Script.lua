@@ -1,6 +1,5 @@
---
 -- script for projectile Missile
---
+
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
 MissileCruiseTerran01 = Class(Projectile) {
@@ -44,7 +43,7 @@ MissileCruiseTerran01 = Class(Projectile) {
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
 
         self.trails = {}
-        local army = self:GetArmy()
+        local army = self.Army
 
         for i in self.FxTrails do
             table.insert(self.trails, CreateEmitterOnEntity(self, army,self.FxLaunchTrails[i]):ScaleEmitter(self.FxLaunchTrailScale):OffsetEmitter(0, 0, self.FxLaunchTrailOffset))
@@ -56,9 +55,9 @@ MissileCruiseTerran01 = Class(Projectile) {
 
     CruiseMissileThread = function(self)
         self:TrackTarget(false)
-        WaitSeconds(4) --Straight Up
+        WaitTicks(41)
         self:TrackTarget(true)
-        WaitSeconds(1) --Start Tracking
+        WaitTicks(11)
         self:TrackTarget(false)
         self:SetMaxSpeed(2)
         self:SetBallisticAcceleration()
@@ -81,7 +80,6 @@ MissileCruiseTerran01 = Class(Projectile) {
         self:SetTurnRate(400)
         self:SetMaxSpeed(25)
         self:SetAcceleration(25)
-
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
@@ -93,4 +91,3 @@ MissileCruiseTerran01 = Class(Projectile) {
     end,
 }
 TypeClass = MissileCruiseTerran01
-

@@ -1,6 +1,4 @@
---
 -- Ship-based Anti-Torpedo Script
---
 local CDepthChargeProjectile = import("/lua/cybranprojectiles.lua").CDepthChargeProjectile
 CIMAntiTorpedo02 = Class(CDepthChargeProjectile) {
 
@@ -11,7 +9,7 @@ CIMAntiTorpedo02 = Class(CDepthChargeProjectile) {
     end,
 
     MotionThread = function(self)
-        WaitSeconds( 2 )
+        WaitTicks(21)
         self:SetBallisticAcceleration(-3)
     end,
 }

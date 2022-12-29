@@ -1,4 +1,3 @@
-------------------------------------------------------------------------------------
 --  File     :  /data/projectiles/SAABlazarAutoCannon02/SAABlazarAutoCannon02_script.lua
 --  Author(s):  Gordon Duclos
 --  Summary  :  Blazar AA AutoCannon Projectile script, XSA0401
