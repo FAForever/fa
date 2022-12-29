@@ -69,7 +69,7 @@ MissileCruiseTerran01 = Class(Projectile) {
         WaitTicks(6) --Falling
         local army = self.Army
         self.MissileExhaust = CreateBeamEmitter('/effects/emitters/missile_cruise_munition_exhaust_beam_02_emit.bp', army)
-        AttachBeamToEntity(self.MissileExhaust, self, -1, self:GetArmy())
+        AttachBeamToEntity(self.MissileExhaust, self, -1, army)
 
         self.trails = {}
         for i in self.FxTrails do

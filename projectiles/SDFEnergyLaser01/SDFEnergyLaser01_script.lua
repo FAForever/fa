@@ -7,7 +7,7 @@ SDFEnergyLaser01 = Class(SEnergyLaser) {
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 	  MovementThread = function(self)
-	  	  WaitTicks(21)
+	  	  WaitTicks(3)
 	  	  self:SetAcceleration(9999)
 	  end,
 }

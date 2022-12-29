@@ -21,7 +21,7 @@ SANHeavyCavitationTorpedo03 = Class(SHeavyCavitationTorpedo) {
         if distance < 6 then
             turnrate = 720
         end
-        WaitSeconds(11)
+        WaitTicks(2)
         self:SetMaxSpeed(20)
         self:TrackTarget(true)
         self:SetTurnRate(turnrate)

@@ -41,7 +41,7 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo) {
     end,
 
     ProjectileSplit = function(self)
-        WaitSeconds(11)
+        WaitTicks(2)
         local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo03/SANHeavyCavitationTorpedo03_proj.bp'
         local vx, vy, vz = self:GetVelocity()
         local velocity = 7
