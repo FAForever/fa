@@ -139,7 +139,7 @@ UnitBlueprint {
         },
         TarmacDecal = 'Tarmacs/tarmac_aeon_2x_albedo',
         TarmacGlowDecal = 'Tarmacs/tarmac_aeon_2x_glow',
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Secret',
         ToggleCaps = {
             RULEUTC_IntelToggle = true,
         },
