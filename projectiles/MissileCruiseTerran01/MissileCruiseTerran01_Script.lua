@@ -50,8 +50,7 @@ MissileCruiseTerran01 = Class(Projectile) {
         end
         self.MissileExhaust = CreateBeamEmitter('/effects/emitters/missile_cruise_munition_exhaust_beam_01_emit.bp',army)
         AttachBeamToEntity(self.MissileExhaust, self, -1, army)
-
-        self.Trash:Add(ForkThread(self.CruiseMissileThread))
+        self.Trash:Add(ForkThread(self.CruiseMissileThread,self))
     end,
 
     CruiseMissileThread = function(self)
@@ -66,11 +65,10 @@ MissileCruiseTerran01 = Class(Projectile) {
             self.trails[i]:Destroy()
         end
         self.MissileExhaust:Destroy()
-        WaitTicks(5) --Falling
+        WaitTicks(6) --Falling
         local army = self.Army
-
         self.MissileExhaust = CreateBeamEmitter('/effects/emitters/missile_cruise_munition_exhaust_beam_02_emit.bp', army)
-        AttachBeamToEntity(self.MissileExhaust, self, -1, self.Army)
+        AttachBeamToEntity(self.MissileExhaust, self, -1, army)
 
         self.trails = {}
         for i in self.FxTrails do
