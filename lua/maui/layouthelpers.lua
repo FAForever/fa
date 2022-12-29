@@ -1130,7 +1130,7 @@ Layouter(component)
 --
 -- Thus, a basic UI class might end up looking something like this:
 --[[
-UIComponent = ClassUI(Group) {
+UIComponent = Class(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)
 
@@ -2073,7 +2073,7 @@ local LayouterAttributeFont = ClassSimple {
 ------------------------------
 
 ---@class LayouterAttributeEditor : LayouterAttributeFont
-local LayouterAttributeEditor = ClassUI(LayouterAttributeFont) {
+local LayouterAttributeEditor = Class(LayouterAttributeFont) {
     --- Sets up the editor of the control
     ---@generic T : LayouterAttributeEditor
     ---@param self T
@@ -2120,7 +2120,7 @@ local LayouterAttributeColor = ClassSimple {
 ------------------------------
 
 ---@class LayouterAttributeTexture : LayouterAttributeColor
-local LayouterAttributeTexture = ClassUI(LayouterAttributeColor) {
+local LayouterAttributeTexture = Class(LayouterAttributeColor) {
     --- Sets the control's texture
     ---@generic T : LayouterAttributeTexture
     ---@param self T
@@ -2194,7 +2194,7 @@ local LayouterAttributeSelection = ClassSimple {
 
 ---@class Layouter : LayouterAttributeControl, LayouterAttributeDropShadow, LayouterAttributeEditor, LayouterAttributeTexture, LayouterAttributeSelection
 ---@field layoutControl Control
-Layouter = ClassUI(LayouterAttributeControl, LayouterAttributeDropShadow, LayouterAttributeEditor, LayouterAttributeTexture, LayouterAttributeSelection) {
+Layouter = Class(LayouterAttributeControl, LayouterAttributeDropShadow, LayouterAttributeEditor, LayouterAttributeTexture, LayouterAttributeSelection) {
     ---@param self Layouter
     ---@param control Control
     __init = function(self, control)
