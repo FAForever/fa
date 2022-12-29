@@ -549,7 +549,7 @@ CFactory = {
     ---@param self any
     ---@return table
     __call = function (self)
-        LOG(string.format("%s -> %s", "CFactory", tostring(self.__name)))
+        -- LOG(string.format("%s -> %s", "CFactory", tostring(self.__name)))
         -- needs a hash part of one for the _c_object field
         local instance = {&1 &0}
         return setmetatable(instance, self)
@@ -775,15 +775,15 @@ Factory = {
 
     -- are created via a (c) function,
     IEffect = EffectFactory,
-    platoon_methods = nil,   
-    projectile_methods = ProjectileFactory,     -- uses metatable of IEffect
-    blip_methods = BlipFactory,                 -- uses metatable of IEffect
-    entity_methods = EntityFactory,             -- uses metatable of IEffect
-    weapon_methods = WeaponFactory,             -- uses metatable of IEffect
-    unit_methods = UnitFactory,                 -- uses metatable of IEffect
-    shield_methods = ShieldFactory,             -- uses metatable of IEffect
-    prop_methods = PropFactory,                 -- uses metatable of IEffect
-    CollisionBeamEntity = nil,                  -- uses metatable of IEffect
+    platoon_methods = nil,
+    projectile_methods = ProjectileFactory,
+    blip_methods = BlipFactory,
+    entity_methods = EntityFactory,
+    weapon_methods = WeaponFactory,
+    unit_methods = UnitFactory,
+    shield_methods = ShieldFactory,
+    prop_methods = PropFactory,
+    CollisionBeamEntity = nil,
 
     -- other classes that are not that relevant as they are not instantiated frequently during gameplay
     aibrain_methods = nil,
