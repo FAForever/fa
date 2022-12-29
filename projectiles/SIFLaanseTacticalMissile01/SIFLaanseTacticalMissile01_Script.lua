@@ -13,7 +13,7 @@ SIFLaanseTacticalMissile01 = Class(SLaanseTacticalMissile) {
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 11
+        self.WaitTime = 2
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
         WaitTicks(4)        
