@@ -19,6 +19,7 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
     end,
 
     OnEnterWater = function(self)
+        ADepthChargeProjectile.OnEnterWater(self)
         self:SetTurnRate(360)
     end,
 
