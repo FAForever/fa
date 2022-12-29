@@ -6,7 +6,7 @@ local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 
 --- A popup that asks the user for a string.
 ---@class InputDialog : Popup
-InputDialog = Class(Popup) {
+InputDialog = ClassUI(Popup) {
     __init = function(self, parent, title, fallbackInputbox, str)
         -- For ridiculous reasons, the lobby *must* keep keyboard focus on the chat input, or
         -- in-game keybindings can be called and cause the world to end.

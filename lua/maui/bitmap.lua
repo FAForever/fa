@@ -1,4 +1,4 @@
--- Class methods:
+-- ClassUI methods:
 -- SetTexture(filename(s), border=1)
 -- SetSolidColor(color)
 -- SetUV(float u0, float v0, float u1, float v1)
@@ -37,7 +37,7 @@ local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 ---@class Bitmap : moho.bitmap_methods, Control, InternalObject
 ---@field _filename BitmapTexture
 ---@field _color LazyVar<Color>
-Bitmap = Class(moho.bitmap_methods, Control) {
+Bitmap = ClassUI(moho.bitmap_methods, Control) {
     ---@param self Bitmap
     ---@param parent Control
     ---@param filename Lazy<FileName>

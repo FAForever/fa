@@ -115,8 +115,6 @@ Projectile = ClassProjectile(moho.projectile_methods) {
     ---@param inWater? boolean Flag to indicate the projectile is in water or not
     OnCreate = function(self, inWater)
 
-        LOG(debug.allocatedsize(self))
-
         -- store information 
         self.Blueprint = EntityGetBlueprint(self)
         self.Army = EntityGetArmy(self)
