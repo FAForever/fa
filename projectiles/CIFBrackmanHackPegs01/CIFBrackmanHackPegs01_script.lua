@@ -15,7 +15,7 @@ CIFBrackmanHackPegs01 = Class(CDFBrackmanHackPegProjectile01) {
         local ChildProjectileBP = '/projectiles/CIFBrackmanHackPegs02/CIFBrackmanHackPegs02_proj.bp'  
         ------ Play split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtEntity( self, self:GetArmy(), v )
+            CreateEmitterAtEntity( self, self.Army, v )
         end
         local vx, vz = self:GetVelocity()
         local velocity = 18
@@ -35,8 +35,8 @@ CIFBrackmanHackPegs01 = Class(CDFBrackmanHackPegProjectile01) {
             xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
             zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul 
             local proj = self:CreateProjectile(ChildProjectileBP, 0, 0.0, 0, xVec, -1.0, zVec):SetCollision(true):SetVelocity(velocity)
-            proj:PassDamageData(self.DamageData)
-            proj:SetTargetPosition(self:GetCurrentTargetPosition())                    
+            proj.DamageData = self.DamageData
+            proj:SetTargetPosition(self:GetCurrentTargetPosition())
         end
         self:Destroy()
     end,

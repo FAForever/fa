@@ -5,17 +5,17 @@ AIFMissileSerpentine01 = Class(AMissileSerpentineProjectile) {
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
-        self.MoveThread = self:ForkThread(self.MovementThread)
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
-    MovementThread = function(self)        
-        self.WaitTime = 0.1
+    MovementThread = function(self)
+        self.WaitTime = 2
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
-        WaitSeconds(0.3)        
+        WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(self.WaitTime)
         end
     end,
 
@@ -23,26 +23,25 @@ AIFMissileSerpentine01 = Class(AMissileSerpentineProjectile) {
         local dist = self:GetDistanceToTarget()
         if dist > self.Distance then
         	self:SetTurnRate(75)
-        	WaitSeconds(3)
+        	WaitTicks(31)
         	self:SetTurnRate(8)
         	self.Distance = self:GetDistanceToTarget()
         end
-        if dist > 50 then        
-            --Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+        if dist > 50 then
+            WaitTicks(21)
             self:SetTurnRate(10)
         elseif dist > 30 and dist <= 50 then
 						self:SetTurnRate(12)
-						WaitSeconds(1.5)
+						WaitTicks(16)
             self:SetTurnRate(12)
         elseif dist > 10 and dist <= 25 then
-            WaitSeconds(0.3)
+            WaitTicks(4)
             self:SetTurnRate(50)
-				elseif dist > 0 and dist <= 10 then         
-            self:SetTurnRate(100)   
-            KillThread(self.MoveThread)         
+				elseif dist > 0 and dist <= 10 then
+            self:SetTurnRate(100)
+            KillThread(self.MoveThread)
         end
-    end,        
+    end,
 
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
@@ -51,5 +50,4 @@ AIFMissileSerpentine01 = Class(AMissileSerpentineProjectile) {
         return dist
     end,
 }
-
 TypeClass = AIFMissileSerpentine01

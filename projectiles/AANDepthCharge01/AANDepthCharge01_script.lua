@@ -1,15 +1,9 @@
 -- Depth Charge Script
-
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
 local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
 
 AANDepthCharge01 = Class(ADepthChargeProjectile) {
-
-    CountdownLengthInTicks = 100,
-    FxEnterWater= {
-        '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
-        '/effects/emitters/water_splash_plume_01_emit.bp',
-    },
+    CountdownLengthInTicks = 101,
 
     OnCreate = function(self)
         ADepthChargeProjectile.OnCreate(self)
@@ -24,6 +18,14 @@ AANDepthCharge01 = Class(ADepthChargeProjectile) {
         end
     end,
 
+    OnEnterWater = function(self)
+        ADepthChargeProjectile.OnEnterWater(self)
+        self:SetMaxSpeed(20)
+        self:SetVelocity(0)
+        self:SetAcceleration(5)
+        self:SetTurnRate(180)
+    end,
+
     OnLostTarget = function(self)
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
@@ -31,7 +33,7 @@ AANDepthCharge01 = Class(ADepthChargeProjectile) {
     end,
 
     CountdownMovement = function(self)
-        WaitTicks(30)
+        WaitTicks(31)
         self:SetMaxSpeed(0)
         self:SetAcceleration(0)
         self:SetVelocity(0)

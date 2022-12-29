@@ -15,7 +15,7 @@ AIFQuanticCluster02 = Class(import("/lua/aeonprojectiles.lua").AQuantumCluster) 
 
         -- Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtEntity( self, self:GetArmy(), v )
+            CreateEmitterAtEntity( self, self.Army, v )
         end
 
         local vx, vy, vz = self:GetVelocity()
@@ -43,7 +43,7 @@ AIFQuanticCluster02 = Class(import("/lua/aeonprojectiles.lua").AQuantumCluster) 
             local proj = self:CreateChildProjectile(ChildProjectileBP)
             proj:SetVelocity(xVec,yVec,zVec)
             proj:SetVelocity(velocity)
-            proj:PassDamageData(self.DamageData)
+            proj.DamageData =self.DamageData
         end
         self:Destroy()
     end,

@@ -1,12 +1,8 @@
-﻿--****************************************************************************
---**
---**  File     :  /data/projectiles/SANHeavyCavitationTorpedo01/SANHeavyCavitationTorpedo01_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  Heavy Cavitation Torpedo Projectile script, XSA0204
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+﻿-- File     :  /data/projectiles/SANHeavyCavitationTorpedo01/SANHeavyCavitationTorpedo01_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Heavy Cavitation Torpedo Projectile script, XSA0204
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------------------------------------------
 
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
@@ -31,7 +27,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
         self:TrackTarget(true):StayUnderwater(true)
         self:SetCollideSurface(false)
         self:SetTurnRate(360)
-        self:ForkThread(self.ProjectileSplit)
+        self.Trash:Add(ForkThread(self.ProjectileSplit,self))
     end,
 
     OnCreate = function(self,inWater)
@@ -43,7 +39,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
     end,
 
     ProjectileSplit = function(self)
-        WaitSeconds(0.1)
+        WaitTicks(2)
         local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo04/SANHeavyCavitationTorpedo04_proj.bp'
         local vx, vy, vz = self:GetVelocity()
         local velocity = 10
@@ -66,7 +62,6 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
         DividedDamageData.DamageAmount = DividedDamageData.DamageAmount / numProjectiles
         self.DamageData = nil
 
-
         local FxFragEffect = EffectTemplate.SHeavyCavitationTorpedoSplit
 
         -- Split effects
@@ -79,13 +74,12 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
             xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
             zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
             local proj = self:CreateChildProjectile(ChildProjectileBP)
-            proj:PassDamageData(DividedDamageData)
+            proj.DamageData = DividedDamageData
             proj:PassData(self:GetTrackingTarget())
             proj:SetVelocity(xVec,yVec,zVec)
             proj:SetVelocity(velocity)
         end
         self:Destroy()
     end,
-
 }
 TypeClass = SANHeavyCavitationTorpedo01

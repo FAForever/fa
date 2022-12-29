@@ -4,5 +4,6 @@
 local CTorpedoSubProjectile = import("/lua/cybranprojectiles.lua").CTorpedoSubProjectile
 
 CANTorpedoMeson02 = Class(CTorpedoSubProjectile) {
-    FxSplashScale = 1,}
+    FxSplashScale = 1,
+}
 TypeClass = CANTorpedoMeson02

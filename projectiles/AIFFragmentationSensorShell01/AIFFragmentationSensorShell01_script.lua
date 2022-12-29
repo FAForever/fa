@@ -10,13 +10,13 @@ local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 AIFFragmentationSensorShell01 = Class(AArtilleryFragmentationSensorShellProjectile) {
 
-    OnImpact = function(self, TargetType, TargetEntity) 
+    OnImpact = function(self, TargetType, TargetEntity)
         local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag01
-        local bp = self:GetBlueprint().Physics
+        local bp = self.Blueprint.Physics
 
         -- Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtBone( self, -1, self:GetArmy(), v )
+            CreateEmitterAtBone( self, -1, self.Army, v )
         end
 
         local vx, vy, vz = self:GetVelocity()
@@ -41,11 +41,11 @@ AIFFragmentationSensorShell01 = Class(AArtilleryFragmentationSensorShellProjecti
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, numProjectiles - 1 do
             xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul 
+            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
             local proj = self:CreateChildProjectile(bp.FragmentId)
             proj:SetVelocity(xVec,yVec,zVec)
             proj:SetVelocity(velocity)
-            proj:PassDamageData(self.DamageData)                        
+            proj.DamageData = self.DamageData
         end
         local pos = self:GetPosition()
         local spec = {

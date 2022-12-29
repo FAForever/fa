@@ -6,7 +6,6 @@
 ------------------------------------------------------------------------------
 local TargetPos
 local RandomInt = import("/lua/utilities.lua").GetRandomInt
-local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 --This one should just like be something kind of new compared to the older version
@@ -14,11 +13,11 @@ CIFBrackmanHackPegs02 = Class(import("/lua/cybranprojectiles.lua").CDFBrackmanHa
     OnImpact = function(self, TargetType, TargetEntity)
         self:SetVelocity(0)
         self:SetBallisticAcceleration(0)
-        self:ForkThread(self.WaitingForDeath)
-        self:CreateImpactEffects(self:GetArmy(), self.FxImpactLand, 1 )
+        self.Trash:Add(ForkThread(self.WaitingForDeath,self))
+        self:CreateImpactEffects(self.Army, self.FxImpactLand, 1 )
         for k, v in EffectTemplate.CBrackmanCrabPegAmbient01 do
-			CreateEmitterOnEntity( self, self:GetArmy(), v )
-		end			
+			CreateEmitterOnEntity( self, self.Army, v )
+		end
     end,
 
     SetTargetPosition= function(self, NewPosition) 
@@ -34,8 +33,8 @@ CIFBrackmanHackPegs02 = Class(import("/lua/cybranprojectiles.lua").CDFBrackmanHa
         }
         local num_projectiles= 50
         for i = 0, num_projectiles do
-            WaitTime= ( 0.4+RandomFloat(-0.2,0.2) )  ------Get how long to wait before launching the next one.
-            WaitSeconds( WaitTime )
+            WaitTime= 5 + ((Random() * 3) ^0)  ------Get how long to wait before launching the next one.
+            WaitTicks( WaitTime )
             local pos = self:GetPosition()
             local vel_x= (TargetPos[1]-pos[1])
             local vel_y= (TargetPos[2]-pos[2])
