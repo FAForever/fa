@@ -8,7 +8,7 @@ CAANanoDart01 = Class(CAANanoDartProjectile) {
 
    OnCreate = function(self)
         CAANanoDartProjectile.OnCreate(self)
-        self.Thread:Add(ForkThread(self.UpdateThread))
+        self.Trash:Add(ForkThread(self.UpdateThread, self))
    end,
 
 
