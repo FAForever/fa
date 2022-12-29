@@ -16,17 +16,17 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 
 
 ---@class UAS0103 : ASeaUnit
-UAS0103 = Class(ASeaUnit) {
+UAS0103 = ClassUnit(ASeaUnit) {
 
     Weapons = {
-        MainGun = Class(ADFCannonQuantumWeapon) {
+        MainGun = ClassWeapon(ADFCannonQuantumWeapon) {
             FxMuzzleFlash = EffectTemplate.AQuantumCannonMuzzle02
         },
-        MainGun2 = Class(ADFCannonQuantumWeapon) {
+        MainGun2 = ClassWeapon(ADFCannonQuantumWeapon) {
             FxMuzzleFlash = EffectTemplate.AQuantumCannonMuzzle02
         },
-        AntiTorpedo01 = Class(AIFQuasarAntiTorpedoWeapon) {},
-        AntiTorpedo02 = Class(AIFQuasarAntiTorpedoWeapon) {},
+        AntiTorpedo01 = ClassWeapon(AIFQuasarAntiTorpedoWeapon) {},
+        AntiTorpedo02 = ClassWeapon(AIFQuasarAntiTorpedoWeapon) {},
     },
 }
 

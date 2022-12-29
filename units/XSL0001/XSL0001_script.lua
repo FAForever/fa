@@ -18,18 +18,18 @@ local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLaunch
 local AIUtils = import("/lua/ai/aiutilities.lua")
 
 ---@class XSL0001 : ACUUnit
-XSL0001 = Class(ACUUnit) {
+XSL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        ChronotronCannon = Class(SDFChronotronCannonWeapon) {},
-        Missile = Class(SIFLaanseTacticalMissileLauncher) {
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        ChronotronCannon = ClassWeapon(SDFChronotronCannonWeapon) {},
+        Missile = ClassWeapon(SIFLaanseTacticalMissileLauncher) {
             OnCreate = function(self)
                 SIFLaanseTacticalMissileLauncher.OnCreate(self)
                 self:SetWeaponEnabled(false)
             end,
         },
-        OverCharge = Class(SDFChronotronOverChargeCannonWeapon) {},
-        AutoOverCharge = Class(SDFChronotronOverChargeCannonWeapon) {},
+        OverCharge = ClassWeapon(SDFChronotronOverChargeCannonWeapon) {},
+        AutoOverCharge = ClassWeapon(SDFChronotronOverChargeCannonWeapon) {},
     },
 
     __init = function(self)

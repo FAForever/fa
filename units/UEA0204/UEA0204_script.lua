@@ -13,9 +13,9 @@ local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
 
 
 ---@class UEA0204 : TAirUnit
-UEA0204 = Class(TAirUnit) {
+UEA0204 = ClassUnit(TAirUnit) {
     Weapons = {
-        Torpedo = Class(TANTorpedoAngler) {
+        Torpedo = ClassWeapon(TANTorpedoAngler) {
         },
     },
 }

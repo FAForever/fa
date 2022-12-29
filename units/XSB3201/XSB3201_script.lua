@@ -11,7 +11,7 @@
 local SRadarUnit = import("/lua/seraphimunits.lua").SRadarUnit
 
 ---@class XSB3201 : SRadarUnit
-XSB3201 = Class(SRadarUnit) {
+XSB3201 = ClassUnit(SRadarUnit) {
 
     OnIntelDisabled = function(self)
         SRadarUnit.OnIntelDisabled(self)

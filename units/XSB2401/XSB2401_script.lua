@@ -12,9 +12,9 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
 
 ---@class XSB2401 : SStructureUnit
-XSB2401 = Class(SStructureUnit) {
+XSB2401 = ClassUnit(SStructureUnit) {
     Weapons = {
-        ExperimentalNuke = Class(SIFExperimentalStrategicMissile) {
+        ExperimentalNuke = ClassWeapon(SIFExperimentalStrategicMissile) {
             OnWeaponFired = function(self)
                 self.unit:ForkThread(self.unit.HideMissile)
             end,
@@ -24,7 +24,7 @@ XSB2401 = Class(SStructureUnit) {
                 SIFExperimentalStrategicMissile.PlayFxWeaponUnpackSequence(self)
             end,
         },
-        DeathWeapon = Class(DeathNukeWeapon) {},
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
     },
 
     StartBeingBuiltEffects = function(self, builder, layer)

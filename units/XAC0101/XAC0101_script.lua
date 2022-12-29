@@ -8,7 +8,7 @@
 local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
 
 ---@class XAC0101 : ASeaUnit
-XAC0101 = Class(ASeaUnit) {
+XAC0101 = ClassUnit(ASeaUnit) {
 }
 
 

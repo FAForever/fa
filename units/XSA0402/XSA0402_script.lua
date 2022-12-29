@@ -16,15 +16,15 @@ local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesse
 local explosion = import("/lua/defaultexplosions.lua")
 
 ---@class XSA0402 : SAirUnit
-XSA0402 = Class(SAirUnit) {
+XSA0402 = ClassUnit(SAirUnit) {
     DestroyNoFallRandomChance = 1.1,
     
     Weapons = {
-        Bomb = Class(SB0OhwalliExperimentalStrategicBombWeapon) {},
-        RightFrontAutocannon = Class(SAALosaareAutoCannonWeapon) {},
-        LeftFrontAutocannon = Class(SAALosaareAutoCannonWeapon) {},
-        RightRearAutocannon = Class(SAALosaareAutoCannonWeapon) {},
-        LeftRearAutocannon = Class(SAALosaareAutoCannonWeapon) {},
+        Bomb = ClassWeapon(SB0OhwalliExperimentalStrategicBombWeapon) {},
+        RightFrontAutocannon = ClassWeapon(SAALosaareAutoCannonWeapon) {},
+        LeftFrontAutocannon = ClassWeapon(SAALosaareAutoCannonWeapon) {},
+        RightRearAutocannon = ClassWeapon(SAALosaareAutoCannonWeapon) {},
+        LeftRearAutocannon = ClassWeapon(SAALosaareAutoCannonWeapon) {},
     },
     
     ContrailEffects = {'/effects/emitters/contrail_ser_ohw_polytrail_01_emit.bp',},

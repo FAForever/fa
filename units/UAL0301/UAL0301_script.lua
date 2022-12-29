@@ -13,10 +13,10 @@ local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class UAL0301 : CommandUnit
-UAL0301 = Class(CommandUnit) {
+UAL0301 = ClassUnit(CommandUnit) {
     Weapons = {
-        RightReactonCannon = Class(ADFReactonCannon) {},
-        DeathWeapon = Class(SCUDeathWeapon) {},
+        RightReactonCannon = ClassWeapon(ADFReactonCannon) {},
+        DeathWeapon = ClassWeapon(SCUDeathWeapon) {},
     },
 
     __init = function(self)

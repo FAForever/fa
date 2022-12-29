@@ -13,10 +13,10 @@ local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultPro
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
 ---@class UAL0307 : AShieldHoverLandUnit
-UAL0307 = Class(AShieldHoverLandUnit, ShieldEffectsComponent) {
+UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
     
     Weapons = {        
-        TargetPointer = Class(DefaultProjectileWeapon) {},
+        TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
     },
     
     ShieldEffects = {

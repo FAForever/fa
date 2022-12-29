@@ -10,7 +10,7 @@
 local TCivilianStructureUnit = import("/lua/terranunits.lua").TCivilianStructureUnit
 
 ---@class UEC1401 : TCivilianStructureUnit
-UEC1401 = Class(TCivilianStructureUnit) {
+UEC1401 = ClassUnit(TCivilianStructureUnit) {
 
 	OnCreate = function(self)
 		TCivilianStructureUnit.OnCreate(self)

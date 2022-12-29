@@ -11,7 +11,7 @@
 local SLandFactoryUnit = import("/lua/seraphimunits.lua").SLandFactoryUnit
 
 ---@class XSB0301 : SLandFactoryUnit
-XSB0301 = Class(SLandFactoryUnit) {
+XSB0301 = ClassUnit(SLandFactoryUnit) {
 
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)

@@ -14,7 +14,7 @@ local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffect
 ---@field Rotator1? moho.RotateManipulator
 ---@field Rotator2? moho.RotateManipulator
 ---@field ShieldEffectsBag TrashBag
-UEB4202 = Class(TShieldStructureUnit, ShieldEffectsComponent) {
+UEB4202 = ClassUnit(TShieldStructureUnit, ShieldEffectsComponent) {
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_t2_01_emit.bp',
         '/effects/emitters/terran_shield_generator_t2_02_emit.bp',
