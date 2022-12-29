@@ -1,12 +1,8 @@
---****************************************************************************
---**
---**  File     :  /data/projectiles/SIFHuAntiNuke01/SIFHuAntiNuke01_script.lua
---**  Author(s):  Greg Kohne, Matt Vainio
---**
---**  Summary  : Seraphim Anti Nuke Missile
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /data/projectiles/SIFHuAntiNuke01/SIFHuAntiNuke01_script.lua
+-- Author(s):  Greg Kohne, Matt Vainio
+-- Summary  : Seraphim Anti Nuke Missile
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------------------
 
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local SIFHuAntiNuke = import("/lua/seraphimprojectiles.lua").SIFHuAntiNuke
@@ -20,7 +16,7 @@ SIFHuAntiNuke01 = Class(SIFHuAntiNuke) {
         local SmallTendrilProjectile = '/effects/Entities/SIFHuAntiNuke03/SIFHuAntiNuke03_proj.bp'  
         --Play the hit effect for the core explosion on the anti nuke.
         for k, v in FxHitEffect do
-            CreateEmitterAtEntity( self, self:GetArmy(), v )
+            CreateEmitterAtEntity( self, self.Army, v )
         end
         local vx, vz = self:GetVelocity()
         local velocity = 19
