@@ -3,7 +3,7 @@ local WatchedValueTable = import("/lua/ui/lobby/data/watchedvalue/watchedvalueta
 --- A WatchedValueTable with integral keys. Note that `false` is indistinguishable from `nil` in this
 -- structure, because Lua.
 ---@class WatchedValueArray : WatchedValueTable
-WatchedValueArray = ClassUI(WatchedValueTable) {
+WatchedValueArray = Class(WatchedValueTable) {
     __init = function(self, size)
         local initialMapping = {}
         for i = 1, size do
