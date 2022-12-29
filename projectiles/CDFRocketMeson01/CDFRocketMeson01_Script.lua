@@ -6,12 +6,13 @@ CDFRocketMeson01 = Class(CRocketProjectile) {
     PolyTrail = '/effects/emitters/default_polytrail_06_emit.bp',
     OnCreate = function(self)
         CRocketProjectile.OnCreate(self)
-        self:ForkThread(self.UpdateThread)
-    end,
+        self.Trash:Add(ForkThread(self.UpdateThread,self))
+   end,
+
     UpdateThread = function(self)
-        WaitSeconds(0.15)
+        WaitTicks(2)
         self:SetMesh('/projectiles/CDFRocketMeson01/CDFRocketMesonUnPacked01_mesh')
-        local army = self:GetArmy()
+        local army = self.Army
 
         -- Polytrails offset to wing tips
         CreateTrail(self, -1, army, self.PolyTrail ):OffsetEmitter(0.075, -0.05, 0.25)

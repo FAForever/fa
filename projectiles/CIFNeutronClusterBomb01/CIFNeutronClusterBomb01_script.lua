@@ -1,4 +1,3 @@
--------------------------------------------------------------------------------
 --  File     :  /projectiles/CIFNeutronClusterBomb01/CIFNeutronClusterBomb01.lua
 --  Author(s):  Gordon Duclos
 --  Summary  :  Cybran Neutron Cluster bomb
