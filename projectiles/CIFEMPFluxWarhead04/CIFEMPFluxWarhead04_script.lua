@@ -5,6 +5,8 @@ local CEMPFluxWarheadProjectile = import("/lua/cybranprojectiles.lua").CEMPFluxW
 
 CIFEMPFluxWarhead04 = Class(CEMPFluxWarheadProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',
+    FxTrails = { },
+    
     FxSplashScale = 0.5,
     LaunchSound = 'Nuke_Launch',
     ExplodeSound = 'Nuke_Impact',
