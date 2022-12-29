@@ -196,6 +196,41 @@ function Class(...)
     end
 end
 
+--- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
+---construct a class
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
+function ClassProjectile(...)
+    LOG("Helloooo!")
+    reprsl(debug.traceback())
+    -- arg = { 
+    --     { 
+    --         -- { table with information of base 1 } OR { specifications }
+    --         -- { table with information of base 2 }
+    --         -- ...
+    --         -- { table with information of base n }
+    --     }, 
+    --     n=1 -- number of bases
+    -- }
+
+    -- Class ({ field=value, field=value, ... })
+    if IsSimpleClass(arg) then
+        local class = arg[1] --[[@as fa-class]]
+        setmetatable(class, ProjectileFactory)
+        return ConstructClass(nil, class) --[[@as unknown]]
+    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
+    else
+        local bases = { unpack (arg) }
+        return function(specs)
+            local class = specs
+            setmetatable(class, ProjectileFactory)
+            return ConstructClass(bases, class)
+        end
+    end
+end
+
 ---create a simple class which does not inherit from anything
 ---@generic T
 ---@param specs T
@@ -442,6 +477,15 @@ ClassFactory = {
             postinitfn(instance, unpack(arg))
         end
 
+        return instance
+    end
+}
+
+ProjectileFactory = {
+    __call = function(self)
+        -- create the new entity with us as its meta table
+        local instance = {& 8 & 8}
+        setmetatable(instance, self)
         return instance
     end
 }

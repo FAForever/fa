@@ -11,5 +11,5 @@
 
 local SZthuthaamArtilleryShell = import("/lua/seraphimprojectiles.lua").SZthuthaamArtilleryShell
 
-SIFZthuthaamArtilleryShell02 = Class(SZthuthaamArtilleryShell) { }
+SIFZthuthaamArtilleryShell02 = ClassProjectile(SZthuthaamArtilleryShell) { }
 TypeClass = SIFZthuthaamArtilleryShell02

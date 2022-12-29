@@ -279,7 +279,7 @@ SLaanseTacticalMissile = Class(SinglePolyTrailProjectile) {
 --  SERAPHIM ZTHUTHAAM ARTILLERY SHELL
 --------------------------------------------------------------------------
 ---@class SZthuthaamArtilleryShell : MultiPolyTrailProjectile
-SZthuthaamArtilleryShell = Class(MultiPolyTrailProjectile) {
+SZthuthaamArtilleryShell = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactLand = EffectTemplate.SZthuthaamArtilleryHit,
     FxImpactWater = EffectTemplate.SZthuthaamArtilleryHit,
     FxImpactNone = EffectTemplate.SZthuthaamArtilleryHit,
