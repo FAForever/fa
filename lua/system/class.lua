@@ -500,6 +500,7 @@ end
 --- Instantiation of a class, referring to the paragraphs of text at the top of this file
 ClassFactory = {
     __call = function(self, ...)
+
         -- LOG(string.format("%s -> %s", "ClassFactory", tostring(self.__name)))
 
         -- create the new entity with us as its meta table
@@ -548,7 +549,7 @@ CFactory = {
     ---@param self any
     ---@return table
     __call = function (self)
-        -- LOG(string.format("%s -> %s", "CFactory", tostring(self.__name)))
+        LOG(string.format("%s -> %s", "CFactory", tostring(self.__name)))
         -- needs a hash part of one for the _c_object field
         local instance = {&1 &0}
         return setmetatable(instance, self)

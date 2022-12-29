@@ -38,7 +38,7 @@ NullShell = ClassProjectile(Projectile) {}
 -----------------------------------------------------------------
 
 ---@class EmitterProjectile : Projectile
-EmitterProjectile = ClassProjectileProjectile(Projectile) {
+EmitterProjectile = ClassProjectile(Projectile) {
     FxTrails = {'/effects/emitters/missile_munition_trail_01_emit.bp',},
     FxTrailScale = 1,
     FxTrailOffset = 0,
@@ -266,7 +266,7 @@ SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 }
 
 ---@class MultiPolyTrailProjectile : EmitterProjectile
-MultiPolyTrailProjectile = ClassProjectileProjectile(EmitterProjectile) {
+MultiPolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
     PolyTrailOffset = {0},
