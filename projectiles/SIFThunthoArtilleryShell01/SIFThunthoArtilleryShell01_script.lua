@@ -29,6 +29,15 @@ local ProjectileGetVelocity = _G.moho.projectile_methods.GetVelocity
 
 SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
 
+    __init = function(self)
+        LOG("__init: " .. tostring(debug.allocatedsize(self)))
+    end,
+
+    OnCreate = function(self)
+        LOG("OnCreate: " .. tostring(debug.allocatedsize(self)))
+        SThunthoArtilleryShell.OnCreate(self)
+    end,
+
     OnImpact = function(self, TargetType, TargetEntity) 
 
         -- the split fx

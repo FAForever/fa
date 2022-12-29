@@ -183,14 +183,14 @@ function Class(...)
     -- Class ({ field=value, field=value, ... })
     if IsSimpleClass(arg) then
         local class = arg[1] --[[@as fa-class]]
-        setmetatable(class, ClassFactory)
+        setmetatable(class, ProjectileFactory)
         return ConstructClass(nil, class) --[[@as unknown]]
     -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
     else
         local bases = { unpack (arg) }
         return function(specs)
             local class = specs
-            setmetatable(class, ClassFactory)
+            setmetatable(class, ProjectileFactory)
             return ConstructClass(bases, class)
         end
     end
@@ -461,11 +461,16 @@ function ConstructClass(bases, specs)
 end
 
 --- Instantiation of a class, referring to the paragraphs of text at the top of this file
-ClassFactory = {
+ProjectileFactory = {
     __call = function(self, ...)
         -- create the new entity with us as its meta table
         local instance = {}
         setmetatable(instance, self)
+
+        if instance.IsProjectile then
+            LOG("ProjectileFactory")
+            reprsl(debug.traceback())
+        end
 
         -- call class initialisation functions, if they exist
         local initfn = self.__init
@@ -482,11 +487,30 @@ ClassFactory = {
 }
 
 ProjectileFactory = {
-    __call = function(self)
+    __call = function(self, ...)
         -- create the new entity with us as its meta table
-        local instance = {& 8 & 8}
+        local instance = {&8 &0}
         setmetatable(instance, self)
+        
+        
+        if instance.IsProjectile then
+            LOG(debug.allocatedsize(instance))
+            LOG("ProjectileFactory")
+            reprsl(debug.traceback())
+        end
+
+        -- call class initialisation functions, if they exist
+        local initfn = self.__init
+        if initfn then
+            initfn(instance, unpack(arg))
+        end
+        local postinitfn = self.__post_init
+        if postinitfn then
+            postinitfn(instance, unpack(arg))
+        end
         return instance
+
+
     end
 }
 
@@ -546,14 +570,14 @@ local function Flatten(flattee, hierarchy, seen)
     end
 end
 
+local Factory = {
+    entity_methods = ProjectileFactory,
+    projectile_methods = ProjectileFactory
+}
+
 --- Converts a C class into a simplified Lua class with no bases. This must adjust the cclass in place as the reference
 -- to the table appears to be hardcoded in the engine.
-function ConvertCClassToLuaSimplifiedClass(cclass)
-    if getmetatable(cclass) == ClassFactory then
-        LOG("Already populated class: " .. tostring(cclass))
-        return
-    end
-
+function ConvertCClassToLuaSimplifiedClass(cclass, name)
     local seen = {}
     local flatten = {}
     Flatten(flatten, cclass, seen)
@@ -578,5 +602,5 @@ function ConvertCClassToLuaSimplifiedClass(cclass)
 
     -- allow tables to search the meta table
     cclass.__index = cclass
-    setmetatable(cclass, ClassFactory)
+    setmetatable(cclass, ProjectileFactory)
 end
