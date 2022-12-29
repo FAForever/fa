@@ -229,6 +229,37 @@ function ClassUI(...)
     end
 end
 
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
+function ClassShield(...)
+    -- arg = { 
+    --     { 
+    --         -- { table with information of base 1 } OR { specifications }
+    --         -- { table with information of base 2 }
+    --         -- ...
+    --         -- { table with information of base n }
+    --     }, 
+    --     n=1 -- number of bases
+    -- }
+
+    -- Class ({ field=value, field=value, ... })
+    if IsSimpleClass(arg) then
+        local class = arg[1] --[[@as fa-class]]
+        setmetatable(class, ShieldFactory)
+        return ConstructClass(nil, class) --[[@as unknown]]
+    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
+    else
+        local bases = { unpack (arg) }
+        return function(specs)
+            local class = specs
+            setmetatable(class, ShieldFactory)
+            return ConstructClass(bases, class)
+        end
+    end
+end
+
 --- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
 ---construct a class
 ---@generic T: fa-class
@@ -579,7 +610,7 @@ PropFactory = {
 EntityFactory = {
     ---@param self any
     ---@return table
-    __call = function (self)
+    __call = function (self, ...)
         -- LOG(string.format("%s -> %s", "EntityFactory", tostring(self.__name)))
 
         local instance = {&1 &0}
@@ -639,6 +670,8 @@ ShieldFactory = {
         -- LOG(string.format("%s -> %s", "ShieldFactory", tostring(self.__name)))
 
         local instance = {&63 &0}
+        setmetatable(instance, self)
+
         local initfn = self.__init
         if initfn then
             initfn(instance, spec, owner)
@@ -648,7 +681,7 @@ ShieldFactory = {
             postinitfn(instance, spec, owner)
         end
 
-        return setmetatable(instance, self)
+        return instance
     end
 }
 

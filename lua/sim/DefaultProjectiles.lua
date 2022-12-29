@@ -547,7 +547,7 @@ BaseGenericDebris = ClassProjectile(DummyProjectile) {
 -----------------------------------------------------------
 
 ---@class OverchargeProjectile
-OverchargeProjectile = ClassProjectileSimple {
+OverchargeProjectile = ClassSimple {
     ---@param self OverchargeProjectile
     ---@param targetType string
     ---@param targetEntity Unit
