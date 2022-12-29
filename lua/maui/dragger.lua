@@ -1,4 +1,4 @@
--- ClassUI methods:
+-- Class methods:
 -- Destroy()
 -- PostDragger(originFrame, keycode, dragger)
 

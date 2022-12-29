@@ -1,4 +1,4 @@
--- ClassUI methods:
+-- Class methods:
 -- SetTexture(filename(s), border=1)
 -- SetSolidColor(color)
 -- SetUV(float u0, float v0, float u1, float v1)

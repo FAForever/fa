@@ -1,4 +1,4 @@
--- ClassUI methods:
+-- Class methods:
 -- Set(string filename)
 -- Play()
 -- Stop()

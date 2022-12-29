@@ -1,4 +1,4 @@
--- ClassUI methods:
+-- Class methods:
 -- SetNewFont(family, pointsize)
 -- SetNewColors(foreground, background, selected_foreground, selected_background)
 -- item GetItem(index)

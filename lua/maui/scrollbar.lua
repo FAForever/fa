@@ -1,4 +1,4 @@
--- ClassUI methods:
+-- Class methods:
 -- Scrollbar:SetScrollable(scrollable) - set the scrollable item this controls
 -- Scrollbar:SetNewTextures(background, thumbMiddle, thumbTop, thumbBottom)
 -- ScrollBar:ScrollLines(float lines)

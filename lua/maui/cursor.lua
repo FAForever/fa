@@ -1,4 +1,4 @@
--- ClassUI methods:
+-- Class methods:
 -- SetNewTexture(filename, hotspotX, hotspotY)
 -- SetDefaultTexture(filename, hotspotX, hotspotY)
 -- Reset() -- re-applies default texture

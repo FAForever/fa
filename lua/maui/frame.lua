@@ -1,4 +1,4 @@
--- ClassUI methods:
+-- Class methods:
 -- number GetTopmostDepth() - returns the topmost depth value regardless of hiding
 
 local Control = import("/lua/maui/control.lua").Control

@@ -1,4 +1,4 @@
--- ClassUI methods:
+-- Class methods:
 -- SetNewFont(family, pointsize) NOTE: Currently Width must be set before SetFont is called
 -- SetNewForegroundColor(color)
 -- color GetForegroundColor()

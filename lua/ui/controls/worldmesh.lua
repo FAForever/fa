@@ -1,4 +1,4 @@
--- ClassUI methods
+-- Class methods
 -- Destroy()
 -- SetMesh(meshDesc)
 --  UniformScale = number (optional, defaults to 1.0)

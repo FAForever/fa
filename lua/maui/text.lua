@@ -1,4 +1,4 @@
--- ClassUI methods:
+-- Class methods:
 -- SetNewFont(family, pointsize)
 -- SetNewColor(color)
 -- SetText(text)
