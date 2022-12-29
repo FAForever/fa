@@ -28,7 +28,7 @@ local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (ca
 
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
----@field AdjacentUnits? Unit[] 
+---@field AdjacentUnits? Unit[]
 StructureUnit = Class(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
@@ -797,7 +797,7 @@ FactoryUnit = Class(StructureUnit) {
         -- anything else can not upgrade
         return nil
     end,
-    
+
     ---@param self FactoryUnit
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
@@ -1088,7 +1088,7 @@ FactoryUnit = Class(StructureUnit) {
         size = size * size
         local unitPosition, dx, dz, d
         local buildPosition = self:GetPosition(self.Blueprint.Display.BuildAttachBone or 0)
-        repeat 
+        repeat
             unitPosition = self.UnitBeingBuilt:GetPosition()
             dx = buildPosition[1] - unitPosition[1]
             dz = buildPosition[3] - unitPosition[3]
@@ -2017,7 +2017,7 @@ AirUnit = Class(MobileUnit) {
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
 local slotsData = {}
----@class BaseTransport 
+---@class BaseTransport
 BaseTransport = ClassSimple {
 
     ---@param self BaseTransport
