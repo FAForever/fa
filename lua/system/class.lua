@@ -529,7 +529,7 @@ UIFactory = {
         -- LOG(string.format("%s -> %s", "UIFactory", tostring(self.__name)))
         -- needs a hash part of atleast 8 for all the lazy var fields, the _c_object reference and the _disabled field
 
-        local instance = {&8 &0}
+        local instance = {&15 &0}
         setmetatable(instance, self)
 
         local initfn = self.__init
@@ -571,7 +571,7 @@ PropFactory = {
     ---@return table
     __call = function (self)
         -- LOG(string.format("%s -> %s", "PropFactory", tostring(self.__name)))
-        local instance = {&4 &0}
+        local instance = {&7 &0}
         return setmetatable(instance, self)
     end
 }
@@ -605,7 +605,7 @@ ProjectileFactory = {
     __call = function (self)
         -- LOG(string.format("%s -> %s", "ProjectileFactory", tostring(self.__name)))
         -- needs a hash part of one for the _c_object field
-        local instance = {&8 &0}
+        local instance = {&15 &0}
         return setmetatable(instance, self)
     end
 }
@@ -616,7 +616,7 @@ UnitFactory = {
     __call = function (self)
         -- LOG(string.format("%s -> %s", "UnitFactory", tostring(self.__name)))
         -- needs a hash part of one for the _c_object field
-        local instance = {&16 &0}
+        local instance = {&31 &0}
         return setmetatable(instance, self)
     end
 }
@@ -627,7 +627,7 @@ WeaponFactory = {
     __call = function (self)
         -- LOG(string.format("%s -> %s", "WeaponFactory", tostring(self.__name)))
         -- needs a hash part of one for the _c_object field
-        local instance = {&8 &0}
+        local instance = {&15 &0}
         return setmetatable(instance, self)
     end
 }
@@ -638,7 +638,7 @@ ShieldFactory = {
     __call = function (self, spec, owner)
         -- LOG(string.format("%s -> %s", "ShieldFactory", tostring(self.__name)))
 
-        local instance = {&16 &0}
+        local instance = {&63 &0}
         local initfn = self.__init
         if initfn then
             initfn(instance, spec, owner)
