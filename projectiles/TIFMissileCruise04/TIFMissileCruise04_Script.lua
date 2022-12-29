@@ -24,7 +24,7 @@ TIFMissileCruise04 = Class(TMissileCruiseProjectile) {
     end,
 
     MovementThread = function(self)        
-        self.WaitTime = 11
+        self.WaitTime = 2
         self:SetTurnRate(8)
         WaitTicks(4)
         while not self:BeenDestroyed() do
