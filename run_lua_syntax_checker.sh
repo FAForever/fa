@@ -24,7 +24,7 @@ while read file; do
   # file contains table pre-allocation synax ( {&1&4} ) that is not supported at the moment
   if [ "$file" != "./lua/lazyvar.lua" ]; then
     if [ "$file" != "./.vscode/fa-plugin.lua" ]; then
-      if [ "$file" != "./lua/system/class.lue" ]; then
+      if [ "$file" != "./lua/system/class.lua" ]; then
         check_file "$file"
         (( files_checked++ ))
       fi
