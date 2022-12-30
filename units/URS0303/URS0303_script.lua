@@ -15,19 +15,19 @@ local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon
 local loading = false
 
 ---@class URS0303 : AircraftCarrier
-URS0303 = Class(AircraftCarrier) {
+URS0303 = ClassUnit(AircraftCarrier) {
 
     Weapons = {
     -- Weapons
     --  4 AA Autocannon w/ Guided Rounds
     --  1 "Zapper" Anti-Missile
 
-        AAGun01 = Class(CAAAutocannon) {},
-        AAGun02 = Class(CAAAutocannon) {},
-        AAGun03 = Class(CAAAutocannon) {},
-        AAGun04 = Class(CAAAutocannon) {},
+        AAGun01 = ClassWeapon(CAAAutocannon) {},
+        AAGun02 = ClassWeapon(CAAAutocannon) {},
+        AAGun03 = ClassWeapon(CAAAutocannon) {},
+        AAGun04 = ClassWeapon(CAAAutocannon) {},
 
-        Zapper = Class(CAMZapperWeapon) {},
+        Zapper = ClassWeapon(CAMZapperWeapon) {},
 
     },
 

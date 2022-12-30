@@ -10,7 +10,7 @@
 local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
 
 ---@class XSC0001 : SLandUnit
-XSC0001 = Class(SLandUnit) {
+XSC0001 = ClassUnit(SLandUnit) {
 
 }
 

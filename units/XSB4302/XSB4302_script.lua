@@ -13,10 +13,10 @@ local SIFHuAntiNukeWeapon = import("/lua/seraphimweapons.lua").SIFHuAntiNukeWeap
 local nukeFiredOnGotTarget = false
 
 ---@class XSB4302 : SStructureUnit
-XSB4302 = Class(SStructureUnit) {
+XSB4302 = ClassUnit(SStructureUnit) {
 
     Weapons = {
-        MissileRack = Class(SIFHuAntiNukeWeapon) {
+        MissileRack = ClassWeapon(SIFHuAntiNukeWeapon) {
         
             IdleState = State(SIFHuAntiNukeWeapon.IdleState) {
                 OnGotTarget = function(self)

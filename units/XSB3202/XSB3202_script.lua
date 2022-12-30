@@ -10,7 +10,7 @@ local SSubUnit = import("/lua/seraphimunits.lua").SSubUnit
 local SSeaUnit = import("/lua/seraphimunits.lua").SSeaUnit
 
 ---@class XSB3202 : SSubUnit
-XSB3202 = Class(SSubUnit) {
+XSB3202 = ClassUnit(SSubUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         SSubUnit.OnStopBeingBuilt(self,builder,layer)

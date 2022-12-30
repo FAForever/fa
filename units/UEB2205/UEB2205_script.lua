@@ -12,9 +12,9 @@ local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
 
 ---@class UEB2205 : TStructureUnit
-UEB2205 = Class(TStructureUnit) {
+UEB2205 = ClassUnit(TStructureUnit) {
     Weapons = {
-         Torpedo = Class(TANTorpedoAngler) {
+         Torpedo = ClassWeapon(TANTorpedoAngler) {
        },
     },
 }

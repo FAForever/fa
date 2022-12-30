@@ -11,7 +11,7 @@ local AShieldStructureUnit = import("/lua/aeonunits.lua").AShieldStructureUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
 ---@class UAB4301 : AShieldStructureUnit
-UAB4301 = Class(AShieldStructureUnit, ShieldEffectsComponent) {
+UAB4301 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
     ShieldEffects = {
         '/effects/emitters/aeon_shield_generator_t2_01_emit.bp',
         '/effects/emitters/aeon_shield_generator_t3_02_emit.bp',

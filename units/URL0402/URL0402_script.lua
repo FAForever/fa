@@ -20,16 +20,16 @@ local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
 local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class URL0402 : CWalkingLandUnit
-URL0402 = Class(CWalkingLandUnit) {
+URL0402 = ClassUnit(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
     Weapons = {
-        MainGun = Class(CDFHeavyMicrowaveLaserGenerator) {},
-        RightLaserTurret = Class(CDFElectronBolterWeapon) {},
-        LeftLaserTurret = Class(CDFElectronBolterWeapon) {},
-        RightAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
-        LeftAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
+        MainGun = ClassWeapon(CDFHeavyMicrowaveLaserGenerator) {},
+        RightLaserTurret = ClassWeapon(CDFElectronBolterWeapon) {},
+        LeftLaserTurret = ClassWeapon(CDFElectronBolterWeapon) {},
+        RightAntiAirMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
+        LeftAntiAirMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
+        Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
     },
 
     OnStartBeingBuilt = function(self, builder, layer)

@@ -11,7 +11,7 @@
 local AMassCollectionUnit = import("/lua/aeonunits.lua").AMassCollectionUnit
 
 ---@class UAB1103 : AMassCollectionUnit
-UAB1103 = Class(AMassCollectionUnit) {
+UAB1103 = ClassUnit(AMassCollectionUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         AMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)

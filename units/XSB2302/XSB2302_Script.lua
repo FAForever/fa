@@ -11,9 +11,9 @@ local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
 local SIFSuthanusArtilleryCannon = import("/lua/seraphimweapons.lua").SIFSuthanusArtilleryCannon
 
 ---@class XSB2302 : SStructureUnit
-XSB2302 = Class(SStructureUnit) {
+XSB2302 = ClassUnit(SStructureUnit) {
     Weapons = {
-        MainGun = Class(SIFSuthanusArtilleryCannon) {
+        MainGun = ClassWeapon(SIFSuthanusArtilleryCannon) {
             CreateProjectileAtMuzzle = function(self, muzzle)
                 local proj = SIFSuthanusArtilleryCannon.CreateProjectileAtMuzzle(self, muzzle)
                 local data = self:GetBlueprint().ShieldDamage

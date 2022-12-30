@@ -11,7 +11,7 @@ local AShieldStructureUnit = import("/lua/aeonunits.lua").AShieldStructureUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
 ---@class UAB4202 : AShieldStructureUnit
-UAB4202 = Class(AShieldStructureUnit, ShieldEffectsComponent) {
+UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
 
     ShieldEffectsScale = 0.75,
     ShieldEffects = {

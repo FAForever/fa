@@ -9,6 +9,6 @@
 --****************************************************************************
 local AAirFactoryUnit = import("/lua/aeonunits.lua").AAirFactoryUnit
 ---@class UAB0202 : AAirFactoryUnit
-UAB0202 = Class(AAirFactoryUnit) {}
+UAB0202 = ClassUnit(AAirFactoryUnit) {}
 
 TypeClass = UAB0202

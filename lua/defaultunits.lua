@@ -29,7 +29,7 @@ local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (ca
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
 ---@field AdjacentUnits? Unit[]
-StructureUnit = Class(Unit) {
+StructureUnit = ClassUnit(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
     MinWeaponRequiresEnergy = 0,
@@ -721,7 +721,7 @@ StructureUnit = Class(Unit) {
 ---@field BuildingUnit boolean
 ---@field BuildBoneRotator moho.RotateManipulator
 ---@field BuildEffectBones string[]
-FactoryUnit = Class(StructureUnit) {
+FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnCreate = function(self)
@@ -1146,15 +1146,15 @@ FactoryUnit = Class(StructureUnit) {
 
 -- AIR FACTORY UNITS
 ---@class AirFactoryUnit : FactoryUnit
-AirFactoryUnit = Class(FactoryUnit) {}
+AirFactoryUnit = ClassUnit(FactoryUnit) {}
 
 -- AIR STAGING PLATFORMS UNITS
 ---@class AirStagingPlatformUnit : StructureUnit
-AirStagingPlatformUnit = Class(StructureUnit) { }
+AirStagingPlatformUnit = ClassUnit(StructureUnit) { }
 
 -- ENERGY CREATION UNITS
 ---@class ConcreteStructureUnit : StructureUnit
-ConcreteStructureUnit = Class(StructureUnit) {
+ConcreteStructureUnit = ClassUnit(StructureUnit) {
     ---@param self ConcreteStructureUnit
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
@@ -1164,19 +1164,19 @@ ConcreteStructureUnit = Class(StructureUnit) {
 
 -- ENERGY CREATION UNITS
 ---@class EnergyCreationUnit : StructureUnit
-EnergyCreationUnit = Class(StructureUnit) { }
+EnergyCreationUnit = ClassUnit(StructureUnit) { }
 
 -- ENERGY STORAGE UNITS
 ---@class EnergyStorageUnit : StructureUnit
-EnergyStorageUnit = Class(StructureUnit) { }
+EnergyStorageUnit = ClassUnit(StructureUnit) { }
 
 -- LAND FACTORY UNITS
 ---@class LandFactoryUnit : FactoryUnit
-LandFactoryUnit = Class(FactoryUnit) {}
+LandFactoryUnit = ClassUnit(FactoryUnit) {}
 
 -- MASS COLLECTION UNITS
 ---@class MassCollectionUnit : StructureUnit
-MassCollectionUnit = Class(StructureUnit) {
+MassCollectionUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassCollectionUnit
     OnConsumptionActive = function(self)
@@ -1289,7 +1289,7 @@ MassCollectionUnit = Class(StructureUnit) {
 
 -- MASS FABRICATION UNITS
 ---@class MassFabricationUnit : StructureUnit
-MassFabricationUnit = Class(StructureUnit) {
+MassFabricationUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassFabricationUnit
     ---@param bit number
@@ -1372,11 +1372,11 @@ MassFabricationUnit = Class(StructureUnit) {
 
 -- MASS STORAGE UNITS
 ---@class MassStorageUnit : StructureUnit
-MassStorageUnit = Class(StructureUnit) { }
+MassStorageUnit = ClassUnit(StructureUnit) { }
 
 -- RADAR UNITS
 ---@class RadarUnit : StructureUnit
-RadarUnit = Class(StructureUnit) {
+RadarUnit = ClassUnit(StructureUnit) {
 
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
@@ -1422,7 +1422,7 @@ RadarUnit = Class(StructureUnit) {
 
 -- RADAR JAMMER UNITS
 ---@class RadarJammerUnit : StructureUnit
-RadarJammerUnit = Class(StructureUnit) {
+RadarJammerUnit = ClassUnit(StructureUnit) {
 
     -- Shut down intel while upgrading
     ---@param self RadarJammerUnit
@@ -1482,7 +1482,7 @@ RadarJammerUnit = Class(StructureUnit) {
 
 -- SONAR UNITS
 ---@class SonarUnit : StructureUnit
-SonarUnit = Class(StructureUnit) {
+SonarUnit = ClassUnit(StructureUnit) {
 
     ---@param self SonarUnit
     ---@param builder Unit
@@ -1534,7 +1534,7 @@ SonarUnit = Class(StructureUnit) {
 
 -- SEA FACTORY UNITS
 ---@class SeaFactoryUnit : FactoryUnit
-SeaFactoryUnit = Class(FactoryUnit) {
+SeaFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self SeaFactoryUnit
     DestroyUnitBeingBuilt = function(self)
@@ -1606,11 +1606,11 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
 -- SHIELD STRCUTURE UNITS
 ---@class ShieldStructureUnit : StructureUnit
-ShieldStructureUnit = Class(StructureUnit) { }
+ShieldStructureUnit = ClassUnit(StructureUnit) { }
 
 -- TRANSPORT BEACON UNITS
 ---@class TransportBeaconUnit : StructureUnit
-TransportBeaconUnit = Class(StructureUnit) {
+TransportBeaconUnit = ClassUnit(StructureUnit) {
 
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
     FxTransportBeaconScale = 0.5,
@@ -1635,15 +1635,15 @@ TransportBeaconUnit = Class(StructureUnit) {
 
 -- WALL STRCUTURE UNITS
 ---@class WallStructureUnit : StructureUnit
-WallStructureUnit = Class(StructureUnit) { }
+WallStructureUnit = ClassUnit(StructureUnit) { }
 
 -- QUANTUM GATE UNITS
 ---@class QuantumGateUnit : FactoryUnit
-QuantumGateUnit = Class(FactoryUnit) { }
+QuantumGateUnit = ClassUnit(FactoryUnit) { }
 
 -- MOBILE UNITS
 ---@class MobileUnit : Unit
-MobileUnit = Class(Unit) {
+MobileUnit = ClassUnit(Unit) {
 
     ---@param self MobileUnit
     OnCreate = function(self)
@@ -1713,7 +1713,7 @@ MobileUnit = Class(Unit) {
 
 -- WALKING LAND UNITS
 ---@class WalkingLandUnit : MobileUnit
-WalkingLandUnit = Class(MobileUnit) {
+WalkingLandUnit = ClassUnit(MobileUnit) {
     WalkingAnim = nil,
     WalkingAnimRate = 1,
     IdleAnim = false,
@@ -1764,7 +1764,7 @@ WalkingLandUnit = Class(MobileUnit) {
 -- SUB UNITS
 -- These units typically float under the water and have wake when they move
 ---@class SubUnit : MobileUnit
-SubUnit = Class(MobileUnit) {
+SubUnit = ClassUnit(MobileUnit) {
     -- Use default spark effect until underwater damaged states are made
     FxDamage1 = { EffectTemplate.DamageSparks01 },
     FxDamage2 = { EffectTemplate.DamageSparks01 },
@@ -1790,7 +1790,7 @@ SubUnit = Class(MobileUnit) {
 
 -- AIR UNITS
 ---@class AirUnit : MobileUnit
-AirUnit = Class(MobileUnit) {
+AirUnit = ClassUnit(MobileUnit) {
     -- Contrails
     ContrailEffects = {'/effects/emitters/contrail_polytrail_01_emit.bp', },
     BeamExhaustCruise = '/effects/emitters/air_move_trail_beam_03_emit.bp',
@@ -2103,7 +2103,7 @@ BaseTransport = ClassSimple {
 
 --- Base class for air transports.
 ---@class AirTransport: AirUnit, BaseTransport
-AirTransport = Class(AirUnit, BaseTransport) {
+AirTransport = ClassUnit(AirUnit, BaseTransport) {
 
     ---@param self AirTransport
     OnTransportAborted = function(self)
@@ -2188,11 +2188,11 @@ AirTransport = Class(AirUnit, BaseTransport) {
 
 -- LAND UNITS
 ---@class LandUnit : MobileUnit
-LandUnit = Class(MobileUnit) {}
+LandUnit = ClassUnit(MobileUnit) {}
 
 --  CONSTRUCTION UNITS
 ---@class ConstructionUnit : MobileUnit
-ConstructionUnit = Class(MobileUnit) {
+ConstructionUnit = ClassUnit(MobileUnit) {
 
     ---@param self ConstructionUnit
     OnCreate = function(self)
@@ -2337,7 +2337,7 @@ ConstructionUnit = Class(MobileUnit) {
 -- SEA UNITS
 -- These units typically float on the water and have wake when they move
 ---@class SeaUnit : MobileUnit
-SeaUnit = Class(MobileUnit){
+SeaUnit = ClassUnit(MobileUnit){
     DeathThreadDestructionWaitTime = 0,
     ShowUnitDestructionDebris = false,
     PlayEndestructionEffects = false,
@@ -2354,7 +2354,7 @@ SeaUnit = Class(MobileUnit){
 
 --- Base class for aircraft carriers.
 ---@class AircraftCarrier : SeaUnit
-AircraftCarrier = Class(SeaUnit, BaseTransport) {
+AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
 
     ---@param self AircraftCarrier
     ---@param instigator Unit
@@ -2369,10 +2369,10 @@ AircraftCarrier = Class(SeaUnit, BaseTransport) {
 
 -- HOVERING LAND UNITS
 ---@class HoverLandUnit : MobileUnit
-HoverLandUnit = Class(MobileUnit) { }
+HoverLandUnit = ClassUnit(MobileUnit) { }
 
 ---@class SlowHoverLandUnit : HoverLandUnit
-SlowHoverLandUnit = Class(HoverLandUnit) {
+SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
 
     ---@param self SlowHoverLandUnit
     ---@param new string
@@ -2397,10 +2397,10 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
 
 -- AMPHIBIOUS LAND UNITS
 ---@class AmphibiousLandUnit : MobileUnit
-AmphibiousLandUnit = Class(MobileUnit) { }
+AmphibiousLandUnit = ClassUnit(MobileUnit) { }
 
 ---@class SlowAmphibiousLandUnit : AmphibiousLandUnit
-SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
+SlowAmphibiousLandUnit = ClassUnit(AmphibiousLandUnit) {
 
     ---@param self SlowAmphibiousLandUnit
     ---@param new string
@@ -2421,7 +2421,7 @@ SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
 
 --- Base class for command units.
 ---@class CommandUnit : WalkingLandUnit
-CommandUnit = Class(WalkingLandUnit) {
+CommandUnit = ClassUnit(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
 
     ---@param self CommandUnit
@@ -2625,7 +2625,7 @@ CommandUnit = Class(WalkingLandUnit) {
 }
 
 ---@class ACUUnit : CommandUnit
-ACUUnit = Class(CommandUnit) {
+ACUUnit = ClassUnit(CommandUnit) {
     -- The "commander under attack" warnings.
     ---@param self ACUUnit
     ---@param bpShield any
@@ -2816,12 +2816,12 @@ ACUUnit = Class(CommandUnit) {
 
 -- SHIELD HOVER UNITS
 ---@class ShieldHoverLandUnit : HoverLandUnit
-ShieldHoverLandUnit = Class(HoverLandUnit) {}
+ShieldHoverLandUnit = ClassUnit(HoverLandUnit) {}
 
 -- SHIELD LAND UNITS
 ---@class ShieldLandUnit : LandUnit
-ShieldLandUnit = Class(LandUnit) {}
+ShieldLandUnit = ClassUnit(LandUnit) {}
 
 -- SHIELD SEA UNITS
 ---@class ShieldSeaUnit : SeaUnit
-ShieldSeaUnit = Class(SeaUnit) {}
+ShieldSeaUnit = ClassUnit(SeaUnit) {}

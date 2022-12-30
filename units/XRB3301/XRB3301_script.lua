@@ -12,7 +12,7 @@ local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 local CSoothSayerAmbient = import("/lua/effecttemplates.lua").CSoothSayerAmbient
 
 ---@class XRB3301 : CRadarUnit
-XRB3301 = Class(CRadarUnit) {
+XRB3301 = ClassUnit(CRadarUnit) {
     IntelEffects = {
         {
             Bones = { 'Emitter', },

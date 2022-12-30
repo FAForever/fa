@@ -11,6 +11,6 @@
 local ALandFactoryUnit = import("/lua/aeonunits.lua").ALandFactoryUnit
 
 ---@class UAB0301 : ALandFactoryUnit
-UAB0301 = Class(ALandFactoryUnit) {}
+UAB0301 = ClassUnit(ALandFactoryUnit) {}
 
 TypeClass = UAB0301

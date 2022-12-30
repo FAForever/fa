@@ -17,7 +17,7 @@ local TAirToAirLinkedRailgun = WeaponsFile.TAirToAirLinkedRailgun
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 
 ---@class UEA0104 : AirTransport
-UEA0104 = Class(AirTransport) {
+UEA0104 = ClassUnit(AirTransport) {
     AirDestructionEffectBones = { 'Char04', 'Char03', 'Char02', 'Char01',
                                 'Front_Right_Exhaust','Front_Left_Exhaust','Back_Right_Exhaust','Back_Left_Exhaust',
                                 'Right_Arm05','Right_Arm07','Right_Arm02','Right_Arm03', 'Right_Arm04','Right_Arm01'},
@@ -27,10 +27,10 @@ UEA0104 = Class(AirTransport) {
     BeamExhaustIdle = '/effects/emitters/transport_thruster_beam_02_emit.bp',
 
     Weapons = {
-        FrontLinkedRailGun = Class(TAirToAirLinkedRailgun) {},
-        BackLinkedRailGun = Class(TAirToAirLinkedRailgun) {},
-        FrontRiotGun = Class(TDFRiotWeapon) {},
-        BackRiotGun = Class(TDFRiotWeapon) {},
+        FrontLinkedRailGun = ClassWeapon(TAirToAirLinkedRailgun) {},
+        BackLinkedRailGun = ClassWeapon(TAirToAirLinkedRailgun) {},
+        FrontRiotGun = ClassWeapon(TDFRiotWeapon) {},
+        BackRiotGun = ClassWeapon(TDFRiotWeapon) {},
     },
 
     EngineRotateBones = {'Front_Right_Engine', 'Front_Left_Engine', 'Back_Left_Engine', 'Back_Right_Engine', },
