@@ -10,9 +10,9 @@ local CKrilTorpedoLauncherWeapon = import("/lua/cybranweapons.lua").CKrilTorpedo
 local utilities = import("/lua/utilities.lua")
 
 ---@class XRB2308 : CStructureUnit
-XRB2308 = Class(CStructureUnit) {
+XRB2308 = ClassUnit(CStructureUnit) {
     Weapons = {
-        Turret01 = Class(CKrilTorpedoLauncherWeapon) {},
+        Turret01 = ClassWeapon(CKrilTorpedoLauncherWeapon) {},
     },
 
     OnStopBeingBuilt = function(self, builder, layer)

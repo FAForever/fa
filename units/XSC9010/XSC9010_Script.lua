@@ -11,7 +11,7 @@ local SSJammerCrystalAmbient = import("/lua/effecttemplates.lua").SJammerCrystal
 
 
 ---@class XSC9010 : SLandUnit
-XSC9010 = Class(SLandUnit) {
+XSC9010 = ClassUnit(SLandUnit) {
 
     OnCreate = function(self, builder, layer)
         SLandUnit.OnCreate(self)

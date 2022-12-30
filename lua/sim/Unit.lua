@@ -40,6 +40,9 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 
 local DeprecatedWarnings = { }
 
+local DefaultTerrainType = GetTerrainType(-1, -1)
+
+
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
 local veterancyTechLevels = {
@@ -109,12 +112,10 @@ local cUnit = moho.unit_methods
 ---@field EngineFlags any
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
-Unit = Class(moho.unit_methods) {
+Unit = ClassUnit(moho.unit_methods) {
 
     Weapons = {},
 
-    FxScale = 1,
-    FxDamageScale = 1,
     -- FX Damage tables. A random damage effect table of emitters is chosen out of this table
     FxDamage1 = {EffectTemplate.DamageSmoke01, EffectTemplate.DamageSparks01},
     FxDamage2 = {EffectTemplate.DamageFireSmoke01, EffectTemplate.DamageSparks01},
@@ -2208,6 +2209,8 @@ Unit = Class(moho.unit_methods) {
     OnDestroy = function(self)
         self.Dead = true
 
+        -- LOG(string.format("%s -> %s", tostring(self.UnitId), tostring(debug.allocatedsize(self))))
+
         -- clear out all manipulators, at this point the wreck has been made
         for k = 1, self.WeaponCount do 
             self.WeaponInstances[k]:ClearProjectileTrash();
@@ -3831,73 +3834,102 @@ Unit = Class(moho.unit_methods) {
 
     ---@param self Unit
     ---@param pos Vector
-    ---@return string
+    ---@return TerrainTreadType
     GetTTTreadType = function(self, pos)
-        local TerrainType = GetTerrainType(pos.x, pos.z)
-        return TerrainType.Treads or 'None'
+        local terrainType = GetTerrainType(pos[1], pos[3])
+        return terrainType.Treads or 'None'
     end,
 
-    ---@param FxType string
+    ---@param fxType TerrainEffectType
     ---@param layer Layer
     ---@param pos Vector
-    ---@param type string
-    ---@param typesuffix string
+    ---@param type? EffectType
+    ---@param typeSuffix? string
     ---@return table
-    GetTerrainTypeEffects = function(FxType, layer, pos, type, typesuffix)
-        local TerrainType
-
-        -- Get terrain type mapped to local position and if none defined use default
+    GetTerrainTypeEffects = function(fxType, layer, pos, type, typeSuffix)
+        -- Get terrain type mapped to local position
         if type then
-            TerrainType = GetTerrainType(pos.x, pos.z)
+            local terrainType = GetTerrainType(pos[1], pos[3])
+            if typeSuffix then
+                type = type .. typeSuffix
+            end
+            local terrainFx = terrainType[fxType][layer][type]
+
+            if terrainFx then
+                return terrainFx
+            end
+            -- If our current terrain type doesn't have the effects, try the default terrain type
         else
-            TerrainType = GetTerrainType(-1, -1)
-            type = 'Default'
+            -- only useful for impact effect types
+            type = "Default"
+            if typeSuffix then
+                type = type .. typeSuffix
+            end
         end
 
-        -- Add in type suffix to type mask name
-        if typesuffix then
-            type = type .. typesuffix
-        end
-
-        -- If our current masking is empty try and get the default layer effect
-        if TerrainType[FxType][layer][type] == nil then
-            TerrainType = GetTerrainType(-1, -1)
-        end
-
-        return TerrainType[FxType][layer][type] or {}
+        return DefaultTerrainType[fxType][layer][type] or EmptyTable
     end,
 
+    ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXImpact", impactType: ImpactType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
+    ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXMotionChange", motionChange: MotionChangeType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
+    ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXLayerChange", layerChange: LayerChangeType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
+    ---
     ---@param self Unit
-    ---@param effectTypeGroups string
-    ---@param FxBlockType string
-    ---@param FxBlockKey string
-    ---@param TypeSuffix string
-    ---@param EffectsBag TrashBag
-    ---@param TerrainType string
-    CreateTerrainTypeEffects = function(self, effectTypeGroups, FxBlockType, FxBlockKey, TypeSuffix, EffectsBag, TerrainType)
+    ---@param effectTypeGroups UnitBlueprintEffect[]
+    ---@param fxBlockType LayerTerrainEffectType
+    ---@param layer Layer
+    ---@param typeSuffix? string
+    ---@param effectsBag? TrashBag
+    ---@param terrainType? TerrainType
+    CreateTerrainTypeEffects = function(self, effectTypeGroups, fxBlockType, layer, typeSuffix, effectsBag, terrainType)
+        local effects, terrainFX, GetTerrainTypeEffects
         local pos = self:GetPosition()
-        local effects = {}
-        local emit
+        local army = self.Army
+        if terrainType then
+            terrainFX = terrainType[fxBlockType][layer]
+        else
+            GetTerrainTypeEffects = self.GetTerrainTypeEffects
+        end
 
-        for kBG, vTypeGroup in effectTypeGroups do
-            if TerrainType then
-                effects = TerrainType[FxBlockType][FxBlockKey][vTypeGroup.Type] or {}
-            else
-                effects = self.GetTerrainTypeEffects(FxBlockType, FxBlockKey, pos, vTypeGroup.Type, TypeSuffix)
+        for _, typeGroup in effectTypeGroups do
+            local bones = typeGroup.Bones
+            if table.empty(bones) then
+                WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self.Layer, '.Effects {Bones ={}} in unit blueprint.')
+                continue
             end
 
-            if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.empty(vTypeGroup.Bones))) then
-                WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self.Layer, '.Effects {Bones ={}} in unit blueprint.')
+            if terrainType then
+                effects = terrainFX[typeGroup.Type]
             else
-                for kb, vBone in vTypeGroup.Bones do
-                    for ke, vEffect in effects do
-                        emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
-                        if vTypeGroup.Offset then
-                            emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
-                        end
-                        if EffectsBag then
-                            TrashAdd(EffectsBag, emit)
-                        end
+                effects = GetTerrainTypeEffects(fxBlockType, layer, pos, typeGroup.Type, typeSuffix)
+            end
+            if table.empty(effects) then
+                continue
+            end
+
+            local scale = typeGroup.Scale
+            if scale == 1 then
+                scale = nil
+            end
+            local offset = typeGroup.Offset
+            local offsetX, offsetY, offsetZ
+            if offset then
+                offsetX, offsetY, offsetZ = offset[1] or 0, offset[2] or 0, offset[3] or 0
+                if offsetX == 0 and offsetY == 0 and offsetZ == 0 then
+                    offset = nil
+                end
+            end
+            for _, bone in bones do
+                for _, effect in effects do
+                    local emitter = CreateAttachedEmitter(self, bone, army, effect)
+                    if scale then
+                        emitter:ScaleEmitter(scale)
+                    end
+                    if offset then
+                        emitter:OffsetEmitter(offsetX, offsetY, offsetZ)
+                    end
+                    if effectsBag then
+                        TrashAdd(effectsBag, emitter)
                     end
                 end
             end
@@ -5331,7 +5363,7 @@ Unit = Class(moho.unit_methods) {
     CheckCanBeKilled = function(self, other)
         return self.CanBeKilled
     end,
-    
+
     ---@deprecated
     ---@param self Unit
     ---@param val number
@@ -5355,7 +5387,7 @@ local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
 ---@class DummyUnit : moho.unit_methods
-DummyUnit = Class(moho.unit_methods) {
+DummyUnit = ClassDummyUnit(moho.unit_methods) {
 
     ---@param self DummyUnit
     OnCreate = function(self)

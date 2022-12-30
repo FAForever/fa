@@ -11,8 +11,5 @@
 local TRadarUnit = import("/lua/terranunits.lua").TRadarUnit
 
 ---@class UEB3101 : TRadarUnit
-UEB3101 = Class(TRadarUnit) {
-
-}
-
+UEB3101 = ClassUnit(TRadarUnit) { }
 TypeClass = UEB3101

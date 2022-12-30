@@ -11,7 +11,7 @@
 local CMassCollectionUnit = import("/lua/cybranunits.lua").CMassCollectionUnit
 
 ---@class URB1103 : CMassCollectionUnit
-URB1103 = Class(CMassCollectionUnit) {
+URB1103 = ClassUnit(CMassCollectionUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         CMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
         if not self.AnimationManipulator then return end

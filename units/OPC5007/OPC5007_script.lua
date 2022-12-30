@@ -11,7 +11,7 @@
 local TWallStructureUnit = import("/lua/terranunits.lua").TWallStructureUnit
 
 ---@class OPC5007 : TWallStructureUnit
-OPC5007 = Class(TWallStructureUnit) {
+OPC5007 = ClassUnit(TWallStructureUnit) {
 }
 
 TypeClass = OPC5007

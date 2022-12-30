@@ -140,7 +140,7 @@ local function getMusicVolumeOption()
         }
 
     else
-        
+
         -- replaced option with an "disableable" type. It preserves the original value in config.
         -- on empty profile it is defaulted to 100 as in original option
         return {
@@ -160,7 +160,7 @@ local function getMusicVolumeOption()
                 },
             },
         }
-        
+
     end
 end
 options = {
@@ -391,26 +391,26 @@ options = {
 
             {
                 title = "<LOC selectionsets0001>Steal from other control groups",
-                key = 'selection_sets_add_behavior',
+                key = 'steal_from_other_control_groups',
                 type = 'toggle',
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC _Yes>No", key = false },
-                        {text = "<LOC _No>Yes", key = true },
+                        {text = "<LOC _No>No", key = false },
+                        {text = "<LOC _Yes>Yes", key = true },
                     },
                 },
             },
 
             {
                 title = "<LOC selectionsets0004>Add to factory control group",
-                key = 'selection_sets_production_behavior',
+                key = 'add_to_factory_control_group',
                 type = 'toggle',
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC _No>No", key = true },
-                        {text = "<LOC _Yes>Yes", key = false },
+                        {text = "<LOC _No>No", key = false },
+                        {text = "<LOC _Yes>Yes", key = true },
                     },
                 },
             },
@@ -465,6 +465,18 @@ options = {
             -- },
 
             {
+                title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
+                key = 'repeatbuild',
+                type = 'toggle',
+                default = false,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0273>Automated Structure Ringing",
                 key = 'structure_capping_feature_01',
                 type = 'toggle',
@@ -476,7 +488,7 @@ options = {
                         {text = "<LOC _FullSuite>Full suite",                               key = "full-suite"},
                     },
                 },
-            }, 
+            },
             {
                 title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
                 key = 'automex',

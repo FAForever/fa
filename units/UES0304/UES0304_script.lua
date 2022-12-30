@@ -11,10 +11,10 @@ local TIFCruiseMissileLauncherSub = WeaponFile.TIFCruiseMissileLauncherSub
 local TIFStrategicMissileWeapon = WeaponFile.TIFStrategicMissileWeapon
 
 ---@class UES0304 : TSubUnit
-UES0304 = Class(TSubUnit) {
+UES0304 = ClassUnit(TSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
-        CruiseMissiles = Class(TIFCruiseMissileLauncherSub) {
+        CruiseMissiles = ClassWeapon(TIFCruiseMissileLauncherSub) {
             CurrentRack = 1,
 
             PlayFxMuzzleSequence = function(self, muzzle)
@@ -47,7 +47,7 @@ UES0304 = Class(TSubUnit) {
             end,
         },
 
-        NukeMissiles = Class(TIFStrategicMissileWeapon) {
+        NukeMissiles = ClassWeapon(TIFStrategicMissileWeapon) {
             CurrentRack = 1,
 
             PlayFxMuzzleSequence = function(self, muzzle)

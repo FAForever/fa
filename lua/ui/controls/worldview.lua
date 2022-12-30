@@ -211,7 +211,7 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
-WorldView = Class(moho.UIWorldView, Control) {
+WorldView = ClassUI(moho.UIWorldView, Control) {
 
     PingThreads = {},
     AutoBuild = false,

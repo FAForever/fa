@@ -5,5 +5,5 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 local CIridiumRocketProjectile = import("/lua/cybranprojectiles.lua").CIridiumRocketProjectile
-CDFRocketIridium02 = Class(CIridiumRocketProjectile) { }
+CDFRocketIridium02 = ClassProjectile(CIridiumRocketProjectile) { }
 TypeClass = CDFRocketIridium02

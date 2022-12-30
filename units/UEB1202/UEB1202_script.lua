@@ -11,7 +11,7 @@
 local TMassCollectionUnit = import("/lua/terranunits.lua").TMassCollectionUnit
 
 ---@class UEB1202 : TMassCollectionUnit
-UEB1202 = Class(TMassCollectionUnit) {
+UEB1202 = ClassUnit(TMassCollectionUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         TMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)

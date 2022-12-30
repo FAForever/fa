@@ -15,11 +15,11 @@ local SDFSihEnergyRifleSniperMode = SeraphimWeapons.SDFSniperShotSniperMode
 
 
 ---@class XSL0305 : SLandUnit
-XSL0305 = Class(SLandUnit) {
+XSL0305 = ClassUnit(SLandUnit) {
 
     Weapons = {
-        MainGun = Class(SDFSihEnergyRifleNormalMode) {},
-        SniperGun = Class(SDFSihEnergyRifleSniperMode) {
+        MainGun = ClassWeapon(SDFSihEnergyRifleNormalMode) {},
+        SniperGun = ClassWeapon(SDFSihEnergyRifleSniperMode) {
             SetOnTransport = function(self, transportstate)
                 SDFSihEnergyRifleSniperMode.SetOnTransport(self, transportstate)
                 self.unit:SetScriptBit('RULEUTC_WeaponToggle', false)

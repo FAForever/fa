@@ -13,9 +13,9 @@ local CIFArtilleryWeapon = import("/lua/cybranweapons.lua").CIFArtilleryWeapon
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 
 ---@class URB2302 : CStructureUnit
-URB2302 = Class(CStructureUnit) {
+URB2302 = ClassUnit(CStructureUnit) {
     Weapons = {
-        MainGun = Class(CIFArtilleryWeapon) {
+        MainGun = ClassWeapon(CIFArtilleryWeapon) {
             FxMuzzleFlashScale = 0.6,
             FxGroundEffect = EffectTemplate.CDisruptorGroundEffect,
             FxVentEffect = EffectTemplate.CDisruptorVentEffect,

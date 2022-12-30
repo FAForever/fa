@@ -10,11 +10,11 @@ local CIFBombNeutronWeapon = import("/lua/cybranweapons.lua").CIFBombNeutronWeap
 local CAAAutocannon = import("/lua/cybranweapons.lua").CAAAutocannon
 
 ---@class URA0304 : CAirUnit
-URA0304 = Class(CAirUnit) {
+URA0304 = ClassUnit(CAirUnit) {
     Weapons = {
-        Bomb = Class(CIFBombNeutronWeapon) {},
-        AAGun1 = Class(CAAAutocannon) {},
-        AAGun2 = Class(CAAAutocannon) {},
+        Bomb = ClassWeapon(CIFBombNeutronWeapon) {},
+        AAGun1 = ClassWeapon(CAAAutocannon) {},
+        AAGun2 = ClassWeapon(CAAAutocannon) {},
     },
     ContrailBones = {'Left_Exhaust','Center_Exhaust','Right_Exhaust'},
     ExhaustBones = {'Left_Exhaust','Center_Exhaust','Right_Exhaust'},

@@ -11,7 +11,7 @@
 local CRadarUnit = import("/lua/cybranunits.lua").CRadarUnit
 
 ---@class URB3104 : CRadarUnit
-URB3104 = Class(CRadarUnit) {
+URB3104 = ClassUnit(CRadarUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CRadarUnit.OnStopBeingBuilt(self,builder,layer)

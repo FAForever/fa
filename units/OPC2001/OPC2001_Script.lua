@@ -10,7 +10,7 @@
 local Unit = import("/lua/sim/unit.lua").Unit
 
 ---@class OPC2001 : Unit
-OPC2001 = Class(Unit) {
+OPC2001 = ClassUnit(Unit) {
 }
 
 TypeClass = OPC2001

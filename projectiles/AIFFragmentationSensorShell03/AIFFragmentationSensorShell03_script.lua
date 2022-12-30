@@ -6,7 +6,7 @@
 ------------------------------------------------------------
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile03
 
-AIFFragmentationSensorShell03 = Class(AArtilleryFragmentationSensorShellProjectile) {
+AIFFragmentationSensorShell03 = ClassProjectile(AArtilleryFragmentationSensorShellProjectile) {
     OnImpact = function(self, targetType, targetEntity)       
         AArtilleryFragmentationSensorShellProjectile.OnImpact( self, targetType, targetEntity )
         self:ShakeCamera(20, 1, 0, 1)

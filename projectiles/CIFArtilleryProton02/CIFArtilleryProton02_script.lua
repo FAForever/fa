@@ -4,7 +4,7 @@
 
 local CArtilleryProtonProjectile = import("/lua/cybranprojectiles.lua").CArtilleryProtonProjectile
 
-CIFArtilleryProton02 = Class(CArtilleryProtonProjectile) {
+CIFArtilleryProton02 = ClassProjectile(CArtilleryProtonProjectile) {
     FxLandHitScale = 1.1,
     FxPropHitScale = 1.1,
     FxUnitHitScale = 1.1,

@@ -12,9 +12,9 @@ local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TDFLightPlasmaCannonWeapon = import("/lua/terranweapons.lua").TDFLightPlasmaCannonWeapon
 
 ---@class UEB2101 : TStructureUnit
-UEB2101 = Class(TStructureUnit) {
+UEB2101 = ClassUnit(TStructureUnit) {
     Weapons = {
-        MainGun = Class(TDFLightPlasmaCannonWeapon) {}
+        MainGun = ClassWeapon(TDFLightPlasmaCannonWeapon) {}
     },
 }
 

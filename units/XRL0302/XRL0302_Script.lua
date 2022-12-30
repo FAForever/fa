@@ -12,7 +12,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 --- A unique death weapon for the Fire Beetle
-local DeathWeaponKamikaze = Class(Weapon) {
+local DeathWeaponKamikaze = ClassUnit(Weapon) {
     OnFire = function(self)
         -- do regular death weapon of unit if we didn't already
         if not self.unit.Dead then 
@@ -22,7 +22,7 @@ local DeathWeaponKamikaze = Class(Weapon) {
 }
 
 --- A unique death weapon for the Fire Beetle
-local DeathWeaponEMP = Class(Weapon) {
+local DeathWeaponEMP = ClassUnit(Weapon) {
 
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
@@ -62,7 +62,7 @@ local DeathWeaponEMP = Class(Weapon) {
 }
 
 ---@class XRL0302 : CWalkingLandUnit
-XRL0302 = Class(CWalkingLandUnit) {
+XRL0302 = ClassUnit(CWalkingLandUnit) {
 
     IntelEffects = {
         Cloak = {
@@ -77,8 +77,8 @@ XRL0302 = Class(CWalkingLandUnit) {
     },
 
     Weapons = {
-        Suicide = Class(DeathWeaponKamikaze) {},
-        DeathWeapon = Class(DeathWeaponEMP) {},
+        Suicide = ClassWeapon(DeathWeaponKamikaze) {},
+        DeathWeapon = ClassWeapon(DeathWeaponEMP) {},
     },
 
     AmbientExhaustBones = {

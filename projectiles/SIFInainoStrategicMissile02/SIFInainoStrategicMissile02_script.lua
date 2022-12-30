@@ -6,7 +6,7 @@
 ---------------------------------------------------------------------------------------------------
 local SIFInainoStrategicMissile = import("/lua/seraphimprojectiles.lua").SIFInainoStrategicMissile
 
-SIFInainoStrategicMissile02 = Class(SIFInainoStrategicMissile) {
+SIFInainoStrategicMissile02 = ClassProjectile(SIFInainoStrategicMissile) {
     FxSplashScale = 0.5,
     FxTrails = {},
 
