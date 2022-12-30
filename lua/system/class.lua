@@ -328,6 +328,37 @@ end
 ---@generic T_Base: fa-class
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
+function ClassDummyUnit(...)
+    -- arg = { 
+    --     { 
+    --         -- { table with information of base 1 } OR { specifications }
+    --         -- { table with information of base 2 }
+    --         -- ...
+    --         -- { table with information of base n }
+    --     }, 
+    --     n=1 -- number of bases
+    -- }
+
+    -- Class ({ field=value, field=value, ... })
+    if IsSimpleClass(arg) then
+        local class = arg[1] --[[@as fa-class]]
+        setmetatable(class, DummyUnitFactory)
+        return ConstructClass(nil, class) --[[@as unknown]]
+    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
+    else
+        local bases = { unpack (arg) }
+        return function(specs)
+            local class = specs
+            setmetatable(class, DummyUnitFactory)
+            return ConstructClass(bases, class)
+        end
+    end
+end
+
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
 function ClassWeapon(...)
     -- arg = { 
     --     { 
@@ -710,6 +741,17 @@ UnitFactory = {
         -- LOG(string.format("%s -> %s", "UnitFactory", tostring(self.__name)))
         -- needs a hash part of one for the _c_object field
         local instance = {&31 &0}
+        return setmetatable(instance, self)
+    end
+}
+
+DummyUnitFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "UnitFactory", tostring(self.__name)))
+        -- needs a hash part of one for the _c_object field
+        local instance = {&15 &0}
         return setmetatable(instance, self)
     end
 }

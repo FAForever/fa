@@ -16,7 +16,7 @@ local BuilderArmManipulatorSetPrecedence = _G.moho.BuilderArmManipulator.SetPrec
 local TrashBagAdd = _G.TrashBag.Add
 
 local CBuildBotUnit = import("/lua/cybranunits.lua").CBuildBotUnit
-URA0002O = ClassUnit(CBuildBotUnit) { 
+URA0002O = ClassDummyUnit(CBuildBotUnit) { 
     OnCreate = function(self)
         CBuildBotUnit.OnCreate(self)
 

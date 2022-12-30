@@ -272,7 +272,7 @@ CConstructionTemplate = ClassSimple {
 --- The build bot class for drones. It removes a lot of
 -- the basic functionality of a unit to save on performance.
 ---@class CBuildBotUnit : DummyUnit
-CBuildBotUnit = Class(DummyUnit) {
+CBuildBotUnit = ClassDummyUnit(DummyUnit) {
 
     -- Keep track of the builder that made the bot
     SpawnedBy = false,
@@ -281,13 +281,13 @@ CBuildBotUnit = Class(DummyUnit) {
     ---@param self CBuildBotUnit
     OnPreCreate = function(self) 
         self.Trash = TrashBag()
-    end,             
+    end,         
 
     --- only initialise what we need
     ---@param self CBuildBotUnit
     OnCreate = function(self)
         DummyUnit.OnCreate(self)
-        
+
         -- prevent drone from consuming anything
         UnitSetConsumptionActive(self, false)
     end,
@@ -295,14 +295,14 @@ CBuildBotUnit = Class(DummyUnit) {
     --- short-cut when being destroyed
     ---@param self CBuildBotUnit
     OnDestroy = function(self) 
-        self.Dead = true 
+        self.Dead = true
         self.Trash:Destroy()
 
         if self.SpawnedBy then 
             self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
         end
     end,
-    
+
     ---@param self CBuildBotUnit
     Kill = function(self)
         -- make it go boom
