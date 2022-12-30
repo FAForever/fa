@@ -1378,9 +1378,11 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param self Unit
     DestroyAllDamageEffects = function(self)
         local damageEffectsBags = self.DamageEffectsBag
-        damageEffectsBags[1]:Destroy()
-        damageEffectsBags[2]:Destroy()
-        damageEffectsBags[3]:Destroy()
+        if damageEffectsBags then
+            damageEffectsBags[1]:Destroy()
+            damageEffectsBags[2]:Destroy()
+            damageEffectsBags[3]:Destroy()
+        end
     end,
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
