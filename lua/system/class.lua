@@ -739,9 +739,21 @@ UnitFactory = {
     ---@return table
     __call = function (self)
         -- LOG(string.format("%s -> %s", "UnitFactory", tostring(self.__name)))
-        -- needs a hash part of one for the _c_object field
         local instance = {&31 &0}
-        return setmetatable(instance, self)
+        setmetatable(instance, self)
+
+        -- ACUs use this function
+        local initfn = self.__init
+        if initfn then
+            initfn(instance)
+        end
+
+        local postinitfn = self.__post_init
+        if postinitfn then
+            postinitfn(instance)
+        end
+
+        return instance
     end
 }
 
