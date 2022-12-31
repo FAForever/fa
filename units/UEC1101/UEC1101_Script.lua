@@ -8,9 +8,5 @@
 local TCivilianStructureUnit = import("/lua/terranunits.lua").TCivilianStructureUnit
 
 ---@class UEC1101 : TCivilianStructureUnit
-UEC1101 = Class(TCivilianStructureUnit) {
-}
-
-
+UEC1101 = ClassUnit(TCivilianStructureUnit) {}
 TypeClass = UEC1101
-

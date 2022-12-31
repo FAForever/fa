@@ -138,7 +138,7 @@ function IsFilenameInvalid(filename)
 end
 
 ---@class FilePicker : Group
-FilePicker = Class(Group) {
+FilePicker = ClassUI(Group) {
     __init = function(self, parent, fileType, onlyShowMine, selectAction, debugName)
         Group.__init(self, parent)
         self:SetName(debugName or "FilePicker")

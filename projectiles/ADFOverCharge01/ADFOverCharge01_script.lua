@@ -4,7 +4,7 @@ local ALaserBotProjectile = import("/lua/aeonprojectiles.lua").ALaserBotProjecti
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local OverchargeProjectile = import("/lua/sim/defaultprojectiles.lua").OverchargeProjectile
 
-TDFOverCharge01 = Class(ALaserBotProjectile, OverchargeProjectile) {
+TDFOverCharge01 = ClassProjectile(ALaserBotProjectile, OverchargeProjectile) {
 
     PolyTrail = '/effects/emitters/aeon_commander_overcharge_trail_01_emit.bp',
     FxTrails = EffectTemplate.ACommanderOverchargeFXTrail01,
@@ -17,11 +17,10 @@ TDFOverCharge01 = Class(ALaserBotProjectile, OverchargeProjectile) {
         OverchargeProjectile.OnImpact(self, targetType, targetEntity)
         ALaserBotProjectile.OnImpact(self, targetType, targetEntity)
     end,
-    
+
     OnCreate = function(self)
         OverchargeProjectile.OnCreate(self)
         ALaserBotProjectile.OnCreate(self)
     end,
 }
-
 TypeClass = TDFOverCharge01

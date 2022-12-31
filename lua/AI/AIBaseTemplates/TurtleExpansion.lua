@@ -134,6 +134,9 @@ BaseBuilderTemplate {
     },
     ExpansionFunction = function(aiBrain, location, markerType)
         -- This is wrong. This would allow the template to potentially be used on ARMY_# marker. Fix later.
+        if markerType == 'Naval Area' then
+            return 0
+        end
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not(personality == 'adaptive' or personality == 'turtle') then
             return 0

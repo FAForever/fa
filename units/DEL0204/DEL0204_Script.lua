@@ -16,10 +16,10 @@ local EffectUtils = import("/lua/effectutilities.lua")
 local Effects = import("/lua/effecttemplates.lua")
 
 ---@class DEL0204 : TWalkingLandUnit
-DEL0204 = Class(TWalkingLandUnit)
+DEL0204 = ClassUnit(TWalkingLandUnit)
 {
     Weapons = {
-        GatlingCannon = Class(TDFPlasmaCannonWeapon) 
+        GatlingCannon = ClassWeapon(TDFPlasmaCannonWeapon) 
         {
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip then
@@ -49,7 +49,7 @@ DEL0204 = Class(TWalkingLandUnit)
                 TDFPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },
-        Grenade = Class(TIFFragLauncherWeapon) {}
+        Grenade = ClassWeapon(TIFFragLauncherWeapon) {}
     },
 }
 TypeClass = DEL0204

@@ -14,7 +14,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local utilities = import("/lua/utilities.lua")
 
 ---@class XRC2201 : CCivilianStructureUnit
-XRC2201 = Class(CCivilianStructureUnit) {
+XRC2201 = ClassUnit(CCivilianStructureUnit) {
 
     OnCreate = function(self, builder, layer)      
         CCivilianStructureUnit.OnCreate(self)

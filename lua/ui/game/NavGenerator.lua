@@ -38,7 +38,7 @@ local DebugInterface = false
 ---@alias NavUIStates 'overview' | 'actions'
 
 ---@class NavUIOverview : Group
-NavUIOverview = Class(Group) {
+NavUIOverview = ClassUI(Group) {
     __init = function(self, parent) 
         Group.__init(self, parent, 'NavUIOverview')
     end
@@ -46,7 +46,7 @@ NavUIOverview = Class(Group) {
 
 ---@class NavUIPathTo : Group
 ---@field State NavDebugGetLabelState
-NavUIGetLabel = Class(Group) {
+NavUIGetLabel = ClassUI(Group) {
     __init = function (self, parent)
         local name = 'NavUIGetLabel'
         Group.__init(self, parent, name)
@@ -152,7 +152,7 @@ NavUIGetLabel = Class(Group) {
 
 ---@class NavUIPathTo : Group
 ---@field State NavDebugGetLabelState
-NavUIGetLabelMetadata = Class(Group) {
+NavUIGetLabelMetadata = ClassUI(Group) {
     __init = function (self, parent)
         local name = 'NavUIGetLabelMetadata'
         Group.__init(self, parent, name)
@@ -247,7 +247,7 @@ NavUIGetLabelMetadata = Class(Group) {
 
 ---@class NavUIPathTo : Group
 ---@field State NavDebugCanPathToState
-NavUIPathTo = Class(Group) {
+NavUIPathTo = ClassUI(Group) {
     __init = function (self, parent)
         local name = 'NavUIPathTo'
         Group.__init(self, parent, name)
@@ -370,7 +370,7 @@ NavUIPathTo = Class(Group) {
 
 ---@class NavUICanPathTo : Group
 ---@field State NavDebugCanPathToState
-NavUICanPathTo = Class(Group) {
+NavUICanPathTo = ClassUI(Group) {
     __init = function (self, parent)
         local name = 'NavUICanPathTo'
         Group.__init(self, parent, name)
@@ -508,7 +508,7 @@ NavUICanPathTo = Class(Group) {
 }
 
 ---@class NavUILayerStatistics : Group
-NavUILayerStatistics = Class(Group) {
+NavUILayerStatistics = ClassUI(Group) {
     __init = function(self, parent, layer)
         local name = 'NavUILayerStatistics - ' .. tostring(layer)
         Group.__init(self, parent, 'NavUILayerStatistics - ' .. tostring(layer))
@@ -596,7 +596,7 @@ NavUILayerStatistics = Class(Group) {
 }
 
 ---@class NavUIActions : Group
-NavUIActions = Class(Group) {
+NavUIActions = ClassUI(Group) {
     __init = function(self, parent) 
         Group.__init(self, parent, 'NavUIActions')
 
@@ -714,7 +714,7 @@ NavUIActions = Class(Group) {
 }
 
 ---@class NavUI : Window
-NavUI = Class(Window) {
+NavUI = ClassUI(Window) {
 
     __init = function(self, parent)
 

@@ -1611,6 +1611,9 @@ AIBrain = Class(moho.aibrain_methods) {
         }
 
         self:IMAPConfiguration()
+        if self:IsBaseAI() then
+            self:ForkThread(self.MapAnalysis)
+        end
     end,
 
     ---@param self AIBrain
@@ -1888,6 +1891,14 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param baseName string
     ---@param useCenter boolean
     AddBuilderManagers = function(self, position, radius, baseName, useCenter)
+
+        local baseLayer = 'Land'
+        position[2] = GetTerrainHeight( position[1], position[3] )
+        if GetSurfaceHeight( position[1], position[3] ) > position[2] then
+            position[2] = GetSurfaceHeight( position[1], position[3] )
+            baseLayer = 'Water'
+        end
+
         self.BuilderManagers[baseName] = {
             FactoryManager = FactoryManager.CreateFactoryBuilderManager(self, baseName, position, radius, useCenter),
             PlatoonFormManager = PlatoonFormManager.CreatePlatoonFormManager(self, baseName, position, radius, useCenter),
@@ -1896,6 +1907,7 @@ AIBrain = Class(moho.aibrain_methods) {
             BuilderHandles = {},
             Position = position,
             BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
+            Layer = baseLayer,
         }
         self.NumBases = self.NumBases + 1
     end,
@@ -5097,6 +5109,16 @@ AIBrain = Class(moho.aibrain_methods) {
             self.IMAPConfig.IMAPSize = 256
             self.IMAPConfig.Rings = 0
         end
+    end,
+
+    MapAnalysis = function(self)
+        -- This function will provide various means of the AI populating intel data
+        -- Due to it potentially influencing buider/base template decisions it needs to run before the AI creates its first buildermanager
+        WaitTicks(10)
+        self.IntelData.MapWaterRatio = self:GetMapWaterRatio()
+        local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+        AIAttackUtils.NavalAttackCheck(self)
+
     end,
 }
 

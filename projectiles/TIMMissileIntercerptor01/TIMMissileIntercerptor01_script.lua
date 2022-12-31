@@ -5,6 +5,6 @@ local TAntiNukeInterceptorProjectile = import("/lua/terranprojectiles.lua").TAnt
 
 --- used by ueb4302
 ---@class TIMMissileIntercerptor01 : TAntiNukeInterceptorProjectile
-TIMMissileIntercerptor01 = Class(TAntiNukeInterceptorProjectile) {}
+TIMMissileIntercerptor01 = ClassProjectile(TAntiNukeInterceptorProjectile) {}
 
 TypeClass = TIMMissileIntercerptor01

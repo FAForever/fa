@@ -11,7 +11,7 @@ local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
 local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 ---@class XSA0101 : SAirUnit
-XSA0101 = Class(SAirUnit) {
+XSA0101 = ClassUnit(SAirUnit) {
     OnImpact = function(self, with, other)
         SAirUnit.OnImpact(self, with, other)
 

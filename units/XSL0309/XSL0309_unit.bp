@@ -227,7 +227,6 @@ UnitBlueprint {
             'BUILTBYTIER3ENGINEER SERAPHIM',
         },
         MaxBuildDistance = 7,
-        NeedToFaceTargetToBuild = false,
         StorageEnergy = 0,
         StorageMass = 40,
         TeleportEnergyMod = 0.15,

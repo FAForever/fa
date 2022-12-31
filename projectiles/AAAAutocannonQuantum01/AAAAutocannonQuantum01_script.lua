@@ -1,6 +1,4 @@
--- Cybran Anti Air Quantum Displacement Autocannon Projectile
-
--- uaa0303
+-- Cybran Anti Air Quantum Displacement Autocannon Projectile - UAA0303
 local AAAQuantumDisplacementCannonProjectile = import("/lua/aeonprojectiles.lua").AAAQuantumDisplacementCannonProjectile
-AAAAutocannonQuantum01 = Class(AAAQuantumDisplacementCannonProjectile) { }
+AAAAutocannonQuantum01 = ClassProjectile(AAAQuantumDisplacementCannonProjectile) { }
 TypeClass = AAAAutocannonQuantum01

@@ -9,9 +9,9 @@ local SDFPhasicAutoGunWeapon = import("/lua/seraphimweapons.lua").SDFPhasicAutoG
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class XSL0101 : SWalkingLandUnit
-XSL0101 = Class(SWalkingLandUnit) {
+XSL0101 = ClassUnit(SWalkingLandUnit) {
     Weapons = {
-        LaserTurret = Class(SDFPhasicAutoGunWeapon) {
+        LaserTurret = ClassWeapon(SDFPhasicAutoGunWeapon) {
             OnWeaponFired = function(self)
                 if not self.unit.WaitingForCloak then
                     self.unit:RevealUnit()

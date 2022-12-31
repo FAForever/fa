@@ -11,7 +11,7 @@
 local CEnergyStorageUnit= import("/lua/cybranunits.lua").CEnergyStorageUnit
 
 ---@class URB1105 : CEnergyStorageUnit
-URB1105 = Class(CEnergyStorageUnit) {
+URB1105 = ClassUnit(CEnergyStorageUnit) {
     DestructionPartsChassisToss = {'URB1105'},
 
     OnStopBeingBuilt = function(self,builder,layer)

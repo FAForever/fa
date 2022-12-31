@@ -3,7 +3,7 @@
 -- PostDragger(originFrame, keycode, dragger)
 
 ---@class Dragger : moho.dragger_methods, InternalObject
-Dragger = Class(moho.dragger_methods) {
+Dragger = ClassUI(moho.dragger_methods) {
     ---@param self Dragger
     __init = function(self)
         InternalCreateDragger(self)

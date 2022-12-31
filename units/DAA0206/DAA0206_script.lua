@@ -13,13 +13,13 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtils = import("/lua/effectutilities.lua")
 
 ---@class DAA0206 : AAirUnit
-DAA0206 = Class(AAirUnit) {
+DAA0206 = ClassUnit(AAirUnit) {
     ContrailEffects = {
         '/effects/emitters/contrail_ser_ohw_polytrail_01_emit.bp',
     },
 
     Weapons = {
-        Suicide = Class(DefaultProjectileWeapon) {}
+        Suicide = ClassWeapon(DefaultProjectileWeapon) {}
     },
 
     OnRunOutOfFuel = function(self)

@@ -13,7 +13,7 @@ local DEFAULT_MASS_ICON_SIZE = 10
 
 --- UI control to show a preview image of a map, with optional resource markers.
 ---@class ResourceMapPreview : Group
-ResourceMapPreview = Class(Group) {
+ResourceMapPreview = ClassUI(Group) {
     __init = function(self, parent, size, massIconSize, hydroIconSize, buttonsDisabled)
         Group.__init(self, parent)
         self.size = size

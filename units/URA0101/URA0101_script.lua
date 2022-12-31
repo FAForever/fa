@@ -10,7 +10,5 @@
 local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
 
 ---@class URA0101 : CAirUnit
-URA0101 = Class(CAirUnit) {
-    DestroySeconds = 7.5,
-}
+URA0101 = ClassUnit(CAirUnit) {}
 TypeClass = URA0101

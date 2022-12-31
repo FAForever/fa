@@ -13,9 +13,9 @@ local CAMZapperWeapon03 = CybranWeaponsFile.CAMZapperWeapon03
 local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaserInvisible
 
 ---@class URS0202 : CSeaUnit
-URS0202 = Class(CSeaUnit) {
+URS0202 = ClassUnit(CSeaUnit) {
     Weapons = {
-        TargetPainter = Class(TargetingLaser) {
+        TargetPainter = ClassWeapon(TargetingLaser) {
             -- Unit in range. Cease ground fire and turn on AA
             OnWeaponFired = function(self)
                 if not self.AA then
@@ -38,10 +38,10 @@ URS0202 = Class(CSeaUnit) {
                 end,
             },
         },
-        ParticleGun = Class(CDFProtonCannonWeapon) {},
-        AAGun = Class(CAANanoDartWeapon) {},
-        GroundGun = Class(CAANanoDartWeapon) {},
-        Zapper = Class(CAMZapperWeapon03) {},
+        ParticleGun = ClassWeapon(CDFProtonCannonWeapon) {},
+        AAGun = ClassWeapon(CAANanoDartWeapon) {},
+        GroundGun = ClassWeapon(CAANanoDartWeapon) {},
+        Zapper = ClassWeapon(CAMZapperWeapon03) {},
     },
 }
 
