@@ -114,7 +114,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         local FactionIndexToName = {[1] = 'UEF', [2] = 'AEON', [3] = 'CYBRAN', [4] = 'SERAPHIM', [5] = 'NOMADS' }
         local AIFactionName = FactionIndexToName[factionIndex]
         SPEW('*AIExecuteBuildStructure: We cant decide whatToBuild! AI-faction: '..AIFactionName..', Building Type: '..repr(buildingType)..', engineer-faction: '..repr(builder.Blueprint.FactionCategory))
-        -- Get the UnitId for the actual buildingType
+        -- Get the BlueprintId for the actual buildingType
         local BuildUnitWithID
         for Key, Data in buildingTemplate do
             if Data[1] and Data[2] and Data[1] == buildingType then

@@ -966,6 +966,13 @@ local function OverchargeFrame(self, deltaTime)
 end
 
 
+---@alias CommandCap EngineCommandCap
+---| "AttackMove"
+---| "DroneL"
+---| "DroneR"
+
+---@alias ToggleCap EngineToggleCap
+
 ---@class OrderInfo
 ---@field helpText string
 ---@field bitmapId string

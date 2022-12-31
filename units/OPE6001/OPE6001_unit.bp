@@ -19,7 +19,7 @@ UnitBlueprint {
                     AlbedoName = '/Units/UEC1902/UEC1902_Albedo.dds',
                     LODCutoff = 250,
                     MeshName = '/Units/UEC1902/UEC1902_LOD0.scm',
-                    Shader = 'TMeshAlpha',
+                    ShaderName = 'TMeshAlpha',
                 },
             },
         },

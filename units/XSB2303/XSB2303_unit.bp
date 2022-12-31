@@ -230,7 +230,6 @@ UnitBlueprint {
             MaxRadius = 128,
             MinRadius = 50,
             MuzzleChargeDelay = 1,
-            MuzzleSalvoChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 26.13,

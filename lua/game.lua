@@ -6,8 +6,8 @@
 -----------------------------------------------------------------
 
 ---@class UnitRestrictions
----@field Global table<UnitId, boolean>
----@field PerArmy table<UnitId, boolean>[]
+---@field Global table<BlueprintId, boolean>
+---@field PerArmy table<BlueprintId, boolean>[]
 
 
 
@@ -163,7 +163,7 @@ end
 --- army restrictions (set in Scenario Script)
 --- e.g. IsRestricted('xab1401', 1) -> checks if Aeon Paragon is restricted for army with index 1
 --- Note that global restrictions take precedence over restrictions set on specific armies
----@param unitId UnitId
+---@param unitId BlueprintId
 ---@param army number
 ---@return boolean
 function IsRestricted(unitId, army)

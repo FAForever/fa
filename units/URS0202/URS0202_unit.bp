@@ -356,7 +356,7 @@ UnitBlueprint {
             MaxRadius = 75,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            PreferPrimaryWeaponTarget = true,
+            PrefersPrimaryWeaponTarget = true,
             ProjectileLifetimeUsesMultiplier = 1.15,
             RackBones = {
                 {

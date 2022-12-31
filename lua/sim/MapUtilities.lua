@@ -53,7 +53,7 @@ function MapResourceCheck()
     ---@param x number
     ---@param y number
     ---@param z number
-    ---@param id UnitId
+    ---@param id BlueprintId
     local function TryUnit(x, y, z, id)
         if brain:CanBuildStructureAt(id, {x, y, z}) then
             CreateUnitHPR(id, army, x, y, z, 0, 0, 0)

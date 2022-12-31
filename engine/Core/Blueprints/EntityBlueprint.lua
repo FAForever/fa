@@ -27,7 +27,6 @@
 ---@field LifeBarRender boolean
 --- size of lifebar in OGrids
 ---@field LifeBarSize number
----@field Lifetime
 --- module defining entity's class
 ---@field ScriptModule FileName
 --- name of entity's class
@@ -46,7 +45,8 @@
 ---@field SelectionMeshScaleY number
 --- Scale the mesh on the Z axis by this much when we perform our mouse over entity test
 ---@field SelectionMeshScaleZ number
---- Use this much of the top portion of our mesh for intersection test. Useful for naval stuctures that go deep into water
+--- Use this much of the top portion of our mesh for intersection test. Useful for naval stuctures
+--- that go deep into water
 ---@field SelectionMeshUseTopAmount number
 --- x size of the entity's selection box
 ---@field SelectionSizeX number
@@ -54,12 +54,13 @@
 ---@field SelectionSizeY number
 --- z size of the entity's selection box
 ---@field SelectionSizeZ number
----@field SelectionYOffset
 --- Use this to modify the thickness of the rendered selection indicator for the unit
 ---@field SelectionThickness number
---- name of strategic icon to use for this unit
+--- Name of strategic icon to use for this unit. Should not be defined with `StrategicIconSize`.
 ---@field StrategicIconName string
----@field StrategicIconSize
+--- How large is the strategic icon square for the projectile.
+--- Should not be defined with `StrategicIconName`.
+---@field StrategicIconSize? number
 --- 0 tends to render on top, and 255 on bottom (based on factors such the order the strategic
 --- icons were created in and the sort priority of the surrounding icons) 
 ---@field StrategicIconSortPriority integer

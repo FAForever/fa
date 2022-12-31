@@ -4147,7 +4147,7 @@ Unit = ClassUnit(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param treads UnitBlueprintTreads
+    ---@param treads UnitBlueprintTreadMarks
     ---@param type string
     CreateTreadsThread = function(self, treads, type)
         local sizeX = treads.TreadMarksSizeX
