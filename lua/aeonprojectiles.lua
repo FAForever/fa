@@ -25,14 +25,11 @@ local NukeProjectile = DefaultProjectileFile.NukeProjectile
 ASaintAntiNuke = ClassProjectile(SinglePolyTrailProjectile) {
     PolyTrail = '/effects/emitters/aeon_missile_trail_02_emit.bp',
     FxTrails = {'/effects/emitters/saint_munition_01_emit.bp'},
-
     FxImpactUnit = EffectTemplate.AMissileHit01,
     FxImpactProp = EffectTemplate.AMissileHit01,
     FxImpactNone = EffectTemplate.AMissileHit01,
     FxImpactLand = EffectTemplate.AMissileHit01,
     FxImpactProjectile = EffectTemplate.ASaintImpact01,
-    FxImpactUnderWater = {},
-
 }
 
 --- AEON Ballistic Mortar Launcher
@@ -705,7 +702,6 @@ ATorpedoCluster = ClassProjectile(ATorpedoShipProjectile) {
     TrailDelay = 0,
     TrackTime = 0,
     FxUnitHitScale = 1.25,
-    FxImpactLand = {},
     FxImpactUnit = EffectTemplate.ATorpedoUnitHit01,
     FxImpactProp = EffectTemplate.ATorpedoUnitHit01,
     FxImpactUnderWater = EffectTemplate.ATorpedoUnitHitUnderWater01,
@@ -716,13 +712,11 @@ ATorpedoCluster = ClassProjectile(ATorpedoShipProjectile) {
 
 --- AEON QUANTUM CLUSTER
 ---@class AQuantumCluster : ABaseTempProjectile
-AQuantumCluster = ClassProjectile(ABaseTempProjectile) {
-}
+AQuantumCluster = ClassProjectile(ABaseTempProjectile) {}
 
 --- AEON LIGHT DISPLACEMENT AUTOCANNON
 ---@class ALightDisplacementAutoCannon : ABaseTempProjectile
-ALightDisplacementAutoCannon = ClassProjectile(ABaseTempProjectile) {
-}
+ALightDisplacementAutoCannon = ClassProjectile(ABaseTempProjectile) {}
 
 --- AEON ARTILLERY FRAGMENTATION SENSOR SHELL
 ---@class AArtilleryFragmentationSensorShellProjectile : SinglePolyTrailProjectile
