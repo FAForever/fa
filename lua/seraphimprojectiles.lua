@@ -215,7 +215,6 @@ SHeavyQuarnonCannon = ClassProjectile(MultiPolyTrailProjectile) {
 SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) { 
     FxImpactLand = EffectTemplate.SLaanseMissleHit,
     FxImpactProp = EffectTemplate.SLaanseMissleHitUnit,
-    FxImpactUnderWater = {},
     FxImpactUnit = EffectTemplate.SLaanseMissleHitUnit,
     FxTrails = EffectTemplate.SLaanseMissleExhaust02,
     PolyTrail = EffectTemplate.SLaanseMissleExhaust01,
