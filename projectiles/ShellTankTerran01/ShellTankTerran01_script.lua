@@ -8,7 +8,6 @@ ShellTankTerran01 = ClassProjectile(Projectile) {
     FxWaterHitScale = 1,
     FxImpactWater = {},
     FxUnderWaterHitScale = 0.25,
-    FxImpactUnderWater = {},
     FxAirUnitHitScale = 1,
     FxImpactAirUnit = {},
     FxNoneHitScale = 1,

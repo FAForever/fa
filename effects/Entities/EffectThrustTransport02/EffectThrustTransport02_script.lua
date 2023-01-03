@@ -20,7 +20,6 @@ EffectThrustTransport01 = Class(EmitterProjectile) {
         },
 
     FxUnderWaterHitScale = 1,
-    FxImpactUnderWater = {},
     FxNoneHitScale = 1,
     FxImpactNone = {},
     

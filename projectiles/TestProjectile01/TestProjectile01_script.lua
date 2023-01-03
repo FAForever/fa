@@ -12,7 +12,6 @@ TestProjectile01 = ClassProjectile(Projectile)
     FxImpactUnit = {},
     FxImpactLand = {},
     FxImpactWater = {},
-    FxImpactUnderWater = {},
 
     OnCreate = function(self)
         Projectile.OnCreate(self)
