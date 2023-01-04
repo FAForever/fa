@@ -72,11 +72,11 @@ function CanPathTo(layer, origin, destination)
         return nil, 'Origin is not inside the map'
     end
 
-    if originLeaf.label == -1 then
+    if originLeaf.Label == -1 then
         return nil, 'Origin is unpathable'
     end
 
-    if originLeaf.label == 0 then
+    if originLeaf.Label == 0 then
         return nil, 'Origin has no label assigned, report to the maintainers. This should not be possible'
     end
 
@@ -86,15 +86,15 @@ function CanPathTo(layer, origin, destination)
         return nil, 'Destination is not inside the map'
     end
 
-    if destinationLeaf.label == -1 then
+    if destinationLeaf.Label == -1 then
         return nil, 'Destination is unpathable'
     end
 
-    if destinationLeaf.label == 0 then
+    if destinationLeaf.Label == 0 then
         return nil, 'Destination has no label assigned, report to the maintainers. This should not be possible'
     end
 
-    if originLeaf.label == destinationLeaf.label then
+    if originLeaf.Label == destinationLeaf.Label then
         return true
     else
         return false, 'Not reachable for this layer'
@@ -179,16 +179,16 @@ function PathTo(layer, origin, destination, options)
         end
 
         -- continue state
-        for id, neighbor in leaf.neighbors do
+        for k = 1, table.getn(leaf) do
+            local neighbor = leaf[k]
             if neighbor.Seen != seenIdentifier then
                 local preferLargeNeighbor = 0
-                if leaf.c > neighbor.c then
+                if leaf.Size > neighbor.Size then
                     preferLargeNeighbor = 100
                 end
                 neighbor.From = leaf
                 neighbor.Seen = seenIdentifier
-                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf.neighborDistances[id] + 2 + preferLargeNeighbor
-                -- TotalCosts = AcquiredCosts + ExpectedCosts
+                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor) + 2 + preferLargeNeighbor
                 neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
 
                 PathToHeap:Insert(neighbor)
@@ -221,7 +221,7 @@ function PathTo(layer, origin, destination, options)
         head = head + 1
 
         -- keep track of distance
-        distance = distance + leaf.From.neighborDistances[leaf.identifier]
+        distance = distance + leaf:DistanceTo(leaf.From)
         
         -- continue down the tree
         leaf = leaf.From
@@ -268,15 +268,15 @@ function GetLabel(layer, position)
         return nil, 'Position is not inside the map'
     end
 
-    if leaf.label == 0 then
+    if leaf.Label == 0 then
         return nil, 'Position has no label assigned, report to the maintainers. This should not be possible'
     end
 
-    if leaf.label == -1 then
+    if leaf.Label == -1 then
         return nil, 'Position is unpathable'
     end
 
-    return leaf.label, nil
+    return leaf.Label, nil
 end
 
 --- Returns the metadata of a label.

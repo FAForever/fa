@@ -100,25 +100,24 @@ end
 
 function ScanOver(mouse, layer)
     if mouse then
-        local over = NavGenerator.NavGrids[layer]:FindLeaf(mouse)
-        if over then 
-            if over.label > 0 then
-                local color = Shared.LabelToColor(over.label)
-                over:Draw(color, 0.1)
-                over:Draw(color, 0.15)
-                over:Draw(color, 0.2)
+        -- local over = NavGenerator.NavGrids[layer]:FindLeaf(mouse)
+        -- if over then 
+        --     if over.Label > 0 then
+        --         local color = Shared.LabelToColor(over.Label)
+        --         over:Draw(color, 0.1)
+        --         over:Draw(color, 0.15)
+        --         over:Draw(color, 0.2)
 
-                if over.neighbors then
-                    for _, neighbor in over.neighbors do
-                        neighbor:Draw(color, 0.25)
-                    end
-                end
-            else
-                over:Draw('ff0000', 0.1)
-                over:Draw('ff0000', 0.15)
-                over:Draw('ff0000', 0.2)
-            end
-        end
+        --         for k = 1, table.getn(over) do
+        --              local neighbor = over[k]
+        --              neighbor:Draw(color, 0.25)
+        --         end
+        --     else
+        --         over:Draw('ff0000', 0.1)
+        --         over:Draw('ff0000', 0.15)
+        --         over:Draw('ff0000', 0.2)
+        --     end
+        -- end
     end
 end
 
