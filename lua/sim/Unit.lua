@@ -1346,9 +1346,10 @@ Unit = ClassUnit(moho.unit_methods) {
         -- cache for performance
         local TableGetn = table.getn
         local Random = Random
+        local TableRandom = table.random
 
         -- retrieve an effect, which can be nil
-        local effects = fxTable[Random(1, TableGetn(fxTable))]
+        local effects = TableRandom(fxTable)
         if not effects then
             return
         end
