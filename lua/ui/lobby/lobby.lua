@@ -4808,10 +4808,11 @@ function ConfigureMapListeners(mapCtrl, scenario)
         local marker = mapCtrl.startPositions[inSlot]
 
         marker.OnRollover = function(self, state)
+            local slotName = GUI.slots[slot].name
             if state == 'enter' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseEnter'})
+                slotName:HandleEvent({Type = 'MouseEnter'})
             elseif state == 'exit' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseExit'})
+                slotName:HandleEvent({Type = 'MouseExit'})
             end
         end
 
