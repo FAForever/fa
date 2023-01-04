@@ -181,8 +181,8 @@ CANNaniteTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
             PostDamageEffects = {},
         }
         if projectile and not projectile:BeenDestroyed() then
-            projectile.PassData(data)
-            projectile.PassDamageData(damageTable)
+            projectile:PassData(data)
+            projectile:PassDamageData(damageTable)
         end
         return projectile
     end,
@@ -294,8 +294,8 @@ CAABurstCloudFlakArtilleryWeapon = ClassWeapon(DefaultProjectileWeapon) {
             DamageFriendly = blueprint.DamageFriendly,
         }
         if projectile and not projectile:BeenDestroyed() then
-            projectile.PassData(data)
-            projectile.PassDamageData(damageTable)
+            projectile:PassData(data)
+            projectile:PassDamageData(damageTable)
         end
         return projectile
     end,
@@ -353,8 +353,8 @@ CIFNaniteTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
         }
 
         if proj and not proj:BeenDestroyed() then
-            proj.PassDamageData(damageTable)
-            proj.PassData(data)
+            proj:PassDamageData(damageTable)
+            proj:PassData(data)
         end
         return proj
     end,

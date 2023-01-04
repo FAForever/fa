@@ -530,8 +530,8 @@ AANDepthChargeBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
         }
 
         if proj and not proj:BeenDestroyed() then
-            proj.PassDamageData(damageTable)
-            proj.PassData(data)
+            proj:PassDamageData(damageTable)
+            proj:PassData(data)
         end
 
         return proj
@@ -562,8 +562,8 @@ AANDepthChargeBombWeapon02 = ClassWeapon(DefaultProjectileWeapon) {
         }
 
         if proj and not proj:BeenDestroyed() then
-            proj.PassDamageData(damageTable)
-            proj.PassData(data)
+            proj:PassDamageData(damageTable)
+            proj:PassData(data)
         end
 
         return proj
@@ -594,8 +594,8 @@ AANTorpedoCluster = ClassWeapon(DefaultProjectileWeapon) {
         }
 
         if proj and not proj:BeenDestroyed() then
-            proj.PassDamageData(damageTable)
-            proj.PassData(data)
+            proj:PassDamageData(damageTable)
+            proj:PassData(data)
         end
 
         return proj
