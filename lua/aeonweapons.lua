@@ -92,7 +92,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     OnFire = function(self)
         -- only tractor one target at a time
         if self.RunningTractorThread then
-            self:ForkThread(self.OnInvalidTargetThread)
+            self.Trash:Add(ForkThread(self.OnInvalidTargetThread,self))
             return
         end
 
@@ -105,13 +105,13 @@ ADFTractorClaw = ClassWeapon(Weapon) {
         -- only tractor actual units
         local target = self:GetUnitBehindTarget(blipOrUnit)
         if not target then
-            self:ForkThread(self.OnInvalidTargetThread)
+            self.Trash:Add(ForkThread(self.OnInvalidTargetThread,self))
             return
         end
 
         -- only tract units that are not being tracted at the moment
         if target.Tractored then
-            self:ForkThread(self.OnInvalidTargetThread)
+            self.Trash:Add(ForkThread(self.OnInvalidTargetThread,self))
             return
         end
 
@@ -127,7 +127,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     OnInvalidTargetThread = function(self)
         self:ResetTarget()
         self:SetEnabled(false)
-        WaitSeconds(0.4)
+        WaitTicks(5)
         if not IsDestroyed(self) then
             self:SetEnabled(true)
         end
@@ -136,7 +136,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     --- Attempts to retrieve the unit behind the target, can return false if the blip is too far away from the unit due to jamming
     ---@param self ADFTractorClaw
     ---@param blip Blip | Unit
-    ---@return Unit | false
+    ---@return Blip | Unit | false
         GetUnitBehindTarget = function(self, blip)
         if IsUnit(blip) then
             -- return the unit
@@ -353,7 +353,6 @@ ADFTractorClaw = ClassWeapon(Weapon) {
 ---@class ADFTractorClawStructure : DefaultBeamWeapon
 ADFTractorClawStructure = ClassWeapon(DefaultBeamWeapon) {
     BeamType = TractorClawCollisionBeam,
-    FxMuzzleFlash = {},
 }
 
 ---@class ADFChronoDampener : DefaultProjectileWeapon
