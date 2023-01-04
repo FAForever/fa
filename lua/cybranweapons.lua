@@ -45,19 +45,17 @@ CDFOverchargeWeapon = ClassWeapon(OverchargeWeapon) {
     DesiredWeaponLabel = 'RightRipper'
 }
 
--- COMMANDER ENHANCEMENT WEAPON!
+--- COMMANDER ENHANCEMENT WEAPON!
 ---@class CDFHeavyMicrowaveLaserGeneratorCom : DefaultBeamWeapon
 CDFHeavyMicrowaveLaserGeneratorCom = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam02,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {},
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 
     ---@param self CDFHeavyMicrowaveLaserGeneratorCom
     PlayFxWeaponUnpackSequence = function(self)
         if not self:EconomySupportsBeam() then return end
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         for k, v in self.FxUpackingChargeEffects do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                 CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -67,12 +65,10 @@ CDFHeavyMicrowaveLaserGeneratorCom = ClassWeapon(DefaultBeamWeapon) {
     end,
 }
 
--- SPIDER BOT WEAPON!
+--- SPIDER BOT WEAPON!
 ---@class CDFHeavyMicrowaveLaserGenerator : DefaultBeamWeapon
 CDFHeavyMicrowaveLaserGenerator = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam01,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {},
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 
@@ -111,7 +107,7 @@ CDFHeavyMicrowaveLaserGenerator = ClassWeapon(DefaultBeamWeapon) {
     PlayFxWeaponUnpackSequence = function(self)
 
         if not self.ContBeamOn then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -142,7 +138,6 @@ CDFHeavyElectronBolterWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class CIFSmartCharge : DefaultProjectileWeapon
 CIFSmartCharge = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {},
 
     ---@param self CDFHeavyMicrowaveLaserGenerator
     ---@param muzzle string
@@ -152,14 +147,13 @@ CIFSmartCharge = ClassWeapon(DefaultProjectileWeapon) {
         if not proj or proj:BeenDestroyed() then
             return proj
         end
-        local tbl = self:GetBlueprint().DepthCharge
+        local tbl = self.Blueprint.DepthCharge
         proj:AddDepthCharge(tbl)
     end,
 }
 
 ---@class CANTorpedoLauncherWeapon : DefaultProjectileWeapon
-CANTorpedoLauncherWeapon = ClassWeapon(DefaultProjectileWeapon) {
-}
+CANTorpedoLauncherWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class CANNaniteTorpedoWeapon : DefaultProjectileWeapon
 CANNaniteTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
@@ -175,7 +169,7 @@ CANNaniteTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local projectile = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local data = {
             Instigator = self.unit,
             Damage = bp.DoTDamage,
@@ -187,17 +181,15 @@ CANNaniteTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
             PostDamageEffects = {},
         }
         if projectile and not projectile:BeenDestroyed() then
-            projectile:PassData(data)
-            projectile:PassDamageData(damageTable)
+            projectile.PassData(data)
+            projectile.PassDamageData(damageTable)
         end
         return projectile
     end,
 }
 
 ---@class CDFMissileMesonWeapon : DefaultProjectileWeapon
-CDFMissileMesonWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {},
-}
+CDFMissileMesonWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class CDFRocketIridiumWeapon : DefaultProjectileWeapon
 CDFRocketIridiumWeapon = ClassWeapon(DefaultProjectileWeapon) {
@@ -260,7 +252,6 @@ CDFLaserDisintegratorWeapon02 = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class CDFHeavyDisintegratorWeapon : DefaultProjectileWeapon
 CDFHeavyDisintegratorWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxChargeMuzzleFlash = {},
     FxMuzzleFlash = {
         '/effects/emitters/disintegratorhvy_muzzle_flash_01_emit.bp',
         '/effects/emitters/disintegratorhvy_muzzle_flash_02_emit.bp',
@@ -271,8 +262,7 @@ CDFHeavyDisintegratorWeapon = ClassWeapon(DefaultProjectileWeapon) {
 }
 
 ---@class CAAAutocannon : DefaultProjectileWeapon
-CAAAutocannon = ClassWeapon(DefaultProjectileWeapon) {
-}
+CAAAutocannon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class CAANanoDartWeapon : DefaultProjectileWeapon
 CAANanoDartWeapon = ClassWeapon(DefaultProjectileWeapon) {
@@ -293,7 +283,7 @@ CAABurstCloudFlakArtilleryWeapon = ClassWeapon(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local projectile = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         local data = {
             Instigator = self.unit,
             Damage = blueprint.DoTDamage,
@@ -304,17 +294,15 @@ CAABurstCloudFlakArtilleryWeapon = ClassWeapon(DefaultProjectileWeapon) {
             DamageFriendly = blueprint.DamageFriendly,
         }
         if projectile and not projectile:BeenDestroyed() then
-            projectile:PassData(data)
-            projectile:PassDamageData(damageTable)
+            projectile.PassData(data)
+            projectile.PassDamageData(damageTable)
         end
         return projectile
     end,
 }
 
 ---@class CAAMissileNaniteWeapon : DefaultProjectileWeapon
-CAAMissileNaniteWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    -- Uses default muzzle flash
-}
+CAAMissileNaniteWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class CIFGrenadeWeapon : DefaultProjectileWeapon
 CIFGrenadeWeapon = ClassWeapon(DefaultProjectileWeapon) {
@@ -327,9 +315,7 @@ CIFArtilleryWeapon = ClassWeapon(DefaultProjectileWeapon) {
 }
 
 ---@class CIFMissileStrategicWeapon : DefaultProjectileWeapon
-CIFMissileStrategicWeapon = ClassWeapon(DefaultProjectileWeapon) {
-}
-
+CIFMissileStrategicWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class CIFMissileLoaTacticalWeapon : DefaultProjectileWeapon
 CIFMissileLoaTacticalWeapon = ClassWeapon(DefaultProjectileWeapon) {
@@ -354,7 +340,7 @@ CIFNaniteTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local data = {
             Instigator = self.unit,
             Damage = bp.DoTDamage,
@@ -367,13 +353,12 @@ CIFNaniteTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
         }
 
         if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
+            proj.PassDamageData(damageTable)
+            proj.PassData(data)
         end
         return proj
     end,
 }
-
 
 ---@class CIFMissileLoaWeapon : DefaultProjectileWeapon
 CIFMissileLoaWeapon = ClassWeapon(DefaultProjectileWeapon) {
@@ -400,7 +385,7 @@ CAMZapperWeapon = ClassWeapon(DefaultBeamWeapon) {
     OnCreate = function(self)
         DefaultBeamWeapon.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.SphereEffectEntity = import("/lua/sim/entity.lua").Entity()
         self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
@@ -454,7 +439,7 @@ CAMZapperWeapon03 = ClassWeapon(DefaultBeamWeapon) {
     OnCreate = function(self)
         DefaultBeamWeapon.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.SphereEffectEntity = import("/lua/sim/entity.lua").Entity()
         self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
@@ -493,8 +478,7 @@ CCannonMolecularWeapon = ClassWeapon(DefaultProjectileWeapon) {
 }
 
 ---@class CEMPAutoCannon : DefaultProjectileWeapon
-CEMPAutoCannon = ClassWeapon(DefaultProjectileWeapon) {
-}
+CEMPAutoCannon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class CKrilTorpedoLauncherWeapon : DefaultProjectileWeapon
 CKrilTorpedoLauncherWeapon = ClassWeapon(DefaultProjectileWeapon) {
