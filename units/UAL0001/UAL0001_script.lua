@@ -18,13 +18,13 @@ local ADFChronoDampener = AWeapons.ADFChronoDampener
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class UAL0001 : ACUUnit
-UAL0001 = Class(ACUUnit) {
+UAL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        RightDisruptor = Class(ADFDisruptorCannonWeapon) {},
-        ChronoDampener = Class(ADFChronoDampener) {},
-        OverCharge = Class(ADFOverchargeWeapon) {},
-        AutoOverCharge = Class(ADFOverchargeWeapon) {},
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        RightDisruptor = ClassWeapon(ADFDisruptorCannonWeapon) {},
+        ChronoDampener = ClassWeapon(ADFChronoDampener) {},
+        OverCharge = ClassWeapon(ADFOverchargeWeapon) {},
+        AutoOverCharge = ClassWeapon(ADFOverchargeWeapon) {},
     },
 
     __init = function(self)

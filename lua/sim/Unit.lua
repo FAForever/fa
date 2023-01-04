@@ -112,7 +112,7 @@ local cUnit = moho.unit_methods
 ---@field EngineFlags any
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
-Unit = Class(moho.unit_methods) {
+Unit = ClassUnit(moho.unit_methods) {
 
     Weapons = {},
 
@@ -1346,9 +1346,10 @@ Unit = Class(moho.unit_methods) {
         -- cache for performance
         local TableGetn = table.getn
         local Random = Random
+        local TableRandom = table.random
 
         -- retrieve an effect, which can be nil
-        local effects = fxTable[Random(1, TableGetn(fxTable))]
+        local effects = TableRandom(fxTable)
         if not effects then
             return
         end
@@ -1378,9 +1379,11 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     DestroyAllDamageEffects = function(self)
         local damageEffectsBags = self.DamageEffectsBag
-        damageEffectsBags[1]:Destroy()
-        damageEffectsBags[2]:Destroy()
-        damageEffectsBags[3]:Destroy()
+        if damageEffectsBags then
+            damageEffectsBags[1]:Destroy()
+            damageEffectsBags[2]:Destroy()
+            damageEffectsBags[3]:Destroy()
+        end
     end,
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
@@ -2208,6 +2211,8 @@ Unit = Class(moho.unit_methods) {
     ---@param self Unit
     OnDestroy = function(self)
         self.Dead = true
+
+        -- LOG(string.format("%s -> %s", tostring(self.UnitId), tostring(debug.allocatedsize(self))))
 
         -- clear out all manipulators, at this point the wreck has been made
         for k = 1, self.WeaponCount do 
@@ -5361,7 +5366,7 @@ Unit = Class(moho.unit_methods) {
     CheckCanBeKilled = function(self, other)
         return self.CanBeKilled
     end,
-    
+
     ---@deprecated
     ---@param self Unit
     ---@param val number
@@ -5385,7 +5390,7 @@ local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
 ---@class DummyUnit : moho.unit_methods
-DummyUnit = Class(moho.unit_methods) {
+DummyUnit = ClassDummyUnit(moho.unit_methods) {
 
     ---@param self DummyUnit
     OnCreate = function(self)

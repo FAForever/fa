@@ -15,10 +15,10 @@ local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local DummyWeapon = import("/lua/aeonweapons.lua").AAASonicPulseBatteryWeapon
 
 ---@class UEA0107 : AirTransport
-UEA0107 = Class(AirTransport) {
+UEA0107 = ClassUnit(AirTransport) {
 
         Weapons = {
-            GuidanceSystem = Class(DummyWeapon) {},
+            GuidanceSystem = ClassWeapon(DummyWeapon) {},
         },
 
         AirDestructionEffectBones = { 'Front_Right_Exhaust','Front_Left_Exhaust','Back_Right_Exhaust','Back_Left_Exhaust',

@@ -1,7 +1,7 @@
 local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
-Sinker = Class(Projectile) {
+Sinker = ClassProjectile(Projectile) {
     OnCreate = function(self)
         Projectile.OnCreate(self)
         self:SetVizToFocusPlayer('Never')
@@ -45,7 +45,7 @@ Sinker = Class(Projectile) {
         targetEntity:AttachBoneTo(targetBone, self, 'anchor')
 
         if not targetEntity:BeenDestroyed() then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             local acc = -bp.Physics.SinkSpeed
             self:SetBallisticAcceleration(acc + GetRandomFloat(-0.02, 0.02))
         end

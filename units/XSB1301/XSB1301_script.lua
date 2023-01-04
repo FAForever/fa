@@ -10,7 +10,7 @@
 local SEnergyCreationUnit = import("/lua/seraphimunits.lua").SEnergyCreationUnit
 
 ---@class XSB1301 : SEnergyCreationUnit
-XSB1301 = Class(SEnergyCreationUnit) {
+XSB1301 = ClassUnit(SEnergyCreationUnit) {
     AmbientEffects = 'ST3PowerAmbient',
     
     OnStopBeingBuilt = function(self, builder, layer)

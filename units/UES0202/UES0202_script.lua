@@ -16,13 +16,13 @@ local TAMPhalanxWeapon = WeaponFile.TAMPhalanxWeapon
 local TIFCruiseMissileLauncher = WeaponFile.TIFCruiseMissileLauncher
 
 ---@class UES0202 : TSeaUnit
-UES0202 = Class(TSeaUnit) {
+UES0202 = ClassUnit(TSeaUnit) {
     Weapons = {
-        FrontTurret01 = Class(TDFGaussCannonWeapon) {},
-        BackTurret02 = Class(TSAMLauncher) {
+        FrontTurret01 = ClassWeapon(TDFGaussCannonWeapon) {},
+        BackTurret02 = ClassWeapon(TSAMLauncher) {
             FxMuzzleFlash = EffectTemplate.TAAMissileLaunchNoBackSmoke,
         },
-        PhalanxGun01 = Class(TAMPhalanxWeapon) {
+        PhalanxGun01 = ClassWeapon(TAMPhalanxWeapon) {
             PlayFxWeaponUnpackSequence = function(self)
                 if not self.SpinManip then 
                     self.SpinManip = CreateRotator(self.unit, 'Center_Turret_Barrel', 'z', nil, 270, 180, 60)
@@ -43,7 +43,7 @@ UES0202 = Class(TSeaUnit) {
             end,
         },
         
-        CruiseMissile = Class(TIFCruiseMissileLauncher) {
+        CruiseMissile = ClassWeapon(TIFCruiseMissileLauncher) {
             OnCreate = function(self)
                 TIFCruiseMissileLauncher.OnCreate(self)
                 self.RackToUse = 1

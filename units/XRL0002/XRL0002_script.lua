@@ -10,6 +10,6 @@
 local CConstructionEggUnit = import("/lua/cybranunits.lua").CConstructionEggUnit
 
 ---@class XRL0002 : CConstructionEggUnit
-XRL0002 = Class(CConstructionEggUnit) {}
+XRL0002 = ClassUnit(CConstructionEggUnit) {}
 
 TypeClass = XRL0002

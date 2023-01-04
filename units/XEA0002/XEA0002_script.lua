@@ -9,13 +9,13 @@ local TAirUnit = import("/lua/terranunits.lua").TAirUnit
 local TOrbitalDeathLaserBeamWeapon = import("/lua/terranweapons.lua").TOrbitalDeathLaserBeamWeapon
 
 ---@class XEA0002 : TAirUnit
-XEA0002 = Class(TAirUnit) {
+XEA0002 = ClassUnit(TAirUnit) {
     DestroyNoFallRandomChance = 1.1,
 
     HideBones = {'Shell01', 'Shell02', 'Shell03', 'Shell04',},
 
     Weapons = {
-        OrbitalDeathLaserWeapon = Class(TOrbitalDeathLaserBeamWeapon){},
+        OrbitalDeathLaserWeapon = ClassWeapon(TOrbitalDeathLaserBeamWeapon){},
     },
     
     OnDestroy = function(self)

@@ -13,10 +13,10 @@ local CDFLaserHeavyWeapon = import("/lua/cybranweapons.lua").CDFLaserHeavyWeapon
 
 
 ---@class URB2101 : CStructureUnit
-URB2101 = Class(CStructureUnit) {
+URB2101 = ClassUnit(CStructureUnit) {
 
     Weapons = {
-        MainGun = Class(CDFLaserHeavyWeapon) {}
+        MainGun = ClassWeapon(CDFLaserHeavyWeapon) {}
     },
 }
 

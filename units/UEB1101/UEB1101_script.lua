@@ -10,7 +10,7 @@
 local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
 ---@class UEB1101 : TEnergyCreationUnit
-UEB1101 = Class(TEnergyCreationUnit) {
+UEB1101 = ClassUnit(TEnergyCreationUnit) {
     OnCreate = function(self)
         TEnergyCreationUnit.OnCreate(self)
         self.Sliders = {

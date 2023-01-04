@@ -115,7 +115,7 @@ function DepopulateDefaultElement(element)
 end
 
 ---@class ProfilerScrollArea : Group
-ProfilerScrollArea = Class(Group) {
+ProfilerScrollArea = ClassUI(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)
         self.bg = Bitmap(self)

@@ -13,11 +13,11 @@ local WeaponsFile = import("/lua/aeonweapons.lua")
 local AAAZealotMissileWeapon = WeaponsFile.AAAZealotMissileWeapon
 
 ---@class UAS0303 : AircraftCarrier
-UAS0303 = Class(AircraftCarrier) {
+UAS0303 = ClassUnit(AircraftCarrier) {
 
     Weapons = {
-        AntiAirMissiles01 = Class(AAAZealotMissileWeapon) {},
-        AntiAirMissiles02 = Class(AAAZealotMissileWeapon) {},
+        AntiAirMissiles01 = ClassWeapon(AAAZealotMissileWeapon) {},
+        AntiAirMissiles02 = ClassWeapon(AAAZealotMissileWeapon) {},
     },
 
     BuildAttachBone = 'UAS0303',

@@ -140,7 +140,7 @@ local function getMusicVolumeOption()
         }
 
     else
-        
+
         -- replaced option with an "disableable" type. It preserves the original value in config.
         -- on empty profile it is defaulted to 100 as in original option
         return {
@@ -160,7 +160,7 @@ local function getMusicVolumeOption()
                 },
             },
         }
-        
+
     end
 end
 options = {
@@ -465,6 +465,18 @@ options = {
             -- },
 
             {
+                title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
+                key = 'repeatbuild',
+                type = 'toggle',
+                default = false,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0273>Automated Structure Ringing",
                 key = 'structure_capping_feature_01',
                 type = 'toggle',
@@ -476,7 +488,7 @@ options = {
                         {text = "<LOC _FullSuite>Full suite",                               key = "full-suite"},
                     },
                 },
-            }, 
+            },
             {
                 title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
                 key = 'automex',
@@ -747,6 +759,18 @@ options = {
                         {text = "<LOC _Off>", key = 0 },
                         {text = "<LOC _On>", key = 1 },
                     },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE>Reclaim Batching Distance Threshold",
+                key = 'reclaim_batching_distance_treshold',
+                type = 'slider',
+                default = 150,
+                custom = {
+                    min = 150,
+                    max = 600,
+                    inc = 10,
                 },
             },
 

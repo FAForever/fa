@@ -16,48 +16,48 @@ local OrbitalDeathLaserCollisionBeam = CollisionBeams.OrbitalDeathLaserCollision
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class TDFFragmentationGrenadeLauncherWeapon : DefaultProjectileWeapon
-TDFFragmentationGrenadeLauncherWeapon = Class(DefaultProjectileWeapon) {
+TDFFragmentationGrenadeLauncherWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.THeavyFragmentationGrenadeMuzzleFlash,
 }
 
 ---@class TDFPlasmaCannonWeapon : DefaultProjectileWeapon
-TDFPlasmaCannonWeapon = Class(DefaultProjectileWeapon) {
+TDFPlasmaCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TPlasmaGatlingCannonMuzzleFlash,
 }
 
 ---@class TIFFragLauncherWeapon : DefaultProjectileWeapon
-TIFFragLauncherWeapon = Class(DefaultProjectileWeapon) {
+TIFFragLauncherWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TPlasmaCannonHeavyMuzzleFlash,
 }
 
 ---@class TDFHeavyPlasmaGatlingWeapon : DefaultProjectileWeapon
-TDFHeavyPlasmaGatlingWeapon = Class(DefaultProjectileWeapon) {
+TDFHeavyPlasmaGatlingWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TPlasmaCannonHeavyMuzzleFlash,
 }
 
 ---@class TDFLightPlasmaCannonWeapon : DefaultProjectileWeapon
-TDFLightPlasmaCannonWeapon = Class(DefaultProjectileWeapon) {
+TDFLightPlasmaCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TPlasmaCannonLightMuzzleFlash,
 }
 
 ---@class TDFHeavyPlasmaCannonWeapon : DefaultProjectileWeapon
-TDFHeavyPlasmaCannonWeapon = Class(DefaultProjectileWeapon) {
+TDFHeavyPlasmaCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TPlasmaCannonHeavyMuzzleFlash,
 }
 
 ---@class TDFHeavyPlasmaGatlingCannonWeapon : DefaultProjectileWeapon
-TDFHeavyPlasmaGatlingCannonWeapon = Class(DefaultProjectileWeapon) {
+TDFHeavyPlasmaGatlingCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.THeavyPlasmaGatlingCannonMuzzleFlash,
 }
 
 ---@class TDFOverchargeWeapon : OverchargeWeapon
-TDFOverchargeWeapon = Class(WeaponFile.OverchargeWeapon) {
+TDFOverchargeWeapon = ClassWeapon(WeaponFile.OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.TCommanderOverchargeFlash01,
     DesiredWeaponLabel = 'RightZephyr'
 }
 
 ---@class TDFMachineGunWeapon : DefaultProjectileWeapon
-TDFMachineGunWeapon = Class(DefaultProjectileWeapon) {
+TDFMachineGunWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
         '/effects/emitters/machinegun_muzzle_fire_01_emit.bp',
         '/effects/emitters/machinegun_muzzle_fire_02_emit.bp',
@@ -65,42 +65,42 @@ TDFMachineGunWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class TDFGaussCannonWeapon : DefaultProjectileWeapon
-TDFGaussCannonWeapon = Class(DefaultProjectileWeapon) {
+TDFGaussCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TGaussCannonFlash,
 }
 
 ---@class TDFShipGaussCannonWeapon : DefaultProjectileWeapon
-TDFShipGaussCannonWeapon = Class(DefaultProjectileWeapon) {
+TDFShipGaussCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TShipGaussCannonFlash,
 }
 
 ---@class TDFLandGaussCannonWeapon : DefaultProjectileWeapon
-TDFLandGaussCannonWeapon = Class(DefaultProjectileWeapon) {
+TDFLandGaussCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TLandGaussCannonFlash,
 }
 
 ---@class TDFZephyrCannonWeapon : DefaultProjectileWeapon
-TDFZephyrCannonWeapon = Class(DefaultProjectileWeapon) {
+TDFZephyrCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TLaserMuzzleFlash,
 }
 
 ---@class TDFRiotWeapon : DefaultProjectileWeapon
-TDFRiotWeapon = Class(DefaultProjectileWeapon) {
+TDFRiotWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFx,
 }
 
 ---@class TAAGinsuRapidPulseWeapon : DefaultProjectileWeapon
-TAAGinsuRapidPulseWeapon = Class(DefaultProjectileWeapon) {
+TAAGinsuRapidPulseWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {},
 }
 
 ---@class TDFIonizedPlasmaCannon : DefaultProjectileWeapon
-TDFIonizedPlasmaCannon = Class(DefaultProjectileWeapon) {
+TDFIonizedPlasmaCannon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TIonizedPlasmaGatlingCannonMuzzleFlash,
 }
 
 ---@class TDFHiroPlasmaCannon : DefaultBeamWeapon
-TDFHiroPlasmaCannon = Class(DefaultBeamWeapon) {
+TDFHiroPlasmaCannon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeams.TDFHiroCollisionBeam,
     FxMuzzleFlash = {},
     FxChargeMuzzleFlash = {},
@@ -122,7 +122,7 @@ TDFHiroPlasmaCannon = Class(DefaultBeamWeapon) {
 }
 
 ---@class TAAFlakArtilleryCannon : DefaultProjectileWeapon
-TAAFlakArtilleryCannon = Class(DefaultProjectileWeapon) {
+TAAFlakArtilleryCannon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TFlakCannonMuzzleFlash01,
     
     --- Custom over-ride for this weapon, so it passes data and damageTable
@@ -153,36 +153,36 @@ TAAFlakArtilleryCannon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class TAALinkedRailgun : DefaultProjectileWeapon
-TAALinkedRailgun = Class(DefaultProjectileWeapon) {
+TAALinkedRailgun = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TRailGunMuzzleFlash01,
 }
 
 ---@class TAirToAirLinkedRailgun : DefaultProjectileWeapon
-TAirToAirLinkedRailgun = Class(DefaultProjectileWeapon) {
+TAirToAirLinkedRailgun = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TRailGunMuzzleFlash02,
 }
 
 ---@class TIFCruiseMissileUnpackingLauncher : DefaultProjectileWeapon
-TIFCruiseMissileUnpackingLauncher = Class(DefaultProjectileWeapon) {
+TIFCruiseMissileUnpackingLauncher = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {},
 }
 ---@class TIFCruiseMissileLauncher : DefaultProjectileWeapon
-TIFCruiseMissileLauncher = Class(DefaultProjectileWeapon) {
+TIFCruiseMissileLauncher = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchSmoke,
 }
 
 ---@class TIFCruiseMissileLauncherSub : DefaultProjectileWeapon
-TIFCruiseMissileLauncherSub = Class(DefaultProjectileWeapon) {
+TIFCruiseMissileLauncherSub = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchUnderWater,
 }
 
 ---@class TSAMLauncher : DefaultProjectileWeapon
-TSAMLauncher = Class(DefaultProjectileWeapon) {
+TSAMLauncher = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TAAMissileLaunch,
 }
 
 ---@class TANTorpedoLandWeapon : DefaultProjectileWeapon
-TANTorpedoLandWeapon = Class(DefaultProjectileWeapon) {
+TANTorpedoLandWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
@@ -191,7 +191,7 @@ TANTorpedoLandWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class TANTorpedoAngler : DefaultProjectileWeapon
-TANTorpedoAngler = Class(DefaultProjectileWeapon) {
+TANTorpedoAngler = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
@@ -200,7 +200,7 @@ TANTorpedoAngler = Class(DefaultProjectileWeapon) {
 }
 
 ---@class TIFSmartCharge : DefaultProjectileWeapon
-TIFSmartCharge = Class(DefaultProjectileWeapon) {
+TIFSmartCharge = ClassWeapon(DefaultProjectileWeapon) {
 
     ---@param self TIFSmartCharge
     ---@param muzzle Bone
@@ -212,15 +212,15 @@ TIFSmartCharge = Class(DefaultProjectileWeapon) {
 }
 
 ---@class TIFStrategicMissileWeapon : DefaultProjectileWeapon
-TIFStrategicMissileWeapon = Class(DefaultProjectileWeapon) {}
+TIFStrategicMissileWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class TIFArtilleryWeapon : DefaultProjectileWeapon
-TIFArtilleryWeapon = Class(DefaultProjectileWeapon) {
+TIFArtilleryWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TIFArtilleryMuzzleFlash
 }
 
 ---@class TIFCarpetBombWeapon : DefaultProjectileWeapon
-TIFCarpetBombWeapon = Class(DefaultProjectileWeapon) {
+TIFCarpetBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
 
     ---@param self TIFCarpetBombWeapon
@@ -265,22 +265,22 @@ TIFCarpetBombWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class TIFSmallYieldNuclearBombWeapon : DefaultProjectileWeapon
-TIFSmallYieldNuclearBombWeapon = Class(DefaultProjectileWeapon) {
+TIFSmallYieldNuclearBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
 }
 
 ---@class TIFHighBallisticMortarWeapon : DefaultProjectileWeapon
-TIFHighBallisticMortarWeapon = Class(DefaultProjectileWeapon) {
+TIFHighBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TMobileMortarMuzzleEffect01,
 }
 
 ---@class TAMInterceptorWeapon : DefaultProjectileWeapon
-TAMInterceptorWeapon = Class(DefaultProjectileWeapon) {
+TAMInterceptorWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/terran_antinuke_launch_01_emit.bp',},
 }
 
 ---@class TAMPhalanxWeapon : DefaultProjectileWeapon
-TAMPhalanxWeapon = Class(DefaultProjectileWeapon) {
+TAMPhalanxWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TPhalanxGunMuzzleFlash,
     FxShellEject  = EffectTemplate.TPhalanxGunShells,
 
@@ -295,7 +295,7 @@ TAMPhalanxWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class TOrbitalDeathLaserBeamWeapon : DefaultBeamWeapon
-TOrbitalDeathLaserBeamWeapon = Class(DefaultBeamWeapon) {
+TOrbitalDeathLaserBeamWeapon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = OrbitalDeathLaserCollisionBeam,
     FxUpackingChargeEffects = {},
     FxUpackingChargeEffectScale = 1,

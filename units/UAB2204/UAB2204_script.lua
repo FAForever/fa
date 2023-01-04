@@ -11,9 +11,9 @@ local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 local AAATemporalFizzWeapon = import("/lua/aeonweapons.lua").AAATemporalFizzWeapon
 
 ---@class UAB2204 : AStructureUnit
-UAB2204 = Class(AStructureUnit) {
+UAB2204 = ClassUnit(AStructureUnit) {
     Weapons = {
-        AAFizz = Class(AAATemporalFizzWeapon) {
+        AAFizz = ClassWeapon(AAATemporalFizzWeapon) {
             ChargeEffectMuzzles = {'Turret_Right_Muzzle', 'Turret_Left_Muzzle'},
 
             PlayFxRackSalvoChargeSequence = function(self)

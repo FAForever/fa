@@ -14,13 +14,13 @@ local SANAnaitTorpedo = SeraphimWeapons.SANAnaitTorpedo
 local SDFAjelluAntiTorpedoDefense = SeraphimWeapons.SDFAjelluAntiTorpedoDefense
 
 ---@class XSS0201 : SSubUnit
-XSS0201 = Class(SSubUnit) {
+XSS0201 = ClassUnit(SSubUnit) {
     BackWakeEffect = {},
     Weapons = {
-        FrontTurret = Class(SDFUltraChromaticBeamGenerator) {},
-        BackTurret = Class(SDFUltraChromaticBeamGenerator) {},
-        Torpedo1 = Class(SANAnaitTorpedo) {},
-        AntiTorpedo = Class(SDFAjelluAntiTorpedoDefense) {},
+        FrontTurret = ClassWeapon(SDFUltraChromaticBeamGenerator) {},
+        BackTurret = ClassWeapon(SDFUltraChromaticBeamGenerator) {},
+        Torpedo1 = ClassWeapon(SANAnaitTorpedo) {},
+        AntiTorpedo = ClassWeapon(SDFAjelluAntiTorpedoDefense) {},
     },
 
     OnKilled = function(self, instigator, type, overkillRatio)

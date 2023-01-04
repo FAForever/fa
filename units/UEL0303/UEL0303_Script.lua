@@ -14,10 +14,10 @@ local TDFHeavyPlasmaCannonWeapon = TerranWeaponFile.TDFHeavyPlasmaCannonWeapon
 local TSAMLauncher = TerranWeaponFile.TSAMLauncher
 
 ---@class UEL0303 : TWalkingLandUnit
-UEL0303 = Class(TWalkingLandUnit) {
+UEL0303 = ClassUnit(TWalkingLandUnit) {
 
     Weapons = {
-        HeavyPlasma01 = Class(TDFHeavyPlasmaCannonWeapon) {
+        HeavyPlasma01 = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {
             DisabledFiringBones = { 'Torso' },
         },
     },

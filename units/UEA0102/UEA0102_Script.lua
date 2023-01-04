@@ -12,11 +12,11 @@ local TAirUnit = import("/lua/terranunits.lua").TAirUnit
 local TAirToAirLinkedRailgun = import("/lua/terranweapons.lua").TAirToAirLinkedRailgun
 
 ---@class UEA0102 : TAirUnit
-UEA0102 = Class(TAirUnit) {
+UEA0102 = ClassUnit(TAirUnit) {
     PlayDestructionEffects = true,
 
     Weapons = {
-        LinkedRailGun = Class(TAirToAirLinkedRailgun) {},
+        LinkedRailGun = ClassWeapon(TAirToAirLinkedRailgun) {},
     },
 }
 

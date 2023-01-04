@@ -979,7 +979,7 @@ function FatBoyBuildCheck(self)
 
     -- Randomly build T3 MMLs, siege bots, and percivals.
     local buildUnits = {'uel0303', 'xel0305', 'xel0306', }
-    local unitToBuild = buildUnits[Random(1, table.getn(buildUnits))]
+    local unitToBuild = table.random(buildUnits)
 
     aiBrain:BuildUnit(experimental, unitToBuild, 1)
     WaitTicks(1)

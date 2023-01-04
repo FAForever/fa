@@ -64,7 +64,7 @@ end
 ---@field TrashManipulators TrashBag
 ---@field TrashProjectiles TrashBag
 ---@field unit Unit
-Weapon = Class(moho.weapon_methods) {
+Weapon = ClassWeapon(moho.weapon_methods) {
 
     -- stored here for mods compatibility, overridden in the inner table when written to
     DamageMod = 0,

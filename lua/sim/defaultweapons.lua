@@ -35,7 +35,7 @@ local MathClamp = math.clamp
 ---@field AdjustedSalvoDelay? number if the weapon blueprint requests a trajectory fix, this is set to the effective duration of the salvo in ticks used to calculate projectile spread
 ---@field DropBombShortRatio? number if the weapon blueprint requests a trajectory fix, this is set to the ratio of the distance to the target that the projectile is launched short to
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
-DefaultProjectileWeapon = Class(Weapon) {
+DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     FxRackChargeMuzzleFlash = {},
     FxRackChargeMuzzleFlashScale = 1,
@@ -1166,7 +1166,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 }
 
 ---@class KamikazeWeapon : Weapon
-KamikazeWeapon = Class(Weapon) {
+KamikazeWeapon = ClassWeapon(Weapon) {
     ---@param self KamikazeWeapon
     OnFire = function(self)
         local unit = self.unit
@@ -1178,7 +1178,7 @@ KamikazeWeapon = Class(Weapon) {
 }
 
 ---@class BareBonesWeapon : Weapon
-BareBonesWeapon = Class(Weapon) {
+BareBonesWeapon = ClassWeapon(Weapon) {
     Data = {},
 
     ---@param self BareBonesWeapon
@@ -1193,7 +1193,7 @@ BareBonesWeapon = Class(Weapon) {
 }
 
 ---@class OverchargeWeapon : DefaultProjectileWeapon
-OverchargeWeapon = Class(DefaultProjectileWeapon) {
+OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
     NeedsUpgrade = false,
     AutoMode = false,
     AutoThread = nil,
@@ -1397,7 +1397,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class DefaultBeamWeapon : DefaultProjectileWeapon
-DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
+DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,
 
     ---@param self DefaultBeamWeapon
@@ -1660,7 +1660,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
 local NukeDamage = import("/lua/sim/nukedamage.lua").NukeAOE
 ---@class DeathNukeWeapon : BareBonesWeapon
-DeathNukeWeapon = Class(BareBonesWeapon) {
+DeathNukeWeapon = ClassWeapon(BareBonesWeapon) {
 
     ---@param self DeathNukeWeapon
     OnFire = function(self)
@@ -1697,7 +1697,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
 }
 
 ---@class SCUDeathWeapon : BareBonesWeapon
-SCUDeathWeapon = Class(BareBonesWeapon) {
+SCUDeathWeapon = ClassWeapon(BareBonesWeapon) {
     ---@param self SCUDeathWeapon
     OnFire = function(self)
     end,

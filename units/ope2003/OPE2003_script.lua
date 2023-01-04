@@ -11,7 +11,7 @@
 local TLandUnit = import("/lua/terranunits.lua").TLandUnit
 
 ---@class OPE2003 : TLandUnit
-OPE2003 = Class(TLandUnit) {
+OPE2003 = ClassUnit(TLandUnit) {
     KickupBones = {'Kickup_R','Kickup_L'},
 }
 

@@ -12,16 +12,16 @@ local TAirToAirLinkedRailgun = TWeapons.TAirToAirLinkedRailgun
 
 
 ---@class UEA0305 : TAirUnit
-UEA0305 = Class(TAirUnit) {
+UEA0305 = ClassUnit(TAirUnit) {
 
     EngineRotateBones = {'Jet_Front', 'Jet_Back',},
     BeamExhaustCruise = '/effects/emitters/gunship_thruster_beam_01_emit.bp',
     BeamExhaustIdle = '/effects/emitters/gunship_thruster_beam_02_emit.bp',
 
     Weapons = {
-        Plasma01 = Class(TDFHeavyPlasmaCannonWeapon) {},
-        Plasma02 = Class(TDFHeavyPlasmaCannonWeapon) {},
-        AAGun = Class(TAirToAirLinkedRailgun) {},
+        Plasma01 = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {},
+        Plasma02 = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {},
+        AAGun = ClassWeapon(TAirToAirLinkedRailgun) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)
