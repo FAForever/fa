@@ -113,7 +113,7 @@ local br = { 0, 0, 0 }
 ---@param pz number
 ---@param c number
 ---@param color string
-local function DrawSquare(px, pz, c, color, inset)
+function DrawSquare(px, pz, c, color, inset)
     inset = inset or 0
     tl[1], tl[2], tl[3] = px + inset, GetSurfaceHeight(px + inset, pz + inset), pz + inset
     tr[1], tr[2], tr[3] = px + c - inset, GetSurfaceHeight(px + c - inset, pz + inset), pz + inset
@@ -384,11 +384,6 @@ CompressedLabelTree = ClassSimple {
             return
         end
 
-        -- do not generate neighbors for non-pathable cells to save memory
-        if label == -1 then
-            return
-        end
-
         -- we are a leaf, so find those neighbors!
         local x1 = bx + ox
         local z1 = bz + oz
@@ -414,7 +409,7 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x, z1Outside)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label == 0 and not seen[neighbor] then
+                if not seen[neighbor] then
                     seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
@@ -430,7 +425,7 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x, z2Outside)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label == 0 and not seen[neighbor] then
+                if not seen[neighbor] then
                     seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
@@ -446,7 +441,7 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x1Outside, z)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label == 0 and not seen[neighbor] then
+                if not seen[neighbor] then
                     seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
@@ -462,7 +457,7 @@ CompressedLabelTree = ClassSimple {
             local neighbor = root:FindLeafXZ(x2Outside, z)
             if neighbor then
                 k = k + neighbor.Size - 1
-                if neighbor.Label == 0 and not seen[neighbor] then
+                if not seen[neighbor] then
                     seen[neighbor] = true
                     TableInsert(self, neighbor)
                 end
@@ -479,12 +474,12 @@ CompressedLabelTree = ClassSimple {
         local a, b
         local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
-        if neighbor and neighbor.Label == 0 and not seen[neighbor] then
+        if neighbor and not seen[neighbor] then
             seen[neighbor] = true
             a = root:FindLeafXZ(x1Outside + 1, z1Outside)
             b = root:FindLeafXZ(x1Outside, z1Outside + 1)
 
-            if a and b and a.Label == 0 and b.Label == 0 then
+            if a and b and (a.Label == 0 or b.Label == 0) then
                 TableInsert(self, neighbor)
             end
         end
@@ -492,12 +487,12 @@ CompressedLabelTree = ClassSimple {
         -- scan top-right
         neighbor = root:FindLeafXZ(x2Outside, z1Outside)
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
-        if neighbor and neighbor.Label == 0 and not seen[neighbor] then
+        if neighbor and not seen[neighbor] then
             seen[neighbor] = true
             a = root:FindLeafXZ(x2Outside - 1, z1Outside)
             b = root:FindLeafXZ(x2Outside, z1Outside + 1)
 
-            if a and b and a.Label == 0 and b.Label == 0 then
+            if a and b and (a.Label == 0 or b.Label == 0) then
                 TableInsert(self, neighbor)
             end
         end
@@ -505,12 +500,12 @@ CompressedLabelTree = ClassSimple {
         -- scan bottom-left
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x1Outside, z2Outside)
-        if neighbor and neighbor.Label == 0 and not seen[neighbor] then
+        if neighbor and not seen[neighbor] then
             seen[neighbor] = true
             a = root:FindLeafXZ(x1Outside + 1, z2Outside)
             b = root:FindLeafXZ(x1Outside, z2Outside - 1)
 
-            if a and b and a.Label == 0 and b.Label == 0 then
+            if a and b and (a.Label == 0 or b.Label == 0) then
                 TableInsert(self, neighbor)
             end
         end
@@ -518,12 +513,12 @@ CompressedLabelTree = ClassSimple {
         -- scan bottom-right
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x2Outside, z2Outside)
-        if neighbor and neighbor.Label == 0 and not seen[neighbor] then
+        if neighbor and not seen[neighbor] then
             seen[neighbor] = true
             a = root:FindLeafXZ(x2Outside - 1, z2Outside)
             b = root:FindLeafXZ(x2Outside, z2Outside - 1)
 
-            if a and b and a.Label == 0 and b.Label == 0 then
+            if a and b and (a.Label == 0 or b.Label == 0) then
                 TableInsert(self, neighbor)
             end
         end
@@ -621,10 +616,8 @@ CompressedLabelTree = ClassSimple {
             self[3]:ComputeCenter(bx, bz, ox, oz + hc, hc)
             self[4]:ComputeCenter(bx, bz, ox + hc, oz + hc, hc)
         else
-            if self[1] then -- TODO: bad neighbor check here
-                self.px = bx + ox + 0.5 * size
-                self.pz = bz + oz + 0.5 * size
-            end
+            self.px = bx + ox + 0.5 * size
+            self.pz = bz + oz + 0.5 * size
         end
     end,
 
@@ -1122,10 +1115,10 @@ function Generate()
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
     ---@type number
-    local compressionThreshold = 2
+    local compressionThreshold = 4
 
     if MapSize > 1024 then
-        compressionThreshold = 4
+        compressionThreshold = 8
     end
 
     NavGrids['Land'] = NavGrid('Land', CompressionTreeSize)
