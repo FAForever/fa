@@ -697,6 +697,8 @@ AHeavyDisruptorCannonShell = ClassProjectile(MultiPolyTrailProjectile) {
 --- AEON TORPEDO CLUSTER
 ---@class ATorpedoCluster : ATorpedoShipProjectile
 ATorpedoCluster = ClassProjectile(ATorpedoShipProjectile) {
+    FxInitial = {},
+    FxTrails = {},
     PolyTrail = '',
     FxTrailScale = 1,
     TrailDelay = 0,
@@ -738,6 +740,7 @@ AArtilleryFragmentationSensorShellProjectile02 = ClassProjectile(AArtilleryFragm
 ---@class AArtilleryFragmentationSensorShellProjectile03 : AArtilleryFragmentationSensorShellProjectile
 AArtilleryFragmentationSensorShellProjectile03 = ClassProjectile(AArtilleryFragmentationSensorShellProjectile) {
     PolyTrail = EffectTemplate.Aeon_QuanticClusterProjectilePolyTrail03,
+    FxTrails = {},
 }
 
 -- kept for mod backwards compatibility
