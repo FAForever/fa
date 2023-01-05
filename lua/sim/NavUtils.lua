@@ -47,6 +47,54 @@ local function WarnNoNavMesh()
     WARN(" - Call the Generate function of NavUtils before calling any other function")
 end
 
+---@param layer NavLayers
+---@return NavGrid?
+---@return string?
+local function FindGrid(layer)
+    -- check layer argument
+    local grid = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
+    if not grid then
+        return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
+    end
+
+    return grid
+end
+
+---@param grid NavGrid
+---@param position Vector
+---@return CompressedLabelTreeLeaf?
+---@return string?
+local function FindLeaf(grid, position)
+    -- check position argument
+    local leaf = grid:FindLeafXZ(position[1], position[3])
+    if not leaf then
+        return nil, 'position is not inside the map'
+    end
+
+    if leaf.Label == -1 then
+        local distance = 1024
+        local nearest = nil
+
+        -- try and find nearest valid neighbor
+        for k = 1, table.getn(leaf) do
+
+            ---@type CompressedLabelTreeLeaf
+            local neighbor = leaf[k]
+            if neighbor.Label > 0 then
+                local d = leaf:DistanceTo(neighbor)
+                if d < distance then
+                    distance = d
+                    nearest = neighbor
+                end
+            end
+        end
+
+        return nearest or leaf
+    end
+
+    return leaf
+end
+
 --- Returns true when you can path from the origin to the destination
 ---@param layer NavLayers
 ---@param origin Vector
@@ -61,13 +109,13 @@ function CanPathTo(layer, origin, destination)
     end
 
     -- check layer argument
-    local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
-    if not root then
+    local grid = FindGrid(layer)
+    if not grid then
         return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
     end
 
     -- check origin argument
-    local originLeaf = root:FindLeafXZ(origin[1], origin[3])
+    local originLeaf = FindLeaf(grid, origin)
     if not originLeaf then
         return nil, 'Origin is not inside the map'
     end
@@ -81,7 +129,7 @@ function CanPathTo(layer, origin, destination)
     end
 
     -- check destination argument
-    local destinationLeaf = root:FindLeafXZ(destination[1], destination[3])
+    local destinationLeaf = FindLeaf(grid, destination)
     if not destinationLeaf then
         return nil, 'Destination is not inside the map'
     end
@@ -152,9 +200,9 @@ function PathTo(layer, origin, destination, options)
 
     -- setup pathing
     local seenIdentifier = PathToGetUniqueIdentifier()
-    local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
-    local originLeaf = root:FindLeafXZ(origin[1], origin[3]) --[[@as CompressedLabelTreeLeaf]]
-    local destinationLeaf = root:FindLeafXZ(destination[1], destination[3]) --[[@as CompressedLabelTreeLeaf]]
+    local grid = FindGrid(layer)                        --[[@as NavGrid]]
+    local originLeaf = FindLeaf(grid, origin)           --[[@as CompressedLabelTreeLeaf]]
+    local destinationLeaf = FindLeaf(grid, destination) --[[@as CompressedLabelTreeLeaf]]
 
     -- 0th iteration of search
     originLeaf.From = nil
@@ -181,7 +229,7 @@ function PathTo(layer, origin, destination, options)
         -- continue state
         for k = 1, table.getn(leaf) do
             local neighbor = leaf[k]
-            if neighbor.Seen != seenIdentifier then
+            if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 local preferLargeNeighbor = 0
                 if leaf.Size > neighbor.Size then
                     preferLargeNeighbor = 100
@@ -222,7 +270,7 @@ function PathTo(layer, origin, destination, options)
 
         -- keep track of distance
         distance = distance + leaf:DistanceTo(leaf.From)
-        
+
         -- continue down the tree
         leaf = leaf.From
     end
@@ -257,13 +305,13 @@ function GetLabel(layer, position)
     end
 
     -- check layer argument
-    local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
-    if not root then
+    local grid = FindGrid(layer)
+    if not grid then
         return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
     end
 
     -- check position argument
-    local leaf = root:FindLeafXZ(position[1], position[3])
+    local leaf = FindLeaf(grid, position)
     if not leaf then
         return nil, 'Position is not inside the map'
     end
@@ -291,16 +339,16 @@ function GetLabelMetadata(id)
     end
 
     -- check id argument
-    if id == 0 then 
+    if id == 0 then
         return nil, 'Invalid layer id - this should not be possible'
     end
 
-    if id == -1 then 
+    if id == -1 then
         return nil, 'Position is unpathable'
     end
 
     local meta = NavGenerator.NavLabels[id]
-    if not meta then 
+    if not meta then
         return nil, 'Invalid layer id - no metadata is assigned to this label'
     end
 
