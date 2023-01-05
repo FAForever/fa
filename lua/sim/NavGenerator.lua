@@ -1139,23 +1139,38 @@ function Generate()
     GenerateCullLabels()
     print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    -- allows debugging tools to function
-    import("/lua/sim/navdebug.lua")
+    -- ditch hover / amphibious if they are identical to land
+    if  NavLayerData['Land'].Labels == NavLayerData['Hover'].Labels and
+        NavLayerData['Land'].Neighbors == NavLayerData['Hover'].Neighbors and
+        NavLayerData['Land'].PathableLeafs == NavLayerData['Hover'].PathableLeafs and
+        NavLayerData['Land'].Subdivisions == NavLayerData['Hover'].Subdivisions and
+        NavLayerData['Land'].UnpathableLeafs == NavLayerData['Hover'].UnpathableLeafs
+    then
+        SPEW("Hover grid equals land grid - ditching hover grid")
+        NavGrids['Hover'] = NavGrids['Land']
+    end
 
-    -- pass data to sync
-    Sync.NavLayerData = NavLayerData
+    if  NavLayerData['Land'].Labels == NavLayerData['Amphibious'].Labels and
+        NavLayerData['Land'].Neighbors == NavLayerData['Amphibious'].Neighbors and
+        NavLayerData['Land'].PathableLeafs == NavLayerData['Amphibious'].PathableLeafs and
+        NavLayerData['Land'].Subdivisions == NavLayerData['Amphibious'].Subdivisions and
+        NavLayerData['Land'].UnpathableLeafs == NavLayerData['Amphibious'].UnpathableLeafs
+    then
+        SPEW("Amphibious grid equals land grid - ditching amphibious grid")
+        NavGrids['Amphibious'] = NavGrids['Land']
+    end
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
-
-    -- NavGrids['Hover'] = NavGrids['Land']
-    -- NavGrids['Amphibious'] = NavGrids['Land']
 
     local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
     local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
 
-
     SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
     SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
 
+    Sync.NavLayerData = NavLayerData
     Generated = true
+
+    -- allows debugging tools to function
+    import("/lua/sim/navdebug.lua")
 end
