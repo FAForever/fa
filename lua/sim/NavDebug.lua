@@ -119,6 +119,7 @@ function ScanOver(mouse, layer)
                      local neighbor = over[k]
                      local size = neighbor.Size
                      local h = 0.5 * size
+                     local color = Shared.LabelToColor(neighbor.Label)
                      NavGenerator.DrawSquare(neighbor.px - h, neighbor.pz - h, size, color, 0.1)
                 end
             else
