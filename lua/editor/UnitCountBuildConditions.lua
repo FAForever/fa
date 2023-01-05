@@ -92,19 +92,19 @@ function HaveLessThanUnitsWithCategoryInArea(aiBrain, numReq, category, area)
     return false
 end
 
----@param brain AIBrain
+---@param aiBrain AIBrain
 ---@param baseName string
 ---@param category EntityCategory
 ---@param num number
 ---@return boolean
-function NumUnitsLessNearBase(brain, baseName, category, num)
-    if brain.BaseTemplates[baseName].Location == nil then
+function NumUnitsLessNearBase(aiBrain, baseName, category, num)
+    if aiBrain.BaseTemplates[baseName].Location == nil then
         return false
     else
-        local unitList = brain:GetUnitsAroundPoint(category,brain.BaseTemplates[baseName].Location,brain.BaseTemplates[baseName].Radius, 'Ally')
+        local unitList = aiBrain:GetUnitsAroundPoint(category,aiBrain.BaseTemplates[baseName].Location,aiBrain.BaseTemplates[baseName].Radius, 'Ally')
         local count = 0
         for i,unit in unitList do
-            if unit:GetAIBrain() == brain then
+            if unit:GetAIBrain() == aiBrain then
                 count = count + 1
             end
         end
