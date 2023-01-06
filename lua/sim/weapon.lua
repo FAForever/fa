@@ -76,9 +76,6 @@ Weapon = ClassWeapon(moho.weapon_methods) {
 
     ---@param self Weapon
     OnCreate = function(self)
-
-        LOG("Weapon OnCreate")
-
         -- Store blueprint for improved access pattern, see benchmark on blueprints
         local bp = self:GetBlueprint()
         self.Blueprint = bp

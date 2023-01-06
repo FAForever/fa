@@ -161,8 +161,6 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param self Unit
     OnPreCreate = function(self)
 
-        LOG("Unit OnPreCreate")
-
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
