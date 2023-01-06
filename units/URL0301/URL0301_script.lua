@@ -15,20 +15,20 @@ local CDFLaserDisintegratorWeapon = CWeapons.CDFLaserDisintegratorWeapon02
 local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 
 ---@class URL0301 : CCommandUnit
-URL0301 = Class(CCommandUnit) {
+URL0301 = ClassUnit(CCommandUnit) {
     LeftFoot = 'Left_Foot02',
     RightFoot = 'Right_Foot02',
 
     Weapons = {
-        DeathWeapon = Class(SCUDeathWeapon) {},
-        RightDisintegrator = Class(CDFLaserDisintegratorWeapon) {
+        DeathWeapon = ClassWeapon(SCUDeathWeapon) {},
+        RightDisintegrator = ClassWeapon(CDFLaserDisintegratorWeapon) {
             OnCreate = function(self)
                 CDFLaserDisintegratorWeapon.OnCreate(self)
                 -- Disable buff
                 self:DisableBuff('STUN')
             end,
         },
-        NMissile = Class(CAAMissileNaniteWeapon) {},
+        NMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
     },
 
     -- Creation

@@ -29,9 +29,7 @@ local LobbyComm = import("/lua/ui/lobby/lobbycomm.lua")
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 local Mods = import("/lua/mods.lua")
 local FactionData = import("/lua/factions.lua")
-local Text = import("/lua/maui/text.lua").Text
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
-local Border = import("/lua/ui/controls/border.lua").Border
 
 local utils = import("/lua/system/utils.lua")
 
@@ -53,7 +51,6 @@ local aitypes
 local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
-
 
 
 
@@ -483,6 +480,11 @@ function GetAIPlayerData(name, AIPersonality, slot)
             baseAI = baseAI or entry.baseAI
         end
     end
+
+    reprsl(aitypes)
+
+    LOG(baseAI)
+    LOG(requiresNavMesh)
 
     return PlayerData(
         {
@@ -3184,7 +3186,7 @@ function CreateUI(maxPlayers)
     else
         tooltipText['body'] = LOC("<LOC lobui_0771>Left click ACU icon to move yourself.")
     end
-    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText, 0,198)
+    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText)
 
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 813, 325)
@@ -4295,6 +4297,9 @@ function CreateUI(maxPlayers)
             WaitSeconds(1)
         end
     end)
+    if true then
+        import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
+    end
 end
 
 function setupChatEdit(chatPanel)
@@ -4803,10 +4808,11 @@ function ConfigureMapListeners(mapCtrl, scenario)
         local marker = mapCtrl.startPositions[inSlot]
 
         marker.OnRollover = function(self, state)
+            local slotName = GUI.slots[slot].name
             if state == 'enter' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseEnter'})
+                slotName:HandleEvent({Type = 'MouseEnter'})
             elseif state == 'exit' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseExit'})
+                slotName:HandleEvent({Type = 'MouseExit'})
             end
         end
 
@@ -6295,7 +6301,7 @@ end
 
 function ShowLobbyOptionsDialog()
     local dialogContent = Group(GUI)
-    LayoutHelpers.SetDimensions(dialogContent, 420, 260)
+    LayoutHelpers.SetDimensions(dialogContent, 420, 310)
 
     local dialog = Popup(GUI, dialogContent)
     GUI.lobbyOptionsDialog = dialog
@@ -6357,6 +6363,30 @@ function ShowLobbyOptionsDialog()
             GUI.chatPanel:ScrollToBottom()
         end
     end
+    if true then
+        --snowflakes count
+        local currentSnowFlakesCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
+        local slider_SnowFlakes_Count_TEXT = UIUtil.CreateText(dialogContent,'Snowflakes count '.. currentSnowFlakesCount, 14, 'Arial', true)
+        LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count_TEXT, dialogContent, 27, 202)
+
+        -- slider for changing chat font size
+        local slider_SnowFlakes_Count = Slider(dialogContent, false, 100, 1000,
+            UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
+            UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+            LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count, dialogContent, 20, 222)
+        slider_SnowFlakes_Count:SetValue(currentSnowFlakesCount)
+        slider_SnowFlakes_Count.OnValueChanged = function(self, newValue)
+            local sliderValue = math.floor(newValue)
+            slider_SnowFlakes_Count_TEXT:SetText('Snowflakes count '.. sliderValue)
+            Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
+            import("/lua/ui/events/SnowFlake.lua").Clear()
+            import("/lua/ui/events/SnowFlake.lua").CreateSnowFlakes(GUI, sliderValue)
+        end
+    end
+
+
     --
     local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0402>Windowed mode"))
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialogContent, 20, 42)

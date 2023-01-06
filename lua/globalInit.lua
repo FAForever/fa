@@ -37,11 +37,16 @@ doscript '/lua/system/GlobalBuilderTemplate.lua'
 doscript '/lua/system/GlobalBuilderGroup.lua'
 doscript '/lua/system/GlobalBaseTemplate.lua'
 
+EmptyTable = {}
+setmetatable(EmptyTable, {__newindex = function()
+    WARN("Attempt to set field of the empty table")
+end})
+
 InitialRegistration = false
 
 -- Classes exported from the engine are in the 'moho' table. But they aren't full
 -- classes yet, just lists of exported methods and base classes. Turn them into
 -- real classes.
 for name,cclass in moho do
-    ConvertCClassToLuaSimplifiedClass(cclass)
+    ConvertCClassToLuaSimplifiedClass(cclass, name)
 end

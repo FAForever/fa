@@ -1,7 +1,5 @@
---
 -- Cybran laser 'bolt'
---
-local TLaserBotProjectile = import("/lua/terranprojectiles.lua").TLaserBotProjectile
-LaserBotTerran01 = Class(TLaserBotProjectile) {}
-TypeClass = LaserBotTerran01
 
+local TLaserBotProjectile = import("/lua/terranprojectiles.lua").TLaserBotProjectile
+LaserBotTerran01 = ClassProjectile(TLaserBotProjectile) {}
+TypeClass = LaserBotTerran01

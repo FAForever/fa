@@ -197,10 +197,10 @@ function AddUnitToSelectionSet(name, unit)
     -- bug where name is an index, not a key
     name = tostring(name)
 
-    if Prefs.GetFromCurrentProfile('options.selection_sets_production_behavior') then
+    if Prefs.GetFromCurrentProfile('options.add_to_factory_control_group') then
 
         -- remove it from existing selection sets
-        if Prefs.GetFromCurrentProfile('options.selection_sets_add_behavior') then
+        if Prefs.GetFromCurrentProfile('options.steal_from_other_control_groups') then
             local others = unit:GetSelectionSets()
             for k, other in others do
                 if selectionSets[other] then
@@ -241,7 +241,7 @@ function AddSelectionSet(name, unitArray)
         for _, unit in unitArray do
 
             -- remove it from existing selection sets
-            if Prefs.GetFromCurrentProfile('options.selection_sets_add_behavior') then
+            if Prefs.GetFromCurrentProfile('options.steal_from_other_control_groups') then
                 local others = unit:GetSelectionSets()
                 for k, other in others do
                     unit:RemoveSelectionSet(other)

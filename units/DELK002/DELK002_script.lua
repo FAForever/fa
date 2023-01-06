@@ -12,9 +12,9 @@ local Effects = import("/lua/effecttemplates.lua")
 
 
 ---@class DELK002 : TLandUnit
-DELK002 = Class(TLandUnit) {
+DELK002 = ClassUnit(TLandUnit) {
     Weapons = {
-        GatlingCannon = Class(TAAPhalanxWeapon)
+        GatlingCannon = ClassWeapon(TAAPhalanxWeapon)
         {
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip1 then

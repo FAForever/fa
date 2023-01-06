@@ -13,13 +13,13 @@ local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
 local TDFLightPlasmaCannonWeapon = import("/lua/terranweapons.lua").TDFLightPlasmaCannonWeapon
 
 ---@class UES0203 : TSubUnit
-UES0203 = Class(TSubUnit) {
+UES0203 = ClassUnit(TSubUnit) {
     PlayDestructionEffects = true,
     DeathThreadDestructionWaitTime = 0,
 
     Weapons = {
-        Torpedo01 = Class(TANTorpedoAngler) {},
-        PlasmaGun = Class(TDFLightPlasmaCannonWeapon) {}
+        Torpedo01 = ClassWeapon(TANTorpedoAngler) {},
+        PlasmaGun = ClassWeapon(TDFLightPlasmaCannonWeapon) {}
     },
 }
 

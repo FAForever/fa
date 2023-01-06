@@ -13,7 +13,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
-local PhasonCollisionBeam = Class(SCCollisionBeam) {
+local PhasonCollisionBeam = ClassWeapon(SCCollisionBeam) {
 
     FxBeamStartPoint = {
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_01_emit.bp',
@@ -41,7 +41,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 }
 
-local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
+local PhasonCollisionBeam2 = ClassWeapon(PhasonCollisionBeam) {
 
     FxBeam = { '/Effects/Emitters/seraphim_lightning_beam_02_emit.bp', },
     TerrainImpactScale = 0.1,
@@ -87,7 +87,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
     end,
 }
 
-local PhasonBeam = Class(DefaultBeamWeapon) {
+local PhasonBeam = ClassWeapon(DefaultBeamWeapon) {
     BeamType = PhasonCollisionBeam,
     FxMuzzleFlash = {},
     FxChargeMuzzleFlash = {},
@@ -96,10 +96,10 @@ local PhasonBeam = Class(DefaultBeamWeapon) {
 }
 
 ---@class DSLK004 : SLandUnit
-DSLK004 = Class(SLandUnit) {
+DSLK004 = ClassUnit(SLandUnit) {
     Weapons = {
-        PhasonBeamAir = Class(PhasonBeam) {},
-        PhasonBeamGround = Class(PhasonBeam) {
+        PhasonBeamAir = ClassWeapon(PhasonBeam) {},
+        PhasonBeamGround = ClassWeapon(PhasonBeam) {
             BeamType = PhasonCollisionBeam2,
             FxBeamEndPointScale = 0.01,
         },

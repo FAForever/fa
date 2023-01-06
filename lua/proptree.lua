@@ -50,14 +50,6 @@ Tree = Class(Prop) {
         end
     end,
 
-    --- Collision check with projectiles
-    ---@param self Tree
-    ---@param other Projectile
-    ---@return boolean
-    OnCollisionCheck = function(self, other)
-        return not self.Dead
-    end,
-
     --- Collision check with units
     ---@param self Tree
     ---@param other Unit
@@ -66,14 +58,18 @@ Tree = Class(Prop) {
     ---@param nz number
     ---@param depth number
     OnCollision = function(self, other, nx, ny, nz, depth)
-        if not self.Dead then 
-            if not self.Fallen then 
-                -- change internal state
-                self.Fallen = true
-                TrashAdd(self.Trash, ForkThread(self.FallThread, self, nx, ny, nz, depth))
-                self:PlayUprootingEffect(other)
-            end
+        if not self:BeenDestroyed() then
+            return
         end
+
+        if self.Fallen then
+            return
+        end
+
+        -- change internal state
+        self.Fallen = true
+        TrashAdd(self.Trash, ForkThread(self.FallThread, self, nx, ny, nz, depth))
+        self:PlayUprootingEffect(other)
     end,
 
     --- When damaged in some fashion - note that the tree can only be destroyed by disintegrating 
@@ -84,45 +80,46 @@ Tree = Class(Prop) {
     ---@param direction number
     ---@param type DamageType
     OnDamage = function(self, instigator, amount, direction, type)
-        if not self.Dead then 
+        if self:BeenDestroyed() then
+            return
+        end
 
-            local canFall = not self.Fallen 
-            local canBurn = (not self.Burning) and (not self.NoBurn)
+        local canFall = not self.Fallen 
+        local canBurn = (not self.Burning) and (not self.NoBurn)
 
-            if type == 'Disintegrate' or type == "Reclaimed" then
-                -- we just got obliterated
-                EntityDestroy(self)
+        if type == 'Disintegrate' or type == "Reclaimed" then
+            -- we just got obliterated
+            EntityDestroy(self)
 
-            elseif type == 'Force' or type == "TreeForce" then
-                if canFall then 
-                    -- change internal state
-                    self.NoBurn = true
-                    self.Fallen = true
-                    TrashAdd(self.Trash, ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
+        elseif type == 'Force' or type == "TreeForce" then
+            if canFall then 
+                -- change internal state
+                self.NoBurn = true
+                self.Fallen = true
+                TrashAdd(self.Trash, ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
 
-                    -- change the mesh
-                    EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
-                end
-
-            elseif type == 'Nuke' and canBurn then
-                -- slight chance we catch fire
-                if Random(1, 250) < 5 then
-                    self:Burn()
-                end
-
-            elseif (type == 'Fire' or type == 'TreeFire') and canBurn then 
-
-                -- fire type damage, slightly higher odds to catch fire
-                if Random(1, 35) <= 2 then
-                    self:Burn()
-                end
+                -- change the mesh
+                EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
             end
-            
-            if (type ~= 'Force') and (type ~= 'Fire') and canBurn and canFall then 
-                -- any damage type but force can cause a burn
-                if Random(1, 20) <= 1 then
-                    self:Burn()
-                end
+
+        elseif type == 'Nuke' and canBurn then
+            -- slight chance we catch fire
+            if Random(1, 250) < 5 then
+                self:Burn()
+            end
+
+        elseif (type == 'Fire' or type == 'TreeFire') and canBurn then 
+
+            -- fire type damage, slightly higher odds to catch fire
+            if Random(1, 35) <= 2 then
+                self:Burn()
+            end
+        end
+        
+        if (type ~= 'Force') and (type ~= 'Fire') and canBurn and canFall then 
+            -- any damage type but force can cause a burn
+            if Random(1, 20) <= 1 then
+                self:Burn()
             end
         end
     end,
@@ -179,7 +176,7 @@ Tree = Class(Prop) {
         local trash = self.Trash
         local position = self.CachePosition
 
-        local effect = false 
+        local effect
         local effects = { }
         local effectsHead = 1
 

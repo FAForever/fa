@@ -3,7 +3,7 @@
 --
 local QuasarAntiTorpedoChargeSubProjectile = import("/lua/aeonprojectiles.lua").ATorpedoSubProjectile
 
-AIMAntiTorpedo01 = Class(QuasarAntiTorpedoChargeSubProjectile) {
+AIMAntiTorpedo01 = ClassProjectile(QuasarAntiTorpedoChargeSubProjectile) {
     OnLostTarget = function(self)
         self:SetAcceleration(-3.6)
         self:SetLifetime(0.5)

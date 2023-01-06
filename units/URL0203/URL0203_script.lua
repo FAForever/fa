@@ -12,12 +12,12 @@ local CDFMissileMesonWeapon = CybranWeaponsFile.CDFMissileMesonWeapon
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
 local SlowAmphibious = import("/lua/defaultunits.lua").SlowAmphibiousLandUnit
 
-URL0203 = Class(CLandUnit, SlowAmphibious) {
+URL0203 = ClassUnit(CLandUnit, SlowAmphibious) {
 
     Weapons = {
-        Bolter = Class(CDFElectronBolterWeapon) {},
-        Rocket = Class(CDFMissileMesonWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
+        Bolter = ClassWeapon(CDFElectronBolterWeapon) {},
+        Rocket = ClassWeapon(CDFMissileMesonWeapon) {},
+        Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
     },
     
     OnStopBeingBuilt = function(self, builder, layer)

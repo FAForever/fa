@@ -13,11 +13,11 @@ local TANTorpedoAngler = WeaponFile.TANTorpedoAngler
 local TIFSmartCharge = WeaponFile.TIFSmartCharge
 
 ---@class XES0102 : TSeaUnit
-XES0102 = Class(TSeaUnit) {
+XES0102 = ClassUnit(TSeaUnit) {
 
     Weapons = {
-        Torpedo01 = Class(TANTorpedoAngler) {},
-        AntiTorpedo = Class(TIFSmartCharge) {},
+        Torpedo01 = ClassWeapon(TANTorpedoAngler) {},
+        AntiTorpedo = ClassWeapon(TIFSmartCharge) {},
     },    
 }
 

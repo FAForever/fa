@@ -15,13 +15,13 @@ local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 
 ---@class XSL0301 : CommandUnit
-XSL0301 = Class(CommandUnit) {
+XSL0301 = ClassUnit(CommandUnit) {
     Weapons = {
-        LightChronatronCannon = Class(SDFLightChronotronCannonWeapon) {},
-        DeathWeapon = Class(SCUDeathWeapon) {},
-        OverCharge = Class(SDFOverChargeWeapon) {},
-        AutoOverCharge = Class(SDFOverChargeWeapon) {},
-        Missile = Class(SIFLaanseTacticalMissileLauncher) {
+        LightChronatronCannon = ClassWeapon(SDFLightChronotronCannonWeapon) {},
+        DeathWeapon = ClassWeapon(SCUDeathWeapon) {},
+        OverCharge = ClassWeapon(SDFOverChargeWeapon) {},
+        AutoOverCharge = ClassWeapon(SDFOverChargeWeapon) {},
+        Missile = ClassWeapon(SIFLaanseTacticalMissileLauncher) {
             OnCreate = function(self)
                 SIFLaanseTacticalMissileLauncher.OnCreate(self)
                 self:SetWeaponEnabled(false)

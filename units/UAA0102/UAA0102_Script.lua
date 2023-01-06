@@ -12,13 +12,13 @@ local aWeapons = import("/lua/aeonweapons.lua")
 local AAASonicPulseBatteryWeapon = aWeapons.AAASonicPulseBatteryWeapon
 
 ---@class UAA0102 : AAirUnit
-UAA0102 = Class(AAirUnit) {
+UAA0102 = ClassUnit(AAirUnit) {
 
     Weapons = {
-        SonicPulseBattery1 = Class(AAASonicPulseBatteryWeapon) {
+        SonicPulseBattery1 = ClassWeapon(AAASonicPulseBatteryWeapon) {
 			FxMuzzleFlash = {'/effects/emitters/sonic_pulse_muzzle_flash_02_emit.bp',},
         },
-        SonicPulseBattery2 = Class(AAASonicPulseBatteryWeapon) {
+        SonicPulseBattery2 = ClassWeapon(AAASonicPulseBatteryWeapon) {
 			FxMuzzleFlash = {'/effects/emitters/sonic_pulse_muzzle_flash_02_emit.bp',},
         },
     }, 

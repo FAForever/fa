@@ -20,6 +20,44 @@ local TableGetn = table.getn
 local TableRemove = table.remove 
 local TableSort = table.sort
 
+--- Determines the size in bytes of the given element
+---@param element any
+---@param ignore table<string, boolean>     # List of key names to ignore of all (referenced) tables
+---@param seen? table<table, any>           # List of strings and / or tables that we've seen so far. Should be nil by default
+---@return integer
+function ToBytes(element, ignore, seen)
+
+    -- has no allocated bytes
+    if element == nil then
+        return 0
+    end
+
+    -- applies to tables and strings, to prevent counting them multiple times
+    seen = seen or { }
+    if seen[element] then
+        return 0
+    end
+
+    -- determine size
+    local allocatedSize = debug.allocatedsize(element)
+    if allocatedSize == 0 then
+        return 8
+    elseif type(element) ~= 'table' then
+        seen[element] = true
+        return allocatedSize
+    end
+
+    -- at this point we know it is a table
+    seen[element] = true
+    for k, v in element do
+        if not ignore[k] then
+            allocatedSize = allocatedSize + ToBytes(v, ignore, seen)
+        end
+    end
+
+    return allocatedSize
+end
+
 --- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
 --- Each element of the table will be returned once. This is essentially for "shuffling" sets.
 function RandomIter(someSet)
@@ -541,6 +579,16 @@ function table.unique(t)
 
     return unique
 end
+
+
+---Returns a random entry from an array
+---@generic T
+---@param array T[]
+---@return T
+function table.random(array)
+    return array[Random(1, TableGetn(array))]
+end
+
 
 -- Lua 5.0 implementation of the Lua 5.1 function string.match
 -- Returns a regex match

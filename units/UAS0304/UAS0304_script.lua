@@ -11,11 +11,11 @@ local AIFMissileTacticalSerpentineWeapon = WeaponFile.AIFMissileTacticalSerpenti
 local AIFQuantumWarhead = WeaponFile.AIFQuantumWarhead
 
 ---@class UAS0304 : ASubUnit
-UAS0304 = Class(ASubUnit) {
+UAS0304 = ClassUnit(ASubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
-        CruiseMissiles = Class(AIFMissileTacticalSerpentineWeapon) {},
-        NukeMissiles = Class(AIFQuantumWarhead) {},
+        CruiseMissiles = ClassWeapon(AIFMissileTacticalSerpentineWeapon) {},
+        NukeMissiles = ClassWeapon(AIFQuantumWarhead) {},
     },
 }
 

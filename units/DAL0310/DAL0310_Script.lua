@@ -10,9 +10,9 @@ local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
 local ADFDisruptorCannonWeapon = import("/lua/aeonweapons.lua").ADFDisruptorWeapon
 
 ---@class DAL0310 : AHoverLandUnit
-DAL0310 = Class(AHoverLandUnit) {
+DAL0310 = ClassUnit(AHoverLandUnit) {
     Weapons = {
-        MainGun = Class(ADFDisruptorCannonWeapon) {
+        MainGun = ClassWeapon(ADFDisruptorCannonWeapon) {
             CreateProjectileAtMuzzle = function(self, muzzle)
                 local proj = ADFDisruptorCannonWeapon.CreateProjectileAtMuzzle(self, muzzle)
                 local data = self:GetBlueprint().DamageToShields

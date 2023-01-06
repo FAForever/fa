@@ -15,7 +15,7 @@ local explosion = import("/lua/defaultexplosions.lua")
 local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
 
 ---@class XSL0401 : SWalkingLandUnit
-XSL0401 = Class(SWalkingLandUnit) {
+XSL0401 = ClassUnit(SWalkingLandUnit) {
     SpawnEffects = {
         '/effects/emitters/seraphim_othuy_spawn_01_emit.bp',
         '/effects/emitters/seraphim_othuy_spawn_02_emit.bp',
@@ -44,9 +44,9 @@ XSL0401 = Class(SWalkingLandUnit) {
     end,
 
     Weapons = {
-        EyeWeapon = Class(SDFExperimentalPhasonProj) {},
-        LeftArm = Class(SDFAireauWeapon) {},
-        RightArm = Class(SDFSinnuntheWeapon) {
+        EyeWeapon = ClassWeapon(SDFExperimentalPhasonProj) {},
+        LeftArm = ClassWeapon(SDFAireauWeapon) {},
+        RightArm = ClassWeapon(SDFSinnuntheWeapon) {
             PlayFxMuzzleChargeSequence = function(self, muzzle)
                 -- CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
                 if not self.ClawTopRotator then
@@ -70,8 +70,8 @@ XSL0401 = Class(SWalkingLandUnit) {
                 end)
             end,
         },
-        LeftAA = Class(SAAOlarisCannonWeapon) {},
-        RightAA = Class(SAAOlarisCannonWeapon) {},
+        LeftAA = ClassWeapon(SAAOlarisCannonWeapon) {},
+        RightAA = ClassWeapon(SAAOlarisCannonWeapon) {},
     },
 
     StartBeingBuiltEffects = function(self, builder, layer)

@@ -9,9 +9,9 @@ local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 
 ---@class DAA0206 : AAirUnit
-DAA0206 = Class(AAirUnit) {
+DAA0206 = ClassUnit(AAirUnit) {
     Weapons = {
-        Suicide = Class(DefaultProjectileWeapon) {}
+        Suicide = ClassWeapon(DefaultProjectileWeapon) {}
     },
 
     OnRunOutOfFuel = function(self)

@@ -10,9 +10,9 @@ local EffectUtils = import("/lua/effectutilities.lua")
 local Effects = import("/lua/effecttemplates.lua")
 
 ---@class XEB2306 : TStructureUnit
-XEB2306 = Class(TStructureUnit) {
+XEB2306 = ClassUnit(TStructureUnit) {
     Weapons = {
-        MainGun = Class(TDFHeavyPlasmaCannonWeapon) 
+        MainGun = ClassWeapon(TDFHeavyPlasmaCannonWeapon) 
         {
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip then

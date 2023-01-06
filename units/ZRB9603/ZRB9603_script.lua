@@ -12,7 +12,7 @@ local CSeaFactoryUnit = import("/lua/cybranunits.lua").CSeaFactoryUnit
 
 
 ---@class ZRB0303 : CSeaFactoryUnit
-ZRB0303 = Class(CSeaFactoryUnit) {
+ZRB0303 = ClassUnit(CSeaFactoryUnit) {
     StartArmsMoving = function(self)
         CSeaFactoryUnit.StartArmsMoving(self)
         if not self.ArmSlider1 then

@@ -13,7 +13,7 @@ local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 
 ---@class UEL0301 : CommandUnit
-UEL0301 = Class(CommandUnit) {
+UEL0301 = ClassUnit(CommandUnit) {
     IntelEffects = {
         {
             Bones = {
@@ -25,8 +25,8 @@ UEL0301 = Class(CommandUnit) {
     },
 
     Weapons = {
-        RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon) {},
-        DeathWeapon = Class(SCUDeathWeapon) {},
+        RightHeavyPlasmaCannon = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {},
+        DeathWeapon = ClassWeapon(SCUDeathWeapon) {},
     },
 
     OnCreate = function(self)

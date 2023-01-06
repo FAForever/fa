@@ -12,14 +12,14 @@ local util = import("/lua/utilities.lua")
 local fxutil = import("/lua/effectutilities.lua")
 
 ---@class URA0401 : CAirUnit
-URA0401 = Class(CAirUnit) {
+URA0401 = ClassUnit(CAirUnit) {
     Weapons = {
-        Missile01 = Class(CDFRocketIridiumWeapon) {},
-        Missile02 = Class(CDFRocketIridiumWeapon) {},
-        HeavyBolter = Class(CDFHeavyElectronBolterWeapon){},
-        HeavyBolterBack = Class(CDFHeavyElectronBolterWeapon){},
-        AAMissile01 = Class(CAAMissileNaniteWeapon) {},
-        AAMissile02 = Class(CAAMissileNaniteWeapon) {},
+        Missile01 = ClassWeapon(CDFRocketIridiumWeapon) {},
+        Missile02 = ClassWeapon(CDFRocketIridiumWeapon) {},
+        HeavyBolter = ClassWeapon(CDFHeavyElectronBolterWeapon){},
+        HeavyBolterBack = ClassWeapon(CDFHeavyElectronBolterWeapon){},
+        AAMissile01 = ClassWeapon(CAAMissileNaniteWeapon) {},
+        AAMissile02 = ClassWeapon(CAAMissileNaniteWeapon) {},
     },
 
     MovementAmbientExhaustBones = {

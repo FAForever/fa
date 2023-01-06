@@ -8,9 +8,9 @@ local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
 local AAAZealotMissileWeapon = import("/lua/aeonweapons.lua").AAAZealotMissileWeapon
 
 ---@class DALK003 : AWalkingLandUnit
-DALK003 = Class(AWalkingLandUnit) {
+DALK003 = ClassUnit(AWalkingLandUnit) {
     Weapons = {
-        Missile = Class(AAAZealotMissileWeapon) {},
+        Missile = ClassWeapon(AAAZealotMissileWeapon) {},
     },
 }
 TypeClass = DALK003
