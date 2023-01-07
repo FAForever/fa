@@ -38,6 +38,11 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         self.Trash:Add(self.AmbientExhaustEffectsBag)
     end,
 
+    DestroyAllTrashBags = function(self)
+        CWalkingLandUnit.DestroyAllTrashBags(self)
+        self.AmbientExhaustEffectsBag:Destroy()
+    end,
+
     OnStartBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStartBeingBuilt(self, builder, layer)
         if not self.AnimationManipulator then

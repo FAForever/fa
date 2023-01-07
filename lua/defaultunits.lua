@@ -1649,6 +1649,25 @@ MobileUnit = ClassUnit(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:SetFireState(FireState.GROUND_FIRE)
+
+        self.MovementEffectsBag = TrashBag()
+        self.TopSpeedEffectsBag = TrashBag()
+        self.BeamExhaustEffectsBag = TrashBag()
+        self.IdleEffectsBag = TrashBag()
+    end,
+
+    DestroyAllTrashBags = function(self)
+        Unit.DestroyAllTrashBags(self)
+
+        self.MovementEffectsBag:Destroy()
+        self.TopSpeedEffectsBag:Destroy()
+        self.BeamExhaustEffectsBag:Destroy()
+        self.IdleEffectsBag:Destroy()
+
+        -- only exists if unit is transported
+        if self.TransportBeamEffectsBag then
+            self.TransportBeamEffectsBag:Destroy()
+        end
     end,
 
     ---@param self MobileUnit

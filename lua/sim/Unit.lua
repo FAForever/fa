@@ -235,11 +235,7 @@ Unit = ClassUnit(moho.unit_methods) {
         -- used for rebuilding mechanic
         self.Repairers = {}
 
-        -- used by almost all unit types, sadly some are even used for structures in rare occasions
-        self.MovementEffectsBag = TrashBag()
-        self.TopSpeedEffectsBag = TrashBag()
-        self.BeamExhaustEffectsBag = TrashBag()
-        self.IdleEffectsBag = TrashBag()
+        -- used by almost all unit types
         self.OnBeingBuiltEffectsBag = TrashBag()
 
         -- Set up veterancy
@@ -2142,26 +2138,8 @@ Unit = ClassUnit(moho.unit_methods) {
         -- but for mod compatibility reasons we delete them all here.
 
         -- used by various units for unit-specific effects
-        if self.EffectsBag then
-            for _, v in self.EffectsBag do
-                v:Destroy()
-            end
-        end
-
         if self.ReleaseEffectsBag then
             for _, v in self.ReleaseEffectsBag do
-                v:Destroy()
-            end
-        end
-
-        if self.AmbientExhaustEffectsBag then
-            for _, v in self.AmbientExhaustEffectsBag do
-                v:Destroy()
-            end
-        end
-
-        if self.OmniEffectsBag then
-            for k, v in self.OmniEffectsBag do
                 v:Destroy()
             end
         end
@@ -2189,26 +2167,6 @@ Unit = ClassUnit(moho.unit_methods) {
             for _, v in EffectsBag do
                 v:Destroy()
             end
-        end
-    
-        if self.MovementEffectsBag then 
-            self.MovementEffectsBag:Destroy()
-        end
-
-        if self.IdleEffectsBag then 
-            self.IdleEffectsBag:Destroy()
-        end
-
-        if self.TopSpeedEffectsBag then 
-            self.TopSpeedEffectsBag:Destroy()
-        end
-
-        if self.BeamExhaustEffectsBag then
-            self.BeamExhaustEffectsBag:Destroy()
-        end
-
-        if self.TransportBeamEffectsBag then 
-            self.TransportBeamEffectsBag:Destroy()
         end
     end,
 
@@ -5421,7 +5379,7 @@ DummyUnit = ClassDummyUnit(moho.unit_methods) {
 
 if next(__active_mods) then
 
-    SPEW("Sim mod detected - adding in missing fields to the unit class to improve compatibility")
+    SPEW("Sim mod detected - adding in missing fields to unit class to improve compatibility")
 
     local oldUnit = Unit
     Unit = Class(oldUnit) {
@@ -5432,6 +5390,42 @@ if next(__active_mods) then
             self.factionCategory = self.Blueprint.FactionCategory
             self.layerCategory = self.Blueprint.LayerCategory
             self.factionCategory = self.Blueprint.FactionCategory
+
+            self.MovementEffectsBag = TrashBag()
+            self.TopSpeedEffectsBag = TrashBag()
+            self.BeamExhaustEffectsBag = TrashBag()
+            self.IdleEffectsBag = TrashBag()
+        end,
+
+        DestroyAllTrashBags = function(self)
+            oldUnit.DestroyAllTrashBags(self)
+
+            self.MovementEffectsBag:Destroy()
+            self.TopSpeedEffectsBag:Destroy()
+            self.BeamExhaustEffectsBag:Destroy()
+            self.IdleEffectsBag:Destroy()
+    
+            if self.TransportBeamEffectsBag then
+                self.TransportBeamEffectsBag:Destroy()
+            end
+
+            if self.AmbientExhaustEffectsBag then
+                for _, v in self.AmbientExhaustEffectsBag do
+                    v:Destroy()
+                end
+            end
+
+            if self.EffectsBag then
+                for _, v in self.EffectsBag do
+                    v:Destroy()
+                end
+            end
+
+            if self.OmniEffectsBag then
+                for k, v in self.OmniEffectsBag do
+                    v:Destroy()
+                end
+            end
         end,
     }
 end
