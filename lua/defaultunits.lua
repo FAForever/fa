@@ -2202,8 +2202,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildEffectBones = bp.General.BuildBones.BuildEffectBones
-
-        self.EffectsBag = {}
+        
         if bp.General.BuildBones then
             self:SetupBuildBones()
         end
