@@ -624,7 +624,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- Destroy the sliders which cause weapon visual recoil
     ---@param self DefaultProjectileWeapon
     DestroyRecoilManips = function(self)
-        self.RecoilManipulators:Destroy()
+        if self.RecoilManipulators then
+            self.RecoilManipulators:Destroy()
+        end
     end,
 
     -- Should be called whenever a target is lost

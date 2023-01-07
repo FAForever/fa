@@ -2140,25 +2140,36 @@ Unit = ClassUnit(moho.unit_methods) {
     DestroyAllTrashBags = function(self)
         -- Some bags should really be managed by their classes
         -- but for mod compatibility reasons we delete them all here.
-        for _, v in self.EffectsBag or {} do
-            v:Destroy()
+
+        -- used by various units for unit-specific effects
+        if self.EffectsBag then
+            for _, v in self.EffectsBag do
+                v:Destroy()
+            end
         end
+
+        if self.ReleaseEffectsBag then
+            for _, v in self.ReleaseEffectsBag do
+                v:Destroy()
+            end
+        end
+
+        if self.AmbientExhaustEffectsBag then
+            for _, v in self.AmbientExhaustEffectsBag do
+                v:Destroy()
+            end
+        end
+
+        if self.OmniEffectsBag then
+            for k, v in self.OmniEffectsBag do
+                v:Destroy()
+            end
+        end
+
         for k, v in self.ShieldEffectsBag or {} do
             v:Destroy()
         end
-        for _, v in self.ReleaseEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.AmbientExhaustEffectsBag or {} do
-            v:Destroy()
-        end
-        for k, v in self.OmniEffectsBag or {} do
-            v:Destroy()
-        end
-        for k, v in self.AdjacencyBeamsBag or {} do
-            v.Trash:Destroy()
-            self.AdjacencyBeamsBag[k] = nil
-        end
+
         for _, v in self.IntelEffectsBag or {} do
             v:Destroy()
         end
@@ -2168,6 +2179,12 @@ Unit = ClassUnit(moho.unit_methods) {
         for _, v in self.TeleportSoundChargeBag or {} do
             v:Destroy()
         end
+
+        for k, v in self.AdjacencyBeamsBag or {} do
+            v.Trash:Destroy()
+            self.AdjacencyBeamsBag[k] = nil
+        end
+
         for _, EffectsBag in self.DamageEffectsBag or {} do
             for _, v in EffectsBag do
                 v:Destroy()
