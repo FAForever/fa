@@ -561,7 +561,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
         NavLayerData[layer].Neighbors = NavLayerData[layer].Neighbors + table.getn(self)
     end,
 
-    ---@param self CompressedLabelTreeNode
+    ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf
     ---@param stack table
     ---@param layer NavLayers
     GenerateLabels = function(self, stack, layer)
@@ -706,7 +706,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
         return self:_FindLeafXZ(bx, bz, ox, oz, size, x - bx, z - bz)
     end;
 
-    ---@param self CompressedLabelTreeNode
+    ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf
     ---@param bx number             # Location of top-left corner, in world space
     ---@param bz number             # Location of top-left corner, in world space
     ---@param ox number             # Offset from top-left corner, in local space
@@ -737,7 +737,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
     end;
 
-    ---@param self CompressedLabelTreeNode
+    ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf
     ---@param color Color
     Draw = function(self, color, inset, bx, bz, ox, oz, size)
         if self.Label then
@@ -753,7 +753,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
     end,
 
-    ---@param self CompressedLabelTreeNode
+    ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf
     DrawLabels = function(self, inset, bx, bz, ox, oz, size)
         if self.Label then
             if self.Label >= 0 then
@@ -814,7 +814,6 @@ end
 
 --- Populates the caches for the given label tree,
 --- Heavily inspired by the code written by Softles
----@param labelTree CompressedLabelTreeNode
 ---@param tCache NavTerrainCache
 ---@param dCache NavDepthCache
 ---@param daCache NavAverageDepthCache
