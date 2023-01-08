@@ -126,20 +126,35 @@ function DrawSquare(px, pz, c, color, inset)
     DrawLine(br, tr, color)
 end
 
+local FactoryNavGrid = {
+    __call = function(self, layer, treeSize)
+        local instance = {&3 &0}
+        setmetatable(instance, self)
+        instance:OnCreate(layer, treeSize)
+        return instance
+    end
+}
+
+---@param meta any
+local ClassNavGrid = function(meta)
+    meta.__index = meta
+    return setmetatable(meta, FactoryNavGrid)
+end
+
 ---@class NavGrid
 ---@field Layer NavLayers
 ---@field TreeSize number
 ---@field Trees CompressedLabelTreeNode[][]
-NavGrid = ClassSimple {
+NavGrid = ClassNavGrid {
 
     ---@param self NavGrid
     ---@param layer NavLayers
-    __init = function(self, layer, treeSize)
+    OnCreate = function(self, layer, treeSize)
         self.Layer = layer
         self.TreeSize = treeSize
-        self.Trees = {}
+        self.Trees = {&0 &16}
         for z = 0, LabelCompressionTreesPerAxis - 1 do
-            self.Trees[z] = {}
+            self.Trees[z] = {&0 &16}
         end
     end,
 
@@ -249,6 +264,18 @@ NavGrid = ClassSimple {
     end,
 }
 
+local FactoryCompressedLabelTree = {
+    __call = function(self, layer, treeSize)
+        return setmetatable({&0 &4}, self)
+    end
+}
+
+---@param meta any
+local ClassCompressedLabelTree = function(meta)
+    meta.__index = meta
+    return setmetatable(meta, FactoryCompressedLabelTree)
+end
+
 -- defined here, as it is a recursive class
 local CompressedLabelTree
 
@@ -278,7 +305,7 @@ local CompressedLabelTree
 ---@field [2] CompressedLabelTreeNode?
 ---@field [3] CompressedLabelTreeNode?
 ---@field [4] CompressedLabelTreeNode?
-CompressedLabelTree = ClassSimple {
+CompressedLabelTree = ClassCompressedLabelTree {
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
     --- the label cache only exists of 0s and -1s
