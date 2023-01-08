@@ -25,7 +25,7 @@ while read file; do
   if [ "$file" != "./lua/lazyvar.lua" ]; then
     if [ "$file" != "./.vscode/fa-plugin.lua" ]; then
       if [ "$file" != "./lua/system/class.lua" ]; then
-        if [ "$file" != "./lua/sim/navgenerator.lua" ]; then
+        if [ "$file" != "./lua/sim/NavGenerator.lua" ]; then
           check_file "$file"
           (( files_checked++ ))
         fi
