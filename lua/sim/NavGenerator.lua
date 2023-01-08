@@ -152,9 +152,9 @@ NavGrid = ClassNavGrid {
     OnCreate = function(self, layer, treeSize)
         self.Layer = layer
         self.TreeSize = treeSize
-        self.Trees = {}
+        self.Trees = {&0 &16}
         for z = 0, LabelCompressionTreesPerAxis - 1 do
-            self.Trees[z] = {}
+            self.Trees[z] = {&0 &16}
         end
     end,
 
