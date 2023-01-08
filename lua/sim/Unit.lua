@@ -1715,7 +1715,6 @@ Unit = Class(moho.unit_methods) {
     ---@param firingWeapon Weapon The weapon that the projectile originates from
     ---@return boolean
     OnCollisionCheck = function(self, other, firingWeapon)
-
         -- bail out immediately
         if self.DisallowCollisions then
             return false
