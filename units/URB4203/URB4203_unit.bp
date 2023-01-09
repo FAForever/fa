@@ -141,9 +141,9 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        RadarStealthFieldRadius = 42,
+        RadarStealthFieldRadius = 32,
         ReactivateTime = 5,
-        VisionRadius = 26,
+        VisionRadius = 18,
     },
     Interface = {
         HelpText = '<LOC urb4203_help>Stealth Field Generator',
