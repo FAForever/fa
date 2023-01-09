@@ -3030,7 +3030,7 @@ Unit = Class(moho.unit_methods) {
 
     ---@param self Unit
     ---@param disabler string
-    ---@param intel string
+    ---@param intel IntelType
     DisableUnitIntel = function(self, disabler, intel)
         local function DisableOneIntel(disabler, intel)
             local intDisabled = false
@@ -3078,7 +3078,7 @@ Unit = Class(moho.unit_methods) {
 
     ---@param self Unit
     ---@param disabler string
-    ---@param intel string
+    ---@param intel IntelType
     EnableUnitIntel = function(self, disabler, intel)
         local function EnableOneIntel(disabler, intel)
             local intEnabled = false
@@ -3122,16 +3122,19 @@ Unit = Class(moho.unit_methods) {
         end
 
         if intEnabled then
-            self:OnIntelEnabled()
+            self:OnIntelEnabled(intel)
         end
     end,
 
     ---@param self Unit
-    OnIntelEnabled = function(self)
+    ---@param type IntelType
+    OnIntelEnabled = function(self, type)
     end,
 
     ---@param self Unit
-    OnIntelDisabled = function(self)
+    ---@param disabler string
+    ---@param type IntelType
+    OnIntelDisabled = function(self, disabler, type)
     end,
 
     ---@param self Unit
