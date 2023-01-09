@@ -140,7 +140,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        RadarStealthFieldRadius = 26,
+        RadarStealthFieldRadius = 28,
         ReactivateTime = 5,
         VisionRadius = 22,
     },
