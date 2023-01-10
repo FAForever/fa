@@ -179,7 +179,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        ActiveIntel = {
+        FreeIntel = {
             Radar = true,
         },
         Cloak = true,

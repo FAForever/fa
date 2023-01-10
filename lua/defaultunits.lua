@@ -1409,12 +1409,14 @@ RadarUnit = ClassUnit(StructureUnit) {
 
     ---@param self RadarUnit
     OnIntelDisabled = function(self)
+        LOG("OnIntelDisabled")
         StructureUnit.OnIntelDisabled(self)
         self:DestroyIdleEffects()
     end,
 
     ---@param self RadarUnit
     OnIntelEnabled = function(self)
+        LOG("OnIntelEnabled")
         StructureUnit.OnIntelEnabled(self)
         self:CreateIdleEffects()
     end,

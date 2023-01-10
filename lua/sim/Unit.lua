@@ -24,6 +24,7 @@ local PersonalShield = import("/lua/shield.lua").PersonalShield
 local Shield = import("/lua/shield.lua").Shield
 local TransportShield = import("/lua/shield.lua").TransportShield
 local Weapon = import("/lua/sim/weapon.lua").Weapon
+local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
@@ -112,7 +113,7 @@ local cUnit = moho.unit_methods
 ---@field EngineFlags any
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
-Unit = ClassUnit(moho.unit_methods) {
+Unit = ClassUnit(moho.unit_methods, IntelComponent) {
 
     Weapons = {},
 
@@ -214,6 +215,8 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param self Unit
     OnCreate = function(self)
         local bp = self:GetBlueprint()
+
+
 
         -- cache often accessed values into inner table
         self.Blueprint = bp
@@ -2199,8 +2202,6 @@ Unit = ClassUnit(moho.unit_methods) {
     OnDestroy = function(self)
         self.Dead = true
 
-        -- LOG(string.format("%s -> %s", tostring(self.UnitId), tostring(debug.allocatedsize(self))))
-
         if self:GetFractionComplete() < 1 then
             self:SendNotifyMessage('cancelled')
         end
@@ -2216,7 +2217,6 @@ Unit = ClassUnit(moho.unit_methods) {
         Sync.ReleaseIds[self.EntityId] = true
 
         -- Destroy everything added to the trash
-        LOG("Destroyed")
         self.Trash:Destroy()
 
         -- Destroy all extra trashbags in case the DeathTread() has not already destroyed it (modded DeathThread etc.)
@@ -2431,6 +2431,13 @@ Unit = ClassUnit(moho.unit_methods) {
             return false
         end
 
+        -- Create any idle effects on unit
+        if TrashEmpty(self.IdleEffectsBag) then
+            self:CreateIdleEffects()
+        end
+        
+        IntelComponent.OnStopBeingBuilt(self, builder, layer)
+
         local bp = self.Blueprint
         self.isFinishedUnit = true
 
@@ -2470,7 +2477,6 @@ Unit = ClassUnit(moho.unit_methods) {
             end
         end
 
-        self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
         if self.Layer == 'Water' then
@@ -2500,11 +2506,6 @@ Unit = ClassUnit(moho.unit_methods) {
 
         -- Turn off land bones if this unit has them.
         self:DoUnitCallbacks('OnStopBeingBuilt')
-
-        -- Create any idle effects on unit
-        if TrashEmpty(self.IdleEffectsBag) then
-            self:CreateIdleEffects()
-        end
 
         -- If we have a shield specified, create it.
         -- Blueprint registration always creates a dummy Shield entry:
@@ -3012,111 +3013,111 @@ Unit = ClassUnit(moho.unit_methods) {
     -- As an optimisation, EnableIntel and DisableIntel are only called when going from one disabler
     -- present to zero, and when going from zero disablers to one.
 
-    ---@param self Unit
-    ---@param disabler string
-    ---@param intel string
-    DisableUnitIntel = function(self, disabler, intel)
-        local function DisableOneIntel(disabler, intel)
-            local intDisabled = false
-            if Set.Empty(self.IntelDisables[intel]) then
-                local active = self.Blueprint.Intel.ActiveIntel
-                if active and active[intel] then
-                    return
-                end
-                self:DisableIntel(intel)
+    -- ---@param self Unit
+    -- ---@param disabler string
+    -- ---@param intel string
+    -- DisableUnitIntel = function(self, disabler, intel)
+    --     local function DisableOneIntel(disabler, intel)
+    --         local intDisabled = false
+    --         if Set.Empty(self.IntelDisables[intel]) then
+    --             local active = self.Blueprint.Intel.ActiveIntel
+    --             if active and active[intel] then
+    --                 return
+    --             end
+    --             self:DisableIntel(intel)
 
-                -- Handle the cloak FX timing
-                if intel == 'Cloak' or intel == 'CloakField' then
-                    if disabler ~= 'NotInitialized' and self.Blueprint.Intel[intel] then
-                        self:UpdateCloakEffect(false, intel)
-                    end
-                end
+    --             -- Handle the cloak FX timing
+    --             if intel == 'Cloak' or intel == 'CloakField' then
+    --                 if disabler ~= 'NotInitialized' and self.Blueprint.Intel[intel] then
+    --                     self:UpdateCloakEffect(false, intel)
+    --                 end
+    --             end
 
-                intDisabled = true
-            end
-            self.IntelDisables[intel][disabler] = true
-            return intDisabled
-        end
+    --             intDisabled = true
+    --         end
+    --         self.IntelDisables[intel][disabler] = true
+    --         return intDisabled
+    --     end
 
-        local intDisabled = false
+    --     local intDisabled = false
 
-        -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here with certain units that have Intel changes on layer change
-        -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
-        if self.IntelDisables['Radar']['NotInitialized'] then
-            return
-        end
+    --     -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here with certain units that have Intel changes on layer change
+    --     -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
+    --     if self.IntelDisables['Radar']['NotInitialized'] then
+    --         return
+    --     end
 
-        if intel then
-            intDisabled = DisableOneIntel(disabler, intel)
-        else
-            -- Loop over all intels and add disabler
-            for intel, v in self.IntelDisables do
-                intDisabled = DisableOneIntel(disabler, intel) or intDisabled -- Beware of short-circuiting
-            end
-        end
+    --     if intel then
+    --         intDisabled = DisableOneIntel(disabler, intel)
+    --     else
+    --         -- Loop over all intels and add disabler
+    --         for intel, v in self.IntelDisables do
+    --             intDisabled = DisableOneIntel(disabler, intel) or intDisabled -- Beware of short-circuiting
+    --         end
+    --     end
 
-        if intDisabled then
-            self:OnIntelDisabled(disabler, intel)
-        end
-    end,
+    --     if intDisabled then
+    --         self:OnIntelDisabled(disabler, intel)
+    --     end
+    -- end,
 
-    ---@param self Unit
-    ---@param disabler string
-    ---@param intel string
-    EnableUnitIntel = function(self, disabler, intel)
-        local function EnableOneIntel(disabler, intel)
-            local intEnabled = false
-            if self.IntelDisables[intel][disabler] then -- Must check for explicit true contained
-                self.IntelDisables[intel][disabler] = nil
-                if Set.Empty(self.IntelDisables[intel]) then
-                    self:EnableIntel(intel)
+    -- ---@param self Unit
+    -- ---@param disabler string
+    -- ---@param intel string
+    -- EnableUnitIntel = function(self, disabler, intel)
+    --     local function EnableOneIntel(disabler, intel)
+    --         local intEnabled = false
+    --         if self.IntelDisables[intel][disabler] then -- Must check for explicit true contained
+    --             self.IntelDisables[intel][disabler] = nil
+    --             if Set.Empty(self.IntelDisables[intel]) then
+    --                 self:EnableIntel(intel)
 
-                    -- Handle the cloak FX timing
-                    if intel == 'Cloak' or intel == 'CloakField' then
-                        if disabler ~= 'NotInitialized' and self.Blueprint.Intel[intel] then
-                            self:UpdateCloakEffect(true, intel)
-                        end
-                    end
+    --                 -- Handle the cloak FX timing
+    --                 if intel == 'Cloak' or intel == 'CloakField' then
+    --                     if disabler ~= 'NotInitialized' and self.Blueprint.Intel[intel] then
+    --                         self:UpdateCloakEffect(true, intel)
+    --                     end
+    --                 end
 
-                    intEnabled = true
-                end
-            end
-            return intEnabled
-        end
+    --                 intEnabled = true
+    --             end
+    --         end
+    --         return intEnabled
+    --     end
 
-        local intEnabled = false
+    --     local intEnabled = false
 
-        -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
-        -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
-        if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
-            return
-        end
+    --     -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
+    --     -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
+    --     if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
+    --         return
+    --     end
 
-        if intel then
-            intEnabled = EnableOneIntel(disabler, intel)
-        else
-            -- Loop over all intels and remove disabler
-            for intel, v in self.IntelDisables do
-                intEnabled = EnableOneIntel(disabler, intel) or intEnabled -- Beware of short-circuiting
-            end
-        end
+    --     if intel then
+    --         intEnabled = EnableOneIntel(disabler, intel)
+    --     else
+    --         -- Loop over all intels and remove disabler
+    --         for intel, v in self.IntelDisables do
+    --             intEnabled = EnableOneIntel(disabler, intel) or intEnabled -- Beware of short-circuiting
+    --         end
+    --     end
 
-        if not self.IntelThread then
-            self.IntelThread = self:ForkThread(self.IntelWatchThread)
-        end
+    --     if not self.IntelThread then
+    --         self.IntelThread = self:ForkThread(self.IntelWatchThread)
+    --     end
 
-        if intEnabled then
-            self:OnIntelEnabled()
-        end
-    end,
+    --     if intEnabled then
+    --         self:OnIntelEnabled()
+    --     end
+    -- end,
 
-    ---@param self Unit
-    OnIntelEnabled = function(self)
-    end,
+    -- ---@param self Unit
+    -- OnIntelEnabled = function(self)
+    -- end,
 
-    ---@param self Unit
-    OnIntelDisabled = function(self)
-    end,
+    -- ---@param self Unit
+    -- OnIntelDisabled = function(self)
+    -- end,
 
     ---@param self Unit
     ---@param cloaked string

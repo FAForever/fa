@@ -77,8 +77,9 @@ local TableGetn = table.getn
 ---@field EnergyExcessThread thread
 ---@field EnergyExcessUnitsEnabled table<EntityId, MassFabricationUnit>
 ---@field EnergyExcessUnitsDisabled table<EntityId, MassFabricationUnit>
----@field EnergyDependingUnits Shield[]
+---@field EnergyDependingUnits table<number, Unit | Shield>
 ---@field EnergyDependingUnitsHead number
+---@field EnergyDepleted boolean
 ---@field EconomyTicksMonitor number
 ---@field HasPlatoonList boolean
 ---@field HQs table<HqFaction, table<HqLayer, table<HqTech, number>>>
@@ -307,8 +308,7 @@ AIBrain = Class(moho.aibrain_methods) {
         -- add initial trigger and assume we're not depleted
         self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
         self.EnergyDepleted = false 
-        self.EnergyDependingUnits = { }
-        self.EnergyDependingUnits.__mode = 'v'
+        self.EnergyDependingUnits = setmetatable({ }, { __mode = 'v' })
         self.EnergyDependingUnitsHead = 1
 
         --- Units that we toggle on / off depending on whether we have excess energy
@@ -653,16 +653,21 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
     ---@param self AIBrain
-    ---@param entity Shield
+    ---@param entity Unit | Shield
     AddEnergyDependingEntity = function(self, entity)
-        self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity 
+        self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity
         self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
+
+        LOG(self.EnergyDepleted)
+        if self.EnergyDepleted then
+            entity:OnEnergyDepleted()
+        end
     end,
 
     ---@param self AIBrain
     ---@param triggerName string
     OnEnergyTrigger = function(self, triggerName)
-        if triggerName == "EnergyDepleted" then 
+        if triggerName == "EnergyDepleted" then
             -- add trigger when we can recover units
             self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyViable', 'GreaterThanOrEqual', 0.1)
             self.EnergyDepleted = true 
@@ -671,7 +676,6 @@ AIBrain = Class(moho.aibrain_methods) {
             local index = 1 
             for k = 1, self.EnergyDependingUnitsHead - 1 do 
                 local entity = self.EnergyDependingUnits[k]
-
                 if not entity:BeenDestroyed() then 
                     self.EnergyDependingUnits[index] = entity 
                     index = index + 1

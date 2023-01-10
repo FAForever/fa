@@ -326,6 +326,7 @@
 ---@field UpgradesTo string            What unit, if any, does this unit upgrade to.
 
 ---@class UnitBlueprintIntel
+---@field ActiveIntel table<IntelType, boolean>
 ---@field Cloak boolean                   Single unit cloaking.
 ---@field CloakFieldRadius number         How far our cloaking goes.
 ---@field FreeIntel boolean               The intel is free. Without this the unit will try drain energy for it's intelligence (radar, sonar, etc) and turn off if you run out.
