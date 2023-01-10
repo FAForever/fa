@@ -70,7 +70,7 @@ XRB3301 = ClassUnit(CRadarUnit) {
         entity:Destroy()
     end,
 
-    OnIntelEnabled = function(self)
+    OnIntelEnabled = function(self, intel)
         self.ExpandingVisionDisableCount = self.ExpandingVisionDisableCount - 1
         if self.ExpandingVisionDisableCount == 0 then
             if self.OmniEffectsBag then
@@ -86,7 +86,7 @@ XRB3301 = ClassUnit(CRadarUnit) {
         end
     end,
 
-    OnIntelDisabled = function(self)
+    OnIntelDisabled = function(self, intel)
         self.ExpandingVisionDisableCount = self.ExpandingVisionDisableCount + 1
         if self.ExpandingVisionDisableCount == 1 then
             if self.OmniEffectsBag then

@@ -1408,16 +1408,16 @@ RadarUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self RadarUnit
-    OnIntelDisabled = function(self)
+    OnIntelDisabled = function(self, intel)
         LOG("OnIntelDisabled")
-        StructureUnit.OnIntelDisabled(self)
+        StructureUnit.OnIntelDisabled(self, intel)
         self:DestroyIdleEffects()
     end,
 
     ---@param self RadarUnit
-    OnIntelEnabled = function(self)
+    OnIntelEnabled = function(self, intel)
         LOG("OnIntelEnabled")
-        StructureUnit.OnIntelEnabled(self)
+        StructureUnit.OnIntelEnabled(self, intel)
         self:CreateIdleEffects()
     end,
 }
@@ -1465,8 +1465,8 @@ RadarJammerUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self RadarJammerUnit
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        StructureUnit.OnIntelEnabled(self, intel)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
             self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
@@ -1475,8 +1475,8 @@ RadarJammerUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self RadarJammerUnit
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        StructureUnit.OnIntelDisabled(self, intel)
         EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
         self.IntelFxOn = false
     end,
