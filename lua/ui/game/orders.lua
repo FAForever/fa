@@ -349,10 +349,33 @@ function ClearCommands(units)
 end
 
 function SoftStop(units)
+    LOG("SoftStop")
+
+
     local units = units or GetSelectedUnits()
-    Construction.ResetOrderQueues(units)
-    ClearCommands(EntityCategoryFilterDown(categories.SILO, units))
-    Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY + categories.SILO, units))
+    if units then
+
+        local cats = (categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY
+
+        -- soft stop factories
+        Construction.ResetOrderQueues(EntityCategoryFilterDown(cats, units))
+
+        -- for everything else
+        local units = EntityCategoryFilterOut(cats + categories.SILO, units)
+
+        local ids = { }
+        for _, unit in units do 
+            local queue = unit:GetCommandQueue()
+            reprsl(queue)
+            for k = 2, table.getn(queue) do
+                local id = queue[k].ID
+                if not ids[id] then
+                    ids[id] = true
+                    DeleteCommand(id)
+                end
+            end
+        end
+    end
 end
 
 function StopOrderBehavior(self, modifiers)
