@@ -2027,9 +2027,9 @@ function PlatoonChooseRandomNonNegative(aiBrain, locationList, ringSize)
             table.insert(landingList, v)
         end
     end
-    local loc = landingList[Random(1, table.getn(landingList))]
+    local loc = table.random(landingList)
     if not loc then
-        loc = locationList[Random(1, table.getn(locationList))]
+        loc = table.random(locationList)
     end
     return loc
 end

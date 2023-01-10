@@ -533,7 +533,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self.UnpackAnimator = unpackAnimator
             unpackAnimator:PlayAnim(unpackAnimation):SetRate(0)
             unpackAnimator:SetPrecedence(bp.WeaponUnpackAnimatorPrecedence or 0)
-            self.TrashManipulators:Add(unpackAnimator)
+            self.Trash:Add(unpackAnimator)
         end
         if unpackAnimator then
             unpackAnimator:SetRate(bp.WeaponUnpackAnimationRate)
@@ -572,14 +572,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             tmpSldr:SetPrecedence(11)
             tmpSldr:SetGoal(0, 0, rackRecoilDist)
             tmpSldr:SetSpeed(-1)
-            self.TrashManipulators:Add(tmpSldr)
+            self.Trash:Add(tmpSldr)
             if telescopeBone then
                 tmpSldr = CreateSlider(self.unit, telescopeBone)
                 table.insert(self.RecoilManipulators, tmpSldr)
                 tmpSldr:SetPrecedence(11)
                 tmpSldr:SetGoal(0, 0, rack.TelescopeRecoilDistance or rackRecoilDist)
                 tmpSldr:SetSpeed(-1)
-                self.TrashManipulators:Add(tmpSldr)
+                self.Trash:Add(tmpSldr)
             end
         end
         self:ForkThread(self.PlayRackRecoilReturn, rackList)
@@ -652,6 +652,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- Sends the weapon to DeadState, probably called by the Owner
     ---@param self DefaultProjectileWeapon
     OnDestroy = function(self)
+        Weapon.OnDestroy(self)
         ChangeState(self, self.DeadState)
     end,
 
@@ -1431,10 +1432,17 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
                 }
                 local beamTable = {Beam = beam, Muzzle = muzzle, Destroyables = {}}
                 table.insert(self.Beams, beamTable)
-                self.TrashProjectiles:Add(beam)
+                self.Trash:Add(beam)
                 beam:SetParentWeapon(self)
                 beam:Disable()
             end
+        end
+    end,
+
+    OnDestroy = function(self)
+        DefaultProjectileWeapon.OnDestroy(self)
+        for k, info in self.Beams do
+            info.Beam:Destroy()
         end
     end,
 
@@ -1480,7 +1488,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
         if beam:IsEnabled() then return end
         beam:Enable()
-        self.TrashProjectiles:Add(beam)
+        self.Trash:Add(beam)
 
         -- Deal with continuous and non-continuous beams
         if bp.BeamLifetime > 0 then
