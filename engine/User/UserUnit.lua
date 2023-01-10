@@ -187,9 +187,8 @@ end
 function UserUnit:IsStunned()
 end
 
----
----@param command 'string'
----@param value string
+---@param command 'SetAutoMode' | 'SetFireState' | 'SetAutoSurfaceMode' | 'SetRepeatQueue' | 'SetPaused' | 'CustomName' | 'ToggleScriptBit' | 'PlayNoStagingPlatformsVO' | 'PlayBusyStagingPlatformsVO' 
+---@param value boolean | string
 function UserUnit:ProcessInfo(command, value)
 end
 

@@ -450,7 +450,6 @@ end
 local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
-local categoriesTech1Extractor = categories.MASSEXTRACTION * categories.TECH1
 
 --- Upgrades a tech 1 extractor that is being assisted
 ---@param unit UserUnit
