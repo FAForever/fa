@@ -74,11 +74,13 @@ IntelComponent = ClassSimple {
         end
 
         -- gather data
+        local economyBlueprint = self.Blueprint.Economy
         local intelBlueprint = self.Blueprint.Intel
         local enhancementBlueprints = self.Blueprint.Enhancements
         if intelBlueprint or enhancementBlueprints then
             -- life is good, intel is funded by the government
-            if intelBlueprint.FreeIntel then
+            if intelBlueprint.FreeIntel or (economyBlueprint and (not economyBlueprint.MaintenanceConsumptionPerSecondEnergy or economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0)) then
+                LOG("No intel for: " .. self.UnitId)
                 return
             end
 
@@ -282,7 +284,6 @@ IntelComponent = ClassSimple {
     ---@param self IntelComponent | Unit
     ---@param intel? IntelType
     OnIntelEnabled = function(self, intel)
-        LOG(debug.traceback())
         LOG("Enabled intel: " .. tostring(intel))
     end,
 
