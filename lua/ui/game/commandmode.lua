@@ -450,10 +450,68 @@ end
 local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
+local categoriesTech1Extractor = categories.MASSEXTRACTION * categories.TECH1
+
+--- Upgrades a tech 1 extractor that is being assisted
+---@param unit UserUnit
+local function OnGuardUpgrade(unit)
+    if  EntityCategoryContains(categories.MASSEXTRACTION * categories.TECH1, unit) and
+        Prefs.GetFromCurrentProfile('options.assist_to_upgrade') == 'Tech1Extractors'
+    then
+        ForkThread(
+            function ()
+                ---@type UserUnit
+                local units = { unit }
+                if unit and not unit:GetFocus() then
+
+                    local isPaused = GetIsPaused(units)
+                    if isPaused then
+                        SetPaused(units, false)
+                    end
+
+                    import("/lua/ui/game/selection.lua").Hidden(
+                        function ()
+                            SelectUnits(units)
+                            IssueBlueprintCommand("UNITCOMMAND_Upgrade", unit:GetBlueprint().General.UpgradesTo, 1, true)
+                        end
+                    )
+
+                    WaitSeconds(1.0)
+
+                    if isPaused then
+                        SetPaused(units, true)
+                    end
+                end
+            end
+        )
+    end
+end
+
+--- Unpauses a
+---@param unit any
+local function OnGuardUnpause(unit)
+    local prefs = Prefs.GetFromCurrentProfile('options.assist_to_unpause')
+    LOG(prefs)
+    if   prefs == 'On' or
+        (prefs == 'ExtractorsAndRadars' and EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, unit))
+    then
+        local units = { unit }
+        SetPaused(units, false)
+    end
+end
+
+--- Is called when a unit receies a guard / assist order
+---@param guardees UserUnit[]
+---@param unit UserUnit
+local function OnGuard(guardees, unit)
+    OnGuardUpgrade(unit)
+    OnGuardUnpause(unit)
+end
 
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
+
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
     if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then 
         if not IsKeyDown('Shift') then 
@@ -485,6 +543,9 @@ function OnCommandIssued(command)
     -- - a factory-like construction that is not finished is being continued
     -- - a (finished) unit is being guarded (right clicked)
     if command.CommandType == 'Guard' and command.Target.EntityId then
+
+        local unit = GetUnitById(command.Target.EntityId)
+        OnGuard(command.Units, unit)
 
         -- validate factories assisting other factories
         if EntityCategoryContains(categoriesFactories, command.Blueprint) then

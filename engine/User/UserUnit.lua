@@ -188,7 +188,7 @@ function UserUnit:IsStunned()
 end
 
 ---
----@param command string
+---@param command 'string'
 ---@param value string
 function UserUnit:ProcessInfo(command, value)
 end
