@@ -77,8 +77,7 @@ local TableGetn = table.getn
 ---@field EnergyExcessThread thread
 ---@field EnergyExcessUnitsEnabled table<EntityId, MassFabricationUnit>
 ---@field EnergyExcessUnitsDisabled table<EntityId, MassFabricationUnit>
----@field EnergyDependingUnits table<number, Unit | Shield>
----@field EnergyDependingUnitsHead number
+---@field EnergyDependingUnits table<EntityId, Unit | Shield>
 ---@field EnergyDepleted boolean
 ---@field EconomyTicksMonitor number
 ---@field HasPlatoonList boolean
@@ -309,7 +308,6 @@ AIBrain = Class(moho.aibrain_methods) {
         self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
         self.EnergyDepleted = false 
         self.EnergyDependingUnits = setmetatable({ }, { __mode = 'v' })
-        self.EnergyDependingUnitsHead = 1
 
         --- Units that we toggle on / off depending on whether we have excess energy
         self.EnergyExcessConsumed = 0
@@ -655,10 +653,9 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param entity Unit | Shield
     AddEnergyDependingEntity = function(self, entity)
-        self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity
-        self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
+        self.EnergyDependingUnits[entity.EntityId] = entity
 
-        LOG(self.EnergyDepleted)
+        -- guarantee callback when entity is depleted
         if self.EnergyDepleted then
             entity:OnEnergyDepleted()
         end
@@ -670,31 +667,22 @@ AIBrain = Class(moho.aibrain_methods) {
         if triggerName == "EnergyDepleted" then
             -- add trigger when we can recover units
             self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyViable', 'GreaterThanOrEqual', 0.1)
-            self.EnergyDepleted = true 
+            self.EnergyDepleted = true
 
             -- recurse over the list of units and do callbacks accordingly
-            local index = 1 
-            for k = 1, self.EnergyDependingUnitsHead - 1 do 
-                local entity = self.EnergyDependingUnits[k]
-                if not entity:BeenDestroyed() then 
-                    self.EnergyDependingUnits[index] = entity 
-                    index = index + 1
+            for id, entity in self.EnergyDependingUnits do
+                if not IsDestroyed(entity) then 
                     entity:OnEnergyDepleted()
                 end
             end
         else 
             -- add trigger when we're depleted
             self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
-            self.EnergyDepleted = false 
+            self.EnergyDepleted = false
 
             -- recurse over the list of units and do callbacks accordingly
-            local index = 1 
-            for k = 1, self.EnergyDependingUnitsHead - 1 do 
-                local entity = self.EnergyDependingUnits[k]
-
-                if entity and not entity:BeenDestroyed() then 
-                    self.EnergyDependingUnits[index] = entity 
-                    index = index + 1
+            for id, entity in self.EnergyDependingUnits do
+                if not IsDestroyed(entity) then
                     entity:OnEnergyViable()
                 end
             end
