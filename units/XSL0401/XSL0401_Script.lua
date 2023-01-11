@@ -146,6 +146,18 @@ XSL0401 = Class(SWalkingLandUnit) {
         self:Destroy()
     end,
 
+    OnMotionHorzEventChange = function(self, new, old)
+        SWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
+
+        if (old == 'Stopped') then
+            local bpDisplay = self:GetBlueprint().Display
+            if bpDisplay.AnimationWalk and self.Animator then
+                self.Animator:SetDirectionalAnim(true)
+                self.Animator:SetRate(bpDisplay.AnimationWalkRate)
+            end
+         end
+    end,
+
 }
 
 TypeClass = XSL0401

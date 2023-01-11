@@ -176,6 +176,18 @@ UAL0401 = Class(AWalkingLandUnit) {
 
         self:Destroy()
     end,
+
+    OnMotionHorzEventChange = function(self, new, old)
+        AWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
+
+        if (old == 'Stopped') then
+            local bpDisplay = self:GetBlueprint().Display
+            if bpDisplay.AnimationWalk and self.Animator then
+                self.Animator:SetDirectionalAnim(true)
+                self.Animator:SetRate(bpDisplay.AnimationWalkRate)
+            end
+         end
+    end,
 }
 
 TypeClass = UAL0401
