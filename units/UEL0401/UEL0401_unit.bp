@@ -377,7 +377,7 @@ UnitBlueprint {
         MaxAcceleration = 1.75,
         MaxBrake = 1.75,
         MaxSpeed = 1.75,
-        MaxSpeedReverse = 1.5,
+        MaxSpeedReverse = 1.75,
         MaxSteerForce = 1000,
         MeshExtentsX = 8,
         MeshExtentsY = 2,
