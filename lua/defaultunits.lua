@@ -148,9 +148,6 @@ StructureUnit = Class(Unit) {
                     bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
                 )
 
-
-
-                reprsl(axis)
                 if axis.InvertAxis then
                     if axis.InvertAxis.Z then 
                         az = -1 * az
