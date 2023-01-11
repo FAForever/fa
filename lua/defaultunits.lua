@@ -10,6 +10,7 @@ local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local TerrainUtils = import("/lua/sim/terrainutils.lua")
 local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
@@ -131,72 +132,42 @@ StructureUnit = Class(Unit) {
     OnStartBeingBuilt = function(self, builder, layer)
         Unit.OnStartBeingBuilt(self, builder, layer)
 
+        local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         elseif not bp.Physics.FlattenSkirt then
             local bp = self.Blueprint
-            local function GetTerrainSlopeAngles(pos, box)
-                --Sanitise box into a table
-                if type(box) == "number" or type(box) == "nil" then
-                    box = {(box or 1)*0.5, (box or 1)*0.5}
-                --If we made it here, we already know its a table
-                elseif type(box[1]) == "number" and type(box[2]) == "number" then
-                    box = {box[1] * 0.5, box[2] * 0.5}
-                else
-                    return
-                end
-                --Get heights
-                local Heights = {
-                    GetTerrainHeight(pos[1]-box[1],pos[3]), GetTerrainHeight(pos[1],pos[3]-box[2])
-                }
-                --Get averages if its 2 squares or bigger, bearing in mind the number was halved.
-                if math.max(box[1],box[2]) >= 1 then
-                    Heights[3] = GetTerrainHeight(pos[1]+box[1],pos[3])
-                    Heights[4] = GetTerrainHeight(pos[1],pos[3]+box[2])
-                end
-                --Subtract center height
-                for i, v in Heights do
-                    Heights[i] = v - pos[2]
-                end
-                --Calculate angles
-                local Angles = {}
-                for i, v in Heights do
-                    Angles[i] = math.atan(Heights[i]/box[math.mod(i-1,2)+1])
-                end
-                --Condence down to average if they were calculated
-                if table.getn(Angles) == 4 then
-                    Angles = {(Angles[1]-Angles[3])/2,(Angles[2]-Angles[4])/2}
-                end
-                return Angles
-            end
-            local function GetTerrainSlopeAnglesDegrees(pos, box)
-                local Angles = GetTerrainSlopeAngles(pos, box)
-                for i, v in Angles do
-                    Angles[i] = math.deg(Angles[i])
-                end
-                return(Angles)
-            end
+            
             
             if bp.Physics.SlopeToTerrain and not self.TerrainSlope and (layer == 'Land' or layer == 'Seabed') then
 
-                local Angles = GetTerrainSlopeAnglesDegrees(self:GetPosition(),{bp.Footprint.SizeX or bp.Physics.SkirtSizeX, bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ})
-                local Axis = bp.Physics.SlopeToTerrainAxis
+                local axis = bp.Physics.SlopeToTerrainAxis
+                local az, ax = TerrainUtils.GetTerrainSlopeAnglesDegrees(
+                    self:GetPosition(),
+                    bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
+                    bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+                )
 
-                if Axis.InvertAxis then
-                    for i, v in Angles do
-                        if Axis.InvertAxis[i] then
-                            Angles[i] = -v
-                        end
+
+
+                reprsl(axis)
+                if axis.InvertAxis then
+                    if axis.InvertAxis.Z then 
+                        az = -1 * az
+                    end
+
+                    if axis.InvertAxis.X then 
+                        ax = -1 * ax 
                     end
                 end
+
                 self.TerrainSlope = {
-                    CreateRotator(self, 0, Axis and Axis.Axis1 or 'z', -Angles[1], 99999),
-                    CreateRotator(self, 0, Axis and Axis.Axis2 or 'x', Angles[2], 99999)
+                    CreateRotator(self, 0, axis and axis.Axis1 or 'z', -az, 99999),
+                    CreateRotator(self, 0, axis and axis.Axis2 or 'x', ax, 99999)
                 }
             end
         end
 
-        local bp = self.Blueprint
         if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
                 self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
