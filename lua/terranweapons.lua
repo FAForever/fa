@@ -90,7 +90,9 @@ TDFRiotWeapon = ClassWeapon(DefaultProjectileWeapon) {
 }
 
 ---@class TAAGinsuRapidPulseWeapon : DefaultProjectileWeapon
-TAAGinsuRapidPulseWeapon = ClassWeapon(DefaultProjectileWeapon) {}
+TAAGinsuRapidPulseWeapon = ClassWeapon(DefaultProjectileWeapon) {
+    FxMuzzleFlash = {},
+}
 
 ---@class TDFIonizedPlasmaCannon : DefaultProjectileWeapon
 TDFIonizedPlasmaCannon = ClassWeapon(DefaultProjectileWeapon) {
@@ -100,6 +102,7 @@ TDFIonizedPlasmaCannon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class TDFHiroPlasmaCannon : DefaultBeamWeapon
 TDFHiroPlasmaCannon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeams.TDFHiroCollisionBeam,
+    FxMuzzleFlash = {},
     FxUpackingChargeEffectScale = 1,
 
     ---@param self TDFHiroPlasmaCannon
@@ -158,7 +161,9 @@ TAirToAirLinkedRailgun = ClassWeapon(DefaultProjectileWeapon) {
 }
 
 ---@class TIFCruiseMissileUnpackingLauncher : DefaultProjectileWeapon
-TIFCruiseMissileUnpackingLauncher = ClassWeapon(DefaultProjectileWeapon) {}
+TIFCruiseMissileUnpackingLauncher = ClassWeapon(DefaultProjectileWeapon) {
+    FxMuzzleFlash = {},
+}
 
 ---@class TIFCruiseMissileLauncher : DefaultProjectileWeapon
 TIFCruiseMissileLauncher = ClassWeapon(DefaultProjectileWeapon) {
