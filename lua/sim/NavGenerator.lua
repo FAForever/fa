@@ -1197,11 +1197,11 @@ function Generate()
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
-    local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
+    -- local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
+    -- local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
 
-    SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
-    SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
+    -- SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
+    -- SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
 
     Sync.NavLayerData = NavLayerData
     Generated = true
