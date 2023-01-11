@@ -142,25 +142,25 @@ StructureUnit = Class(Unit) {
             if bp.Physics.SlopeToTerrain and not self.TerrainSlope and (layer == 'Land' or layer == 'Seabed') then
 
                 local axis = bp.Physics.SlopeToTerrainAxis
-                local az, ax = TerrainUtils.GetTerrainSlopeAnglesDegrees(
+                local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
                     self:GetPosition(),
                     bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
                     bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
                 )
 
                 if axis.InvertAxis then
-                    if axis.InvertAxis.Z then 
-                        az = -1 * az
+                    if axis.InvertAxis[1] then
+                        a1 = -1 * a1
                     end
 
-                    if axis.InvertAxis.X then 
-                        ax = -1 * ax 
+                    if axis.InvertAxis[2] then
+                        a2 = -1 * a2
                     end
                 end
 
                 self.TerrainSlope = {
-                    CreateRotator(self, 0, axis and axis.Axis1 or 'z', -az, 99999),
-                    CreateRotator(self, 0, axis and axis.Axis2 or 'x', ax, 99999)
+                    CreateRotator(self, 0, axis and axis.Axis1 or 'z', a1, 99999),
+                    CreateRotator(self, 0, axis and axis.Axis2 or 'x', a2, 99999)
                 }
             end
         end

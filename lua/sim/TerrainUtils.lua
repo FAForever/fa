@@ -47,6 +47,6 @@ function GetTerrainSlopeAngles(pos, bx, bz, sx, sz)
 end
 
 function GetTerrainSlopeAnglesDegrees(pos, bx, bz, sx, sz)
-    local az, ax = GetTerrainSlopeAngles(pos, bx, bz, sx, sz)
-    return -1 * MathDeg(az), MathDeg(ax)
+    local a1, a2 = GetTerrainSlopeAngles(pos, bx, bz, sx, sz)
+    return -1 * MathDeg(a1), MathDeg(a2)
 end
