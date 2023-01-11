@@ -15,7 +15,7 @@ UEFNukeEffectController01 = Class(NullShell) {
 
         -- Create full-screen glow flash
         CreateLightParticle(self, -1, self.Army, 35, 4, 'glow_02', 'ramp_red_02')
-        WaitSeconds(0.25)
+        WaitTicks(3)
         CreateLightParticle(self, -1, self.Army, 80, 20, 'glow_03', 'ramp_fire_06')
 
         -- Create initial fireball dome effect
@@ -31,11 +31,11 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
 
         self:CreateInitialFireballSmokeRing()
-        self:ForkThread(self.CreateOuterRingWaveSmokeRing)
-        self:ForkThread(self.CreateHeadConvectionSpinners)
-        self:ForkThread(self.CreateFlavorPlumes)
+        self.Trash:Add(ForkThread(self.CreateOuterRingWaveSmokeRing,self))
+        self.Trash:Add(ForkThread(self.CreateHeadConvectionSpinners,self))
+        self.Trash:Add(ForkThread(self.CreateFlavorPlumes,self))
 
-        WaitSeconds(0.55)
+        WaitTicks(6)
 
         CreateLightParticle(self, -1, self.Army, 300, 250, 'glow_03', 'ramp_nuke_04')
 
@@ -45,7 +45,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, self.Army)
         CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 60, 60, 1200, 0, self.Army)
 
-        WaitSeconds(8.9)
+        WaitTicks(90)
         self:CreateGroundPlumeConvectionEffects(self.Army)
     end,
 
@@ -78,7 +78,7 @@ UEFNukeEffectController01 = Class(NullShell) {
             table.insert(projectiles, proj)
         end
 
-        WaitSeconds(3)
+        WaitTicks(31)
 
         -- Slow projectiles down to normal speed
         for k, v in projectiles do
@@ -112,7 +112,7 @@ UEFNukeEffectController01 = Class(NullShell) {
             table.insert(projectiles, self:CreateProjectile('/effects/entities/UEFNukeFlavorPlume01/UEFNukeFlavorPlume01_proj.bp', 0, 0, 0, xVec, yVec, zVec):SetVelocity(velocity))
         end
 
-        WaitSeconds(3)
+        WaitTicks(31)
 
         -- Slow projectiles down to normal speed
         for k, v in projectiles do
@@ -136,7 +136,7 @@ UEFNukeEffectController01 = Class(NullShell) {
             table.insert(projectiles, proj)
         end
 
-        WaitSeconds(1)
+        WaitTicks(11)
         for i = 0, (sides-1) do
             local x = math.sin(i*angle)
             local z = math.cos(i*angle)

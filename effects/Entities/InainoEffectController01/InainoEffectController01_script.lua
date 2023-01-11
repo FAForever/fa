@@ -11,15 +11,15 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local SIFInainoStrategicMissileEffect01 = '/effects/Entities/SIFInainoStrategicMissileEffect01/SIFInainoStrategicMissileEffect01_proj.bp'
 local SIFInainoStrategicMissileEffect02 = '/effects/Entities/SIFInainoStrategicMissileEffect02/SIFInainoStrategicMissileEffect02_proj.bp'
 local SIFInainoStrategicMissileEffect03 = '/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp'
-local SIFInainoStrategicMissileEffect04 = '/effects/Entities/SIFInainoStrategicMissileEffect04/SIFInainoStrategicMissileEffect04_proj.bp'
 
 InainoEffectController01 = Class(NullShell) {
     EffectThread = function(self, Data)
-        self:ForkThread(self.CreateInitialHit, self.Army)
-        self:ForkThread(self.CreateInitialBuildup, self.Army)
-        self:ForkThread(self.CreateGroundFingers)
-        self:ForkThread(self.CreateInitialFingers)
-        self:ForkThread(self.MainBlast, self.Army)
+
+        self.Trash:Add(ForkThread(self.CreateInitialHit,self,self.Army))
+        self.Trash:Add(ForkThread(self.CreateInitialBuildup,self,self.Army))
+        self.Trash:Add(ForkThread(self.CreateGroundFingers,self))
+        self.Trash:Add(ForkThread(self.CreateInitialFingers,self))
+        self.Trash:Add(ForkThread(self.MainBlast,self,self.Army))
     end,
 
     CreateInitialHit = function(self, army)
@@ -36,7 +36,7 @@ InainoEffectController01 = Class(NullShell) {
     end,
 
     MainBlast = function(self, army)
-        WaitSeconds(5.00)
+        WaitTicks(51)
 
         -- Create a light for this thing's flash.
         CreateLightParticle(self, -1, self.Army, 160, 14, 'flare_lens_add_03', 'ramp_white_07')
@@ -50,7 +50,7 @@ InainoEffectController01 = Class(NullShell) {
         end
         self:ShakeCamera(55, 10, 0, 2.5)
 
-        WaitSeconds(0.3)
+        WaitTicks(4)
 
         -- Create upward moving smoke plume
         local plume = self:CreateProjectile('/effects/entities/SIFInainoStrategicMissileEffect04/SIFInainoStrategicMissileEffect04_proj.bp', 0, 3, 0, 0, 0, 0)

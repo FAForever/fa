@@ -24,7 +24,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 10.0
         local px, pz
 
-        WaitSeconds(3.5)
+        WaitTicks(36)
         for i = 0, (num_projectiles -1) do
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
@@ -48,7 +48,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 0.0
         local px, pz
 
-        WaitSeconds(3.5)
+        WaitTicks(36)
         for i = 0, (num_projectiles -1) do
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
@@ -63,18 +63,18 @@ SeraphimNukeEffectController01 = Class(NullShell) {
     end,
 
     EffectThread = function(self)
-        self:ForkThread(self.CreateEffectInnerPlasma)
-        self:ForkThread(self.CreateEffectElectricity)
+        self.Trash:Add(ForkThread(self.CreateEffectInnerPlasma,self))
+        self.Trash:Add(ForkThread(self.CreateEffectElectricity,self))
         local position = self:GetPosition()
 
         -- Knockdown force rings
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
-        WaitSeconds(0.1)
+        WaitTicks(11)
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
 
         -- Create full-screen glow flash
         CreateLightParticle(self, -1, self.Army, 140, 10, 'glow_02', 'ramp_blue_22')
-        WaitSeconds(0.3)
+        WaitTicks(4)
         CreateLightParticle(self, -1, self.Army, 80, 36, 'glow_02', 'ramp_blue_16')
 
         -- Create explosion effects
@@ -82,9 +82,9 @@ SeraphimNukeEffectController01 = Class(NullShell) {
             emit = CreateEmitterAtEntity(self, self.Army, v)
         end
         
-        WaitSeconds(3.0)
+        WaitTicks(31)
         CreateLightParticle(self, -1, self.Army, 160, 6, 'glow_02', 'ramp_blue_16')
-        WaitSeconds(0.1)
+        WaitTicks(2)
         CreateLightParticle(self, -1, self.Army, 60, 60, 'glow', 'ramp_blue_22')
 
         -- Create detonate effects
@@ -126,7 +126,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         plume:SetCollision(false)
         plume:SetVelocityAlign(true)
 
-        WaitSeconds(1.0)
+        WaitTicks(11)
 
         -- Create fireball plumes to accentuate the explosive detonation
         local num_projectiles = 15
