@@ -81,7 +81,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         for k, v in EffectTemplate.SIFExperimentalStrategicMissileHit01 do
             emit = CreateEmitterAtEntity(self, self.Army, v)
         end
-        
+
         WaitTicks(31)
         CreateLightParticle(self, -1, self.Army, 160, 6, 'glow_02', 'ramp_blue_16')
         WaitTicks(2)

@@ -1,6 +1,4 @@
---
 -- script for projectile BoneAttached
---
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 
 UEFNukeShockwave02 = Class(EmitterProjectile) {
@@ -8,5 +6,4 @@ UEFNukeShockwave02 = Class(EmitterProjectile) {
     FxTrailScale = 0.5,
     FxTrailOffset = 0,
 }
-
 TypeClass = UEFNukeShockwave02

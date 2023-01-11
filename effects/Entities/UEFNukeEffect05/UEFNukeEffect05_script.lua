@@ -1,13 +1,8 @@
---****************************************************************************
---**
---**  File     :  /effects/Entities/UEFNukeEffect02/UEFNukeEffect05_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  Nuclear explosion script
---**
---**  Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /effects/Entities/UEFNukeEffect02/UEFNukeEffect05_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Nuclear explosion script
+-- Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
+----------------------------------------------------------------------------
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local EffectTemplate = import("/lua/effecttemplates.lua")
 

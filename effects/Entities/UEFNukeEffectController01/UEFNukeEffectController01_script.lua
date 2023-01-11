@@ -176,5 +176,4 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 }
-
 TypeClass = UEFNukeEffectController01

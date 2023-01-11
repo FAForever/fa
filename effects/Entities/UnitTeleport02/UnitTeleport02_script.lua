@@ -1,26 +1,20 @@
---****************************************************************************
---**
---**  File     :  /effects/entities/UnitTeleport01/UnitTeleport01_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  Unit Teleport effect entity
---**
---**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /effects/entities/UnitTeleport01/UnitTeleport01_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Unit Teleport effect entity
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 UnitTeleportEffect02 = Class(NullShell) {
-
     OnCreate = function(self)
         NullShell.OnCreate(self)
-        self:ForkThread(self.TeleportEffectThread)
+        self.Trash:Add(ForkThread(self.TeleportEffectThread,self))
     end,
 
     TeleportEffectThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local pos = self:GetPosition()
         pos[2] = GetSurfaceHeight(pos[1], pos[3]) - 2
 
@@ -30,14 +24,14 @@ UnitTeleportEffect02 = Class(NullShell) {
 
         -- Initial light flashs
         CreateLightParticleIntel( self, -1, army, 18, 4, 'flare_lens_add_02', 'ramp_blue_13' )
-        WaitSeconds(0.3)
+        WaitTicks(4)
         CreateLightParticleIntel( self, -1, army, 35, 10, 'flare_lens_add_02', 'ramp_blue_13' )
 
 		--self:CreateEnergySpinner()
         self:CreateQuantumEnergy(army)
 
 		-- Wait till we want the commander to appear visibily
-		WaitSeconds(1.8)
+		WaitTicks(19)
 
         -- Smoke ring, explosion effects
         CreateLightParticleIntel( self, -1, army, 35, 10, 'glow_02', 'ramp_blue_13' )
@@ -45,7 +39,6 @@ UnitTeleportEffect02 = Class(NullShell) {
         for k, v in EffectTemplate.CommanderTeleport01 do
             CreateEmitterOnEntity( self, army, v )
         end
-        --self:ForkThread(self.CreateSmokeRing)
 
         local decalOrient = RandomFloat(0,2*math.pi)
         CreateDecal(self:GetPosition(), decalOrient, 'nuke_scorch_002_albedo', '', 'Albedo', 28, 28, 500, 600, army)
@@ -70,16 +63,15 @@ UnitTeleportEffect02 = Class(NullShell) {
     CreateFlares = function( self, army )
         local numFlares = 45
         local angle = (2*math.pi) / numFlares
-        local angleInitial = 0.0 --RandomFloat( 0, angle )
-        local angleVariation = (2*math.pi) --0.0 --angle * 0.5
-
+        local angleInitial = 0.0
+        local angleVariation = (2*math.pi)
         local emit, x, y, z = nil
         local DirectionMul = 0.02
         local OffsetMul = 1
 
         for i = 0, (numFlares - 1) do
             x = math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
-            y = 0.5 --RandomFloat(0.5, 1.5)
+            y = 0.5
             z = math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
 
             for k, v in EffectTemplate.CloudFlareEffects01 do
@@ -110,12 +102,10 @@ UnitTeleportEffect02 = Class(NullShell) {
             table.insert( projectileList, proj )
         end
 
-        WaitSeconds( 2.5 )
+        WaitTicks( 26 )
         for k, v in projectileList do
             v:SetAcceleration(0)
         end
     end,
 }
-
 TypeClass = UnitTeleportEffect02
-

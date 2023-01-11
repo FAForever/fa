@@ -1,8 +1,5 @@
---
 -- Fire Plume Test Projectile Script
---
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
-
 DestructionFirePlume01 = Class(NullShell) {
     FxImpactUnit = {},
     FxImpactLand = {},
@@ -10,6 +7,4 @@ DestructionFirePlume01 = Class(NullShell) {
     FxImpactUnderWater = {},
     FxImpactNone = {},
 }
-
 TypeClass = DestructionFirePlume01
-

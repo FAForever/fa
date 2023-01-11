@@ -14,7 +14,6 @@ local SIFInainoStrategicMissileEffect03 = '/effects/Entities/SIFInainoStrategicM
 
 InainoEffectController01 = Class(NullShell) {
     EffectThread = function(self, Data)
-
         self.Trash:Add(ForkThread(self.CreateInitialHit,self,self.Army))
         self.Trash:Add(ForkThread(self.CreateInitialBuildup,self,self.Army))
         self.Trash:Add(ForkThread(self.CreateGroundFingers,self))
@@ -29,7 +28,7 @@ InainoEffectController01 = Class(NullShell) {
     end,
 
     CreateInitialBuildup = function(self, army)
-        WaitSeconds(2.0)
+        WaitTicks(21)
         for k, v in EffectTemplate.SIFInainoHit02 do
             emit = CreateEmitterAtEntity(self,army,v)
         end
@@ -101,7 +100,7 @@ InainoEffectController01 = Class(NullShell) {
     end,
 
     CreateInitialFingers = function(self)
-        WaitSeconds(1.75)
+        WaitTicks(18)
         -- Upward rising fingers that join to form explosion
         local num_projectiles = 5
         local horizontal_angle = (2*math.pi) / num_projectiles

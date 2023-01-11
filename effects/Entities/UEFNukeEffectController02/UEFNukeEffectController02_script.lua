@@ -16,27 +16,26 @@ UEFNukeEffectController01 = Class(NullShell) {
         -- Create projectile that controls plume effects
         local PlumeEffectYOffset = 0
         self:CreateProjectile('/effects/entities/UEFBillyNukeEffect02/UEFBillyNukeEffect02_proj.bp',0,PlumeEffectYOffset,0,0,0,1)
-        
+
         -- Create full-screen glow flash
         CreateLightParticle(self, -1, self.Army, 20, 2, 'glow_02', 'ramp_red_02')
-        WaitSeconds(0.25)
+        WaitTicks(3)
         CreateLightParticle(self, -1, self.Army, 40, 10, 'glow_03', 'ramp_fire_06')
 
         -- Create initial fireball dome effect
         local FireballDomeYOffset = -5
         self:CreateProjectile('/effects/entities/UEFBillyNukeEffect01/UEFBillyNukeEffect01_proj.bp',0,FireballDomeYOffset,0,0,0,1)
-        
+
         for k, v in EffectTemplate.TNukeRings01 do
             CreateEmitterAtEntity(self, self.Army, v):ScaleEmitter(0.5)
         end
-        
-        self:CreateInitialFireballSmokeRing()
-        self:ForkThread(self.CreateOuterRingWaveSmokeRing)
-        self:ForkThread(self.CreateHeadConvectionSpinners)
-        self:ForkThread(self.CreateFlavorPlumes)
 
-        WaitSeconds(0.55)
-        
+        self:CreateInitialFireballSmokeRing()
+        self.Trash:Add(ForkThread(self.CreateOuterRingWaveSmokeRing,self))
+        self.Trash:Add(ForkThread(self.CreateHeadConvectionSpinners,self))
+        self.Trash:Add(ForkThread(self.CreateFlavorPlumes,self))
+        WaitTicks(6)
+
         local pos = self:GetPosition()
         DamageArea(self, pos, 27, 1, 'Force', true)
         DamageArea(self, pos, 27, 1, 'Force', true)
@@ -49,7 +48,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 25, 25, 1200, 0, self.Army)
         CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 30, 30, 1200, 0, self.Army)
 
-        WaitSeconds(8.9)
+        WaitTicks(90)
         self:CreateGroundPlumeConvectionEffects(self.Army)
     end,
 
@@ -82,7 +81,7 @@ UEFNukeEffectController01 = Class(NullShell) {
             table.insert(projectiles, proj)
         end
 
-        WaitSeconds(3)
+        WaitTicks(31)
 
         -- Slow projectiles down to normal speed
         for k, v in projectiles do
@@ -116,7 +115,7 @@ UEFNukeEffectController01 = Class(NullShell) {
             table.insert(projectiles, self:CreateProjectile('/effects/entities/UEFNukeFlavorPlume01/UEFNukeFlavorPlume01_proj.bp', 0, 0, 0, xVec, yVec, zVec):SetVelocity(velocity))
         end
 
-        WaitSeconds(3)
+        WaitTicks(31)
 
         -- Slow projectiles down to normal speed
         for k, v in projectiles do
@@ -140,7 +139,7 @@ UEFNukeEffectController01 = Class(NullShell) {
             table.insert(projectiles, proj)
         end
 
-        WaitSeconds(1)
+        WaitTicks(11)
         for i = 0, (sides-1) do
             local x = math.sin(i*angle)
             local z = math.cos(i*angle)
@@ -180,5 +179,4 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 }
-
 TypeClass = UEFNukeEffectController01

@@ -1,6 +1,5 @@
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 
-
 UEFNukeEffect01 = Class(NullShell) {
     OnCreate = function(self)
         NullShell.OnCreate(self)
