@@ -10,8 +10,6 @@
 ---@alias AIPersonality string
 ---@alias ArmyPlans any
 
----@alias BlueprintId string
-
 ---@alias Faction
 ---| 0 # UEF
 ---| 1 # Aeon
@@ -272,7 +270,7 @@ end
 
 --- spawns the initial unit for the given army
 ---@param army Army
----@param unitId BlueprintId
+---@param unitId UnitId
 ---@return Unit
 function CreateInitialArmyUnit(army, unitId)
 end
@@ -457,7 +455,7 @@ end
 --- Creates a unit from a blueprint for an army, at a position with heading, pitch, and roll
 ---@see CreateUnit() # quaternion version
 ---@see CreateUnit2() # simple version
----@param blueprint BlueprintId
+---@param blueprint UnitId
 ---@param army Army
 ---@param x number
 ---@param y number

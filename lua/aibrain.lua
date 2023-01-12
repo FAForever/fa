@@ -120,7 +120,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@param unitId EntityId
+    ---@param unitId UnitId
     ---@param statName string
     ---@param value number
     AddUnitStat = function(self, unitId, statName, value)

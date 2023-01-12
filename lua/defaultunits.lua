@@ -744,7 +744,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@return string?
     ToSupportFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local identifier = self.Blueprint.BlueprintId
         local faction = identifier:sub(2, 2)
         local layer = identifier:sub(7, 7)
 
@@ -775,7 +775,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     ToHQFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local identifier = self.Blueprint.BlueprintId
         local faction = identifier:sub(1, 3)
         local layer = identifier:sub(7, 7)
 

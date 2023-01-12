@@ -49,11 +49,11 @@ function MapResourceCheck()
     local mass = MarkerUtilities.GetMarkersByType("Mass")
     local hydro = MarkerUtilities.GetMarkersByType("Hydrocarbon")
 
-    ---Helper function that attempts to build a unit there
+    --- Helper function that attempts to build a unit there
     ---@param x number
     ---@param y number
     ---@param z number
-    ---@param id BlueprintId
+    ---@param id UnitId
     local function TryUnit(x, y, z, id)
         if brain:CanBuildStructureAt(id, {x, y, z}) then
             CreateUnitHPR(id, army, x, y, z, 0, 0, 0)

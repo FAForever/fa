@@ -30,6 +30,8 @@
 ---@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM"
 ---@alias IconBackgroundType "air" | "amph" | "land" | "sea"
 
+---@alias UnitId BlueprintId
+
 
 -- read more here: https://wiki.faforever.com/en/Blueprints
 
@@ -100,7 +102,7 @@
 ---
 --- Auto-generated unit id from the folder name. When modifying a blueprint, this must be defined to
 --- the blueprint id it is modifying instead.
----@field BlueprintId BlueprintId
+---@field BlueprintId UnitId
 --- auto-generated categories table based on `Categories` with each key a value in that array
 ---@field CategoriesHash table<CategoryName, true>
 --- auto-generated number from `DoNotCollideList`
@@ -481,7 +483,7 @@
 --- the animation that is played when the unit is upgrading
 ---@field AnimationUpgrade FileName
 --- A table of animations to use while upgrading, depending on the unit it is upgrading to.
----@field AnimationUpgradeTable? table<BlueprintId, FileName>
+---@field AnimationUpgradeTable? table<UnitId, FileName>
 --- Animation walk file is linked here: '/units/UnitID/UnitID_??.sca'
 ---@field AnimationWalk? FileName
 --- controls the speed of the animation. Adjusting this number can cause or prevent "skating"
@@ -540,7 +542,7 @@
 --- used by the Salem Class            
 ---@field WaterAnimationDeath? {}                   
 ---
---- auto-generated field that points to the mess to use while building
+--- auto-generated field that points to the mesh to use while building
 ---@field BuildMeshBlueprint BlueprintId
 
 ---@class UnitBlueprintAnimationDeath
@@ -680,14 +682,14 @@
 --- present in UEF engineering drones
 ---@field BuildRadius? number
 --- used by crab eggs
----@field BuildUnit? BlueprintId
+---@field BuildUnit? UnitId
 --- present in Cybran build drones
 ---@field ConsumptionPerSecondEnergy? number
 --- present in Cybran build drones
 ---@field ConsumptionPerSecondMass? number
 --- the cost of upgrading will subtracting the base unit's cost
 ---@field DifferentialUpgradeCostCalculation? boolean
----@field EngineeringPods? {CreateWithUnit: boolean, PodAttachpoint: Bone, PodName: string, PodUnitID: BlueprintId}
+---@field EngineeringPods? {CreateWithUnit: boolean, PodAttachpoint: Bone, PodName: string, PodUnitID: UnitId}
 --- default rally point X for the factory
 ---@field InitialRallyX number
 --- default rally point Z for the factory
@@ -784,7 +786,7 @@
 ---@class UnitBlueprintAssignedEnhancementPreset
 ---@field Name string
 ---@field Enhancements Enhancement[]
----@field BaseBlueprintId BlueprintId
+---@field BaseBlueprintId UnitId
 
 --- TODO
 ---@class UnitBlueprintEnhancement
@@ -827,11 +829,11 @@
 ---@field UnitName UnlocalizedString
 ---@field UnitWeight number unused
 --- what unit, if any, this unit can be upgraded from
----@field UpgradesFrom? BlueprintId
+---@field UpgradesFrom? UnitId
 --- what unit, if any, this unit can be upgraded to
----@field UpgradesTo? BlueprintId
+---@field UpgradesTo? UnitId
 --- the base unit from which all units in this upgrade chain can be upgraded from
----@field UpgradesFromBase? BlueprintId
+---@field UpgradesFromBase? UnitId
 ---
 --- auto-generated field from `CommandCaps`
 ---@field CommandCapsHash table<CommandCap, true>
@@ -1076,7 +1078,7 @@
 --- the amount of health this wreck has so it can take damage from weapons that do area damage>
 ---@field HealthMult number
 --- override for the `AssociatedBP` on the wreckage prop used for rebuild bonuses
----@field IdHook? BlueprintId
+---@field IdHook? UnitId
 --- the amount of mass you get when reclaiming expressed as a multiplier of the mass cost when it was alive>
 ---@field MassMult number
 --- the time it takes to reclaim this wreck expressed as a multiplier of the build time>
