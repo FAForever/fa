@@ -117,7 +117,9 @@ StructureUnit = Class(Unit) {
         -- get direction vector, atanify it for angle
         local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
         local degrees = rad * (180 / math.pi)
-        self.Trash:Add(CreateRotator(self, self:GetWeapon(1).Blueprint.TurretBoneYaw, 'y', degrees, nil, nil, nil))
+        self.TurretRotator = CreateRotator(self, self:GetWeapon(1).Blueprint.TurretBoneYaw, 'y', degrees, nil, nil, nil)
+        LOG("did a thing!")
+        LOG(degrees)
     end,
 
     ---@param self StructureUnit
@@ -143,7 +145,10 @@ StructureUnit = Class(Unit) {
 
         -- technically obsolete, but as this is part of an integration we don't want to break
         -- the mod package that it originates from. Originates from the BrewLan mod suite
+        if not bp.Physics.FlattenSkirt then
         self.TerrainSlope = {}
+        end
+
 
         -- create decal below structure
         if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
@@ -160,6 +165,13 @@ StructureUnit = Class(Unit) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         Unit.OnStopBeingBuilt(self, builder, layer)
+
+        if self.TurretRotator then
+            ---@type moho.RotateManipulator
+            local rotator = self.TurretRotator
+            rotator:SetGoal(0)
+            rotator:SetSpeed(10)
+        end
 
         -- tarmac is made once seraphim animation is complete
         if self.Blueprint.General.FactionName == "Seraphim" then
