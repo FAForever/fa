@@ -10,7 +10,14 @@ local CacheBox = { 0, 0 }
 local CacheAngles = { 0, 0, 0, 0 }
 local CacheHeights = { 0, 0, 0, 0 }
 
-function GetTerrainSlopeAngles(pos, bx, bz, sx, sz)
+--- Compute two angles in radians to match the terrain gradient
+--- Copyright 2018-2022 Sean 'Balthazar' Wheeldon
+---@param pos Vector
+---@param bx number
+---@param bz number
+---@return number
+---@return number
+function GetTerrainSlopeAngles(pos, bx, bz)
 
     local box = CacheBox
     box[1], box[2] = 0.5 * bx, 0.5 * bz
@@ -46,11 +53,24 @@ function GetTerrainSlopeAngles(pos, bx, bz, sx, sz)
     end
 end
 
-function GetTerrainSlopeAnglesDegrees(pos, bx, bz, sx, sz)
-    local a1, a2 = GetTerrainSlopeAngles(pos, bx, bz, sx, sz)
+--- Compute two angles in degrees to match the terrain gradient
+--- Copyright 2018-2022 Sean 'Balthazar' Wheeldon
+---@param pos Vector Center of area
+---@param bx number width
+---@param bz number height
+---@return number
+---@return number
+function GetTerrainSlopeAnglesDegrees(pos, bx, bz)
+    local a1, a2 = GetTerrainSlopeAngles(pos, bx, bz)
     return -1 * MathDeg(a1), MathDeg(a2)
 end
 
+--- Flattens the terrain by interpolating between 
+--- Copyright 2018-2022 Sean 'Balthazar' Wheeldon
+---@param x number Top-left coordinate
+---@param z number Top-left coordinate
+---@param w number
+---@param h number
 FlattenGradientMapRect = function(x,z,w,h)
     --a1,a2
     --b1,b2

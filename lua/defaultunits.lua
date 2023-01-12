@@ -25,7 +25,7 @@ local GameHasAIs = ScenarioInfo.GameHasAIs
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
 local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL))
 
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
@@ -117,13 +117,7 @@ StructureUnit = Class(Unit) {
         -- get direction vector, atanify it for angle
         local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
         local degrees = rad * (180 / math.pi)
-
-        -- some buildings can only take 90 degree angles
-        if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
-            degrees = math.floor((degrees + 45) / 90) * 90
-        end
-
-        self:SetRotation(degrees)
+        self.Trash:Add(CreateRotator(self, self:GetWeapon(1).Blueprint.TurretBoneYaw, 'y', degrees, nil, nil, nil))
     end,
 
     ---@param self StructureUnit
@@ -132,39 +126,34 @@ StructureUnit = Class(Unit) {
     OnStartBeingBuilt = function(self, builder, layer)
         Unit.OnStartBeingBuilt(self, builder, layer)
 
+        -- rotate weaponry towards enemy
         local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
-        else 
-            local bp = self.Blueprint
-            
-            
-            if not self.TerrainSlope then
+        end
 
-                local axis = bp.Physics.SlopeToTerrainAxis
-                local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
-                    self:GetPosition(),
-                    bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
-                    bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
-                )
+        -- rotate structure to match terrain gradient
+        local axis = bp.Physics.SlopeToTerrainAxis
+        local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
+            self:GetPosition(),
+            bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
+            bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+        )
 
-                if axis.InvertAxis then
-                    if axis.InvertAxis[1] then
-                        a1 = -1 * a1
-                    end
+        if axis.InvertAxis then
+            if axis.InvertAxis[1] then
+                a1 = -1 * a1
+            end
 
-                    if axis.InvertAxis[2] then
-                        a2 = -1 * a2
-                    end
-                end
-
-                self.TerrainSlope = {
-                    CreateRotator(self, 0, axis and axis.Axis1 or 'z', a1, 99999),
-                    CreateRotator(self, 0, axis and axis.Axis2 or 'x', a2, 99999)
-                }
+            if axis.InvertAxis[2] then
+                a2 = -1 * a2
             end
         end
 
+        self.Trash:Add(CreateRotator(self, 0, axis and axis.Axis1 or 'z', a1, 99999))
+        self.Trash:Add(CreateRotator(self, 0, axis and axis.Axis2 or 'x', a2, 99999))
+
+        -- create decal below structure
         if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
                 self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
