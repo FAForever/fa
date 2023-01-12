@@ -138,12 +138,6 @@ UnitBlueprint {
     Physics = {
         MaxGroundVariation = 512,
         FlattenSkirt = false,
-        SlopeToTerrain = true,
-        SlopeToTerrainAxis = {
-            Axis1 = 'z',
-            Axis2 = 'x',
-            InvertAxis = {true,true}
-        },
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,

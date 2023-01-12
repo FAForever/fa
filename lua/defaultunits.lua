@@ -133,25 +133,17 @@ StructureUnit = Class(Unit) {
         end
 
         -- rotate structure to match terrain gradient
-        local axis = bp.Physics.SlopeToTerrainAxis
-        local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
+        local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
             self:GetPosition(),
             bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
             bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
         )
 
-        if axis.InvertAxis then
-            if axis.InvertAxis[1] then
-                a1 = -1 * a1
-            end
+        self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
 
-            if axis.InvertAxis[2] then
-                a2 = -1 * a2
-            end
-        end
-
-        self.Trash:Add(CreateRotator(self, 0, axis and axis.Axis1 or 'z', a1, 99999))
-        self.Trash:Add(CreateRotator(self, 0, axis and axis.Axis2 or 'x', a2, 99999))
+        -- technically obsolete, but as this is part of an integration we don't want to break
+        -- the mod package that it originates from. Originates from the BrewLan mod suite
+        self.TerrainSlope = {}
 
         -- create decal below structure
         if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then

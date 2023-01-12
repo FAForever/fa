@@ -62,7 +62,7 @@ end
 ---@return number
 function GetTerrainSlopeAnglesDegrees(pos, bx, bz)
     local a1, a2 = GetTerrainSlopeAngles(pos, bx, bz)
-    return -1 * MathDeg(a1), MathDeg(a2)
+    return MathDeg(a1), MathDeg(a2)
 end
 
 --- Flattens the terrain by interpolating between 

@@ -139,12 +139,6 @@ UnitBlueprint {
     LifeBarOffset = 0.55,
     LifeBarSize = 0.8,
     Physics = {
-        SlopeToTerrain = true,
-        SlopeToTerrainAxis = {
-            InvertAxis = { true, false},
-            Axis1='y',
-            Axis2='x',
-        },
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
