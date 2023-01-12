@@ -24,7 +24,6 @@ local GameHasAIs = ScenarioInfo.GameHasAIs
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
-local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
 local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
 
 -- STRUCTURE UNITS
@@ -134,19 +133,21 @@ StructureUnit = Class(Unit) {
             self:RotateTowardsEnemy()
         end
 
-        -- rotate structure to match terrain gradient
-        local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
-            self:GetPosition(),
-            bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
-            bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
-        )
+        if not bp.Physics.AltitudeToTerrain then
+            -- rotate structure to match terrain gradient
+            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
+                self:GetPosition(),
+                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
+                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+            )
 
-        self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
+            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
 
-        -- technically obsolete, but as this is part of an integration we don't want to break
-        -- the mod package that it originates from. Originates from the BrewLan mod suite
-        if not bp.Physics.FlattenSkirt then
-        self.TerrainSlope = {}
+            -- technically obsolete, but as this is part of an integration we don't want to break
+            -- the mod package that it originates from. Originates from the BrewLan mod suite
+            if not bp.Physics.FlattenSkirt then
+                self.TerrainSlope = {}
+            end
         end
 
 
