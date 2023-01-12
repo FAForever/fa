@@ -25,7 +25,7 @@ local GameHasAIs = ScenarioInfo.GameHasAIs
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
 local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL))
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
 
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
@@ -117,9 +117,9 @@ StructureUnit = Class(Unit) {
         -- get direction vector, atanify it for angle
         local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
         local degrees = rad * (180 / math.pi)
-        self.TurretRotator = CreateRotator(self, self:GetWeapon(1).Blueprint.TurretBoneYaw, 'y', degrees, nil, nil, nil)
-        LOG("did a thing!")
-        LOG(degrees)
+
+        local rotator = CreateRotator(self, self:GetWeapon(1).Blueprint.TurretBoneYaw, 'y', degrees, nil, nil, nil)
+        rotator:SetPrecedence(1)
     end,
 
     ---@param self StructureUnit
@@ -165,13 +165,6 @@ StructureUnit = Class(Unit) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         Unit.OnStopBeingBuilt(self, builder, layer)
-
-        if self.TurretRotator then
-            ---@type moho.RotateManipulator
-            local rotator = self.TurretRotator
-            rotator:SetGoal(0)
-            rotator:SetSpeed(10)
-        end
 
         -- tarmac is made once seraphim animation is complete
         if self.Blueprint.General.FactionName == "Seraphim" then
