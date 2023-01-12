@@ -69,7 +69,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
 
         -- Knockdown force rings
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
-        WaitTicks(11)
+        WaitTicks(2)
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
 
         -- Create full-screen glow flash
@@ -126,7 +126,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         plume:SetCollision(false)
         plume:SetVelocityAlign(true)
 
-        WaitTicks(11)
+        WaitTicks(2)
 
         -- Create fireball plumes to accentuate the explosive detonation
         local num_projectiles = 15

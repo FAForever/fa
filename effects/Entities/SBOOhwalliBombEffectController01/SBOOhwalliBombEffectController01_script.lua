@@ -1,12 +1,8 @@
---****************************************************************************
---**
---**  File     :  \data\effects\Entities\SBOOhwalliBombEffectController01\SBOOhwalliBombEffectController01_script.lua
---**  Author(s):  Greg Kohne
---**
---**  Summary  :  Ohwalli Bomb effect controller script, non-damaging
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  \data\effects\Entities\SBOOhwalliBombEffectController01\SBOOhwalliBombEffectController01_script.lua
+-- Author(s):  Greg Kohne
+-- Summary  :  Ohwalli Bomb effect controller script, non-damaging
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------------------------------------------------------
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local RandomInt = import("/lua/utilities.lua").GetRandomInt
@@ -65,7 +61,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     end,
 
     MainBlast = function( self, army )
-		WaitTicks(206)
+		WaitTicks(26)
 
         --Create a light for this thing's flash.
         CreateLightParticle(self, -1, self.Army, 80, 14, 'flare_lens_add_03', 'ramp_white_07' )
@@ -80,7 +76,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
 
         self:CreatePlumes()
         self:ShakeCamera( 55, 10, 0, 2.5 )
-		WaitTicks(31)
+		WaitTicks(4)
 
         -- Create upward moving smoke plume
         local plume = self:CreateProjectile('/effects/entities/SBOOhwalliBombEffect02/SBOOhwalliBombEffect02_proj.bp', 0, 3, 0, 0, 0, 0)
