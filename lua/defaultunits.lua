@@ -47,7 +47,7 @@ StructureUnit = Class(Unit) {
         Unit.OnCreate(self)
         self:HideLandBones()
         self.FxBlinkingLightsBag = {}
-        if self.Layer == 'Land' and self.Blueprint.Physics.FlattenSkirt then
+        if self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
         end
     end,
@@ -135,11 +135,11 @@ StructureUnit = Class(Unit) {
         local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
-        elseif not bp.Physics.FlattenSkirt then
+        else 
             local bp = self.Blueprint
             
             
-            if bp.Physics.SlopeToTerrain and not self.TerrainSlope and (layer == 'Land' or layer == 'Seabed') then
+            if not self.TerrainSlope then
 
                 local axis = bp.Physics.SlopeToTerrainAxis
                 local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
@@ -201,8 +201,8 @@ StructureUnit = Class(Unit) {
     FlattenSkirt = function(self)
         local x, y, z = self:GetPositionXYZ()
         local x0, z0, x1, z1 = self:GetSkirtRect()
-        x0, z0, x1, z1 = math.floor(x0), math.floor(z0), math.ceil(x1), math.ceil(z1)
-        FlattenMapRect(x0, z0, x1 - x0, z1 - z0, y)
+
+        import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
 
     ---@param self StructureUnit

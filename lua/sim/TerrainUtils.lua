@@ -50,3 +50,19 @@ function GetTerrainSlopeAnglesDegrees(pos, bx, bz, sx, sz)
     local a1, a2 = GetTerrainSlopeAngles(pos, bx, bz, sx, sz)
     return -1 * MathDeg(a1), MathDeg(a2)
 end
+
+FlattenGradientMapRect = function(x,z,w,h)
+    --a1,a2
+    --b1,b2
+    local a1, a2, b1, b2 = GetTerrainHeight(x,z), GetTerrainHeight(x+w,z), GetTerrainHeight(x,z+h), GetTerrainHeight(x+w,z+h)
+    for i = 0, w do
+        for j = 0, h do
+            FlattenMapRect(x+i,z+j,0,0,
+                (
+                    ((a1*(w-i)+a2*(i))/w)*(h-j) +
+                    ((b1*(w-i)+b2*(i))/w)*(j)
+                )/h
+            )
+        end
+    end
+end
