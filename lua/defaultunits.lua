@@ -24,6 +24,7 @@ local GameHasAIs = ScenarioInfo.GameHasAIs
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
+local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
 local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
 
 -- STRUCTURE UNITS
@@ -117,7 +118,11 @@ StructureUnit = Class(Unit) {
         local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
         local degrees = rad * (180 / math.pi)
 
-        local rotator = CreateRotator(self, self:GetWeapon(1).Blueprint.TurretBoneYaw, 'y', degrees, nil, nil, nil)
+        if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
+            degrees = math.floor((degrees + 90) / 180) * 180
+        end
+
+        local rotator = CreateRotator(self, 0, 'y', degrees, nil, nil)
         rotator:SetPrecedence(1)
     end,
 
@@ -133,7 +138,8 @@ StructureUnit = Class(Unit) {
             self:RotateTowardsEnemy()
         end
 
-        if not bp.Physics.AltitudeToTerrain then
+        if not (bp.Physics.AltitudeToTerrain or bp.Physics.StandUpright) then
+            reprsl(bp.Physics)
             -- rotate structure to match terrain gradient
             local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
                 self:GetPosition(),
@@ -149,7 +155,6 @@ StructureUnit = Class(Unit) {
                 self.TerrainSlope = {}
             end
         end
-
 
         -- create decal below structure
         if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
