@@ -124,6 +124,7 @@ StructureUnit = Class(Unit) {
 
         local rotator = CreateRotator(self, 0, 'y', degrees, nil, nil)
         rotator:SetPrecedence(1)
+        self.Trash:Add(rotator)
     end,
 
     ---@param self StructureUnit
@@ -139,7 +140,6 @@ StructureUnit = Class(Unit) {
         end
 
         if not (bp.Physics.AltitudeToTerrain or bp.Physics.StandUpright) then
-            reprsl(bp.Physics)
             -- rotate structure to match terrain gradient
             local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
                 self:GetPosition(),
