@@ -162,6 +162,7 @@ ADepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
         for i in self.FxEnterWater do --splash
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
         end
+        
         self:SetMaxSpeed(20)
         self:SetVelocity(0)
         self:SetAcceleration(5)
@@ -171,7 +172,10 @@ ADepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
         self:SetVelocityAlign(true)
         self:SetStayUpright(false)
         self:SetVelocity(0.5)
-        self.Trash:Add(ForkThread(self.EnterWaterMovementThread, self))
+
+        if self.EnterWaterMovementThread then
+            self.Trash:Add(ForkThread(self.EnterWaterMovementThread, self))
+        end
     end,
 }
 
