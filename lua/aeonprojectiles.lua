@@ -156,7 +156,7 @@ ADepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     end,
 
     OnEnterWater = function(self)
-        ADepthChargeProjectile.OnEnterWater(self)
+        OnWaterEntryEmitterProjectile.OnEnterWater(self)
         local army = self.Army()
 
         for i in self.FxEnterWater do --splash
