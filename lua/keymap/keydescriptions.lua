@@ -12,10 +12,10 @@ keyDescriptions = {
 
     ['split_next'] = 'Select the next subgroup, or the original selection if there is no next subgroup.',
     ['split_prev'] = 'Select the previous subgroup, or the original selection if there is no previous subgroup.',
-    ['split_major_axis'] = 'Divides a selection by the line through your mouse position and the center of the selection.',
-    ['split_minor_axis'] = 'Divides a selection orthogonally to the line from your mouse position to the center of the selection.',
-    ['split_mouse_axis'] = 'Divides a selection over the major axis of the selected units.',
-    ['split_mouse_axis_orthogonal'] = 'Divides a selection over the minor axis of the selected units.',
+    ['split_mouse_axis'] = 'Divides a selection by the line through your mouse position and the center of the selection.',
+    ['split_mouse_axis_orthogonal'] = 'Divides a selection orthogonally to the line from your mouse position to the center of the selection.',
+    ['split_major_axis'] = 'Divides a selection over the major axis of the selected units.',
+    ['split_minor_axis'] = 'Divides a selection over the minor axis of the selected units.',
 
     ['revert_selection_set'] = 'Restore selection to the one before recalling a control group',
 
