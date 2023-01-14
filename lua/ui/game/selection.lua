@@ -12,7 +12,8 @@ local cacheHead = 1
 
 -- needs to be global in order to be saved
 selectionSets = {}
-local selectionSetCallbacks = {}
+selectionSetCallbacks = {}
+
 local lastSelectionName = nil
 local lastSelectionTime = 0
 
@@ -37,6 +38,24 @@ function PlaySelectionSound(newSelection)
         end
     end
 end
+
+local hidden_select = false
+function IsHidden()
+    return hidden_select == true
+end
+
+function Hidden(callback)
+    local CM = import("/lua/ui/game/commandmode.lua")
+    local current_command = CM.GetCommandMode()
+    local old_selection = GetSelectedUnits() or {}
+
+    hidden_select = true
+    callback()
+    SelectUnits(old_selection)
+    CM.StartCommandMode(current_command[1], current_command[2])
+    hidden_select = false
+end
+
 
 --- Registers a callback that is called when a selection is set (flag set to false) and when it is used (flag set to true)
 ---@param func function<UserUnit[], boolean>
@@ -391,19 +410,131 @@ function CombineSelectionAndSet(name)
     end
 end
 
-local hidden_select = false
-function IsHidden()
-    return hidden_select == true
+local OldSelection = { }
+local Splits = { }
+local SplitCount = 0
+local SplitCurrent = 0
+
+--- Select the next split, or return to the old selection if there are no next splits
+function SplitNext()
+    SplitCurrent = SplitCurrent + 1
+    if SplitCurrent > SplitCount then
+        SelectUnits(OldSelection)
+        return
+    end
+
+    SelectUnits(Splits[SplitCurrent])
 end
 
-function Hidden(callback)
-    local CM = import("/lua/ui/game/commandmode.lua")
-    local current_command = CM.GetCommandMode()
-    local old_selection = GetSelectedUnits() or {}
+--- Select the previous split, ore turn to the old selection if there are no previous splits
+function SplitPrevious()
+    SplitCurrent = SplitCurrent - 1
+    if SplitCurrent < 1 then
+        SelectUnits(OldSelection)
+        return
+    end
 
-    hidden_select = true
-    callback()
-    SelectUnits(old_selection)
-    CM.StartCommandMode(current_command[1], current_command[2])
-    hidden_select = false
+    SelectUnits(Splits[SplitCurrent])
+end
+
+--- Computes the two eigen vectors based on the x and z coordinates of each unit
+--- https://en.wikipedia.org/wiki/Principal_component_analysis
+---@param units UserUnit[]
+---@return Vector2 principle
+---@return Vector2 secondary
+---@return number
+---@return number
+local function GetPrincipleComponents(units)
+    -- calculate means
+    local xbar, zbar = 0, 0
+    local n = table.getn(units)
+    for i = 1, n do
+        local pos = units[i]:GetPosition()
+        xbar = xbar + pos[1]
+        zbar = zbar + pos[3]
+    end
+
+    xbar = xbar / n
+    zbar = zbar / n
+
+    -- calculate covariance
+    local covar, numer = 0, 0
+    for i = 1, n do
+        local pos = units[i]:GetPosition()
+        local xadj = pos[1] - xbar
+        local zadj = pos[3] - zbar
+        covar = covar + zadj*zadj - xadj*xadj
+        numer = numer + xadj * zadj
+    end
+    covar = covar / (2 * numer)
+
+    -- calculate eigenvectors
+    local orth = math.sqrt(covar*covar + 1)
+    local minor = {covar + orth, 1}
+    local major = {covar - orth, 1}
+
+    -- normalize
+    local l = minor[1] * minor[1] + minor[2] * minor[2]
+    minor[1] = 1 / l * minor[1]
+    minor[2] = 1 / l * minor[2]
+
+    local l = major[1] * major[1] + major[2] * major[2]
+    major[1] = 1 / l * major[1]
+    major[2] = 1 / l * major[2]
+
+    return minor, major, xbar, zbar
+end
+
+--- Splits the table of units into two tables, using the axis as the divider
+---@param units UserUnit[]
+---@param ax number x component of axis
+---@param az number z component of axis
+---@param cx number d component of center
+---@param cz number z component of center
+function SplitOverAxis(units, ax, az, cx, cz)
+
+    local a1, a2 = {}, {}
+    for k, unit in units do
+        -- direction to center
+        local pos = unit:GetPosition()
+        local dx = pos[1] - cx
+        local dz = pos[3] - cz
+
+        -- normalize
+        local l = dx * dx + dz * dz
+        dx = 1 / l * dx
+        dz = 1 / l * dz
+
+        -- determine dot product sign
+        if dx * ax + dz * az < 0 then
+            table.insert(a1, unit)
+        else
+            table.insert(a2, unit)
+        end
+    end
+
+    OldSelection = units
+    SplitCurrent = 1
+    SplitCount = 2
+    Splits = {
+        a1, a2
+    }
+
+    SelectUnits(a1)
+end
+
+--- Splits the current selection into two sets by using the major axis as the divider
+function SplitMajorAxis()
+    ---@type UserUnit[]
+    local units = GetSelectedUnits()
+    local minor, major, cx, cz = GetPrincipleComponents(units)
+    SplitOverAxis(units, major[1], major[2], cx, cz)
+end
+
+--- Splits the current selection into two sets by using the minor axis as the divider
+function SplitMinorAxis()
+    ---@type UserUnit[]
+    local units = GetSelectedUnits()
+    local minor, major, cx, cz = GetPrincipleComponents(units)
+    SplitOverAxis(units, minor[1], minor[2], cx, cz)
 end

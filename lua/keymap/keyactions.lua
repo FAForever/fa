@@ -69,6 +69,15 @@ keyActions = {
     ['revert_selection_set'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").RevertSelectionSet()',
         category = 'selection', order = 0,},
 
+    ['split_next'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitNext()',
+        category = 'selection', order = 1,},
+
+    ['split_prev'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitPrevious()',
+        category = 'selection', order = 1,},
+
+    ['split_major_axis'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitMajorAxis()',
+        category = 'selection', order = 1,},
+
     ['group1'] = {action = 'UI_ApplySelectionSet 1',
         category = 'selection', order = 1,},
     ['group2'] = {action = 'UI_ApplySelectionSet 2',
