@@ -412,7 +412,6 @@ end
 
 local OldSelection = { }
 local Splits = { }
-local SplitCount = 0
 local SplitCurrent = 0
 
 local function SelectSplit(units)
@@ -424,7 +423,7 @@ end
 --- Select the next split, or return to the old selection if there are no next splits. Preserves the command mode
 function SplitNext()
     SplitCurrent = SplitCurrent + 1
-    if SplitCurrent > SplitCount then
+    if SplitCurrent > table.getn(Splits) then
         SelectSplit(OldSelection)
         return
     end
@@ -522,7 +521,6 @@ function SplitOverAxis(units, ax, az, cx, cz)
 
     OldSelection = units
     SplitCurrent = 1
-    SplitCount = 2
     Splits = {
         a1, a2
     }
