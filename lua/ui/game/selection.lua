@@ -415,7 +415,7 @@ local Splits = { }
 local SplitCount = 0
 local SplitCurrent = 0
 
---- Select the next split, or return to the old selection if there are no next splits
+--- Select the next split, or return to the old selection if there are no next splits. Preserves the command mode
 function SplitNext()
     SplitCurrent = SplitCurrent + 1
     if SplitCurrent > SplitCount then
@@ -428,7 +428,7 @@ function SplitNext()
     import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
 end
 
---- Select the previous split, ore turn to the old selection if there are no previous splits
+--- Select the previous split, or return to the old selection if there are no previous splits. Preserves the command mode
 function SplitPrevious()
     SplitCurrent = SplitCurrent - 1
     if SplitCurrent < 1 then
