@@ -791,9 +791,9 @@ options = {
                 key = 'camera_shake_intensity',
                 type = 'slider',
                 set = function(key,value,startup)
-                    ConExecute("cam_ShakeMult " .. tostring(math.floor(0.01 * value)))
+                    ConExecute("cam_ShakeMult " .. tostring(0.01 * value))
                 end,
-                default = 150,
+                default = 100,
                 custom = {
                     min = 0,
                     max = 100,
