@@ -423,7 +423,9 @@ function SplitNext()
         return
     end
 
+    import("/lua/ui/game/commandmode.lua").CacheCommandMode()
     SelectUnits(Splits[SplitCurrent])
+    import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
 end
 
 --- Select the previous split, ore turn to the old selection if there are no previous splits
@@ -434,7 +436,9 @@ function SplitPrevious()
         return
     end
 
+    import("/lua/ui/game/commandmode.lua").CacheCommandMode()
     SelectUnits(Splits[SplitCurrent])
+    import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
 end
 
 --- Computes the two eigen vectors based on the x and z coordinates of each unit
@@ -520,7 +524,9 @@ function SplitOverAxis(units, ax, az, cx, cz)
         a1, a2
     }
 
+    import("/lua/ui/game/commandmode.lua").CacheCommandMode()
     SelectUnits(a1)
+    import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
 end
 
 --- Splits the current selection into two sets by using the major axis as the divider
