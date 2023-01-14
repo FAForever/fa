@@ -78,6 +78,10 @@ keyActions = {
         category = 'selection', order = 1,},
     ['split_minor_axis'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitMinorAxis()',
         category = 'selection', order = 1,},
+    ['split_mouse_axis'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitMouseAxis()',
+        category = 'selection', order = 1,},
+    ['split_mouse_axis_orthogonal'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitMouseOrthogonalAxis()',
+        category = 'selection', order = 1,},
 
     ['group1'] = {action = 'UI_ApplySelectionSet 1',
         category = 'selection', order = 1,},

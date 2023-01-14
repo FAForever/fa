@@ -415,30 +415,51 @@ local Splits = { }
 local SplitCount = 0
 local SplitCurrent = 0
 
+local function SelectSplit(units)
+    import("/lua/ui/game/commandmode.lua").CacheCommandMode()
+    SelectUnits(units)
+    import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
+end
+
 --- Select the next split, or return to the old selection if there are no next splits. Preserves the command mode
 function SplitNext()
     SplitCurrent = SplitCurrent + 1
     if SplitCurrent > SplitCount then
-        SelectUnits(OldSelection)
+        SelectSplit(OldSelection)
         return
     end
 
-    import("/lua/ui/game/commandmode.lua").CacheCommandMode()
-    SelectUnits(Splits[SplitCurrent])
-    import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
+    SelectSplit(Splits[SplitCurrent])
 end
 
 --- Select the previous split, or return to the old selection if there are no previous splits. Preserves the command mode
 function SplitPrevious()
     SplitCurrent = SplitCurrent - 1
     if SplitCurrent < 1 then
-        SelectUnits(OldSelection)
+        SelectSplit(OldSelection)
         return
     end
 
-    import("/lua/ui/game/commandmode.lua").CacheCommandMode()
-    SelectUnits(Splits[SplitCurrent])
-    import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
+    SelectSplit(Splits[SplitCurrent])
+end
+
+--- Computes the center position of a set of units
+---@param units UserUnit[]
+---@return number x component of center
+---@return number z component of center
+local function GetCenter(units)
+    local cx, cz = 0, 0
+    local n = table.getn(units)
+    for i = 1, n do
+        local pos = units[i]:GetPosition()
+        cx = cx + pos[1]
+        cz = cz + pos[3]
+    end
+
+    cx = cx / n
+    cz = cz / n
+
+    return cx, cz
 end
 
 --- Computes the two eigen vectors based on the x and z coordinates of each unit
@@ -450,23 +471,14 @@ end
 ---@return number
 local function GetPrincipleComponents(units)
     -- calculate means
-    local xbar, zbar = 0, 0
-    local n = table.getn(units)
-    for i = 1, n do
-        local pos = units[i]:GetPosition()
-        xbar = xbar + pos[1]
-        zbar = zbar + pos[3]
-    end
-
-    xbar = xbar / n
-    zbar = zbar / n
+    local cx, cz = GetCenter(units)
 
     -- calculate covariance
     local covar, numer = 0, 0
-    for i = 1, n do
+    for i = 1, table.getn(units) do
         local pos = units[i]:GetPosition()
-        local xadj = pos[1] - xbar
-        local zadj = pos[3] - zbar
+        local xadj = pos[1] - cx
+        local zadj = pos[3] - cz
         covar = covar + zadj*zadj - xadj*xadj
         numer = numer + xadj * zadj
     end
@@ -477,23 +489,14 @@ local function GetPrincipleComponents(units)
     local minor = {covar + orth, 1}
     local major = {covar - orth, 1}
 
-    -- normalize
-    local l = minor[1] * minor[1] + minor[2] * minor[2]
-    minor[1] = 1 / l * minor[1]
-    minor[2] = 1 / l * minor[2]
-
-    local l = major[1] * major[1] + major[2] * major[2]
-    major[1] = 1 / l * major[1]
-    major[2] = 1 / l * major[2]
-
-    return minor, major, xbar, zbar
+    return minor, major, cx, cz
 end
 
 --- Splits the table of units into two tables, using the axis as the divider
 ---@param units UserUnit[]
 ---@param ax number x component of axis
 ---@param az number z component of axis
----@param cx number d component of center
+---@param cx number x component of center
 ---@param cz number z component of center
 function SplitOverAxis(units, ax, az, cx, cz)
 
@@ -524,9 +527,7 @@ function SplitOverAxis(units, ax, az, cx, cz)
         a1, a2
     }
 
-    import("/lua/ui/game/commandmode.lua").CacheCommandMode()
-    SelectUnits(a1)
-    import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
+    SelectSplit(a1)
 end
 
 --- Splits the current selection into two sets by using the major axis as the divider
@@ -543,4 +544,30 @@ function SplitMinorAxis()
     local units = GetSelectedUnits()
     local minor, major, cx, cz = GetPrincipleComponents(units)
     SplitOverAxis(units, minor[1], minor[2], cx, cz)
+end
+
+--- Splits the current selection into two sets by dividing it with the line between the mouse location and the center of the selection
+function SplitMouseAxis()
+    ---@type UserUnit[]
+    local units = GetSelectedUnits()
+    local cx, cz = GetCenter(units)
+    local mouse = GetMouseWorldPos()
+
+    local ax = cx - mouse[1]
+    local az = cz - mouse[3]
+
+    SplitOverAxis(units, az, -1 * ax, cx, cz)
+end
+
+--- Splits the current selections into two sets by dividing it with the line orthogonal with the line between the mouse location and the center of the selection
+function SplitMouseOrthogonalAxis()
+    ---@type UserUnit[]
+    local units = GetSelectedUnits()
+    local cx, cz = GetCenter(units)
+    local mouse = GetMouseWorldPos()
+
+    local ax = cx - mouse[1]
+    local az = cz - mouse[3]
+
+    SplitOverAxis(units, ax, az, cx, cz)
 end
