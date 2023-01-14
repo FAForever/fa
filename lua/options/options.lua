@@ -787,6 +787,21 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_CAMERA_SHAKE>Camera shake intensity",
+                key = 'camera_shake_intensity',
+                type = 'slider',
+                set = function(key,value,startup)
+                    ConExecute("cam_ShakeMult " .. tostring(math.floor(0.01 * value)))
+                end,
+                default = 150,
+                custom = {
+                    min = 0,
+                    max = 100,
+                    inc = 5,
+                },
+            },
+
+            {
                 title = 'Building',
                 type = 'header',
 
