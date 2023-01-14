@@ -56,7 +56,6 @@ function Hidden(callback)
     hidden_select = false
 end
 
-
 --- Registers a callback that is called when a selection is set (flag set to false) and when it is used (flag set to true)
 ---@param func function<UserUnit[], boolean>
 function RegisterSelectionSetCallback(func)
@@ -410,8 +409,8 @@ function CombineSelectionAndSet(name)
     end
 end
 
-local OldSelection = { }
-local Splits = { }
+local OldSelection = {}
+local Splits = {}
 local SplitCurrent = 0
 
 local function SelectSplit(units)
@@ -478,15 +477,15 @@ local function GetPrincipleComponents(units)
         local pos = units[i]:GetPosition()
         local xadj = pos[1] - cx
         local zadj = pos[3] - cz
-        covar = covar + zadj*zadj - xadj*xadj
+        covar = covar + zadj * zadj - xadj * xadj
         numer = numer + xadj * zadj
     end
     covar = covar / (2 * numer)
 
     -- calculate eigenvectors
-    local orth = math.sqrt(covar*covar + 1)
-    local minor = {covar + orth, 1}
-    local major = {covar - orth, 1}
+    local orth = math.sqrt(covar * covar + 1)
+    local minor = { covar + orth, 1 }
+    local major = { covar - orth, 1 }
 
     return minor, major, cx, cz
 end
