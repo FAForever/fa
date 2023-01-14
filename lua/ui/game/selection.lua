@@ -1,4 +1,3 @@
-
 local Prefs = import("/lua/user/prefs.lua")
 
 ---@alias SelectionSetDoubleTapBehavior
@@ -8,7 +7,7 @@ local Prefs = import("/lua/user/prefs.lua")
 --- | 'translate'                   # When you double tap the camera only translates
 
 -- used to re-use memory where possible
-local cache = { }
+local cache = {}
 local cacheHead = 1
 
 -- needs to be global in order to be saved
@@ -43,7 +42,7 @@ end
 ---@param func function<UserUnit[], boolean>
 function RegisterSelectionSetCallback(func)
     -- see if this function is already in here
-    for i,v in selectionSetCallbacks do
+    for i, v in selectionSetCallbacks do
         if v == func then
             return
         end
@@ -55,15 +54,13 @@ end
 --- Removes a callback that is called when a selection is set
 ---@param func function<UserUnit[], boolean>
 function WithdrawSelectionSetCallback(func)
-    for i,v in selectionSetCallbacks do
+    for i, v in selectionSetCallbacks do
         if v == func then
             table.remove(selectionSetCallbacks, i)
             return
         end
     end
 end
-
-
 
 --- Removes all entries from a hash-based table, returns the hash-based table
 ---@param hash table<UserUnit, boolean>
@@ -152,7 +149,7 @@ local function DoubleTapBehavior(name, units)
                     cam:SetZoom(settings.Zoom, 0)
                 end
 
-            -- do not adjust the zoom
+                -- do not adjust the zoom
             elseif doubleTapbehavior == 'translate' then
                 cam:SetZoom(settings.Zoom, 0)
             end
@@ -173,7 +170,7 @@ end
 local function ProcessSelectionSet(name)
 
     -- guarantee one exists
-    selectionSets[name] = selectionSets[name] or { }
+    selectionSets[name] = selectionSets[name] or {}
 
     -- clear out the cache
     EmptyArray(cache)
@@ -211,10 +208,10 @@ function AddUnitToSelectionSet(name, unit)
         end
 
         -- guarantee that a table exists
-        selectionSets[name] = selectionSets[name] or { }
+        selectionSets[name] = selectionSets[name] or {}
         selectionSets[name][unit] = true
         unit:AddSelectionSet(name)
-    else 
+    else
         unit:RemoveSelectionSet(name)
     end
 end
@@ -228,7 +225,7 @@ function AddSelectionSet(name, unitArray)
     name = tostring(name)
 
     -- guarantee that a table exists
-    selectionSets[name] = selectionSets[name] or { }
+    selectionSets[name] = selectionSets[name] or {}
 
     -- remove the current units in the set
     for unit, _ in selectionSets[name] do
@@ -266,18 +263,19 @@ function AddCurrentSelectionSet(name)
     AddSelectionSet(name, GetSelectedUnits())
 end
 
-local oldSelection = { }
+local oldSelection = {}
 
 --- Selects the selection set provided
 ---@param name string | number
 function ApplySelectionSet(name)
-    
+
     -- bug where name is an index, not a key
     name = tostring(name)
 
     -- validate units, remove the ones that got transformed into wrecks
     local aValidUnits = ProcessSelectionSet(name)
-    local aSelection = EntityCategoryFilterDown(categories.ALLUNITS - (categories.FACTORY - categories.MOBILE) , aValidUnits)
+    local aSelection = EntityCategoryFilterDown(categories.ALLUNITS - (categories.FACTORY - categories.MOBILE),
+        aValidUnits)
     if table.getsize(aSelection) == 0 then
         aSelection = EntityCategoryFilterDown(categories.FACTORY - categories.MOBILE, aValidUnits)
         if table.getsize(aSelection) == 0 then
@@ -346,7 +344,7 @@ end
 
 --- Appends the selection to the selection set
 ---@param name string | number
-function AppendSelectionToSet (name)
+function AppendSelectionToSet(name)
 
     -- bug where name is an index, not a key
     name = tostring(name)
