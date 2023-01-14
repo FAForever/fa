@@ -318,6 +318,9 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // how to shade and it should become lesser as we get shallower
     // so that we don't have a sharp line
     float4 waterTexture = tex2D( UtilitySamplerC, inV.mTexUV );
+
+	// return waterTexture.bbbb;
+
     float waterDepth =  waterTexture.g;
   
     float3 viewVector = normalize(inV.mViewVec);
