@@ -319,8 +319,6 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // so that we don't have a sharp line
     float4 waterTexture = tex2D( UtilitySamplerC, inV.mTexUV );
 
-	// return waterTexture.bbbb;
-
     float waterDepth =  waterTexture.g;
   
     float3 viewVector = normalize(inV.mViewVec);
