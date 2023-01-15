@@ -409,47 +409,75 @@ function CombineSelectionAndSet(name)
     end
 end
 
-local OldSelection = {}
-local Splits = {}
-local SplitCurrent = 0
+---@type 'None' | 'Static' | 'Dynamic'
+local SplitType = 'None'
 
-local function SelectSplit()
+---@type UserUnit[]
+local OldSelection = {}
+---@type fun() : UserUnit[]
+local DynamicSplit = function() end
+---@type UserUnit[][]
+local StaticSplits = {}
+---@type number
+local StaticSplitCurrent = 0
+
+---@param units UserUnit[]
+local function SelectSplit(units)
     import("/lua/ui/game/commandmode.lua").CacheCommandMode()
-    SelectUnits(Splits[SplitCurrent])
+    SelectUnits(units)
     import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
 end
 
+--- Selects the old selection
 local function SelectOldSelection()
+    import("/lua/ui/game/commandmode.lua").CacheCommandMode()
     SelectUnits(OldSelection)
+    import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
 end
 
-local function DefineSplits(oldSelection, splits)
+---@param oldSelection UserUnit[]
+---@param splits UserUnit[][]
+local function SetupStaticSplits(oldSelection, splits)
     OldSelection = oldSelection
-    Splits = splits
-    SplitCurrent = 1
-    SelectSplit()
+    SplitType = 'Static'
+
+    StaticSplits = splits
+    StaticSplitCurrent = 1
+    SelectSplit(StaticSplits[StaticSplitCurrent])
+end
+
+---@param oldSelection any
+---@param func fun(): UserUnit[]?
+local function SetupDynamicSplits(oldSelection, func)
+    OldSelection = oldSelection
+    SplitType = 'Dynamic'
+
+    DynamicSplit = func
+    SelectSplit(DynamicSplit())
 end
 
 --- Select the next split, or return to the old selection if there are no next splits. Preserves the command mode
 function SplitNext()
-    SplitCurrent = SplitCurrent + 1
-    if SplitCurrent > table.getn(Splits) then
-        SelectOldSelection()
-        return
+    if SplitType == 'Dynamic' then
+        ---@type UserUnit[]
+        local split = DynamicSplit()
+        if not table.empty(split) then
+            SelectSplit(split)
+        else
+            SplitType = 'None'
+            SelectOldSelection()
+            return
+        end
+    elseif SplitType == 'Static' then
+        StaticSplitCurrent = StaticSplitCurrent + 1
+        if StaticSplitCurrent > table.getn(StaticSplits) then
+            SplitType = 'None'
+            SelectOldSelection()
+            return
+        end
+
+        SelectSplit(StaticSplits[StaticSplitCurrent])
     end
-
-    SelectSplit()
-end
-
---- Select the previous split, or return to the old selection if there are no previous splits. Preserves the command mode
-function SplitPrevious()
-    SplitCurrent = SplitCurrent - 1
-    if SplitCurrent < 1 then
-        SelectOldSelection()
-        return
-    end
-
-    SelectSplit()
 end
 
 --- Computes the center position of a set of units
@@ -501,7 +529,136 @@ local function GetPrincipleComponents(units)
     return minor, major, cx, cz
 end
 
---- Splits the table of units into two tables, using the axis as the divider
+---@type UserUnit[][]
+local Grid = {
+    { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },
+    { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },
+    { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },
+    { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },
+    { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },
+    { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },
+    { { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },
+}
+
+local GridSize = 7
+
+---@type UIOrderSelectionGrid[]
+local GridOrder = {
+    nil, nil, nil, nil, nil, nil, nil,
+    nil, nil, nil, nil, nil, nil, nil,
+    nil, nil, nil, nil, nil, nil, nil,
+    nil, nil, nil, nil, nil, nil, nil,
+    nil, nil, nil, nil, nil, nil, nil,
+    nil, nil, nil, nil, nil, nil, nil,
+}
+
+--- Computes an axis-aligned bounding box that encapsulates the set of units
+---@param units UserUnit[]
+---@return number x coordinate of top-left point of grid
+---@return number z coordinate of top-left point of grid
+---@return number x coordinate of bottom-right point of grid
+---@return number z coordinate of bottom-right point of grid
+local function GetBoundingBox(units)
+    -- top-left
+    local x1, z1 = 8192, 8192
+
+    -- bottom-right
+    local x2, z2 = 0, 0
+
+    for k, unit in units do
+        local pos = unit:GetPosition()
+        if x1 > pos[1] then
+            x1 = pos[1]
+        end
+
+        if x2 < pos[1] then
+            x2 = pos[1]
+        end
+
+        if z1 > pos[3] then
+            z1 = pos[3]
+        end
+
+        if z2 < pos[3] then
+            z2 = pos[3]
+        end
+    end
+
+    return x1 - 1, z1 - 1, x2 + 1, z2 + 1
+end
+
+---@param units UserUnit[]
+local function GetGrid(units)
+
+    local grid = Grid
+
+    -- clear out grid
+    for z = 1, 7 do
+        for x = 1, 7 do
+            for unit, _ in grid[z][x] do
+                grid[z][x][unit] = nil
+            end
+        end
+    end
+
+    -- compute bounding box
+    local x1, z1, x2, z2 = GetBoundingBox(units)
+
+    for k, unit in units do
+        local pos = unit:GetPosition()
+        local bx = 1 + math.floor(GridSize * ((pos[1] - x1) / (x2 - x1)))
+        local bz = 1 + math.floor(GridSize * ((pos[3] - z1) / (z2 - z1)))
+        grid[bz][bx][unit] = true
+    end
+
+    return grid, x1, z1, x2, z2
+end
+
+---@class UIOrderSelectionGrid
+---@field Units UserUnit[]
+---@field X number
+---@field Z number
+---@field Distance number
+
+---@param grid UserUnit[][]
+---@param x1 number x coordinate of top-left point of grid
+---@param z1 number z coordinate of top-left point of grid
+---@param x2 number x coordinate of bottom-right point of grid
+---@param z2 number z coordinate of bottom-right point of grid
+---@param x number x coordinate of point to sort over
+---@param z number z coordinate of point to sort over
+---@return UIOrderSelectionGrid[]
+local function GetGridOrder(grid, x1, z1, x2, z2, x, z)
+    local gridOrder = GridOrder
+
+    local index = 1
+    for bz = 1, GridSize do
+        for bx = 1, GridSize do
+            ---@type UIOrderSelectionGrid
+            local cell = { Units = grid[bz][bx] }
+            cell.X = x1 + (bx - 0.5) * ((x2 - x1) / GridSize)
+            cell.Z = z1 + (bz - 0.5) * ((z2 - z1) / GridSize)
+
+            local dx = cell.X - x
+            local dz = cell.Z - z
+            cell.Distance = dx * dx + dz * dz
+
+            gridOrder[index] = cell
+            index = index + 1
+        end
+    end
+
+    table.sort(
+        gridOrder,
+        function(a, b)
+            return a.Distance < b.Distance
+        end
+    )
+
+    return gridOrder
+end
+
+--- StaticSplits the table of units into two tables, using the axis as the divider
 ---@param units UserUnit[]
 ---@param ax number x component of axis
 ---@param az number z component of axis
@@ -529,10 +686,10 @@ function SplitOverAxis(units, ax, az, cx, cz)
         end
     end
 
-    DefineSplits(units, {a1, a2})
+    SetupStaticSplits(units, { a1, a2 })
 end
 
---- Splits the current selection into two sets by using the major axis as the divider
+--- StaticSplits the current selection into two sets by using the major axis as the divider
 function SplitMajorAxis()
     ---@type UserUnit[]
     local units = GetSelectedUnits()
@@ -543,7 +700,7 @@ function SplitMajorAxis()
     end
 end
 
---- Splits the current selection into two sets by using the minor axis as the divider
+--- StaticSplits the current selection into two sets by using the minor axis as the divider
 function SplitMinorAxis()
     ---@type UserUnit[]
     local units = GetSelectedUnits()
@@ -554,7 +711,7 @@ function SplitMinorAxis()
     end
 end
 
---- Splits the current selection into two sets by dividing it with the line between the mouse location and the center of the selection
+--- StaticSplits the current selection into two sets by dividing it with the line between the mouse location and the center of the selection
 function SplitMouseAxis()
     ---@type UserUnit[]
     local units = GetSelectedUnits()
@@ -570,7 +727,7 @@ function SplitMouseAxis()
     end
 end
 
---- Splits the current selections into two sets by dividing it with the line orthogonal with the line between the mouse location and the center of the selection
+--- StaticSplits the current selections into two sets by dividing it with the line orthogonal with the line between the mouse location and the center of the selection
 function SplitMouseOrthogonalAxis()
     ---@type UserUnit[]
     local units = GetSelectedUnits()
@@ -592,13 +749,14 @@ function SplitEngineerTech()
     local units = GetSelectedUnits()
 
     if units and not table.empty(units) then
-        local experimental = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.EXPERIMENTAL, units)
+        local experimental = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.EXPERIMENTAL,
+            units)
         local SACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER, units)
         local tech3 = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.TECH3, units)
         local tech2 = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.TECH2, units)
         local tech1 = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.TECH1, units)
 
-        local splits = { }
+        local splits = {}
         if not table.empty(experimental) then
             table.insert(splits, experimental)
         end
@@ -620,7 +778,7 @@ function SplitEngineerTech()
         end
 
         if table.getn(splits) > 0 then
-            DefineSplits(units, splits)
+            SetupStaticSplits(units, splits)
         end
     end
 end
@@ -637,7 +795,7 @@ function SplitTech()
         local tech2 = EntityCategoryFilterDown(categories.TECH2, units)
         local tech1 = EntityCategoryFilterDown(categories.TECH1, units)
 
-        local splits = { }
+        local splits = {}
         if not table.empty(experimental) then
             table.insert(splits, experimental)
         end
@@ -659,7 +817,7 @@ function SplitTech()
         end
 
         if table.getn(splits) > 0 then
-            DefineSplits(units, splits)
+            SetupStaticSplits(units, splits)
         end
     end
 end
@@ -673,8 +831,8 @@ function SplitLayer()
         local land = EntityCategoryFilterDown(categories.LAND + categories.HOVER + categories.AMPHIBIOUS, units)
         local naval = EntityCategoryFilterDown(categories.NAVAL, units)
         local air = EntityCategoryFilterDown(categories.AIR, units)
-        
-        local splits = { }
+
+        local splits = {}
         if not table.empty(land) then
             table.insert(land, splits)
         end
@@ -686,5 +844,46 @@ function SplitLayer()
         if not table.empty(air) then
             table.insert(splits, air)
         end
+    end
+end
+
+--- Divides a selection into various subgroups of units
+---@param size any
+function SplitIntoGroups(size)
+    ---@type UserUnit[]
+    local units = GetSelectedUnits()
+
+    if units and not table.empty(units) then
+        -- construct grid based on current selection
+        local grid, x1, z1, x2, z2 = GetGrid(units)
+
+        ---@return UserUnit[]
+        local func = function()
+            local mouse = GetMouseWorldPos()
+            local order = GetGridOrder(grid, x1, z1, x2, z2, mouse[1], mouse[3])
+
+            local count = 0
+            local subgroup = {}
+            for k = 1, table.getn(order) do
+                if count >= size then
+                    break
+                end
+
+                local cell = order[k]
+                for unit, _ in cell.Units do
+                    count = count + 1
+                    subgroup[count] = unit
+                    cell.Units[unit] = nil
+
+                    if count >= size then
+                        break
+                    end
+                end
+            end
+
+            return subgroup
+        end
+
+        SetupDynamicSplits(units, func)
     end
 end

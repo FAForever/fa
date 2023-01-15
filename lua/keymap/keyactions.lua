@@ -71,8 +71,6 @@ keyActions = {
 
     ['split_next'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitNext()',
         category = 'selectionSubgroups', order = 1,},
-    ['split_prev'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitPrevious()',
-        category = 'selectionSubgroups', order = 1,},
 
     ['split_major_axis'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitMajorAxis()',
         category = 'selectionSubgroups', order = 1,},
@@ -87,6 +85,8 @@ keyActions = {
     ['split_tech'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitTech()',
         category = 'selectionSubgroups', order = 1,},
     ['split_layer'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitLayer()',
+        category = 'selectionSubgroups', order = 1,},
+    ['split_into_groups_1'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitIntoGroups(5)',
         category = 'selectionSubgroups', order = 1,},
 
     ['group1'] = {action = 'UI_ApplySelectionSet 1',
