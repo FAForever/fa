@@ -138,6 +138,8 @@ UnitBlueprint {
     LifeBarOffset = 1.2,
     LifeBarSize = 3,
     Physics = {
+        MaxGroundVariation = 512,
+        FlattenSkirt = false,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -149,7 +151,6 @@ UnitBlueprint {
         },
         BuildRestriction = 'RULEUBR_OnHydrocarbonDeposit',
         DragCoefficient = 0.2,
-        FlattenSkirt = true,
         MaxSteerForce = 0,
         MeshExtentsX = 3.25,
         MeshExtentsY = 1.5,

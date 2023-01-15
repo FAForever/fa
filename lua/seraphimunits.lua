@@ -632,7 +632,7 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
                         table.insert(filteredUnits, v)
                     end
                 end
-                local target = filteredUnits[Random(1, table.getn(filteredUnits))]
+                local target = table.random(filteredUnits)
                 if target then
                     weapon:SetTargetEntity(target)
                 else

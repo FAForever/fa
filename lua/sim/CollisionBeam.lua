@@ -150,7 +150,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             self.Trash:Add(fx)
         end
         if not table.empty(self.FxBeam) then
-            local fxBeam = CreateBeamEmitter(self.FxBeam[Random(1, table.getn(self.FxBeam))], self.Army)
+            local fxBeam = CreateBeamEmitter(table.random(self.FxBeam), self.Army)
             AttachBeamToEntity(fxBeam, self, 0, self.Army)
 
             -- collide on start if it's a continuous beam
