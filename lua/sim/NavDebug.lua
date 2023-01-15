@@ -98,25 +98,37 @@ function GetLabelMeta(data)
     end
 end
 
+---comment
+---@param mouse Vector
+---@param layer NavLayers
 function ScanOver(mouse, layer)
     if mouse then
-        local over = NavGenerator.NavGrids[layer]:FindLeaf(mouse)
-        if over then 
-            if over.label > 0 then
-                local color = Shared.LabelToColor(over.label)
-                over:Draw(color, 0.1)
-                over:Draw(color, 0.15)
-                over:Draw(color, 0.2)
+        ---@type NavGrid
+        local navGrid = NavGenerator.NavGrids[layer]
+        local over = navGrid:FindLeaf(mouse)
+        if over then
+            if over.Label then
+                local color = Shared.LabelToColor(over.Label)
+                local size = over.Size
+                local h = 0.5 * size
+                NavGenerator.DrawSquare(over.px - h, over.pz - h, size, color, 0.1)
+                NavGenerator.DrawSquare(over.px - h, over.pz - h, size, color, 0.15)
+                NavGenerator.DrawSquare(over.px - h, over.pz - h, size, color, 0.2)
 
-                if over.neighbors then
-                    for _, neighbor in over.neighbors do
-                        neighbor:Draw(color, 0.25)
-                    end
+                for k = 1, table.getn(over) do
+                     local neighbor = over[k]
+                     local size = neighbor.Size
+                     local h = 0.5 * size
+                     local color = Shared.LabelToColor(neighbor.Label)
+                     NavGenerator.DrawSquare(neighbor.px - h, neighbor.pz - h, size, color, 0.1)
                 end
             else
-                over:Draw('ff0000', 0.1)
-                over:Draw('ff0000', 0.15)
-                over:Draw('ff0000', 0.2)
+                local color = 'ff0000'
+                local size = over.Size
+                local h = 0.5 * size
+                NavGenerator.DrawSquare(over.px - h, over.pz -  h, size, color, 0.1)
+                NavGenerator.DrawSquare(over.px - h, over.pz -  h, size, color, 0.15)
+                NavGenerator.DrawSquare(over.px - h, over.pz -  h, size, color, 0.2)
             end
         end
     end
