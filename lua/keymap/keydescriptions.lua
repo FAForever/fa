@@ -10,12 +10,15 @@ keyDescriptions = {
     ['cap_frame'] = '<LOC key_desc_0003>Take a screen shot',
     ['show_fps'] = "<LOC key_desc_0131>Toggle the display of frames rendered per second",
 
-    ['split_next'] = '<LOC key_split_next>Select the next subgroup, or the original selection if there is no next subgroup.',
-    ['split_prev'] = '<LOC key_split_prev>Select the previous subgroup, or the original selection if there is no previous subgroup.',
-    ['split_mouse_axis'] = '<LOC key_split_mouse_axis>Divides a selection by the line through your mouse position and the center of the selection.',
-    ['split_mouse_axis_orthogonal'] = '<LOC key_split_mouse_axis_orthogonal>Divides a selection orthogonally to the line from your mouse position to the center of the selection.',
-    ['split_major_axis'] = '<LOC key_split_major_axis>Divides a selection over the major axis of the selected units.',
-    ['split_minor_axis'] = '<LOC key_split_minor_axis>Divides a selection over the minor axis of the selected units.',
+    ['split_next'] = '<LOC key_split_next>Select the next subgroup, or the original selection if there is no next subgroup',
+    ['split_prev'] = '<LOC key_split_prev>Select the previous subgroup, or the original selection if there is no previous subgroup',
+    ['split_mouse_axis'] = '<LOC key_split_mouse_axis>Divides a selection by the line through your mouse position and the center of the selection',
+    ['split_mouse_axis_orthogonal'] = '<LOC key_split_mouse_axis_orthogonal>Divides a selection orthogonally to the line from your mouse position to the center of the selection',
+    ['split_major_axis'] = '<LOC key_split_major_axis>Divides a selection over the major axis of the selected units',
+    ['split_minor_axis'] = '<LOC key_split_minor_axis>Divides a selection over the minor axis of the selected units',
+    ['split_tech'] = '<LOC key_split_major_axis>Divides a selection over experimentals, SACUs, tech 3, tech 2 and tech 1 units',
+    ['split_layer'] = '<LOC key_split_minor_axis>Divides a selection over land, naval and air units',
+    ['split_engineer_tech'] = '<LOC key_split_minor_axis>Divides a selection over SACUs, tech 3, tech 2 and tech 1 engineers',
 
     ['revert_selection_set'] = 'Restore selection to the one before recalling a control group',
 

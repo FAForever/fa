@@ -82,6 +82,12 @@ keyActions = {
         category = 'selectionSubgroups', order = 1,},
     ['split_mouse_axis_orthogonal'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitMouseOrthogonalAxis()',
         category = 'selectionSubgroups', order = 1,},
+    ['split_engineer_tech'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitEngineerTech()',
+        category = 'selectionSubgroups', order = 1,},
+    ['split_tech'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitTech()',
+        category = 'selectionSubgroups', order = 1,},
+    ['split_layer'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").SplitLayer()',
+        category = 'selectionSubgroups', order = 1,},
 
     ['group1'] = {action = 'UI_ApplySelectionSet 1',
         category = 'selection', order = 1,},

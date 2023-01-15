@@ -413,32 +413,43 @@ local OldSelection = {}
 local Splits = {}
 local SplitCurrent = 0
 
-local function SelectSplit(units)
+local function SelectSplit()
     import("/lua/ui/game/commandmode.lua").CacheCommandMode()
-    SelectUnits(units)
+    SelectUnits(Splits[SplitCurrent])
     import("/lua/ui/game/commandmode.lua").RestoreCommandMode()
+end
+
+local function SelectOldSelection()
+    SelectUnits(OldSelection)
+end
+
+local function DefineSplits(oldSelection, splits)
+    OldSelection = oldSelection
+    Splits = splits
+    SplitCurrent = 1
+    SelectSplit()
 end
 
 --- Select the next split, or return to the old selection if there are no next splits. Preserves the command mode
 function SplitNext()
     SplitCurrent = SplitCurrent + 1
     if SplitCurrent > table.getn(Splits) then
-        SelectSplit(OldSelection)
+        SelectOldSelection()
         return
     end
 
-    SelectSplit(Splits[SplitCurrent])
+    SelectSplit()
 end
 
 --- Select the previous split, or return to the old selection if there are no previous splits. Preserves the command mode
 function SplitPrevious()
     SplitCurrent = SplitCurrent - 1
     if SplitCurrent < 1 then
-        SelectSplit(OldSelection)
+        SelectOldSelection()
         return
     end
 
-    SelectSplit(Splits[SplitCurrent])
+    SelectSplit()
 end
 
 --- Computes the center position of a set of units
@@ -518,53 +529,162 @@ function SplitOverAxis(units, ax, az, cx, cz)
         end
     end
 
-    OldSelection = units
-    SplitCurrent = 1
-    Splits = {
-        a1, a2
-    }
-
-    SelectSplit(a1)
+    DefineSplits(units, {a1, a2})
 end
 
 --- Splits the current selection into two sets by using the major axis as the divider
 function SplitMajorAxis()
     ---@type UserUnit[]
     local units = GetSelectedUnits()
-    local minor, major, cx, cz = GetPrincipleComponents(units)
-    SplitOverAxis(units, major[1], major[2], cx, cz)
+
+    if units and not table.empty(units) then
+        local minor, major, cx, cz = GetPrincipleComponents(units)
+        SplitOverAxis(units, major[1], major[2], cx, cz)
+    end
 end
 
 --- Splits the current selection into two sets by using the minor axis as the divider
 function SplitMinorAxis()
     ---@type UserUnit[]
     local units = GetSelectedUnits()
-    local minor, major, cx, cz = GetPrincipleComponents(units)
-    SplitOverAxis(units, minor[1], minor[2], cx, cz)
+
+    if units and not table.empty(units) then
+        local minor, major, cx, cz = GetPrincipleComponents(units)
+        SplitOverAxis(units, minor[1], minor[2], cx, cz)
+    end
 end
 
 --- Splits the current selection into two sets by dividing it with the line between the mouse location and the center of the selection
 function SplitMouseAxis()
     ---@type UserUnit[]
     local units = GetSelectedUnits()
-    local cx, cz = GetCenter(units)
-    local mouse = GetMouseWorldPos()
 
-    local ax = cx - mouse[1]
-    local az = cz - mouse[3]
+    if units and not table.empty(units) then
+        local cx, cz = GetCenter(units)
+        local mouse = GetMouseWorldPos()
 
-    SplitOverAxis(units, az, -1 * ax, cx, cz)
+        local ax = cx - mouse[1]
+        local az = cz - mouse[3]
+
+        SplitOverAxis(units, az, -1 * ax, cx, cz)
+    end
 end
 
 --- Splits the current selections into two sets by dividing it with the line orthogonal with the line between the mouse location and the center of the selection
 function SplitMouseOrthogonalAxis()
     ---@type UserUnit[]
     local units = GetSelectedUnits()
-    local cx, cz = GetCenter(units)
-    local mouse = GetMouseWorldPos()
 
-    local ax = cx - mouse[1]
-    local az = cz - mouse[3]
+    if units and not table.empty(units) then
+        local cx, cz = GetCenter(units)
+        local mouse = GetMouseWorldPos()
 
-    SplitOverAxis(units, ax, az, cx, cz)
+        local ax = cx - mouse[1]
+        local az = cz - mouse[3]
+
+        SplitOverAxis(units, ax, az, cx, cz)
+    end
+end
+
+--- Divides a selection into up to fives sets of experimental engineers, SACUs, tech 3 engineers, tech 2 engineers and tech 1 engineers
+function SplitEngineerTech()
+    ---@type UserUnit[]
+    local units = GetSelectedUnits()
+
+    if units and not table.empty(units) then
+        local experimental = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.EXPERIMENTAL, units)
+        local SACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER, units)
+        local tech3 = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.TECH3, units)
+        local tech2 = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.TECH2, units)
+        local tech1 = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.TECH1, units)
+
+        local splits = { }
+        if not table.empty(experimental) then
+            table.insert(splits, experimental)
+        end
+
+        if not table.empty(SACUs) then
+            table.insert(splits, SACUs)
+        end
+
+        if not table.empty(tech3) then
+            table.insert(splits, tech3)
+        end
+
+        if not table.empty(tech2) then
+            table.insert(splits, tech2)
+        end
+
+        if not table.empty(tech1) then
+            table.insert(splits, tech1)
+        end
+
+        if table.getn(splits) > 0 then
+            DefineSplits(units, splits)
+        end
+    end
+end
+
+--- Divides a selection into up to five sets of experimentals, SACUs, tech 3, tech 2 and tech 1
+function SplitTech()
+    ---@type UserUnit[]
+    local units = GetSelectedUnits()
+
+    if units and not table.empty(units) then
+        local experimental = EntityCategoryFilterDown(categories.EXPERIMENTAL, units)
+        local SACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER, units)
+        local tech3 = EntityCategoryFilterDown(categories.TECH3, units)
+        local tech2 = EntityCategoryFilterDown(categories.TECH2, units)
+        local tech1 = EntityCategoryFilterDown(categories.TECH1, units)
+
+        local splits = { }
+        if not table.empty(experimental) then
+            table.insert(splits, experimental)
+        end
+
+        if not table.empty(SACUs) then
+            table.insert(splits, SACUs)
+        end
+
+        if not table.empty(tech3) then
+            table.insert(splits, tech3)
+        end
+
+        if not table.empty(tech2) then
+            table.insert(splits, tech2)
+        end
+
+        if not table.empty(tech1) then
+            table.insert(splits, tech1)
+        end
+
+        if table.getn(splits) > 0 then
+            DefineSplits(units, splits)
+        end
+    end
+end
+
+--- Divides a selection into up to three sets of land units, naval units and air units
+function SplitLayer()
+    ---@type UserUnit[]
+    local units = GetSelectedUnits()
+
+    if units and not table.empty(units) then
+        local land = EntityCategoryFilterDown(categories.LAND + categories.HOVER + categories.AMPHIBIOUS, units)
+        local naval = EntityCategoryFilterDown(categories.NAVAL, units)
+        local air = EntityCategoryFilterDown(categories.AIR, units)
+        
+        local splits = { }
+        if not table.empty(land) then
+            table.insert(land, splits)
+        end
+
+        if not table.empty(naval) then
+            table.insert(splits, naval)
+        end
+
+        if not table.empty(air) then
+            table.insert(splits, air)
+        end
+    end
 end
