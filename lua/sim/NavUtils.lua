@@ -181,7 +181,6 @@ function PathToDefaultOptions()
     return PathToOptions
 end
 
---- Returns true when you can path from the origin to the destination
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector
@@ -248,6 +247,157 @@ function PathTo(layer, origin, destination, options)
                 -- if neighbor.AcquiredCosts > leaf.AcquiredCosts + leaf.neighborDistances[id] then
                 --     neighbor.From = leaf
                 -- end
+            end
+        end
+    end
+
+    -- check if we found a path
+    if not destinationLeaf.Seen == seenIdentifier then
+        return nil, 'Did not manage to find the destination'
+    end
+
+    -- construct current path
+    local head = 1
+    local path = { }
+    local distance = 0
+    local leaf = destinationLeaf.From
+    while leaf.From and leaf.From != leaf do
+
+        -- add to path
+        path[head] = {
+            leaf.px,
+            GetSurfaceHeight(leaf.px, leaf.pz),
+            leaf.pz
+        }
+        head = head + 1
+
+        -- keep track of distance
+        distance = distance + leaf:DistanceTo(leaf.From)
+
+        -- continue down the tree
+        leaf = leaf.From
+    end
+
+    -- reverse the path
+    for k = 1, (0.5 * head) ^ 0 do
+        local temp = path[k]
+        path[k] = path[head - k]
+        path[head - k] = temp
+    end
+
+    -- add destination to the path
+    path[head] = destination
+
+    -- clear up after ourselves
+    PathToHeap:Clear()
+
+    -- return all the goodies!!
+    return path, head, distance
+end
+
+local ThreatPosition = { }
+
+---@type table<string, fun(aiBrain: AIBrain, position: Vector, radius: number) : number>
+ThreatFunctions = {
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    AntiSurface = function(aibrain, position, radius)
+        return aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
+    end,
+
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    AntiAir = function(aibrain, position, radius)
+        return aibrain:GetThreatAtPosition(position, radius, true, 'AntiAir')
+    end,
+}
+
+---@param layer NavLayers
+---@param origin Vector
+---@param destination Vector
+---@param aibrain AIBrain
+---@param threatFunc fun(aiBrain: AIBrain, position: Vector, radius: number) : number
+---@param threatThreshold number
+---@param threatRadius number
+---@return Vector[]?            # List of positions
+---@return (string | number)?   # Error message, or the number of positions
+---@return number?              # Length of path
+function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFunc, threatThreshold, threatRadius)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
+
+    -- check if we can path
+    local ok, msg = CanPathTo(layer, origin, destination)
+    if not ok then
+        return nil, msg
+    end
+
+    -- setup pathing
+    local seenIdentifier = PathToGetUniqueIdentifier()
+    local grid = FindGrid(layer)                        --[[@as NavGrid]]
+    local originLeaf = FindLeaf(grid, origin)           --[[@as CompressedLabelTreeLeaf]]
+    local destinationLeaf = FindLeaf(grid, destination) --[[@as CompressedLabelTreeLeaf]]
+
+    ---@type CompressedLabelTreeLeaf[]
+    local invalidDueToThreat = { }
+
+    -- 0th iteration of search
+    originLeaf.From = nil
+    originLeaf.AcquiredCosts = 0
+    originLeaf.TotalCosts = originLeaf:DistanceTo(destinationLeaf)
+    originLeaf.Seen = seenIdentifier
+    PathToHeap:Insert(originLeaf)
+
+    destinationLeaf.From = nil
+    destinationLeaf.AcquiredCosts = 0
+    destinationLeaf.TotalCosts = 0
+    destinationLeaf.Seen = 0
+
+    -- search iterations
+    while not PathToHeap:IsEmpty() do
+
+        local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
+
+        -- final state
+        if leaf == destinationLeaf then
+            break
+        end
+
+        local root = leaf.Root
+        if root.Seen != seenIdentifier then
+            root.Seen = seenIdentifier
+            root.Threat = threatFunc(aibrain, {leaf.px, 0, leaf.pz}, threatRadius)
+            
+            if root.Threat > 0 then
+                local surface = GetSurfaceHeight(leaf.px, leaf.pz)
+                DrawCircle({leaf.px, surface, leaf.pz}, 10, 'ff0000')
+            end
+        end
+
+        -- do nothing, for now
+        if root.Threat > threatThreshold then
+
+        -- scan all neighbors and continue the search
+        else
+            for k = 1, table.getn(leaf) do
+                local neighbor = leaf[k]
+                if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
+                    local preferLargeNeighbor = 0
+                    if leaf.Size > neighbor.Size then
+                        preferLargeNeighbor = 100
+                    end
+                    neighbor.From = leaf
+                    neighbor.Seen = seenIdentifier
+                    neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor) + 2 + preferLargeNeighbor
+                    neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
+
+                    PathToHeap:Insert(neighbor)
+                end
             end
         end
     end

@@ -240,7 +240,7 @@ function Scan()
         end
 
         if PathToState.Origin and PathToState.Destination then
-            local path, n, label = NavUtils.PathTo(PathToState.Layer, PathToState.Origin, PathToState.Destination, nil)
+            local path, n, label = NavUtils.PathToWithThreatThreshold(PathToState.Layer, PathToState.Origin, PathToState.Destination, ArmyBrains[1], NavUtils.ThreatFunctions.AntiSurface, 100, 0)
 
             if not path then
                 DrawLinePop(PathToState.Origin, PathToState.Destination, 'ff0000')
