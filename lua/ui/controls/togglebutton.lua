@@ -7,7 +7,7 @@ local Tooltip = import("/lua/ui/game/tooltip.lua")
 -- A ToggleButton is a button that, when clicked, moves to the next state (or back to the first state
 -- if the end of the state list has been reached) and dispatches an event.
 ---@class ToggleButton : Group
-ToggleButton = Class(Group) {
+ToggleButton = ClassUI(Group) {
     --- Create a new ToggleButton
     --
     -- @param parent The UI control to parent this control from.

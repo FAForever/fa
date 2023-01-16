@@ -1,15 +1,11 @@
--------------------------------------------------------------------------------
---
---  File     :  /data/projectiles/SBOZhanaseeBomb/SBOZhanaseeBomb01_script.lua
---  Author(s):  Greg Kohne, Gordon Duclos, Aaron Lundquist
---
---  Summary  :  Zhanasee Bomb script, used on XSA0304
---
---  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-- File     :  /data/projectiles/SBOZhanaseeBomb/SBOZhanaseeBomb01_script.lua
+-- Author(s):  Greg Kohne, Gordon Duclos, Aaron Lundquist
+-- Summary  :  Zhanasee Bomb script, used on XSA0304
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 local SZhanaseeBombProjectile = import("/lua/seraphimprojectiles.lua").SZhanaseeBombProjectile
 
-SBOZhanaseeBombProjectile01 = Class(SZhanaseeBombProjectile){
+SBOZhanaseeBombProjectile01 = ClassProjectile(SZhanaseeBombProjectile){
     OnImpact = function(self, targetType, targetEntity)        
 		SZhanaseeBombProjectile.OnImpact(self, targetType, targetEntity) 
         CreateLightParticle(self, -1, self.Army, 26, 5, 'sparkle_white_add_08', 'ramp_white_24' )

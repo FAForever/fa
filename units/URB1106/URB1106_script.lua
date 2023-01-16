@@ -11,7 +11,7 @@
 local CMassStorageUnit = import("/lua/cybranunits.lua").CMassStorageUnit
 
 ---@class URB1106 : CMassStorageUnit
-URB1106 = Class(CMassStorageUnit) {
+URB1106 = ClassUnit(CMassStorageUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         CMassStorageUnit.OnStopBeingBuilt(self,builder,layer)
         self:ForkThread(self.AnimThread)

@@ -11,7 +11,7 @@
 local TSonarUnit = import("/lua/terranunits.lua").TSonarUnit
 
 ---@class UEB3202 : TSonarUnit
-UEB3202 = Class(TSonarUnit) {
+UEB3202 = ClassUnit(TSonarUnit) {
     TimedSonarTTIdleEffects = {
         {
             Bones = {

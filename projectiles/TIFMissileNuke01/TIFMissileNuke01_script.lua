@@ -3,7 +3,7 @@
 --
 local TIFMissileNuke = import("/lua/terranprojectiles.lua").TIFMissileNuke
 
-TIFMissileNuke01 = Class(TIFMissileNuke) {
+TIFMissileNuke01 = ClassProjectile(TIFMissileNuke) {
 
     InitialEffects = {'/effects/emitters/nuke_munition_launch_trail_02_emit.bp',},
     LaunchEffects = {

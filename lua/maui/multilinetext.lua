@@ -8,7 +8,7 @@ local LazyVar = import("/lua/lazyvar.lua")
 --TODO word wrap
 
 ---@class MultiLineText : Group
-MultiLineText = Class(Group) {
+MultiLineText = ClassUI(Group) {
     __init = function(self, parent, font, pointSize, color)
         Group.__init(self, parent)
 

@@ -26,19 +26,19 @@ local CAABurstCloudFlakArtilleryWeapon = CybranWeaponsFile.CAABurstCloudFlakArti
 local CDFBrackmanCrabHackPegLauncherWeapon = CybranWeaponsFile.CDFBrackmanCrabHackPegLauncherWeapon
 
 ---@class XRL0403 : CWalkingLandUnit
-XRL0403 = Class(CWalkingLandUnit) {
+XRL0403 = ClassUnit(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
     Weapons = {
-        ParticleGunRight = Class(CDFHvyProtonCannonWeapon) {},
-        ParticleGunLeft = Class(CDFHvyProtonCannonWeapon) {},
-        Torpedo01 = Class(CANNaniteTorpedoWeapon) {},
-        Torpedo02 = Class(CANNaniteTorpedoWeapon) {},
-        Torpedo03 = Class(CANNaniteTorpedoWeapon) {},
-        Torpedo04 = Class(CANNaniteTorpedoWeapon) {},
-        AntiTorpedo = Class(CIFSmartCharge) {},
-        AAGun = Class(CAABurstCloudFlakArtilleryWeapon) {},
-        HackPegLauncher= Class(CDFBrackmanCrabHackPegLauncherWeapon){},
+        ParticleGunRight = ClassWeapon(CDFHvyProtonCannonWeapon) {},
+        ParticleGunLeft = ClassWeapon(CDFHvyProtonCannonWeapon) {},
+        Torpedo01 = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        Torpedo02 = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        Torpedo03 = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        Torpedo04 = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        AntiTorpedo = ClassWeapon(CIFSmartCharge) {},
+        AAGun = ClassWeapon(CAABurstCloudFlakArtilleryWeapon) {},
+        HackPegLauncher = ClassWeapon(CDFBrackmanCrabHackPegLauncherWeapon){},
     },
 
     DisableAllButHackPegLauncher= function(self)

@@ -11,7 +11,7 @@
 local ASonarUnit = import("/lua/aeonunits.lua").ASonarUnit
 
 ---@class UAB3102 : ASonarUnit
-UAB3102 = Class(ASonarUnit) {
+UAB3102 = ClassUnit(ASonarUnit) {
     TimedSonarTTIdleEffects = {
         {
             Bones = {

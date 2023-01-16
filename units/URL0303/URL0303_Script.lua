@@ -12,7 +12,7 @@ local CDFLaserDisintegratorWeapon = cWeapons.CDFLaserDisintegratorWeapon01
 local CDFElectronBolterWeapon = cWeapons.CDFElectronBolterWeapon
 local MissileRedirect = import("/lua/defaultantiprojectile.lua").MissileRedirect
 
-local EMPDeathWeapon = Class(Weapon) {
+local EMPDeathWeapon = ClassWeapon(Weapon) {
     OnCreate = function(self)
         Weapon.OnCreate(self)
         self:SetWeaponEnabled(false)
@@ -26,13 +26,13 @@ local EMPDeathWeapon = Class(Weapon) {
 }
 
 ---@class URL0303 : CWalkingLandUnit
-URL0303 = Class(CWalkingLandUnit) {
+URL0303 = ClassUnit(CWalkingLandUnit) {
     PlayEndAnimDestructionEffects = false,
 
     Weapons = {
-        Disintigrator = Class(CDFLaserDisintegratorWeapon) {},
-        HeavyBolter = Class(CDFElectronBolterWeapon) {},
-        DeathWeapon = Class(EMPDeathWeapon) {},
+        Disintigrator = ClassWeapon(CDFLaserDisintegratorWeapon) {},
+        HeavyBolter = ClassWeapon(CDFElectronBolterWeapon) {},
+        DeathWeapon = ClassWeapon(EMPDeathWeapon) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)

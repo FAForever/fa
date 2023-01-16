@@ -14,9 +14,9 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local nukeFiredOnGotTarget = false
 
 ---@class URB4302 : CStructureUnit
-URB4302 = Class(CStructureUnit) {
+URB4302 = ClassUnit(CStructureUnit) {
     Weapons = {
-        MissileRack = Class(CAMEMPMissileWeapon) {
+        MissileRack = ClassWeapon(CAMEMPMissileWeapon) {
             FxMuzzleFlash = EffectTemplate.CAntiNukeLaunch01,
             
             IdleState = State(CAMEMPMissileWeapon.IdleState) {

@@ -12,12 +12,12 @@ local CAAMissileNaniteWeapon = import("/lua/cybranweapons.lua").CAAMissileNanite
 local CDFLaserDisintegratorWeapon = import("/lua/cybranweapons.lua").CDFLaserDisintegratorWeapon02
 
 ---@class XRA0305 : CAirUnit
-XRA0305 = Class(CAirUnit) {
+XRA0305 = ClassUnit(CAirUnit) {
     
     Weapons = {
-        Missiles1 = Class(CAAMissileNaniteWeapon) {},
-        Disintegrator01 = Class(CDFLaserDisintegratorWeapon) {},
-        Disintegrator02 = Class(CDFLaserDisintegratorWeapon) {},
+        Missiles1 = ClassWeapon(CAAMissileNaniteWeapon) {},
+        Disintegrator01 = ClassWeapon(CDFLaserDisintegratorWeapon) {},
+        Disintegrator02 = ClassWeapon(CDFLaserDisintegratorWeapon) {},
     },
     
     OnStopBeingBuilt = function(self,builder,layer)

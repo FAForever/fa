@@ -37,11 +37,17 @@ function CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, scale)
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
 
     -- -- Create the mercury pool
-    local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 0)
+    local pool = unitBeingBuilt:CreateProjectileAtBone('/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0)
     TrashBagAdd(onDeathTrash, pool)
     TrashBagAdd(onFinishedTrash, pool)
-    EntitySetOrientation(pool, EntityGetOrientation(unitBeingBuilt), true)
-    ProjectileSetScale(pool, sx, sy, sz)
+
+    ProjectileSetScale(pool, sz, sy, sx)
+    local offset = unitBeingBuilt.Blueprint.Display.AeonMercuryPoolOffset
+    if offset then
+        local position = pool:GetPosition()
+        position[2] = position[2] + offset
+        Warp(pool, position)
+    end
 
     -- -- Create effects of build animation
     local emitter = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
@@ -71,12 +77,14 @@ function CreateMercuryPoolOnBone(unitBeingBuilt, army, bone, sx, sy, sz, scale)
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
 
+    LOG("CreateMercuryPoolOnBone")
+
     -- -- Create the mercury pool
     local pool = EntityCreateProjectileAtBone(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', bone)
     TrashBagAdd(onDeathTrash, pool)
     TrashBagAdd(onFinishedTrash, pool)
     EntitySetOrientation(pool, EntityGetOrientation(unitBeingBuilt), true)
-    ProjectileSetScale(pool, sx, sy, sz)
+    ProjectileSetScale(pool, sz, sy, sx)
 
     -- -- Create effects of build animation
     local emitter = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
@@ -212,7 +220,7 @@ local function SharedBuildThread(pool, unitBeingBuilt, trash, onStopBeingBuiltTr
                 end
 
                 scale = 1 - progress * progress
-                ProjectileSetScale(pool, sx * scale, scaledSy * scale, sz * scale)
+                ProjectileSetScale(pool, sz * scale, scaledSy * scale, sx * scale)
             end
 
             -- adjust slider for hover units
@@ -248,7 +256,7 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     local Footprint = unitBeingBuilt.Blueprint.Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
     local sz = Physics.MeshExtentsZ or Footprint.SizeZ
-    local sy = Physics.MeshExtentsY or Footprint.SizeYX or MathMin(sx, sz)
+    local sy = Physics.MeshExtentsY or Footprint.SizeY or MathMin(sx, sz)
 
     local pool = CreateMercuryPool(unitBeingBuilt, army, sx, sy * 1.5, sz, (sx + sz) * 0.3)
 

@@ -17,12 +17,12 @@ local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 local Entity = import("/lua/sim/entity.lua").Entity
 
-URL0001 = Class(ACUUnit, CCommandUnit) {
+URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        RightRipper = Class(CCannonMolecularWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
-        MLG = Class(CDFHeavyMicrowaveLaserGeneratorCom) {
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        RightRipper = ClassWeapon(CCannonMolecularWeapon) {},
+        Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
+        MLG = ClassWeapon(CDFHeavyMicrowaveLaserGeneratorCom) {
             DisabledFiringBones = {'Turret_Muzzle_03'},
 
             SetOnTransport = function(self, transportstate)
@@ -39,8 +39,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end,
         },
 
-        OverCharge = Class(CDFOverchargeWeapon) {},
-        AutoOverCharge = Class(CDFOverchargeWeapon) {},
+        OverCharge = ClassWeapon(CDFOverchargeWeapon) {},
+        AutoOverCharge = ClassWeapon(CDFOverchargeWeapon) {},
     },
 
     __init = function(self)

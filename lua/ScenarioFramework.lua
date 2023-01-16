@@ -1460,7 +1460,7 @@ function PlatoonAttackWithTransportsThread(platoon, landingChain, attackChain, i
     end
 
     local landingLocs = ScenarioUtils.ChainToPositions(landingChain)
-    local landingLocation = landingLocs[Random(1, table.getn(landingLocs))]
+    local landingLocation = table.random(landingLocs)
 
     if instant then
         AttachUnitsToTransports(units, transports)
@@ -1674,13 +1674,8 @@ function DetermineBestAttackLocation(attackingBrain, targetBrain, relationship, 
     return attackLocation
 end
 
---- Returns a random entry from an array
----@generic T
----@param array T[]
----@return T
-function GetRandomEntry(array)
-    return array[Random(1, table.getn(array))]
-end
+
+GetRandomEntry = table.random
 
 ---
 ---@param brain AIBrain
