@@ -5,5 +5,5 @@
 ----  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 
-CDFHeavyDisintegratorPulseLaser01 = Class(import("/lua/cybranprojectiles.lua").CHeavyDisintegratorPulseLaser) {}
+CDFHeavyDisintegratorPulseLaser01 = ClassProjectile(import("/lua/cybranprojectiles.lua").CHeavyDisintegratorPulseLaser) {}
 TypeClass = CDFHeavyDisintegratorPulseLaser01

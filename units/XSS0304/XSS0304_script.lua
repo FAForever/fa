@@ -13,13 +13,13 @@ local SDFAjelluAntiTorpedoDefense = import("/lua/seraphimweapons.lua").SDFAjellu
 local SAALosaareAutoCannonWeapon = import("/lua/seraphimweapons.lua").SAALosaareAutoCannonWeaponSeaUnit
 
 ---@class XSS0304 : SSubUnit
-XSS0304 = Class(SSubUnit) {
+XSS0304 = ClassUnit(SSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
-        TorpedoFront = Class(SANUallCavitationTorpedo) {},
-        AntiTorpedoLeft = Class(SDFAjelluAntiTorpedoDefense) {},
-        AntiTorpedoRight = Class(SDFAjelluAntiTorpedoDefense) {},
-        AutoCannon = Class(SAALosaareAutoCannonWeapon) {},
+        TorpedoFront = ClassWeapon(SANUallCavitationTorpedo) {},
+        AntiTorpedoLeft = ClassWeapon(SDFAjelluAntiTorpedoDefense) {},
+        AntiTorpedoRight = ClassWeapon(SDFAjelluAntiTorpedoDefense) {},
+        AutoCannon = ClassWeapon(SAALosaareAutoCannonWeapon) {},
     },
     
     OnStopBeingBuilt = function(self,builder,layer)

@@ -62,7 +62,7 @@ local PlayableArea
 ---@field position Vector
 ---@field mass Bitmap
 ---@field text Text
-local WorldLabel = Class(Group) {
+local WorldLabel = ClassUI(Group) {
     __init = function(self, parent, position)
         Group.__init(self, parent)
         self.parent = parent
@@ -377,7 +377,7 @@ local function _CombineReclaim(reclaim)
 
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
 
-    if zoom < ZoomThreshold then
+    if zoom < (Prefs.GetFromCurrentProfile('options.reclaim_batching_distance_treshold') or ZoomThreshold) then
         return false
     end
 

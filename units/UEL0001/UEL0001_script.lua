@@ -16,14 +16,14 @@ local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class UEL0001 : ACUUnit
-UEL0001 = Class(ACUUnit) {
+UEL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        RightZephyr = Class(TDFZephyrCannonWeapon) {},
-        OverCharge = Class(TDFOverchargeWeapon) {},
-        AutoOverCharge = Class(TDFOverchargeWeapon) {},
-        TacMissile = Class(TIFCruiseMissileLauncher) {},
-        TacNukeMissile = Class(TIFCruiseMissileLauncher) {},
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        RightZephyr = ClassWeapon(TDFZephyrCannonWeapon) {},
+        OverCharge = ClassWeapon(TDFOverchargeWeapon) {},
+        AutoOverCharge = ClassWeapon(TDFOverchargeWeapon) {},
+        TacMissile = ClassWeapon(TIFCruiseMissileLauncher) {},
+        TacNukeMissile = ClassWeapon(TIFCruiseMissileLauncher) {},
     },
 
     __init = function(self)

@@ -16,13 +16,13 @@ local TANTorpedoAngler = WeaponFile.TANTorpedoAngler
 local TIFSmartCharge = WeaponFile.TIFSmartCharge
 
 ---@class UES0201 : TSeaUnit
-UES0201 = Class(TSeaUnit) {
+UES0201 = ClassUnit(TSeaUnit) {
     Weapons = {
-        FrontTurret01 = Class(TDFGaussCannonWeapon) {},
-        BackTurret01 = Class(TDFGaussCannonWeapon) {},
-        FrontTurret02 = Class(TAALinkedRailgun) {},
-        Torpedo01 = Class(TANTorpedoAngler) {},
-        AntiTorpedo = Class(TIFSmartCharge) {},
+        FrontTurret01 = ClassWeapon(TDFGaussCannonWeapon) {},
+        BackTurret01 = ClassWeapon(TDFGaussCannonWeapon) {},
+        FrontTurret02 = ClassWeapon(TAALinkedRailgun) {},
+        Torpedo01 = ClassWeapon(TANTorpedoAngler) {},
+        AntiTorpedo = ClassWeapon(TIFSmartCharge) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)

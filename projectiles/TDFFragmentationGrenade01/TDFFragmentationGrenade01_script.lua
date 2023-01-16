@@ -9,7 +9,6 @@
 ------------------------------------------------------------
 
 local TFragmentationGrenade = import("/lua/terranprojectiles.lua").TFragmentationGrenade
-local DefaultProjectileFile = import("/lua/sim/defaultprojectiles.lua")
 
-TDFFragmentationGrenade01 = Class(TFragmentationGrenade) { }
+TDFFragmentationGrenade01 = ClassProjectile(TFragmentationGrenade) { }
 TypeClass = TDFFragmentationGrenade01

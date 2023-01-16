@@ -3,7 +3,7 @@
 local AArtilleryProjectile = import("/lua/aeonprojectiles.lua").AArtilleryProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-AIFSonanceShell02 = Class(AArtilleryProjectile) {
+AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     FxTrails = EffectTemplate.ASonanceWeaponFXTrail02,
     FxImpactUnit =  EffectTemplate.ASonanceWeaponHit02,
     FxImpactProp =  EffectTemplate.ASonanceWeaponHit02,

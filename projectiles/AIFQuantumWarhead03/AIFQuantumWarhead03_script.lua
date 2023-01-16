@@ -3,7 +3,7 @@
 --
 local AQuantumWarheadProjectile = import("/lua/aeonprojectiles.lua").AQuantumWarheadProjectile
 
-AIFQuantumWarhead03 = Class(AQuantumWarheadProjectile) {
+AIFQuantumWarhead03 = ClassProjectile(AQuantumWarheadProjectile) {
     Beams = {'/effects/emitters/aeon_nuke_exhaust_beam_02_emit.bp',},
     OnCreate = function(self)
         AQuantumWarheadProjectile.OnCreate(self)

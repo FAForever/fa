@@ -7,12 +7,12 @@
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local AIMFlareProjectile = import("/lua/aeonprojectiles.lua").AIMFlareProjectile
 
-AIMFlare01 = Class(AIMFlareProjectile) {
+AIMFlare01 = ClassProjectile(AIMFlareProjectile) {
     OnCreate = function(self)
         AIMFlareProjectile.OnCreate(self)
         self.MyShield = Flare {
             Owner = self,
-            Radius = self:GetBlueprint().Physics.FlareRadius,
+            Radius = self.Blueprint.Physics.FlareRadius,
         }
         self.Trash:Add(self.MyShield)
         self:TrackTarget(false)

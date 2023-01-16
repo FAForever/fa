@@ -12,7 +12,7 @@ local TRadarUnit = import("/lua/terranunits.lua").TRadarUnit
 ---@class UEB3104 : TRadarUnit
 ---@field UpperRotator? moho.RotateManipulator
 ---@field LowerRotator? moho.RotateManipulator
-UEB3104 = Class(TRadarUnit) {
+UEB3104 = ClassUnit(TRadarUnit) {
 
     ---@param self UEB3104
     OnIntelDisabled = function(self)

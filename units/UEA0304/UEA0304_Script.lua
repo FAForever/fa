@@ -10,11 +10,11 @@ local TIFSmallYieldNuclearBombWeapon = import("/lua/terranweapons.lua").TIFSmall
 local TAirToAirLinkedRailgun = import("/lua/terranweapons.lua").TAirToAirLinkedRailgun
 
 ---@class UEA0304 : TAirUnit
-UEA0304 = Class(TAirUnit) {
+UEA0304 = ClassUnit(TAirUnit) {
     Weapons = {
-        Bomb = Class(TIFSmallYieldNuclearBombWeapon) {},
-        LinkedRailGun1 = Class(TAirToAirLinkedRailgun) {},
-        LinkedRailGun2 = Class(TAirToAirLinkedRailgun) {},
+        Bomb = ClassWeapon(TIFSmallYieldNuclearBombWeapon) {},
+        LinkedRailGun1 = ClassWeapon(TAirToAirLinkedRailgun) {},
+        LinkedRailGun2 = ClassWeapon(TAirToAirLinkedRailgun) {},
     },
 
     OnDamage = function(self, instigator, amount, vector, damageType)

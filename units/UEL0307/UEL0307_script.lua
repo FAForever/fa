@@ -13,10 +13,10 @@ local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffect
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
 ---@class UEL0307 : TShieldLandUnit
-UEL0307 = Class(TShieldLandUnit, ShieldEffectsComponent) {
+UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
 
     Weapons = {        
-        TargetPointer = Class(DefaultProjectileWeapon) {},
+        TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
     },
 
     ShieldEffects = {

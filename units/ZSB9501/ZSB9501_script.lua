@@ -11,7 +11,7 @@
 local SLandFactoryUnit = import("/lua/seraphimunits.lua").SLandFactoryUnit
 
 ---@class ZSB9501 : SLandFactoryUnit
-ZSB9501 = Class(SLandFactoryUnit) {
+ZSB9501 = ClassUnit(SLandFactoryUnit) {
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)
         local bp = self:GetBlueprint()

@@ -10,7 +10,7 @@
 local TCivilianStructureUnit = import("/lua/terranunits.lua").TCivilianStructureUnit
 
 ---@class UEC1907 : TCivilianStructureUnit
-UEC1907 = Class(TCivilianStructureUnit) {
+UEC1907 = ClassUnit(TCivilianStructureUnit) {
 }
 
 

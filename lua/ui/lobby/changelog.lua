@@ -26,7 +26,7 @@ local debugInterface = false
 isOpen = false 
 
 ---@class Changelog : Group
-Changelog = Class(Group) {
+Changelog = ClassUI(Group) {
 
     __init = function(self, parent)
         Group.__init(self, parent)

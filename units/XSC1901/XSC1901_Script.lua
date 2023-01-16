@@ -8,7 +8,7 @@
 local SCivilianStructureUnit = import("/lua/seraphimunits.lua").SCivilianStructureUnit
 
 ---@class XSC1901 : SCivilianStructureUnit
-XSC1901 = Class(SCivilianStructureUnit) {
+XSC1901 = ClassUnit(SCivilianStructureUnit) {
 	OnCreate = function(self)
 		SCivilianStructureUnit.OnCreate(self)
 		local army = self:GetArmy()

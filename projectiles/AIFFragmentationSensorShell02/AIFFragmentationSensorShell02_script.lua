@@ -8,15 +8,14 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile02
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
-AIFFragmentationSensorShell02 = Class(AArtilleryFragmentationSensorShellProjectile) {
+AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShellProjectile) {
     OnImpact = function(self, TargetType, TargetEntity) 
         if TargetType != 'Shield' then
 	        local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag02 
-            local bp = self:GetBlueprint().Physics
-
+            local bp = self.Blueprint.Physics
 	        -- Split effects
 	        for k, v in FxFragEffect do
-	            CreateEmitterAtBone( self, -1, self:GetArmy(), v )
+	            CreateEmitterAtBone( self, -1, self.Army, v )
 	        end
 
 			local vx, vy, vz = self:GetVelocity()
@@ -44,7 +43,7 @@ AIFFragmentationSensorShell02 = Class(AArtilleryFragmentationSensorShellProjecti
                 local proj = self:CreateChildProjectile(bp.FragmentId)
 	            proj:SetVelocity(xVec,yVec,zVec)
 	            proj:SetVelocity(velocity)
-	            proj:PassDamageData(self.DamageData)                        
+	            proj.DamageData = self.DamageData
 	        end
 	        local pos = self:GetPosition()
 	        local spec = {

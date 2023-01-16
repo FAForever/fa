@@ -4,6 +4,6 @@ local ATorpedoShipProjectile = import("/lua/aeonprojectiles.lua").ATorpedoShipPr
 
 --- Unused
 ---@class TorpedoShipAeon01 : ATorpedoShipProjectile
-TorpedoShipAeon01 = Class(ATorpedoShipProjectile) {}
+TorpedoShipAeon01 = ClassProjectile(ATorpedoShipProjectile) {}
 
 TypeClass = TorpedoShipAeon01
