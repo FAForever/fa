@@ -52,7 +52,9 @@ local BlueprintNameToIntel = {
 local IntelStatusCache = { }
 
 ---@class UnitIntelStatus
+---@field RechargeThread thread?
 ---@field AllIntel table<IntelType, boolean>
+---@field AllIntelRecharging table<IntelType, boolean>
 ---@field AllIntelMaintenanceFree table<IntelType, boolean>
 ---@field AllIntelFromEnhancements table<IntelType, boolean>
 ---@field AllIntelDisabledByEvent table<IntelType, table<string, boolean>>
@@ -86,6 +88,8 @@ IntelComponent = ClassSimple {
 
             ---@type UnitIntelStatus
             local status = { }
+
+            status.AllIntelRecharging = { } -- TODO: catch non existence with if statements
 
             -- special case: unit has intel that is considered free
             status.AllIntelMaintenanceFree = { } -- TODO: catch non existence with if statements
@@ -158,6 +162,9 @@ IntelComponent = ClassSimple {
         if status then
             LOG("DisableUnitIntel: " .. tostring(disabler) .. " for " .. tostring(intel))
 
+            -- prevent recharging from occuring
+            self:OnIntelRechargeFailed()
+
             -- disable all intel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
             if not intel then
@@ -229,8 +236,9 @@ IntelComponent = ClassSimple {
                 return
             end
 
-            -- disable all intel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
+
+            -- disable all intel
             if not intel then
                 for i, _ in status.AllIntel do
                     if not (disabler == 'Energy' and status.AllIntelMaintenanceFree[i]) then
@@ -238,8 +246,7 @@ IntelComponent = ClassSimple {
                         if allIntelDisabledByEvent[i][disabler] then
                             allIntelDisabledByEvent[i][disabler] = nil
                             if table.empty(allIntelDisabledByEvent[i]) then
-                                self:EnableIntel(i)
-                                self:OnIntelEnabled(i)
+                                self:OnIntelRecharge(i)
                             end
                         end
                     end
@@ -251,8 +258,7 @@ IntelComponent = ClassSimple {
                         if allIntelDisabledByEvent[i][disabler] then
                             allIntelDisabledByEvent[i][disabler] = nil
                             if table.empty(allIntelDisabledByEvent[i]) then
-                                self:EnableIntel(i)
-                                self:OnIntelEnabled(i)
+                                self:OnIntelRecharge(i)
                             end
                         end
                     end
@@ -270,14 +276,75 @@ IntelComponent = ClassSimple {
                     if allIntelDisabledByEvent[intel][disabler] then
                         allIntelDisabledByEvent[intel][disabler] = nil
                         if table.empty(allIntelDisabledByEvent[intel]) then
-                            self:EnableIntel(intel)
-                            self:OnIntelEnabled(intel)
+                            self:OnIntelRecharge(intel)
                         end
                     end
                 end
             end
 
             reprsl(status)
+        end
+    end,
+
+    ---@param self IntelComponent | Unit
+    ---@param intel IntelType
+    OnIntelRecharge = function(self, intel)
+        local status = self.IntelStatus
+        if status then
+            LOG("OnIntelRecharge: for " .. tostring(intel))
+            if not status.RechargeThread then 
+                status.RechargeThread = ForkThread(self.IntelRechargeThread, self)
+            end
+
+            status.AllIntelRecharging[intel] = true
+
+            reprsl(status)
+        end
+    end,
+
+    ---@param self IntelComponent | Unit
+    OnIntelRecharged = function(self)
+        local status = self.IntelStatus
+        if status then
+            LOG("OnIntelRecharged")
+            for i, _ in status.AllIntelRecharging do
+                self:EnableIntel(i)
+                self:OnIntelEnabled(i)
+                status.AllIntelRecharging[i] = nil
+            end
+
+            reprsl(status)
+        end
+    end,
+
+    ---@param self IntelComponent | Unit
+    OnIntelRechargeFailed = function(self)
+        local status = self.IntelStatus
+        if status and status.RechargeThread then
+            LOG("OnIntelRechargeFailed")
+            status.RechargeThread:Destroy()
+            status.RechargeThread = nil
+            self:SetWorkProgress(0)
+
+            reprsl(status)
+        end
+    end,
+
+    ---@param self IntelComponent | Unit
+    IntelRechargeThread = function(self)
+        local status = self.IntelStatus
+        if status then
+            LOG("IntelRechargeThread")
+            local ticks = 10 * (self.Blueprint.Intel.ReactivateTime or 1)
+
+            --- display progress
+            for k = 1, ticks do
+                self:SetWorkProgress((k / ticks))
+                WaitTicks(1)
+            end
+
+            self:SetWorkProgress(-1)
+            self:OnIntelRecharged()
         end
     end,
 
