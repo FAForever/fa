@@ -2199,9 +2199,7 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param self Unit
     OnDestroy = function(self)
         self.Dead = true
-
-        -- LOG(string.format("%s -> %s", tostring(self.UnitId), tostring(debug.allocatedsize(self))))
-
+        
         if self:GetFractionComplete() < 1 then
             self:SendNotifyMessage('cancelled')
         end
@@ -2217,7 +2215,6 @@ Unit = ClassUnit(moho.unit_methods) {
         Sync.ReleaseIds[self.EntityId] = true
 
         -- Destroy everything added to the trash
-        LOG("Destroyed")
         self.Trash:Destroy()
 
         -- Destroy all extra trashbags in case the DeathTread() has not already destroyed it (modded DeathThread etc.)
