@@ -46,7 +46,7 @@ StructureUnit = ClassUnit(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:HideLandBones()
-        self.FxBlinkingLightsBag = {}
+        self.FxBlinkingLightsBag = { }
         if self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
         end
@@ -311,7 +311,7 @@ StructureUnit = ClassUnit(Unit) {
         for _, v in self.FxBlinkingLightsBag do
             v:Destroy()
         end
-        self.FxBlinkingLightsBag = {}
+        self.FxBlinkingLightsBag = { }
     end,
 
     ---@param self StructureUnit

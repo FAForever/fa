@@ -15,7 +15,7 @@ TargetingLaser = Class(DefaultBeamWeapon) {
 ---@class TargetingLaserInvisible : TargetingLaser
 TargetingLaserInvisible = Class(TargetingLaser) {
     BeamType = CollisionBeamFile.TargetingCollisionBeamInvisible,
-    FxMuzzleFlash = {},
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
 }
 
 ---@class TAAPhalanxWeapon : DefaultProjectileWeapon
@@ -37,8 +37,8 @@ TAAPhalanxWeapon = Class(DefaultProjectileWeapon) {
 ---@class SDFUnstablePhasonBeam : DefaultBeamWeapon
 SDFUnstablePhasonBeam = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {}, --------OriginalEffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects, --------OriginalEffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
     FxUpackingChargeEffects = OriginalEffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 0.2,
 }
@@ -46,8 +46,8 @@ SDFUnstablePhasonBeam = Class(DefaultBeamWeapon) {
 ---@class SDFUnstablePhasonBeam2 : DefaultBeamWeapon
 SDFUnstablePhasonBeam2 = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam2,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {}, --------OriginalEffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects, --------OriginalEffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
     FxUpackingChargeEffects = OriginalEffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 0.1,
     FxBeamEndPointScale = 0.01,

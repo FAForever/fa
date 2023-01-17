@@ -91,7 +91,7 @@ TDFRiotWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class TAAGinsuRapidPulseWeapon : DefaultProjectileWeapon
 TAAGinsuRapidPulseWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {},
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
 }
 
 ---@class TDFIonizedPlasmaCannon : DefaultProjectileWeapon
@@ -102,7 +102,7 @@ TDFIonizedPlasmaCannon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class TDFHiroPlasmaCannon : DefaultBeamWeapon
 TDFHiroPlasmaCannon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeams.TDFHiroCollisionBeam,
-    FxMuzzleFlash = {},
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxUpackingChargeEffectScale = 1,
 
     ---@param self TDFHiroPlasmaCannon
@@ -162,7 +162,7 @@ TAirToAirLinkedRailgun = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class TIFCruiseMissileUnpackingLauncher : DefaultProjectileWeapon
 TIFCruiseMissileUnpackingLauncher = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {},
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
 }
 
 ---@class TIFCruiseMissileLauncher : DefaultProjectileWeapon
@@ -296,7 +296,7 @@ TAMPhalanxWeapon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class TOrbitalDeathLaserBeamWeapon : DefaultBeamWeapon
 TOrbitalDeathLaserBeamWeapon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = OrbitalDeathLaserCollisionBeam,
-    FxUpackingChargeEffects = {},
+    FxUpackingChargeEffects = import("/lua/effecttemplates.lua").NoEffects,
     FxUpackingChargeEffectScale = 1,
 
     ---@param self TOrbitalDeathLaserBeamWeapon
