@@ -283,6 +283,7 @@ Unit = ClassUnit(moho.unit_methods) {
 
         -- for syncing data to UI
         self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate)
+        self:SetStat("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
