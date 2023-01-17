@@ -1653,7 +1653,7 @@ MobileUnit = ClassUnit(Unit) {
         self.MovementEffectsBag = TrashBag()
         self.TopSpeedEffectsBag = TrashBag()
         self.BeamExhaustEffectsBag = TrashBag()
-        self.IdleEffectsBag = TrashBag()
+
     end,
 
     DestroyAllTrashBags = function(self)
@@ -1662,7 +1662,6 @@ MobileUnit = ClassUnit(Unit) {
         self.MovementEffectsBag:Destroy()
         self.TopSpeedEffectsBag:Destroy()
         self.BeamExhaustEffectsBag:Destroy()
-        self.IdleEffectsBag:Destroy()
 
         -- only exists if unit is transported
         if self.TransportBeamEffectsBag then

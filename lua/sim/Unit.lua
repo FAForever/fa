@@ -237,6 +237,7 @@ Unit = ClassUnit(moho.unit_methods) {
 
         -- used by almost all unit types
         self.OnBeingBuiltEffectsBag = TrashBag()
+        self.IdleEffectsBag = TrashBag()
 
         -- Set up veterancy
         self.Instigators = {}
@@ -2134,38 +2135,54 @@ Unit = ClassUnit(moho.unit_methods) {
 
     ---@param self Unit
     DestroyAllTrashBags = function(self)
-        -- Some bags should really be managed by their classes
-        -- but for mod compatibility reasons we delete them all here.
+        -- Some bags should really be managed by their classes,
+        -- but for mod compatibility reasons we destroy those here too
 
-        -- used by various units for unit-specific effects
+        self.IdleEffectsBag:Destroy()
+        self.OnBeingBuiltEffectsBag:Destroy()
+
         if self.ReleaseEffectsBag then
             for _, v in self.ReleaseEffectsBag do
                 v:Destroy()
             end
         end
 
-        for k, v in self.ShieldEffectsBag or {} do
-            v:Destroy()
-        end
-
-        for _, v in self.IntelEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.TeleportDestChargeBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.TeleportSoundChargeBag or {} do
-            v:Destroy()
-        end
-
-        for k, v in self.AdjacencyBeamsBag or {} do
-            v.Trash:Destroy()
-            self.AdjacencyBeamsBag[k] = nil
-        end
-
-        for _, EffectsBag in self.DamageEffectsBag or {} do
-            for _, v in EffectsBag do
+        if self.ShieldEffectsBag then 
+            for k, v in self.ShieldEffectsBag do
                 v:Destroy()
+            end
+        end
+
+        if self.IntelEffectsBag then
+            for _, v in self.IntelEffectsBag do
+                v:Destroy()
+            end
+        end
+
+        if self.TeleportDestChargeBag then
+            for _, v in self.TeleportDestChargeBag do
+                v:Destroy()
+            end
+        end
+
+        if self.TeleportSoundChargeBag then
+            for _, v in self.TeleportSoundChargeBag do
+                v:Destroy()
+            end
+        end 
+
+        if self.AdjacencyBeamsBag then
+            for k, v in self.AdjacencyBeamsBag do
+                v.Trash:Destroy()
+                self.AdjacencyBeamsBag[k] = nil
+            end
+        end
+
+        if self.DamageEffectsBag then
+            for _, EffectsBag in self.DamageEffectsBag do
+                for _, v in EffectsBag do
+                    v:Destroy()
+                end
             end
         end
     end,
