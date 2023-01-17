@@ -1,8 +1,8 @@
 
 local weaponTargetCheckUpperLimit = 6000
 
----@param unit Unit
----@param weapon Weapon
+---@param unit UnitBlueprint
+---@param weapon WeaponBlueprint
 local function ProcessWeapon(unit, weapon)
     -- pre-compute flags   
     local isAir = false

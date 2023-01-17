@@ -134,7 +134,7 @@ UnitBlueprint {
         AnimationIdle = '/units/URA0401/URA0401_Aidle.sca',
         AnimationLand = '/units/URA0401/URA0401_Aland.sca',
         AnimationTakeOff = '/units/URA0401/URA0401_Afoldup.sca',
-        AttackReticle = 3,
+        AttackReticleSize = 3,
         IdleEffects = {
             Air = {
                 Effects = {
