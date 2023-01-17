@@ -460,11 +460,6 @@ Projectile = ClassProjectile(moho.projectile_methods) {
             end
         end
 
-        -- for k, v in self do 
-        --     LOG(k)
-        -- end
-        -- LOG(debug.allocatedsize(self))
-
         -- in case we die slightly later
         local timeout = bp.Physics.ImpactTimeout
         if timeout and targetType == 'Terrain' then
