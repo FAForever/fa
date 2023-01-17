@@ -46,7 +46,7 @@ StructureUnit = ClassUnit(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:HideLandBones()
-        self.FxBlinkingLightsBag = {}
+        self.FxBlinkingLightsBag = import("/lua/effecttemplates.lua").NoEffects
         if self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
         end
@@ -311,7 +311,7 @@ StructureUnit = ClassUnit(Unit) {
         for _, v in self.FxBlinkingLightsBag do
             v:Destroy()
         end
-        self.FxBlinkingLightsBag = {}
+        self.FxBlinkingLightsBag = import("/lua/effecttemplates.lua").NoEffects
     end,
 
     ---@param self StructureUnit

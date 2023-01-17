@@ -4,7 +4,7 @@
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 
 EffectThrustTransport01 = Class(EmitterProjectile) {
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
     FxTrailScale = 1,
     FxTrailOffset = 0,
 
@@ -21,7 +21,7 @@ EffectThrustTransport01 = Class(EmitterProjectile) {
 
     FxUnderWaterHitScale = 1,
     FxNoneHitScale = 1,
-    FxImpactNone = {},
+    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
     
 }
 

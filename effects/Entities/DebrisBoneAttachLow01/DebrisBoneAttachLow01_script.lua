@@ -7,7 +7,7 @@ DebrisBoneAttachLow01 = Class(GenericDebris) {
     FxNoneHitScale = 0.25,
     FxWaterHitScale = 0.25,
     FxLandHitScale = 0.5,
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
     FxTrailScale = 1,
 }
 

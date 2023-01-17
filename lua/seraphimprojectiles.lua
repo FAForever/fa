@@ -59,7 +59,7 @@ SChronatronCannon = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactUnderWater = EffectTemplate.SChronotronCannonHit,
     FxTrails = EffectTemplate.SChronotronCannonProjectileFxTrails,
     PolyTrails = EffectTemplate.SChronotronCannonProjectileTrails,
-    PolyTrailOffset = {0,0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
 }
 
 ---  SERAPHIM CHRONATRON CANNONS
@@ -72,7 +72,7 @@ SChronatronCannonOverCharge = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.SChronotronCannonOverChargeUnitHit,
     FxTrails = EffectTemplate.SChronotronCannonOverChargeProjectileFxTrails,
     PolyTrails = EffectTemplate.SChronotronCannonOverChargeProjectileTrails,
-    PolyTrailOffset = {0,0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
 }
 
 --- SACU
@@ -84,7 +84,7 @@ SLightChronatronCannon = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.SLightChronotronCannonHit,
     FxImpactUnit = EffectTemplate.SLightChronotronCannonUnitHit,
     PolyTrails = EffectTemplate.SLightChronotronCannonProjectileTrails,
-    PolyTrailOffset = {0,0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
     FxTrails = EffectTemplate.SLightChronotronCannonProjectileFxTrails,
     FxImpactWater = EffectTemplate.SLightChronotronCannonLandHit,
     FxImpactUnderWater = EffectTemplate.SLightChronotronCannonHit,
@@ -100,7 +100,7 @@ SLightChronatronCannonOverCharge = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.SLightChronotronCannonOverChargeHit,
     PolyTrails = EffectTemplate.SLightChronotronCannonOverChargeProjectileTrails,
     FxTrails = EffectTemplate.SLightChronotronCannonOverChargeProjectileFxTrails,
-    PolyTrailOffset = {0,0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
 }
 
 ---  SERAPHIM PHASIC AUTOGUNS
@@ -111,7 +111,7 @@ SPhasicAutogun = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.PhasicAutoGunHitUnit,
     FxImpactUnit = EffectTemplate.PhasicAutoGunHitUnit,
     PolyTrails = EffectTemplate.PhasicAutoGunProjectileTrail,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 -- T2 gunship and T2 transport
@@ -125,7 +125,7 @@ SHeavyPhasicAutogun = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactUnderWater = EffectTemplate.HeavyPhasicAutoGunHitUnit,
     PolyTrails = EffectTemplate.HeavyPhasicAutoGunProjectileTrail,
     FxTrails = EffectTemplate.HeavyPhasicAutoGunProjectileTrailGlow,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 -- Adjustment for XSA0203 projectile speed. : T2 gunship
@@ -143,7 +143,7 @@ SOhCannon = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.OhCannonHitUnit,
     FxImpactUnit = EffectTemplate.OhCannonHitUnit,
     PolyTrails = EffectTemplate.OhCannonProjectileTrail,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---@class SOhCannon02 : MultiPolyTrailProjectile
@@ -153,7 +153,7 @@ SOhCannon02 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.OhCannonHitUnit,
     FxImpactUnit = EffectTemplate.OhCannonHitUnit,
     PolyTrails = EffectTemplate.OhCannonProjectileTrail02,
-    PolyTrailOffset = {0,0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
 }
 
 ---  SERAPHIM SHRIEKER AUTO-CANNONS
@@ -166,7 +166,7 @@ SShriekerAutoCannon = ClassProjectile(MultiPolyTrailProjectile) {
     PolyTrails = EffectTemplate.ShriekerCannonPolyTrail,
     FxImpactWater = EffectTemplate.ShriekerCannonHit,
     FxImpactUnderWater = EffectTemplate.ShriekerCannonHit,
-    PolyTrailOffset = {0,0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
 }
 
 ---  SERAPHIM AIRE-AU BOLTER
@@ -178,7 +178,7 @@ SAireauBolter = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.SAireauBolterHit,
     FxImpactUnit = EffectTemplate.SAireauBolterHit,
     FxTrails = EffectTemplate.SAireauBolterProjectileFxTrails,
-    PolyTrailOffset = {0,0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
     PolyTrails = EffectTemplate.SAireauBolterProjectilePolyTrails,
 }
 
@@ -191,7 +191,7 @@ STauCannon = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.STauCannonHit,
     FxImpactUnit = EffectTemplate.STauCannonHit,
     FxTrails = EffectTemplate.STauCannonProjectileTrails,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
     PolyTrails = EffectTemplate.STauCannonProjectilePolyTrails,
 }
 
@@ -204,7 +204,7 @@ SHeavyQuarnonCannon = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.SHeavyQuarnonCannonHit,
     FxImpactUnit = EffectTemplate.SHeavyQuarnonCannonUnitHit,
     PolyTrails = EffectTemplate.SHeavyQuarnonCannonProjectilePolyTrails,
-    PolyTrailOffset = {0,0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
     FxTrails = EffectTemplate.SHeavyQuarnonCannonProjectileFxTrails,
     FxImpactWater = EffectTemplate.SHeavyQuarnonCannonWaterHit,
 }
@@ -236,7 +236,7 @@ SZthuthaamArtilleryShell = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.SZthuthaamArtilleryUnitHit,
     FxTrails = EffectTemplate.SZthuthaamArtilleryProjectileFXTrails,
     PolyTrails = EffectTemplate.SZthuthaamArtilleryProjectilePolyTrails,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---  SERAPHIM SUTHANUS ARTILLERY SHELL
@@ -278,7 +278,7 @@ SThunthoArtilleryShell = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.SThunderStormCannonHit,
     FxTrails = EffectTemplate.SThunderStormCannonProjectileTrails,
     PolyTrails = EffectTemplate.SThunderStormCannonProjectilePolyTrails,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---@class SThunthoArtilleryShell2 : MultiPolyTrailProjectile
@@ -290,7 +290,7 @@ SThunthoArtilleryShell2 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.SThunderStormCannonHit,
     FxImpactUnit = EffectTemplate.SThunderStormCannonUnitHit,
     PolyTrails = EffectTemplate.SThunderStormCannonProjectilePolyTrails,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---  SERAPHIM SHLEO AA GATLING ROUND
@@ -324,7 +324,7 @@ SOlarisAAArtillery = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.SOlarisCannonHit,
     FxTrails = EffectTemplate.SOlarisCannonTrails,
     PolyTrails = EffectTemplate.SOlarisCannonProjectilePolyTrail,
-    PolyTrailOffset = {0,0}
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2
 }
 
 ---  SERAPHIM LOSAARE AA CANNON
@@ -335,14 +335,14 @@ SLosaareAAAutoCannon = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.SLosaareAutoCannonHit,
     FxImpactAirUnit = EffectTemplate.SLosaareAutoCannonHit,
     PolyTrails = EffectTemplate.SLosaareAutoCannonProjectileTrail,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---  SERAPHIM LOSAARE AA CANNON (XSS0303 / XSS0304 ADJUSTMENTS)
 ---@class SLosaareAAAutoCannon02 : SLosaareAAAutoCannon
 SLosaareAAAutoCannon02 = ClassProjectile(SLosaareAAAutoCannon) {
     PolyTrails = EffectTemplate.SLosaareAutoCannonProjectileTrail02,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---  SERAPHIM OTHE TACTICAL BOMB
@@ -365,7 +365,7 @@ SAnaitTorpedo = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactNone =  EffectTemplate.SAnaitTorpedoHit,
     FxTrails =  EffectTemplate.SAnaitTorpedoFxTrails,
     PolyTrails =  EffectTemplate.SAnaitTorpedoPolyTrails,
-    PolyTrailOffset =  {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 
     ---@param self SAnaitTorpedo
     ---@param inWater boolean
@@ -384,7 +384,7 @@ SHeavyCavitationTorpedo = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactUnderWater =  EffectTemplate.SHeavyCavitationTorpedoHit,
     FxImpactUnit =  EffectTemplate.SHeavyCavitationTorpedoHit,
     PolyTrails =  EffectTemplate.SHeavyCavitationTorpedoPolyTrails,
-    PolyTrailOffset =  {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 
     ---@param self SAnaitTorpedo
     ---@param inWater boolean
@@ -427,7 +427,7 @@ SExperimentalStrategicMissile = ClassProjectile(NukeProjectile, MultiPolyTrailPr
     FxSplashScale = 0.65,
     FxTrails = EffectTemplate.SIFExperimentalStrategicMissileFXTrails,
     PolyTrails = EffectTemplate.SIFExperimentalStrategicMissilePolyTrails,
-    PolyTrailOffset = {0,0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
     FxUnderWaterTrail = {'/effects/emitters/missile_cruise_munition_underwater_trail_01_emit.bp',},
 }
 
@@ -440,7 +440,7 @@ SIMAntiMissile01 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.SElectrumMissleDefenseHit,
     FxImpactUnit = EffectTemplate.SElectrumMissleDefenseHit,
     PolyTrails = EffectTemplate.SElectrumMissleDefenseProjectilePolyTrail,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---  INAINO EXPERIMENTAL STRATEGIC BOMB
@@ -513,7 +513,7 @@ SAAHotheFlareProjectile = ClassProjectile(EmitterProjectile) {
 SOhwalliStrategicBombProjectile = ClassProjectile(MultiPolyTrailProjectile) {
     FxTrails = EffectTemplate.SOhwalliBombFxTrails01,
     PolyTrails = EffectTemplate.SOhwalliBombPolyTrails,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---  ANJELLU TORPEDO DEFENSE PROJECTILE
@@ -521,7 +521,7 @@ SOhwalliStrategicBombProjectile = ClassProjectile(MultiPolyTrailProjectile) {
 SAnjelluTorpedoDefenseProjectile = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProjectileUnderWater = EffectTemplate.SDFAjelluAntiTorpedoHit01,
     PolyTrails = EffectTemplate.SDFAjelluAntiTorpedoPolyTrail01,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---  SERAPHIM SNIPER ENERGY RIFLE
@@ -532,7 +532,7 @@ SDFSniperShotNormal = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.SDFSniperShotNormalHitUnit,
     FxImpactUnit = EffectTemplate.SDFSniperShotNormalHitUnit,
     PolyTrails = EffectTemplate.SDFSniperShotNormalPolytrail,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---  SERAPHIM SNIPER ENERGY RIFLE
@@ -544,7 +544,7 @@ SDFSniperShot = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.SDFSniperShotHitUnit,
     FxTrails = EffectTemplate.SDFSniperShotTrails,
     PolyTrails = EffectTemplate.SDFSniperShotPolytrail,
-    PolyTrailOffset = {0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 ---  SERAPHIM EXPERIMENTAL PHASON BEAM PROJECTILE
@@ -579,7 +579,7 @@ SDFAireauProjectile = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactWater= EffectTemplate.SDFAireauWeaponHit01,
     RandomPolyTrails = 1,
     PolyTrails = EffectTemplate.SDFAireauWeaponPolytrails01,
-    PolyTrailOffset = {0,0,0},
+    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
 }
 
 -- kept for mod backwards compatibility

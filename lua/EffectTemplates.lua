@@ -11,6 +11,11 @@
 EmtBpPath = '/effects/emitters/'
 EmitterTempEmtBpPath = '/effects/emitters/temp/'
 
+NoEffects = { }
+DefaultPolyTrailOffset1 = { 0 }
+DefaultPolyTrailOffset2 = { 0, 0 }
+DefaultPolyTrailOffset3 = { 0, 0, 0 }
+
 -- For gatling gun cooldown
 WeaponSteam01 = {
     EmtBpPath .. 'weapon_mist_01_emit.bp',
@@ -1354,7 +1359,7 @@ CCorsairMissileUnitHit01 = {
     EmtBpPath .. 'cybran_corsair_missile_hit_ring.bp',
     EmtBpPath .. 'unit_shrapnel_hit_01_emit.bp',
 }
-CCorsairMissileFxTrails01 = {}
+CCorsairMissileFxTrails01 = import("/lua/effecttemplates.lua").NoEffects
 CCorsairMissilePolyTrail01= EmtBpPath .. 'cybran_corsair_missile_polytrail_01_emit.bp'
 
 
