@@ -1359,8 +1359,8 @@ CCorsairMissileUnitHit01 = {
     EmtBpPath .. 'cybran_corsair_missile_hit_ring.bp',
     EmtBpPath .. 'unit_shrapnel_hit_01_emit.bp',
 }
-CCorsairMissileFxTrails01 = import("/lua/effecttemplates.lua").NoEffects
-CCorsairMissilePolyTrail01= EmtBpPath .. 'cybran_corsair_missile_polytrail_01_emit.bp'
+CCorsairMissileFxTrails01 = NoEffects
+CCorsairMissilePolyTrail01 = EmtBpPath .. 'cybran_corsair_missile_polytrail_01_emit.bp'
 
 
 
