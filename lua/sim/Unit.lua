@@ -2135,11 +2135,12 @@ Unit = ClassUnit(moho.unit_methods) {
 
     ---@param self Unit
     DestroyAllTrashBags = function(self)
-        -- Some bags should really be managed by their classes,
-        -- but for mod compatibility reasons we destroy those here too
 
         self.IdleEffectsBag:Destroy()
         self.OnBeingBuiltEffectsBag:Destroy()
+
+        -- Some bags should really be managed by their classes, but
+        -- for mod compatibility reasons we destroy those here too
 
         if self.ReleaseEffectsBag then
             for _, v in self.ReleaseEffectsBag do
@@ -2844,7 +2845,7 @@ Unit = ClassUnit(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built RadarJammerUnit
     ---@param order string
     ---@return boolean
     OnStartBuild = function(self, built, order)
@@ -2910,7 +2911,7 @@ Unit = ClassUnit(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     OnStopBuild = function(self, built)
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
@@ -3983,7 +3984,12 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param self Unit
     DestroyMovementEffects = function(self)
         -- Destroy the stored movement effects
-        TrashDestroy(self.MovementEffectsBag)
+        if self.MovementEffectsBag then
+            TrashDestroy(self.MovementEffectsBag)
+        else 
+            LOG(self.Blueprint.BlueprintId)
+        end
+
 
         -- Clean up any camera shake going on.
         local bpTable = self.Blueprint.Display.MovementEffects
