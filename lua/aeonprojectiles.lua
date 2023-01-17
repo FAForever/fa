@@ -46,7 +46,7 @@ AIFBallisticMortarProjectile = ClassProjectile(EmitterProjectile) {
 ---@class AIFBallisticMortarProjectile02 : MultiPolyTrailProjectile
 AIFBallisticMortarProjectile02 = ClassProjectile(MultiPolyTrailProjectile) {
     PolyTrails = EffectTemplate.AIFBallisticMortarTrails02,
-    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
     FxTrails = EffectTemplate.AIFBallisticMortarFxTrails02,
     FxImpactUnit =  EffectTemplate.AIFBallisticMortarHitUnit02,
     FxImpactProp =  EffectTemplate.AIFBallisticMortarHitUnit02,
@@ -208,7 +208,7 @@ AQuadLightLaserProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/aeon_laser_trail_02_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
     FxImpactUnit = EffectTemplate.ALightLaserHitUnit01,
     FxImpactProp = EffectTemplate.ALightLaserHitUnit01,
     FxImpactLand = EffectTemplate.ALightLaserHit01,
@@ -221,7 +221,7 @@ ALightLaserProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/aeon_laser_trail_02_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
     FxImpactUnit = EffectTemplate.ALightLaserHitUnit01,
     FxImpactProp = EffectTemplate.ALightLaserHitUnit01,
     FxImpactLand = EffectTemplate.ALightLaserHit01,
@@ -280,7 +280,7 @@ AAALightDisplacementAutocannonMissileProjectile = ClassProjectile(MultiPolyTrail
     FxImpactNone = EffectTemplate.ALightDisplacementAutocannonMissileHit,
     FxImpactLand = EffectTemplate.ALightDisplacementAutocannonMissileHit,
     PolyTrails = EffectTemplate.ALightDisplacementAutocannonMissilePolyTrails,
-    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 --- AEON GUIDED MISSILE PROJECTILES
@@ -653,7 +653,7 @@ QuasarAntiTorpedoChargeSubProjectile = ClassProjectile(MultiPolyTrailProjectile)
     FxNoneHitScale = 1,
     FxImpactNone = EffectTemplate.AQuasarAntiTorpedoHit,
     PolyTrails= EffectTemplate.AQuasarAntiTorpedoPolyTrails,
-    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
 }
 
 --------------------------------------------------------------------------

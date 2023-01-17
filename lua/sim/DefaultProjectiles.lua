@@ -267,7 +267,7 @@ SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 MultiPolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
-    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset1,
+    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset1,
     FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 
     --- Count of how many are selected randomly for PolyTrail table
@@ -335,7 +335,7 @@ MultiCompositeEmitterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
 
     Beams = {'/effects/emitters/default_beam_01_emit.bp',},
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
-    $1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset1,
+    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset1,
     -- Count of how many are selected randomly for PolyTrail table
     RandomPolyTrails = 0,
     FxTrails = import("/lua/effecttemplates.lua").NoEffects,

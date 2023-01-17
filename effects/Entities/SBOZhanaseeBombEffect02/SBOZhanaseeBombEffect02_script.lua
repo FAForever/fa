@@ -12,6 +12,6 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 SBOZhanaseeBombEffect02 = Class(import("/lua/sim/defaultprojectiles.lua").MultiPolyTrailProjectile) {
 	FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 	PolyTrails = EffectTemplate.SZhanaseeBombHitSpiralFxPolyTrails,
-	$1 = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset1,   
+	PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset1,   
 }
 TypeClass = SBOZhanaseeBombEffect02
