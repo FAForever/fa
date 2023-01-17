@@ -13,7 +13,6 @@ TDFOverCharge01 = ClassProjectile(TLaserBotProjectile, OverchargeProjectile) {
     FxImpactProp =  EffectTemplate.TCommanderOverchargeHit01,
     FxImpactLand =  EffectTemplate.TCommanderOverchargeHit01,
     FxImpactAirUnit =  EffectTemplate.TCommanderOverchargeHit01,
-    FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
         OverchargeProjectile.OnImpact(self, targetType, targetEntity)

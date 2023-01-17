@@ -7,7 +7,6 @@ DestructionFire01 = Class(NullShell) {
     FxImpactUnit = {},
     FxImpactLand = {},
     FxImpactWater = {},
-    FxImpactUnderWater = {},
     FxImpactNone = {},
 }
 

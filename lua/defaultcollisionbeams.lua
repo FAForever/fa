@@ -42,7 +42,6 @@ GinsuCollisionBeam = Class(SCCollisionBeam) {
     FxImpactLand = {'/effects/emitters/destruction_land_hit_puff_01_emit.bp',
                     '/effects/emitters/destruction_explosion_flash_01_emit.bp'},
     FxLandHitScale = 0.1625,
-    FxImpactUnderWater = {},
 }
 
 ------------------------------------

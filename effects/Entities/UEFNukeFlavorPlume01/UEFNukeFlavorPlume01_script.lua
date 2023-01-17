@@ -9,7 +9,6 @@ UEFNukeFlavorPlume01 = Class(EmitterProjectile) {
     FxImpactUnit = {},
     FxImpactLand = {},
     FxImpactWater = {},
-    FxImpactUnderWater = {},
     FxImpactNone = {},
 }
 
