@@ -305,8 +305,9 @@ IntelComponent = ClassSimple {
     ---@param self IntelComponent | Unit
     OnIntelRecharged = function(self)
         local status = self.IntelStatus
-        if status then
+        if status and status.RechargeThread then
             LOG("OnIntelRecharged")
+            status.RechargeThread = nil
             for i, _ in status.AllIntelRecharging do
                 self:EnableIntel(i)
                 self:OnIntelEnabled(i)
