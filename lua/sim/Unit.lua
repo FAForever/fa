@@ -167,9 +167,7 @@ Unit = ClassUnit(moho.unit_methods) {
         self.Sync.army = self:GetArmy()
         setmetatable(self.Sync, SyncMeta)
 
-        if not self.Trash then
-            self.Trash = TrashBag()
-        end
+        self.Trash = self.Trash or TrashBag()
 
         self.IntelDisables = {
             Radar = {NotInitialized = true},
@@ -285,6 +283,7 @@ Unit = ClassUnit(moho.unit_methods) {
 
         -- for syncing data to UI
         self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate)
+        self:SetStat("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
@@ -1392,14 +1391,8 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
-
         local layer = self.Layer
         self.Dead = true
-
-        -- Clear out any remaining projectiles
-        for k = 1, self.WeaponCount do 
-            self.WeaponInstances[k]:ClearProjectileTrash();
-        end
 
         -- Units killed while being invisible because they're teleporting should show when they're killed
         if self.TeleportFx_IsInvisible then
@@ -2201,25 +2194,12 @@ Unit = ClassUnit(moho.unit_methods) {
         if self.TransportBeamEffectsBag then 
             self.TransportBeamEffectsBag:Destroy()
         end
-
-        -- destroy remaining trash of weapon
-        for k = 1, self.WeaponCount do 
-            self.WeaponInstances[k].Trash:Destroy();
-        end
     end,
 
     ---@param self Unit
     OnDestroy = function(self)
         self.Dead = true
-
-        -- LOG(string.format("%s -> %s", tostring(self.UnitId), tostring(debug.allocatedsize(self))))
-
-        -- clear out all manipulators, at this point the wreck has been made
-        for k = 1, self.WeaponCount do 
-            self.WeaponInstances[k]:ClearProjectileTrash();
-            self.WeaponInstances[k]:ClearManipulatorTrash();
-        end
-
+        
         if self:GetFractionComplete() < 1 then
             self:SendNotifyMessage('cancelled')
         end
@@ -4148,7 +4128,7 @@ Unit = ClassUnit(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param treads UnitBlueprintTreads
+    ---@param treads UnitBlueprintTreadMarks
     ---@param type string
     CreateTreadsThread = function(self, treads, type)
         local sizeX = treads.TreadMarksSizeX

@@ -7,7 +7,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+
 ---@alias OpBuffType
+---| "AIBUILDRATE"
+
+---@alias OpBuffName
 ---| "BaseManagerFactoryDefaultBuildRate"
 ---| "BaseManagerEngineerDefaultBuildRate"
 
