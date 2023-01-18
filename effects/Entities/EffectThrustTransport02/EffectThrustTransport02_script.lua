@@ -1,7 +1,7 @@
 -- script for projectile BoneAttached
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 EffectThrustTransport01 = Class(EmitterProjectile) {
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
     FxTrailScale = 1,
     FxTrailOffset = 0,
     FxUnitHitScale = 1,
@@ -13,8 +13,7 @@ EffectThrustTransport01 = Class(EmitterProjectile) {
         '/effects/emitters/destruction_water_splash_wash_02_emit.bp',
         },
     FxUnderWaterHitScale = 1,
-    FxImpactUnderWater = {},
     FxNoneHitScale = 1,
-    FxImpactNone = {},
+    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,   
 }
 TypeClass = EffectThrustTransport01

@@ -415,7 +415,6 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Accurate = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             Damage = 1,

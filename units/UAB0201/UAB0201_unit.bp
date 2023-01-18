@@ -79,6 +79,9 @@ UnitBlueprint {
             IconFadeInZoom = 130,
             LODs = {
                 {
+                    AlbedoName = '/units/uab0103/UAB0103_Albedo.dds',
+                    NormalsName = '/units/uab0103/UAB0103_NormalsTS.dds',
+                    SpecularName = '/units/uab0103/UAB0103_SpecTeam.dds', 
                     LODCutoff = 200,
                     ShaderName = 'Aeon',
                     AlbedoName = '/units/uab0101/uab0101_albedo.dds',

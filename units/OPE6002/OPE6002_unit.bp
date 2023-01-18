@@ -19,7 +19,7 @@ UnitBlueprint {
                     AlbedoName = '/Env/Structures/Props/UEF_Condo01_albedo.dds',
                     LODCutoff = 250,
                     MeshName = '/Env/Structures/Props/UEF_Condo01_lod0.scm',
-                    Shader = 'TMeshAlpha',
+                    ShaderName = 'TMeshAlpha',
                 },
             },
         },
