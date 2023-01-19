@@ -237,6 +237,9 @@ end
 
 
 local function CreateUI()
+
+    LOG("Don't mind me x2")
+
     if currentDialog ~= false then
         MenuCommon.MenuCleanup()
         currentDialog:Destroy()

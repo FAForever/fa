@@ -49,16 +49,16 @@ UnitBlueprint {
                 OffsetY = 2.5,
                 OffsetZ = 0.25,
             },
-            {
-                Water = {
-                    Effects = {
-                        {
-                            Bones = {
-                                'XAC0101',
-                            },
-                            Scale = 3.5,
-                            Type = 'BackWake',
+        },
+        MovementEffects = {
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            'XAC0101',
                         },
+                        Scale = 3.5,
+                        Type = 'BackWake',
                     },
                 },
             },

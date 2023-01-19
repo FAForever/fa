@@ -503,7 +503,7 @@ UnitBlueprint {
             FiringTolerance = 2,
             InitialProjectileStorage = 0,
             Label = 'NukeMissile',
-            ManualFire = 1,
+            ManualFire = true,
             MaxProjectileStorage = 3,
             MaxRadius = 410,
             MinRadius = 128,
