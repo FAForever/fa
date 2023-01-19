@@ -86,16 +86,21 @@ UnitBlueprint {
             IconFadeInZoom = 130,
             LODs = {
                 {
+                    AlbedoName = '/units/XSB0102/XSB0102_Albedo.dds',
+                    NormalsName = '/units/XSB0102/XSB0102_normalsTS.dds',
+                    SpecularName = '/units/XSB0102/XSB0102_SpecTeam.dds',
                     LODCutoff = 200,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
                     Scrolling = true,
                     ShaderName = 'Seraphim',
                 },
                 {
-                    AlbedoName = 'zsb9602_lod1_albedo.dds',
+                    AlbedoName = '/units/XSB0102/XSB0102_lod1_albedo.dds',
+                    NormalsName = '/units/XSB0102/XSB0102_lod1_normalsTS.dds',
+                    SpecularName = '/units/XSB0102/XSB0102_lod1_specteam.dds',
                     LODCutoff = 500,
                     ShaderName = 'Seraphim',
-                    SpecularName = 'zsb9602_lod1_specteam.dds',
+                    
                 },
             },
         },
