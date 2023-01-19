@@ -23,6 +23,7 @@
 ---| "OtheTacticalBomb"
 ---| "Overcharge"
 ---| "Reclaimed"
+---| "Spell"
 ---| "Stun"
 ---| "TacticalMissile"
 ---| "TreeFire"

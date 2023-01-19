@@ -105,7 +105,7 @@ local function LoadPreGameData()
 end
 
 ---@class BlueprintIconAssignment
----@field BlueprintId string
+---@field BlueprintId BlueprintId
 ---@field IconSet? string
 ---@field TypeId? string
 

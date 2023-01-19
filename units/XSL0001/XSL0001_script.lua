@@ -7,6 +7,24 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
+---@alias SeraphimACUEnhancementBuffType
+---| "ACUUPGRADEDMG"
+---| "COMMANDERAURA"
+---| "COMMANDERAURAFORSELF"
+---| "ACUBUILDRATE"
+
+---@alias SeraphimACUEnhancementBuffName      # BuffType
+---| "SeraphimACUDamageStabilization"         # ACUUPGRADEDMG
+---| "SeraphimACUDamageStabilizationAdv"      # ACUUPGRADEDMG
+---| "SeraphimACUAdvancedRegenAura"           # COMMANDERAURA
+---| "SeraphimACUAdvancedRegenAuraSelfBuff"   # COMMANDERAURAFORSELF
+---| "SeraphimACURegenAura"                   # COMMANDERAURA
+---| "SeraphimACURegenAuraSelfBuff"           # COMMANDERAURAFORSELF
+---| "SeraphimACUT2BuildRate"                 # ACUBUILDRATE
+---| "SeraphimACUT3BuildRate"                 # ACUBUILDRATE
+
+
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local Buff = import("/lua/sim/buff.lua")
 local SWeapons = import("/lua/seraphimweapons.lua")

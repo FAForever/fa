@@ -83,9 +83,6 @@ UnitBlueprint {
         'CANNOTUSEAIRSTAGING',
         'SHOWATTACKRETICLE',
     },
-    ContrailEffects = {
-        '/effects/emitters/contrail_ser_ohw_polytrail_01_emit.bp',
-    },
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Light',
@@ -241,7 +238,7 @@ UnitBlueprint {
                     LodCutoff = 'Weapon_LodCutoff',
                 },
             },
-            BallicsticArc = 'RULEUBA_None',
+            BallisticArc = 'RULEUBA_None',
             CollideFriendly = true,
             Damage = 2400,
             DamageFriendly = true,

@@ -265,7 +265,7 @@ UnitBlueprint {
             ForceSingleFire = true,
             InitialProjectileStorage = 0,
             Label = 'NukeMissiles',
-            ManualFire = 1,
+            ManualFire = true,
             MaxProjectileStorage = 5,
             MaxRadius = 20000,
             MinRadius = 0,
