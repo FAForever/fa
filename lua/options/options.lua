@@ -465,7 +465,7 @@ options = {
             -- },
 
             {
-                title = "<LOC ASSIST_TO_UPGRADE>Assist to Upgrade",
+                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade",
                 key = 'assist_to_upgrade',
                 type = 'toggle',
                 default = 'Off',
@@ -473,6 +473,20 @@ options = {
                     states = {
                         {text = "<LOC _Off>",                                               key = 'Off'},
                         {text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Only tech 1 extractors", key = 'Tech1Extractors'},
+                    },
+                },
+            },
+
+            {
+                title = "<LOC ASSIST_TO_UNPAUSE>Assist to unpause",
+                key = 'assist_to_unpause',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>Off",                                                                key = 'Off'},
+                        {text = "<LOC _ASSIST_TO_UNPAUSE_EXTRACTORS_AND_RADARS>Only extractors and radars",     key = 'ExtractorsAndRadars'},
+                        {text = "<LOC _On>On",                                                                  key = 'On'},
                     },
                 },
             },
