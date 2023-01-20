@@ -2854,10 +2854,7 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param order string
     ---@return boolean
     OnStartBuild = function(self, built, order)
-
         self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
-
-        reprsl(built)
 
         -- Prevent UI mods from violating game/scenario restrictions
         local id = built.UnitId

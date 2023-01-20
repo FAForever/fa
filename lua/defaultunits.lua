@@ -2267,9 +2267,6 @@ ConstructionUnit = ClassUnit(MobileUnit) {
     ---@param unitBeingBuilt Unit
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
-
-        reprsl(unitBeingBuilt)
-
         if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
             return
         else
