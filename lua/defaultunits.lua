@@ -139,7 +139,11 @@ StructureUnit = ClassUnit(Unit) {
             self:RotateTowardsEnemy()
         end
 
-        if not (bp.Physics.AltitudeToTerrain or bp.Physics.StandUpright) then
+        if not (
+                bp.Physics.AltitudeToTerrain or
+                bp.Physics.StandUpright
+            ) and self.Layer == 'Land'
+        then
             -- rotate structure to match terrain gradient
             local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
                 self:GetPosition(),
