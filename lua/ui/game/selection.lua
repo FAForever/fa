@@ -752,7 +752,7 @@ function SplitEngineerTech()
         local experimental = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.EXPERIMENTAL,
             units)
         local SACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER, units)
-        local tech3 = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.TECH3, units)
+        local tech3 = EntityCategoryFilterDown((categories.ENGINEER * categories.MOBILE * categories.TECH3) - categories.SUBCOMMANDER, units)
         local tech2 = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.TECH2, units)
         local tech1 = EntityCategoryFilterDown(categories.ENGINEER * categories.MOBILE * categories.TECH1, units)
 
@@ -791,7 +791,7 @@ function SplitTech()
     if units and not table.empty(units) then
         local experimental = EntityCategoryFilterDown(categories.EXPERIMENTAL, units)
         local SACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER, units)
-        local tech3 = EntityCategoryFilterDown(categories.TECH3, units)
+        local tech3 = EntityCategoryFilterDown(categories.TECH3 - categories.SUBCOMMANDER, units)
         local tech2 = EntityCategoryFilterDown(categories.TECH2, units)
         local tech1 = EntityCategoryFilterDown(categories.TECH1, units)
 
@@ -834,7 +834,7 @@ function SplitLayer()
 
         local splits = {}
         if not table.empty(land) then
-            table.insert(land, splits)
+            table.insert(splits, land)
         end
 
         if not table.empty(naval) then
@@ -843,6 +843,10 @@ function SplitLayer()
 
         if not table.empty(air) then
             table.insert(splits, air)
+        end
+
+        if table.getn(splits) > 0 then
+            SetupStaticSplits(units, splits)
         end
     end
 end
