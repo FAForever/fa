@@ -293,6 +293,21 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_CAMERA_SHAKE>Shake intensity",
+                key = 'camera_shake_intensity',
+                type = 'slider',
+                set = function(key,value,startup)
+                    ConExecute("cam_ShakeMult " .. tostring(0.01 * value))
+                end,
+                default = 100,
+                custom = {
+                    min = 0,
+                    max = 100,
+                    inc = 5,
+                },
+            },
+
+            {
                 title = '<LOC OPTIONS_0325>Build templates',
                 type = 'header',
 
