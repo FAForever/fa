@@ -622,6 +622,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0115>Always Render Strategic Icons",
         description = "<LOC OPTIONS_0116>Strategic icons are always shown, regardless of zoom distance",
     },
+    options_camera_shake_intensity = {
+        title = "<LOC OPTIONS_CAMERA_SHAKE_TITLE>Adjust shake intensity of camera",
+        description = "<LOC OPTIONS_CAMERA_SHAKE_DESCRIPTION>Adjusts the shake intensity: 0% is no shaking at all and 100% is the default shake behavior. \r\nLarge explosions and units can shake the camera to improve immersion, but practically it can be annoying.",
+    },
     options_uvd_format = {
         title = "<LOC OPTIONS_0107>Construction Tooltip Information",
         description = "<LOC OPTIONS_0118>Shows full, partial or no description when the unit icon is moused over",

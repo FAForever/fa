@@ -4,7 +4,7 @@
 local GenericDebris = import("/lua/genericdebris.lua").GenericDebris
 DebrisBoneAttachChassis01 = Class(GenericDebris) {
     FxLandHitScale = 1.0,
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
     FxTrailScale = 1,
 }
 

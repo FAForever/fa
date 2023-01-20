@@ -250,7 +250,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Unstable Phason Laser 2',
             FireTargetLayerCapsTable = {
-                Land = 'Land',
+                Land = 'Land|Water|Seabed',
             },
             FiringTolerance = 0,
             Label = 'PhasonBeamGround',

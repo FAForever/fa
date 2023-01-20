@@ -563,7 +563,11 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
     -- revert collision shapes of any blocking units or wreckage
     for _, entity in blockingEntities do
         if not entity:BeenDestroyed() then
-            entity:ApplyCachedCollisionExtents()
+            if entity.IsProp then 
+                entity:ApplyCachedCollisionExtents()
+            else 
+                entity:RevertCollisionShape()
+            end
         end
     end
 end

@@ -5,6 +5,17 @@
 -- Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@alias CybranSCUEnhancementBuffType
+---| "SCUBUILDRATE"
+---| "SCUCLOAKBONUS"
+---| "SCUREGENERATEBONUS"
+
+---@alias CybranSCUEnhancementBuffName        # BuffType
+---| "CybranSCUBuildRate"                     # SCUBUILDRATE
+---| "CybranSCUCloakBonus"                    # SCUCLOAKBONUS
+---| "CybranSCURegenerateBonus"               # SCUREGENERATEBONUS
+
+
 local CybranUnits = import("/lua/cybranunits.lua")
 local CCommandUnit = CybranUnits.CCommandUnit
 

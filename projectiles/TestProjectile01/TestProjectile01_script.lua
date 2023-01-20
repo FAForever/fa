@@ -9,10 +9,9 @@ TestProjectile01 = ClassProjectile(Projectile)
     PolyTrail = '/effects/emitters/test_polytrail_01_emit.bp',
     FxTrails = {'/effects/emitters/test_emittrail_01_emit.bp',},
 
-    FxImpactUnit = {},
-    FxImpactLand = {},
-    FxImpactWater = {},
-    FxImpactUnderWater = {},
+    FxImpactUnit = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactWater = import("/lua/effecttemplates.lua").NoEffects,
 
     OnCreate = function(self)
         Projectile.OnCreate(self)

@@ -49,7 +49,7 @@ function MapResourceCheck()
     local mass = MarkerUtilities.GetMarkersByType("Mass")
     local hydro = MarkerUtilities.GetMarkersByType("Hydrocarbon")
 
-    ---Helper function that attempts to build a unit there
+    --- Helper function that attempts to build a unit there
     ---@param x number
     ---@param y number
     ---@param z number
