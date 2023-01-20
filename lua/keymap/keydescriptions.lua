@@ -18,6 +18,11 @@ keyDescriptions = {
     ['split_tech'] = '<LOC key_split_major_axis>Divides a selection over experimentals, SACUs, tech 3, tech 2 and tech 1 units',
     ['split_layer'] = '<LOC key_split_minor_axis>Divides a selection over land, naval and air units',
     ['split_engineer_tech'] = '<LOC key_split_minor_axis>Divides a selection over SACUs, tech 3, tech 2 and tech 1 engineers',
+    ['split_into_groups_1'] = '<LOC key_split_subgroups_1>Divides a selection over subgroups of 1 unit',
+    ['split_into_groups_2'] = '<LOC key_split_subgroups_2>Divides a selection over subgroups of 2 units',
+    ['split_into_groups_4'] = '<LOC key_split_subgroups_4>Divides a selection over subgroups of 4 units',
+    ['split_into_groups_8'] = '<LOC key_split_subgroups_8>Divides a selection over subgroups of 8 units',
+    ['split_into_groups_16'] = '<LOC key_split_subgroups_16>Divides a selection over subgroups of 16 units',
 
     ['revert_selection_set'] = 'Restore selection to the one before recalling a control group',
 
