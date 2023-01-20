@@ -453,7 +453,7 @@ local categoriesStructure = categories.STRUCTURE
 
 --- Upgrades a tech 1 extractor that is being assisted
 ---@param unit UserUnit
-local function OnGuardUpgrade(unit)
+local function OnGuardUpgrade(guardees, unit)
     if  EntityCategoryContains(categories.MASSEXTRACTION * categories.TECH1, unit) and
         Prefs.GetFromCurrentProfile('options.assist_to_upgrade') == 'Tech1Extractors'
     then
@@ -486,11 +486,43 @@ local function OnGuardUpgrade(unit)
     end
 end
 
+--- Unpauses a
+---@param guardees UserUnit[]
+---@param target UserUnit
+local function OnGuardUnpause(guardees, target)
+    local prefs = Prefs.GetFromCurrentProfile('options.assist_to_unpause')
+    if   prefs == 'On' or
+        (prefs == 'ExtractorsAndRadars' and EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, target))
+    then
+        for k, guardee in guardees do
+
+            -- for correct upvalue scope
+            ---@type UserUnit
+            local engineer = guardee
+
+            ForkThread(
+                function ()
+                    while not (IsDestroyed(engineer) or IsDestroyed(target)) do
+                        WaitSeconds(1.0)
+
+                        local focus = engineer:GetFocus()
+                        if focus == target:GetFocus() then
+                            SetPaused({target}, false)
+                            break
+                        end
+                    end
+                end
+            )
+        end
+    end
+end
+
 --- Is called when a unit receies a guard / assist order
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
 local function OnGuard(guardees, unit)
-    OnGuardUpgrade(unit)
+    OnGuardUpgrade(guardees, unit)
+    OnGuardUnpause(guardees, unit)
 end
 
 --- Called by the engine when a new command has been issued by the player.
