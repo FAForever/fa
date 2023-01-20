@@ -2267,11 +2267,15 @@ ConstructionUnit = ClassUnit(MobileUnit) {
     ---@param unitBeingBuilt Unit
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
+
+        reprsl(unitBeingBuilt)
+
         if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
             return
         else
             MobileUnit.OnStartBuild(self, unitBeingBuilt, order)
         end
+
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
