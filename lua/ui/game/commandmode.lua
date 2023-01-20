@@ -486,25 +486,11 @@ local function OnGuardUpgrade(unit)
     end
 end
 
---- Unpauses a
----@param unit any
-local function OnGuardUnpause(unit)
-    local prefs = Prefs.GetFromCurrentProfile('options.assist_to_unpause')
-    LOG(prefs)
-    if   prefs == 'On' or
-        (prefs == 'ExtractorsAndRadars' and EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, unit))
-    then
-        local units = { unit }
-        SetPaused(units, false)
-    end
-end
-
 --- Is called when a unit receies a guard / assist order
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
 local function OnGuard(guardees, unit)
     OnGuardUpgrade(unit)
-    OnGuardUnpause(unit)
 end
 
 --- Called by the engine when a new command has been issued by the player.
