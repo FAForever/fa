@@ -630,6 +630,15 @@ Tooltips = {
         title = "<LOC OPTIONS_0107>Construction Tooltip Information",
         description = "<LOC OPTIONS_0118>Shows full, partial or no description when the unit icon is moused over",
     },
+    options_assist_to_upgrade = {
+        title = "<LOC ASSIST_TO_UPGRADE_TITLE>Assist to Upgrade",
+        description = "<LOC ASSIST_TO_UPGRADE_DESCRIPTION>When enabled structures automatically queue and pause their upgrade when you issue an assist order",
+    },
+
+    options_assist_to_unpause = {
+        title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to Unpause",
+        description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled structures automatically unpause as engineers start assisting it.",
+    },
     options_mp_taunt_head = {
         title = "<LOC OPTIONS_0119>MP Taunt Head",
         description = "<LOC OPTIONS_0120>Select which 3D head is displayed when taunts are used in multiplayer",
