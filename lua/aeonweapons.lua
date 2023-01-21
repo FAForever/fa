@@ -465,32 +465,7 @@ AIFMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 AIFBombGravitonWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class AIFArtilleryMiasmaShellWeapon : DefaultProjectileWeapon
-AIFArtilleryMiasmaShellWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    ---@param self AIFArtilleryMiasmaShellWeapon
-    ---@param bone Bone
-    ---@return Projectile |nil
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self.Blueprint
-        local data = {
-            Instigator = self.unit,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Radius = blueprint.DamageRadius,
-            Type = 'Normal',
-            DamageFriendly = blueprint.DamageFriendly,
-        }
-
-        if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
-        end
-
-        return proj
-    end,
-}
+AIFArtilleryMiasmaShellWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class AIFArtillerySonanceShellWeapon : DefaultProjectileWeapon
 AIFArtillerySonanceShellWeapon = ClassWeapon(DefaultProjectileWeapon) {
@@ -509,97 +484,16 @@ AIFBombQuarkWeapon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class AANDepthChargeBombWeapon : DefaultProjectileWeapon
 AANDepthChargeBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp', },
-
-    ---@param self AANDepthChargeBombWeapon
-    ---@param bone Bone
-    ---@return Projectile|nil
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self.Blueprint
-        local data = {
-            Army = self.unit.Army,
-            Instigator = self.unit,
-            StartRadius = blueprint.DOTStartRadius,
-            EndRadius = blueprint.DOTEndRadius,
-            DOTtype = blueprint.DOTtype,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Type = 'Normal',
-        }
-
-        if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
-        end
-
-        return proj
-    end,
 }
 
 ---@class AANDepthChargeBombWeapon02 : DefaultProjectileWeapon
 AANDepthChargeBombWeapon02 = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_01_emit.bp', },
-
-    ---@param self AANDepthChargeBombWeapon02
-    ---@param bone Bone
-    ---@return Projectile|nil
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self.Blueprint
-        local data = {
-            Army = self.unit.Army,
-            Instigator = self.unit,
-            StartRadius = blueprint.DOTStartRadius,
-            EndRadius = blueprint.DOTEndRadius,
-            DOTtype = blueprint.DOTtype,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Type = 'Normal',
-        }
-
-        if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
-        end
-
-        return proj
-    end,
 }
 
 ---@class AANTorpedoCluster : DefaultProjectileWeapon
 AANTorpedoCluster = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/aeon_torpedocluster_flash_01_emit.bp', },
-
-    ---@param self AANTorpedoCluster
-    ---@param bone Bone
-    ---@return Projectile|nil
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self.Blueprint
-        local data = {
-            Army = self.unit.Army,
-            Instigator = self.unit,
-            StartRadius = blueprint.DOTStartRadius,
-            EndRadius = blueprint.DOTEndRadius,
-            DOTtype = blueprint.DOTtype,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Type = 'Normal',
-        }
-
-        if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
-        end
-
-        return proj
-    end,
 }
 
 ---@class AIFSmartCharge : DefaultProjectileWeapon
