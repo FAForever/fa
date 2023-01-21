@@ -45,16 +45,6 @@ AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShe
 	            proj:SetVelocity(velocity)
 	            proj.DamageData = self.DamageData
 	        end
-	        local pos = self:GetPosition()
-	        local spec = {
-	            X = pos[1],
-	            Z = pos[3],
-	            Radius = self.Data.Radius,
-	            LifeTime = self.Data.Lifetime,
-	            Army = self.Data.Army,
-	            Omni = false,
-	            WaterVision = false,
-	        }
 	        self:Destroy()
 		else
 	        self:DoDamage( self, self.DamageData, TargetEntity)
