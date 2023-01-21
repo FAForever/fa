@@ -448,7 +448,7 @@ UnitBlueprint {
             WeaponCategory = 'Direct Fire',
         },
     },
-    SecondsBeforeChargeKicksIn = 4,
+    SecondsBeforeChargeKicksIn = 3,
     SecondsBeforeExplosionWhenCharging = 6,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
