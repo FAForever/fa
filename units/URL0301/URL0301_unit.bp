@@ -141,8 +141,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 19000,
-        MaxHealth = 19000,
+        Health = 11000,
+        MaxHealth = 11000,
         RegenRate = 25,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 150,
@@ -271,7 +271,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 26400,
         BuildCostMass = 2000,
-        BuildRate = 56,
+        BuildRate = 40,
         BuildTime = 14400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER CYBRAN',
@@ -295,7 +295,7 @@ UnitBlueprint {
             Icon = 'cfs',
             MaintenanceConsumptionPerSecondEnergy = 3500,
             Name = '<LOC enhancements_0089>Personal Cloaking Generator',
-            NewHealth = 15000,
+            NewHealth = 23000,
             Prerequisite = 'StealthGenerator',
             Slot = 'Back',
             UpgradeUnitAmbientBones = {
@@ -346,7 +346,7 @@ UnitBlueprint {
             BuildTime = 3000,
             Icon = 'fc',
             Name = '<LOC enhancements_0093>Disintegrator Amplifier',
-            NewDamageMod = 200,
+            NewDamageMod = 400,
             NewMaxRadius = 35,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
@@ -422,6 +422,7 @@ UnitBlueprint {
             BuildTime = 6000,
             Icon = 'srs',
             Name = '<LOC enhancements_0099>Nano-Repair System',
+            NewHealth = 8000,
             NewRegenRate = 375,
             Slot = 'Back',
             UpgradeUnitAmbientBones = {
@@ -484,9 +485,9 @@ UnitBlueprint {
             Slot = 'Back',
         },
         Switchback = {
-            BuildCostEnergy = 51100,
-            BuildCostMass = 800,
-            BuildTime = 4200,
+            BuildCostEnergy = 8700,
+            BuildCostMass = 380,
+            BuildTime = 2500,
             Icon = 'ses',
             Name = '<LOC enhancements_0109>Rapid Fabricator',
             NewBuildRate = 98,
