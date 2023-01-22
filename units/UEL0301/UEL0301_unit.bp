@@ -142,8 +142,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 16000,
-        MaxHealth = 16000,
+        Health = 12000,
+        MaxHealth = 12000,
         RegenRate = 20,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 150,
@@ -269,7 +269,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 25200,
         BuildCostMass = 2100,
-        BuildRate = 56,
+        BuildRate = 40,
         BuildTime = 14400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER UEF',
@@ -294,6 +294,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0061>Energy Accelerator',
             NewRateOfFire = 1.82,
             Slot = 'LCH',
+			UpgradeDamageMod = 500,
             UpgradeUnitAmbientBones = {
                 'UEL0301',
             },
@@ -499,7 +500,7 @@ UnitBlueprint {
             PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 26000,#32000
+            ShieldMaxHealth = 30000,#32000
             ShieldRechargeTime = 170,
             ShieldRegenRate = 50,
             ShieldRegenStartTime = 1,
@@ -776,7 +777,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 300,
+            Damage = 100,
             DamageRadius = 0,
             DamageType = 'Normal',
             DisplayName = 'Heavy Plasma Cannon',
