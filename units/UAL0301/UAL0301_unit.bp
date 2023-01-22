@@ -151,8 +151,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 15000,
-        MaxHealth = 15000,
+        Health = 11000,
+        MaxHealth = 11000,
         RegenRate = 17,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 150,
@@ -301,7 +301,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 27100,
         BuildCostMass = 1950,
-        BuildRate = 56,
+        BuildRate = 40,
         BuildTime = 14400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER AEON',
@@ -320,9 +320,9 @@ UnitBlueprint {
     },
     Enhancements = {
         EngineeringFocusingModule = {
-            BuildCostEnergy = 50500,
-            BuildCostMass = 800,
-            BuildTime = 4200,
+            BuildCostEnergy = 8700,
+            BuildCostMass = 380,
+            BuildTime = 2500,
             Icon = 'efm',
             Name = '<LOC enhancements_0022>Rapid Fabricator',
             NewBuildRate = 98,
@@ -406,7 +406,7 @@ UnitBlueprint {
             PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 20000,
+            ShieldMaxHealth = 24000,
             ShieldRechargeTime = 190,
             ShieldRegenRate = 40,
             ShieldRegenStartTime = 1,
@@ -433,7 +433,7 @@ UnitBlueprint {
             PersonalShield = true,
             Prerequisite = 'Shield',
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 40000,
+            ShieldMaxHealth = 44000,
             ShieldRechargeTime = 180,
             ShieldRegenRate = 120,
             ShieldRegenStartTime = 1,
@@ -502,7 +502,7 @@ UnitBlueprint {
             Icon = 'ss',
             Name = '<LOC enhancements_0031>Reacton Refractor',
             NewDamageRadiusMod = 3.5,
-
+			NewDamageMod = 200,
             NewMaxRadius = 40,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {
@@ -773,7 +773,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_LowArc',
             ChargeDelay = 0.3,
             CollideFriendly = false,
-            Damage = 300,
+            Damage = 100,
             DamageType = 'Normal',
             DisplayName = 'Reacton Cannon',
             FireTargetLayerCapsTable = {
