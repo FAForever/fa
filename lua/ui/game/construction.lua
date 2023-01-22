@@ -398,7 +398,6 @@ function CreateTabs(type)
     local desiredTabs = 0
     -- Construction tab, this is called before fac templates have been added
     if type == 'construction' and allFactories and options.gui_templates_factory ~= 0 then
-        LOG("Set templates")
         -- nil value would cause refresh issues if templates tab is currently selected
         sortedOptions.templates = {}
 
@@ -507,14 +506,7 @@ function CreateTabs(type)
         end
     end
 
-    LOG(string.format("%s -> %s", tostring(previousTabSet), tostring(type)))
-    LOG(string.format("%s -> %s", tostring(previousTabSize), tostring(numActive)))
-
     if previousTabSet ~= type or previousTabSize ~= numActive then
-
-        reprsl(debug.traceback())
-
-
         if defaultTab then
             defaultTab:SetCheck(true)
         end
