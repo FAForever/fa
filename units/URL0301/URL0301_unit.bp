@@ -745,7 +745,7 @@ UnitBlueprint {
             },
             ChargeDelay = 0.5,
             CollideFriendly = false,
-            Damage = 300,
+            Damage = 100,
             DamageType = 'Normal',
             DisplayName = 'Disintegrator Pulse Laser',
             FireTargetLayerCapsTable = {
