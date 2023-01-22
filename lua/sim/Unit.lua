@@ -2850,11 +2850,10 @@ Unit = ClassUnit(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     ---@return boolean
     OnStartBuild = function(self, built, order)
-
         self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
 
         -- Prevent UI mods from violating game/scenario restrictions

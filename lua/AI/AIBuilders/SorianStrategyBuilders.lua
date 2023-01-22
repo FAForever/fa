@@ -26,7 +26,7 @@ local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local Behaviors = import("/lua/ai/aibehaviors.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
-local UpgradeTemplates = lazyimport("/lua/upgradetemplates.lua")
+local UpgradeTemplates = import("/lua/upgradetemplates.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 
 local econThread

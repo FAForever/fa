@@ -120,20 +120,9 @@ ADepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
 
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
-        local army = self.Army()
-
-        for i in self.FxEnterWater do --splash
-            CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
-        end
-        
         self:SetMaxSpeed(20)
-        self:SetVelocity(0)
         self:SetAcceleration(5)
-        self:TrackTarget(true)
-        self:StayUnderwater(true)
         self:SetTurnRate(180)
-        self:SetVelocityAlign(true)
-        self:SetStayUpright(false)
         self:SetVelocity(0.5)
 
         if self.EnterWaterMovementThread then
