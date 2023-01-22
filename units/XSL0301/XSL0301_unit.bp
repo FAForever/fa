@@ -161,8 +161,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 15500,
-        MaxHealth = 15500,
+        Health = 11500,
+        MaxHealth = 11500,
         RegenRate = 15,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 150,
@@ -315,7 +315,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 25800,
         BuildCostMass = 2050,
-        BuildRate = 56,
+        BuildRate = 40,
         BuildTime = 14400,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER SERAPHIM',
@@ -337,7 +337,7 @@ UnitBlueprint {
             BuildTime = 5900,
             Icon = 'dss',
             Name = '<LOC enhancements_0131>Nano-Repair System',
-            NewHealth = 14000,
+            NewHealth = 18000,
             NewRegenRate = 250,
             ShowBones = {
                 'Back_Upgrade',
@@ -368,9 +368,9 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         EngineeringThroughput = {
-            BuildCostEnergy = 51800,
-            BuildCostMass = 800,
-            BuildTime = 4200,
+            BuildCostEnergy = 8700,
+            BuildCostMass = 380,
+            BuildTime = 2500,
             Icon = 'efm',
             Name = '<LOC enhancements_0143>Rapid Fabricator',
             NewBuildRate = 98,
@@ -409,6 +409,7 @@ UnitBlueprint {
                 'Back_Upgrade',
             },
             Slot = 'Back',
+            UpgradeDamageMod = 300,
             UpgradeEffectBones = {
                 'Back_Upgrade',
             },
@@ -505,7 +506,7 @@ UnitBlueprint {
             PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 20000,
+            ShieldMaxHealth = 24000,
             ShieldRechargeTime = 160,
             ShieldRegenRate = 22,
             ShieldRegenStartTime = 1,
@@ -769,7 +770,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_LowArc',
             ChargeDelay = 0.3,
             CollideFriendly = false,
-            Damage = 400,
+            Damage = 100,
             DamageType = 'Normal',
             DisplayName = 'Light Chronotron Cannon',
             FireTargetLayerCapsTable = {
