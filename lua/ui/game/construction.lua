@@ -2673,7 +2673,6 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
 
         -- Allow all races to build other races templates
-        LOG("Check for templates!")
         if options.gui_all_race_templates ~= 0 then
             local templates = Templates.GetTemplates()
             local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
@@ -2842,7 +2841,6 @@ function SetCurrentTechTab(techLevel)
 end
 
 function GetCurrentTechTab()
-    reprsl(debug.traceback())
     if GetTabByID('t1'):IsChecked() then
         return 1
     elseif GetTabByID('t2'):IsChecked() then
