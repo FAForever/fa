@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------
 
 local BaseTmplFile = lazyimport("/lua/basetemplates.lua")
-local StructureTemplates = lazyimport("/lua/buildingtemplates.lua")
+local StructureTemplates = import("/lua/buildingtemplates.lua")
 local Utils = import("/lua/utilities.lua")
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
