@@ -398,6 +398,7 @@ function CreateTabs(type)
     local desiredTabs = 0
     -- Construction tab, this is called before fac templates have been added
     if type == 'construction' and allFactories and options.gui_templates_factory ~= 0 then
+        LOG("Set templates")
         -- nil value would cause refresh issues if templates tab is currently selected
         sortedOptions.templates = {}
 
@@ -408,7 +409,9 @@ function CreateTabs(type)
             local numActive = 0
             for _, tab in controls.tabs do
                 if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
-                    numActive = numActive + 1
+                    if tab.ID != 'templates' then
+                        numActive = numActive + 1
+                    end
                 end
             end
             previousTabSize = numActive
@@ -489,7 +492,11 @@ function CreateTabs(type)
     for _, tab in controls.tabs do
         if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
             tab:Enable()
-            numActive = numActive + 1
+
+            if tab.ID != 'templates' then
+                numActive = numActive + 1
+            end
+
             if defaultTabOrder[tab.ID] then
                 if not defaultTab or defaultTabOrder[tab.ID] < defaultTabOrder[defaultTab.ID] then
                     defaultTab = tab
@@ -500,7 +507,14 @@ function CreateTabs(type)
         end
     end
 
+    LOG(string.format("%s -> %s", tostring(previousTabSet), tostring(type)))
+    LOG(string.format("%s -> %s", tostring(previousTabSize), tostring(numActive)))
+
     if previousTabSet ~= type or previousTabSize ~= numActive then
+
+        reprsl(debug.traceback())
+
+
         if defaultTab then
             defaultTab:SetCheck(true)
         end
@@ -2667,6 +2681,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
 
         -- Allow all races to build other races templates
+        LOG("Check for templates!")
         if options.gui_all_race_templates ~= 0 then
             local templates = Templates.GetTemplates()
             local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
@@ -2835,6 +2850,7 @@ function SetCurrentTechTab(techLevel)
 end
 
 function GetCurrentTechTab()
+    reprsl(debug.traceback())
     if GetTabByID('t1'):IsChecked() then
         return 1
     elseif GetTabByID('t2'):IsChecked() then

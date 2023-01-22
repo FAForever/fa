@@ -7,8 +7,6 @@ local techCats = {
 
 -- TODO: refactor this for better performance :)))
 function insertIntoTableLowestTechFirst(units, t, isLowFuel, isIdleCon)
-
-
     local didInsert = false
     local isPut = false
     for _, tech in techCats do
