@@ -5,8 +5,8 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- --------------------------------------------------------------
 
-local StructureTemplates = lazyimport("/lua/buildingtemplates.lua")
-local UnitTemplates = lazyimport("/lua/unittemplates.lua")
+local StructureTemplates = import("/lua/buildingtemplates.lua")
+local UnitTemplates = import("/lua/unittemplates.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local Utils = import("/lua/utilities.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")

@@ -461,13 +461,7 @@ local function OnGuardUpgrade(guardees, unit)
             function ()
                 ---@type UserUnit
                 local units = { unit }
-                if unit and not unit:GetFocus() then
-
-                    local isPaused = GetIsPaused(units)
-                    if isPaused then
-                        SetPaused(units, false)
-                    end
-
+                if not IsDestroyed(unit) and not unit:GetFocus() then
                     import("/lua/ui/game/selection.lua").Hidden(
                         function ()
                             SelectUnits(units)
@@ -475,11 +469,9 @@ local function OnGuardUpgrade(guardees, unit)
                         end
                     )
 
-                    WaitSeconds(1.0)
+                    WaitSeconds(0.5)
 
-                    if isPaused then
-                        SetPaused(units, true)
-                    end
+                    SetPaused(units, true)
                 end
             end
         )
