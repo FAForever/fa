@@ -294,7 +294,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0061>Energy Accelerator',
             NewRateOfFire = 1.82,
             Slot = 'LCH',
-			UpgradeDamageMod = 200,
+            UpgradeDamageMod = 200,
             UpgradeUnitAmbientBones = {
                 'UEL0301',
             },

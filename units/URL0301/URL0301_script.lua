@@ -136,7 +136,7 @@ URL0301 = Class(CCommandUnit) {
                     Stacks = 'ALWAYS',
                     Duration = -1,
                     Affects = {
-					    MaxHealth = {
+                        MaxHealth = {
                             Add = bp.NewHealth,
                             Mult = 1.0,
                         },

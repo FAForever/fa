@@ -502,7 +502,7 @@ UnitBlueprint {
             Icon = 'ss',
             Name = '<LOC enhancements_0031>Reacton Refractor',
             NewDamageRadiusMod = 3.5,
-			NewDamageMod = 200,
+            NewDamageMod = 200,
             NewMaxRadius = 40,
             Slot = 'RCH',
             UpgradeUnitAmbientBones = {

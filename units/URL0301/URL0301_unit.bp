@@ -141,8 +141,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 11000,
-        MaxHealth = 11000,
+        Health = 10000,
+        MaxHealth = 10000,
         RegenRate = 25,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 150,
@@ -295,7 +295,7 @@ UnitBlueprint {
             Icon = 'cfs',
             MaintenanceConsumptionPerSecondEnergy = 3500,
             Name = '<LOC enhancements_0089>Personal Cloaking Generator',
-            NewHealth = 23000,
+            NewHealth = 24000,
             Prerequisite = 'StealthGenerator',
             Slot = 'Back',
             UpgradeUnitAmbientBones = {
@@ -422,7 +422,7 @@ UnitBlueprint {
             BuildTime = 6000,
             Icon = 'srs',
             Name = '<LOC enhancements_0099>Nano-Repair System',
-            NewHealth = 8000,
+            NewHealth = 9000,
             NewRegenRate = 375,
             Slot = 'Back',
             UpgradeUnitAmbientBones = {
