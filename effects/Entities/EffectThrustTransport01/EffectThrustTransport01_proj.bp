@@ -1,7 +1,7 @@
 ProjectileBlueprint {
     Physics = {
-        CollideEntity = true,
-        CollideSurface = true,
+        CollideEntity = false,
+        CollideSurface = false,
         DestroyOnWater = true,
         DirectionX = 0,
         DirectionXRange = 0,

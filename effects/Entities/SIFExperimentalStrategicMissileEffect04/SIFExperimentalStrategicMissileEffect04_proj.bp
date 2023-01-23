@@ -3,6 +3,7 @@ ProjectileBlueprint {
         StrategicIconSize = 0,
     },
     Physics = {
+        CollideEntity = false,
         DestroyOnWater = true,
         TrackTarget = false,
         TurnRate = 360,

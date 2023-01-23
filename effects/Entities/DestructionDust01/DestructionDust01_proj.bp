@@ -1,7 +1,7 @@
 ProjectileBlueprint {
     Physics = {
-        MinBounceCount = 10000,
-        MaxBounceCount = 10000,
+        MinBounceCount = 1,
+        MaxBounceCount = 3,
         BounceVelDamp = 1,
         DestroyOnWater = false,
         InitialSpeed = 5,

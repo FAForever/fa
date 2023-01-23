@@ -6,6 +6,8 @@ ProjectileBlueprint {
         Weapon = 'Anti Nuke Tendril',
     },
     Physics = {
+        CollideEntity = false,
+        CollideSurface = false,
         Acceleration = 60,
         DestroyOnWater = false,
         LeadTarget = false,
