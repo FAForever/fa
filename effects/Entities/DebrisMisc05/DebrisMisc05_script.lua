@@ -3,6 +3,6 @@
 --
 
 local GenericDebris = import("/lua/genericdebris.lua").GenericDebris
-DebrisMisc05 = DummyProjectileFactory(GenericDebris) { }
+DebrisMisc05 = DummyProjectileClass(GenericDebris) { }
 TypeClass = DebrisMisc05
 

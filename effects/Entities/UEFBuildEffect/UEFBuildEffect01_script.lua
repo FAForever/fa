@@ -1,4 +1,4 @@
 
 -- unused
-UEFBuildEffect01 = DummyProjectileFactory(import("/lua/sim/projectile.lua").DummyProjectile) { }
+UEFBuildEffect01 = DummyProjectileClass(import("/lua/sim/projectile.lua").DummyProjectile) { }
 TypeClass = UEFBuildEffect01
