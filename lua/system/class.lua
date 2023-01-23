@@ -297,7 +297,7 @@ end
 ---@generic T_Base: fa-class
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
-function ClassProjectile(...)
+function ClassDummyProjectile(...)
     if IsSimpleClass(arg) then
         local class = arg[1] --[[@as fa-class]]
         setmetatable(class, DummyProjectileFactory)

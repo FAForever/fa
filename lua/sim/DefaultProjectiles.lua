@@ -480,7 +480,7 @@ local EmitterMethods = _G.moho.IEffect
 local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
 
 ---@class BaseGenericDebris : DummyProjectile
-BaseGenericDebris = DummyProjectileClass(DummyProjectile) {
+BaseGenericDebris = ClassDummyProjectile(DummyProjectile) {
 
     ---@param self BaseGenericDebris
     ---@param targetType string
