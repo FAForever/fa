@@ -345,13 +345,6 @@ function SetupPlayerLines()
         group.Width:Set(controls.armyGroup.Width)
         group.armyID = armyIndex
 
-        group.div = Bitmap(group)
-        group.div.Width:Set(function() return group.Height()*2 end)
-        group.div.Height:Set(group.Height)
-        LayoutHelpers.AtCenterIn(group.div, group)
-        group.div:Hide()
-
-
         group.bg = Bitmap(group)
         group.bg:SetSolidColor('ffa0a0a0')
         group.bg:SetAlpha(0)
@@ -512,13 +505,6 @@ function SetupPlayerLines()
         end
 
         line.name:SetText(playerClan .. playerName .. playerRating)
-        if playerDiv~=""then
-            local divPath = "/textures/divisions/".. playerDiv.."_medium.png"
-            if exists(divPath) then
-                line.div:SetTexture(divPath)
-                line.div:Show()
-            end
-        end
     end
 
     local mapData = {}
