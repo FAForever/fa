@@ -353,12 +353,85 @@ IntelComponent = ClassSimple {
     ---@param intel? IntelType
     OnIntelEnabled = function(self, intel)
         LOG("Enabled intel: " .. tostring(intel))
+
+        if intel == 'Cloak' or intel == 'CloakField' then
+            self:UpdateCloakEffect(true, intel)
+        end
     end,
 
     ---@param self IntelComponent | Unit
     ---@param intel? IntelType
     OnIntelDisabled = function(self, intel)
         LOG("Disabled intel: " .. tostring(intel))
+
+        if intel == 'Cloak' or intel == 'CloakField' then
+            self:UpdateCloakEffect(false, intel)
+        end
+    end,
+
+    ---@param self IntelComponent | Unit
+    ---@param cloaked boolean
+    ---@param intel IntelType
+    UpdateCloakEffect = function(self, cloaked, intel)
+        -- When debugging cloak FX issues, remember that once a structure unit is seen by the enemy,
+        -- recloaking won't make it vanish again, and they'll see the new FX.
+        if self and not self.Dead then
+            if intel == 'Cloak' then
+                local bpDisplay = self.Blueprint.Display
+
+                if cloaked then
+                    self:SetMesh(bpDisplay.CloakMeshBlueprint, true)
+                else
+                    self:SetMesh(bpDisplay.MeshBlueprint, true)
+                end
+            elseif intel == 'CloakField' then
+                if self.CloakFieldWatcherThread then
+                    KillThread(self.CloakFieldWatcherThread)
+                    self.CloakFieldWatcherThread = nil
+                end
+
+                if cloaked then
+                    self.CloakFieldWatcherThread = self:ForkThread(self.CloakFieldWatcher)
+                end
+            end
+        end
+    end,
+
+    ---@param self IntelComponent | Unit
+    CloakFieldWatcher = function(self)
+        if self and not self.Dead then
+            local bp = self.Blueprint
+            local radius = bp.Intel.CloakFieldRadius - 2 -- Need to take off 2, because engine reasons
+            local brain = self:GetAIBrain()
+
+            while self and not self.Dead and self:IsIntelEnabled('CloakField') do
+                local pos = self:GetPosition()
+                local units = brain:GetUnitsAroundPoint(categories.ALLUNITS, pos, radius, 'Ally')
+
+                for _, unit in units do
+                    if unit and not unit.Dead and unit ~= self then
+                        if unit.CloakFXWatcherThread then
+                            KillThread(unit.CloakFXWatcherThread)
+                            unit.CloakFXWatcherThread = nil
+                        end
+
+                        unit:UpdateCloakEffect(true, 'Cloak') -- Turn on the FX for the unit
+                        unit.CloakFXWatcherThread = unit:ForkThread(unit.CloakFXWatcher)
+                    end
+                end
+
+                WaitTicks(6)
+            end
+        end
+    end,
+
+    ---@param self IntelComponent | Unit
+    CloakFXWatcher = function(self)
+        WaitTicks(6)
+
+        if self and not self.Dead then
+            self:UpdateCloakEffect(false, 'Cloak')
+        end
     end,
 
 }
