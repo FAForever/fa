@@ -434,4 +434,37 @@ IntelComponent = ClassSimple {
         end
     end,
 
+
+    ---@param self Unit
+    ---@param hook fun(unit: Unit, army: number)
+    AddDetectedByHook = function(self, hook)
+        if not self.DetectedByHooks then
+            self.DetectedByHooks = {}
+        end
+        table.insert(self.DetectedByHooks, hook)
+    end,
+
+    ---@param self Unit
+    ---@param hook fun(unit: Unit, army: number)
+    RemoveDetectedByHook = function(self, hook)
+        if self.DetectedByHooks then
+            for k, v in self.DetectedByHooks do
+                if v == hook then
+                    table.remove(self.DetectedByHooks, k)
+                    return
+                end
+            end
+        end
+    end,
+
+    ---@param self Unit
+    ---@param index integer
+    OnDetectedBy = function(self, index)
+        if self.DetectedByHooks then
+            for k, v in self.DetectedByHooks do
+                v(self, index)
+            end
+        end
+    end,
+
 }
