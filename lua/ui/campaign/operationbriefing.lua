@@ -40,12 +40,20 @@ local control = {}
 local originalBriefing = false
 
 function CreateUI(parent, scenarioPath)
+    operationData = import(string.gsub(scenarioPath, '_scenario.lua', '_operation.lua')).operationData
+    -- Entering from Campaign select screen
     if not parent then
         parent = Group(GetFrame(0))
         LayoutHelpers.FillParent(parent, GetFrame(0))
         originalBriefing = true
+        -- FAF missions use a slightly different format of the op table
+        operationData.opBriefing = {
+            text = operationData.opBriefingText,
+            movies = operationData.opMovies.briefing.movies,
+            bgsound = operationData.opMovies.briefing.bgsound,
+            voice = operationData.opMovies.briefing.voice,
+        }
     end
-    operationData = import(string.gsub(scenarioPath, '_scenario.lua', '_operation.lua')).operationData
     local operationID = operationData.key
     -- Either vanilla faction specific UI or defaults to FA one.
     local factionStyle = operationData.opBriefing.style
@@ -458,6 +466,7 @@ function CreateUI(parent, scenarioPath)
                 mapErrorDialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
             end
         end
+        launchBtn:Disable()
     end
     
     -- Mission name
