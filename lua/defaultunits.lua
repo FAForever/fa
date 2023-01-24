@@ -6,6 +6,7 @@
 -----------------------------------------------------------------
 local Entity = import("/lua/sim/entity.lua").Entity
 local Unit = import("/lua/sim/unit.lua").Unit
+local DummyUnit = import("/lua/sim/unit.lua").DummyUnit
 local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
@@ -18,9 +19,6 @@ local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 local RolloffUnitTable = { nil }
 local RolloffPositionTable = { 0, 0, 0 }
-
--- allows us to skip ai-specific functionality
-local GameHasAIs = ScenarioInfo.GameHasAIs
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
@@ -535,22 +533,23 @@ StructureUnit = ClassUnit(Unit) {
     ---@param self StructureUnit
     ---@param wreckage Wreckage
     CheckRepairersForRebuild = function(self, wreckage)
-        local units = {}
-        for id, u in self.Repairers do
-            if u:BeenDestroyed() then
-                self.Repairers[id] = nil
-            else
-                local focus = u:GetFocusUnit()
-                if focus == self and ((u:IsUnitState('Repairing') and not u:GetGuardedUnit()) or
-                                      EntityCategoryContains(categories.SUBCOMMANDER, u)) then
-                    table.insert(units, u)
+        if self.Repairers then
+            local units = {}
+            for id, u in self.Repairers do
+                if u:BeenDestroyed() then
+                    self.Repairers[id] = nil
+                else
+                    local focus = u:GetFocusUnit()
+                    if focus == self and ((u:IsUnitState('Repairing') and not u:GetGuardedUnit()) or
+                                        EntityCategoryContains(categories.SUBCOMMANDER, u)) then
+                        table.insert(units, u)
+                    end
                 end
             end
+
+            if not units[1] then return end
+            wreckage:Rebuild(units)
         end
-
-        if not units[1] then return end
-
-        wreckage:Rebuild(units)
     end,
 
     ---@param self StructureUnit
@@ -1660,7 +1659,71 @@ TransportBeaconUnit = ClassUnit(StructureUnit) {
 
 -- WALL STRCUTURE UNITS
 ---@class WallStructureUnit : StructureUnit
-WallStructureUnit = ClassUnit(StructureUnit) { }
+WallStructureUnit = ClassUnit(StructureUnit) {
+
+    ---@param self WallStructureUnit
+    OnPreCreate = function(self)
+    end,
+
+    ---@param self WallStructureUnit
+    OnCreate = function(self)
+        -- cache engine calls
+        self.EntityId = self:GetEntityId()
+        self.Blueprint = self:GetBlueprint()
+        self.Army = self:GetArmy()
+        self.UnitId = self:GetUnitId()
+        self.Brain = self:GetAIBrain()
+        self.Trash = TrashBag()
+        self.OnBeingBuiltEffectsBag = TrashBag()
+    end,
+
+    ---@param self WallStructureUnit
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
+        ArmyBrains[self.Army]:AddUnitStat(self.UnitId, "built", 1)
+    end,
+
+    ---@param self WallStructureUnit
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
+    OnDamage = function(self, instigator, amount, vector, damageType)
+        local health = self:GetHealth()
+        if health < amount then
+            self:Kill(instigator, damageType, 1)
+        else 
+            self:AdjustHealth(instigator, -amount)
+        end
+    end,
+
+    ---@param self WallStructureUnit
+    ---@param new number
+    ---@param old number
+    OnHealthChanged = function(self, new, old)
+    end,
+
+    ---@param self WallStructureUnit
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
+    OnKilled = function(self, instigator, type, overkillRatio)
+        ArmyBrains[self.Army]:AddUnitStat(self.UnitId, "lost", 1)
+        self:CreateWreckage(overkillRatio)
+        explosion.CreateScalableUnitExplosion(self)
+
+        self:Destroy()
+    end,
+
+
+    ---@param self WallStructureUnit
+    OnDestroy = function(self)
+        self.Trash:Destroy()
+        self.OnBeingBuiltEffectsBag:Destroy()
+    end,
+ }
 
 -- QUANTUM GATE UNITS
 ---@class QuantumGateUnit : FactoryUnit

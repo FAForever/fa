@@ -734,6 +734,7 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param self Unit
     ---@param unit Unit
     OnStartRepair = function(self, unit)
+        unit.Repairers = unit.Repairers or { }
         unit.Repairers[self.EntityId] = self
 
         if unit.WorkItem ~= self.WorkItem then

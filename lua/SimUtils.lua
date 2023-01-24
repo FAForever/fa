@@ -280,10 +280,12 @@ function TransferUnitsOwnership(units, toArmy, captured)
     -- add delay on turning on each weapon 
     for _, unit in newUnits do
         -- disable all weapons, enable with a delay
-        for k = 1, unit.WeaponCount do
-            local weapon = unit:GetWeapon(k)
-            weapon:SetEnabled(false)
-            weapon:ForkThread(TransferUnitsOwnershipDelayedWeapons)
+        if unit.WeaponCount then
+            for k = 1, unit.WeaponCount do
+                local weapon = unit:GetWeapon(k)
+                weapon:SetEnabled(false)
+                weapon:ForkThread(TransferUnitsOwnershipDelayedWeapons)
+            end
         end
     end
 
