@@ -250,7 +250,12 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ReEvaluateHQSupportFactoryRestrictions = function (self)
         local layers = { "AIR", "LAND", "NAVAL" }
-        local factions = { "UEF", "AEON", "CYBRAN", "SERAPHIM", "NOMADS" }
+        local factions = { "UEF", "AEON", "CYBRAN", "SERAPHIM" }
+
+        if categories.NOMADS then
+            table.insert(factions, 'NOMADS')
+        end
+
         for _, faction in factions do
             for _, layer in layers do
                 self:SetHQSupportFactoryRestrictions(faction, layer)
