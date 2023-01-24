@@ -15,7 +15,6 @@
 
 -- types commonly used in repository
 
----@class FileName: string
 ---@class FunctionName: string
 
 ---@class BuildCondition
@@ -66,8 +65,8 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
-local StructureTemplates = lazyimport("/lua/buildingtemplates.lua")
-local UpgradeTemplates = lazyimport("/lua/upgradetemplates.lua")
+local StructureTemplates = import("/lua/buildingtemplates.lua")
+local UpgradeTemplates = import("/lua/upgradetemplates.lua")
 local Buff = import("/lua/sim/buff.lua")
 
 local BaseOpAI = import("/lua/ai/opai/baseopai.lua")

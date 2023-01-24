@@ -5,6 +5,16 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@alias UEFACUEnhancementBuffType
+---| "DamageStabilization"
+---| "ACUBUILDRATE"
+
+---@alias UEFACUEnhancementBuffName           # BuffType
+---| "UEFACUDamageStabilization"              # DamageStabilization
+---| "UEFACUT2BuildRate"                      # ACUBUILDRATE
+---| "UEFACUT3BuildRate"                      # ACUBUILDRATE
+
+
 local Shield = import("/lua/shield.lua").Shield
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local TerranWeaponFile = import("/lua/terranweapons.lua")

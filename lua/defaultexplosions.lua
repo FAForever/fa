@@ -206,8 +206,8 @@ local ProjectileDebrisBpsN = TableGetn(ProjectileDebrisBps)
 -- @unit The Unit to create the explosion for.
 -- @overKillRatio Has an impact on how strong the explosion is.
 ---@param unit Unit
----@param debrisMultiplier integer
----@param circularDebris boolean
+---@param debrisMultiplier? integer
+---@param circularDebris? boolean
 function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
 
     debrisMultiplier = debrisMultiplier or 1
@@ -434,7 +434,7 @@ end
 
 --- Creates a flash and fire emitters that represents an explosion on hit.
 ---@param obj Unit The entity to create the flash at.
----@param boneName string The bone to attach the effect to.
+---@param boneName Bone The bone to attach the effect to.
 ---@param scale number The scale of the flash.
 function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
     local army = obj.Army

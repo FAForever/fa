@@ -33,7 +33,6 @@ MissileCruiseTerran01 = ClassProjectile(Projectile) {
         '/effects/emitters/missile_hit_fire_01_emit.bp',
         '/effects/emitters/destruction_scorch_01_emit.bp',
     },
-    FxImpactUnderWater = {},
     FxImpactNone = {'/effects/emitters/missile_hit_flash_01_emit.bp',
         '/effects/emitters/missile_hit_fire_01_emit.bp',
     },

@@ -7,7 +7,7 @@
 
 local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local StructureTemplates = lazyimport("/lua/buildingtemplates.lua")
+local StructureTemplates = import("/lua/buildingtemplates.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
 --- Retrieves all human brains that are hostile to the given army index

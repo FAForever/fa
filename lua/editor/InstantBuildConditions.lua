@@ -27,7 +27,7 @@ function NotPreBuilt(aiBrain)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq boolean
 ---@return boolean
@@ -45,7 +45,7 @@ function HaveEqualToUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq EntityCategory
 ---@return boolean
@@ -63,7 +63,7 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq EntityCategory
 ---@return boolean

@@ -734,7 +734,6 @@ UnitBlueprint {
                     TargetDisallow = 'TECH1,TECH2,SHIELD,WALL',
                 },
             },
-            ChargeDelay = 0.5,
             CollideFriendly = false,
             Damage = 300,
             DamageType = 'Normal',

@@ -10,6 +10,7 @@ local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local TerrainUtils = import("/lua/sim/terrainutils.lua")
 local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
@@ -24,7 +25,7 @@ local GameHasAIs = ScenarioInfo.GameHasAIs
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
 local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
 
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
@@ -45,8 +46,8 @@ StructureUnit = ClassUnit(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:HideLandBones()
-        self.FxBlinkingLightsBag = {}
-        if self.Layer == 'Land' and self.Blueprint.Physics.FlattenSkirt then
+        self.FxBlinkingLightsBag = { }
+        if self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
         end
     end,
@@ -117,12 +118,13 @@ StructureUnit = ClassUnit(Unit) {
         local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
         local degrees = rad * (180 / math.pi)
 
-        -- some buildings can only take 90 degree angles
         if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
-            degrees = math.floor((degrees + 45) / 90) * 90
+            degrees = math.floor((degrees + 90) / 180) * 180
         end
 
-        self:SetRotation(degrees)
+        local rotator = CreateRotator(self, 0, 'y', degrees, nil, nil)
+        rotator:SetPrecedence(1)
+        self.Trash:Add(rotator)
     end,
 
     ---@param self StructureUnit
@@ -131,11 +133,34 @@ StructureUnit = ClassUnit(Unit) {
     OnStartBeingBuilt = function(self, builder, layer)
         Unit.OnStartBeingBuilt(self, builder, layer)
 
+        -- rotate weaponry towards enemy
+        local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         end
 
-        local bp = self.Blueprint
+        if not (
+                bp.Physics.AltitudeToTerrain or
+                bp.Physics.StandUpright
+            ) and self.Layer == 'Land'
+        then
+            -- rotate structure to match terrain gradient
+            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
+                self:GetPosition(),
+                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
+                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+            )
+
+            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
+
+            -- technically obsolete, but as this is part of an integration we don't want to break
+            -- the mod package that it originates from. Originates from the BrewLan mod suite
+            if not bp.Physics.FlattenSkirt then
+                self.TerrainSlope = {}
+            end
+        end
+
+        -- create decal below structure
         if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
                 self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
@@ -172,8 +197,8 @@ StructureUnit = ClassUnit(Unit) {
     FlattenSkirt = function(self)
         local x, y, z = self:GetPositionXYZ()
         local x0, z0, x1, z1 = self:GetSkirtRect()
-        x0, z0, x1, z1 = math.floor(x0), math.floor(z0), math.ceil(x1), math.ceil(z1)
-        FlattenMapRect(x0, z0, x1 - x0, z1 - z0, y)
+
+        import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
 
     ---@param self StructureUnit
@@ -290,7 +315,7 @@ StructureUnit = ClassUnit(Unit) {
         for _, v in self.FxBlinkingLightsBag do
             v:Destroy()
         end
-        self.FxBlinkingLightsBag = {}
+        self.FxBlinkingLightsBag = { }
     end,
 
     ---@param self StructureUnit
@@ -744,7 +769,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@return string?
     ToSupportFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local identifier = self.Blueprint.BlueprintId
         local faction = identifier:sub(2, 2)
         local layer = identifier:sub(7, 7)
 
@@ -775,7 +800,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     ToHQFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local identifier = self.Blueprint.BlueprintId
         local faction = identifier:sub(1, 3)
         local layer = identifier:sub(7, 7)
 
@@ -2253,6 +2278,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         else
             MobileUnit.OnStartBuild(self, unitBeingBuilt, order)
         end
+
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order

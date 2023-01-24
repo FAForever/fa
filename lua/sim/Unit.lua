@@ -286,6 +286,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
 
         -- for syncing data to UI
         self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate)
+        self:SetStat("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
@@ -2853,11 +2854,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     ---@return boolean
     OnStartBuild = function(self, built, order)
-
         self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
 
         -- Prevent UI mods from violating game/scenario restrictions
@@ -3844,7 +3844,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     end,
 
     ---@param self Unit
-    ---@param treads UnitBlueprintTreads
+    ---@param treads UnitBlueprintTreadMarks
     ---@param type string
     CreateTreadsThread = function(self, treads, type)
         local sizeX = treads.TreadMarksSizeX
