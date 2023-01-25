@@ -724,7 +724,7 @@ function CreateAdjacencyBeams(unit, adjacentUnit, adjacencyBeamsBag)
             node.entity:SetOrientation(OrientFromDir(vec), true)
         end
         if beamEffect then
-            local beam = AttachBeamEntityToEntity(node.entity, -1, nodeList[i + 1].entity, -1, unitArmy, beamEffect)
+            local beam = AttachBeamEntityToEntity(nodeList[i + 1].entity, -1, node.entity, -1, unitArmy, beamEffect)
             TrashBagAdd(infoTrash, beam)
             TrashBagAdd(unitTrash, beam)
         end
