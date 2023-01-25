@@ -101,7 +101,7 @@ SyncMeta = {
 }
 
 local cUnit = moho.unit_methods
----@class Unit : moho.unit_methods
+---@class Unit : moho.unit_methods, IntelComponent
 ---@field Brain AIBrain
 ---@field Trash TrashBag
 ---@field Buffs {Affects: table<BuffEffectName, BlueprintBuff.Effect>, buffTable: table<string, table>}
@@ -2424,7 +2424,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
 
     ---@param self Unit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     ---@return boolean
     OnStopBeingBuilt = function(self, builder, layer)
         if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
@@ -3007,7 +3007,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     -------------------------------------------------------------------------------------------
     -- GENERIC WORK
     -------------------------------------------------------------------------------------------
-    
+
     ---@param self Unit
     ---@param target Unit
     InheritWork = function(self, target)
