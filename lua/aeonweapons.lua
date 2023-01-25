@@ -469,7 +469,7 @@ AIFArtilleryMiasmaShellWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class AIFArtillerySonanceShellWeapon : DefaultProjectileWeapon
 AIFArtillerySonanceShellWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {
+    FxChargeMuzzleFlash = {
         '/effects/emitters/aeon_sonance_muzzle_01_emit.bp',
         '/effects/emitters/aeon_sonance_muzzle_02_emit.bp',
         '/effects/emitters/aeon_sonance_muzzle_03_emit.bp',
