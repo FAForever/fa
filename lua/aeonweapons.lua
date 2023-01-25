@@ -51,9 +51,9 @@ ADFTractorClaw = Class(Weapon) {
     BeamFx = { EffectTemplate.ACollossusTractorBeam01 },
 
     SliderVelocity = {
-        TECH3 = 1,
-        TECH2 = 7,
-        TECH1 = 13,
+        TECH3 = 10,
+        TECH2 = 13,
+        TECH1 = 16,
     },
 
     --- Adds logic to catch edge cases
@@ -232,6 +232,14 @@ ADFTractorClaw = Class(Weapon) {
                 WaitTicks(1)
 
                 if not IsDestroyed(unit) then 
+                    
+
+                    self:MakeVulnerable(target)
+                    while not IsDestroyed(target) and not IsDestroyed(unit) do
+                        WaitSeconds(0.1)
+                        Damage(unit, bonePosition, target, 1, "Normal")
+                    end
+
                     CreateLightParticle(unit, muzzle, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
                     Explosion.CreateScalableUnitExplosion(target, 3, true)
 
@@ -247,6 +255,7 @@ ADFTractorClaw = Class(Weapon) {
                     -- create thread to take into account the fall
                     self:ForkThread(self.TargetFallThread, target, trash, muzzle)
                     self:ResetTarget()
+                    LOG("0")
                 else 
                     self:MakeVulnerable(target)
                     trash:Destroy()
