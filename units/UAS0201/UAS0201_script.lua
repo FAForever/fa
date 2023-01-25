@@ -8,7 +8,7 @@ local AeonWeapons = import("/lua/aeonweapons.lua")
 local AANDepthChargeBombWeapon02 = AeonWeapons.AANDepthChargeBombWeapon02
 local AANChronoTorpedoWeapon = AeonWeapons.AANChronoTorpedoWeapon
 local AIFQuasarAntiTorpedoWeapon = AeonWeapons.AIFQuasarAntiTorpedoWeapon
-local NavalCannonOblivionWeapon = import("/lua/aeonprojectiles.lua").ADFCannonOblivionNaval
+local NavalCannonOblivionWeapon = AeonWeapons.ADFCannonOblivionNaval
 
 ---@class UAS0201 : ASeaUnit
 UAS0201 = ClassUnit(ASeaUnit) {

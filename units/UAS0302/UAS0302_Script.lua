@@ -5,7 +5,7 @@
 -------------------------------------------------------------------
 local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
 local AAMWillOWisp = import("/lua/aeonweapons.lua").AAMWillOWisp
-local NavalCannonOblivionWeapon = import("/lua/aeonprojectiles.lua").ADFCannonOblivionNaval
+local NavalCannonOblivionWeapon = import("/lua/aeonweapons.lua").ADFCannonOblivionNaval
 ---@class UAS0302 : ASeaUnit
 UAS0302 = ClassUnit(ASeaUnit) {
     Weapons = {
