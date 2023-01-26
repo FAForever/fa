@@ -714,9 +714,6 @@ function CreateAdjacencyBeams(unit, adjacentUnit, adjacencyBeamsBag)
         TrashBagAdd(unitTrash, entity)
     end
 
-    LOG(unit.UnitId)
-    LOG(adjacentUnit.UnitId)
-
     -- Attach beams to the adjacent unit
     for i = 1, numNodes + 1 do
         local node = nodeList[i]
