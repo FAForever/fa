@@ -31,7 +31,7 @@ UAA0104 = ClassUnit(AirTransport) {
 
     -- Override air destruction effects so we can do something custom here
     CreateUnitAirDestructionEffects = function(self, scale)
-        self:ForkThread(self.AirDestructionEffectsThread, self)
+        self.Trash:Add(ForkThread(self.AirDestructionEffectsThread, self))
     end,
 
     AirDestructionEffectsThread = function(self)

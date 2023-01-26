@@ -27,13 +27,13 @@ UAB2305 = ClassUnit(AStructureUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         AStructureUnit.OnStopBeingBuilt(self,builder,layer)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.Trash:Add(CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
-        self:ForkThread(self.PlayArmSounds)
+        self.Trash:Add(ForkThread(self.PlayArmSounds,self))
     end,
 
     PlayArmSounds = function(self)
-        local myBlueprint = self:GetBlueprint()
+        local myBlueprint = self.Blueprint
         if myBlueprint.Audio.Open and myBlueprint.Audio.Activate then
             WaitSeconds(4.75)
             self:PlaySound(myBlueprint.Audio.Activate)

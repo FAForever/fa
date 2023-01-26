@@ -19,7 +19,7 @@ UAB1302 = ClassUnit(AMassCollectionUnit) {
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
-        self.ExtractionAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationActivate):SetRate(1)
+        self.ExtractionAnimManip:PlayAnim(self.Blueprint.Display.AnimationActivate):SetRate(1)
         self.Trash:Add(self.ExtractionAnimManip)
         AMassCollectionUnit.OnStopBeingBuilt(self,builder,layer)
         ChangeState(self, self.ActiveState)
@@ -30,7 +30,7 @@ UAB1302 = ClassUnit(AMassCollectionUnit) {
             WaitFor(self.ExtractionAnimManip)
             while not self:IsDead() do
                 
-                self.ExtractionAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationActivate):SetRate(1)
+                self.ExtractionAnimManip:PlayAnim(self.Blueprint.Display.AnimationActivate):SetRate(1)
                 WaitFor(self.ExtractionAnimManip)
             end
         end,

@@ -9,11 +9,12 @@
 --****************************************************************************
 
 local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
+local OblivionCannon = import("/lua/aeonweapons.lua").ADFCannonOblivionWeapon03
 
 ---@class UAB2301 : AStructureUnit
 UAB2301 = ClassUnit(AStructureUnit) {
     Weapons = {
-        MainGun = ClassWeapon(import("/lua/aeonweapons.lua").ADFCannonOblivionWeapon03) {}
+        MainGun = ClassWeapon(OblivionCannon) {}
     },
 }
 

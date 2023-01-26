@@ -36,7 +36,7 @@ UAB1104 = ClassUnit(AMassFabricationUnit) {
 
             if not self.Open then
                 self.Open = true
-                self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen):SetRate(1)
+                self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationOpen):SetRate(1)
                 WaitFor(self.AnimManip)
             end
 
