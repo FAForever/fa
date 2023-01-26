@@ -4095,8 +4095,6 @@ Unit = ClassUnit(moho.unit_methods) {
             return false
         end
 
-        LOG("Creating footfall manipulators")
-
         self.Detector = CreateCollisionDetector(self)
         self.Trash:Add(self.Detector)
         for _, v in footfall.Bones do
