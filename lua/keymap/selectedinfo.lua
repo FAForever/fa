@@ -1,26 +1,32 @@
-local Prefs = import('/lua/user/prefs.lua')
+---@class RolloverInfo : EconData, MissileInfo
+---@field armyIndex number
+---@field blueprintId string
+---@field customName? string
+---@field entityId string
+---@field focus? RolloverInfo
+---@field focusUpgrade? RolloverInfo
+---@field fuelRatio number
+---@field health? number
+---@field kills number
+---@field maxHealth? number
+---@field shieldRatio number
+---@field teamColor string
+---@field userUnit? Unit
+---@field workProgress number
+
+
+local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 
 local selectionOverlay = {
-        key = 'selection',
-        Label = "<LOC map_options_0006>Selection",
-        Pref = 'range_RenderSelected',
-        Type = 3,
-        Tooltip = "overlay_selection",
+    key = 'selection',
+    Label = "<LOC map_options_0006>Selection",
+    Pref = 'range_RenderSelected',
+    Type = 3,
+    Tooltip = "overlay_selection",
 }
 
-SelectedInfoOn = true
-SelectedOverlayOn = true
-
-if options.gui_enhanced_unitview == 0 then
-   SelectedInfoOn = false
-end
-
-if options.gui_enhanced_unitrings == 0 then
-   SelectedOverlayOn = false
-end
-
-function GetUnitRolloverInfo(unit)
+function GetUnitRolloverInfo(unit, skipFocus)
     local info = {}
 
     info.blueprintId = unit:GetBlueprint().BlueprintId
@@ -42,8 +48,22 @@ function GetUnitRolloverInfo(unit)
     info.shieldRatio = unit:GetShieldRatio()
     info.workProgress = unit:GetWorkProgress()
 
-    if unit:GetFocus() then
-        info.focus = GetUnitRolloverInfo(unit:GetFocus())
+    local focus = unit:GetFocus()
+    if focus and not skipFocus then
+        local visited = { [unit:GetEntityId()] = true }
+        local focusingInfo = info
+        while focus do
+            local id = focus:GetEntityId()
+            if visited[id] then
+                info.focus.focus = nil
+                break
+            end
+            visited[id] = true
+            local focusInfo = GetUnitRolloverInfo(focus, true)
+            focusingInfo.focus = focusInfo
+            focusingInfo = focusInfo
+            focus = focus:GetFocus()
+        end
     end
 
     local killStat = unit:GetStat('KILLS')
@@ -62,38 +82,4 @@ function GetUnitRolloverInfo(unit)
     info.armyIndex = unit:GetArmy() - 1
 
     return info
-end
-
-function ToggleOn()
-   if SelectedInfoOn then
-      SelectedInfoOn = false
-   else
-      SelectedInfoOn = true
-   end
-end
-
-function ToggleOverlayOn()
-   if SelectedOverlayOn then
-      SelectedOverlayOn = false
-      DeactivateSingleRangeOverlay()
-   else
-      SelectedOverlayOn = true
-      local selUnits = GetSelectedUnits()
-      if selUnits and table.getn(selUnits) == 1 then
-         ActivateSingleRangeOverlay()
-      end
-   end
-end
-
-function ActivateSingleRangeOverlay()
-   ConExecute('range_RenderSelected true')
-end
-
-function DeactivateSingleRangeOverlay()
-   local info = selectionOverlay
-   local pref = Prefs.GetFromCurrentProfile(info.Pref)
-   if pref == nil then
-      pref = true
-   end
-   ConExecute(info.Pref..' '..tostring(pref))
 end

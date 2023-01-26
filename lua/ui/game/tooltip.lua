@@ -3,72 +3,96 @@
 --* Author: Ted Snook
 --* Summary: Tool Tips
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local TooltipInfo = import('/lua/ui/help/tooltips.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local Button = import('/lua/maui/button.lua').Button
-local Edit = import('/lua/maui/edit.lua').Edit
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Keymapping = import('/lua/keymap/defaultKeyMap.lua').defaultKeyMap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local TooltipInfo = import("/lua/ui/help/tooltips.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local Button = import("/lua/maui/button.lua").Button
+local Edit = import("/lua/maui/edit.lua").Edit
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Keymapping = import("/lua/keymap/defaultkeymap.lua").defaultKeyMap
 
 local mouseoverDisplay = false
 local createThread = false
 
-function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
+-- creates a tooltip box from ID table and with optional parameters
+-- @param ID table e.g. { text = 'tooltip header', body = 'tooltip description' } 
+-- @param extended boolean indicates whether to just create tooltip header or also tooltip description
+-- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
+-- @param forced boolean determine if the tooltip should override hiding tooltips set in game options
+-- @param padding number is optional space between tooltip description text and border of tooltip 
+-- @param descFontSize number is optional font size for description text of tooltip 
+-- @param textFontSize number is optional font size for header text of tooltip  
+-- @param position string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
+function CreateMouseoverDisplay(parent, ID, delay, extended, width, forced, padding, descFontSize, textFontSize, position)
+
+    -- values used throughout the function
+    local totalTime = 0
+    local alpha = 0.0
+    local text = ""
+    local body = ""
+    if not position then position = 'center' end
+    
+    -- remove previous instance
     if mouseoverDisplay then
         mouseoverDisplay:Destroy()
         mouseoverDisplay = false
     end
 
-    if not Prefs.GetOption('tooltips') then return end
+    -- determine if we want to show this tooltip (game options can prevent that)
+    if not forced and not Prefs.GetOption('tooltips') then return end
+
+    -- determine delay
     local createDelay = 0
     if delay and Prefs.GetOption('tooltip_delay') then
         createDelay = math.max(delay, Prefs.GetOption('tooltip_delay'))
     else
         createDelay = Prefs.GetOption('tooltip_delay') or 0
     end
-    local totalTime = 0
-    local alpha = 0.0
-    local text = ""
-    local body = ""
+
+    -- retrieve tooltip title / description
     if type(ID) == 'string' then
         if TooltipInfo['Tooltips'][ID] then
-            text = LOC(TooltipInfo['Tooltips'][ID]['title'])
-            body = LOC(TooltipInfo['Tooltips'][ID]['description'])
+            text = TooltipInfo['Tooltips'][ID]['title']
+            body = TooltipInfo['Tooltips'][ID]['description']
             if TooltipInfo['Tooltips'][ID]['keyID'] and TooltipInfo['Tooltips'][ID]['keyID'] ~= "" then
                 for i, v in Keymapping do
                     if v == TooltipInfo['Tooltips'][ID]['keyID'] then
-                        local properkeyname = import('/lua/ui/dialogs/keybindings.lua').FormatKeyName(i)
+                        local properkeyname = import("/lua/ui/dialogs/keybindings.lua").FormatKeyName(i)
                         text = LOCF("%s (%s)", text, properkeyname)
                         break
                     end
                 end
             end
         else
-            if extendedBool then
+            if extended then
                 WARN("No tooltip in table for key: "..ID)
             end
             text = ID
             body = "No Description"
         end
     elseif type(ID) == 'table' then
-        text = LOC(ID.text)
-        body = LOC(ID.body)
+        text = ID.text
+        body = ID.body
     else
         WARN('UNRECOGNIZED TOOLTIP ENTRY - Not a string or table! ', repr(ID))
     end
-    if extendedBool then
-        mouseoverDisplay = CreateExtendedToolTip(parent, text, body, width)
-    else
+
+    if extended then 
+        -- creating a tooltip with header text and body description
+        mouseoverDisplay = CreateExtendedToolTip(parent, text, body, width, padding, descFontSize, textFontSize)
+    else 
+        -- creating a tooltip with just header text
         mouseoverDisplay = CreateToolTip(parent, text)
     end
-    if extendedBool then
+
+    -- adjust position to show tooltip on left/right side of its parent and within main window
+    if extended then
         local Frame = GetFrame(0)
         if parent.Top() - mouseoverDisplay.Height() < 0 then
             mouseoverDisplay.Top:Set(function() return parent.Bottom() + 10 end)
@@ -79,7 +103,11 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
             mouseoverDisplay.Left:Set(parent.Right)
         elseif (parent.Right() - (parent.Width() / 2)) + (mouseoverDisplay.Width() / 2) > Frame.Right() then
             mouseoverDisplay.Right:Set(parent.Left)
-        else
+        elseif position == 'left' then
+            mouseoverDisplay.Left:Set(function() return parent.Left() + 10 end)
+        elseif position == 'right' then
+            mouseoverDisplay.Left:Set(function() return parent.Right() - mouseoverDisplay.Width() - 10 end)
+        else -- position == 'center'
             LayoutHelpers.AtHorizontalCenterIn(mouseoverDisplay, parent)
         end
     else
@@ -93,6 +121,8 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
             LayoutHelpers.AtHorizontalCenterIn(mouseoverDisplay, parent)
         end
     end
+
+    -- some hack
     if ID == "mfd_defense" then
         local size = table.getn(mouseoverDisplay.desc)
         mouseoverDisplay.desc[size]:SetColor('ffff0000')
@@ -100,6 +130,8 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
         mouseoverDisplay.desc[size-2]:SetColor('ff00ff00')
         mouseoverDisplay.desc[size-3]:SetColor('ff4f77f4')
     end
+
+    -- adding smooth popup animation to the tooltip 
     mouseoverDisplay:SetAlpha(alpha, true)
     mouseoverDisplay:SetNeedsFrameUpdate(true)
     mouseoverDisplay.OnFrame = function(self, deltaTime)
@@ -131,7 +163,7 @@ function DestroyMouseoverDisplay()
 end
 
 function CreateToolTip(parent, text)
-    local tooltip = UIUtil.CreateText(parent, text, 12, UIUtil.bodyFont)
+    local tooltip = UIUtil.CreateText(parent, LOC(text), 12, UIUtil.bodyFont)
     tooltip.Depth:Set(function() return parent.Depth() + 10000 end)
 
     tooltip.bg = Bitmap(tooltip)
@@ -139,61 +171,101 @@ function CreateToolTip(parent, text)
     tooltip.bg.Depth:Set(function() return tooltip.Depth() - 1 end)
     tooltip.bg.Top:Set(tooltip.Top)
     tooltip.bg.Bottom:Set(tooltip.Bottom)
-    tooltip.bg.Left:Set(function() return tooltip.Left() - 2 end)
-    tooltip.bg.Right:Set(function() return tooltip.Right() + 2 end)
+    LayoutHelpers.AtLeftIn(tooltip.bg, tooltip, -2)
+    LayoutHelpers.AtRightIn(tooltip.bg, tooltip, -2)
 
     tooltip.border = Bitmap(tooltip)
     tooltip.border:SetSolidColor(UIUtil.tooltipBorderColor)
     tooltip.border.Depth:Set(function() return tooltip.bg.Depth() - 1 end)
-    tooltip.border.Left:Set(function() return tooltip.bg.Left() - 1 end)
-    tooltip.border.Top:Set(function() return tooltip.bg.Top() - 1 end)
-    tooltip.border.Right:Set(function() return tooltip.bg.Right() + 1 end)
-    tooltip.border.Bottom:Set(function() return tooltip.bg.Bottom() + 1 end)
+    LayoutHelpers.AtLeftTopIn(tooltip.border, tooltip, -1, -1)
+    LayoutHelpers.AtRightBottomIn(tooltip.border, tooltip, -1, -1)
 
     tooltip:DisableHitTest(true)
 
     return tooltip
 end
 
-function CreateExtendedToolTip(parent, text, desc, width)
-    if not width then width = 150 end
+-- creates a tooltip box with title text and/or description and with optional parameters
+-- @param text string displayed in header of tooltip
+-- @param desc string displayed in description of tooltip, this text is wrapped into multiple if longer than width
+-- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
+-- @param padding is optional space between tooltip description text and border of tooltip 
+-- @param descFontSize number is optional font size for description text of tooltip 
+-- @param textFontSize number is optional font size for header text of tooltip
+function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize, textFontSize)
+    text = LOC(text)
+    desc = LOC(desc)
+    -- scale padding by UI scaling factor so we do not need to do this later in code
+    -- when adjusting position of tooltip elements
+    -- default padding should be 2-4 to text is not to close to tooltip border but kept original value
+    padding = LayoutHelpers.ScaleNumber(padding or 0)
+    -- using passed font size or falling back to default values which should be the same but kept original values
+    descFontSize = descFontSize or 12
+    textFontSize = textFontSize or 14
+    -- calculating an offset for lower letters: p, j so they are not clipped by header background
+    local textFillOffset = LayoutHelpers.ScaleNumber(textFontSize / 4)
+     
+    if width then -- adjusting width by optional padding
+       width = width + (padding + padding)
+    end
 
-    if text ~= "" or desc ~= "" then
-        local tooltip = Group(parent)
+    if text == '' then
+         text = nil
+    end
+    if desc == '' then
+         desc = nil
+    end
+
+    if text or desc then
+        -- using Bitmap instead of Group so we do not need to create tooltip.extbg = Bitmap(tooltip)
+        local tooltip = Bitmap(parent)
+        tooltip:SetSolidColor('FF000202') -- #FF000202 -- #E5B06AFF
         tooltip.Depth:Set(function() return parent.Depth() + 10000 end)
-        tooltip.Width:Set(width)
 
-        if text ~= "" and text ~= nil then
-            tooltip.title = UIUtil.CreateText(tooltip, text, 14, UIUtil.bodyFont)
+        if text then
+            -- creating tooltip title
+            tooltip.title = UIUtil.CreateText(tooltip, text, textFontSize, UIUtil.bodyFont)
             tooltip.title.Top:Set(tooltip.Top)
-            tooltip.title.Left:Set(tooltip.Left)
-
+            tooltip.title.Top:Set(function() return tooltip.Top() + textFillOffset end)
+            tooltip.title.Left:Set(function() return tooltip.Left() + padding end)
+            -- creating background fill for tooltip title
             tooltip.bg = Bitmap(tooltip)
+            
             tooltip.bg:SetSolidColor(UIUtil.tooltipTitleColor)
             tooltip.bg.Depth:Set(function() return tooltip.title.Depth() - 1 end)
-            tooltip.bg.Top:Set(tooltip.title.Top)
-            tooltip.bg.Bottom:Set(tooltip.title.Bottom)
-            tooltip.bg.Left:Set(function() return tooltip.Left() - 2 end)
-            tooltip.bg.Right:Set(function() return tooltip.Right() + 2 end)
+            tooltip.bg.Top:Set(function() return tooltip.Top() end)
+            tooltip.bg.Left:Set(function() return tooltip.Left() end)
+            tooltip.bg.Right:Set(function() return tooltip.Right() end)
+            tooltip.bg.Bottom:Set(function() return tooltip.title.Bottom() + textFillOffset end)
         end
 
         tooltip.desc = {}
         local tempTable = false
 
-        if desc ~= "" and desc ~= nil then
-            tooltip.desc[1] = UIUtil.CreateText(tooltip, "", 12, UIUtil.bodyFont)
+        if desc then
+            tooltip.desc[1] = UIUtil.CreateText(tooltip, "", descFontSize, UIUtil.bodyFont)
             tooltip.desc[1].Width:Set(tooltip.Width)
-            if text == "" and text ~= nil then
-                tooltip.desc[1].Top:Set(tooltip.Top)
-                tooltip.desc[1].Left:Set(tooltip.Left)
+            if text == nil then
+                tooltip.desc[1].Top:Set(function() return tooltip.Top() + padding end)
+                tooltip.desc[1].Left:Set(function() return tooltip.Left() + padding end)
             else
-                LayoutHelpers.Below(tooltip.desc[1], tooltip.title)
+                tooltip.desc[1].Top:Set(function() return tooltip.bg.Bottom() + padding end)
+                tooltip.desc[1].Left:Set(function() return tooltip.Left() + padding end)
             end
 
-            local textBoxWidth = tooltip.Width()
-            tempTable = import('/lua/maui/text.lua').WrapText(LOC(desc), textBoxWidth,
+            local textBoxWidth
+            if not width then
+                textBoxWidth = tooltip.desc[1]:GetStringAdvance(desc) + 1
+                textBoxWidth = math.min(textBoxWidth, LayoutHelpers.ScaleNumber(250))
+                if tooltip.title then
+                    textBoxWidth = math.max(textBoxWidth, tooltip.title.TextAdvance())
+                end
+            else
+                textBoxWidth = LayoutHelpers.ScaleNumber(width - padding - padding)
+            end
+            tempTable = import("/lua/maui/text.lua").WrapText(desc, textBoxWidth,
             function(text)
-                return  tooltip.desc[1]:GetStringAdvance(text)
+                return tooltip.desc[1]:GetStringAdvance(text)
             end)
 
             for i=1, table.getn(tempTable) do
@@ -201,57 +273,58 @@ function CreateExtendedToolTip(parent, text, desc, width)
                     tooltip.desc[i]:SetText(tempTable[i])
                 else
                     local index = i
-                    tooltip.desc[i] = UIUtil.CreateText(tooltip, tempTable[i], 12, UIUtil.bodyFont)
+                    tooltip.desc[i] = UIUtil.CreateText(tooltip, tempTable[i], descFontSize, UIUtil.bodyFont)
                     tooltip.desc[i].Width:Set(tooltip.desc[1].Width)
                     LayoutHelpers.Below(tooltip.desc[index], tooltip.desc[index-1])
                 end
-                tooltip.desc[i]:SetColor('FFCCCCCC') --#FFCCCCCC
+                tooltip.desc[i]:SetColor('FFCCCCCC') -- #FFCCCCCC
             end
-
-            tooltip.extbg = Bitmap(tooltip)
-            tooltip.extbg:SetSolidColor('FF000202') --#FF000202
-            tooltip.extbg.Depth:Set(function() return tooltip.desc[1].Depth() - 1 end)
-            tooltip.extbg.Top:Set(tooltip.desc[1].Top)
-            tooltip.extbg.Left:Set(function() return tooltip.Left() - 2 end)
-            tooltip.extbg.Right:Set(function() return tooltip.Right() + 2 end)
-            tooltip.extbg.Bottom:Set(tooltip.desc[table.getn(tempTable)].Bottom)
+            -- removed tooltip.extbg Bitmap because it is redundant by tooltip Bitmap
         end
 
-
-        tooltip.extborder = Bitmap(tooltip)
-        tooltip.extborder:SetSolidColor(UIUtil.tooltipBorderColor)
-        if text ~= "" and text ~= nil then
-            tooltip.extborder.Depth:Set(function() return tooltip.bg.Depth() - 1 end)
-            tooltip.extborder.Top:Set(function() return tooltip.bg.Top() - 1 end)
-            tooltip.extborder.Left:Set(function() return tooltip.bg.Left() - 1 end)
-            tooltip.extborder.Right:Set(function() return tooltip.bg.Right() + 1 end)
-        else
-            tooltip.extborder.Depth:Set(function() return tooltip.extbg.Depth() - 1 end)
-            tooltip.extborder.Top:Set(function() return tooltip.extbg.Top() - 1 end)
-            tooltip.extborder.Left:Set(function() return tooltip.extbg.Left() - 1 end)
-            tooltip.extborder.Right:Set(function() return tooltip.extbg.Right() + 1 end)
-        end
-        if desc ~= "" and desc ~= nil then
-            tooltip.extborder.Bottom:Set(function() return tooltip.extbg.Bottom() + 1 end)
-        else
-            tooltip.extborder.Bottom:Set(function() return tooltip.bg.Bottom() + 1 end)
+        if not width then
+            if tooltip.title then
+                width = tooltip.title.TextAdvance()
+            else
+                width = 0
+            end
+            for _, v in tooltip.desc do
+                local w = v.TextAdvance()
+                if w > width then width = w end
+            end
+            width = width + padding + padding -- adding left padding and right padding
         end
 
-        tooltip:DisableHitTest(true)
-
-        if text ~= "" and text ~= nil then
-            tooltip.Width:Set(function() return math.max(tooltip.title.Width(), width) end)
+        if text then
+            local titleWidth = tooltip.title.Width() + padding + padding
+            tooltip.Width:Set(function() return math.max(titleWidth, width) end)
         else
             tooltip.Width:Set(function() return width end)
         end
+        
+        tooltip.extborder = Bitmap(tooltip)
+        tooltip.extborder:SetSolidColor(UIUtil.tooltipBorderColor)
+        tooltip.extborder.Depth:Set(function() return tooltip.Depth() - 1 end)
+        tooltip:DisableHitTest(true)
+        LayoutHelpers.FillParentFixedBorder(tooltip.extborder, tooltip, -1)
+        
+        local descHeight = 0
+        if tooltip.desc and tooltip.desc[1] then
+           tooltip.descTotalHeight = (tooltip.desc[1].Height() * table.getn(tempTable))
+           tooltip.descTotalHeight = tooltip.descTotalHeight + padding + padding
+        end
 
-        if text == "" and text ~= nil then
-            tooltip.Height:Set(function() return (tooltip.desc[1].Height() * table.getn(tempTable)) end)
-        elseif desc == "" and desc ~= nil then
-            tooltip.Height:Set(function() return tooltip.title.Height() end)
-            tooltip.Width:Set(function() return tooltip.title.Width() end)
+        local textHeight = 0
+        if text then
+           textHeight = tooltip.title.Height() + textFillOffset + textFillOffset
+        end
+
+        if text == nil then
+            tooltip.Height:Set(function() return tooltip.descTotalHeight end)
+        elseif desc == nil then
+            tooltip.Height:Set(function() return textHeight end)
         else
-            tooltip.Height:Set(function() return tooltip.title.Height() + (tooltip.desc[1].Height() * table.getn(tempTable)) end)
+            tooltip.Height:Set(function() return textHeight + tooltip.descTotalHeight end)
         end
 
 
@@ -283,7 +356,71 @@ function AddControlTooltip(control, tooltipID, delay, width)
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end
-        return self.oldHandleEvent(self, event)
+        return self:oldHandleEvent(event)
+    end
+end
+
+-- creates a tooltip box with specified title and description
+-- @param title string displayed in tooltip header
+-- @param description string displayed in tooltip body
+-- @param delay number is optional milliseconds used to delay tooltip popup
+-- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
+-- @param padding is optional space between tooltip description text and border of tooltip 
+-- @param descFontSize number is optional font size for description text of tooltip 
+-- @param textFontSize number is optional font size for header text of tooltip  
+-- @param position string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
+function AddControlTooltipManual(control, title, description, delay, width, padding, descFontSize, textFontSize, position)
+
+    if not control.oldHandleEvent then
+        control.oldHandleEvent = control.HandleEvent
+    end
+    control.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            CreateMouseoverDisplay(self, 
+                {
+                    text = title,
+                    body = description
+                }, delay, true, width, false, padding, descFontSize, textFontSize, position
+            )
+        elseif event.Type == 'MouseExit' then
+            DestroyMouseoverDisplay()
+        end
+        return self:oldHandleEvent(event)
+    end
+end
+
+function AddForcedControlTooltipManual(control, title, description, delay, width)
+    if not control.oldHandleEvent then
+        control.oldHandleEvent = control.HandleEvent
+    end
+    control.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            local forced = true
+            CreateMouseoverDisplay(self, 
+                {
+                    text = title,
+                    body = description
+                }, delay, true, width, forced
+            )
+        elseif event.Type == 'MouseExit' then
+            DestroyMouseoverDisplay()
+        end
+        return self:oldHandleEvent(event)
+    end
+end
+
+function AddAutoUpdatedControlTooltip(control, displayText, displayBody, delay, width)
+    if not control.oldHandleEvent then
+        control.oldHandleEvent = control.HandleEvent
+    end
+    control.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            CreateMouseoverDisplay(self, {text= displayText(),
+            body=displayBody()}, delay, true, width)
+        elseif event.Type == 'MouseExit' then
+            DestroyMouseoverDisplay()
+        end
+        return self:oldHandleEvent(event)
     end
 end
 
@@ -297,7 +434,7 @@ function AddCheckboxTooltip(control, tooltipID, delay, width)
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end
-        return self.oldHandleEvent(self, event)
+        return self:oldHandleEvent(event)
     end
 end
 
@@ -332,10 +469,10 @@ function SetTooltipText(control, id)
     end
 end
 
--- Add tooltipsfrom every AI mod to TooltipInfo table
+-- Add tooltips from every AI mod to TooltipInfo table
 function AddModAILobbyTooltips()
     -- get all sim mods installed in /mods/
-    local simMods = import('/lua/mods.lua').AllMods()
+    local simMods = import("/lua/mods.lua").AllMods()
     local TooltipData
     -- loop over all installed mods
     for Index, ModData in simMods do
@@ -350,5 +487,6 @@ function AddModAILobbyTooltips()
         end
     end
 end
+
 -- Add tooltips for AI mods
 AddModAILobbyTooltips()

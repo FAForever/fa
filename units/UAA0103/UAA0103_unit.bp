@@ -1,13 +1,12 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 120,
-        GuardScanRadius = 60,
     },
     Air = {
         AutoLandTime = 1,
         BankFactor = 3,
         BankForward = false,
-        BreakOffDistance = 24,
+        BreakOffDistance = 32,
         BreakOffIfNearNewTarget = true,
         BreakOffTrigger = 20,
         CanFly = true,
@@ -83,15 +82,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -109,6 +99,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWATTACKRETICLE',
         'OVERLAYRADAR',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -180,9 +171,9 @@ UnitBlueprint {
         UniformScale = 0.125,
     },
     Economy = {
-        BuildCostEnergy = 2450,
-        BuildCostMass = 105,
-        BuildTime = 700,
+        BuildCostEnergy = 2050,
+        BuildCostMass = 90,
+        BuildTime = 500,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -214,6 +205,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
+        RadarRadius = 44,
         VisionRadius = 32,
     },
     Interface = {
@@ -282,7 +274,7 @@ UnitBlueprint {
                     AppliedToTarget = true,
                     BuffType = 'STUN',
                     Duration = 1.5,
-                    Radius = 4,
+                    Radius = 4.55, -- this is the closest approximation in order to make the stun range the same as DamageRadius (4)
                     TargetAllow = 'ALLUNITS',
                     TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND,WALL',
                 },
@@ -299,7 +291,7 @@ UnitBlueprint {
             },
             FiringRandomness = 0,
             FiringTolerance = 6,
-            FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true, -- [152]
             Label = 'Bomb',
             MaxRadius = 40,
             MuzzleSalvoDelay = 0,
@@ -311,9 +303,9 @@ UnitBlueprint {
             RackBones = {
                 {
                     MuzzleBones = {
-                        'UAA0103',  # [102]
+                        'UAA0103',  -- [102]
                     },
-                    RackBone = 'UAA0103',  # [102]
+                    RackBone = 'UAA0103',  -- [102]
                 },
             },
             RackFireTogether = false,
@@ -324,13 +316,11 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.2,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.25,
             TurretDualManipulators = false,
             Turreted = false,
             WeaponCategory = 'Bomb',

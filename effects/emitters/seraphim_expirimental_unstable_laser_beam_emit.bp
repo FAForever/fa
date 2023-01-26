@@ -1,0 +1,13 @@
+BeamBlueprint {
+    Lifetime = 10,
+    TextureName = '/textures/particles/beam_phason_01.dds',
+    Thickness = 1.55,
+    StartColor = {x=1,y=1,z=1,w=0.0}, -- R,G,B,A
+    EndColor = {x=1,y=1,z=1,w=0.0}, -- R,G,B,A
+    Blendmode = 2.0,
+    RepeatRate = 0.05,
+    Length = 2000,
+    UShift = 0.0,
+    VShift = -0.5,
+    LODCutoff = 400,
+}

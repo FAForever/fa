@@ -1,11 +1,11 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local parent = import('/lua/ui/game/economy.lua').savedParent
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local parent = import("/lua/ui/game/economy.lua").savedParent
 
 local style = {
     mass = {
@@ -23,8 +23,8 @@ local style = {
 }
 
 function SetLayout()
-    local GUI = import('/lua/ui/game/economy.lua').GUI
-    local parent = import('/lua/ui/game/economy.lua').savedParent
+    local GUI = import("/lua/ui/game/economy.lua").GUI
+    local parent = import("/lua/ui/game/economy.lua").savedParent
 
     GUI.collapseArrow:SetTexture(UIUtil.UIFile('/game/tab-l-btn/tab-close_btn_up.dds'))
     GUI.collapseArrow:SetNewTextures(UIUtil.UIFile('/game/tab-l-btn/tab-close_btn_up.dds'),
@@ -47,11 +47,11 @@ function SetLayout()
     GUI.bg.leftBracket:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-left_bmp.dds'))
     GUI.bg.leftBracketGlow:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-energy-l_bmp.dds'))
 
-    GUI.bg.leftBracket.Right:Set(function() return GUI.bg.panel.Left() + 10 end)
-    GUI.bg.leftBracketGlow.Left:Set(function() return GUI.bg.leftBracket.Left() + 12 end)
+    LayoutHelpers.AnchorToLeft(GUI.bg.leftBracket, GUI.bg.panel, -10)
+    LayoutHelpers.AtLeftIn(GUI.bg.leftBracketGlow, GUI.bg.leftBracket, 12)
 
     GUI.bg.leftBracket.Depth:Set(GUI.bg.panel.Depth)
-    GUI.bg.leftBracketGlow.Depth:Set(function() return GUI.bg.leftBracket.Depth() - 1 end)
+    LayoutHelpers.DepthUnderParent(GUI.bg.leftBracketGlow, GUI.bg.leftBracket)
 
     LayoutHelpers.AtVerticalCenterIn(GUI.bg.leftBracket, GUI.bg.panel)
     LayoutHelpers.AtVerticalCenterIn(GUI.bg.leftBracketGlow, GUI.bg.panel)
@@ -60,9 +60,9 @@ function SetLayout()
     GUI.bg.rightGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_m.dds'))
     GUI.bg.rightGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_b.dds'))
 
-    GUI.bg.rightGlowTop.Top:Set(function() return GUI.bg.Top() + 2 end)
-    GUI.bg.rightGlowTop.Left:Set(function() return GUI.bg.Right() - 12 end)
-    GUI.bg.rightGlowBottom.Bottom:Set(function() return GUI.bg.Bottom() - 2 end)
+    LayoutHelpers.AtTopIn(GUI.bg.rightGlowTop, GUI.bg, 2)
+    LayoutHelpers.AnchorToRight(GUI.bg.rightGlowTop, GUI.bg, -12)
+    LayoutHelpers.AtBottomIn(GUI.bg.rightGlowBottom, GUI.bg, 2)
     GUI.bg.rightGlowBottom.Left:Set(GUI.bg.rightGlowTop.Left)
     GUI.bg.rightGlowMiddle.Top:Set(GUI.bg.rightGlowTop.Bottom)
     GUI.bg.rightGlowMiddle.Bottom:Set(function() return math.max(GUI.bg.rightGlowTop.Bottom(), GUI.bg.rightGlowBottom.Top()) end)
@@ -78,19 +78,18 @@ end
 function LayoutResourceGroup(group, groupType)
     group.icon:SetTexture(UIUtil.UIFile(style[groupType].iconTexture))
     if groupType == 'mass' then
-        group.icon.Width:Set(44)
+        LayoutHelpers.SetWidth(group.icon, 44)
         LayoutHelpers.AtLeftIn(group.icon, group, -14)
     elseif groupType == 'energy' then
-        group.icon.Width:Set(36)
+        LayoutHelpers.SetWidth(group.icon, 36)
         LayoutHelpers.AtLeftIn(group.icon, group, -10)
     end
-    group.icon.Height:Set(36)
+    LayoutHelpers.SetHeight(group.icon, 36)
     LayoutHelpers.AtVerticalCenterIn(group.icon, group)
 
     LayoutHelpers.AtCenterIn(group.warningBG, group, 0, -2)
 
-    group.storageBar.Width:Set(100)
-    group.storageBar.Height:Set(10)
+    LayoutHelpers.SetDimensions(group.storageBar, 100, 10)
     group.storageBar._bar:SetTexture(UIUtil.UIFile(style[groupType].barTexture))
     LayoutHelpers.AtLeftTopIn(group.storageBar, group, 22, 2)
 
@@ -135,13 +134,12 @@ function LayoutResourceGroup(group, groupType)
         group.reclaimTotal:SetColor('FFF8C000')
     end
 
-    group.Height:Set(25)
-    group.Width:Set(296)
+    LayoutHelpers.SetDimensions(group, 296, 25)
 end
 
 function TogglePanelAnimation(state)
-    local GUI = import('/lua/ui/game/economy.lua').GUI
-    local savedParent = import('/lua/ui/game/economy.lua').savedParent
+    local GUI = import("/lua/ui/game/economy.lua").GUI
+    local savedParent = import("/lua/ui/game/economy.lua").savedParent
     if UIUtil.GetAnimationPrefs() then
         if state or GUI.bg:IsHidden() then
             PlaySound(Sound({Cue = "UI_Score_Window_Open", Bank = "Interface"}))
@@ -182,8 +180,8 @@ function TogglePanelAnimation(state)
 end
 
 function InitAnimation()
-    local GUI = import('/lua/ui/game/economy.lua').GUI
-    local savedParent = import('/lua/ui/game/economy.lua').savedParent
+    local GUI = import("/lua/ui/game/economy.lua").GUI
+    local savedParent = import("/lua/ui/game/economy.lua").savedParent
     GUI.bg:Show()
     GUI.bg.Left:Set(savedParent.Left()-GUI.bg.Width())
     GUI.bg:SetNeedsFrameUpdate(true)

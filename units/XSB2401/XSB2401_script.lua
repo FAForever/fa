@@ -2,14 +2,16 @@
 -- File     :  /cdimage/units/XSB2401/XSB2401_script.lua
 -- Author(s):  John Comes, David Tomandl, Matt Vainio
 -- Summary  :  Seraphim Tactical Missile Launcher Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
-local SIFExperimentalStrategicMissile = import('/lua/seraphimweapons.lua').SIFExperimentalStrategicMissile
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
+local SIFExperimentalStrategicMissile = import("/lua/seraphimweapons.lua").SIFExperimentalStrategicMissile
+local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
 
+---@class XSB2401 : SStructureUnit
 XSB2401 = Class(SStructureUnit) {
     Weapons = {
         ExperimentalNuke = Class(SIFExperimentalStrategicMissile) {
@@ -22,7 +24,14 @@ XSB2401 = Class(SStructureUnit) {
                 SIFExperimentalStrategicMissile.PlayFxWeaponUnpackSequence(self)
             end,
         },
+        DeathWeapon = Class(DeathNukeWeapon) {},
     },
+
+    StartBeingBuiltEffects = function(self, builder, layer)
+        -- triggers the effect twice, one is larger than the other
+        SStructureUnit.StartBeingBuiltEffects(self, builder, layer)
+        self:ForkThread( CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 2 )
+    end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         SStructureUnit.OnStopBeingBuilt(self, builder, layer)
@@ -66,7 +75,7 @@ XSB2401 = Class(SStructureUnit) {
                 if not self.MissileEffect[bidx] then
                     self.MissileEffect[bidx] = {}
                 end
-                self.MissileEffect[bidx][k] = CreateAttachedEmitter(self,bone, self:GetArmy(), v)
+                self.MissileEffect[bidx][k] = CreateAttachedEmitter(self,bone, self.Army, v)
             end
         end
         self:PlayUnitSound('Construct')

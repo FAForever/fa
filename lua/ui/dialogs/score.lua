@@ -6,42 +6,40 @@
 --* Copyright © :005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Text = import('/lua/maui/text.lua').Text
-local Movie = import('/lua/maui/movie.lua').Movie
-local WrapText = import('/lua/maui/text.lua').WrapText
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local hotstats = import('/lua/ui/dialogs/hotstats.lua')
-local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local Movie = import("/lua/maui/movie.lua").Movie
+local WrapText = import("/lua/maui/text.lua").WrapText
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local RadioGroup = import("/lua/maui/mauiutil.lua").RadioGroup
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Prefs = import("/lua/user/prefs.lua")
+local hotstats = import("/lua/ui/dialogs/hotstats.lua")
+local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
 dialog = false
-local currentPage = false
-local curGrid = false
-local curInfo = false
-local elapsedTime = false
-local curType = false
-local curSortCol = false
+local currentPage = nil
+local curGrid = nil
+local curInfo = nil
+local elapsedTime = nil
+local curType = nil
+local curSortCol = nil
 local curSortDescending = true
-local savedGameTime = false
-local curScore = false
+local savedGameTime = nil
+local curScore = nil
 
 local campaignScore = ''
 
 scoreScreenActive = false
 
-# '<LOC SCORE_0058>Debrief'
-# '<LOC SCORE_0059>Combat Report'
+-- '<LOC SCORE_0058>Debrief'
+-- '<LOC SCORE_0059>Combat Report'
 
 local tabs = {
     {
@@ -116,6 +114,14 @@ local tabs = {
     },
 }
 
+local prefix = {
+    Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
+    Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
+    UEF = {texture = '/icons/comm_uef.dds', cue = 'UI_Comm_UEF'},
+    Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
+    NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}
+}
+
 -- determine which data to show based on current page, data type and column
 local function UpdateDisplay()
     -- show elapsed time
@@ -138,8 +144,23 @@ local function UpdateDisplay()
     for index, info in ipairs(curInfo) do
         sortOrder[index] = {}
         sortOrder[index].infoIndex = index
-        sortOrder[index].sortKey = curInfo.scoreData.current[index][curScoreKey][curSortCol][curType]
-                                   or curInfo.scoreData.current[index][curScoreKey][curSortCol]
+
+        local PlayerData = curInfo.scoreData.current[index]
+        PlayerData.general.mass = PlayerData.resources.massin.total
+        PlayerData.general.energy = PlayerData.resources.energyin.total
+        PlayerData.resources.massover = {}
+        PlayerData.resources.energyover = {}
+        PlayerData.resources.massover.total = PlayerData.resources.massout.excess
+        PlayerData.resources.energyover.total = PlayerData.resources.energyout.excess
+        PlayerData.resources.massover.rate = math.max(0, PlayerData.resources.massin.rate -
+            PlayerData.resources.massout.rate + PlayerData.resources.massin.reclaimRate +
+            PlayerData.resources.storage.storedMass - PlayerData.resources.storage.maxMass)
+        PlayerData.resources.energyover.rate = math.max(0, PlayerData.resources.energyin.rate -
+            PlayerData.resources.energyout.rate + PlayerData.resources.energyin.reclaimRate +
+            PlayerData.resources.storage.storedEnergy - PlayerData.resources.storage.maxEnergy)
+
+        sortOrder[index].sortKey = PlayerData[curScoreKey][curSortCol][curType]
+                                or PlayerData[curScoreKey][curSortCol]
     end
 
     table.sort(sortOrder, function(first, second)
@@ -206,7 +227,7 @@ function UpdateData()
         if not armyInfo.civilian and armyInfo.showScore then
             -- set basic info from armies table
             curInfo[index] = {}
-            curInfo[index].name = armyInfo.nickname
+            curInfo[index].name = hotstats.scoreData.current[i].name
             curInfo[index].faction = armyInfo.faction
             curInfo[index].color = armyInfo.color
             --curInfo[index].teamName = index --TODO we need to get team data in here
@@ -215,7 +236,7 @@ function UpdateData()
     end
 
     -- set score data
-    curInfo.scoreData = import('/lua/ui/game/scoreaccum.lua').scoreData
+    curInfo.scoreData = hotstats.scoreData
 end
 
 function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
@@ -224,10 +245,18 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
         return
     end
     scoreScreenActive = true
-
     SessionEndGame()
     DisableWorldSounds()
     StopAllSounds()
+    ForkThread(function()
+        while not(hotstats.scoreData.interval and hotstats.scoreData.current and hotstats.scoreData.history) do
+            WaitSeconds(0.5)
+        end
+        CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
+    end)
+end
+
+function CreateDialog2(victory, showCampaign, operationVictoryTable, midGame)
     UpdateData()
 
     campaignScore = tostring(curInfo.scoreData.current[1].general.score)
@@ -241,7 +270,7 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
         end
         if operationVictoryTable.opData.opMovies.postOpMovies[successKey] then
             GetCursor():Hide()
-            local subtitleThread = false
+            local subtitleThread = nil
             function DisplaySubtitles(textControl,captions)
                 if subtitleThread then
                     KillThread(subtitleThread)
@@ -300,7 +329,7 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
 
             movie:DisableHitTest()    -- get clicks to parent group
 
-            local subtitleSource = import('/lua/ui/game/vo_fmv.lua')
+            local subtitleSource = import("/lua/ui/game/vo_fmv.lua")
             movie.OnLoaded = function(self)
                 movie:Play()
                 GetCursor():Hide()
@@ -374,12 +403,11 @@ function CreateDialog(victory, showCampaign, operationVictoryTable, midGame)
     end
 end
 
-
 function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     if dialog then return end
 
     GetCursor():Show()
-    local factions = import('/lua/factions.lua').Factions
+    local factions = import("/lua/factions.lua").Factions
     UIUtil.SetCurrentSkin(factions[1].DefaultSkin)
 
     -- create the dialog
@@ -424,7 +452,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
     -- set controls that are global to the dialog
     if HasCommandLineArg("/gpgnet") then
-        bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_FAF>Exit to FAF", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+        bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Exit_to_Windows>Exit to FAF", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
         Tooltip.AddButtonTooltip(bg.continueBtn, 'esc_exit')
     else
         bg.continueBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Continue>", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
@@ -588,8 +616,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             local gridGroup = Group(currentPage, "scoreGridGroup")
             -- no layout info for these sub pages, so position manually
             LayoutHelpers.AtLeftTopIn(gridGroup, currentPage, 43, 102)
-            gridGroup.Width:Set(743)
-            gridGroup.Height:Set(257)
+            LayoutHelpers.SetDimensions(gridGroup, 743, 257)
 
             local gridBG = Bitmap(gridGroup, UIUtil.SkinnableFile('/scx_menu/score-victory-defeat/totals-back_bmp.dds'))
             LayoutHelpers.AtLeftTopIn(gridBG, bg, 34, 114)
@@ -609,8 +636,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             }
 
             local playerText = MultiLineText(gridBG, UIUtil.bodyFont, 16, UIUtil.fontColor)
-            playerText.Width:Set(250)
-            playerText.Height:Set(35)
+            LayoutHelpers.SetDimensions(playerText, 250, 35)
             LayoutHelpers.AtLeftTopIn(playerText, gridBG, labelXPos.icon + 5, 12)   -- note this is at icon as there is none in the label
             playerText:SetText(LOC("<LOC _Player>"))
 
@@ -639,7 +665,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 sortButtons[index].label[1] = UIUtil.CreateText(sortButtons[index].checkbox, '', 11, UIUtil.bodyFont)
                 sortButtons[index].label[1]:DisableHitTest()
 
-                local wrappedText = import('/lua/maui/text.lua').WrapText(LOC(colName.title),
+                local wrappedText = import("/lua/maui/text.lua").WrapText(LOC(colName.title),
                     80,
                     function(text)
                         return sortButtons[Index].label[1]:GetStringAdvance(text)
@@ -704,8 +730,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                     curGrid[index] = {}
 
                     curGrid[index].color = Bitmap(armyBg)
-                    curGrid[index].color.Width:Set(21)
-                    curGrid[index].color.Height:Set(20)
+                    LayoutHelpers.SetDimensions(curGrid[index].color, 21, 20)
                     LayoutHelpers.AtLeftTopIn(curGrid[index].color, armyBg, labelXPos.icon, 6)
 
                     curGrid[index].factionIcon = Bitmap(curGrid[index].color)
@@ -714,7 +739,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                     local INDEX = index
                     curGrid[index].playerName = UIUtil.CreateText(armyBg, "", 16, UIUtil.bodyFont)
                     LayoutHelpers.AtLeftTopIn(curGrid[index].playerName, armyBg, labelXPos.player, 6)
-                    curGrid[index].playerName.Right:Set(function() return curGrid[INDEX].playerName.Left() + 220 end)
+                    LayoutHelpers.AnchorToLeft(curGrid[index].playerName, curGrid[INDEX].playerName, -220)
                     curGrid[index].playerName:SetClipToWidth(true)
 
                     --curGrid[index].teamName = UIUtil.CreateText(armyBg, "", 16, UIUtil.bodyFont)
@@ -773,7 +798,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 typeButtons[index].checkbox._dataType = dataType.scoreKey
             end
             typeGroup.Width:Set(width)
-            typeGroup.Height:Set(1)
+            LayoutHelpers.SetHeight(typeGroup, 1)
             LayoutHelpers.AtTopIn(typeGroup, gridGroup, 316)
             LayoutHelpers.AtHorizontalCenterIn(typeGroup, bg)
 
@@ -797,16 +822,9 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             -- Set up campaign display
             local opData = operationVictoryTable.opData
 
-            local prefix = {Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
-                Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
-                UEF = {texture = '/icons/comm_uef.dds', cue = 'UI_Comm_UEF'},
-                Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
-                NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}}
-
             local movieGroup = CreateBorderGroup(currentPage)
             LayoutHelpers.AtLeftTopIn(movieGroup, currentPage, 40, 120)
-            movieGroup.Height:Set(290)
-            movieGroup.Width:Set(330)
+            LayoutHelpers.SetDimensions(movieGroup, 330, 290)
 
             -- Set debriefing dialogue if it exists
             local debriefData = {text = '<NO DATA AVAILABLE>', faction = 'NONE'}
@@ -819,8 +837,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             local opDebriefMovie = Movie(movieGroup)
             LayoutHelpers.AtTopIn(opDebriefMovie, movieGroup, 2)
             LayoutHelpers.AtHorizontalCenterIn(opDebriefMovie, movieGroup)
-            opDebriefMovie.Height:Set(192)
-            opDebriefMovie.Width:Set(192)
+            LayoutHelpers.SetDimensions(opDebriefMovie, 192, 192)
 
             local hasVideo = false
             if debriefData.vid and GetMovieDuration('/movies/' .. debriefData.vid) ~= 0 then
@@ -866,15 +883,14 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
             local debriefText = UIUtil.CreateTextBox(movieGroup)
             LayoutHelpers.AtBottomIn(debriefText, movieGroup)
             LayoutHelpers.AtHorizontalCenterIn(debriefText, movieGroup, -15)
-            debriefText.Width:Set(function() return movieGroup.Width() - 30 end)
-            debriefText.Height:Set(90)
+            debriefText.Width:Set(function() return movieGroup.Width() - LayoutHelpers.ScaleNumber(30) end)
+            LayoutHelpers.SetHeight(debriefText, 90)
 
             UIUtil.SetTextBoxText(debriefText, debriefData.text)
 
             local scoreGroup = CreateBorderGroup(currentPage)
             LayoutHelpers.AtTopIn(scoreGroup, currentPage, 120)
-            scoreGroup.Height:Set(50)
-            scoreGroup.Width:Set(150)
+            LayoutHelpers.SetDimensions(scoreGroup, 150, 50)
 
             local opScoreLabel = UIUtil.CreateText(scoreGroup, LOC("<LOC SCORE_0043>Operation Score"), 14, UIUtil.bodyFont)
             LayoutHelpers.AtTopIn(opScoreLabel, scoreGroup, 5)
@@ -886,8 +902,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
             local objGroup = CreateBorderGroup(currentPage)
             LayoutHelpers.AtLeftTopIn(objGroup, currentPage, 395, 190)
-            objGroup.Height:Set(220)
-            objGroup.Width:Set(535)
+            LayoutHelpers.SetDimensions(objGroup, 535, 220)
 
             LayoutHelpers.AtHorizontalCenterIn(scoreGroup, objGroup)
 
@@ -960,7 +975,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
             objContainer = Group(objGroup)
             objContainer.Height:Set(function() return objGroup.Height() + 0 end)
-            objContainer.Width:Set(function() return objGroup.Width() - 30 end)
+            objContainer.Width:Set(function() return objGroup.Width() - LayoutHelpers.ScaleNumber(30) end)
             objContainer.top = 0
 
             LayoutHelpers.AtLeftTopIn(objContainer, objGroup)
@@ -980,7 +995,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 objEntries[index].result = UIUtil.CreateText(objEntries[1].bg, '', 16, UIUtil.bodyFont)
                 objEntries[index].result:DisableHitTest()
 
-                objEntries[index].bg.Height:Set(function() return objEntries[index].title.Height() + 4 end)
+                objEntries[index].bg.Height:Set(function() return objEntries[index].title.Height() + LayoutHelpers.ScaleNumber(4) end)
 
                 LayoutHelpers.AtVerticalCenterIn(objEntries[index].title, objEntries[index].bg)
                 LayoutHelpers.AtVerticalCenterIn(objEntries[index].result, objEntries[index].bg)
@@ -1117,15 +1132,14 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
         local curButton = UIUtil.CreateButtonStd(bg, '/scx_menu/tab_btn/tab', value.title, 16, nil, nil, "UI_Tab_Click_02", "UI_Tab_Rollover_02")
         if prev then
-            #curButton.Left:Set(function() return prev.Right() + 0 end)
-            #curButton.Bottom:Set(function() return prev.Bottom() end)
+            --curButton.Left:Set(function() return prev.Right() + 0 end)
+            --curButton.Bottom:Set(function() return prev.Bottom() end)
             LayoutHelpers.RightOf(curButton, prev, -5)
         else
-            #LayoutHelpers.RelativeTo(curButton, bg,
-            #    UIUtil.SkinnableFile('/dialogs/score-victory-defeat/score-victory-defeat_layout.lua'),
-            #    'l_general_btn', 'panel_bmp', -10)
-            curButton.Left:Set(function() return bg.Left() + 17 end)
-            curButton.Top:Set(function() return bg.Top() + 57 end)
+            --LayoutHelpers.RelativeTo(curButton, bg,
+            --    UIUtil.SkinnableFile('/dialogs/score-victory-defeat/score-victory-defeat_layout.lua'),
+            --    'l_general_btn', 'panel_bmp', -10)
+            LayoutHelpers.AtLeftTopIn(curButton, bg, 17, 57)
             defaultTab = curButton
         end
         prev = curButton
@@ -1149,7 +1163,6 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
     hotstats.Set_graph(victory, showCampaign, operationVictoryTable, dialog, bg)
 end
-
 
 function CreateBorderGroup(parent)
     local group = Group(parent)
@@ -1193,3 +1206,7 @@ function CreateBorderGroup(parent)
 
     return group
 end
+
+-- kept for mod backwards compatibility
+local CampaignManager = import("/lua/ui/campaign/campaignmanager.lua")
+local Text = import("/lua/maui/text.lua").Text

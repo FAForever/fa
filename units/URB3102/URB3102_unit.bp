@@ -29,7 +29,6 @@ UnitBlueprint {
         'INTELLIGENCE',
         'TECH1',
         'SONAR',
-        'DRAGBUILD',
         'SIZE4',
         'VISIBLETORECON',
         'RECLAIMABLE',
@@ -175,7 +174,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.4,
     SelectionThickness = 1,
     SizeX = 0.5,
-    SizeY = 0.5,
+    SizeY = 0.6,
     SizeZ = 0.5,
     StrategicIconName = 'icon_structure1_intel',
     StrategicIconSortPriority = 235,
@@ -188,9 +187,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = false,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

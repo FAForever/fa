@@ -3,30 +3,29 @@
 --* Author: Chris Blackwell
 --* Summary: Manages the options dialog
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Grid = import('/lua/maui/grid.lua').Grid
-local Slider = import('/lua/maui/slider.lua').Slider
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
-local OptionsLogic = import('/lua/options/optionslogic.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Grid = import("/lua/maui/grid.lua").Grid
+local Slider = import("/lua/maui/slider.lua").Slider
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local OptionsLogic = import("/lua/options/optionslogic.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 -- this will hold the working set of options, which won't be valid until applied
-local currentOptionsSet = false
-local currentTabButton = false
-local currentTabBitmap = false
+local currentOptionsSet = nil
+local currentTabButton = nil
+local currentTabBitmap = nil
 
 -- contains a map of current option controls keyed by their option keys
-local optionKeyToControlMap = false
+local optionKeyToControlMap = nil
 
 -- this table is keyed with the different types of controls that can be created
 -- each key's value is the function that actually creates the type
@@ -34,9 +33,16 @@ local optionKeyToControlMap = false
 -- note that each control should create a change function that allows the control to have its value changed
 -- not that each control should create a SetCustomData(newCustomData, newDefault) function that will initialize the control with new custom data
 local controlTypeCreate = {
+
+    header = function(parent, optionItemData)
+        local group = Group(parent)
+        LayoutHelpers.SetDimensions(group, 10, 10)
+        return group
+    end,
+
     toggle = function(parent, optionItemData)
         local combo = Combo(parent, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-        combo.Width:Set(250)
+        LayoutHelpers.SetWidth(combo, 250)
 
         combo.SetCustomData = function(newCustomData, newDefault)
             local itemArray = {}
@@ -184,7 +190,11 @@ local controlTypeCreate = {
         end
 
         -- set initial value
-        sliderGroup._slider:SetValue(currentOptionsSet[optionItemData.key])
+        if currentOptionsSet[optionItemData.key] then 
+            sliderGroup._slider:SetValue(currentOptionsSet[optionItemData.key])
+        else
+            sliderGroup._slider:SetValue(optionItemData.default)
+        end
 
         sliderGroup.SetCustomData = function(newCustomData, newDefault)
             -- this isn't really correct as it should check the indent, and recreate the control if needed
@@ -202,24 +212,24 @@ local controlTypeCreate = {
 local function CreateOption(parent, optionItemData)
     local bg = Bitmap(parent, UIUtil.SkinnableFile('/dialogs/options-02/content-box_bmp.dds'))
 
+
     bg._label = UIUtil.CreateText(bg, optionItemData.title, 16, UIUtil.bodyFont)
     LayoutHelpers.AtLeftTopIn(bg._label, bg, 9, 6)
     bg._label._tipText = optionItemData.key
 
     bg._label.HandleEvent = function(self, event)
-        if event.Type == 'MouseEnter' then
-            Tooltip.CreateMouseoverDisplay(self, "options_" .. bg._label._tipText, .5, true)
-        elseif event.Type == 'MouseExit' then
-            Tooltip.DestroyMouseoverDisplay()
+        if bg._label._tipText then
+            if event.Type == 'MouseEnter' then
+                Tooltip.CreateMouseoverDisplay(self, "options_" .. bg._label._tipText, .5, true)
+            elseif event.Type == 'MouseExit' then
+                Tooltip.DestroyMouseoverDisplay()
+            end
         end
     end
 
-    -- this is here to help position the control
-    --TODO get this data from layout!
     local controlGroup = Group(bg)
     LayoutHelpers.AtLeftTopIn(controlGroup, bg, 338, 5)
-    controlGroup.Width:Set(252)
-    controlGroup.Height:Set(24)
+    LayoutHelpers.SetDimensions(controlGroup, 252, 24)
 
     if controlTypeCreate[optionItemData.type] then
         bg._control = controlTypeCreate[optionItemData.type](controlGroup, optionItemData)
@@ -234,17 +244,23 @@ local function CreateOption(parent, optionItemData)
         LayoutHelpers.AtCenterIn(bg._control, controlGroup)
     end
 
-    optionKeyToControlMap[optionItemData.key] = bg._control
+    if not (optionItemData.type == 'header') then 
+        optionKeyToControlMap[optionItemData.key] = bg._control
+    end
+
+    if optionItemData.type == 'header' then
+        bg:SetAlpha(0.0)
+    end
 
     return bg
 end
 
-local dialog = false
+local dialog = nil
 
 function CreateDialog(over, exitBehavior)
     currentOptionsSet = OptionsLogic.GetCurrent()
 
-    local parent = false
+    local parent = nil
 
     -- lots of state
     local function KillDialog()
@@ -380,12 +396,13 @@ function CreateDialog(over, exitBehavior)
             {escapeButton = 2, enterButton = 1, worldCover = false})
     end
 
-    UIUtil.MakeInputModal(dialog, function() okBtn.OnClick(okBtn) end, function() dialog.cancelBtn.OnClick(dialog.cancelBtn) end)
+    UIUtil.MakeInputModal(dialog, function() okBtn:OnClick() end, function() dialog.cancelBtn:OnClick() end)
 
     -- set up option grid
     local elementWidth, elementHeight = GetTextureDimensions(UIUtil.UIFile('/dialogs/options-02/content-box_bmp.dds'))
     local optionGrid = Grid(dialog, elementWidth, elementHeight)
     LayoutHelpers.RelativeTo(optionGrid, dialog, UIUtil.SkinnableFile('/dialogs/options-02/options-02_layout.lua'), 'gameplay_bmp', 'panel_bmp')
+    LayoutHelpers.AtRightBottomIn(optionGrid, dialog, 43, 100)
     LayoutHelpers.DimensionsRelativeTo(optionGrid, UIUtil.SkinnableFile('/dialogs/options-02/options-02_layout.lua'), 'gameplay_bmp')
     local scrollbar = UIUtil.CreateVertScrollbarFor(optionGrid, -4)
 
@@ -419,6 +436,24 @@ function CreateDialog(over, exitBehavior)
         for index, option in tabData.items do
             optionGrid:AppendRows(1, true)
             local optCtrl = CreateOption(optionGrid, option)
+
+            optCtrl.HandleEvent = function(self, event)
+                if scrollbar and event.Type == 'WheelRotation' then
+                    local scrollDim = { optionGrid:GetScrollValues('Vert') }
+                    if event.WheelRotation <= 0 then -- scroll down ...
+                        if scrollDim[2] != scrollDim[4] then -- ... if we can
+                            PlaySound(Sound({ Cue = 'UI_Tab_Rollover_01', Bank = 'Interface' }))
+                            scrollbar:DoScrollLines(1)
+                        end
+                    else -- scroll up ...
+                        if scrollDim[1] != scrollDim[3] then -- ... if we can
+                            PlaySound(Sound({ Cue = 'UI_Tab_Rollover_01', Bank = 'Interface' }))
+                            scrollbar:DoScrollLines(-1)
+                        end
+                    end
+                end
+            end
+            
             optionGrid:SetItem(optCtrl, 1, index, true)
             if option.init then
                 option.init()
@@ -433,8 +468,8 @@ function CreateDialog(over, exitBehavior)
     local defaultTab = false
 
     -- get the tab data
-    local options = import('/lua/options/options.lua').options
-    local optionsOrder = import('/lua/options/options.lua').optionsOrder
+    local options = import("/lua/options/options.lua").options
+    local optionsOrder = import("/lua/options/options.lua").optionsOrder
 
     for index, key in optionsOrder do
         tabData = options[key]
@@ -507,3 +542,6 @@ function OnNISBegin()
         dialog.cancelBtn:OnClick()
     end
 end
+
+-- kept for mod backwards compatibility
+local Text = import("/lua/maui/text.lua").Text

@@ -1,0 +1,11 @@
+BeamBlueprint {
+    Lifetime = 2,
+    TextureName = '/textures/particles/beam_exhaust_stream_red_01.dds',
+    Thickness = 0.025,
+    StartColor = {x=1,y=0.2,z=0.2,w=0.5}, -- R,G,B,A
+    EndColor = {x=1,y=0.2,z=0.2,w=0.5}, -- R,G,B,A
+    Length = 8,
+    RepeatRate = 0.5,
+    UShift = 0.0,
+    VShift = -0.3,
+}

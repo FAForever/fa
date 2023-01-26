@@ -5,10 +5,11 @@
 -- Copyright ? 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CKrilTorpedoLauncherWeapon = import('/lua/cybranweapons.lua').CKrilTorpedoLauncherWeapon
-local utilities = import('/lua/utilities.lua')
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
+local CKrilTorpedoLauncherWeapon = import("/lua/cybranweapons.lua").CKrilTorpedoLauncherWeapon
+local utilities = import("/lua/utilities.lua")
 
+---@class XRB2308 : CStructureUnit
 XRB2308 = Class(CStructureUnit) {
     Weapons = {
         Turret01 = Class(CKrilTorpedoLauncherWeapon) {},
@@ -18,7 +19,7 @@ XRB2308 = Class(CStructureUnit) {
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
         
         local pos = self:GetPosition()
-        local armySelf = self:GetArmy()
+        local armySelf = self.Army
         local health = self:GetHealth()
         local armies = ListArmies()
         local spottedByArmy = {}
@@ -36,7 +37,7 @@ XRB2308 = Class(CStructureUnit) {
 
         
         if not self:IsIdleState() then --not IsIdle means that dummy HARMS has attack order and we want to transfer it to actual HARMS
-            ForkThread(self.CreateNewHarmsWithDelay, self, armySelf, pos, spottedByArmy, fireState)
+            self:ForkThread(self.CreateNewHarmsWithDelay, armySelf, pos, spottedByArmy, fireState)
         else
             self:Destroy()
             
@@ -51,7 +52,7 @@ XRB2308 = Class(CStructureUnit) {
     CreateNewHarmsWithDelay = function(self, armySelf, pos, spottedByArmy, fireState) 
         WaitTicks(1) --wait 1 tick to determine HARMS target
         
-        if not self:IsDead() then
+        if not self.Dead then
             local health = self:GetHealth()
             local target = self:GetTargetEntity()
             
@@ -73,7 +74,7 @@ XRB2308 = Class(CStructureUnit) {
         local bp = self:GetBlueprint()
 
         -- Add an initial death explosion
-        local army = self:GetArmy()
+        local army = self.Army
         self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/flash_03_emit.bp'):ScaleEmitter(2))
         self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/flash_04_emit.bp'):ScaleEmitter(2))
 
@@ -97,7 +98,7 @@ XRB2308 = Class(CStructureUnit) {
 
         -- Flying bits of metal and whatnot. More bits for more overkill.
         if self.ShowUnitDestructionDebris and overkillRatio then
-            self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
+            self:CreateUnitDestructionDebris(true, true, overkillRatio > 2)
         end
 
         self.DisallowCollisions = true
@@ -119,7 +120,7 @@ XRB2308 = Class(CStructureUnit) {
     -- Called from unit.lua DeathThread
     StartSinking = function(self, callback)
         if not self.sinkingFromBuild and self.Bottom then -- We don't want to sink at death if we're on the seabed
-            ForkThread(callback)
+            self:ForkThread(callback)
         elseif self.sinkingFromBuild then -- If still sinking, set the destruction callback for impact
             self.sinkProjectile.callback = callback
             return

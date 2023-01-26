@@ -6,11 +6,11 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
+local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
 local dialog = false
 local doesntCare = false
@@ -22,8 +22,7 @@ function UpdateDialog(beatNumber, strings)
     end
 
     local dialogContent = Group(GetFrame(0))
-    dialogContent.Width:Set(400)
-    dialogContent.Height:Set(320)
+    LayoutHelpers.SetDimensions(dialogContent, 400, 320)
 
     dialog = Popup(GetFrame(0), dialogContent)
 
@@ -67,5 +66,5 @@ function UpdateDialog(beatNumber, strings)
             dialog.diagnosticBox:AppendLine(v)
         end
     end
-    dialog.diagnosticBox:AppendLine(LOC("<LOC desync_0001>Beat# ") .. tostring(beatNumber))
+    dialog.diagnosticBox:AppendLine(LOC("<LOC desync_0001>Beat-- ") .. tostring(beatNumber))
 end

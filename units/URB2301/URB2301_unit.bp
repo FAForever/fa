@@ -16,15 +16,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 110,
     Categories = {
         'PRODUCTSC1',
@@ -45,6 +36,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'SORTDEFENSE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -96,7 +88,7 @@ UnitBlueprint {
         UniformScale = 0.06,
     },
     Economy = {
-        BuildCostEnergy = 3400,
+        BuildCostEnergy = 3360,
         BuildCostMass = 480,
         BuildTime = 600,
         RebuildBonusIds = {
@@ -195,7 +187,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 1,
             Label = 'MainGun',
             MaxRadius = 50,
             MuzzleSalvoDelay = 0,
@@ -224,14 +216,17 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
             ReTargetOnMiss = true,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
-                'MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'EXPERIMENTAL',
+                '(STRUCTURE * TECH2 * DEFENSE - ANTIMISSILE)',
+                'MOBILE TECH1 ARTILLERY',
+                'MOBILE TECH3',
+                'MOBILE TECH2',
+                'MOBILE TECH1',
+                'COMMAND',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle01',
             TurretBonePitch = 'Turret_B02',
             TurretBoneYaw = 'Turret_B01',
@@ -241,7 +236,7 @@ UnitBlueprint {
             TurretPitchSpeed = 60,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 60,
+            TurretYawSpeed = 120,
             Turreted = true,
             WeaponCategory = 'Direct Fire',
         },

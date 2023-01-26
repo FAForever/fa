@@ -63,6 +63,7 @@ UnitBlueprint {
         },
     },
     BuildIconSortPriority = 200,
+    BuildBotTotal = 3,
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
@@ -165,8 +166,8 @@ UnitBlueprint {
             },
         },
 
-        # PitchBone = 'Attachpoint01',
-        # YawBone = 'Turret',
+        -- PitchBone = 'Attachpoint01',
+        -- YawBone = 'Turret',
         Category = 'Construction',
         Classification = 'RULEUC_Engineer',
         CommandCaps = {

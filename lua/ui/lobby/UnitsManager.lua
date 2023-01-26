@@ -3,19 +3,19 @@
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
 -- * Summary    : Contains UI for managing unit and enhancement restrictions
 -- ==========================================================================================
-local Mods     = import('/lua/mods.lua')
-local UIUtil   = import('/lua/ui/uiutil.lua')
-local Utils    = import('/lua/system/utils.lua')
-local Tooltip  = import('/lua/ui/game/tooltip.lua')
-local Group    = import('/lua/maui/group.lua').Group
-local Popup    = import('/lua/ui/controls/popups/popup.lua').Popup
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Bitmap   = import('/lua/maui/bitmap.lua').Bitmap
-local Grid     = import('/lua/maui/grid.lua').Grid
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local UnitsAnalyzer   = import('/lua/ui/lobby/UnitsAnalyzer.lua')
-local UnitsRestrictions = import('/lua/ui/lobby/UnitsRestrictions.lua')
+local Mods     = import("/lua/mods.lua")
+local UIUtil   = import("/lua/ui/uiutil.lua")
+local Utils    = import("/lua/system/utils.lua")
+local Tooltip  = import("/lua/ui/game/tooltip.lua")
+local Group    = import("/lua/maui/group.lua").Group
+local Popup    = import("/lua/ui/controls/popups/popup.lua").Popup
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Bitmap   = import("/lua/maui/bitmap.lua").Bitmap
+local Grid     = import("/lua/maui/grid.lua").Grid
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local UnitsAnalyzer   = import("/lua/ui/lobby/unitsanalyzer.lua")
+local UnitsRestrictions = import("/lua/ui/lobby/unitsrestrictions.lua")
 
 -- Stores unit blueprints for all factions
 local blueprints = { All = {}, Original = {}, Modified = {}, Skipped = {} }
@@ -199,7 +199,7 @@ local sortBy = {
     },
 }
 
-local taskNotifier = import('/lua/ui/lobby/TaskNotifier.lua').Create()
+local taskNotifier = import("/lua/ui/lobby/tasknotifier.lua").Create()
 local timer = CreateTimer()
 --==============================================================================
 -- Create a dialog allowing the user to select categories of unit to disable
@@ -226,8 +226,8 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     restrictions.Initial = initial
 
     -- Scaling dialog size based on window size
-    dialogWidth = GetFrame(0).Width() - 40
-    dialogHeight = GetFrame(0).Height() - 40
+    dialogWidth = GetFrame(0).Width() - LayoutHelpers.ScaleNumber(40)
+    dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(40)
 
     GUI.bg = Group(parent)
     GUI.bg.Width:Set(dialogWidth)
@@ -254,22 +254,22 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
 
     GUI.content = Group(GUI.bg)
     LayoutHelpers.AtLeftIn(GUI.content, GUI.bg, 6)
-    GUI.content.Top:Set(function() return GUI.title.Bottom() - 2 end)
+    LayoutHelpers.AnchorToBottom(GUI.content, GUI.title, -2)
     GUI.content.Bottom:Set(GUI.resetBtn.Top)
     GUI.content.Width:Set(function() return GUI.bg.Width() - 12 end)
     GUI.content:DisableHitTest()
 
     GUI.progressBar = StatusBar(GUI.bg, 0, 1, false, false, nil, nil, true)
-    GUI.progressBar._bar:SetSolidColor('DDC0C0C0') --#DDC0C0C0
+    GUI.progressBar._bar:SetSolidColor('DDC0C0C0') ----DDC0C0C0
     GUI.progressBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     GUI.progressBar:SetValue(0)
-    GUI.progressBar.Height:Set(5)
-    GUI.progressBar.Left:Set(function() return GUI.bg.Left() + 30 end)
-    GUI.progressBar.Right:Set(function() return GUI.bg.Right() - 30 end)
+    LayoutHelpers.SetHeight(GUI.progressBar, 5)
+    LayoutHelpers.AtLeftIn(GUI.progressBar, GUI.bg, 30)
+    LayoutHelpers.AtRightIn(GUI.progressBar, GUI.bg, 30)
     LayoutHelpers.AtVerticalCenterIn(GUI.progressBar, GUI.bg)
 
     GUI.progressTxt = UIUtil.CreateText(GUI.bg, "Blueprints Loading ... ", 16, UIUtil.titleFont)
-    GUI.progressTxt:SetColor('FFAEACAC') -- #FFAEACAC
+    GUI.progressTxt:SetColor('FFAEACAC') -- --FFAEACAC
     LayoutHelpers.Above(GUI.progressTxt, GUI.progressBar, 5)
     LayoutHelpers.AtHorizontalCenterIn(GUI.progressTxt, GUI.bg)
 
@@ -280,7 +280,7 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
     taskNotifier.OnProgressCallback = OnBlueprintsProgress
     taskNotifier.OnCompleteCallback = OnBlueprintsLoaded
 
-    import('/lua/ui/lobby/UnitsAnalyzer.lua').FetchBlueprints(Mods.GetGameMods(), false, taskNotifier)
+    import("/lua/ui/lobby/unitsanalyzer.lua").FetchBlueprints(Mods.GetGameMods(), false, taskNotifier)
 
 end
 
@@ -300,7 +300,7 @@ function OnBlueprintsLoaded()
     GUI.progressBar:Hide()
     GUI.progressTxt:Hide()
 
-    blueprints = import('/lua/ui/lobby/UnitsAnalyzer.lua').GetBlueprintsList()
+    blueprints = import("/lua/ui/lobby/unitsanalyzer.lua").GetBlueprintsList()
     local blueprintsCount = table.getsize(blueprints.All)
 
     if blueprintsCount > 0 then
@@ -326,7 +326,7 @@ function OnBlueprintsLoaded()
         for name, faction in factions do
             UnitsAnalyzer.GetUnitsGroups(faction.Blueprints, faction)
             for group, units in faction.Units do
-                if table.getsize(units) > 0 then
+                if not table.empty(units) then
                     cellMax = cellMax + 1
                 elseif group ~= 'CIVILIAN' then
                     WARN('UnitsManager detected '..name..' faction without any '..group..' units')
@@ -336,9 +336,9 @@ function OnBlueprintsLoaded()
         timer:Stop('UnitsManager...UnitsGroupping',true)
 
         -- scale cell size by dialog size and make space for scroll bar
-        cellSpace = dialogWidth - dialogScrollWidth - 20
+        cellSpace = dialogWidth / LayoutHelpers.GetPixelScaleFactor() - dialogScrollWidth - 20
         cellSize = math.floor(cellSpace / cellMax)
-        cellSize = math.min(cellSize, 55)
+        cellSize = math.min(cellSize, LayoutHelpers.ScaleNumber(55))
         -- calculate grid size and margin to ensure grids are centered
         gridWidth = cellSize * cellMax
         gridMargin = (cellSpace - gridWidth) / 2
@@ -369,9 +369,8 @@ end
 function CreatePresetsGrid()
     local rowMax = 4
     GUI.presetsGrid = CreateGrid(GUI.content, cellSize, cellSize, cellMax, rowMax)
-    GUI.presetsGrid.Top:Set(function() return GUI.content.Top() + 6 end)
-    GUI.presetsGrid.Left:Set(function() return GUI.content.Left() + gridMargin end)
-    GUI.presetsGrid.Height:Set(function() return cellSize * rowMax end)
+    LayoutHelpers.AtLeftTopIn(GUI.presetsGrid, GUI.content, gridMargin, 6)
+    LayoutHelpers.SetHeight(GUI.presetsGrid, cellSize * rowMax)
     GUI.presetsGrid.Width:Set(function() return GUI.content.Width() - gridMargin end)
 
     local index = 0
@@ -400,9 +399,9 @@ end
 -- Creates a grid with buttons representing all original units and modded units (if game mods are enabled)
 function CreateUnitsGrid()
     GUI.unitsGrid = CreateGrid(GUI.content, cellSize, cellSize, cellMax, 25)
-    GUI.unitsGrid.Top:Set(function() return GUI.presetsGrid.Bottom() + 6 end)
-    GUI.unitsGrid.Left:Set(function() return GUI.content.Left() + gridMargin end)
-    GUI.unitsGrid.Bottom:Set(function() return GUI.content.Bottom() - 2 end)
+    LayoutHelpers.AnchorToBottom(GUI.unitsGrid, GUI.presetsGrid, 6)
+    LayoutHelpers.AtLeftIn(GUI.unitsGrid, GUI.content, gridMargin)
+    LayoutHelpers.AtBottomIn(GUI.unitsGrid, GUI.content, 2)
     GUI.unitsGrid.Width:Set(function() return GUI.content.Width() - gridMargin end)
 
     GUI.unitsGrid.HandleEvent = function(self, event)
@@ -444,12 +443,12 @@ function CreateControls(OnOk, OnCancel, isHost)
     LayoutHelpers.AtHorizontalCenterIn(GUI.title, GUI.bg)
 
     GUI.stats = UIUtil.CreateText(GUI.bg, "", 14, UIUtil.bodyFont)
-    GUI.stats:SetColor('ff8C8C8C') -- #ff8C8C8C
+    GUI.stats:SetColor('ff8C8C8C') -- --ff8C8C8C
     LayoutHelpers.AtTopIn(GUI.stats, GUI.bg, 10)
     LayoutHelpers.AtRightIn(GUI.stats, GUI.bg, 10)
     Tooltip.AddControlTooltip(GUI.stats, {
-        text = 'Current Restrictions',
-        body = 'Restrictions are set using Presets (first two rows), Custom restrictions (rest of rows), or combination of both - Presets and Custom restrictions \n\n'
+        text = '<LOC restricted_units_dlg_0001>Current Restrictions',
+        body = '<LOC restricted_units_dlg_0002>Restrictions are set using Presets (first four rows), Custom restrictions (rest of rows), or combination of both - Presets and Custom restrictions \n\n'
             .. 'To minimize number of restrictions, first select custom restrictions and then preset restrictions.' })
 
     GUI.cancelBtn = UIUtil.CreateButtonWithDropshadow(GUI.bg, '/BUTTON/medium/', "<LOC _Cancel>")
@@ -457,11 +456,11 @@ function CreateControls(OnOk, OnCancel, isHost)
     LayoutHelpers.AtHorizontalCenterIn(GUI.cancelBtn, GUI.bg)
 
     GUI.okBtn = UIUtil.CreateButtonWithDropshadow(GUI.bg, '/BUTTON/medium/', "<LOC _Ok>")
-    GUI.okBtn.Left:Set(function() return GUI.cancelBtn.Left() - 120 end)
+    LayoutHelpers.AtLeftIn(GUI.okBtn, GUI.cancelBtn, -120)
     LayoutHelpers.AtBottomIn(GUI.okBtn, GUI.bg, 5)
 
     GUI.resetBtn = UIUtil.CreateButtonWithDropshadow(GUI.bg, '/BUTTON/medium/', "<LOC _Reset>")
-    GUI.resetBtn.Left:Set(function() return GUI.cancelBtn.Left() + 120 end)
+    LayoutHelpers.AtLeftIn(GUI.resetBtn, GUI.cancelBtn, 120)
     LayoutHelpers.AtBottomIn(GUI.resetBtn, GUI.bg, 5)
     Tooltip.AddButtonTooltip(GUI.resetBtn, 'options_reset_all')
 
@@ -504,7 +503,7 @@ end
 function CloseDialog()
 
     -- stop loading of blueprints in case they are still loading
-    import('/lua/ui/lobby/UnitsAnalyzer.lua').StopBlueprints()
+    import("/lua/ui/lobby/unitsanalyzer.lua").StopBlueprints()
 
     for id, control in GUI.controls or {} do
         if control then
@@ -580,38 +579,34 @@ function UpdateRestrictionsStats()
         end
     end
 
-    local info = restrictions.Stats.Total .. ' Restrictions = ' ..
-                 restrictions.Stats.Custom .. ' Custom + ' ..
-                 restrictions.Stats.Presets .. ' Presets (' .. restrictions.Stats.Units .. ')'
+    local info = LOCF('<LOC restricted_units_dlg_0003>%s Restrictions = %s Custom + %s Presets (%s)',
+        restrictions.Stats.Total, restrictions.Stats.Custom, restrictions.Stats.Presets, restrictions.Stats.Units)
     GUI.stats:SetText(info)
 
     return restrictions.Stats
 end
 
-local UnitsTooltip = import('/lua/ui/lobby/UnitsTooltip.lua')
+local UnitsTooltip = import("/lua/ui/lobby/unitstooltip.lua")
 
 function CreateUnitIcon(parent, bp, faction)
     local colors = {}
 
     local control = Bitmap(parent)
     control.bp = bp -- Save blueprint reference for later
-    control.Height:Set(cellSize)
-    control.Width:Set(cellSize)
+    LayoutHelpers.SetDimensions(control, cellSize, cellSize)
     control:SetSolidColor('FF000000')
 
     local imagePath = UnitsAnalyzer.GetImagePath(bp, faction)
     bp.ImagePath = imagePath
 
     local fill = Bitmap(control)
-    fill.Height:Set(cellSize-1)
-    fill.Width:Set(cellSize-1)
+    LayoutHelpers.SetDimensions(fill, cellSize - 1, cellSize - 1)
     fill:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(fill, control)
     LayoutHelpers.AtHorizontalCenterIn(fill, control)
 
     local hover = Bitmap(control)
-    hover.Height:Set(cellSize)
-    hover.Width:Set(cellSize)
+    LayoutHelpers.SetDimensions(hover, cellSize, cellSize)
     hover:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(hover, control)
     LayoutHelpers.AtHorizontalCenterIn(hover, control)
@@ -624,8 +619,7 @@ function CreateUnitIcon(parent, bp, faction)
           imagePath, -- dis.dds'),
           imagePath, -- dis.dds'),
           'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
-    checkbox.Height:Set(cellSize - 6)
-    checkbox.Width:Set(cellSize - 6)
+    LayoutHelpers.SetDimensions(checkbox, cellSize - 6, cellSize - 6)
     checkbox:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(checkbox, control, 5, 5)
 
@@ -635,8 +629,7 @@ function CreateUnitIcon(parent, bp, faction)
         imagePath = '/textures/ui/icons_strategic/commander_generic.dds'
         local position = cellSize - unitFontSize - 2
         local typeIcon = Bitmap(control)
-        typeIcon.Height:Set(unitFontSize)
-        typeIcon.Width:Set(unitFontSize)
+        LayoutHelpers.SetDimensions(typeIcon, unitFontSize, unitFontSize)
         typeIcon:SetTexture(imagePath)
         typeIcon:DisableHitTest()
         LayoutHelpers.AtLeftTopIn(typeIcon, control, position, 3)
@@ -648,8 +641,7 @@ function CreateUnitIcon(parent, bp, faction)
 
     local modPosition = cellSize - unitFontSize
     local modFill = Bitmap(control)
-    modFill.Height:Set(unitFontSize + 1)
-    modFill.Width:Set(unitFontSize + 1)
+    LayoutHelpers.SetDimensions(modFill, unitFontSize + 1, unitFontSize + 1)
     modFill:SetSolidColor('00ffffff')
     modFill:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(modFill, control, modPosition - 2, modPosition - 2)
@@ -660,14 +652,13 @@ function CreateUnitIcon(parent, bp, faction)
     LayoutHelpers.AtLeftTopIn(modText, control, modPosition, modPosition - 3)
 
     if bp.Mod then
-        modFill:SetSolidColor('ffAA00FF')-- #ffAA00FF'
+        modFill:SetSolidColor('ffAA00FF')-- --ffAA00FF'
         modText:SetText('M')
         modText:SetColor('ffffffff')
     end
 
     local overlay = Bitmap(control)
-    overlay.Height:Set(cellSize)
-    overlay.Width:Set(cellSize)
+    LayoutHelpers.SetDimensions(overlay, cellSize, cellSize)
     overlay:SetSolidColor('00ffffff')
     overlay:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(overlay, control)
@@ -675,14 +666,13 @@ function CreateUnitIcon(parent, bp, faction)
 
     if bp.Type == 'UPGRADE' or
        bp.CategoriesHash.ISPREENHANCEDUNIT then
-        colors.TextChecked = 'ffffffff'  -- #ffffffff'
-        colors.TextUncheck = 'ffffffff'  -- #ffffffff'
-        colors.FillChecked = 'ad575757'  -- #ad575757'
-        colors.FillUncheck = '003e3d3d'  -- #003e3d3d'
+        colors.TextChecked = 'ffffffff'  -- --ffffffff'
+        colors.TextUncheck = 'ffffffff'  -- --ffffffff'
+        colors.FillChecked = 'ad575757'  -- --ad575757'
+        colors.FillUncheck = '003e3d3d'  -- --003e3d3d'
 
         checkbox.selector = overlay
-        checkbox.Height:Set(cellSize)
-        checkbox.Width:Set(cellSize)
+        LayoutHelpers.SetDimensions(checkbox, cellSize, cellSize)
         LayoutHelpers.AtVerticalCenterIn(checkbox, control)
         LayoutHelpers.AtHorizontalCenterIn(checkbox, control)
 
@@ -694,10 +684,10 @@ function CreateUnitIcon(parent, bp, faction)
             LayoutHelpers.AtLeftTopIn(techUI, control, 2, 2)
         end
     else
-        colors.TextChecked = 'ffC0C0C0' --#ffC0C0C0
-        colors.TextUncheck = 'ff000000' --#ff000000
-        colors.FillChecked = 'ff575757' --#ff575757
-        colors.FillUncheck = bp.Color or 'ff524A3E' --#ff524A3E
+        colors.TextChecked = 'ffC0C0C0' ----ffC0C0C0
+        colors.TextUncheck = 'ff000000' ----ff000000
+        colors.FillChecked = 'ff575757' ----ff575757
+        colors.FillUncheck = bp.Color or 'ff524A3E' ----ff524A3E
 
         fill:SetSolidColor(colors.FillUncheck)
         techUI:SetColor(colors.TextUncheck)
@@ -791,23 +781,20 @@ function CreatePresetIcon(parent, presetName)
     local control = Bitmap(parent)
     control.preset = preset
     control.presetName = presetName
-    control.Height:Set(cellSize)
-    control.Width:Set(cellSize)
+    LayoutHelpers.SetDimensions(control, cellSize, cellSize)
     control:SetSolidColor(colors.FillUncheck)
 
     local imagePath = UnitsAnalyzer.GetImagePath(preset, '')
 
     local fill = Bitmap(control)
-    fill.Height:Set(cellSize-1)
-    fill.Width:Set(cellSize-1)
+    LayoutHelpers.SetDimensions(fill, cellSize - 1, cellSize - 1)
     fill:SetSolidColor(colors.FillUncheck)
     fill:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(fill, control)
     LayoutHelpers.AtHorizontalCenterIn(fill, control)
 
     local hover = Bitmap(control)
-    hover.Height:Set(cellSize)
-    hover.Width:Set(cellSize)
+    LayoutHelpers.SetDimensions(hover, cellSize, cellSize)
     hover:SetSolidColor('00ffffff')
     hover:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(hover, control)
@@ -821,8 +808,7 @@ function CreatePresetIcon(parent, presetName)
           imagePath, -- dis.dds'),
           imagePath, -- dis.dds'),
           'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
-    checkbox.Height:Set(cellSize-2)
-    checkbox.Width:Set(cellSize-2)
+    LayoutHelpers.SetDimensions(checkbox, cellSize - 2, cellSize - 2)
     checkbox:DisableHitTest()
     LayoutHelpers.AtVerticalCenterIn(checkbox, control)
     LayoutHelpers.AtHorizontalCenterIn(checkbox, control)
@@ -1062,7 +1048,7 @@ end
 -- @param sortReversed - optional boolean for sorting in revers of order specified in sortCategories
 function CompareUnitsOrder(a, b, sortCategories, sortReversed)
 
-    if table.getsize(sortCategories) == 0 then
+    if table.empty(sortCategories) then
         return 0
     end
 
@@ -1110,7 +1096,7 @@ function SortUnits(unitsByID, sortCategories, sortReversed)
        sortCategories = sortBy.TECH
     end
 
-    if table.getsize(unitsByID) == 0 then
+    if table.empty(unitsByID) then
         return unitsByID
     end
 

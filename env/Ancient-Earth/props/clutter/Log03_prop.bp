@@ -1,0 +1,35 @@
+PropBlueprint {
+    Categories = {
+		'INVULNERABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'log03_albedo.dds',
+                    LODCutoff = 100,
+                    ShaderName = 'TMeshAlpha',
+					NormalsName = 'log03_normalsTS.dds',
+                },
+            },
+        },
+        UniformScale = 0.01,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 0,
+        ReclaimTime = 0,
+    },
+    Interface = {
+        HelpText = 'chad on a Log',
+    },
+    SizeX = 0.4,
+    SizeY = 0.25,
+    SizeZ = 0.25,
+}
+    

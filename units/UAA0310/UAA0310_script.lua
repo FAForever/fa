@@ -4,15 +4,18 @@
 -- Summary  :  Aeon CZAR Script
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
-local aWeapons = import('/lua/aeonweapons.lua')
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local aWeapons = import("/lua/aeonweapons.lua")
 local AQuantumBeamGenerator = aWeapons.AQuantumBeamGenerator
 local AAAZealotMissileWeapon = aWeapons.AAAZealotMissileWeapon
 local AANDepthChargeBombWeapon = aWeapons.AANDepthChargeBombWeapon
 local AAATemporalFizzWeapon = aWeapons.AAATemporalFizzWeapon
-local explosion = import('/lua/defaultexplosions.lua')
-local CzarShield = import('/lua/shield.lua').CzarShield
+local explosion = import("/lua/defaultexplosions.lua")
+local CzarShield = import("/lua/shield.lua").CzarShield
 
+local CreateAeonCZARBuildingEffects = import("/lua/effectutilities.lua").CreateAeonCZARBuildingEffects
+
+---@class UAA0310 : AirTransport
 UAA0310 = Class(AirTransport) {
     DestroyNoFallRandomChance = 1.1,
     BuildAttachBone = 'UAA0310',
@@ -28,6 +31,11 @@ UAA0310 = Class(AirTransport) {
         AAFizz01 = Class(AAATemporalFizzWeapon) {},
         AAFizz02 = Class(AAATemporalFizzWeapon) {},
     },
+
+    StartBeingBuiltEffects = function(self, builder, layer)
+        AirTransport.StartBeingBuiltEffects(self, builder, layer)
+        CreateAeonCZARBuildingEffects(self)
+    end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         local wep = self:GetWeaponByLabel('QuantumBeamGeneratorWeapon')
@@ -56,9 +64,10 @@ UAA0310 = Class(AirTransport) {
     end,
 
     OnAnimTerrainCollision = function(self, bone,x,y,z)
+        local size = self.Size
         DamageArea(self, {x,y,z}, 5, 1000, 'Default', true, false)
         explosion.CreateDefaultHitExplosionAtBone(self, bone, 5.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)

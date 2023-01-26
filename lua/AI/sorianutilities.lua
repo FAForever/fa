@@ -7,12 +7,12 @@
 --
 ----------------------------------------------------------------------------
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
-local Utils = import('/lua/utilities.lua')
-local Mods = import('/lua/mods.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local Utils = import("/lua/utilities.lua")
+local Mods = import("/lua/mods.lua")
 
-local AIChatText = import('/lua/AI/sorianlang.lua').AIChatText
+local AIChatText = import("/lua/ai/sorianlang.lua").AIChatText
 
 -- Table of AI taunts orginized by faction
 local AITaunts = {
@@ -56,7 +56,7 @@ function XZDistanceTwoVectorsSq(v1, v2)
 end
 
 function AICheckForWeakEnemyBase(aiBrain)
-    if aiBrain:GetCurrentEnemy() and table.getn(aiBrain.AirAttackPoints) == 0 then
+    if aiBrain:GetCurrentEnemy() and table.empty(aiBrain.AirAttackPoints) then
         local enemy = aiBrain:GetCurrentEnemy()
         local x,z = enemy:GetArmyStartPos()
         local enemyBaseThreat = aiBrain:GetThreatAtPosition({x,0,z}, 1, true, 'AntiAir', enemy:GetArmyIndex())
@@ -505,7 +505,7 @@ function GetTemplateReplacement(aiBrain, building, faction, buildingTmpl)
             end
         end
         -- If we found a possibility
-        if table.getn(possibles) > 0 then
+        if not table.empty(possibles) then
             rand = Random(1,table.getn(possibles))
             local customUnitID = possibles[rand]
             retTemplate = { { building, customUnitID, } }
@@ -566,7 +566,7 @@ function CanRespondEffectively(aiBrain, location, platoon)
         return true
     end
     -- If no visible targets go anyway
-    if table.getn(targets) == 0 then
+    if table.empty(targets) then
         return true
     end
     return false
@@ -592,7 +592,7 @@ function AISendPing(position, pingType, army)
    }
     local data = {Owner = army - 1, Type = pingType, Location = position}
     data = table.merged(data, PingTypes[pingType])
-    import('/lua/simping.lua').SpawnPing(data)
+    import("/lua/simping.lua").SpawnPing(data)
 end
 
 function AIDelayChat(aigroup, ainickname, aiaction, targetnickname, delaytime)
@@ -1153,7 +1153,7 @@ function Nuke(aiBrain)
                         break
                     end
                 end
-                ForkThread(LaunchNukesTimed, nukesToFire, tarPosition)
+                aiBrain:ForkThread(LaunchNukesTimed, nukesToFire, tarPosition)
             end
             -- Keep track of old targets
             table.insert(oldTarget, target)
@@ -1189,7 +1189,7 @@ end
 --    Returns:
 --        nil
 -- -----------------------------------------------------
-function LaunchNukesTimed(nukesToFire, target)
+function LaunchNukesTimed(aiBrain, nukesToFire, target)
     local nukes = {}
     for k,v in nukesToFire do
         local pos = v:GetPosition()
@@ -1456,29 +1456,19 @@ end
 -- -----------------------------------------------------
 --    Function: TimeConvert
 --    Args:
---        temptime      - Time in seconds
+--        seconds      - Time in seconds
 --    Description:
 --        Converts seconds into eaier to read time.
 --    Returns:
 --        Converted time
 -- -----------------------------------------------------
-function TimeConvert(temptime)
-    hours = math.floor(temptime / 3600)
-    minutes = math.floor(temptime/60)
-    seconds = math.floor(math.mod(temptime, 60))
-    hours = tostring(hours)
-    if minutes < 10 then
-        minutes = '0'..tostring(minutes)
-    else
-        minutes = tostring(minutes)
-    end
-    if seconds < 10 then
-        seconds = '0'..tostring(seconds)
-    else
-        seconds = tostring(seconds)
-    end
-    returntext = hours..':'..minutes..':'..seconds
-    return returntext
+function TimeConvert(seconds)
+    local MathFloor = math.floor
+    local hours = MathFloor(seconds / 3600)
+    seconds = seconds - hours * 3600
+    local minutes = MathFloor(seconds / 60)
+    seconds = seconds - minutes * 60
+    return ("%02d:%02d:%02d"):format(hours, minutes, seconds)
 end
 
 -- Small function the draw intel points on the map for debugging

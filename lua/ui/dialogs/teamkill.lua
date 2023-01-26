@@ -4,11 +4,11 @@
 --* Summary: pops up to warn of a teamkill and ask if it should be reported
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
+local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
 local dialog = false
 local shouldReport = false
@@ -20,11 +20,10 @@ function CreateDialog(teamkill)
     end
 
     local dialogContent = Group(GetFrame(0))
-    dialogContent.Width:Set(360)
-    dialogContent.Height:Set(180)
+    LayoutHelpers.SetDimensions(dialogContent, 360, 180)
 
     dialog = Popup(GetFrame(0), dialogContent)
-    
+
     local title = UIUtil.CreateText(dialogContent, "<LOC teamkill_0001>Teamkill Detected", 14, UIUtil.titleFont)
     LayoutHelpers.AtTopIn(title, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
@@ -61,7 +60,7 @@ function CreateDialog(teamkill)
 
     dialog.OnShadowClicked = function(self)
     end
-    
+
     dialog.countdownThread = ForkThread(WaitBeforeEnablingReportButton, reportBtn)
 end
 

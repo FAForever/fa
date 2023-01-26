@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_light_chronotron_cannon_overcharge_projectile',
+	Lifetime = -1.00,
+    TrailLength = 0.65,
+    Size = 0.075,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_white_02.dds',
+	RampTexture = '/textures/particles/ramp_white_orange_01.dds',
+}
+

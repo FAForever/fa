@@ -66,7 +66,7 @@ function GetAItypes()
     local CustomAIfile
     local ModAIFiles
     -- get all sim mods installed in /mods/
-    local simMods = import('/lua/mods.lua').GetGameMods()
+    local simMods = import("/lua/mods.lua").GetGameMods()
     -- loop over all installed mods
     for Index, ModData in simMods do
         -- check if we have a CustomAIs_v2 folder (then we have an AI mod)
@@ -90,7 +90,7 @@ function GetAItypes()
             end
         end
     end
-    
+
     --Default GPG Cheating AIs
     table.insert(aitypes, { key = 'adaptivecheat', name = "<LOC lobui_0379>AIx: Adaptive" })
     table.insert(aitypes, { key = 'rushcheat', name = "<LOC lobui_0380>AIx: Rush" })

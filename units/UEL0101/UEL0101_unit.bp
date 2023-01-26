@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 26, -- Weapon range so that the scout doesn't suicide when attack moved into T1 tanks that are not Aurora
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UEL',
@@ -24,15 +27,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'UEF_Select_Vehicle',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
         },
     },
     BuildIconSortPriority = 20,
@@ -117,8 +111,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 80,
         BuildCostMass = 12,
-        BuildTime = 80,
-        MinBuildTime = 100,
+        BuildTime = 60,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -169,7 +162,7 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         MaxAcceleration = 4.5,
-        MaxBrake = 4.5,
+        MaxBrake = 9,
         MaxSpeed = 4.5,
         MaxSpeedReverse = 4.5,
         MaxSteerForce = 1000,
@@ -184,9 +177,9 @@ UnitBlueprint {
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.75,
-    SizeX = 0.6, #0.35,
-    SizeY = 0.7, #0.4,
-    SizeZ = 1, # 0.65
+    SizeX = 0.6, --0.35,
+    SizeY = 0.7, --0.4,
+    SizeZ = 1, -- 0.65
     StrategicIconName = 'icon_land1_intel',
     StrategicIconSortPriority = 135,
     Transport = {
@@ -221,7 +214,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'MainGun',
-            MaxRadius = 25,
+            MaxRadius = 26,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
@@ -244,14 +237,12 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',

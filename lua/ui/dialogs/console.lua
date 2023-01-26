@@ -3,21 +3,17 @@
 --* Author: Chris Blackwell
 --* Summary: command console
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
-local Border = import('/lua/maui/border.lua').Border
-local Edit = import('/lua/maui/edit.lua').Edit
-local Control = import('/lua/maui/control.lua').Control
-local Window = import('/lua/maui/window.lua').Window
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Edit = import("/lua/maui/edit.lua").Edit
+local Control = import("/lua/maui/control.lua").Control
+local Window = import("/lua/maui/window.lua").Window
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local Prefs = import("/lua/user/prefs.lua")
 
 local commandDeque = {}
 local maxCommandDequeSize = 10
@@ -28,32 +24,46 @@ local consoleFontSize = 12
 local window = false
 local parent = false
 
+local TableGetN = table.getn
+
+local windowTexture = {
+    bl = '/textures/ui/uef/game/options_brd/options_brd_ll.dds',
+    bm = '/textures/ui/uef/game/options_brd/options_brd_lm.dds',
+    borderColor = 'ff415055',
+    br = '/textures/ui/uef/game/options_brd/options_brd_lr.dds',
+    m = '/textures/ui/uef/game/options_brd/options_brd_m.dds',
+    ml = '/textures/ui/uef/game/options_brd/options_brd_vert_l.dds',
+    mr = '/textures/ui/uef/game/options_brd/options_brd_vert_r.dds',
+    tl = '/textures/ui/uef/game/options_brd/options_brd_ul.dds',
+    tm = '/textures/ui/uef/game/options_brd/options_brd_horz_um.dds',
+    tr = '/textures/ui/uef/game/options_brd/options_brd_ur.dds'
+}
+
 local function InsertCommand(text)
     table.insert(commandDeque, text)
-    if table.getn(commandDeque) > maxCommandDequeSize then
+    if TableGetN(commandDeque) > maxCommandDequeSize then
         table.remove(commandDeque, 1)
     end
-    currentCommandDequeIndex = table.getn(commandDeque)
+    currentCommandDequeIndex = TableGetN(commandDeque)
 end
 
 function ConfigWindow(parent)
     if window then return end
-    window = Window(GetFrame(0), '<LOC console_0000>Console Config', nil, nil, nil, true)
-    window.Left:Set(function() return parent.Left() + 10 end)
-    window.Top:Set(function() return parent.Top() + 30 end)
-    window.Right:Set(function() return parent.Left() + 230 end)
-    window.Bottom:Set(function() return parent.Top() + 120 end)
+    window = Window(GetFrame(0), '<LOC console_0000>Console Config', nil, nil, nil, true, nil, 'console_window_config', nil, windowTexture)
+    LayoutHelpers.AtLeftTopIn(window, parent, 10, 30)
+    LayoutHelpers.AnchorToLeft(window, parent, -230)
+    LayoutHelpers.AnchorToTop(window, parent, -120)
     window.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-    
+
     local client = window:GetClientGroup()
     local defValue = Prefs.GetFromCurrentProfile('console_alpha') or 1
     defValue = defValue * 100
     local label = UIUtil.CreateText(client, LOCF("<LOC console_alpha>Alpha: %d%%", defValue), 14)
     LayoutHelpers.AtLeftTopIn(label, client, 5, 5)
-    
-    local slider = IntegerSlider(client, false, 
-            20, 100, 1, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'), 
-            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'), 
+
+    local slider = IntegerSlider(client, false,
+            20, 100, 1, UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'), UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
             UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
     LayoutHelpers.Below(slider, label)
     slider.OnValueSet = function(self, newValue)
@@ -74,13 +84,12 @@ function CreateDialog()
     local mainFrame = GetFrame(0)
 
     local location = {Top = 5, Left = 5, Bottom = 500, Right = 300}
-    parent = Window(mainFrame, '<LOC _Console>Console', nil, nil, true, false, false, 'console_window', location)
+    parent = Window(mainFrame, '<LOC _Console>Console', nil, nil, true, false, false, 'console_window', location, windowTexture)
     parent.Depth:Set(UIUtil.consoleDepth)
     parent:SetMinimumResize(200, 170)
     local edit = Edit(parent:GetClientGroup())
-    edit.Left:Set(function() return parent:GetClientGroup().Left() + 10 end)
-    edit.Right:Set(function() return parent:GetClientGroup().Right() - 38 end)
-    edit.Bottom:Set(function() return parent:GetClientGroup().Bottom() - 10 end)
+    LayoutHelpers.AtLeftIn(edit, parent:GetClientGroup(), 10)
+    LayoutHelpers.AtRightBottomIn(edit, parent:GetClientGroup(), 38, 10)
     edit:SetForegroundColor(UIUtil.consoleFGColor())
     edit:SetBackgroundColor('ff333333')
     edit:SetHighlightForegroundColor("black")
@@ -90,13 +99,13 @@ function CreateDialog()
 
     local consoleOutput = ItemList(parent:GetClientGroup())
     LayoutHelpers.Above(consoleOutput, edit, 10)
-    consoleOutput.Top:Set(function() return parent:GetClientGroup().Top() + 5 end)
+    LayoutHelpers.AtTopIn(consoleOutput, parent:GetClientGroup(), 5)
     consoleOutput.Right:Set(edit.Right)
     consoleOutput:SetColors(UIUtil.consoleFGColor(), UIUtil.consoleTextBGColor(), UIUtil.consoleFGColor(), UIUtil.consoleTextBGColor()) -- we don't really want selection here so don't differentiate colors
     consoleOutput:SetFont(consoleFontName, consoleFontSize)
 
     UIUtil.CreateVertScrollbarFor(consoleOutput)
-    
+
     parent.OnConfigClick = function(self)
         ConfigWindow(parent)
     end
@@ -127,23 +136,23 @@ function CreateDialog()
                 conFuncsList = false
             end
             local matches = ConTextMatches(newText)
-            local numMatches = table.getn(matches)
+            local numMatches = TableGetN(matches)
             if (numMatches > 0) then
                 conFuncsList = ItemList(consoleOutput)
                 conFuncsList:SetFont(consoleFontName, consoleFontSize)
                 LayoutHelpers.Above(conFuncsList, edit)
-                conFuncsList.Right:Set(function() return edit.Right() - 32 end)
+                LayoutHelpers.AtRightIn(conFuncsList, edit, 32)
                 conFuncsList.Height:Set(function()
                     return math.min(consoleOutput.Height(), conFuncsList:GetRowHeight() * numMatches)
                 end)
                 for i,v in matches do
                     conFuncsList:AddItem(v)
                 end
-                
+
                 if conFuncsList:NeedsScrollBar() then
                     UIUtil.CreateVertScrollbarFor(conFuncsList)
                 end
-                
+
                 conFuncsList:SetSelection(conFuncsList:GetItemCount() - 1)
                 conFuncsList:ScrollToBottom()
 
@@ -178,7 +187,7 @@ function CreateDialog()
                 ChangeConFuncSelection(-1)
             else
                 -- store off the current text if this is the first press
-                local commandDequeSize = table.getn(commandDeque)
+                local commandDequeSize = TableGetN(commandDeque)
                 if commandDequeSize > 0 then
                     if currentCommandDequeIndex == commandDequeSize then currentText = edit:GetText() end
                     edit:SetText(commandDeque[currentCommandDequeIndex])
@@ -191,8 +200,8 @@ function CreateDialog()
                 ChangeConFuncSelection(1)
             else
                 currentCommandDequeIndex = currentCommandDequeIndex + 1
-                if currentCommandDequeIndex > table.getn(commandDeque) then
-                    currentCommandDequeIndex = table.getn(commandDeque)
+                if currentCommandDequeIndex > TableGetN(commandDeque) then
+                    currentCommandDequeIndex = TableGetN(commandDeque)
                     edit:SetText(currentText)
                 else
                     edit:SetText(commandDeque[currentCommandDequeIndex])
@@ -238,3 +247,9 @@ function CreateDialog()
     parent:SetAlpha(tempalpha, true)
     return parent
 end
+
+-- kept for mod backwards compatibility
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
+local Border = import("/lua/maui/border.lua").Border

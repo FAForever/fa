@@ -6,12 +6,12 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Button = import('/lua/maui/button.lua').Button
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Button = import("/lua/maui/button.lua").Button
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 -- Menu background
 local background = false
@@ -86,7 +86,7 @@ function MenuCleanup()
         StopSound(ambientSoundHandle)
         ambientSoundHandle = false
     end
-    import('/lua/ui/uimain.lua').SetEscapeHandler(nil)
+    import("/lua/ui/uimain.lua").SetEscapeHandler(nil)
 end
 
 local profileDlg = nil
@@ -129,7 +129,7 @@ function CreateProfileButton(parent, exitBehavior, enterBehavior)
             enterBehavior()
         end
         if not profileDlg then
-            profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(function()
+            profileDlg = import("/lua/ui/dialogs/profile.lua").CreateDialog(function()
                 SetNameToCurrentProfile()
                 profileDlg = nil
                 if exitBehavior then

@@ -46,11 +46,6 @@ Tooltips = {
         description = "<LOC tooltipui0300>Units will not engage enemies",
         keyID = "mode",
     },
-    mode_aggressive = {
-        title = "<LOC tooltipui0301>Ground Fire",
-        description = "<LOC tooltipui0302>Units will attack targeted positions rather attack-move",
-        keyID = "mode",
-    },
     mode_return_fire = {
         title = "<LOC tooltipui0303>Return Fire",
         description = "<LOC tooltipui0304>Units will move and engage normally",
@@ -177,6 +172,10 @@ Tooltips = {
         title = "<LOC tooltipui0038>Pause Construction",
         description = "<LOC tooltipui0506>Pause/unpause current construction order",
         keyID = "pause_unit",
+    },
+    toggle_amphibious = {
+        title = "<LOC tooltipui0697>Amphibious Mode Toggle",
+        description = "",
     },
     toggle_omni = {
         title = "<LOC tooltipui0479>Omni Toggle",
@@ -394,11 +393,18 @@ Tooltips = {
         title = "Persist Chat Feed Timeout",
         description = "Allows chat to timeout normally in the chat feed after closing the chat window",
     },
+    chat_send_type = {
+        title = "<LOC chat_send_type_title>Default recipient: allies",
+        description = "<LOC chat_send_type_description>When enabled, enter sends messages to allies and holding shift + enter sends to all. When not enabled, the behavior is reversed.",
+    },
     minimap_reset = {
         title = "<LOC tooltipui0649>Reset Minimap Window",
         description = "<LOC tooltipui0650>Resets the position and layout of the minimap window",
     },
-
+    minimap_pin = {
+        title = "<LOC tooltipui0800>Pin Minimap Window",
+        description = "<LOC tooltipui0801>Locks the position and layout of the minimap window",
+    },
     toggle_cartographic = {
         title = "<LOC tooltipui0415>Cartographic Mode",
         description = "<LOC tooltipui0416>Display the terrain using a topographic visualization",
@@ -540,11 +546,54 @@ Tooltips = {
         title = "<LOC tooltipui0129>Build Efficiency",
         description = "<LOC tooltipui0130>Your overall Economic Efficiency",
     },
-
+    -- **********************
+    -- ** Mass Fabs panel Strings
+    -- **********************
+    mf_mass_income_display = {
+        title = "<LOC tooltipui1000>Mass Income",
+        description = "<LOC tooltipui1001>Mass being generated with mass fabricators per second",
+    },
+    mf_energy_expense_display = {
+        title = "<LOC tooltipui1002>Energy Expense",
+        description = "<LOC tooltipui1003>Energy being spent with mass fabricators per second",
+    },
+    mf_active_amount = {
+        title = "<LOC tooltipui1004>Active mass fabricators",
+        description = "<LOC tooltipui1005>Amount of active mass fabricators",
+    },
+    mf_inactive_amount = {
+        title = "<LOC tooltipui1006>Inactive mass fabricators",
+        description = "<LOC tooltipui1007>Amount of inactive mass fabricators",
+    },
+    mf_energy_required = {
+        title = "<LOC tooltipui1008>Energy Required",
+        description = "<LOC tooltipui1009>Amount of required energy for mass fabricators to work",
+    },
 
     -- **********************
     -- ** Options Strings
     -- **********************
+
+    options_commands_ignore_mode = {
+        title = "Ignore mode",
+        description = "When enabled, ignore any other command but move commands when you hold left-ctrl. This can help to guarantee that you issue a move command, over (accidentally) starting a reclaim or attack command. \r\n\r\nThis is disabled when holding shift.",
+    },
+
+    options_selection_threshold_regular = {
+        title = "Default selection threshold",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This can help you select individual units or props, especially on displays with higher resolutions. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
+    options_selection_threshold_reclaim = {
+        title = "Default selection threshold",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when you are in reclaim mode. It makes it easier to hit all of your clicks, reducing the amount of fake reclaim orders. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
+    options_selection_threshold_replay = {
+        title = "Default selection threshold",
+        description = "The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units. \r\n\r\nInteraction with units take precedence over props. \r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
     options_wheel_sensitivity = {
         title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
         description = "<LOC OPTIONS_0035>Sets the Zoom Speed when using the Mouse Wheel",
@@ -598,7 +647,7 @@ Tooltips = {
         description = "<LOC OPTIONS_0079>Sets the Delay before Tooltips are displayed",
     },
     options_loading_tips = {
-        title = "<LOC OPTIONS_0009>Display Loading Tips",
+        title = "<LOC OPTIONS_0009>Show Loading Tips",
         description = "<LOC OPTIONS_0011>Toggles whether or not tips are displayed on the loading screen",
     },
     options_persistent_built_mode = {
@@ -720,7 +769,7 @@ Tooltips = {
         description = "",
     },
     map_select_supportedplayers = {
-        title = "<LOC OPTIONS_0145>Max. Players",
+        title = "<LOC MAPSEL_0009>Supported Players",
         description = "<LOC OPTIONS_0146>Sort by the maximum number of Players allowed",
     },
     options_vsync = {
@@ -730,6 +779,10 @@ Tooltips = {
     options_selectedlanguage = {
         title = "<LOC OPTIONS_0007>Language selection",
         description = "<LOC OPTIONS_0008>Select original or custom languages. Also changes voices if available. (needs game restart)",
+    },
+    options_ui_scale = {
+        title = "<LOC OPTIONS_0283>UI Scale",
+        description = "<LOC OPTIONS_0284>Changes the size of all UI elements. (requires game restart)",
     },
     options_subtitles = {
         title = "<LOC OPTIONS_0151>Display Subtitles",
@@ -783,6 +836,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0184>Bloom Render",
         description = "<LOC OPTIONS_0185>Toggles a glow type effect that is used on many weapon effects and some UI elements (off = fastest)",
     },
+    options_experimental_graphics = {
+        title = "<LOC OPTIONS_EXP_GRAPHICS_01>Experimental graphics",
+        description = "<LOC OPTIONS_EXP_GRAPHICS_02>Requires fidelity set to 'High'. \r\n\r\nIntroduces experimental graphics that high-end hardware should be able to support. \r\n\r\nThis feature may be unstable - use at your own risk.",
+    },
     options_use_mydocuments = {
         title = "<LOC OPTIONS_0186>Save Games and Replays in My Documents",
         description = "<LOC OPTIONS_0187>When on, changes the location where save games and replays get stored (My Documents\\My Games\\Supreme Commander Forged Alliance\\). Note that you will only see save games and replays in the active directory. Also, files saved to the alternate location will not be removed when the game is uninstalled.",
@@ -795,9 +852,13 @@ Tooltips = {
         title = "<LOC OPTIONS_0212>Accept Build Templates",
         description = "<LOC OPTIONS_0217>Allows other players to send you build templates over the network",
     },
-    options_assist_mex = {
-        title = "<LOC OPTIONS_0273>Assist Mex to Build Mass Storages",
-        description = "<LOC OPTIONS_0274>Assist a T2 or T3 massextractor with engineer(s) to build surrounding mass storages. If mex currently is upgrading, you need to shift-right click twice on the mex to build mass storages.",
+    options_structure_capping_feature_01 = {
+        title = "<LOC OPTIONS_0273>Automated Structure Ringing",
+        description = "<LOC OPTIONS_0274>Assist a structure to cap it with adjacency-friendly structures. As an example: storages surrounding a tech 2 or tech 3 mass extractor.",
+    },
+    options_automex = {
+        title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
+        description = "<LOC OPTIONS_0286>After selecting an engineer, hover the mouse over a mass extractor spot to autopreselect a mass extractor for building",
     },
     options_show_attached_unit_lifebars = {
         title = "<LOC OPTIONS_0222>Show Lifebars of Attached Units",
@@ -818,10 +879,6 @@ Tooltips = {
     options_hotbuild_cycle_reset_time = {
         title = "<LOC OPTIONS_0251>Cycle reset time",
         description = "<LOC OPTIONS_0252>Time in milliseconds until hotbuild cycle will reset",
-    },
-    options_advanced_statistics = {
-        title = "<LOC OPTIONS_0213>Advanced Statistics",
-        description = "<LOC OPTIONS_0221>If enabled, you will have advanced statistics of your game in the score screen.",
     },
     options_maximum_reclaim_count = {
         title = "<LOC OPTIONS_0275>Maximum Reclaim Label Count",
@@ -849,6 +906,10 @@ Tooltips = {
     Lobby_Mod_Option = {
         title = "<LOC tooltipui0668>Mods Enabled",
         description = "<LOC tooltipui0669>The host has enabled mods. Be sure to check the mod manager.",
+    },
+    Lobby_patchnotes = {
+        title = "<LOC tooltipui2000>Patchnotes",
+        description = "<LOC tooltipui2001>Access to all previous patch notes made by and for the community",
     },
     Lobby_Load = {
         title = "<LOC tooltipui0171>Load",
@@ -904,34 +965,6 @@ Tooltips = {
     },
     lob_random = {
         title = '<LOC lobui_0090>',
-        description = '',
-    },
-    lob_team_none = {
-        title = '<LOC tooltipui0631>No Team',
-        description = '',
-    },
-    lob_team_one = {
-        title = '<LOC tooltipui0632>Team 1',
-        description = '',
-    },
-    lob_team_two = {
-        title = '<LOC tooltipui0633>Team 2',
-        description = '',
-    },
-    lob_team_three = {
-        title = '<LOC tooltipui0634>Team 3',
-        description = '',
-    },
-    lob_team_four = {
-        title = '<LOC tooltipui0635>Team 4',
-        description = '',
-    },
-    lob_team_five = {
-        title = '<LOC lobui_0746>Team 5',
-        description = '',
-    },
-    lob_team_six = {
-        title = '<LOC lobui_0747>Team 6',
         description = '',
     },
     ['Give Units'] = {
@@ -995,28 +1028,12 @@ Tooltips = {
         description='<LOC lobui_0775>Closes all empty open slots. If all empty slots are already closed, then it opens them. Right-click for close - spawn mex. Hold Ctrl to reset.'
     },
     map_type = {
-        title = "<LOC lobui_0583>Map Type",
+        title = "<LOC MAPSEL_0032>Map Type",
         description = "<LOC lobui_0584>Sort by official or custom maps",
     },
     lob_disable_allmods = {
         title = "<LOC lobui_0600>Disable All Mods",
         description = "<LOC lobui_0601>Click to disable all the mods at once",
-    },
-    lob_UnitCap_125 = {
-        title = "<LOC lobui_0719>125",
-        description = "<LOC lobui_0720>125 units per player may be in play",
-    },
-    lob_UnitCap_375 = {
-        title = "<LOC lobui_0721>375",
-        description = "<LOC lobui_0722>375 units per player may be in play",
-    },
-    lob_UnitCap_625 = {
-        title = "<LOC lobui_0723>625",
-        description = "<LOC lobui_0724>625 units per player may be in play",
-    },
-    lob_UnitCap_875 = {
-        title = "<LOC lobui_0725>875",
-        description = "<LOC lobui_0726>875 units per player may be in play",
     },
     lob_click_LargeMapPreview = {
         title = "<LOC lobui_0618>Large Preview",
@@ -1365,18 +1382,6 @@ Tooltips = {
         title = "<LOC tooltipui0219>Score",
         description = "<LOC tooltipui0220>Sort by Overall Performance",
     },
-    PostScore_kills = {
-        title = "<LOC tooltipui0221>Kills",
-        description = "<LOC tooltipui0222>Sort by Units Destroyed",
-    },
-    PostScore_built = {
-        title = "<LOC tooltipui0223>Built",
-        description = "<LOC tooltipui0224>Sort by Structures Built",
-    },
-    PostScore_lost = {
-        title = "<LOC tooltipui0225>Losses",
-        description = "<LOC tooltipui0226>Sort by Units Lost",
-    },
     PostScore_cdr = {
         title = "<LOC tooltipui0231>Command Units",
         description = "<LOC tooltipui0232>Sort by Command Units",
@@ -1589,6 +1594,42 @@ Tooltips = {
     dip_offer_draw = {
         title = "<LOC tooltipui0463>Propose Draw",
         description = "<LOC tooltipui0464>Propose ending the game in a draw.  All players must click this to accept.",
+    },
+    dip_recall_request = {
+        title = "<LOC tooltipui0722>Activate Recall Beacon",
+        description = "<LOC tooltipui0723>Signal to your allies that you are ready to recall from battle.",
+    },
+    dip_recall_request_dis_active = {
+        title = "<LOC tooltipui0724>Recall Beacon Active",
+        description = "<LOC tooltipui0725>Your team has been notified of your request to recall from battle.",
+    },
+    dip_recall_request_dis_scenario = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0727>You cannot recall from battle in this scenario.",
+    },
+    dip_recall_request_dis_gate = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0728>You cannot recall from battle within 5 minutes of gating in.",
+    },
+    dip_recall_request_dis_ai = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0729>There are AI armies on your team that will not recall.",
+    },
+    dip_recall_request_dis_request = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0730>You have sent a recall request too recently.",
+    },
+    dip_recall_request_dis_vote = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0731>Your team has had a recall vote too recently.",
+    },
+    dip_recall_request_accept = {
+        title = "<LOC tooltipui0732>Accept Recall Request",
+        description = "<LOC tooltipui0733>Accept the request for your team to recall from battle.",
+    },
+    dip_recall_request_veto = {
+        title = "<LOC tooltipui0734>Veto Recall Request",
+        description = "<LOC tooltipui0735>Veto the request for your team to recall from battle.",
     },
     dip_give_units = {
         title = "<LOC tooltipui0465>Give Units",
@@ -2060,10 +2101,6 @@ Tooltips = {
     -- **********************
     -- ** Misc
     -- **********************
-    minimap_reset = {
-        title = "<LOC tooltipui0625>Reset Minimap",
-        description = "<LOC tooltipui0626>Sets the minimap to its default position and size",
-    },
     no_rush_clock = {
         title = "<LOC tooltipui0627>No Rush Clock",
         description = "<LOC tooltipui0628>Displays time remaining in the no rush clock",
@@ -2071,6 +2108,9 @@ Tooltips = {
     save_template = {
         title = "<LOC tooltipui0629>Save Template",
         description = "<LOC tooltipui0630>Creates construction template by saving units/structures and their position",
+    },
+    minimap_mesh = {
+        description = "<LOC tooltipui0720>Disables the rendering of meshes of units and props on the minimap to reduce the burden on the rendering thread. Can potentially improve your framerate.",
     },
 
     -- **********************
@@ -2089,12 +2129,16 @@ Tooltips = {
         title = '<LOC OPTIONS_0231>Draggable Build Queue',
         description = '<LOC OPTIONS_0258>Allows factory build queues to be reordered with drag and drop.',
     },
+    options_gui_queue_on_hover_02 = {
+        title = '<LOC OPTIONS_0246>Show Factory Queue on Hover',
+        description = '<LOC OPTIONS_0249>Shows Factory queue above unit description when hover over unit with mouse.',
+    },
     options_gui_idle_engineer_avatars = {
         title = '<LOC OPTIONS_0232>Middle Click Avatars',
         description = '<LOC OPTIONS_0259>Allows middle clicking idle engineer avatars to select all idle engineers on screen.',
     },
     options_gui_all_race_templates = {
-        title = '<LOC OPTIONS_0233>All Race Templates',
+        title = '<LOC OPTIONS_0233>All Faction Templates',
         description = '<LOC OPTIONS_0260>Allows build templates to be used across all 4 factions.',
     },
     options_gui_enhanced_unitview = {
@@ -2110,7 +2154,7 @@ Tooltips = {
         description = '<LOC OPTIONS_0263>Allows creation of factory build queue templates.',
     },
     options_gui_seperate_idle_builders = {
-        title = '<LOC OPTIONS_0238>Seperate Idle Builders',
+        title = '<LOC OPTIONS_0238>Separate Idle Builders',
         description = '<LOC OPTIONS_0264>Use a seperate icon for idle Engineers and other builders.',
     },
     options_gui_visible_template_names = {
@@ -2126,11 +2170,11 @@ Tooltips = {
         description = '<LOC OPTIONS_0267>Displays Shield Hp, Regen rate, Hp Regen rate and Build rate. Adapted from Total Veterancy by Eni.',
     },
     options_gui_render_custom_names = {
-        title = '<LOC OPTIONS_0242>Always Render Custom Names',
+        title = '<LOC OPTIONS_0242>Always Show Custom Names',
         description = '<LOC OPTIONS_0268>Toggle display of custom names. Enabled by default.',
     },
     options_gui_render_enemy_lifebars = {
-        title = '<LOC OPTIONS_0243>Force Render Enemy Lifebars',
+        title = '<LOC OPTIONS_0243>Always Show Enemy Lifebars',
         description = '<LOC OPTIONS_0269>Force rendering enemy lifebars. Disabled by default',
     },
     options_gui_render_armament_detail = {
@@ -2145,4 +2189,12 @@ Tooltips = {
         title = '<LOC OPTIONS_0236>Zoom Pop Distance',
         description = '<LOC OPTIONS_0272>Adjusts distance to which Zoom Pop zooms to.',
     },
+    options_reclaim_overview_size_scale = {
+        title = '<LOC OPTIONS_RECLAIMSIZE>Reclaim label scaling factor',
+        description = '<LOC OPTIONS_RECLAIMSIZEDESC>Scales the text of the reclaim label to its value',
+    },
+    options_reclaim_overview_batching = {
+        title = '<LOC OPTIONS_RECLAIMBATCHING>Reclaim batching>',
+        description = '<LOC OPTIONS_RECLAIMBATCHINGDESC>Batches nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more. \r\n\r\nSignificantly improves performance. Is recommended for lower end systems.',
+    }
 }

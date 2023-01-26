@@ -1,15 +1,14 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 100,
-        GuardScanRadius = 80,
     },
     Air = {
         AutoLandTime = 1,
         BankFactor = 2,
         BankForward = false,
-        BreakOffDistance = 1.5,
+        BreakOffDistance = 5,
         BreakOffIfNearNewTarget = true,
-        BreakOffTrigger = 10,
+        BreakOffTrigger = 15,
         CanFly = true,
         CombatTurnSpeed = 1.5,
         EngageDistance = 50,
@@ -82,15 +81,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 15,
     Categories = {
         'PRODUCTFA',
@@ -109,13 +99,14 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'BOMBER',
         'SHOWATTACKRETICLE',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 6,
         ArmorType = 'Light',
         EconomyThreatLevel = 0,
-        Health = 1175,
-        MaxHealth = 1175,
+        Health = 1000,
+        MaxHealth = 1000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 4,
@@ -283,6 +274,11 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.4, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'XSA_Weapon',
@@ -306,7 +302,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 3,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             NeedPrep = true,
             ProjectileId = '/projectiles/SAAShleoAAGatlingGun03/SAAShleoAAGatlingGun03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
@@ -330,18 +326,15 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.6,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
-            TrackingRadius = 1.25,
             TargetRestrictOnlyAllow = 'AIR',
             TurretBoneMuzzle = 'Turret_Muzzle_Left',
             TurretBonePitch = 'Turret_Muzzle_Left',
@@ -357,6 +350,11 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.4, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'XSA_Weapon',
@@ -380,7 +378,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 3,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             NeedPrep = true,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/SAAShleoAAGatlingGun03/SAAShleoAAGatlingGun03_proj.bp',
@@ -405,18 +403,10 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.6,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
-                'AIR MOBILE TECH3 BOMBER',
-                'AIR MOBILE BOMBER',
-                'AIR MOBILE GROUNDATTACK',
-                'AIR MOBILE TRANSPORTATION',
-                'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
-            TrackingRadius = 1.25,
             TargetRestrictOnlyAllow = 'AIR',
             TurretBoneMuzzle = 'Turret_Muzzle_Right',
             TurretBonePitch = 'Turret_Muzzle_Right',
@@ -456,9 +446,9 @@ UnitBlueprint {
             },
             FiringRandomness = 0,
             FiringTolerance = 6,
-            FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true, -- [152]
             Label = 'Bomb',
-            MaxRadius = 60, # 45
+            MaxRadius = 60, -- 45
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 0,
@@ -484,13 +474,11 @@ UnitBlueprint {
             RateOfFire = 0.1,
             SkipReadyState = true,
             StopOnPrimaryWeaponBusy = true,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.25,
             TurretDualManipulators = false,
             TurretPitch = -90,
             TurretPitchRange = 20,
@@ -503,7 +491,7 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 25,
+            Damage = 200,
             DamageFriendly = true,
             DamageRadius = 1,
             DamageType = 'Normal',

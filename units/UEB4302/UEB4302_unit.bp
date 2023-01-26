@@ -135,6 +135,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC ueb4302_name>Nuke Eliminator',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
@@ -179,7 +180,6 @@ UnitBlueprint {
     StrategicIconSortPriority = 195,
     Weapon = {
         {
-            AlwaysRecheckTarget = false,
             Audio = {
                 Fire = Sound {
                     Bank = 'UELWeapon',
@@ -190,7 +190,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             CountedProjectile = true,
-            Damage = 30,
+            Damage = 30000,
             DamageType = 'Normal',
             DisplayName = 'AntiNuke',
             FireTargetLayerCapsTable = {
@@ -225,11 +225,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.6,
-            TargetCheckInterval = 0.1,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'STRATEGIC MISSILE',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 2,
             TurretDualManipulators = false,
             Turreted = false,
             WeaponCategory = 'Defense',

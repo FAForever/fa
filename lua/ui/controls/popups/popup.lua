@@ -1,12 +1,13 @@
-local Group = import('/lua/maui/group.lua').Group
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
+local Group = import("/lua/maui/group.lua").Group
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
 --- Base class for popups. A popup appears on top of other UI content, darkens the content behind it,
 -- and draws a standard background behind its content. You'll probably want to extend it to do
 -- something more involved, or use it as-is if you want to manually assemble your popup UI Group.
+---@class Popup : Group
 Popup = Class(Group) {
     --- Create a new popup
     --
@@ -31,30 +32,25 @@ Popup = Class(Group) {
 
         local background = UIUtil.CreateNinePatchStd(self, '/scx_menu/lan-game-lobby/dialog/background/')
 
-        background.Left:Set(function() return content.Left() + 64 end)
-        background.Right:Set(function() return content.Right() - 64 end)
-        background.Top:Set(function() return content.Top() + 64 end)
-        background.Bottom:Set(function() return content.Bottom() - 64 end)
+        LayoutHelpers.FillParentFixedBorder(background, content, 64)
 
         LayoutHelpers.DepthUnderParent(background, content)
 
         -- Plant the dialog in the middle of the screen.
         LayoutHelpers.AtCenterIn(self, GUI)
 
-        -- Closure copy.
-        local this = self
-
+        
         -- Dismiss dialog when shadow is clicked.
         shadow.HandleEvent = function(shadow, event)
             if event.Type == 'ButtonPress' then
-                this:OnShadowClicked()
+                self:OnShadowClicked()
             end
         end
 
         ---- Close when the escape key is pressed.
         EscapeHandler.PushEscapeHandler(function()
             EscapeHandler.PopEscapeHandler()
-            this:OnEscapePressed()
+            self:OnEscapePressed()
         end)
     end,
 

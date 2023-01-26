@@ -6,23 +6,23 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Group = import('/lua/maui/group.lua').Group
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local ToolTip = import('/lua/ui/game/tooltip.lua')
-local TooltipInfo = import('/lua/ui/help/tooltips.lua').Tooltips
-local Prefs = import('/lua/user/prefs.lua')
-local Factions = import('/lua/factions.lua').Factions
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local Group = import("/lua/maui/group.lua").Group
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local ToolTip = import("/lua/ui/game/tooltip.lua")
+local TooltipInfo = import("/lua/ui/help/tooltips.lua").Tooltips
+local Prefs = import("/lua/user/prefs.lua")
+local Factions = import("/lua/factions.lua").Factions
 local options = Prefs.GetFromCurrentProfile('options')
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
 
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
 controls.avatars = controls.avatars or {}
 
 local recievingBeatUpdate = false
@@ -74,8 +74,8 @@ function ToggleAvatars(checked)
     -- disable when in Screen Capture mode
     if GameMain.gameUIHidden then
        return
-    end	
-	
+    end
+
     if UIUtil.GetAnimationPrefs() then
         if controls.avatarGroup:IsHidden() then
             PlaySound(Sound({Cue = "UI_Score_Window_Open", Bank = "Interface"}))
@@ -136,34 +136,32 @@ function CreateAvatar(unit)
     else
         bg.icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
     end
-    bg.icon.Height:Set(44)
-    bg.icon.Width:Set(44)
+    LayoutHelpers.SetDimensions(bg.icon, 44, 44)
     bg.icon:DisableHitTest()
 
     bg.healthbar = StatusBar(bg, 0, 1, false, false,
         UIUtil.SkinnableFile('/game/avatar/health-bar-back_bmp.dds'),
-        UIUtil.SkinnableFile('/game/avatar/health-bar-green.dds'),		
+        UIUtil.SkinnableFile('/game/avatar/health-bar-green.dds'),
         true, "avatar RO Health Status Bar")
-		
+
     bg.shieldbar = StatusBar(bg, 0, 1, false, false,
         UIUtil.SkinnableFile('/game/avatar/health-bar-back_bmp.dds'),
         UIUtil.SkinnableFile('/game/avatar/shield-bar-blue.dds'),
         true, "avatar RO Shield Status Bar")
-	
 
-    bg.healthbar.Left:Set(function() return bg.Left() + 8 end)
-    bg.healthbar.Right:Set(function() return bg.Right() - 14 end)
-    bg.healthbar.Bottom:Set(function() return bg.Bottom() - 5 end)
-    bg.healthbar.Top:Set(function() return bg.healthbar.Bottom() - 10 end)
+
+    LayoutHelpers.AtLeftIn(bg.healthbar, bg, 8)
+    LayoutHelpers.AtRightBottomIn(bg.healthbar, bg, 14, 5)
+    LayoutHelpers.AnchorToBottom(bg.healthbar, bg.healthbar, -10)
     bg.healthbar.Height:Set(function() return bg.healthbar.Bottom() - bg.healthbar.Top() end)
     bg.healthbar.Width:Set(function() return bg.healthbar.Right() - bg.healthbar.Left() end)
     bg.healthbar:DisableHitTest(true)
-	
+
     LayoutHelpers.CenteredBelow(bg.shieldbar, bg.healthbar, -5)
     bg.shieldbar.Height:Set(function() return bg.healthbar.Bottom() - bg.healthbar.Top() end)
     bg.shieldbar.Width:Set(function() return  bg.healthbar.Right() - bg.healthbar.Left() end)
     bg.shieldbar:DisableHitTest(true)
-	
+
     bg.curIndex = 1
     bg.HandleEvent = ClickFunc
     bg.idleAnnounced = true
@@ -208,15 +206,15 @@ function CreateAvatar(unit)
         bg.healthbar:SetRange(0, self.units[1]:GetMaxHealth())
         bg.healthbar:SetValue(tempHealth)
         bg.shieldbar:SetValue(shieldRatio)
-		
+
         if not GameMain.gameUIHidden then
-           if shieldRatio > 0 and self.units[1]:IsInCategory('COMMAND') then          
+           if shieldRatio > 0 and self.units[1]:IsInCategory('COMMAND') then
               bg.shieldbar:Show()
            else
               bg.shieldbar:Hide()
            end
         end
-		
+
         if tempPrevHealth ~= tempHealth then
             SetHealthbarColor(bg.healthbar, self.units[1]:GetHealth() / self.units[1]:GetMaxHealth())
         end
@@ -246,8 +244,7 @@ function CreateIdleTab(unitData, id, expandFunc)
     bg.icon = Bitmap(bg)
     LayoutHelpers.AtLeftTopIn(bg.icon, bg, 7, 8)
     bg.icon:SetSolidColor('00000000')
-    bg.icon.Height:Set(34)
-    bg.icon.Width:Set(34)
+    LayoutHelpers.SetDimensions(bg.icon, 34, 34)
     bg.icon:DisableHitTest()
 
     bg.count = UIUtil.CreateText(bg.icon, '', 18, UIUtil.bodyFont)
@@ -263,7 +260,7 @@ function CreateIdleTab(unitData, id, expandFunc)
         UIUtil.SkinnableFile('/game/avatar-arrow_btn/tab-close_btn_over.dds'),
         UIUtil.SkinnableFile('/game/avatar-arrow_btn/tab-open_btn_dis.dds'),
         UIUtil.SkinnableFile('/game/avatar-arrow_btn/tab-close_btn_dis.dds'))
-    bg.expandCheck.Right:Set(function() return bg.Left() + 4 end)
+    LayoutHelpers.AnchorToLeft(bg.expandCheck, bg, -4)
     LayoutHelpers.AtVerticalCenterIn(bg.expandCheck, bg)
     bg.expandCheck.OnCheck = function(self, checked)
         if checked then
@@ -298,7 +295,7 @@ function CreateIdleTab(unitData, id, expandFunc)
             local i = table.getn(sortedUnits)
             local needIcon = true
             while i > 0 do
-                if table.getn(sortedUnits[i]) > 0 then
+                if not table.empty(sortedUnits[i]) then
                     if needIcon then
                         -- Idle engineer icons
                         if Factions[currentFaction].IdleEngTextures[keyToIcon[i]] and UIUtil.UIFile(Factions[currentFaction].IdleEngTextures[keyToIcon[i]],true) then
@@ -328,7 +325,7 @@ function CreateIdleTab(unitData, id, expandFunc)
             local needIcon = true
             while i > 0 do
                 for curCat = 1, 3 do
-                    if table.getn(sortedFactories[curCat][i]) > 0 then
+                    if not table.empty(sortedFactories[curCat][i]) then
                         if needIcon then
                             -- Idle factory icons
                             if UIUtil.UIFile(Factions[currentFaction].IdleFactoryTextures[categoryTable[curCat]][i],true) then
@@ -347,7 +344,7 @@ function CreateIdleTab(unitData, id, expandFunc)
             end
            if needIcon == true then
                local ExpFactories = EntityCategoryFilterDown(categories.EXPERIMENTAL, self.allunits)
-               if table.getn(ExpFactories) > 0 then
+               if not table.empty(ExpFactories) then
                    local FactoryUnitId = ExpFactories[1]:GetUnitId()
                    if UIUtil.UIFile('/icons/units/' .. FactoryUnitId .. '_icon.dds', true) then
                        self.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. FactoryUnitId .. '_icon.dds', true))
@@ -509,7 +506,7 @@ function CreateIdleEngineerList(parent, units)
     local bgStretch = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/panel-eng_bmp_m.dds'))
 
     group.Width:Set(bgTop.Width)
-    group.Height:Set(1)
+    LayoutHelpers.SetHeight(group, 1)
 
     bgTop.Bottom:Set(group.Top)
     bgBottom.Top:Set(group.Bottom)
@@ -521,7 +518,7 @@ function CreateIdleEngineerList(parent, units)
     LayoutHelpers.AtHorizontalCenterIn(bgStretch, group)
 
     group.connector = Bitmap(group, UIUtil.SkinnableFile('/game/avatar-engineers-panel/bracket_bmp.dds'))
-    group.connector.Right:Set(function() return parent.Left() + 8 end)
+    LayoutHelpers.AnchorToLeft(group.connector, parent, -8)
     LayoutHelpers.AtVerticalCenterIn(group.connector, parent)
 
     LayoutHelpers.LeftOf(group, parent, 10)
@@ -542,14 +539,13 @@ function CreateIdleEngineerList(parent, units)
             else
                 entry.icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
-            entry.icon.Height:Set(34)
-            entry.icon.Width:Set(34)
+            LayoutHelpers.SetDimensions(entry.icon, 34, 34)
             LayoutHelpers.AtRightIn(entry.icon, entry, 22)
             LayoutHelpers.AtVerticalCenterIn(entry.icon, entry)
 
             entry.iconBG = Bitmap(entry, UIUtil.SkinnableFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
             LayoutHelpers.AtCenterIn(entry.iconBG, entry.icon)
-            entry.iconBG.Depth:Set(function() return entry.icon.Depth() - 1 end)
+            LayoutHelpers.DepthUnderParent(entry.iconBG, entry.icon)
 
             entry.techIcon = Bitmap(entry, UIUtil.SkinnableFile('/game/avatar-engineers-panel/tech-'..techLevel..'_bmp.dds'))
             LayoutHelpers.AtLeftIn(entry.techIcon, entry)
@@ -563,13 +559,11 @@ function CreateIdleEngineerList(parent, units)
 
             entry.countBG = Bitmap(entry)
             entry.countBG:SetSolidColor('77000000')
-            entry.countBG.Top:Set(function() return entry.count.Top() - 1 end)
-            entry.countBG.Left:Set(function() return entry.count.Left() - 1 end)
-            entry.countBG.Right:Set(function() return entry.count.Right() + 1 end)
-            entry.countBG.Bottom:Set(function() return entry.count.Bottom() + 1 end)
+            LayoutHelpers.AtLeftTopIn(entry.countBG, entry.count, -1, -1)
+            LayoutHelpers.AtRightBottomIn(entry.countBG, entry.count, -1, -1)
 
-            entry.countBG.Depth:Set(function() return entry.Depth() + 1 end)
-            entry.count.Depth:Set(function() return entry.countBG.Depth() + 1 end)
+            LayoutHelpers.DepthOverParent(entry.countBG, entry)
+            LayoutHelpers.DepthOverParent(entry.count, entry.countBG)
 
             entry.Height:Set(function() return entry.iconBG.Height() end)
             entry.Width:Set(self.Width)
@@ -605,7 +599,7 @@ function CreateIdleEngineerList(parent, units)
                 self.icons[i] = CreateUnitEntry(indexToIcon[i], units, Factions[currentFaction].IdleEngTextures[keyToIcon[index]])
                 self.icons[i].priority = i
             end
-            if table.getn(units) > 0 and not self.icons[i]:IsHidden() then
+            if not table.empty(units) and not self.icons[i]:IsHidden() then
                 self.icons[i].units = units
                 self.icons[i].count:SetText(table.getn(units))
                 self.icons[i].count:Show()
@@ -643,12 +637,12 @@ end
 function CreateIdleFactoryList(parent, units)
     local bg = Bitmap(parent, UIUtil.SkinnableFile('/game/avatar-factory-panel/factory-panel_bmp.dds'))
 
-    bg.Right:Set(function() return parent.Left() - 9 end)
+    LayoutHelpers.AnchorToLeft(bg, parent, 9)
     bg.Top:Set(function() return math.max(controls.avatarGroup.Top()+10, (parent.Top() + (parent.Height() / 2)) - (bg.Height() / 2)) end)
 
     local connector = Bitmap(bg, UIUtil.SkinnableFile('/game/avatar-factory-panel/bracket_bmp.dds'))
     LayoutHelpers.AtVerticalCenterIn(connector, parent)
-    connector.Right:Set(function() return parent.Left() + 7 end)
+    LayoutHelpers.AnchorToLeft(connector, parent, -7)
 
     bg:DisableHitTest(true)
 
@@ -668,8 +662,7 @@ function CreateIdleFactoryList(parent, units)
             else
                 icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
             end
-            icon.Height:Set(40)
-            icon.Width:Set(40)
+            LayoutHelpers.SetDimensions(icon, 40, 40)
 
             icon.count = UIUtil.CreateText(icon, '', 20, UIUtil.bodyFont)
             icon.count:SetColor('ffffffff')
@@ -678,10 +671,8 @@ function CreateIdleFactoryList(parent, units)
 
             icon.countBG = Bitmap(icon)
             icon.countBG:SetSolidColor('77000000')
-            icon.countBG.Top:Set(function() return icon.count.Top() - 1 end)
-            icon.countBG.Left:Set(function() return icon.count.Left() - 1 end)
-            icon.countBG.Right:Set(function() return icon.count.Right() + 1 end)
-            icon.countBG.Bottom:Set(function() return icon.count.Bottom() + 1 end)
+            LayoutHelpers.AtLeftTopIn(icon.countBG, icon.count, -1, -1)
+            LayoutHelpers.AtRightBottomIn(icon.countBG, icon.count, -1, -1)
 
             icon.countBG.Depth:Set(function() return icon.Depth() + 1 end)
             icon.count.Depth:Set(function() return icon.countBG.Depth() + 1 end)
@@ -720,7 +711,7 @@ function CreateIdleFactoryList(parent, units)
         for type, icons in bg.icons do
             for index=1,3 do
                 local i = index
-                if table.getn(factories[type][i]) > 0 then
+                if not table.empty(factories[type][i]) then
                     bg.icons[type][i].units = factories[type][i]
                     bg.icons[type][i]:SetAlpha(1)
                     bg.icons[type][i].countBG:Show()
@@ -740,7 +731,7 @@ function CreateIdleFactoryList(parent, units)
 end
 
 function AvatarUpdate()
-    if import('/lua/ui/game/gamemain.lua').IsNISMode() then
+    if import("/lua/ui/game/gamemain.lua").IsNISMode() then
         return
     end
     local avatars = GetArmyAvatars()
@@ -799,7 +790,7 @@ function AvatarUpdate()
         end
     end
 
-    if factories and table.getn(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE - categories.ORBITALSYSTEM, factories)) > 0 then
+    if factories and not table.empty(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE - categories.ORBITALSYSTEM, factories)) then
         if controls.idleFactories then
             controls.idleFactories:Update(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE, factories))
         else

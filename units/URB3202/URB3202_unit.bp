@@ -29,7 +29,6 @@ UnitBlueprint {
         'BUILTBYTIER3ENGINEER',
         'BUILTBYTIER2COMMANDER',
         'BUILTBYTIER3COMMANDER',
-        'DRAGBUILD',
         'SIZE4',
         'VISIBLETORECON',
         'RECLAIMABLE',
@@ -89,7 +88,7 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 3600,
-        BuildCostMass = 150,#120
+        BuildCostMass = 150,--120
         BuildRate = 15,
         BuildTime = 845,
         BuildableCategory = {
@@ -175,7 +174,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.88,
     SizeX = 0.5,
-    SizeY = 0.5,
+    SizeY = 0.6,
     SizeZ = 0.5,
     StrategicIconName = 'icon_structure2_intel',
     StrategicIconSortPriority = 230,
@@ -188,9 +187,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = false,
-            Seabed = true, #from false
-            Sub = true, #from false,
-            Water = true, #from false,
+            Seabed = true, --from false
+            Sub = true, --from false,
+            Water = true, --from false,
         },
     },
 }

@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 30, -- allow mobile shield to keep a distance when on attack move
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UEL',
@@ -36,15 +39,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 110,
     Categories = {
         'PRODUCTSC1',
@@ -61,6 +55,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYDEFENSE',
         'DUMMYGSRWEAPON',
+        'DIESTOOCDEPLETINGSHIELD',
     },
     CollisionOffsetZ = 0.05,
     Defense = {
@@ -77,7 +72,7 @@ UnitBlueprint {
             MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 3500,
+            ShieldMaxHealth = 3000,
             ShieldRechargeTime = 24,
             ShieldRegenRate = 55,
             ShieldRegenStartTime = 3,
@@ -149,7 +144,7 @@ UnitBlueprint {
         BuildCostEnergy = 900,
         BuildCostMass = 220,
         BuildTime = 660,
-        MaintenanceConsumptionPerSecondEnergy = 60,
+        MaintenanceConsumptionPerSecondEnergy = 80,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -185,6 +180,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC uel0307_name>Parashield',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
@@ -206,9 +202,9 @@ UnitBlueprint {
             LAYER_Water = false,
         },
         DragCoefficient = 0.2,
-        MaxAcceleration = 4,
-        MaxBrake = 4,
-        MaxSpeed = 4,
+        MaxAcceleration = 3.5,
+        MaxBrake = 3.5,
+        MaxSpeed = 3.5,
         MaxSpeedReverse = 0,
         MaxSteerForce = 10,
         MeshExtentsX = 0.75,
@@ -242,7 +238,7 @@ UnitBlueprint {
                 Land = 'Land|Water',
                 Water = 'Land|Water',
             },
-            MaxRadius = 33,
+            MaxRadius = 28,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -252,12 +248,10 @@ UnitBlueprint {
                 },
             },
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.2,
             Turreted = false,
             SlavedToBody = false,
         },

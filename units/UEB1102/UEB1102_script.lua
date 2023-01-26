@@ -5,11 +5,12 @@
 --
 --  Summary  :  UEF Hydrocarbon Power Plant Script
 --
---  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
-local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
+local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
+---@class UEB1102 : TEnergyCreationUnit
 UEB1102 = Class(TEnergyCreationUnit) {
     DestructionPartsHighToss = {'Exhaust01',},
     DestructionPartsLowToss = {'Exhaust01','Exhaust02','Exhaust03','Exhaust04','Exhaust05',},
@@ -27,7 +28,7 @@ UEB1102 = Class(TEnergyCreationUnit) {
 
     ActiveState = State {
         Main = function(self)
-            # Play the "activate" sound
+            -- Play the "activate" sound
             local myBlueprint = self:GetBlueprint()
             if myBlueprint.Audio.Activate then
                 self:PlaySound(myBlueprint.Audio.Activate)
@@ -35,17 +36,17 @@ UEB1102 = Class(TEnergyCreationUnit) {
             local effects = {}
             local bones = {}
             local scale = 1
-            if self:GetCurrentLayer() == 'Land' then
+            if self.Layer == 'Land' then
                 effects = self.AirEffects
                 bones = self.AirEffectsBones
-            elseif self:GetCurrentLayer() == 'Seabed' then
+            elseif self.Layer == 'Seabed' then
                 effects = self.WaterEffects
                 bones = self.WaterEffectsBones
                 scale = 3
             end
             for keys,values in effects do
                 for keysbones,valuesbones in bones do
-                    table.insert(self.EffectsBag, CreateAttachedEmitter(self,valuesbones,self:GetArmy(), values):ScaleEmitter(scale):OffsetEmitter(0,-.1,0))
+                    table.insert(self.EffectsBag, CreateAttachedEmitter(self,valuesbones,self.Army, values):ScaleEmitter(scale):OffsetEmitter(0,-.1,0))
                 end
             end
         end,

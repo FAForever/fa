@@ -8,10 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local TAirToAirLinkedRailgun = import('/lua/terranweapons.lua').TAirToAirLinkedRailgun
-local TIFCarpetBombWeapon = import('/lua/terranweapons.lua').TIFCarpetBombWeapon
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local TAirToAirLinkedRailgun = import("/lua/terranweapons.lua").TAirToAirLinkedRailgun
+local TIFCarpetBombWeapon = import("/lua/terranweapons.lua").TIFCarpetBombWeapon
 
+---@class DEA0202 : TAirUnit
 DEA0202 = Class(TAirUnit) {
     Weapons = {
         RightBeam = Class(TAirToAirLinkedRailgun) {},
@@ -107,7 +108,6 @@ DEA0202 = Class(TAirUnit) {
         local airTargetRight
         local airTargetLeft
         while self and not self.Dead do
-            WaitSeconds(1)
             local airTargetWeapon = self:GetWeaponByLabel('RightBeam')
             if airTargetWeapon then     
                 airTargetRight = airTargetWeapon:GetCurrentTarget()
@@ -124,6 +124,8 @@ DEA0202 = Class(TAirUnit) {
             else
                 self:RotateWings(nil)
             end
+            
+            WaitSeconds(1)
         end
     end,
 }

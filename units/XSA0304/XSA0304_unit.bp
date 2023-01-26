@@ -1,7 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
     },
     Air = {
         AutoLandTime = 1,
@@ -82,15 +81,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTFA',
@@ -107,6 +97,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYRADAR',
         'STRATEGICBOMBER',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 1.5,
@@ -199,7 +190,7 @@ UnitBlueprint {
         UniformScale = 0.08,
     },
     Economy = {
-        BuildCostEnergy = 144000,#105000
+        BuildCostEnergy = 144000,--105000
         BuildCostMass = 2100,
         BuildTime = 9600,
     },
@@ -251,7 +242,7 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = false,
         },
-        Elevation = 20,
+        Elevation = 14,
         FuelRechargeRate = 15,
         FuelUseTime = 1500,
         GroundCollisionOffset = 2,
@@ -281,6 +272,13 @@ UnitBlueprint {
         Level4 = 48,
         Level5 = 60,
     },
+    VeteranMass = {
+        4200,
+        4200,
+        4200,
+        4200,
+        4200,
+    },
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
@@ -295,9 +293,9 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 3.5,
             CollideFriendly = false,
-            Damage = 3250,
+            Damage = 3000,
             DamageFriendly = true,
-            DamageRadius = 5,
+            DamageRadius = 6,
             DamageType = 'Normal',
             Display = 'Zhanasee Strategic Bomb',
             DisplayName = 'Zhanasee Strategic Bomb',
@@ -308,7 +306,7 @@ UnitBlueprint {
             },
             FiringRandomness = 0,
             FiringTolerance = 6,
-            FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true, -- [152]
             Label = 'Bomb',
             MaxRadius = 90,
             MuzzleSalvoDelay = 0,
@@ -332,22 +330,20 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.2,
-            TargetCheckInterval = 2.5,
             TargetPriorities = {
                 'TECH4',
                 'TECH3 STRUCTURE',
                 'TECH2 STRUCTURE',
                 'TECH1 STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             WeaponCategory = 'Bomb',
         },
         {
             Damage = 500,
             DamageFriendly = true,
-            DamageRadius = 1,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,

@@ -8,10 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CRadarJammerUnit = import('/lua/cybranunits.lua').CRadarJammerUnit
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local CRadarJammerUnit = import("/lua/cybranunits.lua").CRadarJammerUnit
+local EffectUtil = import("/lua/effectutilities.lua")
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
+---@class URL0306 : CRadarJammerUnit
 URL0306 = Class(CRadarJammerUnit) {
 
     Weapons = {        
@@ -53,7 +54,7 @@ URL0306 = Class(CRadarJammerUnit) {
             WaitSeconds(1)
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self:GetCurrentLayer()]) --this resets the stop feature - note that its reset on layer change!
+                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!
             end
         end
     end,

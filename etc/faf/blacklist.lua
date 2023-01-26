@@ -43,13 +43,10 @@ Blacklist = {
     ['98785b7a-9e9e-4863-abb3-46aaf1caef80'] = INTEGRATED,
 
     -- GAZ_UI (already merged)
-    ['4f8b5ac3-346c-4d25-ac34-7b8ccc14eb0a'] = INTEGRATED,
+    -- ['4f8b5ac3-346c-4d25-ac34-7b8ccc14eb0a'] = INTEGRATED,
     ['CC5A5288-18E3-11DD-BF33-005055D89593'] = INTEGRATED,
     ['e9bb4b11-2952-4b19-bf4e-11fb6e5fcbe9'] = INTEGRATED,
-    ['CC5A5288-18E3-11DD-BF33-005055D89593'] = INTEGRATED,
-    ['e9bb4b11-2952-4b19-bf4e-11fe6e5fcbe9'] = INTEGRATED,
-    ['CC5A5288-18E3-11DD-BF33-005055D89593'] = INTEGRATED,
-    ['e9bb4b11-2952-4b19-bf4e-11fb6e5fcbe9'] = INTEGRATED,
+
 
     -- MoreUnitInfo
     ['CC51528A-1823-113D-BF33-044655D89593'] = INTEGRATED,
@@ -151,6 +148,7 @@ Blacklist = {
     ['7749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['1749EEN4-DE86-5CC2-39AC-35692BDE76XF'] = UPGRADE,
     ['EEFFA8C6-96D9-11E4-9DA1-460D1D5D46B0'] = UPGRADE,
+    ['1dd86878-6d2f-4f6d-b879-d14d37bcd45b'] = UPGRADE, --V9
 
     -- OneClickWonder
     ['c5cc7241-d9f8-4b46-8662-ad130e426a4a'] = UPGRADE,
@@ -178,5 +176,19 @@ Blacklist = {
 
     -- old versions of Experimental Wars
     ['ce6f9860-d2d2-11e0-9572-0800200c9a66'] = UPGRADE,
-
+    
+    -- mod pack that was hidden in the vault -> blacklisting to prevent it from being used on faf
+    ['fff6f6c8-248a-11de-8c30-362b9e155667'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100002'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100003'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100004'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100005'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100006'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100007'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100008'] = HARMFUL,
+    ['fff6f6c8-248a-11de-8c30-362b9e100009'] = HARMFUL,
+    
+    -- cheat mods
+    ['086060ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v3
+    ['086061ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v4
 }

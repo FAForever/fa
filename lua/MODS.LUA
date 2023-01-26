@@ -4,12 +4,12 @@ Mods
 All mods must be in subdirectories somewhere under /mods. Each mod has a
 mod_info.lua file which contains various bits of info:
 
-    name = "Happy mod"                          # Name to use for this mod
-    version = 123                               # Version number to use for this mod
-    copyright = "Copyright © 2006, Someone"     # Optional copyright info
+    name = "Happy mod"                          -- Name to use for this mod
+    version = 123                               -- Version number to use for this mod
+    copyright = "Copyright © 2006, Someone"     -- Optional copyright info
     description = "A long description of happy mod and why it will make you happy"
-    author = "Joe"                              # Optional author info
-    url = "http://www.gaspoweredgames.com"      # Optional URL to anywhere author likes
+    author = "Joe"                              -- Optional author info
+    url = "http://www.gaspoweredgames.com"      -- Optional URL to anywhere author likes
 
     uid = B019FBEE-E411-11DB-AFAE-13D355D89593
         Uniquely identify this mod. This defaults to the mods name, but that's
@@ -56,9 +56,9 @@ mod_info.lua file which contains various bits of info:
         mod_icon.dds in the same directory as the mod_info.lua file.
 
     requires = {
-        # Optionally indicates that this mod only works if another mod is also present.
-        # It might be nice if you add a comment after each uid to denote the name of the mod
-        # so mere mortals can maintain your list :)
+        -- Optionally indicates that this mod only works if another mod is also present.
+        -- It might be nice if you add a comment after each uid to denote the name of the mod
+        -- so mere mortals can maintain your list :)
         "fec58b30-0036-4b9e-9995-fe2d6fe4c6e9",     -- Chris' Whacky Mod
         "18e391bc-67aa-49fb-8a5f-34efec2d1c2c",     -- Jeffs Cool Mod
         "61d2cb50-08ac-46ba-b261-3c3e3372aef0",     -- Teds Dumb Mod
@@ -84,7 +84,7 @@ mod_info.lua file which contains various bits of info:
     }
 
     requiresNames = {
-        # an optional table which will map the required uids to friendly names so the user of the mod can determine what they are missing
+        -- an optional table which will map the required uids to friendly names so the user of the mod can determine what they are missing
         ["fec58b30-0036-4b9e-9995-fe2d6fe4c6e9"] = "Chris' Whacky Mod v123",
         ["18e391bc-67aa-49fb-8a5f-34efec2d1c2c"] = "Jeff's Cool Mod",
         ["61d2cb50-08ac-46ba-b261-3c3e3372aef0"] = "Ted's Dumb Mod",
@@ -199,14 +199,39 @@ Mod initialization issues
 '
 -------------------------------------------------------------------------------------------------------------------- ]]
 
-local SetUtils = import('/lua/system/setutils.lua')
+-- we should really stick `optiondir` in here, so it isn't hardcoded to `mapname .. 'options.lua'`
+
+---@class ModInfo
+---@field location string    defaults to `Dirname(filename)`
+---@field name string        defaults to `filename`
+---@field description string defaults to `"<LOC uimod_0006>(No description)"`
+---@field author string      defaults to `''`
+---@field copyright string   defaults to `''`
+---@field exclusive boolean  defaults to `false`
+---@field icon string        defaults to `'/textures/ui/common/dialogs/mod-manager/generic-icon_bmp.dds'`
+---@field selectable boolean defaults to `true`
+---@field hookdir string     defaults to `'/hook'`
+---@field shadowdir string   defaults to `'/shadow'`
+---@field uid string         defaults to `filename`
+---@field ui_only? boolean
+---@field enabled? boolean
+---@field requires? string[] UID list of mods that this mod requires to be also present
+---@field conflicts? string[] UID list of mods that the game will refuse to launch with
+---@field before? string[] UID list of mods that this mod will be applied before
+---@field after? string[] UID list of mods this this mod will be applied after; defaults to `requires` if present
+---@field requiresNames? table<string, string> Optional UID-to-name map of required mods
+
+---@alias uidSet table<string, true>
+
+local SetUtils = import("/lua/system/setutils.lua")
 
 -- Table of all mods found on disk, indexed by id
 local _mod_cache = nil
 
 
--- Set the list of active mods requested by the user from the mod manager.
--- nil means do nothing (happens when cancel selected from mod manager)
+--- Set the list of active mods requested by the user from the mod manager.
+--- `nil` means do nothing (happens when `cancel` is selected from mod manager)
+---@param s? uidSet set of mod UID's
 function SetSelectedMods(s)
     if s then
         LOG("MOD LIST SET TO:")
@@ -219,6 +244,8 @@ function SetSelectedMods(s)
     end
 end
 
+---
+---@return uidSet #set of mod UID's
 function GetLocallyAvailableMods()
     local result = {}
     for k,mod in AllMods() do
@@ -229,7 +256,8 @@ function GetLocallyAvailableMods()
     return result
 end
 
--- Get List of selected mods and check if they still exist.
+--- Get list of selected mods and check if they still exist
+---@return uidSet #set of mod UID's
 function GetSelectedMods()
     local ModsFromGamePrefs = GetPreference('active_mods') or {}
     local ModsFromDisk= {}
@@ -246,22 +274,29 @@ function GetSelectedMods()
     return ModsFromGamePrefs
 end
 
+--- Return those selected mods with `ui_only` set to true filtered out
+---@return uidSet #set of mod UID's
 function GetSelectedSimMods()
     return SetUtils.PredicateFilter(GetSelectedMods(),
         function(uid)
             return not AllMods()[uid].ui_only
         end
-)
+    )
 end
 
+--- Return those selected mods with `ui_only` not set to true filtered out
+---@return uidSet #set of mod UID's
 function GetSelectedUIMods()
     return SetUtils.PredicateFilter(GetSelectedMods(),
         function(uid)
             return AllMods()[uid].ui_only
         end
-)
+    )
 end
 
+--- Load a mod from `filename` and return a `ModInfo` table with default values set
+---@param filename string
+---@return ModInfo
 local function LoadModInfo(filename)
     -- Fill in some defaults to start with...
     local env = {
@@ -288,13 +323,14 @@ local function LoadModInfo(filename)
 end
 
 
---Clear _mod_cache to pick up any changes on disk
+--- Clear `_mod_cache` to pick up any changes on disk
 function ClearCache()
     _mod_cache = nil
 end
 
 
--- Return a table of all mods found on disk (mapping id->mod_info)
+--- Return a table of all mods found on disk (where table keys are the UID's to the mod info)
+---@return table<string, ModInfo>
 function AllMods()
     if not _mod_cache then
         local r = {}
@@ -310,7 +346,8 @@ function AllMods()
 end
 
 
--- Return a table of all mods found on disk with the 'selectable' flag set
+--- Return a table of all mods found on disk with the `selectable` flag set
+---@return table<string, ModInfo> #keys are UID's
 function AllSelectableMods()
     local r = {}
     for uid,mod in AllMods() do
@@ -321,55 +358,119 @@ function AllSelectableMods()
     return r
 end
 
--- sorts mods according to their before/after lists, otherwise alphabetically
--- returns true when first less than second
-local function ModComp(first, second)
+--- topological sort the mods using before/after lists  
+--- log a warning and return `nil` in case of a cycle
+---@param mods_to_sort table<string, ModInfo> keys are UID's
+---@return ModInfo[] | nil
+local function ModTopSort(mods_to_sort)
+    local required_for = {}
+    for uid,mod in mods_to_sort do
+        required_for[uid] = {}
+    end
 
-    if _mod_cache[first].before then
-        for i,uid in _mod_cache[first].before do
-            if _mod_cache[second].uid == uid then
-                return true
+    for uid,mod in mods_to_sort do
+        if _mod_cache[uid].before then
+            for i,before_uid in _mod_cache[uid].before do
+                if mods_to_sort[before_uid] ~= nil then
+                    table.insert(required_for[uid], before_uid)
+                end
+            end
+        end
+
+        if _mod_cache[uid].after then
+            for i,after_uid in _mod_cache[uid].after do
+                if mods_to_sort[after_uid] ~= nil then
+                    table.insert(required_for[after_uid], uid)
+                end
             end
         end
     end
 
-    if _mod_cache[first].after then
-        for i,uid in _mod_cache[first].after do
-            if _mod_cache[second].uid == uid then
-                return false
-            end
+    local result = {}
+    local processing = {}
+    local done_with = {}
+
+    local function visit(uid)
+        if done_with[uid] then
+            return 0
+        end
+        if processing[uid] then
+            return 1
+        end
+
+        processing[uid] = true
+        for i,child_uid in required_for[uid] do
+            local r = visit(child_uid)
+            if r == 1 then return 1 end
+        end
+
+        processing[uid] = false
+        done_with[uid] = true
+        table.insert(result, mods_to_sort[uid])
+        return 0
+    end
+
+    local r = 0
+    for uid,mod in mods_to_sort do
+        r = visit(uid)
+        if r == 1 then
+            WARN('Inconsistent mod order lists, load order will be arbitrary')
+            return
         end
     end
 
-    return first < second
+    return table.reverse(result)
 end
 
--- Get a list of ingame UI mods that should be active, based on preferences.
--- Only "ui_only" mods are included in the list; mods that affect the sim
--- from from GetActiveGameMods().
+--- Get a list of ingame UI mods that should be active, based on preferences.
+--- Only `ui_only` mods are included in the list; mods that affect the sim
+--- are from `GetActiveGameMods()`.
+---@param filter fun(mod: ModInfo): boolean
+---@param selected? uidSet set of mod UID's; defaults to `GetSelectedMods()`
+---@return ModInfo[]
 local function GetActiveModsFiltered(filter, selected)
     if not selected then
         selected = GetSelectedMods()
     end
 
     local all_mods = AllMods()
-    local r = {}
-    for uid,m in sortedpairs(all_mods, ModComp) do
-        if selected[uid] and filter(m) then
+    local filtered = {}
+
+    for uid,mod in all_mods do
+        if selected[uid] and filter(mod) then
+            filtered[uid] = mod
+        end
+    end
+
+    local r = ModTopSort(filtered)
+    if r == nil then
+        r = {}
+        for uid,m in filtered do
             table.insert(r,m)
         end
     end
+
     return r
 end
 
-function GetUiMods(selected)
-    return GetActiveModsFiltered(function(m) return m.ui_only end, selected)
+--- Return a list out of the mods that have `ui_only` set to true
+---@param mods? uidSet set of mod UID's; defaults to `GetSelectedMods()`
+---@return ModInfo[]
+function GetUiMods(mods)
+    return GetActiveModsFiltered(function(m) return m.ui_only end, mods)
 end
 
-function GetGameMods(selected)
-    return GetActiveModsFiltered(function(m) return not m.ui_only end, selected)
+--- Return a list out of the mods that don't have `ui_only` set to true
+---@param mods? uidSet set of mod UID's; defaults to `GetSelectedMods()`
+---@return ModInfo[]
+function GetGameMods(mods)
+    return GetActiveModsFiltered(function(m) return not m.ui_only end, mods)
 end
 
+--- If `scenario` is a campaign type, return only the FAF campaign mod (`6AAFE20A-E851-11DB-B8BE-ECC755D89593`).
+--- Otherwise, return `GetGameMods()`.
+---@param scenario UIScenarioInfo
+---@return uidSet #set of mod UID's
 function GetCampaignMods(scenario)
     local r
     if scenario.type == 'campaign' then
@@ -380,10 +481,12 @@ function GetCampaignMods(scenario)
     return r
 end
 
--- given a uid of a mod, returns a tabe containing:
---  requires: list of installed uids that this mod requires
---  missing: list of uids that this mod requires but aren't installed
---  conflicts: list of installed uids that this mod conflicts with (or conflict with this mod)
+--- Given a uid of a mod, return a table containing:  
+---  `requires`: set of installed uids that this mod requires  
+---  `missing`: set of uids that this mod requires but aren't installed  
+---  `conflicts`: set of installed uids that this mod conflicts with (or conflict with this mod)
+---@param uid string
+---@return {requires: uidSet, missing: uidSet, conflicts: uidSet}
 function GetDependencies(uid)
     local ret = {requires = {}, missing = {}, conflicts = {}}
     local allMods = AllMods()
@@ -445,6 +548,7 @@ function GetDependencies(uid)
     return ret
 end
 
+--- Update `__active_mods` from `GetUiMods`
 function UpdateUIMods()
     __active_mods = {}
     for i,m in ipairs(GetUiMods()) do

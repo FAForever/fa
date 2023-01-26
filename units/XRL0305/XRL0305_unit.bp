@@ -36,15 +36,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 20,
     Categories = {
         'PRODUCTFA',
@@ -103,7 +94,7 @@ UnitBlueprint {
             },
         },
         AnimationWalk = '/units/xrl0305/xrl0305_awalk.sca',
-        AnimationWalkRate = 2,     #8
+        AnimationWalkRate = 2,     --8
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -256,7 +247,7 @@ UnitBlueprint {
             MaxRadius = 32,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 42,
+            MuzzleVelocity = 38,
             ProjectileId = '/projectiles/CDFHeavyDisintegratorPulseLaser01/CDFHeavyDisintegratorPulseLaser01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 1,
@@ -278,16 +269,14 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 2.5,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.20,
             TurretBoneMuzzle = 'Projectile03',
             TurretBonePitch = 'Projectile03',
             TurretBoneYaw = 'Turret',
@@ -345,11 +334,10 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
             RateOfFire = 0.25,
-            TargetCheckInterval = 1.5,
             TargetPriorities = {
                 'MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,
@@ -401,11 +389,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.065,
-            TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.15,
             Turreted = false,
             WeaponCategory = 'Defense',
             WeaponRepackTimeout = 0,
@@ -421,9 +407,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

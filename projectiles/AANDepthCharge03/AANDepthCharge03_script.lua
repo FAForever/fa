@@ -1,8 +1,8 @@
-#
-# Depth Charge Script
-#
-local ADepthChargeProjectile = import('/lua/aeonprojectiles.lua').ADepthChargeProjectile
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+--
+-- Depth Charge Script
+--
+local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
 AANDepthCharge03 = Class(ADepthChargeProjectile) {
 
@@ -21,28 +21,26 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
         WaitSeconds(self.CountdownLength)
 
         if not self.HasImpacted then
-            self.OnImpact(self, 'Underwater', nil)
+            self:OnImpact('Underwater', nil)
         end
     end,
 
     OnEnterWater = function(self)
-        #ADepthChargeProjectile.OnEnterWater(self)
+        --ADepthChargeProjectile.OnEnterWater(self)
 
-        local army = self:GetArmy()
-
-        for i in self.FxEnterWater do #splash
-            CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
+        for i in self.FxEnterWater do --splash
+            CreateEmitterAtEntity(self, self.Army, self.FxEnterWater[i])
         end
 
-        #self:SetMaxSpeed(20)
-        #self:SetVelocity(0)
-        #self:SetAcceleration(5)
+        --self:SetMaxSpeed(20)
+        --self:SetVelocity(0)
+        --self:SetAcceleration(5)
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetTurnRate(360)
         self:SetVelocityAlign(true)
         self:SetStayUpright(false)
-        #self:ForkThread(self.EnterWaterMovementThread)
+        --self:ForkThread(self.EnterWaterMovementThread)
     end,
 
     EnterWaterMovementThread = function(self)
@@ -64,7 +62,7 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
-        #LOG('Projectile impacted with: ' .. TargetType)
+        --LOG('Projectile impacted with: ' .. TargetType)
         self.HasImpacted = true
         local pos = self:GetPosition()
         local spec = {
@@ -74,7 +72,7 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
             LifeTime = 10,
             Omni = false,
             Vision = false,
-            Army = self:GetArmy(),
+            Army = self.Army,
         }
         local vizEntity = VizMarker(spec)
         ADepthChargeProjectile.OnImpact(self, TargetType, TargetEntity)

@@ -1,10 +1,11 @@
 UnitBlueprint {
     AI = {
+        GuardScanRadius = 26, -- allows for factory reclaim bug 
         TargetBones = {
             'UEL0301',
             'Head',
-#            'Leg_Left_B02',
-#            'Leg_Right_B02',
+--            'Leg_Left_B02',
+--            'Leg_Right_B02',
         },
     },
     Audio = {
@@ -97,15 +98,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'UEF_Select_Commander',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
         },
     },
     BuildIconSortPriority = 10,
@@ -500,7 +492,7 @@ UnitBlueprint {
             PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 30000,#32000
+            ShieldMaxHealth = 30000,--32000
             ShieldRechargeTime = 170,
             ShieldRegenRate = 50,
             ShieldRegenStartTime = 1,
@@ -750,7 +742,7 @@ UnitBlueprint {
     SizeX = 1.1,
     SizeY = 2,
     SizeZ = 1.1,
-    StrategicIconName = 'icon_commander_generic',
+    StrategicIconName = 'icon_subcommander',
     StrategicIconSortPriority = 1,
     Transport = {
         CanFireFromTransport = false,
@@ -812,11 +804,13 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'MOBILE EXPERIMENTAL',
+                'MOBILE TECH3',
+                'MOBILE TECH2',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'MOBILE TECH1',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Arm_Left_Muzzle',
@@ -860,7 +854,6 @@ UnitBlueprint {
             },
             RackRecoilDistance = 0,
             RateOfFire = 1,
-            TargetCheckInterval = 9999999,
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',

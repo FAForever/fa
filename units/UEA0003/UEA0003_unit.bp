@@ -1,6 +1,5 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 10,
         InitialAutoMode = true,
     },
     Air = {

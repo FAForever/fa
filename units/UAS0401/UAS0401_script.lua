@@ -5,13 +5,16 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local ASubUnit = import('/lua/aeonunits.lua').ASubUnit
-local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
-local WeaponsFile = import('/lua/aeonweapons.lua')
+local ASubUnit = import("/lua/aeonunits.lua").ASubUnit
+local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
+local WeaponsFile = import("/lua/aeonweapons.lua")
 local ADFCannonOblivionWeapon = WeaponsFile.ADFCannonOblivionWeapon02
 local AANChronoTorpedoWeapon = WeaponsFile.AANChronoTorpedoWeapon
 local AIFQuasarAntiTorpedoWeapon = WeaponsFile.AIFQuasarAntiTorpedoWeapon
 
+local CreateAeonTempestBuildingEffects = import("/lua/effectutilities.lua").CreateAeonTempestBuildingEffects
+
+---@class UAS0401 : ASeaUnit
 UAS0401 = Class(ASeaUnit) {
     BuildAttachBone = 'Attachpoint01',
 
@@ -26,6 +29,12 @@ UAS0401 = Class(ASeaUnit) {
         AntiTorpedo01 = Class(AIFQuasarAntiTorpedoWeapon) {},
         AntiTorpedo02 = Class(AIFQuasarAntiTorpedoWeapon) {},
     },
+
+    StartBeingBuiltEffects = function(self, builder, layer)
+        ASeaUnit.StartBeingBuiltEffects(self, builder, layer)
+        CreateAeonTempestBuildingEffects(self)
+    end,
+
 
     OnStopBeingBuilt = function(self, builder, layer)
         self:SetWeaponEnabledByLabel('MainGun', true)
@@ -165,7 +174,7 @@ UAS0401 = Class(ASeaUnit) {
             self:Destroy()
         end)
 
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         self:DestroyIdleEffects()
         if layer == 'Water' or layer == 'Seabed' or layer == 'Sub' then
             self.SinkExplosionThread = self:ForkThread(self.ExplosionThread)

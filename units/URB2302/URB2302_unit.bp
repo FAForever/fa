@@ -21,15 +21,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 140,
     Categories = {
         'PRODUCTSC1',
@@ -50,6 +41,7 @@ UnitBlueprint {
         'OVERLAYINDIRECTFIRE',
         'SORTSTRATEGIC',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -95,7 +87,7 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 870000,
+        BuildCostEnergy = 1305000,
         BuildCostMass = 69600,
         BuildTime = 105000,
         RebuildBonusIds = {
@@ -208,7 +200,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Proton Artillery',
             EnergyDrainPerSecond = 3500,
-            EnergyRequired = 7000,
+            EnergyRequired = 14000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
@@ -222,7 +214,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 75,
             MuzzleVelocityReduceDistance = 800,
-            ProjectileId = '/projectiles/CIFArtilleryProton01/CIFArtilleryProton01_proj.bp',
+            ProjectileId = '/projectiles/CIFArtilleryProton02/CIFArtilleryProton02_proj.bp',
             ProjectileLifetime = 120,
             ProjectilesPerOnFire = 1,
             RackBones = {
@@ -244,10 +236,20 @@ UnitBlueprint {
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 0.13,
             RenderFireClock = true,
-            TargetCheckInterval = 8,
             TargetPriorities = {
+                'EXPERIMENTAL MASSFABRICATION',
+                '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy
+                'TECH3 ANTIMISSILE',
+                'NUKE STRUCTURE',
+                'TECH3 STRUCTURE ARTILLERY',
+                'TECH3 ENERGYPRODUCTION',
+                'ORBITALSYSTEM',
+                'SHIELD',
+                'EXPERIMENTAL MOBILE',
+                'TECH3 STRUCTURE',
+                'TECH3 MOBILE',
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Muzzle',

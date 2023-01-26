@@ -4,27 +4,28 @@
 -- **
 -- **  Summary  :  Megalith script
 -- **
--- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local MobileUnit = import('/lua/defaultunits.lua').MobileUnit
-local explosion = import('/lua/defaultexplosions.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local MobileUnit = import("/lua/defaultunits.lua").MobileUnit
+local explosion = import("/lua/defaultexplosions.lua")
 local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local utilities = import('/lua/Utilities.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local Entity = import('/lua/sim/Entity.lua').Entity
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local utilities = import("/lua/utilities.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
+local Entity = import("/lua/sim/entity.lua").Entity
 
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFHvyProtonCannonWeapon = CybranWeaponsFile.CDFHvyProtonCannonWeapon
 local CANNaniteTorpedoWeapon = CybranWeaponsFile.CANNaniteTorpedoWeapon
 local CIFSmartCharge = CybranWeaponsFile.CIFSmartCharge
 local CAABurstCloudFlakArtilleryWeapon = CybranWeaponsFile.CAABurstCloudFlakArtilleryWeapon
 local CDFBrackmanCrabHackPegLauncherWeapon = CybranWeaponsFile.CDFBrackmanCrabHackPegLauncherWeapon
 
+---@class XRL0403 : CWalkingLandUnit
 XRL0403 = Class(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
@@ -53,7 +54,7 @@ XRL0403 = Class(CWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('HackPegLauncher', true)   -- -- -- Enable and show hack-peg launcher.
     end,
 
-    OnCreate= function(self)
+    OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
         self:SetWeaponEnabledByLabel('HackPegLauncher', false)
         if self:IsValidBone('Missile_Turret') then
@@ -67,11 +68,34 @@ XRL0403 = Class(CWalkingLandUnit) {
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
+
         self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false):SetRate(0)
+
+        -- adjust collision box due to build animation
+        self:SetCollisionShape(
+            'Box', 
+            self.Blueprint.CollisionOffsetX,
+            self.Blueprint.CollisionOffsetY,
+            self.Blueprint.CollisionOffsetZ,
+            0.5 * self.Blueprint.SizeX,
+            0.5 * self.Blueprint.SizeY,
+            0.5 * self.Blueprint.SizeZ
+        )
+
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
         CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
+
+        -- adjust collision box due to build animation
+        self:SetCollisionShape('Box',
+            2 * self.Blueprint.CollisionOffsetX,
+            2 * self.Blueprint.CollisionOffsetY,
+            2 * self.Blueprint.CollisionOffsetZ,
+            0.5 * self.Blueprint.SizeX,
+            0.5 * self.Blueprint.SizeY,
+            0.5 * self.Blueprint.SizeZ
+        )
 
         if self:IsValidBone('Missile_Turret') then
             self:HideBone('Missile_Turret', true)
@@ -91,8 +115,6 @@ XRL0403 = Class(CWalkingLandUnit) {
 
     OnLayerChange = function(self, new, old)
         CWalkingLandUnit.OnLayerChange(self, new, old)
-
-        --LOG("Mega Layerchange from ", old, " to ", new)
 
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')
@@ -153,7 +175,7 @@ XRL0403 = Class(CWalkingLandUnit) {
 
     DeathThread = function(self)
         self:PlayUnitSound('Destroyed')
-        local army = self:GetArmy()
+        local army = self.Army
 
         -- Create Initial explosion effects
         explosion.CreateFlash(self, 'Left_Leg01_B01', 4.5, army)
@@ -177,8 +199,27 @@ XRL0403 = Class(CWalkingLandUnit) {
 
         WaitSeconds(1)
         self:CreateFirePlumes(army, {'Right_Leg01_B01','Right_Leg02_B01','Left_Leg02_B01',}, 0.5)
-        WaitSeconds(0.3)
+        WaitSeconds(0.4)
         self:CreateDeathExplosionDustRing()
+        
+        -- only apply death damage when the unit is sufficiently build
+        local bp = self:GetBlueprint()
+        local FractionThreshold = bp.General.FractionThreshold or 0.99
+        if self:GetFractionComplete() >= FractionThreshold then 
+            local bp = self:GetBlueprint()
+            local position = self:GetPosition()
+            local qx, qy, qz, qw = unpack(self:GetOrientation())
+            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
+            for i, numWeapons in bp.Weapon do
+                if(bp.Weapon[i].Label == 'MegalithDeath') then
+                    position[3] = position[3]+2.5*math.cos(a)
+                    position[1] = position[1]+2.5*math.sin(a)
+                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    break
+                end
+            end
+        end
+        
         WaitSeconds(0.4)
 
 
@@ -199,14 +240,6 @@ XRL0403 = Class(CWalkingLandUnit) {
 
         -- Finish up force ring to push trees
         DamageRing(self, {x,y,z}, 0.1, 3, 1, 'Force', true)
-
-        local bp = self:GetBlueprint()
-        for i, numWeapons in bp.Weapon do
-            if(bp.Weapon[i].Label == 'MegalithDeath') then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
-            end
-        end
 
         -- Explosion on and damage fire on various bones
         CreateDeathExplosion(self, 'Right_Leg0' .. Random(1,2) .. '_B0' .. Random(1,2), 0.25)

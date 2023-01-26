@@ -23,15 +23,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 130,
     Categories = {
         'PRODUCTSC1',
@@ -54,6 +45,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'SORTDEFENSE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -1,
     Defense = {
@@ -263,15 +255,17 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SalvoShotDelay = 0,
             SalvoSize = 1,
-            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'SUBMERSIBLE',
-                'MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'MOBILE DIRECTFIRE',
+                'MOBILE ANTINAVY',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE - ANTIAIR)',
+                'MOBILE TECH3',
+                'MOBILE TECH2',
+                'MOBILE TECH1',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle01',
             TurretBonePitch = 'Turret',
             TurretBoneYaw = 'Turret',
@@ -297,9 +291,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = false,
-            Seabed = true, #from false
-            Sub = true, #from false,
-            Water = true, #from false,
+            Seabed = true, --from false
+            Sub = true, --from false,
+            Water = true, --from false,
         },
     },
 }

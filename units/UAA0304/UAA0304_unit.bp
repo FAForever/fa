@@ -1,7 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
     },
     Air = {
         AutoLandTime = 1,
@@ -82,15 +81,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -107,6 +97,7 @@ UnitBlueprint {
         'SHOWATTACKRETICLE',
         'OVERLAYRADAR',
         'STRATEGICBOMBER',
+        'SNIPEMODE',
     },
     CollisionOffsetZ = 0.2,
     Defense = {
@@ -179,7 +170,7 @@ UnitBlueprint {
         UniformScale = 0.15,
     },
     Economy = {
-        BuildCostEnergy = 144000,#105000
+        BuildCostEnergy = 144000,--105000
         BuildCostMass = 2100,
         BuildTime = 9600,
     },
@@ -231,7 +222,7 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = false,
         },
-        Elevation = 20,
+        Elevation = 14,
         FuelRechargeRate = 15,
         FuelUseTime = 1500,
         GroundCollisionOffset = 2,
@@ -261,6 +252,13 @@ UnitBlueprint {
         Level4 = 48,
         Level5 = 60,
     },
+    VeteranMass = {
+        4200,
+        4200,
+        4200,
+        4200,
+        4200,
+    },
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
@@ -274,10 +272,23 @@ UnitBlueprint {
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 3.5,
+            Buffs = {
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 3,
+                    Radius = 5.8, -- this is the closest approximation in order to make the stun range the same as DamageRadius (5.25)
+                    TargetAllow = 'ALLUNITS',
+                    TargetDisallow = 'EXPERIMENTAL,COMMAND,WALL',
+                },
+            },
             CollideFriendly = false,
-            Damage = 3450,
+            Damage = 3000,
             DamageFriendly = true,
-            DamageRadius = 4,
+            DamageRadius = 5.25,
             DamageType = 'Normal',
             Display = 'Quark Bomb',
             DisplayName = 'Quark Bomb',
@@ -287,8 +298,8 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
             },
             FiringRandomness = 0,
-            FiringTolerance = 6, # [102]
-            FixBombTrajectory = true, # [152]
+            FiringTolerance = 6, -- [102]
+            FixBombTrajectory = true, -- [152]
             Label = 'Bomb',
             MaxRadius = 90,
             MuzzleSalvoDelay = 0,
@@ -312,23 +323,21 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.2,
-            TargetCheckInterval = 2.5,
             TargetPriorities = {
                 'TECH4',
                 'TECH3 STRUCTURE',
                 'TECH2 STRUCTURE',
                 'TECH1 STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             WeaponCategory = 'Bomb',
         },
         {
             AboveWaterTargetsOnly = true,
             Damage = 500,
             DamageFriendly = true,
-            DamageRadius = 1,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,

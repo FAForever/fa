@@ -41,15 +41,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -140,9 +131,9 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 273,
-        BuildCostMass = 52,
+        BuildCostMass = 56,
         BuildRate = 1,
-        BuildTime = 260,
+        BuildTime = 285,
         NeedToFaceTargetToBuild = true,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
@@ -215,9 +206,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.7,
     SizeX = 0.7,
-    SizeY = 0.7, #from0.5
+    SizeY = 0.7, --from0.5
     SizeZ = 0.9,
-    StrategicIconName = 'icon_bot1_directfire',
+    StrategicIconName = 'icon_land1_directfire',
     StrategicIconSortPriority = 135,
     Transport = {
         CanFireFromTransport = false,
@@ -283,16 +274,14 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
                 'TECH1 MOBILE',
                 'TECH2 MOBILE',
                 'TECH3 MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle_01',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Torso',

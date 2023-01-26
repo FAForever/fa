@@ -1,9 +1,9 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Grid = import('/lua/maui/grid.lua').Grid
-local Button = import('/lua/maui/button.lua').Button
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Grid = import("/lua/maui/grid.lua").Grid
+local Button = import("/lua/maui/button.lua").Button
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 
 
 function SetLayout()
@@ -43,15 +43,15 @@ function SetLayout()
             off = UIUtil.UIFile('/game/construct-sm_nav_horiz_btn/end_off.dds')
         }
     }
-    local controls = import('/lua/ui/game/construction.lua').controls
-    local ordersControl = import('/lua/ui/game/construction.lua').ordersControl
-    local controlClusterGroup = import('/lua/ui/game/construction.lua').controlClusterGroup
+    local controls = import("/lua/ui/game/construction.lua").controls
+    local ordersControl = import("/lua/ui/game/construction.lua").ordersControl
+    local controlClusterGroup = import("/lua/ui/game/construction.lua").controlClusterGroup
     controls.constructionGroup.Left:Set(controlClusterGroup.Left)
-    controls.constructionGroup.Bottom:Set(function() return controlClusterGroup.Bottom() - 5 end)
+    LayoutHelpers.AtBottomIn(controls.constructionGroup, controlClusterGroup, 5)
     if ordersControl then
-        controls.constructionGroup.Top:Set(function() return ordersControl.Bottom() + 2 end)
+        LayoutHelpers.AnchorToBottom(controls.constructionGroup, ordersControl, 2)
     else
-        controls.constructionGroup.Top:Set(function() return controlClusterGroup.Top() + 2 end)
+        LayoutHelpers.AtTopIn(controls.constructionGroup, controlClusterGroup, 2)
     end
     controls.constructionGroup.Right:Set(controlClusterGroup.Right)
 
@@ -63,27 +63,27 @@ function SetLayout()
 
     controls.leftBracketMin:SetTexture(UIUtil.UIFile('/game/bracket-left/bracket_bmp_t.dds'))
     controls.leftBracketMin.Left:Set(controls.constructionGroup.Left)
-    controls.leftBracketMin.Top:Set(function() return controls.constructionGroup.Top() + 1 end)
+    LayoutHelpers.AtTopIn(controls.leftBracketMin, controls.constructionGroup, 1)
 
     controls.leftBracketMax:SetTexture(UIUtil.UIFile('/game/bracket-left/bracket_bmp_b.dds'))
     controls.leftBracketMax.Left:Set(controls.constructionGroup.Left)
-    controls.leftBracketMax.Bottom:Set(function() return controls.constructionGroup.Bottom() + 4 end)
+    LayoutHelpers.AtBottomIn(controls.leftBracketMax, controls.constructionGroup, -4)
 
     controls.leftBracketMid:SetTexture(UIUtil.UIFile('/game/bracket-left/bracket_bmp_m.dds'))
-    controls.leftBracketMid.Left:Set(function() return controls.constructionGroup.Left() + 7 end)
+    LayoutHelpers.AtLeftIn(controls.leftBracketMid, controls.constructionGroup, 7)
     controls.leftBracketMid.Bottom:Set(controls.leftBracketMax.Top)
     controls.leftBracketMid.Top:Set(controls.leftBracketMin.Bottom)
 
     controls.rightBracketMin:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_t.dds'))
-    controls.rightBracketMin.Right:Set(function() return controls.minBG.Right() + 11 end)
-    controls.rightBracketMin.Top:Set(function() return controls.constructionGroup.Top() + 6 end)
+    LayoutHelpers.AtRightIn(controls.rightBracketMin, controls.minBG, -11)
+    LayoutHelpers.AtTopIn(controls.rightBracketMin, controls.constructionGroup, 6)
 
     controls.rightBracketMax:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_b.dds'))
-    controls.rightBracketMax.Right:Set(function() return controls.minBG.Right() + 11 end)
-    controls.rightBracketMax.Bottom:Set(function() return controls.constructionGroup.Bottom() + 1 end)
+    LayoutHelpers.AtRightIn(controls.rightBracketMax, controls.minBG, -11)
+    LayoutHelpers.AtBottomIn(controls.rightBracketMax, controls.constructionGroup, -1)
 
     controls.rightBracketMid:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_m.dds'))
-    controls.rightBracketMid.Right:Set(function() return controls.minBG.Right() + 11 end)
+    LayoutHelpers.AtRightIn(controls.rightBracketMid, controls.minBG, -11)
     controls.rightBracketMid.Bottom:Set(controls.rightBracketMax.Top)
     controls.rightBracketMid.Top:Set(controls.rightBracketMin.Bottom)
 
@@ -106,15 +106,15 @@ function SetLayout()
     controls.midBG3.Left:Set(controls.minBG.Left)
     controls.midBG3.Top:Set(controls.minBG.Bottom)
     controls.midBG3.Bottom:Set(controls.maxBG.Top)
-    controls.midBG3.Width:Set(controls.midBG3.BitmapWidth)
-    controls.midBG3:SetTiled(true)
+    LayoutHelpers.SetWidth(controls.midBG3, controls.midBG3.BitmapWidth())
+    --controls.midBG3:SetTiled(true) -- TODO: Now it breaks if the layout changes left to bottom, but stable as long as it doesnt change.
     LayoutHelpers.ResetRight(controls.midBG3)
     LayoutHelpers.ResetHeight(controls.midBG3)
 
-    controls.choices.Top:Set(function() return controls.constructionGroup.Top() + 100 end)
-    controls.choices.Bottom:Set(function() return controls.constructionGroup.Bottom() - 38 end)
-    controls.choices.Left:Set(function() return controls.minBG.Left() + 10 end)
-    controls.choices.Width:Set(56)
+    LayoutHelpers.AtTopIn(controls.choices, controls.constructionGroup, 100)
+    LayoutHelpers.AtBottomIn(controls.choices, controls.constructionGroup, 38)
+    LayoutHelpers.AtLeftIn(controls.choices, controls.minBG, 10)
+    LayoutHelpers.SetWidth(controls.choices, 56)
     controls.choices:SetToVertical(true)
     LayoutHelpers.ResetHeight(controls.choices)
     LayoutHelpers.ResetRight(controls.choices)
@@ -213,8 +213,8 @@ function SetLayout()
 
     controls.secondaryChoices.Top:Set(controls.choices.Top)
     controls.secondaryChoices.Bottom:Set(controls.choices.Bottom)
-    controls.secondaryChoices.Left:Set(function() return controls.choices.Right() + 4 end)
-    controls.secondaryChoices.Right:Set(function() return controls.secondaryChoices.Left() + 56 end)
+    LayoutHelpers.AnchorToRight(controls.secondaryChoices, controls.choices, 4)
+    LayoutHelpers.AnchorToLeft(controls.secondaryChoices, controls.secondaryChoices, -56)
     controls.secondaryChoices:SetToVertical(true)
 
     controls.secondaryChoicesBGMin:SetTexture(UIUtil.UIFile('/game/construct-panel_vert/que-panel_bmp_t.dds'))
@@ -238,8 +238,7 @@ function SetLayout()
     LayoutHelpers.AtTopIn(controls.secondaryProgress, controls.secondaryChoices, 42)
     LayoutHelpers.ResetBottom(controls.secondaryProgress)
     controls.secondaryProgress.Depth:Set(function() return controls.secondaryChoices.Depth() + 5 end)
-    controls.secondaryProgress.Width:Set(40)
-    controls.secondaryProgress.Height:Set(4)
+    LayoutHelpers.SetDimensions(controls.secondaryProgress, 40, 4)
 
     controls.secondaryScrollMin:SetNewTextures(textures.midBtn.up, textures.midBtn.down, textures.midBtn.over, textures.midBtn.dis)
     controls.secondaryScrollMin:SetTexture(textures.midBtn.up)
@@ -331,7 +330,7 @@ function SetLayout()
     LayoutHelpers.RightOf(controls.extraBtn2, controls.extraBtn1, 3)
 
     controls.constructionGroup:DisableHitTest()
-    LayoutTabs(import('/lua/ui/game/construction.lua').controls)
+    LayoutTabs(import("/lua/ui/game/construction.lua").controls)
     controls.constructionGroup:Hide()
 end
 
@@ -377,8 +376,7 @@ function LayoutTabs(controls)
             Checkbox.OnDisable(self)
         end
 
-        control.disabledGroup.Height:Set(25)
-        control.disabledGroup.Width:Set(40)
+        LayoutHelpers.SetDimensions(control.disabledGroup, 40, 25)
         LayoutHelpers.AtCenterIn(control.disabledGroup, control)
 
         control.OnEnable = function(self)
@@ -387,7 +385,7 @@ function LayoutTabs(controls)
         end
     end
 
-    if table.getsize(controls.tabs) > 0 then
+    if not table.empty(controls.tabs) then
         for id, control in controls.tabs do
             SetupTab(control)
 
@@ -411,7 +409,7 @@ function LayoutTabs(controls)
 end
 
 function OnTabChangeLayout(type)
-    local controls = import('/lua/ui/game/construction.lua').controls
+    local controls = import("/lua/ui/game/construction.lua").controls
     if type == 'construction' or type == 'templates' then
         controls.extraBtn1.icon.OnTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
         controls.extraBtn1.icon.OffTexture = UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds')
@@ -436,7 +434,7 @@ function OnTabChangeLayout(type)
 end
 
 function OnSelection(empty)
-    local controls = import('/lua/ui/game/construction.lua').controls
+    local controls = import("/lua/ui/game/construction.lua").controls
     if empty then
         if not controls.constructionGroup:IsHidden() then
             controls.constructionGroup:Hide()

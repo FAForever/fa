@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_heavyquarnon_cannon_projectile_trail_01',
+	Lifetime = -1.00,
+    TrailLength = 2.85,
+    Size = 0.15,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 0.55,
+    LODCutoff = 300,
+	RepeatTexture = '/textures/particles/heavy_quarnoncannon_trail_01.dds',
+	RampTexture = '/textures/particles/ramp_blue_17.dds',
+}
+

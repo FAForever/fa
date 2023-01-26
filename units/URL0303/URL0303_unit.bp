@@ -27,13 +27,6 @@ UnitBlueprint {
         },
     },
     Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
         Stun = {
             Add = {
                 OnDeath = true,
@@ -41,7 +34,8 @@ UnitBlueprint {
             },
             AppliedToTarget = true,
             BuffType = 'STUN',
-            Duration = 1.4,
+            Duration = 1.5,
+            DurationWhenCharging = 3,
             Radius = 10,
             TargetAllow = 'MOBILE',
             TargetDisallow = 'EXPERIMENTAL, COMMAND'
@@ -61,9 +55,11 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'BOT',
+        'BOMB',
         'OVERLAYDIRECTFIRE',
         'OVERLAYDEFENSE',
     },
+    CollisionOffsetZ = 0.15,
     Defense = {
         AirThreatLevel = 0,
         AntiMissile = {
@@ -73,8 +69,8 @@ UnitBlueprint {
         },
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 3000,
-        MaxHealth = 3000,
+        Health = 2500,
+        MaxHealth = 2500,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 9,
@@ -82,6 +78,8 @@ UnitBlueprint {
     Description = '<LOC url0303_desc>Siege Assault Bot',
     Display = {
         Abilities = {
+            '<LOC ability_suicideweapon>Suicide Weapon',
+            '<LOC ability_stun>EMP Weapon',
             '<LOC ability_tacticalmissledeflect>Tactical Missile Deflection',
             '<LOC ability_deathaoe>Volatile',
         },
@@ -91,12 +89,30 @@ UnitBlueprint {
                 AnimationRateMax = 1.25,
                 AnimationRateMin = 0.75,
                 Weight = 1,
+
+                HitBox = {
+                    CollisionOffsetX = 0,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = -0.5,
+                    SizeX = 0.9,
+                    SizeY = 0.6,
+                    SizeZ = 1.4,
+                },
             },
             {
                 Animation = '/units/URL0303/URL0303_Adeath02.sca',
                 AnimationRateMax = 1.25,
                 AnimationRateMin = 0.75,
                 Weight = 1,
+
+                HitBox = {
+                    CollisionOffsetX = 0.1,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = 0.5,
+                    SizeX = 1.0,
+                    SizeY = 0.6,
+                    SizeZ = 1.4,
+                },
             },
         },
         AnimationWalk = '/units/url0303/url0303_awalk.sca',
@@ -140,7 +156,7 @@ UnitBlueprint {
         UniformScale = 0.15,
     },
     Economy = {
-        BuildCostEnergy = 5400,
+        BuildCostEnergy = 5250,
         BuildCostMass = 480,
         BuildTime = 2400,
         TeleportEnergyMod = 0.15,
@@ -166,6 +182,15 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'land',
+        OrderOverrides = {
+            RULEUTC_SpecialToggle = {
+                bitmapId = 'charge',
+                helpText = 'Charge',
+            },
+        },
+        ToggleCaps = {
+            RULEUTC_SpecialToggle = true,
+        },
         TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC url0303_name>Loyalist',
         UnitWeight = 1,
@@ -189,6 +214,8 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = false,
         },
+        ChargeAccMult = 2,
+        ChargeSpeedMult = 1.75,
         DragCoefficient = 0.2,
         MaxAcceleration = 4.2,
         MaxBrake = 3.8,
@@ -209,9 +236,9 @@ UnitBlueprint {
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
-    SizeX = 0.9,
+    SizeX = 1.2,
     SizeY = 1.2,
-    SizeZ = 0.9,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_bot3_directfire',
     StrategicIconSortPriority = 115,
     Transport = {
@@ -241,6 +268,19 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_LowArc',
+            Buffs = {
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 1.5,
+                    Radius = 0,
+                    TargetAllow = 'TECH1,TECH2',
+                    TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND,NAVAL,STRUCTURE',
+                },
+            },
             CollideFriendly = false,
             Damage = 150,
             DamageType = 'Normal',
@@ -279,16 +319,14 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.3,
-            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Muzzle_Left',
             TurretBonePitch = 'Barrel_L',
             TurretBoneYaw = 'Torso',
@@ -305,7 +343,6 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',
@@ -315,7 +352,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 14,
+            Damage = 28,
             DamageType = 'Normal',
             DisplayName = 'Heavy Electron Bolter',
             FireTargetLayerCapsTable = {
@@ -325,7 +362,7 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'HeavyBolter',
             LeadTarget = true,
-            MaxRadius = 20,
+            MaxRadius = 24,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 35,
@@ -350,16 +387,14 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 2.5,
-            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'TECH1 MOBILE',
                 'TECH2 MOBILE',
                 'TECH3 MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Muzzle_Right',
             TurretBonePitch = 'Barrel_R',
             TurretBoneYaw = 'Barrel_R',
@@ -409,11 +444,12 @@ UnitBlueprint {
             RateOfFire = 0.5,
             SalvoSize = 1,
             SlavedToBody = true,
-            TargetCheckInterval = 1,
             TargetRestrictDisallow = 'UNTARGETABLE, AIR',
             WeaponCategory = 'Direct Fire',
         },
     },
+    SecondsBeforeChargeKicksIn = 3,
+    SecondsBeforeExplosionWhenCharging = 6,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,

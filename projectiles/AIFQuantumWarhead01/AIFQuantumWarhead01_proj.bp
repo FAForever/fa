@@ -30,8 +30,8 @@ ProjectileBlueprint {
         'NOSPLASHDAMAGE',
     },
     Defense = {
-        Health = 25,
-        MaxHealth = 25,
+        Health = 25000,
+        MaxHealth = 25000,
     },
     Description = 'AEON Nuclear Missile',
     DesiredShooterCap = 1,
@@ -49,7 +49,7 @@ ProjectileBlueprint {
         UniformScale = 0.2,
     },
     Economy = {
-        BuildCostEnergy = 1350000,
+        BuildCostEnergy = 1500000,
         BuildCostMass = 12000,
         BuildTime = 450000,
     },

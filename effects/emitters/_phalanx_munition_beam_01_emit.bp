@@ -1,0 +1,8 @@
+BeamBlueprint {
+    Lifetime = 3.0,
+    TextureName = '/textures/particles/beam_white_03.dds',
+    Length = 1.5,
+    Thickness = 0.0175,
+    StartColor = {x=0,y=0.5,z=1,w=0}, -- R,G,B,A
+    EndColor = {x=0,y=0.5,z=1,w=0}, -- R,G,B,A
+}

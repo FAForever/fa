@@ -22,15 +22,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 140,
     Categories = {
         'PRODUCTSC1',
@@ -53,6 +44,7 @@ UnitBlueprint {
         'OVERLAYINDIRECTFIRE',
         'SORTSTRATEGIC',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -104,8 +96,8 @@ UnitBlueprint {
         UniformScale = 0.35,
     },
     Economy = {
-        BuildCostEnergy = 13500,
-        BuildCostMass = 1890,
+        BuildCostEnergy = 13585,
+        BuildCostMass = 1900,
         BuildTime = 1600,
         RebuildBonusIds = {
             'ueb2303',
@@ -212,7 +204,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 2,
+            FiringRandomness = 2.25,
             FiringTolerance = 1,
             Label = 'MainGun',
             MaxRadius = 128,
@@ -241,9 +233,24 @@ UnitBlueprint {
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 0.05,
             RenderFireClock = true,
-            TargetCheckInterval = 5,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'EXPERIMENTAL MOBILE UEF ARTILLERY',
+                '(ARTILLERY - TECH1)',
+                'ANTISHIELD',
+                'SNIPER', -- Megalith included
+                'SHIELD STRUCTURE',
+                'EXPERIMENTAL MOBILE',
+                'TECH3 ENERGYPRODUCTION',
+                'TECH2 ENERGYPRODUCTION',
+                'RESEARCH',
+                'TECH3 MASSPRODUCTION',
+                'TECH2 MASSPRODUCTION',
+                'TECH3 MOBILE',
+                'TECH2 MOBILE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'COMMAND',
+                'TECH1 MOBILE',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Muzzle',

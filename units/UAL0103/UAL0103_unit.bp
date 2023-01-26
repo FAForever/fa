@@ -26,15 +26,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 60,
     Categories = {
         'PRODUCTSC1',
@@ -51,6 +42,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYINDIRECTFIRE',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -121,7 +113,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 180,
         BuildCostMass = 36,
-        BuildTime = 180,
+        BuildTime = 200,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -192,7 +184,7 @@ UnitBlueprint {
     SelectionThickness = 0.8,
     SizeX = 0.55,
     SizeY = 0.25,
-    SizeZ = 1, # 0.6
+    SizeZ = 1, -- 0.6
     StrategicIconName = 'icon_land1_artillery',
     StrategicIconSortPriority = 135,
     Veteran = {
@@ -252,13 +244,27 @@ UnitBlueprint {
             RateOfFire = 0.5,
             SlavedToBody = true,
             SlavedToBodyArcRange = 40,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'STRUCTURE EXPERIMENTAL',
+                'TECH3 ANTIMISSILE',
+                'NUKE STRUCTURE',
+                'TECH3 STRUCTURE ARTILLERY',
+                'TECH3 ENERGYPRODUCTION',
+                'TECH3 MASSFABRICATION',
+                'TECH3 RESEARCH',
+                'TECH3 MASSPRODUCTION',
+                'TECH3 RESEARCH',
+                'TECH2 ENERGYPRODUCTION',
+                'TECH2 MASSPRODUCTION',
+                'TECH2 RESEARCH',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'MOBILE EXPERIMENTAL',
+                'MOBILE TECH3',
+                'MOBILE TECH2',
+                '(MOBILE * TECH1 + COMMAND)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret_Barrel',

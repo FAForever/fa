@@ -135,6 +135,7 @@ UnitBlueprint {
         TurnRate = 180,
     },
     SelectionThickness = 0.2,
+    SizeSphere = 0.8,
     SizeX = 0.25,
     SizeY = 0.25,
     SizeZ = 0.25,

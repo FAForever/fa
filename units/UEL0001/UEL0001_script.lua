@@ -5,16 +5,17 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local Shield = import('/lua/shield.lua').Shield
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
-local TerranWeaponFile = import('/lua/terranweapons.lua')
+local Shield = import("/lua/shield.lua").Shield
+local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
+local TerranWeaponFile = import("/lua/terranweapons.lua")
 local TDFZephyrCannonWeapon = TerranWeaponFile.TDFZephyrCannonWeapon
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
 local TIFCruiseMissileLauncher = TerranWeaponFile.TIFCruiseMissileLauncher
 local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
+local EffectUtil = import("/lua/effectutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
 
+---@class UEL0001 : ACUUnit
 UEL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(DeathNukeWeapon) {},
@@ -68,12 +69,11 @@ UEL0001 = Class(ACUUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
-        -- If we are assisting an upgrading unit, or repairing a unit, play separate effects
-        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom ~= 'none' and self:IsUnitState('Guarding'))then
-            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        -- Different effect if we have building cube
+        if unitBeingBuilt.BuildingCube then
+            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         else
-            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
@@ -91,7 +91,7 @@ UEL0001 = Class(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod)
                 self.RebuildingPod = nil
                 local location = self:GetPosition('AttachSpecial02')
-                local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+                local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'LeftPod')
                 pod:SetCreator(self)
                 self.Trash:Add(pod)
@@ -110,7 +110,7 @@ UEL0001 = Class(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod2)
                 self.RebuildingPod2 = nil
                 local location = self:GetPosition('AttachSpecial01')
-                local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+                local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'RightPod')
                 pod:SetCreator(self)
                 self.Trash:Add(pod)
@@ -143,7 +143,7 @@ UEL0001 = Class(ACUUnit) {
         if not bp then return end
         if enh == 'LeftPod' then
             local location = self:GetPosition('AttachSpecial02')
-            local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'LeftPod')
             pod:SetCreator(self)
             self.Trash:Add(pod)
@@ -151,7 +151,7 @@ UEL0001 = Class(ACUUnit) {
             self.LeftPod = pod
         elseif enh == 'RightPod' then
             local location = self:GetPosition('AttachSpecial01')
-            local pod = CreateUnitHPR('UEA0001', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'RightPod')
             pod:SetCreator(self)
             self.Trash:Add(pod)
@@ -198,7 +198,7 @@ UEL0001 = Class(ACUUnit) {
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldGeneratorField' then
             self:DestroyShield()
-            ForkThread(function()
+            self:ForkThread(function()
                 WaitTicks(1)
                 self:CreateShield(bp)
                 self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -235,8 +235,6 @@ UEL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT2BuildRate')
-            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-            self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -246,8 +244,6 @@ UEL0001 = Class(ACUUnit) {
             if Buff.HasBuff(self, 'UEFACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'UEFACUT2BuildRate')
             end
-            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-            self:updateBuildRestrictions()
         elseif enh =='T3Engineering' then
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
@@ -275,8 +271,6 @@ UEL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT3BuildRate')
-            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-            self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -285,8 +279,6 @@ UEL0001 = Class(ACUUnit) {
                 Buff.RemoveBuff(self, 'UEFACUT3BuildRate')
             end
             self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-            self:updateBuildRestrictions()
         elseif enh =='DamageStabilization' then
             if not Buffs['UEFACUDamageStabilization'] then
                 BuffBlueprint {

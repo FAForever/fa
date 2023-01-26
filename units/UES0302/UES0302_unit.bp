@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 60,
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 15,
         TargetBones = {
             'UES0302',
             'Front_Turret01',
@@ -42,15 +42,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
-        },
-    },
     BuildIconSortPriority = 20,
     Categories = {
         'PRODUCTSC1',
@@ -71,6 +62,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'OVERLAYDEFENSE',
         'OVERLAYDIRECTFIRE',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.375,
     CollisionOffsetZ = 0.8,
@@ -129,14 +121,8 @@ UnitBlueprint {
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    LODCutoff = 250,
-                    ShaderName = 'Unit',
-                },
-                {
-                    AlbedoName = 'ues0302_lod1_albedo.dds',
                     LODCutoff = 600,
                     ShaderName = 'Unit',
-                    SpecularName = 'ues0302_lod1_specteam.dds',
                 },
             },
         },
@@ -233,10 +219,10 @@ UnitBlueprint {
             SizeY = 2.35,
             SizeZ = 13,
         },
-        MaxAcceleration = 2.5,
-        MaxBrake = 2.5,
-        MaxSpeed = 2.5,
-        MaxSpeedReverse = 2.5,
+        MaxAcceleration = 2.75,
+        MaxBrake = 2.75,
+        MaxSpeed = 2.75,
+        MaxSpeedReverse = 2.75,
         MaxSteerForce = 5,
         MeshExtentsX = 2.25,
         MeshExtentsY = 2,
@@ -244,7 +230,7 @@ UnitBlueprint {
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_Water',
         TurnRadius = 25,
-        TurnRate = 25,
+        TurnRate = 27.5,
     },
     SelectionSizeX = 1.8,
     SelectionSizeZ = 9,
@@ -342,13 +328,11 @@ UnitBlueprint {
             RenderFireClock = true,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 3,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Front_Turret01_Muzzle02',
             TurretBonePitch = 'Front_Turret01_Barrel02',
             TurretBoneYaw = 'Front_Turret01',
@@ -445,13 +429,11 @@ UnitBlueprint {
             RenderFireClock = true,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 3,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Front_Turret02_Muzzle02',
             TurretBonePitch = 'Front_Turret02_Barrel02',
             TurretBoneYaw = 'Front_Turret02',
@@ -547,13 +529,11 @@ UnitBlueprint {
             RateOfFire = 0.05,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 3,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Back_Turret_Muzzle02',
             TurretBonePitch = 'Back_Turret_Barrel02',
             TurretBoneYaw = 'Back_Turret',
@@ -570,7 +550,6 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -617,18 +596,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.6,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Right_Turret01_Muzzle01',
             TurretBonePitch = 'Right_Turret01_Barrel01',
             TurretBoneYaw = 'Right_Turret01',
@@ -645,7 +621,6 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -693,18 +668,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.6,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Right_Turret03_Muzzle01',
             TurretBonePitch = 'Right_Turret03_Barrel01',
             TurretBoneYaw = 'Right_Turret03',
@@ -721,7 +693,6 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -769,18 +740,15 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.6,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Left_Turret01_Muzzle01',
             TurretBonePitch = 'Left_Turret01_Barrel01',
             TurretBoneYaw = 'Left_Turret01',
@@ -797,7 +765,6 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -845,18 +812,15 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.6,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Left_Turret03_Muzzle01',
             TurretBonePitch = 'Left_Turret03_Barrel01',
             TurretBoneYaw = 'Left_Turret03',
@@ -915,11 +879,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.5,
-            TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE,STRATEGIC',
             TargetRestrictOnlyAllow = 'TACTICAL,MISSILE',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.5,
             TurretBoneMuzzle = 'Right_Turret02_Muzzle',
             TurretBonePitch = 'Right_Turret02_Barrel',
             TurretBoneYaw = 'Right_Turret02',
@@ -979,11 +941,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.5,
-            TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE,STRATEGIC',
             TargetRestrictOnlyAllow = 'TACTICAL,MISSILE',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.5,
             TurretBoneMuzzle = 'Left_Turret02_Muzzle',
             TurretBonePitch = 'Left_Turret02_Barrel',
             TurretBoneYaw = 'Left_Turret02',

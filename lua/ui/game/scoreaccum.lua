@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Accumulates score info during the game
 --*
---* Copyright Â© :005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © :005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- this table collects score info from the sync table and stores it for later use
@@ -61,13 +61,12 @@ scoreData {
                     kills,
                     built,
                     lost,
-                },
+                }, 
                 experimental {
                     kills,
                     built,
                     lost,
                 },
-                ... and more for specific units
             },
             resources {
                 massin {
@@ -113,20 +112,39 @@ scoreData {
 -- global score data can be read from directly
 scoreData = {}
 scoreData.current = {}
-scoreData.historical = {}
-
 fullSyncOccured = false
 
+--[[
+scoreData.historical = {}
+--]]
+
 -- score interval determines how often the historical data gets updated, this is in seconds
-scoreInterval = 10 -- FIXME: this should be synced from sim side
+scoreInterval = 10
 
 function UpdateScoreData(newData)
-    if fullSyncOccured == false then
-        scoreData.current = table.deepcopy(newData)
+    scoreData.current = table.deepcopy(newData)
+end
+
+function OnFullSync()
+    fullSyncOccured = true
+end
+
+--[[
+
+-- copy data over to historical
+local curInterval = 1
+local historicalUpdateThread = ForkThread(function()
+    while true do
+        WaitSeconds(scoreInterval)
+        scoreData.historical[curInterval] = table.deepcopy(scoreData.current)
+        curInterval = curInterval + 1
+    end        
+end)
+
+function StopScoreUpdate()
+    if historicalUpdateThread then
+        KillThread(historicalUpdateThread)
     end
 end
 
-function OnFullSync(accumData)
-    scoreData = accumData
-    fullSyncOccured = true
-end
+--]]

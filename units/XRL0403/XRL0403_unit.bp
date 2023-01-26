@@ -60,15 +60,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 65,
-            Level3 = 120,
-            Level4 = 180,
-            Level5 = 235,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTFA',
@@ -84,8 +75,6 @@ UnitBlueprint {
         'FACTORY',
         'DIRECTFIRE',
         'AMPHIBIOUS',
-        'ANTIAIR',
-        'ANTINAVY',
         'SNIPER',
         'NEEDMOBILEBUILD',
         'SONAR',
@@ -100,6 +89,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
         'SNIPEMODE',
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = 2.1,
     CollisionOffsetZ = -0.6,
@@ -130,6 +120,15 @@ UnitBlueprint {
             {
                 Animation = '/units/xrl0403/xrl0403_adeath.sca',
                 Weight = 100,
+
+                HitBox = {
+                    CollisionOffsetX = 1,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = 1.25,
+                    SizeX = 4.6,
+                    SizeY = 3.0,
+                    SizeZ = 7.3,
+                },
             },
         },
         AnimationWalk = '/units/xrl0403/xrl0403_awalk01.sca',
@@ -259,6 +258,7 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Experimental',
         UnitName = '<LOC xrl0403_name>Megalith',
         UnitWeight = 1,
+        FractionThreshold = 0.99,
     },
     Intel = {
         SonarRadius = 76,
@@ -381,7 +381,6 @@ UnitBlueprint {
             RateOfFire = 0.8,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.625,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
@@ -389,10 +388,9 @@ UnitBlueprint {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Right_Turret_Muzzle01',
             TurretBonePitch = 'Right_Turret_Barrel',
             TurretBoneYaw = 'Right_Turret',
@@ -469,7 +467,6 @@ UnitBlueprint {
             RateOfFire = 0.8,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.625,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
@@ -477,10 +474,9 @@ UnitBlueprint {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Left_Turret_Muzzle01',
             TurretBonePitch = 'Left_Turret_Barrel',
             TurretBoneYaw = 'Left_Turret',
@@ -559,12 +555,11 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
             RateOfFire = 0.75,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'SUBMERSIBLE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,
@@ -619,11 +614,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.13,
-            TargetCheckInterval = 1.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.5,
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 0,
@@ -639,7 +632,6 @@ UnitBlueprint {
         {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XRL_Weapon',
@@ -688,18 +680,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1.6,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'AA_Muzzle',
             TurretBonePitch = 'AA_Barrel',
             TurretBoneYaw = 'AA_Turret',
@@ -765,13 +754,11 @@ UnitBlueprint {
             RateOfFire = 0.03,
             SlavedToBody = true,
             SlavedToBodyArcRange = 40,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 0,
             TurretBoneMuzzle = 'Missile_Muzzle',
             TurretBonePitch = 'Missile_Turret',
             TurretBoneYaw = 'Missile_Turret',
@@ -787,9 +774,9 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 7500,
+            Damage = 8000,
             DamageFriendly = true,
-            DamageRadius = 4,
+            DamageRadius = 9,
             DamageType = 'DeathExplosion',
             DisplayName = 'Megalith Death',
             DummyWeapon = true,

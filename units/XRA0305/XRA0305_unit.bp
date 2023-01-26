@@ -73,15 +73,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 50,
     Categories = {
         'PRODUCTFA',
@@ -344,9 +335,14 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1.6,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ANTIAIR',
+                'GROUNDATTACK',
+                'TECH3 MOBILE',
+                'TECH2 MOBILE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'TECH1 MOBILE',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
             TurretBoneDualMuzzle = 'Turret_Down_Muzzle_02',
@@ -415,15 +411,13 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 175,
-            TargetCheckInterval = 0.6,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
-                'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(AIR * MOBILE - INTELLIGENCE)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -442,9 +436,9 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 100,
+            Damage = 300,
             DamageFriendly = true,
-            DamageRadius = 1,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,

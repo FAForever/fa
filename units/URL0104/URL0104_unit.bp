@@ -26,15 +26,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 50,
     Categories = {
         'PRODUCTSC1',
@@ -205,7 +196,6 @@ UnitBlueprint {
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',
@@ -249,17 +239,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'TECH1 MOBILE',
                 'TECH2 MOBILE',
                 'TECH3 MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             ToggleWeapon = 'AAGun',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',
@@ -275,7 +263,6 @@ UnitBlueprint {
         },
         {
             AimsStraightOnDisable = true,
-            AlwaysRecheckTarget = true,
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             BeamCollisionDelay = 0.2,
@@ -312,18 +299,15 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RateOfFire = 10,
             ReTargetOnMiss = true,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'AttachPoint',
             TurretBonePitch = 'AttachPoint',
             TurretBoneYaw = 'AttachPoint',
@@ -340,7 +324,6 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',
@@ -363,9 +346,9 @@ UnitBlueprint {
             MaxRadius = 32,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 15,
+            MuzzleVelocity = 20,
             ProjectileId = '/projectiles/CAANanoDart01/CAANanoDart01_proj.bp',
-            ProjectileLifetime = 3.5,
+            ProjectileLifetime = 4.5,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -384,19 +367,16 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             ToggleWeapon = 'GroundGun',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',

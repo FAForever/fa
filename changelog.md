@@ -1,3 +1,2845 @@
+
+Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
+
+
+# Game version 3745 (6th of November, 2022)
+
+And there it is, the last major patch of the year!
+
+This patch was ambitious. The purpose was to introduce modern features into the game, while at
+the same time make the game easier to customize to your liking. Some of the patch can be
+immediately applied by players, like the extended features on control groups, camera recall
+functionality and the improved performance of the reclaim overview. Other features are not
+immediately visible but are a major step forward, like the navigational mesh we generate for
+the map you're playing on for AIs.
+
+Previous patches primarily made changes in the code directly related to the simulation. This
+patch also includes changes to the code surrounding the user interface. Also refers to UI
+code or UI mods. It was not possible to do this patch without causing incompatibility with
+some of the UI mods that are out there. We introduced a list of incompatible mods at the
+end of this changelog. Authors can update their mod, bump the version number and the game
+should automatically make it available again.
+
+As a minor note to the authors of UI mods: it is better to have many small UI mods that each
+add in a single feature, then it is to have one large UI mod that adds in many features. One
+example is Economy Manager - a mod often used by players - is no longer compatible because
+one of its dozen features is incompatible:the command feedback no longer triggers with Economy
+Manager enabled. Long story short: keep the UI mods small and simple, as people can enable
+any number of them.
+
+And as this year ends I'd like to show my personal appreciation to some contributors and community
+members. I'll start off with hdt80bro, who has been working on the repository for the past few
+months. His extensive knowledge and motivation was visible in our discussions and above all in his
+code changes. We're lucky to have him. Next to that I'd like to thank Madmax for always being
+there when I needed essentially anything. Whenever I needed a tester, Madmax is usually there
+ready to help confirm the stability of it. And of course there is Rowey - always ready to assist
+with his friendly character. Rowey has pushed the FAF Youtube that increased exposure on the development
+of this game, like being there when we were producing the game development series. a lot of the videos
+on game development. And last I'd like to thank Sprouto - creator of the LOUD community - for being an
+inspiration to what he managed to achieve with LOUD. Every time we talk I learn something new and I am
+looking forward to our next conversation.
+
+And like that, a new year of development will start. And with a new year we'll take a new route
+to how we'll further develop this game. Instead of having a 'game team' - that introduces an arbitrary
+boundary between contributors - we'll move towards how other projects are managed: by creating a clear,
+properly scoped backlog of issues that contributors can pick up. Anyone can add and discuss issues in
+the backlog. Once an issue is accepted it is added to a milestone. Milestones allow us to steer contributors
+towards a common vision. They make it immediately clear when you can expect your changes to be live.  Alas -
+there's too much to tell and too little room in this changelog. For those interested, we'll soon make a post
+on the forums and release the new contribution guidelines on the repository.
+
+With appreciation towards all the contributors that made this patch possible,
+
+Jip
+
+## Features
+
+- (#4119) Extend functionality of control groups
+    Adds in modern features into how control groups work. This includes:
+
+    - the 'stealing' units from other control groups (like in Starcraft II)
+    - being able to toggle the control group inheritance of factories
+    - allow you to adjust the behavior of the camera when you double tap
+    - allow you to adjust the double tap interval
+
+    And on top of that we've introduced various new hotkeys that interact with
+    control groups.
+
+    You can find the settings in the game options. You can find the additional
+    hotkeys in the hotkeys menu.
+
+- (#4124, #4331) Improve cursor / command behaviors
+    Acts as an integration of the 'Random UI improvements' mod of Strogo. This includes:
+
+    - disabled reclaim cursor when you can't issue reclaim orders due to camera distance
+    - manual tactical / nuke launchers no longer attach to units, and instead always
+        target the ground
+    - area of effect preview when you try to issue an attack order
+    - allow you to adjust the selection threshold, particular useful for 2K+ displays or
+        when watching replays
+
+    You can find the settings in the game options.
+
+- (#4124) Extend camera features
+    Acts as an integration of Additional Camera Stuff. This includes:
+
+    - Allows you to retrieve up to 9 camera locations
+    - Allows you to restore the previous camera position
+
+    You can find the additional hotkeys in the hotkeys menu.
+
+- (#4188, #4190, #4191) Allow observers to view mouse position of players in-game
+    In particular useful for casters. The feature does not work with replays or live games
+    (that are replays too). In order for it to work you need to be an observer in the game,
+    as it starts. The information is not stored in the replay either.
+
+- (#4203, #4204, #4212, #4234, #4244) Introduce recall
+    Adds in a recall feature. Similar to a the 'concede' feature that other games provide,
+    it allows you to cast a team vote on whether you want to recall as a team. When you
+    are with two or less alive players it requires all alive players of the same team to
+    agree. When you are with three or more alive players it requires all but one
+    of the alive players of the team to agree.
+
+    Was introduced because people got frustrated with the Fullshare mode in combination
+    with the limitated player base size.
+
+- (#4219) Add in successive upgrades hotkeys for Hotbuild
+    Allows you to easily queue the upgrade of an upgrade using Hotbuild.
+
+- (#4232) Add batching of reclaim labels
+    Reclaim labels are batched as you zoom out. As a result they remain readable.
+
+- (#4241, #4334) Add coloring of reclaim labels
+    Reclaim labels are colored based on their value.
+
+- (#4175) Add PBR blender nodes for rendering of units  
+    This acts as a step-up towards introducing PBR-based shaders. It is used to check the
+    textures / assets of units and acts as an inspiration to the shader implementation.
+
+- (#4131) Introduced of shared armies
+    Allows you to play as one army, where you all share control over the same units. This
+    used to be a standalone executable and is now integrated with the base game.
+
+    You can find these settings in the lobby options. Note that when applied the game
+    is no longer rated.
+
+- (#4254) Improve text markers
+    When you create a text marker it is also send to the chat with camera coordinates
+    attached. This allows you to jump to text markers.
+
+    Based on a forum post.
+
+- (#4253) Attempt at fixing engineer behavior for Seraphim air factories
+    Engineers constructed by the Seraphim air factories get teleported instead of
+    'tractored' off the factory. This was the only factory that made it impossible
+    to select the engineer during roll off. Attempting to make the unit selectable during
+    tractoring introduced a pile of issues.
+
+    Therefore now all Seraphim air factories are magicians until we find better effects.
+
+    Based on a forum post.
+
+- (#4249) Add in a hotkey to select intelligence structures
+
+    Based on a suggestion by a user.
+
+- (#4249) Add in a hotkey to filter your selection to the engineer with the highest tech
+    All other engineers in your old selection will assist the selected engineer
+
+    Based on a suggestion by a user.
+
+- (#4266) Improve pathing surrounding props
+    Only large props (the size of a frigate or larger) block pathing.
+
+    Previously a lot of props blocked pathing, in particular small rocks. This introduced a
+    lot of noise in the occupancy layers, where it isn't clear that this noise exists. Especially
+    when you are zoomed out, being unable to see the rocks.
+
+    The noise caused units to behave strange, suddenly stop, circle around, etc. By removing
+    this noise we indirectly improve pathing a lot.
+
+- (#4270, #4282, #4285, #4298, #4312, #4313, #4308) Introduce generated navigational mesh to interpret maps
+    This feature is technically involved. The idea is similar to the marker generator that has
+    been part of the Uveso AI for a few years now, but instead of markers we work with
+    areas. The navigational mesh can be used by AIs to understand and interact with the map.
+
+    The feature is based on compression via quad trees that compress the pathing information. We use
+    the leafs of the quad tree to create a graph. This graph is initially used for just pathfinding,
+    but we can use the graph for so much more.
+
+    All the code related to this feature is licensed using the MIT license. We're improving
+    it in collaboration with the AI developers. We try to convert their requests into an
+    algorithm that computes the answer. The algorithm needs to be simple, yet efficient as there
+    is essentially no budget to perform computationally expensive algorithms.
+
+    We're open to new contributors to help maintain and expand this exciting new feature of FAF.
+
+- (#4287, #4328) Adjust factory behavior when building and finished building a unit
+    Drastically reduces the time it can take for a unit to roll off the building pad of a factory. The
+    production of a new unit starts the moment the build pad is clear. Also allows units to rotate to
+    the correct roll off point right before being finished.
+
+    Tech 1 tanks, artillery and labs have one second additional build time to compensate for the
+    reduction of roll off time.
+
+- (#4307) Re-organize game options
+    Adds in headers and groups various options together. A few options have been renamed. Others have
+    been removed. The game options menu is a lot more organised now.
+
+## Bug fixes
+
+- (#4338) Fix remote code exploit
+    It was possible to inject arbitrary code into the simulation via a UI mod. This would
+    not be able to affect your system, but it would allow you to run any code in the simulation
+    and have that code run for all players involved.
+
+    It is highly appreciated that this was brought to our attention discretely.
+
+- (#4205) Fix typo with missile callbacks for AIs
+
+- (#4225, E#13) Fix Harbingers preference to reclaim instead of attacking during an attack move
+    They now attack move as you'd expect, instead of notoriously reclaiming the nearest tree.
+
+- (#4248, #4337) Fix issues with Tractor Claws of the Colossus
+    Air units are now destroyed as soon as they reach the claw and the beam of the colossus
+    is now less likely to try and attack units that are being tractored.
+
+- (#4201) Fix footprint and collision box of Ythotha
+    The Ythotha is no longer afraid of walls and can again happily crush them.
+
+- (#4202) Fix duration of death animations of structures
+    It now matches the time it has always taken for factories to be destroyed.
+
+- (#4250) Fix missing meshes and normals of various units
+    Including the Summit, that now again looks a lot better.
+
+- (#4207, 4230) Fix props corrupting bomber weapon state
+
+- (#4260) Add the BlueprintId to `Blueprint.CategoriesHash`
+
+- (#4171) Fix scaling issue with new mod manager
+
+- (#4262) Fix teleportation glitches
+    No more teleporting Cybran ACU with a cloak upgrade.
+
+- (#4264) Fix a glitch with an Atlantis and a gunship with its cargo
+    No more invincible units through this weird glitch.
+
+- (#4291) Allow turrets to rotate to the nearest threat again
+    This was broken by the previous patch, it now functions as expected again.
+
+- (#4329) Fix collision size of Titans, Loyalists and Ilshahovs for beam weapons
+    Beam weapons (in particular, the Seraphim tech 2 point defense) should now more
+    reliably hit these specific units.
+
+- Properly populate `AdjacentUnits` of structures
+    Useful for AIs to quickly determine adjacent units. Only units that provide an
+    adjacency bonus are tracked.
+
+## Performance
+
+- (#4180) Improve performance of AI economy conditions
+
+- (#4284) Improve performance of AI builder conditions
+
+- (#4237) Improve performance by changing `self.Fun(self, ...)` to `self:Fun(...)`
+    This was initially considered an improvement to performance. With the recent
+    improvements to the benchmarking tools we found out that this isn't strictly
+    the case. Therefore we are reverting it back to the more-readable format.
+
+- (#4232, #4242, #4241, #4243) Improve performance of reclaim labels
+    Drastically improves the performance of reclaim labels.
+
+    A lot of UI mods adjusted the behavior of reclaim labels. Usually they did this
+    by using destructive hooks. That makes it impossible for us to push through
+    these improvements. UI mods that apply destructive hooks to `reclaim.lua`
+    have been deprecated. Their authors are highly encouraged to update their mods
+    and are recommended to use soft hooks instead.
+
+- (#4325) Clean up and improve performance of imports
+
+## Campaign / AI
+
+- (#4265, #4268, #4271, #4305, #4300, #4294) Improve AI behavior and performance of the base game
+    Including, but not limited to:
+
+    - use alternative move functions that reduce formation issues
+    - implement eco-over-time to better guage the economic situation
+    - fix ACU behavior where it is unable to finish structures
+    - fix various issues with commands not being cleared properly
+    - fix factory manager not cleaning up destroyed factories
+    - introduction of pathing build conditions (using navigational mesh)
+
+- (#4304) Add HQ support functions for AIs
+
+- (#4309, #4310, #4319, #4311) Clean up of various build conditions
+
+## Annotations
+
+(#4172, #4186, #4176, #4174, #4183, #4235, #4227, #4238, #4025, #4229, #4069)
+
+We're batching all pull requests with regards to annotations into one entry. That
+doesn't make the work less meaningful - the introductions of annotations is what
+Typescript is for Javascript: a completely new and improved approach to development.
+
+You can find the plugin by searching for `fa-lua-vscode-extension` in the `FAForever`
+Github group, as found here: https://github.com/FAForever
+
+## Other changes
+
+- (#4214) Adjust order of lobby options for less scrolling
+
+- (#4226) Introduce initialization decoupled layouter design pattern
+    Improves the layouter UI pattern that was introduced since the last patch
+
+- (#4228, #4246) Add key action localization directives
+    Allows us to add in keys that are used for a hotkey to a description. Useful
+    for tooltips and the loading screen tips.
+
+- (#4256) Allow debugging drawing tools to function properly in AI games
+    These are often used by AI developers to debug their code.
+
+- (#4257) Allow easier testing on deploy/fafdevelop
+    All files in `/devdata` are now loaded when playing on the `FAF Develop` game type
+
+- (#4217) Add new and improve existing loading tips
+
+- (#4274) Update description of Fullshare gamemode
+
+- (#4280, #4281, #4323) Improve workflow for testing
+    Allows us to write better tests for engine-oblivious functionality
+
+- (#4279) Add or improve translations for traditional chinese
+
+- (#4269) UI Framework: introduction of the set and support classes
+
+- (#4289) Speed up checking when a player is defeated
+    In an attempt to match the old time taken to determine when a player is defeated.
+
+    Based on a forum post.
+
+- (#4299) Fix energy storage large strategic icon in construction menu
+
+- (#4290) Allow hovering over the Ythotha storm
+    Allows you to see veterancy statistics, to finally settle the debate how useful the storm is
+
+    Based on a forum post.
+
+- (#4301) Introduce color library
+    Allows us to easily convert numbers into colors as RGB, HSL or HSV.
+
+- (#4321, #4332) Deprecate mods by version number
+    Previously we could only deprecate mods by its name, regardless of its version. We can
+    now also include the version, allowing an author to update the mod and have it
+    automatically 'undeprecate' by doing so.
+
+- (#4326) Create initial tests for NavDatastructures.lua
+
+## Contributors
+
+- 4z0t (#4232, #4242, #4171, #4269, #4309, #4310, #4319, #4311)
+- Penguin5 (#4214, #4217)
+- Relent0r (#4180, #4205, #4265, #4268, #4271, #4284, #4305, #4294)
+- hdt80bro (#4172, #4186, #4176, #4174, #4203, #4204, #4183, #4184, #4185, #4236, #4225, #4234,
+    #4226, #4237, #4228, #4227, #4238, #4280, #4270, #4229, #4069, #4301, #4321, #4325, #4217,
+    #4334, #4207)
+- Rowey (#4172, #4176, #4174, #4183, #4184, #4185, #4235, #4236, #4238)
+- Jip (#4119, #4124#4188, #4190, #4191, #4212, #4205, #4232, #4241, #4243, #4244, #4248, #4250,
+    #4253, #4260, #4254, #4262, #4249, #4025, #4267, #4266, #4264, #4281, #4270, #4282, #4285,
+    #4286, #4292, #4290, #4304, #4298, #4312, #4313, #4308, #4291, #4287, #4328, #4329, #4307,
+    #4331, #4332, #4327, #4334, #4338, #4336, #4201, #4202, 4230)
+- iczero (#4338)
+- FemtoZetta (#4274)
+- KionX (#4131, #4255)
+- CheeseBerry (#4219)
+- BlackYps (#4175)
+- YuchenJimmy (#4279)
+- xXEddieXxx (#4299)
+- Zjonn (#4323, #4326)
+- ErikMekkes (#4321)
+
+And with thanks to Fichom for creating various textures scattered over the pull requests.
+
+## List of incompatible mods
+
+```lua
+-- you can find the most recent list here: https://github.com/FAForever/fa/blob/deploy/fafdevelop/init_fafdevelop.lua#L70
+-- mods that are deprecated, based on mod folder name
+deprecatedMods["simspeed++"] = true
+deprecatedMods["#quality of performance 2022"] = true
+deprecatedMods["em"] = "11"
+
+-- as per #4119 the control groups (called selection sets in code) are completely overhauled
+-- and extended feature-wise, because of that these mods are no longer viable / broken / integrated
+deprecatedMods["group_split"] = "0.1"
+deprecatedMods["Control Group Zoom Mod"] = "2"
+deprecatedMods["additionalControlGroupStuff"] = true
+
+-- as per #4124 the cursor and command interactions are complete overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["additionalCameraStuff"] = "3"
+deprecatedMods["RUI"] = "1.0"
+
+-- as per #4232 the reclaim view is completely overhauled
+deprecatedMods["Advanced Reclaim&Selection Info"] = "1"
+deprecatedMods["AdvancedReclaimInfo"] = "1"
+deprecatedMods["BetterReclaimView"] = "2"
+deprecatedMods["disableReclaimUI"] = "2"
+deprecatedMods["DynamicReclaimGrouping"] = "1"
+deprecatedMods["EzReclaim"] = "1.0"
+deprecatedMods["OnScreenReclaimCounter"] = "8"
+deprecatedMods["ORV"] = "1"
+deprecatedMods["SmartReclaimSupport"] = "3"
+deprecatedMods["DrimsUIPack"] = "3"
+deprecatedMods["Rheclaim"] = "2"
+```
+
+Note that mods like Quality of Performance are no longer required - they barely have impact on the
+performance of the simulation these days.
+
+# Game version 3744 (25th of August, 2022)
+
+The maintainers of Nomads have resolved the issues with tactical and strategical defenses! They should
+now work as intended again.
+
+Jip
+
+## Bug fixes
+
+- (#4178) Do not allow regular projectiles to collide with missiles
+
+  Reverts the behavior to before game patch 3741.
+
+- (#4173) Fix minor issue with recoil of weapons
+
+## Contributors
+
+- Jip: #4178
+- Hdt80bro: #4173
+
+# Game version 3743 (23rd of August, 2022)
+
+There's an issue with tactical and strategic defenses not working when Nomads is enabled. This is due to
+changes to the base game done by patch 3741 that guarantees SMDs to function properly when there are
+multiple strategic missiles on top of each other. We can't revert this change without re-introducing the
+original bug that we're trying to fix.
+
+We've reported the issue and the solution to the maintainers of the mod.
+
+Jip
+
+## Bug fixes
+
+- (#4169) Fix internal state of HQs
+
+  There was an issue with the internal state of the HQs, causing it to get corrupt. This was caused by a refactoring of
+  patch 3741. If there are more issues with HQs then do report them on the forums or via Discord.
+
+- (#4167) Fix text focus of mods manager after exiting
+
+  You can now type again after exiting the mods manager as a non-host user :)!
+
+- (#4165) Add guard for Blueprint.General for command caps
+
+  Not having the guard broke a few mods, among one of them being SCTA.
+
+## Contributors
+
+- 4z0t: #4167
+- Jip: #4169
+- Hdt80bro: #4165
+
+# Game version 3742 (21st of August, 2022)
+
+## Bug fixes
+
+- (e35f16) Revert an engine patch that tries to update the `XACT` (audio engine) version
+
+## Contributors
+
+- Sheikah: e35f16
+- Jip: e35f16
+
+# Game version 3741 (21st of August, 2022)
+
+Another month, another patch! With pride we present the next version of the game where we slowly start
+tackling long-standing issues that we've been taking for granted. Among them the tactical missile
+defenses that feel underwhelming, broken weapons such as those of the Galactic Colossus and beam
+weapons being unable to hit reliable. But soon no more - we're tackling them one by one!
+
+Not only that, from a development perspective we've made great strides. The amount of annotated
+code has exploded, allowing our extension to give proper suggestions and hints. Step by step,
+pull request by pull request we slowly turn the code base into one that supports modern programming
+features such as being able to jump to a definition and we now provide sane suggestions and snippets.
+
+Let alone the improvements to the infrastructure surrounding FAF. With the cache servers of Cloudflare as
+our backbone the distribution of maps, mods and game assets have never been better.
+
+With appreciation towards all the contributors that made this patch possible,
+
+Jip
+
+## Bug fixes
+
+- (#4002) Fix issue with single-item combo list
+
+- (#4016, #4080) Re-implement game results
+
+  A complete re-implementation of how the game results are tracked. This should fix the famous
+  draw bug (where one player wins and the other loses) and in general there should be less
+  unknown game results.
+
+- (#4063) Fix targeting bones of static shields
+
+  Should make them easier to hit with low-arc projectiles and beams
+
+- (#4058) Fix units being able to evade area damage
+
+  Due to how the game processes the game over several steps the area damage could be applied too
+  late, allowing really fast units to already be out of the area of damage, even though the
+  projectile had a direct impact. This is particularly noticeable for spy planes, where they
+  are able to 'sustain' a lot of SAM fire while barely receiving a scratch in damage.
+
+  All in all, this makes the game feel a lot more consistent. A hit should be a hit.
+
+- (#4058) Fix beam weapons being unable to hit all air units
+
+  Due to how the game processes beams there's a possibility that the beam aims 'in front' of the
+  unit, causing it to miss. This is fixed by giving the unit (air units, for this change) a collision
+  box (or sphere) that is of sufficient size. As a result, the Seraphim Lighting Tank (T3 MAA) no
+  longer requires its hack, and because of that can no longer pierce shields :).
+
+- (#4071) Remove smoke ring on underwater SACU death
+
+- (#4074) Disable blue shield bar of shields when turned off
+
+- (#4079) Remove problematic code of JSON library
+
+  Could occasionally cause a game crash
+
+- (#4078) Adjust collision hitboxes of all transports
+
+  Allows their cargo to receive (splash) damage more consistently and makes the transports easier to
+  hit when they are landed.
+
+- (#4082, #4083, #4084) Fix target bones - Seraphim Land units
+
+  Similar to #4058 and #4063, makes these units easier and more consistent to hit when firing with
+  beam weapons. We'll slowly tackle all of the units in the base game, but this is a consuming process!
+
+- (#4093) Add guard to check if dummy weapon of shields are de-allocated
+
+- (#4088) Fix stack overflow in UI when units are assisting each other
+
+- (#4102) Adjust collision box of Megalith due to build animation
+
+  Allows units to consistently hit the Megalith while it is being constructed
+
+- (#4110, #4109, #4160) Add guards to prevent execution when c-object is de-allocated
+
+- (#4103) Attempt at fixing a shield assist bug that could send all your resources into limbo
+
+  Particularly relevant for hives when they are assisting shields that are also taking damage
+
+- (#4121) Rowey fixing Jip
+
+  What would we be without him!
+
+- (#4112) Attempt to fix the save / load functionality of the game
+
+  Long story short - we tried applying some tricks to improve performance a while ago and those
+  did not work anymore after saving and then loading in the game. As a consequence, after loading
+  the game was working with the wrong data causing all sorts of issues!
+
+  We hope this fixes it, but if you still have issues with saving and loading then you can
+  contact us via Discord or the forums.
+
+- (#4113) Reduce projectile speed of air to air weapons
+
+  There's a collision bug that causes the game engine to pick the furthest collision if a projectile
+  collides with multiple instances at the same time. As a consequence, it was difficult for interceptors
+  to hit landed air units and in particular transports. By reducing the projectile speed (and increasing
+  the size of the hitboxes with #4078) we try and solve this issue consistently for the base game
+
+- (#4115) Prevent manual attack move (via the UI) of clearing structure queues
+
+- (#4125) Fix Solace not having the bomber category
+
+- (#4120) Fix the enhancement removal dialogue being stuck
+
+- (#4132) Fix mass of wreckage of Kennel
+
+- (#4144) Fix the death animation of the tempest
+
+- (#4140, #4152) Fix rare occasions when the statuos quo of HQs are not updated properly
+  In particular, when gifting due to full share and when directly destroying the unit
+
+- Fix beam weapons not disabling themselves (#4154)
+
+## Features
+
+- (#4040, #4043, #4044) Re-implement the tractor beams of the Galactic Colossus
+
+  Re-implements the tractor beams of the Galactic Colossus from the ground up. They finally work
+  as intended and can no longer remain stuck on invalid targets. Includes a slight boost to the
+  effects, enjoy toying with the physics!
+
+- (#3893) Add shooter cap to tactical missiles
+
+  Prevents the TMDs from overshooting their targets, as a result TMDs feel a lot more consistent
+  and are in general a lot stronger.
+
+  Fixes an issue with multiple SMDs being unable to stop multiple strategic missiles.
+
+  Adds callbacks to units when their missile is intersected by a shield, a defense or by terrain.
+
+- (#4018) Improved Mod Manager UI  
+
+  Improves the mod manager by introducing a search bar, being able to mark mods as favorite and being
+  able to sort mods on their type. Introduces the capability of interpreting URLs from the `mod_info.lua`
+  file, allowing you to send people to a github, gitlab, bitbucket, sourceforge page or to a topic
+  on the forums.
+
+- (#3927) Allow jammers to recreate their jamming blips
+
+  Fixes the issue of jamming blips being gone forever once they were scouted. With this implementation,
+  after fifteen seconds of being in the fog of war the jamming blips should re-emerge on their own.
+
+- (#4114, 44fd74) Alternative CPU benchmark pt. 1 
+
+  The first of two parts on creating a new CPU benchmark. The current benchmark tries to run some computations
+  in the lobby. This has shown to be inaccurate. The new benchmark takes samples during the game and stores the highest
+  possible sim rate you can run in combination with the total amount of units. Initial data points suggest that this
+  is highly accurate and is even capable of detecting the throttling of laptops.
+
+  The next part will replace implementation of the CPU score in the lobby. That will be part of the next release. This
+  guarantees that everyone has some data to start off with.
+
+- (#3650, #4158) Improve team color mode
+
+  Allows players to adjust the colors used in team color mode. With it, we can finally support people with color blindness.
+
+  Players can choose their own colors by right clicking the team color mode button.
+
+- (#3916) Introduce reclaim statistics for engineers
+
+  The game now keeps track of the reclaim statistics of engineers. They are shown where you'd usually see the veterancy of
+  a unit. You can not see the statistics of allied units, just your own. Works for observers (and casters).
+
+  This is the start of a new era where we'll be introducing statistics gradually. They help players with understanding the
+  value of their actions - as an example, an engineer reclaiming trees on Seton's Clutch can quickly become responsible
+  for hundreds (if not thousands) of additional mass.
+
+## Performance
+
+- (#3932, #4011) Remove unused unit blueprint tabels related to veterancy
+
+  Reduces total amount of allocated memory
+
+- (#4003) Remove collision shape of the Cybran Build Bots
+
+- (#3995, #4000, #3995) Refactor effect utilities pt. 1, 3 and 4
+
+- (#4073, #4076, d86021) Optimize vision and range-ring shaders
+
+  Includes an engine patch - significantly reduces the impact of vision and range rings on your FPS.
+
+- (#4064, 84f68f, 9fd987, 647bdfe) Reduce memory allocations for when bombers fire their projectiles
+
+  Significantly reduces the amount of table allocations when we correct the trajectory of a
+  bomber in Lua.
+
+- (#4111) Reduce memory impact of weapons
+
+- (#4141) Reduce number of pre-allocated trashbags for units
+
+- (#4140) Remove remainders of an experimental setup for caching data
+
+- (#4037) Implement alternative, less resource-hungry vision entities
+
+  Used for example by the lobo - the tech 1 UEF mobile artillery
+
+## Annotation
+
+- (#3936) Annotate and refactor layouthelpers.lua
+
+  Improves performance of UI functions that are used by almost every UI element
+
+- (#4009) Annotate campaign related functions pt. 2
+
+- (#4021) Cleanup annotation of engine documentation
+
+- (#3975, #4023, #4086) Add annotation support for blueprints
+
+- (#4049) Annotate /Engine/Sim.lua creation functions
+
+- (#4050) Annotate /engine/Sim damage functions
+
+- (#4057) Annotate engine/Sim.lua
+
+- (#4053, #4055, #4054, #4056) Annotate engine/Sim/
+
+- (#4041) Annotate categories
+
+- (#4047) Conform /Engine/Sim/ to Moho
+
+- (#4039) Annotate entity.lua
+
+- (#4034) Annotate engine/core.lua
+
+- (#4051) Annotate /engine/Sim army functions
+
+- (#4052) Annotate command functions  
+
+- (#4065) Annotate scenario framework pt. 2
+
+- (#4106) Annotate inheritance of all remaining unit classes
+
+- (#4118) Add annotation to ignore some file specific non errors
+
+- (#4116) Annotate code of all scripts in the editor folder
+
+- (#4038) Annotate cAIBrain and AI related structures / functions
+
+- (#4126) Fix annotation for classes
+
+- (#4127, #4128, #4129, #4148) Annotate missing intermediate unit classes
+
+- (#4130) Annotate defaultunits.lua
+
+## Campaign
+
+- (32d97d, f555cb, 5d0802, 4ad7f8) Various small improvements to the campaign AI (base managers)
+
+- (439757) Fix the protect objective breaking when given dead units
+
+- (7f6a4e) Simplify base manager engineer patrol
+
+  When the patrol path was generated, there was a logic to move instead of patrol if the reclaiming was disabled on
+  the base. That got removed since just moving engineers around does nothing. So it's either patrol or nothing.
+
+- (26bcee) Fix base manager rebuild counter
+
+  Rebuild structure counter was deecremented even for spawning units. Meaning that that AI would not rebuild at all,
+  while it was supposee to be rebuilding once.
+
+- (fa1448) Update base manager rebuild data
+
+  Used for counting how many times to rebuild stuff, based on difficulty. Some of the names were wrong and
+  the list was kinda incomplete.
+
+- (8e167b) Fix base manager sometimes not upgrading factories
+
+  Upgrade thread was checking for IdleState, but if the factory that was suppose to be upgraded was grabbed first
+  to assist other factories in the base, it would never be idle.
+
+- (945df8) Simplify T3 mobile AA builder
+
+  Uses faction convert isntead of separate platoons, since the AA exists for all factions.
+
+- (f65240) Fix PlayerDeath cam unlocking input too early
+
+  Input is always unlocked when the final popup to end the mission shows up.
+
+- (8793ef) Add game speed into objectives UI
+
+  Next to time, just like normal score panel
+
+- (09a829) Improve TransportPool
+
+  Adds MoveRoute and MoveChain to add more control over movingthe transports
+
+- (#4092) Fix the guard return radius of naval units  
+
+  Prevents them from wandering off, taking on quests - finding loot and end up dying because they're on their own chasing
+  their dreams.
+
+- (#4155) Improve the balance of some of the adjusted mechanics
+
+  Such as the tactical missile defense improvements and the tractor beams of the Galactic Colossus
+
+## Other changes
+
+- (#3952) Update AI-related categories for the Cybran experimentals
+
+- (#4032) Update AI-related categories of Obsidian
+
+- (#4030) Update AI-related antiair and antinavy categories of Aeon Experimentals
+
+- (#4029) Update AI-related antiair and antinavy categories of Seraphim Experimentals
+
+- (#4028) Update AI-related antiair and antinavy categories of UEF Experimentals
+
+- (#4036) Update AI-related categories of engineers
+
+- (#4035) Update AI-related categories of ACUs
+
+- (#4031) Update AI-related categories of navy
+
+- (#3851) Reduce amount of unfinished buildings for the AI
+
+  This is a difficult one to tackle, but what happens is that buildings remain unfinished because there
+  is a nearby threat to the ACU. The ACU attempts to defend, but then doesn't always continue what he
+  started previously
+
+- (#3971) Cleaning up of files
+
+- (7ff888) Fix name of operational AI (related to campaign)
+
+- (#4033) Reduce amount of trees on fire at the start of the game  
+
+- (#4070, #4100) Add unit utilities
+  Step-up work to make sacrifice work properly again
+
+- (#4117) Refactor # -> -- for original performance testing scripts
+
+- (#4122) Fix duplicated functions and typo
+
+- (#3910) Refactor BuffAffectsUnit to be easier to mod
+
+  Previously all the functions (that apply the buff) were scoped in another function.
+
+- (#3783) Improve code style of common UI elements
+
+## Contributors
+
+- Hdt80bro: #3936, #3995, #4000, #3995, #4049, #4050, #4053, #4041, #4047, #4055, #4054, #4071, #4051, #4052, #4056, #4079,
+-   #4057, #4065, #4070, #4086, #4064, 84f68f, 9fd987
+- Rowey: #3932, #3971, #4117, #4116, #4122, #4127, #4128, #4129, #4130, #4132, #4148
+- Maudlin: #3952, #4032, #4030, #4029, #4028, #4036
+- Uveso: #3851, #4080
+- speed2: 7ff888, 32d97d, f555cb, 5d0802, 4ad7f8, 439757, 26bcee, fa1448, 8e167b, 945df8, f65240, 8793ef, 09a829
+- Jip: #4011, #4003, #4016, #4009, #4021, #4023, #4033, #4040, #4044, #3893, #4058, #4039, #4034, #4074, #4082, #4083, 
+-   #4084, #4093, #4100, #4110, #4106, #4109, #4112, #4113, #4114, #4125, #4111, #4038, #4144, #4141, #4140, #4152, #4037,
+-   #3916, #4154, #4158, #4156, #4159, #4160
+- Ejsstiil: #4002
+- hahn-kev: #3975, #4118, #4126, #4128
+- hussar-mtrela: #4018
+- SpikeyNoob: #3927
+- 4z0t: #4088, #3783, #4120
+- KionX: #4073, #4076, d86021, 44fd74, #8
+- Penguin: #4115
+- Balthazar: #3910
+- Strogo: #8, #3650
+
+Game version 3740 (23th of June, 2022)
+======================================
+
+## Bug fixes
+
+(#3987) Align the stun radius of a Medusa with its damage radius
+
+(#3988) Fix the initialisation of a state as part of a simple class
+
+(#3990) Fix various issues with transports for AIs
+    Specifically allows the AIs to properly understand the number of units that can be attached to a transport 
+
+## Features
+
+(#3979) Improve campaign AI behavior
+    Includes various fixes for campaign behavior, specifically to their use of transports
+
+(#3989, #3993) Allow all direct fire weapons to retarget as usual
+    Prevents units from 'being stuck' attacking a factory while an engineer is next to it. This type of issue
+    shows up a lot more often in matchmaking. Change made with thanks to a conversation on the forums.
+
+    I'd also like to use this opportunity to note that we're making the game better for the community. If a change 
+    appears to be the reverse of that then we're always open to discuss why you think that is the case. 
+
+## Other changes
+
+(#3962) Add annotation to campaign related files
+
+(#3983) Fix the Russian translation to 'Depth charges'
+
+(#3991) Prevent loading of the mod `Quality of Performance 2022`
+    It was damaging some of the optimalisations that were introduced the past few months. At the same time it
+    introduces a unit that is free and produces a lot of resources, but it is only available to the Cybran faction
+
+(#3992) Adjust the spacing of tech 1 / tech 2 bombers / gunships
+
+## Contributors
+
+Jip (#3962, #3988, #3992, #3991, #3993, #3990)
+Uveso (#3983)
+Fluffy (#3987)
+speed2 (#3979, #3990)
+
+Game version 3739 (20th of June, 2022)
+======================================
+
+## Bug fixes
+
+- (#3978) Fix tactical missile enhancements of (S)ACUs
+
+## Contributors
+
+- Jip (#3978)
+
+Game version 3738 (19th of June, 2022)
+======================================
+
+The past month has been exciting - there is no other word that we can use.
+
+From a development perspective we're on the verge of being able to provide a modern, interactive development environment to our community. With the work of Eluvatar a Visual Studio Code (VSC) extension is close to release that provides intellisense support for map scripters, mod makers and game developers. And with the work of Ejsstiil the Lua debugger that ships with the game is fully functional again when you work from your development environment. Programmers understand how critical these features are for the development of essentially anything.
+
+And from a user perspective the game has never been more performing. Specifically the infamously slow ASF battles has been tackled. For the majority of matches the game no longer slows down, with the assumption that there is no potato processor participating in the match.
+
+All of that shadows all of the other critical work that has been done the past month with thanks to all the remaining contributors, including SpikeyNoob, Hdt80bro and LilJoe7k4 who made their first contributions to the game repository.
+
+A great deal of appreciation towards everyone that made this patch possible.
+
+I hope you all enjoy the lack of APM during a late Seton's Clutch game,
+
+With kind regards,
+
+Jip
+
+## Bug fixes
+
+- (#3896, #3899, #3901) Fix UI elements ignoring the console command UI_ToggleGamePanels
+
+- (#3909) Fix enhancements ETAs leaking to the other screen when using split screen
+
+- (#3876) Sanitize weapon target priorities of Point Defenses
+    This fixes the issue that point defenses are not firing while a target is in range
+
+- (#3923, #3924) Fix an economy related glitch that allows you to gain resources free of charge
+    For all intends and purposes we will not dive into the details ;)
+
+- (#3946) Fix damage of child projectiles, such as Cybran tactical missiles after they split
+
+- (#3961) Fix issue with the attachment bones of the tech 2 Aeon Transport
+    As a consequence the tech 2 Aeon transport can now carry up to 3 tech 3 units, instead of 2
+
+- (#3966) Fix roll off points for various factories
+    The roll off points were not properly aligned, as a consequence ships had trouble leaving the dock. This was especially noticeable on the naval factories of the Cybran faction
+
+## Features
+
+- (#3887, #3968) Introduce Intellisense support for the FA Visual Studio Code (VSC) extension
+    As map scripters, mod makers and game developers we have been living in a cave. But no more - thanks to the work on the extension and the work in this pull request we are slowly introducing annotation across the repository.
+
+    For those with programming experience: it is like the introduction of Typescript, after working for years on ends in Javascript.
+
+    This also works when you have no development environment for the FA repository on your system, see the readme on the Github page of the FA repository for more information.
+
+- (#3938) Revive the FA Lua debugger
+    Revives the FA Lua debugger when you are working from your development environment. Allows you to set breakpoints and inspect the stack, locals and globals. Extremely useful when you are debugging your maps, mods and when you're working on game development in general.
+
+    Requires a development environment in order to work. You can set this up in half an hour, see the readme on the Github page of the FA repository for more information.
+
+- (#3883) Introduce a UI to keep track of the mass fabricator behavior
+    The UI element is to the right of the economy panel. It can be dragged horizontally by using the middle mouse button.
+
+- (#3889, #3906) Improve in-game chat settings panel
+    Fixes various small issues with the chat panel and allows you to view and inspect the changes in the settings live by using the apply button.
+
+- (#3863) Pimp the Aeon Quantum Optics Facility
+    The unit was unfinished in every regard - as part of a live programming session we improved the feeling and aesthetics.
+
+- (#3905) Add guidelines for a development environment for FA for Linux-based operating systems
+    For more information, see the work instructions of the github page.
+
+- (#3933) Use playable area instead of map size on the default scoreboard
+
+- (#3835) Introduce a builder pattern to create UI elements
+    An alternative, more modern approach to creating, positioning and checking of UI elements.
+
+- (#3972) Add the ability to manually recheck weapon targets of the selected units via a hotkey
+    As per #3857 the weapons of the majority of units do not recheck their targets. Usually this is not required, but it does cause a big hit on performance. This new hotkey is introduced to allow you to let your units retarget on command for those situations where that is required
+
+    You can find the hotkey by searching for 'recheck' in the hotkeys menu
+
+### For map, mod and AI developers
+
+- (#3884) Add support for a unit.IsCivilian flag
+    Introduces an easy to use flag to indicate whether a unit belongs to a civilian army
+
+- (#3894) Add support for a unit.ImmuneToStun flag
+    Introduces an easy to use flag to make a unit immune to stuns
+
+- (#3894) Add support for a shield.SkipAttachment flag
+    Introduces an easy to use flag to allow shields to function when attached
+
+- (#3944) Add support for multiple upgrade animations via the function unit.GetUpgradeAnimation
+
+## Performance
+
+- (#3845) Reduce table allocations when defining weapon target priorities
+
+- (#3875, #3945) Reduce memory impact of units, weapons and props
+
+- (#3891, 6fefe78) Sanitize guard scan radius of units
+    The guard scan radius is used by units on attack move or patrol to find and engage hostile units in their surrounding. The value was all over the place and could cause serious slowdowns, especially during the late game.
+
+- (#3892, #3903) Sanitize footprints of air units
+    All non-experimental air units had a footprint size of 1 - the size of a wall. Because of that there were two issues: due to their proximity it introduced mesh intersections that break the immersion of the game. And due to their density it causes performance issues. From now on all bombers have a footprint size of 4, all gunships have a footprint size of 3 and all interceptors have a footprint size of 2.
+
+- (#3930) Remove dependency on the schook folder
+    Improves code maintainability and reduces the amount of hooks that ships with the game.
+
+- (#3857, #3931, #3950) Sanitize weapon parameters
+    There are three crucial parameters that determine the behavior and performance of weaponary: the weapon target check interval, the weapon tracking radius and the retargeting behavior of weaponry. The weapon target check interval is now based on the rate of fire of the weapon. The weapon tracking radius is reduced to 7% for non-anti air weaponry units and 15% for anti air weaponry. The retargeting is disabled unless the weapon is considered artillery or anti air.
+
+    This slightly changes the behavior of units, by standardizing their weapon parameters. In return, the game performs a lot better and units respond more consistent based on their weapon statistics.
+
+- (#3949) Reduce impact of props on FPS
+    Aligns the rendering distance of props with the base game
+
+- (#3943, #3951) Reduce impact of mesh entities on FPS
+    Aligns the rendering of various mesh-based entities with their respective size. As an example, the adjancency node was rendered up to the same distance as that of shields.
+
+- (#3967, #3965) reduce impact of projectiles on FPS
+    Sanitizes the LODCutoff of projectiles that have a mesh. The average projectile is emitter based, but some use a mesh. These meshes were visible at extreme ranges, causing them to be rendered even though they were completely hidden behind the strategical overlay of projectiles (dots)
+
+## Other changes
+
+- (#3885) Fix argumentations for the Hunter AI
+
+- (#3879) Fix minor issue with lobby
+
+- (#3881) Refactor effect files of the Lighting Tank
+    As told to us by Rowey - we'd be lost without him.
+
+- (#3895) Fix minor issues with the initialisation files
+
+- (#3907, #3926) Improve the /nomovie command line switch
+
+- (#3908) Introduce a /nomusic command line switch
+
+- (#3904) Fix game options menu not being scrollable by mousewheel
+
+- (#3913) Fix issues with the .gitignore of the repository
+
+- (#3921) Add tooltip to patchnotes button in the lobby
+    The mighty Rowey - at work again.
+
+- (#3882) Fix bone names of the upgraded Hives
+
+- (#3925) Fix the width, padding and layouts of various UI elements
+
+- (#3912, #3724) Add in remaining base game blueprint and script files
+    Greatly improves code maintainability of working on the game as a whole.
+
+- (#3947) Fix UEF engineers not applying their water animation
+
+- (#3948) Fix a rare issue where the speed adjustment of (slow) hover units caused an error
+
+- (#3941) Fix categories missmatch for the Atlantis
+
+- (#3969) Fix the Flayer (AA) missiles of the tech 2 UEF Cruiser
+    The missiles were using a torpedo mesh, instead of the typical UEF AA Flayer mesh used by sams
+
+## Contributors
+
+- LilJoe7k4: (#3845)
+- speed2: (#3885)
+- 4z0t: (#3879, #3883, #3835)
+- Jip: (#3895, #3894, #3884, #3875, #3863, #3891, #3892, #3903, #3923, #3913, #3924, #3857, #3931, #3912, #3724, #3944, #3947, #3946, #3945, #3948, #3950, #3972)
+- Ejsstiil: (#3896, #3889, #3899, #3907, #3908, #3909, #3904, #3906, #3901, #3926, #3925, #3937)
+- Madmax: (#3863, #3951, #3943, #3961)
+- SpikeyNoob: (#3905)
+- Tagada: (#3876)
+- Rowey: (#3921, #3881, #3882)
+- Hdt80bro: (#3933)
+- Eluvatar: (#3887, #3968)
+- Uveso: (#3941)
+- M0rph3us (#3969, #3967, #3965)
+- KionX (6fefe78)
+
+## Translators
+
+- 4z0t (Russian)
+- M0rph3us (French)
+- Unknow (French)
+- Carchagassky (French)
+
+
+Game version 3737 (15th of May, 2022)
+===================================
+
+### Features
+
+ - (Engine patch) Introduction of alternative profiling function for better accuracy (ff630c8)
+
+ - (Engine patch) Maximum game speed is set to +50 (adc06ef5)
+    Note that the interface (for replays, for example) has not been adjusted yet. Usually anything
+    above +10 is only applicable in the first few minutes of the game.
+
+ - Add button to lobby to access patch notes (#3842)
+    Another contribution of Rowey: introduces a button in the lobby to access the patch notes.
+
+ - Add Cloak Enhancement restriction option (#3844)
+    Allows the host to restrict the cloak enhancement of the Cybran ACU / SACU.
+
+ - Add proper recursive logging (#3861, #3869) 
+    Introduces the functions 'reprs' and 'reprsl'. They are abbreviations for 'Recursive printing safe' and
+    'Recursive printing safe to log'. It introduces an alternative to 'repr' which can get stuck in a recursive
+    loop when trying to stringify units, projectiles, weapons and / or props. The old repr functions is available
+    as 'repru', which is an abbreviation for 'Recursive printing unsafe'. The function 'repr' refers to 'reprs'.
+
+### Bug fixes
+
+ - (Engine patch) Disable mesh rendering for minimap (#7)
+
+ - (Engine patch) Fix a crash when restarting a map with a Salem (#6)
+
+ - (Engine patch) Fix a crash when air units have a collision of 'None' (1b17fe7)
+
+ - (Engine patch) Excludes negative income and problems from this (1b17fe7)
+    The problem in question is complicated and happens in every game, but it noticeable when it
+    happens to a commander. The negative income causes the commander to not be 'fully built', and that causes
+    a player to lose the game. This could happen when the commander was being repaired.
+
+ - (Engine patch) Fix a crash when the mouse is pointing towards the sky, away from the terrain (3bf0ba5)
+
+ - Fix mass fabricator behavior for multiplayer (#3852)
+    Fixes an issue where the new fabricators could seriously hamper the performance of the game
+
+ - Fix reclaim effects (#3865) 
+    Fixes an issue where the beam glitches out when reclaiming a unit
+
+ - Fix destruction sound of units being played twice (#3868)
+    Was especially noticeable on the Spiderbot
+
+### Performance
+
+ - (Engine patch) Improve performance of common table operations (ff630c8, da692d3)
+
+ - Optimize abstract projectile classes (#3847, #3855, #3866, #3867)
+    Further reduces the load on the CPU when projectiles are taking part in the simulation
+
+ - Clean up defaultunits.lua (#3806) 
+    Improves documentation, while removing engine calls, empty functions and duplicated code
+
+### Other 
+
+ - Fix coloring of lobby buttons (#3846) 
+    Rowey has keen eyes - fixes a few textures having the wrong colors when in the lobby when
+    you select the UEF faction
+
+ - Minor autobalance-related improvements (#3849)
+    Prevents a no-op swap where a player is switched with him / herself
+
+ - Fix two UI layout functions (#3848)
+    Fixes the UI functions 'OffsetIn' and 'PercentIn' of LayoutHelpers.lua
+
+ - Announce game full on slot closure (#3862)
+    Enables the game full announcement to happen when you close slots
+
+### Contributors
+
+ - Strogo (#7, #6)
+ - KionX (1b17fe7, ff630c8, 3bf0ba5, 564ff89, adc06ef5)
+ - Rowey (#3842, #3846, #3844)
+ - Jip (#3847, #3855, #3866, #3867, #3865,
+        #3868, #3861, #3869)
+ - 4z0t (#3852, #3848)
+ - Penguin (#3849, #3862)
+
+Game version 3736 (6th of May, 2022)
+===================================
+
+### Features
+
+ - Introduction of automated fabricator behavior (#3813, #3814, #3822, #3838, #3840)
+    Automates the fabricators depending on your energy storage and energy trend:
+     - Less than 90% storage: fabricators are turned off, one by one until the storage is full again.
+     - Full storage and more than 100 energy income: fabricators are turned on, as long as the conditions are met
+
+    There is no particular order in enabling and disabling the fabricators. Only one fabricator is enabled or disabled 
+    at any moment. This is an intended limitation to encourage the construction of one tech 3 fabricator over 
+    16 tech 2 fabricators.
+
+    The fabricators production toggle enables or disables the automated behavior of fabricators. When toggled off both 
+    the behavior and the production is removed. When toggled on the behavior is enabled again but does not follow suite: 
+    the fabricator will be enabled over time assuming that you meet its conditions: full storage and  more than 
+    100 energy income.
+
+    This feature is experimental and may be removed again in the future. Please use the Discord channels and the forums to 
+    provide feedback on this feature. Note that the feature is not intended to play the game for you - it should therefore 
+    not always make an optimal choice. As an example, if you want certain fabricators enabled but they remain off then you 
+    should build more power to sustain all fabricators or disable other fabricators manually.
+
+ - Allow the cheat window to spawn multiple units at once (#3825)
+
+ - Re-implement the changelog dialog (#3833)
+    Adapts the changelog into one that is more versatile. It puts an emphasis on the amount of work that has been done in 
+    the past, can be dismissed by pressing escape, highlights the lines that you're hovering over and has a button with a 
+    link to the more user-friendly version of balance patches.
+
+### Bug fixes
+
+ - Fix UI issue with some co-op maps (#3816)
+    Fixes the playable area not being set for various co-op maps
+
+ - Fix invulnerable Continentals (#3830)
+    Continentals could end up being invulnerable, making the ideal ghetto gunship. This was damaging to the game balance 
+    and therefore corrected.
+
+ - Fix rendering issues with the minimap (#3834)
+
+ - Fix behavior when kicking observers (#3836)
+    Removes the 'offset' that was introduced by 3732 and a host can no longer eject him/herself.
+
+### Performance
+
+ - Improve performance of entity allocations (#3824)
+
+ - Re-introduce input delay when there is one or fewer players (#3837)
+    Six years ago the input delay was removed when a single player game was detected. This would allow your units to respond 
+    immediately. This brought in some serious side effects such as a (massive) loss of performance over the duration of a 
+    game. Particular players playing against AI may notice a significant speed up and more stable performance.
+
+### Other 
+
+ - Remove deprecation warnings (#3827)
+    The deprecation warnings ended up being confusion to map and mod makers alike. They are removed until a better 
+    alternative is available.
+
+ - Update description of fabricators (#3817)
+    We have been rewarded by another contribution from Rowey - an event unlike any other. We're blessed to have him with us.
+
+### Contributors
+
+ - 4z0t (#3816)
+ - Rowey (#3817)
+ - Strogo (#3834)
+ - Penguin (#3836)
+ - Jip  (#3813, #3814, #3822, #3838, #3840,
+        (#3825, #3827, #3824, #3826, #3822,
+         #3833, #3830)
+
+With thanks to speed2 for reporting some of the issues through Github.
+
+Game version 3735 (24th of April, 2022)
+===================================
+
+### Bug fixes
+
+ - Remove remainder of old decal / tree knocking code (#3803)
+    Fixes issues with the missiles of the Cybran 'Plan B' submarine
+
+ - Fix consumption issue with extractors when production is paused (#3804)
+    Extractors no longer produce mass for free when their production is paused :)
+
+ - Allow for ambiguous states in classes (#3805)
+    This fixes an issue with the mod RKs explosions that immediately 
+    broke the simulation upon launch
+
+ - Fix wreckage not taking damage (#3807)
+
+ - Fix inconsistent lods (#3808)
+    This was particularly noticeable between trees and tree groups.
+
+ - Fix Aeon structures shader after construction (#3809)
+
+### Performance
+
+ - Prevent extractors from looking through all markers upon creation (#3804)
+
+### Contributors
+
+ - Jip (#3803, #3804, #3805, #3807, #3808, #3809)
+
+With thanks to Archsimkat, AlfaViTe and Cyrris for taking the time to report various issues.
+
+Game version 3734 (22nd of April, 2022)
+===================================
+
+### Bug fixes
+
+ - Fix (another) missing parameter in matchmaking (#3801) 
+
+### Contributors
+
+ - Jip (#3801)
+
+Game version 3733 (22nd of April, 2022)
+===================================
+
+### Bug fixes
+
+ - Fix missing parameter in matchmaking (#3800) 
+
+### Contributors
+
+ - Jip (#3800)
+
+Game version 3732 (22nd of April, 2022)
+===================================
+
+### Features
+ - In-lobby auto balancing (#3750, #3764, #3768) 
+    Introduction of in-lobby balancing for the typical two-team setup. Similar results
+    to optimal balance but allows the host to manually tweak the starting positions
+    and take into account parties before launching the game.
+
+ - Introduction of experimental graphics (#3775)
+    Allows you to increase the LOD of entities and the LOD and resolution of 
+    shadows. This can be enabled separetely in the graphics options of the game. Is
+    applied after restarting the game.
+
+    Please read the tooltip carefully.
+
+ - Introduction of lobby option to determine sharing behavior of units (#3741)
+    Allows the host to enable the sharing of all units, only allow the sharing of
+    non-construction units or disable the sharing of units all together. By default
+    sharing of all units is enabled.
+
+ - Dynamic AI threat calculations (#3660) 
+    The AI threat values have not been updated over the years - they are now 
+    computed based on unit statistics during the blueprint loading phase. 
+    Introduces a utilities window that allows you to inspect AI-related blueprint 
+    values of a unit. You need to set a hotkey for that window. You can find it 
+    in the hotkeys dialogue (F1) by searching for 'information'. Cheats need to 
+    be enabled in order for the window to show.
+
+ - Allow Hives to start upgrading immediately (#3675)
+    Part of the Small Suggestions topic on the forum - suggested by Tagada.
+
+ - Introduce connection status during matchmaking
+    Adds a UI component that informs you how many players are connected while waiting for
+    the people to connect for ladder / matchmaking.
+
+ - Introduction of the (performance) profiler (#3674, #3700)
+    Allows us to diagnose where the performance is being used during a game. Revolutionary 
+    in terms of our capabilities of understanding where all those cycles are going.
+
+    Requires you to set a hotkey to enable it. Abuse is bannable.
+
+ - Introduce toggle for mesh rendering on the minimap (#3667)
+    All meshes would be culled (or rendered) accordingly on the minimap even though
+    they are, typically, never visible. Introduces a toggle to disable mesh rendering
+    in the minimap.
+
+    This is not functional until the next release of the executable.
+
+ - Adjust dynamic threat computations (#3680, #3673)
+    Armored command units no longer have inflated threat values. Introduces a flag to skip 
+    the dynamic threat computation all together, defaulting back to what was set in the 
+    blueprint. Weapons by default produce direct fire threat, unless they are flagged to be 
+    blockable by an anti-artillery shield. In that case they only produce economic threat.
+
+    This only impacts AI-related games. With thanks to Relent0r (creator of RNGAI) for his time.
+
+ - Temporarily disables weapons of a unit upon gifting (#3696)
+    Prevents the cheat where gifted units can immediately fire again. This was particularly
+    relevant to bombers.
+
+ - Map utilities window (#3677, #3713) 
+    Introduces a window to help analyse a map. Can be used to visualize the threat values of an AI, 
+    check the buildability of extractors, along with ringed storages and fabricators. Can visualize
+    all markers on a map.
+
+    Requires you to set a hotkey to enable it. 
+
+ - Display team ratings in the observer window of the lobby (#3721, #3728, #3742)
+
+ - Introduction of an announcement when you receive units due to full share (#3712) 
+
+ - Introduction of click-on-name-to-whisper feature while in the lobby (#3747)
+    
+### Bug fixes
+
+ - Remove new lines when you set a lobby title (#3644) 
+    Prevents having lobbies in the client that occupy multiple lines, 
+    allowing them to overlap with other lobbies.
+
+ - Preserve weapon bone orientation upon destruction (#3668)
+    There was a bug introduced last patch that causes weapons to reset
+    their orientation right before the unit was destroyed. 
+
+ - Fix trampling damage (#3669)
+    There was a bug introduced last patch that reduced all trampling
+    damage to zero. Surprising how little people reported about it :)
+ 
+ - Fix inconsistencies with cheat menu (#3656)
+    The mouse click is now always registered. Prevents selected units from 
+    interfering with the cheat progress by deselecting them while spawning 
+    units and reselecting them when you are finished. Fixes veterancy issues: 
+    both for the spawn menu and all campaign missions.
+
+ - Proper UI scaling of Window class (#3679, #3795)
+
+ - Fix display name of Ythotha death weapon (#3689)
+    The yearly contribution of Rowey - can't wait what next year will bring us!
+
+ - Add missing build mode entries (#3690)
+
+ - Fix Cerberus turrets over extending their range (#3693)
+
+ - Fix encoding issues with unicode characters in the preference file (#3711, #3737) 
+
+ - Fix issues with the color picker of the lobby (#3705, #3715, #3751, #3765, #3706, #3799)
+
+ - Fix various issues that people found while playing on FAF Develop 
+   - (#3729, #3731, #3732, #3748, #3771, #3774, #3780, #3782, #3784,
+      #3788, #3794, #3793, #3796) 
+
+    With thanks to: Yudi, Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
+    people that hosted games on FAF Develop and / or reported issues to the game team.
+
+### Other
+ - Improve readme of repository (#3647, #3663, #3670)
+    Introduces a modern readme and accurate installation instructions of the 
+    development environment. With thanks to everyone involved, including but not 
+    limited to BlackYps, Sheikah, Balthazar, Emperor, Ftx. And thanks to 4z0t there is 
+    a complete Russian translation of the readme and the installation instructions.
+
+ - Adjust map preview button (#3646)
+    The button to show the map preview is enlarged and remains enabled when 
+    you are ready as a player.
+
+    Part of the Small Suggestions topic on the forum - suggested by Scout_More_Often.
+
+ - Add enabled mods to tooltip (#3649) 
+    Adds the enabled ui or sim mods to the tooltip in the lobby, allowing you to preview 
+    the enabled mods without entering the mod manager. A small quality of life feature.
+
+    Part of the Small Suggestions topic on the forum - suggested by Emperor_Penguin.
+
+ - Chat ally option (#3651)
+    Adds a chat option to send to allies by default instead of to all. Chat options 
+    can be found by clicking the wrench icon on the chat dialogue when you are in-game.
+
+    Part of the Small Suggestions topic on the forum - suggested by CheeseBerry.
+
+ - Add map version to tooltip in scoreboard (#3648) 
+    Improves the default scoreboard by introducing the map description and version
+    when hovering over the map.
+
+    Part of the Small Suggestions topic on the forum - suggested by Emperor_Penguin.
+
+ - Change default army color order of lobby (#3642)
+    Changes the default army colors to be more intuitive, as an example: when the game is 
+    2 vs 2 then it is two shades of red versus two shades of blue.
+
+ - Improve compatibility with Lua 5.1 (#3676) 
+
+ - Improve compatibility for LuaJIT (#3682) 
+    Sadly - LuaJit itself has been cancelled due to the insignificant improvements to the simulation
+    in comparison to the amount of work.
+
+ - Enable `wld_RunWithTheWind` from the command line (#3653)
+    Useful when you have Ai vs Ai games
+
+ - Allow Galacitic Colossus to retarget if the current target is unreachable (#3695)
+
+ - Fix some styling issues with the lobby (#3777)
+
+ - Attempts to fix the self-awareness of the ready button in the lobby (#3791, #3792)
+    Reduces the occurences of the ready button not being in sync with the
+    host and other users in the lobby.
+
+### Performance
+ - Fix LODs of effects (#3720, #3798)
+
+    Fixes inconsistent Level of Detail (LOD) cutoffs for effects. The cutoff is used to 
+    prevent the creation and rendering of particles when they barely contribute to the final 
+    image. A lot of effects had an infinite cutoff. These particles were always created and 
+    rendered. The creation of particles has a significant impact on the sim, the rendering 
+    has an impact on your fps. We introduce a sane LOD cutoff value with which we improve 
+    the performance of the sim and your fps at the same time.
+
+    With thanks to Madmax (creator of various maps and mods) for all his effort to
+    look at more than individual 300 effect files.
+
+    This was a well-described starters issue - you can find more of these issues on the repository.
+
+ - Dynamic LOD settings (#3662) 
+    Computes the LOD cut off values of props based on its blueprint properties. A 
+    prop that occupies less screen space will have a lower cut off value - allowing 
+    it to be culled sooner. This improves the framerate of the game in general, 
+    while having a minor impact on visual fidelity. 
+    
+    Technical detail: The LOD values of props in the blueprint are now ignored.
+
+ - Improve performance of markers (#3387) 
+    Allows AI developers / map scripters to work with markers without having to worry 
+    about underlying performance issues. As an example, retrieving the mass markers
+    on a map is a common operation for AIs. If done through the base game code it would 
+    re-allocate a new table of markers each time an AI condition manager starts 
+    checking the state of the game. That is quite wasteful. This file keeps
+    track of previous calls, caching the result. Supports adaptive and crazy rush-like maps.
+
+    Introduces a UI that allows you to inspect the cached markers. The window is toggled with 
+    'K' by default and can be adjusted as usual. Requires cheats to be enabled.
+
+    Technical detail: this has no impact on regular games, only on games with AI once they've
+    implemented these new routines.
+
+ - Improve performance of various UI-related functions (#3659) 
+    Replaces the global function to use a cached result. A call to `GetSessionClients` or 
+    `GetArmiesTable` created a unique table that the garbage collector can pick up two 
+    lines later. These functions are called each frame or each tick. With this caching 
+    behavior they get replenished every two seconds, or every 0.025 seconds if a fast
+    interval is set.
+
+ - Improve performance of reclaim effects (#3672)
+    Reduces the amount of garbage generated when an engineer is reclaiming a prop, such
+    as a tree or a wreck.
+
+ - Improve performance of shield interactions (#3681, #3699)
+    Significantly improves the performance when a lot of shield interactions are happening
+    simultaniously. This is the case when shields get tickled to death, such as by a Mantis
+    or by a bomber. 
+
+    One particular use case that is significantly faster is when you have fire at Janus fly over
+    30 mobile shields. This took about 60% of the total budget per tick, but now only takes 10%.
+
+ - Improve performance of damage over time (DOT) (#3683)
+    Reduction of table allocations. 
+
+ - Improve performance of projectile collisions (#3685) 
+    Reduction of table allocations and engine calls.
+
+ - Improve performance of unit sound interactions (#3686) 
+    According to commit dfb363d the sound of submarine units do not work. The solution introduced 
+    is applied to all units and allocates a handful of entities per unit. These allocations are 
+    expensive! By default, units try to play the sound themselves. For submarine units we 
+    introduce one entity that plays all the sounds of the submarine. 
+
+ - Improve performance of utility functions of the Unit class (#3678, #3691)
+    Reduction of table allocations and engine calls.
+
+ - Removal of the blinking lights (#3698)
+
+ - Improve performance of UI related classes 
+   - (#3704, #3703, #3709, #3725, #3766, #3767, #3521, #3781, #3785)
+
+ - Improve performance of all props, including wrecks (#3714)
+    Significantly reduces the number of tables allocated per prop. Simplifies some 
+    of the logic in favor of performance. Completely removes the state machine. Improves
+    the visual fidelity of forest fires.
+
+ - Improve performance of all projectiles (#3718)
+    Reduction of table allocations, engine calls and various logic across the projectile
+    class hierarchy.
+
+    Part of a session available on Youtube. See the videos about improving the 
+    performance of projectiles in the playlist Game Development on the FAForever Youtube 
+    channel.
+
+ - Improve performance of tree-knocking and decal creation of projectiles (#3719)
+    Introduces a generic approach that is highly optimized. Supports units from
+    mod packs accordingly.
+ 
+ - Improve performance of the UEF build effects (#3702, #3736, #3738)
+    Significant reduction of table allocations, engine calls and a significant reduction in
+    the amount of Lua instructions related to these functions.
+
+    Part of a session available on Youtube. See the videos about improving the 
+    performance of UEF build effects in the playlist Game Development on the FAForever  
+    Youtube channel.
+
+ - Improve performance of the Seraphim build effects (#3740, #3753)
+    Corrects the scope of some values and improves the consistency of the Seraphim build effect.
+
+ - Improve performance of the Lua class hierarchy (#3710) 
+    Re-implements the class hierarchy used on the Lua side of the game from scratch. It simplifies
+    the implementation to improve the performance while retaining the same functionality. Reduces
+    the amount of tables allocated and the amount of table-related Lua instructions. Supports  
+    automated class culling and adjust the implementation of states to reduce the memory footprint 
+    of the game. 
+
+ - Improve performance of exhaus effects (#3743)
+    Significant reduction of table allocations.
+    
+    This was a well-described starters issue - you can find more of these issues on the repository.
+
+ - Improve performance of veterancy buff creation (#3720)
+    Reduction of table allocations.
+
+    This was a well-described starters issue - you can find more of these issues on the repository.
+
+ - Improve performance of OnMotionHorzEventChange (#3717) 
+    Reduction of function calls and removes the 'OnMotionHorzStart' callback.
+
+### Contributors
+
+ - Sheikah (#3647)
+ - FtxCommando (#3647)
+ - BlackYps (#3647, #3642, #3759)
+ - Penguin  (#3647, #3705, #3715, #3721,
+             #3728, #3712, #3742, #3751,
+             #3764, #3750, #3768, #3765,
+             #3782, #3706, #3792, #3799) 
+ - Askaholic (#3647, #3759)
+ - Sheeo (#3647)
+ - Balthazar (#3660, #3647, #3676)
+ - 4z0t (#3651, #3647, #3704, #3703, #3709,
+         #3725, #3737, #3747, #3766, #3767,
+         #3777, #3787, #3785, #3795)
+ - Jip (#3660, #3647, #3663, #3656, #3387, 
+        #3659, #3648, #3646, #3649, #3672,
+        #3668, #3669, #3670, #3675, #3679,
+        #3681, #3683, #3685, #3673, #3653,
+        #3693, #3691, #3696, #3698, #3718,
+        #3714, #3719, #3702, #3729, #3710,
+        #3712, #3736, #3740, #3753, #3720,
+        #3774, #3775, #3780, #3521, #3781,
+        #3788, #3791, #3793, #3794, #3796,
+        #3759)
+ - Tagada (#3675, #3678)
+ - Strogo (#3667)
+ - Rowey (#3689)
+ - Unbring (#3690)
+ - KionX (#3682)
+ - Relent0r (#3673)
+ - Brokerjoe (#3738, #3740)
+ - SkepticSpecter (#3743)
+ - Madmax (#3720, #3798)
+ - Healther (#3722, #3717)
+ - Crotalus (#3741)
+ - speed2 (#3759)
+
+
+Game version 3731 (30th of December, 2021)
+===================================
+
+### Features
+ - Improve scoreboard (#3633)
+    Adds the share conditions to the scoreboard. Adds tooltip for 
+    the share condition, explaining what it means. Adds information 
+    to the share condition tooltip on how to find the remaining 
+    game options. Adds a tooltip for the map name to include the
+    map description. The replay ID can be found in the map description.
+
+    This last one is a bit unintuitive, but the replay ID is 99% of the time
+    not relevant information. It would take up UI space if we'd just put 
+    it there regardless. 
+
+    Once the map generator is updated the settings used to generate
+    the map are set as its map description. That way you can view those
+    settings in game when required.
+
+### Bug fixes
+ - Fix filtering insignificant units (#3636)
+    We made the assumption that categories.INSIGNIFICANTUNIT
+    was not widely used by mods. This was wrong - hence we still
+    introduced a new category specifically for units that inherit the
+    DummyUnit class. These units should not be reachable by code
+    as they are not a typical unit - they lack all the functions you'd
+    expect.
+
+    Fixes (for example) the anti teleporting mechanic of Blackops.
+
+ - Update initialisation files (#3637)
+    Allows loading `kyros.nxt` on the regular branch. Adds 
+    proper checks on the extension of maps / mods instead to
+    prevent loading in rar / zip / scd files as mods. Improves
+    debugging information: as an example when something is
+    excluded the user is informed through the log. Introduces
+    the removal of incompatible shaders. Incompatible here 
+    means shaders of previous versions of FAF.
+
+### Other
+ - Revert "Snowflakes in lobby (#3615)" (#3634)
+    Removes the snow flakes from the lobby.
+
+### Contributors
+ - Emperor_Penguin (#3633)
+ - Jip (#3634, #3637, #3633, #3636)
+
+Patch 3730 (23th of December, 2021)
+===================================
+
+Games using the featured mod Nomads will break when playing the Aeon 
+faction until Nomads has been updated by its maintainer.
+
+### Features
+ - (#3627) Whitelist Kyro's lobby
+    The file `kyros.nxt` is now white listed. If you intent to
+    work on this lobby, please consider working on the lobby
+    of the repository instead.
+
+### Bug fixes
+ - (#3628) Fix inconsistency with hover queue
+ - (#3626) Fix issue with insignificant units and campaign levels
+ - (#3625) Force recompilation of shaders due to Nomads shaders
+ - (#3624) Fix highlight of selected units to drop in transport
+ - (#3624) Fix template menu that allows you to rename / delete templates
+
+### Contributors
+ - 4z0t (#3624)
+ - Jip (#3627, #3628, #3626, #3625)
+
+Patch 3729 (20th of December, 2021)
+===================================
+
+### Features
+ - (#3615) Happy Christmas (in advance) ^_^
+
+### Bug fixes
+ - (#3618) Fix scale of Seraphim build effects
+ - (#3618) Fix issue with disconnection window for auto lobbies (ladder / tmm)
+ - (#3618) Revert removed effect template for backwards compatibility with mods
+ - (#3620) Add delay to ringing feature to prevent malicious intent
+
+### Contributors
+ - 4z0t (#3615)
+ - Jip (#3618, #3620)
+
+Patch 3728 (20th of December, 2021)
+===================================
+
+### Features
+ - (#3484, #3500, #3535, #3600, #3604, #3610, #3611) 
+    Allow more structures to be cap-able using a similar mechanic to storages for extractors.
+    This changes the ringing behavior to:
+    - 2 clicks + shift to mass storage an upgrading t1 extractor
+    - 1 click to mass storage a t2 / t3 extractor
+    - 3 clicks to shift + mass fab cap an upgrading t2 extractor
+    - 2 clicks to shift + mass fab cap a t3 extractor
+
+    - 1 clicks to mass storage a t3 fabricator
+    - 1 clicks to pgen an t2 artillery
+    - 2 clicks + shift to pgen an upgrading t1 radar
+    - 1 clicks to pgen an t2 radar or t3 radar
+    - 1 click to wall a t1 pd
+   
+    General rule of thumb:
+    - Typical: click
+    - Upgrading: shift + 2 click
+    - Dangerous: shift + (regular click count + 1)
+
+    Shift was already part of the feature and is extended to prevent unintended ringing.
+    
+    Assisting behavior
+    - When all engineers are of the same faction, they can all build the same storage. No assisting happening.
+    - When you have engineers of two or more factions, one must assist the other as they can't build the same storages.
+    - When you have engineers of one faction and units that can't build the storage (kennel drones, ACU) then they must assist an engineer as they can't build the storages themselves.
+
+    This option can be adjusted in options -> gameplay. Search for the field 'Automated Structure Encircling'. Options are:
+    - Off
+    - Only mass storages and extractors
+    - Full suite
+
+ - (#3597, #3604, #3605, #3607) Add factory queue on hover
+    This allows you to get a quick overview of the factory queue by just hovering over the unit. Especially useful for casters as you can now view the factory queue without switching to the army in question.
+
+    Can be adjusted in the options -> interface. Search for the field 'Show Factory Queue on Hover'. Options are:
+    - Off
+    - Only on when observing
+    - Always
+
+ - (#3531) Add an option to scale down the UI (to 80%) for low resolution monitors
+    This doesn't appear to be an issue at first due to the infinite zoom but when the score board takes up 50% of your screen due to a 1024x720 resolution then it suddenly is.
+
+    Not all of the UI can manage this - please report issues in #game-general in the FAF discord when you find them.
+
+ - (#3554) Add quick-swap feature to lobby for the host
+    As a host you can quickly swap two players by left-clicking on the slot numbers of two players. It highlights to teal (light / bright blue color) when in swap modus. Click the highlighted slot number to cancel.
+
+ - (#3616) Expands the disconnection dialog
+    A host can now set a lobby option to change the delay required during a disconnection dialog. This defaults to the current behavior but can be set to 10 and  30 seconds.
+
+    The exit dialog is now on top of the disconnection dialog, instead of the other way around.
+
+ - (#3602) Overhaul of the cheat spawn menu
+    Adds a basic prop spawn mode. Units are spawned using the command feedback on the spawn location. If spawning multiple units they spawn in a box formation. Multi column support and customizable in the game options. Dynamic support for custom factions. Adds in a toggle for revealing hidden-from-spawn-menu units
+
+### Stability
+ - (#3477) Prevent clearing critical state in AI functions
+ - (#3490, #3551) Refactor the init files of the game
+    This is an involved change but one that was due. 
+    
+    The init files can no longer load in content that clash between the base game files or between older versions of the same mod. This could also occur when the mod was not activated for sound and / or movie files.
+
+    The client supports loading content from a separate vault location, the init files need to support this functionality accordingly. The init files of the game types FAF, FAF Beta and FAF Develop support this functionality. Other game types need to be updated accordingly.
+
+    The vault location determined by the client is used to load in content (maps / mods). Any other location is no longer read and therefore any map / mod in the other locations are not found by the game. If after this patch you 'lost' a few of your maps and / or mods it means that they were in an old vault location - you'd need to move those manually.
+
+    Adds icon support to FAF Beta.
+
+    Adds the ability to more easily block content that is integrated.
+
+ - (#3527) Integrate the Nvidia Fix mod and block the mod from loading
+ - (#3543) Prevent applying bugs to insignificant units, like the Cybran build drone
+ - (#3550) Attempt to fix Rhino from missing its target 
+
+### Bug
+ - (#3522) Fix upvalue issue of patch 3721
+ - (#3486) Fix (mod) units being unbuildable due to error in UI
+ - (#3432) Fix overcharge occasionally basing its damage on the previous unit it hit
+ - (#3316) Fix experimentals doing death damage upon death during construction
+    Monkeylord: only when fully complete as it sits
+    Megalith: only when fully complete as it sits
+    Colossus: when complete 50% or more
+    Ythotha: when complete 50% or more
+
+ - (#3440, #3604) Removes the dummy drone from the unit restriction list
+    This drone was often misintepreted as an easy way to unrate a game. In contrast to what the name suggests it does have a function: to help gift units when a player dies and full share is on. The drone can no longer be restricted and instead there is a dedicated lobby option to unrate the game.
+
+ - (#3525) Fix the unpathable skirts of the Seraphim Quantum Gateway
+ - (#3582) Fix Aeon aim bones being underground when building
+    This fixes the famous issue where an unfinished t1 pd attracts a lot of fire, but because its aim bones are still underground all the attacking units shoot at the ground. Fix is applied to all Aeon units. Aeon build animations are now done through the shader.
+
+ - (#3581) Fire Beetle properly applies EMP / stun buffs
+ - (#3601) Fix Seraphim t3 MAA from zapping through shields
+ - (#3599) Fix consumption bug introduced by #3447
+ - (#3598) Fix Rhino overshooting its target.
+ - (#3598, #3614) Fix errors on gifting when full share is enabled
+ - (#3596, #3617) Fix typo that prevents cybran build beams from spawning
+ - (#3609) Fix inconsistency with SACU presets that prevent them from having custom strategic icons
+ - (#3612) Fix kennels not spawning their drone when you immediately queue up an upgrade
+
+### Other
+ - (#3480) Update visuals for the UEF T2 PD and Destroyer
+ - (#3523) Switch off debug utilities by default
+    This is only useful for developers, but it did cause a drain on resources when it was turned on even though you're not looking at the logs. It turns it off by default during each startup, you can prevent this as a developer by adding `debug = { enable_debug_facilities = true }` to your preference file
+
+ - (#3417) Add unit tests for generic utility functions
+ - (#3420) Fix small issues for units of the Cybran faction.
+ - (#3492) Remove greyness when deviation is high
+    In combination with other work, such as combining the number of games people played across the board (ladder / tmm / globals) it should become easier for people to 'get into' custom games without being called a noob beforehand or a smurf afterwards (never played custom games, but played a lot of ladder).
+
+ - (#3475) Fix capitalisation consistency
+ - (#3443) Allow trashbag to be re-used for effects
+ - (#3489) Fix UI description of teleport
+ - (#3491) Fix the attack animation of the Monkeylord
+ - (#3349) Updates the readme with the most recent dependencies
+ - (#3461) Remove game quality computations for games with more than two teams
+    The Trueskill system is not designed to compute the quality of a game when more than (or less than) two teams are involved. Hence, the computation is gibberish anyhow.
+
+ - (#3526) Remove the curated maps button until an alternative is available
+ - (#3528) Fix T2 seraphim sonar being restricted when t3 base spam is selected
+ - (#3533) Change default settings of auto lobby to 1.5K unit cap and full share (used by ladder / team match making)
+ - (#3441, #3614) Introduction of insignificant or dummy units
+    This introduces a new unit class that can be used to fix various bugs and glitches with the game. One such issues is the long standing bug with the Aeon build animation where the aim bones are underground at the start of construction.
+    
+    Sadly, this change is quite involved because a lot of the functionality expects a full-fledged unit. We've tried to catch some of these but there will be more issues that will show up, especially with scripted maps.
+
+ - (#3552) Update regular expression of mod version removal
+ - (#3558) Restrict t2 artillery orientation to 90 degree angles
+ - (#3582) Fixed various issues with the Aeon build animation
+    As an example, hover units no longer jump to their hover elevation when they're finished. All experimentals have unique build animations that fit the style of the faction.
+
+ - (#3586) Force shader re-compilation on development branches
+ - (#3583) Update URLs to https instead of http
+ - (#3567) Fix graphics of Summit and Fatboy
+ - (#3606) Fix (build) icon of Seraphim T3 MAA
+ - (#3607) Fix Cybran ACU not having the right amount of build bots when enhanced
+ - (#3613) Add a hotkey to select all idle scouts
+
+### Performance
+ - (#3417) Add minor performance improvements for generic utility functions
+ - (#3447) Removed old AI related code that was being run regardless of whether AIs were in-game
+    This change is involved performance-wise but does not impact gameplay.
+
+    As a practical example: chain ten engineers assisting one another and make the first engineer assist a factory. With these changes they'll start assisting the factory one by one as it takes one tick (simulation tick) to detect the unit it is assisting has started working on something.
+
+    The previous behavior would be that all engineers get updated immediately. This required it to search for engineers in its surrounding and all those it found would need to look up its surroundings too. This can quickly get out of hand.
+
+ - (#3502) Optimize the import function that is used by all files.
+ - (#3512) Removes AI threat computations and fixes AI detection
+    AI code was being run during every game even when no AI was present in said game. After discussing it with the AI devs this pull requests completely removes the threat computations.
+
+ - (#3419) Reduce impact on sim of common hover emitter effects
+    Effects have an impact on the sim, in particular when they create a particle. Once the particles exist they appear to be free of charge. With this PR we reduced the number of particles created for various units such as the Aeon T1 engineer to bring them into the same cost range (sim wise) as the other engineers, without impacting their visual appearance too much. Disables the hover effects of these units all together when playing on low fidelity.
+
+ - (#3557, #3617) Fix and improve performance on Seraphim build animations
+    The old version had complicated logic and various computations that were not required. The new version is better for performance and a lot more smooth with regards to the build animation.
+
+ - (#3582) Prevent unneccessary allocations during the Aeon build animation
+ - (#3587, #3589) Optimize most common called unit functions
+ - (#3595, #3590, #3588, #3617) Optimize weapons
+
+### Contributors
+ - Askaholic (#3417, #3440)
+ - Madmax (#3420, #3419, #3582)
+ - Uveso (#3477)
+ - Rowey (#3475, #3528, #3533, #3583, #3606)
+ - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
+        #3522, #3512, #3440, #3419, #3525, #3526, #3490,
+        #3527, #3531, #3543, #3411, #3551, #3550, #3557
+        #3558, #3582, #3581, #3587, #3589, #3601, #3600
+        #3599, #3598, #3595, #3590, #3588, #3586, #3567
+        #3604, #3607, #3610, #3609, #3611, #3612, #3613
+        #3614, #3616, #3617)
+ - KionX (#3486, #3489, #3523, #3349)
+ - Crotalus (#3432)
+ - Benzi-Junior (#3461)
+ - Balthazar (#3552, #3602)
+ - 4z0t (#3554, #3597, #3605, #3607)
+ - Marlo (#3582)
+ - Eternal (#3597)
+ - Tagada (#3480)
+
+### Reviewers
+ - Balthazar (#3484, #3587)
+ - Relent0r (#3512)
+
+### Translators
+ - Lenkin (#3440)
+ - 4z0t (#3597)
+
+Hotfix 3727 (26th November, 2021)
+============================
+
+### Bug 
+ - (#3571) Fix tree groups when they split
+    Fixes some of the props that were introduced with the 3721 patch.
+ - (#3569) Fix strategic bomber not dropping their bombs
+ - (#3570) Fix Seraphim regen aura buff
+### Contributors
+- Madmax (#3571)
+- Tagada (#3569)
+- Petric (#3570)
+- Jip (#3570)
+
+Hotfix 3726 (26th November, 2021)
+============================
+
+### Bug 
+ - (#3565) Reverts changes to the buff mechanic
+    This introduced a minimal value to each buff, where as some
+    buffs are negative such as adjacency bonusses. This change
+    was intended for solely the Seraphim Regeneration field, where
+    as it affected all buffs.
+
+### Contributors
+- Jip (#3565)
+
+Patch 3725 (26th November, 2021)
+============================
+### Land
+- Zthuee
+    - BuildTime: 180 → 270
+- Titan and Loyalist
+    - BuildCostEnergy: 5400 → 5250
+    - BuildTime: 2400 → 2160
+- Loyalist
+    - Add 1.5s stun to the slow-firing weapon affecting units up to and including T2, excluding navy and structures
+- T1 Land Scouts
+    - Reduce the aggro range while on assist/attack move
+    - BuildTime: 80 → 60
+- Mole
+    - BuildCostEnergy: 80 → 60
+    - EnergyMaintenanceCost: 5 → 1
+- Spirit
+    - BuildCostEnergy: 40 → 60
+- Selen
+    - Energy Maintenance Cost: 0 → 1
+    - StealthWaitTime: 1 → 3
+    - Vision and radar range are now multiplied by 0.6 when entering cloak mode
+- LABs
+    - Slightly increase the hitbox
+- Firebeetle
+    - HP: 350 → 400
+    - ExplosionRadius: 6 → 6.5
+    - MaxAcceleration: 5 → 7
+    - TurnRate: 160 → 200
+    - Reduce detonation trigger distance when manually attacking a unit
+- Rhino
+    - Revert the weapon from a beam-type to a projectile-type to prevent misses when leading targets
+
+### Air
+- T1 Transports
+    - Add dummy weapons which allows units inside to focus fire targets
+- Scorcher
+    - Damage: 4 → 4.5
+    - InitialDamage: 47.5 → 42.5
+    - MuzzleSalvoDelay: 0.3 → 0.2
+- Notha
+    - HP: 1175 → 1000
+- Soul Ripper
+    - Add Stealth at -600 energy maintenance cost
+- Revenant
+    - DamageRadius: 7 → 6.5
+    - EnergyMaintenanceCost: 65 → 150
+- Shocker
+    - Damage: 3450 → 3000
+    - DamageRadius: 4 → 5.25
+    - Added a 3s stun of units up to and including T3
+- Sinntha
+    - Damage: 3250 → 3000
+    - DamageRadius: 5 → 6
+- Ambassador
+    - Damage: 3000 → 3100
+    - DamageRadius: 6 → 5.5
+- All strat bombers
+    - Double the amount of mass killed required to vet
+- Shimmer
+    - Better match the EMP radius to the damage radius
+- Jester
+    - Fix the bug where it would not do damage to moving units
+    - Replace splash damage with soft projectile homing
+
+### Navy
+- UEF Destroyer
+    - TurretYawRange: 140 → 160
+    - TurretYawSpeed: 90 → 100
+    - Torpedo firing cycle adjusted to combat torpedo defense better
+- Cybran Destroyer
+    - TurretYawRange: 135 → 140
+- Aeon Destroyer
+    - TurretYawRange: 160 → 150
+    - TurretYawSpeed: 100 → 90
+- Seraphim Destroyer
+    - Torpedo firing cycle adjusted to combat torpedo defense better
+- Atlantis
+    - Fix the AA behaving in a way inconsistent with the stats, adjust the stats to preserve the current balance
+
+### Structures
+- Kennel Drones
+    - Now have higher selection priority than buildings
+- UEF T3 Sonar
+    - Add Jamming
+- Paragon
+    - Add a 100,000 E storage
+- T1 PDs
+    - Adjust the hitboxes and bones of the PDs to make the wall-pd template behave the same way for each faction
+- T4 Artilleries
+    - Ranges normalized to 4000 (Mavor range)
+
+### Miscellaneous
+- Cybran ACU Stealth Upgrade
+    - EnergyCost: 5000 → 14000
+    - MassCost: 350 → 650
+    - BuildTime: 500 → 800
+    - Provides 2000 extra HP
+- Sera ACU Regen Field Upgrade
+    - Now provides regen to the ACU itself, 10 hp/s for the first upgrade and 20 hp/s for the second
+    - Now uses different regen floor values for units depending on their tier: 
+        - Basic Tier
+            - RegenFloorT1: 3
+            - RegenFloorT2: 8
+            - RegenFloorT3: 15
+            - RegenFloorT4: 25
+            - RegenFloorSCU: 15
+        - Advanced Tier
+            - RegenFloorT1: 15
+            - RegenFloorT2: 30
+            - RegenFloorT3: 60
+            - RegenFloorT4: 120
+            - RegenFloorSCU: 80
+
+### Contributors
+- Tagada
+- Petricpwnz
+- Uveso
+- Jip
+
+Patch 3724 (04th October, 2021)
+============================
+### Gameplay
+ - (#3450) An alternative approach to loading in custom strategic icons
+ - (#3458) Fix UEF Triad and UEF Destroyer projectile on impact animation
+
+### Bugs
+ - (#3442) Fix scathis packing animation time
+ - (#3439) Fix Cybran drone visibility for other players than the owner
+ - (#3450) Fix UI textures being overridden by mods that are not enabled
+ - (#3457) Fix Cybran drone being interactable and other small issues (with thanks to Archsimkat)
+ - (#3453) Fix units being gifted to the same player causing a soft-crash for the shared army mod (co-op campaign)
+ - (#3468) Revert changes to sending the results of games
+ - (#3471) Fix overcharge mouse indicator to use the right damage calculations
+
+### Stability
+ - (#3436) Prevent fetching blueprints for potential entities with no blueprints
+ - (#3449) Fix significant hard-crash potential that patch 3721 introduced (with thanks to all the debugger reports)
+ - (#3460) Fix potential soft-crash when gifting units upon death (with thanks to FemtoZetta)
+ - (#3467) Add SCD support for large icon sets (with thanks to Deribus)
+ - (#3472) Revert changes to some projectiles that caused them to crash for mods (with thanks to DDDX)
+
+### Other
+ - (#3385) Add support for custom game options being set by the server (for 3v3 / 4v4 TMM)
+
+### Contributors
+ - Jip (#3442, #3439, #3449, #3458, #3457, #3460, #3450, #3467, #3468, #3471)
+ - KionX (#3449)
+ - Crotalus (#3436)
+ - Balthazar (#3450)
+ - speed2 (#3453)
+ - Askaholic (#3385)
+ - BlackYps (#3385)
+ - keyser (#3472)
+
+Patch 3723 (19 September, 2021)
+============================
+- Fixed a bug preventing from spawning the wreck of some experimentals
+
+### Contributors
+- Jip
+
+Patch 3722 (19 September, 2021)
+============================
+### Lobby
+- Updated balance patchnotes link
+
+### Bugs
+- Fixed featured mod not working
+
+### Performances
+- Optimize default explosion
+
+### Other
+- Allowed custom vault path
+
+### Contributors
+- Jip
+- KionX
+- keyser
+
+Patch 3721 (19 September, 2021)
+============================
+### Lobby
+- Improved visibility of balance patchnotes
+- Improved CPU benchmark to take into account RAM
+- Removed large map preview when map preview is hidden (map generator)
+- Prevented kyros lobby from displaying spawn location when map preview is hidden (map generator)
+- Fixed ACU display in large map preview
+- Fixed the link for curated map button
+
+### Gameplay
+- Removed reclaim rate from scoreboard mass income
+- Added decals on a lot of projectiles impact and tree falling effect for aesthetics
+- Added feature : preselection of mex when selection engineer and hovering the cursor over a mass spot
+- Allowed battleship/battlecruiser to render their weapon reload bar
+- Speed up Aeon static shields death animation to match other faction
+- Added a hotkey for dock
+- Made sonars more reliable to hit
+
+### Bugs
+- Fixed game resulting in draw when it should not
+- Fixed units doing some friendlyfire and inaccurate damage
+- Fixed Cybran ACU sonar that was working without the torpedo upgrade
+- Fixed unit cap display in coop
+- Fixed some UI scaling issues
+- Fixed game ID displayed in the scoreboard
+- Fixed a warning with shield overspill function
+- Fixed a bug happening when engies were not able to build
+- Fixed some warnings due to lava trees missing textures
+- Fixed aoe damage not working properly on build drones
+- Fixed hotkey not working with Seraphim SACU in buildmode
+
+### Performances
+- Optimized cybran build effects and reduced the number of drones spawned by hives
+- Code optimisation related to weapons
+- Call to faster function
+- Improved UEF build beam logic
+- Simplified Seraphim flash effect at finished structure
+- Simplified UEF static shield build effect
+- Optimized math calculations
+- Optimized function to generate random numbers
+- Optimized logic for structure rotation toward enemies (for point defenses, artillery)
+- Optimized HQ logic
+- Prefetch data in the lobby to speed up loading screen
+- Removed unused code which aimed to rock boats
+- Optimized the access to the current layer of a unit
+- Optimized trashbag
+- Benchmark tool for developper allowing to evaluate easily code impact on performances
+
+### AI
+- Fixed a bug preventing AI from firing nukes from Aeon SML
+- Fixed AI's ACU upgrade in coop
+- Fixed arty range issues with AI
+- Removed unused code for AI
+- Improved description of AI code
+- Fixed AI platoon function
+- Fixed AI game result
+
+### Other
+- Improved and more visible weather
+- Added new props for maps
+- Display beetle as cloacked for the owner
+- Removed duplicates of adjacency visual effects
+- Added field engineer icon to Cybran/Seraphim/Aeon, so it display in case they possess one.
+- Updated loading tips
+- Prevented observers from pinging
+- Prevented sending resources to enemies
+- Fixed tooltip to support experimental transporter
+- Improved code style consistency
+- Fixed chrono dampner and RAS description
+- Removed Aquatic tag from T3 UEF maa
+- Fixed the visual of several cybran unit's weapon
+- Added old patchnotes changes until the version 3636
+- Test code with FAF lua language
+- Better naming of T3 maa unit folders
+- Small refactoring with regard to taunts
+- Add textures for map generator
+
+### Contributors
+- Jip
+- Uveso
+- speed2
+- KionX
+- Sheikah
+- KeyBlue
+- Relent0r
+- Dragun
+- Askaholic
+- Madmax
+- Tagada
+- FemtoZetta
+- Rowey
+- Divran
+- Timocov
+- Melanol
+- Benzi-Junior
+- slinkingant
+- WhenDayBreaks
+- SnaggleFox
+- keyser
+
+Patch 3720 (14 May, 2021)
+============================
+- Land
+    - Tech 1 Land
+        - Mantis
+            - Icon changed from a LAB icon to that of a T1 tank
+        - Sky Slammer
+            - Increase of projectile velocity and projectile lifetime vs air units
+        - Selen
+            - Range: 18 → 19
+            - TurretYawSpeed 120: → 130
+- Air
+    - Tech 1 Air
+        - Jester
+            - Speed: 9 → 10
+            - MuzzleVelocity: 40 → 55
+            - DamageRadius: 0 → 0.15
+        - T1 Bombers
+            - Radar radius: 42 → 44
+- Navy
+    - Tech 1 Navy
+        - Shard
+            - Damage: 7 → 6
+            - MuzzleVelocity: 45 → 60
+- Structures
+    - Mexes
+        - T1 Mexes
+            - BuildPower: 13 → 10
+        - T2 Mexes
+            - BuildPower: 20.58 → 15
+            - BuildTime: 1171 → 900
+        - T3 Mexes
+            - BuildTime: 3944 → 2875
+- Miscellaneous
+    - Unit Target Priorities
+         - Revert ACUs to previous targeting behavior of having no preference between various units
+         - Cruisers now target navy before structures again
+         - Subs target other subs before coopers
+    - Overcharge
+        - Overcharge kills mobile land shield generators if it depletes its shield on impact (only a single one, overspilled ones live). Veterancy counted, no reclaim left.
+    - Artillery damage
+        - Fixed T2 aeon artillery dealing double damage and zthuee & lobo dealing 10 more damage per shot
+### Contributors
+- Petricpwnz
+- Tagada
+- keyser
+
+Hotfix 3719 (2 December, 2020)
+============================
+- Reverted previous change breaking Sorian AI
+
+Patch 3718 (29 November, 2020)
+============================
+- Land
+    - Tech 1 Land
+        - Aurora
+            - Mass Cost: 52 → 54
+            - Power Cost: 260 → 270
+            - Build Time: 260 → 270
+            - Health: 140 → 155
+            - Speed: 2.9 → 3
+            - RateOfFire: 0.66 → 0.6
+        - Mantis
+            - Mass Cost: 52 → 56
+            - Build Time: 260 → 265
+        - Flare
+            - Mass Cost: 35 → 42
+            - Power Cost: 140 → 165
+            - Build Time: 120 → 140
+            - Health: 70 → 115
+            - Speed: 4 → 3.8
+            - Damage: 7 → 9        
+        - Hunter
+            - Health: 65 → 90         
+        - Mech Marine
+            Mass Cost: 35 → 30
+            Power Cost: 120 → 100
+            Build Time: 120 → 100
+            Health: 75 → 60
+            Speed: 4 → 4.2
+            Turnrate: 45 → 50
+            TurretYawSpeed: 180 → 200
+        - Selen
+            Build Time: 80 → 90
+            Speed: 4 → 3.8
+            Range: 16 → 18
+            Turret SlavedToBody: True → False
+            TurretYawRange: 30 → 360
+            TurretYawSpeed: 180 → 120
+    - Tech 2 Land
+        - Mongoose
+            - MaxSpeed: 3.2 → 2.8
+        - Hoplite
+            - MaxSpeed: 3.6 → 3.3
+        - Asylum
+            - Energy maintenance: 35 → 45
+        - Parashield
+            - Energy maintenance: 60 → 80
+            - MaxSpeed: 4 → 3.5
+        - Air scout
+            - Power Cost: 420 → 580
+            - Build Time: 145 → 200
+            
+- Air
+    - Tech 1 Air
+        - T1 bomber
+            - Mass cost: 105 → 90
+            - Energy cost: 2450 → 2050
+            - Build time: 700 → 500
+            - BreakOffDistance: 24 → 32
+            - RadarRadius: 0 → 42
+        - Jester
+            - Mass cost: 200 → 170
+            - Energy cost: 5000 → 4250
+            - Build time: 1000 → 850
+            - Health: 525 → 350
+            - MaxSpeed: 12 → 9
+            - Damage: 16 → 15
+- Structures
+    - Flood XR
+        - Sonar Stealth: 90 → 70
+        - Radar Stealth: 45 → 70
+    - Yolona-Oss
+        - The Yolona-Oss has its animation reduced to increase the speed of its firing cycle. It also explodes like other strategic missile launchers when killed. 
+    - Death Weapon
+        - Inner Ring Damage: 20000
+        - Inner Ring Radius: 15
+        - Outer Ring Damage: 5000
+        - Outer Ring Radius: 20
+        - WeaponRepackTimeout: 32.5 → 20
+- Miscellaneous
+    - Overcharge
+        - Overcharge is changed from a variable system to a fixed damage per energy used. The ratio is 1:4 damage to energy drained and the minimum damage is 1250, maintaining the minimum energy required to Overcharge at 5k.
+        - The damage dealt by overcharge scales with the amount of energy drained from storage.
+        - Overcharge will use as much energy as is needed to kill the highest health unit hit
+        - The minimum damage is 1250 at a cost of 5k energy.
+        - The maximum damage is 15k at a cost of 60k energy.
+        - Overcharge will drain a maximum of 90% of stored energy.
+        - Damage vs buildings and vs commanders is unchanged from the previous system.
+    - Target Priorities
+        - Many units had their target priorities updated to enabled them to function more effectively. Find all the details here: https://github.com/FAForever/fa/pull/3072
+    - Experimental Nuclear Missile
+        - Health: 60 → 60000
+    - Nuclear Missile
+        - Health: 25 → 25000
+    - Anti-nuke missile
+        - Damage: 30 → 30000
+    - Air Factory Rolloff
+        - Air factory rolloff times have been equalised between factions.
+    - T3 Air Crash Damage
+        - The crash damage of T3 air units has been increased and made more consistent.
+    - Fixed the vision effects of Lobos and Seraphim air scouts
+    
+- Game Patch
+    - hide ressources on game preview for generated hidden maps
+    - allow AI to build assist factories
+    
+### Contributors
+- keyser
+- speed2
+- JaggedAppliance
+- Petricpwnz
+- Kazbek
+- KionX
+- Sheikah
+- Azraeel
+
+Hotfix 3717 (13 September, 2020)
+============================
+- Fixed coop not working
+- Fixed all games being unrated
+
+### Contributors
+- KionX
+- Askaholic
+
+Hotfix 3716 (12 September, 2020)
+============================
+- Fixed cybran arty explosion when hitting shields
+
+### Contributors
+- keyser
+
+Patch 3715 (12 September, 2020)
+============================
+### Lobby
+- Allowed single player lobby to get the features from the multiplayer lobby
+- Adapted autolobby for team matchmaker
+- Improved russian translation of the lobby
+
+### Gameplay
+- Added an alternative hotkey layout using cycle when building unit in factory
+- Added a hotkey to access factory template (unit queue template in factory)
+- Allowed to bind action to the "chevron" key
+- Improved AI
+- Prevented reclaim from cancelling death animation when the unit is killed by a shot (doesn\'t apply to volatile structure)
+- Added experimental armor to air/navy/structure experimental
+- Removed beetle armor
+
+### Bugs
+- Fixed bigger strat icons
+- Fixed the eye of Rhianne giving permanent vision underwater
+- Fixed explosion decals spawn when structure dies
+- Fixed chat and minimap repositionning when resizing the game
+- Fixed explosion killing trees
+- Fixed explosion decals spawn with arty/bomber projectiles
+- Fixed mermaid torpedo hitbox
+- Fixed game slowdown on long AI games
+- Fixed wrong game rating reward
+- Fixed lag watching replay at fast speed and improved ingame performances
+- Fixed wreckages\' hitbox positionning
+
+### Other
+- Improved unit description in game
+- Updated resource structure description
+- Improved usability of the cheat menu
+- Allowed cheat menu to spawn modded unit
+- Improved the loading tips
+- Moved faction data out of the functions
+- Added topological sorting for mods
+- Added shaders for the SCTA
+- Improved scripted army movement
+
+### Contributors
+- KionX
+- speed2
+- BlackYps
+- The-Balthazar
+- keyser
+- Uveso
+- Askaholic
+- AugSphere
+- FemtoZetta
+- Dragun123
+- ugandarowanda
+- Jip
+- Kazbek
+
+Patch 3714 (3 May, 2020)
+============================
+- Land
+    - Tech 1 Land
+        - Aurora 
+            - Parameter added: UseFiringSolutionInsteadOfAimBone = true
+    - Tech 2 Land
+        - Obsidian
+            - Damage: 480 → 360
+            - Rate of Fire: 0.25 → 0.333
+        - Pillar
+            - Range: 23 → 22
+        - Riptide
+            - Health: 1700 → 1800
+            - Mass cost: 360 → 320
+            - Power cost: 2000 → 1650
+            - Buildtime: 1600 → 1420
+        - Rhino 
+            - Mass cost: 297 → 290
+            - Buildtime: 1320 → 1300
+            - Range: 23 → 24
+            - Vision Radius: 20 → 22
+        - Blaze
+            - Health: 1050 → 1100
+            - Range: 23 → 24
+        - Ilshavoh
+            - Firing Tolerance: 1 → 3
+            - Turret yaw speed: 70 → 85
+            - Vision Radius: 20 → 24
+        - Yenzyne
+            - Health: 1300 → 1350
+            - Speed: 4.3 → 4
+            - Rate of Fire: 0.25 → 0.3
+        - Firebeetle
+            - Health: 500 → 350
+            - Mass cost: 250 → 190
+            - Power cost: 1500 → 1300
+            - Buildtime: 1000 → 700
+            - Damage: 1500 → 1100
+            - Firebeetle is now cloaked
+        - Tech 2 Engineer
+            - Build range: 5 → 6
+    - Tech 3 Land 
+        - Tanks/Bots
+            - Harbinger 
+                - Health: 3050 → 3600
+                - Range: 26 → 27
+                - Damage: 320 → 160
+                - Rate of Fire: 1 → 2
+                - Shield recharge time: 40 → 30
+            - Titan
+                - Health: 2550 → 2600
+                - Shield: 600 → 700
+                - Damage: 50 → 45
+                - Shield recharge time: 15 → 12
+                - Range: 22 → 24
+            - Loyalist
+                - Health: 3000 → 2500
+                - Stun duration: 1.4s → 1.5s
+                - Bolter damage: 14 → 28
+                - Bolter Range: 20 → 24
+                
+                - Charge Ability
+                    - Stun duration: 3s
+                    - Speed boost: x1.75
+                    - Seconds before charge begins: 4s
+                    - Seconds before exploding: 10s
+            - Percival
+                - Damage: 1690 → 1450
+                - Rate of Fire: 0.2 → 0.23
+                - Muzzle Velocity: 38 → 36
+            - Brick
+                - Muzzle Velocity: 42 → 38
+            - Othuum
+                - Health: 5000 → 4700
+                - Speed: 2.6 → 2.75
+                - SizeY: 0.45 → 0.65
+                - SizeZ: 2.0 → 2.3
+                - Bolters
+                    - Damage: 46 → 64
+                    - Muzzle Velocity: 40 → 30
+                    - Range: 21 → 20
+                - Cannon
+                    - Damage: 525 → 625
+                    - Damage Radius: 0 → 1.2
+        - Snipers
+            - Sprite Striker (Aeon)
+                - Mass cost: 720 → 800
+                - Energy cost: 8000 → 8900
+                - Buildtime: 4000 → 4500
+                - Speed: 2.85 → 2.6
+            - Usha-Ah (Seraphim)
+                - Mass cost: 800 → 880
+                - Energy cost: 8800 → 9700
+                - Buildtime: 4300 → 4900
+                - Speed: 2.5 → 2.4
+        - Mobile Artillery
+            - Serenity(Aeon)
+                - Speed: 2.5 → 2.2
+                - Minimum Range: 0 → 25
+            - Trebuchet(Cybran)
+                - Speed: 2.5 → 2.2
+                - Minimum Range: 0 → 25
+                - Unpacking Animation: 1-2s → 4s
+                - Damage Radius: 7 → 6
+            - Demolisher(UEF)
+                - Speed: 2.5 → 2.2
+                - Minimum Range: 0 → 25
+                - Unpacking Animation: 1-2s → 4s
+            - Suthanus(Seraphim)
+                - Speed: 2.5 → 2.2
+                - Minimum Range: 0 → 25
+                - Unpacking Animation: 1-2s → 4s
+                - Damage Radius: 6 → 5
+        - Tech 3 Engineer
+            - Build Range: 5 → 7
+    - Experimentals
+        - Galactic Colossus
+            - Death weapon damage: 7500 → 8000
+            - Death weapon aoe: 4 → 7
+        - Ythotha
+            - Death weapon damage: 10000 → 7000
+            - Death weapon aoe: 8 → 6
+        - Monkeylord
+            - Death weapon aoe: 7 → 6
+        - Megalith
+            - Death weapon damage: 7500 → 8000
+            - Death weapon aoe: 4 → 9
+
+- Air
+    - Air scouts
+        - Turn rate: 0.6 → 0.8
+        - Max speed: 20 → 19
+    - Spy planes
+        - Turn rate: 0.6 → 0.8
+        - Max speed: 30 → 27
+    - Swiftwind
+        - Mass cost: 200 → 235
+        - Energy cost: 6000 → 6750
+        - Buildtime: 1600 → 1800
+    - Notha
+        - BreakOffDistance: 1.5 → 5
+        - BreakOffTrigger: 10 → 15
+        - Rate of fire: 0.2 → 0.1
+    - Jester
+        - TurretPitchRange: 45 → 60
+    - Stinger
+        - TurretPitch: -40 → -20
+        - TurretPitchRange: 70 → 60
+        - TurretPitchSpeed: 90 → 360
+    - Specter (Aeon gunship)
+        - Mass cost: 240 → 270
+        - Energy cost: 4800 → 5400
+        - Buildtime: 1600 → 1800
+        - Damage: 13 → 78
+        - Range: 22 → 20
+        - Aoe: 0 → 2
+        - Rate of fire: 1.25 → 0.208
+        - Bullet speed: 40 → 25
+        - Dps : 65 → 65
+    - ASF
+        - Max speed: 25 → 22
+    - Experimentals
+        - CZAR
+            - Health: 58 000 → 40 000
+            - Personal shield: 0 → 30 000
+            - Shield recharge time: 120
+            - Shield regen rate: 180
+            - Energy consumption: 0 → 500
+            - SAM (anti-air):
+                - Range: 64 → 120
+                - AoE: 0 → 2
+                - Bullet speed: 50 → 100
+        - Ahwassa
+            - Speed: 20 → 18
+            - Crash Aoe: 8 → 10
+        - Soul ripper
+            - Crash Damage: 5000 → 7000
+            - Crash Aoe: 4 → 8
+            
+- Navy
+    - CI:18 Mermaid(Cybran stealth boat)
+        - Speed: 7 → 6
+        - Turn Rate: 60 → 55
+        - UniformScale: 0.08 → 0.12
+        - SizeX: 0.75 → 1.25
+        - SizeY: 0.8 → 1.3
+        - SizeZ: 2.7 → 3.6
+        
+- Structures
+    - T2 Air HQ
+        - Mass cost: 840 → 920
+        - Energy cost: 14400 → 18000
+        - Buildtime: 1800 → 2000
+    - Shou-esel(T2 Seraphim sonar)
+        - Speed: 1 → 2.5
+        - Speed while submerged: 0.5 → 1.5
+    - T3 Sonar
+        - Aeon
+            - Energy Maintenance: 250 → 500
+        - UEF
+            - Energy Maintenance: 250 → 500
+        - Cybran
+            - Energy Maintenance: 400 → 700
+            
+- Seraphim ACU
+    - regen field
+        - regen ceiling:
+            - T1: 10 hp/s
+            - T2: 15 hp/s
+            - T3: 25 hp/s
+            - T4: 40 hp/s
+        - Moved from RCH (right arm) to LCH (left arm)
+    - advanced regen field
+        - regen ceiling:
+            - T1: 20 hp/s
+            - T2: 50 hp/s
+            - T3: 120 hp/s
+            - T4: 240 hp/s
+        - Moved from RCH (right arm) to LCH (left arm)
+    - RAS
+        - Moved from back to RCH (right arm)
+
+- Misc
+    - Broken tree resource modifier: 1.25 → 2
+    - Nuke missile kills non-experimental air units without explosion
+    - Veterancy rework:
+        - ACU veterancy from units:
+            - from T2: 50% → 100%
+            - from T3: 33% → 100%
+            - from T4: 25% → 100%
+            - from SACU: 30% → 100%
+            - from ACU: 5% → 100%
+        - Units veterancy from economy building: 50% → 100%
+        - ACU veterancy total mass killed requirements:
+            - 2nd level: 2000 → 2250
+            - 3rd level: 3000 → 4000
+            - 4th level: 4000 → 6500
+            - 5th level: 5000 → 10000
+        - units mass killed multiplier:
+            - multiply the unit mass cost by the multiplier to obtain the mass killed requirement per vet.
+            - T1/SACU/Exp: 2
+            - T2: 1.5
+            - T3: 1.25
+    - ACU won't survive an ACU explosion under 2500 hp by vetting anymore (veterancy is gained right after ACU explosion)
+    - A bomb from a strat bomber no longer collides with ASF. 
+    - All mobile shields and land scouts now stop at an appropriate range from enemy units when using an attack move.
+
+### Contributors
+- Strogo
+- keyser
+- TurinTurambar
+- Petricpwnz
+- JaggedAppliance
+- Crotalus
+- wodzu93
+
+Patch 3713 (7 April, 2020)
+============================
+- Fixed a bug allowing to generate resources for free
+
+### Contributors ###
+- speed2
+
+Patch 3712 (4 April, 2020)
+============================
+
+- Fixed wrong rating reward when someone quit the game before it ended
+- Fixed the black plane bug for maps
+- Allowed to scale the UI for people playing with big screens
+- Changed the aesthetic of seraphim units
+- Scoreboard now group people from same team together when score is off
+- Added support for custom map Props
+- Clean up improving the simulation
+- Removed drag build from radars/sonars/stealth field and soothsayer
+- Fixed the targeting of structures with beam weapons
+- Addded Chinese translation and improved russian translation
+- Score windows closing on pressing F2
+- Added ability to spawn unit with veterancy using cheat
+- Added ability to spawn multiple units while holding shift
+- Fixed ACU playing twice the contruction visual fx when building
+- Fixed UEF construction beams animation
+- Improved the frigate sink animation rate
+- Fixed the UI of UEF navy
+- Improved CPU usage in lobby
+- Moved mod manager menu from extra menu to main menu
+- Fixed mods dependencies handling in mod manager
+- Improved simspeed and removed code that wasn\'t working
+- Improved Kennel animation and reduce lags due to kennel
+- Improved text display in game and translation
+- Fixed Russian name being wrongly displayed in lobby
+- Improved dialogue button especially for coop
+- Changed the display of the warning when trying to ctrl-k ACU in coop
+- Updated mod and map blacklist
+
+### Contributors ###
+- speed2
+- KionX
+- keyser
+- Uveso
+- BlackYps
+- Strogo
+- Stratege
+- ZeroCiel
+- Exotic-Retard
+- Lorhtan
+- Askaholic
+
+Patch 3711 (15 March, 2020)
+============================
+- Fix a bug allowing to generate resources for free
+
+### Contributors ###
+- speed2
+
+Patch 3710 (26 January, 2020)
+============================
+- Reworked the score board to request/send resources/unit to allies and view allie's resources income, storage and drain
+- Removed vet bar for unvettable units
+- Allowed mod to change UI textures
+- Improved spawing menu
+- Allowed transition for 3rd person camera
+- Improved AI pathfinding and expansion base template
+- Allowed SCU to have their own strategic icons
+- Fixed "select land unit on screen" selecting factories
+- Allowed dead players to see the whole map only after the team lost
+- Fixed factorie's construction beam still working when they are paused
+- Added an option in lobby for optimal mirrored balance
+- Fixed megalith/monkeylord wreck going under the ground when killed while being built
+- Fixed ACU's gun fire fx
+- Added an amphibious toggle for the salem
+- Fixed exp and mobile sonar that are under construction being selected over engies
+- Allowed T2 sera sonar to be selected over engies
+- Update map blacklist
+
+### Contributors ###
+- KionX
+- wodzu93
+- keyser
+- speed2
+- Uveso
+- Strogo
+- Crotalus
+- Nojoke
+- PhilipJFry
+
+Patch 3709 (16 December, 2019)
+============================
+- Land
+    - Mongoose
+        - Speed: 3.5 → 3.2
+        - Gatling gun damage: 16 → 15
+        - Gatling gun muzzle velocity: 30 → 28
+        - Hitbox: 0.4 → 1
+    - Asylum
+        - Shield HP: 3800 → 3500
+    - Parashield
+        - Shield HP: 3500 → 3000
+    - Wagner
+        - Health: 1450 → 1200
+        - Underwater speed: 3.7 → 3
+    - Blaze
+        - Mass cost: 220 → 180
+        - Energy cost: 1320 → 1080
+        - Buildtime: 1050 → 900
+    - Fire Beetle
+        - Mass cost: 300 → 250
+        - Energy cost: 1800 → 1500
+        - Buildtime: 1200 → 1000
+        - Hitbox: 0.9 → 1
+    - Selen
+        - Hitbox: 0.6 → 0.7
+
+- Air
+    - Air scouts
+        - Turn rate: 0.8 → 0.6
+        - Hitbox: 1.6 → 2
+    - Spy planes
+        - Turn rate: 0.8 → 0.6
+    - Wailer and Broadsword
+        - Mass cost: 1260 → 1500
+        - Energy cost: 42000 → 60000
+    - Notha 
+        - Rate of Fire: 0.1 → 0.2
+    
+- Navy
+    - Frigates
+        - Sonar range: 82 → 18
+    
+- Structures
+    - Seraphim T2 sonar
+        - Can now move and submerge
+            - Speed: 0 → 1
+            - Submerged speed: 0 → 0.5
+        - Mass cost: 180 → 400
+        - Energy cost: 5400 → 6000
+        - Energy maintenance: 100 → 200
+        - Buildtime: 1171 → 600
+        - Health: 2000 → 1000
+    
+- Game Mechanics
+    - Overcharge
+        - Overcharge no longer drains more than 5000 energy for the minimum damage of 1500
+    - Target priorities
+        - ACUs cannot be prioritised by units other than experimentals, labs, gunships, fighter/bombers and ACUs
+	- Repair
+		- Repair get 25% cost reduction
+    
+### Contributors
+- Strogo
+- JaggedAppliance
+- keyser
+- Petricpwnz
+- PhilipJFry
+- TurinTurambar
+- eforgacs
+
 Patch 3708 (19 October, 2019)
 ============================
 - Added new icons for E storages
@@ -11,7 +2853,7 @@ Patch 3708 (19 October, 2019)
 - Updated spelling and punctuation
 - Reduced LOD Cutoff from 1000 to 750
 - Fixed target bones of Cybran T2 Land HQ
-- Added a currated maps button
+- Added a curated maps button
 - Changed air staging icon to T1
 - Added an option to fill all lobby slots with AI
 - Fixed strats scripts
@@ -28,6 +2870,7 @@ Patch 3708 (19 October, 2019)
 - Removed dummy harms from unit database
 - Allow to build several Eye of Rhianne with a drag build order
 - Removed energy from stone reclaim
+- Fixed satellite permanently blocking mavor shell against a specific spot
 
 ### Contributors ###
 - speed2
@@ -90,237 +2933,250 @@ Patch 3705 (5 July, 2019)
 - JaggedAppliance
 - Strogo
 - Exotic-Retard
-- Keyser
+- keyser
 - speed2
 - svenni_badbwoi
 
 Patch 3704 (18 June, 2019)
 ============================
 - Land
-- Mongoose
-    - MaxSpeed: 3.6 → 3.5
-    - MuzzleVelocity: 25 → 30
-    - Muzzle Charge Time: 3 → 2
-    - Gatling Gun Firing Randomness: 0.4 → 0.1
-    - Gatling Gun Damage: 15 → 16                    
-- Asylum
-    - Mass cost: 144 → 220
-    - Energy maintenance: 75 → 30
-    - Overspill modifier: 0.15 → 0.3
-- Parashield
-    - Mass cost: 120 → 220
-    - Energy maintenance: 110 → 60
-    - Overspill modifier: 0.15 → 0.3
-- Athanah              
-    - Mass cost: 540 → 720
-    - Energy cost: 4800 → 6400
-    - Buildtime: 3200 → 3600
-    - Shield Recharge Time: 45 → 40
-    - Energy maintenance: 300 → 175
-    - Overspill modifier: 0.15 → 0.3
-- Deceiver
-    - Mass cost: 80 → 160
-    - Energy cost: 800 → 1600
-    - Buildtime: 400 → 800
-    - Energy maintenance: 75 → 40
-- Wagner
-    - Torpedo Damage: 6 → 15
-- Brick
-    - Torpedo Damage: 4 → 8
-- Othuum
-    - Torpedo Damage: 10 → 30
-- Harbinger
-    - The Harbinger can once again shoot while reclaiming.
-- T1 Mobile Anti-Air
-    - All Factions:
-    - Mass cost: 50 → 55
-    - Seraphim and UEF:
-    - Health: 360 → 310
-- T3 Mobile Anti-Air
-    - Aeon:                    
-    - Speed: 2.8 → 3.5
-    - Range: 54 → 64
-    - Cybran:                          
-    - Speed: 2.9 → 3.6
-    - Range: 52 → 62
-    - UEF:
-    - Speed: 2.6 → 3.3
-    - Range: 50 → 60
-    - Damage Radius: 1 → 1.5
-    - Seraphim:
-    - Speed: 2.7 → 3.4
-    - Range: 48 → 58
-- T2 Engineer
-    - Speed: 1.7 → 1.9
-- T3 Engineer
-    - Speed: 1.5 → 1.9
-- Scathis
-    - Mass cost: 110000 → 220000
-    - Energy cost: 2000000 → 4000000
-    - Buildtime: 80000 → 240000
-    - Health: 17500 → 9000
-    - Damage: 3000 → 1600
-    - Damage Radius: 7 → 12
-    - Fire Rate: 0.53 → 0.05
-    - Muzzle Salvo Size: 1 → 20
-    - Maximum Firing Range: 300 → 2000
-    - Minimum Firing Range: 50 → 150
-- Selen
-    - The Selen gets some fixes to its stealth/cloak toggle.
+    - Mongoose
+        - MaxSpeed: 3.6 → 3.5
+        - MuzzleVelocity: 25 → 30
+        - Muzzle Charge Time: 3 → 2
+        - Gatling Gun Firing Randomness: 0.4 → 0.1
+        - Gatling Gun Damage: 15 → 16                    
+    - Asylum
+        - Mass cost: 144 → 220
+        - Energy maintenance: 75 → 30
+        - Overspill modifier: 0.15 → 0.3
+    - Parashield
+        - Mass cost: 120 → 220
+        - Energy maintenance: 110 → 60
+        - Overspill modifier: 0.15 → 0.3
+    - Athanah              
+        - Mass cost: 540 → 720
+        - Energy cost: 4800 → 6400
+        - Buildtime: 3200 → 3600
+        - Shield Recharge Time: 45 → 40
+        - Energy maintenance: 300 → 175
+        - Overspill modifier: 0.15 → 0.3
+    - Deceiver
+        - Mass cost: 80 → 160
+        - Energy cost: 800 → 1600
+        - Buildtime: 400 → 800
+        - Energy maintenance: 75 → 40
+    - Wagner
+        - Torpedo Damage: 6 → 15
+    - Brick
+        - Torpedo Damage: 4 → 8
+    - Othuum
+        - Torpedo Damage: 10 → 30
+    - Harbinger
+        - The Harbinger can once again shoot while reclaiming.
+    - T1 Mobile Anti-Air
+        - All Factions
+            - Mass cost: 50 → 55
+        - Seraphim and UEF
+            - Health: 360 → 310
+    - T3 Mobile Anti-Air
+        - Aeon
+            - Speed: 2.8 → 3.5
+            - Range: 54 → 64
+        - Cybran
+            - Speed: 2.9 → 3.6
+            - Range: 52 → 62
+        - UEF
+            - Speed: 2.6 → 3.3
+            - Range: 50 → 60
+            - Damage Radius: 1 → 1.5
+        - Seraphim
+            - Speed: 2.7 → 3.4
+            - Range: 48 → 58
+    - T2 Engineer
+        - Speed: 1.7 → 1.9
+    - T3 Engineer
+        - Speed: 1.5 → 1.9
+    - Scathis
+        - Mass cost: 110000 → 220000
+        - Energy cost: 2000000 → 4000000
+        - Buildtime: 80000 → 240000
+        - Health: 17500 → 9000
+        - Damage: 3000 → 1600
+        - Damage Radius: 7 → 12
+        - Fire Rate: 0.53 → 0.05
+        - Muzzle Salvo Size: 1 → 20
+        - Maximum Firing Range: 300 → 2000
+        - Minimum Firing Range: 50 → 150
+    - Selen
+        - The Selen gets some fixes to its stealth/cloak toggle.
+
 - Air
-- Renegade
-    - Mass cost: 240 → 270
-    - Energy cost: 4800 → 5400
-    - Buildtime: 1600 → 1800
-- Notha
-    - Bomb Damage: 1175 → 1250
-- Torpedo Bombers
-    - Mass cost: 240 → 270
-    - Energy cost: 4800 → 8000
-    - BreakOffDistance: 34 → 45
-    - TurnSpeed: 0.48 → 1
-    - Sonar Radius: 90 → 45
-- Restorer
-    - Speed: 8 → 10
-    - Damage: 24 → 28
-- Wailer and Broadsword
-    - Will no longer chase air units which fly past            
-- Novax
-    - Mass cost: 28000 → 36000
-    - Energy cost: 400000 → 512000
-    - Buildtime: 30000 → 44800
-    - Damage: 50 → 60
-    - Radar radius: 150 → 200
-    - Omni radius: 50 → 60
-    - Vision radius: 40 → 60
+    - Renegade
+        - Mass cost: 240 → 270
+        - Energy cost: 4800 → 5400
+        - Buildtime: 1600 → 1800
+    - Notha
+        - Bomb Damage: 1175 → 1250
+    - Torpedo Bombers
+        - Mass cost: 240 → 270
+        - Energy cost: 4800 → 8000
+        - BreakOffDistance: 34 → 45
+        - TurnSpeed: 0.48 → 1
+        - Sonar Radius: 90 → 45
+    - Restorer
+        - Speed: 8 → 10
+        - Damage: 24 → 28
+    - Wailer and Broadsword
+        - Will no longer chase air units which fly past            
+    - Novax
+        - Mass cost: 28000 → 36000
+        - Energy cost: 400000 → 512000
+        - Buildtime: 30000 → 44800
+        - Damage: 50 → 60
+        - Radar radius: 150 → 200
+        - Omni radius: 50 → 60
+        - Vision radius: 40 → 60
+
 - Navy
-- Bulwark
-    - Speed: 7 → 5
-    - Turn Rate: 60 → 45
-    - Overspill Damage Modifier: 0.25 → 0.35
-    - UniformScale: 0.09 → 0.135
-- Beacon
-    - The torpedo defense of the aeon frigate works more effectively
-- Siren
-    - The cybran cruiser now shoots its anti-air missiles in a faster and more effective way.
-- Exodus
-    - AoE: 1 → 1.4
-- Battleships:
-    - Galaxy
-    - Health: 47000 → 44500
-    - Summit
-    - Mass cost: 10500 → 10000
-    - Buildtime: 33000 → 31600
-    - Omen
-    - Range: 104/114 → 110
-    - Tempest
-    - Mass cost: 24000 → 22000
-- Yathsou
-    - WaterVisionRadius: 45 → 55
+    - Bulwark
+        - Speed: 7 → 5
+        - Turn Rate: 60 → 45
+        - Overspill Damage Modifier: 0.25 → 0.35
+        - UniformScale: 0.09 → 0.135
+    - Beacon
+        - The torpedo defense of the aeon frigate works more effectively
+    - Siren
+        - The cybran cruiser now shoots its anti-air missiles in a faster and more effective way.
+    - Exodus
+        - AoE: 1 → 1.4
+    - Battleships
+        - Galaxy
+            - Health: 47000 → 44500
+        - Summit
+            - Mass cost: 10500 → 10000
+            - Buildtime: 33000 → 31600
+        - Omen
+            - Range: 104/114 → 110
+        - Tempest
+            - Mass cost: 24000 → 22000
+    - Yathsou (T3 submarine)
+        - WaterVisionRadius: 45 → 55
 
 - Structures
-- Tactical Missile Defense
-    - Buildtime: 600 → 400
-- T2 Land HQ
-    - Buildtime: 2600 → 2300
-- T2 Artillery
-    - Buildtime: 1200 → 1600
-    - Minimum Range: 5 → 50
-- Eye of Rhianne
-    - Energy Storage: 0 → 10000
-- T2 Static Flak
-    - Mass cost: 392 → 400
-    - Energy cost: 3920 → 4000
-    - Buildtime: 958 → 540
-- T2 Radar
-    - Energy Maintenance: 200 → 150
-- Airstaging
-    - Tech level: 2 → 1
-    - Repair Mass cost: 0.5 → 0
-    - Repair Energy cost: 5 → 30
-    - Buildtime: 534 → 450
+    - Tactical Missile Defense
+        - Buildtime: 600 → 400
+    - T2 Land HQ
+        - Buildtime: 2600 → 2300
+    - T2 Artillery
+        - Buildtime: 1200 → 1600
+        - Minimum Range: 5 → 50
+    - Eye of Rhianne
+        - Energy Storage: 0 → 10000
+    - T2 Static Flak
+        - Mass cost: 392 → 400
+        - Energy cost: 3920 → 4000
+        - Buildtime: 958 → 540
+    - T2 Radar
+        - Energy Maintenance: 200 → 150
+    - Airstaging
+        - Tech level: 2 → 1
+        - Repair Mass cost: 0.5 → 0
+        - Repair Energy cost: 5 → 30
+        - Buildtime: 534 → 450
+    - Nuke Launchers
+        - BuildPower: 1080 → 1500
+        - Missile Buildtime: 324000 → 450000
+    - T2 static shields
+        - Aeon
+            - Recharge Time: 16 → 24
+            - Buildtime: 701 → 950
+        - UEF
+            - Recharge Time: 15 → 23
+            - Buildtime: 845 → 1150
+        - Seraphim
+            - Recharge Time: 17 → 25
+            - Buildtime: 958 → 1250
+        - Cybran
+            - ED1
+                - Recharge Time: 18 → 20
+                - Buildtime: 600 → 700
+                - Buildpower: 15.53 → 19.2
+            - ED2
+                - Recharge Time: 16 → 22
+                - Buildtime: 466 → 775
+                - Buildpower: 13.34 → 21
+            - ED3
+                - Recharge Time: 18 → 25
+                - Buildtime: 1067 → 2200
+                - Buildpower: 30.575 → 29.3
 
-- Nuke Launchers
-    - BuildPower: 1080 → 1500
-    - Missile Buildtime: 324000 → 450000
-- T2 static shields
-    - Aeon
-    - Recharge Time: 16 → 24
-    - Buildtime: 701 → 950
-- UEF
-    - Recharge Time: 15 → 23
-    - Buildtime: 845 → 1150
-- Seraphim
-    - Recharge Time: 17 → 25
-    - Buildtime: 958 → 1250
-- Cybran
-- ED1
-    - Recharge Time: 18 → 20
-    - Buildtime: 600 → 700
-    - Buildpower: 15.53 → 19.2
-- ED2
-    - Recharge Time: 16 → 22
-    - Buildtime: 466 → 775
-    - Buildpower: 13.34 → 21
-- ED3
-    - Recharge Time: 18 → 25
-    - Buildtime: 1067 → 2200
-    - Buildpower: 30.575 → 29.3
-- ED4
-    - Recharge Time: 20 → 25
-    - Buildtime: 3667 → 3515
-    - Buildpower: 11.81 → 50.7
-- HSD Pulse
-- Shield Health: 15000 → 17000
-    - Mass cost: 3000 → 3300
-    - Energy cost: 50000 → 55000
-- ED5
-    - Shield Health: 15000 → 16500
-    - Buildtime: 1654 → 7100
-- T3 Static Artillery
-    - Emissary (Aeon): 30764 → 120000
-    - Hovatham (Seraphim): 29792 → 110000
-    - Duke (UEF): 30278 → 115000
-    - Disruptor (Cybran): 29308 → 105000
-- Game Enders
-    - Mavor: 99900 → 300000
-    - Paragon: 125100 → 325000
-    - Salvation: 90000 → 100000
-    - Yolona Oss: 125100 → 250000
+    - T3 static shields
+        - Cybran
+            - ED4
+                - Recharge Time: 20 → 25
+                - Buildtime: 3667 → 3515
+                - Buildpower: 11.81 → 50.7
+            - ED5
+                - Shield Health: 15000 → 16500
+                - Buildtime: 1654 → 7100
+        - UEF
+            - HSD Pulse
+                - Shield Health: 15000 → 17000
+                - Mass cost: 3000 → 3300
+                - Energy cost: 50000 → 55000
+    - T3 Static Artillery
+        - Emissary (Aeon)
+            - Buildtime: 30764 → 120000 
+        - Hovatham (Seraphim)
+            - Buildtime: 29792 → 110000
+        - Duke (UEF)
+            - Buildtime: 30278 → 115000
+        - Disruptor (Cybran)
+            - Buildtime: 29308 → 105000
+    - Game Enders
+        - Mavor
+            - Buildtime: 99900 → 300000
+        - Paragon
+            - Buildtime: 125100 → 325000
+        - Salvation
+            - Buildtime: 90000 → 100000
+        - Yolona Oss
+            - Buildtime: 125100 → 250000
 
 - ACUs
-- Regen Aura
-    - Mass cost: 600 → 700
-    - Energy cost: 4500 → 18000
-    - BuildTime: 600 → 700
-    - Added ACU HP: 1000 → 500
-    - Range: 22 → 30
-    - Max Health Multiplier: 1 → 1.1
-    - Min Regen: 0 → 3
+    - Regen Aura
+        - Mass cost: 600 → 700
+        - Energy cost: 4500 → 18000
+        - BuildTime: 600 → 700
+        - Added ACU HP: 1000 → 500
+        - Range: 22 → 30
+        - Max Health Multiplier: 1 → 1.1
+        - Min Regen: 0 → 3
 
-- Advanced Regen Aura
-    - Mass cost: 1500 → 1800
-    - Energy cost: 31250 → 42000
-    - BuildTime: 1250 → 1500
-    - Added ACU HP: 2500 → 1500
-    - Range: 30 → 35
-    - Max Health Multiplier: 1.1 → 1.2
-    - Min Regen: 0 → 15
-    
-- Aeon Personal Shield
-    - Shield Recharge time: 90 → 75
+    - Advanced Regen Aura
+        - Mass cost: 1500 → 1800
+        - Energy cost: 31250 → 42000
+        - BuildTime: 1250 → 1500
+        - Added ACU HP: 2500 → 1500
+        - Range: 30 → 35
+        - Max Health Multiplier: 1.1 → 1.2
+        - Min Regen: 0 → 15
+        
+    - Aeon Personal Shield
+        - Shield Recharge time: 90 → 75
 
-- Chrono Dampener
-    - Additional Health: 0 → 3000
-    - Stun Time: 3.5s → 2.5s
+    - Chrono Dampener
+        - Additional Health: 0 → 3000
+        - Stun Time: 3.5s → 2.5s
 
 - Projectiles
-- Tactical missile
-    - Mass cost: 180 → 250
+    - Tactical missile
+        - Mass cost: 180 → 250
 
-- ACU Tactical Missile
-    - Mass cost: 180 → 250
-    - Buildtime: 300 → 450
+    - ACU Tactical Missile
+        - Mass cost: 180 → 250
+        - Buildtime: 300 → 450
 
 ### Contributors
 - Strogo
@@ -382,7 +3238,7 @@ Patch 3702 (28 December, 2018)
 - speed2
 - Exotic_Retard
 - PhilipJFry
-- shalkya
+- keyser
 
 
 Hotfix Patch 3701 (28 October 2018)
@@ -436,7 +3292,7 @@ Patch 3699 (20 October, 2018)
 
 ### Contributors
 - Hussar
-- shalkya
+- keyser
 - Strogo
 - Uveso
 - Rackover
@@ -515,7 +3371,7 @@ Patch 3697 (17 August, 2018)
 - CookieNoob
 - PhilipJFry
 - IceDreamer
-- shalkya
+- keyser
 - Uveso
 - FAETHER
 - TheAdDad
@@ -528,236 +3384,249 @@ Patch 3696 (26 May, 2018)
 ============================
 ### Gameplay
 - Aeon 
-- Personal Shield Generator:
-    - BuildCostMass: 1000 → 1300
-    - BuildTime: 1000 → 1300
-    - Heavy Personal Shield Generator:
-    - BuildCostEnergy: 93750 → 123750
-    - BuildCostMass: 1500 → 2300
-    - BuildTime: 1750 → 2450
-    - ShieldMaxHealth: 29000 → 25000
-    - ShieldRegenRate: 37 → 32
+    - Personal Shield Generator
+        - BuildCostMass: 1000 → 1300
+        - BuildTime: 1000 → 1300
+    - Heavy Personal Shield Generator
+        - BuildCostEnergy: 93750 → 123750
+        - BuildCostMass: 1500 → 2300
+        - BuildTime: 1750 → 2450
+        - ShieldMaxHealth: 29000 → 25000
+        - ShieldRegenRate: 37 → 32
 - UEF
-- Nano-Repair System:
-    - NewHealth: 2000 → 1500
-- Personal Shield Generator:
-    - BuildCostMass: 1500 → 2300
-    - ShieldMaxHealth: 24000 → 19000
-    - ShieldRegenRate: 35 → 30
-    - Shield Generator Field:
-    - BuildCostMass: 3000 → 3600
-    - BuildTime: 2800 → 3400
+    - Nano-Repair System
+        - NewHealth: 2000 → 1500
+    - Personal Shield Generator
+        - BuildCostMass: 1500 → 2300
+        - ShieldMaxHealth: 24000 → 19000
+        - ShieldRegenRate: 35 → 30
+    - Shield Generator Field
+        - BuildCostMass: 3000 → 3600
+        - BuildTime: 2800 → 3400
 - Seraphim
-- Refracting Chronotron Amplifier:
-    - AdditionalDamage: 750 → 620
-    - BuildCostMass: 4800 → 5400
-    - BuildTime: 4200 → 4600
-- Nano-Repair System:
-    - BuildCostEnergy: 42000 → 56000
-    - BuildCostMass: 1200 → 1800
-    - BuildTime: 1200 → 1800
-    - NewHealth: 3000 → 2000
-- Enhanced Nano-Repair System:
-    - BuildCostMass: 4500 → 5800
-    - BuildTime: 4200 → 4600
+    - Refracting Chronotron Amplifier
+        - AdditionalDamage: 750 → 620
+        - BuildCostMass: 4800 → 5400
+        - BuildTime: 4200 → 4600
+    - Nano-Repair System
+        - BuildCostEnergy: 42000 → 56000
+        - BuildCostMass: 1200 → 1800
+        - BuildTime: 1200 → 1800
+        - NewHealth: 3000 → 2000
+    - Enhanced Nano-Repair System
+        - BuildCostMass: 4500 → 5800
+        - BuildTime: 4200 → 4600
 
 - T3 Land Combat
-- Harbinger:
-    - Health: 4600 → 3050
-    - Shield Health: 1300 → 1000
-    - Shield Regen Rate: 9 → 30
-    - Shield Recharge Time: 63 → 40
-    - ShieldRegenStartTime: 3 → 2
-    - Power Drain: 25 → 30
-    - BuildTime: 4500 → 3600
-    - Speed: 3 → 2.85
-    - Acceleration: 3 → 3.2
-    - Turn Rate: 120 → 130
-    - Damage: 300 → 320
-    - Rate of Fire: 1.25 → 1
-    - Range: 28 → 26
-    - Muzzle Velocity: 30 → 40
-- Othuum:
-    - Health: 6700 → 5000
-    - Acceleration: 2.6 → 3.5
-    - SizeY: 0.45 → 0.65
-    - SizeZ: 2.0 → 2.3
-    - First 2 Guns:
-    - Damage: 75 → 39
-    - Muzzle Velocity: 35 → 40
-    - Turret Yaw Speed: 90 → 120
-    - 3rd Gun:
-    - Damage: 400 → 525
-    - Range: 32 → 28
-    - Muzzle Velocity: 30 → 40
-    - Torpedo Weapon:
-    - Range: 32 → 28
-    - Target Priorities:
-    - Othuum now prioritises T3 over T2 over T1 instead of the reverse.
-- Percival:            
-    - Health: 9300 → 7200
-    - BuildTime: 6000 → 4800
-    - Speed: 2 → 2.1
-    - Acceleration: → 2.1
-    - TurnRate: 60 → 70
-    - Damage: 1600 → 1670
-    - Rate of Fire: 0.25 → 0.2
-    - Range: 35 → 34
-    - Muzzle Velocity: 35 → 38
-    - Turret Yaw Speed: 60 → 90
-- Titan:
-    - Health: 2200 → 2550
-    - Shield: 1200 → 600
-    - Recharge Time: 60 → 15
-    - Regen Rate: 9 → 20
-    - Speed: 4 → 3.8
-    - Acceleration: 4 → 4.2
-    - Range: 20 → 22
-    - Muzzle Velocity: 30 → 35
-    - Turn rate: 150 → 120
-    - Target Priorities:
-    - Titan now prioritises T3 over T2 over T1 instead of the reverse.
-- Brick:
-    - Health: 9000 → 7500
-    - BuildTime: 6000 → 4800
-    - Speed: 2 → 2.3
-    - Acceleration: 2 → 2.3
-    - TurnRate: 60 → 65
-    - Main Weapon:
-    - Damage: 150 → 125
-    - Range: 35 → 32
-    - MuzzleVelocity: 35 → 42
-    - Turret Yaw Speed: 60 → 90
-- Loyalist:
-    - Health: 3100 → 3000
-    - Speed: 4 → 3.8
-    - Acceleration: 4 → 4.2
-    - EMP explosion on death:
-    - Duration: 2s → 1.4s
-    - Affected by Stun: Mobile Units → Mobile Units - except for T4 and ACUs
-    - 1st Weapon (Disintegrator Pulse Laser):
-    - Damage: 175 → 150
-    - Range: 25 → 20
-    - 2nd Weapon (Heavy Electron Bolter):
-    - Damage: 12 → 14
-    - Range: 25 → 20
-    - Muzzle Velocity: 40 → 35
-    - TurretYawSpeed: 90 → 120
-- T3 Ranged Units
-    - Sprite Striker:
-    - Mass Cost: 640 → 720
-    - Build Time: 3600 → 4000
-    - Health: 450 → 500
-    - Speed: 3 → 2.85
-    - Sizex: 0.8 → 0.95
-    - SizeY: 1.15 → 1.35
-    - SizeZ: 0.6 → 0.8
-    - Firing Randomness while moving: 0.5 → 0.3
-    - Rate of Fire: 0.142 → 0.15
-    - MuzzleVelocity: 120 → 90
-    - TurretYawSpeed: 90 → 110
-- Usha-Ah:
-    - Mass Cost: 640 → 800
-    - Energy Cost: 8000 → 8800
-    - Build Time: 3600 → 4300
-    - Health: 500 → 700
-    - Speed: 3 → 2.5
-    - Acceleration: 3 → 2.5
-    - UniformScale: 0.08 → 0.095
-    - SizeX: 0.35 → 0.45
-    - SizeY: 1.2 → 1.55
-    - SizeZ: 0.7 → 0.9
-    - Default Fire Mode:
-    - Firing Randomness while moving: 0.25 → 0.4
-    - Rate of Fire: 0.2 → 0.25
-    - Firing Tolerance: 0.5 → 3
-    - Muzzle Velocity: 120 → 80
-    - TurretYawSpeed: 90 → 70
-    - Ranged Fire Mode:
-    - Firing Randomness while moving: 0.5 → 0.2
-    - Rate of Fire: 0.07 → 0.066
-    - TurretYawSpeed: 90 → 50
-- T3 Mobile Artillery:
-    - Build time is reduced for T3 mobile artillery.
-    - Build Time: 4800 → 4300
+    - Harbinger
+        - Health: 4600 → 3050
+        - Shield Health: 1300 → 1000
+        - Shield Regen Rate: 9 → 30
+        - Shield Recharge Time: 63 → 40
+        - ShieldRegenStartTime: 3 → 2
+        - Power Drain: 25 → 30
+        - BuildTime: 4500 → 3600
+        - Speed: 3 → 2.85
+        - Acceleration: 3 → 3.2
+        - Turn Rate: 120 → 130
+        - Damage: 300 → 320
+        - Rate of Fire: 1.25 → 1
+        - Range: 28 → 26
+        - Muzzle Velocity: 30 → 40
+        - DPS: 375 → 320
+    - Othuum
+        - Health: 6700 → 5000
+        - Acceleration: 2.6 → 3.5
+        - SizeY: 0.45 → 0.65
+        - SizeZ: 2.0 → 2.3
+        - First 2 Guns:
+            - Damage: 75 → 39
+            - Muzzle Velocity: 35 → 40
+            - Turret Yaw Speed: 90 → 120
+            - Combined DPS: 300 → 156
+        - 3rd Gun:
+            - Damage: 400 → 525
+            - Range: 32 → 28
+            - Muzzle Velocity: 30 → 40
+            - DPS: 100 → 131
+        - Torpedo Weapon:
+            - Range: 32 → 28
+        - Target Priorities: Othuum now prioritises T3 over T2 over T1 instead of the reverse.
+    - Percival
+        - Health: 9300 → 7200
+        - BuildTime: 6000 → 4800
+        - Speed: 2 → 2.1
+        - Acceleration: → 2.1
+        - TurnRate: 60 → 70
+        - Damage: 1600 → 1670
+        - Rate of Fire: 0.25 → 0.2
+        - Range: 35 → 34
+        - Muzzle Velocity: 35 → 38
+        - Turret Yaw Speed: 60 → 90
+        - DPS: 400 → 334
+    - Titan
+        - Health: 2200 → 2550
+        - Shield: 1200 → 600
+        - Recharge Time: 60 → 15
+        - Regen Rate: 9 → 20
+        - Speed: 4 → 3.8
+        - Acceleration: 4 → 4.2
+        - Range: 20 → 22
+        - Muzzle Velocity: 30 → 35
+        - Turn rate: 150 → 120
+        - Target Priorities: Titan now prioritises T3 over T2 over T1 instead of the reverse.
+    - Brick
+        - Health: 9000 → 7500
+        - BuildTime: 6000 → 4800
+        - Speed: 2 → 2.3
+        - Acceleration: 2 → 2.3
+        - TurnRate: 60 → 65
+        - Main Weapon:
+            - Damage: 150 → 125
+            - Range: 35 → 32
+            - MuzzleVelocity: 35 → 42
+            - Turret Yaw Speed: 60 → 90
+            - DPS: 375 → 312.5
+    - Loyalist
+        - Health: 3100 → 3000
+        - Speed: 4 → 3.8
+        - Acceleration: 4 → 4.2
+        - EMP explosion on death:
+            - Duration: 2s → 1.4s
+            - Affected by Stun: Mobile Units → Mobile Units - except for T4 and ACUs
+        - 1st Weapon (Disintegrator Pulse Laser):
+            - Damage: 175 → 150
+            - Range: 25 → 20
+            - DPS: 175 → 150
+        - 2nd Weapon (Heavy Electron Bolter):
+            - Damage: 12 → 14
+            - Range: 25 → 20
+            - Muzzle Velocity: 40 → 35
+            - TurretYawSpeed: 90 → 120
+            - DPS: 30 → 35
+    - T3 Ranged Units
+        - Sprite Striker
+            - Mass Cost: 640 → 720
+            - Build Time: 3600 → 4000
+            - Health: 450 → 500
+            - Speed: 3 → 2.85
+            - Sizex: 0.8 → 0.95
+            - SizeY: 1.15 → 1.35
+            - SizeZ: 0.6 → 0.8
+            - Firing Randomness while moving: 0.5 → 0.3
+            - Rate of Fire: 0.142 → 0.15
+            - MuzzleVelocity: 120 → 90
+            - TurretYawSpeed: 90 → 110
+        - Usha-Ah
+            - Mass Cost: 640 → 800
+            - Energy Cost: 8000 → 8800
+            - Build Time: 3600 → 4300
+            - Health: 500 → 700
+            - Speed: 3 → 2.5
+            - Acceleration: 3 → 2.5
+            - UniformScale: 0.08 → 0.095
+            - SizeX: 0.35 → 0.45
+            - SizeY: 1.2 → 1.55
+            - SizeZ: 0.7 → 0.9
+            - Default Fire Mode:
+                - Firing Randomness while moving: 0.25 → 0.4
+                - Rate of Fire: 0.2 → 0.25
+                - Firing Tolerance: 0.5 → 3
+                - Muzzle Velocity: 120 → 80
+                - TurretYawSpeed: 90 → 70
+            - Ranged Fire Mode:
+                - Firing Randomness while moving: 0.5 → 0.2
+                - Rate of Fire: 0.07 → 0.066
+                - TurretYawSpeed: 90 → 50
+    - T3 Mobile Artillery
+        - Build time is reduced for T3 mobile artillery.
+        - Build Time: 4800 → 4300
 
 - Experimental Units
-- Cybran:
-    - Monkeylord:
-    - Build Time: 15750 → 27500
-    - Mass Cost: 19000 → 20000
-    - Megalith Build Time: 18750 → 60 625
-    - Soul Ripper Build Time: 20000 → 56250
-    - Scathis Build Time: 50000 → 80000
-- UEF:
-    - Fatboy:
-    - Build Time: 21 000 → 47 500
-    - Shield Recharge Time: 160 → 120
-    - Shield Regen Rate: 64 → 100
-    - Power Upkeep cost: 500 → 600
-    - Atlantis Build Time: 14 400 → 20 500
-    - Novax Center Build Time: 25 000 → 30 000
-- Aeon:
-    - Galactic Colossus:
-    - Power Cost: 343 750 → 330 000
-    - Build Time: 20 625 → 51500
-    - Claws:
-    - Fixed a bug with the claws, credit to EQ.
-    - Rate of Fire: 1 → 0.15
-    - Czar Build Time: 33 750 → 50 625
-    - Tempest Build Time: 14 400 → 28 000
-    - Tempest Muzzle Velocity: 28 → 35
-- Seraphim:
-    - Ythotha:
-    - Build Time: 18750 → 46 875
-    - Mass Cost: 25 000 → 26 500
-    - Power Cost: 312 500 → 330 000
-    - Phason Beam Generator Damage: 8000 → 6000
-    - Gatling Plasma Cannon Damage: 550 → 610
-    - Heavy Sinn Unthe Cannon Damage: 1200 → 1850
-    - Flak Damage: 39 → 46
-    - Flak Range: 25 → 21
-    - Ahwassa Build Time: 36000 → 67500
+    - Cybran
+        - Monkeylord
+            - Build Time: 15750 → 27500
+            - Mass Cost: 19000 → 20000
+        - Megalith
+            - Build Time: 18750 → 60 625
+        - Soul Ripper
+            - Build Time: 20000 → 56250
+        - Scathis
+            - Build Time: 50000 → 80000
+    - UEF
+        - Fatboy
+            - Build Time: 21 000 → 47 500
+            - Shield Recharge Time: 160 → 120
+            - Shield Regen Rate: 64 → 100
+            - Power Upkeep cost: 500 → 600
+        - Atlantis
+            - Build Time: 14 400 → 20 500
+        - Novax Center
+            - Build Time: 25 000 → 30 000
+    - Aeon
+        - Galactic Colossus
+            - Power Cost: 343 750 → 330 000
+            - Build Time: 20 625 → 51500
+            - Claws:
+                - Fixed a bug with the claws, credit to EQ.
+                - Rate of Fire: 1 → 0.15
+        - Czar
+            - Build Time: 33 750 → 50 625
+        - Tempest
+            - Build Time: 14 400 → 28 000
+            - Muzzle Velocity: 28 → 35
+    - Seraphim
+        - Ythotha
+            - Build Time: 18750 → 46 875
+            - Mass Cost: 25 000 → 26 500
+            - Power Cost: 312 500 → 330 000
+            - Phason Beam Generator Damage: 8000 → 6000
+            - Gatling Plasma Cannon Damage: 550 → 610
+            - Heavy Sinn Unthe Cannon Damage: 1200 → 1850
+            - Flak Damage: 39 → 46
+            - Flak Range: 25 → 21
+        - Ahwassa
+            - Build Time: 36000 → 67500
 
 - Navy
-- Battleships:
-- Seraphim:
-    - FiringRandomness: 0.3 → 0.25
-    - MuzzleVelocity: 30 → 40
-- Aeon:
-    - TurnRate: 35 → 40
-    - MaxSpeed: 3.6 → 3.7
-    - Range: 100 → 105
-- Cybran Carrier:
-    - Fixed the aim on the Anti Air weapon of the carrier.
-- Bulwark:
-    - Damage Overspill: 15% → 25%
-    - Recharge time: 35 → 40
-- Shard:
-    - Health: 750 → 800
+    - Battleships
+        - Seraphim
+            - FiringRandomness: 0.3 → 0.25
+            - MuzzleVelocity: 30 → 40
+        - Aeon
+            - TurnRate: 35 → 40
+            - MaxSpeed: 3.6 → 3.7
+            - Range: 100 → 105
+    - Cybran Carrier
+        - Fixed the aim on the Anti Air weapon of the carrier.
+    - Bulwark
+        - Damage Overspill: 15% → 25%
+        - Recharge time: 35 → 40
+    - Shard
+        - Health: 750 → 800
 
 - Structures
-- T3 Land HQs:
-    - Mass Cost: 4 920 → 5 220
-    - Power Cost: 43 900 → 47 400
-    - Build Time: 11 000 → 12 100
-- Ravager:
-    - Health: 7500 → 6500
-    - Mass Cost: 1 800 → 2 000
-    - Power Cost: 16 000 → 17 600
-    - Build Time: 1 500 → 2000
-- T3 Static Artillery:
-    - UEF/Cybran/Seraphim/Aeon Range: 750/700/825/900 → 825 
-- Cybran:
-    - Damage: 4600 → 3700
-    - Rate of Fire: 0.1 → 0.13
-- T3 Mass Fabricator:
-    - Adjacency from storage: 4.1667% → 3%
-    - Adjacency for SML: 20% → 12.5%
-- Civilian Structures
-    - Adjusted Civilian Building Mass values to make them more consistent. Civilian buildings will give 50-150 mass.
-- Cybran Shield
-    - Added the ED4 Shield to the list of buildable structures and to the hotbuild keygroup for shields.
+    - T3 Land HQs
+        - Mass Cost: 4 920 → 5 220
+        - Power Cost: 43 900 → 47 400
+        - Build Time: 11 000 → 12 100
+    - Ravager
+        - Health: 7500 → 6500
+        - Mass Cost: 1 800 → 2 000
+        - Power Cost: 16 000 → 17 600
+        - Build Time: 1 500 → 2000
+    - T3 Static Artillery
+        - UEF/Cybran/Seraphim/Aeon Range: 750/700/825/900 → 825 
+    - Cybran
+        - Damage: 4600 → 3700
+        - Rate of Fire: 0.1 → 0.13
+    - T3 Mass Fabricator
+        - Adjacency from storage: 4.1667% → 3%
+        - Adjacency for SML: 20% → 12.5%
+    - Civilian Structures
+        - Adjusted Civilian Building Mass values to make them more consistent. Civilian buildings will give 50-150 mass.
+    - Cybran Shield
+        - Added the ED4 Shield to the list of buildable structures and to the hotbuild keygroup for shields.
 
 - Overcharge
     - The damage dealt by overcharge now scales with the amount of energy drained from storage.
@@ -779,44 +3648,45 @@ Patch 3696 (26 May, 2018)
 - Teleport
     - Teleporting takes 5 seconds longer. The animation at the teleport destination is unchanged.
 
-- T1 Mobile Anti Air
-    - Aeon:
-    - Mass Cost: 55 → 50
-    - Damage: 10 → 8
-    - UEF:
-    - Mass Cost: 55 → 50
-    - Damage: 16 → 14
-    - Seraphim:
-    - Mass Cost: 55 → 50
-    - Damage: 8 → 14
-    - Cybran:
-    - Mass Cost: 55 → 50
-    - Damage: 10 → 9
-- Fire Beetle:
-    - Damage: 3500 → 1500
-    - AoE: 4.5 → 6
-    - Transport class: 2 → 1
-    - Stun ability added. Duration → 2s. Stuns all units except Experimentals
-    - Friendly Fire → Disabled
-    - Health: 300 → 500
-- T2 Transports:
-    - Mass Cost: 300 → 330
-    - Power Cost: 12000 → 13200
-    - Speed: 15 → 14.3
-- Aurora:
-    - FiringRandomnessWhileMoving: 0.3 → 0.1
-    - MuzzleVelocity: 30 → 25
-- Ahwassa:
-    - BombDropThreshold: 4 → 20
-- T1 Bombers:
-    - RandomBreakOffDistanceMult: 1 → 1.5
-- Selen:
-    - Removed the Power drain from the stealth/cloak ability while not moving.
+- Miscellaneous
+    - T1 Mobile Anti Air
+        - Aeon
+            - Mass Cost: 55 → 50
+            - Damage: 10 → 8
+        - UEF
+            - Mass Cost: 55 → 50
+            - Damage: 16 → 14
+        - Seraphim
+            - Mass Cost: 55 → 50
+            - Damage: 8 → 14
+        - Cybran
+            - Mass Cost: 55 → 50
+            - Damage: 10 → 9
+    - Fire Beetle
+        - Damage: 3500 → 1500
+        - AoE: 4.5 → 6
+        - Transport class: 2 → 1
+        - Stun ability added. Duration → 2s. Stuns all units except Experimentals
+        - Friendly Fire → Disabled
+        - Health: 300 → 500
+    - T2 Transports
+        - Mass Cost: 300 → 330
+        - Power Cost: 12000 → 13200
+        - Speed: 15 → 14.3
+    - Aurora
+        - FiringRandomnessWhileMoving: 0.3 → 0.1
+        - MuzzleVelocity: 30 → 25
+    - Ahwassa
+        - BombDropThreshold: 4 → 20
+    - T1 Bombers
+        - RandomBreakOffDistanceMult: 1 → 1.5
+    - Selen
+        - Removed the Power drain from the stealth/cloak ability while not moving.
 ### Fixes
-    - Nuke trajectory is now corrected so it travels parallel to the ground.
-    - Selens will no longer lose their radar when there is a power stall.
-    - Units with personal shields that are unloading from transports will now take damage on their health when hit.
-    - The seraphim T2 torp defence wreck is no longer invisible.
+- Nuke trajectory is now corrected so it travels parallel to the ground.
+- Selens will no longer lose their radar when there is a power stall.
+- Units with personal shields that are unloading from transports will now take damage on their health when hit.
+- The seraphim T2 torp defence wreck is no longer invisible.
     
 ### Contributors
 - CookieNoob
@@ -1163,8 +4033,7 @@ Patch 3684 (27th May 2017)
     - Seraphim Health increased 3500 → 4000
 - T2 Land/Air HQ + T3 Land/Air Support
     - Aeon Health increased 6200 → 6400
-    - Cybran
-        - Health increased 5000 → 5500
+    - Cybran Health increased 5000 → 5500
 - T2 Naval Support
     - Aeon Health increased 5000 → 6400
     - UEF Health increased 6500 → 8000
@@ -1181,8 +4050,7 @@ Patch 3684 (27th May 2017)
     - Seraphim Health increased 11000 → 14000
 - T3 Land/Air HQ
     - Aeon Health increased 12400 → 12800
-    - Cybran
-        - Health increased 10000 → 11000
+    - Cybran Health increased 10000 → 11000
 - T3 Naval Support
     - Aeon Health decreased 13000 → 12800
     - UEF Health decreased 17000 → 16000
@@ -1500,7 +4368,7 @@ Patch 3675 (5th February, 2017)
 
 Patch 3674 (5th February, 2017)
 ============================
-http://content.faforever.com/patchnotes/3674.html
+http://patchnotes.faforever.com/3674.html
 
 ### Lobby
 - Use default map from file. This allows coop, tutorials, and other mods to have an easier time
@@ -2238,7 +5106,7 @@ Patch 3658 (August 29th, 2016)
         - Decreased StartTurnDistance 5 → 1.4
         - Increased TurnSpeed 0.75 → 1.5
         - Decreased RandomBreakOffDistanceMult 1.5 → 1
-- Ahwasssa
+- Ahwassa
     - Decreased StartTurnDistance 15 → 1
     - Increased TurnSpeed 0.65 → 0.9
 - Cybran T1 Frigate
@@ -2338,7 +5206,7 @@ Patch 3658 (August 29th, 2016)
 - JaggedAppliance
 - JJ173
 - Justify87
-- shalkya
+- keyser
 - Sheeo
 - Speed2
 - Uveso
@@ -2533,7 +5401,7 @@ Patch 3652 (May 2, 2016)
 
 Patch 3650 (August 19, 2015)
 ===========================
-HTML-version of this balance oriented changelog available at: http://content.faforever.com/patchnotes/
+HTML-version of this balance oriented changelog available at: http://patchnotes.faforever.com/
 
 ### Seraphim and UEF ACU TML
 - Missile hitpoints: 3 hp → 2 hp
@@ -2878,7 +5746,7 @@ Patch 3641 (July 12, 2015)
 - bamboofats
 - ckitching
 - quark036
-- shalkya
+- keyser
 - pip
 - zock
 

@@ -1,21 +1,21 @@
 --*****************************************************************************
 --* File: lua/modules/ui/game/controlgroups.lua
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Button = import('/lua/maui/button.lua').Button
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Movie = import('/lua/maui/movie.lua').Movie
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Announcement = import('/lua/ui/game/announcement.lua').CreateAnnouncement
-local Selection = import('/lua/ui/game/selection.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Button = import("/lua/maui/button.lua").Button
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Movie = import("/lua/maui/movie.lua").Movie
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Announcement = import("/lua/ui/game/announcement.lua").CreateAnnouncement
+local Selection = import("/lua/ui/game/selection.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 controls = {
     groups = {},
@@ -60,7 +60,7 @@ function CreateUI(mapGroup)
     controls.container:Hide()
     SetLayout()
     for i, v in validGroups do
-        import('/lua/ui/game/selection.lua').ApplySelectionSet(i)
+        import("/lua/ui/game/selection.lua").ApplySelectionSet(i)
     end
 end
 
@@ -83,8 +83,7 @@ function OnSelectionSetChanged(name, units, applied)
         local bg = Bitmap(controls.container, UIUtil.SkinnableFile('/game/avatar/avatar-control-group_bmp.dds'))
 
         bg.icon = Bitmap(bg)
-        bg.icon.Width:Set(28)
-        bg.icon.Height:Set(20)
+        LayoutHelpers.SetDimensions(bg.icon, 28, 20)
         LayoutHelpers.AtCenterIn(bg.icon, bg, 0, -4)
 
         bg.label = UIUtil.CreateText(bg.icon, label, 18, UIUtil.bodyFont)
@@ -101,7 +100,7 @@ function OnSelectionSetChanged(name, units, applied)
         bg.UpdateGroup = function(self)
             self.units = ValidateUnitsList(self.units)
 
-            if table.getsize(self.units) > 0 then
+            if not table.empty(self.units) then
                 local sortedUnits = {}
                 sortedUnits[1] = EntityCategoryFilterDown(categories.COMMAND, self.units)
                 sortedUnits[2] = EntityCategoryFilterDown(categories.EXPERIMENTAL, self.units)
@@ -112,12 +111,12 @@ function OnSelectionSetChanged(name, units, applied)
 
                 local iconID = ''
                 for _, unitTable in sortedUnits do
-                    if table.getn(unitTable) > 0 then
+                    if not table.empty(unitTable) then
                         iconID = unitTable[1]:GetBlueprint().BlueprintId
                         break
                     end
                 end
-                if iconID != '' and UIUtil.UIFile('/icons/units/' .. iconID .. '_icon.dds', true) then
+                if iconID ~= '' and UIUtil.UIFile('/icons/units/' .. iconID .. '_icon.dds', true) then
                     self.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. iconID .. '_icon.dds', true))
                 else
                     self.icon:SetTexture('/textures/ui/common/icons/units/default_icon.dds')
@@ -168,8 +167,8 @@ function OnSelectionSetChanged(name, units, applied)
 end
 
 function ToggleControlGroups(state)
-    # disable when in Screen Capture mode
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    -- disable when in Screen Capture mode
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         return
     end
 
@@ -218,7 +217,7 @@ function Contract()
 end
 
 function Expand()
-    if table.getsize(controls.groups) > 0 then
+    if not table.empty(controls.groups) then
         controls.container:Show()
         controls.collapseArrow:Show()
     end

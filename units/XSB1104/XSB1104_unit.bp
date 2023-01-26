@@ -46,6 +46,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'SORTECONOMY',
+        'VOLATILE',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -138,7 +139,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC xsb1104_name>Hyaliya',
         UnitWeight = 1,
-        UpgradesTo = nil, #from the T3 massfab
+        UpgradesTo = nil, --from the T3 massfab
     },
     Interface = {
         HelpText = '<LOC xsb1104_help>Mass Fabricator',

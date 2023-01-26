@@ -5,15 +5,16 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
-local SWeapons = import('/lua/seraphimweapons.lua')
-local Buff = import('/lua/sim/Buff.lua')
-local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
+local SWeapons = import("/lua/seraphimweapons.lua")
+local Buff = import("/lua/sim/buff.lua")
+local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
 local SDFLightChronotronCannonWeapon = SWeapons.SDFLightChronotronCannonWeapon
 local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 
+---@class XSL0301 : CommandUnit
 XSL0301 = Class(CommandUnit) {
     Weapons = {
         LightChronatronCannon = Class(SDFLightChronotronCannonWeapon) {},
@@ -41,8 +42,13 @@ XSL0301 = Class(CommandUnit) {
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true
     end,
 
+    StartBeingBuiltEffects = function(self, builder, layer)
+        CommandUnit.StartBeingBuiltEffects(self, builder, layer)
+        self:ForkThread( EffectUtil.CreateSeraphimBuildThread, builder, self.OnBeingBuiltEffectsBag, 2 )
+    end,
+
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     CreateEnhancement = function(self, enh)

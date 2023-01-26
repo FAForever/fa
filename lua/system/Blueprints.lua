@@ -1,3 +1,4 @@
+---@declare-global
 --
 -- Blueprint loading
 --
@@ -53,18 +54,225 @@ local lower = string.lower
 local getinfo = debug.getinfo
 local here = getinfo(1).source
 
+---@type BlueprintsTable
 local original_blueprints
 local current_mod
 
+-- upvalue for performance
+pcall = pcall
+doscript = doscript
+DiskFindFiles = DiskFindFiles
+
+doscript("/lua/system/blueprints-ai.lua")
+doscript("/lua/system/blueprints-lod.lua")
+doscript("/lua/system/blueprints-projectiles.lua")
+doscript("/lua/system/blueprints-units.lua")
+doscript("/lua/system/blueprints-weapons.lua")
+
+---@class PreGameData
+---@field CurrentMapDir string          ## is obsolete, set for removal
+---@field IconReplacements ModInfo[]
+
+--- Load in the pre game data that is defined in the lobby through the preference file.
+---@return PreGameData?
+local function LoadPreGameData()
+    -- load in the prefs file
+    local file = DiskFindFiles("/preferences", "Game.prefs")[1]
+    if not file then
+        WARN('Blueprints.lua - Preferences file is not found. Skipping pre game data.')
+        return nil
+    end
+
+    -- try and load the pre game data of prefs file
+    ---@type PreGameData
+    local preGameData
+    local ok, msg = pcall(
+        function()
+            local data = {}
+            doscript(file, data)
+            preGameData = data.PreGameData
+        end
+    )
+
+    -- tell us if something went wrong
+    if not ok then
+        WARN("Blueprints.lua - Preferences file is locked or corrupt. Skipping pre game data.")
+        WARN(msg)
+    end
+
+    return preGameData
+end
+
+---@class BlueprintIconAssignment
+---@field BlueprintId string
+---@field IconSet? string
+---@field TypeId? string
+
+--- Attempts to assign icons to units if they exist
+---@param units UnitBlueprint[] all unit blueprints
+---@param assignments BlueprintIconAssignment[] A list of assignments
+---@param identifier string The identifier of the UI mod that ensures compatibility when turned off (/textures/ui/game/common/strategicicons/identifier)
+local function AssignIcons(units, assignments, identifier)
+    local StringLower = string.lower
+
+    ---@param units UnitBlueprint[]
+    ---@param id string
+    ---@param icon string
+    local function AssignBlueprintId(units, id, icon)
+        -- do not punish people for capitalization of unit database
+        id = StringLower(id)
+
+        -- check whether unit exists
+        local unit = units[id]
+        if unit then
+            local path = identifier .. "/" .. icon
+            unit.StrategicIconName =  path
+        end
+    end
+
+    local function AssignTypeId(units, id, icon)
+        -- todo :)
+    end
+
+    if assignments then
+        for _, info in assignments do
+            if info.BlueprintId and info.IconSet then
+                AssignBlueprintId(units, info.BlueprintId, info.IconSet)
+                continue
+            end
+
+            if info.TypeId and info.Iconset then
+                AssignTypeId(units, info.TypeId, info.IconSet)
+                continue
+            end
+        end
+    end
+end
+
+--- Finds and applies custom strategic icons defined by UI mods
+--- @param all_bps BlueprintsTable the table with all blueprint values
+local function FindCustomStrategicIcons(all_bps)
+    -- STRATEGIC ICON REPLACEMENT --
+
+    -- try and load in pre game data
+    local preGameData = LoadPreGameData()
+    if preGameData and preGameData.IconReplacements then
+        for _, info in preGameData.IconReplacements do
+            -- data that is set in the lobby
+            -- info.Name = mod.name 
+            -- info.Author = mod.author 
+            -- info.Location = mod.location
+            -- info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+            -- info.UID = uid
+
+            local safemath = table.copy(math)
+            safemath.random = nil
+
+            -- all the functionality that is available in the _icons.lua
+            local state = {
+                -- moholog-interacting statements
+                LOG = LOG,
+                WARN = WARN,
+                _ALERT = _ALERT,
+                SPEW = SPEW,
+                error = error,
+                assert = assert,
+
+                -- debugging statements
+                repr = repr,
+
+                -- compatibility statements
+                pairs = pairs,
+                ipairs = ipairs,
+                next = next,
+
+                -- typical statements
+                table = table,
+                math = safemath,
+                string = string,
+                tonumber = tonumber,
+                type = type,
+                unpack = unpack,
+                tostring = tostring,
+            }
+
+            -- try to get the icons file
+            local ok, msg = pcall(
+                function()
+                    doscript(info.Location .. "/mod_icons.lua", state)
+
+                    -- syntax errors are caught internally and instead it just returns the table untouched
+                    if not (state.UnitIconAssignments or state.ScriptedIconAssignments) then
+                        error("Blueprints.lua - can not import the icon configuration file at '" .. info.Location .. "'. This could be due to missing functionality functionality or a parsing error.")
+                    end
+                end
+            )
+
+            -- if we can't, report it
+            if not ok then
+                WARN("Blueprints.lua - Unable to load icons from mod '" .. info.Name .. "' with uuid '" .. info.UID .. "'. Please inform the author: " .. info.Author)
+                WARN(msg)
+            end
+
+            ok, msg = pcall (
+                function()
+                    -- scripted approach
+                    if state.ScriptedIconAssignments then 
+                        -- retrieve data, make sure it is a deepcopy to prevent ui mods messing with the original
+                        local units = table.deepcopy(all_bps.Unit)
+                        local projectiles = table.deepcopy(all_bps.Projectile)
+                        local icons = DiskFindFiles(info.Location .. "/custom-strategic-icons", "*.dds")
+
+                        -- find scripted icons and assign them
+                        local scriptedIcons = state.ScriptedIconAssignments(units, projectiles, icons)
+                        AssignIcons(all_bps.Unit, scriptedIcons, info.Identifier)
+
+                        -- inform the dev
+                        local n = table.getsize(scriptedIcons)
+                        if n > 0 then
+                            SPEW("Blueprints.lua - Found (" .. n .. ") scripted icon assignments in " .. info.Name .. " by " .. info.Author .. ".")
+                        end
+                    end
+
+                    -- manual approach
+                    if state.UnitIconAssignments then 
+                        AssignIcons(all_bps.Unit, state.UnitIconAssignments, info.Identifier)
+
+                        -- inform the dev
+                        local n = table.getsize(state.UnitIconAssignments)
+                        if n > 0 then 
+                            SPEW("Blueprints.lua - Found (" .. n .. ") manual icon assignments in " .. info.Name .. " by " .. info.Author .. ".")
+                        end
+                    end
+                end
+            )
+
+            -- if we can't, report it
+            if not ok then
+                WARN("Blueprints.lua - Unable to load icons from mod '" .. info.Name .. "' with uuid '" .. info.UID .. "'. Please inform the author: " .. info.Author)
+                WARN(msg)
+            end
+        end
+    end
+end
+
 local function InitOriginalBlueprints()
     current_mod = nil
+    ---@class BlueprintsTable
     original_blueprints = {
+        ---@type MeshBlueprint[]
         Mesh = {},
+        ---@type UnitBlueprint[]
         Unit = {},
+        ---@type PropBlueprint[]
         Prop = {},
+        ---@type ProjectileBlueprint[]
         Projectile = {},
+        ---@type TrailBlueprint[]
         TrailEmitter = {},
+        ---@type EmitterBlueprint[]
         Emitter = {},
+        ---@type BeamBlueprint[]
         Beam = {},
     }
 end
@@ -76,14 +284,16 @@ local function GetSource()
     while true do
         there = getinfo(n).source
         if there ~= here then break end
-        n = n+1
+        n = n + 1
     end
-    if sub(there,1,1)=="@" then
-        there = sub(there,2)
+    if sub(there, 1, 1) == "@" then
+        there = sub(there, 2)
     end
     return DiskToLocal(there)
 end
 
+---@param group string
+---@param bp Blueprint
 local function StoreBlueprint(group, bp)
     local id = bp.BlueprintId
     local t = original_blueprints[group]
@@ -96,18 +306,18 @@ local function StoreBlueprint(group, bp)
         t[id] = bp
     end
 end
---
--- Figure out what to name this blueprint based on the name of the file it came from.
--- Returns the entire filename. Either this or SetLongId() should really be got rid of.
---
+
+--- Figure out what to name this blueprint based on the name of the file it came from.
+--- Returns the entire filename. Either this or SetLongId() should really be got rid of.
+---@param bp Blueprint
 local function SetBackwardsCompatId(bp)
     bp.Source = bp.Source or GetSource()
     bp.BlueprintId = lower(bp.Source)
 end
---
--- Figure out what to name this blueprint based on the name of the file it came from.
--- Returns the full resource name except with ".bp" stripped off
---
+
+--- Figure out what to name this blueprint based on the name of the file it came from.
+--- Returns the full resource name except with ".bp" stripped off
+---@param bp Blueprint
 local function SetLongId(bp)
     bp.Source = bp.Source or GetSource()
     if not bp.BlueprintId then
@@ -117,35 +327,35 @@ local function SetLongId(bp)
         bp.BlueprintId = id
     end
 end
---
--- Figure out what to name this blueprint based on the name of the file it came from.
--- Returns just the base filename, without any blueprint type info or extension. Used
--- for units only.
---
+
+--- Figure out what to name this blueprint based on the name of the file it came from.
+--- Returns just the base filename, without any blueprint type info or extension. Used
+--- for units only.
+---@param bp Blueprint
 local function SetShortId(bp)
     bp.Source = bp.Source or GetSource()
     bp.BlueprintId = bp.BlueprintId or
         gsub(lower(bp.Source), "^.*/([^/]+)_[a-z]+%.bp$", "%1")
 end
---
--- If the bp contains a 'Mesh' section, move that over to a separate Mesh blueprint, and
--- point bp.MeshBlueprint at it.
---
--- Also fill in a default value for bp.MeshBlueprint if one was not given at all.
---
+
+--- If the bp contains a 'Mesh' section, move that over to a separate Mesh blueprint, and
+--- point bp.MeshBlueprint at it.
+---
+--- Also fill in a default value for bp.MeshBlueprint if one was not given at all.
+---@param bp Blueprint
 function ExtractMeshBlueprint(bp)
     local disp = bp.Display or {}
     bp.Display = disp
 
-    if disp.MeshBlueprint=='' then
-        LOG('Warning: ',bp.Source,': MeshBlueprint should not be an empty string')
+    if disp.MeshBlueprint == '' then
+        LOG('Warning: ', bp.Source, ': MeshBlueprint should not be an empty string')
         disp.MeshBlueprint = nil
     end
 
-    if type(disp.MeshBlueprint)=='string' then
-        if disp.MeshBlueprint~=lower(disp.MeshBlueprint) then
+    if type(disp.MeshBlueprint) == 'string' then
+        if disp.MeshBlueprint ~= lower(disp.MeshBlueprint) then
             --Should we allow mixed-case blueprint names?
-            --LOG('Warning: ',bp.Source,' (MeshBlueprint): ','Blueprint IDs must be all lowercase')
+            --LOG('Warning: ', bp.Source, ' (MeshBlueprint): ', 'Blueprint IDs must be all lowercase')
             disp.MeshBlueprint = lower(disp.MeshBlueprint)
         end
 
@@ -153,19 +363,19 @@ function ExtractMeshBlueprint(bp)
         disp.MeshBlueprint = gsub(disp.MeshBlueprint, "%.bp$", "")
 
         if disp.Mesh then
-            LOG('Warning: ',bp.Source,' has mesh defined both inline and by reference')
+            LOG('Warning: ', bp.Source, ' has mesh defined both inline and by reference')
         end
     end
 
-    if disp.MeshBlueprint==nil then
+    if disp.MeshBlueprint == nil then
         -- For a blueprint file "/units/uel0001/uel0001_unit.bp", the default
         -- mesh blueprint is "/units/uel0001/uel0001_mesh"
         local meshname,subcount = gsub(bp.Source, "_[a-z]+%.bp$", "_mesh")
-        if subcount==1 then
+        if subcount == 1 then
             disp.MeshBlueprint = meshname
         end
 
-        if type(disp.Mesh)=='table' then
+        if type(disp.Mesh) == 'table' then
             local meshbp = disp.Mesh
             meshbp.Source = meshbp.Source or bp.Source
             meshbp.BlueprintId = disp.MeshBlueprint
@@ -185,8 +395,11 @@ function ExtractWreckageBlueprint(bp)
 
     local wreckbp = table.deepcopy(meshbp)
     if wreckbp.LODs then
-        for i,lod in wreckbp.LODs do
-            if lod.ShaderName == 'TMeshAlpha' or lod.ShaderName == 'NormalMappedAlpha' or lod.ShaderName == 'UndulatingNormalMappedAlpha' then
+        for _, lod in wreckbp.LODs do
+            if  lod.ShaderName == 'TMeshAlpha' or
+                lod.ShaderName == 'NormalMappedAlpha' or
+                lod.ShaderName == 'UndulatingNormalMappedAlpha'
+            then
                 lod.ShaderName = 'BlackenedNormalMappedAlpha'
             else
                 lod.ShaderName = 'Wreckage'
@@ -199,22 +412,56 @@ function ExtractWreckageBlueprint(bp)
     MeshBlueprint(wreckbp)
 end
 
+local aeonBuildNoAnimation = "AeonBuildNoAnimation"
+
+--- Allows us to specify build shaders on a per-unit basis
+local uniqueBuildAnimations = {}
+uniqueBuildAnimations["ual0401"] = aeonBuildNoAnimation
+uniqueBuildAnimations["uas0401"] = aeonBuildNoAnimation
+
+--- Extracts the build mesh blueprint information. Adds the Display.BuildMeshBlueprint field to the blueprint and registers the build mesh.
+---@param bp UnitBlueprint The blueprint to generate the build mesh for.
 function ExtractBuildMeshBlueprint(bp)
     local FactionName = bp.General.FactionName
+    local isSubCommander = false
 
+    if bp.Categories then
+        for _, v in bp.Categories do
+            if v == 'SUBCOMMANDER' then
+                isSubCommander = true
+                break
+            end
+        end
+    end
+
+    -- determine build mesh blueprint and add it to the game
     if FactionName == 'Aeon' or FactionName == 'UEF' or FactionName == 'Cybran' or FactionName == 'Seraphim' then
+        -- no reason to have a build mesh if you have no mesh at all
         local meshid = bp.Display.MeshBlueprint
         if not meshid then return end
 
+        -- no reason to have a build mesh if regular mesh is not defined properly
         local meshbp = original_blueprints.Mesh[meshid]
         if not meshbp then return end
 
+        -- default shader name
         local shadername = FactionName .. 'Build'
+
+        -- shader for specific unit BPs
+        shadername = uniqueBuildAnimations[string.lower(bp.BlueprintId)] or shadername
+
+        -- shader for specific SACUs
+        if isSubCommander and FactionName == 'Aeon' then
+            shadername = aeonBuildNoAnimation
+        end
+
+        -- build effects
         local secondaryname = '/textures/effects/' .. FactionName .. 'BuildSpecular.dds'
 
+        -- copy over original content and switch up elements
         local buildmeshbp = table.deepcopy(meshbp)
         if buildmeshbp.LODs then
-            for i,lod in buildmeshbp.LODs do
+            for _, lod in buildmeshbp.LODs do
                 lod.ShaderName = shadername
                 lod.SecondaryName = secondaryname
                 if FactionName == 'Seraphim' then
@@ -222,18 +469,22 @@ function ExtractBuildMeshBlueprint(bp)
                 end
             end
         end
+
+        -- set its blueprint id and register it
         buildmeshbp.BlueprintId = meshid .. '_build'
         bp.Display.BuildMeshBlueprint = buildmeshbp.BlueprintId
         MeshBlueprint(buildmeshbp)
     end
 end
 
+---@param bp MeshBlueprint
 function MeshBlueprint(bp)
     -- fill in default values
     SetLongId(bp)
     StoreBlueprint('Mesh', bp)
 end
 
+---@param bp UnitBlueprint
 function UnitBlueprint(bp)
     -- save info about mods that changed this blueprint
     bp.Mod = current_mod
@@ -241,11 +492,13 @@ function UnitBlueprint(bp)
     StoreBlueprint('Unit', bp)
 end
 
+---@param bp PropBlueprint
 function PropBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Prop', bp)
 end
 
+---@param bp ProjectileBlueprint
 function ProjectileBlueprint(bp)
     -- save info about mods that changed this blueprint
     bp.Mod = current_mod
@@ -253,43 +506,45 @@ function ProjectileBlueprint(bp)
     StoreBlueprint('Projectile', bp)
 end
 
+---@param bp TrailBlueprint
 function TrailEmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('TrailEmitter', bp)
 end
 
+---@param bp EmitterBlueprint
 function EmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Emitter', bp)
 end
 
+---@param bp BeamBlueprint
 function BeamBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Beam', bp)
 end
 
 function ExtractAllMeshBlueprints()
-
-    for id,bp in original_blueprints.Unit do
+    for _, bp in original_blueprints.Unit do
         ExtractMeshBlueprint(bp)
         ExtractWreckageBlueprint(bp)
         ExtractBuildMeshBlueprint(bp)
     end
 
-    for id,bp in original_blueprints.Prop do
+    for _, bp in original_blueprints.Prop do
         ExtractMeshBlueprint(bp)
         ExtractWreckageBlueprint(bp)
     end
 
-    for id,bp in original_blueprints.Projectile do
+    for _, bp in original_blueprints.Projectile do
         ExtractMeshBlueprint(bp)
     end
 end
 
+---@param blueprints BlueprintsTable
 function RegisterAllBlueprints(blueprints)
-
     local function RegisterGroup(g, fun)
-        for id,bp in sortedpairs(g) do
+        for id in sortedpairs(g) do
             fun(g[id])
         end
     end
@@ -305,15 +560,15 @@ end
 
 -- Brute51 - Adding support for SCU presets: allows building units that get enhancements at the factory, so no need to enhance
 -- after building SCU.
+---@param bps UnitBlueprint[]
+---@param all_bps BlueprintsTable
 function HandleUnitWithBuildPresets(bps, all_bps)
-
     -- hashing sort categories for quick lookup
     local sortCategories = { ['SORTOTHER'] = true, ['SORTINTEL'] = true, ['SORTSTRATEGIC'] = true, ['SORTDEFENSE'] = true, ['SORTECONOMY'] = true, ['SORTCONSTRUCTION'] = true, }
 
     local tempBp = {}
 
-    for k, bp in bps do
-
+    for _, bp in bps do
         for name, preset in bp.EnhancementPresets do
             -- start with clean copy of the original unit BP
             tempBp = table.deepcopy(bp)
@@ -328,7 +583,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             -- change cost of the new unit to match unit base cost + preset enhancement costs. An override is provided for cases where this is not desired.
             local e, m, t = 0, 0, 0
             if not preset.BuildCostEnergyOverride or not preset.BuildCostMassOverride or not preset.BuildTimeOverride then
-                for k, enh in preset.Enhancements do
+                for _, enh in preset.Enhancements do
                     -- replaced continue by reversing if statement
                     if tempBp.Enhancements[enh] then
                         e = e + (tempBp.Enhancements[enh].BuildCostEnergy or 0)
@@ -338,7 +593,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
                         -- if they have restricted enhancement(s)
                         tempBp.CategoriesHash[enh] = true -- hashing without changing case of enhancements
                     else
-                        WARN('*DEBUG: Enhancement '..repr(enh)..' used in preset '..repr(name)..' for unit '..repr(tempBp.BlueprintId)..' does not exist')
+                        WARN('*DEBUG: Enhancement ' .. repr(enh) .. ' used in preset ' .. repr(name) .. ' for unit ' .. repr(tempBp.BlueprintId) .. ' does not exist')
                     end
                 end
             end
@@ -357,7 +612,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             -- Add a sorting category so similar SCUs are grouped together in the build menu
             if preset.SortCategory then
                 if sortCategories[preset.SortCategory] or preset.SortCategory == 'None' then
-                    for k, v in sortCategories do
+                    for k in sortCategories do
                         tempBp.CategoriesHash[k] = false
                     end
                     if preset.SortCategory ~= 'None' then
@@ -368,19 +623,20 @@ function HandleUnitWithBuildPresets(bps, all_bps)
 
             -- change other things relevant things as well
             tempBp.BaseBlueprintId = tempBp.BlueprintId
-            tempBp.BlueprintId = tempBp.BlueprintId .. '_' .. name
+            tempBp.BlueprintId = string.lower(tempBp.BlueprintId .. '_' .. name)
             tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
             tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText
             tempBp.Description = preset.Description or tempBp.Description
             tempBp.CategoriesHash['ISPREENHANCEDUNIT'] = true
+            tempBp.CategoriesHash[string.upper(name .. 'PRESET')] = true
             -- clean up some data that's not needed anymore
             tempBp.CategoriesHash['USEBUILDPRESETS'] = false
             tempBp.EnhancementPresets = nil
             -- synchronizing Categories with CategoriesHash for compatibility
             tempBp.Categories = table.unhash(tempBp.CategoriesHash)
 
-            table.insert(all_bps.Unit, tempBp)
+            all_bps.Unit[tempBp.BlueprintId] = tempBp
 
             BlueprintLoaderUpdateProgress()
         end
@@ -388,6 +644,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
 end
 
 -- Assign shader and mesh for visual Cloaking FX
+---@param bp UnitBlueprint
 function ExtractCloakMeshBlueprint(bp)
     local meshid = bp.Display.MeshBlueprint
     if not meshid then return end
@@ -402,13 +659,13 @@ function ExtractCloakMeshBlueprint(bp)
 
     local cloakmeshbp = table.deepcopy(meshbp)
     if cloakmeshbp.LODs then
-        for i, cat in bp.Categories do
+        for _, cat in bp.Categories do
             if cat == 'UEF' or cat == 'CYBRAN' then
-                for i, lod in cloakmeshbp.LODs do
+                for _, lod in cloakmeshbp.LODs do
                     lod.ShaderName = shadernameE
                 end
             elseif cat == 'AEON' or cat == 'SERAPHIM' then
-                for i, lod in cloakmeshbp.LODs do
+                for _, lod in cloakmeshbp.LODs do
                     lod.ShaderName = shadernameA
                 end
             end
@@ -419,49 +676,75 @@ function ExtractCloakMeshBlueprint(bp)
     MeshBlueprint(cloakmeshbp)
 end
 
--- Mod unit blueprints before allowing mods to modify it as well, to pass the most correct unit blueprint to mods
+
+--- Adapts all unit blueprints before they're passed onto mods.
+---@param all_bps BlueprintsTable All the blueprints of the game.
 function PreModBlueprints(all_bps)
-
-    -- Brute51: Modified code for ship wrecks and added code for SCU presets.
-    -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
-
     for _, bp in all_bps.Unit do
-
         ExtractCloakMeshBlueprint(bp)
 
-        -- skip units without categories
+        -- Units with no categories are skipped
         if not bp.Categories then
             continue
         end
 
-        -- saving Categories as a hash table for later usage by sim/ui functions
+        -- Construct hash-based categories
         bp.CategoriesHash = table.hash(bp.Categories)
 
-        -- adding or deleting categories on the fly
+        -- Allow to add or delete categories for mods
         if bp.DelCategories then
-            for k, v in bp.DelCategories do
+            for _, v in bp.DelCategories do
                 bp.CategoriesHash[v] = false
             end
             bp.DelCategories = nil
         end
+
         if bp.AddCategories then
-            for k, v in bp.AddCategories do
+            for _, v in bp.AddCategories do
                 bp.CategoriesHash[v] = true
             end
             bp.AddCategories = nil
         end
 
+        -- Build range overlay
         if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
             if not bp.AI then bp.AI = {} end
             bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
-            if not bp.CategoriesHash.POD then -- excluding Build Drones
+            if not (bp.CategoriesHash.POD or bp.CategoriesHash.INSIGNIFICANTUNIT) then -- excluding Build Drones
                 bp.CategoriesHash.OVERLAYMISC = true
             end
         end
 
+        -- Add common category values for easier lookup
+
+        -- Add tech category
+        for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
+            if bp.CategoriesHash[category] then
+                bp.TechCategory = category
+                break
+            end
+        end
+
+        -- Add layer category
+        for _, category in {'LAND', 'AIR', 'NAVAL'} do
+            if bp.CategoriesHash[category] then
+                bp.LayerCategory = category
+                break
+            end
+        end
+
+        -- Add faction category
+        bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
+
+        -- Adjust weapon blueprints
+        for i, w in bp.Weapon or {} do
+            -- add in weapon blueprint id
+            local label = w.Label or "Unlabelled"
+            w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
+        end
+
+        -- Hotfix for naval wrecks
         if bp.CategoriesHash.NAVAL and not bp.Wreckage then
-            -- Add naval wreckage
-            --LOG("Adding wreckage information to ", bp.Description)
             bp.Wreckage = {
                 Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
                 EnergyMult = 0,
@@ -478,96 +761,7 @@ function PreModBlueprints(all_bps)
             }
         end
 
-        -- Create new keys so that unit scripting can more easily reference the most common data needed
-        for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
-            if bp.CategoriesHash[category] then
-                bp.TechCategory = category
-                break
-            end
-        end
-
-        for i, w in bp.Weapon or {} do
-            if w.TargetPriorities then
-
-                local newPriorities = {}
-
-                for g, transcendentPritority in w.TranscendentPriorities or {} do
-                    table.insert(newPriorities, transcendentPritority)
-                end
-
-                table.insert(newPriorities, 'SPECIALHIGHPRI')
-
-                for _, priority in w.TargetPriorities do
-                    table.insert(newPriorities, priority)
-                end
-
-                table.insert(newPriorities, 'SPECIALLOWPRI')
-
-                w.TargetPriorities = newPriorities
-            end
-        end
-
-        for _, category in {'LAND', 'AIR', 'NAVAL'} do
-            if bp.CategoriesHash[category] then
-                bp.LayerCategory = category
-                break
-            end
-        end
-
-        bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
-
-        -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
-        -- Takes ACU/SCU enhancements into account
-        -- fixes move-attack range issues
-        -- Most Air units have the GSR defined already, this is just making certain they don't get included
-        local modGSR = not (bp.AI and bp.AI.GuardScanRadius) and (
-                       (bp.CategoriesHash.MOBILE and (bp.CategoriesHash.LAND or bp.CategoriesHash.NAVAL) and (bp.CategoriesHash.DIRECTFIRE or bp.CategoriesHash.INDIRECTFIRE or bp.CategoriesHash.ANTINAVY or bp.CategoriesHash.ENGINEER)) or
-                       (bp.CategoriesHash.STRUCTURE and (bp.CategoriesHash.DIRECTFIRE or bp.CategoriesHash.INDIRECTFIRE) and (bp.CategoriesHash.DEFENSE or bp.CategoriesHash.ARTILLERY)) or bp.CategoriesHash.DUMMYGSRWEAPON
-                       )
-
-        if modGSR then
-            local br = nil
-
-            if bp.CategoriesHash.ENGINEER and not bp.CategoriesHash.SUBCOMMANDER and not bp.CategoriesHash.COMMAND then
-                br = 26
-            elseif bp.CategoriesHash.SCOUT then
-                br = 10
-            elseif bp.Weapon then
-                local range = 0
-                local tracking = 1.05
-
-                for i, w in bp.Weapon do
-                    local ignore = w.CountedProjectile or w.RangeCategory == 'UWRC_AntiAir' or w.WeaponCategory == 'Defense'
-                    if not ignore then
-                        if w.MaxRadius then
-                            range = math.max(w.MaxRadius, range)
-                        end
-                        if w.TrackingRadius then
-                            tracking = math.max(w.TrackingRadius, tracking)
-                        end
-                    end
-                end
-
-                for name, array in bp.Enhancements or {} do
-                    for key, value in array do
-                        if key == 'NewMaxRadius' then
-                            range = math.max(value, range)
-                        end
-                    end
-                end
-
-                br = (range * tracking)
-            end
-
-            if br then
-                if not bp.AI then bp.AI = {} end
-                bp.AI.GuardScanRadius = br
-                if not bp.AI.GuardReturnRadius then
-                    bp.AI.GuardReturnRadius = 3
-                end
-            end
-        end
-        -- synchronizing bp.Categories with bp.CategoriesHash for compatibility
+        -- Synchronize hashed categories with actual categories
         bp.Categories = table.unhash(bp.CategoriesHash)
 
         BlueprintLoaderUpdateProgress()
@@ -575,11 +769,12 @@ function PreModBlueprints(all_bps)
 end
 
 -- Hook for mods to manipulate the entire blueprint table
+---@param all_bps BlueprintsTable
 function ModBlueprints(all_bps)
 end
 
+---@param all_bps BlueprintsTable
 function PostModBlueprints(all_bps)
-
     -- Brute51: Modified code for ship wrecks and added code for SCU presets.
     -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
     local preset_bps = {}
@@ -603,32 +798,55 @@ function PostModBlueprints(all_bps)
             if not bp.EnhancementPresets then table.insert(issues, 'no EnhancementPresets value') end
             if type(bp.EnhancementPresets) ~= 'table' then table.insert(issues, 'no EnhancementPresets table') end
             -- check blueprint, if correct info for presets then put this unit on the list to handle later
-            if table.getsize(issues) == 0 then
+            if table.empty(issues) then
                 table.insert(preset_bps, table.deepcopy(bp))
             else
-                issues = table.concat(issues,', ')
-                WARN('UnitBlueprint '..repr(bp.BlueprintId)..' has a category USEBUILDPRESETS but ' .. issues)
+                issues = table.concat(issues, ', ')
+                WARN('UnitBlueprint ' .. repr(bp.BlueprintId) .. ' has a category USEBUILDPRESETS but ' .. issues)
             end
         end
         BlueprintLoaderUpdateProgress()
     end
     HandleUnitWithBuildPresets(preset_bps, all_bps)
-end
------------------------------------------------------------------------------------------------
---- Loads all blueprints with optional parameters
---- @param pattern           - specifies pattern of files to load, defaults to '*.bp'
---- @param directories       - specifies table of directory paths to load blueprints from, defaults to all directories
---- @param mods              - specifies table of mods to load blueprints from, defaults to active mods
---- @param skipGameFiles     - specifies whether skip loading original game files, defaults to false
---- @param skipExtraction    - specifies whether skip extraction of meshes, defaults to false
---- @param skipRegistration  - specifies whether skip registration of blueprints, defaults to false
---- @param taskNotifier      - specifies reference to a notifier that is updating UI when loading blueprints
---- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side
---- Sim -> LoadBlueprints() - no arguments, no changes!
---- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true, taskNotifier)  used in ModsManager.lua
---- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true, taskNotifier) used in UnitsAnalyzer.lua
-function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration, taskNotifier)
 
+    -- find custom strategic icons defined by ui mods, this should be the very last thing 
+    -- we do before releasing the blueprint values to the game as we want to catch all
+    -- units, even those included by mods
+    FindCustomStrategicIcons(all_bps)
+    BlueprintLoaderUpdateProgress()
+
+    -- dynamically compute the unit threat values that are used by the AI to make sense
+    -- of a units capabilities
+    SetUnitThreatValues(all_bps.Unit)
+    BlueprintLoaderUpdateProgress()
+
+    ProcessWeapons(all_bps.Unit)
+    BlueprintLoaderUpdateProgress()
+
+    -- re-computes all the LODs of various entities to match the LOD with the size of the entity
+    CalculateLODs(all_bps)
+    BlueprintLoaderUpdateProgress()
+
+    -- post process units and projectiles for easier access to information and sanitizing some fields
+    PostProcessProjectiles(all_bps.Projectile)
+    PostProcessUnits(all_bps.Unit)
+end
+
+
+
+--- Loads all blueprints with optional parameters  
+--- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side  
+--- `Sim -> LoadBlueprints() - no arguments, no changes!`  
+--- `UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true, taskNotifier)`  used in ModsManager.lua  
+--- `UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, false, true, true, taskNotifier)` used in UnitsAnalyzer.lua
+---@param pattern? string            pattern of files to load, defaults to `'*.bp'`
+---@param directories? string[]      paths to load blueprints from, defaults to all directories
+---@param mods? ModInfo[]            mods to load blueprints from, defaults to active mods
+---@param skipGameFiles? boolean     skip loading original game files
+---@param skipExtraction? boolean    skip extraction of meshes
+---@param skipRegistration? boolean  skip registration of blueprints
+---@param taskNotifier? TaskNotifier notifier that is updating UI when loading blueprints
+function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtraction, skipRegistration, taskNotifier)
     local task = 'Blueprints Loading... '
     local progress = nil
     local total = nil
@@ -643,18 +861,18 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     LOG('Blueprints Loading... \'' .. tostring(pattern) .. '\' files')
 
     if not mods then
-        mods = __active_mods or import('/lua/mods.lua').GetGameMods()
+        mods = __active_mods or import("/lua/mods.lua").GetGameMods()
     end
     InitOriginalBlueprints()
 
     if not skipGameFiles then
-        for i,dir in directories do
+        for _, dir in directories do
             task = 'Blueprints Loading: original files from ' .. dir .. ' directory'
             files = DiskFindFiles(dir, pattern)
             total = table.getsize(files)
             LOG(task)
 
-            for k,file in files do
+            for k, file in files do
                 BlueprintLoaderUpdateProgress()
                 -- update UnitManager UI via taskNotifier only if it exists
                 if taskNotifier then
@@ -669,7 +887,23 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     stats.UnitsOrg = table.getsize(original_blueprints.Unit)
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
 
-    for i,mod in mods or {} do
+    -- try and load in pre game data for current map directory
+    local preGameData = LoadPreGameData()
+    if preGameData and preGameData.CurrentMapDir then
+        task = 'Blueprints Loading: Blueprints from current map'
+        files = DiskFindFiles(preGameData.CurrentMapDir, pattern)
+        for k, file in files do
+            BlueprintLoaderUpdateProgress()
+            -- update UnitManager UI via taskNotifier only if it exists
+            if taskNotifier then
+               taskNotifier:Update(task, total, k)
+            end
+
+            safecall(task .. ': ' .. file, doscript, file)
+        end
+    end
+
+    for _, mod in mods or {} do
         current_mod = mod -- used in UnitBlueprint()
         task = 'Blueprints Loading: modded files from "' .. mod.name .. '" mod'
         files = DiskFindFiles(mod.location, pattern)
@@ -723,11 +957,12 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     end
 end
 
--- Reload a single blueprint
+--- Reloads a single blueprint
+---@param file FileName
 function ReloadBlueprint(file)
     InitOriginalBlueprints()
 
-    safecall("Blueprints Reloading... "..file, doscript, file)
+    safecall("Blueprints Reloading... " .. file, doscript, file)
 
     ExtractAllMeshBlueprints()
     ModBlueprints(original_blueprints)

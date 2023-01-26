@@ -1,18 +1,19 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XSS0303/XSS0303_script.lua
-#**  Author(s):  Greg Kohne, Drew Staltman, Gordon Duclos, Aaron Lundquist
-#**
-#**  Summary  :  Seraphim Aircraft Carrier Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/XSS0303/XSS0303_script.lua
+--**  Author(s):  Greg Kohne, Drew Staltman, Gordon Duclos, Aaron Lundquist
+--**
+--**  Summary  :  Seraphim Aircraft Carrier Script
+--**
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
+local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
+local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeaponSeaUnit
 local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
 
+---@class XSS0303 : AircraftCarrier
 XSS0303 = Class(AircraftCarrier) {
 
     Weapons = {

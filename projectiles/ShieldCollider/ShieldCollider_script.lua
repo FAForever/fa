@@ -2,15 +2,18 @@
 -- File     :  /projectiles/ShieldCollider_script.lua
 -- Author(s):  Exotic_Retard, made for Equilibrium Balance Mod
 -- Summary  : Companion projectile enabling air units to hit shields
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright c 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------
 
-local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local Projectile = import('/lua/sim/projectile.lua').Projectile
+local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local Projectile = import("/lua/sim/projectile.lua").Projectile
+local VectorCached = Vector(0, 0, 0)
 
 ShieldCollider = Class(Projectile) {
-    OnCreate = function(self)
+    OnCreate = function(self, inWater)
         Projectile.OnCreate(self)
+
+        self.CrashingAirplaneShieldCollisionLogic = true 
 
         self:SetVizToFocusPlayer('Never') -- Set to 'Always' to see a nice box
         self:SetVizToAllies('Never')
@@ -18,6 +21,10 @@ ShieldCollider = Class(Projectile) {
         self:SetVizToEnemies('Never')
         self:SetStayUpright(false)
         self:SetCollision(true)
+
+        if inWater then
+            self:OnImpact('Water', nil)
+        end
     end,
 
     -- Shields only detect projectiles, so we attach one to keep track of the unit.
@@ -50,6 +57,10 @@ ShieldCollider = Class(Projectile) {
         end
     end,
 
+    OnEnterWater = function(self)
+        self:OnImpact('Water', nil)
+    end,
+
     -- Destroy the sinking unit when it hits the ground.
     OnImpact = function(self, targetType, targetEntity)
         if self and not self:BeenDestroyed() and self.Plane and not self.Plane:BeenDestroyed() then
@@ -62,6 +73,7 @@ ShieldCollider = Class(Projectile) {
                 if not self.Plane.GroundImpacted then
                     self.Plane:OnImpact(targetType)
                 end
+
                 self:Destroy()
             elseif targetType == 'Shield' and targetEntity and not targetEntity:BeenDestroyed() and targetEntity.ShieldType == 'Bubble' then
                 if not self.ShieldImpacted and not self.Plane.GroundImpacted then
@@ -69,7 +81,11 @@ ShieldCollider = Class(Projectile) {
 
                     -- Find the vector to the impact location, used for the impact ripple FX
                     local wx, wy, wz = unpack(VDiff(targetEntity:GetPosition(), self:GetPosition())) -- Vector from mid of shield to impact point
-                    local shieldImpactVector = {x = wx, y = wy, z = wz}
+
+                    local shieldImpactVector = VectorCached
+                    VectorCached[1] = wx 
+                    VectorCached[2] = wy 
+                    VectorCached[3] = wz 
 
                     local exclusions = categories.EXPERIMENTAL + categories.TRANSPORTATION - categories.uea0203
                     if not EntityCategoryContains(exclusions, self.Plane) then -- Exclude experimentals and transports from momentum system, but not damage
@@ -89,7 +105,7 @@ ShieldCollider = Class(Projectile) {
                     end
 
                     if not self.Plane.deathWep or not self.Plane.DeathCrashDamage then -- Bail if stuff's missing.
-                        WARN('ShieldCollider: did not find a deathWep on the plane! Is the weapon defined in the blueprint? - ' .. self:GetUnitId())
+                        WARN('ShieldCollider: did not find a deathWep on the plane! Is the weapon defined in the blueprint? - ' .. self.UnitId)
                         return
                     end
 
@@ -104,7 +120,7 @@ ShieldCollider = Class(Projectile) {
 
                     -- Damage the shield
                     local finalDamage = math.min(shieldDamageLimit, damage)
-                    targetEntity:ApplyDamage(self.Plane, finalDamage, shieldImpactVector or {x = 0, y = 0, z = 0}, deathWep.DamageType, false)
+                    targetEntity:ApplyDamage(self.Plane, finalDamage, shieldImpactVector, deathWep.DamageType, false)
 
                     -- Play an impact effect, but only if not bouncing. Also stop Exps, because it just looks very silly.
                     if not self.Plane.Detector and not EntityCategoryContains(categories.EXPERIMENTAL, self.Plane) then

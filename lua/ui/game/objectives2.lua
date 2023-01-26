@@ -14,22 +14,20 @@
 --    targets = { blipId1, Vector(10,10,10), blipId2, ... }   -- objective is a list of target unit(s) and/or location(s)
 -- }
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Button = import('/lua/maui/button.lua').Button
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Movie = import('/lua/maui/movie.lua').Movie
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local Announcement = import('/lua/ui/game/announcement.lua').CreateAnnouncement
-local cmdMode = import('/lua/ui/game/commandmode.lua')
-local UIPing = import('/lua/ui/game/ping.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Button = import("/lua/maui/button.lua").Button
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Announcement = import("/lua/ui/game/announcement.lua").CreateAnnouncement
+local cmdMode = import("/lua/ui/game/commandmode.lua")
+local UIPing = import("/lua/ui/game/ping.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
+local gameSpeed = 0
 local lastUnitWarning = 0
 local unitWarningUsed = false
 local objectives = {}
@@ -40,7 +38,7 @@ local needsSquadLayoutPostNIS = false
 local preCreationQueue = {}
 local preCreationWaitThread = false
 
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
 controls.objItems = controls.objItems or {}
 
 function CreateUI(inParent)
@@ -91,7 +89,7 @@ function CreateUI(inParent)
             local position = GetMouseWorldPos()
             for _, v in position do
                 local var = v
-                if var != v then
+                if var ~= v then
                     return
                 end
             end
@@ -121,11 +119,16 @@ function SetLayout()
 end
 
 function _OnBeat()
-    controls.time:SetText(GetGameTime())
-    local scoreData = import('/lua/ui/game/score.lua').currentScores
-    if scoreData[GetFocusArmy()].general then
-        SetUnitText(scoreData[GetFocusArmy()].general.currentunits.count, scoreData[GetFocusArmy()].general.currentcap.count)
+    controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate()))
+    local scoreData = import("/lua/ui/game/score.lua").currentScores
+    local armyId = GetFocusArmy()
+    if scoreData[armyId].general then
+        SetUnitText(scoreData[armyId].general.currentunits, scoreData[armyId].general.currentcap)
     end
+end
+
+function NoteGameSpeedChanged(newSpeed)
+    gameSpeed = newSpeed
 end
 
 function SetUnitText(current, cap)
@@ -134,7 +137,7 @@ function SetUnitText(current, cap)
     if current == cap then
         if (not lastUnitWarning or GameTime() - lastUnitWarning > 60) and not unitWarningUsed then
             LOG('>>>>>>>>>>> current: ', current, ' cap: ', cap)
-            import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC('<LOC score_0002>Unit Cap Reached'), controls.units)
+            import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC score_0002>Unit Cap Reached'), controls.units)
             lastUnitWarning = GameTime()
             unitWarningUsed = true
         end
@@ -200,7 +203,7 @@ function UpdateObjectivesTable(updateTable, onLoad)
                 needsLayoutUpdate = true
             end
             objectives[update.tag][update.updateField] = update.updateData
-        elseif update.updateField == 'target' and update.updateField != 'timer' then
+        elseif update.updateField == 'target' and update.updateField ~= 'timer' then
             if controls.objItems[update.tag] then
                 if update.updateData.TargetTag == 1 then
                     if not controls.objItems[update.tag].ImageLocked and update.updateData.BlueprintId and DiskGetFileInfo('/textures/ui/common/icons/units/'..update.updateData.BlueprintId..'_icon.dds') then
@@ -261,7 +264,7 @@ function UpdateObjectiveItems(skipAnnounce)
             LayoutHelpers.AtBottomIn(group.timer, group, 3)
             LayoutHelpers.AtHorizontalCenterIn(group.timer, group)
             group.startTime = data.targets.Time
-        elseif table.getsize(data.targets) > 0 then
+        elseif not table.empty(data.targets) then
             local texture = false
             for _, v in data.targets do
                 if v.BlueprintId and DiskGetFileInfo(UIUtil.UIFile('/icons/units/'..v.BlueprintId..'_icon.dds')) then
@@ -285,8 +288,7 @@ function UpdateObjectiveItems(skipAnnounce)
             group.icon = Bitmap(group.bg, UIUtil.UIFile('/dialogs/objective-unit/help-lg-graphics_bmp.dds'))
         end
         LayoutHelpers.AtCenterIn(group.icon, group.bg, -6, -1)
-        group.icon.Height:Set(40)
-        group.icon.Width:Set(40)
+        LayoutHelpers.SetDimensions(group.icon, 40, 40)
         group.icon:DisableHitTest()
 
         group.icon.flash = Bitmap(group.icon, UIUtil.UIFile('/game/units_bmp/glow.dds'))
@@ -325,7 +327,7 @@ function UpdateObjectiveItems(skipAnnounce)
                 PlaySound(Sound({Bank = 'Interface', Cue = 'UI_IG_Camera_Move'}))
                 local targets = self.data.targets
                 local positions = self.data.unitPositions
-                if targets and table.getsize(targets) > 0 then
+                if targets and not table.empty(targets) then
                     local max = table.getn(targets)
                     local desiredTarget = math.mod(self.TargetFocus or 0, table.getn(targets)) + 1
 
@@ -343,7 +345,7 @@ function UpdateObjectiveItems(skipAnnounce)
                             self.TargetFocus = idx
                         end
                     end
-                elseif positions and table.getsize(positions) > 0 then
+                elseif positions and not table.empty(positions) then
                     local max = table.getsize(positions)
                     local desiredTarget = math.mod(self.TargetFocus or 0, table.getsize(positions)) + 1
 
@@ -435,7 +437,7 @@ function UpdateObjectiveItems(skipAnnounce)
 end
 
 function LayoutObjectiveItems()
-    if import('/lua/ui/game/gamemain.lua').IsNISMode() then
+    if import("/lua/ui/game/gamemain.lua").IsNISMode() then
         needsObjectiveLayoutPostNIS = true
         return
     end
@@ -455,7 +457,7 @@ function LayoutObjectiveItems()
             table.insert(sortedControls, item)
         end
     end
-    if table.getn(sortedControls) > 0 then
+    if not table.empty(sortedControls) then
         local prevControl = false
         local objectiveWidth = 0
         for _, item in sortedControls do
@@ -467,7 +469,7 @@ function LayoutObjectiveItems()
             objectiveWidth = objectiveWidth + item.Width()
             prevControl = item
         end
-        controls.objectiveContainer.Width:Set(objectiveWidth+20)
+        controls.objectiveContainer.Width:Set(objectiveWidth + LayoutHelpers.ScaleNumber(20))
         controls.objectiveContainer:Show()
     else
         controls.objectiveContainer:Hide()
@@ -558,16 +560,16 @@ function CreateTooltip(parentControl, objData, container)
 
         controls.tooltip.text.title:SetText(LOC(objData.title) or LOC(objData.Name))
         local progressStr = ''
-        if objData.progress and objData.progress != '' then
+        if objData.progress and objData.progress ~= '' then
             progressStr = LOC(objData.progress)
         elseif objData.targets.Type == 'Timer' and objData.targets.Time > 0 then
             progressStr = string.format("%02d:%02d", math.floor(objData.targets.Time/60), math.floor(math.mod(objData.targets.Time, 60)))
         end
         controls.tooltip.text.progress:SetText(progressStr)
-        controls.tooltip.Width:Set(function() return math.max(180, controls.tooltip.text.title.Width()) end)
+        controls.tooltip.Width:Set(function() return math.max(LayoutHelpers.ScaleNumber(180), controls.tooltip.text.title.Width()) end)
 
         local curLine = 1
-        local wrapped = import('/lua/maui/text.lua').WrapText(LOC(objData.description) or '', controls.tooltip.Width(),
+        local wrapped = import("/lua/maui/text.lua").WrapText(LOC(objData.description) or '', controls.tooltip.Width(),
             function(curText) return controls.tooltip.text.desc[1]:GetStringAdvance(curText) end)
         for index, line in wrapped do
             local i = index
@@ -593,11 +595,11 @@ function CreateTooltip(parentControl, objData, container)
             for id, control in controls.tooltip.text do
                 if id == 'desc' then
                     for _, line in control do
-                        if line:GetText() != '' then
+                        if line:GetText() ~= '' then
                             totHeight = totHeight + line.Height()
                         end
                     end
-                elseif control:GetText() != '' then
+                elseif control:GetText() ~= '' then
                     totHeight = control.Height() + totHeight
                 end
             end
@@ -609,9 +611,9 @@ function CreateTooltip(parentControl, objData, container)
 
     controls.tooltip:DisableHitTest(true)
     LayoutHelpers.AtVerticalCenterIn(controls.tooltip.connector, container)
-    controls.tooltip.connector.Right:Set(function() return container.Left() + 7 end)
+    LayoutHelpers.AnchorToLeft(controls.tooltip.connector, container, -7)
     LayoutHelpers.LeftOf(controls.tooltip, container, 32)
-    controls.tooltip.Top:Set(function() return container.Top() + 16 end)
+    LayoutHelpers.AtTopIn(controls.tooltip, container, 16)
 end
 
 function DestroyTooltip()
@@ -645,8 +647,8 @@ function AddPingGroups(groupData, onload)
         controls.squads[id] = Bitmap(controls.bg, UIUtil.UIFile('/game/ping-icons/panel-icon_bmp.dds'))
         controls.squads[id].btn = Button(controls.squads[id], icon, icon, icon, icon)
         LayoutHelpers.AtCenterIn(controls.squads[id].btn, controls.squads[id])
-        controls.squads[id].btn.Width:Set(function() return controls.squads[id].Width() - 16 end)
-        controls.squads[id].btn.Height:Set(function() return controls.squads[id].Height() - 16 end)
+        controls.squads[id].btn.Width:Set(function() return controls.squads[id].Width() - LayoutHelpers.ScaleNumber(16) end)
+        controls.squads[id].btn.Height:Set(function() return controls.squads[id].Height() - LayoutHelpers.ScaleNumber(16) end)
         controls.squads[id].btn.Data = pingGroup
         controls.squads[id].btn.OnClick = function(self, modifiers)
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_IG_Camera_Move'}))
@@ -702,14 +704,14 @@ function RemovePingGroups(removeData, onload)
 end
 
 function LayoutSquads()
-    if import('/lua/ui/game/gamemain.lua').IsNISMode() then
+    if import("/lua/ui/game/gamemain.lua").IsNISMode() then
         needsSquadLayoutPostNIS = true
         return
     end
     if not controls.squads then return end
     local prevControl = false
     local squadWidth = 10
-    if table.getsize(controls.squads) > 0 then
+    if not table.empty(controls.squads) then
         for _, item in controls.squads do
             if prevControl then
                 LayoutHelpers.RightOf(item, prevControl)
@@ -750,7 +752,7 @@ end
 
 function ToggleObjectives(state)
     -- disable when in Screen Capture mode
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         return
     end
 
@@ -759,12 +761,12 @@ function ToggleObjectives(state)
             PlaySound(Sound({Cue = "UI_Score_Window_Open", Bank = "Interface"}))
             controls.collapseArrow:SetCheck(false, true)
             controls.bg:Show()
-            if controls.objItems and table.getsize(controls.objItems) > 0 then
+            if controls.objItems and not table.empty(controls.objItems) then
                 controls.objectiveContainer:Show()
             else
                 controls.objectiveContainer:Hide()
             end
-            if controls.squads and table.getsize(controls.squads) > 0 then
+            if controls.squads and not table.empty(controls.squads) then
                 controls.squadContainer:Show()
             else
                 controls.squadContainer:Hide()
@@ -796,12 +798,12 @@ function ToggleObjectives(state)
         if state or controls.bg:IsHidden() then
             controls.collapseArrow:SetCheck(false, true)
             controls.bg:Show()
-            if controls.objItems and table.getsize(controls.objItems) > 0 then
+            if controls.objItems and not table.empty(controls.objItems) then
                 controls.objectiveContainer:Show()
             else
                 controls.objectiveContainer:Hide()
             end
-            if controls.squads and table.getsize(controls.squads) > 0 then
+            if controls.squads and not table.empty(controls.squads) then
                 controls.squadContainer:Show()
             else
                 controls.squadContainer:Hide()
@@ -832,12 +834,12 @@ function Expand()
     end
     controls.bg:SetHidden(preContractState)
     if not preContractState then
-        if controls.objItems and table.getsize(controls.objItems) > 0 then
+        if controls.objItems and not table.empty(controls.objItems) then
             controls.objectiveContainer:Show()
         else
             controls.objectiveContainer:Hide()
         end
-        if controls.squads and table.getsize(controls.squads) > 0 then
+        if controls.squads and not table.empty(controls.squads) then
             controls.squadContainer:Show()
         else
             controls.squadContainer:Hide()

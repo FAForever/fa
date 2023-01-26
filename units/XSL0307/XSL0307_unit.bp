@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 28, -- allow mobile shield to keep a distance when on attack move
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -52,6 +55,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'OVERLAYDEFENSE',
         'DUMMYGSRWEAPON',
+        'DIESTOOCDEPLETINGSHIELD',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -237,6 +241,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC xsl0307_name>Athanah',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         VisionRadius = 20,
@@ -282,7 +287,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.7,
     SelectionThickness = 0.58,
     SizeX = 0.8,
-    SizeY = 0.5,
+    SizeY = 0.8,
     SizeZ = 0.8,
     StrategicIconName = 'icon_land3_shield',
     StrategicIconSortPriority = 125,
@@ -297,7 +302,7 @@ UnitBlueprint {
                 Land = 'Land|Water',
                 Water = 'Land|Water',
             },
-            MaxRadius = 38,
+            MaxRadius = 26,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -307,12 +312,10 @@ UnitBlueprint {
                 },
             },
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.2,
             Turreted = false,
             SlavedToBody = false,
         },
@@ -326,9 +329,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

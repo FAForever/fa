@@ -1,14 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/ZAB9603/ZAB9603_script.lua
-#**  Author(s):  John Comes, David Tomandl, Gordon Duclos
-#**
-#**  Summary  :  Aeon Tier 3 Naval Factory Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/ZAB9603/ZAB9603_script.lua
+--**  Author(s):  John Comes, David Tomandl, Gordon Duclos
+--**
+--**  Summary  :  Aeon Tier 3 Naval Factory Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-local ASeaFactoryUnit = import('/lua/aeonunits.lua').ASeaFactoryUnit
+local ASeaFactoryUnit = import("/lua/aeonunits.lua").ASeaFactoryUnit
+---@class ZAB9603 : ASeaFactoryUnit
 ZAB9603 = Class(ASeaFactoryUnit) {
     OnCreate = function(self)
         ASeaFactoryUnit.OnCreate(self)

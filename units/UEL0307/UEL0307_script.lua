@@ -5,12 +5,13 @@
 --**
 --**  Summary  :  UEF Mobile Shield Generator Script
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TShieldLandUnit = import('/lua/terranunits.lua').TShieldLandUnit
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local TShieldLandUnit = import("/lua/terranunits.lua").TShieldLandUnit
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
+---@class UEL0307 : TShieldLandUnit
 UEL0307 = Class(TShieldLandUnit) {
 
     Weapons = {        
@@ -56,7 +57,7 @@ UEL0307 = Class(TShieldLandUnit) {
             self.ShieldEffectsBag = {}
         end
         for k, v in self.ShieldEffects do
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 0, self:GetArmy(), v ) )
+            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 0, self.Army, v ) )
         end
     end,
 
@@ -98,12 +99,20 @@ UEL0307 = Class(TShieldLandUnit) {
     end,
         
     PointerRestart = function(self)
-    --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
-        while self.PointerEnabled == false do
+        --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
+        while not self.PointerEnabled do
+
             WaitSeconds(1)
+
+            -- break if we're a gooner
+            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then 
+                break 
+            end
+
+            -- if not gooner, check whether we need to enable our weapon to keep reasonable distance
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self:GetCurrentLayer()]) --this resets the stop feature - note that its reset on layer change!
+                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!
             end
         end
     end,
@@ -111,8 +120,10 @@ UEL0307 = Class(TShieldLandUnit) {
     OnLayerChange = function(self, new, old)
         TShieldLandUnit.OnLayerChange(self, new, old)
         
-        if self.PointerEnabled == false then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+        if not IsDestroyed(self) then 
+            if self.PointerEnabled == false then
+                self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+            end
         end
     end,
 }

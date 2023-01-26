@@ -10,6 +10,8 @@ keyDescriptions = {
     ['cap_frame'] = '<LOC key_desc_0003>Take a screen shot',
     ['show_fps'] = "<LOC key_desc_0131>Toggle the display of frames rendered per second",
 
+    ['revert_selection_set'] = 'Restore selection to the one before recalling a control group',
+
     ['group1'] = '<LOC key_desc_0004>Recall Group 1',
     ['group2'] = '<LOC key_desc_0005>Recall Group 2',
     ['group3'] = '<LOC key_desc_0006>Recall Group 3',
@@ -33,16 +35,38 @@ keyDescriptions = {
     ['set_group9'] = '<LOC key_desc_0023>Set Group 9',
     ['set_group0'] = '<LOC key_desc_0024>Set Group 10',
 
-    ['append_group1'] = '<LOC key_desc_0110>Append Group 1 to current selection',
-    ['append_group2'] = '<LOC key_desc_0111>Append Group 2 to current selection',
-    ['append_group3'] = '<LOC key_desc_0112>Append Group 3 to current selection',
-    ['append_group4'] = '<LOC key_desc_0113>Append Group 4 to current selection',
-    ['append_group5'] = '<LOC key_desc_0114>Append Group 5 to current selection',
-    ['append_group6'] = '<LOC key_desc_0115>Append Group 6 to current selection',
-    ['append_group7'] = '<LOC key_desc_0116>Append Group 7 to current selection',
-    ['append_group8'] = '<LOC key_desc_0117>Append Group 8 to current selection',
-    ['append_group9'] = '<LOC key_desc_0118>Append Group 9 to current selection',
-    ['append_group0'] = '<LOC key_desc_0119>Append Group 10 to current selection',
+    ['append_group1'] = 'Append control group 1 to current selection',
+    ['append_group2'] = 'Append control group 2 to current selection',
+    ['append_group3'] = 'Append control group 3 to current selection',
+    ['append_group4'] = 'Append control group 4 to current selection',
+    ['append_group5'] = 'Append control group 5 to current selection',
+    ['append_group6'] = 'Append control group 6 to current selection',
+    ['append_group7'] = 'Append control group 7 to current selection',
+    ['append_group8'] = 'Append control group 8 to current selection',
+    ['append_group9'] = 'Append control group 9 to current selection',
+    ['append_group0'] = 'Append control group 10 to current selection',
+
+    ['add_selection_to_selection_set1'] = 'Append the current selection to control group 1',
+    ['add_selection_to_selection_set2'] = 'Append the current selection to control group 2',
+    ['add_selection_to_selection_set3'] = 'Append the current selection to control group 3',
+    ['add_selection_to_selection_set4'] = 'Append the current selection to control group 4',
+    ['add_selection_to_selection_set5'] = 'Append the current selection to control group 5',
+    ['add_selection_to_selection_set6'] = 'Append the current selection to control group 6',
+    ['add_selection_to_selection_set7'] = 'Append the current selection to control group 7',
+    ['add_selection_to_selection_set8'] = 'Append the current selection to control group 8',
+    ['add_selection_to_selection_set9'] = 'Append the current selection to control group 9',
+    ['add_selection_to_selection_set0'] = 'Append the current selection to control group 0',
+
+    ['combine_and_select_with_selection_set1'] = 'Combine selection and control group 1 and select the control group',
+    ['combine_and_select_with_selection_set2'] = 'Combine selection and control group 2 and select the control group',
+    ['combine_and_select_with_selection_set3'] = 'Combine selection and control group 3 and select the control group',
+    ['combine_and_select_with_selection_set4'] = 'Combine selection and control group 4 and select the control group',
+    ['combine_and_select_with_selection_set5'] = 'Combine selection and control group 5 and select the control group',
+    ['combine_and_select_with_selection_set6'] = 'Combine selection and control group 6 and select the control group',
+    ['combine_and_select_with_selection_set7'] = 'Combine selection and control group 7 and select the control group',
+    ['combine_and_select_with_selection_set8'] = 'Combine selection and control group 8 and select the control group',
+    ['combine_and_select_with_selection_set9'] = 'Combine selection and control group 9 and select the control group',
+    ['combine_and_select_with_selection_set0'] = 'Combine selection and control group 0 and select the control group',
 
     ['fac_group1'] = '<LOC key_desc_0120>Select only factories from Group 1',
     ['fac_group2'] = '<LOC key_desc_0121>Select only factories from Group 2',
@@ -96,6 +120,7 @@ keyDescriptions = {
     ['move'] = '<LOC key_desc_0065>Move',
     ['nuke'] = '<LOC key_desc_0063>Nuke',
     ['mode'] = '<LOC key_desc_0101>Cycle through all of the available fire states.',
+    ['dock'] = '<LOC key_desc_0405>Dock',
     ['shift_repair'] = '<LOC key_desc_0036>Repair',
     ['shift_reclaim'] = '<LOC key_desc_0037>Reclaim',
     ['shift_patrol'] = '<LOC key_desc_0043>Patrol',
@@ -110,6 +135,7 @@ keyDescriptions = {
     ['shift_overcharge'] = '<LOC key_desc_0055>Overcharge',
     ['shift_move'] = '<LOC key_desc_0065>Move',
     ['shift_nuke'] = '<LOC key_desc_0063>Nuke',
+    ['shift_dock'] = '<LOC key_desc_0405>Dock',
     ['rename'] = '<LOC key_desc_0064>Rename the selected unit',
     ['goto_engineer'] = '<LOC key_desc_0066>Go to the nearest idle Engineer',
     ['select_idle_engineer'] = '<LOC key_desc_0067>Select the nearest idle Engineer',
@@ -126,7 +152,9 @@ keyDescriptions = {
     ['select_nearest_naval_factory'] = '<LOC key_desc_0078>Select the nearest Naval Factory',
     ['toggle_build_mode'] = '<LOC key_desc_0102>Toggles keyboard build command mode on and off',
     ['toggle_reclaim_labels'] = '<LOC key_desc_0103>Toggles reclaim labels on and off',
-
+    ['select_upgrading_extractors'] = '<LOC key_desc_select_upgrading_extractors>Select all extractors that are upgrading',
+    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
+    ['select_all_radars'] = '<LOC key_desc_select_all_radars>Select all radars',
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
     ['reset_game_speed'] = '<LOC key_desc_0081>Reset game speed to 0 (Normal Speed)',
@@ -153,7 +181,7 @@ keyDescriptions = {
     ['toggle_diplomacy_screen'] = '<LOC key_desc_0098>Toggles the Diplomacy Window',
     ['toggle_disconnect_screen'] = '<LOC key_desc_0099>Toggles the Connectivity Screen',
     ['toggle_key_bindings'] = '<LOC key_desc_0100>Toggles the Key Bindings Screen',
-    ['toggle_notify_customiser'] = '<LOC key_desc_0379>Toggles the Notify customisation screen',
+    ['toggle_notify_customiser'] = '<LOC key_desc_0388>Toggles the Notify customisation screen',
     ['ping_alert'] = '<LOC key_desc_0105>Create an alert ping at the mouse location',
     ['ping_attack'] = '<LOC key_desc_0106>Create an attack ping at the mouse location',
     ['ping_move'] = '<LOC key_desc_0107>Create a move ping at the mouse location',
@@ -217,6 +245,11 @@ keyDescriptions = {
     ['spreadattack'] = '<LOC key_desc_0182>Spread attack',
     ['shift_spreadattack'] = '<LOC key_desc_0183>Spread attack',
     ['show_objective_screen'] = '<LOC key_desc_0184>Show Scenario Options/Objectives Window',
+    ['toggle_ai_screen'] = 'Toggle AI blueprint information window, requires cheats to be enabled',
+    ['toggle_markers_screen'] = 'Toggle marker information window, requires cheats to be enabled',
+    ['toggle_map_utilities_window'] = 'Toggle map utilities window, requires cheats to be enabled',
+    ['toggle_profiler'] = 'Toggles the profiler. This is a debug tool, abuse is bannable',
+    ['toggle_profiler_window'] = 'Toggles the profiler window. This is a debug tool, abuse is bannable',
 
     -- GAZUI
     ['toggle_repeat_build'] = '<LOC key_desc_0185>Toggle factory repeat build',
@@ -244,7 +277,6 @@ keyDescriptions = {
     ['select_next_air_factory'] = '<LOC key_desc_0208>Select next air factory',
     ['select_next_naval_factory'] = '<LOC key_desc_0209>Select next naval factory',
     ['toggle_selectedinfo'] = '<LOC key_desc_0210>Toggle single unit selected info',
-    ['toggle_selectedrings'] = '<LOC key_desc_0211>Toggle single unit selected rings',
     ['toggle_cloakjammingstealth'] = '<LOC key_desc_0212>Toggle all counter-intelligence abilities',
     ['toggle_intelshield'] = '<LOC key_desc_0213>Toggle intel and shield',
     ['toggle_mdf_panel'] = '<LOC key_desc_0214>Toggle MFD panel',
@@ -267,6 +299,7 @@ keyDescriptions = {
     ['select_bombers'] = '<LOC key_desc_0228>Select all Bombers',
     ['select_anti_air_fighters'] = '<LOC key_desc_0229>Select all Air Fighters',
     ['select_nearest_idle_airscout'] = '<LOC key_desc_0230>Select nearest idle Air Scout',
+    ['select_all_idle_airscouts'] = '<LOC key_desc_0230_all>Select all idle Air Scouts',
     ['select_all_tml'] = '<LOC key_desc_0231>Select all TML',
     ['select_all_stationdrones'] = '<LOC key_desc_0232>Select all Drones',
     ['select_all_t2_podstations'] = '<LOC key_desc_0233>Select all T2 Engineering Podstations',
@@ -292,7 +325,7 @@ keyDescriptions = {
     ['Execute_Paste_Buffer'] = '<LOC key_desc_0252>[Debug] Execute Paste Buffer',
     ['select_air_no_transport'] = '<LOC key_desc_0253>Select air but no transports',
     ['select_air_transport'] = '<LOC key_desc_0254>Select only transports',
-    ['lock_zoom'] = '<LOC key_desc_0255>lock the zoom to current level',
+    ['lock_zoom'] = '<LOC key_desc_0255>Lock the zoom to current level',
 
     -- Hotbuild
     ['builders'] = '<LOC key_desc_0256>build builders (factories, Quantum Gate & T1 engineers)',
@@ -315,6 +348,24 @@ keyDescriptions = {
     ['arties'] = '<LOC key_desc_0273>build Artilleries defenses + T3 Strategic Bombers + Aircraft Carriers + Battlecruiser',
     ['tml'] = '<LOC key_desc_0274>build Tactical Missile Launchers + Shield disruptors + T3 mobile shields + T3 gunships + Missile Ship',
     ['upgrades'] = '<LOC key_desc_0275>build Upgrades + T3 Mobile Anti Air + T3 Air Transport + T3 torpedo bomber',
+
+    -- Alternative Hotbuild
+    ['alt_builders'] = '<LOC key_desc_0389>build factories & quantum gateway + engineers & SCUs', -- also T3 engie from Megalith
+    ['alt_radars'] = '<LOC key_desc_0390>build radars (+ perimeter & eye of Rhianne) + land scouts + air scouts',
+    ['alt_shields'] = '<LOC key_desc_0391>build shields + mobiles Shields & shield disruptors + shield boat',
+    ['alt_tmd'] = '<LOC key_desc_0392>build tactical missiles defense & strategic missile defense',
+    ['alt_xp'] = '<LOC key_desc_0393>build experimentals + mobile bomb + guided missile',
+    ['alt_sonars'] = '<LOC key_desc_0394>build sonars + transports + amphibious / hover tanks',
+    ['alt_mass'] = '<LOC key_desc_0395>build mass extractors / fabricators + tanks + bombers + frigates / destroyers / battlecruisers / battleships', -- also Brick from Megalith
+    ['alt_stealth'] = '<LOC key_desc_0396>build steath fields & cybran T3 sonar + mobile stealth fields + counter intelligence boat',
+    ['alt_pgen'] = '<LOC key_desc_0397>build power generators / storage + snipers & Loyalist / titan & gattling / rocket bots & LABs + gunships',
+    ['alt_templates'] = '<LOC key_desc_0398>build templates + factory templates',
+    ['alt_engystation'] = '<LOC key_desc_0399>build engineers stations + field engineers',
+    ['alt_defense'] = '<LOC key_desc_0400>build point defenses & walls + structure upgrades',
+    ['alt_aa'] = '<LOC key_desc_0401>build static AA + air staging + mobile AA & flaks + air fighters + aircrafts carriers / cruisers / attack boat', -- also flak & T3 mobile anti air from Megalith
+    ['alt_torpedo'] = '<LOC key_desc_0402>build torpedo defenses + torpedo bombers + submarines & torpedo boat',
+    ['alt_arties'] = '<LOC key_desc_0403>build static artilleries + mobile artilleries', -- also T3 arty from Megalith
+    ['alt_tml'] = '<LOC key_desc_0404>build TML & SML + mobile missile launchers + nuke subs / battleship & missile ship & sera / uef cruisers',
 
     -- Extra
     ['land_factory'] = '<LOC key_desc_0276>build Land Factory',
@@ -428,4 +479,8 @@ keyDescriptions = {
     ['t3_support_land_factory'] = '<LOC key_desc_0385>build T3 Support Land Factory',
     ['t3_support_air_factory'] = '<LOC key_desc_0386>build T3 Support Air Factory',
     ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
+
+    ['recheck_targets_of_weapons'] = 'Recheck targets of weapons of selected units',
+    ['set_target_priority'] = 'Set weapon target priorities to the type of unit that you hover over with the mouse',
+    ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
 }

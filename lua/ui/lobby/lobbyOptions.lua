@@ -5,7 +5,61 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+---@alias AIMultiplierOptionValue '1.0' | '1.1' | '1.2' | '1.3' | '1.4' | '1.5' | '1.6' | '1.7' | '1.8' | '1.9' | '2.0' | '2.1' | '2.2' | '2.3' | '2.4' | '2.5' | '2.6' | '2.7' | '2.8' | '2.9' | '3.0' | '3.1' | '3.2' | '3.3' | '3.4' | '3.5' | '3.6' | '3.7' | '3.8' | '3.9' | '4.0' | '4.1' | '4.2' | '4.3' | '4.4' | '4.5' | '4.6' | '4.7' | '4.8' | '4.9' | '5.0' | '5.1' | '5.2' | '5.3' | '5.4' | '5.5' | '5.6' | '5.7' | '5.8' | '5.9'
+---@alias AIExpansionOptionValue '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
+---| '99999' unlimited expansions allowed
+
+--- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
+---@class GameOptions
+---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
+---@field TeamLock 'locked' | 'unlocked'
+---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
+---
+---@field AIReplacement 'Off' | 'On'
+---@field AllowObservers boolean
+---@field CheatsEnabled 'false' | 'true'
+---@field CivilianAlliance 'enemy' | 'neutral' | 'removed'
+---@field DisconnectionDelay02 '10' | '30' | '90'
+---@field FogOfWar 'none' | 'explored'
+---@field GameSpeed 'normal' | 'fast' | 'adjustable'
+---@field ManualUnitShare 'none' | 'no_builders' | 'all'
+---@field NoRushOption '1' | '2' | '3' | '4' | '5' | '10' | '15' | '20' | '25' | '30' | '35' | '40' | '45' | '50' | '55' | '60'
+---@field PrebuiltUnits 'Off' | 'On'
+---@field Ranked boolean
+---@field RevealCivilians 'No' | 'Yes'
+---@field RandomMap 'Off' | 'Official' | 'All'
+---@field Score 'no' | 'yes'
+---@field Share 'FullShare' | 'ShareUntilDeath' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@field ShareUnitCap 'none' | 'allies' | 'all'
+---@field Timeouts '0' | '3'| '-1'
+---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
+---@field UnRanked 'false' | 'true
+---@field Victory 'demoralization' | 'domination' | 'eradication' | 'sandbox'
+---
+---@field BuildMult AIMultiplierOptionValue
+---@field CheatMult AIMultiplierOptionValue
+---@field LandExpansionsAllowed AIExpansionOptionValue
+---@field NavalExpansionsAllowed AIExpansionOptionValue
+---@field OmniCheat 'off' | 'on'
+---@field TMLRandom '0' | '2.5' | '5' | '7.5' | '10' | '12.5' | '15' | '17.5' | '20'
+
+---@class ScenarioOption
+---@field default number
+---@field help string
+---@field key string
+---@field label string
+---@field mponly? boolean
+---@field values (any | ScenarioOptionValue)[] can only contain arbitrary values if `value_text` and `value_help` are set to format them
+---@field value_text? string if present, will format arbitrary values in `values`
+---@field value_help? string if present, will format arbitrary values in `values`
+
+---@class ScenarioOptionValue
+---@field text string
+---@field help string
+---@field key any
+
 -- options that show up in the team options panel
+---@type ScenarioOption[]
 teamOptions =
 {
     {
@@ -43,6 +97,11 @@ teamOptions =
                 text = "<LOC lobui_0778>Optimal balance (Revealed)",
                 help = "<LOC lobui_0779>Teams will be optimally balanced, labeled random start locations",
                 key = 'balanced_reveal',
+            },
+            {
+                text = "<LOC lobui_0782>Optimal balance mirrored (Revealed)",
+                help = "<LOC lobui_0783>Teams will be optimally balanced with mirrored positions, labeled random start locations",
+                key = 'balanced_reveal_mirrored',
             },
             {
                 text = "<LOC lobui_0780>Flexible balance (Revealed)",
@@ -102,9 +161,103 @@ teamOptions =
             },
         },
     },
+
+    {
+        default = 1,
+        label = "<LOC lobui_CAName>Army control",
+        help = "<LOC lobui_CADesc>Allows you to adjust how teams and armies co-operate with each other. Ranging from the default Supreme Commander experience to one army, shared by the entire team.",
+        key = 'CommonArmy',
+        values = {
+            {
+                text = "<LOC at_Default>Default",
+                help = "<LOC lobui_CADDesc>Each player has their own army and their own resources. Allied players can not issue commands to your army. This is the default Supreme Commander experience.",
+                key = 'Off'
+            },
+            {
+                text = "<LOC lobui_CAUnion>Multiple armies, union control",
+                help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
+                key = 'Union'
+            },
+            {
+                text = "<LOC lobui_CACommon>Single army, union control",
+                help = "<LOC lobui_CACDesc>Each team is one army. All units and resources are shared, all team members can issue commands.",
+                key = 'Common'
+            }
+        }
+    },
 }
 
+---@type ScenarioOption[]
 globalOpts = {
+    {
+         default = 2,
+         label = "<LOC lobui_0740>Share Conditions",
+         help = "<LOC lobui_0741>Set what happens to a player's units when they are defeated",
+         key = 'Share',
+         values = {
+             {
+                 text = "<LOC lobui_0742>Full Share",
+                 help = "<LOC lobui_0743>Your units will be transferred to your highest rated ally when you die. Previously transferred units will stay where they are.",
+                 key = 'FullShare',
+             },
+             {
+                 text = "<LOC lobui_0744>Share Until Death",
+                 help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
+                 key = 'ShareUntilDeath',
+             },
+             {
+                 text = "<LOC lobui_0762>Traitors",
+                 help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
+                 key = 'TransferToKiller',
+             },
+             {
+                 text = "<LOC lobui_0766>Defectors",
+                 help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
+                 key = 'Defectors',
+             },
+             {
+                 text = "<LOC lobui_0764>Civilian Desertion",
+                 help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
+                 key = 'CivilianDeserter',
+             },
+         },
+     },
+    {
+        default = 1,
+        label = "<LOC lobui_0802>Unrate",
+        help = "<LOC lobui_0803>Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated.",
+        key = 'Unranked',
+        values = {
+            {
+                  text = "<LOC lobui_0804>No",
+                  help = "<LOC lobui_0805>This game will be rated if all the criteria for a rated game are met.",
+                  key = 'No',
+              },
+              {
+                  text = "<LOC lobui_0806>Yes",
+                  help = "<LOC lobui_0807>This game will not be rated.",
+                  key = 'Yes',
+              },
+          },
+    },
+    {
+        default = 2,
+        label = "<LOC lobui_0592>Allow Observers",
+        help = "<LOC lobui_0593>Are observers permitted after the game has started?",
+        key = 'AllowObservers',
+        values = {
+            {
+                text = "<LOC _Yes>Yes",
+                help = "<LOC lobui_0594>Observers are allowed",
+                key = true,
+            },
+            {
+                text = "<LOC _No>No",
+                help = "<LOC lobui_0595>Observers are not allowed",
+                key = false,
+            },
+        },
+    },
     {
         default = 8,
         label = "<LOC lobui_0102>Unit Cap",
@@ -211,6 +364,30 @@ globalOpts = {
         },
     },
     {
+        default = 3,
+        label = "Disconnection delay",
+        help = "Sets the disconnect delay when a player has trouble connecting.",
+        key = 'DisconnectionDelay02',
+        mponly = true,
+        values = {
+            {
+                text = "Tournament",
+                help = "The eject delay is set to 10 seconds and after 90 seconds the player is ejected automatically.",
+                key = '10',
+            },
+            {
+                text = "Quick",
+                help = "The eject delay is set to 30 seconds and after 90 seconds the player is ejected automatically.",
+                key = '30',
+            },
+            {
+                text = "Regular",
+                help = "The eject delay is set to 90 seconds and after 180 seconds the player is ejected automatically.",
+                key = '90',
+            },
+        },
+    },
+    {
         default = 1,
         label = "<LOC lobui_0258>Game Speed",
         help = "<LOC lobui_0259>Set the game speed",
@@ -230,24 +407,6 @@ globalOpts = {
                 text = "<LOC lobui_0264>Adjustable",
                 help = "<LOC lobui_0265>Adjustable in-game",
                 key = 'adjustable',
-            },
-        },
-    },
-    {
-        default = 2,
-        label = "<LOC lobui_0592>Allow Observers",
-        help = "<LOC lobui_0593>Are observers permitted after the game has started?",
-        key = 'AllowObservers',
-        values = {
-            {
-                text = "<LOC _Yes>Yes",
-                help = "<LOC lobui_0594>Observers are allowed",
-                key = true,
-            },
-            {
-                text = "<LOC _No>No",
-                help = "<LOC lobui_0595>Observers are not allowed",
-                key = false,
             },
         },
     },
@@ -385,36 +544,26 @@ globalOpts = {
             },
         },
     },
-   {
-        default = 2,
-        label = "<LOC lobui_0740>Share Conditions",
-        help = "<LOC lobui_0741>Set what happens to a player's units when they are defeated",
-        key = 'Share',
+    {
+        default = 1,
+        label = "<LOC lobui_0790>Manual Unit Sharing",
+        help = "<LOC lobui_0791>Are players allowed to manually give units?",
+        key = 'ManualUnitShare',
         values = {
             {
-                text = "<LOC lobui_0742>Full Share",
-                help = "<LOC lobui_0743>Your units will be transferred to your highest scoring ally when you die. Previously transferred units will stay where they are.",
-                key = 'FullShare',
+                text = "<LOC _Yes>Yes",
+                help = "<LOC lobui_0792>Manual unit sharing are allowed",
+                key = 'all',
             },
             {
-                text = "<LOC lobui_0744>Share Until Death",
-                help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
-                key = 'ShareUntilDeath',
+                text = "<LOC lobui_0793>Yes except builders",
+                help = "<LOC lobui_0794>No manual sharing of engineers/factories",
+                key = 'no_builders',
             },
             {
-                text = "<LOC lobui_0762>Traitors",
-                help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
-                key = 'TransferToKiller',
-            },
-            {
-                text = "<LOC lobui_0766>Defectors",
-                help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
-                key = 'Defectors',
-            },
-            {
-                text = "<LOC lobui_0764>Civilian Desertion",
-                help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
-                key = 'CivilianDeserter',
+                text = "<LOC _No>No",
+                help = "<LOC lobui_0795>No manual sharing of units",
+                key = 'none',
             },
         },
     },
@@ -438,6 +587,7 @@ globalOpts = {
     },
 }
 
+---@type ScenarioOption[]
 AIOpts = {
    {
         default = 11,

@@ -6,23 +6,23 @@
 -----------------------------------------------------------------
 
 -- This file is the F1 menu used for navigating and interacting with keybindings
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group     = import('/lua/maui/group.lua').Group
-local Bitmap    = import('/lua/maui/bitmap.lua').Bitmap
-local Text      = import('/lua/maui/text.lua').Text
-local Edit      = import('/lua/maui/edit.lua').Edit
-local Popup     = import('/lua/ui/controls/popups/popup.lua').Popup
-local Tooltip   = import('/lua/ui/game/tooltip.lua')
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group     = import("/lua/maui/group.lua").Group
+local Bitmap    = import("/lua/maui/bitmap.lua").Bitmap
+local Edit      = import("/lua/maui/edit.lua").Edit
+local Popup     = import("/lua/ui/controls/popups/popup.lua").Popup
+local Tooltip   = import("/lua/ui/game/tooltip.lua")
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
 
-local properKeyNames = import('/lua/keymap/properKeyNames.lua').properKeyNames
-local keyNames = import('/lua/keymap/keyNames.lua').keyNames
-local keyCategories = import('/lua/keymap/keycategories.lua').keyCategories
-local keyCategoryOrder = import('/lua/keymap/keycategories.lua').keyCategoryOrder
-local KeyMapper = import('/lua/keymap/keymapper.lua')
+local properKeyNames = import("/lua/keymap/properkeynames.lua").properKeyNames
+local keyNames = import("/lua/keymap/keynames.lua").keyNames
+local keyCategories = import("/lua/keymap/keycategories.lua").keyCategories
+local keyCategoryOrder = import("/lua/keymap/keycategories.lua").keyCategoryOrder
+local KeyMapper = import("/lua/keymap/keymapper.lua")
 
 local popup = nil
+local FormatData
 local keyContainer
 local keyTable
 local keyFilter
@@ -59,14 +59,22 @@ local function ResetBindingToHotbuildKeyMap()
     keyContainer:Filter(keyword)
 end
 
+local function ResetBindingToalternativeKeyMap()
+    IN_ClearKeyMap()
+    KeyMapper.ResetUserKeyMapTo('alternativeKeyMap.lua')
+    IN_AddKeyMapTable(KeyMapper.GetKeyActions())
+    keyTable = FormatData()
+    keyContainer:Filter(keyword)
+end
+
 local function ConfirmNewKeyMap()
     KeyMapper.SaveUserKeyMap()
     IN_ClearKeyMap()
     IN_AddKeyMapTable(KeyMapper.GetKeyMappings(true))
     -- update hotbuild modifiers and re-initialize hotbuild labels
     if SessionIsActive() then
-        import('/lua/keymap/hotbuild.lua').addModifiers()
-        import('/lua/keymap/hotkeylabels.lua').init()
+        import("/lua/keymap/hotbuild.lua").addModifiers()
+        import("/lua/keymap/hotkeylabels.lua").init()
     end
 end
 
@@ -81,8 +89,7 @@ end
 
 local function EditActionKey(parent, action, currentKey)
     local dialogContent = Group(parent)
-    dialogContent.Height:Set(170)
-    dialogContent.Width:Set(400)
+    LayoutHelpers.SetDimensions(dialogContent, 400, 170)
 
     local keyPopup = Popup(popup, dialogContent)
 
@@ -178,7 +185,7 @@ local function EditActionKey(parent, action, currentKey)
             if keyMapping[keyPattern] and keyMapping[keyPattern].category == "HOTBUILDING" then
                 local hotKey = "Shift-" .. keyPattern
                 if keyMapping[hotKey] then
-                    UIUtil.QuickDialog(popup, 
+                    UIUtil.QuickDialog(popup,
                         LOCF("<LOC key_binding_0006>The %s key is already mapped under %s category, are you sure you want to clear it for the following action? \n\n %s",
                             hotKey, keyMapping[hotKey].category, keyMapping[hotKey].name),
                         "<LOC _Yes>", ClearShiftKey,
@@ -193,7 +200,7 @@ local function EditActionKey(parent, action, currentKey)
         -- checks if this key is already assigned to some other action
         local keyMapping = KeyMapper.GetKeyMappingDetails()
         if keyMapping[keyPattern] and keyMapping[keyPattern].id ~= action then
-            UIUtil.QuickDialog(popup, 
+            UIUtil.QuickDialog(popup,
                 LOCF("<LOC key_binding_0006>The %s key is already mapped under %s category, are you sure you want to clear it for the following action? \n\n %s",
                     keyPattern, keyMapping[keyPattern].category, keyMapping[keyPattern].name),
                 "<LOC _Yes>", MapKey,
@@ -232,19 +239,19 @@ end
 
 local function GetLineColor(lineID, data)
     if data.type == 'header' then
-        return 'FF282828' --#FF282828
+        return 'FF282828' ----FF282828
     elseif data.type == 'spacer' then
-        return '00000000' --#00000000
+        return '00000000' ----00000000
     elseif data.type == 'entry' then
         if data.selected then
             return UIUtil.factionBackColor
         elseif math.mod(lineID, 2) == 1 then
-            return 'ff202020' --#ff202020
+            return 'ff202020' ----ff202020
         else
-            return 'FF343333' --#FF343333
+            return 'FF343333' ----FF343333
         end
     else
-        return 'FF6B0088' --#FF9D06C6
+        return 'FF6B0088' ----FF9D06C6
     end
 end
 
@@ -282,7 +289,7 @@ end
 
 function CreateToggle(parent, bgColor, txtColor, bgSize, txtSize, txt)
     if not bgSize then bgSize = 20 end
-    if not bgColor then bgColor = 'FF343232' end -- #FF343232
+    if not bgColor then bgColor = 'FF343232' end -- --FF343232
     if not txtColor then txtColor = UIUtil.factionTextColor end
     if not txtSize then txtSize = 18 end
     if not txt then txt = '?' end
@@ -325,7 +332,7 @@ function CreateLine()
     local line = Bitmap(keyContainer)
     line.Left:Set(keyContainer.Left)
     line.Right:Set(keyContainer.Right)
-    line.Height:Set(20)
+    LayoutHelpers.SetHeight(line, 20)
 
     line.key = UIUtil.CreateText(line, '', 16, "Arial")
     line.key:DisableHitTest()
@@ -342,18 +349,18 @@ function CreateLine()
 
     line.statistics = UIUtil.CreateText(line, '', 16, "Arial")
     line.statistics:EnableHitTest()
-    line.statistics:SetColor('FF9A9A9A') --#FF9A9A9A'
+    line.statistics:SetColor('FF9A9A9A') ----FF9A9A9A'
     line.statistics:SetAlpha(0.9)
 
     Tooltip.AddControlTooltip(line.statistics,
     {
-        text = 'Category Statistics',
-        body = 'Show total of bound actions and total of all actions in this category of keys'
+        text = '<LOC key_binding_0014>Category Statistics',
+        body = '<LOC key_binding_0015>Show total of bound actions and total of all actions in this category of keys'
     })
 
     LayoutHelpers.AtLeftIn(line.description, line, keyBindingWidth)
     LayoutHelpers.AtVerticalCenterIn(line.description, line)
-    LayoutHelpers.AtRightIn(line.key, line, line.Width() - keyBindingWidth + 30)
+    LayoutHelpers.LeftOf(line.key, line.description, 30)
     LayoutHelpers.AtVerticalCenterIn(line.key, line)
     LayoutHelpers.AtRightIn(line.statistics, line, 10)
     LayoutHelpers.AtVerticalCenterIn(line.statistics, line)
@@ -410,27 +417,27 @@ function CreateLine()
     end
 
     line.toggle = CreateToggle(line,
-         'FF1B1A1A',  --#FF1B1A1A'
+         'FF1B1A1A',  ----FF1B1A1A'
          UIUtil.factionTextColor,
          line.key.Height() + 4, 18, '+')
     LayoutHelpers.AtLeftIn(line.toggle, line, keyBindingWidth - 30)
     LayoutHelpers.AtVerticalCenterIn(line.toggle, line)
     Tooltip.AddControlTooltip(line.toggle,
     {
-        text = 'Toggle Category',
-        body = 'Toggle visibility of all actions for this category of keys'
+        text = '<LOC key_binding_0010>Toggle Category',
+        body = '<LOC key_binding_0011>Toggle visibility of all actions for this category of keys'
     })
 
     line.assignKeyButton = CreateToggle(line,
-         '645F5E5E',  --#735F5E5E'
-         'FFAEACAC',  --#FFAEACAC'
+         '645F5E5E',  ----735F5E5E'
+         'FFAEACAC',  ----FFAEACAC'
          line.key.Height() + 4, 18, '+')
     LayoutHelpers.AtLeftIn(line.assignKeyButton, line)
     LayoutHelpers.AtVerticalCenterIn(line.assignKeyButton, line)
     Tooltip.AddControlTooltip(line.assignKeyButton,
     {
-        text = LOC("<LOC key_binding_0003>Assign Key"),
-        body = 'Opens a dialog that allows assigning key binding for a given action'
+        text = "<LOC key_binding_0003>Assign Key",
+        body = '<LOC key_binding_0012>Opens a dialog that allows assigning key binding for a given action'
     })
     line.assignKeyButton.OnMouseClick = function(self)
         line:AssignKeyBinding()
@@ -438,15 +445,15 @@ function CreateLine()
     end
 
     line.unbindKeyButton = CreateToggle(line,
-         '645F5E5E',  --#645F5E5E'
-         'FFAEACAC',  --#FFAEACAC'
+         '645F5E5E',  ----645F5E5E'
+         'FFAEACAC',  ----FFAEACAC'
          line.key.Height() + 4, 18, 'x')
     LayoutHelpers.AtRightIn(line.unbindKeyButton, line)
     LayoutHelpers.AtVerticalCenterIn(line.unbindKeyButton, line)
     Tooltip.AddControlTooltip(line.unbindKeyButton,
     {
-        text = LOC("<LOC key_binding_0007>Unbind Key"),
-        body = 'Removes currently assigned key binding for a given action'
+        text = "<LOC key_binding_0007>Unbind Key",
+        body = '<LOC key_binding_0013>Removes currently assigned key binding for a given action'
     })
 
     line.unbindKeyButton.OnMouseClick = function(self)
@@ -465,7 +472,7 @@ function CreateLine()
                self.toggle.txt:SetText('-')
             end
             local stats = keyGroups[data.category].bindings .. ' / ' ..
-                          keyGroups[data.category].visible  ..' Actions Bound'
+                          keyGroups[data.category].visible
             line.toggle:Show()
             line.assignKeyButton:Hide()
             line.unbindKeyButton:Hide()
@@ -484,7 +491,7 @@ function CreateLine()
         elseif data.type == 'entry' then
             line.toggle:Hide()
             line.key:SetText(data.keyText)
-            line.key:SetColor('ffffffff') --#ffffffff'
+            line.key:SetColor('ffffffff') ----ffffffff'
             line.key:SetFont('Arial', 16)
             line.description:SetText(data.text)
             line.description:SetFont('Arial', 16)
@@ -506,7 +513,7 @@ function CloseUI()
 end
 function CreateUI()
     LOG('Keybindings CreateUI')
-    if WorldIsLoading() or (import('/lua/ui/game/gamemain.lua').supressExitDialog == true) then
+    if WorldIsLoading() or (import("/lua/ui/game/gamemain.lua").supressExitDialog == true) then
         return
     end
 
@@ -518,8 +525,7 @@ function CreateUI()
     keyTable = FormatData()
 
     local dialogContent = Group(GetFrame(0))
-    dialogContent.Width:Set(980)
-    dialogContent.Height:Set(730)
+    LayoutHelpers.SetDimensions(dialogContent, 980, 730)
 
     popup = Popup(GetFrame(0), dialogContent)
     popup.OnShadowClicked = CloseUI
@@ -532,29 +538,16 @@ function CreateUI()
     LayoutHelpers.AtTopIn(title, dialogContent, 12)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
 
-    local offset = dialogContent.Width() / 5
-
-    local closeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _Close>"))
-    closeButton.Width:Set(200)
-    LayoutHelpers.AtBottomIn(closeButton, dialogContent, 10)
-    LayoutHelpers.AtRightIn(closeButton, dialogContent, offset - (closeButton.Width() / 2))
-    Tooltip.AddControlTooltip(closeButton,
-    {
-        text = 'Close Dialog', body = 'Closes this dialog and confirms assignments of key bindings'
-    })
-    closeButton.OnClick = function(self, modifiers)
-        -- confirmation of changes will occur on OnClosed of this UI
-        CloseUI() 
-    end
+    local offset = dialogContent.Width() / 5.25
 
     popup.OnClosed = function(self)
         ConfirmNewKeyMap()
     end
 
-    local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0004>Default Preset"))
-    defaultButton.Width:Set(200)
+    local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC key_binding_0004>Default Preset")
+    LayoutHelpers.SetWidth(defaultButton, 200)
     LayoutHelpers.AtBottomIn(defaultButton, dialogContent, 10)
-    LayoutHelpers.AtLeftIn(defaultButton, dialogContent, offset - (defaultButton.Width() / 2))
+    LayoutHelpers.AtLeftIn(defaultButton, dialogContent, (offset - (defaultButton.Width() * 3 / 4)) / LayoutHelpers.GetPixelScaleFactor())
     defaultButton.OnClick = function(self, modifiers)
         UIUtil.QuickDialog(popup, "<LOC key_binding_0005>Are you sure you want to reset all key bindings to the default (GPG) preset?",
             "<LOC _Yes>", ResetBindingToDefaultKeyMap,
@@ -563,14 +556,14 @@ function CreateUI()
     end
     Tooltip.AddControlTooltip(defaultButton,
     {
-        text = LOC("<LOC key_binding_0004>Default Preset"),
-        body = 'Reset all key bindings to the default (GPG) preset'
+        text = "<LOC key_binding_0004>Default Preset",
+        body = '<LOC key_binding_0022>Reset all key bindings to the default (GPG) preset'
     })
 
-    local hotbuildButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC key_binding_0009>Hotbuild Preset"))
-    hotbuildButton.Width:Set(200)
+    local hotbuildButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC key_binding_0009>Hotbuild Preset")
+    LayoutHelpers.SetWidth(hotbuildButton, 200)
     LayoutHelpers.AtBottomIn(hotbuildButton, dialogContent, 10)
-    LayoutHelpers.AtHorizontalCenterIn(hotbuildButton, dialogContent)
+    LayoutHelpers.AtLeftIn(hotbuildButton, defaultButton, (offset + (defaultButton.Width() * 1 / 4)) / LayoutHelpers.GetPixelScaleFactor())
     hotbuildButton.OnClick = function(self, modifiers)
         UIUtil.QuickDialog(popup, "<LOC key_binding_0008>Are you sure you want to reset all key bindings to the hotbuild (FAF) preset?",
             "<LOC _Yes>", ResetBindingToHotbuildKeyMap,
@@ -579,9 +572,39 @@ function CreateUI()
     end
     Tooltip.AddControlTooltip(hotbuildButton,
     {
-        text = LOC("<LOC key_binding_0009>Hotbuild Preset"),
-        body = 'Reset all key bindings to the hotbuild (FAF) preset'
+        text = "<LOC key_binding_0009>Hotbuild Preset",
+        body = '<LOC key_binding_0020>Reset all key bindings to the hotbuild (FAF) preset'
     })
+
+    local alternativeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC key_binding_0025>Alternative Preset")
+    LayoutHelpers.SetWidth(alternativeButton, 200)
+    LayoutHelpers.AtBottomIn(alternativeButton, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(alternativeButton, hotbuildButton, (offset + (defaultButton.Width() * 1 / 4))/ LayoutHelpers.GetPixelScaleFactor())
+    alternativeButton.OnClick = function(self, modifiers)
+        UIUtil.QuickDialog(popup, "<LOC key_binding_0024>Are you sure you want to reset all key bindings to the alternative (FAF) preset?",
+            "<LOC _Yes>", ResetBindingToalternativeKeyMap,
+            "<LOC _No>", nil, nil, nil, true,
+            {escapeButton = 2, enterButton = 1, worldCover = false})
+    end
+    Tooltip.AddControlTooltip(alternativeButton,
+    {
+        text = "<LOC key_binding_0025>Alternative Preset",
+        body = '<LOC key_binding_0026>Reset all key bindings to the alternative (FAF) preset'
+    })
+
+    local closeButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", LOC("<LOC _Close>"))
+    LayoutHelpers.SetWidth(closeButton, 200)
+    LayoutHelpers.AtBottomIn(closeButton, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(closeButton, alternativeButton, (offset + (defaultButton.Width() * 1 / 4))/ LayoutHelpers.GetPixelScaleFactor())
+    Tooltip.AddControlTooltip(closeButton,
+    {
+        text = '<LOC _Close>Close',
+        body = '<LOC key_binding_0021>Closes this dialog and confirms assignments of key bindings'
+    })
+    closeButton.OnClick = function(self, modifiers)
+        -- confirmation of changes will occur on OnClosed of this UI
+        CloseUI()
+    end
 
     dialogContent.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' then
@@ -590,49 +613,50 @@ function CreateUI()
             end
         end
     end
-
     keyFilter = Bitmap(dialogContent)
-    keyFilter:SetSolidColor('FF282828')-- #FF282828
-    keyFilter.Left:Set(function() return dialogContent.Left() + 63 end)
-    keyFilter.Right:Set(function() return dialogContent.Right() - 6 end)
-    keyFilter.Top:Set(function() return title.Bottom() + 10 end)
-    keyFilter.Bottom:Set(function() return title.Bottom() + 40 end)
-    keyFilter.Width:Set(function() return keyFilter.Right() - keyFilter.Left() end)
-    keyFilter.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() end)
 
-    keyFilter:EnableHitTest()
-    import('/lua/ui/game/tooltip.lua').AddControlTooltip(keyFilter,
-    {
-        text = 'Key Binding Filter',
-        body = 'Filter all actions by typing either: ' ..
-        '\n - full key binding "CTRL+K" ' ..
-        '\n - partial key binding "CTRL" ' ..
-        '\n - full action name "Self-Destruct" ' ..
-        '\n - partial action name "Self" '..
-        '\n\n Note that collapsing of key categories is disabled while this filter contains some text'
-    }, nil, 200)
-
-    keyFilter.label = UIUtil.CreateText(dialogContent, 'Filter', 17)
-    keyFilter.label:SetColor('FF929191') -- #FF929191
+    keyFilter.label = UIUtil.CreateText(dialogContent, '<LOC key_binding_0023>Filter', 17)
+    keyFilter.label:SetColor('FF929191') -- --FF929191
     keyFilter.label:SetFont(UIUtil.titleFont, 17)
     LayoutHelpers.AtVerticalCenterIn(keyFilter.label, keyFilter, 2)
     LayoutHelpers.AtLeftIn(keyFilter.label, dialogContent, 9)
 
+    keyFilter:SetSolidColor('FF282828')
+    LayoutHelpers.AnchorToRight(keyFilter, keyFilter.label, 5)
+    LayoutHelpers.AtRightIn(keyFilter, dialogContent, 6)
+    LayoutHelpers.AnchorToBottom(keyFilter, title, 10)
+    LayoutHelpers.AtBottomIn(keyFilter, title, -40)
+    keyFilter.Width:Set(function() return keyFilter.Right() - keyFilter.Left() end)
+    keyFilter.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() end)
+
+    keyFilter:EnableHitTest()
+    import("/lua/ui/game/tooltip.lua").AddControlTooltip(keyFilter,
+    {
+        text = '<LOC key_binding_0018>Key Binding Filter',
+        body = '<LOC key_binding_0019>' ..
+        'Filter all actions by typing either:' ..
+        '\n - full key binding "CTRL+K"' ..
+        '\n - partial key binding "CTRL"' ..
+        '\n - full action name "Self-Destruct"' ..
+        '\n - partial action name "Self"'..
+        '\n\n Note that collapsing of key categories is disabled while this filter contains some text'
+    }, nil)
+
     local text = LOC("<LOC key_binding_filterInfo>Type key binding or name of action")
     keyFilter.info = UIUtil.CreateText(keyFilter, text, 17, UIUtil.titleFont)
-    keyFilter.info:SetColor('FF727171') -- #FF727171
+    keyFilter.info:SetColor('FF727171') -- --FF727171
     keyFilter.info:DisableHitTest()
     LayoutHelpers.AtHorizontalCenterIn(keyFilter.info, keyFilter, -7)
     LayoutHelpers.AtVerticalCenterIn(keyFilter.info, keyFilter, 2)
 
     keyFilter.text = Edit(keyFilter)
-    keyFilter.text:SetForegroundColor('FFF1ECEC') -- #FFF1ECEC
-    keyFilter.text:SetBackgroundColor('04E1B44A') -- #04E1B44A
+    keyFilter.text:SetForegroundColor('FFF1ECEC') -- --FFF1ECEC
+    keyFilter.text:SetBackgroundColor('04E1B44A') -- --04E1B44A
     keyFilter.text:SetHighlightForegroundColor(UIUtil.highlightColor)
-    keyFilter.text:SetHighlightBackgroundColor("880085EF") --#880085EF
-    keyFilter.text.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() - 10 end)
-    keyFilter.text.Left:Set(function() return keyFilter.Left() + 5 end)
-    keyFilter.text.Right:Set(function() return keyFilter.Right() end)
+    keyFilter.text:SetHighlightBackgroundColor("880085EF") ----880085EF
+    keyFilter.text.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() - LayoutHelpers.ScaleNumber(10) end)
+    LayoutHelpers.AtLeftIn(keyFilter.text, keyFilter, 5)
+    LayoutHelpers.AtRightIn(keyFilter.text, keyFilter)
     LayoutHelpers.AtVerticalCenterIn(keyFilter.text, keyFilter)
     keyFilter.text:AcquireFocus()
     keyFilter.text:SetText('')
@@ -656,16 +680,16 @@ function CreateUI()
     end
 
     keyFilter.clear = UIUtil.CreateText(keyFilter.text, 'X', 17, "Arial Bold")
-    keyFilter.clear:SetColor('FF8A8A8A') -- #FF8A8A8A
+    keyFilter.clear:SetColor('FF8A8A8A') -- --FF8A8A8A
     keyFilter.clear:EnableHitTest()
     LayoutHelpers.AtVerticalCenterIn(keyFilter.clear, keyFilter.text, 1)
     LayoutHelpers.AtRightIn(keyFilter.clear, keyFilter.text, 9)
 
     keyFilter.clear.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            keyFilter.clear:SetColor('FFC9C7C7') -- #FFC9C7C7
+            keyFilter.clear:SetColor('FFC9C7C7') -- --FFC9C7C7
         elseif event.Type == 'MouseExit' then
-            keyFilter.clear:SetColor('FF8A8A8A') -- #FF8A8A8A
+            keyFilter.clear:SetColor('FF8A8A8A') -- --FF8A8A8A
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             keyFilter.text:SetText('')
             keyFilter.text:AcquireFocus()
@@ -674,16 +698,16 @@ function CreateUI()
     end
     Tooltip.AddControlTooltip(keyFilter.clear,
     {
-        text = 'Clear Filter',
-        body = 'Clears text that was typed in the filter field.'
+        text = '<LOC key_binding_0016>Clear Filter',
+        body = '<LOC key_binding_0017>Clears text that was typed in the filter field.'
     })
 
     keyContainer = Group(dialogContent)
-    keyContainer.Left:Set(function() return dialogContent.Left() + 10 end)
-    keyContainer.Right:Set(function() return dialogContent.Right() - 20 end)
-    keyContainer.Top:Set(function() return keyFilter.Bottom() + 10 end)
-    keyContainer.Bottom:Set(function() return defaultButton.Top() - 10 end)
-    keyContainer.Height:Set(function() return keyContainer.Bottom() - keyContainer.Top() - 10 end)
+    LayoutHelpers.AtLeftIn(keyContainer, dialogContent, 10)
+    LayoutHelpers.AtRightIn(keyContainer, dialogContent, 20)
+    LayoutHelpers.AnchorToBottom(keyContainer, keyFilter, 10)
+    LayoutHelpers.AnchorToTop(keyContainer, defaultButton, 10)
+    keyContainer.Height:Set(function() return keyContainer.Bottom() - keyContainer.Top() - LayoutHelpers.ScaleNumber(10) end)
     keyContainer.top = 0
     UIUtil.CreateLobbyVertScrollbar(keyContainer)
 
@@ -754,7 +778,7 @@ function CreateUI()
             if data then
                 line:Update(data, id)
             else
-                line:SetSolidColor('00000000') --#00000000
+                line:SetSolidColor('00000000') ----00000000
                 line.key:SetText('')
                 line.description:SetText('')
                 line.statistics:SetText('')
@@ -903,7 +927,7 @@ function FormatData()
     -- flatten all key actions to a list separated by a header with info about key category
     local index = 1
     for category, group in keyGroups do
-        if table.getsize(group.actions) > 0 then
+        if not table.empty(group.actions) then
             keyData[index] = {
                 type = 'header',
                 id = index,
@@ -977,3 +1001,6 @@ function FormatKeyName(key)
 
     return result..LookupToken(key)
 end
+
+-- kept for mod backwards compatibility
+local Text = import("/lua/maui/text.lua").Text

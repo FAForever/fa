@@ -2,11 +2,57 @@
 -- File     :  /lua/utilities.lua
 -- Author(s):  John Comes, Gordon Duclos
 -- Summary  :  Utility functions for scripts.
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local MathMod = math.mod
+
 function GetDistanceBetweenTwoEntities(entity1, entity2)
-    return VDist3(entity1:GetPosition(),entity2:GetPosition())
+    return VDist3(entity1:GetPosition(), entity2:GetPosition())
+end
+
+local powersOf2 = {[0] = 1,
+    2,       4,       8,       16,       32,       64,       128,       256,       512,       1024,
+    2048,    4096,    8192,    16384,    32768,    65536,    131072,    262144,    524288,    1048576,
+    2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824,
+}
+
+--- Returns the bit in a position of a number
+---@param number number
+---@param bit number
+---@return number
+function SelectBit(number, bit)
+    local power = powersOf2[bit]
+    if MathMod(number, power) <= power * 0.5 then
+        return 1
+    else
+        return 0
+    end
+end
+
+--- Returns the boolean in a bit position of a number
+---@param number number
+---@param bit number
+---@return boolean
+function SelectBitBool(number, bit)
+    local power = powersOf2[bit]
+    return MathMod(number, power) <= power * 0.5
+end
+
+--- Gets the bits of the number. Note that the array is zero-indexed.
+---@param number number
+---@return number[]
+function GetBits(number)
+    local MathMod = MathMod
+    local pos = 0
+    local bits = {}
+    while number > 0 do
+        local bit = MathMod(number, 2)
+        bits[pos] = bit
+        pos = pos + 1
+        number = (number - bit) * 0.5
+    end
+    return bits
 end
 
 -- Function originally created to check if a Mass Storage can be queued in a location without overlapping
@@ -26,7 +72,7 @@ function CanBuildInSpot(originUnit, unitId, pos)
     local z2 = pos.z + zDiff
 
     -- Find all the units in that rectangle
-    local units = GetUnitsInRect(Rect(x1, z1, x2, z2))
+    local units = GetUnitsInRect(x1, z1, x2, z2)
 
     -- Filter it down to structures and experimentals only
     units = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, units)
@@ -65,7 +111,7 @@ function GetEnemyUnitsInSphere(unit, position, radius)
     local x2 = position.x + radius
     local y2 = position.y + radius
     local z2 = position.z + radius
-    local UnitsinRec = GetUnitsInRect(Rect(x1, z1, x2, z2))
+    local UnitsinRec = GetUnitsInRect(x1, z1, x2, z2)
 
     -- Check for empty rectangle
     if not UnitsinRec then
@@ -75,7 +121,7 @@ function GetEnemyUnitsInSphere(unit, position, radius)
     local RadEntities = {}
     for _, v in UnitsinRec do
         local dist = VDist3(position, v:GetPosition())
-        if unit:GetArmy() ~= v:GetArmy() and dist <= radius then
+        if unit.Army ~= v.Army and dist <= radius then
             table.insert(RadEntities, v)
         end
     end
@@ -91,7 +137,7 @@ function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
     local x2 = position.x + radius
     local y2 = position.y + radius
     local z2 = position.z + radius
-    local UnitsinRec = GetUnitsInRect(Rect(x1, z1, x2, z2))
+    local UnitsinRec = GetUnitsInRect(x1, z1, x2, z2)
 
     -- Check for empty rectangle
     if not UnitsinRec then
@@ -99,11 +145,10 @@ function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
     end
 
     local RadEntities = {}
-    local unitArmy = unit:GetArmy()
     for _, v in UnitsinRec do
         local dist = VDist3(position, v:GetPosition())
-        local vArmy = v:GetArmy()
-        if unitArmy ~= vArmy and not IsAlly(unitArmy, vArmy) and dist <= radius and EntityCategoryContains(categories or categories.ALLUNITS, v) then
+        local vArmy = v.Army
+        if unit.Army ~= vArmy and not IsAlly(unit.Army, vArmy) and dist <= radius and EntityCategoryContains(categories or categories.ALLUNITS, v) then
             table.insert(RadEntities, v)
         end
     end
@@ -155,11 +200,11 @@ function GetMidPoint(v1, v2)
 end
 
 function GetRandomFloat(nmin, nmax)
-    return (Random() * (nmax - nmin) + nmin)
+    return Random() * (nmax - nmin) + nmin
 end
 
 function GetRandomInt(nmin, nmax)
-    return math.floor(Random() * (nmax - nmin + 1) + nmin)
+    return Random(nmin, nmax)
 end
 
 function GetRandomOffset(sx, sy, sz, scalar)
@@ -167,7 +212,7 @@ function GetRandomOffset(sx, sy, sz, scalar)
     sy = sy * scalar
     sz = sz * scalar
     local x = Random() * sx - (sx * 0.5)
-    local y = Random() * sy
+    local y = Random() * sy - (sy * 0.5)
     local z = Random() * sz - (sz * 0.5)
 
     return x, y, z
@@ -177,9 +222,9 @@ function GetRandomOffset2(sx, sy, sz, scalar)
     sx = sx * scalar
     sy = sy * scalar
     sz = sz * scalar
-    local x = Random(-1.0, 1.0) * sx - (sx * 0.5)
-    local y = Random(-1.0, 1.0) * sy
-    local z = Random(-1.0, 1.0) * sz - (sz * 0.5)
+    local x = (Random() * 2 - 1) * sx - (sx * 0.5)
+    local y = (Random() * 2 - 1) * sy
+    local z = (Random() * 2 - 1) * sz - (sz * 0.5)
 
     return x, y, z
 end
@@ -219,6 +264,28 @@ function GetAngleInBetween(v1, v2)
     local dotp = DotP(vec1, vec2)
 
     return math.acos(dotp) * (360 / (math.pi * 2))
+end
+
+--- Computes the full angle between the two vectors in two dimensions: the y dimension is not taken into account. Angle
+-- is computed in a counter clockwise direction: if the base is to the south ({0, 0, 1}) then the direction to the east ({1, 0, 0}) is 90 degrees.
+-- @param base The base direction from which the angle will be computed in a counter clockwise fashion.
+-- @param direction The direction from which we want to compute the angle given a base.
+function GetAngleCCW(base, direction)
+
+    local bn = NormalizeVector(base)
+    local dn = NormalizeVector(direction)
+
+    -- compute the orthogonal vector to determine if we need to take the inverse
+    local ort = { bn[3], 0, -bn[1] }
+
+    -- compute the radians, correct it accordingly
+    local rads = math.acos(bn[1] * dn[1] + bn[3] * dn[3])
+    if ort[1] * dn[1] + ort[3] * dn[3] < 0 then
+        rads = 2 * math.pi - rads
+    end
+
+    -- convert to degrees
+    return (180 / math.pi) * rads
 end
 
 function UserConRequest(string)

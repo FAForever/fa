@@ -8,15 +8,16 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
-local AWeapons = import('/lua/aeonweapons.lua')
+local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
+local AWeapons = import("/lua/aeonweapons.lua")
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
 local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
-local Buff = import('/lua/sim/Buff.lua')
+local Buff = import("/lua/sim/buff.lua")
 
+---@class UAL0001 : ACUUnit
 UAL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(DeathNukeWeapon) {},
@@ -49,7 +50,7 @@ UAL0001 = Class(ACUUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     CreateEnhancement = function(self, enh)
@@ -153,8 +154,6 @@ UAL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'AeonACUT2BuildRate')
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -163,8 +162,6 @@ UAL0001 = Class(ACUUnit) {
             if Buff.HasBuff(self, 'AeonACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'AeonACUT2BuildRate')
          end
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
         -- T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
@@ -195,8 +192,6 @@ UAL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'AeonACUT3BuildRate')
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -205,8 +200,6 @@ UAL0001 = Class(ACUUnit) {
             if Buff.HasBuff(self, 'AeonACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'AeonACUT3BuildRate')
          end
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
         -- Crysalis Beam
         elseif enh == 'CrysalisBeam' then
             local wep = self:GetWeaponByLabel('RightDisruptor')

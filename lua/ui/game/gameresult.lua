@@ -5,7 +5,9 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+
+local sessionInfo = SessionGetScenarioInfo()
 
 local OtherArmyResultStrings = {
     victory = '<LOC usersync_0001>%s wins!',
@@ -21,15 +23,9 @@ local MyArmyResultStrings = {
     replay = "<LOC GAMERESULT_0003>Replay Finished.",
 }
 
-function OnReplayEnd()
-    import('/lua/ui/game/tabs.lua').TabAnnouncement('main', LOC(MyArmyResultStrings.replay))
-    import('/lua/ui/game/tabs.lua').AddModeText("<LOC _Score>", function() import('/lua/ui/dialogs/score.lua').CreateDialog(true) end)
-end
-
 local announced = {}
 
 function DoGameResult(armyIndex, result)
-    LOG("GAMERESULT : ", result)
     local condPos = string.find(result, " ")
     if condPos ~= 0 then
         result = string.sub(result, 1, condPos - 1)
@@ -42,15 +38,14 @@ function DoGameResult(armyIndex, result)
     local armies = GetArmiesTable().armiesTable
     announced[armyIndex] = true
 
-    -- If it's someone else, announce it and stop.
-    if armyIndex ~= GetFocusArmy() then
-        import('/lua/ui/game/score.lua').ArmyAnnounce(armyIndex, LOCF(OtherArmyResultStrings[result], armies[armyIndex].nickname))
-        return
+    if (not SessionIsReplay()) and (sessionInfo.Options.CheatsEnabled ~= 'true') then
+        SetFocusArmy(-1)
     end
 
-    -- Otherwise, do the end-of-game stuff.
-    if SessionIsObservingAllowed() then
-        SetFocusArmy(-1)
+    -- If it's someone else, announce it and stop.
+    if armyIndex ~= GetFocusArmy() then
+        import("/lua/ui/game/score.lua").ArmyAnnounce(armyIndex, LOCF(OtherArmyResultStrings[result], armies[armyIndex].nickname))
+        return
     end
 
     local victory = result == 'victory'
@@ -60,11 +55,13 @@ function DoGameResult(armyIndex, result)
         PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Fail'}))
     end
 
-    local tabs = import('/lua/ui/game/tabs.lua')
+    local tabs = import("/lua/ui/game/tabs.lua")
     tabs.OnGameOver()
     tabs.TabAnnouncement('main', LOC(MyArmyResultStrings[result]))
+    --For disable ping buttons
+    import("/lua/ui/game/multifunction.lua").FocusArmyChanged()
 
-    local score = import('/lua/ui/dialogs/score.lua')
+    local score = import("/lua/ui/dialogs/score.lua")
     tabs.AddModeText("<LOC _Score>", function()
         UIUtil.QuickDialog(GetFrame(0),
             "<LOC EXITDLG_0003>Are you sure you'd like to exit?",

@@ -4,6 +4,8 @@
 -- Shift = 0x10
 -- Ctrl = 0x11
 -- Alt = 0x12
+-- Set up for QWERTY (american keyboard)
+
 defaultKeyMap = {
     ['Esc']                 = 'stop',
     ['Shift-Esc']           = 'soft_stop',
@@ -20,6 +22,7 @@ defaultKeyMap = {
     ['Alt-LeftArrow']       = 'switch_skin_down',
     ['Alt-RightArrow']      = 'switch_skin_up',
 
+    ['Ctrl-Alt-R']          = 'toggle_reclaim_labels',
     ['F1']                  = 'toggle_key_bindings',
     ['Ctrl-Alt-F1']         = 'toggle_notify_customiser',
     ['F2']                  = 'toggle_score_screen',
@@ -152,13 +155,17 @@ defaultKeyMap = {
 }
 
 debugKeyMap = {
+    ['Ctrl-Alt-N']          = 'debug_nodamage',
     ['Alt-F2']              = 'debug_create_unit',
     ['Ctrl-T']              = 'debug_teleport',
-    ['Ctrl-Alt-B']          = 'debug_blingbling',
     ['Alt-Delete']          = 'debug_destroy_units',
     ['Ctrl-F9']             = 'debug_toggle_log_window',
     ['Ctrl-Shift-C']        = 'debug_copy_units',
     ['Ctrl-Shift-V']        = 'debug_paste_units',
     ['Ctrl-Alt-Z']          = 'debug_sally_shears',
     ['Ctrl-Shift-F1']       = 'debug_toggle_pannels',
+    ['Ctrl-Alt-W']          = 'debug_dump_focus_ui_control',
+    ['Ctrl-Alt-D']          = 'debug_dump_ui_controls',
+    ['Ctrl-Alt-V']          = 'debug_skeletons',
+    ['Ctrl-Alt-B']          = 'debug_bones',
 }

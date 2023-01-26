@@ -1,19 +1,20 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAS0302/UAS0302_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Aeon Battleship Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAS0302/UAS0302_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Aeon Battleship Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
-local AAMWillOWisp = import('/lua/aeonweapons.lua').AAMWillOWisp
+local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
+local AAMWillOWisp = import("/lua/aeonweapons.lua").AAMWillOWisp
 
 --Custom files
-local NavalCannonOblivionWeapon = import('/lua/aeon_naval_weapons.lua').ADFCannonOblivionNaval
+local NavalCannonOblivionWeapon = import("/lua/aeon_naval_weapons.lua").ADFCannonOblivionNaval
 
+---@class UAS0302 : ASeaUnit
 UAS0302 = Class(ASeaUnit) {
     FxDamageScale = 2,
     DestructionTicks = 400,

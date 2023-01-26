@@ -1,7 +1,10 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'UAB1301',
+            'Target_Bone_01',
+            'Target_Bone_02',
+            'Target_Bone_03',
+            'Target_Bone_04',
         },
     },
     Adjacency = 'T3PowerGeneratorAdjacencyBuffs',
@@ -48,6 +51,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'SORTECONOMY',
+        'VOLATILE',
     },
     CollisionOffsetY = 0,
     Defense = {

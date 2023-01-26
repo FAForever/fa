@@ -1,6 +1,7 @@
-local Text = import('/lua/maui/text.lua')
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local UIUtil = import('/lua/ui/uiutil.lua')
+local Text = import("/lua/maui/text.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 --- A multi-line textfield
 --
@@ -13,13 +14,13 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 -- incurred from having to layout a ton of TextFields is absent, we merely have to stave off the
 -- self-harm long enough to finish writing this class so we can call this a solved problem and never
 -- look in this file ever again.
+---@class TextArea : ItemList
 TextArea = Class(ItemList) {
     __init = function(self, parent, width, height)
         ItemList.__init(self, parent)
 
         -- Initial width and height are necessary to dodge partial-initialisation-reflow weirdness.
-        self.Width:Set(width)
-        self.Height:Set(height)
+        LayoutHelpers.SetDimensions(self, width, height)
 
         self.text = ""
 
@@ -32,7 +33,7 @@ TextArea = Class(ItemList) {
         self.advanceFunction = function(text) return self:GetStringAdvance(text) end
 
         -- Reflow text when the width is changed.
-        self.Width.OnDirty = function()
+        self.Width.OnDirty = function(var)
             self:ReflowText()
         end
 

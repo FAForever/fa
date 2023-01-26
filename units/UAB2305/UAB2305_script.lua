@@ -2,13 +2,14 @@
 -- File     :  /cdimage/units/UAB2305/UAB2305_script.lua
 -- Author(s):  John Comes, David Tomandl
 -- Summary  :  Aeon Tactical Missile Launcher Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
-local AIFQuantumWarhead = import('/lua/aeonweapons.lua').AIFQuantumWarhead
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
+local AIFQuantumWarhead = import("/lua/aeonweapons.lua").AIFQuantumWarhead
+local EffectUtil = import("/lua/effectutilities.lua")
 
+---@class UAB2305 : AStructureUnit
 UAB2305 = Class(AStructureUnit) {
     Weapons = {
         QuantumMissiles = Class(AIFQuantumWarhead) {
@@ -16,7 +17,7 @@ UAB2305 = Class(AStructureUnit) {
 
             PlayFxWeaponUnpackSequence = function(self)
                 for k, v in self.UnpackEffects01 do
-                    CreateAttachedEmitter(self.unit, 'B04', self.unit:GetArmy(), v)
+                    CreateAttachedEmitter(self.unit, 'B04', self.unit.Army, v)
                 end
 
                 AIFQuantumWarhead.PlayFxWeaponUnpackSequence(self)

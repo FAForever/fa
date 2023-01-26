@@ -38,10 +38,11 @@ UnitBlueprint {
         'SIZE12',
         'VISIBLETORECON',
         'RECLAIMABLE',
+        'VOLATILE',
     },
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Structure',
+        ArmorType = 'ExperimentalStructure',
         EconomyThreatLevel = 5238,
         Health = 5000,
         MaxHealth = 5000,
@@ -153,6 +154,7 @@ UnitBlueprint {
         BuildTime = 325000,
         MaxEnergy = 1000000,
         MaxMass = 10000,
+        StorageEnergy = 100000,
         RebuildBonusIds = {
             'xab1401',
         },
@@ -265,7 +267,6 @@ UnitBlueprint {
             },
             RackRecoilDistance = 0,
             RateOfFire = 1,
-            TargetCheckInterval = 9999999,
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',

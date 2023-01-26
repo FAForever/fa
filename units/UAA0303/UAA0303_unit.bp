@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
+        GuardScanRadius = 45,       -- 150% of range
     },
     Air = {
         AutoLandTime = 1,
@@ -21,7 +21,7 @@ UnitBlueprint {
         KTurn = 1.5,
         KTurnDamping = 2.3,
         LiftFactor = 7,
-        MaxAirspeed = 25,
+        MaxAirspeed = 22,
         MinAirspeed = 8,
         StartTurnDistance = 5,
         TightTurnMultiplier = 1.02,
@@ -80,15 +80,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 25,
     Categories = {
         'PRODUCTSC1',
@@ -103,12 +94,13 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'OVERLAYANTIAIR',
+        'ASF',
     },
     CollisionOffsetY = 0,
     CollisionOffsetZ = -0.2,
     Defense = {
         AirThreatLevel = 9,
-        ArmorType = 'ASF', # Light
+        ArmorType = 'ASF',
         EconomyThreatLevel = 0,
         Health = 1750,
         MaxHealth = 1750,
@@ -247,7 +239,7 @@ UnitBlueprint {
     SelectionSizeX = 1,
     SelectionSizeZ = 1.1,
     SelectionThickness = 0.36,
-    SizeSphere = 2,
+    SizeSphere = 2.2,
     SizeX = 1,
     SizeY = 0.3,
     SizeZ = 1,
@@ -266,6 +258,11 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.4, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.0,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'UAAWeapon',
@@ -277,7 +274,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 405, # 135
+            Damage = 405,
             DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Displacement Cannon',
@@ -285,15 +282,15 @@ UnitBlueprint {
                 Air = 'Air|Land|Water',
                 Land = 'Air|Land|Water',
             },
-            FiringTolerance = 2, # 0
+            FiringTolerance = 2,
             Label = 'AutoCannon1',
             MaxRadius = 30,
-            MuzzleSalvoDelay = 0, # 0.1
-            MuzzleSalvoSize = 1, # 3
-            MuzzleVelocity = 120,
+            MuzzleSalvoDelay = 0,
+            MuzzleSalvoSize = 1,
+            MuzzleVelocity = 90,
             ProjectileId = '/projectiles/AAAAutocannonQuantum01/AAAAutocannonQuantum01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1, # 3
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -313,15 +310,11 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.5, # 0.3
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 0,
             TurretBoneMuzzle = 'Muzzle',
             TurretBonePitch = 'Muzzle',
             TurretBoneYaw = 'Muzzle',
@@ -340,7 +333,7 @@ UnitBlueprint {
             AboveWaterTargetsOnly = true,
             Damage = 200,
             DamageFriendly = true,
-            DamageRadius = 1,
+            DamageRadius = 2,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,

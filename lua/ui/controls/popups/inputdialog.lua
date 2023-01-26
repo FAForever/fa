@@ -1,10 +1,11 @@
-local Group = import('/lua/maui/group.lua').Group
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Edit = import('/lua/maui/edit.lua').Edit
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
+local Group = import("/lua/maui/group.lua").Group
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Edit = import("/lua/maui/edit.lua").Edit
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 
 --- A popup that asks the user for a string.
+---@class InputDialog : Popup
 InputDialog = Class(Popup) {
     __init = function(self, parent, title, fallbackInputbox, str)
         -- For ridiculous reasons, the lobby *must* keep keyboard focus on the chat input, or
@@ -17,8 +18,7 @@ InputDialog = Class(Popup) {
 
         -- Set up the UI Group to pass to the Popup constructor.
         local dialogContent = Group(parent)
-        dialogContent.Width:Set(364)
-        dialogContent.Height:Set(140)
+        LayoutHelpers.SetDimensions(dialogContent, 364, 140)
 
         if title then
             local titleText = UIUtil.CreateText(dialogContent, title, 17, 'Arial', true)
@@ -31,8 +31,7 @@ InputDialog = Class(Popup) {
         self.inputBox = nameEdit
         LayoutHelpers.AtHorizontalCenterIn(nameEdit, dialogContent)
         LayoutHelpers.AtVerticalCenterIn(nameEdit, dialogContent)
-        nameEdit.Width:Set(334)
-        nameEdit.Height:Set(24)
+        LayoutHelpers.SetDimensions(nameEdit, 334, 24)
         nameEdit:AcquireFocus()
 
         if str then

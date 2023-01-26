@@ -1,457 +1,538 @@
---[[
-If class C1 defines 'x', and inherits from B1 and B2, then an 'x' coming from B1 or B2 is shadowed.
-If we multiply inherit from C1 and C2, and C2 contains 'x', it's an error unless C2 got that x from B1 or B2.
+---@declare-global
+--- Class structure
 
-Todo:
-    Main() runs on a thread
-    the main thread is auto-killed when we leave a state
-    all kinds of manipulators need to get auto-killed when we leave a state too
+-- Simple class
 
-    Units have a field self.StateObjects with weak keys and values
-        Destroy() is called for each of those objects when changing state
+-- A less common type of class that solely consists of a list of specifications. Common examples are:
+-- - TrashBag
+-- - BaseManager
+-- - OpAI
 
-    Unit:CreateThread() caches the thread in self.Threads
+-- Inheriting class
 
-    changing states kills the threads?
+-- The most often used class type. A class that inherits properties from other classes while being able 
+-- to define its own specifications. Common examples are:
+-- - Unit = Class(moho.unit_methods) { ... }
+-- - DefaultProjectileWeapon = Class(Weapon) { ... }
+-- - Projectile = Class(moho.projectile_methods, Entity) { ... }
 
+-- Because of the structure chosen we have three function calls:
+-- - First function call receives (and stores) the base classes, returning a new function 
+-- - Second function call receives (and processes) the class-specific specifications, returning a meta table that can be called
+-- - Third function call creates an instance of the class, this is done by the engine
 
-Implementing classes in Lua
+--- State
 
-    Like almost everything in Lua, a class is represented by a table. Object instances have their metatable set
-    to point to their class.
+-- A state shares the same principle as a class: there is a simple state and a state that inherits from other states. A state is an 'intermediate' class
+-- with a few (typically one or two) changed values or functions. By default the metatable hierarchy of an instance is:
+-- - instance
+-- - class
 
-    A lua class table contains:
+-- A state can put itself 'in between', like so:
+-- - instance
+-- - state
+-- - class 
 
-        key = value entries for all class members, including inherited ones
+--- look up hierarchy to help determine the relationships between classes. 
 
-        __index points back to the class itself
+-- function: 1E0F3E00 (OnDestroy, id = 1) = { base instance }
+-- function: 1F45AA80 (OnGotTarget, id = 1) = { base instance }
+-- function: 1F3902D8 (OnCreate, id = 1) = { function: 1F37B500 (OnCreate, id = 1) }
+-- function: 1F40F0E0 (OnKilled, id = 1) = { function: 1F3D3EE0 (OnKilled, id = 1) }
+-- function: 1DE7E1C0 (BuilderParamCheck, id = 1) = { base instance }
 
-        __bases is an indexed list of base classes
+-- It allows us to track a function back to the base instance.
+Hierarchy = {}
 
-        __spec is the argument originally passed to Class(), which contains all the members defined for this class.
+--- Debug utilities
 
-    For classes, __spec and __bases will be the same. For states they are different.
+local enableDebugging = false
 
+HierarchyDebugLookup = {}
+HierarchyDebugLookupCFunctions = {}
+HierarchyDebugLookupCount = {}
 
-State machines
+local function PrintHierarchy()
+    -- cache for performance
+    local LOG = LOG
+    local tostring = tostring
 
-    States are declared inline within a class spec. A state acts like a class derived from its containing class,
-    except that calling it changes the type of an object instead of creating a new object.
-    Thus, in this example:
-
-        A = Class {
-            S1 = State { ...a1... },
-            S2 = State { ...a2... },
-            S3 = State { ...a3... },
-        }
-
-    We internally create three derived classes:
-        A.S1 = Class(A) { ...a1... }
-        A.S2 = Class(A) { ...a2... }
-        A.S3 = Class(A) { ...a3... }
-
-    Suppose class B derives from A, and overrides some of the states:
-
-        B = Class(A) {
-            S1 = State(A.S1) { ...b1... },
-            S2 = State { ...b2... },
-            S4 = State { ...b4... },
-        }
-
-    Note that B.S1 derives from its equivalent in A, while B.S2 does not.
-    Four new classes will be created to represent the states in B:
-        B.S1 = Class(A.S1, B) { ...b1... }
-        B.S2 = Class(B) { ...b2... }
-        B.S3 = Class(B) { ...a3... }
-        B.S4 = Class(B) { ...b4... }
-
-    Even though B's definition didn't redefine state S3, we need to create a new class to represent B.S3,
-    because B.S3 is always derived from B.
-
-'
-]]
-
-
-local getmetatable = getmetatable
-local setmetatable = setmetatable
-local getn = table.getn
-local ForkThread = ForkThread
-
---
--- Class is a callable object for defining new classes, and the metatable for class objects.
---
-Class = {}
-
---
--- ClassMeta is the metatable for Class.
---
-local ClassMeta = {}
-setmetatable(Class, ClassMeta)
-
---
--- StateProxyTag is the metaclass of temporary 'state' placeholders returned by State().
--- These get turned into class definitions when their containing class is defined.
---
-StateProxyTag = {}
-State = {}
-local StateMeta = {}
-setmetatable(State, StateMeta)
-
-
---
--- Returns true if class 'derived' is derived from class 'base'
---
-local function IsDerived(derived, base)
-    if base==derived then return true end
-    if not derived.__bases then return false end
-    for i,v in ipairs(derived.__bases) do
-        if IsDerived(v, base) then
-            return true
+    local function Format(key)
+        if HierarchyDebugLookupCFunctions[key] then
+            return "base instance (cfunction)"
+        elseif HierarchyDebugLookup[key] then
+            return tostring(key) .. " (" .. tostring(HierarchyDebugLookup[key].func)  .. ", id = " .. tostring(HierarchyDebugLookup[key].identity) .. ", type = " .. tostring(HierarchyDebugLookup[key].type) .. ")"
+        else
+            return "base instance (lua function or table)"
         end
     end
-    return false
+
+    -- write out the hierarchy
+    LOG("{ ")
+    for k, v in Hierarchy do
+        local intermediate = ""
+        for l = 1, v.h - 1 do
+            intermediate = intermediate .. " " .. Format(v[l])
+        end
+
+        LOG( Format(k) .. " = {" .. intermediate .. " }")
+    end
+    LOG("} ")
 end
 
+--- Class functionality
 
---
--- Returns true if object 'obj' is an instance of class 'class',
--- or of any of its subclasses.
---
-function IsInstance(obj,class)
-    return IsDerived(getmetatable(obj),class)
-end
+-- upvalue for performance
+local unpack = unpack
+local getmetatable = getmetatable
+local setmetatable = setmetatable
 
+local TableEmpty = table.empty 
+local TableGetn = table.getn
 
-local function InsertIndexFields(c, index, wherefrom)
-    local fakederived = nil
-    for k,v in c.__spec do
-        if type(k)=='string' then
-            if not wherefrom[k] then
-                wherefrom[k] = c
-                index[k] = v
-            elseif wherefrom[k]=='special' then
-                -- ok - this is a special field which we never copy from base classes
-            elseif IsDerived(wherefrom[k],c) then
-                -- ok - our value was overridden by a derived class
-            elseif IsDerived(c,wherefrom[k]) then
-                -- ok - we are a derived class of whoever's there already
-                -- fixme: this doesn't handle fakederived correctly
-                wherefrom[k] = c
-                index[k] = v
-            elseif v==index[k] then
-                -- ok - it's technically ambiguous, but both values are the same so it's not a problem
-                fakederived = fakederived or {}
-                fakederived[wherefrom[k]] = { __bases = { wherefrom[k], c }}
-                wherefrom[k] = fakederived[wherefrom[k]]
+local Exclusions = {
+    __index = true,
+    n = true,
+}
+
+local function Deepcopy(other)
+    local copy = {}
+    local type = type
+    for k, v in other do
+        if not Exclusions[k] then
+            if type(v) == "table" then
+                copy[k] = Deepcopy(v)
             else
-                error("field '"..tostring(k).."' is ambiguous in class definition")
+                copy[k] = v
             end
         end
     end
 
-    if c.__bases then
-        for i,base in ipairs(c.__bases) do
-            InsertIndexFields(base, index, wherefrom)
+    return copy
+end
+
+--- Determines whether we have a simple class: one that has no base classes
+local emptyMetaTable = getmetatable { }
+local function IsSimpleClass(arg)
+    return arg.n == 1 and getmetatable(arg[1]) == emptyMetaTable
+end
+
+---@class fa-class : function
+---@operator call(...): table
+---@field __init? fun(self, ...)
+---@field __post_init? fun(self, ...)
+
+---@class State
+
+---@class fa-class-state : fa-class
+---@field __State true
+---@field __StateIdentifier number
+
+--- Prepares the construction of a state, , referring to the paragraphs of text at the top of this file.
+local StateIdentifier = 0
+---@generic T: fa-class-state
+---@param ... T
+---@return T
+function State(...)
+    -- arg = { 
+    --     { 
+    --         -- { table with information of base 1 } OR { specifications }
+    --         -- { table with information of base 2 }
+    --         -- ...
+    --         -- { table with information of base n }
+    --     }, 
+    --     n=1 -- number of bases
+    -- }
+
+    -- State ({ field=value, field=value, ... })
+    if IsSimpleClass(arg) then
+        local state = ConstructClass(nil, arg[1] )
+        state.__State = true
+        state.__StateIdentifier = StateIdentifier
+        StateIdentifier = StateIdentifier + 1
+        return state
+    else -- State (Base1, Base2, ...) ({field = value, field = value, ...})
+        local bases = { unpack (arg) }
+        return function(specs)
+            local state = ConstructClass(bases, specs)
+            state.__State = true
+            state.__StateIdentifier = StateIdentifier
+            StateIdentifier = StateIdentifier + 1
+            return state
         end
     end
 end
 
+--- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
+---construct a class
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
+function Class(...)
+    -- arg = { 
+    --     { 
+    --         -- { table with information of base 1 } OR { specifications }
+    --         -- { table with information of base 2 }
+    --         -- ...
+    --         -- { table with information of base n }
+    --     }, 
+    --     n=1 -- number of bases
+    -- }
 
-local function SetupClassFields(c, bases, spec, meta)
-    c.__index = c
-    c.__spec = spec
-    c.__bases = bases
-
-    InsertIndexFields(c, c.__index, { __index='special', __spec='special', __bases='special' })
-
-    setmetatable(c, meta)
-
-    return c
-end
-
-
-local function StateProxiesToClasses(c)
-    --
-    -- States are handled specially. Each state is basically a class derived from the containing class.
-    -- Switching states switches our metatable, i.e. changes the type of the object.
-    --
-    -- The State{} function is just a syntactic placeholder that marks the state spec as a proxy object.
-    -- It can't actually create the state class, because the containing class hasn't been created yet.
-    -- This function is used during the containing class creation to create real states in place of the proxy objects.
-    --
-    local new_states = {}
-    assert(c.__index == c)
-    for k,v in c do
-        -- Class specs should never have actual states as fields coming into this function, because the behavior
-        -- won't be what you expect.
-        assert(getmetatable(v) ~= State)
-
-        if getmetatable(v) == StateProxyTag then
-            local s = SetupClassFields({}, {c,unpack(v.__bases or {})}, v.__spec, State)
-            s.__state = k
-            new_states[k] = s
-        end
-    end
-
-    for k,s in new_states do
-        assert(getmetatable(c[k])==StateProxyTag)
-        assert(getmetatable(s)==State)
-        c[k] = s
-        for k2,s2 in new_states do
-            assert(getmetatable(s[k2])==StateProxyTag)
-            assert(getmetatable(s2)==State)
-            s[k2] = s2
-        end
-    end
-end
-
-local function MakeClass(bases, spec)
-    if spec[1] then
-        error 'Class specification contains indexed elements; it should contain only name=value elements'
-    end
-    local c = SetupClassFields({}, bases, spec, Class)
-    StateProxiesToClasses(c)
-    return c
-end
-local IntermediateClassMeta = { __call = MakeClass }
-
---
--- Invoking Class() creates a new class.  The created class is used as
--- the metatable for instances of the class.
---
--- Class() can be called as:
---   Class { field=value, field=value, ... }     for a class with no bases
---   Class(Base1,Base2,...BaseN)                 for a class with base classes
---
-function ClassMeta:__call(...)
-    if arg.n==1 and getmetatable(arg[1])==getmetatable {} then
-        return MakeClass(nil, arg[1])
-    end
-
-    for i,base in ipairs(arg) do
-        if getmetatable(base) ~= Class and getmetatable(base) ~= State then
-            error 'Something other than a Class or State was used for a base class'
-        end
-    end
-    local temp = { unpack(arg) }
-    setmetatable(temp, IntermediateClassMeta)
-    return temp
-end
-
-
---
--- Invoking a class (note: this is not the same as invoking Class itself)
--- creates a new instance of the class.
---
-function Class:__call(...)
-    --
-    -- create the new object
-    --
-    local newobject = {}
-    setmetatable(newobject, self)
-
-    --
-    -- call the class constructor, if one was defined
-    --
-    local initfn = self.__init
-    if initfn then
-        initfn(newobject,unpack(arg))
-    end
-    local postinitfn = self.__post_init
-    if postinitfn then
-        postinitfn(newobject,unpack(arg))
-    end
-    return newobject
-end
-
---
--- Disallow setting fields on a class after the fact. Unfortunately we can't catch all changes here--if the
--- field already exists, Lua will allow it to be changed without triggering any hooks. But we can at least
--- catch attempts to add new fields.
---
-function Class:__newindex(key,value)
-    error('Attempted to add field "'..tostring(key)..'" after class was defined.')
-end
-
---
--- Invoking State() creates a placeholder for a new state. It doesn't become
--- a "real" state until its containing class is created.
---
-local function MakeStateProxy(bases, spec)
-    if spec[1] then
-        error 'State specification contains indexed elements; it should contain only name=value elements'
-    end
-
-    -- sanity check: a state's definition should not contain other states or state proxies, or things will break
-    for k,v in spec do
-        assert(getmetatable(v) ~= StateProxyTag)
-        assert(getmetatable(v) ~= State)
-    end
-    local proxy = { __bases=bases, __spec=spec }
-    setmetatable(proxy, StateProxyTag)
-    return proxy
-end
-local IntermediateStateMeta = { __call = MakeStateProxy }
-
-
-function StateMeta:__call(...)
-    if arg.n==1 and getmetatable(arg[1])==getmetatable {} then
-        return MakeStateProxy(nil, arg[1])
-    end
-
-    for i,base in ipairs(arg) do
-        if getmetatable(base) ~= Class and getmetatable(base) ~= State then
-            error 'Something other than a Class or State was used for a base class'
-        end
-    end
-    local temp = { unpack(arg) }
-    setmetatable(temp, IntermediateStateMeta)
-    return temp
-end
-
---
--- Invoking a state changes an object's type to the state and calls various trigger functions.
---
---   Changing states:
---
---       1. Kills the main thread if it was running
---
---       2. Calls obj:OnExitState() while still in the old state.
---
---       3. Changes the type of the object to the new state
---
---       4. Calls obj:OnEnterState(). OnEnterState() is allowed to immediately switch to a new state.
---
---       5. If obj:Main() is defined, starts it on a thread
---
-function ChangeState(obj, newstate)
-    --LOG('*DEBUG: CHANGESTATE: ', repr(obj), repr(newstate))
-    if type(newstate)=='string' then
-        newstate = obj[newstate]
-    end
-
-    assert(getmetatable(newstate)==State)
-
-    local oldtype = getmetatable(obj)
-    if(getmetatable(oldtype)==Class) then
-        -- The object is an instance of a class which has not yet been assigned a state.
-        -- Make sure it's the same class this state is defined for.
-        assert(oldtype == newstate.__bases[1], "Tried to set a state, but the state wasn't defined on this object")
-    elseif(getmetatable(oldtype)==State) then
-        -- The object is an instance of a class that's already changed states.
-        -- Make sure it was defined in the same class we were.
-        assert(oldtype.__bases[1] == newstate.__bases[1], "Tried to changes states, but the new state wasn't defined on this object")
+    -- Class ({ field=value, field=value, ... })
+    if IsSimpleClass(arg) then
+        local class = arg[1] --[[@as fa-class]]
+        setmetatable(class, ClassFactory)
+        return ConstructClass(nil, class) --[[@as unknown]]
+    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
     else
-        -- The object is not a class instance at all.
-        error("Attempted to change states on something other than a class instance")
+        local bases = { unpack (arg) }
+        return function(specs)
+            local class = specs
+            setmetatable(class, ClassFactory)
+            return ConstructClass(bases, class)
+        end
+    end
+end
+
+---create a simple class which does not inherit from anything
+---@generic T
+---@param specs T
+---@return T
+function ClassSimple(specs)
+    return Class(specs)
+end
+
+local ChainStack = {}
+local ChainCache = {}
+--- Computes the hierarchy chain of a function: determine the path from the current function back to 
+--- the base instance. Note that this assumes that the base is always called, which is not always the case.
+local function ComputeHierarchyChain(a, cache)
+    -- clear out the cache
+    for k, _ in cache do
+        cache[k] = nil
     end
 
-    -- Ignore redundant state changes.
-    if getmetatable(obj)==newstate then
-        debug.traceback(nil, "Ignoring no-op state change...")
-        return
+    -- populate the cache
+    local stack = ChainStack
+    stack[1] = a
+    local stackHead = 2
+
+    while stackHead > 1 do
+        -- retrieve an element from the stack
+        stackHead = stackHead - 1
+        local elem = stack[stackHead]
+
+        -- add it to the hierarchy chain lookup table
+        cache[elem] = true
+
+        -- extend the stack until we're at a base instance
+        local overrides = Hierarchy[elem]
+        if overrides then
+            for k = 1, overrides.h - 1 do
+                stack[stackHead] = overrides[k]
+                stackHead = stackHead + 1
+            end
+        end
     end
 
-    -- Call state on-exit function, if there is one
-    local OnExitState = obj.OnExitState
-    if OnExitState then
-        OnExitState(obj)
+    if enableDebugging then
+        LOG("Chain for: " .. tostring(a) .. " (" .. tostring(HierarchyDebugLookup[a].func)  .. ", id = " .. tostring(HierarchyDebugLookup[a].identity) .. ")")
+        for k, v in cache do
+            LOG(tostring(k) .. ": " .. tostring(v))
+        end
+    end
+end
+
+--- Checks whether a is part of the hierarchy of b, or b being part of the hierarchy of a
+local function CheckHierarchy(a, b)
+    local c = ChainCache
+
+    -- populate the hierarchy chains
+    ComputeHierarchyChain(a, c)
+    -- if the head of chain b is part of ca, then ca is longer
+    if c[b] then
+        return a
     end
 
-    local old_main_thread = obj.__mainthread
-    obj.__mainthread = nil
-
-    -- Actually change the state
-    setmetatable(obj,newstate)
-
-    -- Call the state on-enter function, if there is one
-    local OnEnterState = obj.OnEnterState
-    if OnEnterState then
-        OnEnterState(obj)
+    ComputeHierarchyChain(b, c)
+    -- if the head of chain a is part of cb, then cb is longer
+    if c[a] then
+        return b
     end
 
-    -- Start the new main thread. Note that OnEnterState() might have switched states on us, in which case the main
-    -- thread will already have been started by that state switch. We test for obj.__mainthread to avoid starting
-    -- it twice.
-    local Main = obj.Main
-    if Main and not obj.__mainthread then
-        obj.__mainthread = ForkThread(Main,obj)
+    -- not part of a hierarchy
+    return false
+end
+
+local Seen = { }
+--- Constructs a class or state, referring to the paragraphs of text at the top of this file
+---@generic Base: table, T:table
+---@param bases Base
+---@param specs T
+---@return T
+function ConstructClass(bases, specs)
+    -- cache as locals for performance
+    local type = type
+    local exclusions = Exclusions
+    local hierarchy = Hierarchy
+    local seen = Seen
+    local class = specs
+
+    if bases then
+        -- special case: we have only one base and an empty specification: just return the base. There are a lot of empty classes
+        -- being created, an example is: 
+
+        -- UEL0001 = Class(ACUUnit) {
+        --     Weapons = {
+        --         DeathWeapon = Class(DeathNukeWeapon) {},
+        --         RightZephyr = Class(TDFZephyrCannonWeapon) {},
+        --         OverCharge = Class(TDFOverchargeWeapon) {},
+        --         AutoOverCharge = Class(TDFOverchargeWeapon) {},
+        --         TacMissile = Class(TIFCruiseMissileLauncher) {},
+        --         TacNukeMissile = Class(TIFCruiseMissileLauncher) {},
+        --     },
+        --     (...)
+        -- }
+
+        -- there is no need to allocate a unique table for all those sub classes that have no specifications!
+        if TableEmpty(specs) and TableGetn(bases) == 1 then
+            return bases[1]
+        end
+
+        -- regular case: we have a specification or multiple bases: work to do!
+
+        -- keep track of hierarchy chains
+        for ks, s in specs do
+            local t = type(s)
+            if t == "function" or t == "cfunction" or t == "table" then
+                for _, base in bases do
+                    -- we're trying to override something here
+                    if base[ks] ~= nil then
+                        -- keep track of the names and give them some unique identifier
+                        if enableDebugging then
+                            HierarchyDebugLookupCount[ks] = HierarchyDebugLookupCount[ks] or 0
+                            HierarchyDebugLookupCount[ks] = HierarchyDebugLookupCount[ks] + 1
+
+                            -- allow us to track states specifically
+                            local ts = t
+                            if t == "table" and s.__State then
+                                ts = "state"
+                            end
+
+                            HierarchyDebugLookup[s] = { func = ks, identity = HierarchyDebugLookupCount[ks], type = ts }  
+                        end
+
+                        -- link to or create a table
+                        hierarchy[s] = hierarchy[s] or { h = 1 }
+
+                        -- put table into a local scope and append the thing we're inheriting from
+                        local elem = hierarchy[s]
+                        elem[elem.h] = base[ks]
+                        elem.h = elem.h + 1
+                    end
+                end
+            end
+        end
+
+        -- check for collisions 
+        for _, base in bases do
+            for l, element in base do
+                if not exclusions[l] then
+                    -- first time we've seen this key, keep track of it
+                    if seen[l] == nil then
+                        seen[l] = element
+
+                    -- we've seen this key before and it has the same matching element: we're good
+                    elseif seen[l] == element then
+                        -- do nothing 
+
+                    -- we've got two elements with the same key but different values, but our specs has a function to define the behavior: we're good
+                    elseif specs[l] ~= nil then
+                        -- do nothing
+                    else
+                        local t = type(element)
+
+                        -- we've got two elements with the same key but different values that are states, check if their state identifiers match
+                        if t == "table" and element.__State and (element.__StateIdentifier == seen[l].__StateIdentifier) then
+                            -- do nothing, it is the same state
+
+                        -- the following two statements are TECHNICALLY wrong, and should be fixed by manually determining the state
+
+                        -- we've got two elements with the same key but different values that are states - oh no!
+                        elseif t == "table" and element.__State and (element.__StateIdentifier < seen[l].__StateIdentifier) then 
+                            WARN("ambiguous state with identifier: " .. tostring(l) .. ", behavior is unpredictable. Solution is to choose the desired state of the basis in the specifications - this needs to be done by the author of the mod.")
+                            WARN(debug.traceback())
+                            -- do nothing
+
+                        -- we've got two elements with the same key but different values that are states - oh no!
+                        elseif t == "table" and element.__State and (element.__StateIdentifier > seen[l].__StateIdentifier) then 
+                            WARN("ambiguous state with identifier: " .. tostring(l) .. ", behavior is unpredictable. Solution is to choose the desired state of the basis in the specifications - this needs to be done by the author of the mod.")                           
+                            WARN(debug.traceback())
+
+                            -- switch them up, use the state made last
+                            class[l] = element
+                            seen[l] = element
+                        else
+                            -- check if one is part of the hierarchy of the other
+                            local hierarchy = CheckHierarchy(seen[l], element)
+                            if hierarchy then
+                                class[l] = hierarchy
+                                seen[l] = hierarchy
+                            else -- we've got two elements with the same key but they're not part of each others hierarchy chain: ambigious!
+                                error("Class initialisation: field '" .. tostring(l).. "' is ambigious between the bases. They use the same field for different values. You need to create a field in the specifications that defines the behavior.")
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        -- clean up seen
+        for k, _ in seen do
+            seen[k] = nil
+        end
+
+        -- populate class 
+        for _, base in bases do
+            for l, element in base do
+                if class[l] == nil then
+                    class[l] = element
+                end
+            end
+        end
     end
 
-    -- Kill the old main thread. We do this AFTER calling OnEnterState and starting the new main thread,
-    -- because the thread we destroy may be ourselves.
+    -- post-process the states to make sure that they're unique and have the correct meta table set
+    for k, v in class do
+        -- any member that has a meta table set is by definition a state
+        if type(v) == "table" and v.__State then
+            -- copy the content into a new table
+            local d = Deepcopy(v)
+
+            -- set meta table information
+            d.__index = d
+            setmetatable(d, class)
+
+            -- override previous entry
+            class[k] = d
+        end
+    end
+
+    class.__index = class
+
+    return class
+end
+
+--- Instantiation of a class, referring to the paragraphs of text at the top of this file
+ClassFactory = {
+    __call = function(self, ...)
+        -- create the new entity with us as its meta table
+        local instance = {}
+        setmetatable(instance, self)
+
+        -- call class initialisation functions, if they exist
+        local initfn = self.__init
+        if initfn then
+            initfn(instance, unpack(arg))
+        end
+        local postinitfn = self.__post_init
+        if postinitfn then
+            postinitfn(instance, unpack(arg))
+        end
+
+        return instance
+    end
+}
+
+--- Switches up the sate of a class instance by inserting the new state between the instance and its class
+---@param instance table The current instance we want to switch states for
+---@param newState State the state we want to insert between the instance and its base class
+function ChangeState(instance, newState)
+
+    -- call on-exit function
+    if instance.OnExitState then
+        instance:OnExitState()
+    end
+
+    -- keep track of the original thread and forget about it inside the object
+    local old_main_thread = instance.__mainthread
+    instance.__mainthread = nil
+
+    -- change the state accordingly by switching up the meta tables:
+    -- - entity
+    -- - state      <-- introduced as an intermediate, prevents a lot of duplicated values and tables
+    -- - class
+    setmetatable(instance, newState)
+
+    -- call on-enter function
+    if instance.OnEnterState then
+        instance:OnEnterState()
+    end
+
+    -- start the new main thread if it wasn't already created during an OnEnterState
+    if instance.Main and not instance.__mainthread then
+        instance.__mainthread = ForkThread(instance.Main, instance)
+    end
+
+    -- remove the old main thread, threads are de-allocated when they've completed their computation chain
     if old_main_thread then
         old_main_thread:Destroy()
     end
 end
 
-function ConvertCClassToLuaClass(cclass)
-    -- check if already done
-    if getmetatable(cclass)==Class then
+--- Flattens a list of elements
+---@param flattee table output table
+---@param hierarchy table to be flattened
+---@param seen table to prevents duplications
+local function Flatten(flattee, hierarchy, seen)
+    -- cache for performance
+    local type = type
+
+    for k, entry in hierarchy do
+        if type(entry) == "table" then
+            if not seen[entry] then
+                seen[entry] = true
+                Flatten(flattee, entry, seen)
+            end
+        else
+            flattee[k] = entry
+        end
+    end
+end
+
+--- Converts a C class into a simplified Lua class with no bases. This must adjust the cclass in place as the reference
+-- to the table appears to be hardcoded in the engine.
+function ConvertCClassToLuaSimplifiedClass(cclass)
+    if getmetatable(cclass) == ClassFactory then
+        LOG("Already populated class: " .. tostring(cclass))
         return
     end
 
-    for i,base in ipairs(cclass) do
-        ConvertCClassToLuaClass(base)
-    end
+    local seen = {}
+    local flatten = {}
+    Flatten(flatten, cclass, seen)
 
-    -- copy the C class into a temp variable to use as the class spec, then turn the C class into an actual instance
-    local spec = {}
-    for k,v in cclass do
-        spec[k] = v
-    end
-    for k,v in spec do
+    -- the reference to the table is hardcoded in the engine, therefore we need to re-populate the cclass or functions
+    -- such as CreateAimManipulator that return a table with the metatable attached won't work properly :sad_cowboy:
+
+    -- remove all entries in the class
+    for k, _ in cclass do
         cclass[k] = nil
     end
-    SetupClassFields(cclass,spec,spec,Class)
-end
 
-function startClass(...)   ------added for shipwreck mod
-    -- class prototype table
-    local proto = {}
-    -- original caller environment
-    local env = getfenv(2)
+    -- re-populate it
+    for k, val in flatten do
+        cclass[k] = val
 
-    -- the default 'endClass' function
-    -- the metamethod for __newindex above will override this if the user behaves
-    -- if this gets called, they _aren't_ behaving, so error
-    function proto.endClass()
-        error("Attempted to create a class without assigning it to anything!")
-    end
-
-    -- metatable for prototype
-    local mt = {}
-
-    -- __index: retain access to global variables
-    mt.__index = env
-
-    -- __newindex: trap the first assignment so that MyClass = startClass(...) works
-    function mt:__newindex(key, value)
-        -- delete ourselves; we only want to trigger on the first assignment
-        mt.__newindex = nil
-
-        -- new endClass() function that does the real work
-        function proto.endClass()
-            -- restore original environment
-            setfenv(2, env)
-            -- tidy up
-            proto.endClass = nil
-            setmetatable(proto, nil)
-            for k,v in pairs(proto) do
-                if type(v) == 'function' then
-                    setfenv(v, env)
-                end
-            end
-            -- create class object and assign to caller's environment with the
-            -- key they originally specified
-            if arg.n == 0 then
-                env[key] = Class(proto)
-            else
-                env[key] = Class(unpack(arg))(proto)
-            end
+        -- allow us to print it out
+        if enableDebugging then
+            HierarchyDebugLookupCFunctions[val] = true
         end
     end
 
-    setmetatable(proto, mt)
-    setfenv(2, proto)
+    -- allow tables to search the meta table
+    cclass.__index = cclass
+    setmetatable(cclass, ClassFactory)
 end

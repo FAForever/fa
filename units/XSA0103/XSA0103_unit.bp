@@ -1,13 +1,12 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 120,
-        GuardScanRadius = 60,
     },
     Air = {
         AutoLandTime = 1,
         BankFactor = 3,
         BankForward = false,
-        BreakOffDistance = 24,
+        BreakOffDistance = 32,
         BreakOffIfNearNewTarget = true,
         BreakOffTrigger = 20,
         CanFly = true,
@@ -92,15 +91,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
 
@@ -109,7 +99,6 @@ UnitBlueprint {
         'BUILTBYTIER1FACTORY',
         'BUILTBYTIER2FACTORY',
         'BUILTBYTIER3FACTORY',
-
         'SERAPHIM',
         'MOBILE',
         'AIR',
@@ -120,6 +109,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'SHOWATTACKRETICLE',
         'OVERLAYRADAR',
+        'SNIPEMODE',
     },
     Defense = {
         AirThreatLevel = 0,
@@ -201,9 +191,9 @@ UnitBlueprint {
         UniformScale = 0.12,
     },
     Economy = {
-        BuildCostEnergy = 2450,
-        BuildCostMass = 105,
-        BuildTime = 700,
+        BuildCostEnergy = 2050,
+        BuildCostMass = 90,
+        BuildTime = 500,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -235,6 +225,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
+        RadarRadius = 44,
         VisionRadius = 32,
     },
     Interface = {
@@ -336,13 +327,11 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.2,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.25,
             TurretDualManipulators = false,
             Turreted = false,
             WeaponCategory = 'Bomb',

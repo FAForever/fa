@@ -1,0 +1,50 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 3000,
+        MaxHealth = 3000,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    AlbedoName = 'jbuild01_Albedo.dds',
+					NormalsName = 'jbuild01_NormalsTS.dds',
+	  	    		ShaderName = 'VertexNormal',
+                    LODCutoff = 200,
+                    
+                },
+				{
+
+                    AlbedoName = 'jbuild01_Albedo.dds',
+					NormalsName = 'jbuild01_NormalsTS.dds',
+	  	    		ShaderName = 'VertexNormal',
+                    LODCutoff = 3000,
+                    
+                },
+            },
+        },
+        UniformScale = 0.2,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 70,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 3,
+    },
+    Interface = {
+        HelpText = 'Japanese Building 02',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 3,
+    SizeY = 3.9,
+    SizeZ = 5,
+}

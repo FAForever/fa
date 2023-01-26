@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardScanRadius = 26, -- allows for factory reclaim bug 
         TargetBones = {
             'Torso',
             'AttachPoint',
@@ -110,15 +111,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Commander',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
         },
     },
     BuildIconSortPriority = 10,
@@ -425,7 +417,7 @@ UnitBlueprint {
             BuildCostEnergy = 100000,
             BuildCostMass = 1800,
             BuildTime = 7000,
-            Icon = 'htsg',
+            Icon = 'phtsg',
             ImpactEffects = 'AeonShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 600,
             Name = '<LOC enhancements_0029>Heavy Personal Shield Generator',
@@ -746,7 +738,7 @@ UnitBlueprint {
     SizeX = 1.1,
     SizeY = 1.85,
     SizeZ = 1.1,
-    StrategicIconName = 'icon_commander_generic',
+    StrategicIconName = 'icon_subcommander',
     StrategicIconSortPriority = 1,
     Transport = {
         CanFireFromTransport = false,
@@ -809,11 +801,13 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'MOBILE EXPERIMENTAL',
+                'MOBILE TECH3',
+                'MOBILE TECH2',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'MOBILE TECH1',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Arm_Left_Muzzle',
@@ -856,7 +850,6 @@ UnitBlueprint {
             },
             RackRecoilDistance = 0,
             RateOfFire = 1,
-            TargetCheckInterval = 9999999,
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
@@ -869,6 +862,7 @@ UnitBlueprint {
             DisplayName = 'Teleport in',
             DummyWeapon = true,
             Label = 'TeleportWeapon',
+            ManualFire = true,
             MaxRadius = 1,
             RateOfFire = 1,
             WeaponCategory = 'Teleport',

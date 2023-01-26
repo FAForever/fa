@@ -41,6 +41,7 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
         'SORTECONOMY',
+        'VOLATILE',
     },
     CollisionOffsetY = 0,
     CollisionOffsetZ = 0.1,
@@ -58,41 +59,6 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_deathaoe>Volatile',
-        },
-        BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = 0,
-                BLOffsetY = 0,
-                BLOffsetZ = 0.75,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = 0,
-                BLOffsetY = 0,
-                BLOffsetZ = -0.75,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = 0.75,
-                BLOffsetY = 0,
-                BLOffsetZ = 0,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = -0.75,
-                BLOffsetY = 0,
-                BLOffsetZ = 0,
-                BLScale = 1,
-            },
-        },
-        BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
         },
         DamageEffects = {
             {

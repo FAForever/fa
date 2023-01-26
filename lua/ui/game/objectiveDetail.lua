@@ -1,17 +1,17 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Button = import('/lua/maui/button.lua').Button
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Grid = import('/lua/maui/grid.lua').Grid
-local WinMgr = import('/lua/ui/game/windowmanager.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Button = import("/lua/maui/button.lua").Button
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Grid = import("/lua/maui/grid.lua").Grid
+local WinMgr = import("/lua/ui/game/windowmanager.lua")
 
 local WIN_ID = 'Objectives_Log'
-local lobbyoptions = import('/lua/ui/lobby/lobbyOptions.lua')
+local lobbyoptions = import("/lua/ui/lobby/lobbyoptions.lua")
 
-local isCampaign = import('/lua/ui/campaign/campaignmanager.lua').campaignMode
+local isCampaign = import("/lua/ui/campaign/campaignmanager.lua").campaignMode
 local savedParent = false
 local DetailWindow = false
 
@@ -61,7 +61,7 @@ function Create()
 
     GUI.bg.bottom = Bitmap(GUI.bg, UIUtil.UIFile('/dialogs/objective-log-02/panel_bmp_b.dds'))
     GUI.bg.bottom.Left:Set(GUI.bg.Left)
-    GUI.bg.bottom.Bottom:Set(function() return frame.Bottom() - 30 end)
+    LayoutHelpers.AtBottomIn(GUI.bg.bottom, frame, 30)
     GUI.bg.bottom.Depth:Set(GUI.bg.Depth)
 
 
@@ -73,8 +73,8 @@ function Create()
     GUI.bg.middle.Height:Set(function() return GUI.bg.bottom.Top() - GUI.bg.Bottom() end)
 
     GUI.closeBtn = UIUtil.CreateButtonStd(GUI.bg, "/widgets02/small", "<LOC _Close>", 16)
-    GUI.closeBtn.Right:Set(function() return GUI.bg.bottom.Right() - 70 end)
-    GUI.closeBtn.Bottom:Set(function() return GUI.bg.bottom.Bottom() - 28 end)
+    LayoutHelpers.AtRightIn(GUI.closeBtn, GUI.bg.bottom, 70)
+    LayoutHelpers.AtBottomIn(GUI.closeBtn, GUI.bg.bottom, 28)
     GUI.closeBtn.OnClick = function(self, modifiers)
         ToggleDisplay()
     end
@@ -88,8 +88,8 @@ function Create()
     end
 
     GUI.logContainer = Group(GUI.bg)
-    GUI.logContainer.Height:Set(function() return GUI.bg.middle.Height() + 20 end)
-    GUI.logContainer.Width:Set(571)
+    GUI.logContainer.Height:Set(function() return GUI.bg.middle.Height() + LayoutHelpers.ScaleNumber(20) end)
+    LayoutHelpers.SetWidth(GUI.logContainer, 571)
     GUI.logContainer.top = 0
 
     local titleText = ''
@@ -137,13 +137,12 @@ function Create()
             GUI.logEntries[index].bg.OnCheck = eventHandler
             GUI.logEntries[index].bg.Left:Set(GUI.logContainer.Left)
             GUI.logEntries[index].bg.Right:Set(GUI.logContainer.Right)
-            GUI.logEntries[index].bg.Height:Set(64)
+            LayoutHelpers.SetHeight(GUI.logEntries[index].bg, 64)
 
             GUI.logEntries[index].icon = Button(GUI.logEntries[1].bg)
             GUI.logEntries[index].icon:SetSolidColor('00000000')
             GUI.logEntries[index].icon:DisableHitTest()
-            GUI.logEntries[index].icon.Height:Set(48)
-            GUI.logEntries[index].icon.Width:Set(48)
+            LayoutHelpers.SetDimensions(GUI.logEntries[index].icon, 48, 48)
 
             GUI.logEntries[index].title = UIUtil.CreateText(GUI.logEntries[1].bg, '', 14, "Arial")
             GUI.logEntries[index].title:DisableHitTest()
@@ -156,8 +155,8 @@ function Create()
 
             LayoutHelpers.AtLeftIn(GUI.logEntries[index].icon, GUI.logEntries[index].bg, 25)
             LayoutHelpers.AtVerticalCenterIn(GUI.logEntries[index].icon, GUI.logEntries[index].bg)
-            GUI.logEntries[index].title.Top:Set(function() return GUI.logEntries[index].icon.Top() + 0 end)
-            GUI.logEntries[index].title.Left:Set(function() return GUI.logEntries[index].icon.Right() + 5 end)
+            LayoutHelpers.AtTopIn(GUI.logEntries[index].title, GUI.logEntries[index].icon)
+            LayoutHelpers.AnchorToRight(GUI.logEntries[index].title, GUI.logEntries[index].icon, 5)
             LayoutHelpers.Below(GUI.logEntries[index].time, GUI.logEntries[index].title)
             LayoutHelpers.Below(GUI.logEntries[index].status, GUI.logEntries[index].time)
         end
@@ -232,7 +231,7 @@ function Create()
                 line.time:SetText('')
                 line.status:SetText('')
                 LayoutHelpers.AtVerticalCenterIn(line.title, line.icon, 8)
-                line.title.Left:Set(function() return line.bg.Left() + 12 end)
+                LayoutHelpers.AtLeftIn(line.title, line.bg, 12)
             else
                 local bgtype = 'middle'
                 if (ObjectiveLogData[lineID+1] and ObjectiveLogData[lineID+1].type == 'title') or not ObjectiveLogData[lineID+1] then
@@ -242,9 +241,9 @@ function Create()
                 line.bg:Enable()
                 if data.HideIcon then
                     line.icon:Hide()
-                    line.title.Left:Set(function() return line.bg.Left() + 25 end)
+                    LayoutHelpers.AtLeftIn(line.title, line.bg, 25)
                 else
-                    line.title.Left:Set(function() return line.icon.Right() + 5 end)
+                    LayoutHelpers.AnchorToRight(line.title, line.icon, 5)
                     line.icon:Show()
                     line.icon:SetNewTextures(GetTargetImages(data))
                     line.icon:SetTexture(line.icon.mNormal)
@@ -280,7 +279,7 @@ function Create()
                 line.title:SetColor('ffffffff')
                 line.title:SetText(LOC(data.title))
                 line.title:SetFont("Arial", 14)
-                line.title.Top:Set(function() return line.icon.Top() + 0 end)
+                LayoutHelpers.AtTopIn(line.title, line.icon)
             end
         end
         for i, v in GUI.logEntries do
@@ -295,7 +294,6 @@ function Create()
                 v.bg:Disable()
             end
         end
-        --LOG(repr(ObjectiveLogData))
     end
     GUI.logContainer.Height.OnDirty = function(self)
         CreateObjectiveElements()
@@ -305,8 +303,7 @@ function Create()
     end
 
     GUI.detailsContainer = Group(GUI.bg)
-    GUI.detailsContainer.Height:Set(103)
-    GUI.detailsContainer.Width:Set(571)
+    LayoutHelpers.SetDimensions(GUI.detailsContainer, 571, 103)
     GUI.detailsContainer.top = 0
 
     LayoutHelpers.AtLeftTopIn(GUI.detailsContainer, GUI.bg.bottom, 48, 21)
@@ -318,7 +315,7 @@ function Create()
 
     GUI.detailEntries[1].Text = UIUtil.CreateText(GUI.detailEntries[1].bg, '', 14, "Arial")
     LayoutHelpers.AtLeftTopIn(GUI.detailEntries[1].Text, GUI.detailsContainer)
-    GUI.detailEntries[1].Text.Width:Set(60)
+    LayoutHelpers.SetWidth(GUI.detailEntries[1].Text, 60)
     GUI.detailEntries[1].Text:DisableHitTest()
 
     LayoutHelpers.FillParent(GUI.detailEntries[1].bg, GUI.detailEntries[1].Text)
@@ -406,7 +403,7 @@ end
 
 function WrapText(intext)
     local textBoxWidth = GUI.detailsContainer.Right() - GUI.detailsContainer.Left()
-    local retText = import('/lua/maui/text.lua').WrapText(intext, textBoxWidth,
+    local retText = import("/lua/maui/text.lua").WrapText(intext, textBoxWidth,
     function(text)
         return GUI.detailEntries[1].Text:GetStringAdvance(text)
     end)
@@ -482,7 +479,7 @@ function ToggleDisplay()
 end
 
 function GetTargetImages(data)
-    # look for an image to display
+    -- look for an image to display
     local overrideImage = UIUtil.UIFile(data.actionImage)
 
     if (overrideImage) then
@@ -493,10 +490,10 @@ function GetTargetImages(data)
         for k,v in data.targets do
             if v.BlueprintId then
                 blueprint = __blueprints[v.BlueprintId]
-                #return GameCommon.GetCachedUnitIconFileNames(blueprint)
+                --return GameCommon.GetCachedUnitIconFileNames(blueprint)
             elseif v.Type == 'Area' then
                 iconName = UIUtil.UIFile('/game/target-area/target-area_bmp.dds')
-                #return iconName, iconName, iconName, iconName
+                --return iconName, iconName, iconName, iconName
             end
         end
         if blueprint then
@@ -554,7 +551,7 @@ function Refresh()
         local function SortFunc(t1, t2)
             return (t1.EndTime or t1.StartTime) > (t2.EndTime or t2.StartTime)
         end
-        if table.getn(sortedPrim) > 0 then
+        if not table.empty(sortedPrim) then
             ObjectiveLogData[index] = {type = 'title', title = primtitle, color = 'ffff0000'}
             index = index + 1
             table.sort(sortedPrim, SortFunc)
@@ -563,7 +560,7 @@ function Refresh()
                 index = index + 1
             end
         end
-        if table.getn(sortedSec) > 0 then
+        if not table.empty(sortedSec) then
             ObjectiveLogData[index] = {type = 'title', title = sectitle, color = 'fffff700'}
             index = index + 1
             table.sort(sortedSec, SortFunc)
@@ -572,7 +569,7 @@ function Refresh()
                 index = index + 1
             end
         end
-        if table.getn(sortedBon) > 0 then
+        if not table.empty(sortedBon) then
             ObjectiveLogData[index] = {type = 'title', title = bontitle, color = 'ffba00ff'}
             index = index + 1
             table.sort(sortedBon, SortFunc)
@@ -581,7 +578,7 @@ function Refresh()
                 index = index + 1
             end
         end
-        if table.getn(sortedCom) > 0 then
+        if not table.empty(sortedCom) then
             ObjectiveLogData[index] = {type = 'title', title = comtitle, color = 'ff5fbde9'}
             index = index + 1
             table.sort(sortedCom, SortFunc)
@@ -590,7 +587,7 @@ function Refresh()
                 index = index + 1
             end
         end
-        if table.getn(sortedFail) > 0 then
+        if not table.empty(sortedFail) then
             ObjectiveLogData[index] = {type = 'title', title = failtitle, color = 'ffe95f5f'}
             index = index + 1
             table.sort(sortedFail, SortFunc)
@@ -602,7 +599,7 @@ function Refresh()
     else
         ObjectiveLogData[1] = {type = 'title', title = mapinfo, color = 'ff5fbde9'}
         local mapinfo = SessionGetScenarioInfo()
-        local mapsizes = import('/lua/ui/dialogs/mapselect.lua').mapFilters[2].Options
+        local mapsizes = import("/lua/ui/dialogs/mapselect.lua").mapFilters[2].Options
         local retText = ''
         for i, v in mapsizes do
             if v.key == mapinfo.size[1] then

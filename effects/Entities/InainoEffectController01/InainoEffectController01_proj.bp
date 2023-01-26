@@ -1,0 +1,23 @@
+ProjectileBlueprint {
+    General = {
+        Category = 'Bomb',
+        Faction = 'Seraphim',
+        TechLevel = 1,
+        Weapon = 'Inaino Strategic Bomb',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = false,
+        TrackTarget = false,
+        TurnRate = 360,
+        VelocityAlign = true,
+        StayUpright = false,
+        Lifetime = 100,
+        UseGravity = false,
+        RotationalVelocity= 0,
+        RotationalAcceleration = 0,
+        Acceleration = 0,
+    },
+}

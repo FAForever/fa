@@ -1,7 +1,7 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
 local numSlots = 14
 local firstAltSlot = 8
 local vertRows = 7
@@ -10,7 +10,7 @@ local vertCols = numSlots/vertRows
 local horzCols = numSlots/horzRows
 
 function SetLayout()
-    local controls = import('/lua/ui/game/orders.lua').controls
+    local controls = import("/lua/ui/game/orders.lua").controls
 
     controls.bg:SetTexture(UIUtil.SkinnableFile('/game/orders-panel/order-panel_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.controlClusterGroup, 17)
@@ -43,8 +43,7 @@ function SetLayout()
         controls.bracketRightMid = nil
     end
 
-    controls.orderButtonGrid.Width:Set(GameCommon.iconWidth * horzCols)
-    controls.orderButtonGrid.Height:Set(GameCommon.iconHeight * horzRows)
+    LayoutHelpers.SetDimensions(controls.orderButtonGrid, GameCommon.iconWidth * horzCols, GameCommon.iconHeight * horzRows)
     LayoutHelpers.AtCenterIn(controls.orderButtonGrid, controls.bg, 0, -1)
     controls.orderButtonGrid:AppendRows(horzRows)
     controls.orderButtonGrid:AppendCols(horzCols)

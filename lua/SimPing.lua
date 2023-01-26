@@ -1,4 +1,4 @@
-local SUtils = import('/lua/ai/sorianutilities.lua')
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 local PingLimit = 1 -- Maximum number of pings per army, within PingTimeout seconds
 local PingTimeout = 1 -- How many seconds a ping counts toward an army's limit
@@ -12,7 +12,6 @@ function AnimatePingMesh(entity)
     local time = 0
     local ascending = true
     while entity do
-        local orien = entity:GetOrientation()
         entity:SetScale(MATH_Lerp(math.sin(time), -.5, 0.5, .3, .5))
         time = time + .3
         WaitSeconds(.001)
@@ -23,7 +22,7 @@ function SpawnPing(data)
     if not PingsRemaining[data.Owner] then
         PingsRemaining[data.Owner] = PingLimit
     end
-    
+
     if PingsRemaining[data.Owner] > 0 then
         if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
             return
@@ -36,7 +35,7 @@ function SpawnPing(data)
             data.ID = GetPingID(data.Owner)
             PingMarkers[data.Owner][data.ID] = data
         else
-            local Entity = import('/lua/sim/Entity.lua').Entity
+            local Entity = import("/lua/sim/entity.lua").Entity
             data.Location[2] = data.Location[2]+2
             local pingSpec = {Owner = data.Owner, Location = data.Location}
             local ping = Entity(pingSpec)
@@ -46,6 +45,7 @@ function SpawnPing(data)
             ping:SetVizToAllies('Always')
             ping:SetVizToNeutrals('Never')
             ping:SetMesh('/meshes/game/ping_'..data.Mesh)
+
             local animThread = ForkThread(AnimatePingMesh, ping)
             ForkThread(function()
                 WaitSeconds(data.Lifetime)
@@ -72,7 +72,7 @@ end
 
 function SpawnSpecialPing(data)
     --This function is used to generate automatic nuke pings
-    local Entity = import('/lua/sim/Entity.lua').Entity
+    local Entity = import("/lua/sim/entity.lua").Entity
     data.Location[2] = data.Location[2]+2
     local pingSpec = {Owner = data.Owner, Location = data.Location}
     local ping = Entity(pingSpec)

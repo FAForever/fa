@@ -26,15 +26,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTSC1',
@@ -58,8 +49,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 70,
-        MaxHealth = 70,
+        Health = 115,
+        MaxHealth = 115,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0.33,
@@ -120,9 +111,9 @@ UnitBlueprint {
         UniformScale = 0.08,
     },
     Economy = {
-        BuildCostEnergy = 140,
-        BuildCostMass = 35,
-        BuildTime = 120,
+        BuildCostEnergy = 165,
+        BuildCostMass = 42,
+        BuildTime = 160,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -171,9 +162,9 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         Elevation = 2,
-        MaxAcceleration = 4,
-        MaxBrake = 4,
-        MaxSpeed = 4,
+        MaxAcceleration = 3.8,
+        MaxBrake = 3.8,
+        MaxSpeed = 3.8,
         MaxSpeedReverse = 0,
         MaxSteerForce = 7,
         MeshExtentsX = 0.35,
@@ -192,9 +183,9 @@ UnitBlueprint {
     SelectionSizeX = 0.3,
     SelectionSizeZ = 0.3,
     SelectionThickness = 1.2,
-    SizeX = 0.6, #from 0.6
-    SizeY = 0.6,
-    SizeZ = 0.6, # 0.6
+    SizeX = 0.7, --from 0.6
+    SizeY = 0.7, --from 0.6
+    SizeZ = 0.7, --from 0.6
     StrategicIconName = 'icon_bot1_directfire',
     StrategicIconSortPriority = 135,
     Transport = {
@@ -219,7 +210,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 7,
+            Damage = 9,
             DamageType = 'Normal',
             DisplayName = 'Sonic Pulsar',
             FireTargetLayerCapsTable = {
@@ -256,16 +247,14 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
             SlavedToBody = false,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret',
             TurretBonePitch = 'Turret',
             TurretBoneYaw = 'Turret',

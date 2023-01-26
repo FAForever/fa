@@ -6,24 +6,34 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local veterancyDefaults = import('/lua/game.lua').VeteranDefault
-local Factions = import('/lua/factions.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local EnhancementCommon = import('/lua/enhancementcommon.lua')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local veterancyDefaults = import("/lua/game.lua").VeteranDefault
+local Factions = import("/lua/factions.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local EnhancementCommon = import("/lua/enhancementcommon.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
+local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
+local unitviewDetail = import("/lua/ui/game/unitviewdetail.lua")
+local Grid = import("/lua/maui/grid.lua").Grid
+local Construction = import("/lua/ui/game/construction.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
 local selectedUnit = nil
 local updateThread = nil
 local unitHP = {}
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
+
+-- shared between sim and ui
+local OverchargeShared = import("/lua/shared/overcharge.lua")
+
+local UpdateWindowShowQueueOfUnit = (categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY
 
 function OverchargeCanKill()
     if unitHP[1] and unitHP.blueprintId then
@@ -31,39 +41,38 @@ function OverchargeCanKill()
         local ACU
         local ACUBp
         local bp
-    
+
         for _, unit in selected do
             if unit:GetBlueprint().CategoriesHash.COMMAND or EntityCategoryContains(categories.SUBCOMMANDER * categories.SERAPHIM, unit) then
                 ACU = unit
                 break
             end
-        end  
-        
+        end
+
         if ACU then
             ACUBp = ACU:GetBlueprint()
-            
+
             if ACUBp.Weapon[2].Overcharge then
                 bp = ACUBp.Weapon[2].Overcharge
             elseif ACUBp.Weapon[3].Overcharge then -- cyb ACU
                 bp = ACUBp.Weapon[3].Overcharge
             -- First weapon in cyb bp is "torpedo fix". Weapon[1] - torp, [2] - normal gun, [3] - OC. Other ACUs: [1] - normal, [2] - OC.
             end
-            
+
             if bp then
                 local targetCategories = __blueprints[unitHP.blueprintId].CategoriesHash
-                -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
-                local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
-                
+                local damage = OverchargeShared.EnergyAsDamage(GetEconomyTotals().stored.ENERGY)
+
                 if damage > bp.maxDamage then
                     damage = bp.maxDamage
                 end
-            
-                if targetCategories.COMMAND then 
+
+                if targetCategories.COMMAND then
                     if unitHP[1] < bp.commandDamage then
                        unitHP[1] = nil
                        return true
                     else
-                       unitHP[1] = nil 
+                       unitHP[1] = nil
                        return false
                     end
                 elseif targetCategories.STRUCTURE then
@@ -71,17 +80,17 @@ function OverchargeCanKill()
                         unitHP[1] = nil
                         return true
                     else
-                        unitHP[1] = nil 
+                        unitHP[1] = nil
                         return false
                         end
                 elseif unitHP[1] < damage then
                     unitHP[1] = nil
                     return true
                 else
-                    unitHP[1] = nil 
+                    unitHP[1] = nil
                     return false
-                end                    
-            end 
+                end
+            end
         end
     end
 end
@@ -95,28 +104,6 @@ function Expand()
     controls.bg:SetNeedsFrameUpdate(true)
     controls.bg:Show()
 end
-
---INFO:   blueprintId="uel0001",
---INFO:   energyConsumed=0,
---INFO:   energyProduced=10,
---INFO:   energyRequested=0,
---INFO:   entityId="0",
---INFO:   fuelRatio=-1,
---INFO:   health=12000,
---INFO:   kills=0,
---INFO:   massConsumed=0,
---INFO:   massProduced=1,
---INFO:   massRequested=0,
---INFO:   maxHealth=12000,
---INFO:   nukeSiloBuildCount=0,
---INFO:   nukeSiloMaxStorageCount=1,
---INFO:   nukeSiloStorageCount=0,
---INFO:   shieldRatio=0,
---INFO:   tacticalSiloBuildCount=0,
---INFO:   tacticalSiloMaxStorageCount=1,
---INFO:   tacticalSiloStorageCount=0,
---INFO:   teamColor="ffe80a0a",
---INFO:   workProgress=0
 
 local queueTextures = {
     Move = {texture = UIUtil.UIFile('/game/orders/move_btn_up.dds'), text = '<LOC order_0000>Moving'},
@@ -154,7 +141,7 @@ local statFuncs = {
             local armyData = GetArmiesTable().armiesTable[info.armyIndex+1]
             local icon = Factions.Factions[armyData.faction+1].Icon
             if armyData.showScore and icon then
-                return armyData.nickname, UIUtil.UIFile(icon), armyData.color
+                return string.sub(armyData.nickname, 1, 12), UIUtil.UIFile(icon), armyData.color
             else
                 return false
             end
@@ -219,7 +206,7 @@ local statFuncs = {
             else
                 return string.format('%d / %d', info.tacticalSiloStorageCount, info.tacticalSiloMaxStorageCount), 'tactical'
             end
-        elseif info.userUnit and table.getn(GetAttachedUnitsList({info.userUnit})) > 0 then
+        elseif info.userUnit and not table.empty(GetAttachedUnitsList({info.userUnit})) then
             return string.format('%d', table.getn(GetAttachedUnitsList({info.userUnit}))), 'attached'
         else
             return false
@@ -250,6 +237,54 @@ local statFuncs = {
     end,
 }
 
+
+function CreateQueueGrid(parent)
+	controls.queue = Bitmap(parent)
+    controls.queue.grid = Bitmap(controls.queue)
+	controls.queue.grid.items = {}	
+	controls.queue.bg = Bitmap(controls.queue)	
+    controls.queue:DisableHitTest()
+	
+	controls.queue.bg.leftBracket = Bitmap(controls.queue.bg)
+	
+	controls.queue.bg.rightGlowTop = Bitmap(controls.queue.bg)
+    controls.queue.bg.rightGlowMiddle = Bitmap(controls.queue.bg)
+    controls.queue.bg.rightGlowBottom = Bitmap(controls.queue.bg)
+	
+	controls.queue.bg.leftGlowTop = Bitmap(controls.queue.bg)
+    controls.queue.bg.leftGlowMiddle = Bitmap(controls.queue.bg)
+    controls.queue.bg.leftGlowBottom = Bitmap(controls.queue.bg)
+	
+	local function CreateGridUnitIcon(parent)
+        local item =  Bitmap(parent)
+        item.icon = Bitmap(item)
+        item.text = UIUtil.CreateText(item, "", 16, 'Arial Black', true)
+        return item
+    end
+	
+	for id = 1, 7 do
+		controls.queue.grid.items[id] = CreateGridUnitIcon(controls.queue.grid)
+	end
+	
+    controls.queue.grid.UpdateQueue = function (self, queue)
+		if not queue then
+			controls.queue:Hide()
+		else
+            controls.queue:Show()
+			for id, item in self.items do
+				if queue[id] then
+					item:Show()
+					item.icon:SetTexture( UIUtil.UIFile('/icons/units/' ..  queue[id].id .. '_icon.dds', true))
+					item.text:SetText(tostring(queue[id].count))
+				else
+					item:Hide()
+				end
+			end
+		end
+    end	
+    controls.queue:Hide()
+end
+
 function UpdateWindow(info)
     if info.blueprintId == 'unknown' then
         controls.name:SetText(LOC('<LOC rollover_0000>Unknown Unit'))
@@ -272,6 +307,7 @@ function UpdateWindow(info)
         controls.actionIcon:Hide()
         controls.actionText:Hide()
         controls.abilities:Hide()
+        controls.ReclaimGroup:Hide()
     else
         local bp = __blueprints[info.blueprintId]
         if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.blueprintId .. '_icon.dds', true)) then
@@ -294,20 +330,24 @@ function UpdateWindow(info)
         end
         local description = LOC(bp.Description)
         if techLevel then
-            description = LOCF("Tech %d %s", techLevel, bp.Description)
+            description = LOC('<LOC _Tech>')..techLevel..' '..description
         end
         LayoutHelpers.AtTopIn(controls.name, controls.bg, 10)
         controls.name:SetFont(UIUtil.bodyFont, 14)
+        local name = ''
         if info.customName then
-            controls.name:SetText(LOCF('%s: %s', info.customName, description))
+            name = LOC(info.customName)
         elseif bp.General.UnitName then
-            controls.name:SetText(LOCF('%s: %s', bp.General.UnitName, description))
-        else
-            controls.name:SetText(LOCF('%s', description))
+            name = LOC(bp.General.UnitName)
         end
-        if controls.name:GetStringAdvance(controls.name:GetText()) > controls.name.Width() then
-            LayoutHelpers.AtTopIn(controls.name, controls.bg, 14)
-            controls.name:SetFont(UIUtil.bodyFont, 10)
+        if name ~='' then
+            name = name..': '
+        end
+        controls.name:SetText(name..description)
+        local scale = controls.name.Width() / controls.name.TextAdvance()
+        if scale < 1 then
+            LayoutHelpers.AtTopIn(controls.name, controls.bg, 10 / scale)
+            controls.name:SetFont(UIUtil.bodyFont, 14 * scale)
         end
         for index = 1, table.getn(statFuncs) do
             local i = index
@@ -343,36 +383,38 @@ function UpdateWindow(info)
             end
         end
 
-        controls.shieldBar:Hide()
         controls.fuelBar:Hide()
         controls.vetBar:Hide()
+        controls.ReclaimGroup:Hide()
 
         if info.shieldRatio > 0 then
             controls.shieldBar:Show()
             controls.shieldBar:SetValue(info.shieldRatio)
+        else
+            controls.shieldBar:Hide()
         end
 
         if info.fuelRatio > 0 then
             controls.fuelBar:Show()
             controls.fuelBar:SetValue(info.fuelRatio)
         end
-		
-	if info.shieldRatio > 0 and info.fuelRatio > 0 then
-	    controls.store = 1
-	else
-	    controls.store = 0
-	end
-		
+
+        if info.shieldRatio > 0 and info.fuelRatio > 0 then
+            controls.store = 1
+        else
+            controls.store = 0
+        end
+
         if info.health then
             controls.healthBar:Show()
 
             -- Removing a MaxHealth buff causes health > maxhealth until a damage event for some reason
             info.health = math.min(info.health, info.maxHealth)
-	    
-        if not info.userUnit then
-            unitHP[1] = info.health
-            unitHP.blueprintId = info.blueprintId
-        end	
+
+            if not info.userUnit then
+                unitHP[1] = info.health
+                unitHP.blueprintId = info.blueprintId
+            end
 
             controls.healthBar:SetValue(info.health/info.maxHealth)
             if info.health/info.maxHealth > .75 then
@@ -388,13 +430,13 @@ function UpdateWindow(info)
         end
 
         -- Control the veterancy stars
-        local currentLevel = UnitData[info.entityId].VeteranLevel
-        local massKilled = UnitData[info.entityId].totalMassKilled
-        local massKilledTrue = UnitData[info.entityId].totalMassKilledTrue
-        local myValue = UnitData[info.entityId].myValue
-        local manualVeterancy = UnitData[info.entityId].manualVeterancy
-        local bp = __blueprints[info.blueprintId]
-        
+        local data = UnitData[info.entityId]
+        local currentLevel = data.VeteranLevel
+        local massKilled = data.totalMassKilled
+        local massKilledTrue = data.totalMassKilledTrue
+        local myValue = data.myValue
+        local manualVeterancy = data.manualVeterancy
+
         for level = 1, 5 do
             if currentLevel >= level then
                 controls.vetIcons[level]:Show()
@@ -412,25 +454,25 @@ function UpdateWindow(info)
             elseif manualVeterancy then
                 local m = manualVeterancy[currentLevel] or 0
                 local lvl = math.min(currentLevel + 1, 5)
-                
+
                 progress = (massKilled - m) / bp.VeteranMass[lvl]
             end
-            
+
             if progress then
                 if currentLevel < 5 then
                     controls.vetBar:Show()
                     controls.vetBar:SetValue(progress)
                     controls.vetTitle:SetText('Veterancy')
-                    
+
                     local nextLevel
                     local text
-                    
+
                     if myValue then
                         nextLevel = myValue * (currentLevel + 1)
                     else
                         nextLevel = manualVeterancy[currentLevel + 1]
-                    end    
-                    
+                    end
+
                     if nextLevel >= 1000000 then
                         text = string.format('%.2fM/%.2fM', massKilled / 1000000, nextLevel / 1000000)
                     elseif nextLevel >= 100000 then
@@ -445,7 +487,7 @@ function UpdateWindow(info)
                     controls.vetBar:Show()
                     controls.vetBar:SetValue(1)
                     controls.vetTitle:SetText('Mass killed')
-                    
+
                     local text
                     if massKilledTrue >= 1000000 then
                         text = string.format('%.2fM', massKilledTrue / 1000000)
@@ -454,12 +496,26 @@ function UpdateWindow(info)
                     elseif massKilledTrue >= 10000 then
                         text = string.format('%.1fK', massKilledTrue / 1000)
                     else
-                        text = massKilledTrue 
+                        text = massKilledTrue
                     end
-                    
-                    controls.nextVet:SetText(text)    
+					
+                    controls.nextVet:SetText(text)
                 else
                     controls.vetBar:Hide()
+                end
+            end
+        else
+            if info.entityId then
+                local reclaimedMass, reclaimedEnergy
+                local unit = GetUnitById(info.entityId)
+                if unit then
+                    reclaimedMass = unit:GetStat('ReclaimedMass').Value
+                    reclaimedEnergy = unit:GetStat('ReclaimedEnergy').Value
+                end
+                if reclaimedMass or reclaimedEnergy then
+                    controls.ReclaimGroup:Show()
+                    controls.ReclaimGroup.MassText:SetText(tostring(reclaimedMass or 0))
+                    controls.ReclaimGroup.EnergyText:SetText(tostring(reclaimedEnergy or 0))
                 end
             end
         end
@@ -468,6 +524,37 @@ function UpdateWindow(info)
         if info.userUnit then
             unitQueue = info.userUnit:GetCommandQueue()
         end
+
+        -- -- Build queue upon hovering of unit
+
+        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'always'
+        local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1
+        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'only-obs'
+
+        if always or (whenObserving and isObserver) then 
+            if (info.userUnit ~= nil) and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and (info.userUnit ~= selectedUnit) then
+
+                -- find the main factory we're using the queue of
+                local mainFactory
+                local factory = info.userUnit
+                while true do 
+                    mainFactory = factory:GetGuardedEntity()
+                    if mainFactory == nil then 
+                        break
+                    end
+                    factory = mainFactory
+                end
+                
+                -- show that queue
+                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(factory))
+                ClearCurrentFactoryForQueueDisplay()
+            else 
+                controls.queue:Hide()
+            end
+        else 
+            controls.queue:Hide()
+        end
+
         if info.focus then
             if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true)) then
                 controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true))
@@ -508,13 +595,33 @@ function UpdateWindow(info)
             controls.actionText:Hide()
         end
 
-        if Prefs.GetOption('uvd_format') == 'full' and bp.Display.Abilities then
+        local lines = nil
+        if Prefs.GetOption('uvd_format') == 'full' then
+            lines = {}
+            --Get not autodetected abilities
+            if bp.Display.Abilities then
+                for _, id in bp.Display.Abilities do
+                    local ability = unitviewDetail.ExtractAbilityFromString(id)
+                    if not unitviewDetail.IsAbilityExist[ability] then
+                        table.insert(lines, LOC(id))
+                    end
+                end
+            end
+            --Autodetect abilities
+            for id, func in unitviewDetail.IsAbilityExist do
+                if (id ~= 'ability_building') and (id ~= 'ability_repairs') and
+                   (id ~= 'ability_reclaim') and (id ~= 'ability_capture') and func(bp) then
+                    table.insert(lines, LOC('<LOC '..id..'>'))
+                end
+            end
+        end
+        if lines and (not table.empty(lines)) then
             local i = 1
             local maxWidth = 0
-            local index = table.getn(bp.Display.Abilities)
-            while bp.Display.Abilities[index] do
+            local index = table.getn(lines)
+            while lines[index] do
                 if not controls.abilityText[i] then
-                    controls.abilityText[i] = UIUtil.CreateText(controls.abilities, LOC(bp.Display.Abilities[index]), 12, UIUtil.bodyFont)
+                    controls.abilityText[i] = UIUtil.CreateText(controls.abilities, lines[index], 12, UIUtil.bodyFont)
                     controls.abilityText[i]:DisableHitTest()
                     if i == 1 then
                         LayoutHelpers.AtLeftIn(controls.abilityText[i], controls.abilities)
@@ -523,7 +630,7 @@ function UpdateWindow(info)
                         LayoutHelpers.Above(controls.abilityText[i], controls.abilityText[i-1])
                     end
                 else
-                    controls.abilityText[i]:SetText(LOC(bp.Display.Abilities[index]))
+                    controls.abilityText[i]:SetText(lines[index])
                 end
                 maxWidth = math.max(maxWidth, controls.abilityText[i].Width())
                 index = index - 1
@@ -564,7 +671,7 @@ function UpdateWindow(info)
             end
 
             if info.shieldRatio > 0 then
-                local getEnh = import('/lua/enhancementcommon.lua')
+                local getEnh = import("/lua/enhancementcommon.lua")
                 local unitBp = info.userUnit:GetBlueprint()
                 local shield = unitBp.Defense.Shield
                 if not shield.ShieldMaxHealth then
@@ -593,7 +700,7 @@ function UpdateWindow(info)
     UpdateEnhancementIcons(info)
 end
 
-local GetEnhancementPrefix = import('/lua/ui/game/construction.lua').GetEnhancementPrefix
+local GetEnhancementPrefix = import("/lua/ui/game/construction.lua").GetEnhancementPrefix
 function UpdateEnhancementIcons(info)
     local unit = info.userUnit
     local existingEnhancements
@@ -616,8 +723,7 @@ function UpdateEnhancementIcons(info)
 
         enhancement:Show()
         enhancement:SetTexture(UIUtil.UIFile(texture, true))
-        enhancement.Width:Set(30)
-        enhancement.Height:Set(30)
+        LayoutHelpers.SetDimensions(enhancement, 30, 30)
     end
 end
 
@@ -625,7 +731,7 @@ function ShowROBox()
 end
 
 function SetLayout(layout)
-    import(UIUtil.GetLayoutFilename('unitview')).SetLayout()
+    unitViewLayout.SetLayout()
 end
 
 function SetupUnitViewLayout(mapGroup, orderControl)
@@ -652,6 +758,17 @@ function CreateUI()
     controls.vetBar = StatusBar(controls.bg, 0, 1, false, false, nil, nil, true)
     controls.nextVet = UIUtil.CreateText(controls.vetBar, '', 10, UIUtil.bodyFont)
     controls.vetTitle = UIUtil.CreateText(controls.vetBar, 'Veterancy', 10, UIUtil.bodyFont)
+
+    controls.ReclaimGroup = Group(controls.bg)
+    -- controls.ReclaimGroup.Title = UIUtil.CreateText(controls.ReclaimGroup, 'Reclaimed', 10, UIUtil.bodyFont)
+    controls.ReclaimGroup.Debug = Bitmap(controls.ReclaimGroup)
+    controls.ReclaimGroup.MassIcon = Bitmap(controls.ReclaimGroup)
+    controls.ReclaimGroup.EnergyIcon = Bitmap(controls.ReclaimGroup)
+    controls.ReclaimGroup.MassText = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
+    controls.ReclaimGroup.EnergyText = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
+    -- controls.ReclaimGroup.MassReclaimed = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
+    -- controls.ReclaimGroup.MassIcon = Bitmap(controls.ReclaimGroup)
+    -- controls.ReclaimGroup.MassReclaimed = UIUtil.CreateText(controls.ReclaimGroup, '0', 10, UIUtil.bodyFont)
 
     controls.statGroups = {}
     for i = 1, table.getn(statFuncs) do
@@ -680,38 +797,36 @@ function CreateUI()
 
     controls.bg.OnFrame = function(self, delta)
         local info = GetRolloverInfo()
-        if not info and selectedUnit then
+        if not info and selectedUnit and options.gui_enhanced_unitview ~= 0 then
             info = GetUnitRolloverInfo(selectedUnit)
         end
 
-        if info and import('/lua/ui/game/unitviewDetail.lua').View:IsHidden() then
+        if info and import("/lua/ui/game/unitviewdetail.lua").View:IsHidden() then
             UpdateWindow(info)
             if self:GetAlpha() < 1 then
                 self:SetAlpha(1, true)
             end
-            import(UIUtil.GetLayoutFilename('unitview')).PositionWindow()
-	    import(UIUtil.GetLayoutFilename('unitview')).UpdateStatusBars(controls)		
+            unitViewLayout.PositionWindow()
+            unitViewLayout.UpdateStatusBars(controls)
         elseif self:GetAlpha() > 0 then
             self:SetAlpha(0, true)
         end
     end
 
     -- This section is for the small icons showing what active enhancements an ACU has
-	controls.enhancements = {}
-	controls.enhancements['RCH'] = Bitmap(controls.bg)
-	controls.enhancements['Back'] = Bitmap(controls.bg)
-	controls.enhancements['LCH'] = Bitmap(controls.bg)
+    controls.enhancements = {}
+    controls.enhancements['RCH'] = Bitmap(controls.bg)
+    controls.enhancements['Back'] = Bitmap(controls.bg)
+    controls.enhancements['LCH'] = Bitmap(controls.bg)
 
-	LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
-	LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
-	LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
+    LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
+    LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
+    LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
+	CreateQueueGrid(controls.bg)
 end
 
 function OnSelection(units)
-    if options.gui_enhanced_unitview == 0 then
-        return
-    end
-
+    -- set if we have one unit selected, useful for state management for information to show
     if units and table.getn(units) == 1 then
         selectedUnit = units[1]
     else

@@ -2,23 +2,24 @@
 -- File     :  /cdimage/units/URL0402/URL0402_script.lua
 -- Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
 -- Summary  :  Cybran Spider Bot Script
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------
 
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFHeavyMicrowaveLaserGenerator = CybranWeaponsFile.CDFHeavyMicrowaveLaserGenerator
 local CDFElectronBolterWeapon = CybranWeaponsFile.CDFElectronBolterWeapon
 local CAAMissileNaniteWeapon = CybranWeaponsFile.CAAMissileNaniteWeapon
-local explosion = import('/lua/defaultexplosions.lua')
+local explosion = import("/lua/defaultexplosions.lua")
 local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local utilities = import('/lua/Utilities.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local utilities = import("/lua/utilities.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
-local Entity = import('/lua/sim/Entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 
+---@class URL0402 : CWalkingLandUnit
 URL0402 = Class(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
@@ -42,7 +43,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        self:CreateUnitAmbientEffect(self:GetCurrentLayer())
+        self:CreateUnitAmbientEffect(self.Layer)
         if self.AnimationManipulator then
             self:SetUnSelectable(true)
             self.AnimationManipulator:SetRate(1)
@@ -99,7 +100,7 @@ URL0402 = Class(CWalkingLandUnit) {
         if layer == 'Land' then
             self.AmbientEffectThread = self:ForkThread(self.UnitLandAmbientEffectThread)
         elseif layer == 'Seabed' then
-            local army = self:GetArmy()
+            local army = self.Army
             for kE, vE in self.AmbientSeabedExhaustEffects do
                 for kB, vB in self.AmbientExhaustBones do
                     table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
@@ -110,7 +111,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
     UnitLandAmbientEffectThread = function(self)
         while not self.Dead do
-            local army = self:GetArmy()
+            local army = self.Army
 
             for kE, vE in self.AmbientLandExhaustEffects do
                 for kB, vB in self.AmbientExhaustBones do
@@ -191,7 +192,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
     DeathThread = function(self)
         self:PlayUnitSound('Destroyed')
-        local army = self:GetArmy()
+        local army = self.Army
 
         -- Create Initial explosion effects
         explosion.CreateFlash(self, 'Center_Turret', 4.5, army)
@@ -235,6 +236,25 @@ URL0402 = Class(CWalkingLandUnit) {
 
         local x, y, z = unpack(self:GetPosition())
         z = z + 3
+
+        -- only apply death damage when the unit is sufficiently build
+        local bp = self:GetBlueprint()
+        local FractionThreshold = bp.General.FractionThreshold or 0.99
+        if self:GetFractionComplete() >= FractionThreshold then 
+            local bp = self:GetBlueprint()
+            local position = self:GetPosition()
+            local qx, qy, qz, qw = unpack(self:GetOrientation())
+            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
+            for i, numWeapons in bp.Weapon do
+                if bp.Weapon[i].Label == 'SpiderDeath' then
+                    position[3] = position[3]+3*math.cos(a)
+                    position[1] = position[1]+3*math.sin(a)
+                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    break
+                end
+            end
+        end
+
         DamageRing(self, {x, y,z}, 0.1, 3, 1, 'Force', true)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Center_Turret', 2)

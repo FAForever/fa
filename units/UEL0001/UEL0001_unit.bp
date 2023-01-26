@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        InitialAutoMode = true,
         GuardRadius = 10,
         GuardScanRadius = 31.5, -- Hardcoded to keep a sensible 'attack while assisting'/stop far away ratio
         TargetBones = {
@@ -113,20 +114,12 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
         'UEF',
         'MOBILE',
+        'AMPHIBIOUS',
         'ECONOMIC',
         'COMMAND',
         'MASSPRODUCTION',
@@ -154,6 +147,7 @@ UnitBlueprint {
         'SNIPEMODE',
     },
     Defense = {
+        SkipDynamicThreatCalculations = true,
         AirThreatLevel = 0,
         ArmorType = 'Commander',
         EconomyThreatLevel = 5,
@@ -353,7 +347,7 @@ UnitBlueprint {
         NeedToFaceTargetToBuild = false,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
-        StorageEnergy = 4000,
+        StorageEnergy = 3900,
         StorageMass = 650,
         TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,
@@ -952,6 +946,7 @@ UnitBlueprint {
         {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
+            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UELWeapon',
@@ -995,12 +990,11 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
             SlavedToBody = false,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'MOBILE',
                 'COMMAND',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Arm_Muzzle',
@@ -1020,6 +1014,7 @@ UnitBlueprint {
         {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
+            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UELWeapon',
@@ -1054,7 +1049,7 @@ UnitBlueprint {
                 commandDamage = 400,
                 structureDamage = 800,
                 maxDamage = 15000,
-                minDamage = 1500,
+                minDamage = 1250,
             },
             OverChargeWeapon = true,
             ProjectileId = '/projectiles/TDFOverCharge01/TDFOverCharge01_proj.bp',
@@ -1077,15 +1072,14 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.3,
             SlavedToBody = false,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE TECH1',
                 'COMMAND',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Arm_Muzzle',
@@ -1107,6 +1101,7 @@ UnitBlueprint {
         {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
+            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UELWeapon',
@@ -1140,7 +1135,7 @@ UnitBlueprint {
                 commandDamage = 400,
                 structureDamage = 800,
                 maxDamage = 15000,
-                minDamage = 1500,
+                minDamage = 1250,
             },
             ProjectileId = '/projectiles/TDFOverCharge01/TDFOverCharge01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
@@ -1162,15 +1157,14 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.2,
             SlavedToBody = false,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE TECH1',
                 'COMMAND',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Arm_Muzzle',
@@ -1243,11 +1237,10 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 5,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
@@ -1318,7 +1311,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 0.1,
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Missile',
@@ -1359,7 +1351,6 @@ UnitBlueprint {
             },
             RackRecoilDistance = 0,
             RateOfFire = 1,
-            TargetCheckInterval = 9999999,
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
@@ -1372,6 +1363,7 @@ UnitBlueprint {
             DisplayName = 'Teleport in',
             DummyWeapon = true,
             Label = 'TeleportWeapon',
+            ManualFire = true,
             MaxRadius = 1,
             RateOfFire = 1,
             WeaponCategory = 'Teleport',

@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardScanRadius = 26, -- Dummy Weapon range so that the scout doesn't suicide when attack moved into T1 tanks that are not Aurora
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',
@@ -104,10 +107,10 @@ UnitBlueprint {
         UniformScale = 0.027,
     },
     Economy = {
-        BuildCostEnergy = 80,
+        BuildCostEnergy = 60,
         BuildCostMass = 8,
-        BuildTime = 80,
-        MaintenanceConsumptionPerSecondEnergy = 5,
+        BuildTime = 60,
+        MaintenanceConsumptionPerSecondEnergy = 1,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -162,7 +165,7 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         MaxAcceleration = 4.8,
-        MaxBrake = 4.8,
+        MaxBrake = 9.6,
         MaxSpeed = 4.8,
         MaxSpeedReverse = 0,
         MaxSteerForce = 10,
@@ -174,11 +177,35 @@ UnitBlueprint {
     SelectionSizeX = 0.3,
     SelectionSizeZ = 0.3,
     SelectionThickness = 1.2,
-    SizeX = 0.7, #from 0.5
-    SizeY = 0.6, #from0.3
-    SizeZ = 1, # #from 0.5
+    SizeX = 0.7, --from 0.5
+    SizeY = 0.6, --from0.3
+    SizeZ = 1, -- --from 0.5
     StrategicIconName = 'icon_land1_intel',
     StrategicIconSortPriority = 135,
+    Weapon = {
+        { -- dummy weapon to stop at a certain point when attack moved
+            AutoInitiateAttackCommand = false,
+            CannotAttackGround = false,
+            Damage = 0,
+            DamageFriendly = false,
+            DamageType = 'Normal',
+            DisplayName = 'Target Tracker',
+            FireTargetLayerCapsTable = {
+                Land = 'Land|Water',
+                Water = 'Land|Water',
+            },
+            MaxRadius = 26,
+            RateOfFire = 0.1,
+            ReTargetOnMiss = false,
+            TargetPriorities = {
+                'ALLUNITS',
+            },
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            Turreted = false,
+            SlavedToBody = false,
+            WeaponCategory = 'Missile',
+        },
+    },
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
         EnergyMult = 0,

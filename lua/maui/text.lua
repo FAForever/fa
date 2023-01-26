@@ -8,8 +8,10 @@
 -- SetCenteredVertically(bool)
 -- SetCenteredHorizontally(bool)
 
-local Control = import('control.lua').Control
+local Control = import("/lua/maui/control.lua").Control
+local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 
+---@class Text : moho.text_methods, Control, InternalObject
 Text = Class(moho.text_methods, Control) {
 
     __init = function(self, parent, debugname)
@@ -18,7 +20,7 @@ Text = Class(moho.text_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import('/lua/lazyvar.lua')
+        local LazyVar = import("/lua/lazyvar.lua")
         self._lockFontChanges = false
         self._font = {_family = LazyVar.Create(), _pointsize = LazyVar.Create()}
         self._font._family.OnDirty = function(var)
@@ -53,7 +55,7 @@ Text = Class(moho.text_methods, Control) {
     SetFont = function(self, family, pointsize)
         if self._font then
             self._lockFontChanges = true
-            self._font._pointsize:Set(pointsize)
+            self._font._pointsize:Set(ScaleNumber(pointsize))
             self._font._family:Set(family)
             self._lockFontChanges = false
             self:_internalSetFont()
@@ -115,7 +117,7 @@ function FitText(text, lineWidth, advanceFunction)
             return lineWidth
         end
     else
-        lineWidthFunc = linWidth
+        lineWidthFunc = lineWidth
     end
 
     local result = {}

@@ -44,15 +44,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 60,
-            Level3 = 115,
-            Level4 = 165,
-            Level5 = 215,
-        },
-    },
     BuildIconSortPriority = 100,
     Categories = {
         'PRODUCTSC1',
@@ -71,9 +62,11 @@ UnitBlueprint {
         'RECLAIMABLE',
         'DRAGBUILD',
         'OVERLAYDIRECTFIRE',
+        'OVERLAYINDIRECTFIRE',
         'OVERLAYOMNI',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
         'SNIPEMODE',
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = 0.3,
     Defense = {
@@ -101,6 +94,15 @@ UnitBlueprint {
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 1,
+
+                HitBox = {
+                    CollisionOffsetX = 0,
+                    CollisionOffsetY = 0,
+                    CollisionOffsetZ = 3,
+                    SizeX = 2.5,
+                    SizeY = 1.0,
+                    SizeZ = 6.5,
+                },
             },
         },
         AnimationWalk = '/units/ual0401/ual0401_awalk.sca',
@@ -283,7 +285,6 @@ UnitBlueprint {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = true,
-            AlwaysRecheckTarget = false,
             Audio = {
                 BeamLoop = Sound {
                     Bank = 'UALWeapon',
@@ -347,16 +348,15 @@ UnitBlueprint {
             RateOfFire = 10,
             SlavedToBody = true,
             SlavedToBodyArcRange = 65,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
                 'TECH3 MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'TECH3 STRUCTURE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Head_Muzzle',
@@ -375,6 +375,11 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+            AlwaysRecheckTarget = false,
+            TrackingRadius = 1.1,
+
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             Audio = {
@@ -400,7 +405,7 @@ UnitBlueprint {
             HeadingArcCenter = -35,
             HeadingArcRange = 40,
             Label = 'RightArmTractor',
-            MaxRadius = 40,
+            MaxRadius = 41,
             MinRadius = 2,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
@@ -423,17 +428,15 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.15,
-            TargetCheckInterval = 2,
+            RangeCategory = 'UWRC_IndirectFire',
+            RateOfFire = 2,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1,
+            TargetRestrictDisallow = 'UNTARGETABLE,STRUCTURE,COMMAND,EXPERIMENTAL,NAVAL,SUBCOMMANDER',
             TurretBoneMuzzle = 'Right_Arm_Muzzle01',
             TurretBonePitch = 'Right_Arm_B02',
             TurretBoneYaw = 'Right_Arm_B01',
@@ -450,6 +453,11 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             Audio = {
@@ -490,7 +498,7 @@ UnitBlueprint {
             HeadingArcCenter = 35,
             HeadingArcRange = 40,
             Label = 'LeftArmTractor',
-            MaxRadius = 40,
+            MaxRadius = 41,
             MinRadius = 2,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
@@ -513,17 +521,15 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.15,
-            TargetCheckInterval = 2,
+            RangeCategory = 'UWRC_IndirectFire',
+            RateOfFire = 2,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1,
+            TargetRestrictDisallow = 'UNTARGETABLE,STRUCTURE,COMMAND,EXPERIMENTAL,NAVAL,SUBCOMMANDER',
             TurretBoneMuzzle = 'Left_Arm_Muzzle01',
             TurretBonePitch = 'Left_Arm_B02',
             TurretBoneYaw = 'Left_Arm_B01',
@@ -541,9 +547,9 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 7500,
+            Damage = 8000,
             DamageFriendly = true,
-            DamageRadius = 4,
+            DamageRadius = 7,
             DamageType = 'DeathExplosion',
             DisplayName = 'Collossus Death',
             DummyWeapon = true,

@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 60,
+        GuardScanRadius = 40,
     },
     Audio = {
         AmbientMove = Sound {
@@ -29,15 +30,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -61,6 +53,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'OVERLAYDIRECTFIRE',
         'OVERLAYDEFENSE',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.375,
     Defense = {
@@ -83,14 +76,20 @@ UnitBlueprint {
         AnimationDeath = {
             {
                 Animation = '/units/uas0103/uas0103_adeath01.sca',
+                AnimationRateMax = 1.4,
+                AnimationRateMin = 1.1,
                 Weight = 100,
             },
             {
                 Animation = '/units/uas0103/uas0103_adeath02.sca',
+                AnimationRateMax = 1.4,
+                AnimationRateMin = 1.1,
                 Weight = 100,
             },
             {
-                Animation = '/units/uas0103/uas0103_adeath02.sca',  #from                 Animation = '/units/uas0103/uas0103_adeath03.sca',
+                Animation = '/units/uas0103/uas0103_adeath03.sca',
+                AnimationRateMax = 1.4,
+                AnimationRateMin = 1.1,
                 Weight = 100,
             },
         },
@@ -139,9 +138,9 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 2900,
-        BuildCostMass = 290,
-        BuildTime = 1450,
+        BuildCostEnergy = 2800,
+        BuildCostMass = 280,
+        BuildTime = 1400,
     },
     Footprint = {
         SizeX = 2,
@@ -257,7 +256,7 @@ UnitBlueprint {
             HeadingArcCenter = 0,
             HeadingArcRange = 150,
             Label = 'MainGun',
-            MaxRadius = 31,
+            MaxRadius = 33,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -282,13 +281,11 @@ UnitBlueprint {
             RateOfFire = 0.588,
             SlavedToBody = true,
             SlavedToBodyArcRange = 145,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Front_Muzzle',
             TurretBonePitch = 'Turret_Front_Barrel',
             TurretBoneYaw = 'Turret_Front',
@@ -325,7 +322,7 @@ UnitBlueprint {
             HeadingArcCenter = 180,
             HeadingArcRange = 150,
             Label = 'MainGun2',
-            MaxRadius = 31,
+            MaxRadius = 33,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -351,13 +348,11 @@ UnitBlueprint {
             RateOfFire = 0.588,
             SlavedToBody = true,
             SlavedToBodyArcRange = 145,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Back_Muzzle',
             TurretBonePitch = 'Turret_Back_Barrel',
             TurretBoneYaw = 'Turret_Back',
@@ -407,11 +402,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.15,
-            TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.5,
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 0,

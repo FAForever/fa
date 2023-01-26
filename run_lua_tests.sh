@@ -1,44 +1,41 @@
 #!/bin/bash
 
-# Ubuntu has luac5.2 instead
-[ -z "$LUAC" ] && LUAC="luac"
-
-# Simple lua code syntax checker using luac
-
-preprocess_gpg_lua() {
-  file="$1"
-  
-  # 1. GPG-style comments and copyright unicode symbol
-  # 2. C-style equality
-  # 3. C-style continue 
-
-  sed -e "s:^\(\([^\"'#]\|\(\"\|'\)[^\"'#]*\3\)*\)#\(.\|\xa9\)*$:\1:g" \
-      -e 's:\!\=:\~\=:g' \
-      -e 's:\(\bcontinue\b\):\1\(\):g' \
-      "$file"
-}
+# Simple lua code syntax checker using https://github.com/FAForever/lua-lang
+# Assumes that FAF lua is installed as `lua`
 
 had_error=0
-check_file() {
+tests_complete=0
+
+run_test() {
   file="$1"
-  
-  output="$(luac -p <(preprocess_gpg_lua "$file") 2>&1 \
+
+  output="$(lua "$file" 2>&1 \
     | sed "s:/dev/fd/[0-9]\+:$file:g")"
 
   if [[ $output != "" ]]; then
     echo "$output" > /dev/fd/2
-    had_error=1
+    if [[ "$output" == *"FAIL"* ]]; then
+      had_error=1
+    fi
   fi
 }
 
-for file in `find . \( -path ./engine -o -path ./testmaps \) -prune -o -name '*.lua' -o -name '*.bp'`; do
-  check_file "$file"
-done
+# make sure the test files run in the tests directory
+pushd tests >/dev/null
+while read file; do
+  # exclude the unit tester module
+  if [ "$file" != "./lust.lua" ]; then
+    run_test "$file"
+    ((tests_complete ++))
+  fi
+done < <(find . -name '*.lua')
+popd >/dev/null
+
+echo "Ran $tests_complete tests"
 
 if [[ $had_error != 0 ]]; then
-  echo "Syntax errors detected."
+  echo "Tests returned errors."
+  exit $had_error
 else
-  echo "Syntax OK."
+  echo "Tests OK."
 fi
-
-exit $had_error

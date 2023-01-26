@@ -145,7 +145,7 @@ UnitBlueprint {
     Wreckage = {
         Blueprint = '/env/Wreckage/props/Walls/UEB5101_prop.bp',
         EnergyMult = 0,
-        HealthMult = 0.2,
+        HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         UseCustomMesh = true,

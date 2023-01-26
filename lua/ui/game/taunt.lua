@@ -1,13 +1,13 @@
-﻿#****************************************************************************
-#**  File     :  lua/modules/ui/game/taunt.lua
-#**  Author(s):  Chris blackwell
-#**
-#**  Summary  :  Taunt system
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-local Prefs = import('/lua/user/prefs.lua')
-local AIChatS = import('/lua/AIChatSorian.lua')
+﻿--****************************************************************************
+--**  File     :  lua/modules/ui/game/taunt.lua
+--**  Author(s):  Chris blackwell
+--**
+--**  Summary  :  Taunt system
+--**
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
+local Prefs = import("/lua/user/prefs.lua")
+local AIChatS = import("/lua/aichatsorian.lua")
 
 local taunts = {
     {text = '<LOC XGG_MP1_010_010>[{i Hall}]: You will not stop the UEF!', bank = 'XGG', cue = 'XGG_Hall__04566'},
@@ -120,7 +120,7 @@ local function RecieveTaunt(sender, msg)
         if taunt then
             StopSound(prevHandle)
             prevHandle = PlayVoice(Sound({Cue = taunt.cue, Bank = taunt.bank}))
-            import('/lua/ui/game/chat.lua').ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
+            import("/lua/ui/game/chat.lua").ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
         end
     end
 end
@@ -131,17 +131,17 @@ function RecieveAITaunt(sender, msg)
         if taunt and msg.aisender then
             StopSound(prevHandle)
             prevHandle = PlayVoice(Sound({Cue = taunt.cue, Bank = taunt.bank}))
-            import('/lua/ui/game/chat.lua').ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all", aisender = msg.aisender})
+            import("/lua/ui/game/chat.lua").ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all", aisender = msg.aisender})
         elseif taunt then
             StopSound(prevHandle)
             prevHandle = PlayVoice(Sound({Cue = taunt.cue, Bank = taunt.bank}))
-            import('/lua/ui/game/chat.lua').ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
+            import("/lua/ui/game/chat.lua").ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
         end
     end
 end
 
 function Init()
-    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(RecieveTaunt, 'Taunt')
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(RecieveTaunt, 'Taunt')
 end
 function SendTaunt(tauntIndex, sender)
     if sender then
@@ -157,11 +157,7 @@ function CheckForAndHandleTaunt(text, sender)
     if (string.len(text) > 1) and (string.sub(text, 1, 1) == "/") then
         local tauntIndex = tonumber(string.sub(text, 2))
         if tauntIndex and taunts[tauntIndex] then
-            if sender then
-                SendTaunt(tauntIndex, sender)
-            else
-                SendTaunt(tauntIndex)
-            end
+            SendTaunt(tauntIndex, sender)
             return true
         end
     end

@@ -1,16 +1,18 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIAddBuilderTable.lua
-#**
-#**  Summary  : Default economic builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIAddBuilderTable.lua
+--**
+--**  Summary  : Default economic builders for skirmish
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
     if not BaseBuilderTemplates[baseBuilderName] then
         error('*AI ERROR: Invalid BaseBuilderTemplate: none found named - ' .. baseBuilderName)
     end
+
+    --SPEW('*AI DEBUG: AddGlobalBaseTemplate(): Loading Base Template '..repr(baseBuilderName))
     for k,v in BaseBuilderTemplates[baseBuilderName].Builders do
         AddGlobalBuilderGroup(aiBrain, locationType, v)
     end

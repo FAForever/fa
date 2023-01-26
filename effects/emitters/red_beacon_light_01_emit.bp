@@ -1,0 +1,148 @@
+-- used by uab5103 ueb5103 urb5103
+EmitterBlueprint {
+	BlueprintId = 'red_beacon_light_01',
+	Lifetime = -1.00,
+	Repeattime = 8.10,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = true,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = true,
+	LODCutoff = 300.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = true,
+	OnlyEmitOnWater = false,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 0.00,
+	Texture = '/textures/particles/flare_lens_add_02.dds',
+	RampTexture = '/textures/particles/ramp_red_05.dds',
+	XDirectionCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=0.000 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=0.000 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=0.000 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=1.037,y=3.000,z=0.000 },
+			{ x=1.037,y=-0.500,z=0.000 },
+			{ x=390.040,y=0.952,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=3.726,y=3.000,z=0.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=1.000,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.131,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=0.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=3.943,y=0.873,z=0.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=0.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=1.000,z=0.000 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=3.943,y=6.000,z=0.100 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=180.000,z=360.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=10.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 8.10,
+		Keys = {
+			{ x=4.050,y=0.000,z=0.000 },
+		},
+	},
+}
+

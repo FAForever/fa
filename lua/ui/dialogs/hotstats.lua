@@ -1,31 +1,29 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Text = import('/lua/maui/text.lua').Text
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local scoreAccum = import('/lua/ui/game/scoreaccum.lua')
-local scoreData = scoreAccum.scoreData
-local scoreInterval = import('/lua/ui/game/scoreaccum.lua').scoreInterval
-local gamemain = import('/lua/ui/game/gamemain.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local gamemain = import("/lua/ui/game/gamemain.lua")
+scoreData = {}
 
-local page_active=false
-local page_active_graph = false
-local page_active_graph2 = false
-local create_anime_graph=false
-local create_anime_graph2=false
+local noData = nil
+local page_active = nil
+local page_active_graph = nil
+local page_active_graph2 = nil
+local create_anime_graph = nil
+local create_anime_graph2 = nil
 local graph_pos={Left=function() return 110 end, Top=function() return 120 end, Right=function() return GetFrame(0).Right()-100 end, Bottom=function() return GetFrame(0).Bottom()-160 end}
 local bar_pos={Left=function() return 90 end, Top=function() return 140 end, Right=function() return GetFrame(0).Right()-60 end, Bottom=function() return GetFrame(0).Bottom()-150 end}
 
-local SCAEffect = import('/lua/ui/dialogs/myeffecthelpers.lua')
-local chartInfoText = false
+local SCAEffect = import("/lua/ui/dialogs/myeffecthelpers.lua")
+local chartInfoText = nil
+local Title_score = nil
 
 local info_dialog = {
     {name="<LOC SCORE_0079>Total Units Built", path={"general","built","count"},key=1},
-    {name="<LOC SCORE_0080>Units Still Alive", path={"general","currentunits","count"},key=2},
+    {name="<LOC SCORE_0080>Units Still Alive", path={"general","currentunits",false},key=2},
     {name="<LOC SCORE_0081>Total Energy Produced", path={"resources","energyin","total"},key=8},
     {name="<LOC SCORE_0082>Total Mass Produced", path={"resources","massin","total"},key=11},
     {name="<LOC SCORE_0083>Score", path={"general","score",false},key=5},
@@ -33,10 +31,10 @@ local info_dialog = {
     {name="<LOC SCORE_0085>Total Losses", path={"general","lost","count"},key=7},
     {name="<LOC SCORE_0086>Energy Rate", path={"resources","energyin","rate",fac_mul=10},key=59},
     {name="<LOC SCORE_0087>Total Energy Spent", path={"resources","energyout","total"},key=9},
-    {name="<LOC SCORE_0088>Total Energy Wasted", path={"resources","energyover",false},key=10},
+    {name="<LOC SCORE_0088>Total Energy Wasted", path={"resources","energyout","excess"},key=10},
     {name="<LOC SCORE_0089>Mass Rate", path={"resources","massin","rate",fac_mul=10},key=59},
     {name="<LOC SCORE_0090>Total Mass Spent", path={"resources","massout","total"},key=12},
-    {name="<LOC SCORE_0091>Total Mass Wasted", path={"resources","massover",false},key=13},
+    {name="<LOC SCORE_0091>Total Mass Wasted", path={"resources","massout","excess"},key=13},
     {name="<LOC SCORE_0092>Air Units Built", path={"units","air","built"},key=14},
     {name="<LOC SCORE_0093>Air Units Killed", path={"units","air","kills"},key=15},
     {name="<LOC SCORE_0094>Air Units Lost", path={"units","air","lost"},key=16},
@@ -91,10 +89,10 @@ local histo={
     main_histo={
         [1]={name="mass",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/mass.dds"),label1="mass",link="mass_histo",Tooltip="<LOC SCORE_0005>Mass",
             data={{name="mass incombe",icon="",path={"resources","massin","total"},color="green",Tooltip="<LOC SCORE_0072>Mass earned during the game."},
-            {name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="<LOC SCORE_0071>Mass wasted during the game."} }},
+            {name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massout","excess"},color="2e6405",Tooltip="<LOC SCORE_0071>Mass wasted during the game."} }},
         [2]={name="energy",icon=mySkinnableFile("/textures/ui/common/game/unit-build-over-panel/energy.dds"),label1="energy",link="energy_histo",Tooltip="<LOC SCORE_0006>Energy",
             data={{name="energy incombe",icon="",path={"resources","energyin","total"},color="orange",Tooltip="<LOC SCORE_0075>Energy earned during the game."},
-            {name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="<LOC SCORE_0074>Energy wasted during the game."} }},
+            {name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyout","excess"},color="c77d1e",Tooltip="<LOC SCORE_0074>Energy wasted during the game."} }},
         [3]={name="units built",icon=mySkinnableFile("/textures/ui/common/game/unit_view_icons/build.dds"),label1="built",label2="",link="built_histo",Tooltip="<LOC SCORE_0078>Total units/structures built during the game.",
             data={{name="air unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/fighter_generic.dds"),path={"units","air","built"},color="39b0be",Tooltip="<LOC SCORE_0069>Air units."},
             {name="land unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/land_generic.dds"),path={"units","land","built"},color="64421a",Tooltip="<LOC SCORE_0068>Land units."},
@@ -116,7 +114,7 @@ local histo={
         [2]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-out-icon.dds"),label1="out",label2="",Tooltip="<LOC SCORE_0073>Mass used during the game.",link="main_histo",
             data={{name="mass out",icon="",path={"resources","massout","total"},color="5fdc5c",Tooltip="<LOC SCORE_0073>Mass used during the game."} }},
         [3]={name="mass",icon=UIUtil.UIFile("/hotstats/score/mass-waste-icon.dds"),label1="wasted",label2="",Tooltip="<LOC SCORE_0071>Mass wasted during the game.",link="main_histo",
-            data={{name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massover",false},color="2e6405",Tooltip="<LOC SCORE_0071>Mass wasted during the game."} }}
+            data={{name="mass wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","massout","excess"},color="2e6405",Tooltip="<LOC SCORE_0071>Mass wasted during the game."} }}
     },
     energy_histo={
         [1]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-in-icon.dds"),label1="in",label2="",Tooltip="<LOC SCORE_0075>Energy earned during the game.",link="main_histo",
@@ -124,7 +122,7 @@ local histo={
         [2]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-out-icon.dds"),label1="out",label2="",Tooltip="<LOC SCORE_0076>Energy used during the game.",link="main_histo",
             data={{name="energy out",icon="",path={"resources","energyout","total"},color="dcb05c",Tooltip="<LOC SCORE_0076>Energy used during the game."} }},
         [3]={name="energy",icon=UIUtil.UIFile("/hotstats/score/energy-waste-icon.dds"),label1="wasted",label2="",Tooltip="<LOC SCORE_0074>Energy wasted during the game.",link="main_histo",
-            data={{name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyover",false},color="c77d1e",Tooltip="<LOC SCORE_0074>Energy wasted during the game."} }}
+            data={{name="energy wasted",icon=mySkinnableFile("/textures/ui/common/game/icons/icon-trash-lg_btn_up.png"),path={"resources","energyout","excess"},color="c77d1e",Tooltip="<LOC SCORE_0074>Energy wasted during the game."} }}
     },
     built_histo={
         [1]={name="units built",icon=UIUtil.UIFile("/hotstats/score/fighter-icon.dds"),label1="air",label2="",Tooltip="<LOC SCORE_0069>Air units.",link="main_histo",
@@ -134,8 +132,9 @@ local histo={
         [3]={name="units built",icon=UIUtil.UIFile("/hotstats/score/ship-icon.dds"),label1="naval",label2="",Tooltip="<LOC SCORE_0070>Naval units.",link="main_histo",
             data={{name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","built"},color="000080",Tooltip="<LOC SCORE_0070>Naval units."}}},
         [4]={name="units built",icon=UIUtil.UIFile("/hotstats/score/experimental-icon.dds"),label1="xp",label2="",Tooltip="<LOC SCORE_0066>Experimentals.",link="main_histo",
-            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="<LOC SCORE_0067>ACUs."}},
             data={{name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","built"},color="641a5e",Tooltip="<LOC SCORE_0066>Experimentals."}}},
+        [5]={name="units built",icon=UIUtil.UIFile("/hotstats/score/commander-icon.dds"),label1="cdr",label2="",Tooltip="<LOC SCORE_0067>Command unit.",link="main_histo",
+            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="<LOC SCORE_0067>ACUs."}}},
         [6]={name="units built",icon=UIUtil.UIFile("/hotstats/score/factory-icon.dds"),label1="struct",label2="",Tooltip="<LOC SCORE_0065>Structures.",link="main_histo",
             data={{name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","built"},color="3b3b3b",Tooltip="<LOC SCORE_0065>Structures."} }}
     },
@@ -147,8 +146,9 @@ local histo={
         [3]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/ship-icon.dds"),label1="naval",label2="",Tooltip="<LOC SCORE_0070>Naval units.",link="main_histo",
             data={{name="naval unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/ship_generic.dds"),path={"units","naval","kills"},color="000080",Tooltip="<LOC SCORE_0070>Naval units."}}},
         [4]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/experimental-icon.dds"),label1="xp",label2="",Tooltip="<LOC SCORE_0066>Experimentals.",link="main_histo",
-            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","kills"},color="white",Tooltip="<LOC SCORE_0067>ACUs."}},
             data={{name="xp unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/experimental_generic.dds"),path={"units","experimental","kills"},color="641a5e",Tooltip="<LOC SCORE_0066>Experimentals."}}},
+        [5]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/commander-icon.dds"),label1="cdr",label2="",Tooltip="<LOC SCORE_0067>Command unit.",link="main_histo",
+            data={{name="cdr unit",icon=UIUtil.UIFile("/textures/ui/icons_strategic/commander_generic.dds"),path={"units","cdr","built"},color="white",Tooltip="<LOC SCORE_0067>ACUs."}}},
         [6]={name="units kills",icon=UIUtil.UIFile("/hotstats/score/factory-icon.dds"),label1="struct",label2="",Tooltip="<LOC SCORE_0065>Structures.",link="main_histo",
             data={{name="structures",icon=UIUtil.UIFile("/textures/ui/icons_strategic/factory_generic.dds"),path={"units","structures","kills"},color="3b3b3b",Tooltip="<LOC SCORE_0065>Structures."} }}
     },
@@ -183,16 +183,16 @@ function FillParentPreserveAspectRatioNoExpand(control, parent,offsetx,offsety)
     end)
 end
 
-function nodata()
-    local nodata=UIUtil.CreateText(GetFrame(0),LOC("<LOC SCORE_0062>No Score"), 22, UIUtil.titleFont)
-    nodata:SetColor("white")
+local function nodata()
+    noData=UIUtil.CreateText(GetFrame(0),LOC("<LOC SCORE_0062>No Score"), 22, UIUtil.titleFont)
+    noData:SetColor("white")
     Title_score:Hide()
-    LayoutHelpers.AtCenterIn(nodata, GetFrame(0))
-    nodata.Depth:Set(GetFrame(0):GetTopmostDepth())
+    LayoutHelpers.AtCenterIn(noData, GetFrame(0))
+    noData.Depth:Set(GetFrame(0):GetTopmostDepth())
 end
 
 function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
-    local data_nbr=table.getsize(scoreData.historical) -- data_nbr is the number of group of data saved
+    local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved
     --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
     local data_histo=histo[name]
@@ -216,7 +216,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
         if not v.civilian and v.nickname != nil then
             player_nbr=player_nbr+1
             player[player_nbr]={}
-            player[player_nbr].name=v.nickname
+            player[player_nbr].name=scoreData.history[1][player_nbr].name
             player[player_nbr].color=v.color
             player[player_nbr].index=m
             player[player_nbr].faction=v.faction
@@ -478,25 +478,27 @@ end
 
 -- if periode=0 then return the current value
 function return_value(periode,player,path)
-    local val=0
+    local val
     if periode==0 then
         if path[3]==nil or path[3]==false then val=scoreData.current[player][path[1]][path[2]]
         else val=scoreData.current[player][path[1]][path[2]][path[3]] end
     else
-        if path[3]==nil or path[3]==false then val=scoreData.historical[periode][player][path[1]][path[2]]
-        else val=scoreData.historical[periode][player][path[1]][path[2]][path[3]] end
+        if (scoreData.history[periode] ~= nil) and (scoreData.history[periode][player] == nil) then
+            scoreData.history[periode][player] = scoreData.history[periode-1][player]
+        end
+        if path[3]==nil or path[3]==false then val=scoreData.history[periode][player][path[1]][path[2]]
+        else val=scoreData.history[periode][player][path[1]][path[2]][path[3]] end
     end
+    if val==nil then val=0 end
     if path.fac_mul != nil then val=val*path.fac_mul end
-    if val==nil then val=-5 end
     return val
 end
 
 function page_graph(parent)
     --LOG("PAGE_GRAPH called")
-    local data_nbr=table.getsize(scoreData.historical) -- data_nbr is the number of group of data saved
+    local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved
     --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
-    clean_view()
     page_active=Group(parent)
     page_active.Left:Set(0)
     page_active.Top:Set(0)
@@ -505,8 +507,8 @@ function page_graph(parent)
     page_active_graph=create_graph(parent,info_dialog[5].path,graph_pos.Left(),graph_pos.Top(),graph_pos.Right(),graph_pos.Bottom())
     -- build the list box
     local graph_list={}
-    local Combo = import('/lua/ui/controls/combo.lua').Combo
-    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
+    local Combo = import("/lua/ui/controls/combo.lua").Combo
+    local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
     combo_graph=Combo(page_active, 17, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     combo_graph.Right:Set(function() return graph_pos.Right() end) --function() return 300 end)
     combo_graph.Top:Set(function() return graph_pos.Top()-25 end) --function() return 300 end)
@@ -560,10 +562,9 @@ function page_graph(parent)
 end
 
 function page_bar(parent)
-    local data_nbr=table.getsize(scoreData.historical) -- data_nbr is the number of group of data saved
+    local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved
     --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
-    clean_view()
     page_active=Group(parent)
     page_active.Left:Set(0)
     page_active.Top:Set(0)
@@ -589,7 +590,7 @@ function page_bar(parent)
 end
 
 function page_dual(parent)
-    local data_nbr=table.getsize(scoreData.historical) -- data_nbr is the number of group of data saved
+    local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved
     --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
     page_active_graph=create_graph(parent,info_dialog[5].path,110,120,GetFrame(0).Right()-100,GetFrame(0).Bottom()/2-15)
@@ -597,7 +598,8 @@ function page_dual(parent)
 end
 
 function clean_view()
-    if  create_anime_graph != nil and create_anime_graph then KillThread(create_anime_graph) end
+    if noData then noData:Destroy() noData = nil end
+    if create_anime_graph != nil and create_anime_graph then KillThread(create_anime_graph) end
     if page_active != nil and page_active then page_active:Destroy() page_active=false end
     if page_active_graph != nil and page_active_graph then page_active_graph:Destroy() page_active_graph=false end
     if page_active_graph2 != nil and page_active_graph2 then page_active_graph2:Destroy() page_active_graph2=false end
@@ -606,9 +608,10 @@ end
 -- path is where is data is stored in scoredata
 -- xi,yi is the windows based on parent of the background
 function create_graph(parent,path,x1,y1,x2,y2)
-    local data_nbr=table.getsize(scoreData.historical) -- data_nbr is the number of group of data saved
+    local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved
     --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
+    local scoreInterval = scoreData.interval
     local player={} -- would be the name/color of the player in the left-top corner
     -- scoreInterval is the time between to data saved
     -- parent group
@@ -633,14 +636,14 @@ function create_graph(parent,path,x1,y1,x2,y2)
         m=m+1
         if not v.civilian and v.nickname != nil then
             player[i]={}
-            player[i].name=v.nickname
+            player[i].name=scoreData.history[1][i].name
             player[i].color=v.color
             player[i].index=m
-            player[i].title_label=UIUtil.CreateText(grp,v.nickname, 14, UIUtil.titleFont)
+            player[i].title_label=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
             player[i].title_label.Left:Set(x1+5)
             player[i].title_label.Top:Set(y1 +23*(i-1)+5)
             player[i].title_label:SetColor("black")
-            player[i].title_label2=UIUtil.CreateText(grp,v.nickname, 14, UIUtil.titleFont)
+            player[i].title_label2=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
             player[i].title_label2.Left:Set(x1+4)
             player[i].title_label2.Top:Set(y1 +23*(i-1)+4)
             player[i].title_label2:SetColor(v.color)
@@ -910,7 +913,7 @@ end
                 if periode==1 then val=0 else val=return_value(periode-1,dat.index,path) end
                 if val==nil or val<0.01 or val==false then val=0 end
                 ya=val
-                local val=return_value(periode,dat.index,path) --{"general","currentunits","count"}
+                local val=return_value(periode,dat.index,path) --{"general","currentunits",false}
                 if val==nil or val<0.01 or val==false then val=0 end
                 yb=val
                 -- put all the data in this table
@@ -1002,14 +1005,12 @@ function CreateDialogTabs(parent, label, pos)
     return button
 end
 
-
 -- the starting function launch by the hook
 function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standardScore)
     --LOG("called Set_graph...")
     if showCampaign then
         return
     end
-    scoreData = scoreAccum.scoreData
     standardScore:Hide()
     page_active=Group(dialog)
     page_active.Left:Set(0)
@@ -1047,6 +1048,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
         if self:IsChecked() then
             return
         else
+            clean_view()
             page_bar(dialog)
             standardScore:Hide()
             self:SetCheck(true)
@@ -1065,6 +1067,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
         if self:IsChecked() then
             return
         else
+            clean_view()
             page_graph(dialog)
             standardScore:Hide()
             Title_score:SetText(LOC("<LOC SCORE_0083>Score"))
@@ -1075,7 +1078,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             exit_btn:SetCheck(false)
         end
     end
-    dual_btn = CreateDialogTabs(dialog, "Dual", "m")
+    dual_btn = CreateDialogTabs(dialog, LOC("<LOC SCORE_0122>Dual"), "m")
     LayoutHelpers.AtLeftIn(dual_btn, dialog, 467)
     dual_btn.Bottom:Set(dialog.Bottom() - 73)
     dual_btn:UseAlphaHitTest(false)
@@ -1097,7 +1100,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
     end
 
     if HasCommandLineArg("/gpgnet") then
-        exit_btn = CreateDialogTabs(dialog, LOC("<LOC _Exit_to_FAF>Exit to FAF"), "r")
+        exit_btn = CreateDialogTabs(dialog, LOC("<LOC _Exit>Exit"), "r")
     else
         exit_btn = CreateDialogTabs(dialog, LOC("<LOC _Continue>"), "r")
     end
@@ -1113,7 +1116,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
             ConExecute("ren_Oblivion false")
             if HasCommandLineArg("/gpgnet") then
                 -- Quit to desktop
-                import('/lua/ui/dialogs/eschandler.lua').SafeQuit()
+                import("/lua/ui/dialogs/eschandler.lua").SafeQuit()
             else
                 -- Back to main menu
                 ExitGame()
@@ -1129,3 +1132,7 @@ function Set_graph(victory, showCampaign, operationVictoryTable, dialog, standar
     beta:SetTexture(mySkinnableFile(UIUtil.UIFile('/hotstats/bt_sca.dds')))
     LayoutHelpers.AtRightTopIn(beta,GetFrame(0),99,67)
 end
+
+-- kept for mod backwards compatibility
+local Button = import("/lua/maui/button.lua").Button
+local Text = import("/lua/maui/text.lua").Text

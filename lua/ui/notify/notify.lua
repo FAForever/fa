@@ -1,16 +1,18 @@
 -- This file contains all functions governing the integrated Notify mod, which sends messages to allies
 -- when you order and complete ACU upgrades
 
-local Prefs = import('/lua/user/prefs.lua')
-local FindClients = import('/lua/ui/game/chat.lua').FindClients
-local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
-local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
-local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
+local Prefs = import("/lua/user/prefs.lua")
+local FindClients = import("/lua/ui/game/chat.lua").FindClients
+local defaultMessages = import("/lua/ui/notify/defaultmessages.lua").defaultMessages
+local AddChatCommand = import("/lua/ui/notify/commands.lua").AddChatCommand
+local NotifyOverlay = import("/lua/ui/notify/notifyoverlay.lua")
+
 local toggleOverlay = NotifyOverlay.toggleOverlay
-local factions = import('/lua/factions.lua').FactionIndexMap
+local factions = import("/lua/factions.lua").FactionIndexMap
+local UTF =  import("/lua/utf.lua")
 
 local categoriesDisabled = {}
-local messages = {}
+local messages
 local ACUs = {}
 local messageCounts = {}
 local messageLimits = {tech = 1, other = 1, experimentals = 1}
@@ -20,7 +22,8 @@ local focusArmy
 local observer
 local localClient
 
-function init(isReplay, parent)
+function init(isReplay, parent, notifyMessages)
+    messages = notifyMessages
     focusArmy = GetFocusArmy()
     observer = isReplay or focusArmy == -1
 
@@ -35,15 +38,14 @@ function init(isReplay, parent)
     AddChatCommand('enablenotify', toggleNotifyTemporary)
     AddChatCommand('disablenotify', toggleNotifyTemporary)
 
-    populateMessages()
     setupStartDisables()
 end
 
 -- Populate the disables table according to the last session
 function setupStartDisables()
     local state
-
-    for key, data in messages do
+    local messagesTable = messages()
+    for key, data in messagesTable do
         local category = key
         if factions[category] then -- Don't make a disabler per-faction
             category = 'acus'
@@ -93,7 +95,7 @@ function processIncomingMessage(sender, msg)
         return true
     end
 
-    if import('/lua/ui/game/gamemain.lua').IsNISMode() or categoriesDisabled.All or categoriesDisabled[category] or factions[category] and categoriesDisabled['acus'] then
+    if import("/lua/ui/game/gamemain.lua").IsNISMode() or categoriesDisabled.All or categoriesDisabled[category] or factions[category] and categoriesDisabled['acus'] then
         return false
     end
 
@@ -126,32 +128,23 @@ function processIncomingMessage(sender, msg)
     if customMessagesDisabled then
         local message = defaultMessages[category][source]
         if trigger == 'started' then
-            msg.text = 'Starting ' .. message
+            msg.text = LOC('<LOC notify_starting>') .. message
         elseif trigger == 'cancelled' then
-            msg.text = message .. ' cancelled'
+            msg.text = message .. LOC('<LOC notify_cancelled>')
         elseif trigger == 'completed' then
             local time = msg.data.time
             if time then
-                msg.text = message .. ' done! (' .. time .. 's)'
+                msg.text = message .. LOC('<LOC notify_done>') .. ' (' .. time .. 's)'
             else
-                msg.text = message .. ' done!'
+                msg.text = message .. LOC('<LOC notify_done>')
             end
         else
-            msg.text = 'Doing abnormal things with ' .. message
+            msg.text = LOC('<LOC notify_abnormal>') .. message
         end
     end
     return true
 end
 
-function populateMessages()
-    local prefsMessages = Prefs.GetFromCurrentProfile('Notify_Messages')
-    if prefsMessages then
-        messages = prefsMessages
-    else
-        messages = defaultMessages
-        Prefs.SetToCurrentProfile('Notify_Messages', messages)
-    end
-end
 
 -- This function is used to toggle ALL ASPECTS of notify functionality, and is saved
 -- It is accessed by the button
@@ -251,7 +244,7 @@ end
 function sendEnhancementMessage(messageTable)
     local source = messageTable.source
     local category = messageTable.category
-    if not messages[category][source] then return end
+    if not messages or not messages()[category][source] then return end
 
     local id = messageTable.id
     local army = messageTable.army
@@ -267,7 +260,7 @@ function sendEnhancementMessage(messageTable)
 end
 
 function onStartEnhancement(id, army, category, source)
-    local msg = {to = 'notify', Chat = true, text = 'Starting ' .. messages[category][source], data = {category = category, source = source, trigger = 'started'}}
+    local msg = {to = 'notify', Chat = true, text = 'Starting ' .. messages()[category][source], data = {category = category, source = source, trigger = 'started'}}
 
     -- Start by storing ACU IDs for future use
     if id and (focusArmy == -1 or army == focusArmy) then
@@ -280,7 +273,7 @@ function onStartEnhancement(id, army, category, source)
 
         -- If we're not already working, watch this one
         if not data.watcher then
-            data.watcher = ForkThread(watchEnhancement, id, messages[category][source], category, source)
+            data.watcher = ForkThread(watchEnhancement, id, messages()[category][source], category, source)
         end
     end
 
@@ -288,7 +281,7 @@ function onStartEnhancement(id, army, category, source)
 end
 
 function onCancelledEnhancement(id, category, source)
-    local msg = {to = 'notify', Chat = true, text = messages[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
+    local msg = {to = 'notify', Chat = true, text = messages()[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
 
     if id then
         local data = ACUs[id]
@@ -302,13 +295,13 @@ end
 
 -- Called from the enhancement watcher
 function onCompletedEnhancement(id, category, source)
-    local msg = {to = 'notify', Chat = true, text = messages[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
+    local msg = {to = 'notify', Chat = true, text = messages()[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
 
     if id then
         local data = ACUs[id]
         if data then
             local time = round(GetGameTimeSeconds() - data.startTime, 2)
-            msg.text = messages[category][source] .. ' done! (' .. time .. 's)'
+            msg.text = messages()[category][source] .. ' done! (' .. time .. 's)'
             msg.data.time = time
             killWatcher(data)
         end

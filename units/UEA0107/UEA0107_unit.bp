@@ -1,10 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'UEB5102',
-        TargetBones = {
-            'UEA0107',
-            'Attachpoint_Lrg_01',
-        },
     },
     Air = {
         AutoLandTime = 1,
@@ -105,7 +101,7 @@ UnitBlueprint {
         'TRANSPORTFOCUS',
         'CANNOTUSEAIRSTAGING',
     },
-    CollisionOffsetY = -0.7,
+    CollisionOffsetY = -0.1,
     Defense = {
         ArmorType = 'Light',
         Health = 500,
@@ -197,8 +193,8 @@ UnitBlueprint {
         Category = 'Transport',
         Classification = 'RULEUC_MilitaryAircraft',
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = true,
+            RULEUCC_Attack = true,
+            RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
@@ -249,7 +245,7 @@ UnitBlueprint {
     SelectionSizeZ = 3,
     SelectionThickness = 0.22,
     SizeX = 1.4,
-    SizeY = 1.8,
+    SizeY = 1.4,
     SizeZ = 4.5,
     StrategicIconName = 'icon_gunship1_transport',
     StrategicIconSortPriority = 65,
@@ -258,9 +254,39 @@ UnitBlueprint {
         Class2AttachSize = 2,
         Class3AttachSize = 4,
         TransportClass = 10,
+        Class1Capacity = 6,
     },
     UseOOBTestZoom = 200,
     Weapon = {
+        {
+            Damage = 0,
+            DisplayName = 'Weapon Guidance System',
+            FireTargetLayerCapsTable = {
+                Air = 'Land|Water|Seabed',
+                Land = 'Land|Water|Seabed',
+            },
+            Label = 'GuidanceSystem',
+            MaxRadius = 22,
+            MuzzleSalvoDelay = 1,
+            MuzzleSalvoSize = 0,
+            ProjectileId = '/projectiles/AAASonicPulse02/AAASonicPulse02_proj.bp',
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Muzzle_R',
+                    },
+                    RackBone = 'Turret_Right',
+                },
+            },
+            RackRecoilDistance = 0,
+            TargetRestrictDisallow = 'UNTARGETABLE AIR',
+            TurretPitch = 0,
+            TurretPitchRange = 45,
+            TurretPitchSpeed = 360,
+            TurretYaw = 0,
+            TurretYawRange = 180,
+            TurretYawSpeed = 360,
+        },
         {
             AboveWaterTargetsOnly = true,
             Damage = 100,

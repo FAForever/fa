@@ -1,0 +1,145 @@
+EmitterBlueprint {
+	BlueprintId = 'water_idle_ripples_01',
+	Lifetime = -1.00,
+	Repeattime = 15.00,
+	TextureFramecount = 1.00,
+	Blendmode = 0.00,
+	LocalVelocity = true,
+	LocalAcceleration = true,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = true,
+	Flat = true,
+	LODCutoff = 150.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = true,
+	OnlyEmitOnWater = true,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = -99.00,
+	Texture = '/textures/particles/water_ripple_alpha_03.dds',
+	RampTexture = '/textures/particles/ramp_water_05.dds',
+	XDirectionCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=8.69,y=0.00,z=0.00 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.59,y=0.00,z=0.00 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=0.00,z=0.00 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=0.50,y=0.06,z=0.00 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=60.00,z=10.00 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=1.00,z=0.00 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=0.00,z=0.00 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=0.00,z=0.00 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=6.39,y=0.00,z=0.00 },
+		},
+	},
+	SizeCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=4.83,y=0.05,z=0.00 },
+		},
+	},
+	XPosCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=0.00,z=0.00 },
+		},
+	},
+	YPosCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.52,y=0.00,z=0.00 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=0.00,z=1.00 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=0.75,z=0.32 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.56,y=1.50,z=0.75 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=90.00,z=0.00 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=0.00,z=0.00 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=1.00,z=0.00 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=0.00,z=0.00 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 15.00,
+		Keys = {
+			{ x=7.50,y=0.00,z=0.00 },
+		},
+	},
+}
+

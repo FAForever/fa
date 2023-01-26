@@ -1,58 +1,54 @@
---- Class CRotateManipulator
--- @classmod Sim.CRotateManipulator
+---@meta
+
+---@class moho.RotateManipulator : moho.manipulator_methods
+local CRotateManipulator = {}
 
 ---
---  RotateManipulator:ClearGoal()
+function CRotateManipulator:ClearFollowBone()
+end
+
+---
 function CRotateManipulator:ClearGoal()
 end
 
 ---
---  RotateManipulator:GetCurrentAngle()
+---@return number
 function CRotateManipulator:GetCurrentAngle()
 end
 
 ---
---  RotateManipulator:SetAccel(degrees_per_second_squared)
-function CRotateManipulator:SetAccel(degrees_per_second_squared)
+---@param degreesPerSecondSquared number
+function CRotateManipulator:SetAccel(degreesPerSecondSquared)
 end
 
 ---
---  RotateManipulator:SetCurrentAngle(angle)
+---@param angle number
 function CRotateManipulator:SetCurrentAngle(angle)
 end
 
 ---
---  RotateManipulator:SetFollowBone(bone)
+---@param bone Bone
 function CRotateManipulator:SetFollowBone(bone)
 end
 
 ---
---  RotateManipulator:SetGoal(self, degrees)
-function CRotateManipulator:SetGoal(self,  degrees)
+---@param degrees number
+function CRotateManipulator:SetGoal(degrees)
 end
 
 ---
---  RotateManipulator:SetSpeed(self, degrees_per_second)
-function CRotateManipulator:SetSpeed(self,  degrees_per_second)
+---@param degreesPerSecond number
+function CRotateManipulator:SetSpeed(degreesPerSecond)
 end
 
 ---
---  RotateManipulator:SetSpinDown(self, flag)
-function CRotateManipulator:SetSpinDown(self,  flag)
+---@param spinDown boolean
+function CRotateManipulator:SetSpinDown(spinDown)
 end
 
 ---
---  RotateManipulator:SetTargetSpeed(degrees_per_second)
-function CRotateManipulator:SetTargetSpeed(degrees_per_second)
+---@param degreesPerSecond number
+function CRotateManipulator:SetTargetSpeed(degreesPerSecond)
 end
 
----
---  derived from IAniManipulator
-function CRotateManipulator:base()
-end
-
----
---
-function CRotateManipulator:moho.RotateManipulator()
-end
-
+return CRotateManipulator

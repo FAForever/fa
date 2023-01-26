@@ -1,10 +1,10 @@
 -- This is a helper file that creates the little UI label for a key binding on a construction or order button
 -- It is called from construction.lua and orders.lua respectively
 
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Prefs = import('/lua/user/prefs.lua')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Prefs = import("/lua/user/prefs.lua")
 
 function addLabel(control, parent, key)
     if not Prefs.GetFromCurrentProfile('options').show_hotkeylabels then
@@ -13,13 +13,13 @@ function addLabel(control, parent, key)
 
     control.hotbuildKeyBg = Bitmap(parent)
     control.hotbuildKeyBg.Depth:Set(99)
-    control.hotbuildKeyBg.Height:Set(20)
+    local width = 30
     if string.len(key.key) <= 2 then
-        control.hotbuildKeyBg.Width:Set(20)
-    else
-        control.hotbuildKeyBg.Width:Set(30)
+        width = 20
     end
-    LayoutHelpers.AtRightTopIn(control.hotbuildKeyBg, parent, 0, parent.Height() - 20)
+    LayoutHelpers.SetDimensions(control.hotbuildKeyBg, width, 20)
+
+    LayoutHelpers.AtRightBottomIn(control.hotbuildKeyBg, parent)
     control.hotbuildKeyBg:SetTexture('/textures/ui/bg.png')
     control.hotbuildKeyBg:DisableHitTest()
 

@@ -1,27 +1,27 @@
-local UiUtilsS = import('/lua/UiUtilsSorian.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Checkbox = import('/lua/ui/controls/checkbox.lua').Checkbox
-local Button = import('/lua/maui/button.lua').Button
-local Text = import('/lua/maui/text.lua').Text
-local Edit = import('/lua/maui/edit.lua').Edit
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Window = import('/lua/maui/window.lua').Window
-local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
-local Prefs = import('/lua/user/prefs.lua')
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local UIMain = import('/lua/ui/uimain.lua')
+local UiUtilsS = import("/lua/uiutilssorian.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Checkbox = import("/lua/ui/controls/checkbox.lua").Checkbox
+local Button = import("/lua/maui/button.lua").Button
+local Text = import("/lua/maui/text.lua").Text
+local Edit = import("/lua/maui/edit.lua").Edit
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Window = import("/lua/maui/window.lua").Window
+local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local Prefs = import("/lua/user/prefs.lua")
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local UIMain = import("/lua/ui/uimain.lua")
 --[[ LOC Strings
 <LOC chat_win_0001>To %s:
 <LOC chat_win_0002>Chat (%d - %d of %d lines)
 --]]
 
-local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
+local AddUnicodeCharToEditText = import("/lua/utf.lua").AddUnicodeCharToEditText
 
 local CHAT_INACTIVITY_TIMEOUT = 15  -- in seconds
 local savedParent = false
@@ -29,7 +29,7 @@ local chatHistory = {}
 
 local commandHistory = {}
 
-local ChatTo = import('/lua/lazyvar.lua').Create()
+local ChatTo = import("/lua/lazyvar.lua").Create()
 
 local defOptions = { all_color = 1,
         allies_color = 2,
@@ -49,11 +49,11 @@ for option, value in defOptions do
     end
 end
 
-GUI = import('/lua/ui/controls.lua').Get()
+GUI = import("/lua/ui/controls.lua").Get()
 GUI.chatLines = GUI.chatLines or {}
 
 local FactionsIcon = {}
-local Factions = import('/lua/factions.lua').Factions
+local Factions = import("/lua/factions.lua").Factions
 for k, FactionData in Factions do
     table.insert(FactionsIcon, FactionData.Icon)
 end
@@ -75,10 +75,10 @@ function SetLayout()
 end
 
 function CreateChatBackground()
-    local location = {Top = function() return GetFrame(0).Bottom() - 393 end,
-        Left = function() return GetFrame(0).Left() + 8 end,
-        Right = function() return GetFrame(0).Left() + 430 end,
-        Bottom = function() return GetFrame(0).Bottom() - 238 end}
+    local location = {Top = function() return GetFrame(0).Bottom() - LayoutHelpers.ScaleNumber(393) end,
+        Left = function() return GetFrame(0).Left() + LayoutHelpers.ScaleNumber(8) end,
+        Right = function() return GetFrame(0).Left() + LayoutHelpers.ScaleNumber(430) end,
+        Bottom = function() return GetFrame(0).Bottom() - LayoutHelpers.ScaleNumber(238) end}
     local bg = Window(GetFrame(0), '', nil, true, true, nil, nil, 'chat_window', location)
     bg.Depth:Set(200)
 
@@ -100,7 +100,7 @@ function CreateChatBackground()
 
     bg.RolloverHandler = function(control, event, xControl, yControl, cursor, controlID)
         if bg._lockSize then return end
-        local styles = import('/lua/maui/window.lua').styles
+        local styles = import("/lua/maui/window.lua").styles
         if not bg._sizeLock then
             if event.Type == 'MouseEnter' then
                 if controlMap[controlID] then
@@ -135,23 +135,19 @@ function CreateChatBackground()
         bg.DragBR:SetTexture(bg.DragBR.textures.up)
     end
 
-    bg.DragTL.Left:Set(function() return bg.Left() - 26 end)
-    bg.DragTL.Top:Set(function() return bg.Top() - 6 end)
+    LayoutHelpers.AtLeftTopIn(bg.DragTL, bg, -26, -6)
     bg.DragTL.Depth:Set(220)
     bg.DragTL:DisableHitTest()
 
-    bg.DragTR.Right:Set(function() return bg.Right() + 22 end)
-    bg.DragTR.Top:Set(function() return bg.Top() - 8 end)
+    LayoutHelpers.AtRightTopIn(bg.DragTR, bg, -22, -8)
     bg.DragTR.Depth:Set(bg.DragTL.Depth)
     bg.DragTR:DisableHitTest()
 
-    bg.DragBL.Left:Set(function() return bg.Left() - 26 end)
-    bg.DragBL.Bottom:Set(function() return bg.Bottom() + 8 end)
+    LayoutHelpers.AtLeftBottomIn(bg.DragBL, bg, -26, -8)
     bg.DragBL.Depth:Set(bg.DragTL.Depth)
     bg.DragBL:DisableHitTest()
 
-    bg.DragBR.Right:Set(function() return bg.Right() + 22 end)
-    bg.DragBR.Bottom:Set(function() return bg.Bottom() + 8 end)
+    LayoutHelpers.AtRightBottomIn(bg.DragBR, bg, -22, -8)
     bg.DragBR.Depth:Set(bg.DragTL.Depth)
     bg.DragBR:DisableHitTest()
 
@@ -245,15 +241,15 @@ function CreateChatLines()
     end
     if GUI.chatContainer then
         local curEntries = table.getsize(GUI.chatLines)
-        local neededEntries = math.floor(GUI.chatContainer.Height() / (GUI.chatLines[1].Height() + 2))
+        local neededEntries = math.floor(GUI.chatContainer.Height() / (GUI.chatLines[1].Height() + 0))
         if curEntries - neededEntries == 0 then
             return
         elseif curEntries - neededEntries < 0 then
             for i = curEntries + 1, neededEntries do
                 local index = i
                 GUI.chatLines[index] = CreateChatLine()
-                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 2)
-                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 4 end)
+                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 0)
+                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 2 end)
                 GUI.chatLines[index].Right:Set(GUI.chatContainer.Right)
             end
         elseif curEntries - neededEntries > 0 then
@@ -267,17 +263,17 @@ function CreateChatLines()
     else
         local clientArea = GUI.bg:GetClientGroup()
         GUI.chatContainer = Group(clientArea)
-        GUI.chatContainer.Left:Set(function() return clientArea.Left() + 10 end)
-        GUI.chatContainer.Top:Set(function() return clientArea.Top() + 2 end)
-        GUI.chatContainer.Right:Set(function() return clientArea.Right() - 38 end)
-        GUI.chatContainer.Bottom:Set(function() return GUI.chatEdit.Top() - 10 end)
+        LayoutHelpers.AtLeftIn(GUI.chatContainer, clientArea, 10)
+        LayoutHelpers.AtTopIn(GUI.chatContainer, clientArea, 2)
+        LayoutHelpers.AtRightIn(GUI.chatContainer, clientArea, 38)
+        LayoutHelpers.AnchorToTop(GUI.chatContainer, GUI.chatEdit, 10)
 
         SetupChatScroll()
 
         if not GUI.chatLines[1] then
             GUI.chatLines[1] = CreateChatLine()
             LayoutHelpers.AtLeftTopIn(GUI.chatLines[1], GUI.chatContainer, 0, 0)
-            GUI.chatLines[1].Height:Set(function() return GUI.chatLines[1].name.Height() + 4 end)
+            GUI.chatLines[1].Height:Set(function() return GUI.chatLines[1].name.Height() + 2 end)
             GUI.chatLines[1].Right:Set(GUI.chatContainer.Right)
         end
         local index = 1
@@ -285,8 +281,8 @@ function CreateChatLines()
             index = index + 1
             if not GUI.chatLines[index] then
                 GUI.chatLines[index] = CreateChatLine()
-                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 2)
-                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 4 end)
+                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 0)
+                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 2 end)
                 GUI.chatLines[index].Right:Set(GUI.chatContainer.Right)
             end
         end
@@ -422,15 +418,14 @@ function SetupChatScroll()
                     line.chatID = chatHistory[curEntry].armyID
                     if chatHistory[curEntry].camera and not line.camIcon then
                         line.camIcon = Bitmap(line.text, UIUtil.UIFile('/game/camera-btn/pinned_btn_up.dds'))
-                        line.camIcon.Height:Set(16)
-                        line.camIcon.Width:Set(20)
+                        LayoutHelpers.SetDimensions(line.camIcon, 20, 16)
                         LayoutHelpers.AtVerticalCenterIn(line.camIcon, line.teamColor)
-                        line.camIcon.Left:Set(function() return line.name.Right() + 4 end)
-                        line.text.Left:Set(function() return line.camIcon.Right() + 4 end)
+                        LayoutHelpers.RightOf(line.camIcon, line.name, 4)
+                        LayoutHelpers.RightOf(line.text, line.camIcon, 4)
                     elseif not chatHistory[curEntry].camera and line.camIcon then
                         line.camIcon:Destroy()
                         line.camIcon = false
-                        line.text.Left:Set(function() return line.name.Right() + 2 end)
+                        LayoutHelpers.RightOf(line.text, line.name, 2)
                     end
                 else
                     line.name:Disable()
@@ -442,7 +437,7 @@ function SetupChatScroll()
                     if line.camIcon then
                         line.camIcon:Destroy()
                         line.camIcon = false
-                        line.text.Left:Set(function() return line.name.Right() + 2 end)
+                        LayoutHelpers.RightOf(line.text, line.name, 2)
                     end
                 end
                 if chatHistory[curEntry].camera then
@@ -565,7 +560,7 @@ function FindClients(id)
     return result
 end
 
-local RunChatCommand = import('/lua/ui/notify/commands.lua').RunChatCommand
+local RunChatCommand = import("/lua/ui/notify/commands.lua").RunChatCommand
 function CreateChatEdit()
     local parent = GUI.bg:GetClientGroup()
     local group = Group(parent)
@@ -576,8 +571,8 @@ function CreateChatEdit()
     group.Top:Set(function() return group.Bottom() - group.Height() end)
 
     local toText = UIUtil.CreateText(group, '', 14, 'Arial')
-    toText.Bottom:Set(function() return group.Bottom() - 1 end)
-    toText.Left:Set(function() return group.Left() + 35 end)
+    LayoutHelpers.AtBottomIn(toText, group, 1)
+    LayoutHelpers.AtLeftIn(toText, group, 35)
 
     ChatTo.OnDirty = function(self)
         if ToStrings[self()] then
@@ -588,10 +583,10 @@ function CreateChatEdit()
     end
 
     group.edit = Edit(group)
-    group.edit.Left:Set(function() return toText.Right() + 5 end)
-    group.edit.Right:Set(function() return group.Right() - 38 end)
+    LayoutHelpers.AnchorToRight(group.edit, toText, 5)
+    LayoutHelpers.AtRightIn(group.edit, group, 38)
     group.edit.Depth:Set(function() return GUI.bg:GetClientGroup().Depth() + 200 end)
-    group.edit.Bottom:Set(function() return group.Bottom() - 1 end)
+    LayoutHelpers.AtBottomIn(group.edit, group, 1)
     group.edit.Height:Set(function() return group.edit:GetFontHeight() end)
     UIUtil.SetupEditStd(group.edit, "ff00ff00", nil, "ffffffff", UIUtil.highlightColor, UIUtil.bodyFont, 14, 200)
     group.edit:SetDropShadow(true)
@@ -684,7 +679,7 @@ function CreateChatEdit()
             ChatPageUp(mod)
             return true
         elseif charcode == UIUtil.VK_UP then
-            if table.getsize(commandHistory) > 0 then
+            if not table.empty(commandHistory) then
                 if self.recallEntry then
                     self.recallEntry = math.max(self.recallEntry-1, 1)
                 else
@@ -693,7 +688,7 @@ function CreateChatEdit()
                 RecallCommand(self.recallEntry)
             end
         elseif charcode == UIUtil.VK_DOWN then
-            if table.getsize(commandHistory) > 0 then
+            if not table.empty(commandHistory) then
                 if self.recallEntry then
                     self.recallEntry = math.min(self.recallEntry+1, table.getsize(commandHistory))
                     RecallCommand(self.recallEntry)
@@ -747,7 +742,7 @@ function CreateChatEdit()
             if gnBegin and (gnBegin == 1 and gnEnd == string.len(text)) then
                 return
             end
-            if import('/lua/ui/game/taunt.lua').CheckForAndHandleTaunt(text) then
+            if import("/lua/ui/game/taunt.lua").CheckForAndHandleTaunt(text) then
                 return
             end
 
@@ -830,8 +825,8 @@ function ReceiveChatFromSim(sender, msg)
     if not msg.Chat then
         return
     end
-    
-    if msg.to == 'notify' and not import('/lua/ui/notify/notify.lua').processIncomingMessage(sender, msg) then
+
+    if msg.to == 'notify' and not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
         return
     end
 
@@ -870,7 +865,7 @@ function ReceiveChatFromSim(sender, msg)
     end
     local tempText = WrapText({text = msg.text, name = name})
     -- if text wrap produces no lines (ie text is all white space) then add a blank line
-    if table.getn(tempText) == 0 then
+    if table.empty(tempText) then
         tempText = {""}
     end
     local entry = {
@@ -931,7 +926,7 @@ end
 
 function ActivateChat(modifiers)
     if type(ChatTo()) ~= 'number' then
-        if modifiers.Shift then
+        if (not modifiers.Shift) == (ChatOptions['send_type'] or false) then
             ChatTo:Set('allies')
         else
             ChatTo:Set('all')
@@ -1010,7 +1005,7 @@ function CreateChatList(parent)
             LayoutHelpers.AtBottomIn(container.entries[i], container)
         end
     end
-    container.Width:Set(maxWidth)
+    container.Width:Set(maxWidth + 40)
     container.Height:Set(height)
 
     container.LTBG = Bitmap(container, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ul.dds'))
@@ -1073,7 +1068,7 @@ end
 function SetupChatLayout(mapGroup)
     savedParent = mapGroup
     CreateChat()
-    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(ReceiveChat, 'Chat')
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveChat, 'Chat')
 end
 
 function CreateChat()
@@ -1175,7 +1170,7 @@ function CreateChat()
     GUI.bg.OldHandleEvent = GUI.bg.HandleEvent
     GUI.bg.HandleEvent = function(self, event)
         if event.Type == "WheelRotation" and self:IsHidden() then
-            import('/lua/ui/game/worldview.lua').ForwardMouseWheelInput(event)
+            import("/lua/ui/game/worldview.lua").ForwardMouseWheelInput(event)
             return true
         else
             return GUI.bg.OldHandleEvent(self, event)
@@ -1206,7 +1201,7 @@ function RewrapLog()
 end
 
 function WrapText(data)
-    return import('/lua/maui/text.lua').WrapText(data.text,
+    return import("/lua/maui/text.lua").WrapText(data.text,
             function(line)
                 local firstLine = GUI.chatLines[1]
                 if line == 1 then
@@ -1250,7 +1245,7 @@ function CloseChat()
 end
 
 function CreateConfigWindow()
-    import('/lua/ui/game/multifunction.lua').CloseMapDialog()
+    import("/lua/ui/game/multifunction.lua").CloseMapDialog()
     local windowTextures = {
         tl = UIUtil.SkinnableFile('/game/panel/panel_brd_ul.dds'),
         tr = UIUtil.SkinnableFile('/game/panel/panel_brd_ur.dds'),
@@ -1263,11 +1258,13 @@ function CreateConfigWindow()
         br = UIUtil.SkinnableFile('/game/panel/panel_brd_lr.dds'),
         borderColor = 'ff415055',
     }
-    GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, true, 'chat_config', nil, windowTextures)
+
+    local defPosition = Prefs.GetFromCurrentProfile('chat_config') or nil
+    GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, true, 'chat_config', defPosition, windowTextures)
     GUI.config.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     Tooltip.AddButtonTooltip(GUI.config._closeBtn, 'chat_close')
-    GUI.config.Top:Set(function() return GetFrame(0).Bottom() - 700 end)
-    GUI.config.Width:Set(300)
+    LayoutHelpers.AnchorToBottom(GUI.config, GetFrame(0), -700)
+    LayoutHelpers.SetWidth(GUI.config, 300)
     LayoutHelpers.AtHorizontalCenterIn(GUI.config, GetFrame(0))
     LayoutHelpers.ResetRight(GUI.config)
 
@@ -1310,10 +1307,11 @@ function CreateConfigWindow()
                 {type = 'color', name = '<LOC _Links>', key = 'link_color', tooltip = 'chat_color'},
                 {type = 'color', name = '<LOC notify_0033>', key = 'notify_color', tooltip = 'chat_color'},
                 {type = 'splitter'},
-                {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 2},
+                {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 1},
                 {type = 'slider', name = '<LOC chat_0010>Window Fade Time', key = 'fade_time', tooltip = 'chat_fadetime', min = 5, max = 30, inc = 1},
                 {type = 'slider', name = '<LOC chat_0011>Window Alpha', key = 'win_alpha', tooltip = 'chat_alpha', min = 20, max = 100, inc = 1},
                 {type = 'splitter'},
+                {type = 'filter', name = '<LOC chat_send_type_title>Default recipient: allies', key = 'send_type', tooltip = 'chat_send_type'},
                 {type = 'filter', name = '<LOC chat_0014>Show Feed Background', key = 'feed_background', tooltip = 'chat_feed_background'},
                 {type = 'filter', name = '<LOC chat_0015>Persist Feed Timeout', key = 'feed_persist', tooltip = 'chat_feed_persist'},
         },
@@ -1361,7 +1359,7 @@ function CreateConfigWindow()
             LayoutHelpers.AtLeftTopIn(group.color, group)
             LayoutHelpers.RightOf(group.name, group.color, 5)
             LayoutHelpers.AtVerticalCenterIn(group.name, group.color)
-            group.color.Width:Set(55)
+            LayoutHelpers.SetWidth(group.color, 55)
             group.color.key = data.key
             group.Height:Set(group.color.Height)
             group.Width:Set(group.color.Width)
@@ -1392,7 +1390,7 @@ function CreateConfigWindow()
                 defValue = defValue * 100
             end
             group.slider:SetValue(defValue)
-            group.Width:Set(200)
+            LayoutHelpers.SetWidth(group, 200)
         elseif data.type == 'splitter' then
             group.split = CreateSplitter()
             LayoutHelpers.AtTopIn(group.split, group)
@@ -1463,9 +1461,19 @@ function CreateConfigWindow()
         index = index + 1
     end
 
+    local applyBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC OPTIONS_0139>', 16)
+    LayoutHelpers.Below(applyBtn, optionGroup.options[index-1], 4)
+    LayoutHelpers.AtLeftIn(applyBtn, optionGroup)
+    applyBtn.OnClick = function(self)
+        ChatOptions = table.merged(ChatOptions, tempOptions)
+        Prefs.SetToCurrentProfile("chatoptions", ChatOptions)
+        GUI.bg:OnOptionsSet()
+    end
+
     local resetBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC _Reset>', 16)
     LayoutHelpers.Below(resetBtn, optionGroup.options[index-1], 4)
-    LayoutHelpers.AtHorizontalCenterIn(resetBtn, optionGroup)
+    LayoutHelpers.AtRightIn(resetBtn, optionGroup)
+    LayoutHelpers.ResetLeft(resetBtn)
     resetBtn.OnClick = function(self)
         for option, value in defOptions do
             for i, control in optionGroup.options do
@@ -1509,6 +1517,13 @@ function CreateConfigWindow()
 
 
     GUI.config.Bottom:Set(function() return okBtn.Bottom() + 5 end)
+    if defPosition ~= nil then
+        GUI.config.Top:Set(defPosition.top)
+        GUI.config.Left:Set(defPosition.left)
+    else
+        GUI.config.Top:Set(function() return LayoutHelpers.ScaleNumber(90) end)
+    end
+    GUI.config:SetPositionLock(false) -- allow window to be draggable, didn't worked in Window() call
 end
 
 function CloseChatConfig()

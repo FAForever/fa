@@ -27,15 +27,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 140,
     Categories = {
         'PRODUCTSC1',
@@ -56,6 +47,7 @@ UnitBlueprint {
         'OVERLAYINDIRECTFIRE',
         'SORTSTRATEGIC',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -107,7 +99,7 @@ UnitBlueprint {
         UniformScale = 0.125,
     },
     Economy = {
-        BuildCostEnergy = 915000,
+        BuildCostEnergy = 1372500,
         BuildCostMass = 73200,
         BuildTime = 120000,
         RebuildBonusIds = {
@@ -231,7 +223,7 @@ UnitBlueprint {
             DoTPulses = 2,
             DoTTime = 2,
             EnergyDrainPerSecond = 4250,
-            EnergyRequired = 8500,
+            EnergyRequired = 17000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
@@ -268,10 +260,20 @@ UnitBlueprint {
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 0.05,
             RenderFireClock = true,
-            TargetCheckInterval = 15,
             TargetPriorities = {
+                'EXPERIMENTAL MASSFABRICATION',
+                '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy
+                'TECH3 ANTIMISSILE',
+                'NUKE STRUCTURE',
+                'TECH3 STRUCTURE ARTILLERY',
+                'TECH3 ENERGYPRODUCTION',
+                'ORBITALSYSTEM',
+                'SHIELD',
+                'EXPERIMENTAL MOBILE',
+                'TECH3 STRUCTURE',
+                'TECH3 MOBILE',
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Muzzle',

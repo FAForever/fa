@@ -1,8 +1,8 @@
 UnitBlueprint {
     AI = {
 
-        # this AI block is only added to make the construction preview work for the unit's vision range.
-        GuardScanRadius = 200,
+        -- this AI block is only added to make the construction preview work for the unit's vision range.
+        ShowAssistRangeOnSelect = true,
         StagingPlatformScanRadius = 200,
     },
     Audio = {
@@ -33,7 +33,6 @@ UnitBlueprint {
         'INTELLIGENCE',
         'TECH3',
         'OPTICS',
-        'DRAGBUILD',
         'SIZE12',
         'VISIBLETORECON',
         'RECLAIMABLE',
@@ -95,7 +94,7 @@ UnitBlueprint {
         BuildTime = 1195,
         MaintenanceConsumptionPerSecondEnergy = 3000,
         RebuildBonusIds = {
-            'xrb3301',       # fix for this unit doesn't have rebuild bonus [150]
+            'xrb3301',       -- fix for this unit doesn't have rebuild bonus [150]
         },
     },
     Footprint = {

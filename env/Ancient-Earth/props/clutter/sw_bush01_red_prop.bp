@@ -1,0 +1,33 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    LODCutoff = 400,
+                    ShaderName = 'TMeshAlpha',
+					NormalsName = 'sw_bush01_normalsTS.dds',
+                },
+            },
+        },
+        UniformScale = 0.1,
+    },
+    Economy = {
+        ReclaimEnergyMax = 2.5,
+        ReclaimMassMax = 0,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Small Bush - Swamp',
+    },
+    SizeX = 0.5,
+    SizeY = 0.25,
+    SizeZ = 0.5,
+}

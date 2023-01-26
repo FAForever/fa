@@ -1,0 +1,38 @@
+ProjectileBlueprint {
+    Display = {
+        Mesh = {
+            LODs = {
+                {
+                    MeshName = '/meshes/generic/cube01_lod0.scm',
+                    ShaderName = 'AlphaFade',
+                    AlbedoName = '/meshes/generic/cube02_albedo.dds',
+                    LODCutoff = 150.0,
+                },
+            },
+        },
+        UniformScale = 1.0,
+    },
+    Physics = {
+        Acceleration = 0,
+        AccelerationRange = 0,
+        CollideEntity = false,
+        CollideSurface = false,
+        DestroyOnWater = false,
+        DirectionX = 0,
+        DirectionXRange = 0,
+        DirectionY = 0,
+        DirectionYRange = 0,
+        DirectionZ = 0,
+        DirectionZRange = 0,
+        InitialSpeed = 0,
+        InitialSpeedRange = 0,
+        Lifetime = 6,
+        MaxSpeed = 0,
+        PositionY = 0,
+        RotationalVelocity = 0,
+        RotationalVelocityRange = 0,
+        TurnRate = 0,
+        UseGravity = false,
+        VelocityAlign = false,
+    },
+}

@@ -2,19 +2,20 @@
 -- File     :  /cdimage/units/UEL0401/UEL0401_script.lua
 -- Author(s):  John Comes, David Tomandl, Gordon Duclos
 -- Summary  :  UEF Mobile Factory Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TMobileFactoryUnit = import('/lua/terranunits.lua').TMobileFactoryUnit
-local WeaponsFile = import('/lua/terranweapons.lua')
+local TMobileFactoryUnit = import("/lua/terranunits.lua").TMobileFactoryUnit
+local WeaponsFile = import("/lua/terranweapons.lua")
 local TDFGaussCannonWeapon = WeaponsFile.TDFLandGaussCannonWeapon
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 local TAALinkedRailgun = WeaponsFile.TAALinkedRailgun
 local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
+---@class UEL0401 : TMobileFactoryUnit
 UEL0401 = Class(TMobileFactoryUnit) {
     FxDamageScale = 2.5,
     PrepareToBuildAnimRate = 5,
@@ -137,7 +138,7 @@ UEL0401 = Class(TMobileFactoryUnit) {
     },
 
     CreateRollOffEffects = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local unitB = self.UnitBeingBuilt
         for k, v in self.RollOffBones do
             local fx = AttachBeamEntityToEntity(self, v, unitB, -1, army, EffectTemplate.TTransportBeam01)

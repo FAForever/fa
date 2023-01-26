@@ -2,7 +2,7 @@ Contributing
 ------------
 
 To contribute, please fork this repository and make pull requests to the
-develop branch.
+`deploy/fafdevelop` branch.
 
 Use the normal git conventions for commit messages, with the following rules:
  - Subject line shorter than 80 characters

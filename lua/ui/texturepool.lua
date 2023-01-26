@@ -5,9 +5,10 @@
 -- bitmaps required to show resources in map previews).
 -- Instead, initilise a TexturePool with the URL to the target texture, and it'll do object pooling
 -- for them in the obvious way.
-TexturePool = Class() {
+---@class TexturePool
+TexturePool = ClassSimple {
     __init = function(self, textureURL, textureParent, width, height)
-        local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+        local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
         self.textureURL = textureURL
 

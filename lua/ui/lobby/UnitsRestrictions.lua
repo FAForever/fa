@@ -112,9 +112,9 @@ Expressions = {
     T1_AIR_SPAM   = "(TECH1 * AIR - STRUCTURE - ENGINEER - SCOUT - TRANSPORTATION + (TECH1 * GROUNDATTACK))",
     T2_AIR_SPAM   = "(TECH2 * AIR - STRUCTURE - ENGINEER - SCOUT - TRANSPORTATION + (TECH2 * GROUNDATTACK))",
     T3_AIR_SPAM   = "(TECH3 * AIR - STRUCTURE - ENGINEER - SCOUT - TRANSPORTATION + (TECH3 * GROUNDATTACK))",
-    T1_BASE_SPAM  = "(TECH1 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE)",
-    T2_BASE_SPAM  = "(TECH2 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE)",
-    T3_BASE_SPAM  = "(TECH3 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE + MOBILESONAR)",
+    T1_BASE_SPAM  = "(TECH1 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE + (TECH1 * MOBILESONAR))",
+    T2_BASE_SPAM  = "(TECH2 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE + (TECH2 * MOBILESONAR))",
+    T3_BASE_SPAM  = "(TECH3 * STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE + (TECH3 * MOBILESONAR))",
 
     -- including Satellite, Soul Ripper, Czar, and Ahwassa and Ghetto-Gunship
     SNIPES_AIR    = "((AIR * (TECH2 + TECH3 + EXPERIMENTAL) * (GROUNDATTACK + BOMBER + ANTINAVY)) + uaa0310 + ual0106 + uel0106 + url0106)", -- CZAR and labs for GhetoGunship
@@ -142,7 +142,7 @@ Expressions = {
     DIRECTFIRE_BASE_T2  = "(DIRECTFIRE * STRUCTURE * TECH2)",
     DIRECTFIRE_BASE_T1  = "(DIRECTFIRE * STRUCTURE * TECH1)",
 
-    SHIELD_AIR  = "(SHIELD * AIR)", 
+    SHIELD_AIR  = "(SHIELD * AIR)",
     SHIELD_NAVY = "(SHIELD * NAVAL)",
     SHIELD_LAND = "(SHIELD * LAND - TANK - BOT + uel0301_BubbleShield + uel0401)", -- excluding personal shields
     SHIELD_BASE = "(SHIELD * STRUCTURE)",
@@ -163,6 +163,7 @@ Expressions = {
     RAS          = "(SUBCOMMANDER * ResourceAllocation)",   -- RAS SCU PRESETS (url0301_ras + uel0301_ras + ual0301_ras)"
     TMLPACK      = "(SUBCOMMANDER * (Missile + RightRocket + LeftRocket))", -- TML SCU PRESET xsl0301_missile
     TELE         = "(SUBCOMMANDER * Teleporter)",           -- TML SCU PRESET with teleporter
+    CLOAK        = "(SUBCOMMANDER * CloakingGenerator) + url0301_Cloak",
 
     INTEL_OPTICS = "(STRUCTURE * OPTICS)", -- "xab3301 + xrb3301",
     INTEL_SONAR  = "(STRUCTURE * SONAR) + MOBILESONAR",
@@ -172,7 +173,7 @@ Expressions = {
 
     STEALTH_BASE = "(STEALTHFIELD * STRUCTURE)",
     STEALTH_AIR  = "(STEALTH * AIR)",
-    STEALTH_LAND = "((STEALTH * LAND) + (STEALTHFIELD * LAND) + url0301_Stealth + url0301_Cloak)",
+    STEALTH_LAND = "((STEALTH * LAND) + (STEALTHFIELD * LAND) + url0301_Stealth)",
     STEALTH_NAVY = "(STEALTHFIELD * NAVAL)",
 }
 --- note that enhancements are defined in tables and not in strings like category expressions are.
@@ -204,6 +205,8 @@ Enhancements = {
                      "StealthGeneratorRemove",
                      "CloakingGenerator",
                      "CloakingGeneratorRemove"},
+    CLOAK =     { "CloakingGenerator",
+                    "CloakingGeneratorRemove"},
     SHIELD_LAND = { "ShieldGeneratorField",
                     "ShieldGeneratorField" },
     ANTIAIR_LAND = { "NaniteMissileSystem",
@@ -316,6 +319,7 @@ local presetsOrder = {
     "RAS",
     "TMLPACK",
     "BILLY",
+    "CLOAK",
     "", -- preset separator
     "SERAPHIM",
     "UEF",
@@ -637,6 +641,10 @@ local function CreatePresets()
         "<LOC restricted_units_info_TMLPACK>Prevents commander upgrades that enable tactical missile launchers (TML)",
         "<LOC restricted_units_data_TMLPACK>No Tactical Missile Pack",
         "/textures/ui/common/icons/presets/enh-tml-icon.dds")
+        CreatePreset("CLOAK",
+        "<LOC restricted_units_info_CLOAK>Prevents commander upgrades that enable Personal Cloak",
+        "<LOC restricted_units_data_CLOAK>No Cloak",
+        "/textures/ui/common/icons/presets/enh-cloak-icon.dds")
     -- INTEL restrictions
     CreatePreset("INTEL_BASE",
         "<LOC restricted_units_info_INTELBASIC>Prevents structures that provide basic intelligence such as radar, sonar, and omni",
@@ -658,7 +666,7 @@ local function CreatePresets()
         "<LOC restricted_units_info_INTEL_LAND>Prevents land units that provide intelligence",
         "<LOC restricted_units_data_INTEL_LAND>No Mobile Intel",
         "/textures/ui/common/icons/presets/intel-land.dds")
-        
+
     -- TACTICAL MISSILES restrictions
     CreatePreset("TMLDEF",
         "<LOC restricted_units_info_TMLDEF>Prevents all structures that provide tactical missile defense (TMD) ability",
@@ -776,12 +784,12 @@ local function CreatePresets()
         "<LOC restricted_units_data_DIRECTFIRE_BASE_T1>No T1 Point Defenses",
         "/textures/ui/common/icons/presets/direct-fire-base-t1.dds")
     CreatePreset("DIRECTFIRE_BASE_T2",
-        "<LOC restricted_units_info_DIRECTFIRE_BASE_T1>Prevents T2 structures with direct-fire weapons",
-        "<LOC restricted_units_data_DIRECTFIRE_BASE_T1>No T2 Point Defenses",
+        "<LOC restricted_units_info_DIRECTFIRE_BASE_T2>Prevents T2 structures with direct-fire weapons",
+        "<LOC restricted_units_data_DIRECTFIRE_BASE_T2>No T2 Point Defenses",
         "/textures/ui/common/icons/presets/direct-fire-base-t2.dds")
     CreatePreset("DIRECTFIRE_BASE_T3",
-        "<LOC restricted_units_info_DIRECTFIRE_BASE_T1>Prevents T3 structures with direct-fire weapons",
-        "<LOC restricted_units_data_DIRECTFIRE_BASE_T1>No T3 Point Defenses",
+        "<LOC restricted_units_info_DIRECTFIRE_BASE_T3>Prevents T3 structures with direct-fire weapons",
+        "<LOC restricted_units_data_DIRECTFIRE_BASE_T3>No T3 Point Defenses",
         "/textures/ui/common/icons/presets/direct-fire-base-t3.dds")
     -- SHIELD GENERATORS restrictions
     CreatePreset("SHIELD_AIR",
@@ -803,7 +811,7 @@ local function CreatePresets()
 end
 --- Generates restriction presets or returns cached presets
 function GetPresetsData()
-    if table.getsize(presetsRestrictions) == 0 then
+    if table.empty(presetsRestrictions) then
         CreatePresets()
     end
     return presetsRestrictions

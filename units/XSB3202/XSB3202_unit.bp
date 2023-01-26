@@ -44,7 +44,6 @@ UnitBlueprint {
         'BUILTBYTIER2COMMANDER',
         'BUILTBYTIER3COMMANDER',
         'SUBMERSIBLE',
-        'DRAGBUILD',
         'MOBILE',
         'NEEDMOBILEBUILD',
         'VISIBLETORECON',
@@ -54,6 +53,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'SORTINTEL',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'LOWSELECTPRIO',
     },
     CollisionOffsetY = -0.25,
     Defense = {
@@ -108,7 +108,7 @@ UnitBlueprint {
                 Effects = {
                     {
                         Bones = {
-                            'XSB3202',
+                            'XSB3102',
                         },
                         Scale = 0.9,
                         Type = 'BackWake',
@@ -123,7 +123,6 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 6000,
         BuildCostMass = 400,
-        BuildRate = 15,
         BuildTime = 600,
         MaintenanceConsumptionPerSecondEnergy = 200,
         RebuildBonusIds = {
@@ -160,7 +159,6 @@ UnitBlueprint {
                 helpText = 'toggle_sonar',
             },
         },
-        SelectionPriority = 5,
         TarmacDecal = 'Tarmacs/tarmac_seraphim_2x_albedo',
         TarmacGlowDecal = 'Tarmacs/tarmac_seraphim_2x_glow',
         TechLevel = 'RULEUTL_Advanced',
@@ -202,15 +200,15 @@ UnitBlueprint {
         SkirtSizeX = 1,
         SkirtSizeZ = 1,
         Elevation = -2,
-        MaxAcceleration = 1,
-        MaxBrake = 1,
-        MaxSpeed = 1,
+        MaxAcceleration = 2.5,
+        MaxBrake = 2.5,
+        MaxSpeed = 2.5,
         MaxSpeedReverse = 0,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_SurfacingSub',
         TurnRadius = 5,
         TurnRate = 20,
-        SubSpeedMultiplier = 0.5,
+        SubSpeedMultiplier = 0.6, --1.5 speed under water
     },
     SelectionSizeX = 0.6,
     SelectionSizeZ = 0.6,
@@ -229,9 +227,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = false,
-            Seabed = true, #from false
-            Sub = true, #from false,
-            Water = true, #from false,
+            Seabed = true, --from false
+            Sub = true, --from false,
+            Water = true, --from false,
         },
     },
 }

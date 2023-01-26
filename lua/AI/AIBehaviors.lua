@@ -5,17 +5,17 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Utilities = import('/lua/utilities.lua')
-local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
-local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
-local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
-local TriggerFile = import('/lua/scenariotriggers.lua')
-local UCBC = import('/lua/editor/UnitCountBuildConditions.lua')
-local SBC = import('/lua/editor/SorianBuildConditions.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Utilities = import("/lua/utilities.lua")
+local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
+local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local TriggerFile = import("/lua/scenariotriggers.lua")
+local UCBC = import("/lua/editor/unitcountbuildconditions.lua")
+local SBC = import("/lua/editor/sorianbuildconditions.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 -- CDR ADD BEHAVIORS
 function CDRRunAway(aiBrain, cdr)
@@ -85,8 +85,6 @@ function CDROverCharge(aiBrain, cdr)
         end
     end
 
-    cdr.UnitBeingBuiltBehavior = false
-
     -- Added for ACUs starting near each other
     if GetGameTimeSeconds() < 60 then
         return
@@ -128,6 +126,7 @@ function CDROverCharge(aiBrain, cdr)
     end
 
     if numUnits > 0 or (not cdr.DistressCall and distressLoc and Utilities.XZDistanceTwoVectors(distressLoc, cdrPos) < distressRange) then
+        cdr.Combat = true
         if cdr.UnitBeingBuilt then
             cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
         end
@@ -148,7 +147,7 @@ function CDROverCharge(aiBrain, cdr)
         local target
         local continueFighting = true
         local counter = 0
-        local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 75
+        local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 60
         local enemyThreat
         repeat
             overCharging = false
@@ -160,8 +159,8 @@ function CDROverCharge(aiBrain, cdr)
                     for k, v in priList do
                         target = plat:FindClosestUnit('Support', 'Enemy', true, v)
                         if target and Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) <= searchRadius then
-                            local cdrLayer = cdr:GetCurrentLayer()
-                            local targetLayer = target:GetCurrentLayer()
+                            local cdrLayer = cdr.Layer
+                            local targetLayer = target.Layer
                             if not (cdrLayer == 'Land' and (targetLayer == 'Air' or targetLayer == 'Sub' or targetLayer == 'Seabed')) and
                                not (cdrLayer == 'Seabed' and (targetLayer == 'Air' or targetLayer == 'Water')) then
                                 break
@@ -234,12 +233,6 @@ function CDROverCharge(aiBrain, cdr)
         until not continueFighting or not aiBrain:PlatoonExists(plat)
 
         IssueClearCommands({cdr})
-
-        -- Finish the unit
-        if cdr.UnitBeingBuiltBehavior and not cdr.UnitBeingBuiltBehavior:BeenDestroyed() and cdr.UnitBeingBuiltBehavior:GetFractionComplete() < 1 then
-            IssueRepair({cdr}, cdr.UnitBeingBuiltBehavior)
-        end
-        cdr.UnitBeingBuiltBehavior = false
     end
 end
 
@@ -268,8 +261,12 @@ function CDRReturnHome(aiBrain, cdr)
             WaitSeconds(7)
         until cdr.Dead or VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) <= distSqAway
 
+        cdr.Combat = false
         cdr.GoingHome = false
         IssueClearCommands({cdr})
+    end
+    if not cdr.Dead and cdr.Combat and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) < distSqAway then
+        cdr.Combat = false
     end
 end
 
@@ -308,13 +305,18 @@ function CommanderThread(cdr, platoon)
         if not cdr.Dead then CDRReturnHome(aiBrain, cdr) end
         WaitTicks(1)
 
+        if not cdr.Dead and not cdr.Combat and cdr.UnitBeingBuiltBehavior then
+            cdr:ForkThread(CDRFinishUnit)
+        end
+
         -- Call platoon resume building deal...
         if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Building")
-        and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing") and not cdr:IsUnitState("Upgrading") then
-            if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
+        and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing")
+        and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState('BlockCommandQueue') then
+            if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
-            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
+            elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
                 end
@@ -338,13 +340,18 @@ function CommanderThreadImproved(cdr, platoon)
         if not cdr.Dead then CDRReturnHome(aiBrain, cdr) end
         WaitTicks(1)
 
+        if not cdr.Dead and not cdr.Combat and cdr.UnitBeingBuiltBehavior then
+            cdr:ForkThread(CDRFinishUnit)
+        end
+
         -- Call platoon resume building deal...
         if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Moving")
         and not cdr:IsUnitState("Building") and not cdr:IsUnitState("Guarding")
         and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing")
-        and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState("Enhancing") then
+        and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState("Enhancing")
+        and not cdr:IsUnitState('BlockCommandQueue') then
             -- if we have nothing to build...
-            if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
+            if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
                 -- check if the we have still a platton assigned to the CDR
                 if cdr.PlatoonHandle then
                     local platoonUnits = cdr.PlatoonHandle:GetPlatoonUnits() or 1
@@ -359,7 +366,7 @@ function CommanderThreadImproved(cdr, platoon)
                 -- assing the CDR to the armypool
                 aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
             -- if we have a BuildQueue then continue building
-            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
+            elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
                 end
@@ -397,7 +404,7 @@ function AirUnitRefitThread(unit, plan, data)
             if aiBrain:GetCurrentUnits(categories.AIRSTAGINGPLATFORM) > 0 then
                 local unitPos = unit:GetPosition()
                 local plats = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIRSTAGINGPLATFORM, unitPos, 400)
-                if table.getn(plats) > 0 then
+                if not table.empty(plats) then
                     local closest, distance
                     for _, v in plats do
                         if not v.Dead then
@@ -514,7 +521,7 @@ function AirLandToggleThread(unit)
         WaitSeconds(2)
     end
 
-    local unitCat = ParseEntityCategory(unit:GetUnitId())
+    local unitCat = ParseEntityCategory(unit.UnitId)
     local aiBrain = unit:GetAIBrain()
     while not unit.Dead do
         local position = unit:GetPosition()
@@ -590,7 +597,7 @@ CommanderOverrideCheck = function(self)
     local weaponRange = mainWeapon:GetBlueprint().MaxRadius + 50 -- Look outside range.
 
     local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
-    if table.getn(commanders) == 0 or commanders[1].Dead then
+    if table.empty(commanders) or commanders[1].Dead then
         return false
     end
 
@@ -834,6 +841,9 @@ end
 -- The shield, else false
 -------------------------------------------------------
 function GetClosestShieldProtectingTarget(attackingUnit, targetUnit)
+    if attackingUnit.Dead or targetUnit.Dead then
+        return false
+    end
     local aiBrain = attackingUnit:GetAIBrain()
     local tPos = targetUnit:GetPosition()
     local aPos = attackingUnit:GetPosition()
@@ -927,7 +937,7 @@ function FatBoyBehavior(self)
                     platoonUnits = platoon:GetPlatoonUnits()
                 end
 
-                if platoonUnits and table.getn(platoonUnits) > 0 then
+                if platoonUnits and not table.empty(platoonUnits) then
                     table.insert(goodList, platoon)
                 end
             end
@@ -1015,7 +1025,7 @@ function FatboyChildBehavior(self, parent, base)
     local targetUnit = false
 
     -- Find target loop
-    while aiBrain:PlatoonExists(self) and table.getn(self:GetPlatoonUnits()) > 0 do
+    while aiBrain:PlatoonExists(self) and not table.empty(self:GetPlatoonUnits()) do
         targetUnit, base = WreckBase(self, base)
 
         local units = self:GetPlatoonUnits()
@@ -1032,7 +1042,7 @@ function FatboyChildBehavior(self, parent, base)
         end
 
         -- Walk to and kill target loop
-        while aiBrain:PlatoonExists(self) and table.getn(self:GetPlatoonUnits()) > 0 and not targetUnit.Dead do
+        while aiBrain:PlatoonExists(self) and not table.empty(self:GetPlatoonUnits()) and not targetUnit.Dead do
             WaitSeconds(3)
         end
 
@@ -1343,7 +1353,7 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
     local maxBaseThreat = 0
     for _, base in enemyBases do
         local threatTable = aiBrain:GetThreatsAroundPosition(base.Position, 1, true, 'Economy')
-        if table.getn(threatTable) ~= 0 then
+        if not table.empty(threatTable) then
             if threatTable[1][3] > maxBaseThreat then
                 maxBaseThreat = threatTable[1][3]
                 bestBaseThreat = threatTable
@@ -1465,7 +1475,7 @@ function AirLandToggleThreadSorian(unit)
     local weapons = bp.Weapon
     local antiAirRange
     local landRange
-    local unitCat = ParseEntityCategory(unit:GetUnitId())
+    local unitCat = ParseEntityCategory(unit.UnitId)
     for _, v in weapons do
         if v.ToggleWeapon then
             local weaponType = 'Land'
@@ -1775,7 +1785,7 @@ function CDROverChargeSorian(aiBrain, cdr)
         local target
         local continueFighting = true
         local counter = 0
-        local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 75
+        local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 60
         local enemyThreat
         repeat
             overCharging = false
@@ -1785,8 +1795,8 @@ function CDROverChargeSorian(aiBrain, cdr)
                 for _, v in priList do
                     target = plat:FindClosestUnit('Support', 'Enemy', true, v)
                     if target and Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) < maxRadius then
-                        local cdrLayer = cdr:GetCurrentLayer()
-                        local targetLayer = target:GetCurrentLayer()
+                        local cdrLayer = cdr.Layer
+                        local targetLayer = target.Layer
                         if not (cdrLayer == 'Land' and (targetLayer == 'Air' or targetLayer == 'Sub' or targetLayer == 'Seabed')) and
                            not (cdrLayer == 'Seabed' and (targetLayer == 'Air' or targetLayer == 'Water')) then
                             break
@@ -1899,7 +1909,7 @@ function CDRReturnHomeSorian(aiBrain, cdr, Mult)
 end
 
 function CDRFinishUnit(cdr)
-    if cdr.UnitBeingBuiltBehavior and not cdr.UnitBeingBuiltBehavior:BeenDestroyed() then
+    if cdr.UnitBeingBuiltBehavior and (not cdr.UnitBeingBuiltBehavior:BeenDestroyed()) then
         IssueClearCommands({cdr})
         IssueRepair({cdr}, cdr.UnitBeingBuiltBehavior)
         repeat
@@ -1910,7 +1920,13 @@ function CDRFinishUnit(cdr)
         until cdr:IsIdleState()
 
         IssueClearCommands({cdr})
-        cdr.UnitBeingBuiltBehavior = false
+        if cdr.UnitBeingBuiltBehavior and (not cdr.UnitBeingBuiltBehavior:BeenDestroyed()) then
+            if cdr.UnitBeingBuiltBehavior:GetFractionComplete() == 1 then
+                cdr.UnitBeingBuiltBehavior = false
+            end
+        else
+            cdr.UnitBeingBuiltBehavior = false
+        end
     end
 end
 
@@ -2025,11 +2041,12 @@ function CommanderThreadSorian(cdr, platoon)
         -- Call platoon resume building deal...
         if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr.Fighting and not cdr.Upgrading and not cdr:IsUnitState("Building")
         and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing") and not cdr.UnitBeingBuiltBehavior and not cdr:IsUnitState("Upgrading")
-        and not cdr:IsUnitState("Enhancing") and not (SUtils.XZDistanceTwoVectorsSq(cdr.CDRHome, cdr:GetPosition()) > 100) then
-            if not cdr.EngineerBuildQueue or table.getn(cdr.EngineerBuildQueue) == 0 then
+        and not cdr:IsUnitState("Enhancing") and not (SUtils.XZDistanceTwoVectorsSq(cdr.CDRHome, cdr:GetPosition()) > 100)
+        and not cdr:IsUnitState('BlockCommandQueue') then
+            if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
                 local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                 aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
-            elseif cdr.EngineerBuildQueue and table.getn(cdr.EngineerBuildQueue) ~= 0 then
+            elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuildingSorian)
                 end
@@ -2068,7 +2085,7 @@ function AirUnitRefitThreadSorian(unit, plan, data)
             if aiBrain:GetCurrentUnits(categories.AIRSTAGINGPLATFORM - categories.CARRIER - categories.EXPERIMENTAL) > 0 then
                 local unitPos = unit:GetPosition()
                 local plats = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIRSTAGINGPLATFORM - categories.CARRIER - categories.EXPERIMENTAL, unitPos, 400)
-                if table.getn(plats) > 0 then
+                if not table.empty(plats) then
                     local closest, distance
                     for k, v in plats do
                         if not v.Dead then
@@ -2123,7 +2140,7 @@ function AirStagingThreadSorian(unit)
         end
 
         local cargo = unit:GetCargo()
-        if ready and numUnits == 0 and table.getn(cargo) > 0 then
+        if ready and numUnits == 0 and not table.empty(cargo) then
             local pos = unit:GetPosition()
             IssueClearCommands({unit})
             IssueTransportUnload({unit}, {pos[1] + 5, pos[2], pos[3] + 5})
@@ -2284,7 +2301,7 @@ CommanderOverrideCheckSorian = function(self)
     local aiBrain = self:GetBrain()
     local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
 
-    if table.getn(commanders) == 0 or commanders[1].Dead or commanders[1]:GetCurrentLayer() == 'Seabed' then
+    if table.empty(commanders) or commanders[1].Dead or commanders[1].Layer == 'Seabed' then
         return false
     end
 
@@ -2340,7 +2357,7 @@ GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
     local maxBaseThreat = 0
     for _, base in enemyBases do
         local threatTable = aiBrain:GetThreatsAroundPosition(base.Position, 1, true, 'Economy')
-        if table.getn(threatTable) ~= 0 then
+        if not table.empty(threatTable) then
             if threatTable[1][3] > maxBaseThreat then
                 maxBaseThreat = threatTable[1][3]
                 bestBaseThreat = threatTable

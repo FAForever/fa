@@ -1,5 +1,10 @@
   UnitBlueprint {
-      Audio = {
+    AI = {
+        TargetBones = {
+            'Orb',
+        },
+    },
+    Audio = {
       Destroyed = Sound {
           Bank = 'UALDestroy',
           Cue = 'UAB_Destroy_Huge',
@@ -25,7 +30,7 @@
           Cue = 'Aeon_Select_Structure',
           LodCutoff = 'UnitMove_LodCutoff',
       },
-      },
+    },
       BuildIconSortPriority = 160,
       Categories = {
       'PRODUCTSC1',
@@ -78,8 +83,8 @@
       AnimationDeath = {
           {
           Animation = '/units/uab4202/uab4202_ADeath.sca',
-          AnimationRateMax = 0.5,
-          AnimationRateMin = 0.5,
+          AnimationRateMax = 1.2,
+          AnimationRateMin = 1.2,
           Weight = 1,
           },
       },
@@ -206,7 +211,7 @@
     SelectionSizeZ = 1.5,
     SelectionThickness = 0.45,
     SizeX = 1.75,
-    SizeY = 2.5,
+    SizeY = 2.75,
     SizeZ = 1.75,
     StrategicIconName = 'icon_structure2_shield',
     StrategicIconSortPriority = 200,

@@ -1,12 +1,13 @@
-#****************************************************************************
-#**
-#**  File     :  /units/XSB0202/XSB0202_script.lua
-#**
-#**  Summary  :  Seraphim T2 Air Factory Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-local SAirFactoryUnit = import('/lua/seraphimunits.lua').SAirFactoryUnit
+--****************************************************************************
+--**
+--**  File     :  /units/XSB0202/XSB0202_script.lua
+--**
+--**  Summary  :  Seraphim T2 Air Factory Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
+local SAirFactoryUnit = import("/lua/seraphimunits.lua").SAirFactoryUnit
+---@class XSB0202 : SAirFactoryUnit
 XSB0202 = Class(SAirFactoryUnit) {
 
     RollOffBones = { 'Pod01', 'Pod02', },

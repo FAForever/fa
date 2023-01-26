@@ -5,12 +5,13 @@
 --**
 --**  Summary  :  Aeon Mobile Shield Generator Script
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AShieldHoverLandUnit = import('/lua/aeonunits.lua').AShieldHoverLandUnit
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local AShieldHoverLandUnit = import("/lua/aeonunits.lua").AShieldHoverLandUnit
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
+---@class UAL0307 : AShieldHoverLandUnit
 UAL0307 = Class(AShieldHoverLandUnit) {
     
     Weapons = {        
@@ -46,7 +47,7 @@ UAL0307 = Class(AShieldHoverLandUnit) {
             self.ShieldEffectsBag = {}
         end
         for k, v in self.ShieldEffects do
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 0, self:GetArmy(), v ) )
+            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 0, self.Army, v ) )
         end
     end,
 
@@ -73,9 +74,15 @@ UAL0307 = Class(AShieldHoverLandUnit) {
     --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
         while self.PointerEnabled == false do
             WaitSeconds(1)
+
+            -- break if we're a gooner
+            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then 
+                break 
+            end
+
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self:GetCurrentLayer()]) --this resets the stop feature - note that its reset on layer change!
+                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!
             end
         end
     end,
@@ -83,8 +90,11 @@ UAL0307 = Class(AShieldHoverLandUnit) {
     OnLayerChange = function(self, new, old)
         AShieldHoverLandUnit.OnLayerChange(self, new, old)
         
-        if self.PointerEnabled == false then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+        if not IsDestroyed(self.TargetPointer) then
+            if self.PointerEnabled == false then
+                -- since its reset on layer change we need to do this, unfortunate
+                self.TargetPointer:SetFireTargetLayerCaps('None') 
+            end
         end
     end,
 }

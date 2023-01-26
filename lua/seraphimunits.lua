@@ -5,7 +5,8 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local DefaultUnitsFile = import('defaultunits.lua')
+local DefaultUnitsFile = import("/lua/defaultunits.lua")
+local FactoryUnit = DefaultUnitsFile.FactoryUnit
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
 local AirUnit = DefaultUnitsFile.AirUnit
@@ -27,18 +28,54 @@ local StructureUnit = DefaultUnitsFile.StructureUnit
 local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
+local CreateSeraphimFactoryBuildingEffects = EffectUtil.CreateSeraphimFactoryBuildingEffects
+
+-- FACTORIES
+---@class SFactoryUnit : FactoryUnit
+SFactoryUnit = Class(FactoryUnit) {
+    StartBuildFx = function(self, unitBeingBuilt)
+        local BuildBones = self.BuildEffectBones
+        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
+        self.BuildEffectsBag:Add(thread)
+    end,
+
+    StartBuildFxUnpause = function(self, unitBeingBuilt)
+        local BuildBones = self.BuildEffectBones
+        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
+        self.BuildEffectsBag:Add(thread)
+    end,
+
+    OnPaused = function(self)
+        -- When factory is paused take some action
+        if self:IsUnitState('Building') and self.UnitBeingBuilt then
+            self:StopUnitAmbientSound('ConstructLoop')
+            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+        end
+        StructureUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        FactoryUnit.OnUnpaused(self)
+        if self:IsUnitState('Building') and self.UnitBeingBuilt then
+            self:StartBuildFxUnpause(self:GetFocusUnit())
+        end
+    end,
+}
 
 -- AIR STRUCTURES
+---@class SAirFactoryUnit : AirFactoryUnit
 SAirFactoryUnit = Class(AirFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
-        local thread = self:ForkThread(EffectUtil.CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
+    end,
+
+    StartBuildFxUnpause = function(self, unitBeingBuilt)
+        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
     end,
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
@@ -59,27 +96,15 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     CreateRollOffEffects = function(self)
-        local army = self:GetArmy()
-        local unitB = self.UnitBeingBuilt
-        if not self.ReleaseEffectsBag then self.ReleaseEffectsBag = {} end
-        for _, v in self.RollOffBones do
-            local fx = AttachBeamEntityToEntity(self, v, unitB, -1, army, EffectTemplate.TTransportBeam01)
-            table.insert(self.ReleaseEffectsBag, fx)
-            self.Trash:Add(fx)
-            fx = AttachBeamEntityToEntity(unitB, -1, self, v, army, EffectTemplate.TTransportBeam02)
-            table.insert(self.ReleaseEffectsBag, fx)
-            self.Trash:Add(fx)
-            fx = CreateEmitterAtBone(self, v, army, EffectTemplate.TTransportGlow01)
-            table.insert(self.ReleaseEffectsBag, fx)
-            self.Trash:Add(fx)
-        end
     end,
 
     DestroyRollOffEffects = function(self)
-        for _, v in self.ReleaseEffectsBag do
-            v:Destroy()
+        if self.ReleaseEffectsBag then 
+            for _, v in self.ReleaseEffectsBag do
+                v:Destroy()
+            end
+            self.ReleaseEffectsBag = {}
         end
-        self.ReleaseEffectsBag = {}
     end,
 
     RollOffUnit = function(self)
@@ -98,32 +123,32 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
         if not EntityCategoryContains(categories.LAND, unitBuilding) then
             AirFactoryUnit.RolloffBody(self)
         else
-            -- Engineers need to be slid off the factory
-            local bp = self:GetBlueprint()
-            if not self.AttachmentSliderManip then
-                self.AttachmentSliderManip = CreateSlider(self, bp.Display.BuildAttachBone or 0)
-            end
 
-            self:CreateRollOffEffects()
-            self.AttachmentSliderManip:SetSpeed(50)  -- Was 30, increased to help engineers move faster off of it
-            self.AttachmentSliderManip:SetGoal(0, 0, 60)
-            WaitFor(self.AttachmentSliderManip)
-
-            self.AttachmentSliderManip:SetGoal(0, -55, 60)
-            WaitFor(self.AttachmentSliderManip)
-
-            if not unitBuilding.Dead then
+            if not IsDestroyed(unitBuilding) then
                 unitBuilding:DetachFrom(true)
-                self:DetachAll(bp.Display.BuildAttachBone or 0)
+                self:DetachAll(self.Blueprint.Display.BuildAttachBone or 0)
+
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                unitBuilding:HideBone(0, true)
             end
 
-            if self.AttachmentSliderManip then
-                self.AttachmentSliderManip:Destroy()
-                self.AttachmentSliderManip = nil
+            WaitTicks(4)
+
+            if not IsDestroyed(unitBuilding) then
+                CreateLightParticle(unitBuilding, -1, unitBuilding.Army, 4, 12, 'glow_02', 'ramp_blue_22')
+                unitBuilding:ShowBone(0, true)
+
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_04_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_05_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_06_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_08_emit.bp'):OffsetEmitter(0, -1, 0)
             end
-            self:DestroyRollOffEffects()
+
+            WaitTicks(8)
+
             self:SetBusy(false)
-
             ChangeState(self, self.IdleState)
         end
     end,
@@ -131,7 +156,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
-        if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
+        if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
             if self.Rotator1 then
@@ -187,22 +212,34 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
            end
         end,
     },
+
+    OnPaused = function(self)
+        SFactoryUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        SFactoryUnit.OnUnpaused(self)
+    end,
 }
 
 -- AIR UNITS
+---@class SAirUnit : AirUnit
 SAirUnit = Class(AirUnit) {
     ContrailEffects = {'/effects/emitters/contrail_ser_polytrail_01_emit.bp'}
 }
 
 --  AIR STAGING STRUCTURES
+---@class SAirStagingPlatformUnit : AirStagingPlatformUnit
 SAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
 -- WALL  STRUCTURES
+---@class SConcreteStructureUnit : ConcreteStructureUnit
 SConcreteStructureUnit = Class(ConcreteStructureUnit) {
     AdjacencyBeam = false,
 }
 
 -- Construction Units
+---@class SConstructionUnit : ConstructionUnit
 SConstructionUnit = Class(ConstructionUnit) {
     OnCreate = function(self)
         ConstructionUnit.OnCreate(self)
@@ -214,7 +251,7 @@ SConstructionUnit = Class(ConstructionUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     SetupBuildBones = function(self)
@@ -265,6 +302,7 @@ SConstructionUnit = Class(ConstructionUnit) {
 }
 
 -- ENERGY CREATION UNITS
+---@class SEnergyCreationUnit : EnergyCreationUnit
 SEnergyCreationUnit = Class(EnergyCreationUnit) {
     OnCreate = function(self)
         EnergyCreationUnit.OnCreate(self)
@@ -273,19 +311,20 @@ SEnergyCreationUnit = Class(EnergyCreationUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
-        local army =  self:GetArmy()
         if self.AmbientEffects then
             for k, v in EffectTemplate[self.AmbientEffects] do
-                CreateAttachedEmitter(self, 0, army, v)
+                CreateAttachedEmitter(self, 0, self.Army, v)
             end
         end
     end,
 }
 
 -- ENERGY STORAGE STRUCTURES
+---@class SEnergyStorageUnit : EnergyStorageUnit
 SEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
 -- HOVERING LAND UNITS
+---@class SHoverLandUnit : HoverLandUnit
 SHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
     FxHoverScale = 1,
     HoverEffects = nil,
@@ -293,17 +332,20 @@ SHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 }
 
 -- LAND FACTORY STRUCTURES
+---@class SLandFactoryUnit : LandFactoryUnit
 SLandFactoryUnit = Class(LandFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
-        local thread = self:ForkThread(EffectUtil.CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
+    end,
+
+    StartBuildFxUnpause = function(self, unitBeingBuilt)
+        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
-        if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
+        if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
             if self.Rotator1 then
@@ -359,38 +401,55 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
            end
         end,
     },
+
+    OnPaused = function(self)
+        SFactoryUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        SFactoryUnit.OnUnpaused(self)
+    end,
 }
 
 -- LAND UNITS
+---@class SLandUnit : LandUnit
 SLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
+---@class SMassCollectionUnit : MassCollectionUnit
 SMassCollectionUnit = Class(MassCollectionUnit) {}
 
 -- MASS FABRICATION STRUCTURES
+---@class SMassFabricationUnit : MassFabricationUnit
 SMassFabricationUnit = Class(MassFabricationUnit) {}
 
 -- MASS STORAGE UNITS
+---@class SMassStorageUnit : MassStorageUnit
 SMassStorageUnit = Class(MassStorageUnit) {}
 
 -- RADAR STRUCTURES
+---@class SRadarUnit : RadarUnit
 SRadarUnit = Class(RadarUnit) {}
 
 -- RADAR STRUCTURES
+---@class SSonarUnit : SonarUnit
 SSonarUnit = Class(SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
+---@class SSeaFactoryUnit : SeaFactoryUnit
 SSeaFactoryUnit = Class(SeaFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
-        local BuildBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
-        local thread = self:ForkThread(EffectUtil.CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
+    end,
+
+    StartBuildFxUnpause = function(self, unitBeingBuilt)
+        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
-        if unitBeingBuilt:GetUnitId() == unitid and order == 'Upgrade' then
+        if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
             if self.Rotator1 then
@@ -446,18 +505,30 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
            end
         end,
     },
+
+    OnPaused = function(self)
+        SFactoryUnit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        SFactoryUnit.OnUnpaused(self)
+    end,
 }
 
 -- SEA UNITS
+---@class SSeaUnit : SeaUnit
 SSeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
 
 -- SHIELD LAND UNITS
+---@class SShieldHoverLandUnit : ShieldHoverLandUnit
 SShieldHoverLandUnit = Class(ShieldHoverLandUnit) {}
 
 -- SHIELD LAND UNITS
+---@class SShieldLandUnit : ShieldLandUnit
 SShieldLandUnit = Class(ShieldLandUnit) {}
 
 -- SHIELD STRUCTURES
+---@class SShieldStructureUnit : ShieldStructureUnit
 SShieldStructureUnit = Class(ShieldStructureUnit) {
     OnShieldEnabled = function(self)
         ShieldStructureUnit.OnShieldEnabled(self)
@@ -479,40 +550,50 @@ SShieldStructureUnit = Class(ShieldStructureUnit) {
 }
 
 -- STRUCTURES
+---@class SStructureUnit : StructureUnit
 SStructureUnit = Class(StructureUnit) {}
 
 -- SUBMARINE UNITS
+---@class SSubUnit : SubUnit
 SSubUnit = Class(DefaultUnitsFile.SubUnit) {
     IdleSubBones = {},
     IdleSubEffects = {}
 }
 
 -- TRANSPORT BEACON UNITS
+---@class STransportBeaconUnit : TransportBeaconUnit
 STransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 
 -- WALKING LAND UNITS
+---@class SWalkingLandUnit : WalkingLandUnit
 SWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 -- WALL  STRUCTURES
+---@class SWallStrutureUnit : WallStructureUnit
 SWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES
+---@class SCivilianStructureUnit : SStructureUnit
 SCivilianStructureUnit = Class(SStructureUnit) {}
 
 -- QUANTUM GATE UNITS
+---@class SQuantumGateUnit : QuantumGateUnit
 SQuantumGateUnit = Class(QuantumGateUnit) {}
 
 -- RADAR JAMMER UNITS
+---@class SRadarJammerUnit : RadarJammerUnit
 SRadarJammerUnit = Class(RadarJammerUnit) {}
 
 -- Seraphim energy ball units
+---@class SEnergyBallUnit : SHoverLandUnit
 SEnergyBallUnit = Class(SHoverLandUnit) {
     timeAlive = 0,
 
     OnCreate = function(self)
         SHoverLandUnit.OnCreate(self)
-        self:SetCanTakeDamage(false)
-        self:SetCanBeKilled(false)
+        self:SetUnSelectable(true)
+        self.CanTakeDamage = false
+        self.CanBeKilled = false
         self:PlayUnitSound('Spawn')
         ChangeState(self, self.KillingState)
     end,
@@ -587,8 +668,8 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
 
     DeathState = State {
         Main = function(self)
-            self:SetCanBeKilled(true)
-            if self:GetCurrentLayer() == 'Water' then
+            self.CanBeKilled = true
+            if self.Layer == 'Water' then
                 self:PlayUnitSound('HoverKilledOnWater')
             end
             self:PlayUnitSound('Destroyed')

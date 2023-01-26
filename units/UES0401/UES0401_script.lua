@@ -5,12 +5,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
-local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
-local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
+local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
+local TSAMLauncher = import("/lua/terranweapons.lua").TSAMLauncher
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 
+---@class UES0401 : AircraftCarrier
 UES0401 = Class(AircraftCarrier) {
     BuildAttachBone = 'UES0401',
 
@@ -41,14 +42,14 @@ UES0401 = Class(AircraftCarrier) {
             self.Trash:Add(v)
         end
 
-        if self:GetCurrentLayer() == 'Water' then
+        if self.Layer == 'Water' then
             self:PlayAllOpenAnims(true)
         end
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom ~= builder:GetUnitId() then
+        if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
             self:HideBone(0, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end

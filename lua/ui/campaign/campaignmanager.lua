@@ -3,12 +3,11 @@
 --* Author: Chris Blackwell
 --* Summary: manages campiagn logic
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
 campaignSequence = {
     uef = {
@@ -75,8 +74,8 @@ function ResetCampaign(campaignID)
     SetCampaignTable(cmpt)
 end
 
-# Returns the last completed operation ID in a campaign
-# If diff. is not supplied, returns the highest completed op in the sequence of all difficulties
+-- Returns the last completed operation ID in a campaign
+-- If diff. is not supplied, returns the highest completed op in the sequence of all difficulties
 function GetLastCompletedOperation(campaign, difficulty)
     if campaignSequence[campaign] then
         local campTable = GetCampaignTable()
@@ -102,7 +101,7 @@ function GetLastCompletedOperation(campaign, difficulty)
     return false
 end
 
-# Returns the next opID in the sequence of the campaign specified
+-- Returns the next opID in the sequence of the campaign specified
 function GetNextOperation(campaign, opKey, diff)
     if campaignSequence[campaign] then
         local found = false
@@ -118,7 +117,7 @@ function GetNextOperation(campaign, opKey, diff)
     return false
 end
 
-# supplied a campaign ID and operation ID, returns whether the user can select the operation or not
+-- supplied a campaign ID and operation ID, returns whether the user can select the operation or not
 function IsOperationSelectable(campaign, operation)
     if campaignSequence[campaign] then
         local campTable = GetCampaignTable()
@@ -138,7 +137,7 @@ function IsOperationSelectable(campaign, operation)
     return false
 end
 
-# supplied a campaign ID and operation ID, returns whether the user has finished the operation or not
+-- supplied a campaign ID and operation ID, returns whether the user has finished the operation or not
 function IsOperationFinished(campaign, operation, difficulty)
     local campTable = GetCampaignTable()
     if campaignSequence[campaign] and campTable[campaign][operation] then
@@ -174,7 +173,7 @@ function OperationVictory(ovTable, skipDialog)
     end
 
     if not skipDialog then
-        import('/lua/ui/game/worldview.lua').UnlockInput()
+        import("/lua/ui/game/worldview.lua").UnlockInput()
 
         if ovTable.success then
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Victory'}))
@@ -186,7 +185,7 @@ function OperationVictory(ovTable, skipDialog)
             resultText,
             "<LOC _Ok>",
             function()
-                import('/lua/ui/dialogs/score.lua').CreateDialog(ovTable.success, true, ovTable)
+                import("/lua/ui/dialogs/score.lua").CreateDialog(ovTable.success, true, ovTable)
             end,
             true)
     end
@@ -196,7 +195,7 @@ function LaunchBriefing(nextOpData)
     local opID = nextOpData.opID
     if DiskGetFileInfo('/maps/'..opID..'/'..opID..'_operation.lua') then
         local opData = import('/maps/'..opID..'/'..opID..'_operation.lua')
-        import('/lua/ui/campaign/operationbriefing.lua').CreateUI(opID, opData.operationData, nextOpData.campaignID, nextOpData.difficulty)
+        import("/lua/ui/campaign/operationbriefing.lua").CreateUI(opID, opData.operationData, nextOpData.campaignID, nextOpData.difficulty)
         return true
     end
     return false
@@ -233,3 +232,5 @@ function InstaWin()
     end
 end
 
+-- kept for mod backwards compatibility
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap

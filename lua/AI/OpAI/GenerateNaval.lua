@@ -7,7 +7,7 @@
 --*  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --******************************************************************************************************************
 
-local ScenarioFramework = import('/lua/scenarioframework.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 --To make life easier with factions not having identical naval units and such.
 local TIERS =
@@ -315,13 +315,13 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
 end
 
 
---##############################################################################################################
---# function: FleetIsBuilt = BuildCondition   doc = "Please work function docs."
---#
---# parameter 0: string   aiBrain     = "default_brain"
---# parameter 1: string   master     = "default_master"
---#
---##############################################################################################################
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---- function: FleetIsBuilt = BuildCondition   doc = "Please work function docs."
+----
+---- parameter 0: string   aiBrain     = "default_brain"
+---- parameter 1: string   master     = "default_master"
+----
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function FleetIsBuilt(aiBrain, master)
     local fleetCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_FleetChildren')
 
@@ -332,13 +332,13 @@ function FleetIsBuilt(aiBrain, master)
     end
 end
 
---##############################################################################################################
---# function: ChildShouldBuild = BuildCondition   doc = "Please work function docs."
---#
---# parameter 0: string   aiBrain     = "default_brain"
---# parameter 1: string   master     = "default_master"
---#
---##############################################################################################################
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---- function: ChildShouldBuild = BuildCondition   doc = "Please work function docs."
+----
+---- parameter 0: string   aiBrain     = "default_brain"
+---- parameter 1: string   master     = "default_master"
+----
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function ChildShouldBuild(aiBrain, master)
     local fleetCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_FleetChildren')
 

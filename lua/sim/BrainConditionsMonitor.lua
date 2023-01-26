@@ -1,15 +1,18 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/sim/BrainConditionsMonitor.lua
-#**
-#**  Summary  : Monitors conditions for a brain and stores them in a keyed
-#**             table
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/sim/BrainConditionsMonitor.lua
+--**
+--**  Summary  : Monitors conditions for a brain and stores them in a keyed
+--**             table
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-BrainConditionsMonitor = Class {
+---@class BrainConditionsMonitor
+BrainConditionsMonitor = ClassSimple {
 
+    ---@param self BrainConditionsMonitor
+    ---@return boolean
     PreCreate = function(self)
         if self.PreCreateFinished then
             return true
@@ -32,7 +35,9 @@ BrainConditionsMonitor = Class {
         self.PreCreateFinished = true
     end,
 
-    # Create the thing
+    -- Create the thing
+    ---@param self BrainConditionsMonitor
+    ---@param brain AIBrain
     Create = function(self, brain)
         if not self.PreCreateFinished then
             self:PreCreate()
@@ -40,13 +45,18 @@ BrainConditionsMonitor = Class {
         self.Brain = brain
     end,
 
+    ---@param self BrainConditionsMonitor
     Destroy = function(self)
         KillThread(self.ConditionMonitor)
         self.Active = false
         self.Trash:Destroy()
     end,
 
-    # Gets result for the keyed condition
+    -- Gets result for the keyed condition
+    ---@param self BrainConditionsMonitor
+    ---@param conditionKey any
+    ---@param reportFailure any
+    ---@return boolean
     CheckKeyedCondition = function(self, conditionKey, reportFailure)
         if self.ResultTable[conditionKey] != nil then
             return self.ResultTable[conditionKey]:GetStatus(reportFailure)
@@ -55,7 +65,12 @@ BrainConditionsMonitor = Class {
         return false
     end,
 
-    # Checks the condition and returns the result
+    -- Checks the condition and returns the result
+    ---@param self BrainConditionsMonitor
+    ---@param cFilename FileName
+    ---@param cFunctionName FunctionName
+    ---@param cData any[]
+    ---@return boolean
     CheckConditionTable = function(self, cFilename, cFunctionName, cData)
         if not cData or not type(cData) == 'table' then
             WARN('*WARNING: Invalid argumetns for build condition: ' .. cFilename .. '[' .. cFunctionName .. ']')
@@ -64,12 +79,21 @@ BrainConditionsMonitor = Class {
         return import(cFilename)[cFunctionName](self.Brain, unpack(cData))
     end,
 
-    # Runs the function and retuns the result
+    -- Runs the function and retuns the result
+    ---@param self BrainConditionsMonitor
+    ---@param func function
+    ---@param params any[]
+    ---@return any
     CheckConditionFunction = function(self, func, params)
         return func(unpack(params))
     end,
 
-    # Find the key for a condition or adds it to the table and checks the condition
+    -- Find the key for a condition or adds it to the table and checks the condition
+    ---@param self BrainConditionsMonitor
+    ---@param cFilename FileName
+    ---@param cFunctionName FunctionName
+    ---@param cData any[]
+    ---@return string
     GetConditionKey = function(self, cFilename, cFunctionName, cData)
         if not cFunctionName then
             error('*BUILD CONDITION MONITOR: Invalid BuilderCondition - Missing function name')
@@ -77,36 +101,36 @@ BrainConditionsMonitor = Class {
             error('*BUILD CONDITION MONITOR: Invalid BuilderCondition - Missing data table')
         end
 
-        # Key the TableConditions by filename
+        -- Key the TableConditions by filename
         if not self.ConditionData.TableConditions[cFilename] then
             self.ConditionData.TableConditions[cFilename] = {}
         end
 
-        # Key the filenames by function name
+        -- Key the filenames by function name
         if not self.ConditionData.TableConditions[cFilename][cFunctionName] then
             self.ConditionData.TableConditions[cFilename][cFunctionName] = {}
         end
 
-        # Check if the cData matches up
+        -- Check if the cData matches up
         for num,data in self.ConditionData.TableConditions[cFilename][cFunctionName] do
-            # Check if the data is the same length
+            -- Check if the data is the same length
             if table.getn(data.ConditionParameters) == table.getn(cData) then
                 local match = true
-                # Check each piece of data to make sure it matches
+                -- Check each piece of data to make sure it matches
                 for k,v in data.ConditionParameters do
                     if v != cData[k] then
                         match = false
                         break
                     end
                 end
-                # Match found, return the key
+                -- Match found, return the key
                 if match then
                     return data.Key
                 end
             end
         end
 
-        # No match found, so add the data to the table and return the key (same number as num items)
+        -- No match found, so add the data to the table and return the key (same number as num items)
         local newCondition
         if cFilename == '/lua/editor/InstantBuildConditions.lua'
             or cFilename == '/lua/editor/UnitCountBuildConditions.lua' or cFilename == '/lua/editor/EconomyBuildConditions.lua'
@@ -118,7 +142,7 @@ BrainConditionsMonitor = Class {
         newCondition:Create(self.Brain, table.getn(self.ResultTable) + 1, cFilename, cFunctionName, cData)
         table.insert(self.ResultTable, newCondition)
 
-        # Add in a hashed table for quicker key lookup, may not be necessary
+        -- Add in a hashed table for quicker key lookup, may not be necessary
         local newTable = {
             ConditionParameters = cData,
             Key = newCondition:GetKey(),
@@ -127,9 +151,13 @@ BrainConditionsMonitor = Class {
         return newTable.Key
     end,
 
-    # Find the key for a condition that is a function
+    -- Find the key for a condition that is a function
+    ---@param self BrainConditionsMonitor
+    ---@param func function
+    ---@param parameters any
+    ---@return any
     GetConditionKeyFunction = function(self, func, parameters)
-        # See if there is a matching function
+        -- See if there is a matching function
         for k,v in self.ConditionData.FunctionConditions do
             if v.Function == func then
                 local found = true
@@ -145,7 +173,7 @@ BrainConditionsMonitor = Class {
             end
         end
 
-        # No match, insert data into the function conditions table
+        -- No match, insert data into the function conditions table
         local newCondition = FunctionCondition()
         newCondition:Create(self.Brain, table.getn(self.ResultTable) + 1, func, parameters)
         table.insert(self.ResultTable, newCondition)
@@ -159,7 +187,8 @@ BrainConditionsMonitor = Class {
         return newTable.Key
     end,
 
-    # Thread that will monitor conditions the brain asks for over time
+    -- Thread that will monitor conditions the brain asks for over time
+    ---@param self BrainConditionsMonitor
     ConditionMonitorThread = function(self)
         while true do
             local checks = 0
@@ -169,26 +198,31 @@ BrainConditionsMonitor = Class {
 
             for k,v in self.ResultTable do
                 if not v:LocationExists() then
-                    #Don't remove the condition, just skip over.
-                    #If the base gets rebuilt the AI will use the old keyed conditions.
+                    --Don't remove the condition, just skip over.
+                    --If the base gets rebuilt the AI will use the old keyed conditions.
                     continue
                 end
                 numResults = numResults + 1
                 v:CheckCondition()
 
-                # Load balance per tick here
+                -- Load balance per tick here
                 checks = checks + 1
                 if checks >= numPerTick then
                     WaitTicks(1)
                     checks = 0
                 end
             end
-            #LOG('*AI DEBUG: '.. self.Brain.Nickname ..' ConditionMonitorThread checked: '..numResults)
+            --LOG('*AI DEBUG: '.. self.Brain.Nickname ..' ConditionMonitorThread checked: '..numResults)
             WaitTicks(1)
         end
     end,
 
-    # Adds a condition to the table and returns the key
+    -- Adds a condition to the table and returns the key
+    ---@param self BrainConditionsMonitor
+    ---@param cFilename FileName
+    ---@param cFunctionName FunctionName
+    ---@param cData any[]
+    ---@return any
     AddCondition = function(self, cFilename, cFunctionName, cData)
         if not self.Active then
             self.Active = true
@@ -200,7 +234,11 @@ BrainConditionsMonitor = Class {
         return self:GetConditionKey(cFilename, cFunctionName, cData)
     end,
 
-    # forking and storing a thread on the monitor
+    -- forking and storing a thread on the monitor
+    ---@param self BrainConditionsMonitor
+    ---@param fn function
+    ---@param ... any
+    ---@return thread
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -212,35 +250,57 @@ BrainConditionsMonitor = Class {
     end,
 }
 
+---@param brain AIBrain
+---@return BrainConditionsMonitor
 function CreateConditionsMonitor(brain)
     local cMonitor = BrainConditionsMonitor()
     cMonitor:Create(brain)
     return cMonitor
 end
 
-Condition = Class {
-    # Create the thing
+---@class Condition
+Condition = ClassSimple {
+    -- Create the thing
+
+    ---@param self Condition
+    ---@param brain AIBrain
+    ---@param key string
     Create = function(self,brain,key)
         self.Status = false
         self.Brain = brain
         self.Key = key
     end,
 
+    ---@param self Condition
+    ---@return boolean
     CheckCondition = function(self)
         self.Status = false
         return self.Status
     end,
 
+    ---@param self Condition
+    ---@param reportFailure boolean
+    ---@return boolean
     GetStatus = function(self, reportFailure)
         return self.Status
     end,
 
+    ---@param self Condition
+    ---@return string
     GetKey = function(self)
         return self.Key
     end
 }
 
+---@class ImportCondition : Condition
 ImportCondition = Class(Condition) {
+
+    ---@param self ImportCondition
+    ---@param brain AIBrain
+    ---@param key string
+    ---@param filename FileName
+    ---@param funcName FunctionName
+    ---@param funcData any[]
     Create = function(self,brain,key,filename,funcName,funcData)
         Condition.Create(self,brain,key)
         self.Filename = filename
@@ -249,6 +309,8 @@ ImportCondition = Class(Condition) {
         self.CheckTime = false
     end,
 
+    ---@param self ImportCondition
+    ---@return boolean
     CheckCondition = function(self)
         if self.CheckTime != GetGameTimeSeconds() then
             self.Status = import(self.Filename)[self.FunctionName](self.Brain, unpack(self.FunctionData))
@@ -257,6 +319,9 @@ ImportCondition = Class(Condition) {
         return self.Status
     end,
 
+    ---@param self ImportCondition
+    ---@param reportFailure boolean
+    ---@return string
     GetStatus = function(self, reportFailure)
         if reportFailure and not self.Status then
             LOG('*AI DEBUG: Build Condition failed - ' .. self.FunctionName .. ' - Data: ' .. repr(self.FunctionData))
@@ -264,6 +329,8 @@ ImportCondition = Class(Condition) {
         return self.Status
     end,
 
+    ---@param self ImportCondition
+    ---@return boolean
     LocationExists = function(self)
         local found = false
         for k,v in self.FunctionData do
@@ -282,7 +349,15 @@ ImportCondition = Class(Condition) {
     end,
 }
 
+---@class InstantImportCondition : Condition
 InstantImportCondition = Class(Condition) {
+
+    ---@param self InstantImportCondition
+    ---@param brain AIBrain
+    ---@param key string
+    ---@param filename FileName
+    ---@param funcName FunctionName
+    ---@param funcData any[]
     Create = function(self,brain,key,filename,funcName,funcData)
         Condition.Create(self,brain,key)
         self.Filename = filename
@@ -291,21 +366,26 @@ InstantImportCondition = Class(Condition) {
         self.CheckTime = false
     end,
 
-    # This class doesn't change when CheckCondition is called; Only changed when requested
+    -- This class doesn't change when CheckCondition is called; Only changed when requested
+    ---@param self InstantImportCondition
+    ---@return string
     CheckCondition = function(self)
-        #if self.CheckTime != GetGameTimeSeconds() then
-            #self.Status = import(self.Filename)[self.FunctionName](self.Brain, unpack(self.FunctionData))
-            #self.CheckTime = GetGameTimeSeconds()
-        #end
+        --if self.CheckTime != GetGameTimeSeconds() then
+            --self.Status = import(self.Filename)[self.FunctionName](self.Brain, unpack(self.FunctionData))
+            --self.CheckTime = GetGameTimeSeconds()
+        --end
         return self.Status
     end,
 
-    # This class always performs the check when getting status (basically for stat checks)
+    -- This class always performs the check when getting status (basically for stat checks)
+    ---@param self InstantImportCondition
+    ---@param reportFailure boolean
+    ---@return string
     GetStatus = function(self, reportFailure)
         if self.CheckTime != GetGameTimeSeconds() then
             self.Status = import(self.Filename)[self.FunctionName](self.Brain, unpack(self.FunctionData))
             self.CheckTime = GetGameTimeSeconds()
-            #LOG('*AI LOG: Instant Check')
+            --LOG('*AI LOG: Instant Check')
         end
         if reportFailure and not self.Status then
             LOG('*AI DEBUG: Build Condition failed - ' .. self.FunctionName .. ' - Data: ' .. repr(self.FunctionData))
@@ -313,6 +393,8 @@ InstantImportCondition = Class(Condition) {
         return self.Status
     end,
 
+    ---@param self InstantImportCondition
+    ---@return boolean
     LocationExists = function(self)
         local found = false
         for k,v in self.FunctionData do
@@ -331,18 +413,29 @@ InstantImportCondition = Class(Condition) {
     end,
 }
 
+---@class FunctionCondition : Condition
 FunctionCondition = Class(Condition) {
+
+    ---@param self FunctionCondition
+    ---@param brain AIBrain
+    ---@param key number
+    ---@param funcHandle any
+    ---@param funcParams any
     Create = function(self,brain,key,funcHandle,funcParams)
         Condition.Create(self,brain,key)
         self.FunctionHandle = funcHandle
         self.FunctionParameters = funcParams or {}
     end,
 
+    ---@param self FunctionCondition
+    ---@return string
     CheckCondition = function(self)
         self.Status = self.FunctionHandle(self.Brain, unpack(self.FunctionParameters))
         return self.Status
     end,
 
+    ---@param self FunctionCondition
+    ---@return boolean
     LocationExists = function(self)
         local found = false
         for k,v in self.FunctionParameters do

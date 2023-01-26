@@ -8,15 +8,15 @@
 -- This file is called on game start from gamemain.lua to fetch keybindings from prefs, or generate them from defaults
 -- It is also used by hotbuild.lua to fetch existing mappings
 
-local Prefs = import('/lua/user/prefs.lua')
-local KeyDescriptions = import('/lua/keymap/keydescriptions.lua').keyDescriptions
+local Prefs = import("/lua/user/prefs.lua")
+local KeyDescriptions = import("/lua/keymap/keydescriptions.lua").keyDescriptions
 
 function GetActionName(action)
     local name = ''
     if KeyDescriptions[action] then
         name = LOC(KeyDescriptions[action])
     else
-        name = LOC("<LOC key_binding_0001>No description text") .. ' for action ' .. action
+        name = LOC('<LOC kb_'..action..'>'..action)
     end
     -- check if action is meant to be mapped with a key modifier, e.g. attack vs shift_attack action
     if string.find(action, 'shift_') == 1 then
@@ -26,10 +26,10 @@ function GetActionName(action)
 end
 
 function GetDefaultKeyMapName()
-    return Prefs.GetFromCurrentProfile("UserKeyMapName") or 'defaultKeyMap.lua'
+    return Prefs.GetFromCurrentProfile("UserKeyMapName") or "/lua/keymap/defaultkeymap.lua"
 end
 
--- stores preset name of UserKeyMap: 'defaultKeyMap.lua' (GPG) or hotbuildKeyMap.lua' (FAF)
+-- stores preset name of UserKeyMap: 'defaultKeyMap.lua' (GPG) or 'hotbuildKeyMap.lua' (FAF) or 'alternatehotbuildKeyMap.lua' (FAF)
 function SetDefaultKeyMapName(preset)
     Prefs.SetToCurrentProfile("UserKeyMapName", preset)
 end
@@ -92,6 +92,27 @@ function GetCurrentKeyMap()
     return GetUserKeyMap() or GetDefaultKeyMap()
 end
 
+--- Returns the current key binding for an action, or `false` if not found
+---@param action string
+---@return string | false
+function GetCurrentKeyBinding(action)
+    local TableFind = table.find -- luckily, this handles nil tables
+
+    local binding = TableFind(Prefs.GetFromCurrentProfile("UserKeyMap"), action)
+    if binding then return binding end
+    binding = TableFind(Prefs.GetFromCurrentProfile("UserDebugKeyMap"), action)
+    if binding then return binding end
+
+    local defaultKeyMap = import(GetDefaultKeyMapName())
+
+    binding = TableFind(defaultKeyMap.defaultKeyMap, action)
+    if binding then return binding end
+    binding = TableFind(defaultKeyMap.debugKeyMap, action)
+    if binding then return binding end
+
+    return false
+end
+
 function ClearUserKeyMapping(key)
     if not key then return end
 
@@ -125,10 +146,10 @@ function SetUserKeyMapping(key, oldKey, action)
         end
     end
 
-    if IsActionInMap(action, newUserMap) or IsActionInMap(action, import('defaultKeyMap.lua').defaultKeyMap) then
+    if IsActionInMap(action, newUserMap) or IsActionInMap(action, import("/lua/keymap/defaultkeymap.lua").defaultKeyMap) then
         LOG('Keybindings adding key "'..key .. '" in user map for action: ' .. action)
         newUserMap[key] = action
-    elseif IsActionInMap(action, newDebugMap) or IsActionInMap(action, import('defaultKeyMap.lua').debugKeyMap) then
+    elseif IsActionInMap(action, newDebugMap) or IsActionInMap(action, import("/lua/keymap/defaultkeymap.lua").debugKeyMap) then
         LOG('Keybindings adding key "'..key .. '" in debug map for action: ' .. action)
         newDebugMap[key] = action
     else
@@ -145,13 +166,13 @@ function ClearUserKeyMap()
     Prefs.SetToCurrentProfile("UserDebugKeyMap", nil)
 end
 
--- resets UserKeyMap in game references file and saves new keybinding preset: 'defaultKeyMap.lua' (GPG) or hotbuildKeyMap.lua' (FAF)
+-- resets UserKeyMap in game references file and saves new keybinding preset: 'defaultKeyMap.lua' (GPG) or hotbuildKeyMap.lua' (FAF) or 'alternatehotbuildKeyMap.lua' (FAF)
 function ResetUserKeyMapTo(newPreset)
     local oldPreset = GetDefaultKeyMapName()
     LOG('Keybindings Preset changed from "' .. oldPreset .. '" to "' .. newPreset .. '"')
     Prefs.SetToCurrentProfile("UserKeyMapName", newPreset)
     local oldKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
-    if table.getsize(oldKeyMap) > 0 then
+    if not table.empty(oldKeyMap) then
         LOG('Keybindings Count changed from ' .. table.getsize(oldKeyMap) .. ' to 0')
     end
      -- key maps must be nil until they are save by a user when existing keybinding UI otherwise UI will show incorrect info
@@ -173,8 +194,8 @@ end
 function GetKeyActions()
     local ret = {}
 
-    local keyActions = import('/lua/keymap/keyactions.lua').keyActions
-    local debugKeyActions = import('/lua/keymap/debugKeyActions.lua').debugKeyActions
+    local keyActions = import("/lua/keymap/keyactions.lua").keyActions
+    local debugKeyActions = import("/lua/keymap/debugkeyactions.lua").debugKeyActions
 
     for k,v in keyActions do
         ret[k] = v
@@ -253,14 +274,25 @@ function GenerateHotbuildModifiers()
     local modifiers = {}
 
     for key, info in keyDetails do
-        if info.action["category"] == "hotbuilding" then
+        local cat = info.action["category"]
+        if cat == "hotbuilding" or cat == "hotbuildingAlternative" or cat == "hotbuildingExtra" then
             if key ~= nil then
-                local modKey = "Shift-" .. key
-                local modBinding = keyDetails[modKey]
-                if not modBinding then
-                    modifiers[modKey] =  info.action
+                local shiftModKey = "Shift-" .. key
+                local altModKey = "Alt-" .. key
+                local shiftModBinding = keyDetails[shiftModKey]
+                local altModBinding = keyDetails[altModKey]
+                if not shiftModBinding and not altModBinding then
+                    modifiers[shiftModKey] =  info.action
+                    modifiers[altModKey] =  info.action
+                elseif not shiftModBinding then
+                    modifiers[shiftModKey] =  info.action
+                    WARN('Hotbuild key '..altModKey..' is already bound to action "'..altModBinding.name..'" under "'..altModBinding.category..'" category')
+                elseif not altModBinding then
+                    modifiers[altModKey] =  info.action
+                    WARN('Hotbuild key '..shiftModKey..' is already bound to action "'..shiftModBinding.name..'" under "'..shiftModBinding.category..'" category')
                 else
-                    WARN('Hotbuild key '..modKey..' is already bound to action "'..modBinding.name..'" under "'..modBinding.category..'" category')
+                    WARN('Hotbuild key '..shiftModKey..' is already bound to action "'..shiftModBinding.name..'" under "'..shiftModBinding.category..'" category')
+                    WARN('Hotbuild key '..altModKey..' is already bound to action "'..altModBinding.name..'" under "'..altModBinding.category..'" category')
                 end
             end
         end
@@ -284,7 +316,7 @@ end
 -- Returns a table of raw (windows) key codes mapped to key names
 function GetKeyCodeLookup()
     local ret = {}
-    local keyCodeTable = import('/lua/keymap/keynames.lua').keyNames
+    local keyCodeTable = import("/lua/keymap/keynames.lua").keyNames
     for k, v in keyCodeTable do
         local codeInt = STR_xtoi(k)
         ret[codeInt] = v
@@ -293,56 +325,102 @@ function GetKeyCodeLookup()
     return ret
 end
 
--- Given a key string makes it always ctrl-shift-alt-key for comparison
--- Returns a table with modifier keys extracted
+---@class NormalizedKeyBinding
+---@field key string
+---@field Ctrl? true
+---@field Shift? true
+---@field Alt? true
+
+--- Given a key string makes it always Ctrl-Shift-Alt-key for comparison
+--- Returns a table with modifier keys extracted
+---@param inKey string
+---@return string
+function NormalizeKeyBinding(inKey)
+    local ctrl, alt, shift = false, false, false
+    local norm = ""
+    inKey:gsub("([^-]+)", function(c)
+        if c == "Ctrl" then
+            ctrl = true
+        elseif c == "Shift" then
+            shift = true
+        elseif c == "Alt" then
+            alt = true
+        else
+            norm = c
+        end
+    end)
+    -- build backwards
+    if norm ~= "Alt" and alt then norm = "Alt-" .. norm end
+    if norm ~= "Shift" and shift then norm = "Shift-" .. norm end
+    if norm ~= "Ctrl" and ctrl then norm = "Ctrl-" .. norm end
+    return norm
+end
+
+--- Given a key string returns a table with modifier keys extracted
+---@param inKey string
+---@return NormalizedKeyBinding
 function NormalizeKey(inKey)
-    local retVal = {}
-    local keyNames = import('/lua/keymap/keyNames.lua').keyNames
-    local modKeys = {[keyNames['11']] = true, -- ctrl
-                     [keyNames['10']] = true, -- shift
-                     [keyNames['12']] = true, -- alt
-                    }
-    local startpos = 1
-    while startpos do
-        local fst, lst = string.find(inKey, "-", startpos)
-        local str
-        if fst then
-            str = string.sub(inKey, startpos, fst - 1)
-            startpos = lst + 1
+    local norm = {}
+    inKey:gsub("([^-]+)", function(c)
+        if c == "Ctrl" then
+            norm.Ctrl = true
+        elseif c == "Shift" then
+            norm.Shift = true
+        elseif c == "Alt" then
+            norm.Alt = true
         else
-            str = string.sub(inKey, startpos, string.len(inKey))
-            startpos = nil
+            norm.key = c
         end
-        if modKeys[str] then
-            retVal[str] = true
+    end)
+    return norm
+end
+
+function LocalizeKeyName(inKey)
+    local ctrl, alt, shift = false, false, false
+    local norm = ""
+    inKey:gsub("([^-]+)", function(c)
+        if c == "Ctrl" then
+            ctrl = true
+        elseif c == "Shift" then
+            shift = true
+        elseif c == "Alt" then
+            alt = true
         else
-            retVal["key"] = str
+            norm = c
         end
+    end)
+    -- build backwards
+    local properKeyNames = import("/lua/keymap/properkeynames.lua").properKeyNames
+    if norm ~= "Alt" and alt then
+        norm = LOC(properKeyNames.Alt) .. "+" .. norm
     end
-    return retVal
+    if norm ~= "Shift" and shift then
+        norm = LOC(properKeyNames.Shift) .. "+" .. norm
+    end
+    if norm ~= "Ctrl" and ctrl then
+        norm = LOC(properKeyNames.Ctrl) .. "+" .. norm
+    end
+    return norm
 end
 
 -- Given a key in string form, checks to see if it's already in the key map
 function IsKeyInMap(key, map)
-    local compKeyCombo = NormalizeKey(key)
+    key = NormalizeKeyBinding(key)
     for keyCombo, action in map do
-        local curKeyCombo = NormalizeKey(keyCombo)
-        if table.equal(curKeyCombo, compKeyCombo) then
-            return true
+        if key == NormalizeKeyBinding(keyCombo) then
+            return action
         end
     end
-
     return false
 end
 
 -- Given an action in string form, checks to see if it's already in the key map
 function IsActionInMap(action, map)
-    for _, curaction in map do
+    for key, curaction in map do
         if action == curaction then
-            return true
+            return key
         end
     end
-
     return false
 end
 
@@ -350,7 +428,7 @@ end
 function GetShiftAction(actionName, category)
     local keyActions = GetKeyActions()
     local keyLookup = GetKeyLookup()
-     
+
     local name = 'shift_' .. actionName
     local action = keyActions[name]
     if action  and action.category == category then

@@ -1,14 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB0303/UAB0303_script.lua
-#**  Author(s):  John Comes, David Tomandl, Gordon Duclos
-#**
-#**  Summary  :  Aeon Tier 3 Naval Factory Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB0303/UAB0303_script.lua
+--**  Author(s):  John Comes, David Tomandl, Gordon Duclos
+--**
+--**  Summary  :  Aeon Tier 3 Naval Factory Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-local SSeaFactoryUnit = import('/lua/seraphimunits.lua').SSeaFactoryUnit
+local SSeaFactoryUnit = import("/lua/seraphimunits.lua").SSeaFactoryUnit
+---@class XSB0303 : SSeaFactoryUnit
 XSB0303 = Class(SSeaFactoryUnit) {
     OnCreate = function(self)
         SSeaFactoryUnit.OnCreate(self)

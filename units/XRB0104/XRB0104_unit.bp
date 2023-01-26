@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 15,
+        GuardScanRadius = 15, 
         InitialAutoMode = true,
         ShowAssistRangeOnSelect = true,
         StagingPlatformScanRadius = 15,
@@ -58,6 +58,7 @@ UnitBlueprint {
         },
     },
     BuildIconSortPriority = 200,
+    BuildBotTotal = 1,
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',

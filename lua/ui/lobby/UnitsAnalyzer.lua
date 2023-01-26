@@ -52,6 +52,7 @@ CategoriesSkipped  = {
     ["NOFORMATION"] = true,
     ["UNSELECTABLE"] = true,
     ["UNTARGETABLE"] = true,
+    ["zxa0001"] = true,    -- Dummy unit for gifting unfinished buildings
     ["uab5103"] = true,    -- Aeon Quantum Gate Beacon
     ["uab5204"] = true,    -- Concrete
     ["ueb5204"] = true,    -- Concrete
@@ -200,12 +201,12 @@ CategoriesHidden  = {
 }
 
 Factions = {
-    { Name = 'AEON',     Color = 'FF238C00' }, --#FF238C00
-    { Name = 'UEF',      Color = 'FF006CD9' }, --#FF006CD9
-    { Name = 'CYBRAN',   Color = 'FFB32D00' }, --#FFB32D00
-    { Name = 'SERAPHIM', Color = 'FFFFBF00' }, --#FFFFBF00
-    { Name = 'NOMADS',   Color = 'FFFF7200' }, --#FFFF7200
-    { Name = 'UNKNOWN',  Color = 'FFD619CE' }, --#FFD619CE
+    { Name = 'AEON',     Color = 'FF238C00' }, ----FF238C00
+    { Name = 'UEF',      Color = 'FF006CD9' }, ----FF006CD9
+    { Name = 'CYBRAN',   Color = 'FFB32D00' }, ----FFB32D00
+    { Name = 'SERAPHIM', Color = 'FFFFBF00' }, ----FFFFBF00
+    { Name = 'NOMADS',   Color = 'FFFF7200' }, ----FFFF7200
+    { Name = 'UNKNOWN',  Color = 'FFD619CE' }, ----FFD619CE
 }
 
 -- Gets unit's color based on faction of given blueprint
@@ -977,7 +978,7 @@ function GetUnitsGroups(bps, faction)
     local DRONES = '(POD - UPGRADE)'
     local DEFENSES = '(ANTINAVY + DIRECTFIRE + ARTILLERY + ANTIAIR + MINE + ORBITALSYSTEM + SATELLITE + NUKE)'
 
-    if table.getsize(faction.Blueprints) == 0 then
+    if table.empty(faction.Blueprints) then
         faction.Blueprints = GetUnits(bps, faction.Name)
     end
     faction.Units = {}
@@ -1168,7 +1169,7 @@ local mods = { Cached = {}, Active = {}, Changed = false }
 -- Checks if game mods have changed between consecutive calls to this function
 -- Thus returns whether or not blueprints need to be reloaded
 function DidModsChanged()
-    mods.All = import('/lua/mods.lua').GetGameMods()
+    mods.All = import("/lua/mods.lua").GetGameMods()
     mods.Active = {}
     mods.Changed = false
 
@@ -1203,7 +1204,7 @@ function GetBlueprints(activeMods, skipGameFiles, taskNotifier)
 
     blueprints.Loaded = false
     -- Load original FA blueprints only once
-    local loadedGameFiles = table.getsize(blueprints.Original) > 0
+    local loadedGameFiles = not table.empty(blueprints.Original)
     if loadedGameFiles then
          skipGameFiles = true
     end

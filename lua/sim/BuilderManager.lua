@@ -1,17 +1,18 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/sim/BuilderManager.lua
-#**
-#**  Summary  : Manage builders
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/sim/BuilderManager.lua
+--**
+--**  Summary  : Manage builders
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local Builder = import("/lua/sim/builder.lua")
 
-BuilderManager = Class {
+---@class BuilderManager
+BuilderManager = ClassSimple {
+    ---@param self BuilderManager
+    ---@param brain AIBrain
     Create = function(self, brain)
         self.Trash = TrashBag()
         self.Brain = brain
@@ -25,6 +26,7 @@ BuilderManager = Class {
         self.NumGet = 0
     end,
 
+    ---@param self BuilderManager
     Destroy = function(self)
         for _,bType in self.BuilderData do
             for k,v in bType do
@@ -34,7 +36,11 @@ BuilderManager = Class {
         self.Trash:Destroy()
     end,
 
-    # forking and storing a thread on the monitor
+    -- forking and storing a thread on the monitor
+    ---@param self BuilderManager
+    ---@param fn function
+    ---@param ... any
+    ---@return thread|nil
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -45,6 +51,8 @@ BuilderManager = Class {
         end
     end,
 
+    ---@param self BuilderManager
+    ---@param enable boolean
     SetEnabled = function(self, enable)
         if not self.BuilderThread and enable then
             self.BuilderThread = self:ForkThread(self.ManagerThread)
@@ -56,16 +64,19 @@ BuilderManager = Class {
         end
     end,
 
+    ---@param self BuilderManager
+    ---@param bType string
+    ---@return boolean
     SortBuilderList = function(self, bType)
-        # Make sure there is a type
+        -- Make sure there is a type
         if not self.BuilderData[bType] then
             error('*BUILDMANAGER ERROR: Trying to sort platoons of invalid builder type - ' .. bType)
             return false
         end
         local sortedList = {}
-        #Simple selection sort, this can be made faster later if we decide we need it.
+        --Simple selection sort, this can be made faster later if we decide we need it.
         for i = 1, table.getn(self.BuilderData[bType].Builders) do
-            local highest = 0
+            local highest = -1
             local key, value
             for k, v in self.BuilderData[bType].Builders do
                 if v.Priority > highest then
@@ -81,6 +92,9 @@ BuilderManager = Class {
         self.BuilderData[bType].NeedSort = false
     end,
 
+    ---@param self BuilderManager
+    ---@param builderName string
+    ---@param changeTable table
     AlterBuilder = function(self, builderName, changeTable)
         for k,v in self.BuilderData do
             for num,builder in v.Builders do
@@ -97,11 +111,18 @@ BuilderManager = Class {
         end
     end,
 
+    ---@param self BuilderManager
+    ---@param builderData number
+    ---@param locationType string
+    ---@param builderType string
     AddBuilder = function(self, builderData, locationType, builderType)
         local newBuilder = Builder.CreateBuilder(self.Brain, builderData, locationType)
         self:AddInstancedBuilder(newBuilder, builderType)
     end,
 
+    ---@param self BuilderManager
+    ---@param newBuilder Unit
+    ---@param builderType string
     AddInstancedBuilder = function(self,newBuilder, builderType)
         builderType = builderType or newBuilder:GetBuilderType()
         if not builderType then
@@ -128,6 +149,9 @@ BuilderManager = Class {
         end
     end,
 
+    ---@param self BuilderManager
+    ---@param builderName string
+    ---@return number|false
     GetBuilderPriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -139,6 +163,9 @@ BuilderManager = Class {
         return false
     end,
 
+    ---@param self BuilderManager
+    ---@param builderName string
+    ---@return number|false
     GetActivePriority = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -150,6 +177,11 @@ BuilderManager = Class {
         return false
     end,
 
+    ---@param self BuilderManager
+    ---@param builderName string
+    ---@param priority integer
+    ---@param temporary number
+    ---@param setbystrat number
     SetBuilderPriority = function(self,builderName,priority,temporary,setbystrat)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -161,6 +193,8 @@ BuilderManager = Class {
         end
     end,
 
+    ---@param self BuilderManager
+    ---@param builderName string
     ResetBuilderPriority = function(self,builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -172,10 +206,12 @@ BuilderManager = Class {
         end
     end,
 
+    ---@param self BuilderManager
     GetLocationType = function(self)
         return self.LocationType
     end,
 
+    ---@param self BuilderManager
     GetLocationCoords = function(self)
         if not self.Location then
             return false
@@ -187,18 +223,24 @@ BuilderManager = Class {
         return { self.Location[1], height, self.Location[3] }
     end,
 
+    ---@param self BuilderManager
     GetLocationRadius = function(self)
        return self.Radius
     end,
 
+    ---@param self BuilderManager
+    ---@param type string
     AddBuilderType = function(self, type)
         self.BuilderData[type] = { Builders = {}, NeedSort = false }
     end,
 
+    ---@param self BuilderManager
+    ---@param interval number
     SetCheckInterval = function(self, interval)
         self.BuildCheckInterval = interval
     end,
 
+    ---@param self BuilderManager
     ClearBuilderLists = function(self)
         for k,v in self.Builders do
             v.Builders = {}
@@ -207,16 +249,24 @@ BuilderManager = Class {
         self.BuilderList = false
     end,
 
+    ---@param self BuilderManager
     HasBuilderList = function(self)
         return self.BuilderList
     end,
 
-    # Function that is run in GetHighestBuilder; allows us to test if the builder is valid
-    # within a certain type of builder mananger (ie: can factories build the builder)
+    -- Function that is run in GetHighestBuilder; allows us to test if the builder is valid
+    -- within a certain type of builder mananger (ie: can factories build the builder)
+    ---@param self BuilderManager
+    ---@param builder Unit
+    ---@param params any
+    ---@return boolean
     BuilderParamCheck = function(self,builder,params)
         return true
     end,
 
+    ---@param self BuilderManager
+    ---@param builderName string
+    ---@return any
     GetBuilder = function(self, builderName)
         for _,bType in self.BuilderData do
             for _,builder in bType.Builders do
@@ -227,8 +277,11 @@ BuilderManager = Class {
         end
         return false
     end,
-    
+
     -- We delay buildplatoons to give engineers the time to move and start building before we call this builder again.
+    ---@param self BuilderManager
+    ---@param DelayEqualBuildPlattons integer
+    ---@return boolean
     IsPlattonBuildDelayed = function(self, DelayEqualBuildPlattons)
         if DelayEqualBuildPlattons then
             local CheckDelayTime = GetGameTimeSeconds()
@@ -244,6 +297,10 @@ BuilderManager = Class {
         end
     end,
 
+    ---@param self BuilderManager
+    ---@param bType string
+    ---@param params any
+    ---@return boolean
     GetHighestBuilder = function(self,bType,params)
         if not self.BuilderData[bType] then
             error('*BUILDERMANAGER ERROR: Invalid builder type - ' .. bType)
@@ -271,7 +328,8 @@ BuilderManager = Class {
         return false
     end,
 
-    # Called every 13 seconds to perform any cleanup; Provides better inheritance
+    -- Called every 13 seconds to perform any cleanup; Provides better inheritance
+    ---@param self BuilderManager
     ManagerThreadCleanup = function(self)
         for bType,bTypeData in self.BuilderData do
             if bTypeData.NeedSort then
@@ -280,13 +338,17 @@ BuilderManager = Class {
         end
     end,
 
+    ---@param self BuilderManager
+    ---@param builder Unit
+    ---@param bType string
     ManagerLoopBody = function(self,builder,bType)
         if builder:CalculatePriority(self) then
             self.BuilderData[bType].NeedSort = true
         end
-        #builder:CheckBuilderConditions(self.Brain)
+        --builder:CheckBuilderConditions(self.Brain)
     end,
 
+    ---@param self BuilderManager
     ManagerThread = function(self)
         while self.Active do
             self:ManagerThreadCleanup()
@@ -299,7 +361,7 @@ BuilderManager = Class {
                     if numTested >= numPerTick then
                         WaitTicks(1)
                         if self.NumGet > 1 then
-                            #LOG('*AI STAT: NumGet = ' .. self.NumGet)
+                            --LOG('*AI STAT: NumGet = ' .. self.NumGet)
                         end
                         self.NumGet = 0
                         numTicks = numTicks + 1
@@ -313,4 +375,26 @@ BuilderManager = Class {
             end
         end
     end,
+    
+    ---@param self, BuilderManager
+    ---@param oldtable, Table
+    ---@return tempTable, Table
+    RebuildTable = function(self, oldtable)
+        local temptable = {}
+        for k, v in oldtable do
+            if v ~= nil then
+                if type(k) == 'string' then
+                    temptable[k] = v
+                else
+                    table.insert(temptable, v)
+                end
+            end
+        end
+        return temptable
+    end,
 }
+
+
+-- kept for mod backwards compatibility
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")

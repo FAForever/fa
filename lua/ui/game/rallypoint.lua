@@ -5,9 +5,9 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------
 
-local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
-local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMeshResources
-local rallyMeshes = import('/lua/ui/game/commandmeshes.lua').rallyMeshes
+local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
+local commandMeshResources = import("/lua/ui/game/commandmeshes.lua").commandMeshResources
+local rallyMeshes = import("/lua/ui/game/commandmeshes.lua").rallyMeshes
 
 local meshes = {}
 local beatFunctionAdded = false
@@ -52,7 +52,7 @@ end
 
 function OnSelectionChanged(selection)
     if not beatFunctionAdded then
-        import('/lua/ui/game/gamemain.lua').AddBeatFunction(OnBeat)
+        import("/lua/ui/game/gamemain.lua").AddBeatFunction(OnBeat)
         beatFunctionAdded = true
     end
 

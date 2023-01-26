@@ -1,7 +1,8 @@
 --
 -- Terran CDR Nuke
 --
-local TIFMissileNuke = import('/lua/terranprojectiles.lua').TIFMissileNuke
+
+local TIFMissileNuke = import("/lua/terranprojectiles.lua").TIFMissileNuke
 
 TIFMissileNukeCDR = Class(TIFMissileNuke) {
 
@@ -15,29 +16,30 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
 
     OnCreate = function(self)
         TIFMissileNuke.OnCreate(self)
-        self.effectEntityPath = '/effects/Entities/UEFNukeEffectController01/UEFNukeEffectController01_proj.bp'
+        self.effectEntityPath = '/effects/Entities/UEFNukeEffectController02/UEFNukeEffectController02_proj.bp'
         self:LauncherCallbacks()
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
-        if EntityCategoryContains(categories.AEON * categories.PROJECTILE * categories.ANTIMISSILE, TargetEntity) then
+        if EntityCategoryContains(categories.AEON * categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_TWO, TargetEntity) then
             self:Destroy()
         else
+
             TIFMissileNuke.OnImpact(self, TargetType, TargetEntity)
         end
     end,
 
+    
     -- Tactical nuke has different flight path
     MovementThread = function(self)
-        local army = self:GetArmy()
         local target = self:GetTrackingTarget()
         local launcher = self:GetLauncher()
-        self.CreateEffects(self, self.InitialEffects, army, 1)
+        self:CreateEffects(self.InitialEffects, self.Army, 1)
         self.WaitTime = 0.1
         self:SetTurnRate(8)
         WaitSeconds(0.3)
-        self.CreateEffects(self, self.LaunchEffects, army, 1)
-        self.CreateEffects(self, self.ThrustEffects, army, 1)
+        self:CreateEffects(self.LaunchEffects, self.Army, 1)
+        self:CreateEffects(self.ThrustEffects, self.Army, 1)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
             WaitSeconds(self.WaitTime)

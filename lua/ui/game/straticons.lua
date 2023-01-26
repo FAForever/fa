@@ -36,6 +36,7 @@ aStratIconTranslation = {
     icon_bot_antiair = 'bot_antiair',
     icon_bot_sniper = 'bot_sniper',
     icon_commander_generic = 'commander_generic',
+    icon_subcommander = 'subcommander',
     icon_experimental_generic = 'experimental_generic',
     icon_factory1_air = 'factory_air',
     icon_factory1_generic = 'factory_generic',
@@ -273,7 +274,7 @@ aStratIconTranslationFull = {
     icon_bomber3_generic = '3/bomber_generic',
     icon_bomber_antinavy = 'bomber_antinavy',
     icon_bomber_directfire = 'bomber_directfire',
-    icon_bomber_generic = 'bomber_generic',
+    icon_bomber_generic = 'bomber_generic', 
     icon_bot1_directfire = '1/bot_directfire',
     icon_bot1_generic = '1/bot_generic',
     icon_bot1_intel = '1/bot_intel',
@@ -543,5 +544,6 @@ aSpecificStratIcons = {
     ueb1106 = 'structure_massstorage',
     ueb1104 = 'structure_massfab',
     ueb1303 = 'structure_massfab',
+
+    xsb1105 = 'structure_energystorage',
 }
- 

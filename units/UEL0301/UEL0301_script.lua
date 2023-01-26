@@ -5,13 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local Shield = import('/lua/shield.lua').Shield
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
-local TWeapons = import('/lua/terranweapons.lua')
+local Shield = import("/lua/shield.lua").Shield
+local EffectUtil = import("/lua/effectutilities.lua")
+local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
+local TWeapons = import("/lua/terranweapons.lua")
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
-local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
+local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 
+---@class UEL0301 : CommandUnit
 UEL0301 = Class(CommandUnit) {
     IntelEffects = {
         {
@@ -47,12 +48,11 @@ UEL0301 = Class(CommandUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
-        -- If we are assisting an upgrading unit, or repairing a unit, play separate effects
-        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom ~= 'none' and self:IsUnitState('Guarding'))then
-            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        -- Different effect if we have building cube
+        if unitBeingBuilt.BuildingCube then
+            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         else
-            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
@@ -65,7 +65,7 @@ UEL0301 = Class(CommandUnit) {
             RemoveEconomyEvent(self, self.RebuildingPod)
             self.RebuildingPod = nil
             local location = self:GetPosition('AttachSpecial01')
-            local pod = CreateUnitHPR('UEA0003', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'Pod')
             pod:SetCreator(self)
             self.Trash:Add(pod)
@@ -89,7 +89,7 @@ UEL0301 = Class(CommandUnit) {
         if not bp then return end
         if enh == 'Pod' then
             local location = self:GetPosition('AttachSpecial01')
-            local pod = CreateUnitHPR('UEA0003', self:GetArmy(), location[1], location[2], location[3], 0, 0, 0)
+            local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'Pod')
             pod:SetCreator(self)
             self.Trash:Add(pod)
@@ -120,7 +120,7 @@ UEL0301 = Class(CommandUnit) {
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldGeneratorField' then
             self:DestroyShield()
-            ForkThread(function()
+            self:ForkThread(function()
                 WaitTicks(1)
                 self:CreateShield(bp)
                 self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -182,7 +182,7 @@ UEL0301 = Class(CommandUnit) {
         if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+                self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['RadarJammer'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()

@@ -1,13 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'UEB5102',
-        TargetBones = {
-            'FrontRight_Engine',
-            'FrontLeft_Engine',
-            'BackRight_Engine',
-            'BackLeft_Engine',
-            'XEA0306',
-        },
     },
     Air = {
         AutoLandTime = 1,
@@ -102,15 +95,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 60,
     Categories = {
         'PRODUCTFA',
@@ -131,8 +115,9 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'CANNOTUSEAIRSTAGING',
         'BUBBLESHIELDSPILLOVERCHECK',
+        'SNIPEMODE',
     },
-    CollisionOffsetY = -1,
+    CollisionOffsetY = -0.1,
     Defense = {
         AirThreatLevel = 18,
         ArmorType = 'Light',
@@ -240,15 +225,15 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 1,
-        SizeZ = 6,
+        SizeX = 4,
+        SizeZ = 8,
     },
     General = {
         Category = 'Transport',
         Classification = 'RULEUC_MilitaryAircraft',
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = true,
+            RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
@@ -308,7 +293,7 @@ UnitBlueprint {
     SelectionSizeZ = 4.8,
     SelectionThickness = 0.2,
     SizeX = 3.1,
-    SizeY = 2,
+    SizeY = 1.8,
     SizeZ = 6.8,
     StrategicIconName = 'icon_gunship3_transport',
     StrategicIconSortPriority = 65,
@@ -317,6 +302,10 @@ UnitBlueprint {
         Class2AttachSize = 2,
         Class3AttachSize = 4,
         TransportClass = 10,
+        Class1Capacity = 28,
+
+        SlotsMedium = 12,
+        SlotsLarge = 6,
     },
     UseOOBTestZoom = 200,
     Veteran = {
@@ -373,9 +362,8 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 2.2,
-            TargetCheckInterval = 0.27,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
             TurretBoneMuzzle = 'PlasmaGun01_Muzzle',
@@ -438,9 +426,8 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 2.2,
-            TargetCheckInterval = 0.27,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
             TurretBoneMuzzle = 'PlasmaGun02_Muzzle',
@@ -532,19 +519,16 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 3,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'AA_Turret01_Barrel01',
             TurretBonePitch = 'AA_Turret01',
             TurretBoneYaw = 'AA_Turret01',
@@ -637,19 +621,16 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 3,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'AA_Turret02_Barrel02',
             TurretBonePitch = 'AA_Turret02',
             TurretBoneYaw = 'AA_Turret02',
@@ -742,19 +723,16 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 3,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'AA_Turret03_Barrel03',
             TurretBonePitch = 'AA_Turret03',
             TurretBoneYaw = 'AA_Turret03',
@@ -847,19 +825,16 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 3,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'AA_Turret04_Barrel04',
             TurretBonePitch = 'AA_Turret04',
             TurretBoneYaw = 'AA_Turret04',
@@ -877,9 +852,9 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 25,
+            Damage = 500,
             DamageFriendly = true,
-            DamageRadius = 3,
+            DamageRadius = 4,
             DamageType = 'Normal',
             DisplayName = 'Air Crash',
             DummyWeapon = true,

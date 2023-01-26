@@ -4,27 +4,40 @@
 -- Summary  :  Cybran Builder bot units
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CreateCybranBuildBeams = import('/lua/EffectUtilities.lua').CreateCybranBuildBeams
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
+local CreateCybranBuildBeamsOpti = import("/lua/effectutilities.lua").CreateCybranBuildBeamsOpti
+local EffectUtil = import("/lua/effectutilities.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
+local DeprecatedWarnings = { }
+
+-- Kept after --3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
+
+---@class URA0001 : CAirUnit
 URA0001 = Class(CAirUnit) {
     spawnedBy = nil,
 
     OnCreate = function(self)
-        CAirUnit.OnCreate(self)
-        self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
-        self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
-        self.BuildArmManipulator:SetPrecedence(5)
-        self.Trash:Add(self.BuildArmManipulator)
-        self:SetConsumptionActive(false)
+
+      -- add deprecation warning
+      if not DeprecatedWarnings.URA0001 then 
+        DeprecatedWarnings.URA0001 = true 
+        WARN("URA0001 is deprecated: use URA0001O, URA0002O or URA0003O instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
+      end
+
+      CAirUnit.OnCreate(self)
+      self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
+      self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
+      self.BuildArmManipulator:SetPrecedence(5)
+      self.Trash:Add(self.BuildArmManipulator)
+      self:SetConsumptionActive(false)
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self:GetArmy(), '/effects/emitters/build_beam_02_emit.bp'))
-        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self:GetArmy(), '/effects/emitters/build_beam_02_emit.bp'))
-        CreateCybranBuildBeams(self, unitBeingBuilt, {'Muzzle_03',}, self.BuildEffectsBag)
+        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
+        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
+        CreateCybranBuildBeamsOpti(self, nil, unitBeingBuilt, self.BuildEffectsBag, false)
     end,
 
     OnStartCapture = function(self, target)
@@ -44,7 +57,7 @@ URA0001 = Class(CAirUnit) {
     OnImpact = function(self, with)
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects(self, self:GetArmy(), EffectTemplate.DefaultProjectileWaterImpact)
+            EffectUtil.CreateEffects(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
         end
 
         self:ForkThread(self.DeathThread, self.OverKillRatio)

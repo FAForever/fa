@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        InitialAutoMode = true,
         GuardRadius = 10,
         GuardScanRadius = 31.5, -- Hardcoded to keep a sensible 'attack while assisting'/stop far away ratio
         TargetBones = {
@@ -125,24 +126,12 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
-    BuffFields = {
-        RegenField = 'SeraphimACURegenBuffField',
-        AdvancedRegenField = 'SeraphimAdvancedACURegenBuffField',
-    },
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
         'SERAPHIM',
         'MOBILE',
+        'AMPHIBIOUS',
         'ECONOMIC',
         'COMMAND',
         'MASSPRODUCTION',
@@ -169,6 +158,7 @@ UnitBlueprint {
     },
     CollisionOffsetZ = 0.2,
     Defense = {
+        SkipDynamicThreatCalculations = true,
         AirThreatLevel = 0,
         ArmorType = 'Commander',
         EconomyThreatLevel = 5,
@@ -337,7 +327,7 @@ UnitBlueprint {
         NeedToFaceTargetToBuild = false,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
-        StorageEnergy = 4000,
+        StorageEnergy = 3900,
         StorageMass = 650,
         TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,
@@ -392,11 +382,13 @@ UnitBlueprint {
             Prerequisite = 'RegenAura',
             Radius = 35,
             MaxHealthFactor = 1.2,
+            NewRegenRate = 20, --this one is for the ACU itself
             RegenFloor = 15,
             RegenCeilingT1 = 20,
             RegenCeilingT2 = 50,
             RegenCeilingT3 = 120,
             RegenCeilingT4 = 240,
+            RegenCeilingSCU = 140,
             RegenPerSecond = 0.01111111111,
             Slot = 'LCH',
             UnitCategory = 'BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD',
@@ -607,11 +599,13 @@ UnitBlueprint {
             Name = '<LOC enhancements_0125>Restoration Field',
             Radius = 30,
             MaxHealthFactor = 1.1,
+            NewRegenRate = 10, --this one is for the ACU itself
             RegenFloor = 3,
             RegenCeilingT1 = 10,
             RegenCeilingT2 = 15,
             RegenCeilingT3 = 25,
             RegenCeilingT4 = 40,
+            RegenCeilingSCU = 30, 
             RegenPerSecond = 0.02,
             ShowBones = {
                 'Left_Upgrade',
@@ -915,6 +909,7 @@ UnitBlueprint {
         {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
+            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XSL_Weapon',
@@ -959,12 +954,11 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'MOBILE',
                 'COMMAND',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
@@ -984,6 +978,7 @@ UnitBlueprint {
         {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
+            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XSL_Weapon',
@@ -1020,7 +1015,7 @@ UnitBlueprint {
                 commandDamage = 400,
                 structureDamage = 800,
                 maxDamage = 15000,
-                minDamage = 1500,
+                minDamage = 1250,
             },
             ProjectileId = '/projectiles/SDFChronatronCannon02/SDFChronatronCannon02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
@@ -1042,15 +1037,14 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.3,
             SlavedToBody = false,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE TECH1',
                 'COMMAND',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
@@ -1072,6 +1066,7 @@ UnitBlueprint {
         {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
+            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XSL_Weapon',
@@ -1106,7 +1101,7 @@ UnitBlueprint {
                 commandDamage = 400,
                 structureDamage = 800,
                 maxDamage = 15000,
-                minDamage = 1500,
+                minDamage = 1250,
             },
             ProjectileId = '/projectiles/SDFChronatronCannon02/SDFChronatronCannon02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 2,
@@ -1128,15 +1123,14 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.2,
             SlavedToBody = false,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE TECH1',
                 'COMMAND',
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
@@ -1189,7 +1183,6 @@ UnitBlueprint {
             },
             RackRecoilDistance = 0,
             RateOfFire = 1,
-            TargetCheckInterval = 9999999,
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
@@ -1242,16 +1235,16 @@ UnitBlueprint {
             RackFireTogether = false,
             RackRecoilDistance = 0,
             RackReloadTimeout = 10,
+            EnabledByEnhancement = "Missile",
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 5,
             TargetPriorities = {
-                'STRUCTURE DEFENSE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
@@ -1267,6 +1260,7 @@ UnitBlueprint {
             DisplayName = 'Teleport in',
             DummyWeapon = true,
             Label = 'TeleportWeapon',
+            ManualFire = true,
             MaxRadius = 1,
             RateOfFire = 1,
             WeaponCategory = 'Teleport',

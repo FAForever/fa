@@ -3,21 +3,17 @@
 --* Author: Ted Snook
 --* Summary: Mission text HUD
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/Bitmap.lua').Bitmap
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local WrapText = import('/lua/maui/text.lua').WrapText
-local Movie = import('/lua/maui/movie.lua').Movie
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local econ = import('/lua/ui/game/economy.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local WrapText = import("/lua/maui/text.lua").WrapText
+local Movie = import("/lua/maui/movie.lua").Movie
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
 local MISSION_TEXT_TIMEOUT = 10
 local missionTextInactivityTime = 11
@@ -28,6 +24,14 @@ local currentlyPlaying = false
 local textHistory = ""
 local subtitleThread = false
 local videoQueue = {}
+
+local prefix = {
+    Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
+    Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
+    UEF = {texture = '/icons/comm_uef.dds', cue = 'UI_Comm_UEF'},
+    Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
+    NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}
+}
 
 controls = {
     infoBG = false,
@@ -58,39 +62,40 @@ end
 local currentMovie = false
 function PlayMFDMovie(movie, text)
     if not controls.movieBrackets then
-        local prefix = {Cybran = {texture = '/icons/comm_cybran.dds', cue = 'UI_Comm_CYB'},
-            Aeon = {texture = '/icons/comm_aeon.dds', cue = 'UI_Comm_AEON'},
-            UEF = {texture = '/icons/comm_uef.dds', cue = 'UI_Comm_UEF'},
-            Seraphim = {texture = '/icons/comm_seraphim.dds', cue = 'UI_Comm_SER'},
-            NONE = {texture = '/icons/comm_allied.dds', cue = 'UI_Comm_UEF'}}
-        
         controls.movieBrackets = Bitmap(GetFrame(0), UIUtil.SkinnableFile('/game/transmission/video-brackets.dds'))
         controls.movieBrackets.Height:Set(1)
         controls.movieBrackets.Width:Set(1)
         controls.movieBrackets.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
         controls.movieBrackets:SetNeedsFrameUpdate(true)
-        
+
         controls.movieBrackets.panel = Bitmap(controls.movieBrackets, UIUtil.SkinnableFile('/game/transmission/video-panel.dds'))
         LayoutHelpers.AtCenterIn(controls.movieBrackets.panel, controls.movieBrackets)
         controls.movieBrackets.panel:SetAlpha(0)
-        
+
         controls.movieBrackets.cover = Bitmap(controls.movieBrackets, UIUtil.UIFile(prefix[movie[4]].texture))
-        controls.movieBrackets.cover.Height:Set(190)
-        controls.movieBrackets.cover.Width:Set(190)
-        controls.movieBrackets.cover.Depth:Set(function() return controls.movieBrackets.panel.Depth() - 1 end)
+        LayoutHelpers.SetDimensions(controls.movieBrackets.cover, 190, 190)
+        LayoutHelpers.DepthUnderParent(controls.movieBrackets.cover, controls.movieBrackets.panel)
         LayoutHelpers.AtCenterIn(controls.movieBrackets.cover, controls.movieBrackets.panel)
         controls.movieBrackets.cover:SetAlpha(0)
-        
+
         controls.movieBrackets.movie = Movie(controls.movieBrackets, movie[1])
-        controls.movieBrackets.movie.Height:Set(190)
-        controls.movieBrackets.movie.Width:Set(190)
-        controls.movieBrackets.movie.Depth:Set(function() return controls.movieBrackets.panel.Depth() - 1 end)
+        LayoutHelpers.SetDimensions(controls.movieBrackets.movie, 190, 190)
+        LayoutHelpers.DepthUnderParent(controls.movieBrackets.movie, controls.movieBrackets.panel)
         LayoutHelpers.AtCenterIn(controls.movieBrackets.movie, controls.movieBrackets.panel)
         controls.movieBrackets.movie:SetAlpha(0)
-        
+
         controls.subtitles = CreateSubtitles(controls.movieBrackets, text[1])
-        
+
         controls.movieBrackets.movie.OnFinished = function(self)
+            if (not controls.movieBrackets.movie:IsLoaded()) and (self.loadCheck == nil) then
+                ForkThread(
+                function(self, duration, onFinished)
+                    WaitSeconds(duration)
+                    onFinished(self)
+                end, self, GetMovieDuration(movie[1]), controls.movieBrackets.movie.OnFinished)
+                self.loadCheck = true
+                return
+            end
             controls.movieBrackets.panel:SetNeedsFrameUpdate(true)
             controls.movieBrackets.panel.sound = PlaySound(Sound{Bank='Interface', Cue=prefix[movie[4]].cue..'_Out'})
             controls.subtitles:Contract()
@@ -131,30 +136,32 @@ function PlayMFDMovie(movie, text)
                     controls.movieBrackets:Destroy()
                     controls.movieBrackets = false
                     local entryData = {
-                        movie = movie[1], 
-                        text = text, 
-                        soundbank = movie[2], 
-                        soundcue = movie[3], 
+                        movie = movie[1],
+                        text = text,
+                        soundbank = movie[2],
+                        soundcue = movie[3],
                         faction = movie[4],
                     }
-                    import('/lua/ui/game/transmissionlog.lua').AddEntry(entryData)
+                    import("/lua/ui/game/transmissionlog.lua").AddEntry(entryData)
                     SimCallback( { Func = "OnMovieFinished", Args = movie[1]} )
                 end
             end
         end
-        
+
         controls.movieBrackets.OnFrame = function(self, delta)
             if controls.movieBrackets._paused then
                 return
             end
             local finishedHeight = false
             local finishedWidth = false
-            local newHeight = math.min(self.Height() + (delta * 600), self.BitmapHeight())
-            local newWidth = math.min(self.Width() + (delta * 600), self.BitmapWidth())
-            if newHeight == self.BitmapHeight() then
+            local bitmapHeight = LayoutHelpers.ScaleNumber(self.BitmapHeight())
+            local bitmapWidth = LayoutHelpers.ScaleNumber(self.BitmapWidth())
+            local newHeight = math.min(self.Height() + (delta * 600), bitmapHeight)
+            local newWidth = math.min(self.Width() + (delta * 600), bitmapWidth)
+            if newHeight == bitmapHeight then
                 finishedHeight = true
             end
-            if newWidth == self.BitmapWidth() then
+            if newWidth == bitmapWidth then
                 finishedWidth = true
             end
             self.Height:Set(newHeight)
@@ -166,7 +173,7 @@ function PlayMFDMovie(movie, text)
                 controls.subtitles:Expand()
             end
         end
-        
+
         controls.movieBrackets.panel.OnFrame = function(self, delta)
             if controls.movieBrackets._paused then
                 return
@@ -184,7 +191,7 @@ function PlayMFDMovie(movie, text)
                 controls.movieBrackets.cover:SetAlpha(newAlpha)
             end
         end
-        
+
         controls.movieBrackets.Pause = function(self, state)
             PauseVoice("VO", state)
             self._paused = state
@@ -194,7 +201,7 @@ function PlayMFDMovie(movie, text)
                 self.movie:Play()
             end
         end
-        
+
         controls.movieBrackets:DisableHitTest(true)
         SetLayout()
     end
@@ -210,10 +217,10 @@ end
 
 function CreateSubtitles(parent, text)
     local bg = Bitmap(parent, UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
-    
+
     bg.text = {}
     bg.text[1] = UIUtil.CreateText(bg, '', 12, UIUtil.bodyFont)
-    
+
     bg.tl = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
     bg.tm = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
     bg.tr = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
@@ -222,7 +229,7 @@ function CreateSubtitles(parent, text)
     bg.bl = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
     bg.bm = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
     bg.br = Bitmap(bg, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
-    
+
     bg.tl.Bottom:Set(bg.Top)
     bg.tl.Right:Set(bg.Left)
     bg.tr.Bottom:Set(bg.Top)
@@ -243,10 +250,11 @@ function CreateSubtitles(parent, text)
     bg.mr.Left:Set(bg.Right)
     bg.mr.Top:Set(bg.Top)
     bg.mr.Bottom:Set(bg.Bottom)
-    
-    local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), 300, 
+
+    local textWidth = LayoutHelpers.ScaleNumber(300)
+    local wrapped = WrapText(LOC(text), textWidth,
         function(curText) return bg.text[1]:GetStringAdvance(curText) end)
-        
+
     for index, line in wrapped do
         local i = index
         if not bg.text[i] then
@@ -255,14 +263,14 @@ function CreateSubtitles(parent, text)
         end
         bg.text[i]:SetText(line)
     end
-    
+
     bg.Top:Set(bg.text[1].Top)
     bg.Left:Set(bg.text[1].Left)
     bg.Width:Set(1)
     bg.Height:Set(function() return table.getsize(bg.text) * bg.text[1].Height() end)
-    
+
     bg:SetAlpha(0, true)
-    
+
     bg.Expand = function(control)
         control:SetAlpha(1, true)
         bg.text[1]:SetAlpha(0, true)
@@ -273,8 +281,8 @@ function CreateSubtitles(parent, text)
             end
             local newWidth = self.Width() + (delta * 800)
             local finishedWidth = false
-            if newWidth > 300 then
-                newWidth = 300
+            if newWidth > textWidth then
+                newWidth = textWidth
                 finishedWidth = true
             end
             if finishedWidth then
@@ -295,7 +303,7 @@ function CreateSubtitles(parent, text)
             self:SetAlpha(newAlpha, true)
         end
     end
-    
+
     bg.Contract = function(control)
         control.text[1]:SetNeedsFrameUpdate(true)
         control.OnFrame = function(self, delta)
@@ -327,7 +335,7 @@ function CreateSubtitles(parent, text)
             self:SetAlpha(newAlpha, true)
         end
     end
-    
+
     return bg
 end
 
@@ -344,7 +352,7 @@ function ResumeTransmission()
 end
 
 function UpdateQueue()
-    if table.getsize(videoQueue) > 0 then
+    if not table.empty(videoQueue) then
         PlayMFDMovie({videoQueue[1][1], videoQueue[1][2], videoQueue[1][3], videoQueue[1][4]}, videoQueue[1][5])
         table.remove(videoQueue, 1)
     end
@@ -353,13 +361,13 @@ end
 function DisplaySubtitles(textControl,captions)
     subtitleThread = ForkThread(
         function()
-            # Display subtitles
+            -- Display subtitles
             local lastOff = 0
             for k,v in captions do
                 WaitSeconds(v.offset - lastOff)
                 textControl:DeleteAllItems()
                 locText = LOC(v.text)
-                #LOG("Wrap: ",locText)
+                --LOG("Wrap: ",locText)
                 local lines = WrapText(locText, textControl.Width(), function(text) return textControl:GetStringAdvance(text) end)
                 for i,line in lines do
                     textControl:AddItem(line)
@@ -426,7 +434,7 @@ function EndGameFMV(faction)
         --DisplaySubtitles(textArea, strings.captions)
         loading = false
     end
-    
+
     function DoExit(onFMVFinished)
         nis:Stop()
         loading = true
@@ -459,11 +467,11 @@ function EndGameFMV(faction)
         end
         nis.stage = nis.stage + 1
     end
-    
+
     nis.OnFinished = function(self)
         DoExit(true)
     end
-    
+
     nis.HandleEvent = function(self, event)
         if loading then
             return false

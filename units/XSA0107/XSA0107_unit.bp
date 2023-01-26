@@ -114,7 +114,7 @@ UnitBlueprint {
         'TRANSPORTFOCUS',
         'CANNOTUSEAIRSTAGING',
     },
-    CollisionOffsetY = -2,
+    CollisionOffsetY = -0.1,
     CollisionOffsetZ = 1.5,
     Defense = {
         AirThreatLevel = 4,
@@ -208,8 +208,8 @@ UnitBlueprint {
         Category = 'Transport',
         Classification = 'RULEUC_MilitaryAircraft',
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = true,
+            RULEUCC_Attack = true,
+            RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
@@ -260,7 +260,7 @@ UnitBlueprint {
     SelectionSizeZ = 4.5,
     SelectionThickness = 0.23,
     SizeX = 4.5,
-    SizeY = 3,
+    SizeY = 1.7,
     SizeZ = 7,
     StrategicIconName = 'icon_gunship1_transport',
     StrategicIconSortPriority = 65,
@@ -269,9 +269,39 @@ UnitBlueprint {
         Class2AttachSize = 2,
         Class3AttachSize = 4,
         TransportClass = 10,
+        Class1Capacity = 8,
     },
     UseOOBTestZoom = 200,
     Weapon = {
+        {
+            Damage = 0,
+            DisplayName = 'Weapon Guidance System',
+            FireTargetLayerCapsTable = {
+                Air = 'Land|Water|Seabed',
+                Land = 'Land|Water|Seabed',
+            },
+            Label = 'GuidanceSystem',
+            MaxRadius = 22,
+            MuzzleSalvoDelay = 1,
+            MuzzleSalvoSize = 0,
+            ProjectileId = '/projectiles/AAASonicPulse02/AAASonicPulse02_proj.bp',
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Muzzle_R',
+                    },
+                    RackBone = 'Turret_Right',
+                },
+            },
+            RackRecoilDistance = 0,
+            TargetRestrictDisallow = 'UNTARGETABLE AIR',
+            TurretPitch = 0,
+            TurretPitchRange = 45,
+            TurretPitchSpeed = 360,
+            TurretYaw = 0,
+            TurretYawRange = 180,
+            TurretYawSpeed = 360,
+        },
         {
             AboveWaterTargetsOnly = true,
             Damage = 100,

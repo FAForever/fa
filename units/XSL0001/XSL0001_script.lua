@@ -7,16 +7,17 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
-local Buff = import('/lua/sim/Buff.lua')
-local SWeapons = import('/lua/seraphimweapons.lua')
+local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
+local Buff = import("/lua/sim/buff.lua")
+local SWeapons = import("/lua/seraphimweapons.lua")
 local SDFChronotronCannonWeapon = SWeapons.SDFChronotronCannonWeapon
 local SDFChronotronOverChargeCannonWeapon = SWeapons.SDFChronotronCannonOverChargeWeapon
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
+---@class XSL0001 : ACUUnit
 XSL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(DeathNukeWeapon) {},
@@ -54,7 +55,7 @@ XSL0001 = Class(ACUUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     GetUnitsToBuff = function(self, bp)
@@ -111,10 +112,13 @@ XSL0001 = Class(ACUUnit) {
                             Add = 0,
                             Mult = bp.RegenPerSecond,
                             Floor = bp.RegenFloor,
-                            CeilT1 = bp.RegenCeilingT1,
-                            CeilT2 = bp.RegenCeilingT2,
-                            CeilT3 = bp.RegenCeilingT3,
-                            CeilT4 = bp.RegenCeilingT4,
+                            BPCeilings = {
+                                TECH1 = bp.RegenCeilingT1,
+                                TECH2 = bp.RegenCeilingT2,
+                                TECH3 = bp.RegenCeilingT3,
+                                EXPERIMENTAL = bp.RegenCeilingT4,
+                                SUBCOMMANDER = bp.RegenCeilingSCU,
+                            },
                         },
                     },
                 }
@@ -142,12 +146,16 @@ XSL0001 = Class(ACUUnit) {
                             Add = bp.ACUAddHealth,
                             Mult = 1,
                         },
+                        Regen = {
+                            Add = bp.NewRegenRate,
+                            Mult = 1,
+                        },
                     },
                 }
             end
 
             Buff.ApplyBuff(self, buff2)
-            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0001', self:GetArmy(), '/effects/emitters/seraphim_regenerative_aura_01_emit.bp'))
+            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0001', self.Army, '/effects/emitters/seraphim_regenerative_aura_01_emit.bp'))
             if self.RegenThreadHandle then
                 KillThread(self.RegenThreadHandle)
                 self.RegenThreadHandle = nil
@@ -294,8 +302,6 @@ XSL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'SeraphimACUT2BuildRate')
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
 
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
@@ -305,8 +311,6 @@ XSL0001 = Class(ACUUnit) {
             if Buff.HasBuff(self, 'SeraphimACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'SeraphimACUT2BuildRate')
          end
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
 
         --T3 Engineering
         elseif enh =='T3Engineering' then
@@ -338,8 +342,6 @@ XSL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'SeraphimACUT3BuildRate')
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -348,8 +350,6 @@ XSL0001 = Class(ACUUnit) {
                 Buff.RemoveBuff(self, 'SeraphimACUT3BuildRate')
             end
             self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
         --Blast Attack
         elseif enh == 'BlastAttack' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')

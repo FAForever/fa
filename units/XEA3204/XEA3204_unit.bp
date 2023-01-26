@@ -1,6 +1,5 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 15,
         InitialAutoMode = true,
     },
     Air = {
@@ -111,8 +110,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Light',
         EconomyThreatLevel = 1,
-        Health = 6,
-        MaxHealth = 6,
+        Health = 50,
+        MaxHealth = 50,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -136,10 +135,10 @@ UnitBlueprint {
         UniformScale = 0.011,
     },
     Economy = {
-        BuildCostEnergy = 2500,
-        BuildCostMass = 250,
+        BuildCostEnergy = 1000,
+        BuildCostMass = 100,
         BuildRate = 25,
-        BuildTime = 750,
+        BuildTime = 500,
     },
     General = {
         BuildBones = {
@@ -176,7 +175,7 @@ UnitBlueprint {
                 helpText = 'drone_station',
             },
         },
-        SelectionPriority = 6,
+        SelectionPriority = 3,
         TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC xea3204_name>C-D2 "Rover-2"',
         UnitWeight = 1,
@@ -200,7 +199,7 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = false,
         },
-        Elevation = 2.0, #from 0.4
+        Elevation = 3.0, --from 0.4
         GroundCollisionOffset = 0.2,
         MaxAcceleration = 10,
         MaxSpeed = 10,

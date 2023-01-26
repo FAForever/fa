@@ -2,14 +2,14 @@
 -- File     :  /maps/perftest/perftest_script.lua
 -- Author(s):  Marc Scattergood
 -- Summary  :  perftest Demo Map
--- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioStrings = import('/lua/ScenarioStrings.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Cinematics = import('/lua/cinematics.lua')
-local Utilities = import('/lua/Utilities.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioStrings = import("/lua/scenariostrings.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Cinematics = import("/lua/cinematics.lua")
+local Utilities = import("/lua/utilities.lua")
 
 function OnPopulate(scenario)
     ScenarioUtils.InitializeScenarioArmies()
@@ -332,14 +332,14 @@ function AtlantisRising()
 
     IssueDive(U_NG_L3_P3)
 
-    if not U_NG_L3_P3[1]:IsDead() then
+    if not U_NG_L3_P3[1].Dead then
         IssueTransportUnload(U_NG_L3_P3, P_NG_L2_P1[1]:GetPosition())
     end
 
     SetArmyGroupState(U_NG_L3_P3, 'Aggressive')
     WaitSeconds(12.0)
 
-    if not P_NG_L3_P3[1]:IsDead() then
+    if not P_NG_L3_P3[1].Dead then
         IssueTransportUnload(P_NG_L3_P3, U_NG_L2_P1[1]:GetPosition())
     end
 end
@@ -524,7 +524,7 @@ end
 function SetArmyGroupState(ArmyGroup, FireState)
     if ArmyGroup then
         for k, v in ArmyGroup do
-            if not v:IsDead() then
+            if not v.Dead then
                 v:SetFireState(FireState)
             end
         end
@@ -539,7 +539,7 @@ function SpawnAndSetArmySubGroupState(FireState, ...)
 
     if units then
         for k, v in units do
-            if not v:IsDead() then
+            if not v.Dead then
                 v:SetFireState(FireState)
             end
         end
@@ -574,7 +574,7 @@ end
 function SetStateAndMove(ArmyGroup, NewFireState, xOff, zOff)
     if ArmyGroup then
         for k, v in ArmyGroup do
-            if not v:IsDead() then
+            if not v.Dead then
                 v:SetFireState(NewFireState)
                 local x, y, z = unpack(v:GetPosition())
                 IssueAggressiveMove({v}, {x + xOff, y, z + zOff})
@@ -588,7 +588,7 @@ end
 function StartAttackMove(units, MoveTo)
     if units then
         for k, v in units do
-            if not v:IsDead() then
+            if not v.Dead then
                 v:SetFireState('Aggressive')
             end
          end
@@ -603,7 +603,7 @@ end
 function StartPassiveMove(units, MoveTo)
     if units then
         for k, v in units do
-            if not v:IsDead() then
+            if not v.Dead then
                 v:SetFireState('HoldFire')
             end
         end

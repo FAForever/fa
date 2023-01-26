@@ -4,24 +4,23 @@
 -- Summary  :  EMP Flux Warhead Impact effects projectile
 -- Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 AIFQuantumWarhead02 = Class(NullShell) {
     NormalEffects = {'/effects/emitters/quantum_warhead_01_emit.bp',},
     CloudFlareEffects = EffectTemplate.CloudFlareEffects01,
 
     EffectThread = function(self)
-        local army = self:GetArmy()
-        CreateLightParticle(self, -1, army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
+        CreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
 
-        self:ForkThread(self.ShakeAndBurnMe, army)
-        self:ForkThread(self.InnerCloudFlares, army)
+        self:ForkThread(self.ShakeAndBurnMe, self.Army)
+        self:ForkThread(self.InnerCloudFlares, self.Army)
         self:ForkThread(self.DistortionField)
 
         for k, v in self.NormalEffects do
-            CreateEmitterAtEntity(self, army, v)
+            CreateEmitterAtEntity(self, self.Army, v)
         end
     end,
 
@@ -46,6 +45,7 @@ AIFQuantumWarhead02 = Class(NullShell) {
         local emit, x, y, z = nil
         local DirectionMul = 0.02
         local OffsetMul = 4
+        local army = self.Army 
 
         for i = 0, (numFlares - 1) do
             x = math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
