@@ -246,6 +246,23 @@ AIBrain = Class(moho.aibrain_methods) {
         self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
     end,
 
+    --- Completely re evaluates the support factory restrictions of the engi mod
+    ---@param self AIBrain
+    ReEvaluateHQSupportFactoryRestrictions = function (self)
+        local layers = { "AIR", "LAND", "NAVAL" }
+        local factions = { "UEF", "AEON", "CYBRAN", "SERAPHIM" }
+
+        if categories.NOMADS then
+            table.insert(factions, 'NOMADS')
+        end
+
+        for _, faction in factions do
+            for _, layer in layers do
+                self:SetHQSupportFactoryRestrictions(faction, layer)
+            end
+        end
+    end,
+
     --- Manages the support factory restrictions of the engi mod
     ---@param self AIBrain
     ---@param faction HqFaction
@@ -260,13 +277,13 @@ AIBrain = Class(moho.aibrain_methods) {
         AddBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
 
         -- lift t2 / t3 support factory restrictions
-        if self.HQs[faction][layer]["TECH3"] > 0 then 
+        if self.HQs[faction][layer]["TECH3"] > 0 then
             RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
             RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
         end
 
         -- lift t2 support factory restrictions
-        if self.HQs[faction][layer]["TECH2"] > 0 then 
+        if self.HQs[faction][layer]["TECH2"] > 0 then
             RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
         end
     end,

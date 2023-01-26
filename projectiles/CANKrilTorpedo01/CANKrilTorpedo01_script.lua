@@ -18,6 +18,7 @@ CANKrilTorpedo01 = ClassProjectile(CKrilTorpedo) {
 
     OnEnterWater = function(self)
         CKrilTorpedo.OnEnterWater(self)
+        LOG("Hi")
         local army = self.Army
         for i in self.FxEnterWater do --splash
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])

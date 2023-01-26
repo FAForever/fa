@@ -50,6 +50,29 @@ StructureUnit = ClassUnit(Unit) {
         if self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
         end
+
+        -- check for terrain orientation
+        local bp = self.Blueprint
+        if not (
+                bp.Physics.AltitudeToTerrain or
+                bp.Physics.StandUpright
+            ) and self.Layer == 'Land'
+        then
+            -- rotate structure to match terrain gradient
+            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
+                self:GetPosition(),
+                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
+                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+            )
+
+            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
+
+            -- technically obsolete, but as this is part of an integration we don't want to break
+            -- the mod package that it originates from. Originates from the BrewLan mod suite
+            if not bp.Physics.FlattenSkirt then
+                self.TerrainSlope = {}
+            end
+        end
     end,
 
     --- Hides parts of a mesh that should be visible when the structure is made on water
@@ -137,23 +160,6 @@ StructureUnit = ClassUnit(Unit) {
         local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
-        end
-
-        if not (bp.Physics.AltitudeToTerrain or bp.Physics.StandUpright) then
-            -- rotate structure to match terrain gradient
-            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
-                self:GetPosition(),
-                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
-                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
-            )
-
-            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
-
-            -- technically obsolete, but as this is part of an integration we don't want to break
-            -- the mod package that it originates from. Originates from the BrewLan mod suite
-            if not bp.Physics.FlattenSkirt then
-                self.TerrainSlope = {}
-            end
         end
 
         -- create decal below structure
@@ -2272,6 +2278,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         else
             MobileUnit.OnStartBuild(self, unitBeingBuilt, order)
         end
+
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order

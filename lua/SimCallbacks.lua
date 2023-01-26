@@ -209,9 +209,6 @@ Callbacks.CapStructure = function(data, units)
     -- check if we're allowed to mess with this structure
     if not OkayToMessWithArmy(structure.Army) then return end
 
-    -- we can't cap an extractor that is on the ocean floor
-    if structure.Layer == 'Seabed' then return end
-
     -- check if we have units
     local units = EntityCategoryFilterDown(CategoriesEngineer, SecureUnits(units))
     if not units[1] then return end

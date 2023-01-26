@@ -365,7 +365,7 @@ TStructureUnit = ClassUnit(DefaultUnitsFile.StructureUnit) {}
 
 ---@class TRadarJammerUnit : RadarJammerUnit
 ---@field MySpinner? moho.RotateManipulator
-TRadarJammerUnit = ClassUnit() {
+TRadarJammerUnit = ClassUnit(DefaultUnitsFile.RadarJammerUnit) {
 
     ---@param self TRadarJammerUnit
     OnIntelEnabled = function(self)

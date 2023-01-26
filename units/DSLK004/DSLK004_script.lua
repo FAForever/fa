@@ -1,11 +1,8 @@
---****************************************************************************
---**
---**  Author(s):  Mikko Tyster, Atte Hulkkonen
---**
---**  Summary  :  Seraphim T3 Mobile Lightning Anti-Air
---**
---**  Copyright © 2008 Blade Braver!
---****************************************************************************
+------------------------------------------------------------------------------
+-- Author(s):  Mikko Tyster, Atte Hulkkonen
+-- Summary  :  Seraphim T3 Mobile Lightning Anti-Air
+-- Copyright © 2008 Blade Braver!
+------------------------------------------------------------------------------
 
 local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
 --local CollisionBeamFile = import("/lua/kirvesbeams.lua")
