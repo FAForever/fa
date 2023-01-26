@@ -25,4 +25,4 @@ AIFMiasmaShell01 = ClassProjectile(AMiasmaProjectile) {
         self:Destroy()
     end,
 }
-TypeClass = AIFMiasmaShell01v
+TypeClass = AIFMiasmaShell01
