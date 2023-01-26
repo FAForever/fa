@@ -961,11 +961,11 @@ NORMALMAPPED_VERTEX NormalMappedVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, viewMatrix);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
+
     // I'm not sure why this is working, should use the camera position for view vector calculation once that is available
-    vertex.viewDirection = -mul(viewMatrix, vertex.position);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
-    vertex.position = mul(vertex.position, projMatrix);
 
     vertex.texcoord0 = ( anim.w > 0.5 ) ? ComputeScrolledTexcoord( texcoord0, material) : texcoord0;
     vertex.color = color;
@@ -6347,7 +6347,7 @@ technique PhaseShield_HighFidelity
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         RasterizerState( Rasterizer_Cull_CW )
 
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
         PixelShader = compile ps_2_0 PhaseShieldPS();
     }
 }
