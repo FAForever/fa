@@ -2441,8 +2441,23 @@ SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
 }
 
 -- AMPHIBIOUS LAND UNITS
----@class AmphibiousLandUnit : MobileUnit
-AmphibiousLandUnit = ClassUnit(MobileUnit) { }
+---@class AmphibiousLandUnit : MobileUnit, TreadComponent
+AmphibiousLandUnit = ClassUnit(MobileUnit, TreadComponent) {
+    OnCreate = function(self)
+        MobileUnit.OnCreate(self)
+        TreadComponent.OnCreate(self)
+    end,
+
+    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
+        MobileUnit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
+        TreadComponent.CreateMovementEffects(self)
+    end,
+
+    DestroyMovementEffects = function(self)
+        MobileUnit.DestroyMovementEffects(self)
+        TreadComponent.DestroyMovementEffects(self)
+    end,
+}
 
 ---@class SlowAmphibiousLandUnit : AmphibiousLandUnit
 SlowAmphibiousLandUnit = ClassUnit(AmphibiousLandUnit) {

@@ -33,10 +33,10 @@ ShieldEffectsComponent = ClassSimple {
 
 ---@type table<string, number>
 local TechToDuration = {
-    TECH1 = 0.5,
+    TECH1 = 1,
     TECH2 = 2,
-    TECH3 = 8,
-    EXPERIMENTAL = 32,
+    TECH3 = 4,
+    EXPERIMENTAL = 16,
 }
 local TechToLOD = {
     TECH1 = 120,
@@ -58,7 +58,6 @@ TreadComponent = ClassSimple {
 
     ---@param self Unit | TreadComponent
     CreateMovementEffects = function(self)
-        LOG("CreateMovementEffects")
         local treads = self.TreadBlueprint
         if treads then
             self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
@@ -72,7 +71,6 @@ TreadComponent = ClassSimple {
 
     ---@param self Unit | TreadComponent
     DestroyMovementEffects = function(self)
-        LOG("DestroyMovementEffects")
         local treads = self.TreadBlueprint
         if treads then
             self:RemoveScroller()
@@ -99,8 +97,8 @@ TreadComponent = ClassSimple {
             self.TreadThreads = treadThreads
         else
             self.TreadSuspend = nil
-            for k, v in treadThreads do
-                ResumeThread(treadThreads[k])
+            for k, thread in treadThreads do
+                ResumeThread(thread)
             end
         end
     end,
@@ -112,6 +110,7 @@ TreadComponent = ClassSimple {
         -- to local scope for performance
         local WaitTicks = WaitTicks
         local CreateSplatOnBone = CreateSplatOnBone
+        local SuspendCurrentThread = SuspendCurrentThread
 
         local tech = self.Blueprint.TechCategory
         local sizeX = treads.TreadMarksSizeX
@@ -126,13 +125,10 @@ TreadComponent = ClassSimple {
         local army = self.Army
 
         while true do
-            LOG("Creating treads!")
             while not self.TreadSuspend do
                 CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, lod, duration, army)
                 WaitTicks(interval)
             end
-
-            LOG("Suspending...")
 
             SuspendCurrentThread()
             self.TreadSuspend = nil

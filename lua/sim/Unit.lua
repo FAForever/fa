@@ -1693,6 +1693,8 @@ Unit = ClassUnit(moho.unit_methods) {
         end
     end,
 
+    
+
     --- Called when a unit collides with a projectile to check if the collision is valid
     ---@param self Unit The unit we're checking the collision for
     ---@param other Projectile The projectile we're checking the collision with
