@@ -714,6 +714,9 @@ function CreateAdjacencyBeams(unit, adjacentUnit, adjacencyBeamsBag)
         TrashBagAdd(unitTrash, entity)
     end
 
+    LOG(unit.UnitId)
+    LOG(adjacentUnit.UnitId)
+
     -- Attach beams to the adjacent unit
     for i = 1, numNodes + 1 do
         local node = nodeList[i]
@@ -724,7 +727,14 @@ function CreateAdjacencyBeams(unit, adjacentUnit, adjacencyBeamsBag)
             node.entity:SetOrientation(OrientFromDir(vec), true)
         end
         if beamEffect then
-            local beam = AttachBeamEntityToEntity(nodeList[i + 1].entity, -1, node.entity, -1, unitArmy, beamEffect)
+            local beam
+            local categoriesHash = adjacentUnit.Blueprint.CategoriesHash
+            if categoriesHash["MASSSTORAGE"] or categoriesHash["ENERGYSTORAGE"] then
+                beam = AttachBeamEntityToEntity(node.entity, -1, nodeList[i + 1].entity, -1, unitArmy, beamEffect)
+            else
+                beam = AttachBeamEntityToEntity(nodeList[i + 1].entity, -1, node.entity, -1, unitArmy, beamEffect)
+            end
+
             TrashBagAdd(infoTrash, beam)
             TrashBagAdd(unitTrash, beam)
         end
