@@ -6347,7 +6347,7 @@ technique PhaseShield_HighFidelity
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         RasterizerState( Rasterizer_Cull_CW )
 
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
         PixelShader = compile ps_2_0 PhaseShieldPS();
     }
 }
