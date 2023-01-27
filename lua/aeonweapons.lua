@@ -235,11 +235,10 @@ ADFTractorClaw = Class(Weapon) {
                     
 
                     target.CanTakeDamage = true
-                    while not IsDestroyed(target) and not IsDestroyed(unit) and target:GetHealth() >= 73 do
-                        WaitSeconds(0.1)
-                        if target:GetHealth() > 73 then
-                            Damage(unit, bonePosition, target, 72, "Normal")
-                        end
+                    while not IsDestroyed(target) and not IsDestroyed(unit) and target:GetHealth() >= 730 do
+                        Damage(unit, bonePosition, target, 729, "Normal")
+                        Explosion.CreateScalableUnitExplosion(target, 1, true)
+                        WaitTicks(11)
                     end
 
                     CreateLightParticle(unit, muzzle, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
@@ -257,7 +256,6 @@ ADFTractorClaw = Class(Weapon) {
                     -- create thread to take into account the fall
                     self:ForkThread(self.TargetFallThread, target, trash, muzzle)
                     self:ResetTarget()
-                    LOG("0")
                 else 
                     self:MakeVulnerable(target)
                     trash:Destroy()
