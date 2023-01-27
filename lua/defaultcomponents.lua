@@ -65,7 +65,8 @@ TreadComponent = ClassSimple {
             self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
 
             local treadMarks = treads.TreadMarks
-            if treadMarks and self.TerrainType.Treads ~= 'None' then
+            local treadType = self.TerrainType.Treads
+            if treadMarks and treadType and treadType ~= 'None' then
                 self:CreateTreads(treadMarks)
             end
         end
