@@ -17,18 +17,19 @@ local Effects = import("/lua/effecttemplates.lua")
 DEL0204 = ClassUnit(TWalkingLandUnit)
 {
     Weapons = {
-        GatlingCannon = ClassWeapon(TDFPlasmaCannonWeapon) 
+        GatlingCannon = ClassWeapon(TDFPlasmaCannonWeapon)
         {
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(0)
                 end
-                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army,
+                    Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxWeaponPackSequence(self)
             end,
 
             PlayFxRackSalvoChargeSequence = function(self)
-                if not self.SpinManip then 
+                if not self.SpinManip then
                     self.SpinManip = CreateRotator(self.unit, 'Left_Arm_Barrel', 'z', nil, 270, 180, 60)
                     self.unit.Trash:Add(self.SpinManip)
                 end
@@ -37,13 +38,14 @@ DEL0204 = ClassUnit(TWalkingLandUnit)
                     self.SpinManip:SetTargetSpeed(500)
                 end
                 TDFPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
-            end,            
+            end,
 
             PlayFxRackSalvoReloadSequence = function(self)
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(200)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                self.ExhaustEffects = EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle',
+                    self.unit.Army, Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },

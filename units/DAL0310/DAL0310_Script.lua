@@ -5,7 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 
---changes from ALandUnit to AHoverLandUnit
+-- changes from ALandUnit to AHoverLandUnit
 local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
 local ADFDisruptorCannonWeapon = import("/lua/aeonweapons.lua").ADFDisruptorWeapon
 
@@ -15,9 +15,9 @@ DAL0310 = ClassUnit(AHoverLandUnit) {
         MainGun = ClassWeapon(ADFDisruptorCannonWeapon) {
             CreateProjectileAtMuzzle = function(self, muzzle)
                 local proj = ADFDisruptorCannonWeapon.CreateProjectileAtMuzzle(self, muzzle)
-                local data = self:GetBlueprint().DamageToShields
+                local data = self.Blueprint.DamageToShields
                 if proj and not proj:BeenDestroyed() then
-                    proj:PassData(data)
+                    proj:PassMetaDamage(data)
                 end
             end,
           }
