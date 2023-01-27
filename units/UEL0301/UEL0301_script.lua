@@ -165,7 +165,7 @@ UEL0301 = Class(CommandUnit) {
         elseif enh =='AdvancedCoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
-            wep:AddDamageMod(-wep:AddDamageMod(-self:GetBlueprint().Enhancements['AdvancedCoolingUpgrade'].UpgradeDamageMod))
+            wep:AddDamageMod(-self:GetBlueprint().Enhancements['AdvancedCoolingUpgrade'].UpgradeDamageMod)
         elseif enh =='HighExplosiveOrdnance' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadius)
