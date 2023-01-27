@@ -399,7 +399,7 @@ UnitBlueprint {
                 'Back_Upgrade',
             },
             Slot = 'Back',
-            UpgradeDamageMod = 300,
+            NewDamageMod = 300,
             UpgradeEffectBones = {
                 'Back_Upgrade',
             },

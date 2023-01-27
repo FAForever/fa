@@ -139,7 +139,7 @@ UAL0301 = Class(CommandUnit) {
             wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
         elseif enh =='StabilitySuppressantRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
+            wep:AddDamageMod(-self:GetBlueprint().Enhancements['StabilitySuppressant'].NewDamageMod)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
         end
