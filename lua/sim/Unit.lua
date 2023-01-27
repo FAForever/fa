@@ -5121,6 +5121,14 @@ Unit = ClassUnit(moho.unit_methods) {
 
     --- Deprecated functionality
 
+    ---@param self Unit
+    ---@param pos Vector
+    ---@return TerrainTreadType
+    GetTTTreadType = function(self, pos)
+        local terrainType = GetTerrainType(pos[1], pos[3])
+        return terrainType.Treads or 'None'
+    end,
+
     ---@deprecated
     ---@param self Unit
     ---@param fn function

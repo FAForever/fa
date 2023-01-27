@@ -38,6 +38,8 @@ local TechToDuration = {
     TECH3 = 4,
     EXPERIMENTAL = 16,
 }
+
+---@type table<string, number>
 local TechToLOD = {
     TECH1 = 120,
     TECH2 = 180,
@@ -63,7 +65,7 @@ TreadComponent = ClassSimple {
             self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
 
             local treadMarks = treads.TreadMarks
-            if treadMarks then
+            if treadMarks and self.TerrainType.Treads ~= 'None' then
                 self:CreateTreads(treadMarks)
             end
         end
@@ -132,7 +134,7 @@ TreadComponent = ClassSimple {
 
             SuspendCurrentThread()
             self.TreadSuspend = nil
-            WaitTicks(interval)
+            WaitTicks(1)
         end
     end,
 }
