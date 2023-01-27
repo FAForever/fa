@@ -234,10 +234,12 @@ ADFTractorClaw = Class(Weapon) {
                 if not IsDestroyed(unit) then 
                     
 
-                    self:MakeVulnerable(target)
-                    while not IsDestroyed(target) and not IsDestroyed(unit) do
+                    target.CanTakeDamage = true
+                    while not IsDestroyed(target) and not IsDestroyed(unit) and target:GetHealth() >= 73 do
                         WaitSeconds(0.1)
-                        Damage(unit, bonePosition, target, 1, "Normal")
+                        if target:GetHealth() > 73 then
+                            Damage(unit, bonePosition, target, 72, "Normal")
+                        end
                     end
 
                     CreateLightParticle(unit, muzzle, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
