@@ -17,8 +17,8 @@ DSLK004 = ClassUnit(SLandUnit) {
         },
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        SLandUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        SLandUnit.OnStopBeingBuilt(self, builder, layer)
 
         local EfctTempl = {
             '/Effects/Emitters/orbeffect_01.bp',
