@@ -133,7 +133,7 @@ However, with the changes to Bulwark UEF Battleships are left out to dry. We are
 Tempest has been very powerful for a long time and it's getting a well-deserved nerf. It will cost a bit more, and you will need more BP/infrastructure ready to build one. It won't be able to act like a quick mass dump after spamming destroyers and skipping T3 Navy completely.
 
 ### Frigates
-***
+
 
 **Aeon**
 
@@ -150,7 +150,7 @@ Tempest has been very powerful for a long time and it's getting a well-deserved 
 * Range: 28 > 26
 
 ### Destroyers
-***
+
 
 **UEF**
 
@@ -174,7 +174,7 @@ Exodus was one of the 2 higher-range destroyers yet it had the highest HP of all
 * Range: 80 > 70
 
 ### Bulwark Mini-rework
-***
+
 
 Decrease of roughly 1/3 in the stats to allow UEF players to get them out during the T2 stage to support their navy without having to worry about having fewer destroyers and dying immediately to an enemy push.
 
@@ -187,7 +187,7 @@ Decrease of roughly 1/3 in the stats to allow UEF players to get them out during
 * Shield Recharge Time: 40 > 30
 
 ### Battleships
-***
+
 
 **UEF**
 
@@ -199,7 +199,7 @@ With the changes to the bulwark Summit will struggle against the other Battleshi
 Acceleration and Break speed were adjusted accordingly
 
 ### Experimentals
-***
+
 
 **Tempest**
 
@@ -330,7 +330,7 @@ T2 static artilleries shouldn't be able to consistently hit small single targets
 * Firing Randomness: 2.5> 2.75
 
 ### Nukes
-***
+
 
 Nukes are extremely strong and can be very oppressive, especially in team games. In almost every game in an early late-game, it's a good idea to make a nuke. Its relatively low cost combined with having potential for game-ending damage while always being able to find value even if the enemy has adequate defenses in place makes it a no-brainer. Not to mention that it will force out SMDs, and not just 1, depending on the map it can be up to 4 which already makes the nuke worth it without even killing anything.
 
