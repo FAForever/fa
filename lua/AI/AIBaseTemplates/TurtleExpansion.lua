@@ -20,8 +20,7 @@ BaseBuilderTemplate {
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
-        'EngineerFactoryConstruction',
-        'EngineerFactoryConstructionLandHigherPriority',
+        'EngineerFactoryConstructionExpansion',
 
         -- Build some power, but not much
         'EngineerEnergyBuildersExpansions',
@@ -31,16 +30,6 @@ BaseBuilderTemplate {
 
         -- Engineer Support buildings
         'EngineeringSupportBuilder',
-
-        -- ACU Builders
-        'Default Initial ACU Builders',
-        'ACUBuilders',
-        'ACUUpgrades',
-
-        -- ==== EXPANSION ==== --
-        --DUNCAN - expansions dont build expansions!
-        --'EngineerExpansionBuildersFull',
-        --'EngineerFirebaseBuilders',
 
         -- ==== DEFENSES ==== --
         'T1BaseDefenses',
@@ -144,13 +133,17 @@ BaseBuilderTemplate {
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
+        -- This is wrong. This would allow the template to potentially be used on ARMY_# marker. Fix later.
+        if markerType == 'Naval Area' then
+            return 0
+        end
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not(personality == 'adaptive' or personality == 'turtle') then
             return 0
         end
 
         local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
-        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
+        local distance = import("/lua/ai/aiutilities.lua").GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 100
         elseif distance > 500 then

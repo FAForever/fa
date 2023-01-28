@@ -1,9 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardScanRadius = 26, -- allows for factory reclaim bug 
-        TargetBones = {
-            'XSL0105',
-        },
     },
     Audio = {
         AmbientMove = Sound {
@@ -224,7 +221,6 @@ UnitBlueprint {
             'BUILTBYTIER1ENGINEER SERAPHIM',
         },
         MaxBuildDistance = 5,
-        NeedToFaceTargetToBuild = false, -- changed to make it build faster
         StorageEnergy = 0,
         StorageMass = 10,
         TeleportEnergyMod = 0.15,
@@ -275,7 +271,7 @@ UnitBlueprint {
     LifeBarOffset = 0.4,
     LifeBarSize = 0.5,
     Physics = {
-        BackUpDistance = 4,
+        BackUpDistance = 8,
         BankingSlope = 0.5,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -287,24 +283,24 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         Elevation = 0.5,
-        MaxAcceleration = 1.9,
-        MaxBrake = 1.9,
+        MaxAcceleration = 3.8,
+        MaxBrake = 3.8,
         MaxSpeed = 1.9,
-        MaxSpeedReverse = 0,
-        MaxSteerForce = 1000,
+        MaxSpeedReverse = 1.9,
+        MaxSteerForce = 15,
         MeshExtentsX = 0.65,
         MeshExtentsY = 0.75,
         MeshExtentsZ = 0.65,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_Hover',
         RotateBodyWhileMoving = true,
-        RotateOnSpot = true,
+        RotateOnSpot = false,
         RotateOnSpotThreshold = 0.1,
-        TurnFacingRate = 120,
+        TurnFacingRate = 180,
         TurnRadius = 0,
-        TurnRate = 120,
-        WobbleFactor = 0,
-        WobbleSpeed = 0,
+        TurnRate = 180,
+        WobbleFactor = 0.015,
+        WobbleSpeed = 0.015,
     },
     SelectionCenterOffsetY = -0.5,
     SelectionSizeX = 0.4,

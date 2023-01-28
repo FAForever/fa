@@ -16,8 +16,8 @@ BuilderArmManipulator = nil
 -- upvalued trashbag functions for performance
 local TrashBagAdd = _G.TrashBag.Add
 
-local CBuildBotUnit = import('/lua/cybranunits.lua').CBuildBotUnit
-URA0003O = Class(CBuildBotUnit) {
+local CBuildBotUnit = import("/lua/cybranunits.lua").CBuildBotUnit
+URA0003O = ClassDummyUnit(CBuildBotUnit) {
 
     OnCreate = function(self)
         CBuildBotUnit.OnCreate(self)

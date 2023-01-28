@@ -1,12 +1,12 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Window = import('/lua/maui/window.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local Text = import('/lua/maui/text.lua').Text
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local Edit = import('/lua/maui/edit.lua').Edit
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Window = import("/lua/maui/window.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local Text = import("/lua/maui/text.lua").Text
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local Edit = import("/lua/maui/edit.lua").Edit
 
 -- TODO 
 -- move to other class
@@ -115,7 +115,7 @@ function DepopulateDefaultElement(element)
 end
 
 ---@class ProfilerScrollArea : Group
-ProfilerScrollArea = Class(Group) {
+ProfilerScrollArea = ClassUI(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)
         self.bg = Bitmap(self)

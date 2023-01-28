@@ -8,25 +8,25 @@
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
-local explosion = import('/lua/defaultexplosions.lua')
-local util = import('/lua/utilities.lua')
-local aWeapons = import('/lua/aeonweapons.lua')
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local explosion = import("/lua/defaultexplosions.lua")
+local util = import("/lua/utilities.lua")
+local aWeapons = import("/lua/aeonweapons.lua")
 local AAASonicPulseBatteryWeapon = aWeapons.AAASonicPulseBatteryWeapon
 
 ---@class UAA0104 : AirTransport
-UAA0104 = Class(AirTransport) {
+UAA0104 = ClassUnit(AirTransport) {
     AirDestructionEffectBones = { 'Exhaust', 'Wing_Right', 'Wing_Left', 'Turret_Right', 'Turret_Left',
         'Slots_Left01', 'Slots_Left02', 'Slots_Right01', 'Slots_Right02',
         'Right_AttachPoint01', 'Right_AttachPoint02', 'Right_AttachPoint03', 'Right_AttachPoint04',
         'Left_AttachPoint01', 'Left_AttachPoint02', 'Left_AttachPoint03', 'Left_AttachPoint04', },
 
     Weapons = {
-        SonicPulseBattery1 = Class(AAASonicPulseBatteryWeapon) {},
-        SonicPulseBattery2 = Class(AAASonicPulseBatteryWeapon) {},
-        SonicPulseBattery3 = Class(AAASonicPulseBatteryWeapon) {},
-        SonicPulseBattery4 = Class(AAASonicPulseBatteryWeapon) {},
-        GuidanceSystem = Class(AAASonicPulseBatteryWeapon) {},
+        SonicPulseBattery1 = ClassWeapon(AAASonicPulseBatteryWeapon) {},
+        SonicPulseBattery2 = ClassWeapon(AAASonicPulseBatteryWeapon) {},
+        SonicPulseBattery3 = ClassWeapon(AAASonicPulseBatteryWeapon) {},
+        SonicPulseBattery4 = ClassWeapon(AAASonicPulseBatteryWeapon) {},
+        GuidanceSystem = ClassWeapon(AAASonicPulseBatteryWeapon) {},
     },
 
     -- Override air destruction effects so we can do something custom here

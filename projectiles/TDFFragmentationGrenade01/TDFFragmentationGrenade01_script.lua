@@ -8,10 +8,7 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
-local TFragmentationGrenade = import('/lua/terranprojectiles.lua').TFragmentationGrenade
-local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
-local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
+local TFragmentationGrenade = import("/lua/terranprojectiles.lua").TFragmentationGrenade
 
-TDFFragmentationGrenade01 = Class(TFragmentationGrenade) { }
-
+TDFFragmentationGrenade01 = ClassProjectile(TFragmentationGrenade) { }
 TypeClass = TDFFragmentationGrenade01

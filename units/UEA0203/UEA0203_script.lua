@@ -5,16 +5,16 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------
 
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
-local TDFRiotWeapon = import('/lua/terranweapons.lua').TDFRiotWeapon
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local TDFRiotWeapon = import("/lua/terranweapons.lua").TDFRiotWeapon
 
 ---@class UEA0203 : AirTransport
-UEA0203 = Class(AirTransport) {
+UEA0203 = ClassUnit(AirTransport) {
     EngineRotateBones = {'Jet_Front', 'Jet_Back',},
 
     Weapons = {
-        Turret01 = Class(TDFRiotWeapon) {},
+        Turret01 = ClassWeapon(TDFRiotWeapon) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)

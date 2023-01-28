@@ -24,11 +24,14 @@
 -- looking over at /lua/EffectTemplate.lua there can be up to nine emitters (oblivion_cannon_hit_08_emit)
 -- for a given effect.
 
-local TableGetn = table.getn 
+local TableGetn = table.getn
 local TableEmpty = table.empty
 
----@class TrashBag
-TrashBag = ClassSimple {
+---@class TrashBag : Destroyable
+TrashBag = ClassTrashBag {
+
+    -- Used during class creation for debugging
+    __name = 'Trashbag',
 
     -- Tell the garbage collector that we're a weak table for our values. If an element is ready to be collected
     -- then we're not a reason for it to remain alive. E.g., we don't care if it got cleaned up earlier.
@@ -36,9 +39,10 @@ TrashBag = ClassSimple {
     -- http://lua-users.org/wiki/WeakTablesTutorial
     __mode = 'v',
 
-    --- Add an entity to the trash bag.
-    Add = function(self, entity)
-
+    --- Adds an entity to the trash bag
+    ---@param self TrashBag
+    ---@param trash Destroyable
+    Add = function(self, trash)
         -- -- Uncomment for performance testing
         -- if entity == nil then 
         --     WARN("Attempted to add a nil to a TrashBag: " .. repr(debug.getinfo(2)))
@@ -51,12 +55,12 @@ TrashBag = ClassSimple {
         --     return 
         -- end
 
-        self[TableGetn(self) + 1] = entity
+        self[TableGetn(self) + 1] = trash
     end,
 
-    --- Destroy all (remaining) entities in the trash bag.
+    --- Destroys all (remaining) entities in the trash bag
+    ---@param self TrashBag
     Destroy = function(self)
-
         -- -- Uncomment for performance testing
         -- if not self then 
         --     WARN("Attempted to trash non-existing trash bag: "  .. repr(debug.getinfo(2)))
@@ -64,15 +68,17 @@ TrashBag = ClassSimple {
         -- end
 
         -- Remove any value still in the trashbag
-        for k, v in self do
-            if self[k] then 
-                self[k]:Destroy()
+        for k, trash in self do
+            if trash then
                 self[k] = nil
+                trash:Destroy()
             end
-        end 
+        end
     end,
-    
-    -- Check if the trashbag is empty. True if empty, false otherwise
+
+    -- Checks if the trashbag is empty
+    ---@param self TrashBag
+    ---@return boolean
     Empty = function(self)
         return TableEmpty(self)
     end

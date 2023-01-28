@@ -1,9 +1,10 @@
----@declare-global
+---@meta
+
 ---@class moho.blip_methods : moho.entity_methods
 local ReconBlip = {}
 
 ---
----@return BlueprintBase
+---@return UnitBlueprint
 function ReconBlip:GetBlueprint()
 end
 

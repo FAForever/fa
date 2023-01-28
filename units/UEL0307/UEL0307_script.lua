@@ -8,24 +8,29 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TShieldLandUnit = import('/lua/terranunits.lua').TShieldLandUnit
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local TShieldLandUnit = import("/lua/terranunits.lua").TShieldLandUnit
+local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
 ---@class UEL0307 : TShieldLandUnit
-UEL0307 = Class(TShieldLandUnit) {
+UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
 
     Weapons = {        
-        TargetPointer = Class(DefaultProjectileWeapon) {},
+        TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
     },
 
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_mobile_01_emit.bp',
         '/effects/emitters/terran_shield_generator_mobile_02_emit.bp',
     },
+
+    OnCreate = function(self)
+        TShieldLandUnit.OnCreate(self)
+        ShieldEffectsComponent.OnCreate(self)
+    end,
     
     OnStopBeingBuilt = function(self,builder,layer)
         TShieldLandUnit.OnStopBeingBuilt(self,builder,layer)
-        self.ShieldEffectsBag = {}
         
         self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
         self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
@@ -34,6 +39,8 @@ UEL0307 = Class(TShieldLandUnit) {
     
     OnShieldEnabled = function(self)
         TShieldLandUnit.OnShieldEnabled(self)
+        ShieldEffectsComponent.OnShieldDisabled(self)
+
         KillThread( self.DestroyManipulatorsThread )
         if not self.RotatorManipulator then
             self.RotatorManipulator = CreateRotator( self, 'Spinner', 'y' )
@@ -49,29 +56,13 @@ UEL0307 = Class(TShieldLandUnit) {
             self.Trash:Add( self.AnimationManipulator )
         end
         self.AnimationManipulator:SetRate(1)
-        
-        if self.ShieldEffectsBag then
-            for k, v in self.ShieldEffectsBag do
-                v:Destroy()
-            end
-            self.ShieldEffectsBag = {}
-        end
-        for k, v in self.ShieldEffects do
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 0, self.Army, v ) )
-        end
     end,
 
     OnShieldDisabled = function(self)
         TShieldLandUnit.OnShieldDisabled(self)
+        ShieldEffectsComponent.OnShieldDisabled(self)
         KillThread( self.DestroyManipulatorsThread )
         self.DestroyManipulatorsThread = self:ForkThread( self.DestroyManipulators )
-        
-        if self.ShieldEffectsBag then
-            for k, v in self.ShieldEffectsBag do
-                v:Destroy()
-            end
-            self.ShieldEffectsBag = {}
-        end
     end,
 
     DestroyManipulators = function(self)

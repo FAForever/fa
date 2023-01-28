@@ -20,6 +20,44 @@ local TableGetn = table.getn
 local TableRemove = table.remove 
 local TableSort = table.sort
 
+--- Determines the size in bytes of the given element
+---@param element any
+---@param ignore table<string, boolean>     # List of key names to ignore of all (referenced) tables
+---@param seen? table<table, any>           # List of strings and / or tables that we've seen so far. Should be nil by default
+---@return integer
+function ToBytes(element, ignore, seen)
+
+    -- has no allocated bytes
+    if element == nil then
+        return 0
+    end
+
+    -- applies to tables and strings, to prevent counting them multiple times
+    seen = seen or { }
+    if seen[element] then
+        return 0
+    end
+
+    -- determine size
+    local allocatedSize = debug.allocatedsize(element)
+    if allocatedSize == 0 then
+        return 8
+    elseif type(element) ~= 'table' then
+        seen[element] = true
+        return allocatedSize
+    end
+
+    -- at this point we know it is a table
+    seen[element] = true
+    for k, v in element do
+        if not ignore[k] then
+            allocatedSize = allocatedSize + ToBytes(v, ignore, seen)
+        end
+    end
+
+    return allocatedSize
+end
+
 --- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
 --- Each element of the table will be returned once. This is essentially for "shuffling" sets.
 function RandomIter(someSet)
@@ -180,6 +218,7 @@ end
 --- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
 --- are expected to be numerically keyed (existing keys are discarded).
 --- e.g. table.cat({1, 2, 3}, {'A', 'House', 3.14})  ->  {1, 2, 3, 'A', 'House', 3.14}
+---@return table
 function table.cat(t1, t2)
     -- handling nil tables before lopping
     if not t1 then return table.copy(t2) end
@@ -476,9 +515,9 @@ function printField(k, v, tblName, printer)
 end
 
 --- Prints keys and values of a table and sub-tables if present
---- @param tbl specifies a table to print
---- @param tblPrefix specifies optional table prefix/name
---- @param printer specifies optional message printer: LOG, WARN, error, etc.
+--- @param tbl? table specifies a table to print
+--- @param tblPrefix? string specifies optional table prefix/name
+--- @param printer? function specifies optional message printer: LOG, WARN, error, etc.
 --- e.g. table.print(categories)
 ---      table.print(categories, 'categories')
 ---      table.print(categories, 'categories', 'WARN')
@@ -540,6 +579,16 @@ function table.unique(t)
 
     return unique
 end
+
+
+---Returns a random entry from an array
+---@generic T
+---@param array T[]
+---@return T
+function table.random(array)
+    return array[Random(1, TableGetn(array))]
+end
+
 
 -- Lua 5.0 implementation of the Lua 5.1 function string.match
 -- Returns a regex match
@@ -610,7 +659,7 @@ end
 function StringSplitCamel(str)
     local first = str:sub(1, 1)
     local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
-    return split:gsub("^.", string.upper)
+    return (split:gsub("^.", string.upper))
 end
 
 --- Reverses order of letters for specified string
@@ -672,7 +721,9 @@ end
 
 --- Clamps numeric value to specified Min and Max range
 function math.clamp(v, min, max)
-    return math.max(min, math.min(max, v))
+    if v <= min then return min end
+    if v >= max then return max end
+    return v
 end
 
 -- Return a table parsed from key:value pairs passed on the command line

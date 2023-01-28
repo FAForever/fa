@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class UserUnit
 local UserUnit = {}
 
@@ -100,7 +101,7 @@ function UserUnit:GetMissileInfo()
 end
 
 --- Returns the current world position of the unit
----@return Position
+---@return Vector
 function UserUnit:GetPosition()
 end
 
@@ -166,7 +167,7 @@ function UserUnit:IsIdle()
 end
 
 ---
----@param category moho.EntityCategory
+---@param category CategoryName
 ---@return boolean
 function UserUnit:IsInCategory(category)
 end
@@ -186,9 +187,8 @@ end
 function UserUnit:IsStunned()
 end
 
----
----@param command string
----@param value string
+---@param command 'SetAutoMode' | 'SetFireState' | 'SetAutoSurfaceMode' | 'SetRepeatQueue' | 'SetPaused' | 'CustomName' | 'ToggleScriptBit' | 'PlayNoStagingPlatformsVO' | 'PlayBusyStagingPlatformsVO' 
+---@param value boolean | string
 function UserUnit:ProcessInfo(command, value)
 end
 

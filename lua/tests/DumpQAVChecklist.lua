@@ -109,13 +109,13 @@ function dump(bp, file)
     end
 
     if bp.Economy.NaturalProducer then
-        file:write("    Natural Producer                                       Unit produces energy\mass.                                        Selected unit will have a tarmac under it when it has completed building.\n")
+        file:write("    Natural Producer                                       Unit produces energy/mass.                                        Selected unit will have a tarmac under it when it has completed building.\n")
     end
  
     if bp.Enhancements then
 ---------file:write("  Enhancments:\n")
         for k,v in sortedpairs(bp.Enhancements) do
-            file:write("    ",k,'                                         Enhancement behavior.                                             Selected unit can enable\disable\use enhancment in game.        \n')
+            file:write("    ",k,'                                         Enhancement behavior.                                             Selected unit can enable/disable/use enhancment in game.        \n')
         end  
     end
     if bp.Physics then

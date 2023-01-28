@@ -1,24 +1,18 @@
--- ****************************************************************************
--- **
--- **  File     :  /units/XRL0403/XRL0403_script.lua
--- **
--- **  Summary  :  Megalith script
--- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
-
-
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local MobileUnit = import('/lua/defaultunits.lua').MobileUnit
-local explosion = import('/lua/defaultexplosions.lua')
+--------------------------------------------------------------------------------
+-- File :  /units/XRL0403/XRL0403_script.lua
+-- Summary  :  Megalith script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------------
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local MobileUnit = import("/lua/defaultunits.lua").MobileUnit
+local explosion = import("/lua/defaultexplosions.lua")
 local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local utilities = import('/lua/Utilities.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local Entity = import('/lua/sim/Entity.lua').Entity
-
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local utilities = import("/lua/utilities.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
+local Entity = import("/lua/sim/entity.lua").Entity
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFHvyProtonCannonWeapon = CybranWeaponsFile.CDFHvyProtonCannonWeapon
 local CANNaniteTorpedoWeapon = CybranWeaponsFile.CANNaniteTorpedoWeapon
 local CIFSmartCharge = CybranWeaponsFile.CIFSmartCharge
@@ -26,19 +20,19 @@ local CAABurstCloudFlakArtilleryWeapon = CybranWeaponsFile.CAABurstCloudFlakArti
 local CDFBrackmanCrabHackPegLauncherWeapon = CybranWeaponsFile.CDFBrackmanCrabHackPegLauncherWeapon
 
 ---@class XRL0403 : CWalkingLandUnit
-XRL0403 = Class(CWalkingLandUnit) {
+XRL0403 = ClassUnit(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
     Weapons = {
-        ParticleGunRight = Class(CDFHvyProtonCannonWeapon) {},
-        ParticleGunLeft = Class(CDFHvyProtonCannonWeapon) {},
-        Torpedo01 = Class(CANNaniteTorpedoWeapon) {},
-        Torpedo02 = Class(CANNaniteTorpedoWeapon) {},
-        Torpedo03 = Class(CANNaniteTorpedoWeapon) {},
-        Torpedo04 = Class(CANNaniteTorpedoWeapon) {},
-        AntiTorpedo = Class(CIFSmartCharge) {},
-        AAGun = Class(CAABurstCloudFlakArtilleryWeapon) {},
-        HackPegLauncher= Class(CDFBrackmanCrabHackPegLauncherWeapon){},
+        ParticleGunRight = ClassWeapon(CDFHvyProtonCannonWeapon) {},
+        ParticleGunLeft = ClassWeapon(CDFHvyProtonCannonWeapon) {},
+        Torpedo01 = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        Torpedo02 = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        Torpedo03 = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        Torpedo04 = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        AntiTorpedo = ClassWeapon(CIFSmartCharge) {},
+        AAGun = ClassWeapon(CAABurstCloudFlakArtilleryWeapon) {},
+        HackPegLauncher = ClassWeapon(CDFBrackmanCrabHackPegLauncherWeapon){},
     },
 
     DisableAllButHackPegLauncher= function(self)

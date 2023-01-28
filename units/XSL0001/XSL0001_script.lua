@@ -7,29 +7,47 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
-local Buff = import('/lua/sim/Buff.lua')
-local SWeapons = import('/lua/seraphimweapons.lua')
+
+---@alias SeraphimACUEnhancementBuffType
+---| "ACUUPGRADEDMG"
+---| "COMMANDERAURA"
+---| "COMMANDERAURAFORSELF"
+---| "ACUBUILDRATE"
+
+---@alias SeraphimACUEnhancementBuffName      # BuffType
+---| "SeraphimACUDamageStabilization"         # ACUUPGRADEDMG
+---| "SeraphimACUDamageStabilizationAdv"      # ACUUPGRADEDMG
+---| "SeraphimACUAdvancedRegenAura"           # COMMANDERAURA
+---| "SeraphimACUAdvancedRegenAuraSelfBuff"   # COMMANDERAURAFORSELF
+---| "SeraphimACURegenAura"                   # COMMANDERAURA
+---| "SeraphimACURegenAuraSelfBuff"           # COMMANDERAURAFORSELF
+---| "SeraphimACUT2BuildRate"                 # ACUBUILDRATE
+---| "SeraphimACUT3BuildRate"                 # ACUBUILDRATE
+
+
+local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
+local Buff = import("/lua/sim/buff.lua")
+local SWeapons = import("/lua/seraphimweapons.lua")
 local SDFChronotronCannonWeapon = SWeapons.SDFChronotronCannonWeapon
 local SDFChronotronOverChargeCannonWeapon = SWeapons.SDFChronotronCannonOverChargeWeapon
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
 ---@class XSL0001 : ACUUnit
-XSL0001 = Class(ACUUnit) {
+XSL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        ChronotronCannon = Class(SDFChronotronCannonWeapon) {},
-        Missile = Class(SIFLaanseTacticalMissileLauncher) {
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        ChronotronCannon = ClassWeapon(SDFChronotronCannonWeapon) {},
+        Missile = ClassWeapon(SIFLaanseTacticalMissileLauncher) {
             OnCreate = function(self)
                 SIFLaanseTacticalMissileLauncher.OnCreate(self)
                 self:SetWeaponEnabled(false)
             end,
         },
-        OverCharge = Class(SDFChronotronOverChargeCannonWeapon) {},
-        AutoOverCharge = Class(SDFChronotronOverChargeCannonWeapon) {},
+        OverCharge = ClassWeapon(SDFChronotronOverChargeCannonWeapon) {},
+        AutoOverCharge = ClassWeapon(SDFChronotronOverChargeCannonWeapon) {},
     },
 
     __init = function(self)

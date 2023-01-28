@@ -1,10 +1,10 @@
-local Group = import('/lua/maui/group.lua').Group
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local Group = import("/lua/maui/group.lua").Group
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 ---@class RadioButton : Group
-RadioButton = Class(Group) {
+RadioButton = ClassUI(Group) {
     -- title: A string displayed above the group. If nil, no textfield is created.
     -- buttons: A table of tables describing buttons. Only one key is required:
     --  Optional parameters are permitted:

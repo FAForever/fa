@@ -8,20 +8,20 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
-local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit
+local SeraphimWeapons = import("/lua/seraphimweapons.lua")
+local SSeaUnit = import("/lua/seraphimunits.lua").SSeaUnit
 local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
 local SAAOlarisCannonWeapon = SeraphimWeapons.SAAOlarisCannonWeapon
 local SAAShleoCannonWeapon = SeraphimWeapons.SAAShleoCannonWeapon
 local SAMElectrumMissileDefense = SeraphimWeapons.SAMElectrumMissileDefense
 
 ---@class XSS0202 : SSeaUnit
-XSS0202 = Class(SSeaUnit) {
+XSS0202 = ClassUnit(SSeaUnit) {
     Weapons = {
-        Missile = Class(SLaanseMissileWeapon) {},
-		RightAAGun = Class(SAAShleoCannonWeapon) {},
-		LeftAAGun = Class(SAAOlarisCannonWeapon) {},
-        AntiMissile = Class(SAMElectrumMissileDefense) {},
+        Missile = ClassWeapon(SLaanseMissileWeapon) {},
+		RightAAGun = ClassWeapon(SAAShleoCannonWeapon) {},
+		LeftAAGun = ClassWeapon(SAAOlarisCannonWeapon) {},
+        AntiMissile = ClassWeapon(SAMElectrumMissileDefense) {},
     },
 
     BackWakeEffect = {},

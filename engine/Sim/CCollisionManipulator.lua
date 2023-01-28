@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.CollisionManipulator : moho.manipulator_methods
 local CCollisionManipulator = {}
 

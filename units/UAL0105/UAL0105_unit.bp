@@ -1,12 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardScanRadius = 26, -- allows for factory reclaim bug 
-        TargetBones = {
-            'Panel_01',
-            'Panel_02',
-            'Panel_03',
-            'Panel_04',
-        },
     },
     Audio = {
         AmbientMove = Sound {
@@ -202,7 +196,6 @@ UnitBlueprint {
             'BUILTBYTIER1ENGINEER AEON',
         },
         MaxBuildDistance = 5,
-        NeedToFaceTargetToBuild = false,
         SacrificeEnergyMult = 0.6,
         SacrificeMassMult = 0.6,
         StorageEnergy = 0,
@@ -247,7 +240,7 @@ UnitBlueprint {
     LifeBarOffset = 0.3,
     LifeBarSize = 0.5,
     Physics = {
-        BackUpDistance = 4,
+        BackUpDistance = 8,
         BankingSlope = 0.5,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -259,10 +252,10 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         Elevation = 0.5,
-        MaxAcceleration = 1.9,
-        MaxBrake = 1.9,
+        MaxAcceleration = 3.8,
+        MaxBrake = 3.8,
         MaxSpeed = 1.9,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 1.9,
         MaxSteerForce = 1000,
         MeshExtentsX = 0.65,
         MeshExtentsY = 0.75,
@@ -270,13 +263,13 @@ UnitBlueprint {
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_Hover',
         RotateBodyWhileMoving = true,
-        RotateOnSpot = true,
+        RotateOnSpot = false,
         RotateOnSpotThreshold = 0.1,
-        TurnFacingRate = 120,
+        TurnFacingRate = 180,
         TurnRadius = 0,
-        TurnRate = 120,
-        WobbleFactor = 0,
-        WobbleSpeed = 0,
+        TurnRate = 180,
+        WobbleFactor = 0.015,
+        WobbleSpeed = 0.015,
     },
     SelectionCenterOffsetX = 0,
     SelectionCenterOffsetY = -0.5,

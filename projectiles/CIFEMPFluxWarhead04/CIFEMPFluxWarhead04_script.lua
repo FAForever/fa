@@ -1,13 +1,13 @@
 --
 -- script for projectile Missile Used on Sub
 --
-local CEMPFluxWarheadProjectile = import('/lua/cybranprojectiles.lua').CEMPFluxWarheadProjectile
+local CEMPFluxWarheadProjectile = import("/lua/cybranprojectiles.lua").CEMPFluxWarheadProjectile
 
-CIFEMPFluxWarhead04 = Class(CEMPFluxWarheadProjectile) {
+CIFEMPFluxWarhead04 = ClassProjectile(CEMPFluxWarheadProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
+    
     FxSplashScale = 0.5,
-    FxTrails = {},
-
     LaunchSound = 'Nuke_Launch',
     ExplodeSound = 'Nuke_Impact',
     AmbientSound = 'Nuke_Flight',
@@ -22,5 +22,4 @@ CIFEMPFluxWarhead04 = Class(CEMPFluxWarheadProjectile) {
         self:LauncherCallbacks()
     end,
 }
-
 TypeClass = CIFEMPFluxWarhead04

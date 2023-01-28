@@ -4,9 +4,9 @@
 -- Summary  :  Inaino Bomb effect controller script
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------------------------------
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local SIFInainoStrategicMissileEffect01 = '/effects/Entities/SIFInainoStrategicMissileEffect01/SIFInainoStrategicMissileEffect01_proj.bp'
 local SIFInainoStrategicMissileEffect02 = '/effects/Entities/SIFInainoStrategicMissileEffect02/SIFInainoStrategicMissileEffect02_proj.bp'

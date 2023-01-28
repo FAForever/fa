@@ -1,69 +1,71 @@
 --
 -- Terran Fragmentation/Sensor Shells
 --
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local TArtilleryProjectile = import('/lua/terranprojectiles.lua').TArtilleryProjectile
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local TArtilleryProjectile = import("/lua/terranprojectiles.lua").TArtilleryProjectile
+local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
-TIFFragmentationSensorShell01 = Class(TArtilleryProjectile) {
-               
-    OnImpact = function(self, TargetType, TargetEntity) 
+-- upvalue for performance
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local Random = Random
+local MathSin = math.sin
+local MathCos = math.cos
 
-        local FxFragEffect = EffectTemplate.TFragmentationSensorShellFrag 
-        local bp = self:GetBlueprint().Physics
-              
-        
-        -- Split effects
-        for k, v in FxFragEffect do
-            CreateEmitterAtEntity( self, self:GetArmy(), v )
-        end
-        
-        local vx, vy, vz = self:GetVelocity()
-        local velocity = 6
-    
-		-- One initial projectile following same directional path as the original
-        self:CreateChildProjectile(bp.FragmentId):SetVelocity(vx, vy, vz):SetVelocity(velocity):PassDamageData(self.DamageData)
-   		
-		-- Create several other projectiles in a dispersal pattern
+local TFragmentationSensorShellFrag = import("/lua/effecttemplates.lua").TFragmentationSensorShellFrag 
+
+TIFFragmentationSensorShell01 = ClassProjectile(TArtilleryProjectile) {
+    OnImpact = function(self, TargetType, TargetEntity)
+        -- the split fx
+        CreateEmitterAtEntity( self, self.Army, TFragmentationSensorShellFrag[1])
+        CreateEmitterAtEntity( self, self.Army, TFragmentationSensorShellFrag[2])
+
+        -- Create several other projectiles in a dispersal pattern
+        local bp = self.Blueprint.Physics
         local numProjectiles = bp.Fragments - 1
-        local angle = (2 * math.pi) / numProjectiles
-        local angleInitial = RandomFloat( 0, angle )
-        
+
         -- Randomization of the spread
-        local angleVariation = angle * 0.35 -- Adjusts angle variance spread
-        local spreadMul = 0.5 -- Adjusts the width of the dispersal        
-        
-        local xVec = 0 
+        local angle = 6.28 / numProjectiles
+        local angleInitial = angle * Random()
+        local angleVariation = angle * 0.35
+
+        local px, _, pz = self:GetPositionXYZ()
+
+        -- retrieve the current velocity
+        local vx, vy, vz = self:GetVelocity()
+        local xVec = 0
         local yVec = vy
         local zVec = 0
 
-        -- Launch projectiles at semi-random angles away from split location
+        -- create vision
+        ---@type VisionMarkerOpti
+        local marker = VisionMarkerOpti({ Owner = self })
+        marker:UpdatePosition(px, pz)
+        marker:UpdateDuration(5)
+        marker:UpdateIntel(self.Army, 5, 'Vision', true)
+
+		-- one initial projectile following same directional path as the original
+        local proj = self:CreateChildProjectile(bp.FragmentId)
+        proj:SetVelocity(vx, vy, vz)
+        proj:SetVelocity(6)
+        proj.DamageData = self.DamageData
+
+        -- launch projectiles at semi-random angles away from split location
         for i = 0, numProjectiles - 1 do
-            xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul 
+
+            -- compute a random offset of the velocity for this fragment
+            local a = angleInitial + (i*angle)
+            xVec = vx + (MathSin(a + 2 * angleVariation * Random() - angleVariation)) * 0.5
+            zVec = vz + (MathCos(a + 2 * angleVariation * Random() - angleVariation)) * 0.5
+
+            -- create the projectile and set the velocity direction and then the velocity magnitude
             local proj = self:CreateChildProjectile(bp.FragmentId)
             proj:SetVelocity(xVec,yVec,zVec)
-            proj:SetVelocity(velocity)
-            proj:PassDamageData(self.DamageData)                        
-        end
-        local pos = self:GetPosition()
+            proj:SetVelocity(6)
 
-        local spec = {
-            X = pos[1],
-            Z = pos[3],
-            Radius = self.Data.Radius,
-            LifeTime = self.Data.Lifetime,
-            Army = self.Data.Army,
-            Omni = false,
-            WaterVision = false,
-        }
-        local vizEntity = VizMarker(spec)
+            -- just copy reference of damage data
+            proj.DamageData = self.DamageData
+        end
+
         self:Destroy()
     end,
-    
-    
-
 }
-
 TypeClass = TIFFragmentationSensorShell01

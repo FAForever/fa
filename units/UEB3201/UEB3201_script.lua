@@ -7,17 +7,21 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TRadarUnit = import('/lua/terranunits.lua').TRadarUnit
+local TRadarUnit = import("/lua/terranunits.lua").TRadarUnit
 
 ---@class UEB3201 : TRadarUnit
-UEB3201 = Class(TRadarUnit) {
+---@field UpperRotator? moho.RotateManipulator
+UEB3201 = ClassUnit(TRadarUnit) {
 
+    ---@param self UEB3201
     OnIntelDisabled = function(self)
         TRadarUnit.OnIntelDisabled(self)
-        self.UpperRotator:SetTargetSpeed(0)
+        if self.UpperRotator then
+            self.UpperRotator:SetTargetSpeed(0)
+        end 
     end,
 
-
+    ---@param self UEB3201
     OnIntelEnabled = function(self)
         TRadarUnit.OnIntelEnabled(self)
         if not self.UpperRotator then

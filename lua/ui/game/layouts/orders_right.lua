@@ -1,8 +1,8 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local numSlots = 14
 local firstAltSlot = 8
 local vertRows = 7
@@ -11,7 +11,7 @@ local vertCols = numSlots/vertRows
 local horzCols = numSlots/horzRows
 
 function SetLayout()
-    local controls = import('/lua/ui/game/orders.lua').controls
+    local controls = import("/lua/ui/game/orders.lua").controls
 
     controls.bg:SetTexture(UIUtil.SkinnableFile('/game/orders-panel/order-panel_bmp.dds'))
     LayoutHelpers.AtRightIn(controls.bg, controls.controlClusterGroup, 10)

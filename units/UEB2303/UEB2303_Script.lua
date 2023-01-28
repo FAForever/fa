@@ -8,23 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TIFArtilleryWeapon = import('/lua/terranweapons.lua').TIFArtilleryWeapon
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TIFArtilleryWeapon = import("/lua/terranweapons.lua").TIFArtilleryWeapon
 
 ---@class UEB2303 : TStructureUnit
-UEB2303 = Class(TStructureUnit) {
-
-    OnStopBeingBuilt = function(self,builder,layer)
-        TStructureUnit.OnStopBeingBuilt(self,builder,layer)
-        local bp = self:GetBlueprint()
-        if bp.Audio.Activate then
-            self:PlaySound(bp.Audio.Activate)
-        end
-    end,
-
+UEB2303 = ClassUnit(TStructureUnit) {
     Weapons = {
-        MainGun = Class(TIFArtilleryWeapon) {
-        },
+        MainGun = ClassWeapon(TIFArtilleryWeapon) {},
     },
 }
 

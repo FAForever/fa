@@ -570,12 +570,30 @@ Tooltips = {
         description = "<LOC tooltipui1009>Amount of required energy for mass fabricators to work",
     },
 
-
-
-
     -- **********************
     -- ** Options Strings
     -- **********************
+
+    options_commands_ignore_mode = {
+        title = "<LOC OPTIONS_0319>Ignore Mode",
+        description = "<LOC OPTIONS_0320>When enabled, ignores any other command but move commands when you hold {i properkeyname_0123}. This can help to guarantee that you issue a move command, instead of (accidentally) starting a reclaim or attack command.\r\n\r\nThis is disabled when holding {i properkeyname_0009}.",
+    },
+
+    options_selection_threshold_regular = {
+        title = "<LOC OPTIONS_0312>Default Selection Threshold",
+        description = "<LOC OPTIONS_0316>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This can help you select individual units or props, especially on displays with higher resolutions.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
+    options_selection_threshold_reclaim = {
+        title = "<LOC OPTIONS_0313>Reclaim Mode Selection Threshold",
+        description = "<LOC OPTIONS_0317>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when you are in reclaim mode. It makes it easier to hit all of your clicks, reducing the amount of fake reclaim orders.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
+    options_selection_threshold_replay = {
+        title = "<LOC OPTIONS_0314>Replay Selection Threshold",
+        description = "<LOC OPTIONS_0318>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
     options_wheel_sensitivity = {
         title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
         description = "<LOC OPTIONS_0035>Sets the Zoom Speed when using the Mouse Wheel",
@@ -596,19 +614,32 @@ Tooltips = {
         title = "<LOC OPTIONS_0080>Reset Help Prompts",
         description = "<LOC OPTIONS_0081>Sets all In-game Help Prompts as unread",
     },
-     options_stratview = {
+    options_stratview = {
         title = "<LOC OPTIONS_0113>Strategic View",
         description = "<LOC OPTIONS_0114>Sets whether or not the mini-map is automatically on or off",
     },
-      options_strat_icons_always_on = {
+    options_strat_icons_always_on = {
         title = "<LOC OPTIONS_0115>Always Render Strategic Icons",
         description = "<LOC OPTIONS_0116>Strategic icons are always shown, regardless of zoom distance",
     },
-      options_uvd_format = {
+    options_camera_shake_intensity = {
+        title = "<LOC OPTIONS_CAMERA_SHAKE_TITLE>Adjust shake intensity of camera",
+        description = "<LOC OPTIONS_CAMERA_SHAKE_DESCRIPTION>Adjusts the shake intensity: 0% is no shaking at all and 100% is the default shake behavior. \r\nLarge explosions and units can shake the camera to improve immersion, but practically it can be annoying.",
+    },
+    options_uvd_format = {
         title = "<LOC OPTIONS_0107>Construction Tooltip Information",
         description = "<LOC OPTIONS_0118>Shows full, partial or no description when the unit icon is moused over",
     },
-     options_mp_taunt_head = {
+    options_assist_to_upgrade = {
+        title = "<LOC ASSIST_TO_UPGRADE_TITLE>Assist to Upgrade",
+        description = "<LOC ASSIST_TO_UPGRADE_DESCRIPTION>When enabled structures automatically queue and pause their upgrade when you issue an assist order",
+    },
+
+    options_assist_to_unpause = {
+        title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to Unpause",
+        description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled structures automatically unpause as engineers start assisting it.",
+    },
+    options_mp_taunt_head = {
         title = "<LOC OPTIONS_0119>MP Taunt Head",
         description = "<LOC OPTIONS_0120>Select which 3D head is displayed when taunts are used in multiplayer",
     },
@@ -629,7 +660,7 @@ Tooltips = {
         description = "<LOC OPTIONS_0079>Sets the Delay before Tooltips are displayed",
     },
     options_loading_tips = {
-        title = "<LOC OPTIONS_0009>Display Loading Tips",
+        title = "<LOC OPTIONS_0009>Show Loading Tips",
         description = "<LOC OPTIONS_0011>Toggles whether or not tips are displayed on the loading screen",
     },
     options_persistent_built_mode = {
@@ -820,7 +851,7 @@ Tooltips = {
     },
     options_experimental_graphics = {
         title = "<LOC OPTIONS_EXP_GRAPHICS_01>Experimental graphics",
-        description = "<LOC OPTIONS_EXP_GRAPHICS_02>Requires fidelity set to 'High'. \r\n\r\nIntroduces experimental graphics that high-end hardware should be able to support. \r\n\r\nThis feature may be unstable - use at your own risk.",
+        description = "<LOC OPTIONS_EXP_GRAPHICS_02>Requires fidelity set to 'High'.\r\n\r\nIntroduces experimental graphics that high-end hardware should be able to support.\r\n\r\nThis feature may be unstable - use at your own risk.",
     },
     options_use_mydocuments = {
         title = "<LOC OPTIONS_0186>Save Games and Replays in My Documents",
@@ -844,7 +875,7 @@ Tooltips = {
     },
     options_show_attached_unit_lifebars = {
         title = "<LOC OPTIONS_0222>Show Lifebars of Attached Units",
-        description = "<LOC OPTIONS_0219>Toggle the visibility of lifebars of on screen units (lifebars will still show in tooltip information)",
+        description = "<LOC OPTIONS_0219>Toggles the visibility of lifebars of on screen units (lifebars will still show in tooltip information)",
     },
     options_skin_change_on_start = {
         title = "<LOC OPTIONS_0211>Use Factional UI Skin",
@@ -859,21 +890,134 @@ Tooltips = {
         description = "<LOC OPTIONS_0248>When on, you can cycle the Hotbuild preview",
     },
     options_hotbuild_cycle_reset_time = {
-        title = "<LOC OPTIONS_0251>Cycle reset time",
+        title = "<LOC OPTIONS_0251>Cycle Reset Time",
         description = "<LOC OPTIONS_0252>Time in milliseconds until hotbuild cycle will reset",
     },
-    options_maximum_reclaim_count = {
+    options_maximum_reclaim_count = { -- unused
         title = "<LOC OPTIONS_0275>Maximum Reclaim Label Count",
         description = "<LOC OPTIONS_0276>When showing the reclaim label overlay, no more than this many labels will be shown",
     },
-    options_minimum_reclaim_amount = {
+    options_minimum_reclaim_amount = { -- unused
         title = "<LOC OPTIONS_0277>Minimum Reclaim Label Amount",
         description = "<LOC OPTIONS_0278>When showing the reclaim label overlay, items with mass values less than this won't be shown",
     },
     options_show_hotkeylabels = {
         title = "<LOC OPTIONS_0281>Hotkey Labels",
         description = "<LOC OPTIONS_0282>Displays associated keybindings on the buttons for commands and building units or structures"
-   },
+    },
+
+    options_gui_bigger_strat_build_icons = {
+        title = '<LOC OPTIONS_0228>Bigger Strategic Build Icons',
+        description = '<LOC OPTIONS_0253>Replaces the default strategic build icons with something more visible.',
+    },
+    options_gui_template_rotator = {
+        title = '<LOC OPTIONS_0229>Template Rotation',
+        description = '<LOC OPTIONS_0256>Allows build templates to be rotated with the middle mouse button.',
+    },
+    options_gui_draggable_queue = {
+        title = '<LOC OPTIONS_0231>Draggable Build Queue',
+        description = '<LOC OPTIONS_0258>Allows factory build queues to be reordered with drag and drop.',
+    },
+    options_gui_queue_on_hover_02 = {
+        title = '<LOC OPTIONS_0246>Show Factory Queue on Hover',
+        description = '<LOC OPTIONS_0249>Shows Factory queue above unit description when hover over unit with mouse.',
+    },
+    options_gui_idle_engineer_avatars = {
+        title = '<LOC OPTIONS_0232>Middle Click Avatars',
+        description = '<LOC OPTIONS_0259>Allows middle clicking idle engineer avatars to select all idle engineers on screen.',
+    },
+    options_gui_all_race_templates = {
+        title = '<LOC OPTIONS_0233>All Faction Templates',
+        description = '<LOC OPTIONS_0260>Allows build templates to be used across all 4 factions.',
+    },
+    options_gui_enhanced_unitview = {
+        title = '<LOC OPTIONS_0234>Single Unit Selected Info',
+        description = '<LOC OPTIONS_0261>Replaces fuel bar with progress bar, and causes the unitview to always be shown for a 1 unit selection.',
+    },
+    options_gui_enhanced_unitrings = {
+        title = '<LOC OPTIONS_0235>Single Unit Selected Rings',
+        description = '<LOC OPTIONS_0262>When a single unit is selected, show that units range rings.',
+    },
+    options_gui_templates_factory = {
+        title = '<LOC OPTIONS_0237>Factory Build Queue Templates',
+        description = '<LOC OPTIONS_0263>Allows creation of factory build queue templates.',
+    },
+    options_gui_seperate_idle_builders = {
+        title = '<LOC OPTIONS_0238>Separate Idle Builders',
+        description = '<LOC OPTIONS_0264>Use a seperate icon for idle Engineers and other builders.',
+    },
+    options_gui_visible_template_names = {
+        title = '<LOC OPTIONS_0239>Visible Template Names',
+        description = '<LOC OPTIONS_0265>Displays template name below template icon.',
+    },
+    options_gui_template_name_cutoff = {
+        title = '<LOC OPTIONS_0240>Template Name Cutoff',
+        description = '<LOC OPTIONS_0266>The first 7 characters are displayed (default). Number of characters omitted can be customized. (Needs restart for effects to be visible.)',
+    },
+    options_gui_detailed_unitview = {
+        title = '<LOC OPTIONS_0241>Display More Unit Stats',
+        description = '<LOC OPTIONS_0267>Displays Shield Hp, Regen rate, Hp Regen rate and Build rate. Adapted from Total Veterancy by Eni.',
+    },
+    options_gui_render_custom_names = {
+        title = '<LOC OPTIONS_0242>Always Show Custom Names',
+        description = '<LOC OPTIONS_0268>Toggle display of custom names. Enabled by default.',
+    },
+    options_gui_render_enemy_lifebars = {
+        title = '<LOC OPTIONS_0243>Always Show Enemy Lifebars',
+        description = '<LOC OPTIONS_0269>Force rendering enemy lifebars. Disabled by default',
+    },
+    options_gui_render_armament_detail = {
+        title = '<LOC OPTIONS_0244>Show Armament Build in Factory Menu',
+        description = '<LOC tooltipui0692>Shows detailed information about the weapons a unit has from the build menu',
+    },
+    options_gui_improved_unit_deselection = {
+        title = '<LOC OPTIONS_0245>Improved Unit Deselection',
+        description = '<LOC OPTIONS_0270>Reduce the number of selected units by shift(-1) or ctrl(-5) or ctrl+shift(-10) right-click in group selection. Enabled by default',
+    },
+    options_gui_zoom_pop_distance = {
+        title = '<LOC OPTIONS_0236>Zoom Pop Distance',
+        description = '<LOC OPTIONS_0288>Adjusts distance to which Zoom Pop zooms to.',
+    },
+    options_reclaim_overview_size_scale = {
+        title = '<LOC OPTIONS_0289>Reclaim Label Scaling Factor',
+        description = '<LOC OPTIONS_0290>Scales the text of the reclaim label to its value',
+    },
+    options_reclaim_overview_batching = {
+        title = '<LOC OPTIONS_0291>Reclaim Batching',
+        description = '<LOC OPTIONS_0292>Combines nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more.\r\n\r\nSignificantly improves performance. Recommended for lower end systems.',
+    },
+    options_steal_from_other_control_groups = {
+        title = "<LOC OPTIONS_0293>Unique Control Groups",
+        description = "<LOC OPTIONS_0294>When on, a unit can only be part of one control group. A unit will be transferred from any previously assigned control groups to the new control group.",
+    },
+    options_add_to_factory_control_group = {
+        title= "<LOC OPTIONS_0295>Transitive Control Groups of Factories",
+        description= "<LOC OPTIONS_0296>When on, a unit inherits the control group of the factory it is produced by."
+    },
+    options_selection_sets_double_tap_behavior = {
+        title = "<LOC OPTIONS_0297>Successive Control Group Select Behavior",
+        description = "<LOC OPTIONS_0298>Defines the behavior when you successively select the same control group."
+    },
+    options_selection_sets_double_tap_decay = {
+        title = "<LOC OPTIONS_0299>Threshold for Successive Control Group Selecting",
+        description = "<LOC OPTIONS_0300>Time in milliseconds between selection calls.",
+    },
+    options_cursor_splash_damage = {
+        title = "<LOC OPTIONS_0301>Splash Damage Indicator",
+        description = "<LOC OPTIONS_0302>Shows a splash damage indicator when an attack command is possible, usually when you attempt to ground-fire with a unit with splash damage, like a bomber.\r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
+    },
+    options_cursor_depth_scanning = {
+        title = "<LOC OPTIONS_0303>Depth Scanning",
+        description = "<LOC OPTIONS_0304>Visualizes the height difference between the water surface and the ocean floor on the cursor cursor.",
+    },
+    options_share_mouse = {
+        title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',
+        description = '<LOC OPTIONS_0306>Shows the cursor locations of alive players and other observers as you observe a game.\r\nDoes not apply for replays, including live ones.',
+    },
+    options_casting_painting = {
+        title = '<LOC OPTIONS_0307>Painting for Observers',
+        description = '<LOC OPTIONS_0308>Allows you to paint directly on the map using the assigned hotkey. \r\nDoes not apply for defeated players.',
+    },
     -- **********************
     -- ** Lobby Strings
     -- **********************
@@ -1577,6 +1721,42 @@ Tooltips = {
         title = "<LOC tooltipui0463>Propose Draw",
         description = "<LOC tooltipui0464>Propose ending the game in a draw.  All players must click this to accept.",
     },
+    dip_recall_request = {
+        title = "<LOC tooltipui0722>Activate Recall Beacon",
+        description = "<LOC tooltipui0723>Signal to your allies that you are ready to recall from battle.",
+    },
+    dip_recall_request_dis_active = {
+        title = "<LOC tooltipui0724>Recall Beacon Active",
+        description = "<LOC tooltipui0725>Your team has been notified of your request to recall from battle.",
+    },
+    dip_recall_request_dis_scenario = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0727>You cannot recall from battle in this scenario.",
+    },
+    dip_recall_request_dis_gate = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0728>You cannot recall from battle within 5 minutes of gating in.",
+    },
+    dip_recall_request_dis_ai = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0729>There are AI armies on your team that will not recall.",
+    },
+    dip_recall_request_dis_request = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0730>You have sent a recall request too recently.",
+    },
+    dip_recall_request_dis_vote = {
+        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        description = "<LOC tooltipui0731>Your team has had a recall vote too recently.",
+    },
+    dip_recall_request_accept = {
+        title = "<LOC tooltipui0732>Accept Recall Request",
+        description = "<LOC tooltipui0733>Accept the request for your team to recall from battle.",
+    },
+    dip_recall_request_veto = {
+        title = "<LOC tooltipui0734>Veto Recall Request",
+        description = "<LOC tooltipui0735>Veto the request for your team to recall from battle.",
+    },
     dip_give_units = {
         title = "<LOC tooltipui0465>Give Units",
         description = "<LOC tooltipui0466>Give currently selected units to specified player",
@@ -1610,6 +1790,16 @@ Tooltips = {
         title = "<LOC tooltipui0475>[Hide/Show] Score Bar",
         description = "",
         keyID = "toggle_score_screen",
+    },
+    fabricator_collapse = {
+        title = "<LOC tooltipui0736>[Hide/Show] Mass Fabricator Panel",
+        description = "",
+        keyID = "toggle_mass_fabricator_panel",
+    },
+    voting_collapse = {
+        title = "<LOC tooltipui0737>[Hide/Show] Voting Panel",
+        description = "",
+        keyID = "toggle_voting_panel",
     },
     econ_collapse = {
         title = "<LOC tooltipui0558>[Hide/Show] Resource Bar",
@@ -2057,82 +2247,5 @@ Tooltips = {
     },
     minimap_mesh = {
         description = "<LOC tooltipui0720>Disables the rendering of meshes of units and props on the minimap to reduce the burden on the rendering thread. Can potentially improve your framerate.",
-    },
-
-    -- **********************
-    -- ** GazUI
-    -- **********************
-
-    options_gui_bigger_strat_build_icons = {
-        title = '<LOC OPTIONS_0228>Bigger Strategic Build Icons',
-        description = '<LOC OPTIONS_0253>Replaces the default strategic build icons with something more visible.',
-    },
-    options_gui_template_rotator = {
-        title = '<LOC OPTIONS_0229>Template Rotation',
-        description = '<LOC OPTIONS_0256>Allows build templates to be rotated with the middle mouse button.',
-    },
-    options_gui_draggable_queue = {
-        title = '<LOC OPTIONS_0231>Draggable Build Queue',
-        description = '<LOC OPTIONS_0258>Allows factory build queues to be reordered with drag and drop.',
-    },
-    options_gui_queue_on_hover_02 = {
-        title = '<LOC OPTIONS_0246>Show Factory Queue on Hover',
-        description = '<LOC OPTIONS_0249>Shows Factory queue above unit description when hover over unit with mouse.',
-    },
-    options_gui_idle_engineer_avatars = {
-        title = '<LOC OPTIONS_0232>Middle Click Avatars',
-        description = '<LOC OPTIONS_0259>Allows middle clicking idle engineer avatars to select all idle engineers on screen.',
-    },
-    options_gui_all_race_templates = {
-        title = '<LOC OPTIONS_0233>All Race Templates',
-        description = '<LOC OPTIONS_0260>Allows build templates to be used across all 4 factions.',
-    },
-    options_gui_enhanced_unitview = {
-        title = '<LOC OPTIONS_0234>Single Unit Selected Info',
-        description = '<LOC OPTIONS_0261>Replaces fuel bar with progress bar, and causes the unitview to always be shown for a 1 unit selection.',
-    },
-    options_gui_enhanced_unitrings = {
-        title = '<LOC OPTIONS_0235>Single Unit Selected Rings',
-        description = '<LOC OPTIONS_0262>When a single unit is selected, show that units range rings.',
-    },
-    options_gui_templates_factory = {
-        title = '<LOC OPTIONS_0237>Factory Build Queue Templates',
-        description = '<LOC OPTIONS_0263>Allows creation of factory build queue templates.',
-    },
-    options_gui_seperate_idle_builders = {
-        title = '<LOC OPTIONS_0238>Seperate Idle Builders',
-        description = '<LOC OPTIONS_0264>Use a seperate icon for idle Engineers and other builders.',
-    },
-    options_gui_visible_template_names = {
-        title = '<LOC OPTIONS_0239>Visible Template Names',
-        description = '<LOC OPTIONS_0265>Displays template name below template icon.',
-    },
-    options_gui_template_name_cutoff = {
-        title = '<LOC OPTIONS_0240>Template Name Cutoff',
-        description = '<LOC OPTIONS_0266>The first 7 characters are displayed (default). Number of characters omitted can be customized. (Needs restart for effects to be visible.)',
-    },
-    options_gui_detailed_unitview = {
-        title = '<LOC OPTIONS_0241>Display more Unit Stats',
-        description = '<LOC OPTIONS_0267>Displays Shield Hp, Regen rate, Hp Regen rate and Build rate. Adapted from Total Veterancy by Eni.',
-    },
-    options_gui_render_custom_names = {
-        title = '<LOC OPTIONS_0242>Always Render Custom Names',
-        description = '<LOC OPTIONS_0268>Toggle display of custom names. Enabled by default.',
-    },
-    options_gui_render_enemy_lifebars = {
-        title = '<LOC OPTIONS_0243>Force Render Enemy Lifebars',
-        description = '<LOC OPTIONS_0269>Force rendering enemy lifebars. Disabled by default',
-    },
-    options_gui_render_armament_detail = {
-        title = '<LOC OPTIONS_0244>Show Armament Build in Factory Menu',
-        description = '<LOC tooltipui0692>Shows detailed information about the weapons a unit has from the build menu',
-    },
-    options_gui_improved_unit_deselection = {
-        title = '<LOC OPTIONS_0245>Improved Unit deselection',
-        description = '<LOC OPTIONS_0270>Reduce the number of selected units by shift(-1) or ctrl(-5) or ctrl+shift(-10) right-click in group selection. Enabled by default',
-    },
-    options_gui_zoom_pop_distance = {
-        title = '<LOC OPTIONS_0236>Zoom Pop Distance',
-        description = '<LOC OPTIONS_0272>Adjusts distance to which Zoom Pop zooms to.',
     },
 }

@@ -1,21 +1,16 @@
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local Border = import('/lua/maui/border.lua').Border
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Edit = import('/lua/maui/edit.lua').Edit
-local options = import('/lua/user/prefs.lua').GetFromCurrentProfile('options')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Edit = import("/lua/maui/edit.lua").Edit
+local options = import("/lua/user/prefs.lua").GetFromCurrentProfile('options')
 
 local dialog, nameDialog, defaultEditField
 local activeFilters, activeFilterTypes, specialFilterControls, filterSet = {}, {}, {}, {}
 local UnitList, CreationList = {}, {}
-local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
-local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')
+
+local TableGetN = table.getn
 
 local ChoiceColumns = options.spawn_menu_filter_columns or 5
 
@@ -76,15 +71,15 @@ end
 local function CreateNameFilter(data)
     local group = Group(dialog)
     group.Width:Set(dialog.Width)
-    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
-        group.Height:Set(30 + math.floor((table.getn(data.choices)-1)/ChoiceColumns) * 25)
+    if data.choices and data.choices[1] and TableGetN(data.choices) > ChoiceColumns then
+        group.Height:Set(30 + math.floor((TableGetN(data.choices)-1)/ChoiceColumns) * 25)
     else
         group.Height:Set(30)
     end
 
     group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
     LayoutHelpers.AtLeftIn(group.check, group)
-    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
+    if data.choices and data.choices[1] and TableGetN(data.choices) > ChoiceColumns then
         LayoutHelpers.AtTopIn(group.check, group, 2)
     else
         LayoutHelpers.AtVerticalCenterIn(group.check, group)
@@ -100,7 +95,7 @@ local function CreateNameFilter(data)
 
     group.label = UIUtil.CreateText(group, data.title, 14, UIUtil.bodyFont)
     LayoutHelpers.RightOf(group.label, group.check)
-    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
+    if data.choices and data.choices[1] and TableGetN(data.choices) > ChoiceColumns then
         LayoutHelpers.AtTopIn(group.label, group, 7)
     else
         LayoutHelpers.AtVerticalCenterIn(group.label, group)
@@ -421,9 +416,9 @@ function CreateDialog(x, y)
     end
 
     dialog.unitList = Group(dialog)
-    dialog.unitList.Height:Set(function() return createBtn.Top() - filterGroups[table.getn(filterGroups)].Bottom() - 5 end)
+    dialog.unitList.Height:Set(function() return createBtn.Top() - filterGroups[TableGetN(filterGroups)].Bottom() - 5 end)
     dialog.unitList.Width:Set(function() return dialog.Width() - 40 end)
-    LayoutHelpers.Below(dialog.unitList, filterGroups[table.getn(filterGroups)])
+    LayoutHelpers.Below(dialog.unitList, filterGroups[TableGetN(filterGroups)])
     dialog.unitList.top = 0
 
     dialog.unitEntries = {}
@@ -545,7 +540,7 @@ function CreateDialog(x, y)
     local numLines = function() return table.getsize(dialog.unitEntries) end
 
     local function DataSize()
-        return table.getn(UnitList)
+        return TableGetN(UnitList)
     end
 
     -- called when the scrollbar for the control requires data to size itself
@@ -696,3 +691,12 @@ function NameSet(callback)
         okButton.OnClick()
     end
 end
+
+-- kept for mod backwards compatibility
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Text = import("/lua/maui/text.lua").Text
+local Border = import("/lua/maui/border.lua").Border
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local RadioGroup = import("/lua/maui/mauiutil.lua").RadioGroup
+local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
+local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')

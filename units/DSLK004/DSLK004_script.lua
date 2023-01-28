@@ -1,22 +1,19 @@
---****************************************************************************
---**
---**  Author(s):  Mikko Tyster, Atte Hulkkonen
---**
---**  Summary  :  Seraphim T3 Mobile Lightning Anti-Air
---**
---**  Copyright © 2008 Blade Braver!
---****************************************************************************
+------------------------------------------------------------------------------
+-- Author(s):  Mikko Tyster, Atte Hulkkonen
+-- Summary  :  Seraphim T3 Mobile Lightning Anti-Air
+-- Copyright © 2008 Blade Braver!
+------------------------------------------------------------------------------
 
-local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
---local CollisionBeamFile = import('/lua/kirvesbeams.lua')
-local DefaultBeamWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultBeamWeapon
---local Dummy = import('/lua/kirvesweapons.lua').Dummy
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+--local CollisionBeamFile = import("/lua/kirvesbeams.lua")
+local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
+--local Dummy = import("/lua/kirvesweapons.lua").Dummy
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
-local SCCollisionBeam = import('/lua/defaultcollisionbeams.lua').SCCollisionBeam
+local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
+local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
-local PhasonCollisionBeam = Class(SCCollisionBeam) {
+local PhasonCollisionBeam = ClassWeapon(SCCollisionBeam) {
 
     FxBeamStartPoint = {
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_01_emit.bp',
@@ -44,7 +41,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 }
 
-local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
+local PhasonCollisionBeam2 = ClassWeapon(PhasonCollisionBeam) {
 
     FxBeam = { '/Effects/Emitters/seraphim_lightning_beam_02_emit.bp', },
     TerrainImpactScale = 0.1,
@@ -72,7 +69,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-        local Util = import('/lua/utilities.lua')
+        local Util = import("/lua/utilities.lua")
 
         while true do
             if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
@@ -90,19 +87,19 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
     end,
 }
 
-local PhasonBeam = Class(DefaultBeamWeapon) {
+local PhasonBeam = ClassWeapon(DefaultBeamWeapon) {
     BeamType = PhasonCollisionBeam,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {},
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 0.2,
 }
 
 ---@class DSLK004 : SLandUnit
-DSLK004 = Class(SLandUnit) {
+DSLK004 = ClassUnit(SLandUnit) {
     Weapons = {
-        PhasonBeamAir = Class(PhasonBeam) {},
-        PhasonBeamGround = Class(PhasonBeam) {
+        PhasonBeamAir = ClassWeapon(PhasonBeam) {},
+        PhasonBeamGround = ClassWeapon(PhasonBeam) {
             BeamType = PhasonCollisionBeam2,
             FxBeamEndPointScale = 0.01,
         },

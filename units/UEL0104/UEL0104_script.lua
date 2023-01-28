@@ -7,13 +7,13 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TLandUnit = import('/lua/terranunits.lua').TLandUnit
-local TAALinkedRailgun = import('/lua/terranweapons.lua').TAALinkedRailgun
+local TLandUnit = import("/lua/terranunits.lua").TLandUnit
+local TAALinkedRailgun = import("/lua/terranweapons.lua").TAALinkedRailgun
 
 ---@class UEL0104 : TLandUnit
-UEL0104 = Class(TLandUnit) {
+UEL0104 = ClassUnit(TLandUnit) {
     Weapons = {
-        AAGun = Class(TAALinkedRailgun) {
+        AAGun = ClassWeapon(TAALinkedRailgun) {
             FxMuzzleFlashScale = 0.25,
         },
     },

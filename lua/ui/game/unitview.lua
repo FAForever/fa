@@ -6,32 +6,32 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local veterancyDefaults = import('/lua/game.lua').VeteranDefault
-local Factions = import('/lua/factions.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local EnhancementCommon = import('/lua/enhancementcommon.lua')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local veterancyDefaults = import("/lua/game.lua").VeteranDefault
+local Factions = import("/lua/factions.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local EnhancementCommon = import("/lua/enhancementcommon.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
 local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
-local unitviewDetail = import('/lua/ui/game/unitviewDetail.lua')
-local Grid = import('/lua/maui/grid.lua').Grid
-local Construction = import('/lua/ui/game/construction.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
+local unitviewDetail = import("/lua/ui/game/unitviewdetail.lua")
+local Grid = import("/lua/maui/grid.lua").Grid
+local Construction = import("/lua/ui/game/construction.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
 local selectedUnit = nil
 local updateThread = nil
 local unitHP = {}
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
 
 -- shared between sim and ui
-local OverchargeShared = import('/lua/shared/overcharge.lua')
+local OverchargeShared = import("/lua/shared/overcharge.lua")
 
 local UpdateWindowShowQueueOfUnit = (categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY
 
@@ -665,13 +665,12 @@ function UpdateWindow(info)
             controls.shieldText:Hide()
 
             if info.userUnit ~= nil then
-                local bp = info.userUnit:GetBlueprint()
-                local regen = UnitData[info.entityId].regen or bp.Defense.RegenRate
+                local regen = info.userUnit:GetStat("HitpointsRegeneration", 0).Value or 0
                 controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth, regen))
             end
 
             if info.shieldRatio > 0 then
-                local getEnh = import('/lua/enhancementcommon.lua')
+                local getEnh = import("/lua/enhancementcommon.lua")
                 local unitBp = info.userUnit:GetBlueprint()
                 local shield = unitBp.Defense.Shield
                 if not shield.ShieldMaxHealth then
@@ -700,7 +699,7 @@ function UpdateWindow(info)
     UpdateEnhancementIcons(info)
 end
 
-local GetEnhancementPrefix = import('/lua/ui/game/construction.lua').GetEnhancementPrefix
+local GetEnhancementPrefix = import("/lua/ui/game/construction.lua").GetEnhancementPrefix
 function UpdateEnhancementIcons(info)
     local unit = info.userUnit
     local existingEnhancements
@@ -801,7 +800,7 @@ function CreateUI()
             info = GetUnitRolloverInfo(selectedUnit)
         end
 
-        if info and import('/lua/ui/game/unitviewDetail.lua').View:IsHidden() then
+        if info and import("/lua/ui/game/unitviewdetail.lua").View:IsHidden() then
             UpdateWindow(info)
             if self:GetAlpha() < 1 then
                 self:SetAlpha(1, true)

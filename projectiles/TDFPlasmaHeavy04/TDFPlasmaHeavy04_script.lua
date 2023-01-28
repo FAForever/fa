@@ -8,8 +8,8 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
-local THeavyPlasmaCannonProjectile = import('/lua/terranprojectiles.lua').THeavyPlasmaCannonProjectile
+local THeavyPlasmaCannonProjectile = import("/lua/terranprojectiles.lua").THeavyPlasmaCannonProjectile
 
-TDFPlasmaHeavy04 = Class(THeavyPlasmaCannonProjectile) { }
+TDFPlasmaHeavy04 = ClassProjectile(THeavyPlasmaCannonProjectile) { }
 TypeClass = TDFPlasmaHeavy04
 

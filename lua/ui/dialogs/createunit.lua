@@ -1,27 +1,24 @@
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local Border = import('/lua/maui/border.lua').Border
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Edit = import('/lua/maui/edit.lua').Edit
-local options = import('/lua/user/prefs.lua').GetFromCurrentProfile('options')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Edit = import("/lua/maui/edit.lua").Edit
+local options = import("/lua/user/prefs.lua").GetFromCurrentProfile('options')
 
-local ssub, gsub, upper, lower, find, slen, format = string.sub, string.gsub, string.upper, string.lower, string.find, string.len, string.format
+local ssub, gsub, upper, lower, find, slen, format = string.sub, string.gsub, string.upper, string.lower, string.find,
+    string.len, string.format
 local mmin, mmax, floor = math.min, math.max, math.floor
 
 local dialog, nameDialog, defaultEditField
 local EscThread, SpawnThread
 local activeFilters, activeFilterTypes, specialFilterControls, filterSet = {}, {}, {}, {}
 local UnitList, CreationList = {}, {}
-local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
-local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')
 
 local NumArmies = GetArmiesTable().numArmies
+local options = nil
+
+local TableGetN = table.getn
 
 local ChoiceColumns = options.spawn_menu_filter_columns or 5
 local TeamColumns = mmin(options.spawn_menu_team_columns or 3, NumArmies)
@@ -32,15 +29,18 @@ local function SourceListTabs()
     local function ShouldGiveTab(mod)
         local dirlen = slen(mod.location)
         for id, bp in __blueprints do
-            if mod.location..'/' == ssub(bp.Source, 1, dirlen+1) then
+            if mod.location .. '/' == ssub(bp.Source, 1, dirlen + 1) then
                 return true
             end
         end
     end
 
     local function NameIsShortEnough(name) return slen(name) <= NameMaxLengthChars end
+
     local function ForWordsIn(text, operation) return gsub(text, '[%a\']+', operation) end
-    local function Initialise(text) return gsub(text, '[%a\'%&]+%s*', function(s) return upper(ssub(s,1,1)) end ) end
+
+    local function Initialise(text) return gsub(text, '[%a\'%&]+%s*', function(s) return upper(ssub(s, 1, 1)) end) end
+
     local function Abreviate(word)
         local words = {
             Additional = 'Add',
@@ -58,7 +58,7 @@ local function SourceListTabs()
             Supreme = 'Sup',
             Veterancy = 'Vet',
         }
-        return words[gsub(word,'\'','')] or word
+        return words[gsub(word, '\'', '')] or word
     end
 
     local function titleFit(name)
@@ -87,13 +87,13 @@ local function SourceListTabs()
 
         else -- If there are words that would be entirely cut off, initialise after the first
             local FirstSpaceIndex = find(name, ' ')
-            local name = ssub(name, 1, FirstSpaceIndex) .. Initialise(ssub(name, FirstSpaceIndex+1))
+            local name = ssub(name, 1, FirstSpaceIndex) .. Initialise(ssub(name, FirstSpaceIndex + 1))
 
             if NameIsShortEnough(name) then
                 return name
 
             else --If it still isn't short enough, just initialise the rest as well, and trim the result just in case
-                name = Initialise(ssub(name, 1, FirstSpaceIndex)) .. ssub(name, FirstSpaceIndex+1)
+                name = Initialise(ssub(name, 1, FirstSpaceIndex)) .. ssub(name, FirstSpaceIndex + 1)
                 return ssub(name, 1, mmin(l, slen(name)))
             end
         end
@@ -121,7 +121,8 @@ local function SourceListTabs()
                 title = 'SC Patch',
                 key = 'dlc',
                 sortFunc = function(unitID, modloc)
-                    return ssub(__blueprints[unitID].Source, 1, 7) == "/units/" and ssub(unitID, 1, 1) ~= 'u' and ssub(unitID, 1, 1) ~= 'x' and ssub(unitID, 1, 1) ~= 'o'
+                    return ssub(__blueprints[unitID].Source, 1, 7) == "/units/" and ssub(unitID, 1, 1) ~= 'u' and
+                        ssub(unitID, 1, 1) ~= 'x' and ssub(unitID, 1, 1) ~= 'o'
                 end,
             }
         }
@@ -140,12 +141,13 @@ local function SourceListTabs()
     for i, mod in __active_mods do
         if mod.name then
             if ShouldGiveTab(mod) then
-                local key = gsub(lower(mod.name),"%s+", "_")
+                local key = gsub(lower(mod.name), "%s+", "_")
                 specialFilterControls[key] = mod.location
                 table.insert(listicle, {
                     title = titleFit(mod.name),
                     key = key,
-                    sortFunc = function(unitID, modloc) return modloc..'/' == ssub(__blueprints[unitID].Source, 1, slen(modloc)+1) end,
+                    sortFunc = function(unitID, modloc) return modloc .. '/' ==
+                        ssub(__blueprints[unitID].Source, 1, slen(modloc) + 1) end,
                 })
             end
         end
@@ -155,15 +157,15 @@ end
 
 local function HasCat(id, cat)
     return __blueprints[id].CategoriesHash and __blueprints[id].CategoriesHash[cat]
-    or __blueprints[id].Categories and table.find(__blueprints[id].Categories, cat)
+        or __blueprints[id].Categories and table.find(__blueprints[id].Categories, cat)
 end
 
 local function FactionListTabs()
     local flisticle = {}
     local allFactionCats = {}
 
-    for i, faction in import('/lua/factions.lua').Factions do
-        local key = 'faction'..faction.Category
+    for i, faction in import("/lua/factions.lua").Factions do
+        local key = 'faction' .. faction.Category
         specialFilterControls[key] = faction.Category
         table.insert(allFactionCats, faction.Category)
         table.insert(flisticle, {
@@ -227,7 +229,8 @@ local function TypeListTabs()
                 key = 'land',
                 sortFunc = function(unitID)
                     local MT = __blueprints[unitID].Physics.MotionType
-                    return (MT == 'RULEUMT_Amphibious' or MT == 'RULEUMT_Land') and __blueprints[unitID].ScriptClass ~= 'ResearchItem'
+                    return (MT == 'RULEUMT_Amphibious' or MT == 'RULEUMT_Land') and
+                        __blueprints[unitID].ScriptClass ~= 'ResearchItem'
                 end,
             },
             {
@@ -316,7 +319,7 @@ local function TechListTabs()
             key = 'civ',
             sortFunc = function(unitID)
                 return not (HasCat(unitID, 'TECH1') or HasCat(unitID, 'TECH2')
-                or HasCat(unitID, 'TECH3') or HasCat(unitID, 'EXPERIMENTAL'))
+                    or HasCat(unitID, 'TECH3') or HasCat(unitID, 'EXPERIMENTAL'))
             end,
         })
     end
@@ -326,8 +329,8 @@ local function TechListTabs()
             key = 'acu',
             sortFunc = function(unitID)
                 return HasCat(unitID, 'COMMAND') -- Show ACU's
-                or find(unitID, 'l0301_Engineer') -- Show SCU's
-                or find(unitID, 'xab1401') -- Show Paragon
+                    or find(unitID, 'l0301_Engineer') -- Show SCU's
+                    or find(unitID, 'xab1401') -- Show Paragon
             end,
         })
     end
@@ -414,11 +417,11 @@ if options.spawn_menu_filter_menu_sort ~= 0 then
                 sortFunc = function(unitID)
                     return HasCat(unitID, 'SORTOTHER') or not (
                         HasCat(unitID, 'SORTCONSTRUCTION') or
-                        HasCat(unitID, 'SORTECONOMY') or
-                        HasCat(unitID, 'SORTDEFENSE') or
-                        HasCat(unitID, 'SORTSTRATEGIC') or
-                        HasCat(unitID, 'SORTINTEL')
-                    )
+                            HasCat(unitID, 'SORTECONOMY') or
+                            HasCat(unitID, 'SORTDEFENSE') or
+                            HasCat(unitID, 'SORTSTRATEGIC') or
+                            HasCat(unitID, 'SORTINTEL')
+                        )
                 end,
             },
         },
@@ -455,15 +458,15 @@ local function getItems() return EntityCategoryGetUnitList(categories.ALLUNITS) 
 local function CreateNameFilter(data)
     local group = Group(dialog)
     group.Width:Set(dialog.Width)
-    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
-        LayoutHelpers.SetHeight(group, 30 + floor((table.getn(data.choices)-1)/ChoiceColumns) * 25)
+    if data.choices and data.choices[1] and TableGetN(data.choices) > ChoiceColumns then
+        LayoutHelpers.SetHeight(group, 30 + floor((TableGetN(data.choices) - 1) / ChoiceColumns) * 25)
     else
         LayoutHelpers.SetHeight(group, 30)
     end
 
     group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
     LayoutHelpers.AtLeftIn(group.check, group)
-    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
+    if data.choices and data.choices[1] and TableGetN(data.choices) > ChoiceColumns then
         LayoutHelpers.AtTopIn(group.check, group, 2)
     else
         LayoutHelpers.AtVerticalCenterIn(group.check, group)
@@ -471,7 +474,7 @@ local function CreateNameFilter(data)
 
     group.check.key = data.key
     if filterSet[data.key] == nil then
-        filterSet[data.key] = {value = data.key == 'spawnable', choices = {}}
+        filterSet[data.key] = { value = data.key == 'spawnable', choices = {} }
     end
     if activeFilters[data.key] == nil then
         activeFilters[data.key] = {}
@@ -479,7 +482,7 @@ local function CreateNameFilter(data)
 
     group.label = UIUtil.CreateText(group, data.title, 14, UIUtil.bodyFont)
     LayoutHelpers.RightOf(group.label, group.check)
-    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
+    if data.choices and data.choices[1] and TableGetN(data.choices) > ChoiceColumns then
         LayoutHelpers.AtTopIn(group.label, group, 7)
     else
         LayoutHelpers.AtVerticalCenterIn(group.label, group)
@@ -489,15 +492,16 @@ local function CreateNameFilter(data)
         group.items = {}
         for i, v in data.choices do
             local index = i
-            group.items[index] = UIUtil.CreateCheckboxStd(group, data.key == 'spawnable' and '/dialogs/check-box_btn/radio' or '/dialogs/toggle_btn/toggle')
+            group.items[index] = UIUtil.CreateCheckboxStd(group,
+                data.key == 'spawnable' and '/dialogs/check-box_btn/radio' or '/dialogs/toggle_btn/toggle')
             if index == 1 then
                 LayoutHelpers.AtLeftTopIn(group.items[index], group, 95)
-            elseif index < ChoiceColumns+1 then
-                LayoutHelpers.RightOf(group.items[index], group.items[index-1])
+            elseif index < ChoiceColumns + 1 then
+                LayoutHelpers.RightOf(group.items[index], group.items[index - 1])
             else
-                LayoutHelpers.Below(group.items[index], group.items[index-ChoiceColumns])
+                LayoutHelpers.Below(group.items[index], group.items[index - ChoiceColumns])
             end
-            if index < ChoiceColumns+1 then
+            if index < ChoiceColumns + 1 then
                 LayoutHelpers.AtTopIn(group.items[index], group)
             end
 
@@ -545,7 +549,7 @@ local function CreateNameFilter(data)
         group.edit:SetBackgroundColor('ff333333')
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
-        LayoutHelpers.SetDimensions(group.edit, (ChoiceColumns-2)*82+15, 15)
+        LayoutHelpers.SetDimensions(group.edit, (ChoiceColumns - 2) * 82 + 15, 15)
         group.edit:SetText(filterSet[data.key].editText or '')
         group.edit:SetFont(UIUtil.bodyFont, 12)
         group.edit:SetMaxChars(20)
@@ -602,6 +606,7 @@ local function CreateNameFilter(data)
 end
 
 function CreateDialog(x, y)
+    
     if dialog then
         dialog:Destroy()
         dialog = nil
@@ -616,11 +621,11 @@ function CreateDialog(x, y)
     dialog:SetSolidColor('CC000000')
 
     local NoArmies = math.ceil(NumArmies / TeamColumns)
-    local NoMods = floor((table.getn(nameFilters[3].choices) - 1)/ChoiceColumns)
+    local NoMods = floor((table.getn(nameFilters[3].choices) - 1) / ChoiceColumns)
 
     LayoutHelpers.SetDimensions(dialog,
         90 + 83 * ChoiceColumns, -- Width
-        450 + NoArmies*30 + NoMods*25 -- Height
+        450 + NoArmies * 30 + NoMods * 25-- Height
     )
     dialog.Left:Set(function() return mmax(mmin(x - dialog.Width() / 2, GetFrame(0).Right() - dialog.Width()), 0) end)
     dialog.Top:Set(function() return mmax(mmin(y - 160, GetFrame(0).Bottom() - dialog.Height()), 0) end)
@@ -687,23 +692,23 @@ function CreateDialog(x, y)
 
     local function spreadSpawn(ids, count, vet)
 
-        if table.getn(ids) > 0 then 
+        if TableGetN(ids) > 0 then
 
-            -- store selection so that units do not go of and try to build the unit we're 
+            -- store selection so that units do not go of and try to build the unit we're
             -- cheating in, is reset in EndCommandMode of '/lua/ui/game/commandmode.lua'
             local selection = GetSelectedUnits()
             SelectUnits(nil);
 
             -- enables command mode for spawning units
-            import('/lua/ui/game/commandmode.lua').StartCommandMode(
-                "build", 
-                { 
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
+                "build",
+                {
                     -- default information required
-                    ids = ids, 
+                    ids = ids,
                     index = 2,
 
                     -- inform this is part of a cheat
-                    cheat = true, 
+                    cheat = true,
 
                     -- information for spawning
                     name = ids[1],
@@ -723,9 +728,9 @@ function CreateDialog(x, y)
 
             -- check if user wants to exit
             while not dialog do
-                if IsCancelKeyDown() then 
-                    import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
-                    break 
+                if IsCancelKeyDown() then
+                    import("/lua/ui/game/commandmode.lua").EndCommandMode(true)
+                    break
                 end
                 WaitSeconds(0.1)
             end
@@ -749,7 +754,8 @@ function CreateDialog(x, y)
                 end
                 if groupControls.items then
                     for choiceIndex, choiceControl in groupControls.items do
-                        if filterTable[key].choices[choiceControl.filterKey] ~= nil and choiceControl:IsChecked() ~= filterTable[key].choices[choiceControl.filterKey] then
+                        if filterTable[key].choices[choiceControl.filterKey] ~= nil and
+                            choiceControl:IsChecked() ~= filterTable[key].choices[choiceControl.filterKey] then
                             choiceControl:SetCheck(filterTable[key].choices[choiceControl.filterKey])
                         end
                     end
@@ -815,7 +821,7 @@ function CreateDialog(x, y)
                     end
                 end
             elseif event.Type == 'ButtonDClick' then
-                ConExecute('SetFocusArmy '..tostring(currentArmy-1))
+                ConExecute('SetFocusArmy ' .. tostring(currentArmy - 1))
             end
         end
         if index == currentArmy then
@@ -830,7 +836,7 @@ function CreateDialog(x, y)
 
     local function IsColumnHead(teamI)
         if TeamColumns <= 1 then return false end
-        for i = 1, TeamColumns-1 do
+        for i = 1, TeamColumns - 1 do
             if teamI == floor(NumArmies / TeamColumns * i) + 1 then
                 return true
             end
@@ -843,14 +849,14 @@ function CreateDialog(x, y)
     for i, val in GetArmiesTable().armiesTable do
         armiesGroup.armySlots[i] = CreateArmySelectionSlot(armiesGroup, i, val)
         if i == 1 then
-            LayoutHelpers.AtLeftTopIn(armiesGroup.armySlots[i],armiesGroup)
+            LayoutHelpers.AtLeftTopIn(armiesGroup.armySlots[i], armiesGroup)
             lowestControl = armiesGroup.armySlots[i]
         elseif IsColumnHead(i) then
-            LayoutHelpers.RightOf(armiesGroup.armySlots[i],armiesGroup.armySlots[WorkingColumnHead])
-            LayoutHelpers.AtTopIn(armiesGroup.armySlots[i],armiesGroup)
+            LayoutHelpers.RightOf(armiesGroup.armySlots[i], armiesGroup.armySlots[WorkingColumnHead])
+            LayoutHelpers.AtTopIn(armiesGroup.armySlots[i], armiesGroup)
             WorkingColumnHead = i
         else
-            LayoutHelpers.Below(armiesGroup.armySlots[i],armiesGroup.armySlots[i-1])
+            LayoutHelpers.Below(armiesGroup.armySlots[i], armiesGroup.armySlots[i - 1])
         end
         if armiesGroup.armySlots[i].Bottom() > lowestControl.Bottom() then
             lowestControl = armiesGroup.armySlots[i]
@@ -909,7 +915,7 @@ function CreateDialog(x, y)
             else
                 newFilterListing[name] = filterSet
             end
-            SetPreference('CreateUnitFilters',newFilterListing)
+            SetPreference('CreateUnitFilters', newFilterListing)
             RefreshFilterList(name)
         end)
     end
@@ -926,16 +932,16 @@ function CreateDialog(x, y)
             if oldFilterSets[delName] then
                 oldFilterSets[delName] = nil
             end
-            SetPreference('CreateUnitFilters',oldFilterSets)
+            SetPreference('CreateUnitFilters', oldFilterSets)
             RefreshFilterList()
-       end
+        end
     end
 
     local propSwapBtn = CreateToggleButton 'Prop mode'
     LayoutHelpers.Below(propSwapBtn, armiesGroup, 5)
     LayoutHelpers.RightOf(propSwapBtn, delFilterSet, 9)
     propSwapBtn.OnClick = function(button)
-        ConExecuteSave('ui_lua import("/lua/ui/dialogs/createprop.lua").CreateDialog('..x..','..y..')')
+        ConExecuteSave('ui_lua import("/lua/ui/dialogs/createprop.lua").CreateDialog(' .. x .. ',' .. y .. ')')
         cancelBtn.OnClick()
     end
 
@@ -953,14 +959,15 @@ function CreateDialog(x, y)
         elseif categories.UNSPAWNABLE and filtIndex == 3 then
             LayoutHelpers.Below(filterGroups[index], filterGroups[1])
         else
-            LayoutHelpers.Below(filterGroups[index], filterGroups[index-1])
+            LayoutHelpers.Below(filterGroups[index], filterGroups[index - 1])
         end
     end
 
     dialog.unitList = Group(dialog)
-    dialog.unitList.Height:Set(function() return createBtn.Top() - filterGroups[table.getn(filterGroups)].Bottom() - LayoutHelpers.ScaleNumber(5) end)
+    dialog.unitList.Height:Set(function() return createBtn.Top() - filterGroups[TableGetN(filterGroups)].Bottom() -
+        LayoutHelpers.ScaleNumber(5) end)
     dialog.unitList.Width:Set(function() return dialog.Width() - LayoutHelpers.ScaleNumber(40) end)
-    LayoutHelpers.Below(dialog.unitList, filterGroups[table.getn(filterGroups)])
+    LayoutHelpers.Below(dialog.unitList, filterGroups[TableGetN(filterGroups)])
     dialog.unitList.top = 0
 
     dialog.unitEntries = {}
@@ -973,16 +980,16 @@ function CreateDialog(x, y)
     }
 
     local mouseover = false
-    local function CreateElementMouseover(unitData,x,y)
+    local function CreateElementMouseover(unitData, x, y)
         if mouseover then mouseover:Destroy() end
         mouseover = Bitmap(dialog)
         mouseover:SetSolidColor('dd115511')
 
         mouseover.img = Bitmap(mouseover)
         LayoutHelpers.SetDimensions(mouseover.img, 40, 40)
-        LayoutHelpers.AtLeftTopIn(mouseover.img, mouseover, 2,2)
-        if DiskGetFileInfo(UIUtil.UIFile('/icons/units/'..unitData..'_icon.dds', true)) then
-            mouseover.img:SetTexture(UIUtil.UIFile('/icons/units/'..unitData..'_icon.dds', true))
+        LayoutHelpers.AtLeftTopIn(mouseover.img, mouseover, 2, 2)
+        if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. unitData .. '_icon.dds', true)) then
+            mouseover.img:SetTexture(UIUtil.UIFile('/icons/units/' .. unitData .. '_icon.dds', true))
         else
             mouseover.img:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
         end
@@ -990,22 +997,26 @@ function CreateDialog(x, y)
         mouseover.name = UIUtil.CreateText(mouseover, __blueprints[unitData].Description, 14, UIUtil.bodyFont)
         LayoutHelpers.RightOf(mouseover.name, mouseover.img, 2)
 
-        mouseover.desc = UIUtil.CreateText(mouseover, __blueprints[unitData].General.UnitName or unitData, 14, UIUtil.bodyFont)
+        mouseover.desc = UIUtil.CreateText(mouseover, __blueprints[unitData].General.UnitName or unitData, 14,
+            UIUtil.bodyFont)
         LayoutHelpers.AtLeftIn(mouseover.desc, mouseover, 44)
         LayoutHelpers.AtBottomIn(mouseover.desc, mouseover, 5)
 
-        mouseover.Left:Set(x+20)
-        mouseover.Top:Set(y+20)
+        mouseover.Left:Set(x + 20)
+        mouseover.Top:Set(y + 20)
         mouseover.Height:Set(function() return mouseover.img.Height() + 4 end)
-        mouseover.Width:Set(function() return mouseover.img.Width() + mmax(mouseover.name.Width(), mouseover.desc.Width()) + 8 end)
+        mouseover.Width:Set(function() return mouseover.img.Width() +
+            mmax(mouseover.name.Width(), mouseover.desc.Width()) + 8 end)
         mouseover.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     end
-    local function MoveMouseover(x,y)
+
+    local function MoveMouseover(x, y)
         if mouseover then
-            mouseover.Left:Set(x+20)
-            mouseover.Top:Set(y+20)
+            mouseover.Left:Set(x + 20)
+            mouseover.Top:Set(y + 20)
         end
     end
+
     local function DestroyMouseover()
         if mouseover then
             mouseover:Destroy()
@@ -1029,7 +1040,7 @@ function CreateDialog(x, y)
             dialog.unitEntries[index].Checked = false
             dialog.unitEntries[index].HandleEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
-                    CreateElementMouseover(self.unitID,event.MouseX,event.MouseY)
+                    CreateElementMouseover(self.unitID, event.MouseX, event.MouseY)
                     if self.Checked then
                         self:SetSolidColor(LineColors.Sel_Over)
                     else
@@ -1054,7 +1065,7 @@ function CreateDialog(x, y)
                     SpawnThread = ForkThread(spreadSpawn, { self.unitID }, count, veterancyLevel)
                     cancelBtn:OnClick()
                 elseif event.Type == 'MouseMotion' then
-                    MoveMouseover(event.MouseX,event.MouseY)
+                    MoveMouseover(event.MouseX, event.MouseY)
                 end
             end
 
@@ -1066,18 +1077,20 @@ function CreateDialog(x, y)
         LayoutHelpers.AtTopIn(dialog.unitEntries[1], dialog.unitList)
 
         local index = 2
-        while dialog.unitEntries[table.getsize(dialog.unitEntries)].Top() + (2 * dialog.unitEntries[1].Height()) < dialog.unitList.Bottom() do
+        while dialog.unitEntries[table.getsize(dialog.unitEntries)].Top() + (2 * dialog.unitEntries[1].Height()) <
+            dialog.unitList.Bottom() do
             CreateElement(index)
-            LayoutHelpers.Below(dialog.unitEntries[index], dialog.unitEntries[index-1])
+            LayoutHelpers.Below(dialog.unitEntries[index], dialog.unitEntries[index - 1])
             index = index + 1
         end
     end
+
     CreateUnitElements()
 
     local numLines = function() return table.getsize(dialog.unitEntries) end
 
     local function DataSize()
-        return table.getn(UnitList)
+        return TableGetN(UnitList)
     end
 
     -- called when the scrollbar for the control requires data to size itself
@@ -1104,7 +1117,7 @@ function CreateDialog(x, y)
         top = floor(top)
         if top == self.top then return end
         local size = DataSize()
-        self.top = mmax(mmin(size - numLines() , top), 0)
+        self.top = mmax(mmin(size - numLines(), top), 0)
         self:CalcVisible()
     end
 
@@ -1126,6 +1139,7 @@ function CreateDialog(x, y)
             line.unitID = data.id
             line.id:SetText(format('%s %5s %s', data.id, ' ', data.desc))
         end
+
         for i, v in dialog.unitEntries do
             if UnitList[i + self.top] then
                 SetTextLine(v, UnitList[i + self.top], i + self.top)
@@ -1176,7 +1190,9 @@ function RefreshList()
         end
         if allValid then
 
-            table.insert(UnitList, {id = v, name = LOC(__blueprints[v].General.UnitName) or '', desc = LOC(__blueprints[v].Description) or ''})
+            table.insert(UnitList,
+                { id = v, name = LOC(__blueprints[v].General.UnitName) or '',
+                    desc = LOC(__blueprints[v].Description) or '' })
         end
     end
     dialog.unitList.top = 0
@@ -1196,7 +1212,8 @@ function NameSet(callback)
 
     local cancelButton = UIUtil.CreateButtonStd(nameDialog, '/widgets02/small', "<LOC _CANCEL>", 12)
     LayoutHelpers.AtTopIn(cancelButton, nameDialog, 112)
-    cancelButton.Left:Set(function() return nameDialog.Left() + (((nameDialog.Width() / 4) * 1) - (cancelButton.Width() / 2)) end)
+    cancelButton.Left:Set(function() return nameDialog.Left() +
+        (((nameDialog.Width() / 4) * 1) - (cancelButton.Width() / 2)) end)
     cancelButton.OnClick = function(self, modifiers)
         nameDialog:Destroy()
         nameDialog = nil
@@ -1225,3 +1242,12 @@ function NameSet(callback)
         okButton.OnClick()
     end
 end
+
+-- kept for mod backwards compatibility
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Text = import("/lua/maui/text.lua").Text
+local Border = import("/lua/maui/border.lua").Border
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local RadioGroup = import("/lua/maui/mauiutil.lua").RadioGroup
+local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
+local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')

@@ -8,11 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
+local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
 
 
 ---@class ZEB9502 : TAirFactoryUnit
-ZEB9502 = Class(TAirFactoryUnit) {
+ZEB9502 = ClassUnit(TAirFactoryUnit) {
 
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)

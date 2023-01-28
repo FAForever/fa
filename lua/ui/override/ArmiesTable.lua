@@ -15,11 +15,11 @@
 ---@field showScore boolean
 
 -- keep a reference to the actual function
-local GlobalGetArmiesTable = GetArmiesTable
+local GlobalGetArmiesTable = _G.GetArmiesTable
 
 --- Allows UI elements to be updated when the cache is updated by adding a callback via Observable:AddObserver()
 local Cached = GlobalGetArmiesTable()
-Observable = import('/lua/shared/observable.lua').Create()
+Observable = import("/lua/shared/observable.lua").Create()
 Observable:Set(Cached)
 
 --- Interval for when we update the cache
@@ -46,7 +46,7 @@ local function TickThread()
 end
 
 --- Override global function to return our cache
-GetArmiesTable = function()
+_G.GetArmiesTable = function()
     return Cached
 end
 

@@ -71,7 +71,6 @@ UnitBlueprint {
                     AlbedoName = '/Units/UAC1902/UAC1902_Albedo.dds',
                     LODCutoff = 300,
                     MeshName = '/Units/UAC1902/UAC1902_LOD0.scm',
-                    Shader = 'TMeshAlpha',
                     ShaderName = 'Seraphim',
                 },
             },

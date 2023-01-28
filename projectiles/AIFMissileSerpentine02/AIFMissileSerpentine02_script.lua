@@ -1,9 +1,9 @@
 --
 -- Aeon Serpentine Missile
 --
-local AMissileSerpentineProjectile = import('/lua/aeonprojectiles.lua').AMissileSerpentineProjectile
+local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
 
-AIFMissileSerpentine02 = Class(AMissileSerpentineProjectile) {
+AIFMissileSerpentine02 = ClassProjectile(AMissileSerpentineProjectile) {
 
     FxWaterHitScale = 1.65,
 

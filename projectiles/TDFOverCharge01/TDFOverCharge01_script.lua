@@ -1,10 +1,10 @@
 -- UEF Blaster
 
-local TLaserBotProjectile = import('/lua/terranprojectiles.lua').TLaserBotProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local OverchargeProjectile = import('/lua/sim/DefaultProjectiles.lua').OverchargeProjectile
+local TLaserBotProjectile = import("/lua/terranprojectiles.lua").TLaserBotProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local OverchargeProjectile = import("/lua/sim/defaultprojectiles.lua").OverchargeProjectile
 
-TDFOverCharge01 = Class(TLaserBotProjectile, OverchargeProjectile) {
+TDFOverCharge01 = ClassProjectile(TLaserBotProjectile, OverchargeProjectile) {
     FxTrails = EffectTemplate.TCommanderOverchargeFXTrail01,
     FxTrailScale = 1.0,
 
@@ -13,16 +13,15 @@ TDFOverCharge01 = Class(TLaserBotProjectile, OverchargeProjectile) {
     FxImpactProp =  EffectTemplate.TCommanderOverchargeHit01,
     FxImpactLand =  EffectTemplate.TCommanderOverchargeHit01,
     FxImpactAirUnit =  EffectTemplate.TCommanderOverchargeHit01,
-    FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        OverchargeProjectile.OnImpact(self, targetType, targetEntity)
         TLaserBotProjectile.OnImpact(self, targetType, targetEntity)
+        OverchargeProjectile.OnImpact(self, targetType, targetEntity)
     end,
     
     OnCreate = function(self)
-        OverchargeProjectile.OnCreate(self)
         TLaserBotProjectile.OnCreate(self)
+        OverchargeProjectile.OnCreate(self)
     end,
 }
 

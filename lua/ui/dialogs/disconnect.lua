@@ -5,19 +5,18 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local LazyVar = import('/lua/lazyvar.lua').Create
-local GameMain = import('/lua/ui/game/gamemain.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
-local SessionClients = import("/lua/ui/override/SessionClients.lua")
+local SessionClients = import("/lua/ui/override/sessionclients.lua")
+local scenario = SessionGetScenarioInfo()
 
-local parent = false
+local parent = nil
 local myIndex = ''
+local CreateBorder
 
 function DestroyDialog()
     SessionClients.ResetInterval()
@@ -29,8 +28,8 @@ end
 
 local function CreateDialog(clients)
     SessionClients.FastInterval()
-    import('/lua/ui/game/worldview.lua').UnlockInput()
-    import('/lua/ui/game/gamemain.lua').KillWaitingDialog()
+    import("/lua/ui/game/worldview.lua").UnlockInput()
+    import("/lua/ui/game/gamemain.lua").KillWaitingDialog()
 
     GetCursor():Show()
     DestroyDialog()
@@ -103,8 +102,8 @@ local function CreateDialog(clients)
 
     -- retrieve disconnection delay and reduce it by five (that is how long it takes for the window to show)
     local disconnectionDelay = 85
-    if GameMain.LobbyOptions.DisconnectionDelay02 then 
-        disconnectionDelay = tonumber(GameMain.LobbyOptions.DisconnectionDelay02) - 5
+    if scenario.Options.DisconnectionDelay02 then 
+        disconnectionDelay = tonumber(scenario.Options.DisconnectionDelay02) - 5
     end
 
     local canEject = false
@@ -286,3 +285,8 @@ function CreateBorder(parent)
 
     return tbl
 end
+
+-- kept for mod backwards compatibility
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
+local LazyVar = import("/lua/lazyvar.lua").Create

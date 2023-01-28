@@ -1,25 +1,18 @@
---****************************************************************************
---**
---**  File     :  /lua/ai/OpAI/AirAttacks_EditorFunctions
---**  Author(s): Dru Staltman
---**
---**  Summary  : Generic AI Platoon Build Conditions
---**             Build conditions always return true or false
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
+------------------------------------------------------------------------------
+-- File     :  /lua/ai/OpAI/AirAttacks_EditorFunctions
+-- Author(s): Dru Staltman
+-- Summary  : Generic AI Platoon Build Conditions
+--            Build conditions always return true or false
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: AirAttackChildCountDifficulty = BuildCondition   doc = "Please work function docs."
---
--- parameter 0: string   aiBrain     = "default_brain"
--- parameter 1: string   master     = "default_master"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+
+--- AirAttackChildCountDifficulty = BuildCondition   doc = "Please work function docs."
+---@param aiBrain AIBrain default_brain
+---@param master string default_master
+---@param number number
+---@return boolean
 function AirAttackChildCountDifficulty(aiBrain, master, number)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
     local number = ScenarioInfo.OSPlatoonCounter[master..'_D'..ScenarioInfo.Options.Difficulty]
@@ -39,13 +32,11 @@ function AirAttackChildCountDifficulty(aiBrain, master, number)
     end
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: AirAttackMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
---
--- parameter 0: string   aiBrain     = "default_brain"
--- parameter 1: string   master     = "default_master"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- AirAttackMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
+---@param aiBrain AIBrain default_brain
+---@param master string default_master
+---@param number number
+---@return boolean
 function AirAttackMasterCountDifficulty(aiBrain, master, number)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
     local number = ScenarioInfo.OSPlatoonCounter[master..'_D'..ScenarioInfo.Options.Difficulty]

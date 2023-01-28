@@ -1,5 +1,6 @@
----@declare-global
----@class moho.userDecal_methods
+---@meta
+
+---@class moho.userDecal_methods : Destroyable
 local ScriptedDecal = {}
 
 ---

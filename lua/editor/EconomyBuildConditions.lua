@@ -8,156 +8,192 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
+
+local GetEconomyTrend = moho.aibrain_methods.GetEconomyTrend
+local GetEconomyStoredRatio = moho.aibrain_methods.GetEconomyStoredRatio
+local GetEconomyIncome = moho.aibrain_methods.GetEconomyIncome
+local GetEconomyRequested = moho.aibrain_methods.GetEconomyRequested
+local GetEconomyStored = moho.aibrain_methods.GetEconomyStored
+local ParagonCat = categories.STRUCTURE * categories.EXPERIMENTAL * categories.ECONOMIC * categories.ENERGYPRODUCTION * categories.MASSPRODUCTION
 
 ---GreaterThanEconStorageRatio = BuildCondition
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param mStorageRatio number
 ---@param eStorageRatio number
 ---@return boolean
 function GreaterThanEconStorageRatio(aiBrain, mStorageRatio, eStorageRatio)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassStorageRatio >= mStorageRatio and econ.EnergyStorageRatio >= eStorageRatio) then
+    if GetEconomyStoredRatio(aiBrain, 'MASS') >= mStorageRatio and GetEconomyStoredRatio(aiBrain, 'ENERGY') >= eStorageRatio then
         return true
     end
     return false
 end
 
 ---GreaterThanEconStorageMax = BuildCondition
----@param aiBrain string
----@param mStorage integer
----@param eStorage integer
+---@param aiBrain AIBrain
+---@param mStorage number
+---@param eStorage number
 ---@return boolean
 function GreaterThanEconStorageMax(aiBrain, mStorage, eStorage)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassMaxStored >= mStorage and econ.EnergyMaxStored >= eStorage) then
+    local massMaxStored
+    local energyMaxStored
+    local massStorageRatio = GetEconomyStoredRatio(aiBrain, 'MASS')
+    local energyStorageRatio = GetEconomyStoredRatio(aiBrain, 'ENERGY')
+
+    if massStorageRatio ~= 0 then
+        massMaxStored = GetEconomyStored('MASS') / massStorageRatio
+    else
+        massMaxStored = GetEconomyStored('MASS')
+    end
+    if energyStorageRatio ~= 0 then
+        energyMaxStored = GetEconomyStored('ENERGY') / energyStorageRatio
+    else
+        energyMaxStored = GetEconomyStored('ENERGY')
+    end
+
+    if (massMaxStored >= mStorage and energyMaxStored >= eStorage) then
         return true
     end
     return false
 end
 
 ---GreaterThanEconStorageCurrent = BuildCondition
----@param aiBrain string
----@param mStorage integer
----@param eStorage integer
+---@param aiBrain AIBrain
+---@param mStorage number
+---@param eStorage number
 ---@return boolean
 function GreaterThanEconStorageCurrent(aiBrain, mStorage, eStorage)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassStorage >= mStorage and econ.EnergyStorage >= eStorage) then
+    if GetEconomyStored(aiBrain, 'MASS') >= mStorage and GetEconomyStored(aiBrain, 'ENERGY') >= eStorage then
         return true
     end
     return false
 end
 
 --- Returns true if energy in storage of <aiBrain> is greater than <eStorage>
----@param aiBrain string
----@param eStorage integer
+---@param aiBrain AIBrain
+---@param eStorage number
 ---@return boolean
 function GreaterThanEnergyStorageCurrent(aiBrain, eStorage)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if econ.EnergyStorage > eStorage then
+    if GetEconomyStored(aiBrain, 'ENERGY') > eStorage then
         return true
     end
     return false
 end
 
 --- Returns true if mass in storage of <aiBrain> is greater than <mStorage>
----@param aiBrain string
----@param mStorage integer
+---@param aiBrain AIBrain
+---@param mStorage number
 ---@return boolean
 function GreaterThanMassStorageCurrent(aiBrain, mStorage)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if econ.MassStorage > mStorage then
+    if GetEconomyStored(aiBrain, 'MASS') > mStorage then
         return true
     end
     return false
 end
 
 ---LessThanEconTrend = BuildCondition
----@param aiBrain string
----@param mTrend integer
----@param eTrend integer
+---@param aiBrain AIBrain
+---@param mTrend number
+---@param eTrend number
 ---@return boolean
 function LessThanEconTrend(aiBrain, mTrend, eTrend)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassTrend < mTrend and econ.EnergyTrend < eTrend) then
+    if GetEconomyTrend(aiBrain, 'MASS') < mTrend and GetEconomyTrend(aiBrain, 'ENERGY') < eTrend then
         return true
-    else
-        return false
     end
+    return false
 end
 
 ---LessThanEconStorageRatio = BuildCondition
----@param aiBrain string
----@param mStorageRatio integer
----@param eStorageRatio integer
+---@param aiBrain AIBrain
+---@param mStorageRatio number
+---@param eStorageRatio number
 ---@return boolean
 function LessThanEconStorageRatio(aiBrain, mStorageRatio, eStorageRatio)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassStorageRatio < mStorageRatio and econ.EnergyStorageRatio < eStorageRatio) then
+    if GetEconomyStoredRatio(aiBrain, 'MASS') < mStorageRatio and GetEconomyStoredRatio(aiBrain, 'ENERGY') < eStorageRatio then
         return true
     end
     return false
 end
 
 ---LessEconStorageMax = BuildCondition
----@param aiBrain string
----@param mStorage integer
----@param eStorage integer
+---@param aiBrain AIBrain
+---@param mStorage number
+---@param eStorage number
 ---@return boolean
 function LessEconStorageMax(aiBrain, mStorage, eStorage)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassMaxStored < mStorage and econ.EnergyMaxStored < eStorage) then
+    local massMaxStored
+    local energyMaxStored
+    local massStorageRatio = GetEconomyStoredRatio(aiBrain, 'MASS')
+    local energyStorageRatio = GetEconomyStoredRatio(aiBrain, 'ENERGY')
+
+    if massStorageRatio ~= 0 then
+        massMaxStored = GetEconomyStored('MASS') / massStorageRatio
+    else
+        massMaxStored = GetEconomyStored('MASS')
+    end
+    if energyStorageRatio ~= 0 then
+        energyMaxStored = GetEconomyStored('ENERGY') / energyStorageRatio
+    else
+        energyMaxStored = GetEconomyStored('ENERGY')
+    end
+
+    if (massMaxStored < mStorage and energyMaxStored < eStorage) then
         return true
     end
     return false
 end
 
 ---LessEconStorageCurrent = BuildCondition
----@param aiBrain string
----@param mStorage integer
----@param eStorage integer
+---@param aiBrain AIBrain
+---@param mStorage number
+---@param eStorage number
 ---@return boolean
 function LessEconStorageCurrent(aiBrain, mStorage, eStorage)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassStorage < mStorage and econ.EnergyStorage < eStorage) then
+    if GetEconomyStored(aiBrain, 'MASS') < mStorage and GetEconomyStored(aiBrain, 'ENERGY') < eStorage then
         return true
     end
     return false
 end
 
 --- Returns true if energy in storage of <aiBrain> is less than <eStorage>
----@param aiBrain string
----@param eStorage integer
+---@param aiBrain AIBrain
+---@param eStorage number
 ---@return boolean
 function LessThanEnergyStorageCurrent(aiBrain, eStorage)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if econ.EnergyStorage < eStorage then
+    if GetEconomyStored(aiBrain, 'ENERGY') < eStorage then
         return true
     end
     return false
 end
 
 --- Returns true if mass in storage of <aiBrain> is less than <mStorage>
----@param aiBrain string
----@param mStorage integer
+---@param aiBrain AIBrain
+---@param mStorage number
 ---@return boolean
 function LessThanMassStorageCurrent(aiBrain, mStorage)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if econ.MassStorage < mStorage then
+    if GetEconomyStored(aiBrain, 'MASS') < mStorage then
         return true
     end
     return false
 end
 
 ---GreaterThanEconTrend = BuildCondition
----@param aiBrain string
----@param MassTrend integer
----@param EnergyTrend integer
+---@param aiBrain AIBrain
+---@param MassTrend number
+---@param EnergyTrend number
 ---@return boolean
 function GreaterThanEconTrend(aiBrain, MassTrend, EnergyTrend)
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassTrend >= MassTrend and econ.EnergyTrend >= EnergyTrend) then
+    if GetEconomyTrend(aiBrain, 'MASS') >= MassTrend and GetEconomyTrend(aiBrain, 'ENERGY') >= EnergyTrend then
+        return true
+    end
+    return false
+end
+
+---LessThanEnergyTrendOverTime = BuildCondition
+---@param aiBrain AIBrain
+---@param EnergyTrend number
+---@return boolean
+function LessThanEnergyTrendOverTime(aiBrain, EnergyTrend)
+    if aiBrain.EconomyOverTimeCurrent.EnergyTrendOverTime < EnergyTrend then
         return true
     end
     return false
@@ -165,16 +201,15 @@ end
 
 ---GreaterThanEconIncome = BuildCondition
 ---@param aiBrain AIBrain
----@param MassIncome integer
----@param EnergyIncome integer
+---@param MassIncome number
+---@param EnergyIncome number
 ---@return boolean
 function GreaterThanEconIncome(aiBrain, MassIncome, EnergyIncome)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return true
     end
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassIncome >= MassIncome and econ.EnergyIncome >= EnergyIncome) then
+    if (GetEconomyIncome(aiBrain,'MASS') >= MassIncome and GetEconomyIncome(aiBrain,'ENERGY') >= EnergyIncome) then
         return true
     end
     return false
@@ -182,16 +217,31 @@ end
 
 ---LessThanEconIncome = BuildCondition
 ---@param aiBrain AIBrain
----@param MassIncome integer
----@param EnergyIncome integer
+---@param MassIncome number
+---@param EnergyIncome number
 ---@return boolean
 function LessThanEconIncome(aiBrain, MassIncome, EnergyIncome)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return false
     end
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassIncome < MassIncome and econ.EnergyIncome < EnergyIncome) then
+    if (GetEconomyIncome(aiBrain,'MASS') < MassIncome and GetEconomyIncome(aiBrain,'ENERGY') < EnergyIncome) then
+        return true
+    end
+    return false
+end
+
+---GreaterThanEconIncomeOverTime = BuildCondition
+---@param aiBrain AIBrain
+---@param MassIncome number
+---@param EnergyIncome number
+---@return boolean
+function GreaterThanEconIncomeOverTime(aiBrain, MassIncome, EnergyIncome)
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
+        --LOG('*AI DEBUG: Found Paragon')
+        return true
+    end
+    if aiBrain.EconomyOverTimeCurrent.MassIncome >= MassIncome and aiBrain.EconomyOverTimeCurrent.EnergyIncome >= EnergyIncome then
         return true
     end
     return false
@@ -199,16 +249,17 @@ end
 
 ---LessThanEconEfficiency = BuildCondition
 ---@param aiBrain AIBrain
----@param MassEfficiency integer
----@param EnergyEfficiency integer
+---@param MassEfficiency number
+---@param EnergyEfficiency number
 ---@return boolean
 function GreaterThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return true
     end
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassEfficiency >= MassEfficiency and econ.EnergyEfficiency >= EnergyEfficiency) then
+    local EnergyEfficiencyCurrent = math.min(GetEconomyIncome(aiBrain,'ENERGY') / GetEconomyRequested(aiBrain,'ENERGY'), 2)
+    local MassEfficiencyCurrent = math.min(GetEconomyIncome(aiBrain,'MASS') / GetEconomyRequested(aiBrain,'MASS'), 2)
+    if (MassEfficiencyCurrent >= MassEfficiency and EnergyEfficiencyCurrent >= EnergyEfficiency) then
         return true
     end
     return false
@@ -216,16 +267,17 @@ end
 
 ---comment
 ---@param aiBrain AIBrain
----@param MassEfficiency integer
----@param EnergyEfficiency integer
+---@param MassEfficiency number
+---@param EnergyEfficiency number
 ---@return boolean
 function LessThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return false
     end
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassEfficiency <= MassEfficiency and econ.EnergyEfficiency <= EnergyEfficiency) then
+    local EnergyEfficiencyCurrent = math.min(GetEconomyIncome(aiBrain,'ENERGY') / GetEconomyRequested(aiBrain,'ENERGY'), 2)
+    local MassEfficiencyCurrent = math.min(GetEconomyIncome(aiBrain,'MASS') / GetEconomyRequested(aiBrain,'MASS'), 2)
+    if (MassEfficiencyCurrent <= MassEfficiency and EnergyEfficiencyCurrent <= EnergyEfficiency) then
         return true
     end
     return false
@@ -233,16 +285,16 @@ end
 
 ---LessThanEconEfficiencyOverTime = BuildCondition
 ---@param aiBrain AIBrain
----@param MassEfficiency integer
----@param EnergyEfficiency integer
+---@param MassEfficiency number
+---@param EnergyEfficiency number
 ---@return boolean
 function GreaterThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficiency)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return true
     end
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassEfficiencyOverTime >= MassEfficiency and econ.EnergyEfficiencyOverTime >= EnergyEfficiency) then
+    if (aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime >= MassEfficiency and 
+    aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime >= EnergyEfficiency) then
         return true
     end
     return false
@@ -250,17 +302,33 @@ end
 
 ---comment
 ---@param aiBrain AIBrain
----@param MassEfficiency integer
----@param EnergyEfficiency integer
+---@param MassEfficiency number
+---@param EnergyEfficiency number
 ---@return boolean
 function LessThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficiency)
-    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
+    if HaveGreaterThanUnitsWithCategory(aiBrain, 0, ParagonCat) then
         --LOG('*AI DEBUG: Found Paragon')
         return false
     end
-    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
-    if (econ.MassEfficiencyOverTime <= MassEfficiency and econ.EnergyEfficiencyOverTime <= EnergyEfficiency) then
+    if (aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime <= MassEfficiency and 
+    aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime <= EnergyEfficiency) then
         return true
+    end
+    return false
+end
+
+---GreaterThanEconEfficiencyCombined = BuildCondition
+---@param aiBrain AIBrain
+---@param MassEfficiency number
+---@param EnergyEfficiency number
+---@return boolean
+function GreaterThanEconEfficiencyCombined(aiBrain, MassEfficiency, EnergyEfficiency)
+    if (aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime >= MassEfficiency and aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime >= EnergyEfficiency) then
+        local EnergyEfficiencyOverTime = math.min(GetEconomyIncome(aiBrain,'ENERGY') / GetEconomyRequested(aiBrain,'ENERGY'), 2)
+        local MassEfficiencyOverTime = math.min(GetEconomyIncome(aiBrain,'MASS') / GetEconomyRequested(aiBrain,'MASS'), 2)
+        if (MassEfficiencyOverTime >= MassEfficiency and EnergyEfficiencyOverTime >= EnergyEfficiency) then
+            return true
+        end
     end
     return false
 end
@@ -272,7 +340,6 @@ end
 ---@param unitCategory EntityCategory
 ---@return boolean
 function MassIncomeToUnitRatio(aiBrain, ratio, compareType, unitCategory)
-    local econTime = aiBrain:GetEconomyOverTime()
 
     local testCat = unitCategory
     if type(testCat) == 'string' then
@@ -283,19 +350,18 @@ function MassIncomeToUnitRatio(aiBrain, ratio, compareType, unitCategory)
     -- Find units of this type being built or about to be built
     unitCount = unitCount + aiBrain:GetEngineerManagerUnitsBeingBuilt(testCat)
 
-    local checkRatio = (econTime.MassIncome * 10) / unitCount
+    local checkRatio = (aiBrain.EconomyOverTimeCurrent.MassIncome * 10) / unitCount
 
     return CompareBody(checkRatio, ratio, compareType)
 end
 
 ---comment
 ---@param aiBrain AIBrain
----@param t1Drain integer
----@param t2Drain integer
----@param t3Drain integer
+---@param t1Drain number
+---@param t2Drain number
+---@param t3Drain number
 ---@return boolean
 function GreaterThanMassIncomeToFactory(aiBrain, t1Drain, t2Drain, t3Drain)
-    local econTime = aiBrain:GetEconomyOverTime()
 
     -- T1 Test
     local testCat = categories.TECH1 * categories.FACTORY
@@ -317,7 +383,7 @@ function GreaterThanMassIncomeToFactory(aiBrain, t1Drain, t2Drain, t3Drain)
 
     massTotal = massTotal + (unitCount * t3Drain)
 
-    if not CompareBody((econTime.MassIncome * 10), massTotal, '>') then
+    if not CompareBody((aiBrain.EconomyOverTimeCurrent.MassIncome * 10), massTotal, '>') then
         return false
     end
 
@@ -343,8 +409,8 @@ function MassToFactoryRatioBaseCheck(aiBrain, locationType)
 end
 
 ---comment
----@param numOne integer
----@param numTwo integer
+---@param numOne number
+---@param numTwo number
 ---@param compareType string
 ---@return boolean
 function CompareBody(numOne, numTwo, compareType)
@@ -402,9 +468,8 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
-
 --- Moved Imports that are unsed for modding support
-
+local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local BuildingTemplates = import('/lua/BuildingTemplates.lua')
+local ScenarioUtils = import('/lua/sim/scenarioutilities.lua')
+local BuildingTemplates = import('/lua/buildingtemplates.lua')

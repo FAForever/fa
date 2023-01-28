@@ -4,9 +4,9 @@
 -- Summary  :  Experimental Strategic Missile Projectile script, XSB2401
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------------------------------------
-local SExperimentalStrategicMissile = import('/lua/seraphimprojectiles.lua').SExperimentalStrategicMissile
+local SExperimentalStrategicMissile = import("/lua/seraphimprojectiles.lua").SExperimentalStrategicMissile
 
-SIFExperimentalStrategicMissile01 = Class(SExperimentalStrategicMissile) {
+SIFExperimentalStrategicMissile01 = ClassProjectile(SExperimentalStrategicMissile) {
     FxSplashScale = 0.5,
 
     LaunchSound = 'Nuke_Launch',

@@ -21,10 +21,9 @@
 -- SetLifetimeParameter(float param)
 --  The parameter functions set values that can be accessed by the shader
 
----@class WorldMesh
-WorldMesh = Class(moho.world_mesh_methods) {
+---@class WorldMesh : moho.world_mesh_methods
+WorldMesh = ClassUI(moho.world_mesh_methods) {
     __init = function(self)
         InternalCreateWorldMesh(self)
     end,
-    
 }

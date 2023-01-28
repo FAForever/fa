@@ -8,10 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SLandFactoryUnit = import('/lua/seraphimunits.lua').SLandFactoryUnit
+local SLandFactoryUnit = import("/lua/seraphimunits.lua").SLandFactoryUnit
 
 ---@class XSB0101 : SLandFactoryUnit
-XSB0101 = Class(SLandFactoryUnit) {
+XSB0101 = ClassUnit(SLandFactoryUnit) {
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)
         self.Rotator1 = CreateRotator(self, 'Pod01', 'y', nil, 5, 0, 0)

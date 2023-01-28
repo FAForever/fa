@@ -24,14 +24,8 @@ PropBlueprint {
         ReclaimMassMax = 150,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
     Interface = {
         HelpText = 'Obsidian Wreckage',
-    },
-    Physics = {
-        BlockPath = true,
     },
     ScriptClass = 'Wreckage',
     ScriptModule = '/lua/wreckage.lua',

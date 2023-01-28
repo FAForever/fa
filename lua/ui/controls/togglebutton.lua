@@ -1,13 +1,13 @@
-local Group = import('/lua/maui/group.lua').Group
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local Group = import("/lua/maui/group.lua").Group
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 --- Represents a button with multiple states.
 -- A ToggleButton is a button that, when clicked, moves to the next state (or back to the first state
 -- if the end of the state list has been reached) and dispatches an event.
 ---@class ToggleButton : Group
-ToggleButton = Class(Group) {
+ToggleButton = ClassUI(Group) {
     --- Create a new ToggleButton
     --
     -- @param parent The UI control to parent this control from.

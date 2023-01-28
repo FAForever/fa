@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.UIWorldView : moho.control_methods
 local CUIWorldView = {}
 

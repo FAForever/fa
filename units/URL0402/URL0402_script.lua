@@ -5,31 +5,31 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------
 
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFHeavyMicrowaveLaserGenerator = CybranWeaponsFile.CDFHeavyMicrowaveLaserGenerator
 local CDFElectronBolterWeapon = CybranWeaponsFile.CDFElectronBolterWeapon
 local CAAMissileNaniteWeapon = CybranWeaponsFile.CAAMissileNaniteWeapon
-local explosion = import('/lua/defaultexplosions.lua')
+local explosion = import("/lua/defaultexplosions.lua")
 local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local utilities = import('/lua/Utilities.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local utilities = import("/lua/utilities.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
-local Entity = import('/lua/sim/Entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class URL0402 : CWalkingLandUnit
-URL0402 = Class(CWalkingLandUnit) {
+URL0402 = ClassUnit(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
     Weapons = {
-        MainGun = Class(CDFHeavyMicrowaveLaserGenerator) {},
-        RightLaserTurret = Class(CDFElectronBolterWeapon) {},
-        LeftLaserTurret = Class(CDFElectronBolterWeapon) {},
-        RightAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
-        LeftAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
+        MainGun = ClassWeapon(CDFHeavyMicrowaveLaserGenerator) {},
+        RightLaserTurret = ClassWeapon(CDFElectronBolterWeapon) {},
+        LeftLaserTurret = ClassWeapon(CDFElectronBolterWeapon) {},
+        RightAntiAirMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
+        LeftAntiAirMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
+        Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
     },
 
     OnStartBeingBuilt = function(self, builder, layer)

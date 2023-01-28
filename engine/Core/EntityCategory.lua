@@ -1,6 +1,14 @@
----@declare-global
+---@meta
+
+---@class EntityCategory : userdata, moho.EntityCategory
+---@operator add(EntityCategory): EntityCategory
+---@operator mul(EntityCategory): EntityCategory
+---@operator sub(EntityCategory): EntityCategory
+
 ---@class moho.EntityCategory
 local EntityCategory = {}
+
+---@alias UnparsedCategory string
 
 --- Return the union between two categories
 ---@param augend moho.EntityCategory

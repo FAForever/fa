@@ -8,10 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ARadarUnit = import('/lua/aeonunits.lua').ARadarUnit
+local ARadarUnit = import("/lua/aeonunits.lua").ARadarUnit
 
 ---@class UAB3101 : ARadarUnit
-UAB3101 = Class(ARadarUnit) {    
+UAB3101 = ClassUnit(ARadarUnit) {    
     OnIntelDisabled = function(self)
         ARadarUnit.OnIntelDisabled(self)
         self.Rotator1:SetSpinDown(true)

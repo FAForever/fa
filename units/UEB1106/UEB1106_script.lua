@@ -8,10 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TMassStorageUnit = import('/lua/terranunits.lua').TMassStorageUnit
+local TMassStorageUnit = import("/lua/terranunits.lua").TMassStorageUnit
 
 ---@class UEB1106 : TMassStorageUnit
-UEB1106 = Class(TMassStorageUnit) {
+UEB1106 = ClassUnit(TMassStorageUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         TMassStorageUnit.OnStopBeingBuilt(self,builder,layer)

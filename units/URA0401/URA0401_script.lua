@@ -1,28 +1,25 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/URA0401/URA0401_script.lua
-----**  Author(s):  John Comes, Andres Mendez, Gordon Duclos
-----**
-----**  Summary  :  Cybran Gunship Script
-----**
-----**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
-local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CDFRocketIridiumWeapon = import('/lua/cybranweapons.lua').CDFRocketIridiumWeapon
-local CAAMissileNaniteWeapon = import('/lua/cybranweapons.lua').CAAMissileNaniteWeapon
-local CDFHeavyElectronBolterWeapon = import('/lua/cybranweapons.lua').CDFHeavyElectronBolterWeapon
-local util = import('/lua/utilities.lua')
-local fxutil = import('/lua/effectutilities.lua')
+--------------------------------------------------------------------------------
+--  File     :  /cdimage/units/URA0401/URA0401_script.lua
+-- Author(s):  John Comes, Andres Mendez, Gordon Duclos
+-- Summary  :  Cybran Gunship Script
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------------
+local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
+local CDFRocketIridiumWeapon = import("/lua/cybranweapons.lua").CDFRocketIridiumWeapon
+local CAAMissileNaniteWeapon = import("/lua/cybranweapons.lua").CAAMissileNaniteWeapon
+local CDFHeavyElectronBolterWeapon = import("/lua/cybranweapons.lua").CDFHeavyElectronBolterWeapon
+local util = import("/lua/utilities.lua")
+local fxutil = import("/lua/effectutilities.lua")
 
 ---@class URA0401 : CAirUnit
-URA0401 = Class(CAirUnit) {
+URA0401 = ClassUnit(CAirUnit) {
     Weapons = {
-        Missile01 = Class(CDFRocketIridiumWeapon) {},
-        Missile02 = Class(CDFRocketIridiumWeapon) {},
-        HeavyBolter = Class(CDFHeavyElectronBolterWeapon){},
-        HeavyBolterBack = Class(CDFHeavyElectronBolterWeapon){},
-        AAMissile01 = Class(CAAMissileNaniteWeapon) {},
-        AAMissile02 = Class(CAAMissileNaniteWeapon) {},
+        Missile01 = ClassWeapon(CDFRocketIridiumWeapon) {},
+        Missile02 = ClassWeapon(CDFRocketIridiumWeapon) {},
+        HeavyBolter = ClassWeapon(CDFHeavyElectronBolterWeapon){},
+        HeavyBolterBack = ClassWeapon(CDFHeavyElectronBolterWeapon){},
+        AAMissile01 = ClassWeapon(CAAMissileNaniteWeapon) {},
+        AAMissile02 = ClassWeapon(CAAMissileNaniteWeapon) {},
     },
 
     MovementAmbientExhaustBones = {

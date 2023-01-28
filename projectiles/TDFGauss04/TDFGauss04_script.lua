@@ -1,8 +1,8 @@
 --
 -- Terran Gauss Cannon Projectile (UEL0401) Fatboy
 --
-local TDFGaussCannonProjectile = import('/lua/terranprojectiles.lua').TDFBigLandGaussCannonProjectile
-TDFGauss04 = Class(TDFGaussCannonProjectile) {
+local TDFGaussCannonProjectile = import("/lua/terranprojectiles.lua").TDFBigLandGaussCannonProjectile
+TDFGauss04 = ClassProjectile(TDFGaussCannonProjectile) {
     
     FxUnitHitScale = 0.9,
     FxLandHitScale = 0.9,
@@ -12,12 +12,12 @@ TDFGauss04 = Class(TDFGaussCannonProjectile) {
         if not inWater then
             self:SetDestroyOnWater(true)
         else
-            self:ForkThread(self.DestroyOnWaterThread)
+            self.Trash:Add(ForkThread(self.DestroyOnWaterThread,self))
         end
     end,
     
     DestroyOnWaterThread = function(self)
-        WaitSeconds(0.2)
+        WaitTicks(3)
         self:SetDestroyOnWater(true)
     end,
 }

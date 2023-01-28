@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.movie_methods : moho.control_methods
 local CMauiMovie = {}
 

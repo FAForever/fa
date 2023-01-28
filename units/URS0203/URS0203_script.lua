@@ -8,17 +8,17 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CSubUnit = import('/lua/cybranunits.lua').CSubUnit
-local CANNaniteTorpedoWeapon = import('/lua/cybranweapons.lua').CANNaniteTorpedoWeapon
-local CDFLaserHeavyWeapon = import('/lua/cybranweapons.lua').CDFLaserHeavyWeapon
+local CSubUnit = import("/lua/cybranunits.lua").CSubUnit
+local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedoWeapon
+local CDFLaserHeavyWeapon = import("/lua/cybranweapons.lua").CDFLaserHeavyWeapon
 
 ---@class URS0203 : CSubUnit
-URS0203 = Class(CSubUnit) {
+URS0203 = ClassUnit(CSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     
     Weapons = {
-        MainGun = Class(CDFLaserHeavyWeapon) {},
-        Torpedo01 = Class(CANNaniteTorpedoWeapon) {},
+        MainGun = ClassWeapon(CDFLaserHeavyWeapon) {},
+        Torpedo01 = ClassWeapon(CANNaniteTorpedoWeapon) {},
     },
     OnStopBeingBuilt = function(self, builder, layer)
         CSubUnit.OnStopBeingBuilt(self,builder,layer)

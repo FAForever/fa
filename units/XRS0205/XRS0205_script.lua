@@ -8,14 +8,14 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
-local CIFSmartCharge = import('/lua/cybranweapons.lua').CIFSmartCharge
+local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
+local CIFSmartCharge = import("/lua/cybranweapons.lua").CIFSmartCharge
 
 ---@class XRS0205 : CSeaUnit
-XRS0205 = Class(CSeaUnit) {
+XRS0205 = ClassUnit(CSeaUnit) {
 
     Weapons = {
-        AntiTorpedo = Class(CIFSmartCharge) {},
+        AntiTorpedo = ClassWeapon(CIFSmartCharge) {},
     },
     
 }

@@ -1,11 +1,11 @@
-local Group = import('group.lua').Group
-local Checkbox = import('checkbox.lua').Checkbox
-local Text = import('text.lua').Text
-local Border = import('border.lua').Border
-local LayoutHelpers = import('layouthelpers.lua')
+local Group = import("/lua/maui/group.lua").Group
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Text = import("/lua/maui/text.lua").Text
+local Border = import("/lua/maui/border.lua").Border
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
-RadioButtons = Class(Group)
-{
+---@class RadioButtons : Group
+RadioButtons = ClassUI(Group) {
     -- title is a string that will get displayed above the group
     -- buttons is a table of strings that represent a button
     -- default is the string that will be selected on start

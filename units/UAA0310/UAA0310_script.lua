@@ -4,32 +4,32 @@
 -- Summary  :  Aeon CZAR Script
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
-local aWeapons = import('/lua/aeonweapons.lua')
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local aWeapons = import("/lua/aeonweapons.lua")
 local AQuantumBeamGenerator = aWeapons.AQuantumBeamGenerator
 local AAAZealotMissileWeapon = aWeapons.AAAZealotMissileWeapon
 local AANDepthChargeBombWeapon = aWeapons.AANDepthChargeBombWeapon
 local AAATemporalFizzWeapon = aWeapons.AAATemporalFizzWeapon
-local explosion = import('/lua/defaultexplosions.lua')
-local CzarShield = import('/lua/shield.lua').CzarShield
+local explosion = import("/lua/defaultexplosions.lua")
+local CzarShield = import("/lua/shield.lua").CzarShield
 
 local CreateAeonCZARBuildingEffects = import("/lua/effectutilities.lua").CreateAeonCZARBuildingEffects
 
 ---@class UAA0310 : AirTransport
-UAA0310 = Class(AirTransport) {
+UAA0310 = ClassUnit(AirTransport) {
     DestroyNoFallRandomChance = 1.1,
     BuildAttachBone = 'UAA0310',
 
     Weapons = {
-        QuantumBeamGeneratorWeapon = Class(AQuantumBeamGenerator){},
-        SonicPulseBattery1 = Class(AAAZealotMissileWeapon) {},
-        SonicPulseBattery2 = Class(AAAZealotMissileWeapon) {},
-        SonicPulseBattery3 = Class(AAAZealotMissileWeapon) {},
-        SonicPulseBattery4 = Class(AAAZealotMissileWeapon) {},
-        DepthCharge01 = Class(AANDepthChargeBombWeapon) {},
-        DepthCharge02 = Class(AANDepthChargeBombWeapon) {},
-        AAFizz01 = Class(AAATemporalFizzWeapon) {},
-        AAFizz02 = Class(AAATemporalFizzWeapon) {},
+        QuantumBeamGeneratorWeapon = ClassWeapon(AQuantumBeamGenerator){},
+        SonicPulseBattery1 = ClassWeapon(AAAZealotMissileWeapon) {},
+        SonicPulseBattery2 = ClassWeapon(AAAZealotMissileWeapon) {},
+        SonicPulseBattery3 = ClassWeapon(AAAZealotMissileWeapon) {},
+        SonicPulseBattery4 = ClassWeapon(AAAZealotMissileWeapon) {},
+        DepthCharge01 = ClassWeapon(AANDepthChargeBombWeapon) {},
+        DepthCharge02 = ClassWeapon(AANDepthChargeBombWeapon) {},
+        AAFizz01 = ClassWeapon(AAATemporalFizzWeapon) {},
+        AAFizz02 = ClassWeapon(AAATemporalFizzWeapon) {},
     },
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -64,10 +64,10 @@ UAA0310 = Class(AirTransport) {
     end,
 
     OnAnimTerrainCollision = function(self, bone,x,y,z)
-        local size = self.Size
+        local blueprint = self.Blueprint
         DamageArea(self, {x,y,z}, 5, 1000, 'Default', true, false)
         explosion.CreateDefaultHitExplosionAtBone(self, bone, 5.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ})
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)

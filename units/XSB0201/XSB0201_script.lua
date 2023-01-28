@@ -8,10 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SLandFactoryUnit = import('/lua/seraphimunits.lua').SLandFactoryUnit
+local SLandFactoryUnit = import("/lua/seraphimunits.lua").SLandFactoryUnit
 
 ---@class XSB0201 : SLandFactoryUnit
-XSB0201 = Class(SLandFactoryUnit) {
+XSB0201 = ClassUnit(SLandFactoryUnit) {
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)
         local bp = self:GetBlueprint()

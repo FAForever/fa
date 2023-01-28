@@ -188,7 +188,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 180,
         BuildCostMass = 54,
-        BuildTime = 270,
+        BuildTime = 290,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -282,7 +282,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_HighArc',
             CollideFriendly = false,
-            Damage = 43, --there is 2 more damage per shell added afterward
+            Damage = 45,
             DamageFriendly = false,
             DamageRadius = 1.5,
             DamageType = 'Normal',

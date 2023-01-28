@@ -7,10 +7,10 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
 
 ---@class URB5103 : CStructureUnit
-URB5103 = Class(CStructureUnit) {
+URB5103 = ClassUnit(CStructureUnit) {
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
     FxTransportBeaconScale = 1,
 

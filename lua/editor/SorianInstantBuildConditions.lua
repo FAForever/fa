@@ -7,18 +7,18 @@
 --**             Build conditions always return true or false
 --**
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param locationRadius integer
+---@param locationRadius number
 ---@param category EntityCategory
----@param markerRadius integer
----@param unitMax integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param markerRadius number
+---@param unitMax number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
 function DefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
@@ -31,13 +31,13 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param locationRadius integer
+---@param locationRadius number
 ---@param category EntityCategory
----@param markerRadius integer
----@param unitMax integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param markerRadius number
+---@param unitMax number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
 function ExpansionPointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
@@ -62,7 +62,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param num integer
+---@param num number
 ---@param unitCategory EntityCategory
 ---@param unitCategory2 EntityCategory
 ---@param unitCategory3 EntityCategory
@@ -100,8 +100,8 @@ function FactoryRatioLessOrEqual(aiBrain, locationType, num, unitCategory, unitC
 end
 
 ---@param aiBrain AIBrain
----@param health integer
----@param shield integer
+---@param health number
+---@param shield number
 ---@return boolean
 function CDRHealthGreaterThan(aiBrain, health, shield)
     local cdr = aiBrain:GetListOfUnits(categories.COMMAND, false)[1]
@@ -120,7 +120,7 @@ function CDRHealthGreaterThan(aiBrain, health, shield)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq boolean
 ---@return boolean
@@ -150,7 +150,7 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq boolean
 ---@return boolean
@@ -180,7 +180,7 @@ function HaveLessThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ---@param aiBrain AIBrain
----@param sizetable integer
+---@param sizetable number
 ---@param category EntityCategory
 ---@param idleReq boolean
 ---@return boolean
@@ -207,7 +207,7 @@ function HaveLessThanUnitsForMapSize(aiBrain, sizetable, category, idleReq)
 end
 
 ---@param aiBrain AIBrain
----@param numunits integer
+---@param numunits number
 ---@param category EntityCategory
 ---@return boolean
 function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
@@ -235,7 +235,7 @@ function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
 end
 
 ---@param aiBrain AIBrain
----@param numunits integer
+---@param numunits number
 ---@param category EntityCategory
 ---@return boolean
 function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
@@ -260,8 +260,8 @@ function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
 end
 
 ---@param aiBrain AIBrain
----@param mTrend integer
----@param eTrend integer
+---@param mTrend number
+---@param eTrend number
 ---@return boolean
 function LessThanEconTrend(aiBrain, mTrend, eTrend)
     if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
@@ -280,8 +280,8 @@ function LessThanEconTrend(aiBrain, mTrend, eTrend)
 end
 
 ---@param aiBrain AIBrain
----@param MassEfficiency integer
----@param EnergyEfficiency integer
+---@param MassEfficiency number
+---@param EnergyEfficiency number
 ---@return boolean
 function GreaterThanEconEfficiencyOverTimeExp(aiBrain, MassEfficiency, EnergyEfficiency)
     local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
@@ -303,8 +303,8 @@ function GreaterThanEconEfficiencyOverTimeExp(aiBrain, MassEfficiency, EnergyEff
 end
 
 ---@param aiBrain AIBrain
----@param MassIncome integer
----@param EnergyIncome integer
+---@param MassIncome number
+---@param EnergyIncome number
 ---@return boolean
 function GreaterThanEconIncome(aiBrain, MassIncome, EnergyIncome)
     if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
@@ -319,8 +319,8 @@ function GreaterThanEconIncome(aiBrain, MassIncome, EnergyIncome)
 end
 
 ---@param aiBrain AIBrain
----@param MassIncome integer
----@param EnergyIncome integer
+---@param MassIncome number
+---@param EnergyIncome number
 ---@return boolean
 function LessThanEconIncome(aiBrain, MassIncome, EnergyIncome)
     if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
@@ -335,8 +335,8 @@ function LessThanEconIncome(aiBrain, MassIncome, EnergyIncome)
 end
 
 ---@param aiBrain AIBrain
----@param MassIncome integer
----@param EnergyIncome integer
+---@param MassIncome number
+---@param EnergyIncome number
 ---@return boolean
 function GreaterThanEconIncomeOverTime(aiBrain, MassIncome, EnergyIncome)
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
@@ -347,8 +347,8 @@ function GreaterThanEconIncomeOverTime(aiBrain, MassIncome, EnergyIncome)
 end
 
 ---@param aiBrain AIBrain
----@param MassEfficiency integer
----@param EnergyEfficiency integer
+---@param MassEfficiency number
+---@param EnergyEfficiency number
 ---@return boolean
 function GreaterThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
     if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
@@ -363,8 +363,8 @@ function GreaterThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
 end
 
 ---@param aiBrain AIBrain
----@param MassEfficiency integer
----@param EnergyEfficiency integer
+---@param MassEfficiency number
+---@param EnergyEfficiency number
 ---@return boolean
 function LessThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
     if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
@@ -379,8 +379,8 @@ function LessThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
 end
 
 ---@param aiBrain AIBrain
----@param MassEfficiency integer
----@param EnergyEfficiency integer
+---@param MassEfficiency number
+---@param EnergyEfficiency number
 ---@return boolean
 function GreaterThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficiency)
     if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
@@ -395,8 +395,8 @@ function GreaterThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEffici
 end
 
 ---@param aiBrain AIBrain
----@param MassEfficiency integer
----@param EnergyEfficiency integer
+---@param MassEfficiency number
+---@param EnergyEfficiency number
 ---@return boolean
 function LessThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficiency)
     if HaveGreaterThanUnitsWithCategory(aiBrain, 0, 'ENERGYPRODUCTION EXPERIMENTAL STRUCTURE') then
@@ -411,8 +411,8 @@ function LessThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficienc
 end
 
 ---@param aiBrain AIBrain
----@param MassIncome integer
----@param EnergyIncome integer
+---@param MassIncome number
+---@param EnergyIncome number
 ---@return boolean
 function LessThanEconIncomeOverTime(aiBrain, MassIncome, EnergyIncome)
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
@@ -495,7 +495,7 @@ end
 function LessThanNavalBases(aiBrain)
     local expBaseCount = 0
     local checkNum = tonumber(ScenarioInfo.Options.NavalExpansionsAllowed) or 4
-    local isIsland = import('/lua/editor/SorianBuildConditions.lua').IsIslandMap(aiBrain)
+    local isIsland = import("/lua/editor/sorianbuildconditions.lua").IsIslandMap(aiBrain)
     expBaseCount = aiBrain:GetManagerCount('Naval Area')
     --LOG('*AI DEBUG: '.. aiBrain.Nickname ..' LessThanNavalBases Total = '..expBaseCount)
     if isIsland and expBaseCount < checkNum then
@@ -523,7 +523,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param compareType string
 ---@return boolean
@@ -544,7 +544,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@return boolean
 function PoolLessAtLocationExp(aiBrain, locationType, unitCount, unitCategory)
@@ -553,15 +553,15 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@return boolean
 function PoolGreaterAtLocationExp(aiBrain, locationType, unitCount, unitCategory)
     return HavePoolUnitComparisonAtLocationExp(aiBrain, locationType, unitCount, unitCategory, '>')
 end
 
----@param numOne integer
----@param numTwo integer
+---@param numOne number
+---@param numTwo number
 ---@param compareType string
 ---@return boolean
 function CompareBody(numOne, numTwo, compareType)
@@ -591,6 +591,6 @@ end
 
 -- Moved Unused Imports to bttom fro mod support
 
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")

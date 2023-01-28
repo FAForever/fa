@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.scrollbar_methods : moho.control_methods
 local CMauiScrollbar = {}
 

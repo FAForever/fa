@@ -6,9 +6,9 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SAirFactoryUnit = import('/lua/seraphimunits.lua').SAirFactoryUnit
+local SAirFactoryUnit = import("/lua/seraphimunits.lua").SAirFactoryUnit
 ---@class ZSB9602 : SAirFactoryUnit
-ZSB9602 = Class(SAirFactoryUnit) {
+ZSB9602 = ClassUnit(SAirFactoryUnit) {
 
     RollOffBones = { 'Pod01', 'Pod02', 'Pod03', },
 

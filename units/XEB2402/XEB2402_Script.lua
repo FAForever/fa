@@ -4,10 +4,10 @@
 -- Summary  :  UEF Sub Orbital Laser
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
+local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
 
 ---@class XEB2402 : TAirFactoryUnit
-XEB2402 = Class(TAirFactoryUnit) {
+XEB2402 = ClassUnit(TAirFactoryUnit) {
 
     OnStopBeingBuilt = function(self)
         TAirFactoryUnit.OnStopBeingBuilt(self)

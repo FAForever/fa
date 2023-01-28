@@ -8,19 +8,19 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
-local explosion = import('/lua/defaultexplosions.lua')
-local util = import('/lua/utilities.lua')
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
-local cWeapons = import('/lua/cybranweapons.lua')
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local explosion = import("/lua/defaultexplosions.lua")
+local util = import("/lua/utilities.lua")
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local cWeapons = import("/lua/cybranweapons.lua")
 local CAAAutocannon = cWeapons.CAAAutocannon
 local CEMPAutoCannon = cWeapons.CEMPAutoCannon
 
 ---@class URA0104 : AirTransport
-URA0104 = Class(AirTransport) {
+URA0104 = ClassUnit(AirTransport) {
     Weapons = {
-        AAAutocannon = Class(CAAAutocannon) {},
-        EMPCannon = Class(CEMPAutoCannon) {},
+        AAAutocannon = ClassWeapon(CAAAutocannon) {},
+        EMPCannon = ClassWeapon(CEMPAutoCannon) {},
     },
 
     AirDestructionEffectBones = { 'Left_Exhaust', 'Right_Exhaust', 'Char04', 'Char03', 'Char02', 'Char01',

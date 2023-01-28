@@ -52,12 +52,13 @@ UnitBlueprint {
         'BOT',
         'OVERLAYDIRECTFIRE',
     },
+    CollisionOffsetZ = 0.15,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 2600,
-        MaxHealth = 2600,
+        Health = 2400,
+        MaxHealth = 2400,
         RegenRate = 0,
         Shield = {
             ImpactEffects = 'UEFShieldHit01',
@@ -156,11 +157,15 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 5250,
         BuildCostMass = 480,
-        BuildTime = 2160,
+        BuildTime = 2400,
         MaintenanceConsumptionPerSecondEnergy = 25,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
+    },
+    Footprint = {
+        SizeX = 1,
+        SizeZ = 1,
     },
     General = {
         Category = 'Direct Fire',
@@ -234,9 +239,9 @@ UnitBlueprint {
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
-    SizeX = 0.9,
+    SizeX = 1.2,
     SizeY = 1.2,
-    SizeZ = 0.9,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_bot3_directfire',
     StrategicIconSortPriority = 115,
     Transport = {

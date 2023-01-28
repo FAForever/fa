@@ -9,18 +9,25 @@
 --****************************************************************************
 
 -- upvalue for performance
-local Damage = Damage 
+local Damage = Damage
 local DamageArea = DamageArea
 
 -- cache for performance
 local VectorCache = Vector(0, 0, 0)
-local MathFloor = math.floor 
-local CoroutineYield = coroutine.yield 
+local MathFloor = math.floor
+local CoroutineYield = coroutine.yield
 
 local EntityBeenDestroyed = _G.moho.entity_methods.BeenDestroyed
 local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 
 --- Performs damage over time on a unit.
+---@param instigator Unit
+---@param unit Unit
+---@param pulses any
+---@param pulseTime integer
+---@param damage number
+---@param damType DamageType
+---@param friendly boolean
 function UnitDoTThread (instigator, unit, pulses, pulseTime, damage, damType, friendly)
 
     -- localize for performance
@@ -43,6 +50,14 @@ function UnitDoTThread (instigator, unit, pulses, pulseTime, damage, damType, fr
 end
 
 --- Performs damage over time in a given area.
+---@param instigator Unit
+---@param position number
+---@param pulses any
+---@param pulseTime integer
+---@param radius number
+---@param damage number
+---@param damType DamageType
+---@param friendly boolean
 function AreaDoTThread (instigator, position, pulses, pulseTime, radius, damage, damType, friendly)
 
     -- localize for performance
@@ -63,7 +78,7 @@ end
 -- SCALABLE RADIUS AREA DOT
 -- - Allows for a scalable damage radius that begins with DamageStartRadius and ends
 -- - with DamageEndRadius, interpolates between based on frequency and duration.
-
+---@param entity Entity
 function ScalableRadiusAreaDoT(entity)
     local spec = entity.Spec.Data
 

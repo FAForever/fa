@@ -171,6 +171,8 @@ UnitBlueprint {
     LifeBarOffset = 0.5,
     LifeBarSize = 0.9,
     Physics = {
+        MaxGroundVariation = 512,
+        FlattenSkirt = false,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -182,7 +184,6 @@ UnitBlueprint {
         },
         BuildRestriction = 'RULEUBR_OnMassDeposit',
         DragCoefficient = 0.2,
-        FlattenSkirt = true,
         MaxSteerForce = 0,
         MeshExtentsX = 1,
         MeshExtentsY = 0.55,

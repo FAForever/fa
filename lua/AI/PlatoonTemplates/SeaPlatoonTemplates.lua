@@ -17,6 +17,14 @@ PlatoonTemplate {
 }
 
 PlatoonTemplate {
+    Name = 'SeaRaid',
+    Plan = 'GuardMarker',
+    GlobalSquads = {
+        { categories.MOBILE * categories.NAVAL * categories.SUBMERSIBLE * categories.TECH1, 1, 3, 'Attack', 'none' }
+    },
+}
+
+PlatoonTemplate {
     Name = 'SeaNuke',
     Plan = 'NavalForceAI',
     GlobalSquads = {

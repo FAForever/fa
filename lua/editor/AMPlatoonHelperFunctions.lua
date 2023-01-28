@@ -1,15 +1,37 @@
---****************************************************************************
---**
---**  File     :  /lua/editor/AMPlatoonHelperFunctions.lua
---**  Author(s): Dru Staltman
---**
---**  Summary  : Functions to help with AM Platoons
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+----------------------------------------------------------------------
+-- File     : /lua/editor/AMPlatoonHelperFunctions.lua
+-- Author(s): Dru Staltman
+-- Summary  : Functions to help with AM Platoons
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+----------------------------------------------------------------------
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 
----AMLockPlatoon = AddFunction
+-- === utility function === --
+
+---@param time number
+---@param name string
+function UnlockTimer(time, name)
+    WaitSeconds( time )
+    ScenarioInfo.AMLockTable[name] = false
+end
+
+---@param pName string
+---@param time number
+function PlatoonDeathUnlockThread( pName, time )
+    if time > 0 then
+        WaitSeconds(time)
+    end
+    ScenarioInfo.AMLockTable[pName] = false
+end
+
+---@param brain AIBrain
+---@param platoon Platoon
+function PlatoonDeathUnlockTimer( brain, platoon )
+    local time = platoon.PlatoonData['DiffLockTimerD'..ScenarioInfo.Options.Difficulty] or platoon.PlatoonData.LockTimer or 0
+    ForkThread(PlatoonDeathUnlockThread, platoon.PlatoonData.BuilderName, time )
+end
+
+--- AMLockPlatoon = AddFunction
 ---@param platoon Platoon
 function AMLockPlatoon(platoon)
     if not ScenarioInfo.AMLockTable then
@@ -18,7 +40,7 @@ function AMLockPlatoon(platoon)
     ScenarioInfo.AMLockTable[platoon.PlatoonData.PlatoonName] = true
 end
 
----PBMLockAndUnlock = AddFunction
+--- PBMLockAndUnlock = AddFunction
 ---@param platoon Platoon
 function PBMLockAndUnlock(platoon)
     if not ScenarioInfo.AMLockTable then
@@ -46,7 +68,7 @@ end
 --- AMUnlockPlatoonTimer = BuildCallback
 ---@param brain AIBrain
 ---@param platoon Platoon
----@param duration integer
+---@param duration number
 function AMUnlockPlatoonTimer(brain, platoon, duration)
     local callback = function()
         if ScenarioInfo.AMLockTable and ScenarioInfo.AMLockTable[platoon.PlatoonData.PlatoonName] then
@@ -107,31 +129,6 @@ function MasterCountDifficulty(aiBrain, master)
     end
 end
 
--- === utility function === --
-
----@param time integer
----@param name string
-function UnlockTimer(time, name)
-    WaitSeconds( time )
-    ScenarioInfo.AMLockTable[name] = false
-end
-
----@param brain AIBrain
----@param platoon Platoon
-function PlatoonDeathUnlockTimer( brain, platoon )
-    local time = platoon.PlatoonData['DiffLockTimerD'..ScenarioInfo.Options.Difficulty] or platoon.PlatoonData.LockTimer or 0
-    ForkThread(PlatoonDeathUnlockThread, platoon.PlatoonData.BuilderName, time )
-end
-
----@param pName string
----@param time integer
-function PlatoonDeathUnlockThread( pName, time )
-    if time > 0 then
-        WaitSeconds(time)
-    end
-    ScenarioInfo.AMLockTable[pName] = false
-end
-
 -- Unused Files but moved for Mod Support
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")

@@ -5,9 +5,9 @@
 --**
 --**  Summary  :  UEF Heavy Plasma Gatling Cannon Projectile script, XEB2306
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-TDFHeavyPlasmaGatlingCannon01 = Class(import('/lua/terranprojectiles.lua').THeavyPlasmaGatlingCannon) {
+TDFHeavyPlasmaGatlingCannon01 = ClassProjectile(import("/lua/terranprojectiles.lua").THeavyPlasmaGatlingCannon) {
 }
 TypeClass = TDFHeavyPlasmaGatlingCannon01

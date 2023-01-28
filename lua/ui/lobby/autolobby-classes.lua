@@ -1,8 +1,8 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap 
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap 
 
 -- upvalue for performance
 local MathMax = math.max
@@ -10,7 +10,7 @@ local MathMin = math.min
 
 --- A small UI component created according to the Model / View / Controller (MVC) principle
 ---@class ConnectionStatus : Group
-ConnectionStatus = Class(Group) {
+ConnectionStatus = ClassUI(Group) {
 
     -- Initialisation
 

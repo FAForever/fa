@@ -8,19 +8,16 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
-local TDFMachineGunWeapon = import('/lua/terranweapons.lua').TDFMachineGunWeapon
-
+local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
+local TDFMachineGunWeapon = import("/lua/terranweapons.lua").TDFMachineGunWeapon
 
 ---@class UEL0101 : TConstructionUnit
-UEL0101 = Class(TConstructionUnit) {
+UEL0101 = ClassUnit(TConstructionUnit) {
     
     Weapons = {
-        MainGun = Class(TDFMachineGunWeapon) {
-        },
+        MainGun = ClassWeapon(TDFMachineGunWeapon) {},
     },
 
 }
-
 
 TypeClass = UEL0101

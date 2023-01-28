@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.bitmap_methods : moho.control_methods
 local CMauiBitmap = {}
 

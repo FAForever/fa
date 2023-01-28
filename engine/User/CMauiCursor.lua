@@ -1,4 +1,5 @@
----@declare-global
+---@meta
+
 ---@class moho.cursor_methods
 local CMauiCursor = {}
 
