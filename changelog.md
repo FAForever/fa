@@ -385,9 +385,9 @@ Increase E cost of all artilleries 1.5 times and double energy required to fire.
 
 ## Mechanics
 
-All ACUs and SACUs that can make tac missiles will start construction by default instead of having to manually enable it.
+* All ACUs and SACUs that can make tac missiles will start construction by default instead of having to manually enable it.
 
-Loyalists will no longer redirect Billy Nukes
+* Loyalists will no longer redirect Billy Nukes
 
 ## Fixes
 
