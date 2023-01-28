@@ -35,7 +35,6 @@ UAS0401 = ClassUnit(ASeaUnit) {
         CreateAeonTempestBuildingEffects(self)
     end,
 
-
     OnStopBeingBuilt = function(self, builder, layer)
         self:SetWeaponEnabledByLabel('MainGun', true)
         ASeaUnit.OnStopBeingBuilt(self, builder, layer)
@@ -50,8 +49,8 @@ UAS0401 = ClassUnit(ASeaUnit) {
 
         ChangeState(self, self.IdleState)
 
-        if not self.SinkSlider then -- Setup the slider and get blueprint values
-            self.SinkSlider = CreateSlider(self, 0, 0, 0, 0, 5, true) -- Create sink controller to overlay ontop of original collision detection
+        if not self.SinkSlider then
+            self.SinkSlider = CreateSlider(self, 0, 0, 0, 0, 5, true)
             self.Trash:Add(self.SinkSlider)
         end
 
@@ -84,7 +83,7 @@ UAS0401 = ClassUnit(ASeaUnit) {
         if new == 'Bottom' and old == 'Down' then -- When finished diving
             self.WatchDepth = true
             if not self.DiverThread then
-                self.DiverThread = self:ForkThread(self.DiveDepthThread)
+                self.DiverThread = self.Trash:Add(ForkThread(self.DiveDepthThread, self))
             end
         end
     end,
@@ -100,11 +99,11 @@ UAS0401 = ClassUnit(ASeaUnit) {
             self.SinkSlider:SetSpeed(1)
 
             self.SinkSlider:SetGoal(0, difference, 0)
-            WaitSeconds(0.2)
+            WaitTicks(3)
         end
 
         self.SinkSlider:SetGoal(0, 0, 0) -- Reset the slider while we are not watching depth
-        WaitFor(self.SinkSlider)-- We have to wait for it to finish before killing the thread or it stops
+        WaitFor(self.SinkSlider) -- We have to wait for it to finish before killing the thread or it stops
 
         KillThread(self.DiverThread)
     end,
@@ -130,13 +129,13 @@ UAS0401 = ClassUnit(ASeaUnit) {
             if not self.UnitBeingBuilt.Dead then
                 unitBuilding:AttachBoneTo(-2, self, bone)
                 if EntityCategoryContains(categories.ENGINEER + categories.uas0102 + categories.uas0103, unitBuilding) then
-                    unitBuilding:SetParentOffset({0, 0, 1})
+                    unitBuilding:SetParentOffset({ 0, 0, 1 })
                 elseif EntityCategoryContains(categories.TECH2 - categories.ENGINEER, unitBuilding) then
-                    unitBuilding:SetParentOffset({0, 0, 3})
+                    unitBuilding:SetParentOffset({ 0, 0, 3 })
                 elseif EntityCategoryContains(categories.uas0203, unitBuilding) then
-                    unitBuilding:SetParentOffset({0, 0, 1.5})
+                    unitBuilding:SetParentOffset({ 0, 0, 1.5 })
                 else
-                    unitBuilding:SetParentOffset({0, 0, 2.5})
+                    unitBuilding:SetParentOffset({ 0, 0, 2.5 })
                 end
             end
             self.UnitDoneBeingBuilt = false
@@ -153,36 +152,35 @@ UAS0401 = ClassUnit(ASeaUnit) {
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
-            local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-            IssueMoveOffFactory({unitBuilding}, worldPos)
+            local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -20 })
+            IssueMoveOffFactory({ unitBuilding }, worldPos)
             ChangeState(self, self.IdleState)
         end,
     },
 
     OnKilled = function(self, instigator, type, overkillRatio)
-        local nrofBones = self:GetBoneCount() -1
-        local watchBone = self:GetBlueprint().WatchBone or 0
+        local nrofBones = self:GetBoneCount() - 1
+        local watchBone = self.Blueprint.WatchBone or 0
 
-        self:ForkThread(function()
+        self.Trash:Add(ForkThread(function()
             local pos = self:GetPosition()
             local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
             while self:GetPosition(watchBone)[2] > seafloor do
-                WaitSeconds(0.1)
+                WaitTicks(2)
             end
 
             self:CreateWreckage(overkillRatio, instigator)
             self:Destroy()
-        end)
+        end, self))
 
         local layer = self.Layer
         self:DestroyIdleEffects()
         if layer == 'Water' or layer == 'Seabed' or layer == 'Sub' then
             self.SinkExplosionThread = self:ForkThread(self.ExplosionThread)
-            self.SinkThread = self:ForkThread(self.SinkingThread)
+            self.SinkThread = self.Trash:Add(ForkThread(self.SinkingThread, self))
         end
 
         ASeaUnit.OnKilled(self, instigator, type, overkillRatio)
     end
 }
-
 TypeClass = UAS0401

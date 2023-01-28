@@ -1,15 +1,9 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UEB0202/UEB0202_script.lua
---**  Author(s):  John Comes, David Tomandl
---**
---**  Summary  :  UEF T2 Air Factory Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/UEB0202/UEB0202_script.lua
+-- Author(s):  John Comes, David Tomandl
+-- Summary  :  UEF T2 Air Factory Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
-
 
 ---@class UEB0202 : TAirFactoryUnit
 UEB0202 = ClassUnit(TAirFactoryUnit) {
@@ -53,16 +47,14 @@ UEB0202 = ClassUnit(TAirFactoryUnit) {
             self.ArmSlider2:SetGoal(0, 0, 0)
             self.ArmSlider2:SetSpeed(40)
     end,
-    
---Overwrite FinishBuildThread to speed up platform lowering rate
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
-            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(10)        --Change: SetRate(4)
+            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(10)
             self.Trash:Add(self.RollOffAnim)
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
@@ -80,11 +72,9 @@ UEB0202 = ClassUnit(TAirFactoryUnit) {
         end
     end,
 
---Overwrite PlayFxRollOffEnd to speed up platform raising rate
-
     PlayFxRollOffEnd = function(self)
         if self.RollOffAnim then
-            self.RollOffAnim:SetRate(10)                                            --Change: SetRate(-4)
+            self.RollOffAnim:SetRate(10)
             WaitFor(self.RollOffAnim)
             self.RollOffAnim:Destroy()
             self.RollOffAnim = nil

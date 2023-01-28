@@ -1,12 +1,8 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/UEB1101/UEB1101_script.lua
-----**  Author(s):  John Comes, David Tomandl
-----**
-----**  Summary  :  Terran Power Generator Script
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+-- File     :  /cdimage/units/UEB1101/UEB1101_script.lua
+-- Author(s):  John Comes, David Tomandl
+-- Summary  :  Terran Power Generator Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
 ---@class UEB1101 : TEnergyCreationUnit
@@ -33,7 +29,6 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         TEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
-
         ChangeState(self, self.OpeningState)
     end,
 
@@ -50,7 +45,7 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
 
     OpeningState = State {
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             if bp.Audio.Activate then
                 self:PlaySound(bp.Audio.Activate)
             end
@@ -77,7 +72,8 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
 
     IdleOpenState = State {
         Main = function(self)
-            self.Effect1 = CreateAttachedEmitter(self, 'Exhaust01', self.Army, '/effects/emitters/economy_electricity_01_emit.bp')
+            self.Effect1 = CreateAttachedEmitter(self, 'Exhaust01', self.Army,
+                '/effects/emitters/economy_electricity_01_emit.bp')
             self.Trash:Add(self.Effecct1)
         end,
     },
@@ -91,14 +87,14 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
                 v:SetSpinDown(true)
                 v:SetTargetSpeed(360)
             end
-            for k,v in self.Spinners do
+            for k, v in self.Spinners do
                 WaitFor(v)
             end
             for k, v in self.Sliders do
                 v:SetGoal(0, 0, 0)
                 v:SetSpeed(20)
             end
-            for k,v in self.Sliders do
+            for k, v in self.Sliders do
                 WaitFor(v)
             end
             ChangeState(self, self.ClosedIdleState)
@@ -108,7 +104,7 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
     ClosedIdleState = State {
         Main = function(self)
             while self.DamageSeconds > 0 do
-                WaitSeconds(1)
+                WaitTicks(11)
                 self.DamageSeconds = self.DamageSeconds - 1
             end
             ChangeState(self, self.OpeningState)

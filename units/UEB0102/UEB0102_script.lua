@@ -11,15 +11,13 @@ local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
 
 ---@class UEB0102 : TAirFactoryUnit
 UEB0102 = ClassUnit(TAirFactoryUnit) {
-    
+
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
-        --local unitBldg = self.UnitBeingBuilt
         if not self.ArmSlider then
             self.ArmSlider = CreateSlider(self, 'Arm01')
             self.Trash:Add(self.ArmSlider)
         end
-        
     end,
 
     MovingArmsThread = function(self)
@@ -33,7 +31,7 @@ UEB0102 = ClassUnit(TAirFactoryUnit) {
             WaitFor(self.ArmSlider)
         end
     end,
-    
+
     StopArmsMoving = function(self)
         TAirFactoryUnit.StopArmsMoving(self)
         if not self.ArmSlider then return end
@@ -44,7 +42,7 @@ UEB0102 = ClassUnit(TAirFactoryUnit) {
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
             self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(10)
@@ -74,5 +72,4 @@ UEB0102 = ClassUnit(TAirFactoryUnit) {
         end
     end,
 }
-
 TypeClass = UEB0102

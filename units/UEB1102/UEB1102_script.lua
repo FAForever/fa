@@ -1,13 +1,8 @@
-----------------------------------------------------------------------------
---
---  File     :  /cdimage/units/UEB1102/UEB1102_script.lua
---  Author(s):  Jessica St. Croix
---
---  Summary  :  UEF Hydrocarbon Power Plant Script
---
---  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----------------------------------------------------------------------------
-
+-- File     :  /cdimage/units/UEB1102/UEB1102_script.lua
+-- Author(s):  Jessica St. Croix
+-- Summary  :  UEF Hydrocarbon Power Plant Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
 ---@class UEB1102 : TEnergyCreationUnit
@@ -28,8 +23,7 @@ UEB1102 = ClassUnit(TEnergyCreationUnit) {
 
     ActiveState = State {
         Main = function(self)
-            -- Play the "activate" sound
-            local myBlueprint = self:GetBlueprint()
+            local myBlueprint = self.Blueprint
             if myBlueprint.Audio.Activate then
                 self:PlaySound(myBlueprint.Audio.Activate)
             end

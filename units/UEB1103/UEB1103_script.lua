@@ -1,13 +1,8 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UEB1103/UEB1103_script.lua
---**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
---**
---**  Summary  :  UEF Tier 1 Mass Extractor Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/UEB1103/UEB1103_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix
+-- Summary  :  UEF Tier 1 Mass Extractor Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local TMassCollectionUnit = import("/lua/terranunits.lua").TMassCollectionUnit
 
 ---@class UEB1103 : TMassCollectionUnit
@@ -27,7 +22,7 @@ UEB1103 = ClassUnit(TMassCollectionUnit) {
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationOpen, true)
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
     end,
 
     OnProductionPaused = function(self)
