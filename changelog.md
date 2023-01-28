@@ -5,7 +5,6 @@ Some sections of the changelog are available in other languages such as [French]
 # Game version 3750 (28th of January, 2023)
 
 ## Land
-***
 
 ### T2 Land
 
@@ -59,7 +58,6 @@ The snipe mode icon is changed to make the difference between the snipe mode and
 * BuildTime: 4500 > 4950
 
 ## Air
-***
 
 ### Air Experimentals
 
@@ -125,7 +123,7 @@ T2 transports had lower crash damage than T1 (100). These changes will also nerf
 * Crash damage 25 -> 250
 
 ## Navy
-***
+
 For a long time, Aeon frigates were absolute garbage while their Destro's were insanely good while Cybran had the exact opposite with OP frigate and weak destroyer. These changes redistribute the power of those factions while retaining the units' unique traits and further enhancing them by adjusting the ranges of the frigate. We hope it will also introduce more micro potential in frigate fights, especially with Cybran vs Aeon.
 
 Bulwark gets a mini-rework to establish it as a T2 support vessel instead of a unit that is mainly used during the T3 stage with Battlecruisers and Battleships. This should help UEF's notoriously weak T2 stage while making their T3 one less oppressive.
@@ -211,7 +209,7 @@ Tempest is an extremely powerful unit in the right hands. It was a common sight 
 * Build Time: 28.800 > 38.400
 
 ## Engineers
-***
+
 Engineer pathfinding is one of the most frustrating things in FAF. With the changes to their Turn rate, Back up distance, and Acceleration/Deaccelaration we hope to finally alleviate those issues. These changes will also make engineers more micro'able, especially in the early stages of the game eg. vs T1 bombers. If you want to read more take a look at this [PR ](https://github.com/FAForever/fa/pull/4571) that Jip made.
 
 We are also buffing the efficiency of higher-tech engineers. They will now get more bp while having the same cost.
@@ -228,7 +226,6 @@ We are also buffing the efficiency of higher-tech engineers. They will now get m
 This small buff should make Sparkies easier and nicer to use by not requiring players to find the nearest T1 engineer on the frontline to construct a radar or a factory. We hope these changes will encourage more aggressive usage of the Sparky on the frontlines and in drops.
 
 ## Buildings
-***
 ## Hives & Kennels
 
 Hives have been the dominant engineer station forever now, they have many advantages over Kennels and are extremely dominant in the super-late game. These changes are meant to bring the Hives more in line with the Kennels without making them a non-viable option if you quickly want some concentrated, albeit less efficient, bp in your base in the mid to early late-game. Hives will now get less efficient the higher tech of the Hive you get, this is meant to reduce their strength as an insanely compact, high bp that is easy to shield. You will now have to pay more to have a more concentrated, higher HP, higher range BP. 
@@ -387,13 +384,13 @@ Increase E cost of all artilleries 1.5 times and double energy required to fire.
 * Energy Required to Fire: 7.000 > 14.000
 
 ## Mechanics
-***
+
 All ACUs and SACUs that can make tac missiles will start construction by default instead of having to manually enable it.
 
 Loyalists will no longer redirect Billy Nukes
 
 ## Fixes
-***
+
 * Fixed the icon of the Heavy Shield upgrade for Aeon ACU
 
 * Fixed the damage of UEF and Sera T1 Artillery. They dealt 2 less damage than intended since the way that units break tree groups was changed some time ago.
