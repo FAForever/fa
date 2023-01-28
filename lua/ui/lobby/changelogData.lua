@@ -16,7 +16,7 @@ gamePatches = {
         name = "Balance patch",
         description = {
             "## Land",
-            ","
+            "",
             "### T2 Land",
             "",
             "T2 land is much slower than T1 and T3 which doesn't allow it to adequately cover the map, raid, and defend against attacks, especially on bigger maps. The meta in team games is to generally either completely skip T2 or go all in. These changes hope to make T2 more viable in team games and 1vs1. Another advantage in increasing the MS of T2 land is how they will interact with Rambo ACUs, especially in 1vs1. Currently, Rambo ACUs are extremely strong and even if you have more army value it's very difficult to press your advantage since if you are the one engaging the enemy gets at least 2-3 OCs for free. With the MS changes it should allow the player with more army to more easily punish the opponent for miss positioning their ACU or being overly aggressive/borderline suicidal.",
