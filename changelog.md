@@ -226,7 +226,7 @@ We are also buffing the efficiency of higher-tech engineers. They will now get m
 This small buff should make Sparkies easier and nicer to use by not requiring players to find the nearest T1 engineer on the frontline to construct a radar or a factory. We hope these changes will encourage more aggressive usage of the Sparky on the frontlines and in drops.
 
 ## Buildings
-## Hives & Kennels
+### Hives & Kennels
 
 Hives have been the dominant engineer station forever now, they have many advantages over Kennels and are extremely dominant in the super-late game. These changes are meant to bring the Hives more in line with the Kennels without making them a non-viable option if you quickly want some concentrated, albeit less efficient, bp in your base in the mid to early late-game. Hives will now get less efficient the higher tech of the Hive you get, this is meant to reduce their strength as an insanely compact, high bp that is easy to shield. You will now have to pay more to have a more concentrated, higher HP, higher range BP. 
 We are also reducing the HP of engineering stations to make them a bit easier to snipe and to emphasize protecting your BP more.
