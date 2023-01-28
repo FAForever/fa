@@ -92,6 +92,7 @@ function SetLayout(layout)
     import("/lua/ui/game/controlgroups.lua").SetLayout()
     import("/lua/ui/game/chat.lua").SetLayout()
     import("/lua/ui/game/minimap.lua").SetLayout()
+    import("/lua/ui/game/massfabs.lua").SetLayout()
     import("/lua/ui/game/recall.lua").SetLayout()
 end
 
@@ -165,6 +166,7 @@ function CreateUI(isReplay)
     -- casting tools 
 
     import("/lua/ui/game/casting/mouse.lua")
+    import("/lua/ui/game/casting/painting.lua")
 
     -- overwrite some globals for performance / safety
 
@@ -182,6 +184,16 @@ function CreateUI(isReplay)
 
     -- prevents the nvidia stuttering bug with their more recent drivers
     ConExecute('d3d_WindowsCursor on')
+
+    -- tweak networking parameters
+    ConExecute('net_MinResendDelay 100')
+    ConExecute('net_MaxResendDelay 1000')
+
+    ConExecute('net_MaxSendRate 8192')
+    ConExecute('net_MaxBacklog 8192')
+
+    ConExecute('net_SendDelay 5')
+    ConExecute('net_AckDelay 5')
 
     -- enable experimental graphics
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
@@ -204,6 +216,7 @@ function CreateUI(isReplay)
             end
         end)
     end
+
     local focusArmy = GetFocusArmy()
 
     -- keep track of the original focus army

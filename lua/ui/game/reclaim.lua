@@ -9,6 +9,7 @@ local options = Prefs.GetFromCurrentProfile('options')
 
 local MathClamp = math.clamp
 local MathLog = math.log
+local MathSqrt = math.sqrt
 local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
@@ -35,7 +36,7 @@ local ZoomThreshold = 150
 
 --- TODO: remove the options
 ---@type number
-local MaxLabels = 500
+local MaxLabels = 1000
 
 ---@type table<EntityId, UIReclaimDataPoint>
 local Reclaim = {}
@@ -156,7 +157,7 @@ local WorldLabel = Class(Group) {
         elseif mass >= 30000 then
             hue = 1
         else
-            hue = MathLog(mass + 0.30000300003) * 0.0868588963807 - 0.104574880463
+            hue = MathLog(mass + 0.30000300003) * 0.0868588963807 + 0.104574880463
         end
 
         -- saturation will just be an abstract indicator of how "compact" the label is
@@ -187,7 +188,7 @@ local WorldLabel = Class(Group) {
             return minSize
         end
 
-        local value = MathClamp(MathLog(mass) * scaling + minSize, minSize, maxSize)
+        local value = MathClamp(0.25 * MathSqrt(mass) * scaling + minSize, minSize, maxSize)
         return value ^ 0
     end,
 
@@ -207,6 +208,8 @@ local WorldLabel = Class(Group) {
         self.text:SetText(mass)
         self.text:SetColor(self:CalculateTextColor(r))
         self.text:SetFont(UIUtil.bodyFont, self:CalculateFontSizeFromMass(r))
+        self.text.Depth:Set(0.001 * r.mass)
+        self.mass.Depth:Set(0.001 * r.mass)
     end,
 
     --- Updates the reclaim that this label displays

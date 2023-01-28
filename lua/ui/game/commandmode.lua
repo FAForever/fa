@@ -135,8 +135,12 @@ function EndCommandMode(isCancel)
             else 
                 if modeData.selection then
                     SelectUnits(modeData.selection)
-                    return
                 end
+            end
+
+            -- we can end up here because we re-start the command mode
+            if not modeData then
+                return
             end
         end
 
@@ -148,6 +152,7 @@ function EndCommandMode(isCancel)
             ClearBuildTemplates()
         end
     end
+
     -- do end behaviors
     for i,v in endBehaviors do
         v(commandMode, modeData)
@@ -424,7 +429,6 @@ local categoriesStructure = categories.STRUCTURE
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
-
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
     if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then 
         if not IsKeyDown('Shift') then 

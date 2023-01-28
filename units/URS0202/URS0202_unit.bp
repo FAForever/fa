@@ -490,6 +490,7 @@ UnitBlueprint {
             FiringTolerance = 5,
             Label = 'Zapper',
             MaxRadius = 50,
+            MinRadius = 2,
             MaximumBeamLength = 60,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
