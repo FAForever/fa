@@ -248,8 +248,8 @@ UnitBlueprint {
             EffectiveRadius = 0,
             FireTargetLayerCapsTable = {
                 Air = 'Land|Seabed|Water',
-                Land = 'Air|Land|Seabed|Water',
-                Water = 'Air|Land|Seabed|Water',
+                Land = 'Land|Seabed|Water',
+                Water = 'Land|Seabed|Water',
             },
             FiringTolerance = 6,
             Label = 'Suicide',
