@@ -1,19 +1,15 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/URB0304/URB0304_script.lua
-----**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-----**
-----**  Summary  :  Cybran Quantum Gate
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+-- File     :  /cdimage/units/URB0304/URB0304_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix
+-- Summary  :  Cybran Quantum Gate
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local CQuantumGateUnit = import("/lua/cybranunits.lua").CQuantumGateUnit
 local EffectUtil = import("/lua/effectutilities.lua")
 
 ---@class URB0304 : CQuantumGateUnit
 URB0304 = ClassUnit(CQuantumGateUnit) {
     GateBones = {
-        {   
+        {
             'Gate01_Left_FX',
             'Gate01_Right_FX',
         },
@@ -34,17 +30,26 @@ URB0304 = ClassUnit(CQuantumGateUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CQuantumGateUnit.OnStopBeingBuilt(self, builder, layer)
-        self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[1][1], self.GateBones[1][2], self.Trash, 0.1)
-        self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2], self.Trash, 0.5)
-        self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2], self.Trash, 1.1)
-        self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[1][1], self.GateBones[1][2], self.Trash, 0.6)
-        self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2], self.Trash, 1.2)
-        self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2], self.Trash, 1.8)
-        self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[1][1], self.GateBones[1][2], self.Trash, 2.3)
-        self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2], self.Trash, 2.7)
-        self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2], self.Trash, 3.1)
+        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[1][1], self.GateBones[1][2],
+            self.Trash, 0.1, self))
+        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2],
+            self.Trash, 0.5, self))
+        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2],
+            self.Trash, 1.1, self))
+        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[1][1], self.GateBones[1][2],
+            self.Trash, 0.6, self))
+        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2],
+            self.Trash, 1.2, self))
+        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2],
+            self.Trash, 1.8, self))
+        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[1][1], self.GateBones[1][2],
+            self.Trash, 2.3, self))
+        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2],
+            self.Trash, 2.7, self))
+        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2],
+            self.Trash, 3.1, self))
 
-        for kBonesSet,vBoneSet in self.GateBones do
+        for kBonesSet, vBoneSet in self.GateBones do
             for kBone, vBone in vBoneSet do
                 for kEffect, vEffect in self.GateEffects do
                     self.Trash:Add(CreateAttachedEmitter(self, vBone, self.Army, vEffect))

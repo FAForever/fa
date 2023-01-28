@@ -1,23 +1,19 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/URB1102/URB1102_script.lua
-----**  Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
-----**
-----**  Summary  :  Cybran Hydrocarbon Power Plant Script
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+-- File     :  /cdimage/units/URB1102/URB1102_script.lua
+-- Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
+-- Summary  :  Cybran Hydrocarbon Power Plant Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local CEnergyCreationUnit = import("/lua/cybranunits.lua").CEnergyCreationUnit
 
 ---@class URB1102 : CEnergyCreationUnit
 URB1102 = ClassUnit(CEnergyCreationUnit) {
-    AirEffects = {'/effects/emitters/hydrocarbon_smoke_01_emit.bp',},
-    AirEffectsBones = {'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04',},
-    WaterEffects = {'/effects/emitters/underwater_idle_bubbles_01_emit.bp',},
-    WaterEffectsBones = {'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04',},
+    AirEffects = { '/effects/emitters/hydrocarbon_smoke_01_emit.bp', },
+    AirEffectsBones = { 'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04', },
+    WaterEffects = { '/effects/emitters/underwater_idle_bubbles_01_emit.bp', },
+    WaterEffectsBones = { 'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04', },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        CEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        CEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         self.EffectsBag = {}
         ChangeState(self, self.ActiveState)
     end,
@@ -29,7 +25,7 @@ URB1102 = ClassUnit(CEnergyCreationUnit) {
             local scale = .5
 
             -- Play the "activate" sound
-            local myBlueprint = self:GetBlueprint()
+            local myBlueprint = self.Blueprint
             if myBlueprint.Audio.Activate then
                 self:PlaySound(myBlueprint.Audio.Activate)
             end
@@ -45,7 +41,9 @@ URB1102 = ClassUnit(CEnergyCreationUnit) {
 
             for keffects, veffects in effects do
                 for kbones, vbones in bones do
-                    table.insert(self.EffectsBag, CreateAttachedEmitter(self, vbones, self.Army, veffects):ScaleEmitter(scale):OffsetEmitter(0,-.1,0))
+                    table.insert(self.EffectsBag,
+                        CreateAttachedEmitter(self, vbones, self.Army, veffects):ScaleEmitter(scale):OffsetEmitter(0, -
+                            .1, 0))
                 end
             end
         end,
@@ -58,7 +56,7 @@ URB1102 = ClassUnit(CEnergyCreationUnit) {
     InActiveState = State {
         Main = function(self)
             if self.EffectsBag then
-                for keys,values in self.EffectsBag do
+                for keys, values in self.EffectsBag do
                     values:Destroy()
                 end
                 self.EffectsBag = {}

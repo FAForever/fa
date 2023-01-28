@@ -1,13 +1,8 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/URB1103/URB1103_script.lua
---**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
---**
---**  Summary  :  Cybran Tier 1 Mass Extractor Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/URB1103/URB1103_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix
+-- Summary  :  Cybran Tier 1 Mass Extractor Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local CMassCollectionUnit = import("/lua/cybranunits.lua").CMassCollectionUnit
 
 ---@class URB1103 : CMassCollectionUnit
@@ -26,7 +21,7 @@ URB1103 = ClassUnit(CMassCollectionUnit) {
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationOpen, true)
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
     end,
 
     OnProductionPaused = function(self)

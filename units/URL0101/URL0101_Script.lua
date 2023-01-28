@@ -1,12 +1,8 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/URL0101/URL0101_script.lua
-----**  Author(s):  John Comes, David Tomandl
-----**
-----**  Summary  :  Cybran Land Scout Script
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+-- File     :  /cdimage/units/URL0101/URL0101_script.lua
+-- Author(s):  John Comes, David Tomandl
+-- Summary  :  Cybran Land Scout Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
 local Entity = import("/lua/sim/entity.lua").Entity
 
@@ -14,16 +10,13 @@ local Entity = import("/lua/sim/entity.lua").Entity
 URL0101 = ClassUnit(CWalkingLandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        --entity used for radar
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.RadarEnt = Entity {}
         self.Trash:Add(self.RadarEnt)
         self.RadarEnt:InitIntel(self.Army, 'Radar', bp.Intel.RadarRadius)
         self.RadarEnt:EnableIntel('Radar')
         self.RadarEnt:AttachBoneTo(-1, self, 0)
-        --antena spinner
         CreateRotator(self, 'Spinner', 'y', nil, 90, 5, 90)
-        --enable cloaking economy
         self:SetMaintenanceConsumptionInactive()
         self:SetScriptBit('RULEUTC_CloakToggle', true)
         self:RequestRefreshUI()

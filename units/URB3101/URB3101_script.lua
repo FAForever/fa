@@ -1,13 +1,8 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/URB3101/URB3101_script.lua
---**  Author(s):  David Tomandl
---**
---**  Summary  :  Cybran Light Radar Tower Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/URB3101/URB3101_script.lua
+-- Author(s):  David Tomandl
+-- Summary  :  Cybran Light Radar Tower Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local CRadarUnit = import("/lua/cybranunits.lua").CRadarUnit
 
 ---@class URB3101 : CRadarUnit
@@ -31,12 +26,11 @@ URB3101 = ClassUnit(CRadarUnit) {
         self.Dish3Rotator:SetTargetSpeed(0)
     end,
 
-
     OnIntelEnabled = function(self)
         CRadarUnit.OnIntelEnabled(self)
-        self.Thread1 = self:ForkThread(self.Dish1Behavior)
-        self.Thread2 = self:ForkThread(self.Dish2Behavior)
-        self.Thread3 = self:ForkThread(self.Dish3Behavior)
+        self.Thread1 = self.Trash:Add(ForkThread(self.Dish1Behavior,self))
+        self.Thread2 = self.Trash:Add(ForkThread(self.Dish2Behavior,self))
+        self.Thread3 = self.Trash:Add(ForkThread(self.Dish3Behavior,self))
     end,
 
     Dish1Behavior = function(self)
@@ -54,12 +48,12 @@ URB3101 = ClassUnit(CRadarUnit) {
             WaitFor(self.Dish1Rotator)
             self.Dish1Rotator:SetTargetSpeed(0)
             WaitFor(self.Dish1Rotator)
-            if (Random() < 0.5) then WaitSeconds(1) end
+            if (Random() < 0.5) then WaitTicks(11) end
             self.Dish1Rotator:SetTargetSpeed(15)
             WaitFor(self.Dish1Rotator)
             self.Dish1Rotator:SetTargetSpeed(0)
             WaitFor(self.Dish1Rotator)
-            if (Random() < 0.5) then WaitSeconds(1) end
+            if (Random() < 0.5) then WaitTicks(11) end
         end
     end,
 
@@ -70,7 +64,7 @@ URB3101 = ClassUnit(CRadarUnit) {
         end
         self.Dish2Rotator:SetSpeed(5):SetGoal(0)
         WaitFor(self.Dish2Rotator)
-        WaitSeconds(2)
+        WaitTicks(21)
         self.Dish2Rotator:SetSpeed(0)
         self.Dish2Rotator:ClearGoal()
         self.Dish2Rotator:SetAccel(5)
@@ -79,12 +73,12 @@ URB3101 = ClassUnit(CRadarUnit) {
             WaitFor(self.Dish2Rotator)
             self.Dish2Rotator:SetTargetSpeed(0)
             WaitFor(self.Dish2Rotator)
-            if (Random() < 0.4) then WaitSeconds(1) end
+            if (Random() < 0.4) then WaitTicks(11) end
             self.Dish2Rotator:SetTargetSpeed(15)
             WaitFor(self.Dish2Rotator)
             self.Dish2Rotator:SetTargetSpeed(0)
             WaitFor(self.Dish2Rotator)
-            if (Random() < 0.4) then WaitSeconds(1) end
+            if (Random() < 0.4) then WaitTicks(11) end
         end
     end,
 
@@ -95,7 +89,7 @@ URB3101 = ClassUnit(CRadarUnit) {
         end
         self.Dish3Rotator:SetSpeed(5):SetGoal(0)
         WaitFor(self.Dish3Rotator)
-        WaitSeconds(5)
+        WaitTicks(51)
         self.Dish3Rotator:SetSpeed(0)
         self.Dish3Rotator:ClearGoal()
         self.Dish3Rotator:SetAccel(5)
@@ -104,12 +98,12 @@ URB3101 = ClassUnit(CRadarUnit) {
             WaitFor(self.Dish3Rotator)
             self.Dish3Rotator:SetTargetSpeed(0)
             WaitFor(self.Dish3Rotator)
-            if (Random() < 0.6) then WaitSeconds(1) end
+            if (Random() < 0.6) then WaitTicks(11) end
             self.Dish3Rotator:SetTargetSpeed(15)
             WaitFor(self.Dish3Rotator)
             self.Dish3Rotator:SetTargetSpeed(0)
             WaitFor(self.Dish3Rotator)
-            if (Random() < 0.6) then WaitSeconds(1) end
+            if (Random() < 0.6) then WaitTicks(11) end
         end
     end,
 }
