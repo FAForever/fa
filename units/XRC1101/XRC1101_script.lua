@@ -1,40 +1,28 @@
---****************************************************************************
---** 
---**  File     :  /cdimage/units/XRC1101/XRC1101_script.lua 
---** 
---**  Authors: Greg Kohne
---** 
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /cdimage/units/XRC1101/XRC1101_script.lua
+-- Authors: Greg Kohne
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local CCivilianStructureUnit = import("/lua/cybranunits.lua").CCivilianStructureUnit
 local SSQuantumJammerTowerAmbient = import("/lua/effecttemplates.lua").SJammerTowerAmbient
 
 ---@class XRC1101 : CCivilianStructureUnit
-XRC1101 = ClassUnit(CCivilianStructureUnit) 
-
+XRC1101 = ClassUnit(CCivilianStructureUnit)
 {
-   OnCreate = function(self, builder, layer)
-        ------Place emitters on certain light bones on the mesh.
+    OnCreate = function(self, builder, layer)
         for k, v in SSQuantumJammerTowerAmbient do
-            CreateAttachedEmitter(self, 'Jammer', self:GetArmy(), v)
+            CreateAttachedEmitter(self, 'Jammer', self.Army, v)
         end
-               
-        self:ForkThread(self.LandBlipThread)
-        self:ForkThread(self.AirBlipThread)
-        
+
+        self.Trash:Add(ForkThread(self.LandBlipThread, self))
+        self.Trash:Add(ForkThread(self.AirBlipThread, self))
+
         CCivilianStructureUnit.OnCreate(self)
-        
-                
-            
+
         if not self.AnimationManipulator then
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationIdle, true)
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationIdle, true)
     end,
-        
 }
-
-
 TypeClass = XRC1101
-

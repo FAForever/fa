@@ -1,12 +1,8 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/XRB3301/XRB3301_script.lua
---**  Author(s):  Dru Staltman, Ted Snook
---**
---**  Summary  :  Cybran Vision unit thing
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /cdimage/units/XRB3301/XRB3301_script.lua
+-- Author(s):  Dru Staltman, Ted Snook
+-- Summary  :  Cybran Vision unit thing
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local CRadarUnit = import("/lua/cybranunits.lua").CRadarUnit
 local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 local CSoothSayerAmbient = import("/lua/effecttemplates.lua").CSoothSayerAmbient
@@ -65,7 +61,7 @@ XRB3301 = ClassUnit(CRadarUnit) {
                 entity:SetIntelRadius('vision', curRadius)
             end
             lifetime = lifetime + 2
-            WaitSeconds(0.1)
+            WaitTicks(2)
         end
         entity:Destroy()
     end,
@@ -101,14 +97,14 @@ XRB3301 = ClassUnit(CRadarUnit) {
 
     ExpandingVision = State {
         Main = function(self)
-            WaitSeconds(0.1)
+            WaitTicks(2)
             while true do
                 if self:GetResourceConsumed() ~= 1 then
                     self.ExpandingVisionEnergyCheck = true
                     self:OnIntelDisabled()
                 end
                 local curRadius = self:GetIntelRadius('vision')
-                local targetRadius = self:GetBlueprint().Intel.MaxVisionRadius
+                local targetRadius = self.Blueprint.Intel.MaxVisionRadius
                 if curRadius < targetRadius then
                     curRadius = curRadius + 1
                     if curRadius >= targetRadius then
@@ -117,7 +113,7 @@ XRB3301 = ClassUnit(CRadarUnit) {
                         self:SetIntelRadius('vision', curRadius)
                     end
                 end
-                WaitSeconds(0.2)
+                WaitTicks(3)
             end
         end,
     },
@@ -134,7 +130,7 @@ XRB3301 = ClassUnit(CRadarUnit) {
                     end
                 end
                 local curRadius = self:GetIntelRadius('vision')
-                local targetRadius = self:GetBlueprint().Intel.MinVisionRadius
+                local targetRadius = self.Blueprint.Intel.MinVisionRadius
                 if curRadius > targetRadius then
                     curRadius = curRadius - 1
                     if curRadius <= targetRadius then
@@ -143,7 +139,7 @@ XRB3301 = ClassUnit(CRadarUnit) {
                         self:SetIntelRadius('vision', curRadius)
                     end
                 end
-                WaitSeconds(0.2)
+                WaitTicks(3)
             end
         end,
     },
