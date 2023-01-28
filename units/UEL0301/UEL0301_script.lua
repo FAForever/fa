@@ -4,7 +4,6 @@
 -- Summary  :  UEF Sub Commander Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
 local Shield = import("/lua/shield.lua").Shield
 local EffectUtil = import("/lua/effectutilities.lua")
 local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
@@ -43,14 +42,13 @@ UEL0301 = ClassUnit(CommandUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
-        -- Block Jammer until Enhancement is built
         self:DisableUnitIntel('Enhancement', 'Jammer')
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
-            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones,
+                self.BuildEffectsBag)
         else
             EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
@@ -76,7 +74,7 @@ UEL0301 = ClassUnit(CommandUnit) {
     NotifyOfPodDeath = function(self, pod, rebuildDrone)
         if rebuildDrone == true then
             if self.HasPod == true then
-                self.RebuildThread = self:ForkThread(self.RebuildPod)
+                self.RebuildThread = self.Trash:Add(ForkThread(self.RebuildPod,self))
             end
         else
             self:CreateEnhancement('PodRemove')
@@ -85,7 +83,7 @@ UEL0301 = ClassUnit(CommandUnit) {
 
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
-        local bp = self:GetBlueprint().Enhancements[enh]
+        local bp = self.Blueprint.Enhancements[enh]
         if not bp then return end
         if enh == 'Pod' then
             local location = self:GetPosition('AttachSpecial01')
@@ -120,31 +118,31 @@ UEL0301 = ClassUnit(CommandUnit) {
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldGeneratorField' then
             self:DestroyShield()
-            self:ForkThread(function()
+            self.Trash:Add(ForkThread(function()
                 WaitTicks(1)
                 self:CreateShield(bp)
                 self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
                 self:SetMaintenanceConsumptionActive()
-            end)
+            end,self))
         elseif enh == 'ShieldGeneratorFieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        elseif enh =='ResourceAllocation' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            local bpEcon = self:GetBlueprint().Economy
+        elseif enh == 'ResourceAllocation' then
+            local bp = self.Blueprint.Enhancements[enh]
+            local bpEcon = self.Blueprint.Economy
             if not bp then return end
             self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
             self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self:GetBlueprint().Economy
+            local bpEcon = self.Blueprint.Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'SensorRangeEnhancer' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
         elseif enh == 'SensorRangeEnhancerRemove' then
-            local bpIntel = self:GetBlueprint().Intel
+            local bpIntel = self.Blueprint.Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
             self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
         elseif enh == 'RadarJammer' then
@@ -153,22 +151,22 @@ UEL0301 = ClassUnit(CommandUnit) {
             self:EnableUnitIntel('Enhancement', 'Jammer')
             self:AddToggleCap('RULEUTC_JammingToggle')
         elseif enh == 'RadarJammerRemove' then
-            local bpIntel = self:GetBlueprint().Intel
+            local bpIntel = self.Blueprint.Intel
             self:SetIntelRadius('Jammer', 0)
             self:DisableUnitIntel('Enhancement', 'Jammer')
             self.RadarJammerEnh = false
             self:RemoveToggleCap('RULEUTC_JammingToggle')
-        elseif enh =='AdvancedCoolingUpgrade' then
+        elseif enh == 'AdvancedCoolingUpgrade' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(bp.NewRateOfFire)
-        elseif enh =='AdvancedCoolingUpgradeRemove' then
+        elseif enh == 'AdvancedCoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
-            wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
-        elseif enh =='HighExplosiveOrdnance' then
+            wep:ChangeRateOfFire(self.Blueprint.Weapon[1].RateOfFire or 1)
+        elseif enh == 'HighExplosiveOrdnance' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadius)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
-        elseif enh =='HighExplosiveOrdnanceRemove' then
+        elseif enh == 'HighExplosiveOrdnanceRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadius)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
@@ -180,9 +178,10 @@ UEL0301 = ClassUnit(CommandUnit) {
         if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
-                self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
-            self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['RadarJammer'].MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['RadarJammer'].MaintenanceConsumptionPerSecondEnergy
+                or 0)
             self:SetMaintenanceConsumptionActive()
         end
     end,

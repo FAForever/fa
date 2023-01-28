@@ -4,7 +4,6 @@
 -- Summary  :  UEF Experimental Submersible Aircraft Carrier Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
 local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
 local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
 local TSAMLauncher = import("/lua/terranweapons.lua").TSAMLauncher
@@ -35,7 +34,8 @@ UES0401 = ClassUnit(AircraftCarrier) {
         self.OpenAnimManips = {}
         self.OpenAnimManips[1] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen.sca'):SetRate(-1)
         for i = 2, 6 do
-            self.OpenAnimManips[i] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen0' .. i .. '.sca'):SetRate(-1)
+            self.OpenAnimManips[i] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen0' .. i .. '.sca'):
+                SetRate(-1)
         end
 
         for k, v in self.OpenAnimManips do
@@ -48,10 +48,10 @@ UES0401 = ClassUnit(AircraftCarrier) {
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
-        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
+        self:SetMesh(self.Blueprint.Display.BuildMeshBlueprint, true)
+        if self.Blueprint.General.UpgradesFrom ~= builder.UnitId then
             self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
+            self.OnBeingBuiltEffectsBag:Add(self.Trash:Add(ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag,self)))
         end
     end,
 
@@ -74,47 +74,40 @@ UES0401 = ClassUnit(AircraftCarrier) {
             self:PlayAllOpenAnims(true)
         end
 
-        if new == 'Up' and old == 'Bottom' then -- When starting to surface
+        if new == 'Up' and old == 'Bottom' then
             self.WatchDepth = false
         end
 
-        if new == 'Bottom' and old == 'Down' then -- When finished diving
+        if new == 'Bottom' and old == 'Down' then
             self.WatchDepth = true
             if not self.DiverThread then
-                self.DiverThread = self:ForkThread(self.DiveDepthThread)
+                self.DiverThread = self.Trash:Add(ForkThread(self.DiveDepthThread,self))
             end
         end
     end,
 
     DiveDepthThread = function(self)
-        -- Takes the given location, adjusts the Y value to the surface height on that location, with an offset
-        local Yoffset = 1.2 -- The default (built in) offset appears to be 0.25 - if the place where thats set is found, that would be epic.
-        -- 1.2 is for tempest to clear the torpedo tubes from most cases of ground clipping, keeping overall height minimal.
+        local Yoffset = 1.2
         while self.WatchDepth == true do
             local pos = self:GetPosition()
-            local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3]) -- Target depth, in this case the seabed
-            local difference = math.max(((seafloor + Yoffset) - pos[2]), -0.5) -- Doesnt sink too much, just maneuveres the bed better.
+            local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
+            local difference = math.max(((seafloor + Yoffset) - pos[2]), -0.5)
             self.SinkSlider:SetSpeed(1)
-
             self.SinkSlider:SetGoal(0, difference, 0)
-            WaitSeconds(1)
+            WaitTicks(11)
         end
-
-        self.SinkSlider:SetGoal(0, 0, 0) -- Reset the slider while we are not watching depth
-        WaitFor(self.SinkSlider)-- We have to wait for it to finish before killing the thread or it stops
-
+        self.SinkSlider:SetGoal(0, 0, 0)
+        WaitFor(self.SinkSlider)
         KillThread(self.DiverThread)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AircraftCarrier.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
-
-        if not self.SinkSlider then -- Setup the slider and get blueprint values
-            self.SinkSlider = CreateSlider(self, 0, 0, 0, 0, 5, true) -- Create sink controller to overlay ontop of original collision detection
+        if not self.SinkSlider then
+            self.SinkSlider = CreateSlider(self, 0, 0, 0, 0, 5, true)
             self.Trash:Add(self.SinkSlider)
         end
-
         self.WatchDepth = false
     end,
 
@@ -159,9 +152,9 @@ UES0401 = ClassUnit(AircraftCarrier) {
             if self:TransportHasAvailableStorage() then
                 self:AddUnitToStorage(unitBuilding)
             else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
+                local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -20 })
+                IssueMoveOffFactory({ unitBuilding }, worldPos)
+                unitBuilding:ShowBone(0, true)
             end
 
             self:RequestRefreshUI()

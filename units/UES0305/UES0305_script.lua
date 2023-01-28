@@ -29,11 +29,11 @@ UES0305 = ClassUnit(TSeaUnit) {
             },
             Type = 'SonarBuoy01',
         },
-    }, 
+    },
 
     CreateIdleEffects = function(self)
         TSeaUnit.CreateIdleEffects(self)
-        self.TimedSonarEffectsThread = self:ForkThread(self.TimedIdleSonarEffects)
+        self.TimedSonarEffectsThread = self.Trash:Add(ForkThread(self.TimedIdleSonarEffects,self))
     end,
 
     TimedIdleSonarEffects = function(self)
@@ -47,14 +47,16 @@ UES0305 = ClassUnit(TSeaUnit) {
 
                     for kb, vBone in vTypeGroup.Bones do
                         for ke, vEffect in effects do
-                            emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
+                            emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale
+                                or 1)
                             if vTypeGroup.Offset then
-                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,vTypeGroup.Offset[3] or 0)
+                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,
+                                    vTypeGroup.Offset[3] or 0)
                             end
                         end
-                    end                    
+                    end
                 end
-                WaitSeconds(6)                
+                WaitTicks(61)
             end
         end
     end,
@@ -62,13 +64,13 @@ UES0305 = ClassUnit(TSeaUnit) {
     DestroyIdleEffects = function(self)
         self.TimedSonarEffectsThread:Destroy()
         TSeaUnit.DestroyIdleEffects(self)
-    end,     
+    end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
         self:HideBone(0, true)
         self.BeingBuiltShowBoneTriggered = false
-        if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
-            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
+        if self.Blueprint.General.UpgradesFrom ~= builder.UnitId then
+            self.OnBeingBuiltEffectsBag:Add(self.Trash:Add(ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag, self)))
         end
     end,
 }

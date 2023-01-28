@@ -8,44 +8,41 @@ local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
 local CreateCybranBuildBeamsOpti = import("/lua/effectutilities.lua").CreateCybranBuildBeamsOpti
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
-
-local DeprecatedWarnings = { }
-
--- Kept after --3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
+local DeprecatedWarnings = {}
 
 ---@class URA0001 : CAirUnit
 URA0001 = ClassUnit(CAirUnit) {
     spawnedBy = nil,
 
     OnCreate = function(self)
+        if not DeprecatedWarnings.URA0001 then
+            DeprecatedWarnings.URA0001 = true
+            WARN("URA0001 is deprecated: use URA0001O, URA0002O or URA0003O instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
 
-      -- add deprecation warning
-      if not DeprecatedWarnings.URA0001 then 
-        DeprecatedWarnings.URA0001 = true 
-        WARN("URA0001 is deprecated: use URA0001O, URA0002O or URA0003O instead.")
-        WARN("Source: " .. repr(debug.getinfo(2)))
-      end
-
-      CAirUnit.OnCreate(self)
-      self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
-      self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
-      self.BuildArmManipulator:SetPrecedence(5)
-      self.Trash:Add(self.BuildArmManipulator)
-      self:SetConsumptionActive(false)
+        CAirUnit.OnCreate(self)
+        self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001', 'URA0001', 0)
+        self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
+        self.BuildArmManipulator:SetPrecedence(5)
+        self.Trash:Add(self.BuildArmManipulator)
+        self:SetConsumptionActive(false)
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
-        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
+        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self.Army,
+            '/effects/emitters/build_beam_02_emit.bp'))
+        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self.Army,
+            '/effects/emitters/build_beam_02_emit.bp'))
         CreateCybranBuildBeamsOpti(self, nil, unitBeingBuilt, self.BuildEffectsBag, false)
     end,
 
     OnStartCapture = function(self, target)
-        IssueStop({self}) -- You can't capture!
+        IssueStop({ self }) -- You can't capture!
     end,
 
     OnStartReclaim = function(self, target)
-        IssueStop({self}) -- You can't reclaim!
+        IssueStop({ self }) -- You can't reclaim!
     end,
 
     -- We never want to waste effort sinking these
@@ -78,7 +75,7 @@ URA0001 = ClassUnit(CAirUnit) {
     end,
 
     -- Don't make wreckage
-    CreateWreckage = function (self, overkillRatio)
+    CreateWreckage = function(self, overkillRatio)
         overkillRatio = 1.1
         CAirUnit.CreateWreckage(self, overkillRatio)
     end,
@@ -88,26 +85,25 @@ URA0001 = ClassUnit(CAirUnit) {
 
     IdleState = State {
         Main = function(self)
-            IssueClearCommands({self})
-            IssueMove({self}, self:GetPosition())
-            WaitSeconds(0.5)
-            IssueMove({self}, self.spawnedBy:GetPosition())
+            IssueClearCommands({ self })
+            IssueMove({ self }, self:GetPosition())
+            WaitTicks(6)
+            IssueMove({ self }, self.spawnedBy:GetPosition())
 
-            local delay = 0.1
+            local delay = 1
             local wait = 0
 
             while wait < 4 do
-                local pos = self:GetPosition()
-                local bpos = self.spawnedBy:GetPosition()
+                local pos = self.Blueprint
+                local bpos = self.spawnedBy.Blueprint
 
                 if VDist2(pos[1], pos[3], bpos[1], bpos[3]) < 1 then
                     break
                 end
 
                 wait = wait + delay
-                WaitSeconds(delay)
+                WaitTicks(delay)
             end
-
             self:Destroy()
         end,
     },
@@ -120,8 +116,8 @@ URA0001 = ClassUnit(CAirUnit) {
                 ChangeState(self, self.IdleState)
             end
 
-            IssueClearCommands({self})
-            IssueGuard({self}, focus)
+            IssueClearCommands({ self })
+            IssueGuard({ self }, focus)
         end,
     },
 }

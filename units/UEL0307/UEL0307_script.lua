@@ -1,21 +1,15 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UEL0307/UEL0307_script.lua
---**  Author(s):  David Tomandl, Jessica St. Croix
---**
---**  Summary  :  UEF Mobile Shield Generator Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/UEL0307/UEL0307_script.lua
+-- Author(s):  David Tomandl, Jessica St. Croix
+-- Summary  :  UEF Mobile Shield Generator Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local TShieldLandUnit = import("/lua/terranunits.lua").TShieldLandUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
-local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 
 ---@class UEL0307 : TShieldLandUnit
 UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
-
-    Weapons = {        
+    Weapons = {
         TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
     },
 
@@ -28,32 +22,34 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
         TShieldLandUnit.OnCreate(self)
         ShieldEffectsComponent.OnCreate(self)
     end,
-    
-    OnStopBeingBuilt = function(self,builder,layer)
-        TShieldLandUnit.OnStopBeingBuilt(self,builder,layer)
-        
-        self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
-        self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
-        self.PointerEnabled = true --a flag to let our thread know whether we should turn on our pointer.
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        TShieldLandUnit.OnStopBeingBuilt(self, builder, layer)
+
+        -- save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
+        self.TargetPointer = self:GetWeapon(1)
+        -- we save this to the unit table so dont have to call every time.
+        self.TargetLayerCaps = self.Blueprint.Weapon[1].FireTargetLayerCapsTable
+        -- a flag to let our thread know whether we should turn on our pointer.
+        self.PointerEnabled = true
     end,
-    
+
     OnShieldEnabled = function(self)
         TShieldLandUnit.OnShieldEnabled(self)
         ShieldEffectsComponent.OnShieldDisabled(self)
 
-        KillThread( self.DestroyManipulatorsThread )
+        KillThread(self.DestroyManipulatorsThread)
         if not self.RotatorManipulator then
-            self.RotatorManipulator = CreateRotator( self, 'Spinner', 'y' )
-            self.Trash:Add( self.RotatorManipulator )
+            self.RotatorManipulator = CreateRotator(self, 'Spinner', 'y')
+            self.Trash:Add(self.RotatorManipulator)
         end
-        self.RotatorManipulator:SetAccel( 5 )
-        self.RotatorManipulator:SetTargetSpeed( 30 )
+        self.RotatorManipulator:SetAccel(5)
+        self.RotatorManipulator:SetTargetSpeed(30)
         if not self.AnimationManipulator then
-            local myBlueprint = self:GetBlueprint()
-            --LOG( 'it is ', repr(myBlueprint.Display.AnimationOpen) )
+            local myBlueprint = self.Blueprint
             self.AnimationManipulator = CreateAnimator(self)
-            self.AnimationManipulator:PlayAnim( myBlueprint.Display.AnimationOpen )
-            self.Trash:Add( self.AnimationManipulator )
+            self.AnimationManipulator:PlayAnim(myBlueprint.Display.AnimationOpen)
+            self.Trash:Add(self.AnimationManipulator)
         end
         self.AnimationManipulator:SetRate(1)
     end,
@@ -61,59 +57,47 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
     OnShieldDisabled = function(self)
         TShieldLandUnit.OnShieldDisabled(self)
         ShieldEffectsComponent.OnShieldDisabled(self)
-        KillThread( self.DestroyManipulatorsThread )
-        self.DestroyManipulatorsThread = self:ForkThread( self.DestroyManipulators )
+        KillThread(self.DestroyManipulatorsThread)
+        self.DestroyManipulatorsThread = self.Trash:Add(ForkThread(self.DestroyManipulators, self))
     end,
 
     DestroyManipulators = function(self)
         if self.RotatorManipulator then
-            self.RotatorManipulator:SetAccel( 10 )
-            self.RotatorManipulator:SetTargetSpeed( 0 )
-            -- Unless it goes smoothly back to its original position,
-            -- it will snap there when the manipulator is destroyed.
-            -- So for now, we'll just keep it on.
-            --WaitFor( self.RotatorManipulator )
-            --self.RotatorManipulator:Destroy()
-            --self.RotatorManipulator = nil
+            self.RotatorManipulator:SetAccel(10)
+            self.RotatorManipulator:SetTargetSpeed(0)
         end
         if self.AnimationManipulator then
             self.AnimationManipulator:SetRate(-1)
-            WaitFor( self.AnimationManipulator )
+            WaitFor(self.AnimationManipulator)
             self.AnimationManipulator:Destroy()
             self.AnimationManipulator = nil
         end
     end,
-    
+
     DisablePointer = function(self)
-        self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-        self.PointerRestartThread = self:ForkThread( self.PointerRestart )
+        -- this disables the stop feature - note that its reset on layer change!
+        self.TargetPointer:SetFireTargetLayerCaps('None')
+        self.PointerRestartThread = self.Trash:Add(ForkThread(self.PointerRestart, self))
     end,
-        
+
     PointerRestart = function(self)
-        --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
         while not self.PointerEnabled do
-
-            WaitSeconds(1)
-
-            -- break if we're a gooner
-            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then 
-                break 
+            WaitTicks(11)
+            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then
+                break
             end
-
-            -- if not gooner, check whether we need to enable our weapon to keep reasonable distance
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!
+                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) 
             end
         end
     end,
-    
+
     OnLayerChange = function(self, new, old)
         TShieldLandUnit.OnLayerChange(self, new, old)
-        
-        if not IsDestroyed(self) then 
+        if not IsDestroyed(self) then
             if self.PointerEnabled == false then
-                self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+                self.TargetPointer:SetFireTargetLayerCaps('None')
             end
         end
     end,

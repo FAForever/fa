@@ -19,7 +19,7 @@ local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 UEL0401 = ClassUnit(TMobileFactoryUnit) {
     PrepareToBuildAnimRate = 5,
     BuildAttachBone = 'Build_Attachpoint',
-    RollOffBones = {'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter', },
+    RollOffBones = { 'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter', },
 
     Weapons = {
         RightTurret01 = ClassWeapon(TDFGaussCannonWeapon) {},
@@ -41,7 +41,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
         TMobileFactoryUnit.OnStopBeingBuilt(self, builder, layer)
         self.EffectsBag = {}
         self.PrepareToBuildManipulator = CreateAnimator(self)
-        self.PrepareToBuildManipulator:PlayAnim(self:GetBlueprint().Display.AnimationBuild, false):SetRate(0)
+        self.PrepareToBuildManipulator:PlayAnim(self.Blueprint.Display.AnimationBuild, false):SetRate(0)
         self.ReleaseEffectsBag = {}
         self.AttachmentSliderManip = CreateSlider(self, self.BuildAttachBone)
         ChangeState(self, self.IdleState)
@@ -52,8 +52,6 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
         ChangeState(self, self.IdleState)
     end,
 
-    -- This unit needs to not be allowed to build while underwater
-    -- Additionally, if it goes underwater while building it needs to cancel the current order
     OnLayerChange = function(self, new, old)
         TMobileFactoryUnit.OnLayerChange(self, new, old)
         if new == 'Land' then
@@ -88,12 +86,12 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             self:DetachAll(bone)
             if not self.UnitBeingBuilt.Dead then
                 unitBuilding:AttachBoneTo(-2, self, bone)
-                local unitHeight = unitBuilding:GetBlueprint().SizeY
+                local unitHeight = unitBuilding.Blueprint.SizeY
                 self.AttachmentSliderManip:SetGoal(0, unitHeight, 0)
                 self.AttachmentSliderManip:SetSpeed(-1)
                 unitBuilding:HideBone(0, true)
             end
-            WaitSeconds(3)
+            WaitTicks(31)
             unitBuilding:ShowBone(0, true)
             WaitFor(self.PrepareToBuildManipulator)
             local unitBuilding = self.UnitBeingBuilt
@@ -102,7 +100,6 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
 
         OnStopBuild = function(self, unitBeingBuilt)
             TMobileFactoryUnit.OnStopBuild(self, unitBeingBuilt)
-
             ChangeState(self, self.RollingOffState)
         end,
     },
@@ -115,22 +112,18 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             end
             WaitFor(self.PrepareToBuildManipulator)
             WaitFor(self.AttachmentSliderManip)
-
             self:CreateRollOffEffects()
             self.AttachmentSliderManip:SetSpeed(10)
             self.AttachmentSliderManip:SetGoal(0, 0, 17)
             WaitFor(self.AttachmentSliderManip)
-
             self.AttachmentSliderManip:SetGoal(0, -3, 17)
             WaitFor(self.AttachmentSliderManip)
-
             if not unitBuilding.Dead then
                 unitBuilding:DetachFrom(true)
                 self:DetachAll(self.BuildAttachBone)
-                local  worldPos = self:CalculateWorldPositionFromRelative({0, 0, -15})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
+                local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -15 })
+                IssueMoveOffFactory({ unitBuilding }, worldPos)
             end
-
             self:DestroyRollOffEffects()
             ChangeState(self, self.IdleState)
         end,
@@ -143,11 +136,9 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             local fx = AttachBeamEntityToEntity(self, v, unitB, -1, army, EffectTemplate.TTransportBeam01)
             table.insert(self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
-
             fx = AttachBeamEntityToEntity(unitB, -1, self, v, army, EffectTemplate.TTransportBeam02)
             table.insert(self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
-
             fx = CreateEmitterAtBone(self, v, army, EffectTemplate.TTransportGlow01)
             table.insert(self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
