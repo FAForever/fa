@@ -22,7 +22,6 @@ URL0107 = ClassUnit(CWalkingLandUnit) {
         end
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.CreateCybranBuildBeamsOpti(self, {}, unitBeingBuilt, self.BuildEffectsBag, false)
     end,
