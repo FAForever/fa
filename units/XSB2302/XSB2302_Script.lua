@@ -1,12 +1,8 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/XSB2302/XSB2302_script.lua
---**  Author(s):  Drew Staltman, Jessica St. Croix, Gordon Duclos, Aaron Lundquist
---**
---**  Summary  :  Seraphim Long Range Artillery Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /cdimage/units/XSB2302/XSB2302_script.lua
+-- Author(s):  Drew Staltman, Jessica St. Croix, Gordon Duclos, Aaron Lundquist
+-- Summary  :  Seraphim Long Range Artillery Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
 local SIFSuthanusArtilleryCannon = import("/lua/seraphimweapons.lua").SIFSuthanusArtilleryCannon
 
@@ -16,9 +12,9 @@ XSB2302 = ClassUnit(SStructureUnit) {
         MainGun = ClassWeapon(SIFSuthanusArtilleryCannon) {
             CreateProjectileAtMuzzle = function(self, muzzle)
                 local proj = SIFSuthanusArtilleryCannon.CreateProjectileAtMuzzle(self, muzzle)
-                local data = self:GetBlueprint().ShieldDamage
+                local data = self.Blueprint.ShieldDamage
                 if proj and not proj:BeenDestroyed() then
-                    proj:PassData(data)
+                    proj:PassMetaDamage(data)
                 end
             end,
         },

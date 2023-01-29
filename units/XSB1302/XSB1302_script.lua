@@ -1,13 +1,8 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UAB1202/UAB1202_script.lua
---**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
---**
---**  Summary  :  Aeon Tier 2 Mass Extractor Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/UAB1202/UAB1202_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix
+-- Summary  :  Aeon Tier 2 Mass Extractor Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local SMassCollectionUnit = import("/lua/seraphimunits.lua").SMassCollectionUnit
 
 ---@class XSB1302 : SMassCollectionUnit
@@ -18,10 +13,10 @@ XSB1302 = ClassUnit(SMassCollectionUnit) {
         self.ExtractionAnimManip = CreateAnimator(self)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        self.ExtractionAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationActivate):SetRate(1)
+    OnStopBeingBuilt = function(self, builder, layer)
+        self.ExtractionAnimManip:PlayAnim(self.Blueprint.Display.AnimationActivate):SetRate(1)
         self.Trash:Add(self.ExtractionAnimManip)
-        SMassCollectionUnit.OnStopBeingBuilt(self,builder,layer)
+        SMassCollectionUnit.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.ActiveState)
     end,
 
@@ -29,8 +24,7 @@ XSB1302 = ClassUnit(SMassCollectionUnit) {
         Main = function(self)
             WaitFor(self.ExtractionAnimManip)
             while not self:IsDead() do
-                
-                self.ExtractionAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationActivate):SetRate(1)
+                self.ExtractionAnimManip:PlayAnim(self.Blueprint.Display.AnimationActivate):SetRate(1)
                 WaitFor(self.ExtractionAnimManip)
             end
         end,
@@ -60,6 +54,3 @@ XSB1302 = ClassUnit(SMassCollectionUnit) {
 }
 
 TypeClass = XSB1302
-    
-    
-    
