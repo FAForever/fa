@@ -36,7 +36,6 @@ URL0306 = ClassUnit(CRadarJammerUnit) {
     
     OnStopBeingBuilt = function(self,builder,layer)
         CRadarJammerUnit.OnStopBeingBuilt(self,builder,layer)
-        self.ShieldEffectsBag = {}
         
         self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
         self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.

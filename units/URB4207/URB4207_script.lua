@@ -24,7 +24,6 @@ URB4207 = ClassUnit(CShieldStructureUnit, ShieldEffectsComponent) {
         CShieldStructureUnit.OnStopBeingBuilt(self, builder, layer)
         self.Rotator1 = CreateRotator(self, 'Shaft', 'z', nil, 30, 5, 30)
         self.Trash:Add(self.Rotator1)
-        self.ShieldEffectsBag = {}
     end,
 
     OnShieldEnabled = function(self)
