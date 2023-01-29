@@ -6,9 +6,7 @@ local CCivilianStructureUnit = import("/lua/cybranunits.lua").CCivilianStructure
 local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 local explosion = import("/lua/defaultexplosions.lua")
-local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
 local EffectTemplate = import("/lua/effecttemplates.lua")
-local utilities = import("/lua/utilities.lua")
 
 ---@class XRC2201 : CCivilianStructureUnit
 XRC2201 = ClassUnit(CCivilianStructureUnit) {
@@ -50,14 +48,14 @@ XRC2201 = ClassUnit(CCivilianStructureUnit) {
         local basePosition = self:GetPosition()
         for k, vBone in bones do
             position = self:GetPosition(vBone)
-            offset = utilities.GetDifferenceVector(position, basePosition)
-            velocity = utilities.GetDirectionVector(position, basePosition) --
-            velocity.x = velocity.x + utilities.GetRandomFloat(-0.3, 0.3)
-            velocity.z = velocity.z + utilities.GetRandomFloat(-0.3, 0.3)
-            velocity.y = velocity.y + utilities.GetRandomFloat(0.2, 0.5)
+            offset = Util.GetDifferenceVector(position, basePosition)
+            velocity = Util.GetDirectionVector(position, basePosition)
+            velocity.x = velocity.x + RandomFloat(-0.3, 0.3)
+            velocity.z = velocity.z + RandomFloat(-0.3, 0.3)
+            velocity.y = velocity.y + RandomFloat(0.2, 0.5)
             proj = self:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp',
                 offset.x, offset.y + yBoneOffset, offset.z, velocity.x, velocity.y, velocity.z)
-            proj:SetBallisticAcceleration(utilities.GetRandomFloat(-1, -2)):SetVelocity(utilities.GetRandomFloat(3, 4)):
+            proj:SetBallisticAcceleration(RandomFloat(-1, -2)):SetVelocity(RandomFloat(3, 4)):
                 SetCollision(false)
 
             local emitter = CreateEmitterOnEntity(proj, army,
@@ -65,7 +63,7 @@ XRC2201 = ClassUnit(CCivilianStructureUnit) {
             local emitter = CreateEmitterOnEntity(proj, army,
                 '/effects/emitters/destruction_explosion_fire_plume_04_emit.bp')
 
-            local lifetime = utilities.GetRandomFloat(12, 22)
+            local lifetime = Util.GetRandomFloat(12, 22)
         end
     end,
 
@@ -138,3 +136,6 @@ XRC2201 = ClassUnit(CCivilianStructureUnit) {
 }
 
 TypeClass = XRC2201
+
+-- Kept for mod support
+local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
