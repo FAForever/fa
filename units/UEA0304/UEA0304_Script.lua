@@ -17,6 +17,12 @@ UEA0304 = ClassUnit(TAirUnit) {
         LinkedRailGun2 = ClassWeapon(TAirToAirLinkedRailgun) {},
     },
 
+    OnStopBeingBuilt = function(self,builder,layer)
+        TAirUnit.OnStopBeingBuilt(self,builder,layer)
+        --Turns Jamming off when unit is built
+        self:SetScriptBit('RULEUTC_JammingToggle', true)
+    end,
+    
     OnDamage = function(self, instigator, amount, vector, damageType)
         if instigator and instigator.Army == self.Army and instigator.Blueprint.CategoriesHash.STRATEGICBOMBER then
             return

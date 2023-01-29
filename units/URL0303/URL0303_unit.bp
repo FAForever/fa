@@ -158,7 +158,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 5250,
         BuildCostMass = 480,
-        BuildTime = 2160,
+        BuildTime = 2400,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -451,7 +451,7 @@ UnitBlueprint {
             WeaponCategory = 'Direct Fire',
         },
     },
-    SecondsBeforeChargeKicksIn = 4,
+    SecondsBeforeChargeKicksIn = 3,
     SecondsBeforeExplosionWhenCharging = 6,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
