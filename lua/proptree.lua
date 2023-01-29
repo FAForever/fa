@@ -139,7 +139,6 @@ Tree = Class(Prop) {
     ---@param dz number
     ---@param depth number
     FallThread = function(self, dx, dy, dz, depth)
-
         -- make it fall down
         local motor = self:FallDown()
         motor:Whack(dx, dy, dz, depth, true)

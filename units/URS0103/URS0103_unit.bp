@@ -142,9 +142,9 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 2500,
-        BuildCostMass = 250,
-        BuildTime = 1250,
+        BuildCostEnergy = 2600,
+        BuildCostMass = 260,
+        BuildTime = 1300,
     },
     Footprint = {
         SizeX = 2,
@@ -255,7 +255,7 @@ UnitBlueprint {
             FiringRandomness = 0.2,
             FiringTolerance = 2,
             Label = 'ProtonCannon',
-            MaxRadius = 28,
+            MaxRadius = 26,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,

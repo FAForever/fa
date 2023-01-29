@@ -16,6 +16,9 @@ local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
+local TreadComponent = import("/lua/defaultcomponents.lua").TreadComponent
+
+
 local RolloffUnitTable = { nil }
 local RolloffPositionTable = { 0, 0, 0 }
 
@@ -2213,9 +2216,23 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     end,
 }
 
--- LAND UNITS
----@class LandUnit : MobileUnit
-LandUnit = ClassUnit(MobileUnit) {}
+---@class LandUnit : MobileUnit, TreadComponent
+LandUnit = ClassUnit(MobileUnit, TreadComponent) {
+    OnCreate = function(self)
+        MobileUnit.OnCreate(self)
+        TreadComponent.OnCreate(self)
+    end,
+
+    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
+        MobileUnit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
+        TreadComponent.CreateMovementEffects(self)
+    end,
+
+    DestroyMovementEffects = function(self)
+        MobileUnit.DestroyMovementEffects(self)
+        TreadComponent.DestroyMovementEffects(self)
+    end,
+}
 
 --  CONSTRUCTION UNITS
 ---@class ConstructionUnit : MobileUnit
@@ -2424,8 +2441,23 @@ SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
 }
 
 -- AMPHIBIOUS LAND UNITS
----@class AmphibiousLandUnit : MobileUnit
-AmphibiousLandUnit = ClassUnit(MobileUnit) { }
+---@class AmphibiousLandUnit : MobileUnit, TreadComponent
+AmphibiousLandUnit = ClassUnit(MobileUnit, TreadComponent) {
+    OnCreate = function(self)
+        MobileUnit.OnCreate(self)
+        TreadComponent.OnCreate(self)
+    end,
+
+    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
+        MobileUnit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
+        TreadComponent.CreateMovementEffects(self)
+    end,
+
+    DestroyMovementEffects = function(self)
+        MobileUnit.DestroyMovementEffects(self)
+        TreadComponent.DestroyMovementEffects(self)
+    end,
+}
 
 ---@class SlowAmphibiousLandUnit : AmphibiousLandUnit
 SlowAmphibiousLandUnit = ClassUnit(AmphibiousLandUnit) {
