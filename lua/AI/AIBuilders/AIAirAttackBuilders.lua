@@ -428,10 +428,10 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             { MIBC, 'ArmyNeedsTransports', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.05 }},  --DUNCAN - was 0.9
+            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.TRANSPORTFOCUS } },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, categories.LAND * (categories.TECH2 + categories.TECH3) } }, --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsWithCategory', { 3 , categories.TRANSPORTFOCUS * categories.TECH2} },
-            { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.TRANSPORTFOCUS } },
         },
         BuilderType = 'Air',
     },
