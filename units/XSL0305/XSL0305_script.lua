@@ -5,8 +5,6 @@
 ----------------------------------------------------------------------------
 local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
 local SeraphimWeapons = import("/lua/seraphimweapons.lua")
-local EffectUtil = import("/lua/effectutilities.lua")  --added for effects
-
 local SDFSihEnergyRifleNormalMode = SeraphimWeapons.SDFSniperShotNormalMode
 local SDFSihEnergyRifleSniperMode = SeraphimWeapons.SDFSniperShotSniperMode
 
@@ -27,7 +25,7 @@ XSL0305 = ClassUnit(SLandUnit) {
         SLandUnit.OnCreate(self)
         self:SetWeaponEnabledByLabel('SniperGun', false)
 
-        local wepBp = self:GetBlueprint().Weapon
+        local wepBp = self.Blueprint.Weapon
         self.sniperRange = 75
         self.normalRange = 65
         for k, v in wepBp do
@@ -42,7 +40,7 @@ XSL0305 = ClassUnit(SLandUnit) {
     OnScriptBitSet = function(self, bit)
         SLandUnit.OnScriptBitSet(self, bit)
         if bit == 1 then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             self:SetSpeedMult(bp.Physics.LandSpeedMultiplier * 0.75)
 
             self:SetWeaponEnabledByLabel('SniperGun', true)
@@ -51,28 +49,22 @@ XSL0305 = ClassUnit(SLandUnit) {
             self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.sniperRange)
         end
 
-
-        --This is to add a visual que that the sniper is in sniper mode
         if not self.ShieldEffectsBag then
             self.ShieldEffectsBag = {}
         end
         self.ShieldEffectsBag = {}
-
         table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0305', self.Army, '/effects/emitters/seraphim_being_built_ambient_01_emit.bp'))
     end,
 
     OnScriptBitClear = function(self, bit)
         SLandUnit.OnScriptBitClear(self, bit)
         if bit == 1 then
-            -- Reset movement speed
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
-
             self:SetWeaponEnabledByLabel('SniperGun', false)
             self:SetWeaponEnabledByLabel('MainGun', true)
             self:GetWeaponManipulatorByLabel('MainGun'):SetHeadingPitch(self:GetWeaponManipulatorByLabel('SniperGun'):GetHeadingPitch())
             self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
-
             if self.ShieldEffectsBag then
                 for k, v in self.ShieldEffectsBag do
                     v:Destroy()
@@ -84,3 +76,6 @@ XSL0305 = ClassUnit(SLandUnit) {
     end,
 }
 TypeClass = XSL0305
+
+--- Kept for mod support
+local EffectUtil = import("/lua/effectutilities.lua")
