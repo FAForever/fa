@@ -848,8 +848,17 @@
 ---@field PitchBone Bone
 ---@field YawBone Bone
 
+---@class UnitIntelStatus
+---@field RechargeThread thread?
+---@field AllIntel table<IntelType, boolean>
+---@field AllIntelRecharging table<IntelType, boolean>
+---@field AllIntelMaintenanceFree table<IntelType, boolean>
+---@field AllIntelFromEnhancements table<IntelType, boolean>
+---@field AllIntelDisabledByEvent table<IntelType, table<string, boolean>>
 
 ---@class UnitBlueprintIntel
+--- intel status that is deep-copied for each unit instance
+---@field State UnitIntelStatus
 --- intel types set to true in this table cannot be disabled
 ---@field ActiveIntel? table<IntelType, boolean>
 --- single unit cloaking

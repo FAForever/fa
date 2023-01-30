@@ -1,3 +1,21 @@
+
+local BlueprintNameToIntel = {
+    Cloak = 'Cloak',
+    CloakField = 'CloakField',
+    CloakFieldRadius = 'CloakField',
+    JammerBlips = 'Spoof',
+
+    RadarRadius = 'Radar',
+    RadarStealth = 'RadarStealth',
+    RadarStealthField = 'RadarStealthField',
+    RadarStealthFieldRadius = 'RadarStealthField',
+
+    Sonar = 'Sonar',
+    SonarRadius = 'Sonar',
+    SonarStealth = 'SonarStealth',
+    SonarStealthFieldRadius = 'SonarStealthField',
+}
+
 --- Post process a unit
 ---@param unit UnitBlueprint
 local function PostProcessUnit(unit)
@@ -201,6 +219,67 @@ local function PostProcessUnit(unit)
 
     unit.Footprint = unit.Footprint or { }
     unit.Footprint.SizeMax = math.max(unit.Footprint.SizeX or 1, unit.Footprint.SizeZ or 1)
+
+    -- Pre-compute intel state
+    -- gather data
+    local economyBlueprint = unit.Economy
+    local intelBlueprint = unit.Intel
+    local enhancementBlueprints = unit.Enhancements
+    if intelBlueprint or enhancementBlueprints then
+        -- life is good, intel is funded by the government
+        if intelBlueprint.FreeIntel or (
+            not enhancementBlueprints and
+            (
+                (not economyBlueprint) or
+                (not economyBlueprint.MaintenanceConsumptionPerSecondEnergy) or
+                economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
+            )
+         ) then
+            LOG("No intel for: " .. unit.BlueprintId)
+            return
+        end
+
+        ---@type UnitIntelStatus
+        local status = { }
+
+        status.AllIntelRecharging = { }
+
+        -- special case: unit has intel that is considered free
+        if intelBlueprint.ActiveIntel then
+            status.AllIntelMaintenanceFree = { } -- TODO: catch non existence with if statements
+            for intel, _ in intelBlueprint.ActiveIntel do
+                status.AllIntelMaintenanceFree[intel] = true
+            end
+        end
+
+        -- special case: unit has enhancements and therefore can have any intel type
+        if enhancementBlueprints then
+            status.AllIntelFromEnhancements = { } -- TODO: catch non existence with if statements
+        end
+
+        -- usual case: find all remaining intel
+        status.AllIntel = { }
+        for name, value in intelBlueprint do
+
+            if value == true or value > 0 then
+                local intel = BlueprintNameToIntel[name]
+                if intel then
+                    status.AllIntel[intel] = true
+                end
+            end
+        end
+
+        -- check if we have any intel
+        if table.empty(status.AllIntel) and not enhancementBlueprints then
+            LOG("No intel for: " .. unit.BlueprintId)
+            return
+        end
+
+        -- cache it
+        status.AllIntelDisabledByEvent = { }
+        unit.Intel = unit.Intel or { }
+        unit.Intel.State = status
+    end
 end
 
 --- Post-processes all units
