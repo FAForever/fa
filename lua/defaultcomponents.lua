@@ -38,7 +38,6 @@ IntelComponent = ClassSimple {
     OnStopBeingBuilt = function(self, builder, layer)
         local intelBlueprint = self.Blueprint.Intel
         if intelBlueprint and intelBlueprint.State then
-            reprsl(intelBlueprint)
             self.IntelStatus = table.deepcopy(intelBlueprint.State)
             reprsl(self.IntelStatus)
             self:EnableUnitIntel('NotInitialized')
@@ -83,7 +82,7 @@ IntelComponent = ClassSimple {
             if not intel then
                 for i, _ in allIntel do
                     if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                        allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or { }
+                        allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
                         if not allIntelDisabledByEvent[i][disabler] then
                             allIntelDisabledByEvent[i][disabler] = true
                             self:DisableIntel(i)
@@ -95,7 +94,7 @@ IntelComponent = ClassSimple {
                 if allIntelMaintenanceFree then
                     for i, _ in allIntelMaintenanceFree do
                         if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                            allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or { }
+                            allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
                             if not allIntelDisabledByEvent[i][disabler] then
                                 allIntelDisabledByEvent[i][disabler] = true
                                 self:DisableIntel(i)
@@ -105,7 +104,7 @@ IntelComponent = ClassSimple {
                     end
                 end
 
-            -- disable one intel
+                -- disable one intel
             elseif allIntel[intel] or (allIntelFromEnhancements and allIntelFromEnhancements[intel]) then
                 -- special case that requires additional book keeping
                 if disabler == 'Enhancement' then
@@ -113,7 +112,7 @@ IntelComponent = ClassSimple {
                 end
 
                 if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[intel]) then
-                    allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or { }
+                    allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
                     if not allIntelDisabledByEvent[intel][disabler] then
                         allIntelDisabledByEvent[intel][disabler] = true
                         self:DisableIntel(intel)
@@ -141,7 +140,7 @@ IntelComponent = ClassSimple {
             -- special case when unit is finished building
             if disabler == 'NotInitialized' then
 
-                -- this bit is weird, but unit logic expects to always have intel immediately enabled when 
+                -- this bit is weird, but unit logic expects to always have intel immediately enabled when
                 -- the unit is done constructing, regardless whether the unit is able to use the intel
                 for i, _ in allIntel do
                     self:OnIntelEnabled(i)
@@ -162,7 +161,7 @@ IntelComponent = ClassSimple {
             if not intel then
                 for i, _ in allIntel do
                     if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                        allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or { }
+                        allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
                         if allIntelDisabledByEvent[i][disabler] then
                             allIntelDisabledByEvent[i][disabler] = nil
                             if table.empty(allIntelDisabledByEvent[i]) then
@@ -175,7 +174,7 @@ IntelComponent = ClassSimple {
                 if allIntelFromEnhancements then
                     for i, _ in allIntelFromEnhancements do
                         if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                            allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or { }
+                            allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
                             if allIntelDisabledByEvent[i][disabler] then
                                 allIntelDisabledByEvent[i][disabler] = nil
                                 if table.empty(allIntelDisabledByEvent[i]) then
@@ -186,7 +185,7 @@ IntelComponent = ClassSimple {
                     end
                 end
 
-            -- disable one intel
+                -- disable one intel
             elseif allIntel[intel] or (allIntelFromEnhancements and allIntelFromEnhancements[intel]) then
                 -- special case that requires additional book keeping
                 if disabler == 'Enhancement' then
@@ -194,7 +193,7 @@ IntelComponent = ClassSimple {
                 end
 
                 if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[intel]) then
-                    allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or { }
+                    allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
                     if allIntelDisabledByEvent[intel][disabler] then
                         allIntelDisabledByEvent[intel][disabler] = nil
                         if table.empty(allIntelDisabledByEvent[intel]) then
@@ -214,7 +213,7 @@ IntelComponent = ClassSimple {
         local status = self.IntelStatus
         if status then
             LOG("OnIntelRecharge: for " .. tostring(intel))
-            if not status.RechargeThread then 
+            if not status.RechargeThread then
                 status.RechargeThread = ForkThread(self.IntelRechargeThread, self)
             end
 
@@ -345,8 +344,8 @@ IntelComponent = ClassSimple {
                 WaitTicks(6)
             end
         end
-     end,
-     
+    end,
+
     ---@param self IntelComponent | Unit
     CloakFXWatcher = function(self)
         WaitTicks(6)
@@ -448,7 +447,7 @@ TreadComponent = ClassSimple {
     CreateTreads = function(self, treadsBlueprint)
         local treadThreads = self.TreadThreads
         if not treadThreads then
-            treadThreads = { }
+            treadThreads = {}
 
             for k, treadBlueprint in treadsBlueprint do
                 local thread = ForkThread(self.CreateTreadsThread, self, treadBlueprint)
