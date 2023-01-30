@@ -1150,10 +1150,16 @@ function Generate()
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
     ---@type number
-    local compressionThreshold = 4
+    local compressionThreshold = 1
 
-    if MapSize > 1024 then
-        compressionThreshold = 8
+    -- 20x20+
+    if MapSize >= 1024 then
+        compressionThreshold = 2 * compressionThreshold
+    end
+
+    -- 40x40+
+    if MapSize >= 2048 then
+        compressionThreshold = 2 * compressionThreshold
     end
 
     NavGrids['Land'] = NavGrid('Land', CompressionTreeSize)
@@ -1197,11 +1203,11 @@ function Generate()
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    -- local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
-    -- local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
+    local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
+    local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
 
-    -- SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
-    -- SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
+    SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
+    SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
 
     Sync.NavLayerData = NavLayerData
     Generated = true
