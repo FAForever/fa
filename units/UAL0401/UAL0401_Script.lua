@@ -9,9 +9,7 @@ local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
 local WeaponsFile = import("/lua/aeonweapons.lua")
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
-local utilities = import("/lua/utilities.lua")
 local explosion = import("/lua/defaultexplosions.lua")
-
 local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
 
 -- upvalue for performance
@@ -178,3 +176,6 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
 }
 
 TypeClass = UAL0401
+
+-- Kept for Mod Backwards Compatability
+local Utilities = import("/lua/utilities.lua")

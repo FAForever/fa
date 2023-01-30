@@ -16,6 +16,9 @@ local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
+local TreadComponent = import("/lua/defaultcomponents.lua").TreadComponent
+
+
 local RolloffUnitTable = { nil }
 local RolloffPositionTable = { 0, 0, 0 }
 
@@ -49,6 +52,29 @@ StructureUnit = ClassUnit(Unit) {
         self.FxBlinkingLightsBag = { }
         if self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
+        end
+
+        -- check for terrain orientation
+        local bp = self.Blueprint
+        if not (
+                bp.Physics.AltitudeToTerrain or
+                bp.Physics.StandUpright
+            ) and self.Layer == 'Land'
+        then
+            -- rotate structure to match terrain gradient
+            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
+                self:GetPosition(),
+                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
+                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+            )
+
+            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
+
+            -- technically obsolete, but as this is part of an integration we don't want to break
+            -- the mod package that it originates from. Originates from the BrewLan mod suite
+            if not bp.Physics.FlattenSkirt then
+                self.TerrainSlope = {}
+            end
         end
     end,
 
@@ -137,27 +163,6 @@ StructureUnit = ClassUnit(Unit) {
         local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
-        end
-
-        if not (
-                bp.Physics.AltitudeToTerrain or
-                bp.Physics.StandUpright
-            ) and self.Layer == 'Land'
-        then
-            -- rotate structure to match terrain gradient
-            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
-                self:GetPosition(),
-                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
-                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
-            )
-
-            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
-
-            -- technically obsolete, but as this is part of an integration we don't want to break
-            -- the mod package that it originates from. Originates from the BrewLan mod suite
-            if not bp.Physics.FlattenSkirt then
-                self.TerrainSlope = {}
-            end
         end
 
         -- create decal below structure
@@ -2213,9 +2218,23 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     end,
 }
 
--- LAND UNITS
----@class LandUnit : MobileUnit
-LandUnit = ClassUnit(MobileUnit) {}
+---@class LandUnit : MobileUnit, TreadComponent
+LandUnit = ClassUnit(MobileUnit, TreadComponent) {
+    OnCreate = function(self)
+        MobileUnit.OnCreate(self)
+        TreadComponent.OnCreate(self)
+    end,
+
+    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
+        MobileUnit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
+        TreadComponent.CreateMovementEffects(self)
+    end,
+
+    DestroyMovementEffects = function(self)
+        MobileUnit.DestroyMovementEffects(self)
+        TreadComponent.DestroyMovementEffects(self)
+    end,
+}
 
 --  CONSTRUCTION UNITS
 ---@class ConstructionUnit : MobileUnit
@@ -2424,8 +2443,23 @@ SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
 }
 
 -- AMPHIBIOUS LAND UNITS
----@class AmphibiousLandUnit : MobileUnit
-AmphibiousLandUnit = ClassUnit(MobileUnit) { }
+---@class AmphibiousLandUnit : MobileUnit, TreadComponent
+AmphibiousLandUnit = ClassUnit(MobileUnit, TreadComponent) {
+    OnCreate = function(self)
+        MobileUnit.OnCreate(self)
+        TreadComponent.OnCreate(self)
+    end,
+
+    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
+        MobileUnit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
+        TreadComponent.CreateMovementEffects(self)
+    end,
+
+    DestroyMovementEffects = function(self)
+        MobileUnit.DestroyMovementEffects(self)
+        TreadComponent.DestroyMovementEffects(self)
+    end,
+}
 
 ---@class SlowAmphibiousLandUnit : AmphibiousLandUnit
 SlowAmphibiousLandUnit = ClassUnit(AmphibiousLandUnit) {

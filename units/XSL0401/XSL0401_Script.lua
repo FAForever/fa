@@ -11,8 +11,8 @@ local SDFExperimentalPhasonProj = WeaponsFile.SDFExperimentalPhasonProj
 local SDFAireauWeapon = WeaponsFile.SDFAireauWeapon
 local SDFSinnuntheWeapon = WeaponsFile.SDFSinnuntheWeapon
 local SAAOlarisCannonWeapon = WeaponsFile.SAAOlarisCannonWeapon
-local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
 local explosion = import("/lua/defaultexplosions.lua")
+local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
 
 ---@class XSL0401 : SWalkingLandUnit
 XSL0401 = ClassUnit(SWalkingLandUnit) {
@@ -26,7 +26,7 @@ XSL0401 = ClassUnit(SWalkingLandUnit) {
     SpawnElectroStorm = function(self)
         local position = self:GetPosition()
         local spawnEffects = self.SpawnEffects
-        
+
         -- Spawn the Energy Being
         local spiritUnit = CreateUnitHPR('XSL0402', self.Army, position[1], position[2], position[3], 0, 0, 0)
         -- Create effects for spawning of energy being
@@ -87,7 +87,6 @@ XSL0401 = ClassUnit(SWalkingLandUnit) {
                                 'Chest_B01', 'Chest_B03',
                                 'Right_Leg_B01', 'Right_Leg_B02', 'Right_Leg_B03',
                                 'Left_Leg_B17', 'Left_Leg_B14', 'Left_Leg_B15'}
-        
         explosion.CreateDefaultHitExplosionAtBone(self, bigExplosionBones[Random(1, 3)], 4.0)
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ})
         WaitSeconds(2)
@@ -145,7 +144,5 @@ XSL0401 = ClassUnit(SWalkingLandUnit) {
         self:PlayUnitSound('Destroyed')
         self:Destroy()
     end,
-
 }
-
 TypeClass = XSL0401

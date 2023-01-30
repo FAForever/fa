@@ -469,7 +469,7 @@ AIFArtilleryMiasmaShellWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class AIFArtillerySonanceShellWeapon : DefaultProjectileWeapon
 AIFArtillerySonanceShellWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {
+    FxChargeMuzzleFlash = {
         '/effects/emitters/aeon_sonance_muzzle_01_emit.bp',
         '/effects/emitters/aeon_sonance_muzzle_02_emit.bp',
         '/effects/emitters/aeon_sonance_muzzle_03_emit.bp',
@@ -658,6 +658,16 @@ AIFQuanticArtillery = ClassWeapon(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = EffectTemplate.Aeon_QuanticClusterChargeMuzzleFlash,
 }
 
+--- AEON DESTROYER PROJECTILE
+---@class ASDCannonOblivionNaval : DefaultProjectileWeapon
+ADFCannonOblivionNaval = Class(DefaultProjectileWeapon) {
+    FxMuzzleFlash = {
+        '/effects/emitters/oblivion_cannon_naval_01_emit.bp',  -- Stream effect
+        '/effects/emitters/oblivion_cannon_naval_02_emit.bp',  -- Gas effect
+        '/effects/emitters/oblivion_cannon_naval_03_emit.bp',  -- Sparkle effect
+        '/effects/emitters/oblivion_cannon_naval_04_emit.bp',  -- Sphere effect
+    },
+}
 
 -- kept for mod backwards compatibility
 local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam

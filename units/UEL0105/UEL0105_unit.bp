@@ -1,9 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardScanRadius = 26, -- allows for factory reclaim bug 
-        TargetBones = {
-            'Turret',
-        },
     },
     Audio = {
         AmbientMove = Sound {
@@ -256,7 +253,7 @@ UnitBlueprint {
     LifeBarOffset = 0.2,
     LifeBarSize = 0.5,
     Physics = {
-        BackUpDistance = 4,
+        BackUpDistance = 8,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -267,10 +264,10 @@ UnitBlueprint {
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
-        MaxAcceleration = 1.9,
-        MaxBrake = 1.9,
+        MaxAcceleration = 3.8,
+        MaxBrake = 3.8,
         MaxSpeed = 1.9,
-        MaxSpeedReverse = 1.5,
+        MaxSpeedReverse = 1.9,
         MaxSteerForce = 15,
         MeshExtentsX = 0.65,
         MeshExtentsY = 0.85,
@@ -278,7 +275,7 @@ UnitBlueprint {
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_AmphibiousFloating',
         TurnRadius = 0,
-        TurnRate = 120,
+        TurnRate = 180,
     },
     SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.1,
