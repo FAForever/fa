@@ -41,8 +41,9 @@ function ToBytes(element, ignore)
 
     while head > 1 do
 
-        local value = stack[head - 1]
         head = head - 1
+        local value = stack[head]
+        stack[head] = nil
 
         local size = debug.allocatedsize(value)
 
@@ -52,18 +53,21 @@ function ToBytes(element, ignore)
 
         -- size of string
         elseif type(value) ~= 'table' then
-            seen[value] = true
-            allocatedSize = allocatedSize + size
+            if not seen[value] then
+                seen[value] = true
+                allocatedSize = allocatedSize + size
+            end
 
         -- size of table
         else
-            allocatedSize = allocatedSize + size
-
-            seen[value] = true
-            for k, v in value do
-                if not (ignore[k] or seen[v]) then
-                    stack[head] = v
-                    head = head + 1
+            if not seen[value] then
+                allocatedSize = allocatedSize + size
+                seen[value] = true
+                for k, v in value do
+                    if not ignore[k] then
+                        stack[head] = v
+                        head = head + 1
+                    end
                 end
             end
         end
