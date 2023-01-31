@@ -226,7 +226,12 @@ local function PostProcessUnit(unit)
     local intelBlueprint = unit.Intel
     local enhancementBlueprints = unit.Enhancements
     if intelBlueprint or enhancementBlueprints then
+
+        ---@type UnitIntelStatus
+        local status = { }
+
         -- life is good, intel is funded by the government
+        local allIntelIsFree = false
         if intelBlueprint.FreeIntel or (
             not enhancementBlueprints and
             (
@@ -235,18 +240,13 @@ local function PostProcessUnit(unit)
                 economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
             )
          ) then
-            LOG("No intel for: " .. unit.BlueprintId)
-            return
+            allIntelIsFree = true
+            status.AllIntelMaintenanceFree = { }
         end
-
-        ---@type UnitIntelStatus
-        local status = { }
-
-        status.AllIntelRecharging = { }
 
         -- special case: unit has intel that is considered free
         if intelBlueprint.ActiveIntel then
-            status.AllIntelMaintenanceFree = { } -- TODO: catch non existence with if statements
+            status.AllIntelMaintenanceFree = status.AllIntelMaintenanceFree or { }
             for intel, _ in intelBlueprint.ActiveIntel do
                 status.AllIntelMaintenanceFree[intel] = true
             end
@@ -254,7 +254,7 @@ local function PostProcessUnit(unit)
 
         -- special case: unit has enhancements and therefore can have any intel type
         if enhancementBlueprints then
-            status.AllIntelFromEnhancements = { } -- TODO: catch non existence with if statements
+            status.AllIntelFromEnhancements = { }
         end
 
         -- usual case: find all remaining intel
@@ -264,19 +264,24 @@ local function PostProcessUnit(unit)
             if value == true or value > 0 then
                 local intel = BlueprintNameToIntel[name]
                 if intel then
-                    status.AllIntel[intel] = true
+                    if allIntelIsFree then
+                        status.AllIntelMaintenanceFree[intel] = true
+                    else
+                        status.AllIntel[intel] = true
+                    end
                 end
             end
         end
 
         -- check if we have any intel
-        if table.empty(status.AllIntel) and not enhancementBlueprints then
+        if table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) and not enhancementBlueprints then
             LOG("No intel for: " .. unit.BlueprintId)
             return
         end
 
         -- cache it
         status.AllIntelDisabledByEvent = { }
+        status.AllIntelRecharging = { }
         unit.Intel = unit.Intel or { }
         unit.Intel.State = status
     end
