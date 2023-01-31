@@ -1007,7 +1007,6 @@ NORMALMAPPED_VERTEX UnitFalloffVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
@@ -1057,7 +1056,6 @@ NORMALMAPPED_VERTEX UndulatingNormalMappedVS(
     vertex.position.xyz += weight * sinSq * windDirection;
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
@@ -1106,7 +1104,6 @@ NORMALMAPPED_VERTEX BloatingNormalMappedVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
@@ -1200,7 +1197,6 @@ NORMALMAPPED_VERTEX WreckageVS_HighFidelity(
     // The rest is just the typical normal mapped vertex shader (sans scrolling)
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
@@ -1333,7 +1329,6 @@ NORMALMAPPED_VERTEX AeonBuildVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
@@ -1381,7 +1376,6 @@ NORMALMAPPED_VERTEX AeonBuildNoAnimationVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
@@ -1537,7 +1531,6 @@ NORMALMAPPED_VERTEX SeraphimBuildVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,colorLookup);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
@@ -1835,7 +1828,6 @@ EFFECT_NORMALMAPPED_VERTEX ShieldNormalVS(
 
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth = float2(vertex.position.y - surfaceElevation,material.x);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
@@ -7112,7 +7104,6 @@ NOMADSBUILD_VERTEX NOMADSBuildVS(
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
@@ -7157,7 +7148,6 @@ NOMADSBUILDMESH_VERTEX NOMADSBuildMeshVS(
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
