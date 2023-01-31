@@ -966,7 +966,7 @@ NORMALMAPPED_VERTEX NormalMappedVS(
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
-
+    
     vertex.texcoord0 = ( anim.w > 0.5 ) ? ComputeScrolledTexcoord( texcoord0, material) : texcoord0;
     vertex.color = color;
     vertex.material = float4( time - material.x, material.yzw);
@@ -1009,8 +1009,9 @@ NORMALMAPPED_VERTEX UnitFalloffVS(
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = ( anim.w > 0.5 ) ? ComputeScrolledTexcoord( texcoord0, material) : texcoord0;
     vertex.color = color;
@@ -1058,8 +1059,9 @@ NORMALMAPPED_VERTEX UndulatingNormalMappedVS(
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = texcoord0;
     vertex.color = color;
@@ -1106,8 +1108,9 @@ NORMALMAPPED_VERTEX BloatingNormalMappedVS(
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = texcoord0;
     vertex.color = color;
@@ -1199,8 +1202,9 @@ NORMALMAPPED_VERTEX WreckageVS_HighFidelity(
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = texcoord0;
     vertex.color = color;
@@ -1331,8 +1335,9 @@ NORMALMAPPED_VERTEX AeonBuildVS(
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = texcoord0;
     vertex.color = color;
@@ -1378,8 +1383,9 @@ NORMALMAPPED_VERTEX AeonBuildNoAnimationVS(
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = texcoord0;
     vertex.color = color;
@@ -1533,8 +1539,9 @@ NORMALMAPPED_VERTEX SeraphimBuildVS(
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = texcoord0;
     vertex.color = color;
@@ -1830,8 +1837,9 @@ EFFECT_NORMALMAPPED_VERTEX ShieldNormalVS(
     vertex.depth = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = texcoord0;
     vertex.texcoord1 = texcoord0;
@@ -7106,8 +7114,9 @@ NOMADSBUILD_VERTEX NOMADSBuildVS(
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = ( anim.w > 0.5 ) ? ComputeScrolledTexcoord( texcoord0, material) : texcoord0;
     vertex.color = color;
@@ -7150,8 +7159,9 @@ NOMADSBUILDMESH_VERTEX NOMADSBuildMeshVS(
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
-    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = ( anim.w > 0.5 ) ? ComputeScrolledTexcoord( texcoord0, material) : texcoord0;
     vertex.color = color;
