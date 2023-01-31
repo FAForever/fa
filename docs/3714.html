@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="UTF-8">
+        <title>Patch 3714 BETA</title>
+        <link href="http://fonts.googleapis.com/css→family=Open+Sans" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="patchnotes.css">
+    </head>
+
+    <body>
+        <table id="container">
+            <tbody>
+                <tr>
+                    <td id="main">
+                        <div id="intro">
+                            <h1>Patch 3714</h1>
+                            <p>Welcome to the patchnotes for the 3714 patch.</p>
+                            <p>This patch primarily aims to improve the land balance between factions and between different unit choices at the T2 and T3 stages. </p>
+                            <p>We wish you good luck and much fun playing with the new patch!</p>                                
+                            <p>-- The Balance Team</p>
+                        </div>
+                        
+                        
+                        <h2>Land</h2>
+                        <div id="aeont1maa" class="card">
+                            <h3><img src="images/obsidian.png"> Obsidian</h3>
+                            <p>The obsidian's damage and rate of fire are adjusted. This is a general improvement aimed at increasing their efficiency versus T1 units and reducing the downside of a missed shot.</p>
+                            <ul>
+                                <li>Damage: <strike>480</strike> → 360</li>
+                                <li>RateOfFire: <strike>0.25</strike> → 0.333</li>
+                            </ul>
+                            
+                            <h3><img src="images/pillar.png"> Pillar</h3>
+                            <p>The pillar gets a slight range reduction to allow for more micro and kiting in some matchups, notably versus the rhino. </p>
+                            <ul>
+                                <li>Range: <strike>23</strike> → 22</li>
+                            </ul>
+                            
+                            <h3><img src="images/uefhover.png"> Riptide</h3>
+                            <p>The riptide was the weakest T2 tank after the recent Blaze buff. It gets a substantial buff to bring it closer in strength to other T2 units. </p>
+                            <ul>
+                                <li>Health: <strike>1700</strike> → 1800</li>
+                                <li>Mass Cost: <strike>360</strike> → 320</li>
+                                <li>Power Cost: <strike>2000</strike> → 1650</li>
+                                <li>Build Time: <strike>1600</strike> → 1420</li>
+                            </ul>
+                            
+                            <h3><img src="images/rhino.png"> Rhino</h3>
+                            <p>The rhino gets a range increase of one to differentiate the ranges of the main T2 tanks more greatly, allowing for more micro and kiting.</p>
+                            <ul>
+                                <li>Mass Cost: <strike>297</strike> → 290</li>
+                                <li>Build Time: <strike>1320</strike> → 1300</li>
+                                <li>Range: <strike>23</strike> → 24</li>
+                                <li>Vision Radius: <strike>20</strike> → 22</li>
+                            </ul>
+                            
+                            <h3><img src="images/aeonhover.png"> Blaze</h3>
+                            <p>The blaze gets a small buff to its health and range to differentiate from other hover tanks.</p>
+                            <ul>
+                                <li>Health: <strike>1050</strike> → 1100</li>
+                                <li>Range: <strike>23</strike> → 24</li>
+                            </ul>
+                            
+                            <h3><img src="images/chickenbot.png"> Ilshavoh</h3>
+                            <p>The Ilshavoh has improved micro capabilities thanks to an increase in turret turn speed. Vision radius is increased to reduce their reliance on selens and radars. </p>
+                            <ul>
+                                <li>FiringTolerance: <strike>1</strike> → 3</li>
+                                <li>TurretYawSpeed: <strike>70</strike> → 85</li>
+                                <li>Vision Radius: <strike>20</strike> → 24</li>
+                            </ul>
+                            
+                            <h3><img src="images/serahover.png"> Yenzyne</h3>
+                            <p>The Yenzyne is given greater health and a faster fire rate with a decrease in speed to improve its effectiveness on land without overbuffing it in the naval arena. </p>
+                            <ul>
+                                <li>Health: <strike>1300</strike> → 1350</li>
+                                <li>Speed: <strike>4.3</strike> → 4</li>
+                                <li>RateOfFire: <strike>0.25</strike> → 0.3</li>
+                            </ul>
+                            
+                            <h3><img src="images/beetle.png"> Firebeetle</h3>
+                            <p>Firebeetles are now cheaper, faster to build and have less health. Firebeetles are permanently cloaked, meaning they must be spotted using radar and cannot be spotted using a units vision. </p>
+                            <ul>
+                                <li>Health: <strike>500</strike> → 350</li>
+                                <li>Mass Cost: <strike>250</strike> → 190</li>
+                                <li>Power Cost: <strike>1500</strike> → 1300</li>
+                                <li>Build Time: <strike>1000</strike> → 700</li>
+                                <li>Damage: <strike>1500</strike> → 1100</li>
+                                <li>Firebeetle can now cloak.</li>
+                            </ul>
+                            
+                            <h3><img src="images/aurora.png"> Aurora</h3>
+                            <p>The Aurora will now use the firing solution instead of its aim bone when targeting units. This should decrease the number of initial shots that miss. </p>
+                            
+                            <h3><img src="images/harb.png"> Harbinger</h3>
+                            <p>Harbingers get a significant buff, gaining a small amount of range to allow for more micro possibilities while also gaining some health and a fast shield 
+                            recharge speed. Their fire cycle is also adjusted.  </p>
+                            <ul>
+                                <li>Health: <strike>3050</strike> → 3600</li>
+                                <li>Range: <strike>26</strike> → 27</li>
+                                <li>Damage: <strike>320</strike> → 160</li>
+                                <li>RateOfFire: <strike>1</strike> → 2</li>
+                                <li>ShieldRechargeTime: <strike>40</strike> → 30</li>
+                            </ul>
+                            
+                            <h3><img src="images/UEF_T3_Heavy_Assault_Bot.png"> Titan</h3>
+							<p>Titans get a buff in range, and small health and shield buffs. Damage is reduced slightly to prevent overbuffing. </p>
+                            <ul>
+                                <li>Health: <strike>2550</strike> → 2600</li>
+                                <li>Shield: <strike>600</strike> → 700</li>
+                                <li>Damage: <strike>50</strike> → 45</li>
+                                <li>Recharge Time: <strike>15</strike> → 12</li>
+                                <li>Range: <strike>22</strike> → 24</li>
+                            </ul>
+                            
+                            <h3><img src="images/loya.png"> Loyalist</h3>
+							<p>The Loyalist gains damage and range at the expense of health. It also gains a new ability called "Charge." When activated, a ten second countdown begins and 
+                            the Loyalist will self-destruct at the end of that countdown. After four seconds the Loyalist gains a x1.75 speed boost and its stun duration is doubled. The 
+                            delay between pressing the charge button and gaining these advantages is to stop players from simply enabling the ability as any Loyalist is about to die. Once 
+                            the charge starts after 4 seconds a timer appears over the head of the Loyalist. At the end of the countdown the loyalist will explode. The aim of the new ability
+                            is to accentuate the death weapon of the Loyalist and allow for new gameplay opportunities. </p>
+                            <ul>
+                                <li>Health: <strike>3000</strike> → 2500</li>
+                            </ul>
+                            <ul>
+                                EMP explosion on death:
+                                <li>Duration: <strike>1.4s</strike> → 1.5s</li>
+							</ul>
+                            <ul>
+                                2nd Weapon (Heavy Electron Bolter):
+                                <li>Damage: <strike>14</strike> → 28</li>
+                                <li>Range: <strike>20</strike> → 24</li>
+                            </ul>
+                            <ul>
+                                Charge ability:
+                                <li>Stun duration when charging: 3</li>
+                                <li>Speed boost while charging: x1.75</li>
+                                <li>SecondsBeforeChargeKicksIn = 4</li>
+                                <li>SecondsBeforeExplosionWhenCharging = 6</li>
+                            </ul>
+                            
+                            <h3><img src="images/UEF_T3_Armored_Assault_Bot.png"> Percival</h3>
+                            <ul>
+							<p>The Percival has its fire cycle adjusted to be less frontloaded and its shots are slightly more dodgeable. </p>
+                                <li>Damage: <strike>1670</strike> → 1450</li>
+                                <li>Rate of Fire: <strike>0.2</strike> → 0.23</li>
+                                <li>Muzzle Velocity: <strike>38</strike> → 36</li>
+                            </ul>
+                            
+                            <h3><img src="images/Cybran_T3_Armored_Assault_Bot.png"> Brick</h3>
+                            <ul>
+							<p>The Brick's shots are more dodgeable.</p>
+                                <li>MuzzleVelocity: <strike>42</strike> → 38</li>
+                            </ul>
+                            
+                            <h3><img src="images/othuum.png"> Othuum</h3>
+                            <p>The Othuum is buffed with greater speed and damage. Health is reduced. The thau cannon has area of effect damage so that it can easily deal with tech 1 point defense.</p>
+                            <ul>
+                                <li>Health: <strike>5000</strike> → 4700</li>
+							<br>
+                                <li>Speed: <strike>2.6</strike> → 2.75</li>
+                                <li>SizeY: <strike>0.45</strike> → 0.65</li>
+                                <li>SizeZ: <strike>2.0</strike> → 2.3</li>
+							<br>
+							<p>First 2 Guns:</p>
+                                <li>Damage: <strike>46</strike> → 64</li>
+                                <li>Muzzle Velocity: <strike>40</strike> → 30</li>
+                                <li>Range: <strike>21</strike> → 20</li>
+							<br>
+							<p>3rd Gun:</p>
+                                <li>Damage: <strike>525</strike> → 625</li>
+                                <li>DamageRadius(AoE): <strike>0</strike> → 1.2</li>
+                            </ul>
+                            
+                            <h3><img src="images/serasniper.png.png"> Sprite Striker</h3>
+                            <p>Snipers have reduced speed and higher cost as they were too often chosen over the main T3 battle tanks. </p>
+                            <ul>
+                                <li>Speed: <strike>2.85</strike> → 2.6</li>
+                                <li>Mass Cost: <strike>720</strike> → 800</li>
+                                <li>Power Cost: <strike>8000</strike> → 8900</li>
+                                <li>Build Time: <strike>4000</strike> → 4500</li>
+                            </ul>
+                            
+                            <h3><img src="images/serasniper.png"> Usha-Ah</h3>
+                            <p>Snipers have reduced speed and higher cost as they were too often chosen over the main T3 battle tanks. </p>
+                            <ul>
+                                <li>Speed: <strike>2.5</strike> → 2.4</li>
+                                <li>Mass Cost: <strike>800</strike> → 880</li>
+                                <li>Power Cost: <strike>8800</strike> → 9700</li>
+                                <li>Build Time: <strike>4300</strike> → 4900</li>
+                            </ul>
+                            
+                            <h3><img src="images/demolisher.png"> T3 Mobile Artillery</h3>
+                            <p>Tech 3 artillery became a strong option versus tech 3 tanks after the tech 3 land health reduction. These changes are 
+                            designed to prevent them from so easily being used against massed tech 3 and tech 2. They will have a harder time retreating from armies. </p>
+                            <ul>
+                                Aeon:
+                                <li>Speed: <strike>2.5</strike> → 2.2</li>
+                                <li>Minimum Range: <strike>0</strike> → 25</li>
+                                <br>
+                                UEF: 
+                                <li>Speed: <strike>2.5</strike> → 2.2</li>
+                                <li>Minimum Range: <strike>0</strike> → 25</li>
+                                <li>Unpacking Animation: <strike>1-2s</strike> → ~4s</li>
+                                <br>
+                                Seraphim:
+                                <li>Speed: <strike>2.5</strike> → 2.2</li>
+                                <li>Minimum Range: <strike>0</strike> → 25</li>
+                                <li>Unpacking Animation: <strike>1-2s</strike> → ~4s</li>
+                                <li>Damage Radius(AoE): <strike>6</strike> → 5</li>
+                                <br>
+                                Cybran: 
+                                <li>Speed: <strike>2.5</strike> → 2.2</li>
+                                <li>Minimum Range: <strike>0</strike> → 25</li>
+                                <li>Unpacking Animation: <strike>1-2s</strike> → ~4s</li>
+                                <li>Damage Radius(AoE): <strike>7</strike> → 6</li>
+                            </ul>
+                            
+                            <h3><img src="images/t2engie.png"> T2 Engineer</h3>
+                            <p>Higher tech engineers have greater build range to reduce pathfinding conflicts during base building. </p>
+                            <ul>
+                                <li>MaxBuildDistance: <strike>5</strike> → 6</li>
+                            </ul>
+                            
+                            <h3><img src="images/t3engie.png"> T3 Engineer</h3>
+                            <p>Higher tech engineers have greater build range to reduce pathfinding conflicts during base building. </p>
+                            <ul>
+                                <li>MaxBuildDistance: <strike>5</strike> → 7</li>
+                            </ul>
+                            
+                            <h3><img src="images/galacticcolossus.png"> Galactic Colossus</h3>
+                            <p>Death Weapons for some experimentals are adjusted to better match the size of the units. </p>
+                            <ul>
+                                <li>Death Weapon Damage: <strike>7500</strike> → 8000</li>
+                                <li>Death Weapon Radius: <strike>4</strike> → 7</li>
+                            </ul>
+                            
+                            <h3><img src="images/ythotha.png"> Ythotha</h3>
+                            <p>Death Weapons for some experimentals are adjusted to better match the size of the units. </p>
+                            <ul>
+                                <li>Death Weapon Damage: <strike>10000</strike> → 7000</li>
+                                <li>Death Weapon Radius: <strike>8</strike> → 6</li>
+                            </ul>
+                            
+                            <h3><img src="images/monkeylord.png"> Monkeylord</h3>
+                            <p>Death Weapons for some experimentals are adjusted to better match the size of the units. </p>
+                            <ul>
+                                <li>Death Weapon Radius: <strike>7</strike> → 6</li>
+                            </ul>
+                            
+                            <h3><img src="images/megalith.png"> Megalith</h3>
+                            <p>Death Weapons for some experimentals are adjusted to better match the size of the units. </p>
+                            <ul>
+                                <li>Death Weapon Damage: <strike>7500</strike> → 8000</li>
+                                <li>Death Weapon Radius: <strike>4</strike> → 9</li>
+                            </ul>
+                            
+                        </div>
+                        
+                        <h2>Air</h2>
+                        <div id="air" class="card">
+                            <h3><img src="images/airscout.png"> Air scouts</h3>
+                            <p>The turn rate change in a previous patch created landing difficulties for these planes. The turn rate change is reverted and they have a reduced speed instead. </p>
+                            <ul>
+                                <li>Turn Rate: <strike>0.6</strike> → 0.8</li>
+                                <li>Speed: <strike>20</strike> → 19</li>
+                            </ul>
+                            
+                            <h3><img src="images/spyplane.png"> Spy planes</h3>
+                            <p>The turn rate change in a previous patch created landing difficulties for these planes. The turn rate change is reverted and they have a reduced speed instead.</p>
+                            <ul>
+                                <li>Turn Rate: <strike>0.6</strike> → 0.8</li>
+                                <li>Speed: <strike>30</strike> → 27</li>
+                            </ul>
+                            
+                            <h3><img src="images/swiftwind.png"> Swiftwind</h3>
+                            <p>The swiftwind gets a cost increase as it is a powerful fighter which can be accessed easily and spammed quite early into the game. </p>
+                            <ul>
+                                <li>Mass Cost: <strike>200</strike> → 235</li>
+                                <li>Power Cost: <strike>6000</strike> → 6750</li>
+                                <li>Build Time: <strike>1600</strike> → 1800</li>
+                            </ul>
+                            
+                            <h3><img src="images/jester.png"> Jester and Stinger</h3>
+                            <p>The weapons on these gunships have a greater range of motion to bring them in line with other gunships. </p>
+                            
+                            <h3><img src="images/specter.png"> Specter</h3>
+                            <p>The Spectre now has a cannon akin to the oblivion turret or the exodus class destroyer although much weaker. This differentiates the gunship from those of the 
+                            other factions and gives Aeon extra options at the T2 air stage. </p>
+                            <ul>
+                                <li>Mass Cost: <strike>240</strike> → 270</li>
+                                <li>Power Cost: <strike>4800</strike> → 5400</li>
+                                <li>Build Time: <strike>1600</strike> → 1800</li>
+                                <li>Damage: <strike>13</strike> → 78</li>
+                                <li>Rate of fire: <strike>1.25</strike> → 0.208</li>
+                                <li>Muzzle Velocity: <strike>40</strike> → 25</li>
+                                <li>Damage radius: <strike>0</strike> → 2</li>
+                                <li>Range: <strike>22</strike> → 20</li>
+                            </ul>
+                            
+                            <h3><img src="images/notha.png"> Notha</h3>
+                            <p>The Notha is nerfed to bring it back to a similar effectiveness as before. The buffing in previous patches was unintended and severe. </p>
+                            <ul>
+                                <li>BreakOffDistance: <strike>1.5</strike> → 5</li>
+                                <li>BreakOffTrigger: <strike>10</strike> → 15</li>
+                                <li>Rate of fire: <strike>0.2</strike> → 0.1</li>
+                            </ul>
+                            
+                            <h3><img src="images/wasp.png"> Air Superiority Fighters</h3>
+                            <p>ASF are nerfed to allow for more aggressive air usage in the T3 stage. They will have a harder time catching threats presented across the map. </p>
+                            <ul>
+                                <li>Speed: <strike>25</strike> → 22</li>
+                            </ul>
+                            
+                            <h3><img src="images/czar.png"> Czar</h3>
+                            <p>The Czar has been due a serious buff for a while and it is finally here. The flying fortress is now equipped with a shield to allow for incursions into and 
+                            retreats from enemy territory. The AA capabilities are also greatly increased.  </p>
+                            <ul>
+                                <li>Health: <strike>58000</strike> → 40000</li>
+                                <li>Personal shield: <strike>0</strike> → 30000</li>
+                                <li>Shield recharge time: 120</li>
+                                <li>Shield regen rate: 180</li>
+                                <li>Energy consumption: <strike>0</strike> → 500</li>
+                                <li>SAM range: <strike>64</strike> → 120</li>
+                                <li>SAM damage radius <strike>0</strike> → 2</li>
+                                <li>SAM velocity: <strike>50</strike> → 100</li>
+                            </ul>
+                                
+                            <h3><img src="images/ahwassa.png"> Ahwassa</h3>
+                            <p>Death Weapons for some experimentals are adjusted to better match the size of the units. Ahwassa also has its speed reduced because of the ASF speed nerf.</p>
+                            <ul>
+                                <li>Speed: <strike>20</strike> → 18</li>
+                                <li>Death Weapon Radius: <strike>8</strike> → 10</li>
+                            </ul>
+                                
+                            <h3><img src="images/soulripper.png"> Soul Ripper</h3>
+                            <p>Death Weapons for some experimentals are adjusted to better match the size of the units. </p>
+                            <ul>
+                                <li>Death Weapon Damage: <strike>5000</strike> → 7500</li>
+                                <li>Death Weapon Radius: <strike>4</strike> → 8</li>
+                            </ul>
+                        </div>
+                        
+                        <h2>Navy</h2>
+                        <div id="Navy" class="card">
+                            <h3><img src="images/mermaid.png"> CI:18 Mermaid</h3>
+                            <p>These changes mirror the changes made to the bulwark a few patches ago. The mermaid is now closer in stature to other tech 2 ships. </p>
+                            <ul>
+                                <li>Speed: <strike>7</strike> → 6</li>
+                                <li>Turn Rate: <strike>60</strike> → 55</li>
+                                <li>UniformScale: <strike>0.08</strike> → 0.12</li>
+                                <li>SizeX: <strike>0.75</strike> → 1.25</li>
+                                <li>SizeY: <strike>0.8</strike> → 1.3</li>
+                                <li>SizeZ: <strike>2.7</strike> → 3.6</li>
+                            </ul>
+                        </div>
+                        
+                        <h2>Structures</h2>
+                        <div id="Structures" class="card">
+                            <h3><img src="images/t2airhq.png"> T2 Air HQ</h3>
+                            <p>The lower cost of the T2 Air HQ compared to land and navy led to a T2 air rush being a no-brainer on 20x20 1v1 maps. </p>
+                            <ul>
+                                <li>Mass cost: <strike>840</strike> → 920</li>
+                                <li>Energy cost: <strike>14400</strike> → 18000</li>
+                                <li>Buildtime: <strike>1800</strike> → 2000</li>
+                            </ul>
+                            
+                            <h3><img src="images/serasonar.png"> Shou-esel</h3>
+                            <p> </p>
+                            <ul>
+                                <li>Speed: <strike>1</strike> → 2.5</li>
+                                <li>Speed while submerged: <strike>0.5</strike> → 1.5</li>
+                            </ul>
+                            
+                            <h3><img src="images/t3sonar.png"> T3 Sonar</h3>
+                            <p>T3 sonar energy maintenance is increased to reflect the effectiveness of this intel structure. </p>
+                            <ul>
+                            Aeon+UEF:
+                                <li>Energy Maintenance: <strike>250</strike> → 500</li>
+                            <br>
+                            Cybran:
+                                <li>Energy Maintenance: <strike>400</strike> → 700</li>
+                            </ul>
+                        </div>
+
+                        <h2>ACUs</h2>
+                        <div id="allacu" class="card">
+                            <h3><img src="images/regenfield.png"> Regen Aura</h3>
+                            <p>The Seraphim Restoration Field upgrade is moved from the right arm to the left arm allowing for it to be used with the gun upgrade. Regen ceiling values are also adjusted slightly. </p>
+                            
+                            Regen Ceiling:
+                            <ul>
+                                <li>T1: 10 hp/s</li>
+                                <li>T2: 15 hp/s</li>
+                                <li>T3: 25 hp/s</li>
+                                <li>T4: 40 hp/s</li>
+                                <li>SCU: 30 hp/s</li>
+                            </ul>
+                            <ul>
+                                <li>Upgrade position: <strike>Right arm</strike> → Left arm</li>
+                            </ul>
+                            
+                            <h3><img src="images/advancedregenfield.png"> Advanced Regen Aura</h3>
+                            <p>The Seraphim Restoration Field upgrade is moved from the right arm to the left arm allowing for it to be used with the gun upgrade. Regen ceiling values are also adjusted slightly.</p>
+                            
+                            Regen Ceiling:
+                            <ul>
+                                <li>T1: 20 hp/s</li>
+                                <li>T2: 50 hp/s</li>
+                                <li>T3: 120 hp/s</li>
+                                <li>T4: 240 hp/s</li>
+                                <li>SCU: 140 hp/s</li>
+                            </ul>
+                            <ul>
+                                <li>Upgrade position: <strike>Right arm</strike> → Left arm</li>
+                            </ul>
+                            
+                            <h3><img src="images/RAS.png"> Seraphim ACU Resource Allocation System</h3>
+                            <p>The RAS upgrade is moved from the back to the right arm to even out the options between the three upgrade slots. </p>
+                            
+                            <ul>
+                                <li>Upgrade position: <strike>Back</strike> → Right arm</li>
+                            </ul>
+                        </div>
+                        
+                        <h2>Game Mechanics</h2>
+                        <div id="mechanics" class="card">
+                            <h3><img src="images/Upgrade_Icon.png">Veterancy</h3>
+                            <p>Since the change to a mass-based veterancy system where you gain veterancy points based on the mass value of damage done, several special rules or exceptions have 
+                            been introduced in attempts to balance the veterancy system. In this patch we are trying to remove as many exceptions as possible to make the system more transparent, understandable and predictable. </p>
+                            
+                            ACU Veterancy gained from damaging units: 
+                            <ul>
+                                <li>T2: <strike>50%</strike> → 100%</li>
+                                <li>T3: <strike>33%</strike> → 100%</li>
+                                <li>T4: <strike>25%</strike> → 100%</li>
+                                <li>SACU: <strike>30%</strike> → 100%</li>
+                                <li>ACU: <strike>5%</strike> → 100%</li>
+                            </ul>
+                            
+                            ACU Veterancy levelup requirements: 
+                            <ul>
+                                <li>2nd level: <strike>2000</strike> → 2250</li>
+                                <li>3rd level: <strike>3000</strike> → 4000</li>
+                                <li>4th level: <strike>4000</strike> → 6500</li>
+                                <li>5th level: <strike>5000</strike> → 10000</li>
+                            </ul>
+                            
+                            <li>Veterancy gained from killing economy buildings: <strike>50%</strike> → 100%</li>
+                            
+                            Units mass killed multiplier(unit mass cost*multiplier = mass killed requirement per vet level): 
+                            <ul>
+                                <li>T1/SACU/Exp: 2</li>
+                                <li>T2: <strike>2</strike> → 1.5</li>
+                                <li>T3: <strike>2</strike> → 1.25</li>
+                            </ul>
+                            
+                            The ACU will not survive an ACU explosion while under 2500 hp by vetting anymore, veterancy is gained right after the ACU explosion.
+                            
+                            <h3><img src="images/Reclaim_icon.png">Trees</h3>
+                            <p>Broken trees now leave a larger amount of resources. Breaking trees is no longer such a painful experience. </p>
+                            <ul>
+                                <li>Broken tree resource modifier: <strike>1.25</strike> → 2</li>
+                            </ul>
+                            
+                            <h3><img src="images/sml.png">Nuke projectile</h3>
+                            <p>A nuclear missile now kills and passes through any air unit it comes into contact with excepting air experimentals.</p>
+                            
+                            <h3><img src="images/uefstrat.png">Strategic Bomber bomb collision</h3>
+                            <p>A bomb from a strat bomber no longer collides with ASF. This decision was taken because the use of strats for sniping key structures is an unrewarding investment 
+                            as people have become much better at blocking the bombs using ASF. </p>
+                            
+                            <h3><img src="images/asylum.png">Support unit attack move stopping range</h3>
+                            <p>All mobile shields and land scouts now stop at an appropriate range from enemy units when using an attack move. </p>
+                            
+                        </div>
+                        
+                        <p style="height: 1000px"></p>
+                    </td>
+                    
+                    <td id="sidebar">
+                        <div id="icongrid">
+                            <h2><a href="#container">Contents</a></h2>
+                            
+							</p><p>Land<br>
+							<a href="#aeont1maa"><img src="images/obsidian.png"></a>
+                            <a href="#aeont1maa"><img src="images/pillar.png"></a>
+                            <a href="#aeont1maa"><img src="images/uefhover.png"></a>
+                            <a href="#aeont1maa"><img src="images/rhino.png"></a>
+                            <a href="#aeont1maa"><img src="images/aeonhover.png"></a>
+                            <a href="#aeont1maa"><img src="images/chickenbot.png"></a>
+                            <a href="#aeont1maa"><img src="images/serahover.png"></a>
+                            <a href="#aeont1maa"><img src="images/beetle.png"></a>
+                            <a href="#aeont1maa"><img src="images/aurora.png"></a>
+                            <a href="#aeont1maa"><img src="images/harb.png"></a>
+                            <a href="#aeont1maa"><img src="images/UEF_T3_Heavy_Assault_Bot.png"></a>
+                            <a href="#aeont1maa"><img src="images/loya.png"></a>
+                            <a href="#aeont1maa"><img src="images/UEF_T3_Armored_Assault_Bot.png"></a>
+                            <a href="#aeont1maa"><img src="images/Cybran_T3_Armored_Assault_Bot.png"></a>
+                            <a href="#aeont1maa"><img src="images/othuum.png"></a>
+                            <a href="#aeont1maa"><img src="images/serasniper.png.png"></a>
+                            <a href="#aeont1maa"><img src="images/serasniper.png"></a>
+                            <a href="#aeont1maa"><img src="images/demolisher.png"></a>
+                            <a href="#aeont1maa"><img src="images/t2engie.png"></a>
+                            <a href="#aeont1maa"><img src="images/t3engie.png"></a>
+                            <a href="#aeont1maa"><img src="images/galacticcolossus.png"></a>
+                            <a href="#aeont1maa"><img src="images/ythotha.png"></a>
+                            <a href="#aeont1maa"><img src="images/monkeylord.png"></a>
+                            <a href="#aeont1maa"><img src="images/megalith.png"></a>
+							
+							</p><p>Air<br>
+							<a href="#air"><img src="images/airscout.png"></a>
+							<a href="#air"><img src="images/spyplane.png"></a>
+							<a href="#air"><img src="images/swiftwind.png"></a>
+                            <a href="#air"><img src="images/jester.png"></a>
+							<a href="#air"><img src="images/specter.png"></a>
+							<a href="#air"><img src="images/notha.png"></a>
+							<a href="#air"><img src="images/wasp.png"></a>
+                            <a href="#air"><img src="images/czar.png"></a>
+							<a href="#air"><img src="images/ahwassa.png"></a>
+							<a href="#air"><img src="images/soulripper.png"></a>
+							
+							</p><p>Structures<br>
+							<a href="#Structures"><img src="images/t2airhq.png"></a>
+							<a href="#Structures"><img src="images/t3sonar.png"></a>
+							
+							</p><p>ACUs<br>		
+							<a href="#allacu"><img src="images/regenfield.png"></a>
+							<a href="#allacu"><img src="images/advancedregenfield.png"></a>
+							<a href="#allacu"><img src="images/RAS.png"></a>
+							
+							</p><p>Mechanics<br>
+							<a href="#mechanics"><img src="images/Upgrade_Icon.png"></a>
+							<a href="#mechanics"><img src="images/Reclaim_icon.png"></a>
+							<a href="#mechanics"><img src="images/sml.png"></a>
+							<a href="#mechanics"><img src="images/uefstrat.png"></a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>
