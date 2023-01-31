@@ -79,7 +79,7 @@ function RequestHandler(data)
 end
 
 ---@class RecallPanel : NinePatch
-RecallPanel = Class(NinePatch.NinePatch) {
+RecallPanel = ClassUI(NinePatch.NinePatch) {
     DefaultWidth = 320,
 
     __init = function(self, parent)

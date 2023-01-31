@@ -365,6 +365,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // not totally on depth as it gets clamped
     float waterLerp = clamp(waterDepth, waterLerp.x, waterLerp.y);
     refractedPixels.xyz = lerp(refractedPixels.xyz, waterColor, waterLerp);
+	refractedPixels.xyz = lerp(refractedPixels, backGroundPixels, saturate(refractedPixels.w * 255) ).xyz;
 
     // calculate reflections of units
 	// We can't compute wich part of the unit we would hit with our reflection vector,

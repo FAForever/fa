@@ -99,7 +99,6 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_LowArc',
-            CameraLifetime = 5,
             CameraVisionRadius = 5,
             CollideFriendly = false,
             Damage = 120,

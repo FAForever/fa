@@ -8,7 +8,7 @@ local Group = import("/lua/maui/group.lua").Group
 local TableGetN = table.getn
 
 ---@class SpecialGrid : Group
-SpecialGrid = Class(Group) {
+SpecialGrid = ClassUI(Group) {
     __init = function(self, parent, isVertical)
         Group.__init(self, parent)
         self.top = 1

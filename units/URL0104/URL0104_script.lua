@@ -11,9 +11,9 @@ local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaserInvisible
 
 ---@class URL0104 : CLandUnit
-URL0104 = Class(CLandUnit) {
+URL0104 = ClassUnit(CLandUnit) {
     Weapons = {
-        TargetPainter = Class(TargetingLaser) {
+        TargetPainter = ClassWeapon(TargetingLaser) {
             -- Unit in range. Cease ground fire and turn on AA
             OnWeaponFired = function(self)
                 if not self.AA then
@@ -36,8 +36,8 @@ URL0104 = Class(CLandUnit) {
                 end,
             },
         },
-        AAGun = Class(CAANanoDartWeapon) {},
-        GroundGun = Class(CAANanoDartWeapon) {},
+        AAGun = ClassWeapon(CAANanoDartWeapon) {},
+        GroundGun = ClassWeapon(CAANanoDartWeapon) {},
     },
 }
 

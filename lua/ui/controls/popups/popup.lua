@@ -8,7 +8,7 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 -- and draws a standard background behind its content. You'll probably want to extend it to do
 -- something more involved, or use it as-is if you want to manually assemble your popup UI Group.
 ---@class Popup : Group
-Popup = Class(Group) {
+Popup = ClassUI(Group) {
     --- Create a new popup
     --
     -- @param GUI A reference to the lobby's GUI object (dialogs should all be parented off there)

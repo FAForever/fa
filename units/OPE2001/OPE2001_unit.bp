@@ -32,7 +32,7 @@ UnitBlueprint {
                     AlbedoName = '/Units/UXB0000/UXB0000_Albedo.dds',
                     LODCutoff = 250,
                     MeshName = '/Units/UXB0000/UXB0000_LOD0.scm',
-                    Shader = 'TMeshAlpha',
+                    ShaderName = 'TMeshAlpha',
                 },
             },
         },

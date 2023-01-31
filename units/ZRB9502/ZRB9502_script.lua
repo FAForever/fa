@@ -10,7 +10,7 @@
 local CAirFactoryUnit = import("/lua/cybranunits.lua").CAirFactoryUnit
 
 ---@class ZRB9502 : CAirFactoryUnit
-ZRB9502 = Class(CAirFactoryUnit) {
+ZRB9502 = ClassUnit(CAirFactoryUnit) {
     PlatformBone = 'B01',
     UpgradeRevealArm1 = 'Arm03',
     UpgradeRevealArm2 = 'Arm06',

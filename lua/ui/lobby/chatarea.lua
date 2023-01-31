@@ -26,7 +26,7 @@ local defaultStyle = {
 }
 
 ---@class ChatArea : Group
-ChatArea = Class(Group) {
+ChatArea = ClassUI(Group) {
 
     __init = function(self, parent, width, height)
         Group.__init(self, parent)
@@ -132,7 +132,7 @@ ChatArea = Class(Group) {
 
     CreateLine = function(self, parent)
         local line = Group(parent)
-        line.Height:Set(self.Style.lineSpacing + self.Style.fontSize())
+        LayoutHelpers.SetHeight(line, self.Style.lineSpacing + self.Style.fontSize())
         line.Width:Set(parent.Width)
         line:DisableHitTest()
 

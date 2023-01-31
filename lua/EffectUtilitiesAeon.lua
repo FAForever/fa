@@ -36,14 +36,22 @@ function CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, scale)
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
 
-    -- -- Create the mercury pool
-    local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 0)
+    -- Create the mercury pool
+    local pool = unitBeingBuilt:CreateProjectile('/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 0, 0, 0, 0)
     TrashBagAdd(onDeathTrash, pool)
     TrashBagAdd(onFinishedTrash, pool)
-    EntitySetOrientation(pool, EntityGetOrientation(unitBeingBuilt), true)
-    ProjectileSetScale(pool, sx, sy, sz)
 
-    -- -- Create effects of build animation
+    ProjectileSetScale(pool, sx, sy, sz)
+    local offset = unitBeingBuilt.Blueprint.Display.AeonMercuryPoolOffset
+    if offset then
+        local position = pool:GetPosition()
+        position[2] = position[2] + offset
+        Warp(pool, position)
+    end
+
+    pool:SetOrientation(unitBeingBuilt:GetOrientation(), true)
+
+    -- Create effects of build animation
     local emitter = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
     IEffectSetEmitterCurveParam(emitter, 'X_POSITION_CURVE', 0, sx * 1.5)
     IEffectSetEmitterCurveParam(emitter, 'Z_POSITION_CURVE', 0, sz * 1.5)
@@ -248,7 +256,7 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     local Footprint = unitBeingBuilt.Blueprint.Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
     local sz = Physics.MeshExtentsZ or Footprint.SizeZ
-    local sy = Physics.MeshExtentsY or Footprint.SizeYX or MathMin(sx, sz)
+    local sy = Physics.MeshExtentsY or Footprint.SizeY or MathMin(sx, sz)
 
     local pool = CreateMercuryPool(unitBeingBuilt, army, sx, sy * 1.5, sz, (sx + sz) * 0.3)
 
@@ -271,6 +279,7 @@ end
 function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBones, buildBone, effectsBag)
     -- -- Hold up for orientation to receive an update
     WaitTicks(2)
+
     -- always check after a wait
     if (not unitBeingBuilt) or unitBeingBuilt.Dead then
         return
@@ -296,6 +305,12 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
         local sx = Physics.MeshExtentsX or Footprint.SizeX
         local sz = Physics.MeshExtentsZ or Footprint.SizeZ
         local sy = Physics.MeshExtentsY or Footprint.SizeY or MathMin(sz, sz)
+
+        if unitBeingBuilt.Blueprint.CategoriesHash["AIR"] then
+            local t = sx
+            sx = sz
+            sz = t
+        end
 
         local pool = CreateMercuryPool(unitBeingBuilt, army, sx, sy * 1.5, sz, (sx + sz) * 0.3)
 
@@ -346,6 +361,7 @@ local ColossusPuddleBones = {
 ---@param puddleBones string[] The set of bones to use for puddles
 local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator, puddleBones)
     WaitTicks(2)
+
     -- -- Store information used throughout the function
     local sx = 1.5
     local sy = 2.25

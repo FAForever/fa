@@ -1,22 +1,18 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/XEB2306/XEB2306_script.lua
-----**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
-----**
-----**  Summary  :  Terran Light Gun Tower Script
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+--------------------------------------------------------------------------------
+-- File     :  /cdimage/units/XEB2306/XEB2306_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
+-- Summary  :  Terran Light Gun Tower Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------------
 local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TDFHeavyPlasmaCannonWeapon = import("/lua/terranweapons.lua").TDFHeavyPlasmaGatlingCannonWeapon
-
 local EffectUtils = import("/lua/effectutilities.lua")
 local Effects = import("/lua/effecttemplates.lua")
 
 ---@class XEB2306 : TStructureUnit
-XEB2306 = Class(TStructureUnit) {
+XEB2306 = ClassUnit(TStructureUnit) {
     Weapons = {
-        MainGun = Class(TDFHeavyPlasmaCannonWeapon) 
+        MainGun = ClassWeapon(TDFHeavyPlasmaCannonWeapon) 
         {
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip then

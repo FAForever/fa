@@ -140,7 +140,7 @@ local function getMusicVolumeOption()
         }
 
     else
-        
+
         -- replaced option with an "disableable" type. It preserves the original value in config.
         -- on empty profile it is defaulted to 100 as in original option
         return {
@@ -160,7 +160,7 @@ local function getMusicVolumeOption()
                 },
             },
         }
-        
+
     end
 end
 options = {
@@ -293,6 +293,21 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_CAMERA_SHAKE>Shake intensity",
+                key = 'camera_shake_intensity',
+                type = 'slider',
+                set = function(key,value,startup)
+                    ConExecute("cam_ShakeMult " .. tostring(0.01 * value))
+                end,
+                default = 100,
+                custom = {
+                    min = 0,
+                    max = 100,
+                    inc = 5,
+                },
+            },
+
+            {
                 title = '<LOC OPTIONS_0325>Build templates',
                 type = 'header',
 
@@ -391,26 +406,26 @@ options = {
 
             {
                 title = "<LOC selectionsets0001>Steal from other control groups",
-                key = 'selection_sets_add_behavior',
+                key = 'steal_from_other_control_groups',
                 type = 'toggle',
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC _Yes>No", key = false },
-                        {text = "<LOC _No>Yes", key = true },
+                        {text = "<LOC _No>No", key = false },
+                        {text = "<LOC _Yes>Yes", key = true },
                     },
                 },
             },
 
             {
                 title = "<LOC selectionsets0004>Add to factory control group",
-                key = 'selection_sets_production_behavior',
+                key = 'add_to_factory_control_group',
                 type = 'toggle',
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC _No>No", key = true },
-                        {text = "<LOC _Yes>Yes", key = false },
+                        {text = "<LOC _No>No", key = false },
+                        {text = "<LOC _Yes>Yes", key = true },
                     },
                 },
             },
@@ -465,6 +480,45 @@ options = {
             -- },
 
             {
+                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade",
+                key = 'assist_to_upgrade',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>",                                               key = 'Off'},
+                        {text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Only tech 1 extractors", key = 'Tech1Extractors'},
+                    },
+                },
+            },
+
+            {
+                title = "<LOC ASSIST_TO_UNPAUSE>Assist to unpause",
+                key = 'assist_to_unpause',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>Off",                                                                key = 'Off'},
+                        {text = "<LOC _ASSIST_TO_UNPAUSE_EXTRACTORS_AND_RADARS>Only extractors and radars",     key = 'ExtractorsAndRadars'},
+                        {text = "<LOC _On>On",                                                                  key = 'On'},
+                    },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
+                key = 'repeatbuild',
+                type = 'toggle',
+                default = false,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0273>Automated Structure Ringing",
                 key = 'structure_capping_feature_01',
                 type = 'toggle',
@@ -476,7 +530,7 @@ options = {
                         {text = "<LOC _FullSuite>Full suite",                               key = "full-suite"},
                     },
                 },
-            }, 
+            },
             {
                 title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
                 key = 'automex',
@@ -747,6 +801,18 @@ options = {
                         {text = "<LOC _Off>", key = 0 },
                         {text = "<LOC _On>", key = 1 },
                     },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE>Reclaim Batching Distance Threshold",
+                key = 'reclaim_batching_distance_treshold',
+                type = 'slider',
+                default = 150,
+                custom = {
+                    min = 150,
+                    max = 600,
+                    inc = 10,
                 },
             },
 

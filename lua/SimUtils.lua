@@ -15,15 +15,27 @@ local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categor
 local sharedUnits = {}
 
 ---@param owner number
-function KillSharedUnits(owner)
+-- categoriesToKill is an optional input (it defaults to all categories)
+function KillSharedUnits(owner, categoriesToKill)
     local sharedUnitOwner = sharedUnits[owner]
     if sharedUnitOwner and not table.empty(sharedUnitOwner) then
-        for _, unit in sharedUnitOwner do
+        local sharedUnitOwnerSize = table.getn(sharedUnitOwner)
+        for i = sharedUnitOwnerSize, 1, -1 do
+            local unit = sharedUnitOwner[i]
             if not unit.Dead and unit.oldowner == owner then
-                unit:Kill()
+                if categoriesToKill then
+                    if EntityCategoryContains(categoriesToKill, unit) then
+                        table.remove(sharedUnits[owner], i)
+                        unit:Kill()
+                    end
+                else
+                    unit:Kill()
+                end
             end
         end
-        sharedUnits[owner] = {}
+        if not categoriesToKill then
+            sharedUnits[owner] = {}
+        end
     end
 end
 
@@ -456,7 +468,7 @@ function CreateRebuildTracker(unit, blockingEntities)
         for _, reclaim in wrecks do
             if reclaim.IsWreckage then
                 -- collision shape to none to prevent it from blocking, keep track to revert later
-                reclaim:SetCollisionShape('None')
+                reclaim:CacheAndRemoveCollisionExtents()
                 table.insert(blockingEntities, reclaim)
             end
         end
@@ -551,7 +563,11 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
     -- revert collision shapes of any blocking units or wreckage
     for _, entity in blockingEntities do
         if not entity:BeenDestroyed() then
-            entity:RevertCollisionShape()
+            if entity.IsProp then 
+                entity:ApplyCachedCollisionExtents()
+            else 
+                entity:RevertCollisionShape()
+            end
         end
     end
 end

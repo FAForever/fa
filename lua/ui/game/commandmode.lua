@@ -59,10 +59,16 @@ local MathAtan = math.atan
 ---@alias CommandModeData CommandModeDataOrder | CommandModeDataBuild | CommandModeDataBuildAnchored | false
 
 ---@type CommandMode
+local cachedCommandMode = false
+
+---@type CommandMode
 local commandMode = false
 
 ---@type CommandModeData
 local modeData = false
+
+---@type CommandModeData
+local cachedModeData = false
 
 --- Auto-disable command mode right after one command - used when shift is not pressed down.
 local issuedOneCommand = false
@@ -108,7 +114,7 @@ function StartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
--- @param isCancel Is set to true when it cancels a current command mode for a new one.
+---@param isCancel boolean set when we're at the end of (a sequence of) order(s), is usually always true
 function EndCommandMode(isCancel)
 
     if ignoreSelection then
@@ -116,7 +122,7 @@ function EndCommandMode(isCancel)
     end
     
     -- in case we want to end the command mode, without knowing it has already ended or not
-    if  modeData then
+    if modeData then
         -- regain selection if we were cheating in units
         if modeData.cheat then
             if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
@@ -162,6 +168,25 @@ function EndCommandMode(isCancel)
     commandMode = false
     modeData = false
     issuedOneCommand = false
+end
+
+--- Caches the command mode, allows us to restore it
+function CacheCommandMode()
+    cachedCommandMode = commandMode
+    cachedModeData = modeData
+end
+
+function CacheAndClearCommandMode()
+    CacheCommandMode()
+    commandMode = false
+    modeData = false
+end
+
+--- Restores the cached command mode
+function RestoreCommandMode()
+    if cachedCommandMode and cachedModeData then 
+        StartCommandMode(cachedCommandMode, cachedModeData)
+    end
 end
 
 -- allocate the table once for performance
@@ -426,9 +451,76 @@ local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
 
+--- Upgrades a tech 1 extractor that is being assisted
+---@param unit UserUnit
+local function OnGuardUpgrade(guardees, unit)
+    if  EntityCategoryContains(categories.MASSEXTRACTION * categories.TECH1, unit) and
+        Prefs.GetFromCurrentProfile('options.assist_to_upgrade') == 'Tech1Extractors'
+    then
+        ForkThread(
+            function ()
+                ---@type UserUnit
+                local units = { unit }
+                if not IsDestroyed(unit) and not unit:GetFocus() then
+                    import("/lua/ui/game/selection.lua").Hidden(
+                        function ()
+                            SelectUnits(units)
+                            IssueBlueprintCommand("UNITCOMMAND_Upgrade", unit:GetBlueprint().General.UpgradesTo, 1, true)
+                        end
+                    )
+
+                    WaitSeconds(0.5)
+
+                    SetPaused(units, true)
+                end
+            end
+        )
+    end
+end
+
+--- Unpauses a
+---@param guardees UserUnit[]
+---@param target UserUnit
+local function OnGuardUnpause(guardees, target)
+    local prefs = Prefs.GetFromCurrentProfile('options.assist_to_unpause')
+    if   prefs == 'On' or
+        (prefs == 'ExtractorsAndRadars' and EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, target))
+    then
+        for k, guardee in guardees do
+
+            -- for correct upvalue scope
+            ---@type UserUnit
+            local engineer = guardee
+
+            ForkThread(
+                function ()
+                    while not (IsDestroyed(engineer) or IsDestroyed(target)) do
+                        WaitSeconds(1.0)
+
+                        local focus = engineer:GetFocus()
+                        if focus == target:GetFocus() then
+                            SetPaused({target}, false)
+                            break
+                        end
+                    end
+                end
+            )
+        end
+    end
+end
+
+--- Is called when a unit receies a guard / assist order
+---@param guardees UserUnit[]
+---@param unit UserUnit
+local function OnGuard(guardees, unit)
+    OnGuardUpgrade(guardees, unit)
+    OnGuardUnpause(guardees, unit)
+end
+
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
+
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
     if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then 
         if not IsKeyDown('Shift') then 
@@ -449,7 +541,7 @@ function OnCommandIssued(command)
         return false
     end
 
-    -- unknown when set, do not understand when this applies yet. In other words: ???
+    -- is set when we hold shift, to queue up multiple commands. This is where the command mode stops
     if not command.Clear then
         issuedOneCommand = true
     else
@@ -460,6 +552,9 @@ function OnCommandIssued(command)
     -- - a factory-like construction that is not finished is being continued
     -- - a (finished) unit is being guarded (right clicked)
     if command.CommandType == 'Guard' and command.Target.EntityId then
+
+        local unit = GetUnitById(command.Target.EntityId)
+        OnGuard(command.Units, unit)
 
         -- validate factories assisting other factories
         if EntityCategoryContains(categoriesFactories, command.Blueprint) then

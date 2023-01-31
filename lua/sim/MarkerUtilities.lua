@@ -25,14 +25,17 @@
 local StringSplit = import("/lua/system/utils.lua").StringSplit
 local TableDeepCopy = table.deepcopy
 
+---@alias MarkerType 'Mass' | 'Hydrocarbon' | 'Spawn' | 'Air Path Node' | 'Land Path Node' | 'Water Path Node' | 'Ampibious Path Node' | 'Transport Marker' | 'Naval Area' | 'Naval Link' | 'Rally Point' | 'Expansion Area' | 'Protected Experimental Construction'
+
 ---@class MarkerData
 ---@field size number
 ---@field resource boolean
 ---@field type string
 ---@field orientation Vector
 ---@field position Vector
----@field color Color | nil 
+---@field color Color | nil
 ---@field adjacentTo string         # used by old pathing markers to identify the neighbors
+---@field name? string              # used by spawn markers
 ---@field NavLayer NavLayers        # Navigational layer that this marker is on, only defined for resources
 ---@field NavLabel number | nil     # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
 
@@ -57,12 +60,22 @@ local MarkerCache = {}
 -- Pre-enable the caching of resource markers, to support adaptive maps
 MarkerCache["Mass"] = { Count = 0, Markers = {} }
 MarkerCache["Hydrocarbon"] = { Count = 0, Markers = {} }
+MarkerCache["Spawn"] = { Count = 0, Markers = {} }
+
+local armies = table.hash(ListArmies())
+for k, marker in AllMarkers do
+    if armies[k] then
+        marker.name = k
+        MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
+        MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
+    end
+end
 
 --- Retrieves all markers of a given type. This is a shallow copy,
 -- which means the reference is copied but the values are not. If you
 -- need a copy with unique values use GetMarkerByTypeDeep instead.
 -- Common marker types are:
--- - "Mass", "Hydrocarbon"
+-- - "Mass", "Hydrocarbon", "Spawn"
 -- - "Air Path Node", "Land Path Node", "Water Path Node", "Amphibious Path Node"
 -- - "Transport Marker", "Naval Area", "Naval Link", "Rally Point", "Expansion Area"
 -- - "Protected Experimental Construction"
@@ -122,7 +135,7 @@ end
 function FlushMarkerCacheByType(type)
 
     -- give developer a warning, you can't do this
-    if type == "Mass" or type == "Hydrocarbon" then
+    if type == "Mass" or type == "Hydrocarbon" or type == "Spawn" then
         WARN("Unable to flush resource markers from the cache - it can cause issues for adaptive maps.")
         return
     end
@@ -133,10 +146,11 @@ end
 --- Flushes the entire marker cache. Does not remove existing references.
 function FlushMarkerCache()
 
-    -- copy over mass / hydro for consistency with adaptive maps
+    -- copy over for consistency
     local cache = {}
     cache.Mass = MarkerCache.Mass
     cache.Hydrocarbon = MarkerCache.Hydrocarbon
+    cache.Spawn = MarkerCache.Spawn
 
     MarkerCache = cache
 end

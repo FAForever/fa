@@ -51,12 +51,12 @@ diffKeyToDiffInt = {
 -- this is sync'd from the sim, so it should be authoritative
 campaignMode = false
 
--- Campaign table format:
--- campaignID - one for each campaign
---      completedOperationID - each operation completed will have an entry
---           difficulty - one entry for each difficulty completed
---              allPrimary  - bool true if all primary objectives completed for this difficulty
---              allSecondary - bool true if all secondary objectives completed for this difficulty
+--- # Campaign table format:
+--- - campaignID - one for each campaign
+--- - completedOperationID - each operation completed will have an entry
+--- - difficulty - one entry for each difficulty completed
+--- - allPrimary - `bool` true if all primary objectives completed for this difficulty
+--- - allSecondary - `bool` true if all secondary objectives completed for this difficulty
 local function GetCampaignTable()
     local cmpt = Prefs.GetFromCurrentProfile('campaign')
     if not cmpt then cmpt = {} end
@@ -156,14 +156,14 @@ function IsOperationFinished(campaign, operation, difficulty)
     return false
 end
 
--- Operation victory table contains the following fields
---  string opKey - unique identifier for the current operation (ie SCCA_E01 would be a good key)
---  bool success - instructs UI which dialog to show
---  int difficulty - 1,2,3 currently supported
---  bool allPrimary - true if all primary objectives completed, otherwise, false
---  bool allSecondary - true if all secondary objectives completed, otherwise, false
---  bool allBonus - true if all bonus objectives completed, otherwise, false
---  int factionVideo - Opt.  If present, display this factions end game video
+--- # Operation victory table contains the following fields
+--- - `string` opKey - unique identifier for the current operation (ie SCCA_E01 would be a good key)
+--- - `bool` success - instructs UI which dialog to show
+--- - `int` difficulty - 1,2,3 currently supported
+--- - `bool` allPrimary - true if all primary objectives completed, otherwise, false
+--- - `bool` allSecondary - true if all secondary objectives completed, otherwise, false
+--- - `bool` allBonus - true if all bonus objectives completed, otherwise, false
+--- - `int` factionVideo - Opt.  If present, display this factions end game video
 function OperationVictory(ovTable, skipDialog)
     local resultText
     if ovTable.success == true then

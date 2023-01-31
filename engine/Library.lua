@@ -50,6 +50,11 @@ end
 function import(path)
 end
 
+---@param path FileName
+---@return Module
+function lazyimport(path)
+end
+
 --- Print a message to the moho logger, this shouldn't be used in production code
 ---@param out any
 ---@param ... any

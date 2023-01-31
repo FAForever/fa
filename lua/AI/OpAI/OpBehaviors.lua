@@ -1,27 +1,15 @@
---****************************************************************************
---**
---**  File     :  /lua/OpBehaviors.lua
---**  Author(s): DFS
---**
---**  Summary  :
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-----------------------------------------------------------------------------------
--- Platoon Lua Module                    --
-----------------------------------------------------------------------------------
-local AIUtils = import("/lua/ai/aiutilities.lua")
+---------------------------------------------------------------------
+-- File     :  /lua/OpBehaviors.lua
+-- Author(s): DFS
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+---------------------------------------------------------------------
+
+-- Platoon Lua Module --
 local Utilities = import("/lua/utilities.lua")
-local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
-local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
-local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
-local ScenarioFramework = import("/lua/scenarioframework.lua")
-local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
-
-
 -- ===== CDR ADD BEHAVIORS ===== --
+---@param platoon Platoon
 function CDROverchargeBehavior(platoon)
     local cdr = platoon:GetPlatoonUnits()[1]
     if platoon.CDRData then
@@ -38,6 +26,7 @@ function CDROverchargeBehavior(platoon)
     end
 end
 
+---@param cdr CommandUnit
 function CDROverChargeThread( cdr )
     local aiBrain = cdr:GetAIBrain()
     local weapBPs = cdr:GetBlueprint().Weapon
@@ -109,11 +98,11 @@ function CDROverChargeThread( cdr )
                     end
                     if overCharging then
                         while target and not target:IsDead() and not cdr:IsDead() and counter <= 5 do
-                            WaitSeconds(.5)
+                            WaitTicks(6)
                             counter = counter + .5
                         end
                     else
-                        WaitSeconds(5)
+                        WaitTicks(51)
                         counter = counter + 5
                     end
                     cdrPos = cdr:GetPosition()
@@ -141,17 +130,19 @@ function CDROverChargeThread( cdr )
                 end
             end
         end
-        WaitSeconds(3)
+        WaitTicks(31)
     end
 end
 
+---@param cdr CommandUnit
+---@param plat Platoon
 function CDRRepairBuildingUnit( cdr, plat )
     local aiBrain = cdr:GetAIBrain()
     if cdr.UnitBeingBuiltBehavior and not cdr.UnitBeingBuiltBehavior:BeenDestroyed() then
         IssueClearCommands( {cdr} )
         IssueRepair( {cdr}, cdr.UnitBeingBuiltBehavior )
         repeat
-            WaitSeconds(1)
+            WaitTicks(11)
             if cdr.Fighting or cdr.Running or cdr.GivingUp or cdr.Leashing or cdr.Cornered then
                 return
             end
@@ -164,6 +155,7 @@ function CDRRepairBuildingUnit( cdr, plat )
     end
 end
 
+---@param cdr CommandUnit
 function CDRLeashThread(cdr)
     -- if no radius specified return out of function
     local rad
@@ -192,7 +184,7 @@ function CDRLeashThread(cdr)
                 plat:MoveToLocation( loc, false )
                 cdr.Leashing = true
                 --LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR AI ACTIVATE - Commander leashing to MAIN' )
-                WaitSeconds( 10 )
+                WaitTicks(101)
                 if not cdr:IsDead() then
                     cdr.Leashing = false
                     if aiBrain:PlatoonExists(plat) then
@@ -201,10 +193,11 @@ function CDRLeashThread(cdr)
                 end
             end
         end
-        WaitSeconds(5)
+        WaitTicks(51)
     end
 end
 
+---@param cdr CommandUnit
 function CDRRunAwayThread( cdr )
     local aiBrain = cdr:GetAIBrain()
     local runSpotX, runSpotZ = aiBrain:GetArmyStartPos()
@@ -232,7 +225,7 @@ function CDRRunAwayThread( cdr )
                 repeat
                     plat:Stop()
                     cmd = plat:MoveToLocation( runSpot, false )
-                    WaitSeconds(3)
+                    WaitTicks(31)
                     if not cdr:IsDead() then
                         cdrPos = cdr:GetPosition()
                         nmeAir = aiBrain:GetUnitsAroundPoint( categories.AIR, cdrPos, 25, 'Enemy' )
@@ -251,6 +244,6 @@ function CDRRunAwayThread( cdr )
                 end
             end
         end
-        WaitSeconds(3)
+        WaitTicks(31)
     end
 end

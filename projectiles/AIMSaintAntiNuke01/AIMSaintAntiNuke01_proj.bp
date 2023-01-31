@@ -11,7 +11,7 @@ ProjectileBlueprint {
         'ANTIMISSILE',
         'NOSPLASHDAMAGE',
         'AEON',
-        'TECH_THREE',
+        'TECH3',
     },
     Description = 'AEON Anti Nuclear Missile',
     Display = {

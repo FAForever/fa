@@ -7,10 +7,6 @@ UnitBlueprint {
             'Left_Leg_B01',
             'Right_Leg_B01',
         },
-        AddTargetBones = {
-            'AttachSpecial01',
-            'AttachSpecial02',
-        },
     },
     Audio = {
         Destroyed = Sound {

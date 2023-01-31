@@ -12,10 +12,10 @@ local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
 local SDFPhasicAutoGunWeapon = import("/lua/seraphimweapons.lua").SDFPhasicAutoGunWeapon
 
 ---@class XSA0203 : SAirUnit
-XSA0203 = Class(SAirUnit) {
+XSA0203 = ClassUnit(SAirUnit) {
     Weapons = {
-        TurretLeft = Class(SDFPhasicAutoGunWeapon) {},
-        TurretRight = Class(SDFPhasicAutoGunWeapon) {},
+        TurretLeft = ClassWeapon(SDFPhasicAutoGunWeapon) {},
+        TurretRight = ClassWeapon(SDFPhasicAutoGunWeapon) {},
     },
 }
 TypeClass = XSA0203

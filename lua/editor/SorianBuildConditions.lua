@@ -24,7 +24,7 @@ function IsBadMap(aiBrain, bool)
     return false
 end
 
----@param aiBrain AIBrain
+---@param aiBrain AIBrain unused
 ---@param resTable string
 ---@return boolean
 function CategoriesNotRestricted(aiBrain, resTable)
@@ -119,7 +119,7 @@ function MarkerLessThan(aiBrain, locationType, markerTypes, distance, checkForBa
 end
 
 ---@param aiBrain AIBrain
----@param num integer
+---@param num number
 ---@return boolean
 function GreaterThanGameTime(aiBrain, num)
     local time = GetGameTimeSeconds()
@@ -135,22 +135,22 @@ function GreaterThanGameTime(aiBrain, num)
 end
 
 ---@param aiBrain AIBrain
----@param num integer
+---@param num number
 ---@return boolean
 function LessThanGameTime(aiBrain, num)
     return (not GreaterThanGameTime(aiBrain, num))
 end
 
 ---@param aiBrain AIBrain
----@param num integer
+---@param num number
 ---@return boolean
 function EnemyToAllyRatioLessOrEqual(aiBrain, num)
     local enemies = 0
     local allies = 0
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             enemies = enemies + 1
-        elseif v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        elseif not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             allies = allies + 1
         end
     end
@@ -162,9 +162,9 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param threatValue integer
+---@param threatValue number
 ---@param threatType string
----@param rings integer
+---@param rings number
 ---@return boolean
 function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
     local testRings = rings or 10
@@ -181,9 +181,9 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locType string
----@param threatValue integer
+---@param threatValue number
 ---@param threatType string
----@param rings integer
+---@param rings number
 ---@return boolean
 function ReclaimablesInArea(aiBrain, locType, threatValue, threatType, rings)
     if aiBrain:GetEconomyStoredRatio('MASS') > .5 and aiBrain:GetEconomyStoredRatio('ENERGY') > .5 then
@@ -206,13 +206,13 @@ function ReclaimablesInArea(aiBrain, locType, threatValue, threatType, rings)
 end
 
 ---@param aiBrain AIBrain
----@param distance integer
+---@param distance number
 ---@return boolean
 function ClosestEnemyLessThan(aiBrain, distance)
     local startX, startZ = aiBrain:GetArmyStartPos()
     local closest
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             local estartX, estartZ = v:GetArmyStartPos()
             local tempDistance = VDist2Sq(startX, startZ, estartX, estartZ)
             if not closest or tempDistance < closest then
@@ -247,13 +247,13 @@ end
 
 ---@param aiBrain AIBrain
 ---@param markerType string
----@param distance integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
----@param startX integer
----@param startZ integer
+---@param startX number
+---@param startZ number
 ---@return boolean
 function MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType, startX, startZ)
     if not startX and not startZ then
@@ -275,12 +275,12 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param distance integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
----@param maxNum integer
+---@param maxNum number
 ---@return boolean
 function CanBuildOnHydroLessThanDistance(aiBrain, locationType, distance, threatMin, threatMax, threatRings, threatType, maxNum)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
@@ -298,21 +298,21 @@ end
 
 ---@param aiBrain AIBrain
 ---@param markerType string
----@param distance integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
----@param startX integer
----@param startZ integer
+---@param startX number
+---@param startZ number
 ---@return boolean
 function NoMarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType, startX, startZ)
     return not MABC.MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType, startX, startZ)
 end
 
 ---@param aiBrain AIBrain
----@param sizeX integer
----@param sizeZ integer
+---@param sizeX number
+---@param sizeZ number
 ---@return boolean
 function MapGreaterThan(aiBrain, sizeX, sizeZ)
     local mapSizeX, mapSizeZ = GetMapSize()
@@ -325,8 +325,8 @@ function MapGreaterThan(aiBrain, sizeX, sizeZ)
 end
 
 ---@param aiBrain AIBrain
----@param sizeX integer
----@param sizeZ integer
+---@param sizeX number
+---@param sizeZ number
 ---@return boolean
 function MapLessThan(aiBrain, sizeX, sizeZ)
     local mapSizeX, mapSizeZ = GetMapSize()
@@ -343,7 +343,7 @@ end
 ---@param ucat EntityCategory
 ---@param ttype string
 ---@param uttype string
----@param divideby integer
+---@param divideby number
 ---@return boolean
 function PoolThreatGreaterThanEnemyBase(aiBrain, locationType, ucat, ttype, uttype, divideby)
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
@@ -373,7 +373,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param ttype string
----@param number integer
+---@param number number
 ---@return boolean
 function LessThanThreatAtEnemyBase(aiBrain, ttype, number)
     if aiBrain:GetCurrentEnemy() then
@@ -394,7 +394,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param ttype string
----@param number integer
+---@param number number
 ---@return boolean
 function GreaterThanThreatAtEnemyBase(aiBrain, ttype, number)
     return not LessThanThreatAtEnemyBase(aiBrain, ttype, number)
@@ -402,9 +402,9 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationtype string
----@param numUnits integer
+---@param numUnits number
 ---@param unitCat EntityCategory
----@param radius integer
+---@param radius number
 ---@return boolean
 function GreaterThanEnemyUnitsAroundBase(aiBrain, locationtype, numUnits, unitCat, radius)
     local engineerManager = aiBrain.BuilderManagers[locationtype].EngineerManager
@@ -476,7 +476,7 @@ function NoRushTimeCheck(aiBrain, timeLeft)
     return true
 end
 
----@param aiBrain AIBrain
+---@param aiBrain AIBrain unused
 ---@return boolean
 function NoRush(aiBrain)
     if ScenarioInfo.Options.NoRushOption and ScenarioInfo.Options.NoRushOption != 'Off' then
@@ -492,9 +492,9 @@ function NoRush(aiBrain)
 end
 
 ---@param aiBrain AIBrain
----@param greater integer
----@param myCategory string
----@param eCategory string
+---@param greater number
+---@param myCategory EntityCategory
+---@param eCategory EntityCategory
 ---@param alliance string
 ---@return boolean
 function HaveComparativeUnitsWithCategoryAndAlliance(aiBrain, greater, myCategory, eCategory, alliance)
@@ -518,10 +518,10 @@ function HaveComparativeUnitsWithCategoryAndAlliance(aiBrain, greater, myCategor
 end
 
 ---@param aiBrain AIBrain
----@param less integer
+---@param less number
 ---@param ratio number
----@param myCategory string
----@param eCategory string
+---@param myCategory EntityCategory
+---@param eCategory EntityCategory
 ---@param alliance string
 ---@return boolean
 function HaveRatioUnitsWithCategoryAndAlliance(aiBrain, less, ratio, myCategory, eCategory, alliance)
@@ -546,9 +546,9 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationtype string
----@param greater integer
----@param myCategory string
----@param eCategory string
+---@param greater number
+---@param myCategory EntityCategory
+---@param eCategory EntityCategory
 ---@param alliance string
 ---@return boolean
 function HaveComparativeUnitsWithCategoryAndAllianceAtLocation(aiBrain, locationtype, greater, myCategory, eCategory, alliance)
@@ -633,15 +633,15 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param radius integer
+---@param radius number
 ---@param markerType string
----@param tMin integer
----@param tMax integer
----@param tRings integer
+---@param tMin number
+---@param tMax number
+---@param tRings number
 ---@param tType string
----@param maxUnits integer
+---@param maxUnits number
 ---@param unitCat EntityCategory
----@param markerRadius integer
+---@param markerRadius number
 ---@return boolean
 function CanBuildFirebase(aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
     local ref, refName = AIUtils.AIFindFirebaseLocationSorian(aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
@@ -652,7 +652,7 @@ function CanBuildFirebase(aiBrain, locationType, radius, markerType, tMin, tMax,
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@return boolean
 function TargetHasLessThanUnitsWithCategory(aiBrain, numReq, category)
@@ -679,7 +679,7 @@ function TargetHasLessThanUnitsWithCategory(aiBrain, numReq, category)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@return boolean
 function TargetHasGreaterThanUnitsWithCategory(aiBrain, numReq, category)
@@ -729,7 +729,7 @@ function EnemyInT3ArtilleryRange(aiBrain, locationtype, inrange)
         radius = 825 + offset
     end
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             local estartX, estartZ = v:GetArmyStartPos()
             if (VDist2Sq(start[1], start[3], estartX, estartZ) <= radius * radius) and inrange then
                 return true
@@ -760,7 +760,7 @@ function AIOutnumbered(aiBrain, bool)
     end
 
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
+        if not v:IsDefeated() and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
             local armyTeam = ScenarioInfo.ArmySetup[v.Name].Team
             --LOG('*AI DEBUG: '..v.Nickname..' is on team '..armyTeam)
             if v.CheatEnabled then

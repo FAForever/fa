@@ -33,6 +33,7 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 190,
     Categories = {
+        'NAVAL',
         'PRODUCTFA',
         'SELECTABLE',
         'SERAPHIM',
@@ -125,9 +126,6 @@ UnitBlueprint {
         BuildCostMass = 400,
         BuildTime = 600,
         MaintenanceConsumptionPerSecondEnergy = 200,
-        RebuildBonusIds = {
-            'xsb3202',
-        },
     },
     Footprint = {
         MinWaterDepth = 1.5,

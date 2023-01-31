@@ -67,6 +67,7 @@ doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
 doscript("/lua/system/blueprints-projectiles.lua")
 doscript("/lua/system/blueprints-units.lua")
+doscript("/lua/system/blueprints-props.lua")
 doscript("/lua/system/blueprints-weapons.lua")
 
 ---@class PreGameData
@@ -104,7 +105,7 @@ local function LoadPreGameData()
 end
 
 ---@class BlueprintIconAssignment
----@field BlueprintId string
+---@field BlueprintId BlueprintId
 ---@field IconSet? string
 ---@field TypeId? string
 
@@ -830,9 +831,8 @@ function PostModBlueprints(all_bps)
     -- post process units and projectiles for easier access to information and sanitizing some fields
     PostProcessProjectiles(all_bps.Projectile)
     PostProcessUnits(all_bps.Unit)
+    PostProcessProps(all_bps.Prop)
 end
-
-
 
 --- Loads all blueprints with optional parameters  
 --- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side  

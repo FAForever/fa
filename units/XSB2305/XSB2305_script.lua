@@ -10,9 +10,9 @@ local SIFInainoWeapon = import("/lua/seraphimweapons.lua").SIFInainoWeapon
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class XSB2305 : SStructureUnit
-XSB2305 = Class(SStructureUnit) {
+XSB2305 = ClassUnit(SStructureUnit) {
     Weapons = {
-        InainoMissiles = Class(SIFInainoWeapon) {
+        InainoMissiles = ClassWeapon(SIFInainoWeapon) {
             LaunchEffects = function(self)
                 local FxLaunch = EffectTemplate.SIFInainoPreLaunch01
 

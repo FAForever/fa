@@ -12,12 +12,13 @@ local explosion = import("/lua/defaultexplosions.lua")
 local util = import("/lua/utilities.lua")
 local WeaponsFile = import("/lua/terranweapons.lua")
 
+
 local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local TAirToAirLinkedRailgun = WeaponsFile.TAirToAirLinkedRailgun
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 
 ---@class UEA0104 : AirTransport
-UEA0104 = Class(AirTransport) {
+UEA0104 = ClassUnit(AirTransport) {
     AirDestructionEffectBones = { 'Char04', 'Char03', 'Char02', 'Char01',
                                 'Front_Right_Exhaust','Front_Left_Exhaust','Back_Right_Exhaust','Back_Left_Exhaust',
                                 'Right_Arm05','Right_Arm07','Right_Arm02','Right_Arm03', 'Right_Arm04','Right_Arm01'},
@@ -27,28 +28,22 @@ UEA0104 = Class(AirTransport) {
     BeamExhaustIdle = '/effects/emitters/transport_thruster_beam_02_emit.bp',
 
     Weapons = {
-        FrontLinkedRailGun = Class(TAirToAirLinkedRailgun) {},
-        BackLinkedRailGun = Class(TAirToAirLinkedRailgun) {},
-        FrontRiotGun = Class(TDFRiotWeapon) {},
-        BackRiotGun = Class(TDFRiotWeapon) {},
+        FrontLinkedRailGun = ClassWeapon(TAirToAirLinkedRailgun) {},
+        BackLinkedRailGun = ClassWeapon(TAirToAirLinkedRailgun) {},
+        FrontRiotGun = ClassWeapon(TDFRiotWeapon) {},
+        BackRiotGun = ClassWeapon(TDFRiotWeapon) {},
     },
 
-    DestructionTicks = 250,
     EngineRotateBones = {'Front_Right_Engine', 'Front_Left_Engine', 'Back_Left_Engine', 'Back_Right_Engine', },
 
     OnStopBeingBuilt = function(self,builder,layer)
         AirTransport.OnStopBeingBuilt(self,builder,layer)
-        self.EngineManipulators = {}
 
         -- create the engine thrust manipulators
-        for k, v in self.EngineRotateBones do
-            table.insert(self.EngineManipulators, CreateThrustController(self, "thruster", v))
-        end
-
-        -- set up the thursting arcs for the engines
-        for keys,values in self.EngineManipulators do
-            --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
-            values:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
+        for _, bone in self.EngineRotateBones do
+            local controller = CreateThrustController(self, 'Thruster', bone)
+            controller:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
+            self.Trash:Add(controller)
         end
 
         self.LandingAnimManip = CreateAnimator(self)
