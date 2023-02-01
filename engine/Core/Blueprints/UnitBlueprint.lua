@@ -858,7 +858,7 @@
 
 ---@class UnitBlueprintIntel
 --- intel status that is deep-copied for each unit instance
----@field State UnitIntelStatus
+---@field State? UnitIntelStatus
 --- intel types set to true in this table cannot be disabled
 ---@field ActiveIntel? table<IntelType, boolean>
 --- single unit cloaking
