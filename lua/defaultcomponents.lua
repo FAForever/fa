@@ -405,7 +405,9 @@ TreadComponent = ClassSimple {
     CreateMovementEffects = function(self)
         local treads = self.TreadBlueprint
         if treads then
-            self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
+            if treads.ScrollTreads then
+                self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
+            end
 
             local treadMarks = treads.TreadMarks
             local treadType = self.TerrainType.Treads
@@ -419,7 +421,9 @@ TreadComponent = ClassSimple {
     DestroyMovementEffects = function(self)
         local treads = self.TreadBlueprint
         if treads then
-            self:RemoveScroller()
+            if treads.ScrollTreads then
+                self:RemoveScroller()
+            end
 
             if self.TreadThreads then
                 self.TreadSuspend = true
