@@ -1679,6 +1679,24 @@ MobileUnit = ClassUnit(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:SetFireState(FireState.GROUND_FIRE)
+
+        self.MovementEffectsBag = TrashBag()
+        self.TopSpeedEffectsBag = TrashBag()
+        self.BeamExhaustEffectsBag = TrashBag()
+
+    end,
+
+    DestroyAllTrashBags = function(self)
+        Unit.DestroyAllTrashBags(self)
+
+        self.MovementEffectsBag:Destroy()
+        self.TopSpeedEffectsBag:Destroy()
+        self.BeamExhaustEffectsBag:Destroy()
+
+        -- only exists if unit is transported
+        if self.TransportBeamEffectsBag then
+            self.TransportBeamEffectsBag:Destroy()
+        end
     end,
 
     ---@param self MobileUnit
@@ -2246,8 +2264,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildEffectBones = bp.General.BuildBones.BuildEffectBones
-
-        self.EffectsBag = {}
+        
         if bp.General.BuildBones then
             self:SetupBuildBones()
         end

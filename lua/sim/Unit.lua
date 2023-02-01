@@ -236,12 +236,9 @@ Unit = ClassUnit(moho.unit_methods) {
         -- used for rebuilding mechanic
         self.Repairers = {}
 
-        -- used by almost all unit types, sadly some are even used for structures in rare occasions
-        self.MovementEffectsBag = TrashBag()
-        self.TopSpeedEffectsBag = TrashBag()
-        self.BeamExhaustEffectsBag = TrashBag()
-        self.IdleEffectsBag = TrashBag()
+        -- used by almost all unit types
         self.OnBeingBuiltEffectsBag = TrashBag()
+        self.IdleEffectsBag = TrashBag()
 
         -- Set up veterancy
         self.Instigators = {}
@@ -2142,60 +2139,56 @@ Unit = ClassUnit(moho.unit_methods) {
 
     ---@param self Unit
     DestroyAllTrashBags = function(self)
-        -- Some bags should really be managed by their classes
-        -- but for mod compatibility reasons we delete them all here.
-        for _, v in self.EffectsBag or {} do
-            v:Destroy()
-        end
-        for k, v in self.ShieldEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.ReleaseEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.AmbientExhaustEffectsBag or {} do
-            v:Destroy()
-        end
-        for k, v in self.OmniEffectsBag or {} do
-            v:Destroy()
-        end
-        for k, v in self.AdjacencyBeamsBag or {} do
-            v.Trash:Destroy()
-            self.AdjacencyBeamsBag[k] = nil
-        end
-        for _, v in self.IntelEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.TeleportDestChargeBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.TeleportSoundChargeBag or {} do
-            v:Destroy()
-        end
-        for _, EffectsBag in self.DamageEffectsBag or {} do
-            for _, v in EffectsBag do
+
+        self.IdleEffectsBag:Destroy()
+        self.OnBeingBuiltEffectsBag:Destroy()
+
+        -- Some bags should really be managed by their classes, but
+        -- for mod compatibility reasons we destroy those here too
+
+        if self.ReleaseEffectsBag then
+            for _, v in self.ReleaseEffectsBag do
                 v:Destroy()
             end
         end
-    
-        if self.MovementEffectsBag then 
-            self.MovementEffectsBag:Destroy()
+
+        if self.ShieldEffectsBag then 
+            for k, v in self.ShieldEffectsBag do
+                v:Destroy()
+            end
         end
 
-        if self.IdleEffectsBag then 
-            self.IdleEffectsBag:Destroy()
+        if self.IntelEffectsBag then
+            for _, v in self.IntelEffectsBag do
+                v:Destroy()
+            end
         end
 
-        if self.TopSpeedEffectsBag then 
-            self.TopSpeedEffectsBag:Destroy()
+        if self.TeleportDestChargeBag then
+            for _, v in self.TeleportDestChargeBag do
+                v:Destroy()
+            end
         end
 
-        if self.BeamExhaustEffectsBag then
-            self.BeamExhaustEffectsBag:Destroy()
+        if self.TeleportSoundChargeBag then
+            for _, v in self.TeleportSoundChargeBag do
+                v:Destroy()
+            end
+        end 
+
+        if self.AdjacencyBeamsBag then
+            for k, v in self.AdjacencyBeamsBag do
+                v.Trash:Destroy()
+                self.AdjacencyBeamsBag[k] = nil
+            end
         end
 
-        if self.TransportBeamEffectsBag then 
-            self.TransportBeamEffectsBag:Destroy()
+        if self.DamageEffectsBag then
+            for _, EffectsBag in self.DamageEffectsBag do
+                for _, v in EffectsBag do
+                    v:Destroy()
+                end
+            end
         end
     end,
 
@@ -2918,7 +2911,7 @@ Unit = ClassUnit(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     OnStopBuild = function(self, built)
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
@@ -3978,7 +3971,12 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param self Unit
     DestroyMovementEffects = function(self)
         -- Destroy the stored movement effects
-        TrashDestroy(self.MovementEffectsBag)
+        if self.MovementEffectsBag then
+            TrashDestroy(self.MovementEffectsBag)
+        else 
+            LOG(self.Blueprint.BlueprintId)
+        end
+
 
         -- Clean up any camera shake going on.
         local bpTable = self.Blueprint.Display.MovementEffects
@@ -5349,7 +5347,7 @@ DummyUnit = ClassDummyUnit(moho.unit_methods) {
 
 if next(__active_mods) then
 
-    SPEW("Sim mod detected - adding in missing fields to the unit class to improve compatibility")
+    SPEW("Sim mod detected - adding in missing fields to unit class to improve compatibility")
 
     local oldUnit = Unit
     Unit = Class(oldUnit) {
@@ -5360,6 +5358,42 @@ if next(__active_mods) then
             self.factionCategory = self.Blueprint.FactionCategory
             self.layerCategory = self.Blueprint.LayerCategory
             self.factionCategory = self.Blueprint.FactionCategory
+
+            self.MovementEffectsBag = TrashBag()
+            self.TopSpeedEffectsBag = TrashBag()
+            self.BeamExhaustEffectsBag = TrashBag()
+            self.IdleEffectsBag = TrashBag()
+        end,
+
+        DestroyAllTrashBags = function(self)
+            oldUnit.DestroyAllTrashBags(self)
+
+            self.MovementEffectsBag:Destroy()
+            self.TopSpeedEffectsBag:Destroy()
+            self.BeamExhaustEffectsBag:Destroy()
+            self.IdleEffectsBag:Destroy()
+    
+            if self.TransportBeamEffectsBag then
+                self.TransportBeamEffectsBag:Destroy()
+            end
+
+            if self.AmbientExhaustEffectsBag then
+                for _, v in self.AmbientExhaustEffectsBag do
+                    v:Destroy()
+                end
+            end
+
+            if self.EffectsBag then
+                for _, v in self.EffectsBag do
+                    v:Destroy()
+                end
+            end
+
+            if self.OmniEffectsBag then
+                for k, v in self.OmniEffectsBag do
+                    v:Destroy()
+                end
+            end
         end,
     }
 end
