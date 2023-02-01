@@ -476,7 +476,7 @@ TreadComponent = ClassSimple {
         local tech = self.Blueprint.TechCategory
         local sizeX = treads.TreadMarksSizeX
         local sizeZ = treads.TreadMarksSizeZ
-        local interval = 10 * treads.TreadMarksInterval
+        local interval = 10 * (treads.TreadMarksInterval or 0.1)
         local treadOffset = treads.TreadOffset
         local treadBone = treads.BoneName or 0
         local treadTexture = treads.TreadMarks
@@ -484,6 +484,11 @@ TreadComponent = ClassSimple {
         local duration = treads.TreadLifeTime or TechToDuration[tech] or 1
         local lod = TechToLOD[tech] or 120
         local army = self.Army
+
+        -- prevent infinite loops
+        if interval < 1 then
+            interval = 1
+        end
 
         while true do
             while not self.TreadSuspend do

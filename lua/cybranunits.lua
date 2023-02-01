@@ -774,7 +774,6 @@ CConstructionStructureUnit = ClassUnit(CStructureUnit, CConstructionTemplate) {
         local bp = self:GetBlueprint()
 
         -- Construction stuff
-        self.EffectsBag = {}
         if bp.General.BuildBones then
             self:SetupBuildBones()
         end
