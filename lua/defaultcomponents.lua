@@ -39,7 +39,6 @@ IntelComponent = ClassSimple {
         local intelBlueprint = self.Blueprint.Intel
         if intelBlueprint and intelBlueprint.State then
             self.IntelStatus = table.deepcopy(intelBlueprint.State)
-            reprsl(self.IntelStatus)
             self:EnableUnitIntel('NotInitialized')
             self.Brain:AddEnergyDependingEntity(self)
         end
@@ -47,7 +46,6 @@ IntelComponent = ClassSimple {
 
     ---@param self IntelComponent | Unit
     OnEnergyDepleted = function(self)
-        LOG("OnEnergyDepleted")
         local status = self.IntelStatus
         if status then
             self:DisableUnitIntel('Energy')
@@ -56,7 +54,6 @@ IntelComponent = ClassSimple {
 
     ---@param self IntelComponent | Unit
     OnEnergyViable = function(self)
-        LOG("OnEnergyDepleted")
         local status = self.IntelStatus
         if status then
             self:EnableUnitIntel('Energy')
@@ -69,7 +66,7 @@ IntelComponent = ClassSimple {
     DisableUnitIntel = function(self, disabler, intel)
         local status = self.IntelStatus
         if status then
-            LOG("DisableUnitIntel: " .. tostring(disabler) .. " for " .. tostring(intel))
+            -- LOG("DisableUnitIntel: " .. tostring(disabler) .. " for " .. tostring(intel))
 
             -- prevent recharging from occuring
             self:OnIntelRechargeFailed()
@@ -120,7 +117,6 @@ IntelComponent = ClassSimple {
                     end
                 end
             end
-            reprsl(status)
         end
     end,
 
@@ -130,7 +126,7 @@ IntelComponent = ClassSimple {
     EnableUnitIntel = function(self, disabler, intel)
         local status = self.IntelStatus
         if status then
-            LOG("EnableUnitIntel: " .. tostring(disabler) .. " for " .. tostring(intel))
+            -- LOG("EnableUnitIntel: " .. tostring(disabler) .. " for " .. tostring(intel))
 
             local allIntel = status.AllIntel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
@@ -202,8 +198,6 @@ IntelComponent = ClassSimple {
                     end
                 end
             end
-
-            reprsl(status)
         end
     end,
 
@@ -212,14 +206,12 @@ IntelComponent = ClassSimple {
     OnIntelRecharge = function(self, intel)
         local status = self.IntelStatus
         if status then
-            LOG("OnIntelRecharge: for " .. tostring(intel))
+            -- LOG("OnIntelRecharge: for " .. tostring(intel))
             if not status.RechargeThread then
                 status.RechargeThread = ForkThread(self.IntelRechargeThread, self)
             end
 
             status.AllIntelRecharging[intel] = true
-
-            reprsl(status)
         end
     end,
 
@@ -227,15 +219,12 @@ IntelComponent = ClassSimple {
     OnIntelRecharged = function(self)
         local status = self.IntelStatus
         if status and status.RechargeThread then
-            LOG("OnIntelRecharged")
             status.RechargeThread = nil
             for i, _ in status.AllIntelRecharging do
                 self:EnableIntel(i)
                 self:OnIntelEnabled(i)
                 status.AllIntelRecharging[i] = nil
             end
-
-            reprsl(status)
         end
     end,
 
@@ -243,12 +232,9 @@ IntelComponent = ClassSimple {
     OnIntelRechargeFailed = function(self)
         local status = self.IntelStatus
         if status and status.RechargeThread then
-            LOG("OnIntelRechargeFailed")
             status.RechargeThread:Destroy()
             status.RechargeThread = nil
             self:SetWorkProgress(0)
-
-            reprsl(status)
         end
     end,
 
@@ -256,7 +242,6 @@ IntelComponent = ClassSimple {
     IntelRechargeThread = function(self)
         local status = self.IntelStatus
         if status then
-            LOG("IntelRechargeThread")
             local ticks = 10 * (self.Blueprint.Intel.ReactivateTime or 1)
 
             --- display progress
@@ -273,7 +258,7 @@ IntelComponent = ClassSimple {
     ---@param self IntelComponent | Unit
     ---@param intel? IntelType
     OnIntelEnabled = function(self, intel)
-        LOG("Enabled intel: " .. tostring(intel))
+        -- LOG("Enabled intel: " .. tostring(intel))
 
         if intel == 'Cloak' or intel == 'CloakField' then
             self:UpdateCloakEffect(true, intel)
@@ -283,7 +268,7 @@ IntelComponent = ClassSimple {
     ---@param self IntelComponent | Unit
     ---@param intel? IntelType
     OnIntelDisabled = function(self, intel)
-        LOG("Disabled intel: " .. tostring(intel))
+        -- LOG("Disabled intel: " .. tostring(intel))
 
         if intel == 'Cloak' or intel == 'CloakField' then
             self:UpdateCloakEffect(false, intel)
