@@ -110,6 +110,7 @@ local cUnit = moho.unit_methods
 ---@field EventCallbacks table<string, function[]>
 ---@field Blueprint UnitBlueprint
 ---@field EngineFlags any
+---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
 Unit = ClassUnit(moho.unit_methods) {
@@ -280,6 +281,7 @@ Unit = ClassUnit(moho.unit_methods) {
 
         -- for syncing data to UI
         self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate)
+        self:SetStat("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
@@ -1688,6 +1690,8 @@ Unit = ClassUnit(moho.unit_methods) {
         end
     end,
 
+    
+
     --- Called when a unit collides with a projectile to check if the collision is valid
     ---@param self Unit The unit we're checking the collision for
     ---@param other Projectile The projectile we're checking the collision with
@@ -2191,9 +2195,7 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param self Unit
     OnDestroy = function(self)
         self.Dead = true
-
-        -- LOG(string.format("%s -> %s", tostring(self.UnitId), tostring(debug.allocatedsize(self))))
-
+        
         if self:GetFractionComplete() < 1 then
             self:SendNotifyMessage('cancelled')
         end
@@ -2209,7 +2211,6 @@ Unit = ClassUnit(moho.unit_methods) {
         Sync.ReleaseIds[self.EntityId] = true
 
         -- Destroy everything added to the trash
-        LOG("Destroyed")
         self.Trash:Destroy()
 
         -- Destroy all extra trashbags in case the DeathTread() has not already destroyed it (modded DeathThread etc.)
@@ -2845,11 +2846,10 @@ Unit = ClassUnit(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param built RadarJammerUnit
+    ---@param built Unit
     ---@param order string
     ---@return boolean
     OnStartBuild = function(self, built, order)
-
         self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
 
         -- Prevent UI mods from violating game/scenario restrictions
@@ -3689,6 +3689,7 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param new string
     ---@param old string
     OnTerrainTypeChange = function(self, new, old)
+        self.TerrainType = new
         if self.MovementEffectsExist then
             self:DestroyMovementEffects()
             self:CreateMovementEffects(self.MovementEffectsBag, nil, new)
@@ -3810,14 +3811,6 @@ Unit = ClassUnit(moho.unit_methods) {
         end
     end,
 
-    ---@param self Unit
-    ---@param pos Vector
-    ---@return TerrainTreadType
-    GetTTTreadType = function(self, pos)
-        local terrainType = GetTerrainType(pos[1], pos[3])
-        return terrainType.Treads or 'None'
-    end,
-
     ---@param fxType TerrainEffectType
     ---@param layer Layer
     ---@param pos Vector
@@ -3936,12 +3929,6 @@ Unit = ClassUnit(moho.unit_methods) {
             bpTable = bpTable[layer]
             local effectTypeGroups = bpTable.Effects
 
-            if bpTable.Treads then
-                self:CreateTreads(bpTable.Treads)
-            else
-                self:RemoveScroller()
-            end
-
             if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
                 if not self.Footfalls and bpTable.Footfall then
                     WARN('*WARNING: No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
@@ -4001,18 +3988,6 @@ Unit = ClassUnit(moho.unit_methods) {
             if shake and shake.Radius and shake.MaxShakeEpicenter and shake.MinShakeAtRadius then
                 self:ShakeCamera(shake.Radius, shake.MaxShakeEpicenter * 0.25, shake.MinShakeAtRadius * 0.25, 1)
             end
-        end
-
-        -- Clean up treads
-        if self.TreadThreads then
-            for k, v in self.TreadThreads do
-                KillThread(v)
-            end
-            self.TreadThreads = {}
-        end
-
-        if bpTable[layer].Treads.ScrollTreads then
-            self:RemoveScroller()
         end
     end,
 
@@ -4106,44 +4081,6 @@ Unit = ClassUnit(moho.unit_methods) {
                 self:ShakeCamera(radius, maxShakeEpicenter, minShakeAtRadius, interval)
                 WaitSeconds(interval)
             end
-        end
-    end,
-
-    ---@param self Unit
-    ---@param treads UnitBlueprintTreads
-    CreateTreads = function(self, treads)
-        if treads.ScrollTreads then
-            self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
-        end
-
-        self.TreadThreads = {}
-        if treads.TreadMarks then
-            local type = self:GetTTTreadType(self:GetPosition())
-            if type ~= 'None' then
-                for k, v in treads.TreadMarks do
-                    table.insert(self.TreadThreads, self:ForkThread(self.CreateTreadsThread, v, type))
-                end
-            end
-        end
-    end,
-
-    ---@param self Unit
-    ---@param treads UnitBlueprintTreads
-    ---@param type string
-    CreateTreadsThread = function(self, treads, type)
-        local sizeX = treads.TreadMarksSizeX
-        local sizeZ = treads.TreadMarksSizeZ
-        local interval = treads.TreadMarksInterval
-        local treadOffset = treads.TreadOffset
-        local treadBone = treads.BoneName or 0
-        local treadTexture = treads.TreadMarks
-        local duration = treads.TreadLifeTime or 10
-
-        while true do
-            -- Syntactic reference
-            -- CreateSplatOnBone(entity, offset, boneName, textureName, sizeX, sizeZ, lodParam, duration, army)
-            CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, 130, duration, self.Army)
-            WaitSeconds(interval)
         end
     end,
 
@@ -5181,6 +5118,14 @@ Unit = ClassUnit(moho.unit_methods) {
     OnDamageBy = function(self, index) end,
 
     --- Deprecated functionality
+
+    ---@param self Unit
+    ---@param pos Vector
+    ---@return TerrainTreadType
+    GetTTTreadType = function(self, pos)
+        local terrainType = GetTerrainType(pos[1], pos[3])
+        return terrainType.Treads or 'None'
+    end,
 
     ---@deprecated
     ---@param self Unit

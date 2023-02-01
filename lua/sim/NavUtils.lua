@@ -72,8 +72,10 @@ local function FindLeaf(grid, position)
     end
 
     if leaf.Label == -1 then
-        local distance = 1024
+        local distance = 1048576
         local nearest = nil
+        local px = position[1]
+        local pz = position[3]
 
         -- try and find nearest valid neighbor
         for k = 1, table.getn(leaf) do
@@ -81,7 +83,9 @@ local function FindLeaf(grid, position)
             ---@type CompressedLabelTreeLeaf
             local neighbor = leaf[k]
             if neighbor.Label > 0 then
-                local d = leaf:DistanceTo(neighbor)
+                local dx = px - neighbor.px
+                local dz = pz - neighbor.pz
+                local d = dx * dx + dz * dz
                 if d < distance then
                     distance = d
                     nearest = neighbor

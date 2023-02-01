@@ -20,6 +20,7 @@ local signs = {
     ["LeftBracket"] = "[", -- this key is the rightbracket for azerty
     ["RightBracket"] = "]",
     ["Chevron"] = "<", -- added for french keyboard
+    ["Backtick"] = "`",
 }
 
 -- Which colour do we make the label? Shift is not taken into account here

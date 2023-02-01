@@ -91,7 +91,7 @@ TDFRiotWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class TAAGinsuRapidPulseWeapon : DefaultProjectileWeapon
 TAAGinsuRapidPulseWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {},
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
 }
 
 ---@class TDFIonizedPlasmaCannon : DefaultProjectileWeapon
@@ -102,15 +102,13 @@ TDFIonizedPlasmaCannon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class TDFHiroPlasmaCannon : DefaultBeamWeapon
 TDFHiroPlasmaCannon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeams.TDFHiroCollisionBeam,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {},
-    FxUpackingChargeEffects = {},
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxUpackingChargeEffectScale = 1,
 
     ---@param self TDFHiroPlasmaCannon
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -124,32 +122,6 @@ TDFHiroPlasmaCannon = ClassWeapon(DefaultBeamWeapon) {
 ---@class TAAFlakArtilleryCannon : DefaultProjectileWeapon
 TAAFlakArtilleryCannon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TFlakCannonMuzzleFlash01,
-    
-    --- Custom over-ride for this weapon, so it passes data and damageTable
-    ---@param self TAAFlakArtilleryCannon
-    ---@param bone Bone
-    ---@return Projectile
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
-        local data = {
-            Instigator = self.unit,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Radius = blueprint.DamageRadius,
-            Type = 'Normal',
-            DamageFriendly = blueprint.DamageFriendly,
-        }
-        
-        if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
-        end
-
-        return proj
-    end
 }
 
 ---@class TAALinkedRailgun : DefaultProjectileWeapon
@@ -164,8 +136,9 @@ TAirToAirLinkedRailgun = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class TIFCruiseMissileUnpackingLauncher : DefaultProjectileWeapon
 TIFCruiseMissileUnpackingLauncher = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {},
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
 }
+
 ---@class TIFCruiseMissileLauncher : DefaultProjectileWeapon
 TIFCruiseMissileLauncher = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchSmoke,
@@ -206,7 +179,7 @@ TIFSmartCharge = ClassWeapon(DefaultProjectileWeapon) {
     ---@param muzzle Bone
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
-        local tbl = self:GetBlueprint().DepthCharge
+        local tbl = self.Blueprint.DepthCharge
         proj:AddDepthCharge(tbl)
     end,
 }
@@ -222,29 +195,6 @@ TIFArtilleryWeapon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class TIFCarpetBombWeapon : DefaultProjectileWeapon
 TIFCarpetBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
-
-    ---@param self TIFCarpetBombWeapon
-    ---@param bone Bone
-    ---@return Projectile | nil
-    CreateProjectileForWeapon = function(self, bone)
-        local projectile = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
-        local data = {
-            Instigator = self.unit,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Radius = blueprint.DamageRadius,
-            Type = 'Normal',
-            DamageFriendly = blueprint.DamageFriendly,
-        }
-        if projectile and not projectile:BeenDestroyed() then
-            projectile:PassData(data)
-            projectile:PassDamageData(damageTable)
-        end
-        return projectile
-    end,
 
     --- This function creates the projectile, and happens when the unit is trying to fire
     --- Called from inside RackSalvoFiringState
@@ -289,7 +239,7 @@ TAMPhalanxWeapon = ClassWeapon(DefaultProjectileWeapon) {
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         for k, v in self.FxShellEject do
-            CreateAttachedEmitter(self.unit, self:GetBlueprint().TurretBonePitch, self.unit.Army, v)
+            CreateAttachedEmitter(self.unit, self.Blueprint.TurretBonePitch, self.unit.Army, v)
         end
     end,
 }
@@ -297,12 +247,12 @@ TAMPhalanxWeapon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class TOrbitalDeathLaserBeamWeapon : DefaultBeamWeapon
 TOrbitalDeathLaserBeamWeapon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = OrbitalDeathLaserCollisionBeam,
-    FxUpackingChargeEffects = {},
+    FxUpackingChargeEffects = import("/lua/effecttemplates.lua").NoEffects,
     FxUpackingChargeEffectScale = 1,
 
     ---@param self TOrbitalDeathLaserBeamWeapon
     PlayFxWeaponUnpackSequence = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         for k, v in self.FxUpackingChargeEffects do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                 CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)

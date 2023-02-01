@@ -84,7 +84,7 @@ UnitBlueprint {
         },
         AnimationWalk = '/units/DRLK001/DRLK001_walk.sca',
         AnimationWalkRate = 7,
-        AttackReticuleSize = 3,
+        AttackReticleSize = 3,
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -333,7 +333,7 @@ UnitBlueprint {
             MaxRadius = 62,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            PreferPrimaryWeaponTarget = true,
+            PrefersPrimaryWeaponTarget = true,
             ProjectileLifetimeUsesMultiplier = 1.15,
             RackBones = {
                 {
@@ -403,7 +403,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 15,
-            PreferPrimaryWeaponTarget = true,
+            PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CAANanoDartEx/CAANanoDartEx_proj.bp',
             ProjectileLifetime = 8.0,
             RackBones = {

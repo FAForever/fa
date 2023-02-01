@@ -9,9 +9,7 @@ local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
 local WeaponsFile = import("/lua/aeonweapons.lua")
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
-local utilities = import("/lua/utilities.lua")
 local explosion = import("/lua/defaultexplosions.lua")
-
 local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
 
 -- upvalue for performance
@@ -115,10 +113,9 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
     end,
 
     DeathThread = function(self, overkillRatio , instigator)
-        local size = self.Size
         self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ})
         WaitSeconds(2)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         WaitSeconds(0.1)
@@ -179,3 +176,6 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
 }
 
 TypeClass = UAL0401
+
+-- Kept for Mod Backwards Compatability
+local Utilities = import("/lua/utilities.lua")

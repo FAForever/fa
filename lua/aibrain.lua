@@ -102,7 +102,7 @@ local TableGetn = table.getn
 ---@field Trash TrashBag
 ---@field TriggerList table
 ---@field UnitBuiltTriggerList table
----@field UnitStats table<UnitId, table<string, number>>
+---@field UnitStats table<EntityId, table<string, number>>
 ---@field VeterancyTriggerList table
 AIBrain = Class(moho.aibrain_methods) {
     -- The state of the brain in the match
@@ -136,7 +136,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@param unitId UnitId
+    ---@param unitId EntityId
     ---@param statName string
     ---@param value number
     SetUnitStat = function(self, unitId, statName, value)
@@ -148,7 +148,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@param unitId UnitId
+    ---@param unitId EntityId
     ---@param statName string
     ---@return number
     GetUnitStat = function(self, unitId, statName)
@@ -246,6 +246,23 @@ AIBrain = Class(moho.aibrain_methods) {
         self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
     end,
 
+    --- Completely re evaluates the support factory restrictions of the engi mod
+    ---@param self AIBrain
+    ReEvaluateHQSupportFactoryRestrictions = function (self)
+        local layers = { "AIR", "LAND", "NAVAL" }
+        local factions = { "UEF", "AEON", "CYBRAN", "SERAPHIM" }
+
+        if categories.NOMADS then
+            table.insert(factions, 'NOMADS')
+        end
+
+        for _, faction in factions do
+            for _, layer in layers do
+                self:SetHQSupportFactoryRestrictions(faction, layer)
+            end
+        end
+    end,
+
     --- Manages the support factory restrictions of the engi mod
     ---@param self AIBrain
     ---@param faction HqFaction
@@ -260,13 +277,13 @@ AIBrain = Class(moho.aibrain_methods) {
         AddBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
 
         -- lift t2 / t3 support factory restrictions
-        if self.HQs[faction][layer]["TECH3"] > 0 then 
+        if self.HQs[faction][layer]["TECH3"] > 0 then
             RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
             RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
         end
 
         -- lift t2 support factory restrictions
-        if self.HQs[faction][layer]["TECH2"] > 0 then 
+        if self.HQs[faction][layer]["TECH2"] > 0 then
             RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
         end
     end,
@@ -1301,7 +1318,7 @@ AIBrain = Class(moho.aibrain_methods) {
         if trash then
             trash:Destroy()
         end
-    end;
+    end,
 
     ---@param self AIBrain
     IsDefeated = function(self)
@@ -1313,7 +1330,7 @@ AIBrain = Class(moho.aibrain_methods) {
     RecallAllCommanders = function(self)
         local commandCat = categories.COMMAND + categories.SUBCOMMANDER
         self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false))
-    end;
+    end,
 
     ---@param self AIBrain
     ---@param recallingUnits Unit[]
@@ -1322,7 +1339,7 @@ AIBrain = Class(moho.aibrain_methods) {
             import("/lua/scenarioframework.lua").FakeTeleportUnits(recallingUnits, true)
         end
         self:OnRecalled()
-    end;
+    end,
 
     ---@param self AIBrain
     ---@param bestPlan string
@@ -2710,7 +2727,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param loc Vector
     ---@param radius number
     ---@param locType string
-    ---@param useCenterPoint boolean
+    ---@param useCenterPoint? boolean
     ---@return boolean
     PBMAddBuildLocation = function(self, loc, radius, locType, useCenterPoint)
         if not radius or not loc or not locType then

@@ -17,15 +17,6 @@ UnitBlueprint {
             'Turret_Right02',
             'UEL0401',
         },
-        AddTargetBones = {
-            'Turret_Left01_Barrel02',
-            'Turret_Left02_Barrel02',
-            'Turret_Right01_Barrel02',
-            'Turret_Right02_Barrel02',
-            'Attachpoint3',
-            'Turret_Left_AA',
-            'Turret_Right_AA',
-        },
     },
     Audio = {
         AmbientMoveLand = Sound {
@@ -247,24 +238,24 @@ UnitBlueprint {
                     TreadMarks = {
                         {
                             TreadMarks = 'tank_treads06_albedo',
-                            TreadMarksInterval = 0.6,
+                            TreadMarksInterval = 0.3,
                             TreadMarksSizeX = 5,
                             TreadMarksSizeZ = 5.5,
                             TreadOffset = {
                                 0,
                                 0,
-                                -1.5,
+                                -0.5,
                             },
                         },
                         {
                             TreadMarks = 'tank_treads06_albedo',
-                            TreadMarksInterval = 0.6,
+                            TreadMarksInterval = 0.3,
                             TreadMarksSizeX = 5.5,
                             TreadMarksSizeZ = 5.5,
                             TreadOffset = {
                                 0,
                                 0,
-                                -5.5,
+                                -4.5,
                             },
                         },
                     },

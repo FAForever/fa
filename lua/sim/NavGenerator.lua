@@ -126,20 +126,37 @@ function DrawSquare(px, pz, c, color, inset)
     DrawLine(br, tr, color)
 end
 
+local FactoryNavGrid = {
+    __call = function(self, layer, treeSize)
+        local instance = {&3 &0}
+        setmetatable(instance, self)
+        instance:OnCreate(layer, treeSize)
+        return instance
+    end
+}
+
+---@generic T: fa-class
+---@param specs T
+---@return T
+local ClassNavGrid = function(specs)
+    specs.__index = specs
+    return setmetatable(specs, FactoryNavGrid)
+end
+
 ---@class NavGrid
 ---@field Layer NavLayers
 ---@field TreeSize number
 ---@field Trees CompressedLabelTreeNode[][]
-NavGrid = ClassSimple {
+NavGrid = ClassNavGrid {
 
     ---@param self NavGrid
     ---@param layer NavLayers
-    __init = function(self, layer, treeSize)
+    OnCreate = function(self, layer, treeSize)
         self.Layer = layer
         self.TreeSize = treeSize
-        self.Trees = {}
+        self.Trees = {&0 &16}
         for z = 0, LabelCompressionTreesPerAxis - 1 do
-            self.Trees[z] = {}
+            self.Trees[z] = {&0 &16}
         end
     end,
 
@@ -249,6 +266,20 @@ NavGrid = ClassSimple {
     end,
 }
 
+local FactoryCompressedLabelTree = {
+    __call = function(self, layer, treeSize)
+        return setmetatable({&0 &4}, self)
+    end
+}
+
+---@generic T: fa-class
+---@param specs T
+---@return T
+local ClassCompressedLabelTree = function(specs)
+    specs.__index = specs
+    return setmetatable(specs, FactoryCompressedLabelTree)
+end
+
 -- defined here, as it is a recursive class
 local CompressedLabelTree
 
@@ -263,6 +294,7 @@ local CompressedLabelTree
 ---@field [7] CompressedLabelTreeLeaf?
 ---@field [8] CompressedLabelTreeLeaf?
 ---@field [9] CompressedLabelTreeLeaf?
+---@field Root CompressedLabelTreeNode | CompressedLabelTreeLeaf    
 ---@field Size number                       # Element count starting at { bx + ox, bz + oz }, used as a parameter during path finding to determine if a unit can pass
 ---@field Label number                      # Label for efficient `CanPathTo` check
 ---@field px number                         # x-coordinate of center in world space
@@ -278,7 +310,7 @@ local CompressedLabelTree
 ---@field [2] CompressedLabelTreeNode?
 ---@field [3] CompressedLabelTreeNode?
 ---@field [4] CompressedLabelTreeNode?
-CompressedLabelTree = ClassSimple {
+CompressedLabelTree = ClassCompressedLabelTree {
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
     --- the label cache only exists of 0s and -1s
@@ -288,11 +320,12 @@ CompressedLabelTree = ClassSimple {
     ---@param ox number             # Offset from top-left corner, in local space
     ---@param oz number             # Offset from top-left corner, in local space
     ---@param size number           # Element count starting at { bx + ox, bz + oz }
+    ---@param root CompressedLabelTreeNode | CompressedLabelTreeLeaf
     ---@param rCache NavLabelCache
     ---@param compressionThreshold number
     ---@param layer NavLayers
-    Compress = function(self, bx, bz, ox, oz, size, rCache, compressionThreshold, layer)
-        -- base case, if we're a square of 4 then we skip the children and become very pessimistic
+    Compress = function(self, bx, bz, ox, oz, size, root, rCache, compressionThreshold, layer)
+        -- base case when we meet compression threshold, we skip the children and become very pessimistic
         if size <= compressionThreshold then
             local value = rCache[oz + 1][ox + 1]
             local uniform = true
@@ -305,9 +338,11 @@ CompressedLabelTree = ClassSimple {
                 end
             end
 
+            self.Size = size
+            self.Root = root
+
             if uniform then
                 self.Label = value
-                self.Size = size
                 if self.Label >= 0 then
                     NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
                 else
@@ -315,7 +350,6 @@ CompressedLabelTree = ClassSimple {
                 end
             else
                 self.Label = -1
-                self.Size = size
                 NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
             end
 
@@ -338,6 +372,7 @@ CompressedLabelTree = ClassSimple {
             -- we're uniform, so we're good
             self.Label = value
             self.Size = size
+            self.Root = root
 
             if self.Label >= 0 then
                 NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
@@ -352,10 +387,10 @@ CompressedLabelTree = ClassSimple {
             self[3] = CompressedLabelTree(hc)
             self[4] = CompressedLabelTree(hc)
 
-            self[1]:Compress(bx, bz, ox, oz, hc, rCache, compressionThreshold, layer)
-            self[2]:Compress(bx, bz, ox + hc, oz, hc, rCache, compressionThreshold, layer)
-            self[3]:Compress(bx, bz, ox, oz + hc, hc, rCache, compressionThreshold, layer)
-            self[4]:Compress(bx, bz, ox + hc, oz + hc, hc, rCache, compressionThreshold, layer)
+            self[1]:Compress(bx, bz, ox, oz, hc, root, rCache, compressionThreshold, layer)
+            self[2]:Compress(bx, bz, ox + hc, oz, hc, root, rCache, compressionThreshold, layer)
+            self[3]:Compress(bx, bz, ox, oz + hc, hc, root, rCache, compressionThreshold, layer)
+            self[4]:Compress(bx, bz, ox + hc, oz + hc, hc, root, rCache, compressionThreshold, layer)
 
             NavLayerData[layer].Subdivisions = NavLayerData[layer].Subdivisions + 1
         end
@@ -596,10 +631,10 @@ CompressedLabelTree = ClassSimple {
         end
 
         -- node case
-        self[1]:GenerateLabels(stack)
-        self[2]:GenerateLabels(stack)
-        self[3]:GenerateLabels(stack)
-        self[4]:GenerateLabels(stack)
+        self[1]:GenerateLabels(stack, layer)
+        self[2]:GenerateLabels(stack, layer)
+        self[3]:GenerateLabels(stack, layer)
+        self[4]:GenerateLabels(stack, layer)
     end,
 
     ---@param self CompressedLabelTreeLeaf
@@ -951,33 +986,33 @@ local function GenerateCompressionGrids(size, threshold)
         local bz = z * size
         for x = 0, LabelCompressionTreesPerAxis - 1 do
             local bx = x * size
-            local labelTreeLand = CompressedLabelTree(size)
-            local labelTreeNaval = CompressedLabelTree(size)
-            local labelTreeHover = CompressedLabelTree(size)
-            local labelTreeAmph = CompressedLabelTree(size)
-            local labelTreeAir = CompressedLabelTree(size)
+            local labelTreeLand = CompressedLabelTree()
+            local labelTreeNaval = CompressedLabelTree()
+            local labelTreeHover = CompressedLabelTree()
+            local labelTreeAmph = CompressedLabelTree()
+            local labelTreeAir = CompressedLabelTree()
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
             PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, size)
 
             ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeLand:Compress(bx, bz, 0, 0, size, rCache, threshold, 'Land')
+            labelTreeLand:Compress(bx, bz, 0, 0, size, labelTreeLand, rCache, threshold, 'Land')
             navLand:AddTree(z, x, labelTreeLand)
 
             ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeNaval:Compress(bx, bz, 0, 0, size, rCache, 2 * threshold, 'Water')
+            labelTreeNaval:Compress(bx, bz, 0, 0, size, labelTreeNaval, rCache, 2 * threshold, 'Water')
             navWater:AddTree(z, x, labelTreeNaval)
 
             ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeHover:Compress(bx, bz, 0, 0, size, rCache, threshold, 'Hover')
+            labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
             navHover:AddTree(z, x, labelTreeHover)
 
             ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeAmph:Compress(bx, bz, 0, 0, size, rCache, threshold, 'Amphibious')
+            labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
             navAmphibious:AddTree(z, x, labelTreeAmph)
 
             ComputeAirPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeAir:Compress(bx, bz, 0, 0, size, rCache, threshold, 'Air')
+            labelTreeAir:Compress(bx, bz, 0, 0, size, labelTreeAir, rCache, threshold, 'Air')
             navAir:AddTree(z, x, labelTreeAir)
         end
     end
@@ -1115,10 +1150,16 @@ function Generate()
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
     ---@type number
-    local compressionThreshold = 4
+    local compressionThreshold = 1
 
-    if MapSize > 1024 then
-        compressionThreshold = 8
+    -- 20x20+
+    if MapSize >= 1024 then
+        compressionThreshold = 2 * compressionThreshold
+    end
+
+    -- 40x40+
+    if MapSize >= 2048 then
+        compressionThreshold = 2 * compressionThreshold
     end
 
     NavGrids['Land'] = NavGrid('Land', CompressionTreeSize)

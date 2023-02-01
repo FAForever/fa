@@ -146,7 +146,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param name string
----@param num integer
+---@param num number
 ---@return boolean
 function NumGreaterOrEqualAMPlatoons(aiBrain, name, num)
     local count
@@ -164,7 +164,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param name string
----@param num integer
+---@param num number
 ---@return boolean
 function NumGreaterAMPlatoons(aiBrain, name, num)
     local count
@@ -182,7 +182,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param name string
----@param num integer
+---@param num number
 ---@return boolean
 function NumLessOrEqualAMPlatoons(aiBrain, name, num)
     local count
@@ -200,7 +200,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param name string
----@param num integer
+---@param num number
 ---@return boolean
 function NumLessAMPlatoons(aiBrain, name, num)
     local count
@@ -218,7 +218,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param builderName string
----@param num integer
+---@param num number
 ---@return boolean
 function NumBuildersLessThanOSCounter(aiBrain, builderName, num)
     local counter = 0
@@ -239,7 +239,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param builderName string
----@param num integer
+---@param num number
 ---@return boolean
 function NumBuildersGreaterThanEqualOSCounter(aiBrain, builderName, num)
     local counter = 0
