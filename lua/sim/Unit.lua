@@ -3690,10 +3690,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
         -- Destroy the stored movement effects
         if self.MovementEffectsBag then
             TrashDestroy(self.MovementEffectsBag)
-        else 
-            LOG(self.Blueprint.BlueprintId)
         end
-
 
         -- Clean up any camera shake going on.
         local bpTable = self.Blueprint.Display.MovementEffects
