@@ -1438,14 +1438,14 @@ RadarUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self RadarUnit
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        StructureUnit.OnIntelDisabled(self, intel)
         self:DestroyIdleEffects()
     end,
 
     ---@param self RadarUnit
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        StructureUnit.OnIntelEnabled(self, intel)
         self:CreateIdleEffects()
     end,
 }
@@ -1493,8 +1493,8 @@ RadarJammerUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self RadarJammerUnit
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        StructureUnit.OnIntelEnabled(self, intel)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
             self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
@@ -1503,8 +1503,8 @@ RadarJammerUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self RadarJammerUnit
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        StructureUnit.OnIntelDisabled(self, intel)
         EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
         self.IntelFxOn = false
     end,
@@ -1672,18 +1672,19 @@ WallStructureUnit = ClassUnit(StructureUnit) { }
 QuantumGateUnit = ClassUnit(FactoryUnit) { }
 
 -- MOBILE UNITS
----@class MobileUnit : Unit
-MobileUnit = ClassUnit(Unit) {
+---@class MobileUnit : Unit, TreadComponent
+MobileUnit = ClassUnit(Unit, TreadComponent) {
 
     ---@param self MobileUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
+        TreadComponent.OnCreate(self)
+
         self:SetFireState(FireState.GROUND_FIRE)
 
         self.MovementEffectsBag = TrashBag()
         self.TopSpeedEffectsBag = TrashBag()
         self.BeamExhaustEffectsBag = TrashBag()
-
     end,
 
     DestroyAllTrashBags = function(self)
@@ -1697,6 +1698,16 @@ MobileUnit = ClassUnit(Unit) {
         if self.TransportBeamEffectsBag then
             self.TransportBeamEffectsBag:Destroy()
         end
+    end,
+
+    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
+        Unit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
+        TreadComponent.CreateMovementEffects(self)
+    end,
+
+    DestroyMovementEffects = function(self)
+        Unit.DestroyMovementEffects(self)
+        TreadComponent.DestroyMovementEffects(self)
     end,
 
     ---@param self MobileUnit
@@ -2234,23 +2245,8 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     end,
 }
 
----@class LandUnit : MobileUnit, TreadComponent
-LandUnit = ClassUnit(MobileUnit, TreadComponent) {
-    OnCreate = function(self)
-        MobileUnit.OnCreate(self)
-        TreadComponent.OnCreate(self)
-    end,
-
-    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
-        MobileUnit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
-        TreadComponent.CreateMovementEffects(self)
-    end,
-
-    DestroyMovementEffects = function(self)
-        MobileUnit.DestroyMovementEffects(self)
-        TreadComponent.DestroyMovementEffects(self)
-    end,
-}
+---@class LandUnit : MobileUnit
+LandUnit = ClassUnit(MobileUnit) {}
 
 --  CONSTRUCTION UNITS
 ---@class ConstructionUnit : MobileUnit
@@ -2458,23 +2454,8 @@ SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
 }
 
 -- AMPHIBIOUS LAND UNITS
----@class AmphibiousLandUnit : MobileUnit, TreadComponent
-AmphibiousLandUnit = ClassUnit(MobileUnit, TreadComponent) {
-    OnCreate = function(self)
-        MobileUnit.OnCreate(self)
-        TreadComponent.OnCreate(self)
-    end,
-
-    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
-        MobileUnit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
-        TreadComponent.CreateMovementEffects(self)
-    end,
-
-    DestroyMovementEffects = function(self)
-        MobileUnit.DestroyMovementEffects(self)
-        TreadComponent.DestroyMovementEffects(self)
-    end,
-}
+---@class AmphibiousLandUnit : MobileUnit
+AmphibiousLandUnit = ClassUnit(MobileUnit) { }
 
 ---@class SlowAmphibiousLandUnit : AmphibiousLandUnit
 SlowAmphibiousLandUnit = ClassUnit(AmphibiousLandUnit) {
