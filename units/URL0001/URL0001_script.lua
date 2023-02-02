@@ -391,8 +391,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         },
     },
 
-    OnIntelEnabled = function(self)
-        ACUUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        ACUUnit.OnIntelEnabled(self, intel)
         if self.CloakEnh and self:IsIntelEnabled('Cloak') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
@@ -410,8 +410,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         end
     end,
 
-    OnIntelDisabled = function(self)
-        ACUUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        ACUUnit.OnIntelDisabled(self, intel)
         if self.IntelEffectsBag then
             EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
             self.IntelEffectsBag = nil
