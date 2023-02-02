@@ -10,7 +10,7 @@
 local CAirFactoryUnit = import("/lua/cybranunits.lua").CAirFactoryUnit
 
 ---@class ZRB9602 : CAirFactoryUnit
-ZRB9602 = ClassUnit(CAirFactoryUnit) {
+ZRB9602 = Class(CAirFactoryUnit) {
     PlatformBone = 'B01',
 
 --Overwrite FinishBuildThread to speed up platform lowering rate
