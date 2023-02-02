@@ -15,9 +15,9 @@ local TIFCarpetBombWeapon = import("/lua/terranweapons.lua").TIFCarpetBombWeapon
 
 
 ---@class UEA0103 : TAirUnit
-UEA0103 = Class(TAirUnit) {
+UEA0103 = ClassUnit(TAirUnit) {
     Weapons = {
-        Bomb = Class(TIFCarpetBombWeapon) {},
+        Bomb = ClassWeapon(TIFCarpetBombWeapon) {},
     },
 }
 

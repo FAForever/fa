@@ -29,17 +29,18 @@ local MathClamp = math.clamp
 
 -- Most weapons derive from this class, including beam weapons later in this file
 ---@class DefaultProjectileWeapon : Weapon
+---@field RecoilManipulators? TrashBag
 ---@field CurrentSalvoNumber number
 ---@field CurrentRackSalvoNumber number
 ---@field CurrentSalvoData? WeaponSalvoData
 ---@field AdjustedSalvoDelay? number if the weapon blueprint requests a trajectory fix, this is set to the effective duration of the salvo in ticks used to calculate projectile spread
 ---@field DropBombShortRatio? number if the weapon blueprint requests a trajectory fix, this is set to the ratio of the distance to the target that the projectile is launched short to
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
-DefaultProjectileWeapon = Class(Weapon) {
+DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
-    FxRackChargeMuzzleFlash = {},
+    FxRackChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxRackChargeMuzzleFlashScale = 1,
-    FxChargeMuzzleFlash = {},
+    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxChargeMuzzleFlashScale = 1,
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
@@ -83,7 +84,9 @@ DefaultProjectileWeapon = Class(Weapon) {
         local rof = self:GetWeaponRoF()
         -- Calculate recoil speed so that it finishes returning just as the next shot is ready
         if rackRecoilDist ~= 0 then
-            self.RecoilManipulators = {}
+            self.RecoilManipulators = TrashBag()
+            self.Trash:Add(self.RecoilManipulators)
+
             local dist = rackRecoilDist
             local telescopeRecoilDist = rackBones[1].TelescopeRecoilDistance
             if telescopeRecoilDist and math.abs(telescopeRecoilDist) > math.abs(dist) then
@@ -533,7 +536,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.UnpackAnimator = unpackAnimator
             unpackAnimator:PlayAnim(unpackAnimation):SetRate(0)
             unpackAnimator:SetPrecedence(bp.WeaponUnpackAnimatorPrecedence or 0)
-            self.TrashManipulators:Add(unpackAnimator)
+            self.Trash:Add(unpackAnimator)
         end
         if unpackAnimator then
             unpackAnimator:SetRate(bp.WeaponUnpackAnimationRate)
@@ -565,21 +568,22 @@ DefaultProjectileWeapon = Class(Weapon) {
     PlayRackRecoil = function(self, rackList)
         local bp = self.Blueprint
         local rackRecoilDist = bp.RackRecoilDistance
+
+        ---@type TrashBag
+        local recoilManipulatorBag = self.RecoilManipulators
         for _, rack in rackList do
             local telescopeBone = rack.TelescopeBone
             local tmpSldr = CreateSlider(self.unit, rack.RackBone)
-            table.insert(self.RecoilManipulators, tmpSldr)
             tmpSldr:SetPrecedence(11)
             tmpSldr:SetGoal(0, 0, rackRecoilDist)
             tmpSldr:SetSpeed(-1)
-            self.TrashManipulators:Add(tmpSldr)
+            recoilManipulatorBag:Add(tmpSldr)
             if telescopeBone then
                 tmpSldr = CreateSlider(self.unit, telescopeBone)
-                table.insert(self.RecoilManipulators, tmpSldr)
                 tmpSldr:SetPrecedence(11)
                 tmpSldr:SetGoal(0, 0, rack.TelescopeRecoilDistance or rackRecoilDist)
                 tmpSldr:SetSpeed(-1)
-                self.TrashManipulators:Add(tmpSldr)
+                recoilManipulatorBag:Add(tmpSldr)
             end
         end
         self:ForkThread(self.PlayRackRecoilReturn, rackList)
@@ -620,12 +624,8 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Destroy the sliders which cause weapon visual recoil
     ---@param self DefaultProjectileWeapon
     DestroyRecoilManips = function(self)
-        local manips = self.RecoilManipulators
-        if manips then
-            for _, manip in manips do
-                manip:Destroy()
-            end
-            self.RecoilManipulators = {}
+        if self.RecoilManipulators then
+            self.RecoilManipulators:Destroy()
         end
     end,
 
@@ -652,6 +652,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Sends the weapon to DeadState, probably called by the Owner
     ---@param self DefaultProjectileWeapon
     OnDestroy = function(self)
+        Weapon.OnDestroy(self)
         ChangeState(self, self.DeadState)
     end,
 
@@ -1166,7 +1167,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 }
 
 ---@class KamikazeWeapon : Weapon
-KamikazeWeapon = Class(Weapon) {
+KamikazeWeapon = ClassWeapon(Weapon) {
     ---@param self KamikazeWeapon
     OnFire = function(self)
         local unit = self.unit
@@ -1178,7 +1179,7 @@ KamikazeWeapon = Class(Weapon) {
 }
 
 ---@class BareBonesWeapon : Weapon
-BareBonesWeapon = Class(Weapon) {
+BareBonesWeapon = ClassWeapon(Weapon) {
     Data = {},
 
     ---@param self BareBonesWeapon
@@ -1193,7 +1194,7 @@ BareBonesWeapon = Class(Weapon) {
 }
 
 ---@class OverchargeWeapon : DefaultProjectileWeapon
-OverchargeWeapon = Class(DefaultProjectileWeapon) {
+OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
     NeedsUpgrade = false,
     AutoMode = false,
     AutoThread = nil,
@@ -1397,7 +1398,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class DefaultBeamWeapon : DefaultProjectileWeapon
-DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
+DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,
 
     ---@param self DefaultBeamWeapon
@@ -1431,10 +1432,17 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
                 }
                 local beamTable = {Beam = beam, Muzzle = muzzle, Destroyables = {}}
                 table.insert(self.Beams, beamTable)
-                self.TrashProjectiles:Add(beam)
+                self.Trash:Add(beam)
                 beam:SetParentWeapon(self)
                 beam:Disable()
             end
+        end
+    end,
+
+    OnDestroy = function(self)
+        DefaultProjectileWeapon.OnDestroy(self)
+        for k, info in self.Beams do
+            info.Beam:Destroy()
         end
     end,
 
@@ -1480,7 +1488,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
         if beam:IsEnabled() then return end
         beam:Enable()
-        self.TrashProjectiles:Add(beam)
+        self.Trash:Add(beam)
 
         -- Deal with continuous and non-continuous beams
         if bp.BeamLifetime > 0 then
@@ -1660,7 +1668,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
 local NukeDamage = import("/lua/sim/nukedamage.lua").NukeAOE
 ---@class DeathNukeWeapon : BareBonesWeapon
-DeathNukeWeapon = Class(BareBonesWeapon) {
+DeathNukeWeapon = ClassWeapon(BareBonesWeapon) {
 
     ---@param self DeathNukeWeapon
     OnFire = function(self)
@@ -1697,7 +1705,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
 }
 
 ---@class SCUDeathWeapon : BareBonesWeapon
-SCUDeathWeapon = Class(BareBonesWeapon) {
+SCUDeathWeapon = ClassWeapon(BareBonesWeapon) {
     ---@param self SCUDeathWeapon
     OnFire = function(self)
     end,

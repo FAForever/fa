@@ -10,10 +10,14 @@ local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local TerrainUtils = import("/lua/sim/terrainutils.lua")
 local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
+
+local TreadComponent = import("/lua/defaultcomponents.lua").TreadComponent
+
 
 local RolloffUnitTable = { nil }
 local RolloffPositionTable = { 0, 0, 0 }
@@ -24,12 +28,12 @@ local GameHasAIs = ScenarioInfo.GameHasAIs
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
 local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
 
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
----@field AdjacentUnits? Unit[] 
-StructureUnit = Class(Unit) {
+---@field AdjacentUnits? Unit[]
+StructureUnit = ClassUnit(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
     MinWeaponRequiresEnergy = 0,
@@ -45,9 +49,32 @@ StructureUnit = Class(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:HideLandBones()
-        self.FxBlinkingLightsBag = {}
-        if self.Layer == 'Land' and self.Blueprint.Physics.FlattenSkirt then
+        self.FxBlinkingLightsBag = { }
+        if self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
+        end
+
+        -- check for terrain orientation
+        local bp = self.Blueprint
+        if not (
+                bp.Physics.AltitudeToTerrain or
+                bp.Physics.StandUpright
+            ) and self.Layer == 'Land'
+        then
+            -- rotate structure to match terrain gradient
+            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
+                self:GetPosition(),
+                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
+                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+            )
+
+            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
+
+            -- technically obsolete, but as this is part of an integration we don't want to break
+            -- the mod package that it originates from. Originates from the BrewLan mod suite
+            if not bp.Physics.FlattenSkirt then
+                self.TerrainSlope = {}
+            end
         end
     end,
 
@@ -117,12 +144,13 @@ StructureUnit = Class(Unit) {
         local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
         local degrees = rad * (180 / math.pi)
 
-        -- some buildings can only take 90 degree angles
         if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
-            degrees = math.floor((degrees + 45) / 90) * 90
+            degrees = math.floor((degrees + 90) / 180) * 180
         end
 
-        self:SetRotation(degrees)
+        local rotator = CreateRotator(self, 0, 'y', degrees, nil, nil)
+        rotator:SetPrecedence(1)
+        self.Trash:Add(rotator)
     end,
 
     ---@param self StructureUnit
@@ -131,11 +159,13 @@ StructureUnit = Class(Unit) {
     OnStartBeingBuilt = function(self, builder, layer)
         Unit.OnStartBeingBuilt(self, builder, layer)
 
+        -- rotate weaponry towards enemy
+        local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         end
 
-        local bp = self.Blueprint
+        -- create decal below structure
         if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
                 self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
@@ -172,8 +202,8 @@ StructureUnit = Class(Unit) {
     FlattenSkirt = function(self)
         local x, y, z = self:GetPositionXYZ()
         local x0, z0, x1, z1 = self:GetSkirtRect()
-        x0, z0, x1, z1 = math.floor(x0), math.floor(z0), math.ceil(x1), math.ceil(z1)
-        FlattenMapRect(x0, z0, x1 - x0, z1 - z0, y)
+
+        import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
 
     ---@param self StructureUnit
@@ -209,7 +239,7 @@ StructureUnit = Class(Unit) {
         local orient = orientation
         if not orientation then
             if tarmac.Orientations and not table.empty(tarmac.Orientations) then
-                orient = tarmac.Orientations[Random(1, table.getn(tarmac.Orientations))]
+                orient = table.random(tarmac.Orientations)
                 orient = (0.01745 * orient)
             else
                 orient = 0
@@ -290,7 +320,7 @@ StructureUnit = Class(Unit) {
         for _, v in self.FxBlinkingLightsBag do
             v:Destroy()
         end
-        self.FxBlinkingLightsBag = {}
+        self.FxBlinkingLightsBag = { }
     end,
 
     ---@param self StructureUnit
@@ -721,7 +751,7 @@ StructureUnit = Class(Unit) {
 ---@field BuildingUnit boolean
 ---@field BuildBoneRotator moho.RotateManipulator
 ---@field BuildEffectBones string[]
-FactoryUnit = Class(StructureUnit) {
+FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnCreate = function(self)
@@ -744,7 +774,7 @@ FactoryUnit = Class(StructureUnit) {
     ---@return string?
     ToSupportFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local identifier = self.Blueprint.BlueprintId
         local faction = identifier:sub(2, 2)
         local layer = identifier:sub(7, 7)
 
@@ -775,7 +805,7 @@ FactoryUnit = Class(StructureUnit) {
     ---@param self FactoryUnit
     ToHQFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local identifier = self.Blueprint.BlueprintId
         local faction = identifier:sub(1, 3)
         local layer = identifier:sub(7, 7)
 
@@ -797,7 +827,7 @@ FactoryUnit = Class(StructureUnit) {
         -- anything else can not upgrade
         return nil
     end,
-    
+
     ---@param self FactoryUnit
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
@@ -1088,7 +1118,7 @@ FactoryUnit = Class(StructureUnit) {
         size = size * size
         local unitPosition, dx, dz, d
         local buildPosition = self:GetPosition(self.Blueprint.Display.BuildAttachBone or 0)
-        repeat 
+        repeat
             unitPosition = self.UnitBeingBuilt:GetPosition()
             dx = buildPosition[1] - unitPosition[1]
             dz = buildPosition[3] - unitPosition[3]
@@ -1146,15 +1176,15 @@ FactoryUnit = Class(StructureUnit) {
 
 -- AIR FACTORY UNITS
 ---@class AirFactoryUnit : FactoryUnit
-AirFactoryUnit = Class(FactoryUnit) {}
+AirFactoryUnit = ClassUnit(FactoryUnit) {}
 
 -- AIR STAGING PLATFORMS UNITS
 ---@class AirStagingPlatformUnit : StructureUnit
-AirStagingPlatformUnit = Class(StructureUnit) { }
+AirStagingPlatformUnit = ClassUnit(StructureUnit) { }
 
 -- ENERGY CREATION UNITS
 ---@class ConcreteStructureUnit : StructureUnit
-ConcreteStructureUnit = Class(StructureUnit) {
+ConcreteStructureUnit = ClassUnit(StructureUnit) {
     ---@param self ConcreteStructureUnit
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
@@ -1164,19 +1194,19 @@ ConcreteStructureUnit = Class(StructureUnit) {
 
 -- ENERGY CREATION UNITS
 ---@class EnergyCreationUnit : StructureUnit
-EnergyCreationUnit = Class(StructureUnit) { }
+EnergyCreationUnit = ClassUnit(StructureUnit) { }
 
 -- ENERGY STORAGE UNITS
 ---@class EnergyStorageUnit : StructureUnit
-EnergyStorageUnit = Class(StructureUnit) { }
+EnergyStorageUnit = ClassUnit(StructureUnit) { }
 
 -- LAND FACTORY UNITS
 ---@class LandFactoryUnit : FactoryUnit
-LandFactoryUnit = Class(FactoryUnit) {}
+LandFactoryUnit = ClassUnit(FactoryUnit) {}
 
 -- MASS COLLECTION UNITS
 ---@class MassCollectionUnit : StructureUnit
-MassCollectionUnit = Class(StructureUnit) {
+MassCollectionUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassCollectionUnit
     OnConsumptionActive = function(self)
@@ -1289,7 +1319,7 @@ MassCollectionUnit = Class(StructureUnit) {
 
 -- MASS FABRICATION UNITS
 ---@class MassFabricationUnit : StructureUnit
-MassFabricationUnit = Class(StructureUnit) {
+MassFabricationUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassFabricationUnit
     ---@param bit number
@@ -1372,11 +1402,11 @@ MassFabricationUnit = Class(StructureUnit) {
 
 -- MASS STORAGE UNITS
 ---@class MassStorageUnit : StructureUnit
-MassStorageUnit = Class(StructureUnit) { }
+MassStorageUnit = ClassUnit(StructureUnit) { }
 
 -- RADAR UNITS
 ---@class RadarUnit : StructureUnit
-RadarUnit = Class(StructureUnit) {
+RadarUnit = ClassUnit(StructureUnit) {
 
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
@@ -1408,21 +1438,21 @@ RadarUnit = Class(StructureUnit) {
     end,
 
     ---@param self RadarUnit
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        StructureUnit.OnIntelDisabled(self, intel)
         self:DestroyIdleEffects()
     end,
 
     ---@param self RadarUnit
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        StructureUnit.OnIntelEnabled(self, intel)
         self:CreateIdleEffects()
     end,
 }
 
 -- RADAR JAMMER UNITS
 ---@class RadarJammerUnit : StructureUnit
-RadarJammerUnit = Class(StructureUnit) {
+RadarJammerUnit = ClassUnit(StructureUnit) {
 
     -- Shut down intel while upgrading
     ---@param self RadarJammerUnit
@@ -1463,8 +1493,8 @@ RadarJammerUnit = Class(StructureUnit) {
     end,
 
     ---@param self RadarJammerUnit
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        StructureUnit.OnIntelEnabled(self, intel)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
             self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
@@ -1473,8 +1503,8 @@ RadarJammerUnit = Class(StructureUnit) {
     end,
 
     ---@param self RadarJammerUnit
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        StructureUnit.OnIntelDisabled(self, intel)
         EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
         self.IntelFxOn = false
     end,
@@ -1482,7 +1512,7 @@ RadarJammerUnit = Class(StructureUnit) {
 
 -- SONAR UNITS
 ---@class SonarUnit : StructureUnit
-SonarUnit = Class(StructureUnit) {
+SonarUnit = ClassUnit(StructureUnit) {
 
     ---@param self SonarUnit
     ---@param builder Unit
@@ -1534,7 +1564,7 @@ SonarUnit = Class(StructureUnit) {
 
 -- SEA FACTORY UNITS
 ---@class SeaFactoryUnit : FactoryUnit
-SeaFactoryUnit = Class(FactoryUnit) {
+SeaFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self SeaFactoryUnit
     DestroyUnitBeingBuilt = function(self)
@@ -1606,11 +1636,11 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
 -- SHIELD STRCUTURE UNITS
 ---@class ShieldStructureUnit : StructureUnit
-ShieldStructureUnit = Class(StructureUnit) { }
+ShieldStructureUnit = ClassUnit(StructureUnit) { }
 
 -- TRANSPORT BEACON UNITS
 ---@class TransportBeaconUnit : StructureUnit
-TransportBeaconUnit = Class(StructureUnit) {
+TransportBeaconUnit = ClassUnit(StructureUnit) {
 
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
     FxTransportBeaconScale = 0.5,
@@ -1635,20 +1665,49 @@ TransportBeaconUnit = Class(StructureUnit) {
 
 -- WALL STRCUTURE UNITS
 ---@class WallStructureUnit : StructureUnit
-WallStructureUnit = Class(StructureUnit) { }
+WallStructureUnit = ClassUnit(StructureUnit) { }
 
 -- QUANTUM GATE UNITS
 ---@class QuantumGateUnit : FactoryUnit
-QuantumGateUnit = Class(FactoryUnit) { }
+QuantumGateUnit = ClassUnit(FactoryUnit) { }
 
 -- MOBILE UNITS
----@class MobileUnit : Unit
-MobileUnit = Class(Unit) {
+---@class MobileUnit : Unit, TreadComponent
+MobileUnit = ClassUnit(Unit, TreadComponent) {
 
     ---@param self MobileUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
+        TreadComponent.OnCreate(self)
+
         self:SetFireState(FireState.GROUND_FIRE)
+
+        self.MovementEffectsBag = TrashBag()
+        self.TopSpeedEffectsBag = TrashBag()
+        self.BeamExhaustEffectsBag = TrashBag()
+    end,
+
+    DestroyAllTrashBags = function(self)
+        Unit.DestroyAllTrashBags(self)
+
+        self.MovementEffectsBag:Destroy()
+        self.TopSpeedEffectsBag:Destroy()
+        self.BeamExhaustEffectsBag:Destroy()
+
+        -- only exists if unit is transported
+        if self.TransportBeamEffectsBag then
+            self.TransportBeamEffectsBag:Destroy()
+        end
+    end,
+
+    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
+        Unit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
+        TreadComponent.CreateMovementEffects(self)
+    end,
+
+    DestroyMovementEffects = function(self)
+        Unit.DestroyMovementEffects(self)
+        TreadComponent.DestroyMovementEffects(self)
     end,
 
     ---@param self MobileUnit
@@ -1713,7 +1772,7 @@ MobileUnit = Class(Unit) {
 
 -- WALKING LAND UNITS
 ---@class WalkingLandUnit : MobileUnit
-WalkingLandUnit = Class(MobileUnit) {
+WalkingLandUnit = ClassUnit(MobileUnit) {
     WalkingAnim = nil,
     WalkingAnimRate = 1,
     IdleAnim = false,
@@ -1764,7 +1823,7 @@ WalkingLandUnit = Class(MobileUnit) {
 -- SUB UNITS
 -- These units typically float under the water and have wake when they move
 ---@class SubUnit : MobileUnit
-SubUnit = Class(MobileUnit) {
+SubUnit = ClassUnit(MobileUnit) {
     -- Use default spark effect until underwater damaged states are made
     FxDamage1 = { EffectTemplate.DamageSparks01 },
     FxDamage2 = { EffectTemplate.DamageSparks01 },
@@ -1790,7 +1849,7 @@ SubUnit = Class(MobileUnit) {
 
 -- AIR UNITS
 ---@class AirUnit : MobileUnit
-AirUnit = Class(MobileUnit) {
+AirUnit = ClassUnit(MobileUnit) {
     -- Contrails
     ContrailEffects = {'/effects/emitters/contrail_polytrail_01_emit.bp', },
     BeamExhaustCruise = '/effects/emitters/air_move_trail_beam_03_emit.bp',
@@ -2017,7 +2076,7 @@ AirUnit = Class(MobileUnit) {
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
 local slotsData = {}
----@class BaseTransport 
+---@class BaseTransport
 BaseTransport = ClassSimple {
 
     ---@param self BaseTransport
@@ -2103,7 +2162,7 @@ BaseTransport = ClassSimple {
 
 --- Base class for air transports.
 ---@class AirTransport: AirUnit, BaseTransport
-AirTransport = Class(AirUnit, BaseTransport) {
+AirTransport = ClassUnit(AirUnit, BaseTransport) {
 
     ---@param self AirTransport
     OnTransportAborted = function(self)
@@ -2186,13 +2245,12 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 }
 
--- LAND UNITS
 ---@class LandUnit : MobileUnit
-LandUnit = Class(MobileUnit) {}
+LandUnit = ClassUnit(MobileUnit) {}
 
 --  CONSTRUCTION UNITS
 ---@class ConstructionUnit : MobileUnit
-ConstructionUnit = Class(MobileUnit) {
+ConstructionUnit = ClassUnit(MobileUnit) {
 
     ---@param self ConstructionUnit
     OnCreate = function(self)
@@ -2202,8 +2260,7 @@ ConstructionUnit = Class(MobileUnit) {
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildEffectBones = bp.General.BuildBones.BuildEffectBones
-
-        self.EffectsBag = {}
+        
         if bp.General.BuildBones then
             self:SetupBuildBones()
         end
@@ -2251,6 +2308,7 @@ ConstructionUnit = Class(MobileUnit) {
         else
             MobileUnit.OnStartBuild(self, unitBeingBuilt, order)
         end
+
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
@@ -2337,7 +2395,7 @@ ConstructionUnit = Class(MobileUnit) {
 -- SEA UNITS
 -- These units typically float on the water and have wake when they move
 ---@class SeaUnit : MobileUnit
-SeaUnit = Class(MobileUnit){
+SeaUnit = ClassUnit(MobileUnit){
     DeathThreadDestructionWaitTime = 0,
     ShowUnitDestructionDebris = false,
     PlayEndestructionEffects = false,
@@ -2354,7 +2412,7 @@ SeaUnit = Class(MobileUnit){
 
 --- Base class for aircraft carriers.
 ---@class AircraftCarrier : SeaUnit
-AircraftCarrier = Class(SeaUnit, BaseTransport) {
+AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
 
     ---@param self AircraftCarrier
     ---@param instigator Unit
@@ -2369,10 +2427,10 @@ AircraftCarrier = Class(SeaUnit, BaseTransport) {
 
 -- HOVERING LAND UNITS
 ---@class HoverLandUnit : MobileUnit
-HoverLandUnit = Class(MobileUnit) { }
+HoverLandUnit = ClassUnit(MobileUnit) { }
 
 ---@class SlowHoverLandUnit : HoverLandUnit
-SlowHoverLandUnit = Class(HoverLandUnit) {
+SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
 
     ---@param self SlowHoverLandUnit
     ---@param new string
@@ -2397,10 +2455,10 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
 
 -- AMPHIBIOUS LAND UNITS
 ---@class AmphibiousLandUnit : MobileUnit
-AmphibiousLandUnit = Class(MobileUnit) { }
+AmphibiousLandUnit = ClassUnit(MobileUnit) { }
 
 ---@class SlowAmphibiousLandUnit : AmphibiousLandUnit
-SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
+SlowAmphibiousLandUnit = ClassUnit(AmphibiousLandUnit) {
 
     ---@param self SlowAmphibiousLandUnit
     ---@param new string
@@ -2421,7 +2479,7 @@ SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
 
 --- Base class for command units.
 ---@class CommandUnit : WalkingLandUnit
-CommandUnit = Class(WalkingLandUnit) {
+CommandUnit = ClassUnit(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
 
     ---@param self CommandUnit
@@ -2625,7 +2683,7 @@ CommandUnit = Class(WalkingLandUnit) {
 }
 
 ---@class ACUUnit : CommandUnit
-ACUUnit = Class(CommandUnit) {
+ACUUnit = ClassUnit(CommandUnit) {
     -- The "commander under attack" warnings.
     ---@param self ACUUnit
     ---@param bpShield any
@@ -2816,12 +2874,12 @@ ACUUnit = Class(CommandUnit) {
 
 -- SHIELD HOVER UNITS
 ---@class ShieldHoverLandUnit : HoverLandUnit
-ShieldHoverLandUnit = Class(HoverLandUnit) {}
+ShieldHoverLandUnit = ClassUnit(HoverLandUnit) {}
 
 -- SHIELD LAND UNITS
 ---@class ShieldLandUnit : LandUnit
-ShieldLandUnit = Class(LandUnit) {}
+ShieldLandUnit = ClassUnit(LandUnit) {}
 
 -- SHIELD SEA UNITS
 ---@class ShieldSeaUnit : SeaUnit
-ShieldSeaUnit = Class(SeaUnit) {}
+ShieldSeaUnit = ClassUnit(SeaUnit) {}

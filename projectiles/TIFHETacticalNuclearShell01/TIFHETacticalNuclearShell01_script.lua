@@ -2,7 +2,7 @@
 
 local TArtilleryAntiMatterProjectile = import("/lua/terranprojectiles.lua").TArtilleryAntiMatterProjectile
 
-TIFAntiMatterShells01 = Class(TArtilleryAntiMatterProjectile) {
+TIFAntiMatterShells01 = ClassProjectile(TArtilleryAntiMatterProjectile) {
     FxSplatScale = 9,
     OnImpact = function(self, targetType, targetEntity)
         TArtilleryAntiMatterProjectile.OnImpact(self, targetType, targetEntity)

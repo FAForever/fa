@@ -5,6 +5,18 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------
 
+---@alias CybranACUEnhancementBuffType
+---| "ACUCLOAKBONUS"
+---| "ACUSTEALTHBONUS"
+---| "ACUBUILDRATE"
+
+---@alias CybranACUEnhancementBuffName        # BuffType
+---| "CybranACUCloakBonus"                    # ACUCLOAKBONUS
+---| "CybranACUStealthBonus"                  # ACUSTEALTHBONUS
+---| "CybranACUT2BuildRate"                   # ACUBUILDRATE
+---| "CybranACUT3BuildRate"                   # ACUBUILDRATE
+
+
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local CCommandUnit = import("/lua/cybranunits.lua").CCommandUnit
 local CWeapons = import("/lua/cybranweapons.lua")
@@ -17,12 +29,12 @@ local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 local Entity = import("/lua/sim/entity.lua").Entity
 
-URL0001 = Class(ACUUnit, CCommandUnit) {
+URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        RightRipper = Class(CCannonMolecularWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
-        MLG = Class(CDFHeavyMicrowaveLaserGeneratorCom) {
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        RightRipper = ClassWeapon(CCannonMolecularWeapon) {},
+        Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
+        MLG = ClassWeapon(CDFHeavyMicrowaveLaserGeneratorCom) {
             DisabledFiringBones = {'Turret_Muzzle_03'},
 
             SetOnTransport = function(self, transportstate)
@@ -39,8 +51,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end,
         },
 
-        OverCharge = Class(CDFOverchargeWeapon) {},
-        AutoOverCharge = Class(CDFOverchargeWeapon) {},
+        OverCharge = ClassWeapon(CDFOverchargeWeapon) {},
+        AutoOverCharge = ClassWeapon(CDFOverchargeWeapon) {},
     },
 
     __init = function(self)
@@ -148,8 +160,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -379,8 +391,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         },
     },
 
-    OnIntelEnabled = function(self)
-        ACUUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        ACUUnit.OnIntelEnabled(self, intel)
         if self.CloakEnh and self:IsIntelEnabled('Cloak') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
@@ -398,8 +410,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         end
     end,
 
-    OnIntelDisabled = function(self)
-        ACUUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        ACUUnit.OnIntelDisabled(self, intel)
         if self.IntelEffectsBag then
             EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
             self.IntelEffectsBag = nil

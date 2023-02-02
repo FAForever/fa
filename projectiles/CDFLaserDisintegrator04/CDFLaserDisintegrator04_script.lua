@@ -8,5 +8,5 @@
 ----  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 local CDisintegratorLaserProjectile = import("/lua/cybranprojectiles.lua").CDisintegratorLaserProjectile
-CDFLaserDisintegrator04 = Class(CDisintegratorLaserProjectile) {}
+CDFLaserDisintegrator04 = ClassProjectile(CDisintegratorLaserProjectile) {}
 TypeClass = CDFLaserDisintegrator04

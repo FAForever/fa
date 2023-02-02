@@ -4,7 +4,7 @@
 local AArtilleryProjectile = import("/lua/aeonprojectiles.lua").AArtilleryProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-AIFSonanceShell01 = Class(AArtilleryProjectile) {
+AIFSonanceShell01 = ClassProjectile(AArtilleryProjectile) {
 
     PolyTrail = '/effects/emitters/aeon_sonicgun_trail_emit.bp',
     FxTrails = EffectTemplate.ASonanceWeaponFXTrail01,

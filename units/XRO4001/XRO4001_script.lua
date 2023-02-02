@@ -11,10 +11,10 @@
 local CWallStructureUnit = import("/lua/cybranunits.lua").CWallStructureUnit
 
 ---@class XRO4001 : CWallStructureUnit
-XRO4001 = Class(CWallStructureUnit) {
-    FxDamage1 = {},
-    FxDamage2 = {},
-    FxDamage3 = {},
+XRO4001 = ClassUnit(CWallStructureUnit) {
+    FxDamage1 = import("/lua/effecttemplates.lua").NoEffects,
+    FxDamage2 = import("/lua/effecttemplates.lua").NoEffects,
+    FxDamage3 = import("/lua/effecttemplates.lua").NoEffects,
 }
 
 TypeClass = XRO4001

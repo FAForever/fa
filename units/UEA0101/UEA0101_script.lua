@@ -11,5 +11,5 @@
 local TAirUnit = import("/lua/terranunits.lua").TAirUnit
 
 ---@class UEA0101 : TAirUnit
-UEA0101 = Class(TAirUnit) {}
+UEA0101 = ClassUnit(TAirUnit) {}
 TypeClass = UEA0101

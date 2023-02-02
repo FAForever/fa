@@ -408,7 +408,9 @@ function CreateTabs(type)
             local numActive = 0
             for _, tab in controls.tabs do
                 if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
-                    numActive = numActive + 1
+                    if tab.ID != 'templates' then
+                        numActive = numActive + 1
+                    end
                 end
             end
             previousTabSize = numActive
@@ -489,7 +491,11 @@ function CreateTabs(type)
     for _, tab in controls.tabs do
         if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
             tab:Enable()
-            numActive = numActive + 1
+
+            if tab.ID != 'templates' then
+                numActive = numActive + 1
+            end
+
             if defaultTabOrder[tab.ID] then
                 if not defaultTab or defaultTabOrder[tab.ID] < defaultTabOrder[defaultTab.ID] then
                     defaultTab = tab

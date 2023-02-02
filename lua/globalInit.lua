@@ -48,5 +48,5 @@ InitialRegistration = false
 -- classes yet, just lists of exported methods and base classes. Turn them into
 -- real classes.
 for name,cclass in moho do
-    ConvertCClassToLuaSimplifiedClass(cclass)
+    ConvertCClassToLuaSimplifiedClass(cclass, name)
 end

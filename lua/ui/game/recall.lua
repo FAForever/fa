@@ -1,3 +1,7 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local NinePatch = import("/lua/ui/controls/ninepatch.lua")
 local Prefs = import("/lua/user/prefs.lua")
@@ -75,7 +79,7 @@ function RequestHandler(data)
 end
 
 ---@class RecallPanel : NinePatch
-RecallPanel = Class(NinePatch.NinePatch) {
+RecallPanel = ClassUI(NinePatch.NinePatch) {
     DefaultWidth = 320,
 
     __init = function(self, parent)

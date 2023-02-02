@@ -11,7 +11,7 @@
 local CEnergyCreationUnit = import("/lua/cybranunits.lua").CEnergyCreationUnit
 
 ---@class URB1101 : CEnergyCreationUnit
-URB1101 = Class(CEnergyCreationUnit) {
+URB1101 = ClassUnit(CEnergyCreationUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)

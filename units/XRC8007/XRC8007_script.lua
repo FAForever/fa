@@ -8,7 +8,7 @@
 local CCivilianStructureUnit = import("/lua/cybranunits.lua").CCivilianStructureUnit
 
 ---@class XRC8002 : CCivilianStructureUnit
-XRC8002 = Class(CCivilianStructureUnit) {
+XRC8002 = ClassUnit(CCivilianStructureUnit) {
 }
 
 

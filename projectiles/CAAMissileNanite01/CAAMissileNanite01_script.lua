@@ -1,14 +1,14 @@
 -- AA Missile for Cybrans
 
 local CAAMissileNaniteProjectile = import("/lua/cybranprojectiles.lua").CAAMissileNaniteProjectile
-CAAMissileNanite01 = Class(CAAMissileNaniteProjectile) {
+CAAMissileNanite01 = ClassProjectile(CAAMissileNaniteProjectile) {
     OnCreate = function(self)
         CAAMissileNaniteProjectile.OnCreate(self)
-        self:ForkThread(self.UpdateThread)
+        self.Trash:Add(ForkThread(self.UpdateThread, self))
     end,
 
     UpdateThread = function(self)
-        WaitSeconds(1.5)
+        WaitTicks(16)
         self:SetMaxSpeed(80)
         self:SetAcceleration(10 + Random() * 8)
         self:ChangeMaxZigZag(0.5)

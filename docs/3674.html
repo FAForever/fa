@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="UTF-8">
+        <title>Patch 3674</title>
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="patchnotes.css">
+    </head>
+    <body>
+        <table id="container">
+            <tbody>
+                <tr>
+                    <td id="main">
+                        <div id="intro">
+                            <h1>Patch 3674</h1>
+                            <p>Welcome to the patchnotes for the 3674.</p>
+                            <p>This patch contains the HP changes that have been in testing and discussion for a long time, and some Ythotha buffs on top. As always, you can post your feedback and opinion on the forums.<p>
+                            <p>We wish you good luck and much fun playing with the new patch!
+                        <br>-- The balanceteam</p>
+                        </div>
+
+                        <h2>Land</h2>
+
+                        <div id="ythotha" class="card">
+                                <h3><img src="images/ythotha.png"> Ythotha:</h3>
+                                A buff to the Ythotha has been long planned and wished, but buffing it in a way that makes the unit more dynamic and interesting turned out to be difficult. We have decided to improve it by making it more nimble and also allowing it to shoot 45 degrees backwards so that it can be microed to a much greater degree. It also gets a slight range increase to help with this goal. We will closely observe if this new microability in certain situations gives the Ythotha the power it should have, or if further adjustments are needed. 
+                                <ul>
+                                <li>TurnRate: <strike>40</strike> → 60</li>
+                                <li>EyeWeapon Range: <strike>45</strike> → 47</li>
+                                <li>LeftArm Range: <strike>45</strike> → 47</li>
+                                <li>RightArm Range: <strike>45</strike> → 47</li>
+                                <li>AA Range: <strike>45</strike> → 47</li>
+                                <li>AA AOE: <strike>1.5</strike> → 4</li>
+                                <li>RightArm, LeftArm and EyeWeapon can now shoot 45 degrees behind them.</li>
+                                <li>AA can shoot at a slightly greater angle to eliminate blindspots.</li>
+                                <li>Added UseFiringSolutionInsteadOfAimBone = true for better AA performance. Credit to EQ for this AA change.</li>
+                                </li></ul>
+                        </div>    
+                        
+                        <div id="stun" class="card">
+                                <h3><img src="images/loya.png"> Stun:</h3>
+                                <ul>
+                                <li>Stun effects will no longer affect air units.</li>
+                                </li></ul>
+                        </div>    
+                        
+                        <h2>Air</h2>
+                        
+                        <div id="janus" class="card">
+                                <h3><img src="images/janus.png"> Janus:</h3>
+                                The Janus change in the last patch worked well but was found to be too strong. The napalm's burn time is increased to allow players to react and move out of the damage radius before all damage has been dealt. The initial damage of the bombs is also decreased.
+                                <ul>
+                                <li>DoTTime: <strike>4.2</strike> → 6</li>
+                                <li>InitialDamage per bomb: <strike>30</strike> → 15</li>
+                                </ul>
+                        </div>
+
+                        <h2>Structures</h2>
+
+                        <div id="fachp" class="card">
+                            <h3>HP Reductions (Part 1)</h3>
+                            The goal with all the HP reductions in general is to allow more options for aggressive play, especially in the lategame and to bring the game closer to how it is working with the current low t2 pg HP and its impact on the game.
+                            <br><br>The goal with increasing the HP differences between the factions is to make them a relevant and interesting part of the game, rather than a visual difference without much impact. The changes are aimed to increase faction diversity and attempt to even out the current differences in power between the factions by giving them more unique strengths and weaknesses, rather than making them more equal. This are rather big changes, but we believe they will make the game more diverse and interesting. 
+                            <br><br>To compensate cybran a bit for the rather large nerfs, and to accompany their new weakness with a strength that fits to them, all their nerfed buildings do (very slowly) regenerate health now in return. They are more vulnuable, but if you don't kill them they will be back at full HP after about 10 minutes for each building.</a> 
+
+                            <h3><img src="images/serafacto.png"> T1 Land/Air/Navy and T2 Land/Air Support Factories</h3>
+                            <ul><li>UEF HP: <strike>4100 / 4100 / 4800 and 4500 / 4500</strike> → 4000</li>
+                            <li>Aeon HP: <strike>3700 / 3700 / 4400 and 4100 / 4100</strike> → 3100</li>
+                            <li>Seraphim HP: <strike>3700 / 3700 / 4600 and 4300 / 4300</strike> → 3100</li>
+                            <li>Cybran HP: <strike>3500 / 3500 / 4200 and 3900 / 3900</strike> → 2500</li>
+                            <li>Cybran HP regeneration: 3 hp/s</li></ul>
+                            
+                            <h3><img src="images/t2landhq.png"> T2 Land/Air HQ and T3 Land/Air Support Factories</h3>
+                            <ul><li>UEF HP: <strike>9000 and 4500 / 4500</strike> → 8000</li>
+                            <li>Aeon HP: <strike>8200 and 10000</strike> → 6200</li>
+                            <li>Seraphim HP: <strike>8200 and 10500</strike> → 6200</li>
+                            <li>Cybran HP: <strike>7800 and 9500</strike> → 5000</li>
+                            <li>Cybran HP regeneration: 10 hp/s</li></ul>
+
+                            <h3><img src="images/t3landhq.png">T3 Land/Air HQs</h3>
+                            <ul><li>UEF HP: <strike>22000</strike> → 16000</li>
+                            <li>Aeon HP: <strike>20000</strike> → 12400</li>
+                            <li>Seraphim HP: <strike>21000</strike> → 12400</li>
+                            <li>Cybran HP: <strike>19000</strike> → 10000</li>
+                            <li>Cybran HP regeneration: 20 hp/s</li></ul>    
+                            
+                            <h3><img src="images/t2naval.png"> T2 Navy Support Factories</h3>
+                            <ul><li>UEF HP: <strike>9000</strike> → 6000</li>
+                            <li>Aeon HP: <strike>8000</strike> → 5000</li>
+                            <li>Seraphim HP: <strike>8500</strike> → 5000</li>
+                            <li>Cybran HP: <strike>7500</strike> → 4000</li>
+                            <li>Cybran HP regeneration: 6 hp/s</li></ul>    
+
+                            <h3><img src="images/t2navalhq.png"> T2 Navy HQs / t3 Navy Support Factories</h3>
+                            <ul><li>UEF HP: <strike>18000 / 20000</strike> → 13000</li>
+                            <li>Aeon HP: <strike>16000 / 18750</strike> → 10000</li>
+                            <li>Seraphim HP: <strike>17000 / 19000</strike> → 10000</li>
+                            <li>Cybran HP: <strike>15000 / 17000</strike> → 8000</li>
+                            <li>Cybran HP regeneration: 15 hp/s</li></ul>
+
+                            <h3><img src="images/t3navalhq.png"> T3 Navy HQs</h3>
+                            <ul><li>UEF HP: <strike>40000</strike> → 26000</li>
+                            <li>Aeon HP: <strike>37500</strike> → 20000</li>
+                            <li>Seraphim HP: <strike>38000</strike> → 20000</li>
+                            <li>Cybran HP: <strike>34000</strike> → 16000</li>
+                            <li>Cybran HP regeneration: 30 hp/s</li></ul>                
+                        </div>
+                        
+                        
+                        <div id="Structure Changes" class="card">
+                            <h3>HP Reductions (Part 2)</h3>
+                            If you look at the values, you will notice that we tried to make the new HP values as consistent and intuitive as possible. Mex and PGs now have equal HP, and most support factories have the same HP as the lower tech HQ. Meanwhile every HQ upgrade will double its HP. 
+                            <br><br>These changes have many interesting side effects and small direct or indirect buffs to specific units and factions. Some examples?
+                            <ul><li>Tired of getting first bombed, or losing your t2 PGs to corsairs? You can pick UEF now, and enjoy their additional toughness. </li>
+                            <li>Or you always felt bad for the Notha (Seraphim Fighterbomber) to be just a less fancy version of the corsair? While corsairs are still better at what they excel at, Nothas can kill t2 mex with 2 bombs now, something Corsairs can only do if they are very lucky and hit all their bombs. </li>
+                            <li>Or you have enough of cybran players TMLing your stuff over and over, even when you have TMD? They can keep doing this, but many of their buildings are very vulnerable to TMLs themself now.. </li></ul>
+                            The last building that got its HP changed are Walls. They found increasing popularity in the past year, and with that also causing increasing annoyance and they proved that they are very powerful. Walls take twice the time to build now (which is still very fast), and while UEF walls are almost as hard to destroy as before, Cybran walls are much less of a obstacle.
+
+                            <h3><img src="images/t1mex.png"> T1 Mass Extractors and T1 Power Generators:</h3>
+                            <ul><li>UEF HP: <strike>600</strike> → 760</li>
+                            <li>Aeon HP: 600</li>
+                            <li>Seraphim HP: 600</li>
+                            <li>Cybran HP: <strike>600</strike> → 500</li>
+                            <li>Cybran HP regeneration: 1 hp/s</li></ul>
+                            
+                            <h3><img src="images/mstorage.png"> T1 Mass Storage:</h3>
+                            <ul><li>UEF HP: <strike>1600</strike> → 760</li>
+                            <li>Aeon HP: <strike>1600</strike> → 600</li>
+                            <li>Seraphim HP: <strike>1600</strike> → 600</li>
+                            <li>Cybran HP: <strike>1600</strike> → 500</li>
+                            <li>Cybran HP regeneration: 1 hp/s</li></ul>    
+                            
+                            <h3><img src="images/t2mex.png"> T2 Mass Extractors and T2 Power Generators:</h3>
+                            <ul><li>UEF HP: <strike>3000 / 2160</strike> → 2500</li>
+                            <li>Aeon HP: <strike>3000 / 2160</strike> → 1900</li>
+                            <li>Seraphim HP: <strike>3000 / 2160</strike> → 1900</li>
+                            <li>Cybran HP: <strike>3000 / 2160</strike> → 1800</li>
+                            <li>Cybran HP regeneration: 3 hp/s</li></ul>    
+                            
+                            <h3><img src="images/t3mexx.png"> T3 Mass Extractors and T3 Power Generators:</h3>
+                            <ul><li>UEF HP: <strike>8400 / 9720</strike> → 9000</li>
+                            <li>Aeon HP: <strike>8400 / 9720</strike> → 6200</li>
+                            <li>Seraphim HP: <strike>8400 / 9720</strike> → 6200</li>
+                            <li>Cybran HP: <strike>8400 / 9720</strike> → 6000</li>
+                            <li>Cybran HP regeneration: 10 hp/s</li>
+                            <li>Explosion Damage (only t3 Power Generator): <strike>8000</strike> → 5500</li></ul>
+                            
+                            <h3><img src="images/hydro.png"> Hydrocarbonplants:</h3>
+                            <ul><li>UEF HP: <strike>1600</strike> → 1800</li>
+                            <li>Aeon HP: 1600</li>
+                            <li>Seraphim HP: 1600</li>
+                            <li>Cybran HP: <strike>1600</strike> → 1400</li>
+                            <li>Cybran HP regeneration: 1 hp/s</li></ul>    
+                            
+                            <h3><img src="images/wall.png"> Walls:</h3>
+                            <ul><li>BuildTime: <strike>10</strike> → 20</li>
+                            <li>UEF HP: <strike>4000</strike> → 3000</li>
+                            <li>Aeon HP: <strike>4000</strike> → 2000</li>
+                            <li>Seraphim HP: <strike>4000</strike> → 2000</li>
+                            <li>Cybran HP: <strike>4000</strike> → 1500</li>
+                            <li>Cybran HP regeneration: 3 hp/s</li></ul>    
+                        </div>
+
+                        <p style="height: 1000px">
+                    </p></td>
+                    
+                    <td id="sidebar">
+                        <div id="icongrid">
+                        <h2><a href="#container">Contents</a></h2>
+                        
+                        <p>Land<br>
+                        <a href="#ythotha"><img src="images/ythotha.png"></a>
+                        <a href="#stun"><img src="images/loya.png"></a>
+                        
+                        </p><p>Air<br>
+                        <a href="#janus"><img src="images/janus.png"></a>
+
+                        </p><p>Structures<br>
+                        <a href="#fachp"><img src="images/serafacto.png"></a>
+                        <a href="#Structure Changes"><img src="images/t3mexx.png"></a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>

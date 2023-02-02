@@ -13,10 +13,10 @@ local CAAAutocannon = import("/lua/cybranweapons.lua").CAAAutocannon
 
 
 ---@class URB2104 : CStructureUnit
-URB2104 = Class(CStructureUnit) {
+URB2104 = ClassUnit(CStructureUnit) {
 
     Weapons = {
-        AAGun = Class(CAAAutocannon) {
+        AAGun = ClassWeapon(CAAAutocannon) {
             FxMuzzleScale = 2.25,
         },
     },

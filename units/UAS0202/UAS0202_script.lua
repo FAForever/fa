@@ -15,12 +15,12 @@ local ADFCannonQuantumWeapon = AeonWeapons.ADFCannonQuantumWeapon
 local AAMWillOWisp = AeonWeapons.AAMWillOWisp
 
 ---@class UAS0202 : ASeaUnit
-UAS0202 = Class(ASeaUnit) {
+UAS0202 = ClassUnit(ASeaUnit) {
     Weapons = {
-        FrontTurret = Class(ADFCannonQuantumWeapon) {},
-        AntiAirMissiles01 = Class(AAAZealotMissileWeapon) {},
-        AntiAirMissiles02 = Class(AAAZealotMissileWeapon) {},
-        AntiMissile = Class(AAMWillOWisp) {},
+        FrontTurret = ClassWeapon(ADFCannonQuantumWeapon) {},
+        AntiAirMissiles01 = ClassWeapon(AAAZealotMissileWeapon) {},
+        AntiAirMissiles02 = ClassWeapon(AAAZealotMissileWeapon) {},
+        AntiMissile = ClassWeapon(AAMWillOWisp) {},
     },
 
     BackWakeEffect = {},

@@ -15,11 +15,11 @@ local SlowHover = import("/lua/defaultunits.lua").SlowHoverLandUnit
 
 
 --Below, changed from ALandUnit to AHoverLandUnit
-UAL0205 = Class(AHoverLandUnit, SlowHover) {
+UAL0205 = ClassUnit(AHoverLandUnit, SlowHover) {
     KickupBones = {},
 
     Weapons = {
-        AAGun = Class(AAATemporalFizzWeapon) {
+        AAGun = ClassWeapon(AAATemporalFizzWeapon) {
             ChargeEffectMuzzles = {'Muzzle_R01', 'Muzzle_L01'},
 
             PlayFxRackSalvoChargeSequence = function(self)

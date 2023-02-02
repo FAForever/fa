@@ -1,3 +1,8 @@
+
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
@@ -205,7 +210,7 @@ function CloseWindow()
 end
 
 ---@class ProfilerWindow : Window
-ProfilerWindow = Class(Window) {
+ProfilerWindow = ClassUI(Window) {
     __init = function(self, parent)
         Window.__init(self, parent, "Profiler", false, false, false, true, false, "profiler2", {
             Left = 10,

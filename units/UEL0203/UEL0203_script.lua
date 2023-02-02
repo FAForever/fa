@@ -13,9 +13,9 @@ local THoverLandUnit = import("/lua/terranunits.lua").THoverLandUnit
 local TDFRiotWeapon = import("/lua/terranweapons.lua").TDFRiotWeapon
 local SlowHover = import("/lua/defaultunits.lua").SlowHoverLandUnit
 
-UEL0203 = Class(THoverLandUnit, SlowHover) {
+UEL0203 = ClassUnit(THoverLandUnit, SlowHover) {
     Weapons = {
-        Riotgun01 = Class(TDFRiotWeapon) {
+        Riotgun01 = ClassWeapon(TDFRiotWeapon) {
             FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFxTank
         },
     },

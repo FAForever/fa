@@ -11,10 +11,10 @@ local SSeaUnit = import("/lua/seraphimunits.lua").SSeaUnit
 local SWeapon = import("/lua/seraphimweapons.lua")
 
 ---@class XSS0103 : SSeaUnit
-XSS0103 = Class(SSeaUnit) {
+XSS0103 = ClassUnit(SSeaUnit) {
     Weapons = {
-        MainGun = Class(SWeapon.SDFShriekerCannon){},
-        AntiAir = Class(SWeapon.SAAShleoCannonWeapon){},
+        MainGun = ClassWeapon(SWeapon.SDFShriekerCannon){},
+        AntiAir = ClassWeapon(SWeapon.SAAShleoCannonWeapon){},
     },
 }
 TypeClass = XSS0103

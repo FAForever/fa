@@ -13,10 +13,10 @@ local CAAMissileNaniteWeapon = import("/lua/cybranweapons.lua").CAAMissileNanite
 local CIFMissileCorsairWeapon = import("/lua/cybranweapons.lua").CIFMissileCorsairWeapon
 
 ---@class DRA0202 : CAirUnit
-DRA0202 = Class(CAirUnit) {
+DRA0202 = ClassUnit(CAirUnit) {
     Weapons = {
-        AntiAirMissiles = Class(CAAMissileNaniteWeapon) {},
-        GroundMissile = Class(CIFMissileCorsairWeapon) {
+        AntiAirMissiles = ClassWeapon(CAAMissileNaniteWeapon) {},
+        GroundMissile = ClassWeapon(CIFMissileCorsairWeapon) {
         
     IdleState = State (CIFMissileCorsairWeapon.IdleState) {
     Main = function(self)

@@ -12,9 +12,9 @@ local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
 local SDFBombOtheWeapon = import("/lua/seraphimweapons.lua").SDFBombOtheWeapon
 
 ---@class XSA0103 : SAirUnit
-XSA0103 = Class(SAirUnit) {
+XSA0103 = ClassUnit(SAirUnit) {
     Weapons = {
-        Bomb = Class(SDFBombOtheWeapon) {},
+        Bomb = ClassWeapon(SDFBombOtheWeapon) {},
     },
 }
 

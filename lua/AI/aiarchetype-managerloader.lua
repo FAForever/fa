@@ -9,13 +9,11 @@
 local AIAddBuilderTable = import("/lua/ai/aiaddbuildertable.lua")
 
 ---@param aiBrain AIBrain
----@return unknown
+---@return any
 ---@return integer
 ---@return boolean
 function GetHighestBuilder(aiBrain)
-    local returnVal = -1
     local base = false
-
     local returnVal = 0
     local aiType = false
 
@@ -145,7 +143,7 @@ end
 function UnitCapWatchThreadSorian(aiBrain)
     --LOG('*AI DEBUG: UnitCapWatchThreadSorian started')
     while true do
-        WaitSeconds(30)
+        WaitTicks(301)
         if GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) > (GetArmyUnitCap(aiBrain:GetArmyIndex()) - 20) then
             local underCap = false
 

@@ -107,6 +107,8 @@ local function MakeLocalPlayerInfo(name)
     result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""
     result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""
     result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
+    result.DIV = (GetCommandLineArg("/division", 1)[1]) or ""
+    result.SUBDIV = (GetCommandLineArg("/subdivision", 1)[1]) or ""
     result.PL = math.floor(result.MEAN - 3 * result.DEV)
     LOG('Local player info: ' .. repr(result))
     return result
@@ -209,9 +211,11 @@ local function CheckForLaunch()
     end
 
     local allRatings = {}
+    local allDivisions = {}
     for k,v in gameInfo.PlayerOptions do
         if v.Human and v.PL then
             allRatings[v.PlayerName] = v.PL
+            allDivisions[v.PlayerName]= v.DIV .. v.SUBDIV
             -- Initialize peer launch statuses
             peerLaunchStatuses[v.OwnerID] = false
         end
@@ -219,6 +223,7 @@ local function CheckForLaunch()
     -- We don't need to wait for a launch status from ourselves
     peerLaunchStatuses[localPlayerID] = nil
     gameInfo.GameOptions['Ratings'] = allRatings
+    gameInfo.GameOptions['Divisions'] = allDivisions
 
     LOG("Host launching game.")
     lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
@@ -237,6 +242,9 @@ end
 
 
 local function CreateUI()
+
+    LOG("Don't mind me x2")
+
     if currentDialog ~= false then
         MenuCommon.MenuCleanup()
         currentDialog:Destroy()

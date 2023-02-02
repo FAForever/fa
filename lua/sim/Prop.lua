@@ -180,7 +180,7 @@ Prop = Class(moho.prop_methods) {
         self.TimeReclaim = time
         self.ReclaimLeft = self.ReclaimLeft or 1
 
-        if self.MaxMassReclaim * self.ReclaimLeft > 10 then
+        if self.MaxMassReclaim * self.ReclaimLeft >= 10 then
             self:SetupUILabel()
         end
     end,
