@@ -17,50 +17,66 @@
 ---| 3 # Seraphim
 ---| 4 # (Nomads if enabled)
 
----@alias Object Blip | CollisionBeam | Entity | Prop | Projectile | Unit
----@alias ReclaimableObject Prop | Unit
----@alias BoneObject Projectile | Prop | Unit
+---@alias ResourceDepositType "Mass" | "Hydrocarbon"
+---@alias ResourceType "MASS" | "ENERGY"
+---@alias DecalType
+---| "Albedo"
+---| "AlbedoXP"
+---| "Alpha Normals"
+---| "Glow"
+---| "Glow Mask"
+---| "Normals"
+---| "Water Albedo"
+---| "Water Mask"
+---| "Water Normals"
 
---- Restricts the army from building the unit category
+---@alias Object Blip | CollisionBeam | Entity | Prop | Projectile | Unit
+---@alias BoneObject Projectile | Prop | Unit
+---@alias ReclaimObject Prop | Unit
+---@alias TargetObject Prop | Unit
+
+--- restricts the army from building the unit category
 ---@param army Army
 ---@param category EntityCategory
 function AddBuildRestriction(army, category)
 end
 
---- It is unknown what this function does or where it gets its value from
+--- it is unknown what this function does or where it gets its value from
 ---@param army Army
 ---@deprecated
 function ArmyGetHandicap(army)
 end
 
---- Initialises the prebuilt units of an army via `AiBrain.OnSpawnPreBuiltUnits`
+--- initializes the prebuilt units of an army via `AIBrain:OnSpawnPreBuiltUnits()`
 ---@param army Army
 function ArmyInitializePrebuiltUnits(army)
 end
 
---- Returns if the indicated army is a civilian army
+--- returns true if the indicated army is a civilian army
 ---@param army Army
 ---@return boolean
 function ArmyIsCivilian(army)
 end
 
---- Returns true if the indicated army has been defeated
+--- returns true if the indicated army has been defeated by having the flag been set with
+--- `SetArmyOutOfGame(army)`
 ---@param army Army
+---@return boolean
 function ArmyIsOutOfGame(army)
 end
 
---- Attaches a beam between two entities
+--- attaches a beam between two entities
 ---@param entityA BoneObject
 ---@param boneA Bone
 ---@param entityB BoneObject
 ---@param boneB Bone
----@param army number
+---@param army Army
 ---@param texture string
 ---@return moho.IEffect
 function AttachBeamEntityToEntity(entityA, boneA, entityB, boneB, army, texture)
 end
 
---- Attaches a beam to an entity
+--- attaches a beam to an entity
 ---@param emitter moho.IEffect
 ---@param entity BoneObject
 ---@param bone Bone
@@ -69,20 +85,21 @@ end
 function AttachBeamToEntity(emitter, entity, bone, army)
 end
 
---- Changes the army of a unit, returning a new unit. By default the ACU can not be shared
+-- engine patched to allow commanders to be able to be shared
+
+--- changes the army of a unit, returning the new unit and destroying the old one
 ---@param unit Unit
 ---@param army Army
----@param noRestrictions? boolean
 ---@return Unit
-function ChangeUnitArmy(unit, army, noRestrictions)
+function ChangeUnitArmy(unit, army)
 end
 
---- Returns true if cheats are enabled, logs the cheat attempt no matter what
+--- returns true if cheats are enabled and logs the cheat attempt no matter what
 ---@return boolean
 function CheatsEnabled()
 end
 
---- It is not known what this does or what its parameters are
+--- it is not known what this does or what its parameters are
 ---@deprecated
 function CoordinateAttacks()
 end
@@ -109,30 +126,33 @@ end
 ---@param army Army
 ---@param length number
 ---@param thickness number
----@param beamBlueprint string
+---@param blueprint FileName
 ---@return moho.IEffect
-function CreateAttachedBeam(object, bone, army, length, thickness, beamBlueprint)
+function CreateAttachedBeam(object, bone, army, length, thickness, blueprint)
 end
 
---- Creates an emitter that is attached to an entity
----@see CreateEmitterAtBone() or CreateEmitterAtEntity() # Alternative functions where the emitter spawns at the entity / bone, but is not attached
+--- creates an emitter that is attached to an entity at a bone
+---@see CreateEmitterAtBone(object, bone, army, blueprint) # to create the emitter at an entity's bone without attaching it there
+---@see CreateEmitterAtEntity(object, bone, army, blueprint) # to create the emitter at an entity without attaching it there
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
----@param emitterBlueprint string
+---@param blueprint FileName
 ---@return moho.IEffect
-function CreateAttachedEmitter(object, bone, army, emitterBlueprint)
+function CreateAttachedEmitter(object, bone, army, blueprint)
 end
 
---- Creates a beam, which then needs to be attached to a bone
----@see AttachBeamToEntity() # Attaches the beam to a bone
+--- creates a beam, which then needs to be attached to a bone
+---@see AttachBeamToEntity(emitter, entity, bone, army) # to attach the beam to an entity bone
+---@see CreateBeamEmitterOnEntity(object, tobone, army, blueprint) # to create an attached beam emitter at once
 ---@param blueprint string
 ---@param army Army
 ---@return moho.IEffect
 function CreateBeamEmitter(blueprint, army)
 end
 
---- Creates a beam and attaches it to an entity, usually used for weaponry
+--- creates a beam and attaches it to an entity, usually used for weaponry
+---@see CreateBeamEmitter(blueprint, army) # to create the beam without attaching it to anything
 ---@param object BoneObject
 ---@param tobone Bone
 ---@param army Army
@@ -141,21 +161,20 @@ end
 function CreateBeamEmitterOnEntity(object, tobone, army, blueprint)
 end
 
---- Creates a beam between two entities
+--- creates a beam collision entity (not a beam emitter) attached between two entities' bones
 ---@param object BoneObject
 ---@param bone Bone
----@param other Entity
+---@param other BoneObject
 ---@param otherBone Bone
 ---@param army Army
----@param blueprint string
+---@param blueprint FileName
 ---@return moho.CollisionBeamEntity
 function CreateBeamEntityToEntity(object, bone, other, otherBone, army, blueprint)
 end
 
---- ???
 ---@param object BoneObject
 ---@param bone Bone
----@param other Entity
+---@param other BoneObject
 ---@param otherBone Bone
 ---@param army Army
 ---@param thickness number
@@ -164,8 +183,8 @@ end
 function CreateBeamToEntityBone(object, bone, other, otherBone, army, thickness, texture)
 end
 
---- Creates a builder arm controller that aims for the unit that is being built, repaired or reclaimed.
---- Similar to an aim controller for weapons.
+--- Creates a builder arm controller that aims for the unit that is being built, repaired, or
+--- reclaimed. Similar to an aim controller for weapons.
 ---@param unit Unit
 ---@param turretBone Bone
 ---@param barrelBone Bone
@@ -174,19 +193,20 @@ end
 function CreateBuilderArmController(unit, turretBone, barrelBone, aimBone)
 end
 
---- Creates a collision detection manipulator, calls the function `self:OnAnimTerrainCollision(bone, x, y, z)`
+--- Creates a collision detection manipulator, calling the function
+--- `self:OnAnimTerrainCollision(bone, x, y, z)`
 --- when a bone that is being watched collides with the terrain
 ---@param unit Unit
 ---@return moho.CollisionManipulator
 function CreateCollisionDetector(unit)
 end
 
---- Creates a decal with supplied parameters, the decal is visible through the fog
+--- Creates a decal with supplied parameters. The decal is visible only to armies allied to `army`.
 ---@param position Vector
----@param heading Vector
----@param textureName1 string
----@param textureName2 string
----@param type string
+---@param heading number
+---@param textureName1 FileName
+---@param textureName2 FileName
+---@param type DecalType
 ---@param sizeX number size on x axis in game units
 ---@param sizeZ number size on y axis in game units
 ---@param lodParam number distance in game units before the decals disappear
@@ -207,37 +227,37 @@ end
 function CreateEconomyEvent(unit, totalEnergy, totalMass, timeInSeconds)
 end
 
---- Creates an emitter at an object's bone, but does not attach the emitter to it
----@see CreateEmitterAtEntity() # at-object version
----@see CreateEmitterOnEntity() # on-object version
+--- creates an emitter at an entity's bone, but does not attach the emitter to it
+---@see CreateEmitterAtEntity(object, army, blueprint) # for an at-object version
+---@see CreateEmitterOnEntity(object, army, blueprint) # for an on-object version
 ---@param object BoneObject
 ---@param army Army
----@param emitterBlueprint string
+---@param blueprint FileName
 ---@return moho.IEffect
-function CreateEmitterAtBone(object, bone, army, emitterBlueprint)
+function CreateEmitterAtBone(object, bone, army, blueprint)
 end
 
---- Creates an emitter at an object, but does not attach the emitter to it
----@see CreateEmitterAtBone() # at-bone version
----@see CreateEmitterOnEntity() # on-object version
+--- creates an emitter at an entity, but does not attach the emitter to it
+---@see CreateEmitterAtBone(object, bone, army, blueprint) # for an at-bone version
+---@see CreateEmitterOnEntity(object, army, blueprint) # for an on-object version
 ---@param object BoneObject
 ---@param army Army
----@param emitterBlueprint string
+---@param blueprint FileName
 ---@return moho.IEffect
-function CreateEmitterAtEntity(object, army, emitterBlueprint)
+function CreateEmitterAtEntity(object, army, blueprint)
 end
 
---- Creates an emitter on an object and attaches the emitter to it
----@see CreateEmitterAtBone() # at-bone version
----@see CreateEmitterAtEntity() # at-object version
+--- creates an emitter on an object and attaches the emitter to it
+---@see CreateEmitterAtBone(object, bone, army, blueprint) # for an at-bone version
+---@see CreateEmitterAtEntity(object, army, blueprint) # for an at-object version
 ---@param object BoneObject
 ---@param army Army
----@param emitterBlueprint string
+---@param blueprint FileName
 ---@return moho.IEffect
-function CreateEmitterOnEntity(object, army, emitterBlueprint)
+function CreateEmitterOnEntity(object, army, blueprint)
 end
 
---- Prevents a bone from going through the terrain, useful for units that walk
+--- prevents a bone from going through the terrain (useful for units that walk)
 ---@param unit Unit
 ---@param footBone Bone
 ---@param kneeBone Bone
@@ -248,9 +268,9 @@ end
 function CreateFootPlantController(unit, footBone, kneeBone, hipBone, straightLegs, maxFootFall)
 end
 
---- Spawns initial unit for the given army
+--- spawns the initial unit for the given army
 ---@param army Army
----@param unitId string
+---@param unitId UnitId
 ---@return Unit
 function CreateInitialArmyUnit(army, unitId)
 end
@@ -264,6 +284,7 @@ end
 ---@param lifetime number
 ---@param texture string
 ---@param rampName string
+---@return moho.IEffect
 function CreateLightParticle(object, bone, army, size, lifetime, texture, rampName)
 end
 
@@ -276,6 +297,7 @@ end
 ---@param lifetime number
 ---@param texture string
 ---@param rampName string
+---@return moho.IEffect
 function CreateLightParticleIntel(object, bone, army, size, lifetime, texture, rampName)
 end
 
@@ -301,7 +323,7 @@ function CreatePropHPR(blueprintPath, x, y, z, heading, pitch, roll)
 end
 
 --- Spawns mass and hydro deposits on the map
----@param type "Mass" | "Hydrocarbon"
+---@param type ResourceDepositType
 ---@param x number
 ---@param y number
 ---@param z number
@@ -312,7 +334,7 @@ end
 --- Creates a manipulator which rotates on a unit's bone
 ---@param object BoneObject
 ---@param bone Bone
----@param axis "x" | "y" | "z
+---@param axis "x" | "y" | "z"
 ---@param goal? unknown
 ---@param speed? number
 ---@param accel? number
@@ -347,7 +369,7 @@ end
 --- Adds a splat to the game at a position and heading
 ---@see CreateSplatOnBone() # adds the splat at an entity bone
 ---@param position Vector
----@param heading Vector
+---@param heading number
 ---@param texture string
 ---@param sizeX number
 ---@param sizeZ number
@@ -372,7 +394,6 @@ end
 function CreateSplatOnBone(object, offset, bone, texture, sizeX, sizeZ, lodParam, duration, army)
 end
 
----
 ---@param object BoneObject
 ---@param bone Bone
 ---@param resource any
@@ -386,7 +407,6 @@ end
 function CreateStorageManip(object, bone, resource, minX, minY, minZ, maxX, maxY, maxZ)
 end
 
----
 ---@param unit Unit
 ---@param label string
 ---@param thrustBone Bone
@@ -394,11 +414,10 @@ end
 function CreateThrustController(unit, label, thrustBone)
 end
 
----
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
----@param trailBlueprint string
+---@param trailBlueprint FileName
 ---@return moho.IEffect
 function CreateTrail(object, bone, army, trailBlueprint)
 end
@@ -436,7 +455,7 @@ end
 --- Creates a unit from a blueprint for an army, at a position with heading, pitch, and roll
 ---@see CreateUnit() # quaternion version
 ---@see CreateUnit2() # simple version
----@param blueprint string
+---@param blueprint UnitId
 ---@param army Army
 ---@param x number
 ---@param y number
@@ -449,7 +468,7 @@ function CreateUnitHPR(blueprint, army, x, y, z, heading, pitch, roll)
 end
 
 --- Deals damage to the target unit
----@param instigator Unit | nil
+---@param instigator TargetObject | nil
 ---@param location Vector origin of the damage, used for effects
 ---@param target Unit
 ---@param amount number
@@ -458,7 +477,7 @@ function Damage(instigator, location, target, amount, damageType)
 end
 
 --- Deals damage in an circle
----@param instigator Unit | nil
+---@param instigator TargetObject | nil
 ---@param location Vector
 ---@param radius number
 ---@param damage number
@@ -469,7 +488,7 @@ function DamageArea(instigator, location, radius, damage, damageType, damageFrie
 end
 
 --- Deals damage in an ring
----@param instigator Unit | nil
+---@param instigator TargetObject | nil
 ---@param location Vector
 ---@param minRadius number
 ---@param maxRadius number
@@ -487,10 +506,10 @@ function DebugGetSelection()
 end
 
 --- Draws a 3D circle
----@param position Vector
+---@param center Vector
 ---@param diameter number
 ---@param color Color
-function DrawCircle(position, diameter, color)
+function DrawCircle(center, diameter, color)
 end
 
 --- Draws a 3D line
@@ -541,7 +560,8 @@ end
 function FlattenMapRect(x, z, sizeX, sizeZ, elevation)
 end
 
---- Removes all recon blips from the target area, if the area is in radar range it generates unseen recon blips
+--- Removes all recon blips from the target area. If the area is in radar range it generates unseen
+--- recon blips.
 ---@param minX number
 ---@param minZ number
 ---@param maxX number
@@ -549,12 +569,10 @@ end
 function FlushIntelInRect(minX, minZ, maxX, maxZ)
 end
 
----
 ---@param armyName string
 function GenerateArmyStart(armyName)
 end
 
----
 ---@return Quaternion
 function GenerateRandomOrientation()
 end
@@ -577,19 +595,20 @@ end
 function GetArmyUnitCostTotal(army)
 end
 
----
----@return Army
+--- Returns the currently active command source in the sim state. This number is the army index
+--- of the army that sent the command.
+---@return number
 function GetCurrentCommandSource()
 end
 
---- Returns the entities inside the given rectangle
+--- returns the entities inside the given rectangle
 ---@param rectangle Rectangle
 function GetEntitiesInRect(rectangle)
 end
 
---- Gets entity by entity id.
---- This ID is unique for each entity.
----@param id string
+--- Gets entity by entity ID. This ID is unique for each entity.
+--- Note that entity ID's are recycled as entities are destroyed.
+---@param id EntityId
 ---@return Entity
 function GetEntityById(id)
 end
@@ -606,11 +625,11 @@ end
 function GetMapSize()
 end
 
+---@overload fun(x0: number, z0: number, x1: number, z1: number): ReclaimObject[] | nil
 --- Returns the reclaimable objects inside the given rectangle.
 --- This includes props, units, wreckages.
 ---@param rectangle Rectangle
----@return ReclaimableObject[] | nil
----@overload fun(x0: number, z0: number, x1: number, z1: number): ReclaimableObject[] | nil
+---@return ReclaimObject[] | nil
 function GetReclaimablesInRect(rectangle)
 end
 
@@ -642,7 +661,6 @@ end
 function GetTerrainType(x, z)
 end
 
----
 ---@return number
 function GetTerrainTypeOffset(x, z)
 end
@@ -653,11 +671,9 @@ end
 function GetUnitBlueprintByName(bpName)
 end
 
---- Retrieves all units in a rectangle, excludes insignificant units (such as the Cybran build bot)
---- by default
+--- retrieves all units in a rectangle
 ---@param rectangle Rectangle
 ---@return Unit[] | nil
----@overload fun(x0: number, z0: number, x1: number, z1: number): Unit[] | nil
 function GetUnitsInRect(rectangle)
 end
 
@@ -666,13 +682,11 @@ end
 function InitializeArmyAI(army)
 end
 
----
 ---@param object Object
 ---@return boolean
 function IsBlip(object)
 end
 
----
 ---@param object Object
 ---@return boolean
 function IsCollisionBeam(object)
@@ -892,7 +906,7 @@ end
 
 --- Orders a group of units to reclaim a target
 ---@param units Unit[]
----@param target ReclaimableObject
+---@param target ReclaimObject
 ---@return SimCommand
 function IssueReclaim(units, target)
 end
@@ -951,7 +965,6 @@ end
 function IssueTeleport(units, position)
 end
 
----
 ---@param units Unit[]
 ---@param beacon unknown
 ---@return SimCommand
@@ -1001,12 +1014,11 @@ end
 function LUnitMoveNear(unit, target, range)
 end
 
---- Lists all armies in the game
----@return table<Army, string> # i.e. string[] of army names
+--- Lists all armies in the game, as defined by the current army configuration of the
+---@return string[]
 function ListArmies()
 end
 
----
 ---@param instigator Unit
 ---@param location Vector
 ---@param maxRadius number
@@ -1017,19 +1029,18 @@ end
 function MetaImpact(instigator, location, maxRadius, amount, affectsCategory, damageFriendly)
 end
 
----
 ---@param from Unit
 ---@param to Unit
 function NotifyUpgrade(from, to)
 end
 
---- Returns true if the current command source is authorized to mess with the given army, or if cheats are enabled
+--- Returns true if the current command source is authorized to mess with the given army,
+--- or if cheats are enabled
 ---@param army Army
 ---@return boolean
 function OkayToMessWithArmy(army)
 end
 
----
 ---@param manager CSimSoundManager
 ---@param sound SoundHandle
 ---@return SoundHandle
@@ -1143,27 +1154,27 @@ end
 function SetArmyUnitCap(army, unitCap)
 end
 
---- Allows rights to the army
----@param targetArmyIndex Army
----@param sourceHumanIndex Army
+--- Sets the command source of an army to match another army's command source.
+---@param targetArmyIndex number
+---@param sourceHumanIndex number
 ---@param enable boolean
 function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
 end
 
---- Sets army to ignore unit cap
+--- sets an army to ignore unit cap
 ---@param army Army
 ---@param ignore boolean
 function SetIgnoreArmyUnitCap(army, ignore)
 end
 
---- Sets army to ignore playable rectangle.
+--- Sets an army to ignore the playable area on a map.
 --- Used in campaign for offmap attacks.
 ---@param army Army
 ---@param ignore boolean
 function SetIgnorePlayableRect(army, ignore)
 end
 
---- Sets playable rectangle
+--- sets the playable area of a map
 ---@param minX number
 ---@param minZ number
 ---@param maxX number
@@ -1178,7 +1189,7 @@ end
 function SetTerrainType(x, z, type)
 end
 
---- Changes terrain type in given rectangle
+--- changes the terrain type in given area
 ---@param rect Rectangle
 ---@param type TerrainType
 function SetTerrainTypeRect(rect, type)
@@ -1188,13 +1199,12 @@ end
 function ShouldCreateInitialArmyUnits()
 end
 
---- Performs a console command
+--- performs a console command
 ---@param command string
 function SimConExecute(command)
 end
 
---- Sinks the entity into the ground.
---- Used for dead trees, for example.
+--- Sinks the entity into the ground. Used for dead trees, for example.
 ---@param velY number
 function SinkAway(velY)
 end
@@ -1212,7 +1222,7 @@ end
 function StopLoop(manager, handle)
 end
 
---- Requests that we submit xml army stats to GPG.net
+--- requests that we submit XML army stats to GPG.net
 function SubmitXMLArmyStats()
 end
 
@@ -1224,16 +1234,15 @@ end
 function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
---- Instantly moves an entity to a location
+--- instantly moves an entity to a location with an orientation
 ---@param object Object
 ---@param location Vector
----@param orientation? Quaternion
+---@param orientation? Quaternion no orientation change if absent
 function Warp(object, location, orientation)
 end
 
----
 ---@param entity Entity
----@param spec UnitBlueprint
+---@param spec EntitySpec
 function _c_CreateEntity(entity, spec)
 end
 

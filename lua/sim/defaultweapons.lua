@@ -29,6 +29,7 @@ local MathClamp = math.clamp
 
 -- Most weapons derive from this class, including beam weapons later in this file
 ---@class DefaultProjectileWeapon : Weapon
+---@field RecoilManipulators? TrashBag
 ---@field CurrentSalvoNumber number
 ---@field CurrentRackSalvoNumber number
 ---@field CurrentSalvoData? WeaponSalvoData
@@ -37,9 +38,9 @@ local MathClamp = math.clamp
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
-    FxRackChargeMuzzleFlash = {},
+    FxRackChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxRackChargeMuzzleFlashScale = 1,
-    FxChargeMuzzleFlash = {},
+    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxChargeMuzzleFlashScale = 1,
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
@@ -83,7 +84,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local rof = self:GetWeaponRoF()
         -- Calculate recoil speed so that it finishes returning just as the next shot is ready
         if rackRecoilDist ~= 0 then
-            self.RecoilManipulators = {}
+            self.RecoilManipulators = TrashBag()
+            self.Trash:Add(self.RecoilManipulators)
+
             local dist = rackRecoilDist
             local telescopeRecoilDist = rackBones[1].TelescopeRecoilDistance
             if telescopeRecoilDist and math.abs(telescopeRecoilDist) > math.abs(dist) then
@@ -565,21 +568,22 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     PlayRackRecoil = function(self, rackList)
         local bp = self.Blueprint
         local rackRecoilDist = bp.RackRecoilDistance
+
+        ---@type TrashBag
+        local recoilManipulatorBag = self.RecoilManipulators
         for _, rack in rackList do
             local telescopeBone = rack.TelescopeBone
             local tmpSldr = CreateSlider(self.unit, rack.RackBone)
-            table.insert(self.RecoilManipulators, tmpSldr)
             tmpSldr:SetPrecedence(11)
             tmpSldr:SetGoal(0, 0, rackRecoilDist)
             tmpSldr:SetSpeed(-1)
-            self.Trash:Add(tmpSldr)
+            recoilManipulatorBag:Add(tmpSldr)
             if telescopeBone then
                 tmpSldr = CreateSlider(self.unit, telescopeBone)
-                table.insert(self.RecoilManipulators, tmpSldr)
                 tmpSldr:SetPrecedence(11)
                 tmpSldr:SetGoal(0, 0, rack.TelescopeRecoilDistance or rackRecoilDist)
                 tmpSldr:SetSpeed(-1)
-                self.Trash:Add(tmpSldr)
+                recoilManipulatorBag:Add(tmpSldr)
             end
         end
         self:ForkThread(self.PlayRackRecoilReturn, rackList)
@@ -620,12 +624,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- Destroy the sliders which cause weapon visual recoil
     ---@param self DefaultProjectileWeapon
     DestroyRecoilManips = function(self)
-        local manips = self.RecoilManipulators
-        if manips then
-            for _, manip in manips do
-                manip:Destroy()
-            end
-            self.RecoilManipulators = {}
+        if self.RecoilManipulators then
+            self.RecoilManipulators:Destroy()
         end
     end,
 

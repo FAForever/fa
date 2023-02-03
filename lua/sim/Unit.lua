@@ -24,6 +24,7 @@ local PersonalShield = import("/lua/shield.lua").PersonalShield
 local Shield = import("/lua/shield.lua").Shield
 local TransportShield = import("/lua/shield.lua").TransportShield
 local Weapon = import("/lua/sim/weapon.lua").Weapon
+local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
@@ -100,7 +101,7 @@ SyncMeta = {
 }
 
 local cUnit = moho.unit_methods
----@class Unit : moho.unit_methods
+---@class Unit : moho.unit_methods, IntelComponent
 ---@field Brain AIBrain
 ---@field Trash TrashBag
 ---@field Buffs {Affects: table<BuffEffectName, BlueprintBuff.Effect>, buffTable: table<string, table>}
@@ -110,9 +111,10 @@ local cUnit = moho.unit_methods
 ---@field EventCallbacks table<string, function[]>
 ---@field Blueprint UnitBlueprint
 ---@field EngineFlags any
+---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
-Unit = ClassUnit(moho.unit_methods) {
+Unit = ClassUnit(moho.unit_methods, IntelComponent) {
 
     Weapons = {},
 
@@ -215,6 +217,8 @@ Unit = ClassUnit(moho.unit_methods) {
     OnCreate = function(self)
         local bp = self:GetBlueprint()
 
+
+
         -- cache often accessed values into inner table
         self.Blueprint = bp
         self.MovementEffects = bp.Display.MovementEffects
@@ -235,12 +239,9 @@ Unit = ClassUnit(moho.unit_methods) {
         -- used for rebuilding mechanic
         self.Repairers = {}
 
-        -- used by almost all unit types, sadly some are even used for structures in rare occasions
-        self.MovementEffectsBag = TrashBag()
-        self.TopSpeedEffectsBag = TrashBag()
-        self.BeamExhaustEffectsBag = TrashBag()
-        self.IdleEffectsBag = TrashBag()
+        -- used by almost all unit types
         self.OnBeingBuiltEffectsBag = TrashBag()
+        self.IdleEffectsBag = TrashBag()
 
         -- Set up veterancy
         self.Instigators = {}
@@ -283,6 +284,7 @@ Unit = ClassUnit(moho.unit_methods) {
 
         -- for syncing data to UI
         self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate)
+        self:SetStat("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
@@ -1691,6 +1693,8 @@ Unit = ClassUnit(moho.unit_methods) {
         end
     end,
 
+    
+
     --- Called when a unit collides with a projectile to check if the collision is valid
     ---@param self Unit The unit we're checking the collision for
     ---@param other Projectile The projectile we're checking the collision with
@@ -2138,68 +2142,62 @@ Unit = ClassUnit(moho.unit_methods) {
 
     ---@param self Unit
     DestroyAllTrashBags = function(self)
-        -- Some bags should really be managed by their classes
-        -- but for mod compatibility reasons we delete them all here.
-        for _, v in self.EffectsBag or {} do
-            v:Destroy()
-        end
-        for k, v in self.ShieldEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.ReleaseEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.AmbientExhaustEffectsBag or {} do
-            v:Destroy()
-        end
-        for k, v in self.OmniEffectsBag or {} do
-            v:Destroy()
-        end
-        for k, v in self.AdjacencyBeamsBag or {} do
-            v.Trash:Destroy()
-            self.AdjacencyBeamsBag[k] = nil
-        end
-        for _, v in self.IntelEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.TeleportDestChargeBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.TeleportSoundChargeBag or {} do
-            v:Destroy()
-        end
-        for _, EffectsBag in self.DamageEffectsBag or {} do
-            for _, v in EffectsBag do
+
+        self.IdleEffectsBag:Destroy()
+        self.OnBeingBuiltEffectsBag:Destroy()
+
+        -- Some bags should really be managed by their classes, but
+        -- for mod compatibility reasons we destroy those here too
+
+        if self.ReleaseEffectsBag then
+            for _, v in self.ReleaseEffectsBag do
                 v:Destroy()
             end
         end
-    
-        if self.MovementEffectsBag then 
-            self.MovementEffectsBag:Destroy()
+
+        if self.ShieldEffectsBag then 
+            for k, v in self.ShieldEffectsBag do
+                v:Destroy()
+            end
         end
 
-        if self.IdleEffectsBag then 
-            self.IdleEffectsBag:Destroy()
+        if self.IntelEffectsBag then
+            for _, v in self.IntelEffectsBag do
+                v:Destroy()
+            end
         end
 
-        if self.TopSpeedEffectsBag then 
-            self.TopSpeedEffectsBag:Destroy()
+        if self.TeleportDestChargeBag then
+            for _, v in self.TeleportDestChargeBag do
+                v:Destroy()
+            end
         end
 
-        if self.BeamExhaustEffectsBag then
-            self.BeamExhaustEffectsBag:Destroy()
+        if self.TeleportSoundChargeBag then
+            for _, v in self.TeleportSoundChargeBag do
+                v:Destroy()
+            end
+        end 
+
+        if self.AdjacencyBeamsBag then
+            for k, v in self.AdjacencyBeamsBag do
+                v.Trash:Destroy()
+                self.AdjacencyBeamsBag[k] = nil
+            end
         end
 
-        if self.TransportBeamEffectsBag then 
-            self.TransportBeamEffectsBag:Destroy()
+        if self.DamageEffectsBag then
+            for _, EffectsBag in self.DamageEffectsBag do
+                for _, v in EffectsBag do
+                    v:Destroy()
+                end
+            end
         end
     end,
 
     ---@param self Unit
     OnDestroy = function(self)
         self.Dead = true
-
-        -- LOG(string.format("%s -> %s", tostring(self.UnitId), tostring(debug.allocatedsize(self))))
 
         if self:GetFractionComplete() < 1 then
             self:SendNotifyMessage('cancelled')
@@ -2216,7 +2214,6 @@ Unit = ClassUnit(moho.unit_methods) {
         Sync.ReleaseIds[self.EntityId] = true
 
         -- Destroy everything added to the trash
-        LOG("Destroyed")
         self.Trash:Destroy()
 
         -- Destroy all extra trashbags in case the DeathTread() has not already destroyed it (modded DeathThread etc.)
@@ -2423,13 +2420,20 @@ Unit = ClassUnit(moho.unit_methods) {
 
     ---@param self Unit
     ---@param builder Unit
-    ---@param layer string
+    ---@param layer Layer
     ---@return boolean
     OnStopBeingBuilt = function(self, builder, layer)
         if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
             self:Kill()
             return false
         end
+
+        -- Create any idle effects on unit
+        if TrashEmpty(self.IdleEffectsBag) then
+            self:CreateIdleEffects()
+        end
+        
+        IntelComponent.OnStopBeingBuilt(self, builder, layer)
 
         local bp = self.Blueprint
         self.isFinishedUnit = true
@@ -2470,7 +2474,6 @@ Unit = ClassUnit(moho.unit_methods) {
             end
         end
 
-        self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
         if self.Layer == 'Water' then
@@ -2500,11 +2503,6 @@ Unit = ClassUnit(moho.unit_methods) {
 
         -- Turn off land bones if this unit has them.
         self:DoUnitCallbacks('OnStopBeingBuilt')
-
-        -- Create any idle effects on unit
-        if TrashEmpty(self.IdleEffectsBag) then
-            self:CreateIdleEffects()
-        end
 
         -- If we have a shield specified, create it.
         -- Blueprint registration always creates a dummy Shield entry:
@@ -2852,11 +2850,10 @@ Unit = ClassUnit(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     ---@return boolean
     OnStartBuild = function(self, built, order)
-
         self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
 
         -- Prevent UI mods from violating game/scenario restrictions
@@ -2918,7 +2915,7 @@ Unit = ClassUnit(moho.unit_methods) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     OnStopBuild = function(self, built)
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
@@ -3004,296 +3001,9 @@ Unit = ClassUnit(moho.unit_methods) {
     end,
 
     -------------------------------------------------------------------------------------------
-    -- INTEL
-    -------------------------------------------------------------------------------------------
-    -- There are several ways to disable a unit's intel: The intel actually being part of an upgrade
-    -- (enhancement) that is not present, the intel requiring energy and energy being stalled, etc.
-    -- The intel is turned on using the EnableIntel engine call if all disablers are removed.
-    -- As an optimisation, EnableIntel and DisableIntel are only called when going from one disabler
-    -- present to zero, and when going from zero disablers to one.
-
-    ---@param self Unit
-    ---@param disabler string
-    ---@param intel string
-    DisableUnitIntel = function(self, disabler, intel)
-        local function DisableOneIntel(disabler, intel)
-            local intDisabled = false
-            if Set.Empty(self.IntelDisables[intel]) then
-                local active = self.Blueprint.Intel.ActiveIntel
-                if active and active[intel] then
-                    return
-                end
-                self:DisableIntel(intel)
-
-                -- Handle the cloak FX timing
-                if intel == 'Cloak' or intel == 'CloakField' then
-                    if disabler ~= 'NotInitialized' and self.Blueprint.Intel[intel] then
-                        self:UpdateCloakEffect(false, intel)
-                    end
-                end
-
-                intDisabled = true
-            end
-            self.IntelDisables[intel][disabler] = true
-            return intDisabled
-        end
-
-        local intDisabled = false
-
-        -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here with certain units that have Intel changes on layer change
-        -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
-        if self.IntelDisables['Radar']['NotInitialized'] then
-            return
-        end
-
-        if intel then
-            intDisabled = DisableOneIntel(disabler, intel)
-        else
-            -- Loop over all intels and add disabler
-            for intel, v in self.IntelDisables do
-                intDisabled = DisableOneIntel(disabler, intel) or intDisabled -- Beware of short-circuiting
-            end
-        end
-
-        if intDisabled then
-            self:OnIntelDisabled(disabler, intel)
-        end
-    end,
-
-    ---@param self Unit
-    ---@param disabler string
-    ---@param intel string
-    EnableUnitIntel = function(self, disabler, intel)
-        local function EnableOneIntel(disabler, intel)
-            local intEnabled = false
-            if self.IntelDisables[intel][disabler] then -- Must check for explicit true contained
-                self.IntelDisables[intel][disabler] = nil
-                if Set.Empty(self.IntelDisables[intel]) then
-                    self:EnableIntel(intel)
-
-                    -- Handle the cloak FX timing
-                    if intel == 'Cloak' or intel == 'CloakField' then
-                        if disabler ~= 'NotInitialized' and self.Blueprint.Intel[intel] then
-                            self:UpdateCloakEffect(true, intel)
-                        end
-                    end
-
-                    intEnabled = true
-                end
-            end
-            return intEnabled
-        end
-
-        local intEnabled = false
-
-        -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
-        -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
-        if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
-            return
-        end
-
-        if intel then
-            intEnabled = EnableOneIntel(disabler, intel)
-        else
-            -- Loop over all intels and remove disabler
-            for intel, v in self.IntelDisables do
-                intEnabled = EnableOneIntel(disabler, intel) or intEnabled -- Beware of short-circuiting
-            end
-        end
-
-        if not self.IntelThread then
-            self.IntelThread = self:ForkThread(self.IntelWatchThread)
-        end
-
-        if intEnabled then
-            self:OnIntelEnabled()
-        end
-    end,
-
-    ---@param self Unit
-    OnIntelEnabled = function(self)
-    end,
-
-    ---@param self Unit
-    OnIntelDisabled = function(self)
-    end,
-
-    ---@param self Unit
-    ---@param cloaked string
-    ---@param intel string
-    UpdateCloakEffect = function(self, cloaked, intel)
-        -- When debugging cloak FX issues, remember that once a structure unit is seen by the enemy,
-        -- recloaking won't make it vanish again, and they'll see the new FX.
-        if self and not self.Dead then
-            if intel == 'Cloak' then
-                local bpDisplay = self.Blueprint.Display
-
-                if cloaked then
-                    self:SetMesh(bpDisplay.CloakMeshBlueprint, true)
-                else
-                    self:SetMesh(bpDisplay.MeshBlueprint, true)
-                end
-            elseif intel == 'CloakField' then
-                if self.CloakFieldWatcherThread then
-                    KillThread(self.CloakFieldWatcherThread)
-                    self.CloakFieldWatcherThread = nil
-                end
-
-                if cloaked then
-                    self.CloakFieldWatcherThread = self:ForkThread(self.CloakFieldWatcher)
-                end
-            end
-        end
-    end,
-
-    ---@param self Unit
-    CloakFieldWatcher = function(self)
-        if self and not self.Dead then
-            local bp = self.Blueprint
-            local radius = bp.Intel.CloakFieldRadius - 2 -- Need to take off 2, because engine reasons
-            local brain = self:GetAIBrain()
-
-            while self and not self.Dead and self:IsIntelEnabled('CloakField') do
-                local pos = self:GetPosition()
-                local units = brain:GetUnitsAroundPoint(categories.ALLUNITS, pos, radius, 'Ally')
-
-                for _, unit in units do
-                    if unit and not unit.Dead and unit ~= self then
-                        if unit.CloakFXWatcherThread then
-                            KillThread(unit.CloakFXWatcherThread)
-                            unit.CloakFXWatcherThread = nil
-                        end
-
-                        unit:UpdateCloakEffect(true, 'Cloak') -- Turn on the FX for the unit
-                        unit.CloakFXWatcherThread = unit:ForkThread(unit.CloakFXWatcher)
-                    end
-                end
-
-                WaitTicks(6)
-            end
-        end
-    end,
-
-    ---@param self Unit
-    CloakFXWatcher = function(self)
-        WaitTicks(6)
-
-        if self and not self.Dead then
-            self:UpdateCloakEffect(false, 'Cloak')
-        end
-    end,
-
-    ---@param self Unit
-    ---@return boolean
-    ShouldWatchIntel = function(self)
-        if self.Blueprint.Intel.FreeIntel then
-            return false
-        end
-        local bpVal = self.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
-        -- Check enhancements
-        if not bpVal or bpVal <= 0 then
-            local enh = self.Blueprint.Enhancements
-            if enh then
-                for k, v in enh do
-                    if self:HasEnhancement(k) and v.MaintenanceConsumptionPerSecondEnergy and v.MaintenanceConsumptionPerSecondEnergy > 0 then
-                        bpVal = v.MaintenanceConsumptionPerSecondEnergy
-                        break
-                    end
-                end
-            end
-        end
-        local watchPower = false
-        if bpVal and bpVal > 0 then
-            local intelTypeTbl = {'JamRadius', 'SpoofRadius'}
-            local intelTypeBool = {'RadarStealth', 'SonarStealth', 'Cloak'}
-            local intelTypeNum = {'RadarRadius', 'SonarRadius', 'OmniRadius', 'RadarStealthFieldRadius', 'SonarStealthFieldRadius', 'CloakFieldRadius', }
-            local bpInt = self.Blueprint.Intel
-            if bpInt then
-                for _, v in intelTypeTbl do
-                    for ki, vi in bpInt[v] do
-                        if vi > 0 then
-                            watchPower = true
-                            break
-                        end
-                    end
-                    if watchPower then break end
-                end
-                for _, v in intelTypeBool do
-                    if bpInt[v] then
-                        watchPower = true
-                        break
-                    end
-                end
-                for _, v in intelTypeNum do
-                    if bpInt[v] > 0 then
-                        watchPower = true
-                        break
-                    end
-                end
-            end
-        end
-        return watchPower
-    end,
-
-    ---@param self Unit
-    IntelWatchThread = function(self)
-        local aiBrain = self:GetAIBrain()
-        local bp = self.Blueprint
-        local recharge = bp.Intel.ReactivateTime or 10
-        while self:ShouldWatchIntel() do
-            WaitSeconds(0.5)
-
-            -- Checking for less than 1 because sometimes there's more
-            -- than 0 and less than 1 in stock and that last bit of
-            -- energy isn't used. This results in the radar being
-            -- on even though there's no energy to run it. Shields
-            -- have a similar bug with a similar fix.
-            if aiBrain:GetEconomyStored('ENERGY') < 1 and not self.ToggledOff then
-                self:DisableUnitIntel('Energy', nil)
-                WaitSeconds(recharge)
-                self:EnableUnitIntel('Energy', nil)
-            end
-        end
-        if self.IntelThread then
-            self.IntelThread = nil
-        end
-    end,
-
-    ---@param self Unit
-    ---@param hook fun(unit: Unit, army: number)
-    AddDetectedByHook = function(self, hook)
-        if not self.DetectedByHooks then
-            self.DetectedByHooks = {}
-        end
-        table.insert(self.DetectedByHooks, hook)
-    end,
-
-    ---@param self Unit
-    ---@param hook fun(unit: Unit, army: number)
-    RemoveDetectedByHook = function(self, hook)
-        if self.DetectedByHooks then
-            for k, v in self.DetectedByHooks do
-                if v == hook then
-                    table.remove(self.DetectedByHooks, k)
-                    return
-                end
-            end
-        end
-    end,
-
-    ---@param self Unit
-    ---@param index integer
-    OnDetectedBy = function(self, index)
-        if self.DetectedByHooks then
-            for k, v in self.DetectedByHooks do
-                v(self, index)
-            end
-        end
-    end,
-
-    -------------------------------------------------------------------------------------------
     -- GENERIC WORK
     -------------------------------------------------------------------------------------------
+
     ---@param self Unit
     ---@param target Unit
     InheritWork = function(self, target)
@@ -3326,11 +3036,11 @@ Unit = ClassUnit(moho.unit_methods) {
         local tempEnhanceBp = self.Blueprint.Enhancements[work]
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
-                WARN('*WARNING: Ordered enhancement ['..tempEnhanceBp.Name..'] does not have the proper prerequisite. Slot ['..tempEnhanceBp.Slot..'] - Needed: ['..unitEnhancements[tempEnhanceBp.Slot]..'] - Installed: ['..tempEnhanceBp.Prerequisite..']')
+                WARN('*WARNING: Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper prerequisite. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] - Needed: ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] - Installed: ['..(tempEnhanceBp.Prerequisite or 'nil')..']')
                 return false
             end
         elseif unitEnhancements[tempEnhanceBp.Slot] then
-            WARN('*WARNING: Ordered enhancement ['..tempEnhanceBp.Name..'] does not have the proper slot available. Slot ['..tempEnhanceBp.Slot..'] has already ['..unitEnhancements[tempEnhanceBp.Slot]..'] installed.')
+            WARN('*WARNING: Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper slot available. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] has already ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] installed.')
             return false
         end
 
@@ -3495,7 +3205,7 @@ Unit = ClassUnit(moho.unit_methods) {
 
     ---@param self Unit
     CleanupEnhancementEffects = function(self)
-        self.UpgradeEffectsBag:Destroy()
+        if self.UpgradeEffectsBag.Destroy then self.UpgradeEffectsBag:Destroy() end
     end,
 
     ---@param self Unit
@@ -3696,6 +3406,7 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param new string
     ---@param old string
     OnTerrainTypeChange = function(self, new, old)
+        self.TerrainType = new
         if self.MovementEffectsExist then
             self:DestroyMovementEffects()
             self:CreateMovementEffects(self.MovementEffectsBag, nil, new)
@@ -3817,14 +3528,6 @@ Unit = ClassUnit(moho.unit_methods) {
         end
     end,
 
-    ---@param self Unit
-    ---@param pos Vector
-    ---@return TerrainTreadType
-    GetTTTreadType = function(self, pos)
-        local terrainType = GetTerrainType(pos[1], pos[3])
-        return terrainType.Treads or 'None'
-    end,
-
     ---@param fxType TerrainEffectType
     ---@param layer Layer
     ---@param pos Vector
@@ -3943,12 +3646,6 @@ Unit = ClassUnit(moho.unit_methods) {
             bpTable = bpTable[layer]
             local effectTypeGroups = bpTable.Effects
 
-            if bpTable.Treads then
-                self:CreateTreads(bpTable.Treads)
-            else
-                self:RemoveScroller()
-            end
-
             if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
                 if not self.Footfalls and bpTable.Footfall then
                     WARN('*WARNING: No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
@@ -3991,7 +3688,9 @@ Unit = ClassUnit(moho.unit_methods) {
     ---@param self Unit
     DestroyMovementEffects = function(self)
         -- Destroy the stored movement effects
-        TrashDestroy(self.MovementEffectsBag)
+        if self.MovementEffectsBag then
+            TrashDestroy(self.MovementEffectsBag)
+        end
 
         -- Clean up any camera shake going on.
         local bpTable = self.Blueprint.Display.MovementEffects
@@ -4003,18 +3702,6 @@ Unit = ClassUnit(moho.unit_methods) {
             if shake and shake.Radius and shake.MaxShakeEpicenter and shake.MinShakeAtRadius then
                 self:ShakeCamera(shake.Radius, shake.MaxShakeEpicenter * 0.25, shake.MinShakeAtRadius * 0.25, 1)
             end
-        end
-
-        -- Clean up treads
-        if self.TreadThreads then
-            for k, v in self.TreadThreads do
-                KillThread(v)
-            end
-            self.TreadThreads = {}
-        end
-
-        if bpTable[layer].Treads.ScrollTreads then
-            self:RemoveScroller()
         end
     end,
 
@@ -4108,44 +3795,6 @@ Unit = ClassUnit(moho.unit_methods) {
                 self:ShakeCamera(radius, maxShakeEpicenter, minShakeAtRadius, interval)
                 WaitSeconds(interval)
             end
-        end
-    end,
-
-    ---@param self Unit
-    ---@param treads UnitBlueprintTreads
-    CreateTreads = function(self, treads)
-        if treads.ScrollTreads then
-            self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
-        end
-
-        self.TreadThreads = {}
-        if treads.TreadMarks then
-            local type = self:GetTTTreadType(self:GetPosition())
-            if type ~= 'None' then
-                for k, v in treads.TreadMarks do
-                    table.insert(self.TreadThreads, self:ForkThread(self.CreateTreadsThread, v, type))
-                end
-            end
-        end
-    end,
-
-    ---@param self Unit
-    ---@param treads UnitBlueprintTreads
-    ---@param type string
-    CreateTreadsThread = function(self, treads, type)
-        local sizeX = treads.TreadMarksSizeX
-        local sizeZ = treads.TreadMarksSizeZ
-        local interval = treads.TreadMarksInterval
-        local treadOffset = treads.TreadOffset
-        local treadBone = treads.BoneName or 0
-        local treadTexture = treads.TreadMarks
-        local duration = treads.TreadLifeTime or 10
-
-        while true do
-            -- Syntactic reference
-            -- CreateSplatOnBone(entity, offset, boneName, textureName, sizeX, sizeZ, lodParam, duration, army)
-            CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, 130, duration, self.Army)
-            WaitSeconds(interval)
         end
     end,
 
@@ -5184,6 +4833,14 @@ Unit = ClassUnit(moho.unit_methods) {
 
     --- Deprecated functionality
 
+    ---@param self Unit
+    ---@param pos Vector
+    ---@return TerrainTreadType
+    GetTTTreadType = function(self, pos)
+        local terrainType = GetTerrainType(pos[1], pos[3])
+        return terrainType.Treads or 'None'
+    end,
+
     ---@deprecated
     ---@param self Unit
     ---@param fn function
@@ -5404,7 +5061,7 @@ DummyUnit = ClassDummyUnit(moho.unit_methods) {
 
 if next(__active_mods) then
 
-    SPEW("Sim mod detected - adding in missing fields to the unit class to improve compatibility")
+    SPEW("Sim mod detected - adding in missing fields to unit class to improve compatibility")
 
     local oldUnit = Unit
     Unit = Class(oldUnit) {
@@ -5415,6 +5072,42 @@ if next(__active_mods) then
             self.factionCategory = self.Blueprint.FactionCategory
             self.layerCategory = self.Blueprint.LayerCategory
             self.factionCategory = self.Blueprint.FactionCategory
+
+            self.MovementEffectsBag = TrashBag()
+            self.TopSpeedEffectsBag = TrashBag()
+            self.BeamExhaustEffectsBag = TrashBag()
+            self.IdleEffectsBag = TrashBag()
+        end,
+
+        DestroyAllTrashBags = function(self)
+            oldUnit.DestroyAllTrashBags(self)
+
+            self.MovementEffectsBag:Destroy()
+            self.TopSpeedEffectsBag:Destroy()
+            self.BeamExhaustEffectsBag:Destroy()
+            self.IdleEffectsBag:Destroy()
+    
+            if self.TransportBeamEffectsBag then
+                self.TransportBeamEffectsBag:Destroy()
+            end
+
+            if self.AmbientExhaustEffectsBag then
+                for _, v in self.AmbientExhaustEffectsBag do
+                    v:Destroy()
+                end
+            end
+
+            if self.EffectsBag then
+                for _, v in self.EffectsBag do
+                    v:Destroy()
+                end
+            end
+
+            if self.OmniEffectsBag then
+                for k, v in self.OmniEffectsBag do
+                    v:Destroy()
+                end
+            end
         end,
     }
 end

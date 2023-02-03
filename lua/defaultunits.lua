@@ -16,6 +16,9 @@ local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
+local TreadComponent = import("/lua/defaultcomponents.lua").TreadComponent
+
+
 local RolloffUnitTable = { nil }
 local RolloffPositionTable = { 0, 0, 0 }
 
@@ -46,9 +49,32 @@ StructureUnit = ClassUnit(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:HideLandBones()
-        self.FxBlinkingLightsBag = {}
+        self.FxBlinkingLightsBag = { }
         if self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
+        end
+
+        -- check for terrain orientation
+        local bp = self.Blueprint
+        if not (
+                bp.Physics.AltitudeToTerrain or
+                bp.Physics.StandUpright
+            ) and self.Layer == 'Land'
+        then
+            -- rotate structure to match terrain gradient
+            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
+                self:GetPosition(),
+                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
+                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+            )
+
+            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
+
+            -- technically obsolete, but as this is part of an integration we don't want to break
+            -- the mod package that it originates from. Originates from the BrewLan mod suite
+            if not bp.Physics.FlattenSkirt then
+                self.TerrainSlope = {}
+            end
         end
     end,
 
@@ -137,23 +163,6 @@ StructureUnit = ClassUnit(Unit) {
         local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
-        end
-
-        if not (bp.Physics.AltitudeToTerrain or bp.Physics.StandUpright) then
-            -- rotate structure to match terrain gradient
-            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
-                self:GetPosition(),
-                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
-                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
-            )
-
-            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
-
-            -- technically obsolete, but as this is part of an integration we don't want to break
-            -- the mod package that it originates from. Originates from the BrewLan mod suite
-            if not bp.Physics.FlattenSkirt then
-                self.TerrainSlope = {}
-            end
         end
 
         -- create decal below structure
@@ -311,7 +320,7 @@ StructureUnit = ClassUnit(Unit) {
         for _, v in self.FxBlinkingLightsBag do
             v:Destroy()
         end
-        self.FxBlinkingLightsBag = {}
+        self.FxBlinkingLightsBag = { }
     end,
 
     ---@param self StructureUnit
@@ -765,7 +774,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@return string?
     ToSupportFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local identifier = self.Blueprint.BlueprintId
         local faction = identifier:sub(2, 2)
         local layer = identifier:sub(7, 7)
 
@@ -796,7 +805,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     ToHQFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local identifier = self.Blueprint.BlueprintId
         local faction = identifier:sub(1, 3)
         local layer = identifier:sub(7, 7)
 
@@ -1429,14 +1438,14 @@ RadarUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self RadarUnit
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        StructureUnit.OnIntelDisabled(self, intel)
         self:DestroyIdleEffects()
     end,
 
     ---@param self RadarUnit
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        StructureUnit.OnIntelEnabled(self, intel)
         self:CreateIdleEffects()
     end,
 }
@@ -1484,8 +1493,8 @@ RadarJammerUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self RadarJammerUnit
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        StructureUnit.OnIntelEnabled(self, intel)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
             self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
@@ -1494,8 +1503,8 @@ RadarJammerUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self RadarJammerUnit
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        StructureUnit.OnIntelDisabled(self, intel)
         EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
         self.IntelFxOn = false
     end,
@@ -1663,13 +1672,42 @@ WallStructureUnit = ClassUnit(StructureUnit) { }
 QuantumGateUnit = ClassUnit(FactoryUnit) { }
 
 -- MOBILE UNITS
----@class MobileUnit : Unit
-MobileUnit = ClassUnit(Unit) {
+---@class MobileUnit : Unit, TreadComponent
+MobileUnit = ClassUnit(Unit, TreadComponent) {
 
     ---@param self MobileUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
+        TreadComponent.OnCreate(self)
+
         self:SetFireState(FireState.GROUND_FIRE)
+
+        self.MovementEffectsBag = TrashBag()
+        self.TopSpeedEffectsBag = TrashBag()
+        self.BeamExhaustEffectsBag = TrashBag()
+    end,
+
+    DestroyAllTrashBags = function(self)
+        Unit.DestroyAllTrashBags(self)
+
+        self.MovementEffectsBag:Destroy()
+        self.TopSpeedEffectsBag:Destroy()
+        self.BeamExhaustEffectsBag:Destroy()
+
+        -- only exists if unit is transported
+        if self.TransportBeamEffectsBag then
+            self.TransportBeamEffectsBag:Destroy()
+        end
+    end,
+
+    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
+        Unit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
+        TreadComponent.CreateMovementEffects(self)
+    end,
+
+    DestroyMovementEffects = function(self)
+        Unit.DestroyMovementEffects(self)
+        TreadComponent.DestroyMovementEffects(self)
     end,
 
     ---@param self MobileUnit
@@ -2207,7 +2245,6 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     end,
 }
 
--- LAND UNITS
 ---@class LandUnit : MobileUnit
 LandUnit = ClassUnit(MobileUnit) {}
 
@@ -2223,8 +2260,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildEffectBones = bp.General.BuildBones.BuildEffectBones
-
-        self.EffectsBag = {}
+        
         if bp.General.BuildBones then
             self:SetupBuildBones()
         end
@@ -2272,6 +2308,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         else
             MobileUnit.OnStartBuild(self, unitBeingBuilt, order)
         end
+
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order

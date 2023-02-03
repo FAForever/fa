@@ -277,7 +277,7 @@ UnitBlueprint {
             ForceSingleFire = true,
             InitialProjectileStorage = 0,
             Label = 'ExperimentalNuke',
-            ManualFire = 1,
+            ManualFire = true,
             MaxProjectileStorage = 1,
             MaxRadius = 20000,
             MinRadius = 0,

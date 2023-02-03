@@ -5,9 +5,19 @@
 -- Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@alias CybranSCUEnhancementBuffType
+---| "SCUBUILDRATE"
+---| "SCUCLOAKBONUS"
+---| "SCUREGENERATEBONUS"
+
+---@alias CybranSCUEnhancementBuffName        # BuffType
+---| "CybranSCUBuildRate"                     # SCUBUILDRATE
+---| "CybranSCUCloakBonus"                    # SCUCLOAKBONUS
+---| "CybranSCURegenerateBonus"               # SCUREGENERATEBONUS
+
+
 local CybranUnits = import("/lua/cybranunits.lua")
 local CCommandUnit = CybranUnits.CCommandUnit
-
 local CWeapons = import("/lua/cybranweapons.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
@@ -151,8 +161,8 @@ URL0301 = ClassUnit(CCommandUnit) {
             end
         elseif enh =='ResourceAllocation' then
             local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -242,8 +252,8 @@ URL0301 = ClassUnit(CCommandUnit) {
         },
     },
 
-    OnIntelEnabled = function(self)
-        CCommandUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        CCommandUnit.OnIntelEnabled(self, intel)
         if self.CloakEnh and self:IsIntelEnabled('Cloak') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
@@ -261,8 +271,8 @@ URL0301 = ClassUnit(CCommandUnit) {
         end
     end,
 
-    OnIntelDisabled = function(self)
-        CCommandUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        CCommandUnit.OnIntelDisabled(self, intel)
         if self.IntelEffectsBag then
             EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
             self.IntelEffectsBag = nil
