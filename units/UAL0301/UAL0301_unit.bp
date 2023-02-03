@@ -417,7 +417,7 @@ UnitBlueprint {
             BuildCostEnergy = 100000,
             BuildCostMass = 1800,
             BuildTime = 7000,
-            Icon = 'htsg',
+            Icon = 'phtsg',
             ImpactEffects = 'AeonShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 600,
             Name = '<LOC enhancements_0029>Heavy Personal Shield Generator',

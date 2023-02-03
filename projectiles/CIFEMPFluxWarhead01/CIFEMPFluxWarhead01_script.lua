@@ -1,7 +1,7 @@
 --
 -- script for projectile Missile
 --
-local CEMPFluxWarheadProjectile = import('/lua/cybranprojectiles.lua').CEMPFluxWarheadProjectile
+local CEMPFluxWarheadProjectile = import("/lua/cybranprojectiles.lua").CEMPFluxWarheadProjectile
 
 CIFEMPFluxWarhead01 = Class(CEMPFluxWarheadProjectile) {
     FxSplashScale = 0.5,

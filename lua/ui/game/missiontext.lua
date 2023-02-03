@@ -6,14 +6,14 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/Bitmap.lua').Bitmap
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local WrapText = import('/lua/maui/text.lua').WrapText
-local Movie = import('/lua/maui/movie.lua').Movie
-local GameMain = import('/lua/ui/game/gamemain.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local WrapText = import("/lua/maui/text.lua").WrapText
+local Movie = import("/lua/maui/movie.lua").Movie
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
 local MISSION_TEXT_TIMEOUT = 10
 local missionTextInactivityTime = 11
@@ -142,7 +142,7 @@ function PlayMFDMovie(movie, text)
                         soundcue = movie[3],
                         faction = movie[4],
                     }
-                    import('/lua/ui/game/transmissionlog.lua').AddEntry(entryData)
+                    import("/lua/ui/game/transmissionlog.lua").AddEntry(entryData)
                     SimCallback( { Func = "OnMovieFinished", Args = movie[1]} )
                 end
             end

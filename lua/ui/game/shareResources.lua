@@ -5,14 +5,14 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Checkbox = import('/lua/maui/Checkbox.lua').Checkbox
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Slider = import('/lua/maui/Slider.lua').Slider
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local Edit = import('/lua/maui/Edit.lua').Edit
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Slider = import("/lua/maui/slider.lua").Slider
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local Edit = import("/lua/maui/edit.lua").Edit
 
 local radWidth, radHeight = GetTextureDimensions(UIUtil.UIFile('/widgets/large-h_scr/bar-mid_scr_up.dds'))
 local lradWidth, lradHeight = GetTextureDimensions(UIUtil.UIFile('/widgets/large-h_scr/bar-left_scr_up.dds'))
@@ -25,7 +25,7 @@ function createShareResourcesDialog(parent, targetPlayer, targetPlayerName)
     local massVal = 0
     local energyVal = 0
 
-    local worldView = import('/lua/ui/game/worldview.lua').view
+    local worldView = import("/lua/ui/game/worldview.lua").view
     local dialog = Bitmap(parent, UIUtil.UIFile('/dialogs/diplomacy-resources_options/diplomacy-panel_bmp.dds'))
     dialog:SetRenderPass(UIUtil.UIRP_PostGlow)  -- just in case our parent is the map
     dialog:SetName("Share Resources Window")

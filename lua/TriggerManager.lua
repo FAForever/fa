@@ -7,10 +7,11 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TriggerFile = import('/lua/scenariotriggers.lua')
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local TriggerFile = import("/lua/scenariotriggers.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
+---@class TriggerManager
 Manager = {
 
     TriggerList = {},

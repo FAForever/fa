@@ -5,10 +5,10 @@
 --
 --  Summary  :  UEF Battleship Script
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
-local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
-local WeaponsFile = import('/lua/terranweapons.lua')
+local TSeaUnit = import("/lua/terranunits.lua").TSeaUnit
+local WeaponsFile = import("/lua/terranweapons.lua")
 local TAMPhalanxWeapon = WeaponsFile.TAMPhalanxWeapon
 local TDFHiroPlasmaCannon = WeaponsFile.TDFHiroPlasmaCannon
 local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler

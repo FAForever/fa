@@ -1,8 +1,8 @@
-local Group = import('/lua/maui/group.lua').Group
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Edit = import('/lua/maui/edit.lua').Edit
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
+local Group = import("/lua/maui/group.lua").Group
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Edit = import("/lua/maui/edit.lua").Edit
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 
 --- A popup that asks the user for a string.
 ---@class InputDialog : Popup

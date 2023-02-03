@@ -7,7 +7,7 @@
 ----**
 ----**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local TShieldSeaUnit = import('/lua/terranunits.lua').TShieldSeaUnit
+local TShieldSeaUnit = import("/lua/terranunits.lua").TShieldSeaUnit
 
 ---@class XES0205 : TShieldSeaUnit
 XES0205 = Class(TShieldSeaUnit) {

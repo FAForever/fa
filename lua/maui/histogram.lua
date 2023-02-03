@@ -14,9 +14,10 @@ Class methods:
             [2] = ...
         }
 --]]
-local Control = import('control.lua').Control
+local Control = import("/lua/maui/control.lua").Control
 
----@class Histogram : moho.histogram_methods, Control
+---@deprecated
+---@class Histogram : moho.histogram_methods, Control, InternalObject
 Histogram = Class(moho.histogram_methods, Control) {
     __init = function(self, parent, debugname)
         InternalCreateHistogram(self, parent)

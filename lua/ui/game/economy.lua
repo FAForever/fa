@@ -19,24 +19,24 @@
 ---@field reclaimed        EconomyResourceValues
 ---@field stored           EconomyResourceValues
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 
 local UIState = true
 
 local _BeatFunction = nil
 
-GUI = import('/lua/ui/controls.lua').Get()
+GUI = import("/lua/ui/controls.lua").Get()
 group = GUI.group or false
 savedParent = GUI.savedParent or false
 
@@ -473,7 +473,7 @@ function ConfigureBeatFunction()
 end
 
 function ToggleEconPanel(state)
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state ~= nil then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden and state ~= nil then
         return
     end
     import(UIUtil.GetLayoutFilename('economy')).TogglePanelAnimation(state)

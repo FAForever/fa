@@ -1,5 +1,6 @@
----@declare-global
----@class moho.world_mesh_methods
+---@meta
+
+---@class moho.world_mesh_methods : Destroyable
 local CUIWorldMesh = {}
 
 ---
@@ -67,8 +68,8 @@ function CUIWorldMesh:SetLifetimeParameter(param)
 end
 
 ---
----@param meshDesc string
-function CUIWorldMesh:SetMesh(meshDesc)
+---@param spec table
+function CUIWorldMesh:SetMesh(spec)
 end
 
 ---
@@ -77,7 +78,7 @@ function CUIWorldMesh:SetScale(scale)
 end
 
 ---
----@param position Position
+---@param position Vector
 ---@param orientation? Quaternion
 function CUIWorldMesh:SetStance(position, orientation)
 end

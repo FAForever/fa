@@ -8,14 +8,14 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
-local CollisionBeams = import('defaultcollisionbeams.lua')
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
+local CollisionBeams = import("/lua/defaultcollisionbeams.lua")
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local GinsuCollisionBeam = CollisionBeams.GinsuCollisionBeam
 local OrbitalDeathLaserCollisionBeam = CollisionBeams.OrbitalDeathLaserCollisionBeam
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class TDFFragmentationGrenadeLauncherWeapon : DefaultProjectileWeapon
 TDFFragmentationGrenadeLauncherWeapon = Class(DefaultProjectileWeapon) {

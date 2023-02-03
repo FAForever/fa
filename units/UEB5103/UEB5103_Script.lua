@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 
 ---@class UEB5103 : TStructureUnit
 UEB5103 = Class(TStructureUnit) {

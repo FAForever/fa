@@ -1,4 +1,3 @@
-
 -----------------------------------------------------------------
 -- File     : /lua/sim/MarkerUtilities.lua
 -- Summary  : Aim of this file is to work with markers without
@@ -9,7 +8,7 @@
 -- want a new table with unique values.
 
 -- Extractor / hydrocarbon markers are setup different from the other
--- markers. As an example, you can not flush these markers. This 
+-- markers. As an example, you can not flush these markers. This
 -- is done to support adaptive maps and the crazy rush mode.
 
 -- Contains various debug facilities to help understand the
@@ -18,65 +17,72 @@
 -- Supports crazyrush-like maps.
 -----------------------------------------------------------------
 
--- imports and upvalues
-
-local StringSplit = import('/lua/system/utils.lua').StringSplit
+local StringSplit = import("/lua/system/utils.lua").StringSplit
 local TableDeepCopy = table.deepcopy
 
--- MARKERS --
+---@class MarkerData
+---@field size number
+---@field resource boolean
+---@field type string
+---@field orientation Vector
+---@field position Vector
+---@field color Color | nil 
+---@field adjacentTo string         # used by old pathing markers to identify the neighbors
+---@field NavLayer NavLayers        # Navigational layer that this marker is on, only defined for resources
+---@field NavLabel number | nil     # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
 
 --- Contains all the markers that are part of the map, including markers of chains
 local AllMarkers = Scenario.MasterChain._MASTERCHAIN_.Markers
 
---- Retrieves all markers of the map.
--- returns A table of all the markers of the map.
+---@return MarkerData[]
 function GetAllMarkers()
     return AllMarkers
 end
 
 --- Retrieves a single marker on the map.
--- @param name The name or key of the marker.
--- returns A marker of the map or nil.
+---@param name string
+---@return MarkerData
 function GetMarker(name)
     return AllMarkers[name]
 end
 
 --- Represents a cache of markers to prevent re-populating tables
-local MarkerCache = { }
+local MarkerCache = {}
 
 -- Pre-enable the caching of resource markers, to support adaptive maps
-MarkerCache["Mass"] = { Count = 0, Markers = { } }
-MarkerCache["Hydrocarbon"] = { Count = 0, Markers = { } } 
+MarkerCache["Mass"] = { Count = 0, Markers = {} }
+MarkerCache["Hydrocarbon"] = { Count = 0, Markers = {} }
 
 --- Retrieves all markers of a given type. This is a shallow copy,
 -- which means the reference is copied but the values are not. If you
 -- need a copy with unique values use GetMarkerByTypeDeep instead.
--- Common marker types are: 
+-- Common marker types are:
 -- - "Mass", "Hydrocarbon"
 -- - "Air Path Node", "Land Path Node", "Water Path Node", "Amphibious Path Node"
 -- - "Transport Marker", "Naval Area", "Naval Link", "Rally Point", "Expansion Area"
 -- - "Protected Experimental Construction"
 -- The list is not limited to these marker types - any marker that has a 'type' property
 -- can be cached. You can find them in the <map>_save.lua file.
--- @param type The type of marker to retrieve.
--- returns A table with markers and its length.
+---@param type string The type of marker to retrieve.
+---@return MarkerData[]
+---@return number
 function GetMarkersByType(type)
 
     -- check if it is cached and return that
     local cache = MarkerCache[type]
-    if cache then 
+    if cache then
         return cache.Markers, cache.Count
     end
 
     -- prepare cache population
-    ms = { }
-    n = 1
+    local ms = {}
+    local n = 1
 
     -- find all the relevant markers
-    for k, marker in AllMarkers do 
-        if marker.type == type then 
-            ms[n] = marker 
-            n = n + 1 
+    for k, marker in AllMarkers do
+        if marker.type == type then
+            ms[n] = marker
+            n = n + 1
         end
     end
 
@@ -86,31 +92,32 @@ function GetMarkersByType(type)
     -- construct the cache
     cache = {
         Count = n - 1,
-        Markers = ms 
+        Markers = ms
     }
 
     -- cache it and return it
-    MarkerCache[type] = cache 
+    MarkerCache[type] = cache
     return cache.Markers, cache.Count
 end
 
 --- Retrieves all markers of a given type. This is a deep copy
 -- and involves a lot of additional allocations. Do not use this
 -- unless you strictly need to.
--- @param type The type of marker to retrieve.
--- returns A table with markers and its length.
+---@param type string
+---@return MarkerData[]
+---@return number
 function GetMarkersByTypeDeep(type)
-    local cache = GetMarkersByType(type)
-    return TableDeepCopy(cache.Markers), cache.Count
+    local markers, number = GetMarkersByType(type)
+    return TableDeepCopy(markers), number
 end
 
 --- Flushes the cache of a certain type. Does not remove
 -- existing references.
--- @param type The type to flush.
+---@param type string The type to flush.
 function FlushMarkerCacheByType(type)
 
     -- give developer a warning, you can't do this
-    if type == "Mass" or type == "Hydrocarbon" then 
+    if type == "Mass" or type == "Hydrocarbon" then
         WARN("Unable to flush resource markers from the cache - it can cause issues for adaptive maps.")
         return
     end
@@ -122,100 +129,98 @@ end
 function FlushMarkerCache()
 
     -- copy over mass / hydro for consistency with adaptive maps
-    local cache = { }
+    local cache = {}
     cache.Mass = MarkerCache.Mass
     cache.Hydrocarbon = MarkerCache.Hydrocarbon
 
     MarkerCache = cache
 end
 
--- CHAINS --
-
 --- Contains all the chains that are part of the map
 local AllChains = Scenario.Chains
 
 --- Represents a cache of chains to prevent re-populating tables
-local ChainCache = { }
+local ChainCache = {}
 
 --- Retrieves a chain of markers. Throws an error if the chain
 -- does not exist. This is a shallow copy, which means the
 -- reference is copied but the values are not. If you need a
 -- copy with unique values use GetMarkerByTypeDeep instead.
--- @param type The type of marker to retrieve.
--- returns A table with markers and its length.
+---@param name MarkerChain The type of marker to retrieve.
+---@return MarkerData
+---@return number
 function GetMarkersInChain(name)
     -- check if it is cached and return that
     local cache = ChainCache[name]
-    if cache then 
+    if cache then
         return cache.Markers, cache.Count
     end
 
     -- check if chain exists
     local chain = AllChains[name]
-    if not chain then 
+    if not chain then
         error('ERROR: Invalid Chain Named- ' .. name, 2)
     end
 
     -- prepare cache population
-    ms = { }
-    n = 1
+    local ms = {}
+    local n = 1
 
     -- find all the relevant markers
-    for k, elem in chain.Markers do 
-        ms[n] = marker.position
+    for k, elem in chain.Markers do
+        ms[n] = elem.position
         n = n + 1
-    end 
+    end
 
     -- construct the cache
     cache = {
         Count = n - 1,
-        Markers = ms 
+        Markers = ms
     }
 
     -- cache it and return it
-    ChainCache[name] = cache 
+    ChainCache[name] = cache
     return cache.Markers, cache.Count
 end
 
---- Retrieves a chain of markers. Throws an error if the 
+--- Retrieves a chain of markers. Throws an error if the
 -- chain does not exist. This is a deep copy and involves
 -- a lot of additional allocations. Do not use this unless
 -- you strictly need to.
--- @param type The type of marker to retrieve.
--- returns A table with markers and its length.
+---@param type MarkerChain The type of marker to retrieve.
+---@return MarkerData[]
+---@return number
 function GetMarkersInChainDeep(type)
-    local cache = GetMarkersInChain(type)
-    return TableDeepCopy(cache.Markers), cache.Count
+    local markers, count = GetMarkersInChain(type)
+    return TableDeepCopy(markers), count
 end
 
---- Flushes the chain cache of a certain type. Does not 
+--- Flushes the chain cache of a certain type. Does not
 -- remove existing references.
--- @param type The type to flush.
+---@param name MarkerChain The type to flush.
 function FlushChainCacheByName(name)
-    ChainCache[name] = false 
+    ChainCache[name] = false
 end
 
 --- Flushes the chain cache. Does not remove existing references.
 -- @param type The type to flush.
 function FlushChainCache()
-    ChainCache = { }
+    ChainCache = {}
 end
 
--- DEBUGGING -- 
-
 --- Retrieves the name / key values of the marker types that are in
--- the cache. This returns a new table in each call - do not use in 
+-- the cache. This returns a new table in each call - do not use in
 -- production code. Useful in combination with ToggleDebugMarkersByType.
 -- returns Table with names and the number of names.
 function DebugGetMarkerTypesInCache()
 
     -- allocate a table
-    local next = 1 
-    local types = { }
+    local next = 1
+    local types = {}
 
     -- retrieve all names
-    for k, cache in MarkerCache do 
-        types[next] = k 
+    for k, cache in MarkerCache do
+        types[next] = k
         next = next + 1
     end
 
@@ -223,47 +228,54 @@ function DebugGetMarkerTypesInCache()
 end
 
 --- Keeps track of all marker debugging threads
-local DebugMarkerThreads = { }
-local DebugMarkerSuspend = { }
+local DebugMarkerThreads = {}
+local DebugMarkerSuspend = {}
 
 --- Debugs the marker cache of a given type by drawing it on-screen. Useful
 -- to check for errors. Can be toggled on and off by calling it again.
--- @param type The type of markers you wish to debug.
+---@param type MarkerChain The type of markers you wish to debug.
 function ToggleDebugMarkersByType(type)
 
     SPEW("Toggled type to debug: " .. type)
 
     -- get the thread if it exists
     local thread = DebugMarkerThreads[type]
-    if not thread then 
+    if not thread then
 
         -- make the thread if it did not exist yet
         thread = ForkThread(
             function()
-                while true do 
+
+                local labelToColor = import("/lua/shared/navgenerator.lua").LabelToColor
+
+                while true do
 
                     -- check if we should sleep or not
-                    if DebugMarkerSuspend[type] then 
+                    if DebugMarkerSuspend[type] then
                         SuspendCurrentThread()
                     end
 
                     -- draw out all markers
                     local markers, count = GetMarkersByType(type)
-                    for k = 1, count do 
+                    for k = 1, count do
                         local marker = markers[k]
                         DrawCircle(marker.position, marker.size or 1, marker.color or 'ffffffff')
 
+                        if marker.NavLabel then
+                            DrawCircle(marker.position, (marker.size or 1) + 1, labelToColor(marker.NavLabel))
+                        end
+
                         -- useful for pathing markers
-                        if marker.adjacentTo then 
-                            for k, neighbour in StringSplit(marker.adjacentTo, " ") do 
+                        if marker.adjacentTo then
+                            for _, neighbour in StringSplit(marker.adjacentTo, " ") do
                                 local neighbour = AllMarkers[neighbour]
-                                if neighbour then 
+                                if neighbour then
                                     DrawLine(marker.position, neighbour.position, marker.color or 'ffffffff')
                                 end
                             end
                         end
                     end
-    
+
                     WaitTicks(2)
                 end
             end
@@ -271,33 +283,34 @@ function ToggleDebugMarkersByType(type)
 
         -- store it and return
         DebugMarkerSuspend[type] = false
-        DebugMarkerThreads[type] = thread 
+        DebugMarkerThreads[type] = thread
         return
     end
 
     -- enable the thread if it should not be suspended
     DebugMarkerSuspend[type] = not DebugMarkerSuspend[type]
-    if not DebugMarkerSuspend[type] then 
+    if not DebugMarkerSuspend[type] then
         ResumeThread(thread)
     end
 
     -- keep track of it
-    DebugMarkerThreads[type] = thread 
+    DebugMarkerThreads[type] = thread
 end
 
 --- Retrieves the name / key values of the chains that are in the
 -- cache. This returns a new table in each call - do not use in
 -- production code.  Useful in combination with ToggleDebugMarkersByType.
--- returns Table with names and the number of names.
+---@return string[]
+---@return number
 function DebugGetChainNamesInCache()
 
     -- allocate a table
-    local next = 1 
-    local types = { }
+    local next = 1
+    local types = {}
 
     -- retrieve all names
-    for k, cache in ChainCache do 
-        types[next] = k 
+    for k, cache in ChainCache do
+        types[next] = k
         next = next + 1
     end
 
@@ -305,49 +318,49 @@ function DebugGetChainNamesInCache()
 end
 
 --- Keeps track of all chain debugging threads
-local DebugChainThreads = { }
-local DebugChainSuspend = { }
+local DebugChainThreads = {}
+local DebugChainSuspend = {}
 
 --- Debugs the chain cache of a given type by drawing it on-screen. Useful
 -- to check for errors. Can be toggled on and off by calling it again.
--- @param type The name of the chain you wish to debug.
+---@param name MarkerChain The name of the chain you wish to debug.
 function ToggleDebugChainByName(name)
 
     SPEW("Toggled chain to debug: " .. name)
 
     -- get the thread if it exists
     local thread = DebugChainThreads[name]
-    if not thread then 
+    if not thread then
 
         -- make the thread if it did not exist yet
         thread = ForkThread(
             function()
-                while true do 
+                while true do
 
                     -- check if we should suspend ourselves
-                    if DebugChainSuspend[name] then 
+                    if DebugChainSuspend[name] then
                         SuspendCurrentThread()
                     end
 
                     -- draw out all markers
                     local markers, count = GetMarkersInChain(name)
-                    if count > 1 then 
-                        for k = 1, count - 1 do 
+                    if count > 1 then
+                        for k = 1, count - 1 do
                             local curr = markers[k]
                             local next = markers[k + 1]
                             DrawLinePop(curr.position, next.position, curr.color or next.color or 'ffffffff')
                         end
 
-                    -- draw out a single marker
-                    else 
-                        if count == 1 then 
+                        -- draw out a single marker
+                    else
+                        if count == 1 then
                             local marker = markers[1]
                             DrawCircle(marker.position, marker.size or 1, marker.color or 'ffffffff')
-                        else 
+                        else
                             WARN("Trying to debug draw an empty chain: " .. name)
                         end
                     end
-    
+
                     WaitTicks(2)
                 end
             end
@@ -355,57 +368,71 @@ function ToggleDebugChainByName(name)
 
         -- store it and return
         DebugChainSuspend[name] = false
-        DebugChainThreads[name] = thread 
+        DebugChainThreads[name] = thread
         return
     end
 
     -- resume thread it is should not be suspended
     DebugChainSuspend[name] = not DebugChainSuspend[name]
-    if not DebugChainSuspend[name] then 
+    if not DebugChainSuspend[name] then
         ResumeThread(thread)
     end
 
     -- keep track of it
-    DebugChainThreads[name] = thread 
+    DebugChainThreads[name] = thread
 end
-
--- HOOKING --
 
 do
 
     -- hook to cache markers created on the fly by crazy rush type of games
     local OldCreateResourceDeposit = _G.CreateResourceDeposit
-    _G.CreateResourceDeposit = function (type, x, y, z, size)
+    _G.CreateResourceDeposit = function(type, x, y, z, size)
 
-        -- fix to terrain height for debugging purposes
+        local NavUtils = import("/lua/sim/navutils.lua")
+
+        -- fix to terrain height
         y = GetTerrainHeight(x, z)
         OldCreateResourceDeposit(type, x, y, z, size)
 
+        local position = Vector(x, y, z)
+        local orientation = Vector(0, -0, 0)
+
+        ---@type NavLayers
+        local layer = 'Land'
+        if y < GetSurfaceHeight(x, z) then
+            layer = 'Amphibious'
+        end
+
+        ---@type number | nil
+        local label = nil
+        if NavUtils.IsGenerated() then
+            label = NavUtils.GetLabel(layer, { x, y, z })
+        end
+
         -- commented values are used by the editor and not by the game
-        local marker = false 
-        if type == 'Mass' then 
+        ---@type MarkerData
+        local marker = nil
+        if type == 'Mass' then
             marker = {
                 size = size,
                 resource = true,
-                -- amount = 100,
-                color = 'ff808080',
-                -- editorIcon = '/textures/editor/marker_mass.bmp',
                 type = type,
-                -- prop = '/env/common/props/markers/M_Mass_prop.bp',
-                orientation = Vector(0, -0, 0),
-                position = Vector(x, y, z),
+                orientation = orientation,
+                position = position,
+
+                NavLayer = layer,
+                NavLabel = label,
             }
-        else 
+        else
             marker = {
                 size = size,
                 resource = true,
-                -- amount = 100,
-                color = 'ff008000',
-                -- editorIcon = '/textures/editor/marker_mass.bmp',
                 type = type,
-                -- prop = '/env/common/props/markers/M_Mass_prop.bp',
-                orientation = Vector(0, -0, 0),
-                position = Vector(x, y, z),
+                orientation = orientation,
+                position = position,
+
+                NavLayer = layer,
+                NavLabel = label,
             }
         end
 

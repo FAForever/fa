@@ -5,9 +5,9 @@
 --**
 --**  Summary  :  Losaare AA AutoCannon Projectile script, XSS0303
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-SAALosaareAutoCannon03 = Class(import('/lua/seraphimprojectiles.lua').SLosaareAAAutoCannon02) {
+SAALosaareAutoCannon03 = Class(import("/lua/seraphimprojectiles.lua").SLosaareAAAutoCannon02) {
 }
 TypeClass = SAALosaareAutoCannon03

@@ -1,4 +1,9 @@
 
+do 
+    -- can only cause issues, like remote code exploit
+    _G.loadstring = nil
+end
+
 do
     -- upvalue for performance
     local EntityCategoryFilterDown = EntityCategoryFilterDown
@@ -75,7 +80,12 @@ end
 do
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
-    _G.ChangeUnitArmy = function(unit, army)
+    _G.ChangeUnitArmy = function(unit, army, noRestrictions)
+        if unit and noRestrictions then
+            return oldChangeUnitArmy(unit, army)
+        end
+
+        -- do not allow command units to be shared
         if unit and unit.Blueprint.CategoriesHash["COMMAND"] then
             return nil
         end

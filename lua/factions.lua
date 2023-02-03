@@ -19,7 +19,7 @@ function GetNewFactionAIPlans(offset)
     -- Gets an AI plan for computer players. Offset is the key with which the table should begin, counting up from
     -- that value + 1.
     if table.empty(NewFactionAiData) then
-        local x = import('/lua/factions.lua').Factions  -- to make sure NewFactionAiData contains something
+        local x = import("/lua/factions.lua").Factions  -- to make sure NewFactionAiData contains something
     end
     if not offset then
         offset = 5  -- 5 for the 5 races
@@ -75,7 +75,7 @@ function GetSelectedMods(AllowedMods)
     local mods = {}
     if __modules['/lua/ui/dialogs/modmanager.lua'] or __modules['/lua/ui/campaign/campaignmanager.lua'] then
         -- Detect if we're in the main menu or loading the game
-        mods = import('/lua/mods.lua').GetSelectedMods()
+        mods = import("/lua/mods.lua").GetSelectedMods()
     elseif rawget(_G, '__active_mods') and not table.empty(__active_mods) then
         for k, mod in __active_mods do
             mods[mod.uid] = true

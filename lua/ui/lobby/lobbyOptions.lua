@@ -161,10 +161,67 @@ teamOptions =
             },
         },
     },
+
+    {
+        default = 1,
+        label = "<LOC lobui_CAName>Army control",
+        help = "<LOC lobui_CADesc>Allows you to adjust how teams and armies co-operate with each other. Ranging from the default Supreme Commander experience to one army, shared by the entire team.",
+        key = 'CommonArmy',
+        values = {
+            {
+                text = "<LOC at_Default>Default",
+                help = "<LOC lobui_CADDesc>Each player has their own army and their own resources. Allied players can not issue commands to your army. This is the default Supreme Commander experience.",
+                key = 'Off'
+            },
+            {
+                text = "<LOC lobui_CAUnion>Multiple armies, union control",
+                help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
+                key = 'Union'
+            },
+            {
+                text = "<LOC lobui_CACommon>Single army, union control",
+                help = "<LOC lobui_CACDesc>Each team is one army. All units and resources are shared, all team members can issue commands.",
+                key = 'Common'
+            }
+        }
+    },
 }
 
 ---@type ScenarioOption[]
 globalOpts = {
+    {
+         default = 2,
+         label = "<LOC lobui_0740>Share Conditions",
+         help = "<LOC lobui_0741>Set what happens to a player's units when they are defeated",
+         key = 'Share',
+         values = {
+             {
+                 text = "<LOC lobui_0742>Full Share",
+                 help = "<LOC lobui_0743>Your units will be transferred to your highest rated ally when you die. Previously transferred units will stay where they are.",
+                 key = 'FullShare',
+             },
+             {
+                 text = "<LOC lobui_0744>Share Until Death",
+                 help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
+                 key = 'ShareUntilDeath',
+             },
+             {
+                 text = "<LOC lobui_0762>Traitors",
+                 help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
+                 key = 'TransferToKiller',
+             },
+             {
+                 text = "<LOC lobui_0766>Defectors",
+                 help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
+                 key = 'Defectors',
+             },
+             {
+                 text = "<LOC lobui_0764>Civilian Desertion",
+                 help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
+                 key = 'CivilianDeserter',
+             },
+         },
+     },
     {
         default = 1,
         label = "<LOC lobui_0802>Unrate",
@@ -182,6 +239,24 @@ globalOpts = {
                   key = 'Yes',
               },
           },
+    },
+    {
+        default = 2,
+        label = "<LOC lobui_0592>Allow Observers",
+        help = "<LOC lobui_0593>Are observers permitted after the game has started?",
+        key = 'AllowObservers',
+        values = {
+            {
+                text = "<LOC _Yes>Yes",
+                help = "<LOC lobui_0594>Observers are allowed",
+                key = true,
+            },
+            {
+                text = "<LOC _No>No",
+                help = "<LOC lobui_0595>Observers are not allowed",
+                key = false,
+            },
+        },
     },
     {
         default = 8,
@@ -336,24 +411,6 @@ globalOpts = {
         },
     },
     {
-        default = 2,
-        label = "<LOC lobui_0592>Allow Observers",
-        help = "<LOC lobui_0593>Are observers permitted after the game has started?",
-        key = 'AllowObservers',
-        values = {
-            {
-                text = "<LOC _Yes>Yes",
-                help = "<LOC lobui_0594>Observers are allowed",
-                key = true,
-            },
-            {
-                text = "<LOC _No>No",
-                help = "<LOC lobui_0595>Observers are not allowed",
-                key = false,
-            },
-        },
-    },
-    {
         default = 1,
         label = "<LOC lobui_0208>Cheating",
         help = "<LOC lobui_0209>Enable cheat codes",
@@ -487,39 +544,6 @@ globalOpts = {
             },
         },
     },
-   {
-        default = 2,
-        label = "<LOC lobui_0740>Share Conditions",
-        help = "<LOC lobui_0741>Set what happens to a player's units when they are defeated",
-        key = 'Share',
-        values = {
-            {
-                text = "<LOC lobui_0742>Full Share",
-                help = "<LOC lobui_0743>Your units will be transferred to your highest scoring ally when you die. Previously transferred units will stay where they are.",
-                key = 'FullShare',
-            },
-            {
-                text = "<LOC lobui_0744>Share Until Death",
-                help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
-                key = 'ShareUntilDeath',
-            },
-            {
-                text = "<LOC lobui_0762>Traitors",
-                help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
-                key = 'TransferToKiller',
-            },
-            {
-                text = "<LOC lobui_0766>Defectors",
-                help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
-                key = 'Defectors',
-            },
-            {
-                text = "<LOC lobui_0764>Civilian Desertion",
-                help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
-                key = 'CivilianDeserter',
-            },
-        },
-    },
     {
         default = 1,
         label = "<LOC lobui_0790>Manual Unit Sharing",
@@ -566,7 +590,7 @@ globalOpts = {
 ---@type ScenarioOption[]
 AIOpts = {
    {
-        default = 11,
+        default = 6,
         label = "<LOC aisettings_0001>>AIx Cheat Multiplier",
         help = "<LOC aisettings_0002>Set the cheat multiplier for the cheating AIs.",
         key = 'CheatMult',
@@ -579,7 +603,7 @@ AIOpts = {
         },
    },
    {
-        default = 11,
+        default = 6,
         label = "<LOC aisettings_0054>AIx Build Multiplier",
         help = "<LOC aisettings_0055>Set the build rate multiplier for the cheating AIs.",
         key = 'BuildMult',

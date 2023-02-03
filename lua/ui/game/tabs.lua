@@ -1,13 +1,13 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Button = import('/lua/maui/button.lua').Button
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Button = import("/lua/maui/button.lua").Button
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 
 local sessionInfo = SessionGetScenarioInfo()
 local savedParent = false
@@ -110,7 +110,6 @@ local menus = {
             },
             {
                 action = 'Return',
-                disableOnGameOver = true,
                 label = '<LOC main_menu_9586>Close Menu',
                 tooltip = 'esc_return',
             },
@@ -158,7 +157,6 @@ local menus = {
             },
             {
                 action = 'Return',
-                disableOnGameOver = true,
                 label = '<LOC main_menu_9586>Close Menu',
                 tooltip = 'esc_return',
             },
@@ -196,7 +194,6 @@ local menus = {
             },
             {
                 action = 'Return',
-                disableOnGameOver = true,
                 label = '<LOC main_menu_9586>Close Menu',
                 tooltip = 'esc_return',
             },
@@ -240,7 +237,6 @@ local menus = {
             },
             {
                 action = 'Return',
-                disableOnGameOver = true,
                 label = '<LOC main_menu_9586>Close Menu',
                 tooltip = 'esc_return',
             },
@@ -251,23 +247,23 @@ local menus = {
 local actions = {
     Save = function()
         local saveType
-        if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+        if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
             saveType = "CampaignSave"
         else
             saveType = "SaveGame"
         end
-        import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0), nil, saveType)
+        import("/lua/ui/dialogs/saveload.lua").CreateSaveDialog(GetFrame(0), nil, saveType)
     end,
     Load = function()
-        if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+        if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
             saveType = "CampaignSave"
         else
             saveType = "SaveGame"
         end
-        import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GetFrame(0), nil, saveType)
+        import("/lua/ui/dialogs/saveload.lua").CreateLoadDialog(GetFrame(0), nil, saveType)
     end,
     LoadReplay = function()
-        import('/lua/ui/dialogs/replay.lua').CreateDialog(GetFrame(0), true)
+        import("/lua/ui/dialogs/replay.lua").CreateDialog(GetFrame(0), true)
     end,
     EndSPGame = function()
         UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0001>Are you sure you'd like to quit?",
@@ -328,7 +324,7 @@ local actions = {
             {escapeButton = 2, enterButton = 1, worldCover = true})
     end,
     ShowObj = function()
-        import("/lua/ui/game/objectiveDetail.lua").ToggleDisplay()
+        import("/lua/ui/game/objectivedetail.lua").ToggleDisplay()
     end,
     ShowGameInfo = function()
         ToggleGameInfo()
@@ -337,13 +333,13 @@ local actions = {
         CollapseWindow()
     end,
     Options = function()
-        import('/lua/ui/dialogs/options.lua').CreateDialog(GetFrame(0))
+        import("/lua/ui/dialogs/options.lua").CreateDialog(GetFrame(0))
     end,
     KeyBindings = function()
         import("/lua/ui/dialogs/keybindings.lua").CreateUI()
     end,
     Customiser = function()
-        import('/lua/ui/notify/customiser.lua').CreateUI()
+        import("/lua/ui/notify/customiser.lua").CreateUI()
     end,
 }
 
@@ -353,17 +349,17 @@ function RehostGame()
 end
 
 function EndGame()
-    if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+    if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
         SetFrontEndData('NextOpBriefing', nil)
-        import('/lua/ui/dialogs/score.lua').CreateDialog(nil, nil, nil, true)
+        import("/lua/ui/dialogs/score.lua").CreateDialog(nil, nil, nil, true)
     else
-        import('/lua/ui/dialogs/score.lua').CreateDialog()
+        import("/lua/ui/dialogs/score.lua").CreateDialog()
     end
 end
 
 function EndGameSaveWindow()
     local saveType
-    if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+    if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
         saveType = 'CampaignSave'
     else
         saveType = 'SaveGame'
@@ -373,13 +369,13 @@ function EndGameSaveWindow()
             EndGame()
         end
     end
-    import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0),
+    import("/lua/ui/dialogs/saveload.lua").CreateSaveDialog(GetFrame(0),
         SaveKillBehavior, saveType)
 end
 
 function ExitGameSaveWindow()
     local saveType
-    if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+    if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
         saveType = 'CampaignSave'
     else
         saveType = 'SaveGame'
@@ -389,11 +385,11 @@ function ExitGameSaveWindow()
             ExitApplication()
         end
     end
-    import('/lua/ui/dialogs/saveload.lua').CreateSaveDialog(GetFrame(0),
+    import("/lua/ui/dialogs/saveload.lua").CreateSaveDialog(GetFrame(0),
         SaveKillBehavior, saveType)
 end
 
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
 
 function CreateStretchBar(parent, topPiece)
     local group = Group(parent)
@@ -488,7 +484,7 @@ end
 
 function CommonLogic()
     for i, tab in controls.tabs do
-        if tab.Data.disableInCampaign and import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+        if tab.Data.disableInCampaign and import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
             tab:Disable()
         elseif tab.Data.disableInReplay and SessionIsReplay() then
             tab:Disable()
@@ -579,8 +575,8 @@ function BuildContent(contentID)
         CollapseWindow(function() BuildContent(contentID) end)
         return
     end
-    import('/lua/ui/game/multifunction.lua').CloseMapDialog()
-    import('/lua/ui/game/chat.lua').CloseChatConfig()
+    import("/lua/ui/game/multifunction.lua").CloseMapDialog()
+    import("/lua/ui/game/chat.lua").CloseChatConfig()
     activeTab = contentID
     for _, tab in controls.tabs do
         if tab.Data.content == contentID then
@@ -834,7 +830,7 @@ function OnPause(state, pausedBy, timeouts)
         Tooltip.SetTooltipText(pauseBtn, LOC('<LOC tooltipui0195>'))
         Tooltip.AddCheckboxTooltip(pauseBtn, 'options_Pause')
     end
-    import('/lua/ui/game/announcement.lua').CreateAnnouncement(text, pauseBtn, owner)
+    import("/lua/ui/game/announcement.lua").CreateAnnouncement(text, pauseBtn, owner)
 end
 
 function TogglePause()
@@ -844,7 +840,7 @@ function TogglePause()
 end
 
 function ToggleGameInfo()
-    local ItemList = import('/lua/maui/itemlist.lua').ItemList
+    local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
     local dialog = Group(GetFrame(0))
     LayoutHelpers.AtCenterIn(dialog, GetFrame(0))
@@ -941,7 +937,7 @@ function ToggleGameInfo()
         end
         if sessionInfo.Options['Rule'] then
             local tmptext = sessionInfo.Options['Rule']
-            wrapped = import('/lua/maui/text.lua').WrapText(tmptext, 232, function(curText) return PresetList:GetStringAdvance(curText) end)
+            wrapped = import("/lua/maui/text.lua").WrapText(tmptext, 232, function(curText) return PresetList:GetStringAdvance(curText) end)
             for i, line in wrapped do
                 if i == 1 then
                     PresetList:AddItem('- '..line)
@@ -1039,7 +1035,7 @@ function CreateScreenGlow()
         end
         self:SetAlpha(newAlpha, true)
     end
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         pauseGlow.Top:Hide()
     end
 end
@@ -1058,11 +1054,21 @@ end
 
 function ToggleScore()
     if not controls.tabs then return end
-    import('/lua/ui/game/score.lua').ToggleScoreControl()
+    import("/lua/ui/game/score.lua").ToggleScoreControl()
+end
+
+function ToggleVotingPanel()
+    if not controls.tabs then return end
+    import("/lua/ui/game/recall.lua").ToggleControl()
+end
+
+function ToggleMassFabricatorPanel()
+    if not controls.tabs then return end
+    import("/lua/ui/game/massfabs.lua").ToggleControl()
 end
 
 function ToggleTabDisplay(state)
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden and state ~= nil then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden and state ~= nil then
         return
     end
     if UIUtil.GetAnimationPrefs() then
@@ -1150,7 +1156,7 @@ function TabAnnouncement(tabID, text)
         end
     end
     if tabControl then
-        import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC(text), tabControl)
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC(text), tabControl)
     end
 end
 

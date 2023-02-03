@@ -1,4 +1,4 @@
-local SUtils = import('/lua/ai/sorianutilities.lua')
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 local PingLimit = 1 -- Maximum number of pings per army, within PingTimeout seconds
 local PingTimeout = 1 -- How many seconds a ping counts toward an army's limit
@@ -35,7 +35,7 @@ function SpawnPing(data)
             data.ID = GetPingID(data.Owner)
             PingMarkers[data.Owner][data.ID] = data
         else
-            local Entity = import('/lua/sim/Entity.lua').Entity
+            local Entity = import("/lua/sim/entity.lua").Entity
             data.Location[2] = data.Location[2]+2
             local pingSpec = {Owner = data.Owner, Location = data.Location}
             local ping = Entity(pingSpec)
@@ -72,7 +72,7 @@ end
 
 function SpawnSpecialPing(data)
     --This function is used to generate automatic nuke pings
-    local Entity = import('/lua/sim/Entity.lua').Entity
+    local Entity = import("/lua/sim/entity.lua").Entity
     data.Location[2] = data.Location[2]+2
     local pingSpec = {Owner = data.Owner, Location = data.Location}
     local ping = Entity(pingSpec)

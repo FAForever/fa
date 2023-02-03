@@ -1,4 +1,4 @@
-local Utilities = import('/lua/utilities.lua')
+local Utilities = import("/lua/utilities.lua")
 
 -- ATTACK MANAGER SPEC
 --{
@@ -27,7 +27,7 @@ local Utilities = import('/lua/utilities.lua')
 -- },
 
 ---@class AttackManager
-AttackManager = ClassSimple({
+AttackManager = ClassSimple {
     brain = nil,
     NeedSort = false,
     PlatoonCount = { DefaultGroupAir = 0, DefaultGroupLand = 0, DefaultGroupSea = 0, },
@@ -367,4 +367,4 @@ AttackManager = ClassSimple({
             AM.PlatoonCount[v] = AM.PlatoonCount[v] - 1
         end
     end
-})
+}

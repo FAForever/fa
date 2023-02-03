@@ -7,7 +7,7 @@
 -- **
 -- **  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
-local ADisruptorProjectile = import('/lua/aeonprojectiles.lua').AShieldDisruptorProjectile
+local ADisruptorProjectile = import("/lua/aeonprojectiles.lua").AShieldDisruptorProjectile
 
 ADFShieldDisruptor01 = Class(ADisruptorProjectile) {
     OnImpact = function(self, TargetType, TargetEntity)

@@ -7,12 +7,12 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
+local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 
-local AQuantumGateAmbient = import('/lua/EffectTemplates.lua').AQuantumGateAmbient
+local AQuantumGateAmbient = import("/lua/effecttemplates.lua").AQuantumGateAmbient
 
 -- Setup as RemoteViewing child of AStructureUnit
-local RemoteViewing = import('/lua/RemoteViewing.lua').RemoteViewing
+local RemoteViewing = import("/lua/remoteviewing.lua").RemoteViewing
 AStructureUnit = RemoteViewing( AStructureUnit )
 
 XAB3301 = Class( AStructureUnit ) {
