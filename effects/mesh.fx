@@ -9402,6 +9402,30 @@ technique PBR_UEF
     }
 }
 
+// The ship variants are supposed to use a mirrored environment
+// texture to emulate the water surface reflecting the sky.
+technique PBR_UEF_Navy
+<
+    string abstractTechnique = "PBR_UEF_Navy";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+    
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState(Rasterizer_Cull_CW)
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_UEF(true, true, false, 0, 0);
+    }
+}
+
 technique PBR_Aeon
 <
     string abstractTechnique = "PBR_Aeon";
@@ -9411,8 +9435,28 @@ technique PBR_Aeon
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
 
-        string environment = "<aeon>";
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_Aeon(true);
+    }
+}
+
+technique PBR_Aeon_Navy
+<
+    string abstractTechnique = "PBR_Aeon_Navy";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+        
+    string environment = "<water>";
 >
 {
     pass P0
@@ -9444,6 +9488,28 @@ technique PBR_Cybran
     }
 }
 
+technique PBR_Cybran_Navy
+<
+    string abstractTechnique = "PBR_Cybran_Navy";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+            
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_Cybran(true);
+    }
+}
+
 technique PBR_Seraphim
 <
     string abstractTechnique = "PBR_Seraphim";
@@ -9455,9 +9521,30 @@ technique PBR_Seraphim
 
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
 
-    string environment = "<seraphim>";
+        VertexShader = compile vs_1_1 UnitFalloffVS();
+        PixelShader = compile ps_2_a PBR_Seraphim(true);
+    }
+}
 
+technique PBR_Seraphim_Navy
+<
+    string abstractTechnique = "PBR_Seraphim_Navy";
+    int fidelity = FIDELITY_HIGH;
+
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+            
+    string environment = "<water>";
 >
 {
     pass P0
