@@ -3036,11 +3036,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
         local tempEnhanceBp = self.Blueprint.Enhancements[work]
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
-                WARN('*WARNING: Ordered enhancement ['..tempEnhanceBp.Name..'] does not have the proper prerequisite. Slot ['..tempEnhanceBp.Slot..'] - Needed: ['..unitEnhancements[tempEnhanceBp.Slot]..'] - Installed: ['..tempEnhanceBp.Prerequisite..']')
+                WARN('*WARNING: Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper prerequisite. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] - Needed: ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] - Installed: ['..(tempEnhanceBp.Prerequisite or 'nil')..']')
                 return false
             end
         elseif unitEnhancements[tempEnhanceBp.Slot] then
-            WARN('*WARNING: Ordered enhancement ['..tempEnhanceBp.Name..'] does not have the proper slot available. Slot ['..tempEnhanceBp.Slot..'] has already ['..unitEnhancements[tempEnhanceBp.Slot]..'] installed.')
+            WARN('*WARNING: Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper slot available. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] has already ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] installed.')
             return false
         end
 
@@ -3205,7 +3205,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
 
     ---@param self Unit
     CleanupEnhancementEffects = function(self)
-        self.UpgradeEffectsBag:Destroy()
+        if self.UpgradeEffectsBag.Destroy then self.UpgradeEffectsBag:Destroy() end
     end,
 
     ---@param self Unit
