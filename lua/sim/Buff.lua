@@ -187,7 +187,7 @@ function BuffWorkThread(unit, buffName, instigator)
     local buffDef = Buffs[buffName]
 
     --Non-Pulsing Buff
-    local totPulses = buffTable.DurationPulse
+    local totPulses = buffDef.DurationPulse
 
     if not totPulses then
         WaitSeconds(buffDef.Duration)
