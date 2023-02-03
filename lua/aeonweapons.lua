@@ -392,8 +392,7 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                 self:OnWeaponFired()
 
                 -- some constants that need to go into blueprint
-                local duration = 35
-                local slices = 10 
+                local slices = 10
 
                 -- extract information from the buff blueprint
                 local buff = bp.Buffs[1]
@@ -414,7 +413,7 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
 
                         if not target:BeenDestroyed() then 
                             if buff.BuffType == 'STUN' then 
-                                target:SetStunned(0.1 * duration / slices + 0.1)
+                                target:SetStunned(0.1 * stunDuration / slices + 0.1)
                             end
                         end
 
@@ -446,10 +445,10 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                         end
                     end
 
-                    WaitTicks(duration / slices + 1)
+                    WaitTicks(stunDuration / slices + 1)
                 end
 
-                WaitTicks(51 - duration)
+                WaitTicks(51 - stunDuration)
             end
         end,
 
