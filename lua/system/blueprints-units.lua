@@ -275,7 +275,6 @@ local function PostProcessUnit(unit)
 
         -- check if we have any intel
         if table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) and not enhancementBlueprints then
-            LOG("No intel for: " .. unit.BlueprintId)
             return
         end
 
