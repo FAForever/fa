@@ -10,7 +10,7 @@ Running the game with your changes
 
 _There is a section about Git in the FAQ if you're unfamilar with it._
 
-Fork the repository. Clone your fork to your system using your favorite Git tool. We refer to the `repository` directory as the location of your repository on your system. We refer to the `bin` directory as the `bin` folder in the installation folder of the client. By default this is:
+Fork the repository. Clone your fork to your system using your favorite Git tool. We refer to the `repository` directory as the location of your repository on your system. We refer to the `bin` directory as the `bin` folder in the data location, as defined in the client settings. By default this is:
  - `C:/ProgramData/FAForever/bin`
 
 Copy the contents of `repository/setup/bin` into the `bin` folder. Open `init_dev.lua` now found in the `bin` folder. At the top it states:
