@@ -9555,3 +9555,91 @@ technique PBR_Seraphim_Navy
         PixelShader = compile ps_2_a PBR_Seraphim(true);
     }
 }
+
+// Personal shields
+technique PBR_PhaseShield
+<
+    string abstractTechnique = "PBR_PhaseShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_UEF(true, true, false, 0, 0);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
+        PixelShader = compile ps_2_0 PhaseShieldPS();
+    }
+}
+
+technique PBR_AeonPhaseShield
+<
+    string abstractTechnique = "PBR_AeonPhaseShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_Aeon(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
+        PixelShader = compile ps_2_0 AeonPhaseShieldPS();
+    }
+}
+
+technique PBR_CybranPhaseShield
+<
+    string abstractTechnique = "PBR_CybranPhaseShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_Cybran(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
+        PixelShader = compile ps_2_0 CybranPhaseShieldPS();
+    }
+}
