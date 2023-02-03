@@ -3694,7 +3694,9 @@ AIBrain = Class(moho.aibrain_methods) {
             PlatoonAlertSounded = false,
         }
         self:ForkThread(self.BaseMonitorThread)
-        self:ForkThread(self.CanPathToCurrentEnemy)
+        if self:IsBaseAI() then
+            self:ForkThread(self.CanPathToCurrentEnemy)
+        end
     end,
 
     ---@param self AIBrain
