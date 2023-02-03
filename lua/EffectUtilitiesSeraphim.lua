@@ -100,7 +100,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         end
 
         -- -- Create slider to move unit
-        slider = CreateSlider(unitBeingBuilt, 0)
+        slider = CreateSlider(builder, 'Attachpoint')
         unitBeingBuilt.ConstructionSlider = slider
 
         SliderSetWorldUnits(slider,true)
