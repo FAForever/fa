@@ -11,6 +11,7 @@ local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
 local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
+local utilities = import('/lua/utilities.lua')
 local Explosion = import("/lua/defaultexplosions.lua")
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
@@ -365,10 +366,14 @@ ADFTractorClawStructure = Class(DefaultBeamWeapon) {
     FxMuzzleFlash = {},
 }
 
+local CategoriesChronoDampener = categories.MOBILE - (categories.COMMAND + categories.EXPERIMENTAL + categories.AIR)
+
 ---@class ADFChronoDampener : DefaultProjectileWeapon
 ADFChronoDampener = Class(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AChronoDampener,
+    FxMuzzleFlash = EffectTemplate.AChronoDampenerLarge,
     FxMuzzleFlashScale = 0.5,
+    FxUnitStun = EffectTemplate.Aeon_HeavyDisruptorCannonMuzzleCharge,
+    FxUnitStunFlash = EffectTemplate.ADisruptorCannonMuzzle01,
 
     RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
         Main = function(self)
@@ -377,15 +382,73 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
             WaitTicks(51 - math.mod(GetGameTick(), 50))
 
             while true do
+
                 if bp.Audio.Fire then
                     self:PlaySound(bp.Audio.Fire)
                 end
-                self:DoOnFireBuffs()
+
                 self:PlayFxMuzzleSequence(1)
                 self:StartEconomyDrain()
                 self:OnWeaponFired()
 
-                WaitTicks(51)
+                -- some constants that need to go into blueprint
+                local slices = 10
+
+                -- extract information from the buff blueprint
+                local buff = bp.Buffs[1]
+                local stunDuration = buff.Duration
+                local sliceSize = buff.Radius / slices
+
+                for i = 1, slices do
+
+                    local radius = i * sliceSize 
+                    local targets = utilities.GetTrueEnemyUnitsInSphere(
+                        self, 
+                        self.unit:GetPosition(), 
+                        radius, 
+                        CategoriesChronoDampener
+                    )
+
+                    for k, target in targets do 
+
+                        if not target:BeenDestroyed() then 
+                            if buff.BuffType == 'STUN' then 
+                                target:SetStunned(0.1 * stunDuration / slices + 0.1)
+                            end
+                        end
+
+                        -- add initial effect
+                        if not target.InitialStunFxApplied then 
+                            for k, effect in self.FxUnitStunFlash do 
+                                local emit = CreateEmitterOnEntity(target, target.Army, effect)
+                                emit:ScaleEmitter(math.max(target.Blueprint.SizeX, target.Blueprint.SizeZ))
+                            end
+
+                            target.InitialStunFxApplied = true 
+                        end
+
+                        -- add effect on target
+                        local count = target:GetBoneCount()
+                        for k, effect in self.FxUnitStun do 
+                            local emit = CreateEmitterAtBone(
+                                target, Random(0, count - 1), target.Army, effect
+                            )
+
+                            -- scale the effect a bit
+                            emit:ScaleEmitter(0.5)
+
+                            -- change lod to match outer lod of unit
+                            local lods = target.Blueprint.Display.Mesh.LODs
+                            if lods then
+                                emit:SetEmitterParam("LODCUTOFF", lods[table.getn(lods)].LODCutoff)
+                            end
+                        end
+                    end
+
+                    WaitTicks(stunDuration / slices + 1)
+                end
+
+                WaitTicks(51 - stunDuration)
             end
         end,
 

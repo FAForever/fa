@@ -1123,10 +1123,10 @@ UnitBlueprint {
                         OnFire = true,
                     },
                     BuffType = 'STUN',
-                    Duration = 2.5,
+                    Duration = 35,          -- duration is in ticks
                     Radius = 35,
                     TargetAllow = 'MOBILE',
-                    TargetDisallow = 'EXPERIMENTAL, COMMAND',
+                    TargetDisallow = 'AIR, EXPERIMENTAL, COMMAND',
                 },
             },
             CanFireFromTransport = true,
@@ -1175,7 +1175,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE',
+            TargetRestrictDisallow = 'UNTARGETABLE,AIR*MOBILE',
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 0,
