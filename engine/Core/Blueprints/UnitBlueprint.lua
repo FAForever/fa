@@ -663,6 +663,7 @@
 ---@field FadeOut number
 ---@field Length number
 ---@field Normal FileName
+---@field Glow FileName
 ---@field Orientations number[]
 ---@field RemoveWhenDead boolean
 ---@field Width number
