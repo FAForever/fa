@@ -109,10 +109,6 @@ XRB2309 = ClassUnit(CStructureUnit) {
         local shallSink = true -- This unit should definitely sink, no need to check cats.
 
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
-        self:DestroyAllDamageEffects()
-        self:DestroyIdleEffects()
-        self:DestroyBeamExhaust()
-        self:DestroyAllBuildEffects()
 
         -- BOOM!
         if self.PlayDestructionEffects then

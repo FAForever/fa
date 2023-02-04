@@ -1,3 +1,7 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 local MarkerUtilities = import("/lua/sim/markerutilities.lua")
 local MapResourceCheckApplied = false
 

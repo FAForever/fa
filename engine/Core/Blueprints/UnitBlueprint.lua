@@ -448,6 +448,10 @@
 
 
 ---@class UnitBlueprintDisplay
+--- Used by the Aeon build animation for a custom mercury pool
+---@field AeonMercuryPool? string
+--- Used by the Aeon build animation to offset the mercury pool
+---@field AeonMercuryPoolOffset? number
 --- Backup abilities shown by the unit view, if the detected ones don't cover them.
 ---@field Abilities UnlocalizedString[]
 --- names that the AI can use to name the unit, provided the AI is programmed to do this
@@ -659,6 +663,7 @@
 ---@field FadeOut number
 ---@field Length number
 ---@field Normal FileName
+---@field Glow FileName
 ---@field Orientations number[]
 ---@field RemoveWhenDead boolean
 ---@field Width number
@@ -848,8 +853,17 @@
 ---@field PitchBone Bone
 ---@field YawBone Bone
 
+---@class UnitIntelStatus
+---@field RechargeThread thread?
+---@field AllIntel table<IntelType, boolean>
+---@field AllIntelRecharging table<IntelType, boolean>
+---@field AllIntelMaintenanceFree table<IntelType, boolean>
+---@field AllIntelFromEnhancements table<IntelType, boolean>
+---@field AllIntelDisabledByEvent table<IntelType, table<string, boolean>>
 
 ---@class UnitBlueprintIntel
+--- intel status that is deep-copied for each unit instance
+---@field State? UnitIntelStatus
 --- intel types set to true in this table cannot be disabled
 ---@field ActiveIntel? table<IntelType, boolean>
 --- single unit cloaking
@@ -901,7 +915,6 @@
 ---@field VisionRadiusOnDeath? number
 --- how far the unit can see underwater
 ---@field WaterVisionRadius number
-
 
 ---@class UnitBlueprintInterface
 ---@field HelpText string

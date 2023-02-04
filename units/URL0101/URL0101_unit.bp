@@ -145,6 +145,9 @@ UnitBlueprint {
         Cloak = true,
         RadarRadius = 45,
         VisionRadius = 24,
+        ActiveIntel = {
+            Radar = true
+        }
     },
     Interface = {
         HelpText = '<LOC url0101_help>Land Scout',

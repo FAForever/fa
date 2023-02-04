@@ -1,10 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardScanRadius = 26, -- allows for factory reclaim bug 
-        TargetBones = {
-            'Spinner_01',
-            'Spinner_02',
-        },
     },
     Audio = {
         AmbientMove = Sound {
@@ -194,7 +190,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 650,
         BuildCostMass = 130,
-        BuildRate = 12.5,
+        BuildRate = 13,
         BuildTime = 650,
         BuildableCategory = {
             'BUILTBYTIER2ENGINEER AEON',
@@ -244,7 +240,7 @@ UnitBlueprint {
     LifeBarOffset = 0.35,
     LifeBarSize = 0.9,
     Physics = {
-        BackUpDistance = 0,
+        BackUpDistance = 10,
         BankingSlope = 0.5,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -256,24 +252,24 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         Elevation = 0.5,
-        MaxAcceleration = 1.9,
-        MaxBrake = 1.9,
+        MaxAcceleration = 3.8,
+        MaxBrake = 3.8,
         MaxSpeed = 1.9,
         MaxSpeedReverse = 0,
-        MaxSteerForce = 1000,
+        MaxSteerForce = 15,
         MeshExtentsX = 1.25,
         MeshExtentsY = 0.75,
         MeshExtentsZ = 0.75,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_Hover',
         RotateBodyWhileMoving = true,
-        RotateOnSpot = true,
+        RotateOnSpot = false,
         RotateOnSpotThreshold = 0.1,
-        TurnFacingRate = 120,
+        TurnFacingRate = 160,
         TurnRadius = 0,
-        TurnRate = 120,
-        WobbleFactor = 0,
-        WobbleSpeed = 0,
+        TurnRate = 160,
+        WobbleFactor = 0.015,
+        WobbleSpeed = 0.015,
     },
     SelectionCenterOffsetY = -0.5,
     SelectionSizeX = 0.65,
