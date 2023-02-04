@@ -9819,6 +9819,36 @@ technique PBR_CybranPhaseShield
     }
 }
 
+technique PBR_SeraphimPersonalShield
+<
+    string abstractTechnique = "PBR_SeraphimPersonalShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+
+    int parameter = PARAM_LIFETIME;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 UnitFalloffVS();
+        PixelShader = compile ps_2_a PBR_Seraphim(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
+        PixelShader = compile ps_2_0 SeraphimPhaseShieldPS();
+    }
+}
+
 // Build techniques
 technique PBR_UEFBuild
 <
