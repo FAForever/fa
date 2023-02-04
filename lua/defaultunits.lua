@@ -215,9 +215,18 @@ StructureUnit = ClassUnit(Unit) {
     ---@param lifeTime number
     ---@return boolean
     CreateTarmac = function(self, albedo, normal, glow, orientation, specTarmac, lifeTime)
-        if self.Layer ~= 'Land' then return end
+        if self.Layer ~= 'Land' then
+            return
+        end
+
         local tarmac
+        local blueprintDisplay = self.Blueprint.Display
+        local blueprintPhysics = self.Blueprint.Physics
+
+
         local bp = self.Blueprint.Display.Tarmacs
+
+
         if not specTarmac then
             if bp and not table.empty(bp) then
                 local num = Random(1, table.getn(bp))
@@ -231,7 +240,8 @@ StructureUnit = ClassUnit(Unit) {
 
         local w = tarmac.Width
         local l = tarmac.Length
-        local fadeout = tarmac.FadeOut
+        local fadeout = math.max(blueprintPhysics.SkirtSizeX or 1, blueprintPhysics.SkirtSizeZ or 1) * 70
+        LOG(fadeout)
 
         local x, y, z = self:GetPositionXYZ()
 
@@ -279,7 +289,7 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         if normal and tarmac.Normal then
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Normal .. GetTarmac(faction, terrainName), '', 'Alpha Normals', w, l, fadeout, lifeTime or 0, self.Army, 0)
+            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Normal .. GetTarmac(faction, terrainName), '', 'Alpha Normals', w, l, 0.5 * fadeout, lifeTime or 0, self.Army, 0)
 
             table.insert(self.TarmacBag.Decals, tarmacHndl)
             if tarmac.RemoveWhenDead then
@@ -288,7 +298,7 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         if glow and tarmac.Glow then
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Glow .. GetTarmac(faction, terrainName), '', 'Glow', w, l, fadeout, lifeTime or 0, self.Army, 0)
+            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Glow .. GetTarmac(faction, terrainName), '', 'Glow', w, l, 0.5 * fadeout, lifeTime or 0, self.Army, 0)
 
             table.insert(self.TarmacBag.Decals, tarmacHndl)
             if tarmac.RemoveWhenDead then

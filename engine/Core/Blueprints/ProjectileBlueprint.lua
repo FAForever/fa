@@ -11,6 +11,7 @@
 ---@field Physics ProjectileBlueprintPhysics
 
 ---@class ProjectileBlueprintDisplay
+---@field Mesh MeshBlueprint
 --- mesh to use as the display of this projectile
 ---@field MeshBlueprint FileName
 --- uniform scale to apply to mesh
