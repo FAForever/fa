@@ -9533,8 +9533,8 @@ float4 PBR_SeraphimBuildPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows
 
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw + lerp( uvaddress.rb, 0, buildFractionMul ), rotationMatrix);
-    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
-    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+    float4 albedo = tex2D( albedoSampler, texcoord2);
+    float4 specular = tex2D( specularSampler, texcoord2);
 
     // Calculate lookup texture for falloff ramp
     float NdotV = saturate(dot( normalize(vertex.viewDirection), normal ));
@@ -9544,10 +9544,10 @@ float4 PBR_SeraphimBuildPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows
     // There are also white highlights in the albedo texture in some models
     float3 whiteness = saturate(albedo.rgb - float3 (0.4,0.4,0.4));
 
-    albedo.rgb = albedo.rgb + float3(0.4, 0.43, 0.47) * 1.5;
+    albedo.rgb = (albedo.rgb + float3(0.4, 0.43, 0.47)) * 0.6;
     albedo.rgb = lerp(albedo.rgb, teamColor, albedo.a);
 
-    float metallic = 1;
+    float metallic = 0.8;
     float roughness = saturate((1 - pow(specular.g, 0.5) + 0.15) * 0.6);
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows).rgb;
     
