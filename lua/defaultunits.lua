@@ -39,6 +39,12 @@ local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.
 local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
 local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
 
+---@class StructureTarmacBag
+---@field Decals TrashBag
+---@field Orientation number
+---@field CurrentBP UnitBlueprintTarmac
+---@field Lifetime number
+
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
 ---@field AdjacentUnits? Unit[]
@@ -315,6 +321,7 @@ StructureUnit = ClassUnit(Unit) {
             OwnedByEntity = self.EntityId,
             Orientation = orientation,
             CurrentBP = tarmac,
+            Lifetime = cutoffOthers,
         }
         local bag = self.TarmacBag.Decals
 
@@ -500,9 +507,11 @@ StructureUnit = ClassUnit(Unit) {
 
             -- give ownership of tarmac bag
             local unitBuilding = self.UnitBeingBuilt
-            local tarmacBag = self.TarmacBag
-            tarmacBag.OwnedByEntity = unitBuilding.EntityId
-            unitBuilding.TarmacBag = tarmacBag
+            if self.TarmacBag then
+                local tarmacBag = self.TarmacBag
+                tarmacBag.OwnedByEntity = unitBuilding.EntityId
+                unitBuilding.TarmacBag = tarmacBag
+            end
 
             local animation = self:GetUpgradeAnimation(self.UnitBeingBuilt)
             if animation then
@@ -540,7 +549,9 @@ StructureUnit = ClassUnit(Unit) {
             Unit.OnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
 
-            self.TarmacBag.OwnedByEntity = self.EntityId
+            if self.TarmacBag then
+                self.TarmacBag.OwnedByEntity = self.EntityId
+            end
 
             if self.AnimatorUpgradeManip then
                 self.AnimatorUpgradeManip:Destroy()
@@ -636,10 +647,12 @@ StructureUnit = ClassUnit(Unit) {
         Unit.OnKilled(self, instigator, type, overkillRatio)
 
         -- re-create tarmac bag, but with a life time
-        local orient = self.TarmacBag.Orientation
-        local currentBP = self.TarmacBag.CurrentBP
+        local bag = self.TarmacBag
+        local orient = bag.Orientation
+        local currentBP = bag.CurrentBP
+        local lifetime = bag.Lifetime
         self:DestroyTarmac()
-        self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
+        self:CreateTarmac(true, true, true, orient, currentBP, lifetime or 300)
     end,
 
     ---@param self StructureUnit
