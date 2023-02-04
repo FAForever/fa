@@ -9435,6 +9435,41 @@ float4 PBR_AeonBuildPuddlePS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShado
     return float4(color, alpha);
 }
 
+float4 PBR_AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
+{
+    // Diffuse texture
+    float4 texcoord = vertex.texcoord0;
+    texcoord.y += vertex.material.x * 0.00162;
+    texcoord.x -= vertex.material.x * 0.001;
+    float4 mask1 = tex2D( secondarySampler, texcoord * 2);
+
+    float4 texcoord2 = vertex.texcoord0;
+    texcoord2.y -= vertex.material.x * 0.00162;
+    float4 mask2 = tex2D( secondarySampler, texcoord2 * 2);
+
+    float3 diffuse = mask1.rrr - mask2.ggg + mask1.ggg * mask2.rrr;
+    diffuse = lerp( diffuse, float3(0.5,0.5,0.5), 0.75);
+
+    // Custom normal mapping
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal );
+    float3 normal = tex2D( normalsSampler, vertex.texcoord0.zw ).gaa;
+    normal = lerp( normal, tex2D( secondarySampler, vertex.texcoord0 * 7 ).baa, 0.5);
+    normal = lerp( normal, diffuse, 0.5);
+    normal = 2 * normal - 1;
+    normal.z = sqrt( 1 - normal.x*normal.x - normal.y*normal.y );
+    normal = normalize( mul( normal, rotationMatrix));
+
+    float metallic = 1;
+    float roughness = 0.15;
+    float3 color = PBR_PS(vertex, diffuse, metallic, roughness, normal, true).rgb;
+
+    // Fade out 95% complete
+    float percentComplete = vertex.material.y;
+    float alpha = (percentComplete >= 0.95) ? (1.0 - ((percentComplete - 0.95) * 20)) * (color.r * 2) : color.r * 2;
+
+    return float4( color, alpha );
+}
+
 float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth);
@@ -9903,7 +9938,7 @@ technique PBR_AeonBuild
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 AeonBuildVS(0);
-        PixelShader = compile ps_2_0 AeonBuildOverlayPS();
+        PixelShader = compile ps_2_a PBR_AeonBuildOverlayPS();
     }
 }
 
