@@ -9158,7 +9158,7 @@ float4 PBR_PS(
     float3 albedo,
     float metallic,
     float roughness,
-    float ao,
+    float3 n,
     uniform bool hiDefShadows,
     // Common material specular values:
     // water: .02
@@ -9166,12 +9166,10 @@ float4 PBR_PS(
     // most materials: .04
     // diamond: .17
     // Not used for metals
-    float facingSpecular = .04
+    float facingSpecular = .04,
+    float ao = 1
 ) : COLOR0
 {
-    float3 p = vertex.position.xyz;
-    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
-    float3 n = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float3 v = normalize(vertex.viewDirection);
 
     float3 reflection = reflect(-v, n);
@@ -9251,6 +9249,8 @@ float4 PBR_UEF(NORMALMAPPED_VERTEX vertex,
 {
     if (1 == mirrored) clip(vertex.depth.x);
 
+    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float4 albedo = tex2D(albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D(specularSampler, vertex.texcoord0.xy);
 
@@ -9272,7 +9272,7 @@ float4 PBR_UEF(NORMALMAPPED_VERTEX vertex,
     roughness += planeCockpitMask - specular.b * 3;
     roughness = saturate(1 - roughness);
 
-    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
+    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, ao);
 
     float emission = specular.b * 0.5;
     color += emission * albedo;
@@ -9284,10 +9284,11 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
+    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float3 albedo = tex2D( albedoSampler, vertex.texcoord0.xy).rgb;
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
 
-    float ao = 1;
     float metallic = 0;
     if (specular.r < 0.4)
         metallic = saturate(mapRange(specular.r, 0.2267, 0.3643, 0, 1));
@@ -9314,7 +9315,7 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
     float specularAmount = lerp(0.08, 0, darkAreas);
     specularAmount = lerp(specularAmount, 0.04, saturate(specular.a * 3));
 
-    float3 color = PBR_PS(vertex, albedo, metallic, roughness, ao, hiDefShadows, specularAmount).rgb;
+    float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount).rgb;
 
     float emission = specular.b + (pow(specular.a, 2) * 0.1);
     color += emission * albedo;
@@ -9327,17 +9328,18 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
+    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
 
-    float ao = 1;
     float metallic = saturate((pow(specular.r, 0.7) + specular.g * 0.2 - specular.a * 0.5) * 4.37);
     float roughness = lerp(0.8 * (1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
 
     albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 3, pow(metallic, 2.5)), float3(1, 1, 1));
     albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.8, specular.a);
 
-    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows);
+    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
 
     float emission = max(specular.b - 0.06, 0.0);
     color += emission * albedo;
@@ -9350,11 +9352,11 @@ float4 PBR_Seraphim(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COL
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
 
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     // Calculate lookup texture for falloff ramp
     float NdotV = saturate(dot( normalize(vertex.viewDirection), normal ));
     float4 fallOff = tex2D( falloffSampler, float2(pow(1 - NdotV, 0.6),vertex.material.x));
@@ -9368,8 +9370,7 @@ float4 PBR_Seraphim(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COL
 
     float metallic = 0.8;
     float roughness = saturate((1 - pow(specular.g, 0.5) + 0.15) * 0.6);
-    float ao = 1;
-    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, ao, hiDefShadows).rgb;
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows).rgb;
     
     float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness * 2;
     color = lerp(color, emission, length(emission));
