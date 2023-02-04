@@ -1329,6 +1329,8 @@ NORMALMAPPED_VERTEX AeonBuildVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
+    // The shadow bugs out at the end of the animation, so we have to disable it
+    vertex.shadow.z = 0;
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
