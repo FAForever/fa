@@ -239,9 +239,7 @@ StructureUnit = ClassUnit(Unit) {
     ---@param lifeTime number
     CreateTarmacThread = function(self, albedo, normal, glow, orientation, tarmac, lifeTime)
         -- hold up one tick to allow upgrades to pass the tarmac bag
-        -- LOG(GetGameTick())
-        -- WaitTicks(1)
-        -- LOG(GetGameTick())
+        WaitTicks(1)
 
         -- upgrades pass the tarmac bag, in which case we do nothing
         if self:HasTarmac() then
@@ -620,7 +618,6 @@ StructureUnit = ClassUnit(Unit) {
 
     ---@param self StructureUnit
     PlayActiveAnimation = function(self)
-
     end,
 
     ---@param self StructureUnit
@@ -637,8 +634,8 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         Unit.OnKilled(self, instigator, type, overkillRatio)
-        -- Adding into OnKilled the ability to destroy the tarmac but put a new one down that looks exactly like it but
-        -- will time out over the time spec'd or 300 seconds.
+
+        -- re-create tarmac bag, but with a life time
         local orient = self.TarmacBag.Orientation
         local currentBP = self.TarmacBag.CurrentBP
         self:DestroyTarmac()
