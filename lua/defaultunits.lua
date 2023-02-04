@@ -44,10 +44,12 @@ local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (ca
 ---@field Orientation number
 ---@field CurrentBP UnitBlueprintTarmac
 ---@field Lifetime number
+---@field OwnedByEntity EntityId
 
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
 ---@field AdjacentUnits? Unit[]
+---@field TarmacBag StructureTarmacBag
 StructureUnit = ClassUnit(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
@@ -202,9 +204,6 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         self:PlayActiveAnimation()
-
-        -- remove land bones if the structure has them
-        self:HideLandBones()
     end,
 
     ---@param self StructureUnit
