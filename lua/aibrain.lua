@@ -427,9 +427,6 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Place resource structures down
             for k, v in resourceStructures do
                 local unit = self:CreateResourceBuildingNearest(v, posX, posY)
-                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
-                    unit:CreateTarmac(true, true, true, false, false)
-                end
             end
         end
 
@@ -437,9 +434,6 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Place initial units down
             for k, v in initialUnits do
                 local unit = self:CreateUnitNearSpot(v, posX, posY)
-                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
-                    unit:CreateTarmac(true, true, true, false, false)
-                end
             end
         end
 
