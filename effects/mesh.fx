@@ -5723,37 +5723,6 @@ technique AeonCZAR_LowFidelity
     }
 }
 
-/// AeonBuild
-///
-///
-technique AeonBuild_HighFidelity
-<
-    string abstractTechnique = "AeonBuild";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicBuild";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-        AlphaState( AlphaBlend_Disable_Write_RGB )
-
-        VertexShader = compile vs_1_1 AeonBuildVS(0.0);
-        PixelShader = compile ps_2_a AeonBuildPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 AeonBuildVS(0);
-        PixelShader = compile ps_2_0 AeonBuildOverlayPS();
-    }
-}
-
 technique AeonBuild_MedFidelity
 <
     string abstractTechnique = "AeonBuild";
@@ -5882,29 +5851,6 @@ technique AeonBuildNoAnimation_LowFidelity
     }
 }
 
-/// AeonBuildPuddle
-///
-///
-technique AeonBuildPuddle_HighFidelity
-<
-    string abstractTechnique = "AeonBuildPuddle";
-    int fidelity = FIDELITY_HIGH;
-
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a AeonBuildPuddlePS(true);
-    }
-}
-
 technique AeonBuildPuddle_MedFidelity
 <
     string abstractTechnique = "AeonBuildPuddle";
@@ -5942,38 +5888,6 @@ technique AeonBuildPuddle_LowFidelity
 
         VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 1, 1, -0.002, 0.0042, 0, 0 );
         PixelShader = compile ps_2_0 AeonBuildPuddleLoFiPS();
-    }
-}
-
-/// CybranBuild
-///
-///
-technique CybranBuild_HighFidelity
-<
-    string abstractTechnique = "CybranBuild";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicBuild";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a CybranBuildPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 14, 4, 0, 0, -0.008, 0.008 );
-        PixelShader = compile ps_2_0 CybranBuildOverlayPS();
     }
 }
 
@@ -6078,38 +5992,6 @@ technique SeraphimBuild_LowFidelity
 
         VertexShader = compile vs_1_1 SeraphimBuildLofiVS();
         PixelShader = compile ps_2_0 CybranBuildLoFiPS();
-    }
-}
-
-/// UEFBuild
-///
-///
-technique UEFBuild_HighFidelity
-<
-    string abstractTechnique = "UEFBuild";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicBuild";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a UEFBuildHiFiPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 EffectVertexNormalHiFiVS( 16.0, 8.0, 0.0192, 0.0176, -0.0122, -0.0122 );
-        PixelShader = compile ps_2_0 UEFBuildOverlayHiFiPS();
     }
 }
 
@@ -6258,38 +6140,6 @@ technique Wreckage_LowFidelity
         PixelShader = compile ps_2_0 WreckagePS_LowFidelity();
     }
 };
-
-/// Phase Shield
-///
-///
-technique PhaseShield_HighFidelity
-<
-    string abstractTechnique = "PhaseShield";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_UNUSED;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
-        PixelShader = compile ps_2_0 PhaseShieldPS();
-    }
-}
 
 /// SeraphimPersonalShield
 ///
@@ -7407,64 +7257,6 @@ float4 ShieldNomadsLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
 }
 
 // TECHNIQUES ------------------------------------------------------------------------------------------
-
-technique AeonPhaseShield_HighFidelity
-<
-    string abstractTechnique = "AeonPhaseShield";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_UNUSED;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
-        PixelShader = compile ps_2_0 AeonPhaseShieldPS();
-    }
-}
-
-technique CybranPhaseShield_HighFidelity
-<
-    string abstractTechnique = "CybranPhaseShield";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_UNUSED;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
-        PixelShader = compile ps_2_0 CybranPhaseShieldPS();
-    }
-}
 
 
 // ====================================================================================================================================================================
@@ -10022,7 +9814,7 @@ technique Insect_HighFidelity
         // PixelShader = compile ps_2_a BSpecPreviewPS();
         // PixelShader = compile ps_2_a ASpecPreviewPS();
 
-        PixelShader = compile ps_2_a PBR_Cybran(true);
+        PixelShader = compile ps_2_a PBR_CybranPS(true);
     }
 }
 
@@ -10056,7 +9848,7 @@ technique Aeon_HighFidelity
         // PixelShader = compile ps_2_a BSpecPreviewPS();
         // PixelShader = compile ps_2_a ASpecPreviewPS();
 
-        PixelShader = compile ps_2_a PBR_Aeon(true);
+        PixelShader = compile ps_2_a PBR_AeonPS(true);
     }
 }
 
@@ -10093,6 +9885,236 @@ technique Seraphim_HighFidelity
         // PixelShader = compile ps_2_a BSpecPreviewPS();
         // PixelShader = compile ps_2_a ASpecPreviewPS();
 
-        PixelShader = compile ps_2_a PBR_Seraphim(true);
+        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
+    }
+}
+
+/// Phase Shield
+///
+///
+technique PhaseShield_HighFidelity
+<
+    string abstractTechnique = "PhaseShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
+        PixelShader = compile ps_2_0 PhaseShieldPS();
+    }
+}
+
+technique AeonPhaseShield_HighFidelity
+<
+    string abstractTechnique = "AeonPhaseShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_AeonPS(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
+        PixelShader = compile ps_2_0 AeonPhaseShieldPS();
+    }
+}
+
+technique CybranPhaseShield_HighFidelity
+<
+    string abstractTechnique = "CybranPhaseShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_CybranPS(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
+        PixelShader = compile ps_2_0 CybranPhaseShieldPS();
+    }
+}
+
+/// UEFBuild
+///
+///
+technique UEFBuild_HighFidelity
+<
+    string abstractTechnique = "UEFBuild";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicBuild";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_UEFBuildPS(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 EffectVertexNormalHiFiVS( 16.0, 8.0, 0.0192, 0.0176, -0.0122, -0.0122 );
+        PixelShader = compile ps_2_0 UEFBuildOverlayHiFiPS();
+    }
+}
+
+/// AeonBuild
+///
+///
+technique AeonBuild_HighFidelity
+<
+    string abstractTechnique = "AeonBuild";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicBuild";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+
+        VertexShader = compile vs_1_1 AeonBuildVS(0.0);
+        PixelShader = compile ps_2_a PBR_AeonBuildPS(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 AeonBuildVS(0);
+        PixelShader = compile ps_2_0 AeonBuildOverlayPS();
+    }
+}
+
+/// AeonBuildPuddle
+///
+///
+technique AeonBuildPuddle_HighFidelity
+<
+    string abstractTechnique = "AeonBuildPuddle";
+    int fidelity = FIDELITY_HIGH;
+
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_AeonBuildPuddlePS(true);
+    }
+}
+
+/// CybranBuild
+///
+///
+technique CybranBuild_HighFidelity
+<
+    string abstractTechnique = "CybranBuild";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicBuild";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_CybranBuildPS(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 14, 4, 0, 0, -0.008, 0.008 );
+        PixelShader = compile ps_2_0 CybranBuildOverlayPS();
+    }
+}
+
+technique SeraphimBuild_HighFidelity
+<
+    string abstractTechnique = "SeraphimBuild";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicBuild";
+    string depthTechnique = "SeraphimBuildDepth";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 SeraphimBuildVS();
+        PixelShader = compile ps_2_a PBR_SeraphimBuildPS(true);
     }
 }
