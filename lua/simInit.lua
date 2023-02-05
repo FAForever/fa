@@ -513,7 +513,10 @@ function OnPostLoad()
     end
 end
 
--- due to cyclic dependencies we need to import these files to break the cycle them
+-- these imports break cycle dependencies of import sequences of mods
 
-import('/lua/ScenarioFramework.lua')
-import('/lua/sim/ScenarioUtilities.lua')
+import('/lua/scenarioframework.lua')
+import('/lua/sim/scenarioutilities.lua')
+import("/lua/ai/aiutilities.lua")
+import("/lua/ai/sorianutilities.lua")
+import("/lua/ai/aiattackutilities.lua")
