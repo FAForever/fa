@@ -171,20 +171,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
 
         self.Trash = self.Trash or TrashBag()
 
-        self.IntelDisables = {
-            Radar = {NotInitialized = true},
-            Sonar = {NotInitialized = true},
-            Omni = {NotInitialized = true},
-            RadarStealth = {NotInitialized = true},
-            SonarStealth = {NotInitialized = true},
-            RadarStealthField = {NotInitialized = true},
-            SonarStealthField = {NotInitialized = true},
-            Cloak = {NotInitialized = true},
-            CloakField = {NotInitialized = true}, -- We really shouldn't use this. Cloak/Stealth fields are pretty busted
-            Spoof = {NotInitialized = true},
-            Jammer = {NotInitialized = true},
-        }
-
         self.EventCallbacks = {
             -- OnKilled = {},
             -- OnUnitBuilt = {},
@@ -5069,14 +5055,31 @@ if next(__active_mods) then
         OnCreate = function(self)
             oldUnit.OnCreate(self)
 
+            -- in case recent mods use these values
             self.factionCategory = self.Blueprint.FactionCategory
             self.layerCategory = self.Blueprint.LayerCategory
             self.factionCategory = self.Blueprint.FactionCategory
 
+            -- in case mods have a mobile unit inherit from a structure
             self.MovementEffectsBag = TrashBag()
             self.TopSpeedEffectsBag = TrashBag()
             self.BeamExhaustEffectsBag = TrashBag()
             self.IdleEffectsBag = TrashBag()
+
+            -- a lot of mods edit this table manually for some reason
+            self.IntelDisables = {
+                Radar = {NotInitialized = true},
+                Sonar = {NotInitialized = true},
+                Omni = {NotInitialized = true},
+                RadarStealth = {NotInitialized = true},
+                SonarStealth = {NotInitialized = true},
+                RadarStealthField = {NotInitialized = true},
+                SonarStealthField = {NotInitialized = true},
+                Cloak = {NotInitialized = true},
+                CloakField = {NotInitialized = true},
+                Spoof = {NotInitialized = true},
+                Jammer = {NotInitialized = true},
+            }
         end,
 
         DestroyAllTrashBags = function(self)
