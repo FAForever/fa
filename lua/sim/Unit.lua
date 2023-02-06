@@ -110,7 +110,7 @@ local cUnit = moho.unit_methods
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
 ---@field Blueprint UnitBlueprint
----@field EngineFlags any
+---@field EngineFlags? table<string, any>
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
@@ -203,8 +203,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     OnCreate = function(self)
         local bp = self:GetBlueprint()
 
-
-
         -- cache often accessed values into inner table
         self.Blueprint = bp
         self.MovementEffects = bp.Display.MovementEffects
@@ -215,12 +213,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
         self.Army = self:GetArmy()
         self.UnitId = self:GetUnitId()
         self.Brain = self:GetAIBrain()
-
-        -- the entity that produces sound, by default ourself
-        self.SoundEntity = self
-
-        -- used to fix engine related bugs
-        self.EngineFlags = { }
 
         -- used for rebuilding mechanic
         self.Repairers = {}
@@ -256,8 +248,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
         }
 
         self:ShowPresetEnhancementBones()
-        self:SetIntelRadius('Vision', bp.Intel.VisionRadius or 0)
-
 
         local bpDeathAnim = bp.Display.AnimationDeath
         if bpDeathAnim and not table.empty(bpDeathAnim) then
@@ -3920,7 +3910,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
             return false
         end
 
-        self.SoundEntity:PlaySound(audio)
+        (self.SoundEntity or self):PlaySound(audio)
         return true
     end,
 
@@ -3934,7 +3924,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
             return false
         end
 
-        self.SoundEntity:SetAmbientSound(audio, nil)
+        (self.SoundEntity or self):SetAmbientSound(audio, nil)
         return true 
     end,
 
@@ -3942,7 +3932,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     ---@param self Unit
     ---@return boolean
     StopUnitAmbientSound = function(self)
-        self.SoundEntity:SetAmbientSound(nil, nil)
+        (self.SoundEntity or self):SetAmbientSound(nil, nil)
         return true
     end,
 
@@ -4628,9 +4618,15 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
     ---@param flag boolean A flag to determine whether our consumption should be active
     SetConsumptionActive = function(self, flag)
-        if self.EngineFlags['SetConsumptionActive'] ~= flag then
+        local engineFlags = self.EngineFlags
+        if not engineFlags then
+            engineFlags = { }
+            self.EngineFlags = engineFlags
+        end
+
+        if engineFlags['SetConsumptionActive'] ~= flag then
             cUnit.SetConsumptionActive(self, flag)
-            self.EngineFlags['SetConsumptionActive'] = flag
+            engineFlags['SetConsumptionActive'] = flag
         end
     end,
 
