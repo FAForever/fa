@@ -9,13 +9,12 @@ AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 2
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
         WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitTicks(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 

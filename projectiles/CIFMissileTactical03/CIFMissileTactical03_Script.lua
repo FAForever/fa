@@ -12,23 +12,16 @@ CIFMissileTactical03 = ClassProjectile(CLOATacticalMissileProjectile) {
     OnCreate = function(self)
         CLOATacticalMissileProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self.Split = false
-        self.MovementTurnLevel = 1
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
     OnImpact = function(self, targetType, targetEntity)      
-        CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
-        -- if I collide with terrain dont split
-        if targetType != 'Projectile' then
-            self.Split = true
-        end
         CLOATacticalMissileProjectile.OnImpact(self, targetType, targetEntity)
+        CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not self.Split and (amount >= self:GetHealth()) then
-            self.Split = true
+        if amount >= self:GetHealth() then
             local vx, vy, vz = self:GetVelocity()
             local velocity = 7
             local ChildProjectileBP = '/projectiles/CIFMissileTacticalSplit01/CIFMissileTacticalSplit01_proj.bp'
@@ -53,12 +46,11 @@ CIFMissileTactical03 = ClassProjectile(CLOATacticalMissileProjectile) {
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 2
         self:SetTurnRate(8)
         WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitTicks(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 

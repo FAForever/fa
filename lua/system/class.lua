@@ -652,7 +652,7 @@ ProjectileFactory = {
     ---@return table
     __call = function (self)
         -- LOG(string.format("%s -> %s", "ProjectileFactory", tostring(self.__name)))
-        local instance = {&15 &0}
+        local instance = {&7 &0}
         return setmetatable(instance, self)
     end
 }
