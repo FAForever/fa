@@ -838,7 +838,7 @@ Platoon = Class(moho.platoon_methods) {
 
         AIAttackUtils.GetMostRestrictiveLayer(self)
         self:SetPlatoonFormationOverride(PlatoonFormation)
-        local markerLocations, en = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
+        local markerLocations = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
 
         local bestMarker = false
 
