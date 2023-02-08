@@ -84,6 +84,7 @@ local armies = table.hash(ListArmies())
 for k, marker in AllMarkers do
     if armies[k] then
         marker.name = k
+        marker.size = 50
         MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
         MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
     end

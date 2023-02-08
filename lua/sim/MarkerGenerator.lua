@@ -32,6 +32,7 @@ function GenerateExpansions()
     ---@field Extractor MarkerResource
     ---@field Seen boolean
     ---@field Neighbors ExtractorNode[]
+    ---@field Candidates ExtractorNode[]
 
     local mapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
     local mapFactor = 16 / (mapSize)
@@ -73,7 +74,8 @@ function GenerateExpansions()
                 Extractor = extractor,
                 Identifier = k,
                 Seen = false,
-                Neighbors = { }
+                Neighbors = { },
+                Candidates = { },
             }
 
             table.insert(structuredExtractorData, node)
@@ -104,13 +106,23 @@ function GenerateExpansions()
                             local d = dx * dx + dz * dz
                             if d < threshold then
                                 instance.Neighbors[neighbor.Identifier] = neighbor
-                                neighbor.Neighbors[instance.Identifier] = instance
+                            elseif d < 1.5 * threshold then
+                                instance.Candidates[neighbor.Identifier] = neighbor
                             end
                         end
                     end
                 end
             end
         end
+
+        -- local numberOfNeighbors = table.getsize(instance.Neighbors)
+        -- local numberOfCandidates = table.getsize(instance.Candidates)
+
+        -- if numberOfNeighbors <= 1 and numberOfCandidates >= 2 then
+        --     for id, neighbor in instance.Candidates do
+        --         instance.Neighbors[id] = neighbor
+        --     end
+        -- end
     end
 
     ---------------------------------------------------
