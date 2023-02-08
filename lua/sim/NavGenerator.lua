@@ -79,22 +79,10 @@ NavGrids = {}
 ---@type table<number, NavLabelMetadata>
 NavLabels = {}
 
-NavLargeExtractorClusters = {}
-NavMediumExtractorClusters = {}
-NavSmallExtractorClusters ={}
-NavIsolatedExtractorClusters = {}
-
 local Generated = false
 ---@return boolean
 function IsGenerated()
     return Generated
-end
-
-local CompressedTreeIdentifier = 0
----@return number
-local function GenerateCompressedTreeIdentifier()
-    CompressedTreeIdentifier = CompressedTreeIdentifier + 1
-    return CompressedTreeIdentifier
 end
 
 local LabelIdentifier = 0
@@ -1099,9 +1087,8 @@ local function GenerateMarkerMetadata()
         Amphibious = NavGrids['Amphibious']
     }
 
-    local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
-    for k = 1, en do
-        local extractor = extractors[k]
+    local extractors = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    for id, extractor in extractors do
         for layer, grid in grids do
             local label = grid:FindLeaf(extractor.position).Label
 
@@ -1117,9 +1104,8 @@ local function GenerateMarkerMetadata()
         end
     end
 
-    local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
-    for k = 1, hn do
-        local hydro = hydrocarbons[k]
+    local hydrocarbons = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
+    for id, hydro in hydrocarbons do
         for layer, grid in grids do
             local label = grid:FindLeaf(hydro.position).Label
 

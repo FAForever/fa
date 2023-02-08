@@ -73,20 +73,20 @@ function GetMarker(name)
 end
 
 --- Represents a cache of markers to prevent re-populating tables
+---@type table<MarkerType, table<string, MarkerData>>
 local MarkerCache = {}
 
 -- Pre-enable the caching of resource markers, to support adaptive maps
-MarkerCache["Mass"] = { Count = 0, Markers = {} }
-MarkerCache["Hydrocarbon"] = { Count = 0, Markers = {} }
-MarkerCache["Spawn"] = { Count = 0, Markers = {} }
+MarkerCache["Mass"] = { }
+MarkerCache["Hydrocarbon"] = { }
+MarkerCache["Spawn"] = { }
 
 local armies = table.hash(ListArmies())
 for k, marker in AllMarkers do
     if armies[k] then
         marker.name = k
         marker.size = 50
-        MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
-        MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
+        MarkerCache["Spawn"][k] = marker
     end
 end
 
@@ -101,47 +101,40 @@ end
 -- The list is not limited to these marker types - any marker that has a 'type' property
 -- can be cached. You can find them in the <map>_save.lua file.
 ---@param type MarkerType The type of marker to retrieve.
----@return MarkerData[]
----@return number
+---@return table<string, MarkerData>
 function GetMarkersByType(type)
 
     -- check if it is cached and return that
     local cache = MarkerCache[type]
     if cache then
-        return cache.Markers, cache.Count
+        return cache
     end
 
     -- prepare cache population
-    local ms = {}
-    local n = 1
+    local markers = {}
 
     -- find all the relevant markers
     for k, marker in AllMarkers do
         if marker.type == type then
-            ms[n] = marker
-            n = n + 1
+            markers[k] = marker
         end
     end
 
     -- tell us about it, for now
-    SPEW("Caching " .. n - 1 .. " markers of type " .. type .. "!")
+    SPEW("Caching " .. table.getsize(markers) .. " markers of type " .. type .. "!")
 
     -- construct the cache
-    cache = {
-        Count = n - 1,
-        Markers = ms
-    }
+    cache = markers
 
     -- cache it and return it
     MarkerCache[type] = cache
-    return cache.Markers, cache.Count
+    return cache
 end
 
 ---@param type MarkerType
 ---@param markers any
 function OverwriteMarkerByType(type, markers)
-    MarkerCache[type] = { } 
-    MarkerCache[type].Markers = markers
+    MarkerCache[type] = TableDeepCopy(markers)
 end
 
 --- Retrieves all markers of a given type. This is a deep copy
@@ -149,10 +142,9 @@ end
 -- unless you strictly need to.
 ---@param type MarkerType
 ---@return MarkerData[]
----@return number
 function GetMarkersByTypeDeep(type)
-    local markers, number = GetMarkersByType(type)
-    return TableDeepCopy(markers), number
+    local markers = GetMarkersByType(type)
+    return TableDeepCopy(markers)
 end
 
 --- Flushes the cache of a certain type. Does not remove
@@ -166,7 +158,7 @@ function FlushMarkerCacheByType(type)
         return
     end
 
-    MarkerCache[type] = false
+    MarkerCache[type] = nil
 end
 
 --- Flushes the entire marker cache. Does not remove existing references.
@@ -459,7 +451,6 @@ do
             label = NavUtils.GetLabel(layer, { x, y, z })
         end
 
-        -- commented values are used by the editor and not by the game
         ---@type MarkerData
         local marker = nil
         if type == 'Mass' then
@@ -487,8 +478,7 @@ do
         end
 
         -- make sure cache exists
-        local markers, count = GetMarkersByType(type)
-        MarkerCache[type].Count = count + 1
-        MarkerCache[type].Markers[count + 1] = marker
+        local markers = GetMarkersByType(type)
+        markers[string.format("%s %d", type, table.getsize(markers))] = marker
     end
 end

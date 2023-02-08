@@ -62,7 +62,7 @@ function GenerateExpansions()
         end
     end
 
-    local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    local extractors = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     for k, extractor in extractors do
         local p = extractor.position
         local px, pz = p[1], p[3]
