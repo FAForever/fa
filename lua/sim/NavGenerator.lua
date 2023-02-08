@@ -68,13 +68,8 @@ NavGrids = {}
 ---@field Layer NavLayers
 ---@field NumberOfExtractors number
 ---@field NumberOfHydrocarbons number
----@field ExtractorMarkers MarkerData[]
----@field HydrocarbonMarkers MarkerData[]
--- ---@field NumberOfSpawns number
--- ---@field NumberOfExpansions number
--- ---@field NumberOfDefensePoints number
--- ---@field ExpansionMarkers MarkerData[]
--- ---@field DefensePointMarkers MarkerData[]
+---@field ExtractorMarkers MarkerResource[]
+---@field HydrocarbonMarkers MarkerResource[]
 
 ---@type table<number, NavLabelMetadata>
 NavLabels = {}

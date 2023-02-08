@@ -848,13 +848,13 @@ Platoon = Class(moho.platoon_methods) {
 
         -- look for a random marker
         if moveFirst == 'Random' then
-            if table.getsize(markerLocations) <= 2 then
+            if table.getn(markerLocations) <= 2 then
                 self.LastMarker[1] = nil
                 self.LastMarker[2] = nil
             end
             for _,marker in RandomIter(markerLocations) do
                 if (self.MovementLayer == 'Land' and marker.NavLayer ~= 'Amphibious') or (self.MovementLayer == 'Water' and marker.NavLayer == 'Amphibious') then
-                    if table.getsize(markerLocations) <= 2 then
+                    if table.getn(markerLocations) <= 2 then
                         self.LastMarker[1] = nil
                         self.LastMarker[2] = nil
                     end
