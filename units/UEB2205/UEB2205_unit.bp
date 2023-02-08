@@ -253,7 +253,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
             RateOfFire = 0.25,
-            SalvoShotDelay = 0,
             SalvoSize = 1,
             TargetPriorities = {
                 'SUBMERSIBLE',

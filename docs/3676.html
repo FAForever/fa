@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="UTF-8">
+        <title>Patch 3676</title>
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="patchnotes.css">
+    </head>
+
+    <body>
+        <table id="container">
+            <tbody>
+                <tr>
+                    <td id="main">
+                        <div id="intro">
+                            <h1>Patch 3676</h1>
+                            <p>Welcome to the patchnotes for the 3676 patch.</p>
+                            <p>The focus of this patch is working on improving the implementation of the previous patch. Cybran regen is improved, Seraphim get a buff to their hps, as well as some smaller changes and fixes.</p>
+                            <p>We wish you good luck and much fun playing with the new patch!</p>                                
+                            <p>-- The Balance Team</p>
+                        </div>
+                        
+                        
+                        <h2>Air</h2>
+                        <div id="janus" class="card">
+                            <h3><img src="images/janus.png"> Janus</h3>
+                            <p>Janus gets a slight buff again to improve it slightly vs units.</p>
+                            <ul>
+                                <li>Initial Damage: <strike>15</strike> → 20</li>
+                                <li>Total Impact Damage: <strike>300</strike> → 400</li>
+                                <li>Total Overall Damage: <strike>1500</strike> → 1600</li>
+                            </ul>
+                        </div>
+
+                        <h2>Structures</h2>
+                        <div id="structures" class="card">
+                            <h3><img src="images/Cybran_T3_Naval_Factory.png">T3 Naval Support Factories</h3>
+                                T3 naval support facs were found to be too vulnerable considering the cost of the units being constructed within them so we have reduced their hp nerf.
+								<ul>
+									<li>UEF HP: <strike>13000</strike> → 17000</li>
+									<li>Seraphim HP: <strike>10000</strike> → 15000</li>
+									<li>Aeon HP: <strike>10000</strike> → 13000</li>
+									<li>Cybran HP: <strike>8000</strike> → 11000</li>
+									<li>Cybran HP Regeneration: <strike>15</strike> → 30</li>
+								</ul>
+								
+							<h3><img src="images/UEF_T2_Naval_Factory.png">T2 UEF Naval Support Factory</h3>
+                                This is a correction of the UEF T2 naval support factory which was missed in testing before the previous balance patch.
+								<ul>
+									<li>HP: <strike>6000</strike> → 6500</li>
+									
+								</ul>
+								
+                            
+							<h3><img src="images/UEF_T1_Mass_Storage.png">Mass Storages</h3>
+                                Mass storage hp has been given some hp back, so that it is more in line with their cost.
+								<ul>
+									<li>UEF HP: <strike>760</strike> → 1200</li>
+									<li>Seraphim HP: <strike>600</strike> → 1100</li>
+									<li>Aeon HP: <strike>600</strike> → 1000</li>
+									<li>Cybran HP: <strike>500</strike> → 800 </li>
+									<li>Cybran HP Regeneration: <strike>1</strike> → 4</li>
+								</ul>
+							
+                            </div>
+                            
+							<div id="serastructures" class="card">
+                            <h3>Seraphim Structures</h3>
+                                In the HP nerf patch Seraphim were given the same HP as Aeon. However we now decided to buff their HP so that they have more than Aeon, but still less than UEF. Seraphim have less unit choices and are not one of the stongest factions so some buffs are warranted and this also increases faction diversity.
+                            
+                            <h3><img src="images/serafacto.png">Seraphim T1 Buildings</h3>
+                                <ul><li>Air/Land/Naval Factory HP: <strike>3100</strike> → 3500</li><p></p>
+									
+                                <li>Power Generator HP: <strike>600</strike> → 650</li>
+                                <li>Hydrocarbon Power Plant HP: <strike>1600</strike> → 1700</li>
+                                <li>Mass Extractor HP: <strike>600</strike> → 650</li><p></p>
+									
+                                <li>Wall Segment HP: <strike>2000</strike> → 2500</li>
+								</ul>
+							
+							<h3><img src="images/Sera_T2_Land_Factory_HQ.png">Seraphim T2 Buildings</h3>
+                            <ul>
+                                <li>Air/Land Factory HQ HP: <strike>6200</strike> → 7000 </li>
+                                <li>Naval Factory HQ HP: <strike>10000</strike> → 11000</li><p></p>
+                            
+                                <li>Air/Land Support Factory HP: <strike>3100</strike> → 3500 </li>
+                                <li>Naval Support Factory HP: <strike>5000</strike> → 5500</li><p></p>
+									
+                                <li>Power Generator/Mass Extractor HP: <strike>1900</strike> → 2000</li><p></p>
+								</ul>
+								
+							<h3><img src="images/Sera_T3_Land_Factory_HQ.png">Seraphim T3 Buildings</h3>
+								<ul>	
+                                <li>Air/Land Factory HQ HP: <strike>12400</strike> → 14000</li>
+                                <li>Naval Factory HQ HP: <strike>20000</strike> → 22000</li><p></p>
+                                
+                                <li>Air/Land Support Factory HP: <strike>6200</strike> → 7000</li>
+                                <li>Naval Support Factory HP: <strike>10000</strike> → 15000</li><p></p>
+									
+                                <li>Power Generator/Mass Extractor HP: <strike>6200</strike> → 7000</li><p></p>
+								</ul>
+                                
+                            </div>    
+							
+							<div id="cybranregen" class="card">
+                            <h3>Cybran Structure Regeneration</h3>
+                            The initial Cybran regen values were found to be too low to be a relevant feature, so we have increased Cybran regen across the board.
+								
+                            <h3><img src="images/cybranfacto.png">Cybran T1 Buildings</h3>
+                                <ul><li>Air/Land/Naval Factory: <strike>3</strike> → 6</li><p></p>
+                                
+                                <li>Power Generator/Mass Extractor: <strike>1</strike> → 2</li>
+                                <li>Hydrocarbon Power Plant: <strike>1</strike> → 6</li><p></p>
+									
+                                <li>Wall Segment: <strike>3</strike> → 6</li>
+								</ul>
+							
+							<h3><img src="images/Cybran_T2_Land_Factory_HQ.png">Cybran T2 Buildings</h3>
+								<ul>
+									<li>Air/Land Factory HQ Regen: <strike>10</strike> → 20 </li>
+									<li>Naval Factory HQ Regen: <strike>15</strike> → 30</li><p></p>
+								
+									<li>Air/Land Support Factory Regen: <strike>3</strike> → 6 </li>
+									<li>Naval Factory Regen: <strike>6</strike> → 12</li><p></p>
+									
+									<li>Power Generator/Mass Extractor Regen: <strike>3</strike> → 6</li><p></p>
+								</ul>
+								
+							<h3><img src="images/Cybran_T3_Land_Factory_HQ.png">Cybran T3 Buildings</h3>
+								<ul>	
+									<li>Land Factory HQ Regen: <strike>20</strike> → 40</li>
+									<li>Air Factory HQ Regen: <strike>20</strike> → 40</li>
+									<li>Naval Factory HQ Regen: <strike>30</strike> → 60</li><p></p>
+									
+									<li>Air/Land Support Factory Regen: <strike>10</strike> → 20</li>
+									<li>Naval Factory Regen: <strike>15</strike> → 30</li><p></p>
+									
+									<li>Power Generator/Mass Extractor Regen: <strike>10</strike> → 20</li><p></p>
+								</ul>
+								
+                            </div>
+                            
+							<div id="misc" class="card"><h3>Miscellaneous</h3>
+                            <h3><img src="images/wall.png">Wall segments</h3>
+								<ul>	
+									<li>Destroying Wall Segments now grants 0.1 veterancy instead of 1. Killing walls for vet was an abuse which became more prevalent since the wall hp nerf.</li>
+								</ul>
+								
+							<h3><img src="images/UEF_T2_Radar.png">T2 Radar</h3>
+                                We have reduced the maintenance cost of T2 radars to encourage this intel option in the midgame.
+								<ul>	
+									<li>T2 Radar energy Mainentance cost: <strike>250</strike> → 200</li>			
+								</ul>
+								
+                        </div>
+                        
+                        <p style="height: 1000px"></p>
+                    </td>
+                    
+                    <td id="sidebar">
+                        <div id="icongrid">
+                            <h2><a href="#container">Contents</a></h2>
+                            
+							</p><p>Air<br>
+							<a href="#janus"><img src="images/janus.png"></a>
+							
+							</p><p>Structures<br>
+							<a href="#structures"><img src="images/Cybran_T3_Naval_Factory.png"></a>
+                            <a href="#serastructures"><img src="images/serafacto.png"></a>
+                            <a href="#cybranregen"><img src="images/cybranfacto.png"></a>
+                            
+                            </p><p>Miscellaneous<br>
+                            <a href="#misc"><img src="images/UEF_T2_Radar.png"></a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>

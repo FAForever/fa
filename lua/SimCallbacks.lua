@@ -209,9 +209,6 @@ Callbacks.CapStructure = function(data, units)
     -- check if we're allowed to mess with this structure
     if not OkayToMessWithArmy(structure.Army) then return end
 
-    -- we can't cap an extractor that is on the ocean floor
-    if structure.Layer == 'Seabed' then return end
-
     -- check if we have units
     local units = EntityCategoryFilterDown(CategoriesEngineer, SecureUnits(units))
     if not units[1] then return end
@@ -431,11 +428,6 @@ Callbacks.BoxFormationSpawn = function(data)
         -- dummy units do not have this function
         if unit.SetVeterancy then 
             unit:SetVeterancy(data.veterancy)
-        end
-
-        -- only structures have this function
-        if unit.CreateTarmac and __blueprints[data.bpId].Display and __blueprints[data.bpId].Display.Tarmacs then
-            unit:CreateTarmac(true,true,true,false,false)
         end
     end
 end

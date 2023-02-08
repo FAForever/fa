@@ -91,8 +91,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 6,
-        Health = 1250,
-        MaxHealth = 1250,
+        Health = 1000,
+        MaxHealth = 1000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -109,12 +109,12 @@ UnitBlueprint {
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = 'Unit',
+                    ShaderName = 'Insect',
                 },
                 {
                     AlbedoName = 'xrb0204_lod1_albedo.dds',
                     LODCutoff = 215,
-                    ShaderName = 'Unit',
+                    ShaderName = 'Insect',
                     SpecularName = 'xrb0204_lod1_specteam.dds',
                 },
             },
@@ -141,9 +141,9 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 4083.33,
+        BuildCostEnergy = 4200,
         BuildCostMass = 700,
-        BuildRate = 50,
+        BuildRate = 37,
         BuildTime = 1171,
         BuildableCategory = {
             'xrb0304',

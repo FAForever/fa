@@ -147,9 +147,6 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param self Shield
     ---@param spec unknown is this Entity?
     OnCreate = function(self, spec)
-
-        LOG(debug.allocatedsize(self))
-
         -- cache information that is used frequently
         self.Army = EntityGetArmy(self)
         self.EntityId = EntityGetEntityId(self)

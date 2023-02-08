@@ -109,12 +109,12 @@ UnitBlueprint {
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = 'Unit',
+                    ShaderName = 'Insect',
                 },
                 {
                     AlbedoName = 'xrb0104_lod1_albedo.dds',
                     LODCutoff = 215,
-                    ShaderName = 'Unit',
+                    ShaderName = 'Insect',
                     SpecularName = 'xrb0104_lod1_specteam.dds',
                 },
             },
@@ -141,9 +141,9 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 1750,
+        BuildCostEnergy = 2100,
         BuildCostMass = 350,
-        BuildRate = 25,
+        BuildRate = 20,
         BuildTime = 1171,
         BuildableCategory = {
             'xrb0204',

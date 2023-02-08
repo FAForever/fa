@@ -82,17 +82,17 @@ Projectile = ClassProjectile(moho.projectile_methods) {
 
     -- tables used for effects
 
-    FxImpactAirUnit = {},
-    FxImpactLand = {},
-    FxImpactNone = {},
-    FxImpactProp = {},
-    FxImpactShield = {},
-    FxImpactWater = {},
-    FxImpactUnderWater = {},
-    FxImpactUnit = {},
-    FxImpactProjectile = {},
-    FxImpactProjectileUnderWater = {},
-    FxOnKilled = {},
+    FxImpactAirUnit = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactProp = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactShield = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactWater = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactUnderWater = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactUnit = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactProjectile = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactProjectileUnderWater = import("/lua/effecttemplates.lua").NoEffects,
+    FxOnKilled = import("/lua/effecttemplates.lua").NoEffects,
 
     -- scale values used for effects
 
@@ -460,11 +460,6 @@ Projectile = ClassProjectile(moho.projectile_methods) {
             end
         end
 
-        -- for k, v in self do 
-        --     LOG(k)
-        -- end
-        -- LOG(debug.allocatedsize(self))
-
         -- in case we die slightly later
         local timeout = bp.Physics.ImpactTimeout
         if timeout and targetType == 'Terrain' then
@@ -728,21 +723,21 @@ Projectile = ClassProjectile(moho.projectile_methods) {
         if not tbl.Radius then return end
         self.MyFlare = Flare {
             Owner = self,
-            Radius = tbl.Radius or 5,
-            Category = tbl.Category or 'MISSILE',  -- We pass the category bp value along so that it actually has a function.
+            Radius = tbl.Radius,
+            Category = tbl.Category,  -- We pass the category bp value along so that it actually has a function.
         }
         if tbl.Stack == true then -- Secondary flare hitboxes, one above, one below (Aeon TMD)
             self.MyUpperFlare = Flare {
                 Owner = self,
                 Radius = tbl.Radius,
                 OffsetMult = tbl.OffsetMult,
-                Category = tbl.Category or 'MISSILE',
+                Category = tbl.Category,
             }
             self.MyLowerFlare = Flare {
                 Owner = self,
                 Radius = tbl.Radius,
                 OffsetMult = -tbl.OffsetMult,
-                Category = tbl.Category or 'MISSILE',
+                Category = tbl.Category,
             }
             self.Trash:Add(self.MyUpperFlare)
             self.Trash:Add(self.MyLowerFlare)

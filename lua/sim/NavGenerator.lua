@@ -1258,10 +1258,16 @@ function Generate()
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
     ---@type number
-    local compressionThreshold = 4
+    local compressionThreshold = 1
 
-    if MapSize > 1024 then
-        compressionThreshold = 8
+    -- 20x20+
+    if MapSize >= 1024 then
+        compressionThreshold = 2 * compressionThreshold
+    end
+
+    -- 40x40+
+    if MapSize >= 2048 then
+        compressionThreshold = 2 * compressionThreshold
     end
 
     NavGrids['Land'] = NavGrid('Land', CompressionTreeSize)

@@ -11,17 +11,9 @@
 
 local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
-local KamikazeWeapon = WeaponFile.KamikazeWeapon
-local BareBonesWeapon = WeaponFile.BareBonesWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local OverchargeWeapon = WeaponFile.OverchargeWeapon
-
-local Explosion = import("/lua/defaultexplosions.lua")
-local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
-local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
-local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
-local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class SANAnaitTorpedo : DefaultProjectileWeapon
@@ -206,7 +198,6 @@ SAALosaareAutoCannonWeaponSeaUnit = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SLosaareAutoCannonMuzzleFlashSeaUnit,
 }
 
-
 ---@class SDFAjelluAntiTorpedoDefense : DefaultProjectileWeapon
 SDFAjelluAntiTorpedoDefense = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SDFAjelluAntiTorpedoLaunch01,
@@ -232,15 +223,13 @@ SIFSuthanusMobileArtilleryCannon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class SDFExperimentalPhasonLaser : DefaultBeamWeapon
 SDFExperimentalPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.ExperimentalPhasonLaserCollisionBeam,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {},
     FxUpackingChargeEffects = EffectTemplate.SChargeExperimentalPhasonLaser,
     FxUpackingChargeEffectScale = 1,
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local army = self.unit.Army
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -254,8 +243,6 @@ SDFExperimentalPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
 ---@class SDFUnstablePhasonBeam : DefaultBeamWeapon
 SDFUnstablePhasonBeam = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {}, --------EffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 }
@@ -263,15 +250,13 @@ SDFUnstablePhasonBeam = ClassWeapon(DefaultBeamWeapon) {
 ---@class SDFUltraChromaticBeamGenerator : DefaultBeamWeapon
 SDFUltraChromaticBeamGenerator = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UltraChromaticBeamGeneratorCollisionBeam,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {},
     FxUpackingChargeEffects = EffectTemplate.SChargeUltraChromaticBeamGenerator,
     FxUpackingChargeEffectScale = 1,
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local army = self.unit.Army
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -328,5 +313,13 @@ SDFSniperShotSniperMode = ClassWeapon(DefaultProjectileWeapon) {
 }
 
 ---@class SB0OhwalliExperimentalStrategicBombWeapon : DefaultProjectileWeapon
-SB0OhwalliExperimentalStrategicBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
-}
+SB0OhwalliExperimentalStrategicBombWeapon = ClassWeapon(DefaultProjectileWeapon) {}
+
+--- Kept Mod Support
+local KamikazeWeapon = WeaponFile.KamikazeWeapon
+local BareBonesWeapon = WeaponFile.BareBonesWeapon
+local Explosion = import("/lua/defaultexplosions.lua")
+local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
+local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
+local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
+local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
