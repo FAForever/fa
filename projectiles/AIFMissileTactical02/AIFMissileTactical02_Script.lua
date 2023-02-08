@@ -15,7 +15,6 @@ AIFMissileTactical02 = ClassProjectile(AMissileSerpentineProjectile) {
         self:SetTurnRate(5)
         WaitTicks(6)
         self:TrackTarget(true)
-        self:TrackTarget(true)
         self:SetTurnRate(10)
         WaitTicks(6)
         while not self:BeenDestroyed() do

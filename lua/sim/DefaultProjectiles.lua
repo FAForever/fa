@@ -407,27 +407,32 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     EnterWaterThread = function(self)
         WaitTicks(self.TrailDelay)
 
-        local effect
         local army = self.Army
+        local fxTrails = self.FxTrails
+        local fxTrailScale = self.FxTrailScale
+        local fxTrailOffset = self.FxTrailOffset
+        local polyTrail = self.PolyTrail
+        local polyTrailOffset = self.PolyTrailOffset
 
-        for i in self.FxTrails do
-            effect = CreateEmitterOnEntity(self, army, self.FxTrails[i])
+        for i in fxTrails do
+            local effect = CreateEmitterOnEntity(self, army, fxTrails[i])
 
             -- only do these engine calls when they matter
-            if self.FxTrailScale ~= 1 then
-                IEffectScaleEmitter(effect, self.FxTrailScale)
+            if fxTrailScale ~= 1 then
+                IEffectScaleEmitter(effect, fxTrailScale)
             end
 
-            if self.FxTrailOffset ~= 1 then
-                IEffectOffsetEmitter(effect, 0, 0, self.FxTrailOffset)
+            if fxTrailOffset ~= 1 then
+                IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
             end
         end
-        if self.PolyTrail ~= '' then
-            local effect = CreateTrail(self, -1, army, self.PolyTrail)
+
+        if polyTrail ~= '' then
+            local effect = CreateTrail(self, -1, army, polyTrail)
 
             -- only do these engine calls when they matter
-            if self.PolyTrailOffset ~= 0 then
-                IEffectOffsetEmitter(effect, 0, 0, self.PolyTrailOffset)
+            if polyTrailOffset ~= 0 then
+                IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
             end
         end
     end,
@@ -435,10 +440,6 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     ---@param self OnWaterEntryEmitterProjectile
     OnEnterWater = function(self)
         Projectile.OnEnterWater(self)
-        local army = self.Army
-        for i in self.FxEnterWater do
-            CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
-        end
 
         self:SetVelocityAlign(true)
         self:SetStayUpright(false)
