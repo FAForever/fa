@@ -21,6 +21,7 @@
 --******************************************************************************************************
 
 local Shared = import("/lua/shared/navgenerator.lua")
+local MarkerGenerator = import("/lua/sim/markergenerator.lua")
 
 ---@alias NavTerrainCache number[][]
 ---@alias NavDepthCache number[][]
@@ -1135,112 +1136,11 @@ local function GenerateMarkerMetadata()
     end
 end
 
---- Generates expansion information
-local function GenerateExpansions()
 
-    ---@class NavStructuredMarkerData 
-    ---@field Extractor MarkerData
-    ---@field Position Vector
-    ---@field Label number
-    ---@field Layer NavLayers
-    ---@field Neighbors NavStructuredMarkerData[]
-    ---@field Id number
-
-    local mapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
-    local mapFactor = 16 / (mapSize)
-
-    local threshold = 400 + mapSize
-
-    local function ComputeBlocks(px, pz)
-        local bx = ((px * mapFactor) ^ 0) + 1
-        local bz = ((pz * mapFactor) ^ 0) + 1
-        return bx, bz
-    end
-
-    ---@type NavStructuredMarkerData[]
-    local structuredExtractorData = { }
-
-    -- create a temporary grid to store extractors in for efficient querying
-    ---@type { Extractors: NavStructuredMarkerData[] }[][]
-    local grid = {&0&16}
-    for z = 1, 16 do 
-        grid[z] = {&0&16}
-        for x = 1, 16 do 
-            grid[z][x] = {
-                Extractors = { }
-            }
-        end
-    end
-
-    -- populate grid with extractors
-    local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
-    for k, extractor in extractors do
-        local p = extractor.position
-        local px, pz = p[1], p[3]
-
-        local bx, bz = ComputeBlocks(px, pz)
-        local cell = grid[bz][bx]
-        if cell then
-            DrawCircle(extractor.position, 10, 'ffffff')
-            local info = { Extractor = extractor, Position = extractor.position, Label = extractor.NavLabel, Neighbors = { }, Id=k}
-            table.insert(structuredExtractorData, info)
-            table.insert(cell.Extractors, info)
-        else 
-            DrawCircle(extractor.position, 10, 'ff0000')
-        end
-
-    end
-
-    -- for each extractor, find 'neighbors'
-    for k = 1, table.getn(structuredExtractorData) do
-        local instance = structuredExtractorData[k]
-        local p = instance.Position
-        local px,pz = p[1], p[3]
-        local bx, bz = ComputeBlocks(px, pz)
-
-        for lz = -1, 1 do
-            for lx = -1, 1 do
-                local cell = grid[bz + lz][bx + lx]
-                if cell then
-                    for k = 1, table.getn(cell.Extractors) do
-                        local neighbor = cell.Extractors[k]
-                        if neighbor != instance and neighbor.Label == instance.Label then
-                            local dx = px - neighbor.Position[1]
-                            local dz = pz - neighbor.Position[3]
-                            local d = dx * dx + dz * dz
-                            if d < threshold then
-                                instance.Neighbors[neighbor.Id] = neighbor
-                                neighbor.Neighbors[instance.Id] = instance
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    ForkThread(
-        function()
-            while true do
-                for k = 1, table.getn(structuredExtractorData) do
-                    local instance = structuredExtractorData[k]
-                    for k, neighbor in instance.Neighbors do
-                        DrawLine(instance.Position, neighbor.Position, Shared.LabelToColor(instance.Label))
-                    end
-                end
-
-                WaitTicks(2)
-            end
-        end
-    )
-
-end
 
 --- Generates a navigational mesh based on the heightmap
 function Generate()
 
-
-    
     -- reset state
     NavGrids = {}
     NavLabels = {}
@@ -1285,7 +1185,7 @@ function Generate()
     GenerateMarkerMetadata()
     print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    GenerateExpansions()
+    MarkerGenerator.GenerateExpansions()
     print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
     GenerateCullLabels()
