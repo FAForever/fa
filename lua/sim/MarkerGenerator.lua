@@ -188,8 +188,6 @@ function GenerateExpansions()
     -- of those extractors is used as the location of
     -- the marker
 
-    reprsl(largeExpansions)
-
     MarkerUtilities.OverwriteMarkerByType('Large Expansion Area', largeExpansions)
     MarkerUtilities.OverwriteMarkerByType('Expansion Area', smallExpansions)
 end
