@@ -124,8 +124,6 @@ end
 ---@param type MarkerType
 ---@param markers any
 function OverwriteMarkerByType(type, markers)
-    LOG("OverwriteMarkerByType")
-    reprsl(markers)
     local ms = {}
     local n = 1
 
@@ -282,9 +280,6 @@ function ToggleDebugMarkersByType(type)
     -- get the thread if it exists
     local thread = DebugMarkerThreads[type]
     if not thread then
-
-        local markers = GetMarkersByType(type)
-        reprsl(markers)
 
         -- make the thread if it did not exist yet
         thread = ForkThread(
