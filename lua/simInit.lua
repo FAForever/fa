@@ -262,6 +262,7 @@ function BeginSession()
     import("/lua/sim/matchstate.lua").Setup()
     import("/lua/sim/markerutilities.lua").Setup()
 
+    BeginSessionGenerateNavMesh()
     BeginSessionAI()
     BeginSessionMapSetup()
     BeginSessionEffects()
@@ -269,6 +270,8 @@ function BeginSession()
 
     import("/lua/sim/scenarioutilities.lua").CreateProps()
     import("/lua/sim/scenarioutilities.lua").CreateResources()
+
+    BeginSessionGenerateMarkers()
 
     import("/lua/sim/score.lua").init()
     import("/lua/sim/recall.lua").init()
@@ -305,17 +308,24 @@ function BeginSession()
     OnStartOffMapPreventionThread()
 end
 
+function BeginSessionGenerateNavMesh()
+    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+    if ScenarioInfo.GameHasAIs then
+        for k, brain in ArmyBrains do
+            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
+                import('/lua/sim/navgenerator.lua').Generate()
+                break
+            end
+        end
+    end
+end
+
 --- Setup for AI related logic and data
 function BeginSessionAI()
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
     if ScenarioInfo.GameHasAIs then
 
-        for k, brain in ArmyBrains do
-            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
-                import('/lua/sim/navutils.lua').Generate()
-                break
-            end
-        end
+
 
         local simMods = __active_mods or {}
         for Index, ModData in simMods do
@@ -343,6 +353,18 @@ function BeginSessionAI()
 
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
             import(file)
+        end
+    end
+end
+
+function BeginSessionGenerateMarkers()
+    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+    if ScenarioInfo.GameHasAIs then
+        for k, brain in ArmyBrains do
+            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
+                import('/lua/sim/navgenerator.lua').GenerateMarkers()
+                break
+            end
         end
     end
 end

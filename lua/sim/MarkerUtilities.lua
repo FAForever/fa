@@ -124,6 +124,8 @@ end
 ---@param type MarkerType
 ---@param markers any
 function OverwriteMarkerByType(type, markers)
+    LOG("OverwriteMarkerByType")
+    reprsl(markers)
     local ms = {}
     local n = 1
 
@@ -150,7 +152,7 @@ function FlushMarkerCacheByType(type)
         return
     end
 
-    MarkerCache[type] = false
+    MarkerCache[type] = nil
 end
 
 --- Flushes the entire marker cache. Does not remove existing references.

@@ -1166,9 +1166,6 @@ function Generate()
     GenerateMarkerMetadata()
     print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    MarkerGenerator.GenerateExpansions()
-    print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
-
     GenerateCullLabels()
     print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
@@ -1206,4 +1203,8 @@ function Generate()
 
     -- allows debugging tools to function
     import("/lua/sim/navdebug.lua")
+end
+
+function GenerateMarkers()
+    MarkerGenerator.GenerateExpansions()
 end
