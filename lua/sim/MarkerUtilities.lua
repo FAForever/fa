@@ -1,4 +1,3 @@
-
 --**************************************************************************************************
 --** Shared under the MIT license
 --**************************************************************************************************
@@ -56,8 +55,22 @@ local TableDeepCopy = table.deepcopy
 -- ---@field Extractors MarkerResource[]
 -- ---@field Hydrocarbons MarkerResource[]
 
---- Contains all the markers that are part of the map, including markers of chains
-local AllMarkers = Scenario.MasterChain._MASTERCHAIN_.Markers
+-- easier access to all markers and all chains
+---@type table<string, MarkerData>
+local AllMarkers
+
+---@type table<string, MarkerChain>
+local AllChains
+
+--- Represents a cache of markers to prevent re-populating tables
+local MarkerCache = {
+    Mass = { Count = 0, Markers = {} },
+    Hydrocarbon = { Count = 0, Markers = {} },
+    Spawn = { Count = 0, Markers = {} },
+}
+
+--- Represents a cache of chains to prevent re-populating tables
+local ChainCache = {}
 
 ---@return MarkerData[]
 function GetAllMarkers()
@@ -71,26 +84,6 @@ function GetMarker(name)
     return AllMarkers[name]
 end
 
---- Represents a cache of markers to prevent re-populating tables
-local MarkerCache = {}
-
--- Pre-enable the caching of resource markers, to support adaptive maps
-MarkerCache["Mass"] = { Count = 0, Markers = {} }
-MarkerCache["Hydrocarbon"] = { Count = 0, Markers = {} }
-MarkerCache["Spawn"] = { Count = 0, Markers = {} }
-
-local armies = table.hash(ListArmies())
-for k, marker in AllMarkers do
-    if armies[k] then
-        marker.Name = k
-        marker.size = 50
-        MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
-        MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
-    end
-end
-
---- Retrieves all markers of a given type
----@param type MarkerType The type of marker to retrieve.
 ---@return MarkerData[]
 ---@return number
 function GetMarkersByType(type)
@@ -157,7 +150,7 @@ function FlushMarkerCacheByType(type)
         return
     end
 
-    MarkerCache[type] = false
+    MarkerCache[type] = nil
 end
 
 --- Flushes the entire marker cache. Does not remove existing references.
@@ -171,12 +164,6 @@ function FlushMarkerCache()
 
     MarkerCache = cache
 end
-
---- Contains all the chains that are part of the map
-local AllChains = Scenario.Chains
-
---- Represents a cache of chains to prevent re-populating tables
-local ChainCache = {}
 
 --- Retrieves a chain of markers. Throws an error if the chain
 -- does not exist. This is a shallow copy, which means the
@@ -272,14 +259,27 @@ local DebugMarkerSuspend = {}
 ---@param type MarkerChain The type of markers you wish to debug.
 function ToggleDebugMarkersByType(type)
 
+    local count = 0
+    for k, brain in ArmyBrains do
+        if brain.BrainType == "Human" then
+            count = count + 1
+        end
+    end
+
+    local onePlayer = count <= 1
+    local cheatsEnabled = CheatsEnabled()
+
+    -- prevent it from working
+    if not (cheatsEnabled or onePlayer) then
+        WARN("Unable to debug AI grid: cheats are disabled or there is more than one player")
+        return
+    end
+
     SPEW("Toggled type to debug: " .. type)
 
     -- get the thread if it exists
     local thread = DebugMarkerThreads[type]
     if not thread then
-
-        local markers = GetMarkersByType(type)
-        reprsl(markers)
 
         -- make the thread if it did not exist yet
         thread = ForkThread(
@@ -370,6 +370,22 @@ local DebugChainSuspend = {}
 ---@param name MarkerChain The name of the chain you wish to debug.
 function ToggleDebugChainByName(name)
 
+    local count = 0
+    for k, brain in ArmyBrains do
+        if brain.BrainType == "Human" then
+            count = count + 1
+        end
+    end
+
+    local onePlayer = count <= 1
+    local cheatsEnabled = CheatsEnabled()
+
+    -- prevent it from working
+    if not (cheatsEnabled or onePlayer) then
+        WARN("Unable to debug AI grid: cheats are disabled or there is more than one player")
+        return
+    end
+
     SPEW("Toggled chain to debug: " .. name)
 
     -- get the thread if it exists
@@ -426,9 +442,22 @@ function ToggleDebugChainByName(name)
     DebugChainThreads[name] = thread
 end
 
-do
+function Setup()
+    AllMarkers = Scenario.MasterChain._MASTERCHAIN_.Markers
+    AllChains = Scenario.Chains
 
-    -- hook to cache markers created on the fly by crazy rush type of games
+    -- prepare spawn markers
+    local armies = table.hash(ListArmies())
+    for k, marker in AllMarkers do
+        if armies[k] then
+            marker.Name = k
+            marker.size = 50
+            MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
+            MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
+        end
+    end
+    
+    -- hook to catch created resources
     local OldCreateResourceDeposit = _G.CreateResourceDeposit
     _G.CreateResourceDeposit = function(type, x, y, z, size)
 
