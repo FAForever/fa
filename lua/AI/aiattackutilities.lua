@@ -2287,13 +2287,13 @@ function NavalAttackCheck(aiBrain)
         return extractorPoints
     end
     local frigateRaidMarkers = {}
-    local markers, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    local markers = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     if markers then
         local markerCount = 0
         local markerCountNotBlocked = 0
         local markerCountBlocked = 0
         local markersUnderWater = 0
-        for _, v in markers do 
+        for _, v in markers do
             -- Check for underwater mass points, can subs hit mass points
             -- We could also do this by pre-populating which mass markers are under water in the marker cache
             if v.NavLayer == 'Amphibious' then

@@ -20,17 +20,15 @@ TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
     OnCreate = function(self)
         TMissileCruiseSubProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self.MovementTurnLevel = 1
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
     MovementThread = function(self)        
-        self.WaitTime = 2
         self:SetTurnRate(8)
         WaitTicks(4)        
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitTicks(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 

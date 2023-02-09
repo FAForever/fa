@@ -28,12 +28,11 @@ TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 2
         self:SetTurnRate(8)
         WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitTicks(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 

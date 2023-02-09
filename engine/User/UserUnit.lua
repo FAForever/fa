@@ -115,8 +115,6 @@ end
 function UserUnit:GetShieldRatio()
 end
 
--- TODO was the UserUnit.GetStat method also binary patched?
-
 ---
 ---@generic T
 ---@param name string
