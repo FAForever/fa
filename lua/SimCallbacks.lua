@@ -429,11 +429,6 @@ Callbacks.BoxFormationSpawn = function(data)
         if unit.SetVeterancy then 
             unit:SetVeterancy(data.veterancy)
         end
-
-        -- only structures have this function
-        if unit.CreateTarmac and __blueprints[data.bpId].Display and __blueprints[data.bpId].Display.Tarmacs then
-            unit:CreateTarmac(true,true,true,false,false)
-        end
     end
 end
 

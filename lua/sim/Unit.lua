@@ -103,17 +103,19 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods, IntelComponent
 ---@field Brain AIBrain
+---@field Blueprint UnitBlueprint
 ---@field Trash TrashBag
----@field Buffs {Affects: table<BuffEffectName, BlueprintBuff.Effect>, buffTable: table<string, table>}
+---@field Layer Layer
 ---@field Army Army
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
----@field Blueprint UnitBlueprint
----@field EngineFlags any
+---@field Buffs {Affects: table<BuffEffectName, BlueprintBuff.Effect>, buffTable: table<string, table>}
+---@field EngineFlags? table<string, any>
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
+---@field SoundEntity? Unit | Entity
 Unit = ClassUnit(moho.unit_methods, IntelComponent) {
 
     Weapons = {},
@@ -171,20 +173,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
 
         self.Trash = self.Trash or TrashBag()
 
-        self.IntelDisables = {
-            Radar = {NotInitialized = true},
-            Sonar = {NotInitialized = true},
-            Omni = {NotInitialized = true},
-            RadarStealth = {NotInitialized = true},
-            SonarStealth = {NotInitialized = true},
-            RadarStealthField = {NotInitialized = true},
-            SonarStealthField = {NotInitialized = true},
-            Cloak = {NotInitialized = true},
-            CloakField = {NotInitialized = true}, -- We really shouldn't use this. Cloak/Stealth fields are pretty busted
-            Spoof = {NotInitialized = true},
-            Jammer = {NotInitialized = true},
-        }
-
         self.EventCallbacks = {
             -- OnKilled = {},
             -- OnUnitBuilt = {},
@@ -217,24 +205,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     OnCreate = function(self)
         local bp = self:GetBlueprint()
 
-
-
         -- cache often accessed values into inner table
         self.Blueprint = bp
-        self.MovementEffects = bp.Display.MovementEffects
-        self.Audio = bp.Audio
 
         -- cache engine calls
         self.EntityId = self:GetEntityId()
         self.Army = self:GetArmy()
         self.UnitId = self:GetUnitId()
         self.Brain = self:GetAIBrain()
-
-        -- the entity that produces sound, by default ourself
-        self.SoundEntity = self
-
-        -- used to fix engine related bugs
-        self.EngineFlags = { }
 
         -- used for rebuilding mechanic
         self.Repairers = {}
@@ -270,8 +248,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
         }
 
         self:ShowPresetEnhancementBones()
-        self:SetIntelRadius('Vision', bp.Intel.VisionRadius or 0)
-
 
         local bpDeathAnim = bp.Display.AnimationDeath
         if bpDeathAnim and not table.empty(bpDeathAnim) then
@@ -2436,6 +2412,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
         IntelComponent.OnStopBeingBuilt(self, builder, layer)
 
         local bp = self.Blueprint
+        local blueprintDisplay = bp.Display
+        local blueprintDefense = bp.Defense
         self.isFinishedUnit = true
 
         -- Set up Veterancy tracking here. Avoids needing to check completion later.
@@ -2477,7 +2455,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
         if self.Layer == 'Water' then
-            local surfaceAnim = bp.Display.AnimationSurface
+            local surfaceAnim = blueprintDisplay.AnimationSurface
             if not self.SurfaceAnimator and surfaceAnim then
                 self.SurfaceAnimator = CreateAnimator(self)
             end
@@ -2511,7 +2489,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
         --     RegenAssistMult = 1
         -- }
         -- ... Which we must carefully ignore.
-        local bpShield = bp.Defense.Shield
+        local bpShield = blueprintDefense.Shield
         if bpShield.ShieldSize ~= 0 then
             self:CreateShield(bpShield)
         end
@@ -2527,13 +2505,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
             )
         end
 
-        if bp.Display.AnimationPermOpen then
-            self.PermOpenAnimManipulator = CreateAnimator(self):PlayAnim(bp.Display.AnimationPermOpen)
+        if blueprintDisplay.AnimationPermOpen then
+            self.PermOpenAnimManipulator = CreateAnimator(self):PlayAnim(blueprintDisplay.AnimationPermOpen)
             self.Trash:Add(self.PermOpenAnimManipulator)
         end
 
         -- Initialize movement effects subsystems, idle effects, beam exhaust, and footfall manipulators
-        local movementEffects = self.MovementEffects
+        local movementEffects = blueprintDisplay.MovementEffects
         if movementEffects.Land or movementEffects.Air or movementEffects.Water or movementEffects.Sub or movementEffects.BeamExhaust then
             self.MovementEffectsExist = true
             if movementEffects.BeamExhaust and (movementEffects.BeamExhaust.Idle ~= false) then
@@ -3281,7 +3259,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
             self:PlayUnitAmbientSound('AmbientMoveSub')
         end
 
-        local movementEffects = self.MovementEffects
+        local movementEffects = self.Blueprint.Display.MovementEffects
         if not self.Footfalls and movementEffects[new].Footfall then
             self.Footfalls = self:CreateFootFallManipulators(movementEffects[new].Footfall)
         end
@@ -3420,7 +3398,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     ---@param z number
     OnAnimCollision = function(self, bone, x, y, z)
         local layer = self.Layer
-        local movementEffects = self.MovementEffects and self.MovementEffects[layer] and self.MovementEffects[layer].Footfall
+        local blueprintMovementEffects = self.Blueprint.Display.MovementEffects
+        local movementEffects = blueprintMovementEffects and blueprintMovementEffects[layer] and blueprintMovementEffects[layer].Footfall
 
         if movementEffects then
             local effects = {}
@@ -3483,8 +3462,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     end,
 
     ---@param self Unit
-    ---@param new string
-    ---@param old string
+    ---@param new Layer
+    ---@param old Layer
     UpdateMovementEffectsOnMotionEventChange = function(self, new, old)
         if old == 'TopSpeed' then
             -- Destroy top speed contrails and exhaust effects
@@ -3492,7 +3471,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
         end
 
         local layer = self.Layer
-        local movementEffects = self.MovementEffects
+        local movementEffects = self.Blueprint.Display.MovementEffects
         local movementEffectsLayer = movementEffects[layer]
         if new == 'TopSpeed' and self.HasFuel then
             if movementEffectsLayer.Contrails and self.ContrailEffects then
@@ -3719,7 +3698,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     ---@param motionState string
     ---@return boolean
     UpdateBeamExhaust = function(self, motionState)
-        local beamExhaust = self.MovementEffects.BeamExhaust
+        local beamExhaust = self.Blueprint.Display.MovementEffects.BeamExhaust
 
         if not beamExhaust then
             return false
@@ -3929,12 +3908,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     ---@param sound SoundBlueprint A string identifier that represents the sound to be played.
     ---@return boolean
     PlayUnitSound = function(self, sound)
-        local audio = self.Audio[sound]
+        local audio = self.Blueprint.Audio[sound]
         if not audio then 
             return false
         end
 
-        self.SoundEntity:PlaySound(audio)
+        (self.SoundEntity or self):PlaySound(audio)
         return true
     end,
 
@@ -3943,12 +3922,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     ---@param sound SoundBlueprint
     ---@return boolean
     PlayUnitAmbientSound = function(self, sound)
-        local audio = self.Audio[sound]
+        local audio = self.Blueprint.Audio[sound]
         if not audio then 
             return false
         end
 
-        self.SoundEntity:SetAmbientSound(audio, nil)
+        (self.SoundEntity or self):SetAmbientSound(audio, nil)
         return true 
     end,
 
@@ -3956,7 +3935,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     ---@param self Unit
     ---@return boolean
     StopUnitAmbientSound = function(self)
-        self.SoundEntity:SetAmbientSound(nil, nil)
+        (self.SoundEntity or self):SetAmbientSound(nil, nil)
         return true
     end,
 
@@ -4642,9 +4621,15 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent) {
     ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
     ---@param flag boolean A flag to determine whether our consumption should be active
     SetConsumptionActive = function(self, flag)
-        if self.EngineFlags['SetConsumptionActive'] ~= flag then
+        local engineFlags = self.EngineFlags
+        if not engineFlags then
+            engineFlags = { }
+            self.EngineFlags = engineFlags
+        end
+
+        if engineFlags['SetConsumptionActive'] ~= flag then
             cUnit.SetConsumptionActive(self, flag)
-            self.EngineFlags['SetConsumptionActive'] = flag
+            engineFlags['SetConsumptionActive'] = flag
         end
     end,
 
@@ -5069,14 +5054,35 @@ if next(__active_mods) then
         OnCreate = function(self)
             oldUnit.OnCreate(self)
 
+            -- in case recent mods use these values
             self.factionCategory = self.Blueprint.FactionCategory
             self.layerCategory = self.Blueprint.LayerCategory
             self.factionCategory = self.Blueprint.FactionCategory
 
+            -- in case mods have a mobile unit inherit from a structure
             self.MovementEffectsBag = TrashBag()
             self.TopSpeedEffectsBag = TrashBag()
             self.BeamExhaustEffectsBag = TrashBag()
             self.IdleEffectsBag = TrashBag()
+
+            -- a lot of mods edit this table manually for some reason
+            self.IntelDisables = {
+                Radar = {NotInitialized = true},
+                Sonar = {NotInitialized = true},
+                Omni = {NotInitialized = true},
+                RadarStealth = {NotInitialized = true},
+                SonarStealth = {NotInitialized = true},
+                RadarStealthField = {NotInitialized = true},
+                SonarStealthField = {NotInitialized = true},
+                Cloak = {NotInitialized = true},
+                CloakField = {NotInitialized = true},
+                Spoof = {NotInitialized = true},
+                Jammer = {NotInitialized = true},
+            }
+            
+            -- in case recent mods use these values
+            self.MovementEffects = self.Blueprint.Display.MovementEffects
+            self.Audio = self.Blueprint.Audio
         end,
 
         DestroyAllTrashBags = function(self)
