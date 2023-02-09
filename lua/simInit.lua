@@ -259,8 +259,8 @@ end
 function BeginSession()
 
     -- imported for side effects
-    import("/lua/sim/matchstate.lua")
-    import("/lua/sim/markerutilities.lua")
+    import("/lua/sim/matchstate.lua").Setup()
+    import("/lua/sim/markerutilities.lua").Setup()
 
     BeginSessionAI()
     BeginSessionMapSetup()
@@ -411,6 +411,16 @@ end
 
 --- Setup for common army, where all teams are batched together into one army
 function BeginSessionCommonArmy()
+    local teams = {}
+    for name,army in ScenarioInfo.ArmySetup do
+        if army.Team > 1 then
+            if not teams[army.Team] then
+                teams[army.Team] = {}
+            end
+            table.insert(teams[army.Team],army.ArmyIndex)
+        end
+    end
+
     local humanIndex = 0
     local IsHuman = {}
     for _, brain in ArmyBrains do
@@ -421,6 +431,7 @@ function BeginSessionCommonArmy()
             table.insert(IsHuman, false)
         end
     end
+
     local teamIndex = 1
     for _, armyIndices in teams do
         for _, i in armyIndices do
@@ -481,7 +492,6 @@ function BeginSessionEffects()
 end
 
 function GameTimeLogger()
-    local time
     while true do
         GTS = GetGameTimeSeconds()
         hours   = math.floor(GTS / 3600);

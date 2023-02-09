@@ -214,4 +214,6 @@ local function MatchStateThread()
 
 end
 
-ForkThread(MatchStateThread)
+function Setup()
+    ForkThread(MatchStateThread)
+end
