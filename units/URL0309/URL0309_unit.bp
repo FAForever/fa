@@ -237,7 +237,7 @@ UnitBlueprint {
     },
     Intel = {
         VisionRadius = 26,
-        WaterVisionRadius = 7,
+        WaterVisionRadius = 14,
     },
     Interface = {
         HelpText = '<LOC url0309_help>Engineer',
