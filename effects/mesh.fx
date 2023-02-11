@@ -9487,7 +9487,8 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR
     albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 3, pow(metallic, 2.5)), float3(1, 1, 1));
     albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.8, specular.a);
 
-    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
+    float ao = lerp(0.8, 1, metallic);
+    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, .8);
 
     float emission = max(specular.b - 0.06, 0.0);
     color += emission * albedo;
