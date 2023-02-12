@@ -21,8 +21,7 @@ ShieldEffectsComponent = ClassSimple {
     OnShieldEnabled = function(self)
         self.ShieldEffectsBag:Destroy()
         for _, v in self.ShieldEffects do
-            self.ShieldEffectsBag:Add(CreateAttachedEmitter(self, self.ShieldEffectsBone, self.Army, v):ScaleEmitter(self
-                .ShieldEffectsScale))
+            self.ShieldEffectsBag:Add(CreateAttachedEmitter(self, self.ShieldEffectsBone, self.Army, v):ScaleEmitter(self.ShieldEffectsScale))
         end
     end,
 
@@ -700,7 +699,6 @@ VeterancyComponent = ClassSimple {
         self:AddVetExperience(massKilled, noLimit)
     end,
 
-    ---@deprecated
     ---@param self Unit | VeterancyComponent
     ---@param level number
     SetVeterancy = function(self, level)
