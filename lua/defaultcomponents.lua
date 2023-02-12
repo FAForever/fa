@@ -716,5 +716,16 @@ VeterancyComponent = ClassSimple {
         self.VetExperience = 0
         self.VetLevel = 0
         self:AddVetExperience(self.Blueprint.VetThresholds[math.min(level, 5)] or 0, true)
-    end
+    end,
+
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
+    GetVeterancyValue = function(self)
+        local fractionComplete = self:GetFractionComplete()
+        local unitMass = self:GetTotalMassCost()
+        local vetMult = self.Blueprint.VeteranImportanceMult or 1
+        local cargoMass = self.cargoMass or 0
+        -- Allow units to count for more or less than their real mass if needed
+        return fractionComplete * unitMass * vetMult + cargoMass
+    end,
 }
