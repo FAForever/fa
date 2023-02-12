@@ -244,7 +244,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     SetIgnoreSelectTolerance = function(self)
         local tolerance = -1000
         if tolerance != self.SelectionTolerance then
-            LOG('Tolerance set to: ' .. tolerance)
+            -- LOG('Tolerance set to: ' .. tolerance)
             ConExecute(string.format("ui_SelectTolerance %i", tolerance))
             self.SelectionTolerance = tolerance
         end
@@ -261,7 +261,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
 
         if tolerance != self.SelectionTolerance then
-            LOG('Tolerance set to: ' .. tolerance)
+            -- LOG('Tolerance set to: ' .. tolerance)
             ConExecute(string.format("ui_SelectTolerance %i", tolerance))
             self.SelectionTolerance = tolerance
         end
@@ -273,7 +273,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         local tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_reclaim')
 
         if tolerance != self.SelectionTolerance then
-            LOG('Tolerance set to: ' .. tolerance)
+            -- LOG('Tolerance set to: ' .. tolerance)
             ConExecute(string.format("ui_SelectTolerance %i", tolerance))
             self.SelectionTolerance = tolerance
         end
@@ -363,9 +363,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- attempt to create a new cursor
         if event and self[event] then
             self[event](self, identifier, true, event ~= self.CursorLastEvent)
-            if (event ~= self.CursorLastEvent) then
-                LOG(event)
-            end
+            -- if (event ~= self.CursorLastEvent) then
+            --     LOG(event)
+            -- end
         else
             self:OnCursorReset(identifier, true, event ~= self.CursorLastEvent)
         end
