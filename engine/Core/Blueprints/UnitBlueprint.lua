@@ -65,11 +65,12 @@
 --- if defined, the collision shape will be a sphere of this radius using the
 --- `CollisionSphereOffset` species of collision offsets
 ---@field SizeSphere? number
+--- Whether this unit uses the mass-based veterancy system
+---@field VetEnabled boolean
+--- Defines threshold when 
+---@field VetThresholds table<number, number>
 --- overrides the veterancy instant heal multiplier per level (which is 0.1)
 ---@field VeteranHealingMult? number[]
---- Other units will multiply the veterancy gained from destroying this unit by this value.
---- Defaults to `1`
----@field VeteranImportanceMult? number
 --- Additional mass needed to get to the veterancy level of the index in the table, relative to the
 --- cumulative mass of the previous levels (or 0 for level 1)
 --- takes precedence over `VeteranMassMult`
