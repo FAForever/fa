@@ -524,7 +524,6 @@ VeterancyComponent = ClassSimple {
     OnCreate = function(self)
         local blueprint = self.Blueprint
 
-        LOG("OnCreate")
         -- these fields are always required
         self.VetDamageTaken = 0
         self.VetDamage = {}
@@ -629,6 +628,7 @@ VeterancyComponent = ClassSimple {
         end
     end,
 
+    ---@param self Unit | VeterancyComponent
     AddVetLevel = function(self)
         local blueprint = self.Blueprint
         if not blueprint.VetEnabled then
@@ -677,4 +677,44 @@ VeterancyComponent = ClassSimple {
         self:DoUnitCallbacks('OnVeteran')
         self.Brain:OnBrainUnitVeterancyLevel(self, nextLevel)
     end,
+
+    -- kept for backwards compatibility with mods, but should really not be used anymore
+
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
+    ---@param massKilled number
+    ---@param noLimit boolean
+    CalculateVeterancyLevel = function(self, massKilled, noLimit)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(massKilled, noLimit)
+    end,
+
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
+    ---@param massKilled number
+    ---@param noLimit boolean
+    CalculateVeterancyLevelAfterTransfer = function(self, massKilled, noLimit)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(massKilled, noLimit)
+    end,
+
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
+    ---@param level number
+    SetVeterancy = function(self, level)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(self.Blueprint.VetThresholds[math.min(level, 5)] or 0, true)
+    end,
+
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
+    ---@param level number
+    SetVeteranLevel = function(self, level)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(self.Blueprint.VetThresholds[math.min(level, 5)] or 0, true)
+    end
 }

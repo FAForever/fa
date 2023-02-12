@@ -239,7 +239,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for syncing data to UI
-        self:SetStat("HitpointsRegeneration", self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate).Value)
+        self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate)
+        self:SetStat("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
@@ -2143,41 +2144,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local blueprintDisplay = bp.Display
         local blueprintDefense = bp.Defense
         self.isFinishedUnit = true
-
-        -- Set up Veterancy tracking here. Avoids needing to check completion later.
-        -- Do all this here so we only have to do for things which get completed
-        -- Don't need to track damage for things which cannot attack!
-
-        if self.Blueprint.VetEnabled then
-            self.Sync.totalMassKilled = 0
-            self.Sync.totalMassKilledTrue = 0
-            self.Sync.VeteranLevel = 0
-
-            -- Values can be setting up manually via bp.
-            if bp.VeteranMass then
-                self.Sync.manualVeterancy = {
-                    [1] = bp.VeteranMass[1],
-                    [2] = bp.VeteranMass[1] + bp.VeteranMass[2],
-                    [3] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3],
-                    [4] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3] + bp.VeteranMass[4],
-                    [5] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3] + bp.VeteranMass[4] + bp.VeteranMass[5],
-                }
-            else
-                -- Allow units to require more or less mass to level up. Decimal multipliers mean
-                -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
-                local techMultipliers = {
-                    TECH1 = 2,
-                    TECH2 = 1.5,
-                    TECH3 = 1.25,
-                    SUBCOMMANDER = 2,
-                    EXPERIMENTAL = 2,
-                    COMMAND = 2,
-                }
-                local defaultMult = techMultipliers[self.Blueprint.TechCategory] or 2
-
-                self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
-            end
-        end
 
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
