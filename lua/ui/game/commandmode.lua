@@ -668,8 +668,7 @@ end
 --- ???
 --- Ensures the command mode ends when one one command should be passed through?
 function OnCommandModeBeat()
-    if issuedOneCommand and
-        not IsKeyDown('Shift')
+    if issuedOneCommand and not IsKeyDown('Shift')
     then
         EndCommandMode(true)
     end
