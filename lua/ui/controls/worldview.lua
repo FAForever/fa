@@ -167,7 +167,6 @@ local orderToCursorCallback = {
 
     -- orders that have use of a cursors
     RULEUCC_Move = 'OnCursorMove',
-    RULEUCC_MoveAlt = 'OnCursorMoveAlt',
     RULEUCC_Guard = 'OnCursorGuard',
     RULEUCC_Repair = 'OnCursorRepair',
     RULEUCC_Attack = 'OnCursorAttack',
@@ -463,27 +462,6 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
             end
         else
             self:EnableIgnoreMode(false)
-        end
-    end,
-
-    --- Called when we hold control
-    ---@param self WorldView
-    ---@param identifier 'RULEUCC_MoveAlt'
-    ---@param enabled boolean
-    ---@param changed boolean
-    OnCursorMoveAlt = function(self, identifier, enabled, changed)
-        if enabled then
-            if changed then
-                local cursor = self.Cursor
-                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('RULEUCC_Move')
-                self:ApplyCursor()
-
-                self:EnableIgnoreMode(true)
-                CommandMode.CacheAndClearCommandMode()
-            end
-        else
-            self:EnableIgnoreMode(false)
-            CommandMode.RestoreCommandMode()
         end
     end,
 
