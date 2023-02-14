@@ -537,7 +537,7 @@ function LoadIntoTransports()
     end
 end
 
-function ToggleHardMove()
+function EnableHardMove()
     import("/lua/ui/game/commandmode.lua").StartCommandMode('order', {
         name = "RULEUCC_Move",
         consistent = true,
