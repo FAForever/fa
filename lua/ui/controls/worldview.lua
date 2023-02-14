@@ -479,11 +479,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 self:ApplyCursor()
 
                 self:EnableIgnoreMode(true)
-                CommandMode.CacheAndClearCommandMode()
             end
         else
             self:EnableIgnoreMode(false)
-            CommandMode.RestoreCommandMode()
         end
     end,
 

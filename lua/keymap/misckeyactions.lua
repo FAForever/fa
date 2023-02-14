@@ -536,3 +536,10 @@ function LoadIntoTransports()
         end
     end
 end
+
+function ToggleHardMove()
+    import("/lua/ui/game/commandmode.lua").StartCommandMode('order', {
+        name = "RULEUCC_Move",
+        consistent = true,
+    })
+end
