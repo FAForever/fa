@@ -791,29 +791,6 @@ local function GetCargoSlots(unit)
     return slots
 end
 
-Callbacks.LoadIntoTransports = function(data, selection)
-    if selection then
-
-        local uTransports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
-
-        -- retrieve usable data about transports
-        local dTransports = { }
-        for k, transport in uTransports do
-            local cargoSlots = GetCargoSlots(transport)
-            table.insert(dTransports, {
-                Transport = transport,
-                Cargo = { },
-                Small = cargoSlots.Small,
-                Medium = cargoSlots.Medium,
-                Large = cargoSlots.Large,
-            })
-        end
-
-        local uCargo = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
-
-    end
-end
-
 Callbacks.NavToggleScanLayer = import("/lua/sim/navdebug.lua").ToggleScanLayer
 Callbacks.NavToggleScanLabels = import("/lua/sim/navdebug.lua").ToggleScanLabels
 Callbacks.NavDebugCanPathTo = import("/lua/sim/navdebug.lua").CanPathTo
