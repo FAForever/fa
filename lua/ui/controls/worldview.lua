@@ -206,6 +206,7 @@ local orderToCursorCallback = {
 ---@field CursorTrash TrashBag
 ---@field CursorLastEvent any
 ---@field CursorLastIdentifier CommandCap
+---@field CursorOverride CommandCap
 ---@field CursorDecals UserDecal[]
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
@@ -235,7 +236,20 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         --- Flag that indicates whether the cursor is over the world (instead of the UI)
         self.CursorOverWorld = false
 
+        self.CursorOverride = false
+
         self.Trash = TrashBag()
+    end,
+
+    ---@param self WorldView
+    ---@param command CommandCap
+    OverrideCursor = function(self, command)
+        self.CursorOverride = command
+    end,
+
+    ---@param self WorldView
+    DefaultCursor = function(self)
+        self.CursorOverride = false
     end,
 
     --- Sets the selection tolerance to ignore everything
@@ -323,6 +337,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- attack move that ignores everything
         if IsKeyDown(KeyCodeAlt) and selection then
             order = 'RULEUCC_AttackAlt'
+
+        elseif self.CursorOverride then
+            order = self.CursorOverride
 
         -- usual order structure
         else

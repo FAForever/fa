@@ -523,23 +523,19 @@ function SelectHighestEngineerAndAssist()
     end
 end
 
-function LoadIntoTransports()
-
-    local selection = GetSelectedUnits()
-    if selection then
-
-        local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
-        local others = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
-        if transports[1] and others[1] then
-            SimCallback({Func= 'LoadIntoTransports', Args = { }}, true)
-            SelectUnits(transports)
-        end
-    end
-end
-
+local hardMoveEnabled = false
 function EnableHardMove()
-    import("/lua/ui/game/commandmode.lua").StartCommandMode('order', {
-        name = "RULEUCC_Move",
-        consistent = true,
-    })
+    ---@type WorldView
+    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    if hardMoveEnabled then
+        import('/lua/ui/game/commandmode.lua').RestoreCommandMode()
+        view:SetDefaultSelectTolerance()
+        view:DefaultCursor()
+        hardMoveEnabled = false
+    else
+        import('/lua/ui/game/commandmode.lua').CacheAndClearCommandMode()
+        view:SetIgnoreSelectTolerance()
+        view:OverrideCursor('RULEUCC_Move')
+        hardMoveEnabled = true
+    end
 end
