@@ -524,7 +524,7 @@ function SelectHighestEngineerAndAssist()
 end
 
 local hardMoveEnabled = false
-function EnableHardMove()
+function ToggleHardMove()
     ---@type WorldView
     local view = import('/lua/ui/game/worldview.lua').viewLeft
     if hardMoveEnabled then
@@ -539,3 +539,13 @@ function EnableHardMove()
         hardMoveEnabled = true
     end
 end
+
+-- untoggle hard move when we have no units selected
+import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
+    function(selectionInfo)
+        if hardMoveEnabled and table.getn(selectionInfo.newSelection) == 0 then
+            ToggleHardMove()
+        end
+    end,
+    'KeyActionHardMove'
+)
