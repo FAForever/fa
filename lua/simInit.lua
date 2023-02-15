@@ -221,6 +221,13 @@ end
 -- use it to store off various useful bits of info.
 -- The global variable "ArmyBrains" contains an array of AI brains, one for each army.
 function OnCreateArmyBrain(index, brain, name, nickname)
+    local info = ScenarioInfo.ArmySetup[name]
+    if (not info.Human) and (info.AIPersonality != '') then
+        -- assign unique metatable for AI instance
+        local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
+        local instance = keyToBrain[name] or keyToBrain["default"]
+        setmetatable(brain, instance)
+    end
 
     import("/lua/sim/scenarioutilities.lua").InitializeStartLocation(name)
     import("/lua/sim/scenarioutilities.lua").SetPlans(name)
@@ -228,6 +235,9 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     ArmyBrains[index] = brain
     ArmyBrains[index].Name = name
     ArmyBrains[index].Nickname = nickname
+    ArmyBrains[index].AI = info.AI
+    ArmyBrains[index].Human = info.Human
+    ArmyBrains[index].Civilian = info.Civilian
     ScenarioInfo.PlatoonHandles[index] = {}
     ScenarioInfo.UnitGroups[index] = {}
     ScenarioInfo.UnitNames[index] = {}
