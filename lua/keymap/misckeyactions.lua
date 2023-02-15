@@ -549,3 +549,4 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
     end,
     'KeyActionHardMove'
 )
+end
