@@ -27,10 +27,6 @@ AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
 
     OnEnterWater = function(self)
         ATorpedoCluster.OnEnterWater(self)
-        local army = self.Army
-        for i in self.FxEnterWater do
-            CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
-        end
         self.Trash:Add(ForkThread(self.EnterWaterMovementThread,self))
     end,
 

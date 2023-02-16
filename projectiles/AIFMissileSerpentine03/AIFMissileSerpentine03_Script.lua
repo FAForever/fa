@@ -11,12 +11,11 @@ AIFMissileTactical02 = ClassProjectile(AMissileSerpentine02Projectile) {
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 2
         self:SetTurnRate(3)
         WaitTicks(21)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitTicks(self.WaitTime)
+            WaitTicks(1)
         end
     end,
 
