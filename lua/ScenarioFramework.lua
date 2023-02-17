@@ -939,22 +939,34 @@ function FakeTeleportUnits(units, killUnits)
     IssueStop(units)
     IssueClearCommands(units)
     for _, unit in units do
-        unit.CanBeKilled = false
-        unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
-        unit:PlayUnitSound('GateCharge')
+        if not unit:IsDestroyed() then
+            unit.CanBeKilled = false
+            unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
+            unit:PlayUnitSound('GateCharge')
+        else
+            LOG(unit.Blueprint.BlueprintId)
+        end
     end
     WaitSeconds(2)
 
     for _, unit in units do
-        unit:CleanupTeleportChargeEffects()
-        unit:PlayTeleportOutEffects()
-        unit:PlayUnitSound('GateOut')
+        if not unit:IsDestroyed() then
+            unit:CleanupTeleportChargeEffects()
+            unit:PlayTeleportOutEffects()
+            unit:PlayUnitSound('GateOut')
+        else
+            LOG(unit.Blueprint.BlueprintId)
+        end
     end
     WaitSeconds(1)
 
     if killUnits then
         for _, unit in units do
-            unit:Destroy()
+            if not unit:IsDestroyed() then
+                unit:Destroy()
+            else
+                LOG(unit.Blueprint.BlueprintId)
+            end
         end
     end
 end
