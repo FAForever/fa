@@ -1,6 +1,6 @@
 
 --- ticks before a player can start the first recall vote (5 minutes)
-PlayerGateCooldown = 5 * 60 * 10
+PlayerGateCooldown = 0.01 * 60 * 10
 
 --- ticks before a player can request another recall (3 minutes)
 PlayerRequestCooldown = 3 * 60 * 10
