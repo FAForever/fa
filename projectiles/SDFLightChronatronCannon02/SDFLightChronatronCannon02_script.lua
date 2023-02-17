@@ -8,13 +8,13 @@ local OverchargeProjectile = import("/lua/sim/DefaultProjectiles.lua").Overcharg
 
 SDFLightChronatronCannon02 = ClassProjectile(SLightChronatronCannonOverCharge, OverchargeProjectile) {
     OnImpact = function(self, targetType, targetEntity)
-        OverchargeProjectile.OnImpact(self, targetType, targetEntity)
         SLightChronatronCannonOverCharge.OnImpact(self, targetType, targetEntity)
+        OverchargeProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
     OnCreate = function(self)
-        OverchargeProjectile.OnCreate(self)
         SLightChronatronCannonOverCharge.OnCreate(self)
+        OverchargeProjectile.OnCreate(self)
     end,
 }
 TypeClass = SDFLightChronatronCannon02

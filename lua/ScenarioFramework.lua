@@ -1079,6 +1079,12 @@ function RemoveRestriction(army, categories, isSilent)
         -- Remove scenario restriction from game restrictions
         Game.RemoveRestriction(categories, army)
         Sync.Restrictions = Game.GetRestrictions()
+
+        ---@type AIBrain
+        local brain = ArmyBrains[army]
+        if brain then
+            brain:ReEvaluateHQSupportFactoryRestrictions()
+        end
     end
 end
 

@@ -15,13 +15,5 @@ CANKrilTorpedo01 = ClassProjectile(CKrilTorpedo) {
         CKrilTorpedo.OnCreate(self, true)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
-
-    OnEnterWater = function(self)
-        CKrilTorpedo.OnEnterWater(self)
-        local army = self.Army
-        for i in self.FxEnterWater do --splash
-            CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
-        end
-    end,
 }
 TypeClass = CANKrilTorpedo01

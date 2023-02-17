@@ -1,3 +1,34 @@
+local BlueprintNameToIntel = {
+    Cloak = 'Cloak',
+    CloakField = 'CloakField',
+    CloakFieldRadius = 'CloakField',
+    JammerBlips = 'Jammer',
+
+    RadarRadius = 'Radar',
+    RadarStealth = 'RadarStealth',
+    RadarStealthField = 'RadarStealthField',
+    RadarStealthFieldRadius = 'RadarStealthField',
+
+    Sonar = 'Sonar',
+    SonarRadius = 'Sonar',
+    SonarStealth = 'SonarStealth',
+    SonarStealthFieldRadius = 'SonarStealthField',
+}
+
+local LabelToVeterancyUse = {
+    ['DeathWeapon'] = true,
+    ['DeathImpact'] = true,
+}
+
+local TechToVetMultipliers = {
+    TECH1 = 2,
+    TECH2 = 1.5,
+    TECH3 = 1.25,
+    SUBCOMMANDER = 2,
+    EXPERIMENTAL = 2,
+    COMMAND = 2,
+}
+
 --- Post process a unit
 ---@param unit UnitBlueprint
 local function PostProcessUnit(unit)
@@ -63,16 +94,16 @@ local function PostProcessUnit(unit)
             if isStructure or isDummy then
                 unit.AI.GuardScanRadius = 0
             elseif isEngineer then -- engineers need their factory reclaim bug
-                unit.AI.GuardScanRadius = 26 -- allows for factory reclaim bug 
+                unit.AI.GuardScanRadius = 26 -- allows for factory reclaim bug
             else -- mobile units do need this value set
                 -- check if we have a primary weapon that is actually a weapon
                 local primaryWeapon = unit.Weapon[1]
                 if primaryWeapon and not (
                     primaryWeapon.DummyWeapon or
-                    primaryWeapon.WeaponCategory == 'Death' or
-                    primaryWeapon.Label == 'DeathImpact' or
-                    primaryWeapon.DisplayName == 'Air Crash'
-                ) then
+                        primaryWeapon.WeaponCategory == 'Death' or
+                        primaryWeapon.Label == 'DeathImpact' or
+                        primaryWeapon.DisplayName == 'Air Crash'
+                    ) then
                     local isAntiAir = primaryWeapon.RangeCategory == 'UWRC_AntiAir'
                     local maxRadius = primaryWeapon.MaxRadius or 0
 
@@ -109,9 +140,9 @@ local function PostProcessUnit(unit)
     -- that the value must be of type unsigned integer!
     if isAir and not (
         isExperimental or
-        isStructure or
-        (isTransport and not isGunship) -- uef tech 2 gunship is also a transport :)
-    ) then
+            isStructure or
+            (isTransport and not isGunship)-- uef tech 2 gunship is also a transport :)
+        ) then
         unit.Footprint = unit.Footprint or {}
 
         -- determine footprint size based on type
@@ -156,17 +187,20 @@ local function PostProcessUnit(unit)
         if speed then
             if unit.SizeSphere then
                 if unit.SizeSphere < 0.1 * speed then
-                    WARN(string.format("Overriding the size of the collision sphere of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons", tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    WARN(string.format("Overriding the size of the collision sphere of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
                     unit.SizeSphere = 0.1 * speed
                 end
             else
                 if unit.SizeX < 0.1 * speed then
-                    WARN(string.format("Overriding the x axis of collision box of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons", tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    WARN(string.format("Overriding the x axis of collision box of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
                     unit.SizeX = 0.1 * speed
                 end
 
                 if unit.SizeZ < 0.1 * speed then
-                    WARN(string.format("Overriding the z axis of collision box of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons", tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    WARN(string.format("Overriding the z axis of collision box of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
                     unit.SizeZ = 0.1 * speed
                 end
             end
@@ -183,7 +217,7 @@ local function PostProcessUnit(unit)
             unitGeneral.CommandCapsHash = {}
         end
     else
-        unit.General = {CommandCapsHash = {}}
+        unit.General = { CommandCapsHash = {} }
     end
 
     -- Pre-compute various elements
@@ -199,8 +233,103 @@ local function PostProcessUnit(unit)
         end
     end
 
-    unit.Footprint = unit.Footprint or { }
+    unit.Footprint = unit.Footprint or {}
     unit.Footprint.SizeMax = math.max(unit.Footprint.SizeX or 1, unit.Footprint.SizeZ or 1)
+
+    -- Pre-compute intel state
+
+    -- gather data
+    local economyBlueprint = unit.Economy
+    local intelBlueprint = unit.Intel
+    local enhancementBlueprints = unit.Enhancements
+    if intelBlueprint or enhancementBlueprints then
+
+        ---@type UnitIntelStatus
+        local status = {}
+
+        -- life is good, intel is funded by the government
+        local allIntelIsFree = false
+        if intelBlueprint.FreeIntel or (
+            not enhancementBlueprints and
+                (
+                (not economyBlueprint) or
+                    (not economyBlueprint.MaintenanceConsumptionPerSecondEnergy) or
+                    economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
+                )
+            ) then
+            allIntelIsFree = true
+            status.AllIntelMaintenanceFree = {}
+        end
+
+        -- special case: unit has intel that is considered free
+        if intelBlueprint.ActiveIntel then
+            status.AllIntelMaintenanceFree = status.AllIntelMaintenanceFree or {}
+            for intel, _ in intelBlueprint.ActiveIntel do
+                status.AllIntelMaintenanceFree[intel] = true
+            end
+        end
+
+        -- special case: unit has enhancements and therefore can have any intel type
+        if enhancementBlueprints then
+            status.AllIntelFromEnhancements = {}
+        end
+
+        -- usual case: find all remaining intel
+        status.AllIntel = {}
+        for name, value in intelBlueprint do
+
+            if value == true or value > 0 then
+                local intel = BlueprintNameToIntel[name]
+                if intel then
+                    if allIntelIsFree then
+                        status.AllIntelMaintenanceFree[intel] = true
+                    else
+                        status.AllIntel[intel] = true
+                    end
+                end
+            end
+        end
+
+        -- check if we have any intel
+        if not (table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) and not enhancementBlueprints) then
+            -- cache it
+            status.AllIntelDisabledByEvent = {}
+            status.AllIntelRecharging = {}
+            unit.Intel = unit.Intel or {}
+            unit.Intel.State = status
+        end
+    end
+
+    -- Pre-compute use of veterancy
+
+    if (not unit.Weapon[1]) or unit.General.ExcludeFromVeterancy then
+        unit.VetEnabled = false
+    else
+        for index, wep in unit.Weapon do
+            if not LabelToVeterancyUse[wep.Label] then
+                unit.VetEnabled = true
+            end
+        end
+    end
+
+    unit.VetThresholds = {
+        0, 0, 0, 0, 0
+    }
+
+    if unit.VeteranMass then
+        unit.VetThresholds[1] = unit.VeteranMass[1]
+        unit.VetThresholds[2] = unit.VeteranMass[2] + unit.VetThresholds[1]
+        unit.VetThresholds[3] = unit.VeteranMass[3] + unit.VetThresholds[2]
+        unit.VetThresholds[4] = unit.VeteranMass[4] + unit.VetThresholds[3]
+        unit.VetThresholds[5] = unit.VeteranMass[5] + unit.VetThresholds[4]
+    else
+        local multiplier = unit.VeteranMassMult or TechToVetMultipliers[unit.TechCategory] or 2
+        unit.VetThresholds[1] = 1 * multiplier * (unit.Economy.BuildCostMass or 1)
+        unit.VetThresholds[2] = 2 * multiplier * (unit.Economy.BuildCostMass or 1)
+        unit.VetThresholds[3] = 3 * multiplier * (unit.Economy.BuildCostMass or 1)
+        unit.VetThresholds[4] = 4 * multiplier * (unit.Economy.BuildCostMass or 1)
+        unit.VetThresholds[5] = 5 * multiplier * (unit.Economy.BuildCostMass or 1)
+    end
 end
 
 --- Post-processes all units

@@ -1,4 +1,3 @@
----@declare-global
 ----****************************************************************************
 ----**
 ----**  File     :  /lua/sim/buff.lua
@@ -10,8 +9,8 @@
 ----
 ---- Unit.Buffs = {
 ----    Affects = {
-----        <AffectType (Regen/MaxHealth/etc)> = {
-----            BuffName = {
+----        <AffectType> = {
+----            <BuffName> = {
 ----                Count = i,
 ----                Add = X,
 ----                Mult = X,
@@ -19,8 +18,8 @@
 ----        }
 ----    }
 ----    BuffTable = {
-----        <BuffType (LEVEL/CATEGORY)> = {
-----            BuffName = {
+----        <BuffType> = {
+----            <BuffName> = {
 ----                Count = i,
 ----                Trash = trashbag,
 ----            }
@@ -30,69 +29,34 @@
 ---@alias BuffType
 ---| AdjacencyBuffType
 ---| CheatBuffType
----| CommonBuffType
+---| EnhancementBuffType
 ---| OpBuffType
 ---| UniqueBuffType
 ---| VeterancyBuffType
+---@alias BuffName
+---| AdjacencyBuffName
+---| CheatBuffName
+---| EnhancementBuffName
+---| OpBuffName
+---| UniqueBuffName
+---| VeterancyBuffName
 
----@alias CommonBuffType
----| 'BuildRate'
----| 'Damage'
----| 'DamageRadius'
----| 'EnergyActive'
----| 'EnergyWeapon'
----| 'EnergyMaintenance'
----| 'EnergyProduction'
----| 'Health'
----| 'MassActive'
----| 'MassMaintenance'
----| 'MaxHealth'
----| 'MaxRadius'
----| 'MoveMult'
----| 'MassProduction'
----| 'OmniRadius'
----| 'RadarRadius'
----| 'RateOfFire'
----| 'Regen'
----| 'Stun'
----| 'StunAlt'
----| 'VisionRadius'
----| 'WeaponsEnable'
-
--- These are only created when needed
 ---@alias UniqueBuffType
----| 'AeonACUChronoDampener'
----| 'AeonACUT2BuildRate'
----| 'AeonACUT3BuildRate'
----| 'AeonSCUBuildRate'
----| 'AeonSCURegenRate'
----| 'CybranACUCloakBonus'
----| 'CybranACUStealthBonus'
----| 'CybranACUT2BuildRate'
----| 'CybranACUT3BuildRate'
----| 'CybranSCUBuildRate'
----| 'CybranSCUCloakBonus'
----| 'CybranSCURegenerateBonus'
----| 'UEFACUDamageStabilization'
----| 'UEFACUT2BuildRate'
----| 'UEFACUT3BuildRate'
----| 'SelenCloakVisionDebuff'
----| 'SeraphimACUDamageStabilization'
----| 'SeraphimACUDamageStabilizationAdv'
----| 'SeraphimACUAdvancedRegenAura'
----| 'SeraphimACUAdvancedRegenAuraSelfBuff'
----| 'SeraphimACURegenAura'
----| 'SeraphimACURegenAuraSelfBuff'
----| 'SeraphimACUT2BuildRate'
----| 'SeraphimACUT3BuildRate'
----| 'SeraphimSCUDamageStabilization'
----| 'SeraphimSCUBuildRate'
+---| SelenBuffType
+---@alias UniqueBuffName
+---| SelenBuffName
 
---Function to apply a buff to a unit.
---This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.
+
+----------
+--- Total refactor upcoming
+----------
+
+
+--- Function to apply a buff to a unit. This function is a fire-and-forget. 
+--- Apply this and it'll be applied over time if there is a duration.
 ---@param unit Unit
----@param buffName string
----@param instigator Unit
+---@param buffName BuffName
+---@param instigator? Unit
 function ApplyBuff(unit, buffName, instigator)
 
     -- do not buff dead units
@@ -220,16 +184,16 @@ end
 ---@param buffName string
 ---@param instigator Unit
 function BuffWorkThread(unit, buffName, instigator)
-    local buffTable = Buffs[buffName]
+    local buffDef = Buffs[buffName]
 
     --Non-Pulsing Buff
-    local totPulses = buffTable.DurationPulse
+    local totPulses = buffDef.DurationPulse
 
     if not totPulses then
-        WaitSeconds(buffTable.Duration)
+        WaitSeconds(buffDef.Duration)
     else
         local pulse = 0
-        local pulseTime = buffTable.Duration / totPulses
+        local pulseTime = buffDef.Duration / totPulses
 
         while pulse <= totPulses and not unit.Dead do
             WaitSeconds(pulseTime)
@@ -241,13 +205,14 @@ function BuffWorkThread(unit, buffName, instigator)
     RemoveBuff(unit, buffName)
 end
 
---Function to affect the unit.  Everytime you want to affect a new part of unit, add it in here.
---afterRemove is a bool that defines if this buff is affecting after the removal of a buff.
---We reaffect the unit to make sure that buff type is recalculated accurately without the buff that was on the unit.
---However, this doesn't work for stunned units because it's a fire-and-forget type buff, not a fire-and-keep-track-of type buff.
+-- Function to affect the unit. Every time you want to affect a new part of unit, add it in here.
+-- afterRemove is a bool that defines if this buff is affecting after the removal of a buff.
+-- We reaffect the unit to make sure that buff type is recalculated accurately without the buff
+-- that was on the unit. However, this doesn't work for stunned units because it's a fire-and-forget
+-- type buff, not a fire-and-keep-track-of type buff.
 BuffEffects = {
 
-    Stun = function(buffDefinition, buffValues, unit, buffName, instigator, afterRemove) -- most dont use the last two args, so most don't have them. This is fine.
+    Stun = function(buffDef, buffValues, unit, buffName, instigator, afterRemove) -- most dont use the last two args, so most don't have them. This is fine.
         if unit.ImmuneToStun or afterRemove then return end
         unit:SetStunned(buffDef.Duration or 1, instigator)
         if unit.Anims then
@@ -259,7 +224,8 @@ BuffEffects = {
 
     --- Quite confident that this one is broken
     Health = function(buffDefinition, buffValues, unit, buffName, instigator)
-        --Note: With health we don't actually look at the unit's table because it's an instant happening.  We don't want to overcalculate something as pliable as health.
+        -- Note: With health we don't actually look at the unit's table because it's an instant
+        -- happening. We don't want to overcalculate something as pliable as health.
         local health = unit:GetHealth()
         local val = ((buffDefinition.Affects.Health.Add or 0) + health) * (buffDefinition.Affects.Health.Mult or 1)
         local healthadj = val - health
@@ -681,8 +647,8 @@ end
 --Removes buffs
 ---@param unit Unit
 ---@param buffName string
----@param removeAllCounts boolean
----@param instigator Unit
+---@param removeAllCounts? boolean
+---@param instigator? Unit
 function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     local def = Buffs[buffName]
     local unitBuff = unit.Buffs.BuffTable[def.BuffType][buffName]

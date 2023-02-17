@@ -8,7 +8,7 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 TAARailgun01 = ClassProjectile(import("/lua/terranprojectiles.lua").TRailGunProjectile) {
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 }
 
 TypeClass = TAARailgun01

@@ -71,6 +71,10 @@ UnitBlueprint {
             '<LOC ability_upgradable>Upgradeable',
         },
         AnimationUpgrade = '/units/uab0103/uab0103_aopen.sca',
+        AnimationUpgradeTable = {
+            uab0203 = '/units/uab0103/UAB0103_Aopen.sca',
+            zab9503 = '/units/uab0103/UAB0103_Aopen_sup.sca',
+        },
         BuildAttachBone = 'Attachpoint01',
         IdleEffects = {
             Water = {

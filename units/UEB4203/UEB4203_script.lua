@@ -12,7 +12,7 @@ local TRadarJammerUnit = import("/lua/terranunits.lua").TRadarJammerUnit
 
 ---@class UEB4203 : TRadarJammerUnit
 UEB4203 = ClassUnit(TRadarJammerUnit) {
-    IntelEffects = {
+	IntelEffects = {
 		{
 			Bones = {
 				'UEB4203',

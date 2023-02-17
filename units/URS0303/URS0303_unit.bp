@@ -120,13 +120,6 @@ UnitBlueprint {
                 },
             },
         },
-        MotionAdjustment = {
-            Sliderlanding = 0.5,
-            Sliderstatic = -8,
-            Yoffsetinmotion = 0.5,
-            Yoffsetlanding = -0.375,
-            slideinmotion = 0.5,
-        },
         MovementEffects = {
             Water = {
                 Effects = {

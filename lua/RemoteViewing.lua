@@ -118,24 +118,24 @@ function RemoteViewing(SuperClass)
             end
         end,
 
-        OnIntelEnabled = function(self)
+        OnIntelEnabled = function(self, intel)
             -- Make sure the button is only calculated once rather than once per possible intel type
             if not self.RemoteViewingData.IntelButton then
                 self.RemoteViewingData.IntelButton = true
                 self.RemoteViewingData.DisableCounter = self.RemoteViewingData.DisableCounter - 1
                 self:CreateVisibleEntity()
             end
-            SuperClass.OnIntelEnabled(self)
+            SuperClass.OnIntelEnabled(self, intel)
         end,
 
-        OnIntelDisabled = function(self)
+        OnIntelDisabled = function(self, intel)
             -- make sure button is only calculated once rather than once per possible intel type
             if self.RemoteViewingData.IntelButton then
                 self.RemoteViewingData.IntelButton = false
                 self.RemoteViewingData.DisableCounter = self.RemoteViewingData.DisableCounter + 1
                 self:DisableVisibleEntity()
             end
-            SuperClass.OnIntelDisabled(self)
+            SuperClass.OnIntelDisabled(self, intel)
         end,
 
         DisableResourceMonitor = function(self)

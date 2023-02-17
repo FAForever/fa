@@ -99,12 +99,6 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     end,
 
     DestroyRollOffEffects = function(self)
-        if self.ReleaseEffectsBag then 
-            for _, v in self.ReleaseEffectsBag do
-                v:Destroy()
-            end
-            self.ReleaseEffectsBag = {}
-        end
     end,
 
     RollOffUnit = function(self)
@@ -569,8 +563,8 @@ STransportBeaconUnit = ClassUnit(DefaultUnitsFile.TransportBeaconUnit) {}
 SWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 -- WALL  STRUCTURES
----@class SWallStrutureUnit : WallStructureUnit
-SWallStructureUnit = ClassUnit(DefaultUnitsFile.WallStructureUnit) {}
+---@class SWallStructureUnit : WallStructureUnit
+SWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES
 ---@class SCivilianStructureUnit : SStructureUnit

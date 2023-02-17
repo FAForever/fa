@@ -77,8 +77,8 @@ local TableGetn = table.getn
 ---@field EnergyExcessThread thread
 ---@field EnergyExcessUnitsEnabled table<EntityId, MassFabricationUnit>
 ---@field EnergyExcessUnitsDisabled table<EntityId, MassFabricationUnit>
----@field EnergyDependingUnits Shield[]
----@field EnergyDependingUnitsHead number
+---@field EnergyDependingUnits table<EntityId, Unit | Shield>
+---@field EnergyDepleted boolean
 ---@field EconomyTicksMonitor number
 ---@field HasPlatoonList boolean
 ---@field HQs table<HqFaction, table<HqLayer, table<HqTech, number>>>
@@ -102,7 +102,7 @@ local TableGetn = table.getn
 ---@field Trash TrashBag
 ---@field TriggerList table
 ---@field UnitBuiltTriggerList table
----@field UnitStats table<UnitId, table<string, number>>
+---@field UnitStats table<EntityId, table<string, number>>
 ---@field VeterancyTriggerList table
 AIBrain = Class(moho.aibrain_methods) {
     -- The state of the brain in the match
@@ -136,7 +136,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@param unitId UnitId
+    ---@param unitId EntityId
     ---@param statName string
     ---@param value number
     SetUnitStat = function(self, unitId, statName, value)
@@ -148,7 +148,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
-    ---@param unitId UnitId
+    ---@param unitId EntityId
     ---@param statName string
     ---@return number
     GetUnitStat = function(self, unitId, statName)
@@ -246,6 +246,23 @@ AIBrain = Class(moho.aibrain_methods) {
         self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
     end,
 
+    --- Completely re evaluates the support factory restrictions of the engi mod
+    ---@param self AIBrain
+    ReEvaluateHQSupportFactoryRestrictions = function (self)
+        local layers = { "AIR", "LAND", "NAVAL" }
+        local factions = { "UEF", "AEON", "CYBRAN", "SERAPHIM" }
+
+        if categories.NOMADS then
+            table.insert(factions, 'NOMADS')
+        end
+
+        for _, faction in factions do
+            for _, layer in layers do
+                self:SetHQSupportFactoryRestrictions(faction, layer)
+            end
+        end
+    end,
+
     --- Manages the support factory restrictions of the engi mod
     ---@param self AIBrain
     ---@param faction HqFaction
@@ -260,13 +277,13 @@ AIBrain = Class(moho.aibrain_methods) {
         AddBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
 
         -- lift t2 / t3 support factory restrictions
-        if self.HQs[faction][layer]["TECH3"] > 0 then 
+        if self.HQs[faction][layer]["TECH3"] > 0 then
             RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
             RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
         end
 
         -- lift t2 support factory restrictions
-        if self.HQs[faction][layer]["TECH2"] > 0 then 
+        if self.HQs[faction][layer]["TECH2"] > 0 then
             RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
         end
     end,
@@ -307,9 +324,7 @@ AIBrain = Class(moho.aibrain_methods) {
         -- add initial trigger and assume we're not depleted
         self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
         self.EnergyDepleted = false 
-        self.EnergyDependingUnits = { }
-        self.EnergyDependingUnits.__mode = 'v'
-        self.EnergyDependingUnitsHead = 1
+        self.EnergyDependingUnits = setmetatable({ }, { __mode = 'v' })
 
         --- Units that we toggle on / off depending on whether we have excess energy
         self.EnergyExcessConsumed = 0
@@ -412,9 +427,6 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Place resource structures down
             for k, v in resourceStructures do
                 local unit = self:CreateResourceBuildingNearest(v, posX, posY)
-                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
-                    unit:CreateTarmac(true, true, true, false, false)
-                end
             end
         end
 
@@ -422,9 +434,6 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Place initial units down
             for k, v in initialUnits do
                 local unit = self:CreateUnitNearSpot(v, posX, posY)
-                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
-                    unit:CreateTarmac(true, true, true, false, false)
-                end
             end
         end
 
@@ -653,44 +662,38 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
     ---@param self AIBrain
-    ---@param entity Shield
+    ---@param entity Unit | Shield
     AddEnergyDependingEntity = function(self, entity)
-        self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity 
-        self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
+        self.EnergyDependingUnits[entity.EntityId] = entity
+
+        -- guarantee callback when entity is depleted
+        if self.EnergyDepleted then
+            entity:OnEnergyDepleted()
+        end
     end,
 
     ---@param self AIBrain
     ---@param triggerName string
     OnEnergyTrigger = function(self, triggerName)
-        if triggerName == "EnergyDepleted" then 
+        if triggerName == "EnergyDepleted" then
             -- add trigger when we can recover units
             self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyViable', 'GreaterThanOrEqual', 0.1)
-            self.EnergyDepleted = true 
+            self.EnergyDepleted = true
 
             -- recurse over the list of units and do callbacks accordingly
-            local index = 1 
-            for k = 1, self.EnergyDependingUnitsHead - 1 do 
-                local entity = self.EnergyDependingUnits[k]
-
-                if not entity:BeenDestroyed() then 
-                    self.EnergyDependingUnits[index] = entity 
-                    index = index + 1
+            for id, entity in self.EnergyDependingUnits do
+                if not IsDestroyed(entity) then 
                     entity:OnEnergyDepleted()
                 end
             end
         else 
             -- add trigger when we're depleted
             self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
-            self.EnergyDepleted = false 
+            self.EnergyDepleted = false
 
             -- recurse over the list of units and do callbacks accordingly
-            local index = 1 
-            for k = 1, self.EnergyDependingUnitsHead - 1 do 
-                local entity = self.EnergyDependingUnits[k]
-
-                if entity and not entity:BeenDestroyed() then 
-                    self.EnergyDependingUnits[index] = entity 
-                    index = index + 1
+            for id, entity in self.EnergyDependingUnits do
+                if not IsDestroyed(entity) then
                     entity:OnEnergyViable()
                 end
             end
@@ -752,8 +755,8 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param reconType ReconTypes
     ---@param val boolean
     OnIntelChange = function(self, blip, reconType, val)
-        if reconType == 'LOSNow' or reconType == 'Omni' then
-            if not val then
+        if not val then
+            if reconType == 'LOSNow' or reconType == 'Omni' then
                 local unit = blip:GetSource()
                 if unit.Blueprint.Intel.JammerBlips > 0 then
                     unit.ResetJammer = self.JammerResetTime
@@ -1310,7 +1313,7 @@ AIBrain = Class(moho.aibrain_methods) {
         if trash then
             trash:Destroy()
         end
-    end;
+    end,
 
     ---@param self AIBrain
     IsDefeated = function(self)
@@ -1322,7 +1325,7 @@ AIBrain = Class(moho.aibrain_methods) {
     RecallAllCommanders = function(self)
         local commandCat = categories.COMMAND + categories.SUBCOMMANDER
         self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false))
-    end;
+    end,
 
     ---@param self AIBrain
     ---@param recallingUnits Unit[]
@@ -1331,7 +1334,7 @@ AIBrain = Class(moho.aibrain_methods) {
             import("/lua/scenarioframework.lua").FakeTeleportUnits(recallingUnits, true)
         end
         self:OnRecalled()
-    end;
+    end,
 
     ---@param self AIBrain
     ---@param bestPlan string
@@ -2719,7 +2722,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param loc Vector
     ---@param radius number
     ---@param locType string
-    ---@param useCenterPoint boolean
+    ---@param useCenterPoint? boolean
     ---@return boolean
     PBMAddBuildLocation = function(self, loc, radius, locType, useCenterPoint)
         if not radius or not loc or not locType then

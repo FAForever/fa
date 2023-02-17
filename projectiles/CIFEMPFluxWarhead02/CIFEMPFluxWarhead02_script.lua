@@ -41,7 +41,7 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
         CreateDecal(self:GetPosition(), RandomFloat(0,2*math.pi), 'nuke_scorch_001_albedo', '', 'Albedo', 28, 28, 500, 0, self.Army)
 
         -- Emitter Effects
-        self.Trash:Add(ForkThread(self.EmitterEffectsThread, self.Plumeproj))
+        self.Trash:Add(ForkThread(self.EmitterEffectsThread, self, self.Plumeproj))
     end,
 
     EmitterEffectsThread = function(self, plume)

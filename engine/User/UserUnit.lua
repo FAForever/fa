@@ -115,8 +115,6 @@ end
 function UserUnit:GetShieldRatio()
 end
 
--- TODO was the UserUnit.GetStat method also binary patched?
-
 ---
 ---@generic T
 ---@param name string
@@ -187,9 +185,8 @@ end
 function UserUnit:IsStunned()
 end
 
----
----@param command string
----@param value string
+---@param command 'SetAutoMode' | 'SetFireState' | 'SetAutoSurfaceMode' | 'SetRepeatQueue' | 'SetPaused' | 'CustomName' | 'ToggleScriptBit' | 'PlayNoStagingPlatformsVO' | 'PlayBusyStagingPlatformsVO' 
+---@param value boolean | string
 function UserUnit:ProcessInfo(command, value)
 end
 

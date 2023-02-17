@@ -113,6 +113,7 @@ URS0201 = ClassUnit(CSeaUnit) {
     OnKilled = function(self, instigator, type, overkillRatio)
         self.Trash:Destroy()
         self.Trash = TrashBag()
+        -- TODO: don't change the entire blueprint's death animation to make this work
         if self.Layer ~= 'Water' and not self.IsWaiting then
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.LandAnimationDeath
         else

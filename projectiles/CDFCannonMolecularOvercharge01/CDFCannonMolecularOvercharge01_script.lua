@@ -14,13 +14,13 @@ CDFCannonMolecular01 = ClassProjectile(CMolecularCannonProjectile, OverchargePro
     FxImpactLand = EffectTemplate.CCommanderOverchargeHit01,
 
     OnImpact = function(self, targetType, targetEntity)
-        OverchargeProjectile.OnImpact(self, targetType, targetEntity)
         CMolecularCannonProjectile.OnImpact(self, targetType, targetEntity)
+        OverchargeProjectile.OnImpact(self, targetType, targetEntity)
     end,
     
     OnCreate = function(self)
-        OverchargeProjectile.OnCreate(self)
         CMolecularCannonProjectile.OnCreate(self)
+        OverchargeProjectile.OnCreate(self)
     end,
 }
 

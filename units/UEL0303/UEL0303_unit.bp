@@ -57,8 +57,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 2600,
-        MaxHealth = 2600,
+        Health = 2400,
+        MaxHealth = 2400,
         RegenRate = 0,
         Shield = {
             ImpactEffects = 'UEFShieldHit01',
@@ -157,7 +157,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 5250,
         BuildCostMass = 480,
-        BuildTime = 2160,
+        BuildTime = 2400,
         MaintenanceConsumptionPerSecondEnergy = 25,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,

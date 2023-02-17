@@ -14,13 +14,13 @@ TDFOverCharge01 = ClassProjectile(ALaserBotProjectile, OverchargeProjectile) {
     FxImpactLand = EffectTemplate.ACommanderOverchargeHit01,
 
     OnImpact = function(self, targetType, targetEntity)
-        OverchargeProjectile.OnImpact(self, targetType, targetEntity)
         ALaserBotProjectile.OnImpact(self, targetType, targetEntity)
+        OverchargeProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
     OnCreate = function(self)
-        OverchargeProjectile.OnCreate(self)
         ALaserBotProjectile.OnCreate(self)
+        OverchargeProjectile.OnCreate(self)
     end,
 }
 TypeClass = TDFOverCharge01

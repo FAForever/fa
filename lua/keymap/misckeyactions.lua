@@ -375,6 +375,10 @@ function CreateTemplateFactory()
     import("/lua/ui/templates_factory.lua").CreateBuildTemplate(currentCommandQueue)
 end
 
+--- Creates a sim callback to set the priorities of the selected units
+---@param prioritiesString string A string of categories
+---@param name string Name of the priority set, used when printing on screen
+---@param exclusive boolean ??
 function SetWeaponPriorities(prioritiesString, name, exclusive)
     local priotable
     if type(prioritiesString) == 'string' then
@@ -388,6 +392,76 @@ function SetWeaponPriorities(prioritiesString, name, exclusive)
     end
 
     SimCallback({Func = 'WeaponPriorities', Args = {SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }})
+end
+
+--- Sets selected units to target the unit (and similar units) that is hovered over
+function SetWeaponPrioritiesToUnitType()
+    local info = GetRolloverInfo()
+    if info and info.blueprintId ~= "unknown" then
+
+        local bpId = info.blueprintId
+        local text = LOC(__blueprints[bpId].General.UnitName)
+        if not text then
+            text = LOC(__blueprints[bpId].Interface.HelpText)
+        end
+
+        SetWeaponPriorities(findPriority(bpId), text, false)
+    end
+end
+
+--- Sets selected units to their default target priority
+function SetDefaultWeaponPriorities()
+    SetWeaponPriorities(0, "Default", false)
+end
+
+local categoriesToCheck = {
+    ['tech'] = {"TECH1", "TECH2", "TECH3", "EXPERIMENTAL", 'COMMAND'},
+    ['faction'] = {"CYBRAN", "UEF", "AEON", "SERAPHIM"},
+    ['type'] = {"FACTORY", 'SCOUT', "DIRECTFIRE", 'INDIRECTFIRE', 'DEFENSE', "ANTIAIR", 'TRANSPORTATION', "ENGINEER",},
+    ['layer'] = {"NAVAL", "AIR", "LAND", "STRUCTURE"},
+}
+
+--- Creates a target priority that includes the tech, faction, type, and layer of a unit
+---@param bpId string The ID of the unit which is to be targetted
+function findPriority(bpID)
+
+    local bp = __blueprints[bpID]
+    if bp then
+
+        local categories = bp.CategoriesHash
+        local tech, faction, unitType, layer
+
+        for _, c in categoriesToCheck['tech'] do
+            if categories[c] then tech = c end
+        end
+
+        for _, c in categoriesToCheck['faction'] do
+            if categories[c] then faction = c end
+        end
+
+        for _, c in categoriesToCheck['type'] do
+            if categories[c] then unitType = c end
+        end
+
+        for _, c in categoriesToCheck['layer'] do
+            if categories[c] then layer = c end
+        end
+
+        if not (tech and faction and unitType and layer) then
+            return string.format("{categories.%s}", bpID)
+        end
+
+        local a = string.format("categories.%s * categories.%s * categories.%s * categories.%s", tech, faction, unitType, layer)
+        local b = string.format("categories.%s * categories.%s * categories.%s", tech, unitType, layer)
+        local c = string.format("categories.%s * categories.%s", unitType, layer)
+        local d = string.format("categories.%s", layer)
+
+        local priorities = string.format("{categories.%s, %s, %s, %s, %s}", bpID, a, b, c, d)
+        return priorities
+    else
+        -- go to defaults, not sure what happened here but unit id is unknown
+        return nil
+    end
 end
 
 function RecheckTargetsOfWeapons()
@@ -449,16 +523,29 @@ function SelectHighestEngineerAndAssist()
     end
 end
 
-function LoadIntoTransports()
-
-    local selection = GetSelectedUnits()
-    if selection then
-
-        local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
-        local others = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
-        if transports[1] and others[1] then
-            SimCallback({Func= 'LoadIntoTransports', Args = { }}, true)
-            SelectUnits(transports)
-        end
+local hardMoveEnabled = false
+function ToggleHardMove()
+    ---@type WorldView
+    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    if hardMoveEnabled then
+        import('/lua/ui/game/commandmode.lua').RestoreCommandMode()
+        view:SetDefaultSelectTolerance()
+        view:DefaultCursor()
+        hardMoveEnabled = false
+    else
+        import('/lua/ui/game/commandmode.lua').CacheAndClearCommandMode()
+        view:SetIgnoreSelectTolerance()
+        view:OverrideCursor('RULEUCC_Move')
+        hardMoveEnabled = true
     end
 end
+
+-- untoggle hard move when we have no units selected
+import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
+    function(selectionInfo)
+        if hardMoveEnabled and table.getn(selectionInfo.newSelection) == 0 then
+            ToggleHardMove()
+        end
+    end,
+    'KeyActionHardMove'
+)

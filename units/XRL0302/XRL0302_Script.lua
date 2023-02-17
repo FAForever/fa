@@ -12,7 +12,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 --- A unique death weapon for the Fire Beetle
-local DeathWeaponKamikaze = ClassUnit(Weapon) {
+local DeathWeaponKamikaze = ClassWeapon(Weapon) {
     OnFire = function(self)
         -- do regular death weapon of unit if we didn't already
         if not self.unit.Dead then 
@@ -22,7 +22,7 @@ local DeathWeaponKamikaze = ClassUnit(Weapon) {
 }
 
 --- A unique death weapon for the Fire Beetle
-local DeathWeaponEMP = ClassUnit(Weapon) {
+local DeathWeaponEMP = ClassWeapon(Weapon) {
 
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
@@ -95,7 +95,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
 
         self.EffectsBagXRL = TrashBag()
         self.AmbientExhaustEffectsBagXRL = TrashBag()
-        self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
+        self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBagXRL)
         self.PeriodicFXThread = self:ForkThread(self.EmitPeriodicEffects)
     end,
 

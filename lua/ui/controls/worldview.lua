@@ -167,7 +167,6 @@ local orderToCursorCallback = {
 
     -- orders that have use of a cursors
     RULEUCC_Move = 'OnCursorMove',
-    RULEUCC_MoveAlt = 'OnCursorMoveAlt',
     RULEUCC_Guard = 'OnCursorGuard',
     RULEUCC_Repair = 'OnCursorRepair',
     RULEUCC_Attack = 'OnCursorAttack',
@@ -207,6 +206,7 @@ local orderToCursorCallback = {
 ---@field CursorTrash TrashBag
 ---@field CursorLastEvent any
 ---@field CursorLastIdentifier CommandCap
+---@field CursorOverride CommandCap
 ---@field CursorDecals UserDecal[]
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
@@ -236,7 +236,20 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         --- Flag that indicates whether the cursor is over the world (instead of the UI)
         self.CursorOverWorld = false
 
+        self.CursorOverride = false
+
         self.Trash = TrashBag()
+    end,
+
+    ---@param self WorldView
+    ---@param command CommandCap
+    OverrideCursor = function(self, command)
+        self.CursorOverride = command
+    end,
+
+    ---@param self WorldView
+    DefaultCursor = function(self)
+        self.CursorOverride = false
     end,
 
     --- Sets the selection tolerance to ignore everything
@@ -244,7 +257,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     SetIgnoreSelectTolerance = function(self)
         local tolerance = -1000
         if tolerance != self.SelectionTolerance then
-            LOG('Tolerance set to: ' .. tolerance)
+            -- LOG('Tolerance set to: ' .. tolerance)
             ConExecute(string.format("ui_SelectTolerance %i", tolerance))
             self.SelectionTolerance = tolerance
         end
@@ -261,7 +274,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
 
         if tolerance != self.SelectionTolerance then
-            LOG('Tolerance set to: ' .. tolerance)
+            -- LOG('Tolerance set to: ' .. tolerance)
             ConExecute(string.format("ui_SelectTolerance %i", tolerance))
             self.SelectionTolerance = tolerance
         end
@@ -273,7 +286,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         local tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_reclaim')
 
         if tolerance != self.SelectionTolerance then
-            LOG('Tolerance set to: ' .. tolerance)
+            -- LOG('Tolerance set to: ' .. tolerance)
             ConExecute(string.format("ui_SelectTolerance %i", tolerance))
             self.SelectionTolerance = tolerance
         end
@@ -325,6 +338,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         if IsKeyDown(KeyCodeAlt) and selection then
             order = 'RULEUCC_AttackAlt'
 
+        elseif self.CursorOverride then
+            order = self.CursorOverride
+
         -- usual order structure
         else
             -- 1. command mode
@@ -363,9 +379,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- attempt to create a new cursor
         if event and self[event] then
             self[event](self, identifier, true, event ~= self.CursorLastEvent)
-            if (event ~= self.CursorLastEvent) then
-                LOG(event)
-            end
+            -- if (event ~= self.CursorLastEvent) then
+            --     LOG(event)
+            -- end
         else
             self:OnCursorReset(identifier, true, event ~= self.CursorLastEvent)
         end
@@ -463,27 +479,6 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
             end
         else
             self:EnableIgnoreMode(false)
-        end
-    end,
-
-    --- Called when we hold control
-    ---@param self WorldView
-    ---@param identifier 'RULEUCC_MoveAlt'
-    ---@param enabled boolean
-    ---@param changed boolean
-    OnCursorMoveAlt = function(self, identifier, enabled, changed)
-        if enabled then
-            if changed then
-                local cursor = self.Cursor
-                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('RULEUCC_Move')
-                self:ApplyCursor()
-
-                self:EnableIgnoreMode(true)
-                CommandMode.CacheAndClearCommandMode()
-            end
-        else
-            self:EnableIgnoreMode(false)
-            CommandMode.RestoreCommandMode()
         end
     end,
 

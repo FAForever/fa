@@ -41,16 +41,16 @@ AFactoryUnit = ClassUnit(FactoryUnit) {
         -- When factory is paused take some action
         if self:IsUnitState('Building') and self.UnitBeingBuilt then
             self:StopUnitAmbientSound('ConstructLoop')
-            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            FactoryUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
-        StructureUnit.OnPaused(self)
+        FactoryUnit.OnPaused(self)
     end,
 
     ---@param self AFactoryUnit
     OnUnpaused = function(self)
         FactoryUnit.OnUnpaused(self)
         if self:IsUnitState('Building') and self.UnitBeingBuilt then
-            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            FactoryUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
         end
     end,
@@ -308,8 +308,8 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     end,
 
     ---@param self ARadarJammerUnit
-    OnIntelEnabled = function(self)
-        RadarJammerUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        RadarJammerUnit.OnIntelEnabled(self, intel)
         if self.OpenAnim then
             self.OpenAnim:SetRate(1)
         end
@@ -322,8 +322,8 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     end,
 
     ---@param self ARadarJammerUnit
-    OnIntelDisabled = function(self)
-        RadarJammerUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        RadarJammerUnit.OnIntelDisabled(self, intel)
         if self.OpenAnim then
             self.OpenAnim:SetRate(-1)
         end
