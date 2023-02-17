@@ -755,7 +755,6 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param reconType ReconTypes
     ---@param val boolean
     OnIntelChange = function(self, blip, reconType, val)
-        LOG(self.Army)
         if reconType == 'LOSNow' or reconType == 'Omni' then
             if not val then
                 local unit = blip:GetSource()
