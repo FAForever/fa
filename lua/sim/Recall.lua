@@ -5,8 +5,6 @@
 -- import recall parameters
 doscript "/lua/shared/RecallParams.lua"
 
--- TODO: generalize to abstract voting system, decoupled from recall
-
 local SyncAnnouncement = import("/lua/simdiplomacy.lua").SyncAnnouncement
 
 
@@ -41,7 +39,7 @@ function OnArmyChange()
         return
     end
     local teamSize = 0
-    local yes, no = 0, 0
+    local accept, veto = 0, 0
     local votingThreadBrain
     for index, brain in ArmyBrains do
         if IsAlly(focus, index) and not ArmyIsCivilian(index) then
@@ -49,9 +47,9 @@ function OnArmyChange()
             teamSize = teamSize + 1
             if brain.Vote ~= nil then
                 if brain.Vote then
-                    yes = yes + 1
+                    accept = accept + 1
                 else
-                    no = no + 1
+                    veto = veto + 1
                 end
             end
             if brain.recallVotingThread then
@@ -64,9 +62,8 @@ function OnArmyChange()
             StartTime = votingThreadBrain.RecallVoteStartTime,
             Open = VoteTime * 0.1,
             Blocks = teamSize,
-            -- TODO: rename to `Yes` and `No`
-            Accept = yes,
-            Veto = no,
+            Accept = accept,
+            Veto = veto,
             CanVote = GetArmyBrain(focus).Vote ~= nil,
         }
     end
@@ -173,7 +170,7 @@ local function RecallVotingThread(requestingArmy)
 
     local focus = GetFocusArmy()
     if requestingBrain.VoteCancelled then
-        if focus ~= -1 and IsAlly(requestingArmy, focus) then
+        if IsAlly(requestingArmy, focus) then
             SyncCancelRecallVote()
             SyncRecallStatus()
         end
@@ -184,7 +181,7 @@ local function RecallVotingThread(requestingArmy)
     end
 
     local gametick = GetGameTick()
-    local yesVotes = 0
+    local recallAcceptance = 0
     local teammates = 0
     local team = {}
     for index, brain in ArmyBrains do
@@ -192,18 +189,18 @@ local function RecallVotingThread(requestingArmy)
             teammates = teammates + 1
             team[teammates] = brain
             if brain.RecallVote then
-                yesVotes = yesVotes + 1
+                recallAcceptance = recallAcceptance + 1
             end
             brain.RecallVote = nil
             brain.LastRecallVoteTime = gametick
         end
     end
     -- this function is found in the recall params file, for those looking
-    local recallPassed = RecallRequestAccepted(yesVotes, teammates)
-    if focus ~= -1 and IsAlly(focus, requestingArmy) then
-        SyncCloseRecallVote(recallPassed)
+    local recallAccepted = RecallRequestAccepted(recallAcceptance, teammates)
+    if IsAlly(focus, requestingArmy) then
+        SyncCloseRecallVote(recallAccepted)
         -- the recall UI will handle the announcement in this case
-    elseif recallPassed then
+    elseif recallAccepted then
         -- in this case though, we need to handle the announcement
         SyncAnnouncement {
             Action = "recall",
@@ -214,16 +211,16 @@ local function RecallVotingThread(requestingArmy)
     for i = 2, table.getn(team) do
         listTeam = listTeam .. ", " .. team[i].Nickname
     end
-    if recallPassed then
-        SPEW("Recalling team " .. listTeam .. " at the request of " .. requestingBrain.Nickname .. " (vote passed " .. yesVotes .. " to " .. (teammates - yesVotes ) .. ")")
+    if recallAccepted then
+        SPEW("Recalling team " .. listTeam .. " at the request of " .. requestingBrain.Nickname .. " (vote passed " .. recallAcceptance .. " to " .. (teammates - recallAcceptance ) .. ")")
         for _, brain in team do
             brain:RecallAllCommanders()
         end
     else
-        SPEW("Not recalling team " .. listTeam .. " (vote failed " .. yesVotes .. " to " .. (teammates - yesVotes ) .. ")")
+        SPEW("Not recalling team " .. listTeam .. " (vote failed " .. recallAcceptance .. " to " .. (teammates - recallAcceptance ) .. ")")
         requestingBrain.LastRecallRequestTime = gametick
     end
-    if focus ~= -1 and IsAlly(requestingArmy, focus) then
+    if IsAlly(requestingArmy, focus) then
         -- update UI once the cooldown dissipates
         SyncRecallStatus()
     end
@@ -242,7 +239,7 @@ local function ArmyVoteRecall(army, vote, lastVote)
                 local thread = ally.recallVotingThread
                 if thread then
                     -- end voting period
-                    ResumeThread(thread)
+                    coroutine.resume(thread)
                     break
                 end
             end
@@ -270,8 +267,6 @@ local function ArmyRequestRecall(army, teammates)
             SyncOpenRecallVote(teammates + 1, army)
         end
     else
-        -- the bug probably occurs here, or in how observers are handled up to here
-
         -- it's just us; recall our army
         SPEW("Recalling " .. brain.Nickname)
         brain:RecallAllCommanders()
@@ -331,7 +326,7 @@ function SetRecallVote(data)
     else
         -- the player is responding to a recall request; we don't count this against their
         -- individual recall request cooldown
-        SPEW("Army " .. tostring(army) .. " recall vote: " .. (vote and "yes" or "no"))
+        SPEW("Army " .. tostring(army) .. " recall vote: " .. (vote and "accept" or "veto"))
         brain.RecallVote = vote
         ArmyVoteRecall(army, vote, lastVote)
     end
