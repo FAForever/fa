@@ -407,7 +407,11 @@ local function SyncRecallStatusThread()
         end
         -- may be interrupted for various reasons, such as the focus army changing
         -- this will be fine, we'll pick up the proper cooldown reason anyway and loop again
-        WaitTicks(cooldown)
+        if cooldown < 1 then
+            WaitTicks(1)
+        else
+            WaitTicks(cooldown)
+        end
 
         reason, cooldown = ArmyRecallRequestCooldown(GetFocusArmy())
     end

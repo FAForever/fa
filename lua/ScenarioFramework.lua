@@ -939,7 +939,7 @@ function FakeTeleportUnits(units, killUnits)
     IssueStop(units)
     IssueClearCommands(units)
     for _, unit in units do
-        if not unit:IsDestroyed() then
+        if not unit:IsDead() then
             unit.CanBeKilled = false
             unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
             unit:PlayUnitSound('GateCharge')
@@ -950,7 +950,7 @@ function FakeTeleportUnits(units, killUnits)
     WaitSeconds(2)
 
     for _, unit in units do
-        if not unit:IsDestroyed() then
+        if not unit:IsDead() then
             unit:CleanupTeleportChargeEffects()
             unit:PlayTeleportOutEffects()
             unit:PlayUnitSound('GateOut')
@@ -962,7 +962,7 @@ function FakeTeleportUnits(units, killUnits)
 
     if killUnits then
         for _, unit in units do
-            if not unit:IsDestroyed() then
+            if not unit:IsDead() then
                 unit:Destroy()
             else
                 LOG(unit.Blueprint.BlueprintId)
