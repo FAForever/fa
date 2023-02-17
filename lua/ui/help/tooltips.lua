@@ -1749,14 +1749,13 @@ Tooltips = {
         title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
         description = "<LOC tooltipui0731>Your team has had a recall vote too recently.",
     },
-    -- TODO: rename to `dip_recall_request_yes` and `dip_recall_request_no`
     dip_recall_request_accept = {
-        title = "<LOC tooltipui0732>Yes Vote",
-        description = "<LOC tooltipui0733>Vote yes to your team recalling from battle as a defeat.",
+        title = "<LOC tooltipui0732>Accept Recall Request",
+        description = "<LOC tooltipui0733>Accept the request for your team to recall from battle.",
     },
     dip_recall_request_veto = {
-        title = "<LOC tooltipui0734>No Vote",
-        description = "<LOC tooltipui0735>Vote no to your team recalling from battle as a defeat.",
+        title = "<LOC tooltipui0734>Veto Recall Request",
+        description = "<LOC tooltipui0735>Veto the request for your team to recall from battle.",
     },
     dip_give_units = {
         title = "<LOC tooltipui0465>Give Units",

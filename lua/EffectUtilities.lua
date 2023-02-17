@@ -939,7 +939,7 @@ end
 ---@param unit Unit
 ---@param teleDest Vector
 ---@param effectsBag TrashBag
----@param teleDelay? number
+---@param teleDelay number
 function PlayTeleportChargingEffects(unit, teleDest, effectsBag, teleDelay)
     -- Plays teleport effects for the given unit
     if not unit then

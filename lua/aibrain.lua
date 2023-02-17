@@ -884,18 +884,9 @@ AIBrain = Class(moho.aibrain_methods) {
     SetResult = function(self, result)
     end,
 
-    -- TODO: put repeated code from `OnDefeat` and `OnRecalled` in one place
-
     ---@param self AIBrain
     OnDefeat = function(self)
         self.Status = 'Defeat'
-
-        for _, ally in ArmyBrains do
-            if IsAlly(self.Army, ally.Army) and ally.recallVotingThread then
-                ally.VoteCancelled = true
-                ResumeThread(ally.recallVotingThread)
-            end
-        end
 
         import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
         import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
@@ -1301,9 +1292,9 @@ AIBrain = Class(moho.aibrain_methods) {
             TransferUnitsToHighestBrain(enemies)
         end
 
-        -- Kill all units left over
-        local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-        if tokill then
+       -- Kill all units left over
+       local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+       if tokill then
             for _, unit in tokill do
                 unit:Kill()
             end

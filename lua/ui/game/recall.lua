@@ -67,9 +67,9 @@ function RequestHandler(data)
     if data.Open then
         panel:StartVote(data.Blocks, data.Open, data.CanVote, data.StartTime)
     end
-    local yes, no = data.Accept, data.Veto -- TODO: rename to `Yes` and `No`
-    if yes or no then
-        panel:AddVotes(yes, no)
+    local accept, veto = data.Accept, data.Veto
+    if accept or veto then
+        panel:AddVotes(accept, veto)
     end
     if data.Close ~= nil then
         panel:CloseVote(data.Close)
@@ -89,9 +89,8 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
         self.collapseArrow = UIUtil.CreateCollapseArrow(parent, "t")
         self.label = UIUtil.CreateText(self, "<LOC diplomacy_0018>Ready for recall", 18, UIUtil.bodyFont, true)
         self.votes = Group(self)
-        -- TODO: rename to `buttonYes` and `buttonNo`
-        self.buttonAccept = UIUtil.CreateButtonStd(self, "/widgets02/small", "<LOC diplomacy_0016>Yes", 16)
-        self.buttonVeto = UIUtil.CreateButtonStd(self, "/widgets02/small", "<LOC diplomacy_0017>No", 16)
+        self.buttonAccept = UIUtil.CreateButtonStd(self, "/widgets02/small", "<LOC diplomacy_0016>Accept", 16)
+        self.buttonVeto = UIUtil.CreateButtonStd(self, "/widgets02/small", "<LOC diplomacy_0017>Veto", 16)
         self.progressBarBG = UIUtil.CreateBitmapColor(self, "Gray")
         self.progressBar = UIUtil.CreateBitmapColor(self.progressBarBG, "Yellow")
 
@@ -129,12 +128,12 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
             end)
             :End()
 
-        local buttonYes = Layouter(self.buttonAccept)
+        local buttonAccept = Layouter(self.buttonAccept)
             :AtLeftIn(self, 8)
             :AnchorToBottom(votes, 5)
             :End()
 
-        local buttonNo = Layouter(self.buttonVeto)
+        local buttonVeto = Layouter(self.buttonVeto)
             :AtRightIn(self, 8)
             :AnchorToBottom(votes, 5)
             :End()
@@ -154,9 +153,8 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
             :End()
 
         Tooltip.AddCheckboxTooltip(collapseArrow, "voting_collapse")
-        -- TODO: rename to `dip_recall_request_yes` and `dip_recall_request_no`
-        Tooltip.AddButtonTooltip(buttonYes, "dip_recall_request_accept")
-        Tooltip.AddButtonTooltip(buttonNo, "dip_recall_request_veto")
+        Tooltip.AddButtonTooltip(buttonAccept, "dip_recall_request_accept")
+        Tooltip.AddButtonTooltip(buttonVeto, "dip_recall_request_veto")
     end;
 
     LayoutBlocks = function(self, blocks)
@@ -262,15 +260,15 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
     end;
 
     SetCanVote = function(self, canVote)
-        local buttonYes = self.buttonAccept
-        local buttonNo = self.buttonVeto
+        local buttonAccept = self.buttonAccept
+        local buttonVeto = self.buttonVeto
         self.canVote:Set(canVote)
         if canVote then
-            buttonYes:Show()
-            buttonNo:Show()
+            buttonAccept:Show()
+            buttonVeto:Show()
         else
-            buttonYes:Hide()
-            buttonNo:Hide()
+            buttonAccept:Hide()
+            buttonVeto:Hide()
         end
     end;
 
@@ -314,7 +312,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
         self:OnResultsReviewed()
     end;
 
-    CloseVote = function(self, passed)
+    CloseVote = function(self, accepted)
         self:SetCanVote(false)
         self.startTime:Set(-9999) -- make sure the OnFrame animation ends
         if self.reviewResultsThread then
@@ -329,7 +327,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
                 self.reviewResultsThread = nil
             end, self)
         end
-        if passed then
+        if accepted then
             self:OnVoteAccepted()
         else
             self:OnVoteVetoed()
@@ -355,7 +353,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
             for _ = 1, accept do
                 local vote = votes[index]
                 index = index + 1
-                vote.cast = "yes"
+                vote.cast = "accept"
                 SetTextures(vote, "/game/recall-panel/recall-accept")
             end
         end
@@ -363,7 +361,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
             for _ = 1, veto do
                 local vote = votes[index]
                 index = index + 1
-                vote.cast = "no"
+                vote.cast = "veto"
                 SetTextures(vote, "/game/recall-panel/recall-veto")
             end
         end
@@ -421,12 +419,12 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
     end;
 
     OnVoteAccepted = function(self)
-        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC("<LOC diplomacy_0021>The recall vote passed."))
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC("<LOC diplomacy_0021>The recall vote was accepted."))
         self.label:SetText(LOC("<LOC diplomacy_0023>Recalling..."))
     end;
 
     OnVoteVetoed = function(self)
-        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC("<LOC diplomacy_0022>The recall vote did not pass."))
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC("<LOC diplomacy_0022>The recall vote was vetoed."))
         self.label:SetText(LOC("<LOC diplomacy_0024>Not ready for recall"))
     end;
 

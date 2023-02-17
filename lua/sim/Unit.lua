@@ -4186,7 +4186,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param location Vector
     ---@param orientation Quaternion
-    ---@param teleDelay? number
+    ---@param teleDelay number
     PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
         self.TeleportFxBag = self.TeleportFxBag or TrashBag()
         EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
