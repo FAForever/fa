@@ -53,8 +53,9 @@ function CreateDefaultBuildBeams(builder, unitBeingBuilt, buildEffectBones, buil
 
     -- reset the state of the projectile
     ProjectileSetVelocity(beamEndBuilder, 0)
-    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
-    TrashBagAdd(buildEffectsBag,  CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/sparks_08_emit.bp'))
+    TrashBagAdd(buildEffectsBag,
+        CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
+    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/sparks_08_emit.bp'))
 
     vc[1], vc[2], vc[3] = ox, oy, oz
     Warp(beamEndBuilder, vc)
@@ -62,12 +63,14 @@ function CreateDefaultBuildBeams(builder, unitBeingBuilt, buildEffectBones, buil
     -- create build beams
     if buildEffectBones ~= nil then
         for _, buildBone in buildEffectBones do
-            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, buildBone, beamEndBuilder, -1, army, '/effects/emitters/build_beam_01_emit.bp'))
+            TrashBagAdd(buildEffectsBag,
+                AttachBeamEntityToEntity(builder, buildBone, beamEndBuilder, -1, army,
+                    '/effects/emitters/build_beam_01_emit.bp'))
         end
     end
 
     local waitTime = Random(8, 15)
-    local waitTimeInv =  10 / waitTime
+    local waitTimeInv = 10 / waitTime
     while not (EntityBeenDestroyed(builder) or EntityBeenDestroyed(unitBeingBuilt)) do
         local x, y, z = builder.GetRandomOffset(unitBeingBuilt, 1)
         local px, py, pz = EntityGetPositionXYZ(beamEndBuilder)
@@ -77,14 +80,14 @@ function CreateDefaultBuildBeams(builder, unitBeingBuilt, buildEffectBones, buil
     end
 end
 
---- Creates the slice beams that UEF engineers use to build UEF units 
+--- Creates the slice beams that UEF engineers use to build UEF units
 ---@param builder Unit The builder
 ---@param unitBeingBuilt Unit The unit being build
 ---@param buildEffectBones string[] The effect bones of the builder
 ---@param buildEffectsBag TrashBag The effects bag of the builder
 function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
     WaitTicks(1)
-    
+
     -- store as locals for performance
     local UnitGetFractionComplete = UnitGetFractionComplete
     local ProjectileSetVelocity = ProjectileSetVelocity
@@ -96,21 +99,27 @@ function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, buildEffectBones, bui
     -- create a projectile for the end of build effect and warp it to the unit
     local beamEndBuilder = builder.UEFBuildProjectile
     if not beamEndBuilder then
-        beamEndBuilder = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
+        beamEndBuilder = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0
+            , nil, nil, nil)
         builder.UEFBuildProjectile = beamEndBuilder
         TrashBagAdd(builder.Trash, beamEndBuilder)
     end
 
     -- reset the state of the projectile
     ProjectileSetVelocity(beamEndBuilder, 0)
-    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
-    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_sparks_blue_01_emit.bp'))
+    TrashBagAdd(buildEffectsBag,
+        CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
+    TrashBagAdd(buildEffectsBag,
+        CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_sparks_blue_01_emit.bp'))
 
     -- add the build beam between the build bones and the projectile
     if buildEffectBones ~= nil then
         for _, BuildBone in buildEffectBones do
-            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, BuildBone, beamEndBuilder, -1, army, '/effects/emitters/build_beam_01_emit.bp'))
-            TrashBagAdd(buildEffectsBag, CreateAttachedEmitter(builder, BuildBone, army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+            TrashBagAdd(buildEffectsBag,
+                AttachBeamEntityToEntity(builder, BuildBone, beamEndBuilder, -1, army,
+                    '/effects/emitters/build_beam_01_emit.bp'))
+            TrashBagAdd(buildEffectsBag,
+                CreateAttachedEmitter(builder, BuildBone, army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
         end
     end
 
@@ -177,7 +186,7 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, onBeingBuiltEffectsBag)
     end
 
     -- create the build cube
-    local buildBaseEffect = EntityCreateProjectile(unitBeingBuilt, '/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp', 0, 0, 0)
+    local buildBaseEffect = EntityCreateProjectile(unitBeingBuilt,'/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp', 0, 0, 0)
     TrashBagAdd(onBeingBuiltEffectsBag, buildBaseEffect)
     TrashBagAdd(unitBeingBuilt.Trash, buildBaseEffect)
     -- warp it to the build site
@@ -252,7 +261,9 @@ end
 ---@param buildEffectsBag TrashBag The effects bag of the unit being built
 function CreateUEFUnitBeingBuiltEffects(builder, unitBeingBuilt, buildEffectsBag)
     local buildAttachBone = builder.Blueprint.Display.BuildAttachBone
-    TrashBagAdd(buildEffectsBag, CreateAttachedEmitter(builder, buildAttachBone, builder.Army, '/effects/emitters/uef_mobile_unit_build_01_emit.bp'))
+    TrashBagAdd(buildEffectsBag,
+        CreateAttachedEmitter(builder, buildAttachBone, builder.Army,
+            '/effects/emitters/uef_mobile_unit_build_01_emit.bp'))
 end
 
 --- Creates the commander-like slice beams where two beams originate from the build effect bones instead of one.
@@ -262,7 +273,7 @@ end
 --- @param buildEffectsBag TrashBag The effects bag of the builder
 function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
     WaitTicks(1)
-    
+
     -- localize for optimal access
     local Warp = Warp
     local WaitTicks = WaitTicks
@@ -275,7 +286,8 @@ function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, buildEffectB
     -- create a projectiles for the end of build effect and warp it to the unit
     local beamEndBuilder = builder.UEFBuildProjectile
     if not beamEndBuilder then
-        beamEndBuilder = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
+        beamEndBuilder = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0
+            , nil, nil, nil)
         builder.UEFBuildProjectile = beamEndBuilder
         TrashBagAdd(builder.Trash, beamEndBuilder)
     end
@@ -283,7 +295,8 @@ function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, buildEffectB
     -- second beam for the commander
     local beamEndBuilder2 = builder.UEFBuildProjectile2
     if not beamEndBuilder2 then
-        beamEndBuilder2 = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
+        beamEndBuilder2 = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0
+            , nil, nil, nil)
         builder.UEFBuildProjectile2 = beamEndBuilder2
         TrashBagAdd(builder.Trash, beamEndBuilder2)
     end
@@ -291,17 +304,26 @@ function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, buildEffectB
     -- reset the state of the projectiles
     ProjectileSetVelocity(beamEndBuilder, 0)
     ProjectileSetVelocity(beamEndBuilder2, 0)
-    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
-    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_sparks_blue_01_emit.bp'))
-    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder2, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
-    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder2, army, '/effects/emitters/build_sparks_blue_01_emit.bp'))
+    TrashBagAdd(buildEffectsBag,
+        CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
+    TrashBagAdd(buildEffectsBag,
+        CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_sparks_blue_01_emit.bp'))
+    TrashBagAdd(buildEffectsBag,
+        CreateEmitterOnEntity(beamEndBuilder2, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
+    TrashBagAdd(buildEffectsBag,
+        CreateEmitterOnEntity(beamEndBuilder2, army, '/effects/emitters/build_sparks_blue_01_emit.bp'))
 
     -- add the build beams between the build bones and the projectiles
     if buildEffectBones ~= nil then
         for _, buildBone in buildEffectBones do
-            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, buildBone, beamEndBuilder, -1, army, '/effects/emitters/build_beam_01_emit.bp'))
-            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, buildBone, beamEndBuilder2, -1, army, '/effects/emitters/build_beam_01_emit.bp'))
-            TrashBagAdd(buildEffectsBag, CreateAttachedEmitter(builder, buildBone, army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+            TrashBagAdd(buildEffectsBag,
+                AttachBeamEntityToEntity(builder, buildBone, beamEndBuilder, -1, army,
+                    '/effects/emitters/build_beam_01_emit.bp'))
+            TrashBagAdd(buildEffectsBag,
+                AttachBeamEntityToEntity(builder, buildBone, beamEndBuilder2, -1, army,
+                    '/effects/emitters/build_beam_01_emit.bp'))
+            TrashBagAdd(buildEffectsBag,
+                CreateAttachedEmitter(builder, buildBone, army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
         end
     end
 

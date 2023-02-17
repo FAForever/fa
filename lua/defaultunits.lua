@@ -881,6 +881,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildBoneRotator = CreateRotator(self, self.Blueprint.Display.BuildAttachBone or 0, 'y', 0, 10000)
+        self.BuildBoneRotator:SetPrecedence(1000)
+
         self.Trash:Add(self.BuildBoneRotator)
         self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         self.BuildingUnit = false
@@ -1271,15 +1273,17 @@ FactoryUnit = ClassUnit(StructureUnit) {
     BuildingState = State {
         ---@param self FactoryUnit
         Main = function(self)
+            local bone = self.Blueprint.Display.BuildAttachBone or 0
+            self.UnitBeingBuilt:HideBone(0, true)
             local spin = self:CalculateRollOffPoint()
             self.BuildBoneRotator:SetGoal(spin)
-
-            WaitTicks(1)
-
-            local bone = self.Blueprint.Display.BuildAttachBone or 0
-            self:DetachAll(bone)
             self.UnitBeingBuilt:AttachBoneTo(-2, self, bone)
             self:StartBuildFx(self.UnitBeingBuilt)
+
+            -- prevents a 1-tick rotating visual 'glitch' of 
+            -- unit as attaching and rotator is applied
+            WaitTicks(3)
+            self.UnitBeingBuilt:ShowBone(0, true)
         end,
     },
 
@@ -1692,7 +1696,6 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self SeaFactoryUnit
     CalculateRollOffPoint = function(self)
-
         -- backwards compatible, don't try and fix mods that rely on the old logic
         if not self.Blueprint.Physics.ComputeRollOffPoint then
             return FactoryUnit.CalculateRollOffPoint(self)
