@@ -274,7 +274,7 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
         self:CreateDamageEffects('Left_Leg03_B03', army)
 
-        self:CreateWreckage(0.1)
+        self:CreateWreckage(0)
         self:Destroy()
     end,
 }

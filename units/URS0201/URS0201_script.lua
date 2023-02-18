@@ -152,7 +152,7 @@ URS0201 = ClassUnit(CSeaUnit) {
             if self.PlayDestructionEffects then
                 self:CreateDestructionEffects(self, overkillRatio)
             end
-            self:CreateWreckage(0.1)
+            self:CreateWreckage(0)
             self:Destroy()
         else
             CSeaUnit.DeathThread(self, overkillRatio)
