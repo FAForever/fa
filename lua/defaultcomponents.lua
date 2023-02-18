@@ -493,6 +493,8 @@ TreadComponent = ClassSimple {
     end,
 }
 
+local MathMin = math.min
+
 local VeterancyToTech = {
     TECH1 = 1,
     TECH2 = 2,
@@ -557,6 +559,7 @@ VeterancyComponent = ClassSimple {
     ---@param vector Vector
     ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        amount = MathMin(amount, self:GetMaxHealth())
         self.VetDamageTaken = self.VetDamageTaken + amount
         if instigator and instigator.IsUnit and not IsDestroyed(instigator) then
             local entityId = instigator.EntityId
@@ -564,7 +567,7 @@ VeterancyComponent = ClassSimple {
             local vetDamage = self.VetDamage
 
             vetInstigators[entityId] = instigator
-            vetDamage[entityId] = (vetDamage[entityId] or 0) + math.min(amount, self:GetMaxHealth())
+            vetDamage[entityId] = (vetDamage[entityId] or 0) + amount
         end
     end,
 
@@ -677,6 +680,14 @@ VeterancyComponent = ClassSimple {
         self.Brain:OnBrainUnitVeterancyLevel(self, nextLevel)
     end,
 
+    ---@param self Unit | VeterancyComponent
+    ---@param level number
+    SetVeterancy = function(self, level)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level, 5)] or 0, true)
+    end,
+
     -- kept for backwards compatibility with mods, but should really not be used anymore
 
     ---@deprecated
@@ -699,21 +710,13 @@ VeterancyComponent = ClassSimple {
         self:AddVetExperience(massKilled, noLimit)
     end,
 
-    ---@param self Unit | VeterancyComponent
-    ---@param level number
-    SetVeterancy = function(self, level)
-        self.VetExperience = 0
-        self.VetLevel = 0
-        self:AddVetExperience(self.Blueprint.VetThresholds[math.min(level, 5)] or 0, true)
-    end,
-
     ---@deprecated
     ---@param self Unit | VeterancyComponent
     ---@param level number
     SetVeteranLevel = function(self, level)
         self.VetExperience = 0
         self.VetLevel = 0
-        self:AddVetExperience(self.Blueprint.VetThresholds[math.min(level, 5)] or 0, true)
+        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level, 5)] or 0, true)
     end,
 
     ---@deprecated
