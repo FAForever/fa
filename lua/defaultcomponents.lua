@@ -571,8 +571,6 @@ VeterancyComponent = ClassSimple {
         end
     end,
 
-    --         ArmyBrains[self.Army]:AddUnitStat(unitKilled.UnitId, "kills", 1)
-
     -- Use this to set a veterancy level directly, usually used by a scenario
     ---@param self Unit | VeterancyComponent
     ---@param experience number
