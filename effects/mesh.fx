@@ -9421,6 +9421,25 @@ float4 PBR_AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
     return float4( color, alpha );
 }
 
+float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    float teamColorFactor = 1;
+    float3 color = PBR_Aeon(vertex, teamColorFactor, hiDefShadows).rgb;
+
+    float2 texcoord = vertex.texcoord0.xy * 60;
+    texcoord.x -= vertex.material.x * 0.16;
+    texcoord.y -= vertex.material.x * 0.01;
+    float2 texcoord2 = vertex.texcoord0.xy * 30;
+    texcoord2.x += vertex.material.x * 0.08;
+    texcoord2.y -= vertex.material.x * 0.005;
+    float3 secondary = tex2D( secondarySampler, texcoord );
+    float3 secondary2 = tex2D( secondarySampler, texcoord2 );
+    color += float3(0.2,0.7,1) * (secondary.b + secondary2.g )* (1-albedo.a);
+
+    float alpha = mirrored ? 0.5 : specular.b + ((secondary.b + secondary2.g )* (1-albedo.a))+ glowMinimum;
+    return float4( color, alpha );
+}
+
 float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool hiDefShadows) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth);
@@ -9611,6 +9630,26 @@ technique PBR_Aeon_Navy
 
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_a PBR_AeonPS(true);
+    }
+}
+
+technique PBR_AeonCZAR
+<
+    string abstractTechnique = "PBR_AeonCZAR";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_AeonCZARPS(true);
     }
 }
 
