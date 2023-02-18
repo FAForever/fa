@@ -84,7 +84,7 @@ SyncMeta = {
 }
 
 local cUnit = moho.unit_methods
----@class Unit : moho.unit_methods, IntelComponent
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent
 ---@field Brain AIBrain
 ---@field Blueprint UnitBlueprint
 ---@field Trash TrashBag

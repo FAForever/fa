@@ -438,11 +438,17 @@ function UpdateWindow(info)
             controls.healthBar:Hide()
         end
 
+        -- always hide veterancy stars initially
+        for i = 1, 5 do
+            controls.vetIcons[i]:Hide()
+        end
+
         -- Control the veterancy stars
         if info.entityId then
             local unit = GetUnitById(info.entityId)
             if unit then
                 local blueprint = unit:GetBlueprint()
+
                 if blueprint.VetEnabled then
                     local level = unit:GetStat('VetLevel', 0).Value
                     local experience = unit:GetStat('VetExperience', 0).Value
@@ -454,14 +460,11 @@ function UpdateWindow(info)
                         upperThreshold = blueprint.VetThresholds[level + 1]
                     end
 
-                    -- show / hide stars
+                    -- show stars
                     for i = 1, 5 do
                         if level >= i then
                             controls.vetIcons[i]:Show()
-                            controls.vetIcons[i]:SetTexture(UIUtil.UIFile(Factions.Factions[
-                                Factions.FactionIndexMap[string.lower(bp.General.FactionName)] ].VeteranIcon))
-                        else
-                            controls.vetIcons[i]:Hide()
+                            controls.vetIcons[i]:SetTexture(UIUtil.UIFile(Factions.Factions[Factions.FactionIndexMap[string.lower(bp.General.FactionName)] ].VeteranIcon))
                         end
                     end
 
