@@ -18,7 +18,6 @@ UEB0103 = ClassUnit(TSeaFactoryUnit) {
             self.ArmSlider = CreateSlider(self, 'Right_Arm')
             self.Trash:Add(self.ArmSlider)
         end
-
     end,
 
     MovingArmsThread = function(self)
@@ -39,7 +38,10 @@ UEB0103 = ClassUnit(TSeaFactoryUnit) {
         self.ArmSlider:SetGoal(0, 0, 0)
         self.ArmSlider:SetSpeed(40)
     end,
-
 }
 
 TypeClass = UEB0103
+
+LOG(repru(debug.listcode(UEB0103.StartArmsMoving)))
+LOG(repru(debug.listcode(UEB0103.MovingArmsThread)))
+LOG(repru(debug.listcode(UEB0103.StopArmsMoving)))
