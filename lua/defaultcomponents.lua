@@ -559,7 +559,7 @@ VeterancyComponent = ClassSimple {
     ---@param vector Vector
     ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
-        amount = MathMin(amount, self:GetMaxHealth())
+        amount = MathMin(amount, self:GetHealth())
         self.VetDamageTaken = self.VetDamageTaken + amount
         if instigator and instigator.IsUnit and not IsDestroyed(instigator) then
             local entityId = instigator.EntityId
