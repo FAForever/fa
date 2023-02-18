@@ -9432,7 +9432,7 @@ float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : 
 
     float metallic = saturate((specular.r - 0.02) * 4 - specular.a * 5);
 
-    albedo.rgb *= 1 + metallic; 
+    albedo.rgb *= 1 + metallic;
     // We need to make the dark areas darker
     // Should find something that offers more control over the result
     float x = albedo.r;
