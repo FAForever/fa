@@ -540,7 +540,26 @@ VeterancyComponent = ClassSimple {
     end,
 
     ---@param self VeterancyComponent | Unit
-    OnKilled = function(self, instigator, type, overkillRatio)
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        amount = MathMin(amount, self:GetMaxHealth())
+        self.VetDamageTaken = self.VetDamageTaken + amount
+        if instigator and instigator.IsUnit and not IsDestroyed(instigator) then
+            local entityId = instigator.EntityId
+            local vetInstigators = self.VetInstigators
+            local vetDamage = self.VetDamage
+
+            vetInstigators[entityId] = instigator
+            vetDamage[entityId] = (vetDamage[entityId] or 0) + amount
+        end
+    end,
+
+    --- Disperses the veterancy, expects to be only called once
+    ---@param self VeterancyComponent | Unit
+    VeterancyDispersal = function(self)
         local vetWorth = self:GetFractionComplete() * self:GetTotalMassCost()
         local vetDamage = self.VetDamage
         local vetInstigators = self.VetInstigators
@@ -553,25 +572,7 @@ VeterancyComponent = ClassSimple {
         end
     end,
 
-    ---@param self VeterancyComponent | Unit
-    ---@param instigator Unit
-    ---@param amount number
-    ---@param vector Vector
-    ---@param damageType DamageType
-    DoTakeDamage = function(self, instigator, amount, vector, damageType)
-        amount = MathMin(amount, self:GetHealth())
-        self.VetDamageTaken = self.VetDamageTaken + amount
-        if instigator and instigator.IsUnit and not IsDestroyed(instigator) then
-            local entityId = instigator.EntityId
-            local vetInstigators = self.VetInstigators
-            local vetDamage = self.VetDamage
-
-            vetInstigators[entityId] = instigator
-            vetDamage[entityId] = (vetDamage[entityId] or 0) + amount
-        end
-    end,
-
-    -- Use this to set a veterancy level directly, usually used by a scenario
+    -- Adds experience to a unit
     ---@param self Unit | VeterancyComponent
     ---@param experience number
     ---@param noLimit boolean
@@ -628,6 +629,7 @@ VeterancyComponent = ClassSimple {
         end
     end,
 
+    --- Adds a single level of veterancy
     ---@param self Unit | VeterancyComponent
     AddVetLevel = function(self)
         local blueprint = self.Blueprint
