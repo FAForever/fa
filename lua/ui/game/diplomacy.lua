@@ -42,10 +42,28 @@ function GetCannotRequestRecallReason()
     return CannotRequestRecallReason
 end
 
-function SetCannotRequestRecallReason(canRequest)
-    CannotRequestRecallReason = canRequest
+function SetCannotRequestRecallReason(reason)
+    CannotRequestRecallReason = reason
     if parent then
-        BuildPlayerLines()
+        local button = parent.personalGroup.button
+        local tooltipID
+        if reason then
+            if not button:IsDisabled() then
+                button:Disable()
+                button:EnableHitTest() -- let the tooltip show
+            end
+            tooltipID = "dip_recall_request_dis_" .. reason
+        else
+            if button:IsDisabled() then
+                button:Enable()
+            end
+            tooltipID = "dip_recall_request"
+        end
+        Tooltip.AddButtonTooltip(button, tooltipID)
+        if button.mMouseOver then
+            Tooltip.DestroyMouseoverDisplay()
+            Tooltip.CreateMouseoverDisplay(button, tooltipID, nil, true, nil)
+        end
     end
 end
 
@@ -288,9 +306,7 @@ local function CreateDiplomacyEntry(parent, data, isAlly)
     entry:SetSolidColor('00000000')
     entry.Data = data
 
-    local typeIcon
-    local factionIcon
-    local colorIcon
+    local typeIcon, factionIcon, colorIcon
     if isHuman then
         typeIcon = "/game/options-diplomacy-panel/icon-person"
     else
@@ -440,6 +456,7 @@ function BuildPlayerLines()
 
         if reason then
             recallButton:Disable()
+            recallButton:EnableHitTest() -- let the tooltip show
             Tooltip.AddButtonTooltip(recallButton, "dip_recall_request_dis_" .. reason)
         else
             local function OnAcceptRecall()
@@ -473,7 +490,7 @@ function BuildPlayerLines()
 
         local recallIcon = CreateBitmapStd(recallButton, "/game/recall-panel/icon-recall")
         Layouter(recallIcon)
-            --:DisableHitTest()
+            :DisableHitTest()
             :AtCenterIn(recallButton)
             :Over(recallButton, 5)
         recallButton.label = recallIcon

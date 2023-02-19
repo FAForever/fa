@@ -938,34 +938,36 @@ end
 function FakeTeleportUnits(units, killUnits)
     IssueStop(units)
     IssueClearCommands(units)
+    local buildingUnits = {}
     for _, unit in units do
-        if not unit:IsDead() then
+        if not IsDestroyed(unit) then
             unit.CanBeKilled = false
-            unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
-            unit:PlayUnitSound('GateCharge')
-        else
-            LOG(unit.Blueprint.BlueprintId)
+            -- if an SCU is currently gating in, it's already getting teleport effects
+            if unit:GetFractionComplete() < 1 then
+                buildingUnits[unit] = true
+            else
+                unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
+                unit:PlayUnitSound('GateCharge')
+            end
         end
     end
     WaitSeconds(2)
 
     for _, unit in units do
-        if not unit:IsDead() then
-            unit:CleanupTeleportChargeEffects()
+        if not IsDestroyed(unit) then
+            if not buildingUnits[unit] then
+                unit:CleanupTeleportChargeEffects()
+                unit:PlayUnitSound('GateOut')
+            end
             unit:PlayTeleportOutEffects()
-            unit:PlayUnitSound('GateOut')
-        else
-            LOG(unit.Blueprint.BlueprintId)
         end
     end
     WaitSeconds(1)
 
     if killUnits then
         for _, unit in units do
-            if not unit:IsDead() then
+            if not IsDestroyed(unit) then
                 unit:Destroy()
-            else
-                LOG(unit.Blueprint.BlueprintId)
             end
         end
     end

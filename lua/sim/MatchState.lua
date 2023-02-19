@@ -44,11 +44,13 @@ local function CollectDefeatedBrains(aliveBrains, condition, delay)
 
             -- no critical units alive or finished, brain is defeated
             if not oneCriticalUnitAlive then
+                LOG("Defeated")
                 defeatedBrains[k] = brain
             end
 
         -- no critical units found, brain is defeated
         else
+            LOG("defeated")
             defeatedBrains[k] = brain
         end
 

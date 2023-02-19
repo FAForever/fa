@@ -421,7 +421,7 @@ end
 
 function SyncRecallStatus()
     if UserRecallStatusThread then
-        coroutine.resume(UserRecallStatusThread) -- force update the existing thread
+        ResumeThread(UserRecallStatusThread) -- force update the existing thread
     else
         UserRecallStatusThread = ForkThread(SyncRecallStatusThread)
     end

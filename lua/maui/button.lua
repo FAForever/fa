@@ -65,6 +65,13 @@ Button = ClassUI(Bitmap) {
 
     HandleEvent = function(self, event)
         if self._isDisabled then
+            if not self:IsHitTestDisabled() then
+                if event.Type == 'MouseEnter' then
+                    self.mMouseOver = true
+                elseif event.Type == 'MouseExit' then
+                    self.mMouseOver = false
+                end
+            end
             return true
         end
 
