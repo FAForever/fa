@@ -78,7 +78,6 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- check for terrain orientation
-        local bp = self.Blueprint
         if not (
                 physicsBlueprint.AltitudeToTerrain or
                 physicsBlueprint.StandUpright
@@ -87,8 +86,8 @@ StructureUnit = ClassUnit(Unit) {
             -- rotate structure to match terrain gradient
             local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
                 self:GetPosition(),
-                bp.Footprint.SizeX or physicsBlueprint.SkirtSizeX,
-                bp.Footprint.SizeZ or physicsBlueprint.SkirtSizeZ
+                blueprint.Footprint.SizeX or physicsBlueprint.SkirtSizeX,
+                blueprint.Footprint.SizeZ or physicsBlueprint.SkirtSizeZ
             )
 
             -- do not orientate structures that are on essentially flat ground
@@ -102,7 +101,7 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- create decal below structure
-        if flatten and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
+        if flatten and not self:HasTarmac() and blueprint.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
                 self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
             else
@@ -193,7 +192,6 @@ StructureUnit = ClassUnit(Unit) {
         Unit.OnStartBeingBuilt(self, builder, layer)
 
         -- rotate weaponry towards enemy
-        local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         end
