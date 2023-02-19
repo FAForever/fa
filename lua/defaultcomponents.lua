@@ -690,6 +690,20 @@ VeterancyComponent = ClassSimple {
 
     ---@deprecated
     ---@param self Unit | VeterancyComponent
+    ---@param instigator Unit
+    OnKilledUnit = function (self, unitThatIsDying, experience)
+        if not experience then
+            return
+        end
+
+        if not IsDestroyed(unitThatIsDying) then
+            local vetWorth = unitThatIsDying:GetFractionComplete() * unitThatIsDying:GetTotalMassCost()
+            self:AddVetExperience(vetWorth, false)
+        end
+    end,
+
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
     ---@param massKilled number
     ---@param noLimit boolean
     CalculateVeterancyLevel = function(self, massKilled, noLimit)
@@ -708,6 +722,7 @@ VeterancyComponent = ClassSimple {
         self:AddVetExperience(massKilled, noLimit)
     end,
 
+    ---@see AddVetLevel
     ---@deprecated
     ---@param self Unit | VeterancyComponent
     ---@param level number
