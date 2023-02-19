@@ -31,6 +31,19 @@ function init()
 
     -- setup user recall state notifier in this thread
     SyncRecallStatus()
+
+    ForkThread(function()
+        WaitSeconds(6)
+        while true do
+            WaitSeconds(4)
+
+            SyncCannotRequestRecall("ai")
+
+            WaitSeconds(4)
+
+            SyncCannotRequestRecall(false)
+        end
+    end)
 end
 
 function OnArmyChange()

@@ -49,8 +49,10 @@ function SetCannotRequestRecallReason(reason)
         local tooltipID
         if reason then
             if not button:IsDisabled() then
+                local over = button.mMouseOver
                 button:Disable()
                 button:EnableHitTest() -- let the tooltip show
+                button.mMouseOver = over
             end
             tooltipID = "dip_recall_request_dis_" .. reason
         else
