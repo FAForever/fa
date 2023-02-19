@@ -75,7 +75,7 @@ StructureUnit = ClassUnit(Unit) {
         local flatten = physicsBlueprint.FlattenSkirt
         if flatten then
             self:FlattenSkirt()
-        end
+    end
 
         -- check for terrain orientation
         if not (
@@ -1278,17 +1278,23 @@ FactoryUnit = ClassUnit(StructureUnit) {
     BuildingState = State {
         ---@param self FactoryUnit
         Main = function(self)
-            local bone = self.Blueprint.Display.BuildAttachBone or 0
-            self.UnitBeingBuilt:HideBone(0, true)
+            -- to help prevent a 1-tick rotation on most units
+            local hasEnhancements = self.UnitBeingBuilt.Blueprint.Enhancements
+            if not hasEnhancements then
+                self.UnitBeingBuilt:HideBone(0, true)
+            end
+
             local spin = self:CalculateRollOffPoint()
             self.BuildBoneRotator:SetGoal(spin)
-            self.UnitBeingBuilt:AttachBoneTo(-2, self, bone)
+            self.UnitBeingBuilt:AttachBoneTo(-2, self, self.Blueprint.Display.BuildAttachBone or 0)
             self:StartBuildFx(self.UnitBeingBuilt)
 
-            -- prevents a 1-tick rotating visual 'glitch' of 
-            -- unit as attaching and rotator is applied
+            -- prevents a 1-tick rotating visual 'glitch' of unit
+            -- as it is being attached and the rotator is applied
             WaitTicks(3)
-            self.UnitBeingBuilt:ShowBone(0, true)
+            if not hasEnhancements then
+                self.UnitBeingBuilt:ShowBone(0, true)
+            end
         end,
     },
 
