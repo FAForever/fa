@@ -16,6 +16,8 @@ local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
+local MathAbs = math.abs
+
 local FactionToTarmacIndex = {
     UEF = 1,
     AEON = 2,
@@ -67,35 +69,39 @@ StructureUnit = ClassUnit(Unit) {
         Unit.OnCreate(self)
         self:HideLandBones()
         self.FxBlinkingLightsBag = { }
-        if self.Blueprint.Physics.FlattenSkirt then
+
+        local blueprint = self.Blueprint
+        local physicsBlueprint = blueprint.Physics
+        local flatten = physicsBlueprint.FlattenSkirt
+        if flatten then
             self:FlattenSkirt()
         end
 
         -- check for terrain orientation
-        local bp = self.Blueprint
         if not (
-                bp.Physics.AltitudeToTerrain or
-                bp.Physics.StandUpright
-            ) and self.Layer == 'Land'
+                physicsBlueprint.AltitudeToTerrain or
+                physicsBlueprint.StandUpright
+            ) and (flatten or physicsBlueprint.AlwaysAlignToTerrain)
         then
             -- rotate structure to match terrain gradient
             local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
                 self:GetPosition(),
-                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
-                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+                blueprint.Footprint.SizeX or physicsBlueprint.SkirtSizeX,
+                blueprint.Footprint.SizeZ or physicsBlueprint.SkirtSizeZ
             )
 
-            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
+            -- do not orientate structures that are on essentially flat ground
+            if MathAbs(a1) > 0.02 or MathAbs(a2) > 0.02 then
+                self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
 
-            -- technically obsolete, but as this is part of an integration we don't want to break
-            -- the mod package that it originates from. Originates from the BrewLan mod suite
-            if not bp.Physics.FlattenSkirt then
+                -- technically obsolete, but as this is part of an integration we don't want to break
+                -- the mod package that it originates from. Originates from the BrewLan mod suite
                 self.TerrainSlope = {}
             end
         end
 
         -- create decal below structure
-        if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
+        if flatten and not self:HasTarmac() and blueprint.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
                 self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
             else
@@ -186,7 +192,6 @@ StructureUnit = ClassUnit(Unit) {
         Unit.OnStartBeingBuilt(self, builder, layer)
 
         -- rotate weaponry towards enemy
-        local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         end
@@ -246,7 +251,7 @@ StructureUnit = ClassUnit(Unit) {
         -- hold up one tick to allow upgrades to pass the tarmac bag
         WaitTicks(1)
 
-        -- upgrades pass the tarmac bag, in which case we do nothing
+        -- upgrades pass the tarmac bag, in which case we take ownership and do nothing
         if self:HasTarmac() then
             self.TarmacBag.OwnedByEntity = self.EntityId
             return
