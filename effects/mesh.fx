@@ -9445,8 +9445,9 @@ float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : 
     else
         specular.g = 0.762 * specular.g - 0.014;
     float teamcolorBorder = saturate(mapRange(specular.a, 0.54, 0.6, 0, 1));
-    float dark = specular.r < 0.18 ? 0.7 : 0.0;
-    float darkAreas = saturate(dark - pow(specular.r, 0.6));
+    float darkAreas = 0;
+    if (specular.r < 0.18)
+        darkAreas = saturate(0.7 - pow(specular.r, 0.6));
     float roughness = lerp(specular.g, 0.03, teamcolorBorder);
     roughness = max(roughness, darkAreas);
 
