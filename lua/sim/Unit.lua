@@ -1335,7 +1335,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
-        VeterancyComponent.OnKilled(self, instigator, type, overkillRatio)
+        VeterancyComponent.VeterancyDispersal(self)
         local layer = self.Layer
         self.Dead = true
 
