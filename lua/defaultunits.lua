@@ -253,7 +253,7 @@ StructureUnit = ClassUnit(Unit) {
         -- hold up one tick to allow upgrades to pass the tarmac bag
         WaitTicks(1)
 
-        -- upgrades pass the tarmac bag, in which case we do nothing
+        -- upgrades pass the tarmac bag, in which case we take ownership and do nothing
         if self:HasTarmac() then
             self.TarmacBag.OwnedByEntity = self.EntityId
             return
