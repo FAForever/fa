@@ -9231,13 +9231,16 @@ float4 PBR_PS(
     //////////////////////////////
     // Compute environment light
     //
-    float3 kS = FresnelSchlickRoughness(max(dot(n, v), 0.0), F0, roughness); 
+    float3 kS = FresnelSchlickRoughness(max(dot(n, v), 0.0), F0, roughness);
     kD = float3(1.0, 1.0, 1.0) - kS;
     kD *= 1.0 - metallic;
 
+    // As maps were not created with this shader in mind we get too much ambient lighting in general.
+    // So we need to tune it down, so the darkness of the shadows matches with the terrain.
+    float shadowCorrection = 0.8;
     float3 diffuse = env_irradiance * albedo;
     float3 specular = env_reflection * (kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g);
-    color += (kD * diffuse + specular) * ao;
+    color += (kD * diffuse + specular) * ao * shadowCorrection;
 
     return float4(color, 0);
 }
@@ -9344,7 +9347,7 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
 
     float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount).rgb;
 
-    float emission = specular.b + (pow(specular.a, 2) * 0.1);
+    float emission = specular.b + (pow(specular.a, 2) * 0.13);
     color += emission * albedo;
     float alpha = mirrored ? 0.5 : emission * 0.5;
 
@@ -9456,7 +9459,7 @@ float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : 
 
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, specularAmount).rgb;
 
-    float emission = specular.b + (pow(specular.a, 2) * 0.1);
+    float emission = specular.b + (pow(specular.a, 2) * 0.13);
     color += emission * albedo.rgb;
 
     float2 texcoord = vertex.texcoord0.xy * 60;
@@ -9488,8 +9491,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
     albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 3, pow(metallic, 2.5)), float3(1, 1, 1));
     albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.8, teamColorFactor * specular.a);
 
-    float ao = lerp(0.8, 1, metallic);
-    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, ao);
+    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
 
     float emission = pow(max(specular.b - 0.06, 0.0), 0.5);
     color += emission * albedo;
@@ -9525,7 +9527,8 @@ float4 PBR_Seraphim(
     // Calculate lookup texture for falloff ramp
     float NdotV = saturate(dot( normalize(vertex.viewDirection), normal ));
     float4 fallOff = tex2D( falloffSampler, float2(pow(1 - NdotV, 0.6),vertex.material.x));
-    float3 teamColor = fallOff.a * vertex.color.rgb;
+    NdotV = 2 * pow(NdotV, 6) - 2 * NdotV + 1.5;
+    float3 teamColor = NdotV * vertex.color.rgb;
 	
     // There are also white highlights in the albedo texture in some models
     float3 whiteness = saturate(albedo.rgb - float3 (0.4,0.4,0.4));
@@ -9538,7 +9541,12 @@ float4 PBR_Seraphim(
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows).rgb;
     
     float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness * 2;
-    color = lerp(color, emission, length(emission));
+    color += emission * albedo;
+
+    // Substitute all the computations on pure glowing parts with the
+    // pure brightness texture to get rid of reflections and shadows
+    float mask = saturate(saturate(specular.b * 2) - albedo.a);
+    color = lerp(color, specular.b, mask);
 
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
