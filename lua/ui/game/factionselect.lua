@@ -1,10 +1,10 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
 local factionData = {
     {name = '<LOC _UEF>', icon = '/dialogs/logo-btn/logo-uef', key = 'uef', color = 'ff00d7ff', sound = 'UI_UEF_Rollover'},
@@ -49,7 +49,7 @@ function RequestPlayerFaction()
             GetCursor():Hide()
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Menu_MouseDown'}))
             if Prefs.GetOption('skin_change_on_start') != 'no' then
-                local factions = import('/lua/factions.lua')
+                local factions = import("/lua/factions.lua")
                 if factions.Factions[factions.FactionIndexMap[key]].DefaultSkin then
                     UIUtil.SetCurrentSkin(factions.Factions[factions.FactionIndexMap[key]].DefaultSkin)
                 end

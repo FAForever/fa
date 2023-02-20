@@ -7,9 +7,11 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local AShieldStructureUnit = import('/lua/aeonunits.lua').AShieldStructureUnit
+local AShieldStructureUnit = import("/lua/aeonunits.lua").AShieldStructureUnit
+local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
-UAB4301 = Class(AShieldStructureUnit) {
+---@class UAB4301 : AShieldStructureUnit
+UAB4301 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
     ShieldEffects = {
         '/effects/emitters/aeon_shield_generator_t2_01_emit.bp',
         '/effects/emitters/aeon_shield_generator_t3_02_emit.bp',
@@ -17,13 +19,15 @@ UAB4301 = Class(AShieldStructureUnit) {
         '/effects/emitters/aeon_shield_generator_t3_04_emit.bp',
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AShieldStructureUnit.OnStopBeingBuilt(self, builder, layer)
-        self.ShieldEffectsBag = {}
+    OnCreate = function(self)
+        AShieldStructureUnit.OnCreate(self)
+        ShieldEffectsComponent.OnCreate(self)
     end,
 
     OnShieldEnabled = function(self)
         AShieldStructureUnit.OnShieldEnabled(self)
+        ShieldEffectsComponent.OnShieldEnabled(self)
+
         if not self.OrbManip1 then
             self.OrbManip1 = CreateRotator(self, 'Orb', 'y', nil, 0, 45, -45)
             self.Trash:Add(self.OrbManip1)
@@ -34,19 +38,12 @@ UAB4301 = Class(AShieldStructureUnit) {
             self.Trash:Add(self.OrbManip2)
         end
         self.OrbManip2:SetTargetSpeed(45)
-        if self.ShieldEffectsBag then
-            for k, v in self.ShieldEffectsBag do
-                v:Destroy()
-            end
-            self.ShieldEffectsBag = {}
-        end
-        for k, v in self.ShieldEffects do
-            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 0, self.Army, v))
-        end
     end,
 
     OnShieldDisabled = function(self)
         AShieldStructureUnit.OnShieldDisabled(self)
+        ShieldEffectsComponent.OnShieldDisabled(self)
+
         if self.OrbManip1 then
             self.OrbManip1:SetSpinDown(true)
             self.OrbManip1:SetTargetSpeed(0)
@@ -54,12 +51,6 @@ UAB4301 = Class(AShieldStructureUnit) {
         if self.OrbManip2 then
             self.OrbManip2:SetSpinDown(true)
             self.OrbManip2:SetTargetSpeed(0)
-        end
-        if self.ShieldEffectsBag then
-            for k, v in self.ShieldEffectsBag do
-                v:Destroy()
-            end
-            self.ShieldEffectsBag = {}
         end
     end,
     

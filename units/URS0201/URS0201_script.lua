@@ -5,26 +5,27 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
-local CybranWeapons = import('/lua/cybranweapons.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
+local CybranWeapons = import("/lua/cybranweapons.lua")
 local CAAAutocannon = CybranWeapons.CAAAutocannon
 local CDFProtonCannonWeapon = CybranWeapons.CDFProtonCannonWeapon
-local CANNaniteTorpedoWeapon = import('/lua/cybranweapons.lua').CANNaniteTorpedoWeapon
-local CIFSmartCharge = import('/lua/cybranweapons.lua').CIFSmartCharge
+local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedoWeapon
+local CIFSmartCharge = import("/lua/cybranweapons.lua").CIFSmartCharge
 
-URS0201 = Class(CSeaUnit) {
+---@class URS0201 : CSeaUnit
+URS0201 = ClassUnit(CSeaUnit) {
     SwitchAnims = true,
     Walking = false,
     IsWaiting = false,
 
     Weapons = {
-        ParticleGun = Class(CDFProtonCannonWeapon) {},
-        AAGun = Class(CAAAutocannon) {},
-        TorpedoR = Class(CANNaniteTorpedoWeapon) {},
-        TorpedoL = Class(CANNaniteTorpedoWeapon) {},
-        AntiTorpedoF = Class(CIFSmartCharge) {},
-        AntiTorpedoB = Class(CIFSmartCharge) {},
+        ParticleGun = ClassWeapon(CDFProtonCannonWeapon) {},
+        AAGun = ClassWeapon(CAAAutocannon) {},
+        TorpedoR = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        TorpedoL = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        AntiTorpedoF = ClassWeapon(CIFSmartCharge) {},
+        AntiTorpedoB = ClassWeapon(CIFSmartCharge) {},
     },
 
     OnMotionHorzEventChange = function(self, new, old)
@@ -112,6 +113,7 @@ URS0201 = Class(CSeaUnit) {
     OnKilled = function(self, instigator, type, overkillRatio)
         self.Trash:Destroy()
         self.Trash = TrashBag()
+        -- TODO: don't change the entire blueprint's death animation to make this work
         if self.Layer ~= 'Water' and not self.IsWaiting then
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.LandAnimationDeath
         else
@@ -131,13 +133,13 @@ URS0201 = Class(CSeaUnit) {
             -- Create Initial explosion effects
             if self.ShowUnitDestructionDebris and overkillRatio then
                 if overkillRatio <= 1 then
-                    self.CreateUnitDestructionDebris(self, true, true, false)
+                    self:CreateUnitDestructionDebris(true, true, false)
                 elseif overkillRatio <= 2 then
-                    self.CreateUnitDestructionDebris(self, true, true, false)
+                    self:CreateUnitDestructionDebris(true, true, false)
                 elseif overkillRatio <= 3 then
-                    self.CreateUnitDestructionDebris(self, true, true, true)
+                    self:CreateUnitDestructionDebris(true, true, true)
                 else -- VAPORIZED
-                    self.CreateUnitDestructionDebris(self, true, true, true)
+                    self:CreateUnitDestructionDebris(true, true, true)
                 end
             end
             WaitSeconds(2)

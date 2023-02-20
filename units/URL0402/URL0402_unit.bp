@@ -52,15 +52,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 40,
-            Level3 = 70,
-            Level4 = 95,
-            Level5 = 125,
-        },
-    },
     BuildIconSortPriority = 20,
     Categories = {
         'PRODUCTSC1',
@@ -74,8 +65,6 @@ UnitBlueprint {
         'BOT',
         'DIRECTFIRE',
         'AMPHIBIOUS',
-        'ANTIAIR',
-        'ANTINAVY',
         'NEEDMOBILEBUILD',
         'INTELLIGENCE',
         'COUNTERINTELLIGENCE',
@@ -298,7 +287,7 @@ UnitBlueprint {
     LifeBarOffset = 3.25,
     LifeBarSize = 6,
     Physics = {
-        BackupDistance = 0,
+        BackUpDistance = 0,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,

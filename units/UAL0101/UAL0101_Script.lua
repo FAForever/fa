@@ -8,12 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
-local ADFLaserLightWeapon = import('/lua/aeonweapons.lua').ADFLaserLightWeapon
+local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
+local ADFLaserLightWeapon = import("/lua/aeonweapons.lua").ADFLaserLightWeapon
 
-UAL0101 = Class(AHoverLandUnit) {
+---@class UAL0101 : AHoverLandUnit
+UAL0101 = ClassUnit(AHoverLandUnit) {
     Weapons = {
-        LaserTurret = Class(ADFLaserLightWeapon) {}
+        LaserTurret = ClassWeapon(ADFLaserLightWeapon) {}
     },
 }
 

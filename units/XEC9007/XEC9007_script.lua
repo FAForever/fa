@@ -7,8 +7,9 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TWallStructureUnit = import('/lua/terranunits.lua').TWallStructureUnit
+local TWallStructureUnit = import("/lua/terranunits.lua").TWallStructureUnit
 
-XEC9007 = Class(TWallStructureUnit) {}
+---@class XEC9007 : TWallStructureUnit
+XEC9007 = ClassUnit(TWallStructureUnit) {}
 
 TypeClass = XEC9007

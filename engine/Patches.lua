@@ -1,6 +1,5 @@
 -- Info about exe patches and new lua<->engine functions
 
-
 -- sim version of GetStat(). Awesome function as it already sends a string, integer and unit object to engine +
 -- returns a table with values. This is basically all you need for lua<->engine communication.
 --

@@ -5,13 +5,14 @@
 -- Copyright ? 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CKrilTorpedoLauncherWeapon = import('/lua/cybranweapons.lua').CKrilTorpedoLauncherWeapon
-local utilities = import('/lua/utilities.lua')
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
+local CKrilTorpedoLauncherWeapon = import("/lua/cybranweapons.lua").CKrilTorpedoLauncherWeapon
+local utilities = import("/lua/utilities.lua")
 
-XRB2308 = Class(CStructureUnit) {
+---@class XRB2308 : CStructureUnit
+XRB2308 = ClassUnit(CStructureUnit) {
     Weapons = {
-        Turret01 = Class(CKrilTorpedoLauncherWeapon) {},
+        Turret01 = ClassWeapon(CKrilTorpedoLauncherWeapon) {},
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -85,10 +86,6 @@ XRB2308 = Class(CStructureUnit) {
         local shallSink = true -- This unit should definitely sink, no need to check cats.
 
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
-        self:DestroyAllDamageEffects()
-        self:DestroyIdleEffects()
-        self:DestroyBeamExhaust()
-        self:DestroyAllBuildEffects()
 
         -- BOOM!
         if self.PlayDestructionEffects then
@@ -97,7 +94,7 @@ XRB2308 = Class(CStructureUnit) {
 
         -- Flying bits of metal and whatnot. More bits for more overkill.
         if self.ShowUnitDestructionDebris and overkillRatio then
-            self.CreateUnitDestructionDebris(self, true, true, overkillRatio > 2)
+            self:CreateUnitDestructionDebris(true, true, overkillRatio > 2)
         end
 
         self.DisallowCollisions = true

@@ -1,30 +1,65 @@
+local BlueprintNameToIntel = {
+    Cloak = 'Cloak',
+    CloakField = 'CloakField',
+    CloakFieldRadius = 'CloakField',
+    JammerBlips = 'Jammer',
+    OmniRadius = 'Omni',
 
--- Post process a unit
+    RadarRadius = 'Radar',
+    RadarStealth = 'RadarStealth',
+    RadarStealthField = 'RadarStealthField',
+    RadarStealthFieldRadius = 'RadarStealthField',
+
+    Sonar = 'Sonar',
+    SonarRadius = 'Sonar',
+    SonarStealth = 'SonarStealth',
+    SonarStealthFieldRadius = 'SonarStealthField',
+}
+
+local LabelToVeterancyUse = {
+    ['DeathWeapon'] = true,
+    ['DeathImpact'] = true,
+}
+
+local TechToVetMultipliers = {
+    TECH1 = 2,
+    TECH2 = 1.5,
+    TECH3 = 1.25,
+    SUBCOMMANDER = 2,
+    EXPERIMENTAL = 2,
+    COMMAND = 2,
+}
+
+--- Post process a unit
+---@param unit UnitBlueprint
 local function PostProcessUnit(unit)
+    if table.find(unit.Categories, "SUBCOMMANDER") then
+        table.insert(unit.Categories, "SACU_BEHAVIOR")
+    end
 
-    -- # create hash tables for quick lookup
-
+    -- create hash tables for quick lookup
     unit.CategoriesCount = 0
-    unit.CategoriesHash = { }
-    if unit.Categories then 
+    unit.CategoriesHash = {}
+    if unit.Categories then
         unit.CategoriesCount = table.getn(unit.Categories)
-        for k, category in unit.Categories do 
-            unit.CategoriesHash[category] = true 
+        for k, category in unit.Categories do
+            unit.CategoriesHash[category] = true
         end
     end
 
-    -- # create hash tables for quick lookup
+    unit.CategoriesHash[unit.BlueprintId] = true
 
-    unit.DoNotCollideListCount = 0 
-    unit.DoNotCollideListHash = { }
-    if unit.DoNotCollideList then 
+    -- create hash tables for quick lookup
+    unit.DoNotCollideListCount = 0
+    unit.DoNotCollideListHash = {}
+    if unit.DoNotCollideList then
         unit.DoNotCollideListCount = table.getn(unit.DoNotCollideList)
-        for k, category in unit.DoNotCollideList do 
-            unit.DoNotCollideListHash[category] = true 
+        for _, category in unit.DoNotCollideList do
+            unit.DoNotCollideListHash[category] = true
         end
     end
 
-    -- # sanitize guard scan radius
+    -- sanitize guard scan radius
 
     -- The guard scan radius is used when:
     -- - A unit attack moves, it determines how far the unit remains from its target
@@ -50,61 +85,47 @@ local function PostProcessUnit(unit)
 
     -- do not touch guard scan radius values of engineer-like units, as it is the reason we have
     -- the factory-reclaim-bug that we're keen in keeping that at this point
-    if not isEngineer then 
-
+    if not isEngineer then
         -- guarantee that the table exists
-        unit.AI = unit.AI or { }
+        unit.AI = unit.AI or {}
 
         -- if it is set then we use that - allows us to make adjustments as we see fit
-        if unit.AI.GuardScanRadius == nil then 
-
+        if unit.AI.GuardScanRadius == nil then
             -- structures don't need this value set
-            if isStructure or isDummy then 
+            if isStructure or isDummy then
                 unit.AI.GuardScanRadius = 0
-
-            -- engineers need their factory reclaim bug
-            elseif isEngineer then 
-                unit.AI.GuardScanRadius = 26 -- allows for factory reclaim bug 
-
-            -- mobile units do need this value set
-            else 
+            elseif isEngineer then -- engineers need their factory reclaim bug
+                unit.AI.GuardScanRadius = 26 -- allows for factory reclaim bug
+            else -- mobile units do need this value set
                 -- check if we have a primary weapon that is actually a weapon
                 local primaryWeapon = unit.Weapon[1]
-                if primaryWeapon and not 
-                    (
-                        primaryWeapon.DummyWeapon or 
+                if primaryWeapon and not (
+                    primaryWeapon.DummyWeapon or
                         primaryWeapon.WeaponCategory == 'Death' or
                         primaryWeapon.Label == 'DeathImpact' or
                         primaryWeapon.DisplayName == 'Air Crash'
-                    )
-                then 
-
+                    ) then
                     local isAntiAir = primaryWeapon.RangeCategory == 'UWRC_AntiAir'
                     local maxRadius = primaryWeapon.MaxRadius or 0
 
                     -- land to air units shouldn't get triggered too fast
-                    if isLand and isAntiAir then 
+                    if isLand and isAntiAir then
                         unit.AI.GuardScanRadius = 0.80 * maxRadius
-
-                    -- all other units will have the default value of 10% on top of their maximum attack radius
-                    else
+                    else -- all other units will have the default value of 10% on top of their maximum attack radius
                         unit.AI.GuardScanRadius = 1.10 * maxRadius
                     end
-
-                -- units with no weaponry don't need this value set
-                else 
+                else -- units with no weaponry don't need this value set
                     unit.AI.GuardScanRadius = 0
                 end
 
-
                 -- cap it, some units have extreme values based on their attack radius
-                if isTech1 and unit.AI.GuardScanRadius > 40 then 
-                    unit.AI.GuardScanRadius = 40 
-                elseif isTech2 and unit.AI.GuardScanRadius > 80 then 
+                if isTech1 and unit.AI.GuardScanRadius > 40 then
+                    unit.AI.GuardScanRadius = 40
+                elseif isTech2 and unit.AI.GuardScanRadius > 80 then
                     unit.AI.GuardScanRadius = 80
-                elseif isTech3 and unit.AI.GuardScanRadius > 120 then 
+                elseif isTech3 and unit.AI.GuardScanRadius > 120 then
                     unit.AI.GuardScanRadius = 120
-                elseif isExperimental and unit.AI.GuardScanRadius > 160 then 
+                elseif isExperimental and unit.AI.GuardScanRadius > 160 then
                     unit.AI.GuardScanRadius = 160
                 end
 
@@ -114,56 +135,208 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- # sanitize air unit footprints
+    -- sanitize air unit footprints
 
     -- value used by formations to determine the distance between other air units. Note
     -- that the value must be of type unsigned integer!
-
-    if  isAir and
-        not (
-            isExperimental or
+    if isAir and not (
+        isExperimental or
             isStructure or
-            (isTransport and not isGunship) -- uef tech 2 gunship is also a transport :)
-        ) 
-    then 
-        
-        unit.Footprint = unit.Footprint or { }
+            (isTransport and not isGunship)-- uef tech 2 gunship is also a transport :)
+        ) then
+        unit.Footprint = unit.Footprint or {}
 
         -- determine footprint size based on type
-        if isBomber then 
+        if isBomber then
             unit.Footprint.SizeX = 4
             unit.Footprint.SizeZ = 4
-        elseif isGunship then 
+        elseif isGunship then
             unit.Footprint.SizeX = 3
             unit.Footprint.SizeZ = 3
-        else 
+        else
             unit.Footprint.SizeX = 2
             unit.Footprint.SizeZ = 2
         end
 
         -- limit their footprint size based on tech
-        if isTech1 then 
+        if isTech1 then
             unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 2)
             unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 2)
-        elseif isTech2 then 
+        elseif isTech2 then
             unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 3)
             unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 3)
-        elseif isTech3 then 
+        elseif isTech3 then
             unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 4)
             unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 4)
         end
     end
 
-    -- # Allow naval factories to correct their roll off points, as they are critical for ships not being stuck
-
-    if unit.CategoriesHash['FACTORY'] and unit.CategoriesHash['NAVAL'] then 
+    -- Allow naval factories to correct their roll off points, as they are critical for ships not being stuck
+    if unit.CategoriesHash['FACTORY'] and unit.CategoriesHash['NAVAL'] then
         unit.Physics.CorrectNavalRollOffPoints = true
+    end
+
+    -- Check size of collision boxes
+    if not isDummy then
+        -- find maximum speed
+        local speed = unit.Physics.MaxSpeed
+        if unit.Air and unit.Air.MaxAirspeed then
+            speed = unit.Air.MaxAirspeed
+        end
+
+        -- determine if collision box is fine
+        if speed then
+            if unit.SizeSphere then
+                if unit.SizeSphere < 0.1 * speed then
+                    WARN(string.format("Overriding the size of the collision sphere of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeSphere = 0.1 * speed
+                end
+            else
+                if unit.SizeX < 0.1 * speed then
+                    WARN(string.format("Overriding the x axis of collision box of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeX = 0.1 * speed
+                end
+
+                if unit.SizeZ < 0.1 * speed then
+                    WARN(string.format("Overriding the z axis of collision box of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeZ = 0.1 * speed
+                end
+            end
+        end
+    end
+
+    -- Fix being able to check for command caps
+    local unitGeneral = unit.General
+    if unitGeneral then
+        local commandCaps = unitGeneral.CommandCaps
+        if commandCaps then
+            unitGeneral.CommandCapsHash = table.deepcopy(commandCaps)
+        else
+            unitGeneral.CommandCapsHash = {}
+        end
+    else
+        unit.General = { CommandCapsHash = {} }
+    end
+
+    -- Pre-compute various elements
+    unit.SizeVolume = (unit.SizeX or 1) * (unit.SizeY or 1) * (unit.SizeZ or 1)
+    unit.SizeDamageEffects = 1
+    unit.SizeDamageEffectsScale = 1
+    if unit.SizeVolume > 10 then
+        unit.SizeDamageEffects = 2
+        unit.SizeDamageEffectsScale = 1.5
+        if unit.SizeVolume > 20 then
+            unit.SizeDamageEffects = 3
+            unit.SizeDamageEffectsScale = 2.0
+        end
+    end
+
+    unit.Footprint = unit.Footprint or {}
+    unit.Footprint.SizeMax = math.max(unit.Footprint.SizeX or 1, unit.Footprint.SizeZ or 1)
+
+    -- Pre-compute intel state
+
+    -- gather data
+    local economyBlueprint = unit.Economy
+    local intelBlueprint = unit.Intel
+    local enhancementBlueprints = unit.Enhancements
+    if intelBlueprint or enhancementBlueprints then
+
+        ---@type UnitIntelStatus
+        local status = {}
+
+        -- life is good, intel is funded by the government
+        local allIntelIsFree = false
+        if intelBlueprint.FreeIntel or (
+            not enhancementBlueprints and
+                (
+                (not economyBlueprint) or
+                    (not economyBlueprint.MaintenanceConsumptionPerSecondEnergy) or
+                    economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
+                )
+            ) then
+            allIntelIsFree = true
+            status.AllIntelMaintenanceFree = {}
+        end
+
+        -- special case: unit has intel that is considered free
+        if intelBlueprint.ActiveIntel then
+            status.AllIntelMaintenanceFree = status.AllIntelMaintenanceFree or {}
+            for intel, _ in intelBlueprint.ActiveIntel do
+                status.AllIntelMaintenanceFree[intel] = true
+            end
+        end
+
+        -- special case: unit has enhancements and therefore can have any intel type
+        if enhancementBlueprints then
+            status.AllIntelFromEnhancements = {}
+        end
+
+        -- usual case: find all remaining intel
+        status.AllIntel = {}
+        for name, value in intelBlueprint do
+
+            if value == true or value > 0 then
+                local intel = BlueprintNameToIntel[name]
+                if intel then
+                    if allIntelIsFree then
+                        status.AllIntelMaintenanceFree[intel] = true
+                    else
+                        status.AllIntel[intel] = true
+                    end
+                end
+            end
+        end
+
+        -- check if we have any intel
+        if not (table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) and not enhancementBlueprints) then
+            -- cache it
+            status.AllIntelDisabledByEvent = {}
+            status.AllIntelRecharging = {}
+            unit.Intel = unit.Intel or {}
+            unit.Intel.State = status
+        end
+    end
+
+    -- Pre-compute use of veterancy
+
+    if (not unit.Weapon[1]) or unit.General.ExcludeFromVeterancy then
+        unit.VetEnabled = false
+    else
+        for index, wep in unit.Weapon do
+            if not LabelToVeterancyUse[wep.Label] then
+                unit.VetEnabled = true
+            end
+        end
+    end
+
+    unit.VetThresholds = {
+        0, 0, 0, 0, 0
+    }
+
+    if unit.VeteranMass then
+        unit.VetThresholds[1] = unit.VeteranMass[1]
+        unit.VetThresholds[2] = unit.VeteranMass[2] + unit.VetThresholds[1]
+        unit.VetThresholds[3] = unit.VeteranMass[3] + unit.VetThresholds[2]
+        unit.VetThresholds[4] = unit.VeteranMass[4] + unit.VetThresholds[3]
+        unit.VetThresholds[5] = unit.VeteranMass[5] + unit.VetThresholds[4]
+    else
+        local multiplier = unit.VeteranMassMult or TechToVetMultipliers[unit.TechCategory] or 2
+        unit.VetThresholds[1] = 1 * multiplier * (unit.Economy.BuildCostMass or 1)
+        unit.VetThresholds[2] = 2 * multiplier * (unit.Economy.BuildCostMass or 1)
+        unit.VetThresholds[3] = 3 * multiplier * (unit.Economy.BuildCostMass or 1)
+        unit.VetThresholds[4] = 4 * multiplier * (unit.Economy.BuildCostMass or 1)
+        unit.VetThresholds[5] = 5 * multiplier * (unit.Economy.BuildCostMass or 1)
     end
 end
 
 --- Post-processes all units
+---@param units UnitBlueprint[]
 function PostProcessUnits(units)
-    for k, unit in units do 
+    for _, unit in units do
         PostProcessUnit(unit)
     end
 end

@@ -1,13 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'UEB5102',
-        TargetBones = {
-            'FrontRight_Engine',
-            'FrontLeft_Engine',
-            'BackRight_Engine',
-            'BackLeft_Engine',
-            'XEA0306',
-        },
     },
     Air = {
         AutoLandTime = 1,
@@ -102,15 +95,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 60,
     Categories = {
         'PRODUCTFA',
@@ -133,7 +117,7 @@ UnitBlueprint {
         'BUBBLESHIELDSPILLOVERCHECK',
         'SNIPEMODE',
     },
-    CollisionOffsetY = -1,
+    CollisionOffsetY = -0.1,
     Defense = {
         AirThreatLevel = 18,
         ArmorType = 'Light',
@@ -309,7 +293,7 @@ UnitBlueprint {
     SelectionSizeZ = 4.8,
     SelectionThickness = 0.2,
     SizeX = 3.1,
-    SizeY = 2,
+    SizeY = 1.8,
     SizeZ = 6.8,
     StrategicIconName = 'icon_gunship3_transport',
     StrategicIconSortPriority = 65,

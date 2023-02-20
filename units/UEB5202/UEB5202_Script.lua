@@ -8,9 +8,8 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TAirStagingPlatformUnit = import('/lua/terranunits.lua').TAirStagingPlatformUnit
+local TAirStagingPlatformUnit = import("/lua/terranunits.lua").TAirStagingPlatformUnit
 
-UEB5202 = Class(TAirStagingPlatformUnit) {
-}
-
+---@class UEB5202 : TAirStagingPlatformUnit
+UEB5202 = ClassUnit(TAirStagingPlatformUnit) {}
 TypeClass = UEB5202

@@ -5,68 +5,83 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local Edit = import('/lua/maui/edit.lua').Edit
-local Checkbox = import('/lua/maui/Checkbox.lua').Checkbox
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local Slider = import('/lua/maui/Slider.lua').Slider
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Tabs = import('/lua/ui/game/tabs.lua')
+---@alias DiplomacyActionType "accept" | "break" | "never" | "offer" | "reject"
 
+---@class DiplomacyAction
+---@field Action DiplomacyActionType
+---@field To number army index
+---@field From number army index
+
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local Slider = import("/lua/maui/slider.lua").Slider
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Tabs = import("/lua/ui/game/tabs.lua")
+
+local ScaleNumber = LayoutHelpers.ScaleNumber
+local Layouter = LayoutHelpers.LayoutFor
+local CreateBitmap = UIUtil.CreateBitmap
+local CreateBitmapStd = UIUtil.CreateBitmapStd
+
+---@type Group
 local parent = false
-parent.Items = {}
-
 local shareResources = true
 local alliedVictory = true
 
 local dialogue = false
 local offerQueue = {}
 local drawOffered = false
-local NeverAllyWith = {}
 
-if SessionGetScenarioInfo().Options.TeamLock and SessionGetScenarioInfo().Options.TeamLock == 'locked' then
-    lockTeams = true
+---@type CannotRecallReason
+local CannotRequestRecallReason = false
+
+function GetCannotRequestRecallReason()
+    return CannotRequestRecallReason
+end
+
+function SetCannotRequestRecallReason(canRequest)
+    CannotRequestRecallReason = canRequest
+    if parent then
+        BuildPlayerLines()
+    end
 end
 
 function ActionHandler(actions)
     local armies = GetArmiesTable().armiesTable
     for _, action in actions do
-        if action.Action == 'offer' then
+        local from = armies[action.From].nickname
+        local actionName = action.Action
+        if actionName == 'offer' then
             if not dialogue then
                 dialogue = CreateOfferDialogue(action)
             else
                 table.insert(offerQueue, action)
             end
-        elseif action.Action == 'accept' then
-            Announce(LOCF('<LOC diplomacy_0005>%s accepts your alliance.', armies[action.From].nickname))
-        elseif action.Action == 'reject' then
-            Announce(LOCF('<LOC diplomacy_0006>%s rejects your alliance.', armies[action.From].nickname))
-        elseif action.Action == 'never' then
-            Announce(LOCF('<LOC diplomacy_0007>%s is now ignoring your requests.', armies[action.From].nickname))
-        elseif action.Action == 'break' then
-            Announce(LOCF('<LOC diplomacy_0008>Your alliance with %s has been broken.', armies[action.From].nickname))
+        elseif actionName == 'accept' then
+            Announce(LOC('<LOC diplomacy_0005>%s accepts your alliance.'):format(from))
+        elseif actionName == 'reject' then
+            Announce(LOC('<LOC diplomacy_0006>%s rejects your alliance.'):format(from))
+        elseif actionName == 'never' then
+            Announce(LOC('<LOC diplomacy_0007>%s is now ignoring your requests.'):format(from))
+        elseif actionName == 'break' then
+            Announce(LOC('<LOC diplomacy_0008>Your alliance with %s has been broken.'):format(from))
         end
     end
 end
 
 function AnnouncementHandler(announcements)
+    local armies = GetArmiesTable().armiesTable
     for _, announcement in announcements do
-        local text = false
-        local armies = GetArmiesTable().armiesTable
-        if announcement.Action == 'accept' then
-            text = LOCF('<LOC diplomacy_0009>%s and %s are now allies.', armies[action.From], armies[action.To])
-        elseif announcement.Action == 'break' then
-            text = LOCF('<LOC diplomacy_0010>%s and %s are no longer allies.', armies[action.From], armies[action.To])
-        end
-        if text then
-            Announce(text)
+        local announcementName = announcement.Action
+        if announcementName == "accept" then
+            Announce(LOC('<LOC diplomacy_0009>%s and %s are now allies.'):format(armies[announcement.From].nickname, armies[announcement.To].nickname))
+        elseif announcementName == "break" then
+            Announce(LOC('<LOC diplomacy_0010>%s and %s are no longer allies.'):format(armies[announcement.From].nickname, armies[announcement.To].nickname))
+        elseif announcementName == "recall" then
+            Announce(LOC('<LOC diplomacy_0020>Team %s has recalled from battle.'):format(announcement.Team))
         end
     end
 end
@@ -79,25 +94,45 @@ function Announce(msg)
 end
 
 function CreateOfferDialogue(action)
-    local armies = GetArmiesTable().armiesTable
-    return UIUtil.QuickDialog(GetFrame(0), LOCF("<LOC diplomacy_0004>%s has offered you an alliance.", armies[action.From].nickname),
-        "<LOC _Accept>", function() SendAnswer(action.From, 'accept') end,
-        "<LOC _Reject>", function() SendAnswer(action.From, 'reject') end,
-        "<LOC _Never>", function() SendAnswer(action.From, 'never') end,
-        true, {escapeButton = 2, enterButton = 1, worldCover = false, OnlyWorldCover = true})
+    local from = action.From
+    local army = GetArmiesTable().armiesTable[from].nickname
+    return UIUtil.QuickDialog(
+        GetFrame(0),
+        LOC("<LOC diplomacy_0004>%s has offered you an alliance."):format(army),
+        "<LOC _Accept>", function() SendAnswer(from, 'accept') end,
+        "<LOC _Reject>", function() SendAnswer(from, 'reject') end,
+        "<LOC _Never>",  function() SendAnswer(from, 'never') end,
+        true, {
+            escapeButton = 2,
+            enterButton = 1,
+            worldCover = false,
+            OnlyWorldCover = true,
+        }
+    )
 end
 
 function SendAnswer(army, answer)
-    SimCallback({Func = 'DiplomacyHandler', Args = {Action = answer, From = GetFocusArmy(), To = army}})
+    SimCallback({
+        Func = 'DiplomacyHandler',
+        Args = {
+            Action = answer,
+            From = GetFocusArmy(),
+            To = army,
+        },
+    })
     local i = 1
-    while offerQueue[i] do
-        if offerQueue[i].From == army then
+    local offer = offerQueue[i]
+    while offer do
+        if offer.From == army then
             table.remove(offerQueue, i)
+        else
+            i = i + 1
         end
-        i = i + 1
+        offer = offerQueue[i]
     end
-    if offerQueue[1] then
-        CreateOfferDialogue(offerQueue[1])
+    offer = offerQueue[1]
+    if offer then
+        CreateOfferDialogue(offer)
         table.remove(offerQueue, 1)
     else
         dialogue = false
@@ -117,386 +152,503 @@ function CreateContent(inParent)
     return parent
 end
 
+local function LayoutMajorAlliedEntry(entry, manualShare)
+    local giveUnitBtn = UIUtil.CreateButtonStd(entry,
+        '/dialogs/toggle_btn/toggle-d',
+        '<LOC diplomacy_0011>Units', 12
+    )
+    giveUnitBtn.label:SetFont(UIUtil.bodyFont, 12)
+    LayoutHelpers.Below(giveUnitBtn, entry.factionIcon, -2)
+    LayoutHelpers.AtLeftIn(giveUnitBtn, entry)
+    Tooltip.AddButtonTooltip(giveUnitBtn, 'dip_give_units')
+    entry.giveUnitBtn = giveUnitBtn
+
+    if manualShare == 'none' then
+        giveUnitBtn:Disable()
+    else
+        giveUnitBtn.OnClick = function(self, modifiers)
+            UIUtil.QuickDialog(GetFrame(0),
+                LOC("<LOC unitxfer_0000>Give Selected Units to %s?"):format(entry.Data.nickname),
+                '<LOC _Yes>',
+                function()
+                    local to = entry.Data.armyIndex
+                    if IsKeyDown('Shift') then
+                        IssueCommand("UNITCOMMAND_Script", {TaskName = 'GiveTask', To = to}, false)
+                    else
+                        SimCallback({
+                            Func = "GiveUnitsToPlayer",
+                            Args = {
+                                From = GetFocusArmy(),
+                                To = to,
+                            },
+                        }, true)
+                    end
+                end,
+                '<LOC _No>', nil, nil, nil, nil,
+                {worldCover = false, enterButton = 1, escapeButton = 2}
+            )
+        end
+    end
+
+    local giveResourcesBtn = UIUtil.CreateButtonStd(entry,
+        '/dialogs/toggle_btn/toggle-d',
+        '<LOC diplomacy_0012>Resources', 12
+    )
+    LayoutHelpers.RightOf(giveResourcesBtn, giveUnitBtn)
+    giveResourcesBtn.label:SetFont(UIUtil.bodyFont, 12)
+    Tooltip.AddButtonTooltip(giveResourcesBtn, 'dip_give_resources')
+    entry.giveResourcesBtn = giveResourcesBtn
+
+    giveResourcesBtn.OnClick = function(self, modifiers)
+        CreateShareResourcesDialog(entry)
+    end
+end
+
+local function LayoutAlliedEntry(entry, armyIndex, isHuman, outOfGame, teamsLocked, manualShare)
+    if isHuman and not outOfGame then
+        LayoutMajorAlliedEntry(entry, manualShare)
+    end
+
+    if teamsLocked then
+    else
+        if not outOfGame then
+            local breakBtn = UIUtil.CreateButtonStd(entry,
+                "/dialogs/toggle_btn/toggle-d",
+                "<LOC diplomacy_0013>Break", 12
+            )
+            breakBtn.label:SetFont(UIUtil.bodyFont, 12)
+            LayoutHelpers.Below(breakBtn, entry.factionIcon, -2)
+            LayoutHelpers.AtRightIn(breakBtn, entry)
+            LayoutHelpers.ResetLeft(breakBtn)
+            Tooltip.AddButtonTooltip(breakBtn, "dip_break_alliance")
+            entry.breakBtn = breakBtn
+
+            breakBtn.OnClick = function(self, checked)
+                SimCallback({
+                    Func = "DiplomacyHandler",
+                    Args = {
+                        Action = "break",
+                        From = GetFocusArmy(),
+                        To = armyIndex,
+                    },
+                })
+                ForkThread(function()
+                    WaitSeconds(1)
+                    BuildPlayerLines()
+                end)
+            end
+        end
+    end
+end
+
+local function LayoutEnemyEntry(entry, armyIndex, isHuman, outOfGame, teamsLocked)
+    if isHuman and not teamsLocked and not outOfGame then
+        local offerBtn = UIUtil.CreateButtonStd(entry,
+            '/dialogs/toggle_btn/toggle-d',
+            '<LOC diplomacy_0014>Offer', 12
+        )
+        offerBtn.label:SetFont(UIUtil.bodyFont, 12)
+        LayoutHelpers.AtRightBottomIn(offerBtn, entry)
+        Tooltip.AddButtonTooltip(offerBtn, 'dip_offer_alliance')
+        entry.offerBtn = offerBtn
+
+        offerBtn.OnClick = function(self, checked)
+            self:Disable()
+            SimCallback({
+                Func = 'DiplomacyHandler',
+                Args = {
+                    Action = 'offer',
+                    From = GetFocusArmy(),
+                    To = armyIndex,
+                },
+            })
+        end
+    end
+end
+
+local function CreateDiplomacyEntry(parent, data, isAlly)
+    local sessionOptions = SessionGetScenarioInfo().Options
+    local isHuman = data.human
+    local outOfGame = data.outOfGame
+    local teamsLocked = sessionOptions and sessionOptions.TeamLock == "locked"
+    local manualShare = sessionOptions.ManualUnitShare
+    local armyIndex = data.armyIndex
+
+    local entry = Bitmap(parent)
+    entry.Height:Set(function()
+        local data = entry.Data
+        if (isAlly or isHuman) and not data.outOfGame then
+            return entry.factionIcon.Height() + 12 + ScaleNumber(12)
+        else
+            return entry.factionIcon.Height() + ScaleNumber(4)
+        end
+    end)
+    entry.Width:Set(function() return parent.Width() - 12 end)
+    entry.Depth:Set(function() return parent.Depth() + 10 end)
+    entry:SetSolidColor('00000000')
+    entry.Data = data
+
+    local typeIcon
+    local factionIcon
+    local colorIcon
+    if isHuman then
+        typeIcon = "/game/options-diplomacy-panel/icon-person"
+    else
+        typeIcon = "/game/options-diplomacy-panel/icon-ai"
+    end
+    if outOfGame then
+        factionIcon = "/game/unit-over/icon-skull_bmp.dds"
+        colorIcon = "ff000000"
+    else
+        factionIcon = UIUtil.GetFactionIcon(data.faction)
+        colorIcon = data.color
+    end
+
+    typeIcon = CreateBitmapStd(entry, typeIcon)
+    LayoutHelpers.AtLeftIn(typeIcon, entry)
+    entry.typeIcon = typeIcon
+
+    factionIcon = CreateBitmap(entry, factionIcon)
+    LayoutHelpers.RightOf(factionIcon, typeIcon)
+    LayoutHelpers.AtTopIn(factionIcon, entry)
+    entry.factionIcon = factionIcon
+
+    LayoutHelpers.AtVerticalCenterIn(typeIcon, factionIcon)
+
+    colorIcon = UIUtil.CreateBitmapColor(factionIcon, colorIcon)
+    colorIcon.Depth:Set(function() return factionIcon.Depth() - 1 end)
+    LayoutHelpers.FillParent(colorIcon, factionIcon)
+    entry.color = colorIcon
+
+    local name = UIUtil.CreateText(entry, data.nickname, 16, UIUtil.bodyFont)
+    LayoutHelpers.AtRightIn(name, entry)
+    LayoutHelpers.AnchorToRight(name, factionIcon, 5)
+    LayoutHelpers.AtVerticalCenterIn(name, factionIcon)
+    entry.name = name
+
+    if isAlly then
+        LayoutAlliedEntry(entry, armyIndex, isHuman, outOfGame, teamsLocked, manualShare)
+    else
+        LayoutEnemyEntry(entry, armyIndex, isHuman, outOfGame, teamsLocked)
+    end
+
+    return entry
+end
+
+local function CreatePlayerGroup(parent, panelFilename, titleLoc, titleColor, controls, controlCount, isAlly)
+    local lineFilename = panelFilename .. "-line"
+    local group = UIUtil.CreateVertFillGroup(parent, panelFilename)
+
+    local title = UIUtil.CreateText(group, titleLoc, 18, UIUtil.bodyFont)
+    Layouter(title)
+        :Color(titleColor)
+        :DropShadow(true)
+        :Over(group, 10)
+    title.Left:Set(function() return group.Left() + 8 end)
+    title.Top:Set(function() return group.Top() + 8 end)
+    title.Right:Set(function() return group.Right() - 8 end)
+
+    local entry = CreateDiplomacyEntry(group, controls[1], isAlly)
+    LayoutHelpers.Below(entry, title, 4)
+    local belowEntry = entry
+    local lines = {entry}
+
+    for index = 2, controlCount do
+        local entry = CreateDiplomacyEntry(group, controls[index], isAlly)
+        LayoutHelpers.Below(entry, belowEntry, 4)
+        lines[index] = entry
+
+        local separator = CreateBitmapStd(entry, lineFilename)
+        separator.Left:Set(function() return group.Left() + 6 end)
+        separator.Top:Set(function() return entry.Top() - 4 end)
+        entry.Separator = separator
+
+        belowEntry = entry
+    end
+
+    group.Height:Set(function()
+        return lines[controlCount].Bottom() - title.Top() + 20
+    end)
+    group.title = title
+    group.lines = lines
+
+    return group
+end
+
+
 function BuildPlayerLines()
     local sessionOptions = SessionGetScenarioInfo().Options
-
-    if not table.empty(parent.Items) then
-        for i, _ in parent.Items do
-            local index = i
-            parent.Items[index]:Destroy()
-            parent.Items[index] = nil
-        end
-        if parent.alliedBG then
-            parent.alliedBG:Destroy()
-        end
-        if parent.enemyBG then
-            parent.enemyBG:Destroy()
+    local focusArmy = GetFocusArmy()
+    if focusArmy == -1 then
+        focusArmy = import("/lua/ui/game/gamemain.lua").OriginalFocusArmy
+        if focusArmy == -1 then
+            return
         end
     end
-    local function CreateEntry(data, isAlly)
-        local entry = Bitmap(parent)
-        entry.Depth:Set(function() return parent.Depth() + 10 end)
-        entry:SetSolidColor('00000000')
 
-        entry.typeIcon = Bitmap(entry)
-        LayoutHelpers.AtLeftIn(entry.typeIcon, entry)
-        if data.human then
-            entry.typeIcon:SetTexture(UIUtil.UIFile('/game/options-diplomacy-panel/icon-person_bmp.dds'))
-        else
-            entry.typeIcon:SetTexture(UIUtil.UIFile('/game/options-diplomacy-panel/icon-ai_bmp.dds'))
-        end
-
-        entry.factionIcon = Bitmap(entry)
-        LayoutHelpers.RightOf(entry.factionIcon, entry.typeIcon)
-        LayoutHelpers.AtTopIn(entry.factionIcon, entry, 1)
-        LayoutHelpers.AtVerticalCenterIn(entry.typeIcon, entry.factionIcon)
-
-        entry.color = Bitmap(entry.factionIcon)
-        LayoutHelpers.FillParent(entry.color, entry.factionIcon)
-        entry.color.Depth:Set(function() return entry.factionIcon.Depth() - 1 end)
-
-        if data.outOfGame then
-            entry.factionIcon:SetTexture(UIUtil.UIFile('/game/unit-over/icon-skull_bmp.dds'))
-            entry.color:SetSolidColor('ff000000')
-        else
-            entry.factionIcon:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
-            entry.color:SetSolidColor(data.color)
-        end
-        entry.name = UIUtil.CreateText(entry, data.nickname, 16, UIUtil.bodyFont)
-        entry.name.Right:Set(entry.Right)
-        LayoutHelpers.RightOf(entry.name, entry.factionIcon, 5)
-        LayoutHelpers.AtTopIn(entry.name, entry.factionIcon)
-        entry.name:SetClipToWidth(true)
-
-        entry.Data = data
-        --LOG('Making entry for: ', repr(data))
-        if isAlly then
-            if data.human and not data.outOfGame then
-                entry.giveUnitBtn = UIUtil.CreateButton(entry,
-                    '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-                    '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-                    '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-                    '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-                    '<LOC diplomacy_0011>Units', 12)
-                entry.giveUnitBtn.label:SetFont(UIUtil.bodyFont, 12)
-                LayoutHelpers.Below(entry.giveUnitBtn, entry.factionIcon, -2)
-                LayoutHelpers.AtLeftIn(entry.giveUnitBtn, entry)
-                entry.giveUnitBtn.OnClick = function(self, modifiers)
-                    UIUtil.QuickDialog(GetFrame(0), LOCF("<LOC unitxfer_0000>Give Selected Units to %s?", entry.Data.nickname),
-                        '<LOC _Yes>', function()
-                            local to = entry.Data.armyIndex
-                            if IsKeyDown('Shift') then
-                                IssueCommand("UNITCOMMAND_Script", {TaskName='GiveTask', To=to}, false)
-                            else
-                                SimCallback({Func="GiveUnitsToPlayer", Args={ From=GetFocusArmy(), To=to},} , true)
-                            end
-                        end,
-                        '<LOC _No>', nil, nil, nil, nil, {worldCover = false, enterButton = 1, escapeButton = 2})
-                end
-                Tooltip.AddButtonTooltip(entry.giveUnitBtn, 'dip_give_units')
-
-                if sessionOptions.ManualUnitShare == 'none' then
-                    entry.giveUnitBtn:Disable()
-                end
-
-                entry.giveResourcesBtn = UIUtil.CreateButton(entry,
-                    '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-                    '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-                    '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-                    '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-                    '<LOC diplomacy_0012>Resources', 12)
-                entry.giveResourcesBtn.label:SetFont(UIUtil.bodyFont, 12)
-                LayoutHelpers.RightOf(entry.giveResourcesBtn, entry.giveUnitBtn)
-                entry.giveResourcesBtn.OnClick = function(self, modifiers)
-                    CreateShareResourcesDialog(entry)
-                end
-                Tooltip.AddButtonTooltip(entry.giveResourcesBtn, 'dip_give_resources')
-            end
-
-            if sessionOptions and sessionOptions.TeamLock == "locked" then
-            else
-                if not data.outOfGame then
-                    entry.breakBtn = UIUtil.CreateButton(entry,
-                        '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-                        '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-                        '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-                        '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-                        '<LOC diplomacy_0013>Break', 12)
-                    entry.breakBtn.label:SetFont(UIUtil.bodyFont, 12)
-                    LayoutHelpers.Below(entry.breakBtn, entry.factionIcon, -2)
-                    LayoutHelpers.AtRightIn(entry.breakBtn, entry)
-                    LayoutHelpers.ResetLeft(entry.breakBtn)
-                    entry.breakBtn.OnClick = function(self, checked)
-                        SimCallback({Func = 'DiplomacyHandler', Args = {Action = 'break', From = GetFocusArmy(), To = data.armyIndex}})
-                        ForkThread(function()
-                            WaitSeconds(1)
-                            BuildPlayerLines()
-                        end)
-                    end
-                    Tooltip.AddButtonTooltip(entry.breakBtn, 'dip_break_alliance')
-                end
-            end
-        elseif data.human then
-            if sessionOptions and sessionOptions.TeamLock == "locked" then
-            else
-                if not data.outOfGame then
-                    entry.offerBtn = UIUtil.CreateButton(entry,
-                        '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-                        '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-                        '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-                        '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-                        '<LOC diplomacy_0014>Offer', 12)
-                    entry.offerBtn.label:SetFont(UIUtil.bodyFont, 12)
-                    LayoutHelpers.AtRightIn(entry.offerBtn, entry)
-                    LayoutHelpers.AtBottomIn(entry.offerBtn, entry)
-                    entry.offerBtn.OnClick = function(self, checked)
-                        self:Disable()
-                        SimCallback({Func = 'DiplomacyHandler', Args = {Action = 'offer', From = GetFocusArmy(), To = data.armyIndex}})
-                    end
-                    Tooltip.AddButtonTooltip(entry.offerBtn, 'dip_offer_alliance')
-                end
-            end
-        end
-
-        entry.Height:Set(function()
-                if (isAlly or data.human) and not data.outOfGame then
-                    return LayoutHelpers.ScaleNumber(40)
-                else
-                    return entry.factionIcon.Height() + LayoutHelpers.ScaleNumber(4)
-                end
-            end)
-        entry.Width:Set(function() return parent.Width() - LayoutHelpers.ScaleNumber(20) end)
-
-        return entry
+    local group = parent.personalGroup
+    if group then
+        group:Destroy()
     end
-
-    parent.Items = {}
+    group = parent.alliedGroup
+    if group then
+        group:Destroy()
+    end
+    group = parent.enemyGroup
+    if group then
+        group:Destroy()
+    end
 
     local allyControls = {}
+    local allyCount = 0
     local enemyControls = {}
+    local enemyCount = 0
+    local allHumanGame = true
 
-    local i = 1
     for index, playerInfo in GetArmiesTable().armiesTable do
-        if playerInfo.civilian or index == GetFocusArmy() then continue end
+        if playerInfo.civilian or index == focusArmy then continue end
         playerInfo.armyIndex = index
-        if IsAlly(GetFocusArmy(), index) then
-            table.insert(allyControls, playerInfo)
+        if IsAlly(focusArmy, index) then
+            allyCount = allyCount + 1
+            allyControls[allyCount] = playerInfo
         else
-            table.insert(enemyControls, playerInfo)
+            enemyCount = enemyCount + 1
+            enemyControls[enemyCount] = playerInfo
         end
-        i = i + 1
+        if allHumanGame and not (playerInfo.human or playerInfo.outOfGame) then
+            allHumanGame = false
+        end
     end
 
-    i = 1
-    if not table.empty(allyControls) then
-        parent.Items[i] = UIUtil.CreateText(parent, LOC('<LOC diplomacy_0002>Allies'), 18, UIUtil.bodyFont)
-        parent.Items[i]:SetColor('ff00ff72')
-        parent.Items[i]:SetDropShadow(true)
-        parent.Items[i].Depth:Set(function() return parent.Depth() + 10 end)
-        LayoutHelpers.AtLeftTopIn(parent.Items[i], parent, 8, 10)
+    local belowEntry = parent
 
-        parent.Items[i].srCheck = UIUtil.CreateCheckboxStd(parent.Items[i], '/game/toggle_btn/toggle')
-        parent.Items[i].srCheck.label = Bitmap(parent.Items[i].srCheck, UIUtil.UIFile('/game/toggle_btn/icon-shared-resources_bmp.dds'))
-        parent.Items[i].srCheck.label:DisableHitTest()
-        LayoutHelpers.AtCenterIn(parent.Items[i].srCheck.label, parent.Items[i].srCheck)
-        parent.Items[i].srCheck:SetCheck(shareResources, true)
-        parent.Items[i].srCheck.OnCheck = function(self, checked)
+    local reason = GetCannotRequestRecallReason()
+    if not import("/lua/ui/campaign/campaignmanager.lua").campaignMode and reason ~= "observer" then
+        local personalGroup = CreateBitmapStd(parent, "/game/options-diplomacy-panel/panel-recall")
+        if belowEntry == parent then
+            LayoutHelpers.AtLeftTopIn(personalGroup, belowEntry, 0, 8)
+        else
+            LayoutHelpers.Below(personalGroup, belowEntry, 8)
+        end
+        parent.personalGroup = personalGroup
+
+        local recallButton = UIUtil.CreateButtonStd(personalGroup, "/widgets02/small")
+        Layouter(recallButton)
+            :AtCenterIn(personalGroup)
+            :Over(personalGroup, 5)
+        personalGroup.button = recallButton
+
+        if reason then
+            recallButton:Disable()
+            Tooltip.AddButtonTooltip(recallButton, "dip_recall_request_dis_" .. reason)
+        else
+            local function OnAcceptRecall()
+                SimCallback({
+                    Func = "SetRecallVote",
+                    Args = {
+                        From = GetFocusArmy(),
+                        Vote = true,
+                    },
+                })
+                -- preemptively expect the sim to accept our recall and disable the button so we
+                -- can't possiblely confuse the sim with more than one request
+                -- note that if--for some reason (*ahem* due to a mod maybe)--the sim *doesn't*
+                -- end up accepting it, then we'll be stuck until the sim sends a new update
+                recallButton:Disable()
+                SetCannotRequestRecallReason("active")
+                Tooltip.AddButtonTooltip(recallButton, "dip_recall_request_dis_active")
+                import("/lua/ui/game/tabs.lua").CollapseWindow()
+            end
+            recallButton.OnClick = function(self, modifiers)
+                UIUtil.QuickDialog(GetFrame(0),
+                    "<LOC diplomacy_0019>Are you sure you're ready to recall from battle? This will send a request to your team.",
+                    "<LOC _Yes>",
+                    OnAcceptRecall,
+                    "<LOC _No>", nil, nil, nil, nil,
+                    {worldCover = false, enterButton = 1, escapeButton = 2}
+                )
+            end
+            Tooltip.AddButtonTooltip(recallButton, "dip_recall_request")
+        end
+
+        local recallIcon = CreateBitmapStd(recallButton, "/game/recall-panel/icon-recall")
+        Layouter(recallIcon)
+            --:DisableHitTest()
+            :AtCenterIn(recallButton)
+            :Over(recallButton, 5)
+        recallButton.label = recallIcon
+
+        belowEntry = personalGroup
+    end
+
+    if allyCount > 0 then
+        local allyGroup = CreatePlayerGroup(parent,
+            "/game/options-diplomacy-panel/panel-allies",
+            "<LOC diplomacy_0002>Allies", "ff00ff72",
+            allyControls, allyCount, true
+        )
+        if belowEntry == parent then
+            LayoutHelpers.AtLeftTopIn(allyGroup, belowEntry, 0, 8)
+        else
+            LayoutHelpers.Below(allyGroup, belowEntry, 8)
+        end
+        parent.alliedGroup = allyGroup
+
+        local allyTitle = allyGroup.title
+
+        local srCheck = UIUtil.CreateCheckboxStd(allyTitle, '/game/toggle_btn/toggle')
+        srCheck:SetCheck(shareResources, true)
+        LayoutHelpers.AtRightIn(srCheck, allyTitle)
+        srCheck.Top:Set(function() return allyGroup.Top() + 4 end)
+        Tooltip.AddCheckboxTooltip(srCheck, 'dip_share_resources')
+        allyTitle.srCheck = srCheck
+
+        local icon = CreateBitmapStd(srCheck, "/game/toggle_btn/icon-shared-resources")
+        icon:DisableHitTest()
+        LayoutHelpers.AtCenterIn(icon, srCheck)
+        srCheck.label = icon
+
+        if sessionOptions.TeamLock == "unlocked" then
+            local avCheck = UIUtil.CreateCheckboxStd(allyTitle, "/game/toggle_btn/toggle")
+            avCheck:SetCheck(alliedVictory, true)
+            LayoutHelpers.LeftOf(avCheck, srCheck)
+            Tooltip.AddCheckboxTooltip(avCheck, "dip_allied_victory")
+            allyTitle.avCheck = avCheck
+
+            icon = CreateBitmapStd(avCheck, "/game/toggle_btn/icon-allied-victory")
+            icon:DisableHitTest()
+            LayoutHelpers.AtCenterIn(icon, avCheck)
+            avCheck.label = icon
+
+            avCheck.OnCheck = function(self, checked)
+                alliedVictory = checked
+                SimCallback({
+                    Func = "RequestAlliedVictory",
+                    Args = {
+                        Army = GetFocusArmy(),
+                        Value = checked,
+                    },
+                })
+            end
+        end
+
+        belowEntry = allyGroup._bottom
+
+        srCheck.OnCheck = function(self, checked)
             shareResources = checked
-            SimCallback({  Func = "SetResourceSharing",
-                            Args = { Army = GetFocusArmy(),
-                                     Value = checked,
-                                   }
-                         }
-                       )
-        end
-        Tooltip.AddCheckboxTooltip(parent.Items[i].srCheck, 'dip_share_resources')
-
-        parent.Items[i].avCheck = UIUtil.CreateCheckboxStd(parent.Items[i], '/game/toggle_btn/toggle')
-        parent.Items[i].avCheck.label = Bitmap(parent.Items[i].avCheck, UIUtil.UIFile('/game/toggle_btn/icon-allied-victory_bmp.dds'))
-        parent.Items[i].avCheck.label:DisableHitTest()
-        LayoutHelpers.AtCenterIn(parent.Items[i].avCheck.label, parent.Items[i].avCheck)
-        parent.Items[i].avCheck:SetCheck(alliedVictory, true)
-        parent.Items[i].avCheck.OnCheck = function(self, checked)
-            alliedVictory = checked
-            SimCallback({  Func = "RequestAlliedVictory",
-                            Args = { Army = GetFocusArmy(),
-                                     Value = checked,
-                                   }
-                         }
-                       )
-        end
-        Tooltip.AddCheckboxTooltip(parent.Items[i].avCheck, 'dip_allied_victory')
-
-        LayoutHelpers.AtRightTopIn(parent.Items[i].srCheck, parent, 2, 6)
-        LayoutHelpers.LeftOf(parent.Items[i].avCheck, parent.Items[i].srCheck)
-
-        i = i + 1
-        local lastAllyControl = false
-        for index, info in allyControls do
-            parent.Items[i] = CreateEntry(info, true)
-            LayoutHelpers.Below(parent.Items[i], parent.Items[i-1], 12)
-            if table.getsize(allyControls) ~= index then
-                parent.Items[i].Seperator = Bitmap(parent.Items[i], UIUtil.UIFile('/game/options-diplomacy-panel/line-allies_bmp.dds'))
-                local curI = i
-                LayoutHelpers.AnchorToBottom(parent.Items[i].Seperator, parent.Items[curI], 12)
-                LayoutHelpers.AtHorizontalCenterIn(parent.Items[i].Seperator, parent.Items[i], 2)
-            end
-            lastAllyControl = parent.Items[i]
-            i = i + 1
-        end
-
-        parent.alliedBG = Bitmap(parent, UIUtil.UIFile('/game/options-diplomacy-panel/panel-allies_bmp_t.dds'))
-        LayoutHelpers.AtTopIn(parent.alliedBG, parent, 2)
-        parent.alliedBG.Left:Set(parent.Left)
-
-        parent.alliedBG.bottomBG = Bitmap(parent.alliedBG, UIUtil.UIFile('/game/options-diplomacy-panel/panel-allies_bmp_b.dds'))
-        parent.alliedBG.bottomBG.Depth:Set(parent.alliedBG.Depth)
-        parent.alliedBG.bottomBG.Left:Set(parent.alliedBG.Left)
-        LayoutHelpers.AnchorToBottom(parent.alliedBG.bottomBG, lastAllyControl, 5)
-
-        parent.alliedBG.middleBG = Bitmap(parent.alliedBG, UIUtil.UIFile('/game/options-diplomacy-panel/panel-allies_bmp_m.dds'))
-        parent.alliedBG.middleBG.Depth:Set(parent.alliedBG.Depth)
-        parent.alliedBG.middleBG.Top:Set(parent.alliedBG.Bottom)
-        parent.alliedBG.middleBG.Left:Set(parent.alliedBG.Left)
-        parent.alliedBG.middleBG.Bottom:Set(parent.alliedBG.bottomBG.Top)
-    end
-
-    parent.Items[i] = UIUtil.CreateText(parent, LOC('<LOC diplomacy_0003>Enemies'), 18, UIUtil.bodyFont)
-    parent.Items[i].Depth:Set(function() return parent.Depth() + 10 end)
-    parent.Items[i]:SetDropShadow(true)
-    parent.Items[i]:SetColor('ffff3c00')
-
-    local enemyTitle = parent.Items[i]
-    local lastEnemyControl = false
-
-    if SessionGetScenarioInfo().Options.Ranked then
-        parent.Items[i].odCheck = UIUtil.CreateCheckboxStd(parent.Items[i], '/dialogs/toggle_btn/toggle')
-        parent.Items[i].odCheck.label = UIUtil.CreateText(parent.Items[i].odCheck, LOC('<LOC _Draw>Draw'), 12, UIUtil.bodyFont)
-        LayoutHelpers.AtCenterIn(parent.Items[i].odCheck.label, parent.Items[i].odCheck)
-        Tooltip.AddCheckboxTooltip(parent.Items[i].odCheck, 'dip_offer_draw')
-        parent.Items[i].odCheck:SetCheck(drawOffered, true)
-        parent.Items[i].odCheck.OnCheck = function(self, checked)
-            drawOffered = checked
-            SimCallback({  Func = "SetOfferDraw",
-                            Args = { Army = GetFocusArmy(),
-                                     Value = checked,
-                                   }
-                         }
-                       )
-            local msg = '<LOC diplomacy_0000>has offered a draw.'
-            if not checked then
-                msg = '<LOC diplomacy_0001>has rescinded their draw offer.'
-            end
-            SessionSendChatMessage({to = 'all', ConsoleOutput = msg})
+            SimCallback({
+                Func = "SetResourceSharing",
+                Args = {
+                    Army = GetFocusArmy(),
+                    Value = checked,
+                },
+            })
         end
     end
 
-    if i == 1 then
-        LayoutHelpers.AtLeftTopIn(parent.Items[i], parent, 6, 10)
-        if parent.Items[i].odCheck then
-            LayoutHelpers.AtRightTopIn(parent.Items[i].odCheck, parent, 6, 8)
+    if enemyCount > 0 then
+        local enemyGroup = CreatePlayerGroup(parent,
+            "/game/options-diplomacy-panel/panel-enemy",
+            "<LOC diplomacy_0003>Enemies", "ffff3c00",
+            enemyControls, enemyCount, false
+        )
+        if belowEntry == parent then
+            LayoutHelpers.AtLeftTopIn(enemyGroup, belowEntry, 0, 8)
+        else
+            LayoutHelpers.Below(enemyGroup, belowEntry, 8)
         end
-    else
-        LayoutHelpers.Below(parent.Items[i], parent.Items[i-1], 40)
-        if parent.Items[i].odCheck then
-            LayoutHelpers.AtTopIn(parent.Items[i].odCheck, parent.Items[i])
-            LayoutHelpers.AtRightIn(parent.Items[i].odCheck, parent)
-        end
-    end
-    i = i + 1
-    for index, info in enemyControls do
-        parent.Items[i] = CreateEntry(info)
-        LayoutHelpers.Below(parent.Items[i], parent.Items[i-1], 2)
-        lastEnemyControl = parent.Items[i]
-        if table.getsize(enemyControls) ~= index then
-            parent.Items[i].Seperator = Bitmap(parent.Items[i], UIUtil.UIFile('/game/options-diplomacy-panel/line-enemies_bmp.dds'))
-            parent.Items[i].Seperator.Top:Set(parent.Items[i].Bottom)
-            LayoutHelpers.AtHorizontalCenterIn(parent.Items[i].Seperator, parent.Items[i], 2)
-        end
-        i = i + 1
-    end
+        parent.enemyGroup = enemyGroup
 
-    parent.enemyBG = Bitmap(parent, UIUtil.UIFile('/game/options-diplomacy-panel/panel-enemy_bmp_t.dds'))
-    LayoutHelpers.AtTopIn(parent.enemyBG, enemyTitle, -8)
-    parent.enemyBG.Left:Set(parent.Left)
-    parent.enemyBG.bottomBG = Bitmap(parent.enemyBG, UIUtil.UIFile('/game/options-diplomacy-panel/panel-enemy_bmp_b.dds'))
-    parent.enemyBG.bottomBG.Depth:Set(parent.enemyBG.Depth)
-    parent.enemyBG.bottomBG.Left:Set(parent.enemyBG.Left)
-    parent.enemyBG.middleBG = Bitmap(parent.enemyBG, UIUtil.UIFile('/game/options-diplomacy-panel/panel-enemy_bmp_m.dds'))
-    parent.enemyBG.middleBG.Depth:Set(parent.enemyBG.Depth)
-    parent.enemyBG.middleBG.Top:Set(parent.enemyBG.Bottom)
-    parent.enemyBG.middleBG.Left:Set(parent.enemyBG.Left)
-    parent.enemyBG.middleBG.Bottom:Set(parent.enemyBG.bottomBG.Top)
-    if lastEnemyControl then
-        parent.enemyBG.bottomBG.Top:Set(function() return lastEnemyControl.Bottom() end)
-    else
-        parent.enemyBG.bottomBG.Top:Set(function() return enemyTitle.Bottom() end)
-    end
+        local enemyTitle = enemyGroup.title
 
-    parent.Height:Set(function()
-            local height = 0
-            for i, item in parent.Items do
-                local index = i
-                if i == 1 then
-                    height = item.Height()
-                else
-                    height = height + (item.Bottom() - parent.Items[index-1].Bottom())
+        if allHumanGame then
+            local odCheck = UIUtil.CreateCheckboxStd(enemyTitle, "/dialogs/toggle_btn/toggle")
+            odCheck:SetCheck(drawOffered, true)
+            odCheck.Top:Set(function() return enemyGroup.Top() + 4 end)
+            LayoutHelpers.AtRightIn(odCheck, enemyTitle)
+            Tooltip.AddCheckboxTooltip(odCheck, 'dip_offer_draw')
+            enemyTitle.odCheck = odCheck
+
+            odCheck.label = UIUtil.CreateText(odCheck, "<LOC _Draw>Draw", 12, UIUtil.bodyFont)
+            LayoutHelpers.AtCenterIn(odCheck.label, odCheck)
+
+            odCheck.OnCheck = function(self, checked)
+                drawOffered = checked
+                SimCallback({
+                    Func = "SetOfferDraw",
+                    Args = {
+                        Army = GetFocusArmy(),
+                        Value = checked,
+                    },
+                })
+                local msg = '<LOC diplomacy_0000>has offered a draw.'
+                if not checked then
+                    msg = '<LOC diplomacy_0001>has rescinded their draw offer.'
                 end
+                SessionSendChatMessage({to = 'all', ConsoleOutput = msg})
             end
-            return height + LayoutHelpers.ScaleNumber(10)
-        end)
+        end
+
+        belowEntry = enemyGroup._bottom
+    end
+
+    LayoutHelpers.AtBottomIn(parent, belowEntry, 14)
 end
 
 function CreateShareResourcesDialog(control)
-    if control.giveResourcesGroup then
-        control.giveResourcesGroup:Destroy()
+    local giveResGroup = control.giveResourcesGroup
+    if giveResGroup then
+        giveResGroup:Destroy()
         control.giveResourcesGroup = false
         control.Height:Set(control.OrigHeight)
         control.OrigHeight = nil
     else
         control.OrigHeight = control.Height()
 
-        control.giveResourcesGroup = Group(control)
-        LayoutHelpers.SetHeight(control.giveResourcesGroup, 90)
-        control.giveResourcesGroup.Width:Set(control.Width)
-        LayoutHelpers.AtBottomIn(control.giveResourcesGroup, control)
-        LayoutHelpers.AtLeftIn(control.giveResourcesGroup, control)
+        giveResGroup = Group(control)
+        giveResGroup.Width:Set(control.Width)
+        LayoutHelpers.SetHeight(giveResGroup, 90)
+        LayoutHelpers.AtLeftBottomIn(giveResGroup, control)
+        control.giveResourcesGroup = giveResGroup
 
-        local okBtn = UIUtil.CreateButton(control.giveResourcesGroup,
-            '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-            '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-            '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-            '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-            '<LOC _Ok>', 12)
+        local okBtn = UIUtil.CreateButtonStd(giveResGroup,
+            '/dialogs/toggle_btn/toggle-d',
+            '<LOC _Ok>', 12
+        )
+        LayoutHelpers.AtBottomIn(okBtn, giveResGroup)
+        okBtn.Left:Set(function()
+            local giveResGroup = control.giveResourcesGroup
+            return giveResGroup.Left() + giveResGroup.Width() * 0.25 - okBtn.Width() * 0.5
+        end)
 
-        local cancelBtn = UIUtil.CreateButton(control.giveResourcesGroup,
-            '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-            '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-            '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-            '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-            '<LOC _Cancel>', 12)
-        cancelBtn.OnClick = function(self, modifiers)
-            CreateShareResourcesDialog(control)
-        end
+        local cancelBtn = UIUtil.CreateButtonStd(giveResGroup,
+            '/dialogs/toggle_btn/toggle-d',
+            '<LOC _Cancel>', 12
+        )
+        LayoutHelpers.AtBottomIn(cancelBtn, giveResGroup)
+        cancelBtn.Left:Set(function()
+            local giveResGroup = control.giveResourcesGroup
+            return giveResGroup.Left() + giveResGroup.Width() * 0.75 - okBtn.Width() * 0.5
+        end)
 
-
-        local massStatus = StatusBar(control.giveResourcesGroup, 0, 100, false, false,
+        local massStatus = StatusBar(giveResGroup, 0, 100, false, false,
             UIUtil.UIFile('/game/resource-bars/mini-mass-bar-back_bmp.dds'),
-            UIUtil.UIFile('/game/resource-bars/mini-mass-bar_bmp.dds'), false)
-        LayoutHelpers.AtTopIn(massStatus, control.giveResourcesGroup, 10)
-        massStatus.Left:Set(control.giveResourcesGroup.Left)
-        LayoutHelpers.AtRightIn(massStatus, control.giveResourcesGroup, 50)
+            UIUtil.UIFile('/game/resource-bars/mini-mass-bar_bmp.dds'), false
+        )
+        massStatus.Left:Set(giveResGroup.Left)
+        LayoutHelpers.AtRightTopIn(massStatus, giveResGroup, 50, 10)
 
-        local massSlider = Slider(control.giveResourcesGroup, false, 0, 100,
+        local massSlider = Slider(giveResGroup, false, 0, 100,
             UIUtil.UIFile('/game/slider-btn/slider-mass_btn_up.dds'),
             UIUtil.UIFile('/game/slider-btn/slider-mass_btn_up.dds'),
-            UIUtil.UIFile('/game/slider-btn/slider-mass_btn_up.dds'))
+            UIUtil.UIFile('/game/slider-btn/slider-mass_btn_up.dds')
+        )
         LayoutHelpers.AtVerticalCenterIn(massSlider, massStatus)
-        massSlider.Left:Set(control.giveResourcesGroup.Left)
-        LayoutHelpers.AtRightIn(massSlider, control.giveResourcesGroup, 50)
+        massSlider.Left:Set(giveResGroup.Left)
         massSlider:SetValue(0)
+        LayoutHelpers.AtRightIn(massSlider, giveResGroup, 50)
 
-        massInput = UIUtil.CreateText(control.giveResourcesGroup, '0%', 16, UIUtil.bodyFont)
+        massInput = UIUtil.CreateText(giveResGroup, '0%', 16, UIUtil.bodyFont)
         massInput:SetColor('ff00ff00')
         LayoutHelpers.RightOf(massInput, massStatus, 5)
 
@@ -507,23 +659,25 @@ function CreateShareResourcesDialog(control)
         massStatus.Depth:Set(function() return massSlider.Depth() - 1 end)
 
 
-        local energyStatus = StatusBar(control.giveResourcesGroup, 0, 100, false, false,
+        local energyStatus = StatusBar(giveResGroup, 0, 100, false, false,
             UIUtil.UIFile('/game/resource-bars/mini-energy-bar-back_bmp.dds'),
-            UIUtil.UIFile('/game/resource-bars/mini-energy-bar_bmp.dds'), false)
+            UIUtil.UIFile('/game/resource-bars/mini-energy-bar_bmp.dds'), false
+        )
+        energyStatus.Left:Set(giveResGroup.Left)
         LayoutHelpers.Below(energyStatus, massStatus, 20)
-        energyStatus.Left:Set(control.giveResourcesGroup.Left)
-        LayoutHelpers.AtRightIn(energyStatus, control.giveResourcesGroup, 50)
+        LayoutHelpers.AtRightIn(energyStatus, giveResGroup, 50)
 
-        local energySlider = Slider(control.giveResourcesGroup, false, 0, 100,
+        local energySlider = Slider(giveResGroup, false, 0, 100,
             UIUtil.UIFile('/game/slider-btn/slider-energy_btn_up.dds'),
             UIUtil.UIFile('/game/slider-btn/slider-energy_btn_up.dds'),
-            UIUtil.UIFile('/game/slider-btn/slider-energy_btn_up.dds'))
+            UIUtil.UIFile('/game/slider-btn/slider-energy_btn_up.dds')
+        )
         LayoutHelpers.AtVerticalCenterIn(energySlider, energyStatus)
-        energySlider.Left:Set(control.giveResourcesGroup.Left)
-        LayoutHelpers.AtRightIn(energySlider, control.giveResourcesGroup, 50)
+        energySlider.Left:Set(giveResGroup.Left)
         energySlider:SetValue(0)
+        LayoutHelpers.AtRightIn(energySlider, giveResGroup, 50)
 
-        energyInput = UIUtil.CreateText(control.giveResourcesGroup, '0%', 16, UIUtil.bodyFont)
+        energyInput = UIUtil.CreateText(giveResGroup, '0%', 16, UIUtil.bodyFont)
         energyInput:SetColor('ffffc700')
         LayoutHelpers.RightOf(energyInput, energyStatus, 5)
 
@@ -533,27 +687,44 @@ function CreateShareResourcesDialog(control)
         end
         energyStatus.Depth:Set(function() return massSlider.Depth() - 1 end)
 
-        LayoutHelpers.AtBottomIn(okBtn, control.giveResourcesGroup)
-        LayoutHelpers.AtBottomIn(cancelBtn, control.giveResourcesGroup)
-        okBtn.Left:Set(function() return control.giveResourcesGroup.Left() + (control.giveResourcesGroup.Width() / 4) - (okBtn.Width() / 2) end)
-        cancelBtn.Left:Set(function() return control.giveResourcesGroup.Left() + ((control.giveResourcesGroup.Width() / 4) * 3) - (okBtn.Width() / 2) end)
+        control.Height:Set(function()
+            return control.OrigHeight + control.giveResourcesGroup.Height()
+        end)
 
         okBtn.OnClick = function(self, modifiers)
-            SimCallback({ Func="GiveResourcesToPlayer",
-                           Args={ From=GetFocusArmy(),
-                                  To=control.Data.armyIndex,
-                                  Mass=massSlider:GetValue() / 100.0,
-                                  Energy=energySlider:GetValue() / 100.0,
-                                }
-                          }
-                       )
+            SimCallback({
+                Func = "GiveResourcesToPlayer",
+                Args = {
+                    From = GetFocusArmy(),
+                    To = control.Data.armyIndex,
+                    Mass = massSlider:GetValue() * 0.01,
+                    Energy = energySlider:GetValue() * 0.01,
+                },
+            })
             CreateShareResourcesDialog(control)
         end
-
-        control.Height:Set(function() return control.OrigHeight + control.giveResourcesGroup.Height() end)
+        cancelBtn.OnClick = function(self, modifiers)
+            CreateShareResourcesDialog(control)
+        end
     end
 end
 
 function SetAlliedVictory(state)
     alliedVictory = state
+end
+
+
+
+--- Unused
+
+local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local Text = import("/lua/maui/text.lua").Text
+local Edit = import("/lua/maui/edit.lua").Edit
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Button = import("/lua/maui/button.lua").Button
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local NeverAllyWith = {}
+
+if SessionGetScenarioInfo().Options.TeamLock == 'locked' then
+    lockTeams = true
 end

@@ -6,23 +6,23 @@
 -----------------------------------------------------------------
 
 -- This file is the F1 menu used for navigating and interacting with keybindings
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group     = import('/lua/maui/group.lua').Group
-local Bitmap    = import('/lua/maui/bitmap.lua').Bitmap
-local Text      = import('/lua/maui/text.lua').Text
-local Edit      = import('/lua/maui/edit.lua').Edit
-local Popup     = import('/lua/ui/controls/popups/popup.lua').Popup
-local Tooltip   = import('/lua/ui/game/tooltip.lua')
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group     = import("/lua/maui/group.lua").Group
+local Bitmap    = import("/lua/maui/bitmap.lua").Bitmap
+local Edit      = import("/lua/maui/edit.lua").Edit
+local Popup     = import("/lua/ui/controls/popups/popup.lua").Popup
+local Tooltip   = import("/lua/ui/game/tooltip.lua")
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
 
-local properKeyNames = import('/lua/keymap/properKeyNames.lua').properKeyNames
-local keyNames = import('/lua/keymap/keyNames.lua').keyNames
-local keyCategories = import('/lua/keymap/keycategories.lua').keyCategories
-local keyCategoryOrder = import('/lua/keymap/keycategories.lua').keyCategoryOrder
-local KeyMapper = import('/lua/keymap/keymapper.lua')
+local properKeyNames = import("/lua/keymap/properkeynames.lua").properKeyNames
+local keyNames = import("/lua/keymap/keynames.lua").keyNames
+local keyCategories = import("/lua/keymap/keycategories.lua").keyCategories
+local keyCategoryOrder = import("/lua/keymap/keycategories.lua").keyCategoryOrder
+local KeyMapper = import("/lua/keymap/keymapper.lua")
 
 local popup = nil
+local FormatData
 local keyContainer
 local keyTable
 local keyFilter
@@ -73,8 +73,8 @@ local function ConfirmNewKeyMap()
     IN_AddKeyMapTable(KeyMapper.GetKeyMappings(true))
     -- update hotbuild modifiers and re-initialize hotbuild labels
     if SessionIsActive() then
-        import('/lua/keymap/hotbuild.lua').addModifiers()
-        import('/lua/keymap/hotkeylabels.lua').init()
+        import("/lua/keymap/hotbuild.lua").addModifiers()
+        import("/lua/keymap/hotkeylabels.lua").init()
     end
 end
 
@@ -513,7 +513,7 @@ function CloseUI()
 end
 function CreateUI()
     LOG('Keybindings CreateUI')
-    if WorldIsLoading() or (import('/lua/ui/game/gamemain.lua').supressExitDialog == true) then
+    if WorldIsLoading() or (import("/lua/ui/game/gamemain.lua").supressExitDialog == true) then
         return
     end
 
@@ -630,7 +630,7 @@ function CreateUI()
     keyFilter.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() end)
 
     keyFilter:EnableHitTest()
-    import('/lua/ui/game/tooltip.lua').AddControlTooltip(keyFilter,
+    import("/lua/ui/game/tooltip.lua").AddControlTooltip(keyFilter,
     {
         text = '<LOC key_binding_0018>Key Binding Filter',
         body = '<LOC key_binding_0019>' ..
@@ -1001,3 +1001,6 @@ function FormatKeyName(key)
 
     return result..LookupToken(key)
 end
+
+-- kept for mod backwards compatibility
+local Text = import("/lua/maui/text.lua").Text

@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ATransportBeaconUnit = import('/lua/aeonunits.lua').ATransportBeaconUnit
+local ATransportBeaconUnit = import("/lua/aeonunits.lua").ATransportBeaconUnit
 
-UAB5102 = Class(ATransportBeaconUnit) {
+---@class UAB5102 : ATransportBeaconUnit
+UAB5102 = ClassUnit(ATransportBeaconUnit) {
 }
 
 TypeClass = UAB5102

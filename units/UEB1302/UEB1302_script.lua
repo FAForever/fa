@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TMassCollectionUnit = import('/lua/terranunits.lua').TMassCollectionUnit
+local TMassCollectionUnit = import("/lua/terranunits.lua").TMassCollectionUnit
 
-UEB1302 = Class(TMassCollectionUnit) {
+---@class UEB1302 : TMassCollectionUnit
+UEB1302 = ClassUnit(TMassCollectionUnit) {
     
     
     PlayActiveAnimation = function(self)

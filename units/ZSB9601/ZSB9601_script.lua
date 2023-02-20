@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SLandFactoryUnit = import('/lua/seraphimunits.lua').SLandFactoryUnit
+local SLandFactoryUnit = import("/lua/seraphimunits.lua").SLandFactoryUnit
 
-ZSB9601 = Class(SLandFactoryUnit) {
+---@class ZSB9601 : SLandFactoryUnit
+ZSB9601 = ClassUnit(SLandFactoryUnit) {
 
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)

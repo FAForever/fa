@@ -1,5 +1,9 @@
 UnitBlueprint {
-    ResolvePath = true,
+    AI = {
+        TargetBones = {
+            'Turret'
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -27,15 +31,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 50,
     Categories = {
         'PRODUCTFA',
@@ -54,7 +49,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'DUMMYGSRWEAPON',
     },
-    CollisionOffsetZ = 0.2,
+    CollisionOffsetZ = -0.05,
     Defense = {
         AirThreatLevel = 0.33,
         ArmorType = 'Normal',
@@ -204,9 +199,9 @@ UnitBlueprint {
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.83,
-    SizeX = 0.6,
-    SizeY = 0.4,
-    SizeZ = 1,
+    SizeX = 0.7,
+    SizeY = 0.6,
+    SizeZ = 0.7,
     StrategicIconName = 'icon_land1_antiair',
     StrategicIconSortPriority = 135,
     Transport = {

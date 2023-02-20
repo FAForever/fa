@@ -1,12 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'UEB5102',
-        TargetBones = {
-            'Char01',
-            'Char02',
-            'Char03',
-            'Char04',
-        },
     },
     Air = {
         AutoLandTime = 1,
@@ -95,15 +89,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -124,7 +109,7 @@ UnitBlueprint {
         'CANNOTUSEAIRSTAGING',
         'SNIPEMODE',
     },
-    CollisionOffsetY = -1,
+    CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 1.5,
         ArmorType = 'Light',
@@ -273,7 +258,7 @@ UnitBlueprint {
     SelectionSizeZ = 5,
     SelectionThickness = 0.19,
     SizeX = 2,
-    SizeY = 2,
+    SizeY = 1.4,
     SizeZ = 7,
     StrategicIconName = 'icon_gunship2_transport',
     StrategicIconSortPriority = 65,
@@ -565,7 +550,7 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 25,
+            Damage = 250,
             DamageFriendly = true,
             DamageRadius = 1,
             DamageType = 'Normal',

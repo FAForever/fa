@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Shaft',
+        },
+    },
     Audio = {
         DeathExplosion = Sound {
             Bank = 'URLDestroy',
@@ -79,14 +84,18 @@ UnitBlueprint {
             IconFadeInZoom = 130,
             LODs = {
                 {
+                    AlbedoName = '/units/urb4202/URB4202_Albedo.dds',
+                    NormalsName = '/units/urb4202/URB4202_NormalsTS.dds',
+                    SpecularName = '/units/urb4202/URB4202_SpecTeam.dds',
                     LODCutoff = 200,
                     ShaderName = 'Insect',
                 },
                 {
-                    AlbedoName = 'urb4204_lod1_albedo.dds',
-                    LODCutoff = 300,
+                    AlbedoName = '/units/urb4202/URB4202_lod1_Albedo.dds',
+                    NormalsName = '/units/urb4202/URB4202_lod1_NormalsTS.dds',
+                    SpecularName = '/units/urb4202/URB4202_lod1_SpecTeam.dds',
+                    LODCutoff = 500,
                     ShaderName = 'Insect',
-                    SpecularName = 'urb4204_lod1_specteam.dds',
                 },
             },
         },

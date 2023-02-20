@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ASeaFactoryUnit = import('/lua/aeonunits.lua').ASeaFactoryUnit
-UAB0303 = Class(ASeaFactoryUnit) {
+local ASeaFactoryUnit = import("/lua/aeonunits.lua").ASeaFactoryUnit
+---@class UAB0303 : ASeaFactoryUnit
+UAB0303 = ClassUnit(ASeaFactoryUnit) {
     OnCreate = function(self)
         ASeaFactoryUnit.OnCreate(self)
         self.BuildPointSlider = CreateSlider(self, self:GetBlueprint().Display.BuildAttachBone or 0, -15, 0, 0, -1)

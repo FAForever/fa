@@ -5,14 +5,15 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local Shield = import('/lua/shield.lua').Shield
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
-local TWeapons = import('/lua/terranweapons.lua')
+local Shield = import("/lua/shield.lua").Shield
+local EffectUtil = import("/lua/effectutilities.lua")
+local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
+local TWeapons = import("/lua/terranweapons.lua")
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
-local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
+local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 
-UEL0301 = Class(CommandUnit) {
+---@class UEL0301 : CommandUnit
+UEL0301 = ClassUnit(CommandUnit) {
     IntelEffects = {
         {
             Bones = {
@@ -24,8 +25,8 @@ UEL0301 = Class(CommandUnit) {
     },
 
     Weapons = {
-        RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon) {},
-        DeathWeapon = Class(SCUDeathWeapon) {},
+        RightHeavyPlasmaCannon = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {},
+        DeathWeapon = ClassWeapon(SCUDeathWeapon) {},
     },
 
     OnCreate = function(self)
@@ -133,8 +134,8 @@ UEL0301 = Class(CommandUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -174,20 +175,20 @@ UEL0301 = Class(CommandUnit) {
         end
     end,
 
-    OnIntelEnabled = function(self)
-        CommandUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        CommandUnit.OnIntelEnabled(self, intel)
         if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['RadarJammer'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
         end
     end,
 
-    OnIntelDisabled = function(self)
-        CommandUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        CommandUnit.OnIntelDisabled(self, intel)
         if self.RadarJammerEnh and not self:IsIntelEnabled('Jammer') then
             self:SetMaintenanceConsumptionInactive()
             if self.IntelEffectsBag then

@@ -29,9 +29,6 @@ PropBlueprint {
     Interface = {
         HelpText = 'Very Small Log',
     },
-    Physics = {
-        BlockPath = true,
-    },
     SizeX = 0.5,
     SizeY = 0.25,
     SizeZ = 0.25,

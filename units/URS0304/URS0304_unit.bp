@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardReturnRadius = 0,
         InitialAutoMode = false,
     },
     Audio = {
@@ -56,15 +57,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Cybran_Select_Sub',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
         },
     },
     BuildIconSortPriority = 20,
@@ -244,8 +236,8 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 80000,
-        BuildCostMass = 10000,
+        BuildCostEnergy = 152000,
+        BuildCostMass = 10500,
         BuildRate = 1080,
         BuildTime = 20000,
         MaintenanceConsumptionPerSecondEnergy = 200,
@@ -511,7 +503,7 @@ UnitBlueprint {
             FiringTolerance = 2,
             InitialProjectileStorage = 0,
             Label = 'NukeMissile',
-            ManualFire = 1,
+            ManualFire = true,
             MaxProjectileStorage = 3,
             MaxRadius = 410,
             MinRadius = 128,

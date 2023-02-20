@@ -2,16 +2,17 @@
 -- File     :  /data/units/XSB2305/XSB2305_script.lua
 -- Author(s):  Jessica St. Croix, Matt Vainio
 -- Summary  :  Seraphim Tactical Missile Launcher Script
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
-local SIFInainoWeapon = import('/lua/seraphimweapons.lua').SIFInainoWeapon
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
+local SIFInainoWeapon = import("/lua/seraphimweapons.lua").SIFInainoWeapon
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-XSB2305 = Class(SStructureUnit) {
+---@class XSB2305 : SStructureUnit
+XSB2305 = ClassUnit(SStructureUnit) {
     Weapons = {
-        InainoMissiles = Class(SIFInainoWeapon) {
+        InainoMissiles = ClassWeapon(SIFInainoWeapon) {
             LaunchEffects = function(self)
                 local FxLaunch = EffectTemplate.SIFInainoPreLaunch01
 

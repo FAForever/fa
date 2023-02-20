@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SSonarUnit = import('/lua/seraphimunits.lua').SSonarUnit
+local SSonarUnit = import("/lua/seraphimunits.lua").SSonarUnit
 
-XSB3102 = Class(SSonarUnit) {
+---@class XSB3102 : SSonarUnit
+XSB3102 = ClassUnit(SSonarUnit) {
     TimedSonarTTIdleEffects = {
         {
             Bones = {

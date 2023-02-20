@@ -11,12 +11,13 @@ git push faforever HEAD:develop
 
 read
 
-git checkout faforever/deploy/fafbeta
-git pull faforever deploy/fafbeta 
-git pull faforever develop --rebase
-git push faforever HEAD:deploy/fafbeta 
+# do this manually
+# git checkout faforever/deploy/fafbeta
+# git pull faforever deploy/fafbeta 
+# git pull faforever develop --rebase
+# git push faforever HEAD:deploy/fafbeta 
 
-read
+# read
 
 git checkout faforever/master 
 git pull faforever master 

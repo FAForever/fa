@@ -1,9 +1,9 @@
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local LazyVar = import('/lua/lazyvar.lua')
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local LazyVar = import("/lua/lazyvar.lua")
 
 local defaultStyle = {
     message = {
@@ -26,7 +26,7 @@ local defaultStyle = {
 }
 
 ---@class ChatArea : Group
-ChatArea = Class(Group) {
+ChatArea = ClassUI(Group) {
 
     __init = function(self, parent, width, height)
         Group.__init(self, parent)
@@ -77,7 +77,7 @@ ChatArea = Class(Group) {
 
         local chatText = authorName .. messageText
         local customAdvanceFunction = function(chatText)
-            return self.AdvanceFunction(self, chatText, messageStyle)
+            return self:AdvanceFunction(chatText, messageStyle)
         end
 
         local wrapLines = Text.WrapText(chatText, self.Width() - self.Style.padding.left - self.Style.padding.right,
@@ -132,7 +132,7 @@ ChatArea = Class(Group) {
 
     CreateLine = function(self, parent)
         local line = Group(parent)
-        line.Height:Set(self.Style.lineSpacing + self.Style.fontSize())
+        LayoutHelpers.SetHeight(line, self.Style.lineSpacing + self.Style.fontSize())
         line.Width:Set(parent.Width)
         line:DisableHitTest()
 

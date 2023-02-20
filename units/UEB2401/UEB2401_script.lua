@@ -8,12 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TIFArtilleryWeapon = import('/lua/terranweapons.lua').TIFArtilleryWeapon
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TIFArtilleryWeapon = import("/lua/terranweapons.lua").TIFArtilleryWeapon
 
-UEB2401 = Class(TStructureUnit) {
+---@class UEB2401 : TStructureUnit
+UEB2401 = ClassUnit(TStructureUnit) {
     Weapons = {
-        MainGun = Class(TIFArtilleryWeapon) {
+        MainGun = ClassWeapon(TIFArtilleryWeapon) {
             FxMuzzleFlashScale = 3,
             
             IdleState = State(TIFArtilleryWeapon.IdleState) {

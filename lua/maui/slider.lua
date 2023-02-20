@@ -1,12 +1,12 @@
 
-local Group = import('group.lua').Group
-local Bitmap = import('bitmap.lua').Bitmap
-local Dragger = import('dragger.lua').Dragger
-local LayoutHelpers = import('layouthelpers.lua')
-local lazyvar = import('/lua/lazyvar.lua')
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local lazyvar = import("/lua/lazyvar.lua")
 
-Slider = Class(Group)
-{
+---@class Slider : Group
+Slider = ClassUI(Group) {
     -- TODO make it possible for the start value to be greate than the end value and have that work the opposite way
     __init = function(self, parent, isVertical, startValue, endValue, thumb, thumbOver, thumbDown, background, debugname)
         Group.__init(self, parent)
@@ -138,23 +138,23 @@ Slider = Class(Group)
 
     -- overload to be informed when the value is changed
     OnValueChanged = function(self, newValue) end,
-    
+
     -- overload to be informed when someone starts and stops dragging the
     -- slider
     OnBeginChange = function(self) end,
     OnEndChange = function(self) end,
-    
+
     -- overload to be informed during scrub
     OnScrub = function(self,value) end,
 }
 
-IntegerSlider = Class(Slider)
-{
+---@class IntegerSlider : Slider
+IntegerSlider = ClassUI(Slider) {
     __init = function(self, parent, isVertical, startValue, endValue, indentValue, thumb, thumbOver, thumbDown, background)
         Slider.__init(self, parent, isVertical, math.floor(startValue), math.floor(endValue), thumb, thumbOver, thumbDown, background)
         self._indentValue = math.floor(indentValue)
     end,
-    
+
     _Constrain = function(self,value)
         value = Slider._Constrain(self,value)
         value = math.floor(value / self._indentValue) * self._indentValue

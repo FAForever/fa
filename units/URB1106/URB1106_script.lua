@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CMassStorageUnit = import('/lua/cybranunits.lua').CMassStorageUnit
+local CMassStorageUnit = import("/lua/cybranunits.lua").CMassStorageUnit
 
-URB1106 = Class(CMassStorageUnit) {
+---@class URB1106 : CMassStorageUnit
+URB1106 = ClassUnit(CMassStorageUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         CMassStorageUnit.OnStopBeingBuilt(self,builder,layer)
         self:ForkThread(self.AnimThread)

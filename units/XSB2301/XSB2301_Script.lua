@@ -8,12 +8,13 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
-local SDFUltraChromaticBeamGenerator = import('/lua/seraphimweapons.lua').SDFUltraChromaticBeamGenerator
+local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
+local SDFUltraChromaticBeamGenerator = import("/lua/seraphimweapons.lua").SDFUltraChromaticBeamGenerator
 
-XSB2301 = Class(SStructureUnit) {
+---@class XSB2301 : SStructureUnit
+XSB2301 = ClassUnit(SStructureUnit) {
     Weapons = {
-        MainGun = Class(SDFUltraChromaticBeamGenerator) {}
+        MainGun = ClassWeapon(SDFUltraChromaticBeamGenerator) {}
     },
 }
 

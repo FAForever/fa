@@ -7,12 +7,13 @@
 ----**
 ----**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
-local AIFQuasarAntiTorpedoWeapon = import('/lua/aeonweapons.lua').AIFQuasarAntiTorpedoWeapon
+local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
+local AIFQuasarAntiTorpedoWeapon = import("/lua/aeonweapons.lua").AIFQuasarAntiTorpedoWeapon
 
-UAS0305 = Class(ASeaUnit) {
+---@class UAS0305 : ASeaUnit
+UAS0305 = ClassUnit(ASeaUnit) {
     Weapons = {
-        AntiTorpedo01 = Class(AIFQuasarAntiTorpedoWeapon) {},
+        AntiTorpedo01 = ClassWeapon(AIFQuasarAntiTorpedoWeapon) {},
     },
 
     TimedSonarTTIdleEffects = {

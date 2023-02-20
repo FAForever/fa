@@ -5,14 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
-local cWeapons = import('/lua/cybranweapons.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local cWeapons = import("/lua/cybranweapons.lua")
 local CDFLaserDisintegratorWeapon = cWeapons.CDFLaserDisintegratorWeapon01
 local CDFElectronBolterWeapon = cWeapons.CDFElectronBolterWeapon
-local MissileRedirect = import('/lua/defaultantiprojectile.lua').MissileRedirect
+local MissileRedirect = import("/lua/defaultantiprojectile.lua").MissileRedirect
 
-local EMPDeathWeapon = Class(Weapon) {
+local EMPDeathWeapon = ClassWeapon(Weapon) {
     OnCreate = function(self)
         Weapon.OnCreate(self)
         self:SetWeaponEnabled(false)
@@ -25,13 +25,14 @@ local EMPDeathWeapon = Class(Weapon) {
     end,
 }
 
-URL0303 = Class(CWalkingLandUnit) {
+---@class URL0303 : CWalkingLandUnit
+URL0303 = ClassUnit(CWalkingLandUnit) {
     PlayEndAnimDestructionEffects = false,
 
     Weapons = {
-        Disintigrator = Class(CDFLaserDisintegratorWeapon) {},
-        HeavyBolter = Class(CDFElectronBolterWeapon) {},
-        DeathWeapon = Class(EMPDeathWeapon) {},
+        Disintigrator = ClassWeapon(CDFLaserDisintegratorWeapon) {},
+        HeavyBolter = ClassWeapon(CDFElectronBolterWeapon) {},
+        DeathWeapon = ClassWeapon(EMPDeathWeapon) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)
@@ -58,8 +59,6 @@ URL0303 = Class(CWalkingLandUnit) {
         WaitSeconds(blueprint.SecondsBeforeChargeKicksIn)
 
         self.ChargingInProgress = true
-        self:SetWeaponEnabledByLabel('Disintigrator', false)
-        self:SetWeaponEnabledByLabel('HeavyBolter', false)
         self:SetAccMult(blueprint.Physics.ChargeAccMult)
         self:SetSpeedMult(blueprint.Physics.ChargeSpeedMult)
         -- EMP duration mult added in DoDeathWeapon 

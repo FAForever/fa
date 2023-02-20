@@ -7,7 +7,7 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-SeraphimBuildEffect01 = Class(import('/lua/sim/defaultprojectiles.lua').NullShell) {
+SeraphimBuildEffect01 = Class(import("/lua/sim/defaultprojectiles.lua").NullShell) {
     OnDamage = function(self, instigator, amount, vector, damageType)
     end,
 }

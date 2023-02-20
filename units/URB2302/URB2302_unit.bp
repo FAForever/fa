@@ -21,15 +21,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 140,
     Categories = {
         'PRODUCTSC1',
@@ -96,7 +87,7 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 870000,
+        BuildCostEnergy = 1305000,
         BuildCostMass = 69600,
         BuildTime = 105000,
         RebuildBonusIds = {
@@ -209,7 +200,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Proton Artillery',
             EnergyDrainPerSecond = 3500,
-            EnergyRequired = 7000,
+            EnergyRequired = 14000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',

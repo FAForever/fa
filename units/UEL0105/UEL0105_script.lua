@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
+local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
 
-UEL0105 = Class(TConstructionUnit) {}
+---@class UEL0105 : TConstructionUnit
+UEL0105 = ClassUnit(TConstructionUnit) {}
 
 TypeClass = UEL0105

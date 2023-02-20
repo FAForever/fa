@@ -41,15 +41,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -142,7 +133,7 @@ UnitBlueprint {
         BuildCostEnergy = 273,
         BuildCostMass = 56,
         BuildRate = 1,
-        BuildTime = 265,
+        BuildTime = 285,
         NeedToFaceTargetToBuild = true,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,

@@ -1,3 +1,4 @@
+
 --[[                                                                           ]]--
 --[[  Automatically generated code (do not edit)                               ]]--
 --[[                                                                           ]]--
@@ -507,10 +508,6 @@ Scenario = {
                                 {'default_brain','default_builder_name', 2 },
                                 {'default_brain','default_builder_name','2'}
                             },
-                            [3] = {'/lua/editor/otherarmyunitcountbuildconditions.lua', 'BrainGreaterThanNumCategory',
-                                {'default_brain','Player', 5 , categories.NAVAL * categories.MOBILE },
-                                {'default_brain','Player','5','categories.NAVAL * categories.MOBILE'}
-                            },
                         },
                         PlatoonData = {
                             {type = 5, name = 'AMPlatoons', value = {
@@ -543,10 +540,6 @@ Scenario = {
                             [2] = {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
                                 {'default_brain','default_builder_name', 2 },
                                 {'default_brain','default_builder_name','2'}
-                            },
-                            [3] = {'/lua/editor/otherarmyunitcountbuildconditions.lua', 'BrainGreaterThanNumCategory',
-                                {'default_brain','Player', 5 , categories.NAVAL * categories.MOBILE },
-                                {'default_brain','Player','5','categories.NAVAL * categories.MOBILE'}
                             },
                         },
                         PlatoonData = {
@@ -585,10 +578,6 @@ Scenario = {
                                 {'default_brain','default_builder_name', 2 },
                                 {'default_brain','default_builder_name','2'}
                             },
-                            --[3] = {'/lua/editor/otherarmyunitcountbuildconditions.lua', 'BrainGreaterThanNumCategory',
-                            --    {'default_brain','Player', 5 , categories.NAVAL * categories.MOBILE },
-                            --    {'default_brain','Player','5','categories.NAVAL * categories.MOBILE'}
-                            --},
                         },
                         PlatoonData = {
                             {type = 5, name = 'AMPlatoons', value = {
@@ -733,7 +722,7 @@ Scenario = {
                                 {type = 2, name = 'APPEND_PlatoonChild', value = 'OSB_Master_AirAttacks'},
                             }},
                         },
-                        ChildrenType = { 'AirSuperiority', 'Gunships', 'Interceptors', },
+                        ChildrenType = { 'AirSuperiority', 'Gunships', 'Bombers', },
                     },
                     ['OSB_Child_AirAttacks_T3Platoon4'] =  {
                         PlatoonTemplate = 'OST_AirAttacks_T3Platoon4',
@@ -868,10 +857,6 @@ Scenario = {
                                 {'default_brain','default_builder_name', 2 },
                                 {'default_brain','default_builder_name','2'}
                             },
-                            [3] = {'/lua/editor/otherarmyunitcountbuildconditions.lua', 'BrainGreaterThanNumCategory',
-                                {'default_brain','Player', 5 , categories.NAVAL * categories.MOBILE },
-                                {'default_brain','Player','5','categories.NAVAL * categories.MOBILE'}
-                            },
                         },
                         PlatoonData = {
                             {type = 5, name = 'AMPlatoons', value = {
@@ -904,10 +889,6 @@ Scenario = {
                             [2] = {'/lua/editor/platooncountbuildconditions.lua', 'NumBuildersLessThanOSCounter',
                                 {'default_brain','default_builder_name', 2 },
                                 {'default_brain','default_builder_name','2'}
-                            },
-                            [3] = {'/lua/editor/otherarmyunitcountbuildconditions.lua', 'BrainGreaterThanNumCategory',
-                                {'default_brain','Player', 5 , categories.NAVAL * categories.MOBILE },
-                                {'default_brain','Player','5','categories.NAVAL * categories.MOBILE'}
                             },
                         },
                         PlatoonData = {

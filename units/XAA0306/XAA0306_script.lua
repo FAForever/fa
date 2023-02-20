@@ -8,13 +8,14 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
-local AANTorpedoCluster = import('/lua/aeonweapons.lua').AANTorpedoCluster
+local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
+local AANTorpedoCluster = import("/lua/aeonweapons.lua").AANTorpedoCluster
 
 
-XAA0306 = Class(AAirUnit) {
+---@class XAA0306 : AAirUnit
+XAA0306 = ClassUnit(AAirUnit) {
     Weapons = {
-        Bomb = Class(AANTorpedoCluster) {},
+        Bomb = ClassWeapon(AANTorpedoCluster) {},
     },
 }
 

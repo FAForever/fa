@@ -121,7 +121,7 @@ UnitBlueprint {
         FactionName = 'Aeon',
         Icon = 'amph',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Secret',
         ToggleCaps = {
             RULEUTC_ProductionToggle = true,
         },
@@ -138,6 +138,8 @@ UnitBlueprint {
     LifeBarOffset = 0.35,
     LifeBarSize = 1.1,
     Physics = {
+        MaxGroundVariation = 512,
+        FlattenSkirt = false,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -149,7 +151,6 @@ UnitBlueprint {
         },
         BuildRestriction = 'RULEUBR_OnMassDeposit',
         DragCoefficient = 0.2,
-        FlattenSkirt = true,
         MaxSteerForce = 0,
         MeshExtentsX = 2,
         MeshExtentsY = 2,

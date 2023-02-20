@@ -79,15 +79,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 20,
     Categories = {
         'PRODUCTSC1',
@@ -243,7 +234,7 @@ UnitBlueprint {
         FuelUseTime = 600,
         GroundCollisionOffset = 1.6,
         MaxSpeed = 0.5,
-        MeshExtentsX = 1.25,
+        MeshExtentsX = 1.0,
         MeshExtentsY = 0.25,
         MeshExtentsZ = 1.25,
         MotionType = 'RULEUMT_Air',

@@ -5,9 +5,10 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SCivilianStructureUnit = import('/lua/seraphimunits.lua').SCivilianStructureUnit
+local SCivilianStructureUnit = import("/lua/seraphimunits.lua").SCivilianStructureUnit
 
-XSC1901 = Class(SCivilianStructureUnit) {
+---@class XSC1901 : SCivilianStructureUnit
+XSC1901 = ClassUnit(SCivilianStructureUnit) {
 	OnCreate = function(self)
 		SCivilianStructureUnit.OnCreate(self)
 		local army = self:GetArmy()

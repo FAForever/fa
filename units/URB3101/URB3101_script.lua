@@ -8,11 +8,12 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CRadarUnit = import('/lua/cybranunits.lua').CRadarUnit
+local CRadarUnit = import("/lua/cybranunits.lua").CRadarUnit
 
-URB3101 = Class(CRadarUnit) {
-    OnIntelDisabled = function(self)
-        CRadarUnit.OnIntelDisabled(self)
+---@class URB3101 : CRadarUnit
+URB3101 = ClassUnit(CRadarUnit) {
+    OnIntelDisabled = function(self, intel)
+        CRadarUnit.OnIntelDisabled(self, intel)
         if (self.Thread1) then
             KillThread(self.Thread1)
             self.Thread1 = nil
@@ -31,8 +32,8 @@ URB3101 = Class(CRadarUnit) {
     end,
 
 
-    OnIntelEnabled = function(self)
-        CRadarUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        CRadarUnit.OnIntelEnabled(self, intel)
         self.Thread1 = self:ForkThread(self.Dish1Behavior)
         self.Thread2 = self:ForkThread(self.Dish2Behavior)
         self.Thread3 = self:ForkThread(self.Dish3Behavior)

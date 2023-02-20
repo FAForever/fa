@@ -7,8 +7,9 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CAirFactoryUnit = import('/lua/cybranunits.lua').CAirFactoryUnit
+local CAirFactoryUnit = import("/lua/cybranunits.lua").CAirFactoryUnit
 
+---@class ZRB9502 : CAirFactoryUnit
 ZRB9502 = Class(CAirFactoryUnit) {
     PlatformBone = 'B01',
     UpgradeRevealArm1 = 'Arm03',

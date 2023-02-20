@@ -1,28 +1,30 @@
---- Class ScriptedDecal
--- @classmod User.ScriptedDecal
+---@meta
+
+---@class moho.userDecal_methods : Destroyable
+local ScriptedDecal = {}
 
 ---
---  Set the position based on wolrd coords
-function ScriptedDecal:SetPosition()
+function ScriptedDecal:Destroy()
 end
 
----
---  Set the position based on screen space mouse coords
-function ScriptedDecal:SetPositionByScreen()
+--- Sets the position based on world coords
+---@param pos Vector
+function ScriptedDecal:SetPosition(pos)
 end
 
----
---  Scale the text
-function ScriptedDecal:SetScale()
+--- Sets the position based on screen space mouse coords
+---@param pos Vector2
+function ScriptedDecal:SetPositionByScreen(pos)
 end
 
----
---  Set the texture and add it to the decal manager
-function ScriptedDecal:SetTexture()
+--- Scales the text
+---@param scale Vector
+function ScriptedDecal:SetScale(scale)
 end
 
----
---
-function ScriptedDecal:moho.userDecal_methods()
+--- Sets the texture and add it to the decal manager
+---@param tex string
+function ScriptedDecal:SetTexture(tex)
 end
 
+return ScriptedDecal

@@ -1,9 +1,9 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Grid = import('/lua/maui/grid.lua').Grid
-local Button = import('/lua/maui/button.lua').Button
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Grid = import("/lua/maui/grid.lua").Grid
+local Button = import("/lua/maui/button.lua").Button
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 
 
 function SetLayout()
@@ -44,9 +44,9 @@ function SetLayout()
             off = UIUtil.UIFile('/game/construct-sm_btn/fforward_off.dds')
         }
     }
-    local controls = import('/lua/ui/game/construction.lua').controls
-    local ordersControl = import('/lua/ui/game/construction.lua').ordersControl
-    local controlClusterGroup = import('/lua/ui/game/construction.lua').controlClusterGroup
+    local controls = import("/lua/ui/game/construction.lua").controls
+    local ordersControl = import("/lua/ui/game/construction.lua").ordersControl
+    local controlClusterGroup = import("/lua/ui/game/construction.lua").controlClusterGroup
     LayoutHelpers.AtTopIn(controls.constructionGroup, controlClusterGroup, 12)
     controls.constructionGroup.Bottom:Set(controlClusterGroup.Bottom)
     if ordersControl then
@@ -344,7 +344,7 @@ function SetLayout()
     LayoutHelpers.Below(controls.extraBtn2, controls.extraBtn1, 1)
 
     controls.constructionGroup:DisableHitTest()
-    LayoutTabs(import('/lua/ui/game/construction.lua').controls)
+    LayoutTabs(import("/lua/ui/game/construction.lua").controls)
     controls.constructionGroup:Hide()
 end
 
@@ -448,7 +448,7 @@ function LayoutTabs(controls)
 end
 
 function OnTabChangeLayout(type)
-    local controls = import('/lua/ui/game/construction.lua').controls
+    local controls = import("/lua/ui/game/construction.lua").controls
     if type ~= 'selection' then
         LayoutHelpers.AtLeftIn(controls.choices, controls.minBG, 85)
         LayoutHelpers.AtRightIn(controls.choices, controls.maxBG, 49)
@@ -484,7 +484,7 @@ function OnTabChangeLayout(type)
 end
 
 function OnSelection(empty)
-    local controls = import('/lua/ui/game/construction.lua').controls
+    local controls = import("/lua/ui/game/construction.lua").controls
     if empty then
         if not controls.constructionGroup:IsHidden() then
             controls.constructionGroup:Hide()

@@ -3,15 +3,15 @@
 --* Author: Chris Blackwell
 --* Summary: Build key mode logic
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local Prefs = import('/lua/user/prefs.lua')
-local Construction = import('/lua/ui/game/construction.lua')
-local Tabs = import('/lua/ui/game/tabs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local Prefs = import("/lua/user/prefs.lua")
+local Construction = import("/lua/ui/game/construction.lua")
+local Tabs = import("/lua/ui/game/tabs.lua")
 
 local trackingMasterControl = nil
 
@@ -33,7 +33,7 @@ local function PlayErrorSound()
 end
 
 local function SetTechLevel(level)
-    if not import('/lua/ui/game/construction.lua').SetCurrentTechTab(level) then
+    if not import("/lua/ui/game/construction.lua").SetCurrentTechTab(level) then
         -- play error sound if we can't set the tech level with our key
         PlayErrorSound()
     end
@@ -86,7 +86,7 @@ local function HandleCommand(key, modifiers)
         return canBuild
     end
 
-    local bmdata = import('/lua/ui/game/buildmodedata.lua').buildModeKeys
+    local bmdata = import("/lua/ui/game/buildmodedata.lua").buildModeKeys
     local bp = selection[1]:GetBlueprint()
     local bpid = bp.BlueprintId
     
@@ -119,7 +119,7 @@ local function HandleCommand(key, modifiers)
         
         if tobuildbp.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, tobuild) then
             -- stationary means it needs to be placed, so go in to build mobile mode
-            import('/lua/ui/game/commandmode.lua').StartCommandMode("build", {name=tobuild})
+            import("/lua/ui/game/commandmode.lua").StartCommandMode("build", {name=tobuild})
         else
             -- if the item to build can move, it must be built by a factory
             local count = 1
@@ -151,7 +151,7 @@ local function HandleKey(key, modifiers)
 end
 
 local function Initialize()
-    local worldView = import('/lua/ui/game/borders.lua').GetMapGroup(true)
+    local worldView = import("/lua/ui/game/borders.lua").GetMapGroup(true)
     trackingMasterControl = Group(worldView)
     trackingMasterControl.Top:Set(1)
     trackingMasterControl.Left:Set(1)
@@ -185,7 +185,7 @@ local modeID = false
 -- turn build mode on and off
 function ToggleBuildMode()
     if trackingMasterControl then
-        import('/lua/ui/game/construction.lua').ShowBuildModeKeys(false)
+        import("/lua/ui/game/construction.lua").ShowBuildModeKeys(false)
         trackingMasterControl:Destroy()
         trackingMasterControl = nil
         if modeID then
@@ -197,7 +197,7 @@ function ToggleBuildMode()
         if not modeID then
             modeID = Tabs.AddModeText("<LOC buildmode_0000>Build Mode")
         end
-        import('/lua/ui/game/construction.lua').ShowBuildModeKeys(true)
+        import("/lua/ui/game/construction.lua").ShowBuildModeKeys(true)
     end
 end
 
@@ -212,7 +212,7 @@ end
 -- given a builder unit and tech level, returns the units there are keys for
 -- techlevel is ignored for units with only upgrades
 function GetUnitKeys(factoryID, techLevel)
-    local bmdata = import('/lua/ui/game/buildmodedata.lua').buildModeKeys
+    local bmdata = import("/lua/ui/game/buildmodedata.lua").buildModeKeys
     
     if not bmdata[factoryID] then
         return nil

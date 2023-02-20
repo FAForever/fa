@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CAirStagingPlatformUnit = import('/lua/cybranunits.lua').CAirStagingPlatformUnit
+local CAirStagingPlatformUnit = import("/lua/cybranunits.lua").CAirStagingPlatformUnit
 
-URB5202 = Class(CAirStagingPlatformUnit) {
+---@class URB5202 : CAirStagingPlatformUnit
+URB5202 = ClassUnit(CAirStagingPlatformUnit) {
 }
 
 TypeClass = URB5202

@@ -4,9 +4,9 @@
 -- Summary  :  Nuclear explosion script
 -- Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------------
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local Util = import('/lua/utilities.lua')
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 
 UEFNukeEffectController01 = Class(NullShell) {

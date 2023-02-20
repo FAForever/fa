@@ -3,12 +3,13 @@
 --* Author: Chris Blackwell
 --* Summary: Responds to wld UI events and show appropriate UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- Functions exposed to lua
 
-WldUIProvider = Class(moho.WldUIProvider_methods) {
+---@class WldUIProvider : moho.WldUIProvider_methods
+WldUIProvider = ClassUI(moho.WldUIProvider_methods) {
     __init = function(self)
         InternalCreateWldUIProvider(self)
     end,

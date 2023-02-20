@@ -89,15 +89,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 15,
-            Level2 = 50,
-            Level3 = 90,
-            Level4 = 125,
-            Level5 = 160,
-        },
-    },
     BuildIconSortPriority = 10,
     Categories = {
         'PRODUCTFA',
@@ -208,7 +199,7 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 780000,
+        BuildCostEnergy = 1920000,
         BuildCostMass = 48000,
         BuildTime = 67500,
     },
@@ -304,7 +295,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 11000,
             DamageFriendly = true,
-            DamageRadius = 20,
+            DamageRadius = 19,
             DamageType = 'OtheTacticalBomb',
             DisplayName = 'Othe Tactical Bomb',
             FireTargetLayerCapsTable = {
@@ -629,7 +620,7 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 10000,
+            Damage = 7000,
             DamageFriendly = true,
             DamageRadius = 10,
             DamageType = 'Normal',

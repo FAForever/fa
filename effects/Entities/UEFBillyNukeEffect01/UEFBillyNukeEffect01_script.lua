@@ -1,4 +1,4 @@
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 
 UEFNukeEffect01 = Class(NullShell) {
     

@@ -7,12 +7,13 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
-local ADFHeavyDisruptorCannonWeapon = import('/lua/aeonweapons.lua').ADFHeavyDisruptorCannonWeapon
+local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
+local ADFHeavyDisruptorCannonWeapon = import("/lua/aeonweapons.lua").ADFHeavyDisruptorCannonWeapon
 
-XAL0305 = Class(AWalkingLandUnit) {
+---@class XAL0305 : AWalkingLandUnit
+XAL0305 = ClassUnit(AWalkingLandUnit) {
     Weapons = {
-        MainGun = Class(ADFHeavyDisruptorCannonWeapon) {}
+        MainGun = ClassWeapon(ADFHeavyDisruptorCannonWeapon) {}
     },
 }
 

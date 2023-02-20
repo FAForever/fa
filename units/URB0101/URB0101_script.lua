@@ -7,9 +7,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CLandFactoryUnit = import('/lua/cybranunits.lua').CLandFactoryUnit
+local CLandFactoryUnit = import("/lua/cybranunits.lua").CLandFactoryUnit
 
-URB0101 = Class(CLandFactoryUnit) {
+---@class URB0101 : CLandFactoryUnit
+URB0101 = ClassUnit(CLandFactoryUnit) {
     BuildAttachBone = 'Attachpoint',
     UpgradeThreshhold1 = 0.167,
     UpgradeThreshhold2 = 0.5,

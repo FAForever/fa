@@ -37,7 +37,7 @@ ProjectileBlueprint {
         UniformScale = 0.35,
     },
     Economy = {
-        BuildCostEnergy = 1350000,
+        BuildCostEnergy = 1500000,
         BuildCostMass = 12000,
         BuildTime = 324000,
     },

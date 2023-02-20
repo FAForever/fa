@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 60,
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 15,
         TargetBones = {
             'Turret_Front',
             'Turret_Back',
@@ -33,15 +33,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
         },
     },
     BuildIconSortPriority = 20,

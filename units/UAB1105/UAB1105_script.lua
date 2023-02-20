@@ -7,9 +7,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AEnergyStorageUnit = import('/lua/aeonunits.lua').AEnergyStorageUnit
+local AEnergyStorageUnit = import("/lua/aeonunits.lua").AEnergyStorageUnit
 
-UAB1105 = Class(AEnergyStorageUnit) {
+---@class UAB1105 : AEnergyStorageUnit
+UAB1105 = ClassUnit(AEnergyStorageUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         AEnergyStorageUnit.OnStopBeingBuilt(self,builder,layer)

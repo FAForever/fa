@@ -7,9 +7,10 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CCivilianStructureUnit = import('/lua/cybranunits.lua').CCivilianStructureUnit
+local CCivilianStructureUnit = import("/lua/cybranunits.lua").CCivilianStructureUnit
 
-URC1201 = Class(CCivilianStructureUnit) {
+---@class URC1201 : CCivilianStructureUnit
+URC1201 = ClassUnit(CCivilianStructureUnit) {
 }
 
 

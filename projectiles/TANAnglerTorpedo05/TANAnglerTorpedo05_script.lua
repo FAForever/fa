@@ -5,10 +5,9 @@
 --**
 --**  Summary  :  Terran Angler Torpedo, XES0307
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TTorpedoSubProjectile = import('/lua/terranprojectiles.lua').TTorpedoSubProjectile
+local TTorpedoSubProjectile = import("/lua/terranprojectiles.lua").TTorpedoSubProjectile
 
-TANAnglerTorpedo05 = Class(TTorpedoSubProjectile) {
-}
+TANAnglerTorpedo05 = ClassProjectile(TTorpedoSubProjectile) { }
 TypeClass = TANAnglerTorpedo05

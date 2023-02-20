@@ -1,9 +1,9 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 function SetLayout()
-    local controls = import('/lua/ui/game/score.lua').controls
-    local mapGroup = import('/lua/ui/game/score.lua').savedParent
+    local controls = import("/lua/ui/game/score.lua").controls
+    local mapGroup = import("/lua/ui/game/score.lua").savedParent
 
     controls.collapseArrow:SetTexture(UIUtil.UIFile('/game/tab-r-btn/tab-close_btn_up.dds'))
     controls.collapseArrow:SetNewTextures(UIUtil.UIFile('/game/tab-r-btn/tab-close_btn_up.dds'),
@@ -72,12 +72,12 @@ function SetLayout()
 
     LayoutHelpers.SetDimensions(controls.timeIcon, controls.timeIcon.BitmapWidth() * .8, controls.timeIcon.BitmapHeight() * .8)
     LayoutHelpers.SetDimensions(controls.unitIcon, controls.unitIcon.BitmapWidth() * .9, controls.unitIcon.BitmapHeight() * .9)
-    local avatarGroup = import('/lua/ui/game/avatars.lua').controls.avatarGroup
+    local avatarGroup = import("/lua/ui/game/avatars.lua").controls.avatarGroup
     avatarGroup.Top:Set(function() return controls.bgBottom.Bottom() + 4 end)
 end
 
 function LayoutArmyLines()
-    local controls = import('/lua/ui/game/score.lua').controls
+    local controls = import("/lua/ui/game/score.lua").controls
 
     for index, line in controls.armyLines do
         local i = index

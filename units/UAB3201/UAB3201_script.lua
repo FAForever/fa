@@ -8,12 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ARadarUnit = import('/lua/aeonunits.lua').ARadarUnit
+local ARadarUnit = import("/lua/aeonunits.lua").ARadarUnit
 
-UAB3201 = Class(ARadarUnit) {
+---@class UAB3201 : ARadarUnit
+UAB3201 = ClassUnit(ARadarUnit) {
 
-    OnIntelDisabled = function(self)
-        ARadarUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        ARadarUnit.OnIntelDisabled(self, intel)
         
         self.Rotator1:SetSpinDown(true)
         self.Rotator1:SetAccel(60)
@@ -21,8 +22,8 @@ UAB3201 = Class(ARadarUnit) {
         self.Rotator2:SetAccel(60)
     end,
 
-    OnIntelEnabled = function(self)
-        ARadarUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        ARadarUnit.OnIntelEnabled(self, intel)
 
         if not self.Rotator1 then
             self.Rotator1 = CreateRotator(self, 'B02', 'y')

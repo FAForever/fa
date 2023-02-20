@@ -1,94 +1,78 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
----@declare-global
 --
 -- Implement import()
 
+-- note that actual modules cannot upvalued because upvalues are not reset when we load a save file
+local FileCollapsePath = FileCollapsePath
+local doscript = doscript
+local pcall = pcall
+local setmetatable = setmetatable
+
+local LOG = LOG
+local SPEW = SPEW
+local WARN = WARN
+local error = error
+
 --- Table of all loaded modules, indexed by name.
 __modules = {}
-
---- Upvalued version of all loaded modules for performance
--- local upModules = __modules
+-- temporary place to store reloading modules
+local oldModules = {}
 
 --- Common metatable used by all modules, which forwards global references to _G
+---@class Module
+---@field __moduleinfo ModuleInfo
 __module_metatable = {
     __index = _G
 }
 
--- upvalue for performance: changes the calls to access these
--- tables from GETGLOBAL to GETUPVALUE. This change can be inspected by calling
--- LOG(repr(debug.listcode(import))).
-local upModules = __modules
-local upModuleMetatable = __module_metatable
-
--- upvalue globals for performance
--- local LOG = LOG
--- local WARN = WARN
--- local error = error
--- local SPEW = SPEW
-local setmetatable = setmetatable
-local pcall = pcall
-local doscript = doscript
-local FileCollapsePath = FileCollapsePath
-
--- upvalue string functions for performance
-local StringLower = string.lower
-local StringSub = string.sub
+---@class ModuleInfo
+---@field name string
+---@field used_by table<string, true>
+---@field track_imports boolean
+---@field OnDirty? fun()
+---@field OnReload? fun(newmod: Module)
 
 -- these values can be adjusted by hooking into this file
 local informDevOfLoad = false
 
---- The global import function used to keep track of modules.
----@param name string The path to the module to load.
----@return table
-function import(name)
+---Load a module
+---@param module Module
+---@return Module
+local function LoadModule(module)
+    local modules = __modules
 
-    -- attempt to find the module without lowering the string
-    local existing = upModules[name]
-    if existing then
-        return existing
-    end
-
-    -- try again after lowering the string
-    name = StringLower(name)
-    existing = upModules[name]
-    if existing then
-        return existing
-    end
+    local moduleinfo = module.__moduleinfo
+    local name = moduleinfo.name
 
     -- inform the devs that we're loading this module for the first time
-    if informDevOfLoad then 
+    if informDevOfLoad then
         SPEW("Loading module '", name, "'")
     end
-    
-    -- set up an environment for the new module
-    local env
-    env = {
-        __moduleinfo = { name = name, used_by = {}, track_imports = true },
 
-        -- Define a new 'import' function customized for the module, to track import dependencies.
-        import = function(name2)
-            if StringSub(name2,1,1)!='/' then
-                name2 = FileCollapsePath(name .. '/../' .. name2)
-            end
-            local m2 = import(name2) -- this will use the global import
-            if env.__moduleinfo.track_imports then
-                m2.__moduleinfo.used_by[name] = true
-            end
-            return m2
-        end,
-    }
+    -- make any old data available to the new one while it reloads
+    local oldMod = oldModules[name]
+    if oldMod then
+        moduleinfo.old = oldMod
+    end
 
-    -- set the meta table so that if it can't find an index it searches in _G
-    setmetatable(env, upModuleMetatable)
-
-    -- add ourselves to prevent loops
-    upModules[name] = env
+    setmetatable(module, __module_metatable)
 
     -- try to add content to the environment
-    local ok, msg = pcall(doscript, name, env)
+    local ok, msg = pcall(doscript, name, module)
+    if oldMod then
+        -- now clear the old module
+        oldModules[name] = nil
+        moduleinfo.old = nil
+        -- let the old module load data into the new one, if they'd prefer to do it that way
+        local onReload = oldMod.__moduleinfo.OnReload
+        if onReload then
+            onReload(module)
+        end
+    end
+
     if not ok then
         -- we failed: report back
-        upModules[name] = nil
+        modules[name] = nil
         WARN(msg)
         error("Error importing '" .. name .. "'", 2)
     end
@@ -96,22 +80,115 @@ function import(name)
     -- Once we've imported successfully, stop tracking dependencies. This means that importing from
     -- within a function will not create a dependency, which is usually what you want. (You can
     -- explicitly set __moduleinfo.track_imports = true to switch tracking back on.)
-    env.__moduleinfo.track_imports = false
-    return env
+    moduleinfo.track_imports = false
+    return module
+
 end
 
+local __lazyimport_metatable = {
+    __index = function(tbl, key)
+        LoadModule(tbl)
+        return tbl[key]
+    end,
+
+    __newindex = function(tbl, key, val)
+        LoadModule(tbl)
+         tbl[key]=val
+    end,
+}
+
+---The global import function used to keep track of modules
+---@param name FileName path to the module to load
+---@param isLazy boolean?
+---@return Module
+function import(name, isLazy)
+    local modules = __modules -- global to local
+
+    -- attempt to find the module without lowering the string
+    local existing = modules[name]
+    if existing then
+        return existing
+    end
+
+    -- caching: if it exists then we return the previous version
+    name = name:lower()
+    existing = modules[name]
+    if existing then
+        return existing
+    end
+    ---@type ModuleInfo
+    local moduleinfo = {
+        name = name,
+        used_by = {},
+        track_imports = true,
+    }
+
+    -- Define a new 'import' function customized for the module, to track import dependencies
+    local _import = function(name2, isLazy)
+        if name2:sub(1, 1) != '/' then
+            name2 = FileCollapsePath(name .. '/../' .. name2)
+        end
+        local module2 = import(name2, isLazy) -- this will use the global import
+        if __modules[name].__moduleinfo.track_imports then
+            module2.__moduleinfo.used_by[name] = true
+        end
+        return module2
+    end
+
+    -- set up an environment for the new module
+    ---@type Module
+    local module = {
+        __moduleinfo = moduleinfo,
+        import = _import,
+        lazyimport = function (name2)
+            return _import(name2, true)
+        end
+    }
+    -- add ourselves to prevent loops
+    modules[name] = module
+
+    if isLazy then
+        -- make lazy
+        setmetatable(module, __lazyimport_metatable)
+    else
+        -- load immediately if said so
+        LoadModule(module)
+    end
+    
+    return module
+end
+
+---Returns the lazy module instance which is gonna be loaded when being indexed
+---@param name FileName
+---@return Module
+function lazyimport(name)
+    return import(name, true)
+end
 
 -- Clear out a module from the table of loaded modules, so that on the next import attempt it will
--- get reloaded from scratch.
+-- get reloaded from scratch
 function dirty_module(name, why)
-    local m = upModules[name]
-    if m then
+    local modules = __modules
+    local module = modules[name]
+    if module then
         if why then LOG("Module '", name, "' changed on disk") end
-        LOG("  marking '",name,"' for reload")
-        upModules[name] = nil
-        local deps = m.__moduleinfo.used_by
+        LOG("  marking '", name, "' for reload")
+
+        local moduleinfo = module.__moduleinfo
+        -- allow us to run code when a module is ejected
+        local onDirty = moduleinfo.OnDirty
+        if onDirty then
+            local ok, msg = pcall(onDirty)
+            if not ok then
+                WARN(msg)
+            end
+        end
+        oldModules[name] = module
+
+        modules[name] = nil
+        local deps = moduleinfo.used_by
         if deps then
-            for k,_ in deps do
+            for k, _ in deps do
                 dirty_module(k)
             end
         end

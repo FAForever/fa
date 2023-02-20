@@ -4,8 +4,8 @@ UnitBlueprint {
             'pelvis',
             'Torso',
             'Head',
-            'Left_Leg_B15',
-            'Right_Leg_B03',
+            'Left_Leg_B17',
+            'Right_Leg_B01',
         },
     },
     Audio = {
@@ -40,15 +40,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 15,
-            Level2 = 60,
-            Level3 = 100,
-            Level4 = 145,
-            Level5 = 185,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTFA',
@@ -61,7 +52,6 @@ UnitBlueprint {
         'DIRECTFIRE',
         'EXPERIMENTAL',
         'BOT',
-        'ANTIAIR',
         'AMPHIBIOUS',
         'NEEDMOBILEBUILD',
         'VISIBLETORECON',
@@ -74,8 +64,7 @@ UnitBlueprint {
         'SNIPEMODE',
         'LOWSELECTPRIO',
     },
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0.6,
+    CollisionOffsetZ = 0.5,
     Defense = {
         AirThreatLevel = 16,
         ArmorType = 'Experimental',
@@ -222,6 +211,10 @@ UnitBlueprint {
         BuildCostMass = 26500,
         BuildTime = 46875,
     },
+    Footprint = {
+        SizeX = 3,
+        SizeZ = 3,
+    },
     General = {
         Category = 'Direct Fire',
         Classification = 'RULEUC_MilitaryVehicle',
@@ -247,11 +240,12 @@ UnitBlueprint {
     },
     Intel = {
         VisionRadius = 50,
-        WaterVisionradius = 50,
+        --WaterVisionRadius = 50,
     },
     Interface = {
         HelpText = '<LOC xsl0401_help>Experimental Assault Bot',
     },
+
     LifeBarHeight = 0.075,
     LifeBarOffset = 2.3,
     LifeBarSize = 3.25,
@@ -288,9 +282,9 @@ UnitBlueprint {
     SelectionSizeX = 2.2,
     SelectionSizeZ = 1.6,
     SelectionThickness = 0.32,
-    SizeX = 3.2,
+    SizeX = 2.0,
     SizeY = 7.5,
-    SizeZ = 2.5,
+    SizeZ = 2.0,
     StrategicIconName = 'icon_experimental_generic',
     StrategicIconSortPriority = 115,
     Transport = {

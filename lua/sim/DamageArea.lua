@@ -1,6 +1,15 @@
 local oldDamageArea = DamageArea
 
--- Trying to mimic DamageArea as good as possible, used for nukes to bypass the bubble damage absorbation of shields.
+---Trying to mimic DamageArea as good as possible, used for nukes to bypass the bubble damage absorbation of shields.
+---@param instigator Unit
+---@param location number
+---@param radius number
+---@param damage number
+---@param type string
+---@param damageAllies boolean
+---@param damageSelf boolean
+---@param brain AIBrain
+---@param army Army
 DamageArea = function(instigator, location, radius, damage, type, damageAllies, damageSelf, brain, army)
     local rect = Rect(location[1]-radius, location[3]-radius, location[1]+radius, location[3]+radius)
     local units = GetUnitsInRect(rect) or {}
@@ -9,7 +18,7 @@ DamageArea = function(instigator, location, radius, damage, type, damageAllies, 
         if VDist3(u:GetPosition(), location) > radius then continue end
         if instigator == u then
             if damageSelf then
-                local vector = import('/lua/utilities.lua').GetDirectionVector(location, u:GetPosition())
+                local vector = import("/lua/utilities.lua").GetDirectionVector(location, u:GetPosition())
                 -- need this ugliness due to Damage() refuse to damage when instigator == u
                 instigator:OnDamage(instigator, damage, vector, type)
             end

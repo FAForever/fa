@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardReturnRadius = 40,
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAS',
@@ -24,15 +27,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
         },
     },
     BuildIconSortPriority = 40,
@@ -199,8 +193,8 @@ UnitBlueprint {
     SelectionSizeX = 0.36,
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.45,
-    SizeX = 0.65,
-    SizeY = 1, -- 0.65
+    SizeX = 0.8,
+    SizeY = 1,
     SizeZ = 1.65,
     StrategicIconName = 'icon_ship1_antiair',
     StrategicIconSortPriority = 165,

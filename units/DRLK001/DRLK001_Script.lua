@@ -3,16 +3,16 @@
 -- Summary  :  Cybran T3 Mobile AA
 -- Copyright © 2008 Blade Braver!
 -----------------------------------
-
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
-local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaser
-local Effects = import('/lua/effecttemplates.lua')
+local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaser
+local Effects = import("/lua/effecttemplates.lua")
 
-DRLK001 = Class(CWalkingLandUnit) {
+---@class DRLK001 : CWalkingLandUnit
+DRLK001 = ClassUnit(CWalkingLandUnit) {
     Weapons = {
-        TargetPainter = Class(TargetingLaser) {
+        TargetPainter = ClassWeapon(TargetingLaser) {
             FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_02_emit.bp'},
 
             -- Unit in range. Cease ground fire and turn on AA
@@ -37,9 +37,8 @@ DRLK001 = Class(CWalkingLandUnit) {
                 end,
             },
         },
-        AAGun = Class(CAANanoDartWeapon) {},
-        GroundGun = Class(CAANanoDartWeapon) {},
+        AAGun = ClassWeapon(CAANanoDartWeapon) {},
+        GroundGun = ClassWeapon(CAANanoDartWeapon) {},
     },
 }
-
 TypeClass = DRLK001

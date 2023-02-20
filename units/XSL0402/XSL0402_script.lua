@@ -7,13 +7,14 @@
 ----**
 ----**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local SEnergyBallUnit = import('/lua/seraphimunits.lua').SEnergyBallUnit
-local SDFUnstablePhasonBeam = import('/lua/seraphimweapons.lua').SDFUnstablePhasonBeam
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local SEnergyBallUnit = import("/lua/seraphimunits.lua").SEnergyBallUnit
+local SDFUnstablePhasonBeam = import("/lua/seraphimweapons.lua").SDFUnstablePhasonBeam
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-XSL0402 = Class(SEnergyBallUnit) {
+---@class XSL0402 : SEnergyBallUnit
+XSL0402 = ClassUnit(SEnergyBallUnit) {
     Weapons = {
-        PhasonBeam = Class(SDFUnstablePhasonBeam) {},
+        PhasonBeam = ClassWeapon(SDFUnstablePhasonBeam) {},
     },
 
     OnCreate = function(self)

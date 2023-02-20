@@ -1,8 +1,6 @@
---- Class CMauiGroup
--- @classmod User.CMauiGroup
+---@meta
 
----
---
-function CMauiGroup:moho.group_methods()
-end
+---@class moho.group_methods : moho.control_methods
+local CMauiGroup = {}
 
+return CMauiGroup

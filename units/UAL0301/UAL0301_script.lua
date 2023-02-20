@@ -5,17 +5,27 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
-local AWeapons = import('/lua/aeonweapons.lua')
-local ADFReactonCannon = AWeapons.ADFReactonCannon
-local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
+---@alias AeonSCUEnhancementBuffType
+---| "SCUBUILDRATE"
+---| "SCUREGENRATE"
 
-UAL0301 = Class(CommandUnit) {
+---@alias AeonSCUEnhancementBuffName          # BuffType
+---| "AeonSCUBuildRate"                       # SCUBUILDRATE
+---| "AeonSCURegenRate"                       # SCUREGENRATE
+
+
+local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
+local AWeapons = import("/lua/aeonweapons.lua")
+local ADFReactonCannon = AWeapons.ADFReactonCannon
+local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
+
+---@class UAL0301 : CommandUnit
+UAL0301 = ClassUnit(CommandUnit) {
     Weapons = {
-        RightReactonCannon = Class(ADFReactonCannon) {},
-        DeathWeapon = Class(SCUDeathWeapon) {},
+        RightReactonCannon = ClassWeapon(ADFReactonCannon) {},
+        DeathWeapon = ClassWeapon(SCUDeathWeapon) {},
     },
 
     __init = function(self)
@@ -74,8 +84,8 @@ UAL0301 = Class(CommandUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)

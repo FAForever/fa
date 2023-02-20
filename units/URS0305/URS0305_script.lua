@@ -7,9 +7,10 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
+local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
 
-URB3302 = Class(CSeaUnit) {
+---@class URB3302 : CSeaUnit
+URB3302 = ClassUnit(CSeaUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CSeaUnit.OnStopBeingBuilt(self, builder, layer)
         --enable sonar economy

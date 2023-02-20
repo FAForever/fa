@@ -4,9 +4,9 @@
 -- Summary  :  Seraphim nuclear explosion script
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------------------------------
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 local SIFExperimentalStrategicMissileEffect02 = '/effects/Entities/SIFExperimentalStrategicMissileEffect02/SIFExperimentalStrategicMissileEffect02_proj.bp'
 local SIFExperimentalStrategicMissileEffect04 = '/effects/Entities/SIFExperimentalStrategicMissileEffect04/SIFExperimentalStrategicMissileEffect04_proj.bp'

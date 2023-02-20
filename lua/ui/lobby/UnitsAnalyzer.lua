@@ -491,19 +491,14 @@ end
 
 -- Get specs for a weapon with projectiles
 function GetWeaponProjectile(bp, weapon)
-    -- Multipliers is needed to properly calculate split projectiles.
-    -- Unfortunately these numbers hard-coded here are not available in the blueprint,
-    -- but specified in the .lua files for corresponding projectiles.
-    local multipliers = {
-        -- Lobo
-        ['/projectiles/TIFFragmentationSensorShell01/TIFFragmentationSensorShell01_proj.bp'] = 4,
-        -- Zthuee
-        ['/projectiles/SIFThunthoArtilleryShell01/SIFThunthoArtilleryShell01_proj.bp'] = 5
-    }
 
-    if weapon.ProjectileId then
-       weapon.Multi = multipliers[weapon.ProjectileId] or 1
+    local split = 1
+    local projPhysics = __blueprints[weapon.ProjectileId].Physics
+    while projPhysics do
+        split = split * (projPhysics.Fragments or 1)
+        projPhysics = __blueprints[projPhysics.FragmentId].Physics
     end
+    weapon.Multi = split
 
     -- NOTE that weapon.ProjectilesPerOnFire is not used at all in FA game
     if weapon.MuzzleSalvoSize > 1 then
@@ -1169,7 +1164,7 @@ local mods = { Cached = {}, Active = {}, Changed = false }
 -- Checks if game mods have changed between consecutive calls to this function
 -- Thus returns whether or not blueprints need to be reloaded
 function DidModsChanged()
-    mods.All = import('/lua/mods.lua').GetGameMods()
+    mods.All = import("/lua/mods.lua").GetGameMods()
     mods.Active = {}
     mods.Changed = false
 

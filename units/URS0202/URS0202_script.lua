@@ -5,16 +5,17 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFProtonCannonWeapon = CybranWeaponsFile.CDFProtonCannonWeapon
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local CAMZapperWeapon03 = CybranWeaponsFile.CAMZapperWeapon03
-local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaserInvisible
+local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaserInvisible
 
-URS0202 = Class(CSeaUnit) {
+---@class URS0202 : CSeaUnit
+URS0202 = ClassUnit(CSeaUnit) {
     Weapons = {
-        TargetPainter = Class(TargetingLaser) {
+        TargetPainter = ClassWeapon(TargetingLaser) {
             -- Unit in range. Cease ground fire and turn on AA
             OnWeaponFired = function(self)
                 if not self.AA then
@@ -37,10 +38,10 @@ URS0202 = Class(CSeaUnit) {
                 end,
             },
         },
-        ParticleGun = Class(CDFProtonCannonWeapon) {},
-        AAGun = Class(CAANanoDartWeapon) {},
-        GroundGun = Class(CAANanoDartWeapon) {},
-        Zapper = Class(CAMZapperWeapon03) {},
+        ParticleGun = ClassWeapon(CDFProtonCannonWeapon) {},
+        AAGun = ClassWeapon(CAANanoDartWeapon) {},
+        GroundGun = ClassWeapon(CAANanoDartWeapon) {},
+        Zapper = ClassWeapon(CAMZapperWeapon03) {},
     },
 }
 

@@ -7,9 +7,10 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
+local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
-UEB1101 = Class(TEnergyCreationUnit) {
+---@class UEB1101 : TEnergyCreationUnit
+UEB1101 = ClassUnit(TEnergyCreationUnit) {
     OnCreate = function(self)
         TEnergyCreationUnit.OnCreate(self)
         self.Sliders = {

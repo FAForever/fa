@@ -1,24 +1,19 @@
---****************************************************************************
---**
---**  Author(s):  Mikko Tyster, Atte Hulkkonen
---**
---**  Summary  :  Seraphim T3 Mobile Lightning Anti-Air
---**
---**  Copyright © 2008 Blade Braver!
---****************************************************************************
+------------------------------------------------------------------------------
+-- Author(s):  Mikko Tyster, Atte Hulkkonen
+-- Summary  :  Seraphim T3 Mobile Lightning Anti-Air
+-- Copyright © 2008 Blade Braver!
+------------------------------------------------------------------------------
 
-local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
---local CollisionBeamFile = import('/lua/kirvesbeams.lua')
-local DefaultBeamWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultBeamWeapon
---local Dummy = import('/lua/kirvesweapons.lua').Dummy
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+--local CollisionBeamFile = import("/lua/kirvesbeams.lua")
+local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
+--local Dummy = import("/lua/kirvesweapons.lua").Dummy
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
-local SCCollisionBeam = import('/lua/defaultcollisionbeams.lua').SCCollisionBeam
+local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
+local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
-
-
-local PhasonCollisionBeam = Class(SCCollisionBeam) {
+local PhasonCollisionBeam = ClassWeapon(SCCollisionBeam) {
 
     FxBeamStartPoint = {
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_01_emit.bp',
@@ -44,113 +39,9 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
     TerrainImpactScale = 0.2,
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.25,
-
-    OnImpact = function(self, impactType, targetEntity)
-        CollisionBeam.OnImpact(self, impactType, targetEntity)
-    end,
-
-    OnDisable = function(self)
-        CollisionBeam.OnDisable(self)
-        KillThread(self.Scorching)
-        self.Scorching = nil
-    end,
-
-    PassTarget = function(self, entity, position)
-        self.TargetEntity = entity
-        self.TargetPosition = position
-    end,
-
-    PassOrigin = function(self, originUnit, originBone)
-        self.OriginUnit = originUnit
-        self.OriginBone = originBone
-    end,
-
-    DoDamage = function(self, instigator, damageData, targetEntity)
-
-        -- fix me: beam weapons shouldn't be used. Instead, use a projectile based weapon that looks like a beam weapon.
-        if self.TargetEntity then
-            if EntityCategoryContains(categories.AIR, self.TargetEntity) then 
-                targetEntity = self.TargetEntity
-            end
-        end
-
-        local damage = damageData.DamageAmount or 0
-
-        if self.Weapon.DamageModifiers then
-            local dmgmod = 1
-            for k, v in self.Weapon.DamageModifiers do
-                dmgmod = v * dmgmod
-            end
-            damage = damage * dmgmod
-        end
-
-        if damage <= 0 then return end
-
-        if instigator then
-            local radius = damageData.DamageRadius
-            local BeamEndPos = self:GetPosition(1)
-            if targetEntity and targetEntity.GetPosition then
-                BeamEndPos = targetEntity:GetPosition()
-            end
-
-
-            if radius and radius > 0 then
-                if not damageData.DoTTime or damageData.DoTTime <= 0 then
-                    DamageArea(instigator, BeamEndPos, radius, damage, damageData.DamageType or 'Normal', damageData.DamageFriendly or false)
-                else
-                    ForkThread(DefaultDamage.AreaDoTThread, instigator, BeamEndPos, damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), radius, damage, damageData.DamageType, damageData.DamageFriendly)
-                end
-            elseif targetEntity then
-                if not damageData.DoTTime or damageData.DoTTime <= 0 then
-                    Damage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
-                else
-                    ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), damage, damageData.DamageType, damageData.DamageFriendly)
-                end
-            else
-                DamageArea(instigator, BeamEndPos, 0.25, damage, damageData.DamageType, damageData.DamageFriendly)
-            end
-        else
-            LOG('*ERROR: THERE IS NO INSTIGATOR FOR DAMAGE ON THIS COLLISIONBEAM = ', repr(damageData))
-        end
-    end,
-
-    CreateBeamEffects = function(self)
-        -- Destructively overwriting this function to make it use AttachBeamEntityToEntity()
-        for k, y in self.FxBeamStartPoint do
-            local fx = CreateAttachedEmitter(self, 0, self.Army, y):ScaleEmitter(self.FxBeamStartPointScale)
-            table.insert(self.BeamEffectsBag, fx)
-            self.Trash:Add(fx)
-        end
-        for k, y in self.FxBeamEndPoint do
-            local fx = CreateAttachedEmitter(self, 1, self.Army, y):ScaleEmitter(self.FxBeamEndPointScale)
-            table.insert(self.BeamEffectsBag, fx)
-            self.Trash:Add(fx)
-        end
-        if not table.empty(self.FxBeam) then
-
-            local fxBeam
-            local bp = self.FxBeam[Random(1, table.getn(self.FxBeam))]
-            if self.TargetEntity then
-                fxBeam = AttachBeamEntityToEntity(self.OriginUnit, self.OriginBone, self.TargetEntity, -2, self.Army, bp)
-            else
-                fxBeam = CreateBeamEmitter(bp, self.Army)
-                AttachBeamToEntity(fxBeam, self, 0, self.Army)
-            end
-
-            -- collide on start if it's a continuous beam
-            local weaponBlueprint = self.Weapon:GetBlueprint()
-            local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
-            self:SetBeamFx(fxBeam, bCollideOnStart)
-
-            table.insert(self.BeamEffectsBag, fxBeam)
-            self.Trash:Add(fxBeam)
-        else
-            LOG('*ERROR: THERE IS NO BEAM EMITTER DEFINED FOR THIS COLLISION BEAM ', repr(self.FxBeam))
-        end
-    end,
 }
 
-local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
+local PhasonCollisionBeam2 = ClassWeapon(PhasonCollisionBeam) {
 
     FxBeam = { '/Effects/Emitters/seraphim_lightning_beam_02_emit.bp', },
     TerrainImpactScale = 0.1,
@@ -178,7 +69,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
-        local Util = import('/lua/utilities.lua')
+        local Util = import("/lua/utilities.lua")
 
         while true do
             if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
@@ -196,33 +87,19 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
     end,
 }
 
-local PhasonBeam = Class(DefaultBeamWeapon) {
+local PhasonBeam = ClassWeapon(DefaultBeamWeapon) {
     BeamType = PhasonCollisionBeam,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {},
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 0.2,
-
-    PlayFxBeamStart = function(self, muzzle)
-        local beam
-        for k, v in self.Beams do
-            if v.Muzzle == muzzle then
-                beam = v.Beam
-                break
-            end
-        end
-        if beam and not beam:IsEnabled() then
-            beam:PassOrigin(self.unit, muzzle)
-            beam:PassTarget(self:GetCurrentTarget(), self:GetCurrentTargetPos())
-        end
-        return DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
-    end,
 }
 
-DSLK004 = Class(SLandUnit) {
+---@class DSLK004 : SLandUnit
+DSLK004 = ClassUnit(SLandUnit) {
     Weapons = {
-        PhasonBeamAir = Class(PhasonBeam) {},
-        PhasonBeamGround = Class(PhasonBeam) {
+        PhasonBeamAir = ClassWeapon(PhasonBeam) {},
+        PhasonBeamGround = ClassWeapon(PhasonBeam) {
             BeamType = PhasonCollisionBeam2,
             FxBeamEndPointScale = 0.01,
         },

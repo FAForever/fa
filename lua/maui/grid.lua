@@ -1,10 +1,10 @@
-local Control = import('control.lua').Control
-local Group = import('group.lua').Group
-local ScaleNumber = import('layouthelpers.lua').ScaleNumber
-local LazyVar = import('/lua/lazyvar.lua')
+local Control = import("/lua/maui/control.lua").Control
+local Group = import("/lua/maui/group.lua").Group
+local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
+local LazyVar = import("/lua/lazyvar.lua")
 
 ---@class Grid : Group
-Grid = Class(Group) {
+Grid = ClassUI(Group) {
     -- note that the grid "assumes" your entries will be the correct width and height but doesn't enforce it
     -- controls could be bigger or smaller, it's up to you, but if they're bigger they will overlap as only
     -- the left top is placed, the whole grid is not resized
@@ -13,40 +13,40 @@ Grid = Class(Group) {
         self._itemWidth = ScaleNumber(itemWidth)
         self._itemHeight = ScaleNumber(itemHeight)
         self._items = {}
-        self._top = {}
-        self._top["Horz"] = 1
-        self._top["Vert"] = 1
-        self._visible = {}
-        self._lines = {}
-        self._lines["Horz"] = 0
-        self._lines["Vert"] = 0
-
+        self._top = {
+            ["Horz"] = 1,
+            ["Vert"] = 1
+        }
+        self._lines = {
+            ["Horz"] = 0,
+            ["Vert"] = 0
+        }
+        
         -- visible
-        self._visible["Horz"] = LazyVar.Create()
-        self._visible["Vert"] = LazyVar.Create()
+        self._visible = {
+            ["Horz"] = LazyVar.Create(),
+            ["Vert"] = LazyVar.Create()
+        }
 
         self._visible["Horz"]:Set(function() return math.floor(self.Width() / self._itemWidth) end)
         self._visible["Vert"]:Set(function() return math.floor(self.Height() / self._itemHeight) end)
-
-        -- get frame update to check visibility
-        self:SetNeedsFrameUpdate(true)
-        self._lastVisible = {}
-        self._lastVisible["Horz"] = 0
-        self._lastVisible["Vert"] = 0
-    end,
-
-    OnInit = function(self)
-        Control.OnInit(self)
-    end,
-
-    OnFrame = function(self, elapsedTime)
---TODO get rid of this frame function and use the OnDirty of the lazy vars
-        if (self._lastVisible["Horz"] != self._visible["Horz"]()) or
-           (self._lastVisible["Vert"] != self._visible["Vert"]()) then
-            self:_CalculateVisible()
-            self._lastVisible["Horz"] = self._visible["Horz"]()
-            self._lastVisible["Vert"] = self._visible["Vert"]()
+        self._visible["Horz"].OnDirty = function(var)
+            if self._lastVisible["Horz"] ~= var() then
+                self:_CalculateVisible()
+                self._lastVisible["Horz"] = var()
+            end
         end
+        self._visible["Vert"].OnDirty = function(var)
+            if self._lastVisible["Vert"] ~= var() then
+                self:_CalculateVisible()
+                self._lastVisible["Vert"] = var()
+            end
+        end
+
+        self._lastVisible = {
+            ["Horz"] = 0,
+            ["Vert"] = 0
+        }
     end,
 
     _CheckRow = function(self, row)
@@ -152,7 +152,7 @@ Grid = Class(Group) {
     RemoveItem = function(self, col, row, batch)
         if not self:_CheckRow(row) then return end
         if not self:_CheckCol(col) then return end
-        if self._items[row][col] != nil then
+        if self._items[row][col] ~= nil then
             if self._items[row][col] then self._items[row][col]:Hide() end
             self._items[row][col] = nil
         end
@@ -175,7 +175,7 @@ Grid = Class(Group) {
     DestroyItem = function(self, col, row, batch)
         if not self:_CheckRow(row) then return end
         if not self:_CheckCol(col) then return end
-        if self._items[row][col] != nil then
+        if self._items[row][col] ~= nil then
             self._items[row][col]:Destroy()
             self._items[row][col] = nil
         end
@@ -255,7 +255,7 @@ Grid = Class(Group) {
         for row = 1, self._lines["Vert"] do
             for col = 1, self._lines["Horz"] do
                 local control = self._items[row][col]
-                if control != nil then
+                if not IsDestroyed(control) then
                     if  (col >= self._top["Horz"]) and (col < self._top["Horz"] + self._visible["Horz"]()) and
                         (row >= self._top["Vert"]) and (row < self._top["Vert"] + self._visible["Vert"]()) then
                         control:SetHidden(false)
@@ -280,4 +280,11 @@ Grid = Class(Group) {
         -- possible to make them not so.
         return not hidden
     end,
+
+    OnDestroy = function(self)
+        self._visible["Horz"]:Destroy()
+        self._visible["Horz"] = nil
+        self._visible["Vert"]:Destroy()
+        self._visible["Vert"] = nil
+    end
 }

@@ -8,12 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
-local AANDepthChargeBombWeapon = import('/lua/aeonweapons.lua').AANDepthChargeBombWeapon
+local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
+local AANDepthChargeBombWeapon = import("/lua/aeonweapons.lua").AANDepthChargeBombWeapon
 
-UAA0204 = Class(AAirUnit) {
+---@class UAA0204 : AAirUnit
+UAA0204 = ClassUnit(AAirUnit) {
     Weapons = {
-        Bomb = Class(AANDepthChargeBombWeapon) {},
+        Bomb = ClassWeapon(AANDepthChargeBombWeapon) {},
     },
 }
 

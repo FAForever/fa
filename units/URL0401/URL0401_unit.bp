@@ -44,15 +44,6 @@
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 25,
-            Level3 = 45,
-            Level4 = 60,
-            Level5 = 80,
-        },
-    },
     BuildIconSortPriority = 10,
     Categories = {
         'PRODUCTSC1',

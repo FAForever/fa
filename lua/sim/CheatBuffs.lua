@@ -5,6 +5,17 @@
 --**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+
+---@alias CheatBuffType
+---| "CHEATBUILDRATE"
+---| "CHEATINCOME"
+---| "INTELCHEAT"
+
+---@alias CheatBuffName
+---| "CheatBuildRate"
+---| "CheatIncome"
+---| "CheatIntel"
+
 BuffBlueprint {
     Name = 'CheatBuildRate',
     DisplayName = 'CheatBuildRate',
@@ -22,7 +33,7 @@ BuffBlueprint {
 BuffBlueprint {
     Name = 'CheatIncome',
     DisplayName = 'CheatIncome',
-    BuffType = 'CHEATBUILDRATE',
+    BuffType = 'CHEATINCOME',
     Stacks = 'ALWAYS',
     Duration = -1,
     Affects = {

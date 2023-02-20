@@ -5,9 +5,10 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TCivilianStructureUnit = import('/lua/terranunits.lua').TCivilianStructureUnit
+local TCivilianStructureUnit = import("/lua/terranunits.lua").TCivilianStructureUnit
 
-XEC8005 = Class(TCivilianStructureUnit) {
+---@class XEC8005 : TCivilianStructureUnit
+XEC8005 = ClassUnit(TCivilianStructureUnit) {
 }
 
 

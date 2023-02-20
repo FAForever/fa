@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ALandFactoryUnit = import('/lua/aeonunits.lua').ALandFactoryUnit
+local ALandFactoryUnit = import("/lua/aeonunits.lua").ALandFactoryUnit
 
-UAB0201 = Class(ALandFactoryUnit) { }
+---@class UAB0201 : ALandFactoryUnit
+UAB0201 = ClassUnit(ALandFactoryUnit) { }
 
 TypeClass = UAB0201

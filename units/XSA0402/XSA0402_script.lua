@@ -8,22 +8,23 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
+local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
+local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeapon
 local SB0OhwalliExperimentalStrategicBombWeapon = SeraphimWeapons.SB0OhwalliExperimentalStrategicBombWeapon
-local CreateSeraphimExperimentalBuildBaseThread = import('/lua/EffectUtilitiesSeraphim.lua').CreateSeraphimExperimentalBuildBaseThread
-local explosion = import('/lua/defaultexplosions.lua')
+local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
+local explosion = import("/lua/defaultexplosions.lua")
 
-XSA0402 = Class(SAirUnit) {
+---@class XSA0402 : SAirUnit
+XSA0402 = ClassUnit(SAirUnit) {
     DestroyNoFallRandomChance = 1.1,
     
     Weapons = {
-        Bomb = Class(SB0OhwalliExperimentalStrategicBombWeapon) {},
-        RightFrontAutocannon = Class(SAALosaareAutoCannonWeapon) {},
-        LeftFrontAutocannon = Class(SAALosaareAutoCannonWeapon) {},
-        RightRearAutocannon = Class(SAALosaareAutoCannonWeapon) {},
-        LeftRearAutocannon = Class(SAALosaareAutoCannonWeapon) {},
+        Bomb = ClassWeapon(SB0OhwalliExperimentalStrategicBombWeapon) {},
+        RightFrontAutocannon = ClassWeapon(SAALosaareAutoCannonWeapon) {},
+        LeftFrontAutocannon = ClassWeapon(SAALosaareAutoCannonWeapon) {},
+        RightRearAutocannon = ClassWeapon(SAALosaareAutoCannonWeapon) {},
+        LeftRearAutocannon = ClassWeapon(SAALosaareAutoCannonWeapon) {},
     },
     
     ContrailEffects = {'/effects/emitters/contrail_ser_ohw_polytrail_01_emit.bp',},

@@ -8,21 +8,22 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
-local WeaponsFile = import('/lua/terranweapons.lua')
+local TSeaUnit = import("/lua/terranunits.lua").TSeaUnit
+local WeaponsFile = import("/lua/terranweapons.lua")
 local TAALinkedRailgun = WeaponsFile.TAALinkedRailgun
 local TAMPhalanxWeapon = WeaponsFile.TAMPhalanxWeapon
 local TDFGaussCannonWeapon = WeaponsFile.TDFShipGaussCannonWeapon
 
-UES0302 = Class(TSeaUnit) {
+---@class UES0302 : TSeaUnit
+UES0302 = ClassUnit(TSeaUnit) {
 
 
     Weapons = {
-        RightAAGun01 = Class(TAALinkedRailgun) {},
-        RightAAGun02 = Class(TAALinkedRailgun) {},
-        LeftAAGun01 = Class(TAALinkedRailgun) {},
-        LeftAAGun02 = Class(TAALinkedRailgun) {},
-        RightPhalanxGun01 = Class(TAMPhalanxWeapon) {
+        RightAAGun01 = ClassWeapon(TAALinkedRailgun) {},
+        RightAAGun02 = ClassWeapon(TAALinkedRailgun) {},
+        LeftAAGun01 = ClassWeapon(TAALinkedRailgun) {},
+        LeftAAGun02 = ClassWeapon(TAALinkedRailgun) {},
+        RightPhalanxGun01 = ClassWeapon(TAMPhalanxWeapon) {
             PlayFxWeaponUnpackSequence = function(self)
                 if not self.SpinManip then 
                     self.SpinManip = CreateRotator(self.unit, 'Right_Turret02_Barrel', 'z', nil, 270, 180, 60)
@@ -42,7 +43,7 @@ UES0302 = Class(TSeaUnit) {
             end,
             
         },
-        LeftPhalanxGun01 = Class(TAMPhalanxWeapon) {
+        LeftPhalanxGun01 = ClassWeapon(TAMPhalanxWeapon) {
             PlayFxWeaponUnpackSequence = function(self)
                 if not self.SpinManip then 
                     self.SpinManip = CreateRotator(self.unit, 'Left_Turret02_Barrel', 'z', nil, 270, 180, 60)
@@ -62,9 +63,9 @@ UES0302 = Class(TSeaUnit) {
             end,
 
         },
-        FrontTurret01 = Class(TDFGaussCannonWeapon) {},
-        FrontTurret02 = Class(TDFGaussCannonWeapon) {},
-        BackTurret = Class(TDFGaussCannonWeapon) {},
+        FrontTurret01 = ClassWeapon(TDFGaussCannonWeapon) {},
+        FrontTurret02 = ClassWeapon(TDFGaussCannonWeapon) {},
+        BackTurret = ClassWeapon(TDFGaussCannonWeapon) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)

@@ -5,6 +5,7 @@ UnitBlueprint {
         RepairConsumeEnergy = 30,
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
+        GuardReturnRadius = 15,
         TargetBones = {
             'URS0303',
             'Back_Wake',
@@ -36,15 +37,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Cybran_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
         },
     },
     BuildIconSortPriority = 40,
@@ -127,13 +119,6 @@ UnitBlueprint {
                     SpecularName = 'urs0303_lod1_specteam.dds',
                 },
             },
-        },
-        MotionAdjustment = {
-            Sliderlanding = 0.5,
-            Sliderstatic = -8,
-            Yoffsetinmotion = 0.5,
-            Yoffsetlanding = -0.375,
-            slideinmotion = 0.5,
         },
         MovementEffects = {
             Water = {
@@ -575,6 +560,7 @@ UnitBlueprint {
             FiringTolerance = 5,
             Label = 'Zapper',
             MaxRadius = 50,
+            MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             NeedPrep = true,

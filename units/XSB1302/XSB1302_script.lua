@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SMassCollectionUnit = import('/lua/seraphimunits.lua').SMassCollectionUnit
+local SMassCollectionUnit = import("/lua/seraphimunits.lua").SMassCollectionUnit
 
-XSB1302 = Class(SMassCollectionUnit) {
+---@class XSB1302 : SMassCollectionUnit
+XSB1302 = ClassUnit(SMassCollectionUnit) {
 
     OnCreate = function(self)
         SMassCollectionUnit.OnCreate(self)

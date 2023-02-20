@@ -81,15 +81,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 15,
     Categories = {
         'PRODUCTFA',
@@ -311,7 +302,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 3,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             NeedPrep = true,
             ProjectileId = '/projectiles/SAAShleoAAGatlingGun03/SAAShleoAAGatlingGun03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
@@ -387,7 +378,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 3,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             NeedPrep = true,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/SAAShleoAAGatlingGun03/SAAShleoAAGatlingGun03_proj.bp',
@@ -500,7 +491,7 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 25,
+            Damage = 200,
             DamageFriendly = true,
             DamageRadius = 1,
             DamageType = 'Normal',

@@ -1,9 +1,9 @@
 --
 -- Terran Sub-Launched Cruise Missile
 --
-local TMissileCruiseSubProjectile = import('/lua/terranprojectiles.lua').TMissileCruiseSubProjectile
+local TMissileCruiseSubProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseSubProjectile
 
-TIFMissileCruise02 = Class(TMissileCruiseSubProjectile) {
+TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
 
 	FxAirUnitHitScale = 1.65,
     FxLandHitScale = 1.65,
@@ -20,17 +20,15 @@ TIFMissileCruise02 = Class(TMissileCruiseSubProjectile) {
     OnCreate = function(self)
         TMissileCruiseSubProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self.MovementTurnLevel = 1
-        self:ForkThread( self.MovementThread )
+        self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
     MovementThread = function(self)        
-        self.WaitTime = 0.1
         self:SetTurnRate(8)
-        WaitSeconds(0.3)        
+        WaitTicks(4)        
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 
@@ -39,16 +37,16 @@ TIFMissileCruise02 = Class(TMissileCruiseSubProjectile) {
         --Get the nuke as close to 90 deg as possible
         if dist > 50 then        
             --Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+            WaitTicks(21)
             self:SetTurnRate(20)
         elseif dist > 64 and dist <= 107 then
 						-- Increase check intervals
 						self:SetTurnRate(30)
-						WaitSeconds(1.5)
+						WaitTicks(16)
             self:SetTurnRate(30)
         elseif dist > 21 and dist <= 53 then
 						-- Further increase check intervals
-            WaitSeconds(0.3)
+                        WaitTicks(4)
             self:SetTurnRate(50)
 				elseif dist > 0 and dist <= 21 then
 						-- Further increase check intervals            

@@ -4,11 +4,11 @@
 -- Summary  :  Inaino Strategic Missile Projectile script, XSB2305
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------------------------
-local SIFInainoStrategicMissile = import('/lua/seraphimprojectiles.lua').SIFInainoStrategicMissile
+local SIFInainoStrategicMissile = import("/lua/seraphimprojectiles.lua").SIFInainoStrategicMissile
 
-SIFInainoStrategicMissile01 = Class(SIFInainoStrategicMissile) {
+SIFInainoStrategicMissile01 = ClassProjectile(SIFInainoStrategicMissile) {
     FxSplashScale = 0.5,
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 
     LaunchSound = 'Nuke_Launch',
     ExplodeSound = 'Nuke_Impact',

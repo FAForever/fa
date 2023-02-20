@@ -1,8 +1,8 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
-local Group = import('/lua/maui/group.lua').Group
+local Group = import("/lua/maui/group.lua").Group
 
 --- Various marker types in categories that we support
 local EnabledMarkerTypes = {
@@ -18,6 +18,7 @@ EnabledMarkerTypes.Pathing["Land Path Node"] = false
 EnabledMarkerTypes.Pathing["Air Path Node"] = false
 EnabledMarkerTypes.Pathing["Water Path Node"] = false
 EnabledMarkerTypes.Pathing["Amphibious Path Node"] = false
+EnabledMarkerTypes.AI["Spawn"] = false
 EnabledMarkerTypes.AI["Rally Point"] = false
 EnabledMarkerTypes.AI["Expansion Area"] = false
 EnabledMarkerTypes.AI["Large Expansion Area"] = false

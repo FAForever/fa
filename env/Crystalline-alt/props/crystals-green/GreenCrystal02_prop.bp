@@ -26,14 +26,8 @@ PropBlueprint {
         ReclaimMassMax = 40,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 0,
-    },
     Interface = {
         HelpText = 'Crystal Formation',
-    },
-    Physics = {
-        BlockPath = false,
     },
     SizeX = 2,
     SizeY = 2.25,

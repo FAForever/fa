@@ -10,13 +10,14 @@
 --
 -- Cybran Interceptor Script : URA0102
 --
-local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CAAAutocannon = import('/lua/cybranweapons.lua').CAAAutocannon
+local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
+local CAAAutocannon = import("/lua/cybranweapons.lua").CAAAutocannon
 
-URA0102 = Class(CAirUnit) {
+---@class URA0102 : CAirUnit
+URA0102 = ClassUnit(CAirUnit) {
     Weapons = {
-        AutoCannon = Class(CAAAutocannon) {},
-        AutoCannon2 = Class(CAAAutocannon) {},
+        AutoCannon = ClassWeapon(CAAAutocannon) {},
+        AutoCannon2 = ClassWeapon(CAAAutocannon) {},
     },
 }
 

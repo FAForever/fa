@@ -5,14 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local Projectile = import('/lua/sim/Projectile.lua').Projectile
-local DummyProjectile = import('/lua/sim/Projectile.lua').DummyProjectile
-local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
-local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities
+local Projectile = import("/lua/sim/projectile.lua").Projectile
+local DummyProjectile = import("/lua/sim/projectile.lua").DummyProjectile
+local UnitsInSphere = import("/lua/utilities.lua").GetTrueEnemyUnitsInSphere
+local GetDistanceBetweenTwoEntities = import("/lua/utilities.lua").GetDistanceBetweenTwoEntities
 local OCProjectiles = {}
 
 -- shared between sim and ui
-local OverchargeShared = import('/lua/shared/overcharge.lua')
+local OverchargeShared = import("/lua/shared/overcharge.lua")
 
 -- upvalue globals for performance
 local Random = Random
@@ -22,8 +22,6 @@ local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
 
 local TableGetn = table.getn
 
-local MathFloor = math.floor 
-
 -- upvalue moho functions for performance
 local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
 local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
@@ -31,30 +29,33 @@ local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
+
 ---@class NullShell : Projectile
-NullShell = Class(Projectile) {}
+NullShell = ClassProjectile(Projectile) {}
 
 -----------------------------------------------------------------
 -- PROJECTILE WITH ATTACHED EFFECT EMITTERS
 -----------------------------------------------------------------
+
 ---@class EmitterProjectile : Projectile
-EmitterProjectile = Class(Projectile) {
+EmitterProjectile = ClassProjectile(Projectile) {
     FxTrails = {'/effects/emitters/missile_munition_trail_01_emit.bp',},
     FxTrailScale = 1,
     FxTrailOffset = 0,
 
+    ---@param self EmitterProjectile
     OnCreate = function(self)
         Projectile.OnCreate(self)
 
         local effect
         for i in self.FxTrails do
             effect = CreateEmitterOnEntity(self, self.Army, self.FxTrails[i])
-            
+
             -- only do these engine calls when they matter
             if self.FxTrailScale ~= 1 then 
                 IEffectScaleEmitter(effect, self.FxTrailScale)
             end
-            
+
             if self.FxTrailOffset ~= 1 then 
                 IEffectOffsetEmitter(effect, 0, 0, self.FxTrailOffset)
             end
@@ -65,12 +66,14 @@ EmitterProjectile = Class(Projectile) {
 -----------------------------------------------------------------
 -- BEAM PROJECTILES
 -----------------------------------------------------------------
+
 ---@class SingleBeamProjectile : EmitterProjectile
-SingleBeamProjectile = Class(EmitterProjectile) {
+SingleBeamProjectile = ClassProjectile(EmitterProjectile) {
 
     BeamName = '/effects/emitters/default_beam_01_emit.bp',
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 
+    ---@param self SingleBeamProjectile
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
 
@@ -81,11 +84,12 @@ SingleBeamProjectile = Class(EmitterProjectile) {
 }
 
 ---@class MultiBeamProjectile : EmitterProjectile
-MultiBeamProjectile = Class(EmitterProjectile) {
+MultiBeamProjectile = ClassProjectile(EmitterProjectile) {
 
     Beams = {'/effects/emitters/default_beam_01_emit.bp',},
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 
+    ---@param self MultiBeamProjectile
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
 
@@ -96,33 +100,36 @@ MultiBeamProjectile = Class(EmitterProjectile) {
     end,
 }
 
--- Nukes
+--- Nukes
 ---@class NukeProjectile : NullShell
-NukeProjectile = Class(NullShell) {
+NukeProjectile = ClassProjectile(NullShell) {
+    ---@param self NukeProjectile
     MovementThread = function(self)
-        local launcher = self:GetLauncher()
 		self.Nuke = true
-        self.CreateEffects(self, self.InitialEffects, self.Army, 1)
+        self:CreateEffects(self.InitialEffects, self.Army, 1)
         self:TrackTarget(false)
-        WaitSeconds(2.5) -- Height
+        WaitTicks(26) -- Height
         self:SetCollision(true)
-        self.CreateEffects(self, self.LaunchEffects, self.Army, 1)
-        WaitSeconds(2.5)
-        self.CreateEffects(self, self.ThrustEffects, self.Army, 3)
-        WaitSeconds(2.5)
+        self:CreateEffects(self.LaunchEffects, self.Army, 1)
+        WaitTicks(26)
+        self:CreateEffects(self.ThrustEffects, self.Army, 3)
+        WaitTicks(26)
         self:TrackTarget(true) -- Turn ~90 degrees towards target
         self:SetDestroyOnWater(true)
         self:SetTurnRate(45)
-        WaitSeconds(2) -- Now set turn rate to zero so nuke flies straight
+        WaitTicks(21) -- Now set turn rate to zero so nuke flies straight
         self:SetTurnRate(0)
         self:SetAcceleration(0.001)
-        self.WaitTime = 0.5
+        self.WaitTime = 6 -- start at 0.5; `SetTurnRateByDist` will decrease this as we get closer
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(self.WaitTime)
         end
     end,
 
+    --- Sets the turn rate to angle the nuke down if it gets close to the target (or stops turning
+    --- if too far). Otherwise, decreases `WaitTime` as it gets closer to the target.
+    ---@param self NukeProjectile
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         -- Get the nuke as close to 90 deg as possible
@@ -130,17 +137,20 @@ NukeProjectile = Class(NullShell) {
             -- Freeze the turn rate as to prevent steep angles at long distance targets
             self:SetTurnRate(0)
         elseif dist > 75 and dist <= 150 then
-            -- Increase check intervals
-            self.WaitTime = 0.3
+            -- Decrease check interval
+            self.WaitTime = 4
         elseif dist > 32 and dist <= 75 then
-            -- Further increase check intervals
-            self.WaitTime = 0.1
+            -- Further decrease check interval
+            self.WaitTime = 2
         elseif dist < 32 then
             -- Turn the missile down
             self:SetTurnRate(50)
         end
     end,
 
+    --- Gets the horizontal distance from the nuke to the current target position
+    ---@param self NukeProjectile
+    ---@return number
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
@@ -148,6 +158,10 @@ NukeProjectile = Class(NullShell) {
         return dist
     end,
 
+    ---@param self NukeProjectile
+    ---@param EffectTable FileName[]
+    ---@param army Army
+    ---@param scale number
     CreateEffects = function(self, EffectTable, army, scale)
         if not EffectTable then return end
         for k, v in EffectTable do
@@ -155,31 +169,35 @@ NukeProjectile = Class(NullShell) {
         end
     end,
 
+    ---@param self NukeProjectile
     ForceThread = function(self)
         -- Knockdown force rings
         local position = self:GetPosition()
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
-        WaitSeconds(0.1)
+        WaitTicks(2)
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
     end,
 
+    ---@param self NukeProjectile
+    ---@param TargetType string
+    ---@param TargetEntity Unit | Prop
     OnImpact = function(self, TargetType, TargetEntity)
-        if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_THREE, TargetEntity) then
-            -- Play the explosion sound
-            local myBlueprint = self:GetBlueprint()
+        if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH3, TargetEntity) then
+            local myBlueprint = self.Blueprint
             if myBlueprint.Audio.NukeExplosion then
                 self:PlaySound(myBlueprint.Audio.NukeExplosion)
             end
 
             self.effectEntity = self:CreateProjectile(self.effectEntityPath, 0, 0, 0, nil, nil, nil):SetCollision(false)
             self.effectEntity:ForkThread(self.effectEntity.EffectThread)
-            self:ForkThread(self.ForceThread)
+            self.Trash:Add(ForkThread(self.ForceThread,self))
         end
         NullShell.OnImpact(self, TargetType, TargetEntity)
     end,
 
+    ---@param self NukeProjectile
     LauncherCallbacks = function(self)
-        local launcher = self:GetLauncher()
+        local launcher = self.Launcher
         if launcher and not launcher.Dead and launcher.EventCallbacks.ProjectileDamaged then
             self.ProjectileDamaged = {}
             for k,v in launcher.EventCallbacks.ProjectileDamaged do
@@ -187,9 +205,14 @@ NukeProjectile = Class(NullShell) {
             end
         end
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self:ForkThread(self.MovementThread)
+        self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
+    ---@param self NukeProjectile
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         if self.ProjectileDamaged then
             for k,v in self.ProjectileDamaged do
@@ -199,8 +222,13 @@ NukeProjectile = Class(NullShell) {
         NullShell.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
 
+    ---@param self NukeProjectile
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
-		local bp = self:GetBlueprint().Defense.MaxHealth
+		local bp = self.Blueprint.Defense.MaxHealth
 			if bp then
 			self:DoTakeDamage(instigator, amount, vector, damageType)
 		else
@@ -212,19 +240,21 @@ NukeProjectile = Class(NullShell) {
 -----------------------------------------------------------------
 -- POLY-TRAIL PROJECTILES
 -----------------------------------------------------------------
+
 ---@class SinglePolyTrailProjectile : EmitterProjectile
-SinglePolyTrailProjectile = Class(EmitterProjectile) {
+SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     PolyTrail = '/effects/emitters/test_missile_trail_emit.bp',
     PolyTrailOffset = 0,
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 
+    ---@param self SinglePolyTrailProjectile
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
 
         if self.PolyTrail ~= '' then
             local effect = CreateTrail(self, -1, self.Army, self.PolyTrail)
-            
+
             -- only do these engine calls when they matter
             if self.PolyTrailOffset ~= 0 then 
                 IEffectOffsetEmitter(effect, 0, 0, self.PolyTrailOffset)
@@ -233,23 +263,23 @@ SinglePolyTrailProjectile = Class(EmitterProjectile) {
     end,
 }
 
--- upvalue for performance
-
-
 ---@class MultiPolyTrailProjectile : EmitterProjectile
-MultiPolyTrailProjectile = Class(EmitterProjectile) {
+MultiPolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
-    PolyTrailOffset = {0},
-    FxTrails = {},
-    RandomPolyTrails = 0,   -- Count of how many are selected randomly for PolyTrail table
+    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset1,
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 
+    --- Count of how many are selected randomly for PolyTrail table
+    RandomPolyTrails = 0,   
+
+    ---@param self MultiPolyTrailProjectile
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
 
         if self.PolyTrails then
             local effect
-            local army = self.Army 
+            local army = self.Army
             local NumPolyTrails = TableGetn(self.PolyTrails)
 
             if self.RandomPolyTrails ~= 0 then
@@ -277,19 +307,19 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
     end,
 }
 
-
 -----------------------------------------------------------------
 -- COMPOSITE EMITTER PROJECTILES - MULTIPURPOSE PROJECTILES
 -- - THAT COMBINES BEAMS, POLYTRAILS, AND NORMAL EMITTERS
 -----------------------------------------------------------------
 
--- LIGHTWEIGHT VERSION THAT LIMITS USE TO 1 BEAM, 1 POLYTRAIL, AND STANDARD EMITTERS
+--- Lightweight Version That Limits Use To 1 Beam, polytrail and standard emitters
 ---@class SingleCompositeEmitterProjectile : SinglePolyTrailProjectile
-SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
+SingleCompositeEmitterProjectile = ClassProjectile(SinglePolyTrailProjectile) {
 
     BeamName = '/effects/emitters/default_beam_01_emit.bp',
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 
+    ---@param self SingleCompositeEmitterProjectile
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
 
@@ -299,16 +329,18 @@ SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
     end,
 }
 
--- HEAVYWEIGHT VERSION, ALLOWS FOR MULTIPLE BEAMS, POLYTRAILS, AND STANDARD EMITTERS
+--- Heavyweight Version, Allows for multiple beams, polytrails and standard emmiters
 ---@class MultiCompositeEmitterProjectile : MultiPolyTrailProjectile
-MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
+MultiCompositeEmitterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
 
     Beams = {'/effects/emitters/default_beam_01_emit.bp',},
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
-    PolyTrailOffset = {0},
-    RandomPolyTrails = 0,   -- Count of how many are selected randomly for PolyTrail table
-    FxTrails = {},
+    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset1,
+    -- Count of how many are selected randomly for PolyTrail table
+    RandomPolyTrails = 0,
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 
+    ---@param self MultiCompositeEmitterProjectile
     OnCreate = function(self)
         MultiPolyTrailProjectile.OnCreate(self)
 
@@ -322,8 +354,9 @@ MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
 -----------------------------------------------------------------
 -- TRAIL ON ENTERING WATER PROJECTILE
 -----------------------------------------------------------------
+
 ---@class OnWaterEntryEmitterProjectile : Projectile
-OnWaterEntryEmitterProjectile = Class(Projectile) {
+OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     FxTrails = {'/effects/emitters/torpedo_munition_trail_01_emit.bp',},
     FxTrailScale = 1,
     FxTrailOffset = 0,
@@ -331,23 +364,29 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
     PolyTrailOffset = 0,
     TrailDelay = 5,
     EnterWaterSound = 'Torpedo_Enter_Water_01',
+    FxEnterWater= {
+        '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
+        '/effects/emitters/water_splash_plume_01_emit.bp',
+    },
 
+    ---@param self OnWaterEntryEmitterProjectile
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
         Projectile.OnCreate(self, inWater)
 
         if inWater then
 
             local effect 
-            local army = self.Army 
+            local army = self.Army
 
             for i in self.FxTrails do
                 effect = CreateEmitterOnEntity(self, army, self.FxTrails[i])
-            
+
                 -- only do these engine calls when they matter
                 if self.FxTrailScale ~= 1 then 
                     IEffectScaleEmitter(effect, self.FxTrailScale)
                 end
-                
+
                 if self.FxTrailOffset ~= 1 then 
                     IEffectOffsetEmitter(effect, 0, 0, self.FxTrailOffset)
                 end
@@ -355,7 +394,7 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
 
             if self.PolyTrail ~= '' then
                 effect = CreateTrail(self, -1, army, self.PolyTrail)
-            
+
                 -- only do these engine calls when they matter
                 if self.PolyTrailOffset ~= 0 then 
                     IEffectOffsetEmitter(effect, 0, 0, self.PolyTrailOffset)
@@ -364,41 +403,55 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
         end
     end,
 
+    ---@param self OnWaterEntryEmitterProjectile
     EnterWaterThread = function(self)
         WaitTicks(self.TrailDelay)
 
-        local effect 
-        local army = self.Army 
+        local army = self.Army
+        local fxTrails = self.FxTrails
+        local fxTrailScale = self.FxTrailScale
+        local fxTrailOffset = self.FxTrailOffset
+        local polyTrail = self.PolyTrail
+        local polyTrailOffset = self.PolyTrailOffset
 
-        for i in self.FxTrails do
-            effect = CreateEmitterOnEntity(self, army, self.FxTrails[i])
-        
+        for i in fxTrails do
+            local effect = CreateEmitterOnEntity(self, army, fxTrails[i])
+
             -- only do these engine calls when they matter
-            if self.FxTrailScale ~= 1 then 
-                IEffectScaleEmitter(effect, self.FxTrailScale)
+            if fxTrailScale ~= 1 then
+                IEffectScaleEmitter(effect, fxTrailScale)
             end
-            
-            if self.FxTrailOffset ~= 1 then 
-                IEffectOffsetEmitter(effect, 0, 0, self.FxTrailOffset)
+
+            if fxTrailOffset ~= 1 then
+                IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
             end
         end
-        if self.PolyTrail ~= '' then
-            local effect = CreateTrail(self, -1, army, self.PolyTrail)
-            
+
+        if polyTrail ~= '' then
+            local effect = CreateTrail(self, -1, army, polyTrail)
+
             -- only do these engine calls when they matter
-            if self.PolyTrailOffset ~= 0 then 
-                IEffectOffsetEmitter(effect, 0, 0, self.PolyTrailOffset)
+            if polyTrailOffset ~= 0 then
+                IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
             end
         end
     end,
 
+    ---@param self OnWaterEntryEmitterProjectile
     OnEnterWater = function(self)
         Projectile.OnEnterWater(self)
+
+        self:SetVelocityAlign(true)
+        self:SetStayUpright(false)
         self:TrackTarget(true)
         self:StayUnderwater(true)
-        self.TTT1 = self:ForkThread(self.EnterWaterThread)
+        self:SetVelocity(0.5)
+        self.Trash:Add(ForkThread(self.EnterWaterThread, self))
     end,
 
+    ---@param self OnWaterEntryEmitterProjectile
+    ---@param TargetType string
+    ---@param TargetEntity Unit
     OnImpact = function(self, TargetType, TargetEntity)
         Projectile.OnImpact(self, TargetType, TargetEntity)
         KillThread(self.TTT1)
@@ -428,8 +481,11 @@ local EmitterMethods = _G.moho.IEffect
 local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
 
 ---@class BaseGenericDebris : DummyProjectile
-BaseGenericDebris = Class(DummyProjectile){
+BaseGenericDebris = ClassProjectile(DummyProjectile) {
 
+    ---@param self BaseGenericDebris
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
 
         -- cache values
@@ -444,7 +500,7 @@ BaseGenericDebris = Class(DummyProjectile){
         elseif targetType == 'Water' then
             impactSnd = "ImpactWater"
         end
-        
+
         -- play impact sound
         local snd = blueprint.Audio[impactSnd]
         if snd then 
@@ -467,7 +523,7 @@ BaseGenericDebris = Class(DummyProjectile){
 
             -- store values in cache
             local emit = false
-            local army = self.Army 
+            local army = self.Army
             local effectScale = blueprintDisplayImpactEffects.Scale or 1
 
             for _, v in terrainEffects do
@@ -490,16 +546,27 @@ BaseGenericDebris = Class(DummyProjectile){
 -----------------------------------------------------------
 
 ---@class OverchargeProjectile
-OverchargeProjectile = Class() {
+OverchargeProjectile = ClassSimple {
+    ---@param self OverchargeProjectile
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
         self.DamageData.DamageAmount = 0
 
         local launcher = self:GetLauncher()
-        if not launcher then return end
+        if not launcher then 
+            return 
+        end
 
         local wep = launcher:GetWeaponByLabel('OverCharge')
-        if not wep then return end
+        if not wep then
+             return 
+            end
+
+        if IsDestroyed(wep) then
+            return
+        end
 
         --  Table layout for Overcharge data section
         --  Overcharge = {
@@ -593,17 +660,27 @@ OverchargeProjectile = Class() {
         end
     end,
 
+    ---@param self OverchargeProjectile
+    ---@param damage number
+    ---@return integer
     DamageAsEnergy = function(self, damage)
         return OverchargeShared.DamageAsEnergy(damage)
     end,
 
+    ---@param self OverchargeProjectile
+    ---@param energy number
+    ---@return number
     EnergyAsDamage = function(self, energy)
         return OverchargeShared.EnergyAsDamage(energy)
     end,
 
+    ---@param self OverchargeProjectile
+    ---@param targetType string
+    ---@param targetEntity Unit
+    ---@return number
     UnitsDetection = function(self, targetType, targetEntity)
      -- looking for units around target which are in splash range
-        local launcher = self:GetLauncher()
+        local launcher = self.Launcher
         local maxHP = 0
 
         for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE -categories.COMMAND) or {} do
@@ -639,8 +716,9 @@ OverchargeProjectile = Class() {
         end
     end,
 
+    ---@param self OverchargeProjectile
     OnCreate = function(self)
-        self.Army = self:GetArmy()
+        self.Army = self.Army
 
         if not OCProjectiles[self.Army] then
             OCProjectiles[self.Army] = 0
@@ -649,3 +727,6 @@ OverchargeProjectile = Class() {
         OCProjectiles[self.Army] = OCProjectiles[self.Army] + 1
     end,
 }
+
+-- Kept for mod backwards compatability
+local MathFloor = math.floor

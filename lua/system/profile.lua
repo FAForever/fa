@@ -108,7 +108,7 @@ end
 -- Note: For memreport to function, you must call debug.trackkallocations(true)
 --       There is one in globalinit.lua but you may also place it in anywhere you
 --       want to begin tracking memory allocations
---       simlua import('/lua/system/profile.lua').memreport()
+--       simlua import("/lua/system/profile.lua").memreport()
 function memreport()
     local all = table.copy(debug.allocinfo())
 

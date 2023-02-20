@@ -38,15 +38,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 150,
     Categories = {
         'PRODUCTSC1',
@@ -122,8 +113,8 @@ UnitBlueprint {
         UniformScale = 0.04,
     },
     Economy = {
-        BuildCostEnergy = 210000,
-        BuildCostMass = 15000,
+        BuildCostEnergy = 412500,
+        BuildCostMass = 16500,
         BuildRate = 1500,
         BuildTime = 25000,
         RebuildBonusIds = {
@@ -233,7 +224,7 @@ UnitBlueprint {
             ForceSingleFire = true,
             InitialProjectileStorage = 0,
             Label = 'NukeMissiles',
-            ManualFire = 1,
+            ManualFire = true,
             MaxProjectileStorage = 5,
             MaxRadius = 20000,
             MinRadius = 0,

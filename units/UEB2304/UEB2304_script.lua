@@ -8,12 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TSAMLauncher = import("/lua/terranweapons.lua").TSAMLauncher
 
-UEB2304 = Class(TStructureUnit) {
+---@class UEB2304 : TStructureUnit
+UEB2304 = ClassUnit(TStructureUnit) {
     Weapons = {
-        MissileRack01 = Class(TSAMLauncher) {},
+        MissileRack01 = ClassWeapon(TSAMLauncher) {},
     },
 }
 

@@ -26,15 +26,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 140,
     Categories = {
         'PRODUCTFA',
@@ -118,7 +109,7 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 885000,
+        BuildCostEnergy = 1327500,
         BuildCostMass = 70800,
         BuildTime = 110000,
         RebuildBonusIds = {
@@ -240,7 +231,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Suthanus Heavy Artillery Cannon',
             EnergyDrainPerSecond = 3750,
-            EnergyRequired = 7500,
+            EnergyRequired = 15000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',

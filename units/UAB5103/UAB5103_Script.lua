@@ -7,9 +7,10 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
+local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 
-UAB5103 = Class(AStructureUnit) {
+---@class UAB5103 : AStructureUnit
+UAB5103 = ClassUnit(AStructureUnit) {
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
     FxTransportBeaconScale = 1,
 

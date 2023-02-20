@@ -6,26 +6,28 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local LazyVar = import('/lua/lazyvar.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local Button = import('/lua/maui/button.lua').Button
-local Edit = import('/lua/maui/edit.lua').Edit
-local Checkbox = import('/lua/ui/controls/Checkbox.lua').Checkbox
-local RadioButtons = import('/lua/maui/radiobuttons.lua').RadioButtons
-local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Cursor = import('/lua/maui/cursor.lua').Cursor
-local Prefs = import('/lua/user/prefs.lua')
-local Border = import('/lua/ui/controls/border.lua').Border
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Layouts = import('/lua/skins/layouts.lua')
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
-local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
-local skins = import('/lua/skins/skins.lua').skins
+local LazyVar = import("/lua/lazyvar.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua").Text
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+local Button = import("/lua/maui/button.lua").Button
+local Edit = import("/lua/maui/edit.lua").Edit
+local Checkbox = import("/lua/ui/controls/checkbox.lua").Checkbox
+local RadioButtons = import("/lua/maui/radiobuttons.lua").RadioButtons
+local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Cursor = import("/lua/maui/cursor.lua").Cursor
+local Prefs = import("/lua/user/prefs.lua")
+local Border = import("/lua/ui/controls/border.lua").Border
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Layouts = import("/lua/skins/layouts.lua")
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
+local NinePatch = import("/lua/ui/controls/ninepatch.lua").NinePatch
+local InputDialog = import("/lua/ui/controls/popups/inputdialog.lua").InputDialog
+local skins = import("/lua/skins/skins.lua").skins
+
+local Layouter = LayoutHelpers.LayoutFor
 
 
 --* Handy global variables to assist skinning
@@ -156,7 +158,8 @@ local UIFileBlacklist = {
     ['/icons/units/ueb5208_icon.dds'] = true
 }
 
---* layout control, sets current layout preference
+--- Layout control, sets current layout preference
+---@param layout string
 function SetCurrentLayout(layout)
     if not layout then return end
     -- make sure this skin contains the layout, otherwise do nothing
@@ -170,11 +173,13 @@ function SetCurrentLayout(layout)
     if not foundLayout then return end
 
     currentLayout = layout
-    Prefs.SetToCurrentProfile("layout", currentLayout)
+    Prefs.SetToCurrentProfile("layout", layout)
     SelectUnits(nil)
     if changeLayoutFunction then changeLayoutFunction(layout) end
 end
 
+---@return boolean network
+---@return boolean session
 function GetNetworkBool()
     local sessionClientsTable = GetSessionClients()
     local networkBool = false
@@ -187,10 +192,13 @@ function GetNetworkBool()
     return networkBool, sessionBool
 end
 
+---@return true
 function GetAnimationPrefs()
     return true
 end
 
+---@param key string
+---@return FileName | false
 function GetLayoutFilename(key)
     if Layouts[currentLayout][key] then
         return Layouts[currentLayout][key]
@@ -200,6 +208,8 @@ function GetLayoutFilename(key)
     end
 end
 
+---@param skin Skin
+---@param isOn? boolean defaults to user preference `"world_border"`
 function UpdateWorldBorderState(skin, isOn)
     if skin == nil then
         skin = currentSkin()
@@ -210,7 +220,7 @@ function UpdateWorldBorderState(skin, isOn)
             isOn = Prefs.GetOption('world_border')
         end
         if isOn then
-            local skins = import('/lua/skins/skins.lua').skins
+            local skins = import("/lua/skins/skins.lua").skins
             if skins[skin].imagerMesh then
                 MapBorderClear()
                 --Set the world mesh to the skins world mesh
@@ -242,17 +252,38 @@ function UpdateWorldBorderState(skin, isOn)
             MapBorderClear()
         end
     end
-
 end
 
---* skin control, sets the current skin table
+---@alias Skin "random" | "uef" | "cybran" | "aeon" | "seraphim"
+
+local currentSkinName = "random"
+--- Gets name of current skin that changes when calling SetCurrentSkin()
+---@return Skin
+function GetCurrentSkinName()
+    return currentSkinName
+end
+
+--- Sets the current skin table
+---@param skin Skin
+---@param overrideTable table
 function SetCurrentSkin(skin, overrideTable)
     local skinTable = skins[skin]
     if not skinTable then
-        skin = 'uef'
+        if skin == "random" then
+            local randomSkin = {}
+            local count = 0
+            for skinName in skins do
+                count = count + 1
+                randomSkin[count] = skinName
+            end
+            skin = randomSkin[Random(1, count)]
+        else
+            skin = "uef"
+        end
         skinTable = skins[skin]
     end
 
+    currentSkinName = skin -- updating name of current skin
     currentSkin:Set(skin)
 
     tooltipTitleColor:Set(skinTable.tooltipTitleColor)
@@ -314,13 +345,14 @@ function UpdateCurrentSkin(overrideTable)
     SetCurrentSkin(currentSkin(), overrideTable)
 end
 
---* cycle through all available skins
+--- Cycles through all available skins
+---@param direction? "+" | "-"
 function RotateSkin(direction)
-    if not SessionIsActive() or import('/lua/ui/game/gamemain.lua').IsNISMode() then
+    if not SessionIsActive() or import("/lua/ui/game/gamemain.lua").IsNISMode() then
         return
     end
 
-    local skins = import('/lua/skins/skins.lua').skins
+    local skins = import("/lua/skins/skins.lua").skins
 
     -- build an array of skin names
     local skinNames = {}
@@ -356,11 +388,11 @@ function RotateSkin(direction)
     end
 end
 
---* cycle through all available layouts
+--- Cycles through all available layouts
+---@param direction? "+" | "-"
 function RotateLayout(direction)
-
     -- disable when in Screen Capture mode
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         return
     end
 
@@ -383,10 +415,13 @@ function RotateLayout(direction)
     end
 end
 
---* given a path and name relative to the skin path, returns the full path based on the current skin
+--- Given a path and name relative to the skin path, returns the full path based on the current skin
+---@param filespec FileName
+---@param checkMods? boolean
+---@return FileName
 function UIFile(filespec, checkMods)
     if UIFileBlacklist[filespec] then return filespec end
-    local skins = import('/lua/skins/skins.lua').skins
+    local skins = import("/lua/skins/skins.lua").skins
     local useSkin = currentSkin()
     local currentPath = skins[useSkin].texturesPath
     local origPath = currentPath
@@ -396,6 +431,7 @@ function UIFile(filespec, checkMods)
     end
 
     if not UIFileCache[currentPath .. filespec] then
+        ---@type FileName | false
         local found = false
 
         if useSkin == 'default' then
@@ -448,15 +484,21 @@ function UIFile(filespec, checkMods)
     return UIFileCache[origPath .. filespec]
 end
 
---* return the filename as a lazy var function to allow triggering of OnDirty
+--- Returns the filename as a lazy var function to allow triggering of `OnDirty()`
+---@param filespec FileName
+---@param checkMods? boolean
+---@return fun(): FileName
 function SkinnableFile(filespec, checkMods)
     return function()
         return UIFile(filespec, checkMods)
     end
 end
 
---* each UI screen needs something to be responsible for parenting all its controls so
---* placement and destruction can occur. This creates a group which fills the screen.
+--- Each UI screen needs something to be responsible for parenting all its controls so
+--- placement and destruction can occur. This creates a group which fills the screen.
+---@param root Control
+---@param debugName? string defaults to `"screenGroup"`
+---@return Group
 function CreateScreenGroup(root, debugName)
     if not root then return end
     local screenGroup = Group(root, debugName or "screenGroup")
@@ -464,23 +506,37 @@ function CreateScreenGroup(root, debugName)
     return screenGroup
 end
 
---* Get cursor information for a given cursor ID
+--- Gets cursor information for a given cursor ID
+---@param id CursorType
+---@return FileName texture
+---@return number hotspotx
+---@return number hotspoty
+---@return number? numFrames
+---@return number? fps
 function GetCursor(id)
-    local skins = import('/lua/skins/skins.lua').skins
+    local skins = import("/lua/skins/skins.lua").skins
+    ---@type CursorDefinition[]
     local cursors = skins[currentSkin()].cursors or skins['default'].cursors
-    if not cursors[id] then
+    local cursor = cursors[id]
+    if not cursor then
         LOG("Requested cursor not found: " .. id)
     end
-    return cursors[id][1], cursors[id][2], cursors[id][3], cursors[id][4], cursors[id][5]
+    return cursor[1], cursor[2], cursor[3], cursor[4], cursor[5]
 end
 
---* create the one cursor used by the game
+--- Creates the one cursor used by the game
+---@return Cursor
 function CreateCursor()
-    local cursor = Cursor(GetCursor('DEFAULT'))
-    return cursor
+    return Cursor(GetCursor("DEFAULT"))
 end
 
---* return a text object with the appropriate font set
+--- Returns a text object with the appropriate font set
+---@param parent Control
+---@param label? UnlocalizedString
+---@param pointSize? number
+---@param font? LazyVarString
+---@param dropshadow? boolean
+---@return Text
 function CreateText(parent, label, pointSize, font, dropshadow)
     label = LOC(label) or LOC("<LOC uiutil_0000>[no text]")
     font = font or buttonFont
@@ -495,6 +551,60 @@ function CreateText(parent, label, pointSize, font, dropshadow)
     return text
 end
 
+---@param parent Control
+---@param filename FileName
+---@param border? number
+---@return Bitmap
+function CreateBitmap(parent, filename, border)
+    local bitmap = Bitmap(parent)
+    bitmap:SetTexture(UIFile(filename), border)
+    return bitmap
+end
+
+---@param parent Control
+---@param filename FileName
+---@param border? number
+---@return Bitmap
+function CreateBitmapStd(parent, filename, border)
+    return CreateBitmap(parent, filename .. "_bmp.dds", border)
+end
+
+---@param parent Control
+---@param color LazyVarColor
+---@return Bitmap
+function CreateBitmapColor(parent, color)
+    local bitmap = Bitmap(parent)
+    bitmap:SetSolidColor(color)
+    return bitmap
+end
+
+---@param parent Control
+---@param filename FileName
+---@param border? number
+---@return Bitmap
+function CreateSkinnableBitmap(parent, filename, border)
+    local bitmap = Bitmap(parent)
+    bitmap:SetTexture(SkinnableFile(filename), border)
+    return bitmap
+end
+
+---@param parent Control
+---@param filename FileName
+---@param border? number
+---@return Bitmap
+function CreateSkinnableBitmapStd(parent, filename, border)
+    return CreateSkinnableBitmap(parent, filename .. "_bmp.dds", border)
+end
+
+
+---@param control Edit
+---@param foreColor? LazyVarColor
+---@param backColor? LazyVarColor
+---@param highlightFore? LazyVarColor
+---@param highlightBack? LazyVarColor
+---@param fontFace? LazyVarString
+---@param fontSize? number
+---@param charLimit? number
 function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBack, fontFace, fontSize, charLimit)
     if charLimit then
         control:SetMaxChars(charLimit)
@@ -527,7 +637,20 @@ function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBac
     end
 end
 
---* return a button set up with a text overlay and a click sound
+--- Returns a button set up with a text overlay and a click sound
+---@param parent Control
+---@param up FileName
+---@param down FileName
+---@param over FileName
+---@param disabled FileName
+---@param label? UnlocalizedString
+---@param pointSize? number
+---@param textOffsetVert? number
+---@param textOffsetHorz? number
+---@param clickCue? string defaults to `"UI_Menu_MouseDown_Sml"`; use `"NO_SOUND"` to not have one
+---@param rolloverCue? string default to `"UI_Menu_Rollover_Sml"`; use `"NO_SOUND"` to not have one
+---@param dropshadow? boolean
+---@return Button
 function CreateButton(parent, up, down, over, disabled, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue, dropshadow)
     textOffsetVert = textOffsetVert or 0
     textOffsetHorz = textOffsetHorz or 0
@@ -586,40 +709,66 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
     return button
 end
 
---* create a button with standardized texture names
---* given a path and button name prefix, generates the four button asset file names according to the naming convention
+--- Creates a button with standardized texture names. 
+--- Given a path and button name prefix, generates the four button asset file names:
+---   * *\<filename>* `_btn_up.dds`
+---   * *\<filename>* `_btn_down.dds`
+---   * *\<filename>* `_btn_over.dds`
+---   * *\<filename>* `_btn_dis.dds`
+---@param parent Control
+---@param filename FileName
+---@param label? UnlocalizedString
+---@param pointSize? number
+---@param textOffsetVert? number
+---@param textOffsetHorz? number
+---@param clickCue? string defaults to `"UI_Menu_MouseDown_Sml"`; use `"NO_SOUND"` to not have one
+---@param rolloverCue? string default to `"UI_Menu_Rollover_Sml"`; use `"NO_SOUND"` to not have one
+---@return Button
 function CreateButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
-    return CreateButton(parent
-        , filename .. "_btn_up.dds"
-        , filename .. "_btn_down.dds"
-        , filename .. "_btn_over.dds"
-        , filename .. "_btn_dis.dds"
-        , label
-        , pointSize
-        , textOffsetVert
-        , textOffsetHorz
-        , clickCue
-        , rolloverCue
-        )
+    return CreateButton(parent,
+        filename .. "_btn_up.dds",
+        filename .. "_btn_down.dds",
+        filename .. "_btn_over.dds",
+        filename .. "_btn_dis.dds",
+        label, pointSize,
+        textOffsetVert, textOffsetHorz,
+        clickCue, rolloverCue
+    )
 end
 
+--- Creates a button with standardized texture names and a drop shadow with text size 11.
+--- Given a path and button name prefix, generates the four button asset file names:
+---   * *\<filename>* `_btn_up.dds`
+---   * *\<filename>* `_btn_down.dds`
+---   * *\<filename>* `_btn_over.dds`
+---   * *\<filename>* `_btn_dis.dds`
+---@param parent Control
+---@param filename FileName
+---@param label? UnlocalizedString
+---@param textOffsetVert? number
+---@param textOffsetHorz? number
+---@param clickCue? string defaults to `"UI_Menu_MouseDown_Sml"`; use `"NO_SOUND"` to not have one
+---@param rolloverCue? string default to `"UI_Menu_Rollover_Sml"`; use `"NO_SOUND"` to not have one
 function CreateButtonWithDropshadow(parent, filename, label, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
-    return CreateButton(parent
-        , filename .. "_btn_up.dds"
-        , filename .. "_btn_down.dds"
-        , filename .. "_btn_over.dds"
-        , filename .. "_btn_dis.dds"
-        , label
-        , 11
-        , textOffsetVert
-        , textOffsetHorz
-        , clickCue
-        , rolloverCue
-        , true
-        )
+    return CreateButton(parent,
+        filename .. "_btn_up.dds",
+        filename .. "_btn_down.dds",
+        filename .. "_btn_over.dds",
+        filename .. "_btn_dis.dds",
+        label, 11,
+        textOffsetVert, textOffsetHorz,
+        clickCue, rolloverCue,
+        true
+    )
 end
 
--- Create a ninepatch using a texture path and naming convention, instead of explicitly with 9 images.
+--- Create a ninepatch using a texture path and the long-name convention,
+--- instead of explicitly with 9 images. These are:
+--- `center.dds`, `topLeft.dds`, `topRight.dds`, `bottomLeft.dds`, `bottomRight.dds`, `left.dds`,
+--- `right.dds`, `top.dds` and `bottom.dds`
+---@param parent Control
+---@param texturePath FileName
+---@return NinePatch
 function CreateNinePatchStd(parent, texturePath)
     return NinePatch(parent,
         SkinnableFile(texturePath .. 'center.dds'),
@@ -634,6 +783,11 @@ function CreateNinePatchStd(parent, texturePath)
 )
 end
 
+--- Surrounds a control with a nine-patch border
+---@param parent Control
+---@param texturePath FileName
+---@param fudgeX? number defaults to `62`
+---@param fudgeY? number defaults to `62`
 function SurroundWithNinePatch(parent, texturePath, fudgeX, fudgeY)
     local patch = CreateNinePatchStd(parent, texturePath)
 
@@ -641,19 +795,15 @@ function SurroundWithNinePatch(parent, texturePath, fudgeX, fudgeY)
     LayoutHelpers.DepthUnderParent(patch, parent, 2)
 end
 
---- Surround the given control with an eight-patch dynamically-scaling Border constructed using
- -- standard names from the given texture path.
- -- The expected names of texture components are:
- -- topLeft.dds, topRight.dds, bottomLeft.dds, bottomRight.dds, left.dds, right.dds, top.dds.
- -- @see Border for an explanation of how the textures are arranged.
- --
- -- @param control The control to surround with the border images.
- -- @param texturePath The path relative to the skinning root where the textue files are located.
- -- @param fudgeX The amount of overlap in the X direction the border textures shall have with the
- --               control. The default fudgefactors are suitable for use with the widely-used
- --               "laser box" borders.
- -- @param fudgeY As fudgeX, but in the Y direction.
- --
+--- Surrounds the given control with an eight-patch dynamically-scaling Border constructed using
+--- the standard long-name convention from the given texture path. These are:
+--- `topLeft.dds`, `topRight.dds`, `bottomLeft.dds`, `bottomRight.dds`, `left.dds`, `right.dds`,
+--- `top.dds` and `bottom.dds`
+---@see Border for an explanation of how the textures are arranged.
+---@param control Control
+---@param texturePath FileName
+---@param fudgeX? number The amount of overlap in the X direction the border textures shall have with the control. The default fudgefactors are suitable for use with the widely-used "laser box" borders (which is `62`).
+---@param fudgeY? number As fudgeX, but in the Y direction.
 function SurroundWithBorder(control, texturePath, fudgeX, fudgeY)
     local border = Border(control,
         SkinnableFile(texturePath .. 'topLeft.dds'),
@@ -664,38 +814,80 @@ function SurroundWithBorder(control, texturePath, fudgeX, fudgeY)
         SkinnableFile(texturePath .. 'right.dds'),
         SkinnableFile(texturePath .. 'top.dds'),
         SkinnableFile(texturePath .. 'bottom.dds')
-)
+    )
 
     border:Surround(control, fudgeX or 62, fudgeY or 62)
     LayoutHelpers.DepthOverParent(border, control, 2)
 end
 
--- Create a checkbox using the default checkbox texture. Kept as its own entry point for the benefit
--- of retarded GPG code that things "radiobtn" is a sensible name for a checkbox texture.
+--- Creates a checkbox using the default checkbox texture. Kept as its own entry point for the
+--- benefit of code that uses "radiobtn" for its checkboxs' texture names. These are:
+--- `-d_btn_up.dds`, `-s_btn_up.dds`, `-d_btn_over.dds`, `-s_btn_over.dds`,
+--- `-d_btn_dis.dds`, and `-s_btn_dis.dds`
 function CreateCheckboxStd(parent, texturePath)
-    local checkbox = Checkbox(parent,
+    return Checkbox(parent,
         SkinnableFile(texturePath .. '-d_btn_up.dds'),
         SkinnableFile(texturePath .. '-s_btn_up.dds'),
         SkinnableFile(texturePath .. '-d_btn_over.dds'),
         SkinnableFile(texturePath .. '-s_btn_over.dds'),
         SkinnableFile(texturePath .. '-d_btn_dis.dds'),
         SkinnableFile(texturePath .. '-s_btn_dis.dds')
-)
-    return checkbox
+    )
 end
 
+--- Creates a checkbox using the standard naming convention. This is:
+--- `d_up.dds`, `s_up.dds`, `d_over.dds`, `s_over.dds`, `d_dis.dds`, and `s_dis.dds`
+---@param parent Control
+---@param texturePath FileName
+---@param label UnlocalizedString
+---@param labelRight any
+---@param labelSize any
+---@param clickCue any
+---@param rollCue any
+---@return unknown
 function CreateCheckbox(parent, texturePath, label, labelRight, labelSize, clickCue, rollCue)
-    local checkbox = Checkbox(parent,
+    return Checkbox(parent,
         SkinnableFile(texturePath .. 'd_up.dds'),
         SkinnableFile(texturePath .. 's_up.dds'),
         SkinnableFile(texturePath .. 'd_over.dds'),
         SkinnableFile(texturePath .. 's_over.dds'),
         SkinnableFile(texturePath .. 'd_dis.dds'),
         SkinnableFile(texturePath .. 's_dis.dds'),
-        label, labelRight, labelSize, clickCue, rollCue)
-    return checkbox
+        label, labelRight, labelSize, clickCue, rollCue
+    )
 end
 
+--- Creates a collapse arrow in one of the directions (note that the bottom is not supported).
+--- Note that the control passed in should be the parent of the control you want to have collapsed
+--- (so that the collapse arrow isn't hidden with it).
+---@param parent Control
+---@param position 'l' | 't' | 'r'
+---@return Checkbox
+function CreateCollapseArrow(parent, position)
+    -- make sure the filename will be well-formed (also, someone's going to think that `position`
+    -- is optional, so let's disillusion them of that idea)
+    if position ~= 't' and position ~= 'r' and position ~= 'l' then
+        error("Collapse arrow position must be one of: 'l', 't', 'r'", 2)
+    end
+    local prefix = "/game/tab-" .. position .. "-btn/tab-"
+    return Checkbox(parent,
+        SkinnableFile(prefix .. "close_btn_up.dds"),
+        SkinnableFile(prefix .. "open_btn_up.dds"),
+        SkinnableFile(prefix .. "close_btn_over.dds"),
+        SkinnableFile(prefix .. "open_btn_over.dds"),
+        SkinnableFile(prefix .. "close_btn_dis.dds"),
+        SkinnableFile(prefix .. "open_btn_dis.dds")
+    )
+end
+
+--- Creates a radio button with the standard naming convention. This is:
+--- `d_up.dds`, `s_up.dds`, `d_over.dds`, `s_over.dds`, `d_dis.dds`, and `s_dis.dds`
+---@param parent Control
+---@param texturePath FileName
+---@param title LocalizedString
+---@param buttons any
+---@param default any
+---@return unknown
 function CreateRadioButtonsStd(parent, texturePath, title, buttons, default)
     local radioButton = RadioButtons(parent, title, buttons, default, "Arial", 14, fontColor,
         SkinnableFile(texturePath .. 'd_up.dds'),
@@ -708,7 +900,17 @@ function CreateRadioButtonsStd(parent, texturePath, title, buttons, default)
     return radioButton
 end
 
- function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
+--- Creates a dialog button
+---@param parent Control
+---@param filename FileName
+---@param label? UnlocalizedString
+---@param pointSize? number
+---@param textOffsetVert? number
+---@param textOffsetHorz? number
+---@param clickCue? string defaults to `"UI_Menu_MouseDown_Sml"`; use `"NO_SOUND"` to not have one
+---@param rolloverCue? string default to `"UI_Menu_Rollover_Sml"`; use `"NO_SOUND"` to not have one
+---@return Button
+function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVert, textOffsetHorz, clickCue, rolloverCue)
     local button = CreateButtonStd(parent,filename,label,pointSize,textOffsetVert,textOffsetHorz, clickCue, rolloverCue)
     button.label:SetFont(dialogButtonFont, pointSize)
     button.label:SetColor(dialogButtonColor)
@@ -731,7 +933,7 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
         scrollbartop = textureName..'bar-top_scr_up.dds'
         scrollbarbot = textureName..'bar-bot_scr_up.dds'
     end
-    local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Vert)
+    local scrollbar = Scrollbar(attachto, import("/lua/maui/scrollbar.lua").ScrollAxis.Vert)
     scrollbar:SetTextures(   SkinnableFile(scrollbg)
                             ,SkinnableFile(scrollbarmid)
                             ,SkinnableFile(scrollbartop)
@@ -808,23 +1010,28 @@ function MakeInputModal(control, onEnterFunc, onEscFunc)
     end
 end
 
--- create and manage an info dialog
--- parent: the control to parent the dialog to
--- dialogText: the text to display in the dialog
--- button1Text: text for the first button (opt)
--- button1Callback: callback function for the first button, signature function() (opt)
--- button2Text: text for the second button (opt)
--- button2Callback: callback function for the second button, signature function() (opt)
--- button3Text: text for the second button (opt)
--- button3Callback: callback function for the second button, signature function() (opt)
--- destroyOnCallback: if true, destroy when any button is pressed (if false, you must destroy) (opt)
--- modalInfo: Sets up modal info for dialog using a table in the form:
---  escapeButton = int 1-3 : the button function to mimic when the escape button is pressed
---  enterButton = int 1-3 : the button function to mimic when the enterButton is pressed
---  worldCover = bool : control if a world cover should be shown
+---@class ModalityInfo
+---@field escapeButton number `1-3` the button function to mimic when the escape button is pressed
+---@field enterButton number `1-3` the button function to mimic when the enter button is pressed
+---@field OnlyWorldCover boolean if only the world is covered (i.e. it's non-modal)
+
+--- Creates and manages an info dialog. Setting a callback for a button will prevent it from closing
+--- the dialog unless `destroyOnCallback` is true (which is the default only when all three callbacks
+--- are supplied).
+---@param parent Control
+---@param dialogText UnlocalizedString
+---@param button1Text? UnlocalizedString text for the first button
+---@param button1Callback fun() | nil callback function for the first button
+---@param button2Text? UnlocalizedString text for the first button
+---@param button2Callback fun() | nil callback function for the first button
+---@param button3Text? UnlocalizedString text for the first button
+---@param button3Callback fun() | nil callback function for the first button
+---@param destroyOnCallback? boolean if true, the popup is closed when a button with a callback is pressed (if false, you must destroy); defaults to `true` when all three callback functions are supplied and `false` otherwise
+---@param modalInfo ModalityInfo Sets up modality info for dialog
+---@return Popup
 function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Text, button2Callback, button3Text, button3Callback, destroyOnCallback, modalInfo)
     -- if there is a callback and destroy not specified, assume destroy
-    if (destroyOnCallback == nil) and (button1Callback or button2Callback or button3Callback) then
+    if destroyOnCallback == nil and (button1Callback or button2Callback or button3Callback) then
         destroyOnCallback = true
     end
 
@@ -836,13 +1043,12 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     LayoutHelpers.AtHorizontalCenterIn(textLine[1], dialog)
 
     LayoutHelpers.SetWidth(dialog, 428)
-    local textBoxWidth = (dialog.Width() - LayoutHelpers.ScaleNumber(80))
-    local tempTable = import('/lua/maui/text.lua').WrapText(LOC(dialogText), textBoxWidth,
-    function(text)
-        return textLine[1]:GetStringAdvance(text)
-    end)
-
-    local tempLines = table.getn(tempTable)
+    local textBoxWidth = dialog.Width() - LayoutHelpers.ScaleNumber(80)
+    local tempTable = import("/lua/maui/text.lua").WrapText(LOC(dialogText), textBoxWidth,
+        function(text)
+            return textLine[1]:GetStringAdvance(text)
+        end
+    )
 
     local textHeight = 0
     local prevControl = false
@@ -867,7 +1073,9 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     popup.OnShadowClicked = function() end
     popup.OnEscapePressed = function() end
 
+    local numButtons = 0
     local function MakeButton(text, callback)
+        numButtons = numButtons + 1
         local button = CreateButtonWithDropshadow(dialog, '/BUTTON/medium/', text)
         if callback then
             button.OnClick = function(self)
@@ -881,88 +1089,80 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
                 popup:Close()
             end
         end
+        LayoutHelpers.AtBottomIn(button, dialog, 10)
         return button
     end
 
-    dialog._button1 = false
-    dialog._button2 = false
-    dialog._button3 = false
-
-    local numButtons = 0
+    ---@type Button, Button, Button
+    local button1, button2, button3 = false, false, false
     if button1Text then
-        numButtons = numButtons + 1
-        dialog._button1 = MakeButton(button1Text, button1Callback)
-        LayoutHelpers.AtBottomIn(dialog._button1, dialog, 10)
+        button1 = MakeButton(button1Text, button1Callback)
     end
     if button2Text then
-        numButtons = numButtons + 1
-        dialog._button2 = MakeButton(button2Text, button2Callback)
-        LayoutHelpers.AtBottomIn(dialog._button2, dialog, 10)
+        button2 = MakeButton(button2Text, button2Callback)
     end
     if button3Text then
-        numButtons = numButtons + 1
-        dialog._button3 = MakeButton(button3Text, button3Callback)
-        LayoutHelpers.AtBottomIn(dialog._button3, dialog, 10)
+        button3 = MakeButton(button3Text, button3Callback)
     end
+    dialog._button1 = button1
+    dialog._button2 = button2
+    dialog._button3 = button3
 
     if numButtons > 1 then
         -- A button to either size...
-        dialog._button1.Left:Set(function()
-            return dialog.Left() + (((dialog.Width() / 2) - dialog._button1.Width()) / 2) - 44
+        button1.Left:Set(function()
+            return dialog.Left() + (dialog.Width() * 0.5 - dialog._button1.Width()) * 0.5 - 44
         end)
 
-        -- Handle stupid weird GPG convention...
         local rightButton
         if numButtons == 3 then
-            rightButton = dialog._button3
+            rightButton = button3
 
             -- The third (second) button goes in the middle.
-            LayoutHelpers.AtHorizontalCenterIn(dialog._button2, dialog)
+            LayoutHelpers.AtHorizontalCenterIn(button2, dialog)
         else
-            rightButton = dialog._button2
+            rightButton = button2
         end
 
         rightButton.Left:Set(function()
-            local halfWidth = dialog.Width() / 2
-            return dialog.Left() + halfWidth + ((halfWidth - dialog._button2.Width()) / 2) + 44
+            local halfWidth = dialog.Width() * 0.5
+            return dialog.Left() + halfWidth + (halfWidth - dialog._button2.Width()) * 0.5 + 44
         end)
     elseif numButtons == 1 then
-        LayoutHelpers.AtHorizontalCenterIn(dialog._button1, dialog)
+        LayoutHelpers.AtHorizontalCenterIn(button1, dialog)
     end
 
     if modalInfo and not modalInfo.OnlyWorldCover then
         local function OnEnterFunc()
-            if modalInfo.enterButton then
-                if modalInfo.enterButton == 1 then
-                    if dialog._button1 then
-                        dialog._button1.OnClick(dialog._button1)
-                    end
-                elseif modalInfo.enterButton == 2 then
-                    if dialog._button2 then
-                        dialog._button2.OnClick(dialog._button2)
-                    end
-                elseif modalInfo.enterButton == 3 then
-                    if dialog._button3 then
-                        dialog._button3.OnClick(dialog._button3)
-                    end
+            local enterButton = modalInfo.enterButton
+            if enterButton then
+                local button
+                if enterButton == 1 then
+                    button = dialog._button1
+                elseif enterButton == 2 then
+                    button = dialog._button2
+                elseif enterButton == 3 then
+                    button = dialog._button3
+                end
+                if button then
+                    button:OnClick()
                 end
             end
         end
 
         local function OnEscFunc()
-            if modalInfo.escapeButton then
-                if modalInfo.escapeButton == 1 then
-                    if dialog._button1 then
-                        dialog._button1.OnClick(dialog._button1)
-                    end
-                elseif modalInfo.escapeButton == 2 then
-                    if dialog._button2 then
-                        dialog._button2.OnClick(dialog._button2)
-                    end
-                elseif modalInfo.escapeButton == 3 then
-                    if dialog._button3 then
-                        dialog._button3.OnClick(dialog._button3)
-                    end
+            local escapeButton = modalInfo.escapeButton
+            if escapeButton then
+                local button
+                if escapeButton == 1 then
+                    button = dialog._button1
+                elseif escapeButton == 2 then
+                    button = dialog._button2
+                elseif escapeButton == 3 then
+                    button = dialog._button3
+                end
+                if button then
+                    button:OnClick()
                 end
             end
         end
@@ -973,59 +1173,84 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     return popup
 end
 
+---@param parent Control
+---@param colorOverride? Color defaults to black
 function CreateWorldCover(parent, colorOverride)
+    colorOverride = colorOverride or "ff000000"
     local NumFrame = GetNumRootFrames() - 1
     local worldCovers = {}
-    for i = 0, NumFrame do
-        local index = i
-        if GetFrame(index) == parent:GetRootFrame() then
-            worldCovers[index] = Bitmap(parent)
-            worldCovers[index].ID = index
-            worldCovers[index].OnDestroy = function(self)
-                for h, x in worldCovers do
-                    if x and h ~= self.ID then
-                        x:Destroy()
-                    end
-                end
+    local parentFrame = parent:GetRootFrame()
+
+    local function OnHide(self, hidden)
+        for id, cover in worldCovers do
+            if cover and id ~= self.ID then
+                cover:SetHidden(hidden)
             end
-            worldCovers[index].OnHide = function(self, hidden)
-                for h, x in worldCovers do
-                    if x and h ~= self.ID then
-                        x:SetHidden(hidden)
-                    end
-                end
+        end
+    end
+    local function OnDestroy(self)
+        for id, cover in worldCovers do
+            if cover and id ~= self.ID then
+                cover:Destroy()
             end
+        end
+    end
+    local function OnFrame(self, delta)
+        local targetAlpha = self:GetAlpha() + (delta * 1.5)
+        if targetAlpha < 0.8 then
+            self:SetAlpha(targetAlpha)
         else
-            worldCovers[index] = Bitmap(GetFrame(index))
+            self:SetAlpha(0.8)
+            self:SetNeedsFrameUpdate(false)
         end
-        worldCovers[index]:SetSolidColor(colorOverride or 'ff000000')
-        LayoutHelpers.FillParent(worldCovers[index], GetFrame(index))
-        worldCovers[index].Depth:Set(function() return parent.Depth() - 2 end)
-        worldCovers[index]:SetAlpha(0)
-        worldCovers[index]:SetNeedsFrameUpdate(true)
-        worldCovers[index].OnFrame = function(self, delta)
-            local targetAlpha = self:GetAlpha() + (delta * 1.5)
-            if targetAlpha < .8 then
-                self:SetAlpha(targetAlpha)
-            else
-                self:SetAlpha(.8)
-                self:SetNeedsFrameUpdate(false)
-            end
+    end
+
+    for index = 0, NumFrame do
+        local worldCover
+        local frame = GetFrame(index)
+        if frame == parentFrame then
+            worldCover = Bitmap(parent)
+            worldCover.ID = index
+            worldCover.OnDestroy = OnDestroy
+            worldCover.OnHide = OnHide
+        else
+            worldCover = Bitmap(frame)
         end
+        worldCover.OnFrame = OnFrame
+        worldCovers[index] = LayoutHelpers.ReusedLayoutFor(worldCover)
+            :Color(colorOverride)
+            :Fill(frame)
+            :Under(parent, 2)
+            :Alpha(0)
+            :NeedsFrameUpdate(true)
+            :End()
     end
 
     return worldCovers
 end
 
+---@param parent Control
+---@param dialogText UnlocalizedString
+---@param buttonText? UnlocalizedString
+---@param buttonCallback fun() | nil
+---@param destroyOnCallback? boolean
+---@return Popup
 function ShowInfoDialog(parent, dialogText, buttonText, buttonCallback, destroyOnCallback)
-    local dlg = QuickDialog(parent, dialogText, buttonText, buttonCallback, nil, nil, nil, nil, destroyOnCallback, {worldCover = false, enterButton = 1, escapeButton = 1})
-    return dlg
+    return QuickDialog(parent, dialogText, buttonText, buttonCallback, nil, nil, nil, nil, destroyOnCallback, {worldCover = false, enterButton = 1, escapeButton = 1})
 end
 
+---@param factionIndex number
+---@return FileName
 function GetFactionIcon(factionIndex)
-    return import('/lua/factions.lua').Factions[factionIndex + 1].Icon
+    return import("/lua/factions.lua").Factions[factionIndex + 1].Icon
 end
 
+---@param parent Control
+---@param leftOffset number
+---@param topOffset number
+---@param rightOffset number
+---@param bottomOffset number
+---@param altTextures? boolean if it uses small brackets
 function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottomOffset, altTextures)
     local ret = Group(parent)
 
@@ -1067,24 +1292,29 @@ function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottom
     return ret
 end
 
--- Enable or disable a control based on a boolean.
+--- Enable or disable a control based on a boolean
+---@param control Control
+---@param enabled boolean
 function setEnabled(control, enabled)
-    if (enabled) then
+    if enabled then
         control:Enable()
     else
         control:Disable()
     end
 end
 
--- Show or hide a control based on a boolean.
+--- Show or hide a control based on a boolean
+---@param control Control
+---@param visible boolean
 function setVisible(control, visible)
-    if (visible) then
+    if visible then
         control:Show()
     else
         control:Hide()
     end
 end
 
+---@return string
 function GetReplayId()
     local id = nil
 
@@ -1104,7 +1334,13 @@ function GetReplayId()
     return id
 end
 
--- Create an input dialog with the given title and listener function.
+--- Create an input dialog with the given title and listener function
+---@param parent Control
+---@param title UnlocalizedString
+---@param listener fun()
+---@param fallbackBox? Control
+---@param str? string
+---@return InputDialog
 function CreateInputDialog(parent, title, listener, fallbackBox, str)
     local dialog = InputDialog(parent, title, fallbackBox, str)
     dialog.OnInput = listener
@@ -1112,6 +1348,9 @@ function CreateInputDialog(parent, title, listener, fallbackBox, str)
     return dialog
 end
 
+
+---@param parent Control
+---@return ItemList
 function CreateTextBox(parent)
     local box = ItemList(parent)
     box:SetFont(bodyFont, 14)
@@ -1120,15 +1359,17 @@ function CreateTextBox(parent)
     return box
 end
 
+---@param textBox ItemList
+---@param text UnlocalizedString
 function SetTextBoxText(textBox, text)
     textBox:DeleteAllItems()
-    local wrapped = import('/lua/maui/text.lua').WrapText(LOC(text), textBox.Width(), function(curText) return textBox:GetStringAdvance(curText) end)
+    local wrapped = import("/lua/maui/text.lua").WrapText(LOC(text), textBox.Width(), function(curText) return textBox:GetStringAdvance(curText) end)
     for i, line in wrapped do
         textBox:AddItem(line)
     end
 end
 
-local Window = import('/lua/maui/window.lua').Window
+local Window = import("/lua/maui/window.lua").Window
 local windowTextures = {
     tl = UIFile('/game/mini-map-brd/mini-map_brd_ul.dds'),
     tr = UIFile('/game/mini-map-brd/mini-map_brd_ur.dds'),
@@ -1143,62 +1384,118 @@ local windowTextures = {
 }
 
 --- Constructs a default window.
--- @param parent Parent of the window, defaults to GetFrame(0)
--- @param title Title of the window
--- @param icon Path to the icon to use for the window, defaults to false (in other words: no icon) 
--- @param pin Toggle for the pin button, override window.OnPinCheck(self, checked) to set the behavior
--- @param config Toggle for configuration button, override window.OnConfigClick(self) to set the behavior
--- @Param lockSize Toggle to allow the user to adjust the size of the window.
--- @param lockPosition Toggle to allow the user to adjust the position of the window.
--- @param preferenceID Identifier used in the preference file to remember where this window was located last
--- @param defaultLeft The default left boundary of the window, defaults to 10
--- @param defaultTop The default top boundary of the window, defaults to 300
--- @param defaultBottom The default bottom boundary of the window, defaults to 600
--- @param defaultRight The default right boundary of the window, defaults to 210
+---@param parent? Control Parent of the window, defaults to GetFrame(0)
+---@param title? UnlocalizedString Title of the window
+---@param icon? FileName Path to the icon to use for the window, defaults to false (in other words: no icon) 
+---@param pin? boolean Toggle for the pin button, override window.OnPinCheck(self, checked) to set the behavior
+---@param config? boolean Toggle for configuration button, override window.OnConfigClick(self) to set the behavior
+---@param lockSize? boolean Toggle to allow the user to adjust the size of the window.
+---@param lockPosition? boolean Toggle to allow the user to adjust the position of the window.
+---@param preferenceID? string Identifier used in the preference file to remember where this window was located last
+---@param defaultLeft? Lazy<number> The default left boundary of the window, defaults to 10
+---@param defaultTop? Lazy<number> The default top boundary of the window, defaults to 300
+---@param defaultBottom? Lazy<number> The default bottom boundary of the window, defaults to 600
+---@param defaultRight? Lazy<number> The default right boundary of the window, defaults to 210
+---@return Window
 function CreateWindowStd(parent, title, icon, pin, config, lockSize, lockPosition, preferenceID, defaultLeft, defaultTop, defaultBottom, defaultRight)
-
-    -- allow for optionals
     parent = parent or GetFrame(0)
-
     defaultLeft = defaultLeft or 10
     defaultTop = defaultTop or 300
     defaultBottom = defaultBottom or 600
     defaultRight = defaultRight or 210
-
-    -- setup data
-    local defaults = { Left = defaultLeft, Top = defaultTop, Bottom = defaultBottom, Right = defaultRight }
-
-    -- create and return window
+    local defaultPos = {
+        Left = defaultLeft,
+        Top = defaultTop,
+        Bottom = defaultBottom,
+        Right = defaultRight,
+    }
     return Window(
-        parent,          -- parent
-        title,           -- title
-        icon,            -- icon
-        pin,             -- pin
-        config,          -- config
-        lockSize,        -- lockSize
-        lockPosition,    -- lockPosition
-        preferenceID,    -- prefID
-        defaults,        -- default position
-        windowTextures   -- textureTable
+        parent, title, icon,
+        pin, config, lockSize, lockPosition,
+        preferenceID, defaultPos, windowTextures
     )
 end
 
+---@param primary UnlocalizedString
+---@param secondary UnlocalizedString
+---@param control? Control defaults to duumy control at center of screen 
 function CreateAnnouncementStd(primary, secondary, control)
-
     -- make it originate from the top
-    if not control then 
+    if not control then
         local frame = GetFrame(0)
         control = Group(frame)
-        control.Left = function() return frame.Left() + 0.49 * frame.Right() end 
-        control.Right = function() return frame.Left() + 0.51 * frame.Right() end 
-        control.Top = frame.Top 
-        control.Bottom = frame.Top 
+        control.Left:Set(function() return frame.Left() + 0.49 * frame.Right() end)
+        control.Right:Set(function() return frame.Left() + 0.51 * frame.Right() end)
+        control.Top = frame.Top
+        control.Bottom = frame.Top
     end
 
     -- create the announcement accordingly
-    import('/lua/ui/game/announcement.lua').CreateAnnouncement(
+    import("/lua/ui/game/announcement.lua").CreateAnnouncement(
         primary,
         control,
-        secondary 
+        secondary
     )
+end
+
+
+---@param parent Control
+---@param filename FileName
+---@return Group
+function CreateVertFillGroup(parent, filename)
+    local group = Group(parent)
+    local top = CreateBitmap(group, filename .. "_bmp_t.dds")
+    local bottom = CreateBitmap(group, filename .. "_bmp_b.dds")
+    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
+
+    Layouter(top)
+        :Over(group, 0)
+        :AtLeftTopIn(group)
+
+    Layouter(bottom)
+        :Over(group, 0)
+        :AtLeftBottomIn(group)
+
+    Layouter(middle)
+        :Over(group, 0)
+        :AtLeftIn(group)
+        :Top(function() return top.Bottom() - 2 end)
+        :AnchorToTop(bottom)
+
+    group.Width:Set(top.Width)
+    group._top = top
+    group._middle = middle
+    group._bottom = bottom
+    return group
+end
+
+
+---@param parent Control
+---@param filename FileName
+---@return Group
+function CreateHorzFillGroup(parent, filename)
+    local group = Group(parent)
+    local left = CreateBitmap(group, filename .. "_bmp_l.dds")
+    local right = CreateBitmap(group, filename .. "_bmp_r.dds")
+    local middle = CreateBitmap(group, filename .. "_bmp_m.dds")
+
+    Layouter(left)
+        :Over(group, 0)
+        :AtLeftTopIn(group)
+
+    Layouter(right)
+        :Over(group, 0)
+        :AtRightTopIn(group)
+
+    Layouter(middle)
+        :Over(group, 0)
+        :AtTopIn(group)
+        :Left(function() return left.Right() - 2 end)
+        :AnchorToLeft(right)
+
+    group.Height:Set(right.Height)
+    group._left = left
+    group._middle = middle
+    group._right = right
+    return group
 end

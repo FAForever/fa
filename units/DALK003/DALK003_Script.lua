@@ -1,21 +1,19 @@
---****************************************************************************
---**
---**  Author(s):  Mikko Tyster
---**
---**  Summary  :  Aeon T3 Anti-Air
---**
---**  Copyright © 2008 Blade Braver!
---****************************************************************************
+------------------------------------
+-- Author(s):  Mikko Tyster       --
+-- Summary  :  Aeon T3 Anti-Air   --
+-- Copyright © 2008 Blade Braver! --
+------------------------------------
 
-local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
-local AAAZealotMissileWeapon = import('/lua/aeonweapons.lua').AAAZealotMissileWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
+local AAAZealotMissileWeapon = import("/lua/aeonweapons.lua").AAAZealotMissileWeapon
 
-DALK003 = Class(AWalkingLandUnit) {
+---@class DALK003 : AWalkingLandUnit
+DALK003 = ClassUnit(AWalkingLandUnit) {
     Weapons = {
-        Missile = Class(AAAZealotMissileWeapon) {},
+        Missile = ClassWeapon(AAAZealotMissileWeapon) {},
     },
-
 }
-
 TypeClass = DALK003
+
+-- Kept for Mod Support
+local EffectUtil = import("/lua/effectutilities.lua")

@@ -1,8 +1,6 @@
---- Class CStorageManipulator
--- @classmod Sim.CStorageManipulator
+---@meta
 
----
---
-function CStorageManipulator:moho.StorageManipulator()
-end
+---@class moho.StorageManipulator : moho.manipulator_methods
+local CStorageManipulator = {}
 
+return CStorageManipulator

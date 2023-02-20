@@ -138,7 +138,7 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         Icon = 'air',
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = 'RULEUTL_Experimental',
         UnitWeight = 1,
     },
     Intel = {
@@ -197,6 +197,9 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {

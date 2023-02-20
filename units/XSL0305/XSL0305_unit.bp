@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Barrel'
+        }
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -26,15 +31,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 20,
     Categories = {
         'PRODUCTFA',
@@ -54,7 +50,7 @@ UnitBlueprint {
         'DUMMYGSRWEAPON',
         'SNIPEMODE',
     },
-    CollisionOffsetY = 0,
+    CollisionOffsetY = 0.4,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -168,9 +164,9 @@ UnitBlueprint {
         UniformScale = 0.095,
     },
     Economy = {
-        BuildCostEnergy = 9700,
-        BuildCostMass = 880,
-        BuildTime = 4900,
+        BuildCostEnergy = 15360,
+        BuildCostMass = 960,
+        BuildTime = 5400,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -246,8 +242,8 @@ UnitBlueprint {
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.47,
     SizeX = 0.45,
-    SizeY = 1.55,
-    SizeZ = 0.9,
+    SizeY = 1.2,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_bot3_sniper',
     StrategicIconSortPriority = 115,
     Transport = {
@@ -404,7 +400,7 @@ UnitBlueprint {
             MuzzleChargeDelay = 0.5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             ProjectileId = '/projectiles/SDFSniperShot02/SDFSniperShot02_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 1,

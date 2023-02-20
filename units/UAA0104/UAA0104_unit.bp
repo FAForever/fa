@@ -1,9 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'UAB5102',
-        TargetBones = {
-            'UAA0104',
-        },
     },
     Air = {
         AutoLandTime = 1,
@@ -92,15 +89,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -121,7 +109,7 @@ UnitBlueprint {
         'SNIPEMODE',
     },
     CollisionOffsetX = 0,
-    CollisionOffsetY = -1.5,
+    CollisionOffsetY = 0.1,
     CollisionOffsetZ = -1.5,
     Defense = {
         AirThreatLevel = 1.5,
@@ -182,6 +170,7 @@ UnitBlueprint {
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = false,
         UniformScale = 0.05,
+        AeonMercuryPoolOffset = 0.5,
     },
     Economy = {
         BuildCostEnergy = 13200,
@@ -249,7 +238,7 @@ UnitBlueprint {
     SelectionSizeZ = 3.8,
     SelectionThickness = 0.26,
     SizeX = 2.2,
-    SizeY = 2.5,
+    SizeY = 1.9,
     SizeZ = 6,
     StrategicIconName = 'icon_gunship2_transport',
     StrategicIconSortPriority = 65,
@@ -563,7 +552,7 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 25,
+            Damage = 250,
             DamageFriendly = true,
             DamageRadius = 1,
             DamageType = 'Normal',

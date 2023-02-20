@@ -1,17 +1,19 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
 
-local MarkerUtilities = import("/lua/sim/MarkerUtilities.lua")
-
+local MarkerUtilities = import("/lua/sim/markerutilities.lua")
 local MapResourceCheckApplied = false
 
 --- Attempts to spawn in extractors and hydrocarbons on each marker that is enabled in the game. Attempts 
--- to ring each extractor with storages and fabricators, similar to how the ringing feature works.
+--- to ring each extractor with storages and fabricators, similar to how the ringing feature works.
 function MapResourceCheck()
 
     -- perform UI checks on sim to prevent cheating
     local count = 0
     local playerIndex = 1
-    for k, brain in ArmyBrains do 
-        if brain.BrainType == "Human" then 
+    for k, brain in ArmyBrains do
+        if brain.BrainType == "Human" then
             count = count + 1
             playerIndex = k
         end
@@ -21,24 +23,24 @@ function MapResourceCheck()
     local cheatsEnabled = CheatsEnabled()
 
     -- prevent it from working
-    if not (cheatsEnabled or onePlayer) then 
+    if not (cheatsEnabled or onePlayer) then
         WARN("Unable to run map resource check: cheats are disabled or there is more than one player")
-        return 
+        return
     end
 
-    if MapResourceCheckApplied then 
+    if MapResourceCheckApplied then
         WARN("Restart the session before running the resource check again.")
-        return 
+        return
     end
 
-    MapResourceCheckApplied = true 
+    MapResourceCheckApplied = true
 
     -- inform us why it worked
-    if onePlayer then 
+    if onePlayer then
         SPEW("Map resource check can be toggled: there is only one player")
     end
 
-    if cheatsEnabled then 
+    if cheatsEnabled then
         SPEW("Map resource check can be toggled: cheats are enabled")
     end
 
@@ -51,17 +53,21 @@ function MapResourceCheck()
     local mass = MarkerUtilities.GetMarkersByType("Mass")
     local hydro = MarkerUtilities.GetMarkersByType("Hydrocarbon")
 
-    -- helper function that attempts to build a unit there
+    --- Helper function that attempts to build a unit there
+    ---@param x number
+    ---@param y number
+    ---@param z number
+    ---@param id UnitId
     local function TryUnit(x, y, z, id)
-        if brain:CanBuildStructureAt(id, {x, y, z}) then 
+        if brain:CanBuildStructureAt(id, {x, y, z}) then
             CreateUnitHPR(id, army, x, y, z, 0, 0, 0)
         end
     end
 
     ForkThread(
-        function() 
+        function()
             local yield = coroutine.yield
-                
+
             -- create resource structures if possible
             for k, marker in mass do 
                 local x, y, z = marker.position[1], marker.position[2], marker.position[3]
@@ -70,7 +76,7 @@ function MapResourceCheck()
 
             yield(2)
 
-            for k, marker in hydro do 
+            for k, marker in hydro do
                 local x, y, z = marker.position[1], marker.position[2], marker.position[3]
                 TryUnit(x, y, z, "uab1102")
             end
@@ -112,17 +118,19 @@ local DebugThreads = { }
 local DebugSuspend = { }
 
 --- Various threat identifiers and corresponding colors, shared between the UI and the sim
-local ThreatInformation = import("/lua/shared/MapUtilities.lua").ThreatInformation
+local ThreatInformation = import("/lua/shared/maputilities.lua").ThreatInformation
 
 --- If the key of a threat identifier has a truthy value in this table it will be rendered
 local ThreatRendering = { }
 
 --- Changes the perspective of the threat values measured
+---@param army number
 function iMapSwitchPerspective(army)
-    iMapArmyPerspective = army 
+    iMapArmyPerspective = army
 end
 
 --- Toggles rendering a threat circle
+---@param identifier any
 function iMapToggleThreat(identifier)
     ThreatRendering[identifier]= not ThreatRendering[identifier]
 end
@@ -132,8 +140,8 @@ function iMapToggleRendering()
 
     -- perform UI checks on sim to prevent cheating
     local count = 0
-    for k, brain in ArmyBrains do 
-        if brain.BrainType == "Human" then 
+    for k, brain in ArmyBrains do
+        if brain.BrainType == "Human" then
             count = count + 1
         end
     end
@@ -142,9 +150,9 @@ function iMapToggleRendering()
     local cheatsEnabled = CheatsEnabled()
 
     -- prevent it from working
-    if not (cheatsEnabled or onePlayer) then 
+    if not (cheatsEnabled or onePlayer) then
         WARN("Unable to debug AI grid: cheats are disabled or there is more than one player")
-        return 
+        return
     end
 
     -- allows us to keep track of the thread
@@ -152,7 +160,7 @@ function iMapToggleRendering()
 
     -- get the thread if it exists
     local thread = DebugThreads[type]
-    if not thread then 
+    if not thread then
 
         -- make the thread if it did not exist yet
         thread = ForkThread(
@@ -164,7 +172,7 @@ function iMapToggleRendering()
                 local mz = ScenarioInfo.size[2]
 
                 -- smaller maps have a 8x8 iMAP
-                if mx == mz and mx == 5 then 
+                if mx == mz and mx == 5 then
                     n = 8
                 end
 
@@ -172,7 +180,7 @@ function iMapToggleRendering()
                 local a = Vector(0, 0, 0)
                 local b = Vector(0, 0, 0)
                 local GetTerrainHeight = GetTerrainHeight
-                local DrawLine = DrawLine 
+                local DrawLine = DrawLine
                 local sqrt = math.sqrt
 
                 local function Line(x1, z1, x2, z2, color)
@@ -186,22 +194,22 @@ function iMapToggleRendering()
                     DrawLine(a, b, color)
                 end
 
-                while true do 
+                while true do
 
                     local brain = ArmyBrains[iMapArmyPerspective]
 
                     -- check if we should suspend ourselves
-                    if DebugSuspend[type] then 
+                    if DebugSuspend[type] then
                         SuspendCurrentThread()
                     end
 
                     -- distance per cell
-                    local fx = 1 / n * mx 
-                    local fz = 1 / n * mz 
+                    local fx = 1 / n * mx
+                    local fz = 1 / n * mz
 
                     -- draw iMAP information
-                    for z = 1, n do 
-                        for x = 1, n do 
+                    for z = 1, n do
+                        for x = 1, n do
 
                             -- draw cell
                             Line(fx * (x - 1), fz * (z - 1), fx * (x - 0), fz * (z - 1), color)
@@ -212,18 +220,18 @@ function iMapToggleRendering()
                             local cx = fx * (x - 0.5)
                             local cz = fz * (z - 0.5)
 
-                            a[1] = cx 
+                            a[1] = cx
                             a[2] = GetTerrainHeight(cx, cz)
                             a[3] = cz
 
                             -- draw individual threat values of cell
-                            for k, info in ThreatInformation do 
+                            for k, info in ThreatInformation do
 
                                 -- DrawCircle(a, 0.25 * sqrt(1600), "000000")
 
-                                if ThreatRendering[info.identifier] then 
+                                if ThreatRendering[info.identifier] then
                                     local threat = brain:GetThreatAtPosition(a, 0, true, info.identifier)
-                                    if threat > 0 then 
+                                    if threat > 0 then
                                         DrawCircle(a, 0.25 * sqrt(threat), info.color)
                                     end
                                 end
@@ -243,10 +251,10 @@ function iMapToggleRendering()
 
     -- enable the thread if it should not be suspended
     DebugSuspend[type] = not DebugSuspend[type]
-    if not DebugSuspend[type] then 
+    if not DebugSuspend[type] then
         ResumeThread(thread)
     end
 
     -- keep track of it
-    DebugThreads[type] = thread 
+    DebugThreads[type] = thread
 end

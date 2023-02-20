@@ -1,178 +1,203 @@
+---@meta
+
 ---@class UserUnit
--- @classmod User.UserUnit
+local UserUnit = {}
+
+---@class MissileInfo
+---@field nukeSiloBuildCount number
+---@field nukeSiloMaxStorageCount number
+---@field nukeSiloStorageCount number
+---@field tacticalSiloBuildCount number
+---@field tacticalSiloMaxStorageCount number
+---@field tacticalSiloStorageCount number
+
+---@class EconData
+---@field energyConsumed number
+---@field energyProduced number
+---@field energyRequested number
+---@field massConsumed number
+---@field massProduced number
+---@field massRequested number
 
 ---
---  UserUnit:CanAttackTarget(target, rangeCheck)
-function UserUnit:CanAttackTarget(target,  rangeCheck)
+---@param target UserUnit
+---@param rangeCheck boolean
+function UserUnit:CanAttackTarget(target, rangeCheck)
 end
 
----
---  GetArmy() -- returns the army index
+--- Returns the army index
+---@return number
 function UserUnit:GetArmy()
 end
 
 ---
---  blueprint = UserUnit:GetBlueprint()
+---@return UnitBlueprint
 function UserUnit:GetBlueprint()
 end
 
----
---  GetBuildRate() -- return current unit build rate
+--- Returns current unit build rate
+---@return number
 function UserUnit:GetBuildRate()
 end
 
----
---  table GetCommandQueue() - returns table of commands
+--- Returns a table of commands
+---@return OrderInfo[]
 function UserUnit:GetCommandQueue()
 end
 
----
---  GetCreator() -- returns the units creator, or nil
+--- Returns the unit's creator, or `nil` if none
+---@return UserUnit | nil
 function UserUnit:GetCreator()
 end
 
----
---  string GetCustomName() -- get the current custom name, nil if none
+--- Returns the current custom name, `nil` if none
+---@return string | nil
 function UserUnit:GetCustomName()
 end
 
----
---  GetEconData() - returns a table of economy data
+--- Returns a table of economy data
+---@return EconData
 function UserUnit:GetEconData()
 end
 
 ---
---  Entity:GetEntityId()
+---@return string
 function UserUnit:GetEntityId()
 end
 
----
---  GetFocus() -- returns the unit this unit is currently focused on, or nil
+--- Returns the unit this unit is currently focused on, or `nil`
+---@return UserUnit | nil
 function UserUnit:GetFocus()
 end
 
 ---
---  UserUnit:GetFootPrintSize()
+---@return {SizeX: number, SizeZ: number}
 function UserUnit:GetFootPrintSize()
 end
 
----
---  GetFuelRatio()
+--- Returns the unit's fuel level, as a decimal between `0.0` and `1.0`
+---@return number
 function UserUnit:GetFuelRatio()
 end
 
----
---  GetGuardedEntity() -- returns the units guard target, or nil
+--- Returns the unit's guard target, or nil
+---@return UserUnit | nil
 function UserUnit:GetGuardedEntity()
 end
 
----
---  GetHealth() -- return current health
+--- Returns current health
+---@return number
 function UserUnit:GetHealth()
 end
 
----
---  GetMaxHealth() -- return max health
+--- Returns max health
+---@return number
 function UserUnit:GetMaxHealth()
 end
 
----
---  table GetMissileInfo() - returns a table of the missile info for this unit
+--- Returns a table of the missile info for this unit
+---@return MissileInfo
 function UserUnit:GetMissileInfo()
 end
 
----
---  VECTOR3 GetPosition() - returns the current world posititon of the unit
+--- Returns the current world position of the unit
+---@return Vector
 function UserUnit:GetPosition()
 end
 
----
---  table GetSelectionSets() -- get table of all selection sets unit belongs to
+--- Gets a table of all selection sets the unit belongs to
+---@return string[]
 function UserUnit:GetSelectionSets()
 end
 
----
---  GetShieldRatio()
+--- Returns the unit's shield level, as a decimal between `0.0` and `1.0`
+---@return number
 function UserUnit:GetShieldRatio()
 end
 
 ---
---  GetStat(Name[,defaultVal])
-function UserUnit:GetStat(Name[, defaultVal])
+---@generic T
+---@param name string
+---@param defaultVal? T
+---@return {Value: T}
+function UserUnit:GetStat(name, defaultVal)
 end
 
----
---  UserUnit:GetUnitId()
+--- Returns the unit's ID (e.g. `"UAL0305"`)
+---@return string
 function UserUnit:GetUnitId()
 end
 
----
---  GetWorkProgress()
+--- Gets the progress of the unit's current work, as a decimal between `0.0` and `1.0`
+---@return number
 function UserUnit:GetWorkProgress()
 end
 
----
---  bool HasSelectionSet(string) -- see if a unit belongs to a given selection set
-function UserUnit:HasSelectionSet(string)
+--- Returns if a unit belongs to a given selection set
+---@param selSet string
+---@return boolean
+function UserUnit:HasSelectionSet(selSet)
 end
 
----
---  See if this unit already has an unload from transport queued up
+--- Returns if this unit already has an unload from transport queued up
+---@return boolean
 function UserUnit:HasUnloadCommandQueuedUp()
 end
 
 ---
---  bool = UserUnit:IsAutoMode()
+---@return boolean
 function UserUnit:IsAutoMode()
 end
 
 ---
---  bool = UserUnit:IsAutoSurfaceMode()
+---@return boolean
 function UserUnit:IsAutoSurfaceMode()
 end
 
----
---  IsDead() -- return true if the unit has been destroyed
+--- Returns if the unit has been destroyed
+---@return boolean
 function UserUnit:IsDead()
 end
 
----
---  IsIdle() -- return true if the unit is idle
+--- Returns if the unit is idle
+---@return boolean
 function UserUnit:IsIdle()
 end
 
 ---
---  bool = UserUnit:IsInCategory(category)
+---@param category CategoryName
+---@return boolean
 function UserUnit:IsInCategory(category)
 end
 
----
---  IsOverchargePaused() -- return current overcharge paused status
+--- Returns current overcharge paused status
+---@return boolean
 function UserUnit:IsOverchargePaused()
 end
 
 ---
---  bool = UserUnit:IsRepeatQueue()
+---@return boolean
 function UserUnit:IsRepeatQueue()
 end
 
 ---
---  flag = UserUnit:IsStunned()
+---@return boolean
 function UserUnit:IsStunned()
 end
 
----
---  UserUnit:ProcessInfoPair()
-function UserUnit:ProcessInfo()
+---@param command 'SetAutoMode' | 'SetFireState' | 'SetAutoSurfaceMode' | 'SetRepeatQueue' | 'SetPaused' | 'CustomName' | 'ToggleScriptBit' | 'PlayNoStagingPlatformsVO' | 'PlayBusyStagingPlatformsVO' 
+---@param value boolean | string
+function UserUnit:ProcessInfo(command, value)
 end
 
----
---  RemoveSelectionSet(string) -- remove a selection set name from a unit
-function UserUnit:RemoveSelectionSet(string)
+--- Removes a selection set name from a unit
+---@param selSet string
+function UserUnit:RemoveSelectionSet(selSet)
 end
 
----
---  SetCustomName(string) -- Set a custom name for the unit
-function UserUnit:SetCustomName(string)
+--- Sets a custom name for the unit
+---@param name string
+function UserUnit:SetCustomName(name)
 end
 
+return UserUnit

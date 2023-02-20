@@ -39,6 +39,16 @@ UnitBlueprint {
         'UNSPAWNABLE',
         'UNSELECTABLE',
     },
+    Defense = {
+        AirThreatLevel = 0,
+        ArmorType = 'Normal',
+        EconomyThreatLevel = 0,
+        Health = 30,
+        MaxHealth = 30,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
+    },
     Display = {
         Mesh = {
             LODs = {
@@ -112,6 +122,7 @@ UnitBlueprint {
         TurnRadius = 360,
         TurnRate = 180,
     },
+    SizeSphere = 0.8,
     SizeX = 0.01,
     SizeY = 0.01,
     SizeZ = 0.01,

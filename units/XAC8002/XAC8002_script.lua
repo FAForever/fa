@@ -5,9 +5,10 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local ACivilianStructureUnit = import('/lua/aeonunits.lua').ACivilianStructureUnit
+local ACivilianStructureUnit = import("/lua/aeonunits.lua").ACivilianStructureUnit
 
-XAC8002 = Class(ACivilianStructureUnit) {
+---@class XAC8002 : ACivilianStructureUnit
+XAC8002 = ClassUnit(ACivilianStructureUnit) {
 }
 
 

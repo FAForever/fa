@@ -5,23 +5,24 @@
 --
 --  Summary  :  UEF Battleship Script
 --
---  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
-local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
-local WeaponsFile = import('/lua/terranweapons.lua')
+local TSeaUnit = import("/lua/terranunits.lua").TSeaUnit
+local WeaponsFile = import("/lua/terranweapons.lua")
 local TAMPhalanxWeapon = WeaponsFile.TAMPhalanxWeapon
 local TDFHiroPlasmaCannon = WeaponsFile.TDFHiroPlasmaCannon
 local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler
 local TIFSmartCharge = WeaponsFile.TIFSmartCharge
 
-UES0302 = Class(TSeaUnit) {
+---@class UES0302 : TSeaUnit
+UES0302 = ClassUnit(TSeaUnit) {
     Weapons = {
-        HiroCannonFront = Class(TDFHiroPlasmaCannon) {},
-        HiroCannonBack = Class(TDFHiroPlasmaCannon) {},
-        AntiTorpedo = Class(TIFSmartCharge) {},
-        TorpedoLeft01 = Class(TANTorpedoAngler) {},
-        TorpedoRight01 = Class(TANTorpedoAngler) {},
-        PhalanxGun = Class(TAMPhalanxWeapon) {
+        HiroCannonFront = ClassWeapon(TDFHiroPlasmaCannon) {},
+        HiroCannonBack = ClassWeapon(TDFHiroPlasmaCannon) {},
+        AntiTorpedo = ClassWeapon(TIFSmartCharge) {},
+        TorpedoLeft01 = ClassWeapon(TANTorpedoAngler) {},
+        TorpedoRight01 = ClassWeapon(TANTorpedoAngler) {},
+        PhalanxGun = ClassWeapon(TAMPhalanxWeapon) {
             PlayFxWeaponUnpackSequence = function(self)
                 if not self.SpinManip then
                     self.SpinManip = CreateRotator(self.unit, 'Front_Turret01_Barrel', 'z', nil, 270, 180, 60)

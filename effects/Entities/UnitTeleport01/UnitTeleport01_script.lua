@@ -8,9 +8,9 @@
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 UnitTeleportEffect01 = Class(NullShell) {
 
@@ -74,7 +74,6 @@ UnitTeleportEffect01 = Class(NullShell) {
         WaitSeconds(0.2)
         
         -- light some trees on fire
-        DamageRing(self, pos, 1, 16, 1, 'TreeFire', false, false)
         DamageRing(self, pos, 1, 16, 1, 'TreeFire', false, false)
 
 		-- knockdown trees

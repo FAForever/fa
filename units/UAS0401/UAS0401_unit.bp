@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardReturnRadius = 0,
         TargetBones = {
             'UAS0401',
             'Turret',
@@ -69,15 +70,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 45,
-            Level3 = 80,
-            Level4 = 115,
-            Level5 = 150,
-        },
-    },
     BuildIconSortPriority = 120,
     Categories = {
         'PRODUCTSC1',
@@ -134,8 +126,8 @@ UnitBlueprint {
         AnimationDeath = {
             {
                 Animation = '/units/uas0401/uas0401_adeath01.sca',
-                AnimationRateMax = 1.5,
-                AnimationRateMin = 0.5,
+                AnimationRateMax = 0.10,
+                AnimationRateMin = 0.04,
                 Weight = 100,
             },
         },
@@ -255,10 +247,10 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 350000,
-        BuildCostMass = 22000,
+        BuildCostEnergy = 380000,
+        BuildCostMass = 24000,
         BuildRate = 240,
-        BuildTime = 28800,
+        BuildTime = 38400,
         BuildableCategory = {
             'BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION',
             'BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION',

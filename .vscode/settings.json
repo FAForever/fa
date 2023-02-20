@@ -6,7 +6,8 @@
     "Lua.completion.showWord": "Disable",
     "Lua.runtime.special": {
         "import": "require",
-        "doscript": "require"
+        "doscript": "require",
+        "lazyimport": "require"
     },
     "Lua.runtime.version": "Lua 5.1",
     "Lua.telemetry.enable": false,
@@ -35,3 +36,4 @@
         "ScenarioInfo"
     ],
 }
+

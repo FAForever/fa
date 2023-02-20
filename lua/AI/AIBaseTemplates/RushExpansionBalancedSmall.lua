@@ -20,7 +20,7 @@ BaseBuilderTemplate {
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
-        'EngineerFactoryConstruction',
+        'EngineerFactoryConstructionExpansion',
         'LandInitialFactoryConstruction',
 
         -- Extractor building
@@ -99,7 +99,7 @@ BaseBuilderTemplate {
         end
 
         local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
-        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
+        local distance = import("/lua/ai/aiutilities.lua").GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 50
         elseif distance > 500 then

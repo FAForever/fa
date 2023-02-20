@@ -5,36 +5,36 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local SpecialGrid = import('/lua/ui/controls/specialgrid.lua').SpecialGrid
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Button = import('/lua/maui/button.lua').Button
-local FixableButton = import('/lua/maui/button.lua').FixableButton
-local Edit = import('/lua/maui/edit.lua').Edit
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local TooltipInfo = import('/lua/ui/help/tooltips.lua').Tooltips
-local Prefs = import('/lua/user/prefs.lua')
-local EnhanceCommon = import('/lua/enhancementcommon.lua')
-local Templates = import('/lua/ui/game/build_templates.lua')
-local BuildMode = import('/lua/ui/game/buildmode.lua')
-local UnitViewDetail = import('/lua/ui/game/unitviewDetail.lua')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local SpecialGrid = import("/lua/ui/controls/specialgrid.lua").SpecialGrid
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Button = import("/lua/maui/button.lua").Button
+local FixableButton = import("/lua/maui/button.lua").FixableButton
+local Edit = import("/lua/maui/edit.lua").Edit
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local RadioGroup = import("/lua/maui/mauiutil.lua").RadioGroup
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local TooltipInfo = import("/lua/ui/help/tooltips.lua").Tooltips
+local Prefs = import("/lua/user/prefs.lua")
+local EnhanceCommon = import("/lua/enhancementcommon.lua")
+local Templates = import("/lua/ui/game/build_templates.lua")
+local BuildMode = import("/lua/ui/game/buildmode.lua")
+local UnitViewDetail = import("/lua/ui/game/unitviewdetail.lua")
 local options = Prefs.GetFromCurrentProfile('options')
-local Effect = import('/lua/maui/effecthelpers.lua')
-local TemplatesFactory = import('/lua/ui/templates_factory.lua')
-local straticonsfile = import('/lua/ui/game/straticons.lua')
-local Select = import('/lua/ui/game/selection.lua')
-local Factions = import('/lua/factions.lua').Factions
-local FactionInUnitBpToKey = import('/lua/factions.lua').FactionInUnitBpToKey
-local SetIgnoreSelection = import('/lua/ui/game/gamemain.lua').SetIgnoreSelection
-local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
+local Effect = import("/lua/maui/effecthelpers.lua")
+local TemplatesFactory = import("/lua/ui/templates_factory.lua")
+local straticonsfile = import("/lua/ui/game/straticons.lua")
+local Select = import("/lua/ui/game/selection.lua")
+local Factions = import("/lua/factions.lua").Factions
+local FactionInUnitBpToKey = import("/lua/factions.lua").FactionInUnitBpToKey
+local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
+local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 local getEnhancementQueue = EnhancementQueueFile.getEnhancementQueue
 
 local modifiedCommandQueue = {}
@@ -63,7 +63,7 @@ local modified = false -- If false then buttonrelease will increase buildcount i
 local dragLock = false -- To disable quick successive drags, which doubles the units in the queue
 
 -- locals for Keybind labels in build queue
-local hotkeyLabel_addLabel = import('/lua/keymap/hotkeylabelsUI.lua').addLabel
+local hotkeyLabel_addLabel = import("/lua/keymap/hotkeylabelsui.lua").addLabel
 local idRelations = {}
 local upgradeKey = false
 local upgradesTo = false
@@ -81,11 +81,11 @@ end
 
 if options.gui_draggable_queue ~= 0 then
     -- Add gameparent handleevent for if the drag ends outside the queue window
-    local gameParent = import('gamemain.lua').GetGameParent()
+    local gameParent = import("/lua/ui/game/gamemain.lua").GetGameParent()
     local oldGameParentHandleEvent = gameParent.HandleEvent
     gameParent.HandleEvent = function(self, event)
         if event.Type == 'ButtonRelease' then
-            import('/lua/ui/game/construction.lua').ButtonReleaseCallback()
+            import("/lua/ui/game/construction.lua").ButtonReleaseCallback()
         end
         oldGameParentHandleEvent(self, event)
     end
@@ -117,7 +117,7 @@ local previousTabSize = nil
 local activeTab = nil
 local showBuildIcons = false
 
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
 controls.tabs = controls.tabs or {}
 
 local constructionTabs = {'t1', 't2', 't3', 't4', 'templates'}
@@ -408,7 +408,9 @@ function CreateTabs(type)
             local numActive = 0
             for _, tab in controls.tabs do
                 if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
-                    numActive = numActive + 1
+                    if tab.ID != 'templates' then
+                        numActive = numActive + 1
+                    end
                 end
             end
             previousTabSize = numActive
@@ -431,7 +433,7 @@ function CreateTabs(type)
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
         local enhancements = selection[1]:GetBlueprint().Enhancements
-        local enhCommon = import('/lua/enhancementcommon.lua')
+        local enhCommon = import("/lua/enhancementcommon.lua")
         local enhancementPrefixes = {Back = 'b-', LCH = 'la-', RCH = 'ra-'}
         local newTabs = {}
         if enhancements.Slots then
@@ -489,7 +491,11 @@ function CreateTabs(type)
     for _, tab in controls.tabs do
         if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
             tab:Enable()
-            numActive = numActive + 1
+
+            if tab.ID != 'templates' then
+                numActive = numActive + 1
+            end
+
             if defaultTabOrder[tab.ID] then
                 if not defaultTab or defaultTabOrder[tab.ID] < defaultTabOrder[defaultTab.ID] then
                     defaultTab = tab
@@ -1200,93 +1206,95 @@ end
 
 function OrderEnhancement(item, clean, destroy)
     local units = sortedOptions.selection
-    local enhancementQueue = getEnhancementQueue()
+    if not table.empty(units) then
+        local enhancementQueue = getEnhancementQueue()
+        
+        SetIgnoreSelection(true)
+        for _, unit in units do
+            local orders = {}
+            local cleanOrder = clean
+            local id = unit:GetEntityId()
+            local existingEnhancements = EnhanceCommon.GetEnhancements(id)
 
-    SetIgnoreSelection(true)
-    for _, unit in units do
-        local orders = {}
-        local cleanOrder = clean
-        local id = unit:GetEntityId()
-        local existingEnhancements = EnhanceCommon.GetEnhancements(id)
+            SelectUnits({unit})
 
-        SelectUnits({unit})
+            if clean and not EnhancementQueueFile.currentlyUpgrading(unit) then
+                enhancementQueue[id] = {}
+            end
 
-        if clean and not EnhancementQueueFile.currentlyUpgrading(unit) then
-            enhancementQueue[id] = {}
-        end
+            local doOrder = true
+            local prereqAlreadyOrdered = false
+            local removeAlreadyOrdered = false
 
-        local doOrder = true
-        local prereqAlreadyOrdered = false
-        local removeAlreadyOrdered = false
+            local slot = item.enhTable.Slot
+            local enhSlot = existingEnhancements[slot]
+            local enhTableId = item.enhTable.ID
+            local prereq = item.enhTable.Prerequisite
 
-        local slot = item.enhTable.Slot
-        local enhSlot = existingEnhancements[slot]
-        local enhTableId = item.enhTable.ID
-        local prereq = item.enhTable.Prerequisite
-
-        for _, enhancement in enhancementQueue[id] or {} do
-            local enhId = enhancement.ID
-            if enhancement.Slot == slot then
-                if string.find(enhId, 'Remove') and enhId == (enhSlot .. 'Remove') then
-                    removeAlreadyOrdered = true
-                elseif enhId == enhTableId or enhId ~= prereq then
-                    doOrder = false
-                    break
-                elseif enhId == prereq then
-                    prereqAlreadyOrdered = true
+            for _, enhancement in enhancementQueue[id] or {} do
+                local enhId = enhancement.ID
+                if enhancement.Slot == slot then
+                    if string.find(enhId, 'Remove') and enhId == (enhSlot .. 'Remove') then
+                        removeAlreadyOrdered = true
+                    elseif enhId == enhTableId or enhId ~= prereq then
+                        doOrder = false
+                        break
+                    elseif enhId == prereq then
+                        prereqAlreadyOrdered = true
+                    end
                 end
             end
-        end
 
-        if enhSlot == enhTableId then
-            doOrder = false
-        end
+            if enhSlot == enhTableId then
+                doOrder = false
+            end
 
-        if doOrder == false then
-            continue
-        end
-
-        if not removeAlreadyOrdered and enhSlot and enhSlot ~= prereq then
-            if not destroy then
+            if doOrder == false then
                 continue
             end
 
-            table.insert(orders, enhSlot .. 'Remove')
-        end
+            if not removeAlreadyOrdered and enhSlot and enhSlot ~= prereq then
+                if not destroy then
+                    continue
+                end
 
-        if cleanOrder and not unit:IsIdle() then
-            local cmdqueue = unit:GetCommandQueue()
-            if cmdqueue and cmdqueue[1] and cmdqueue[1].type == 'Script' then
-                cleanOrder = false
+                table.insert(orders, enhSlot .. 'Remove')
+            end
+
+            if cleanOrder and not unit:IsIdle() then
+                local cmdqueue = unit:GetCommandQueue()
+                if cmdqueue and cmdqueue[1] and cmdqueue[1].type == 'Script' then
+                    cleanOrder = false
+                end
+            end
+
+            if prereq and prereq ~= enhSlot and not prereqAlreadyOrdered then
+                table.insert(orders, prereq)
+            end
+
+            table.insert(orders, item.id)
+
+            local first_order = true
+            for _, order in orders do
+                orderTable = {TaskName = 'EnhanceTask', Enhancement = order}
+                IssueCommand("UNITCOMMAND_Script", orderTable, cleanOrder)
+                if first_order and cleanOrder then
+                    cleanOrder = false
+                    first_order = false
+                end
+            end
+
+            if unit:IsInCategory('COMMAND') then
+                local availableOrders, availableToggles, buildableCategories = GetUnitCommandData({unit})
+                OnSelection(buildableCategories, {unit}, true)
             end
         end
 
-        if prereq and prereq ~= enhSlot and not prereqAlreadyOrdered then
-            table.insert(orders, prereq)
-        end
+        SelectUnits(units)
+        SetIgnoreSelection(false)
 
-        table.insert(orders, item.id)
-
-        local first_order = true
-        for _, order in orders do
-            orderTable = {TaskName = 'EnhanceTask', Enhancement = order}
-            IssueCommand("UNITCOMMAND_Script", orderTable, cleanOrder)
-            if first_order and cleanOrder then
-                cleanOrder = false
-                first_order = false
-            end
-        end
-
-        if unit:IsInCategory('COMMAND') then
-            local availableOrders, availableToggles, buildableCategories = GetUnitCommandData({unit})
-            OnSelection(buildableCategories, {unit}, true)
-        end
+        controls.choices:Refresh(FormatData(sortedOptions[item.enhTable.Slot], item.enhTable.Slot))
     end
-
-    SelectUnits(units)
-    SetIgnoreSelection(false)
-
-    controls.choices:Refresh(FormatData(sortedOptions[item.enhTable.Slot], item.enhTable.Slot))
 end
 
 function OnClickHandler(button, modifiers)
@@ -1411,7 +1419,7 @@ function OnClickHandler(button, modifiers)
             else
                 if itembp.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
                     -- Stationary means it needs to be placed, so go in to build mobile mode
-                    import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, {name = item.id})
+                    import("/lua/ui/game/commandmode.lua").StartCommandMode(buildCmd, {name = item.id})
                 else
                     -- If the item to build can move, it must be built by a factory
                     -- TODO - what about mobile factories?
@@ -1477,14 +1485,14 @@ function OnClickHandler(button, modifiers)
                 end
             end
         else
-            import('/lua/ui/game/commandmode.lua').StartCommandMode('build', {name = item.template.templateData[3][1]})
+            import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = item.template.templateData[3][1]})
             SetActiveBuildTemplate(item.template.templateData)
         end
 
         if options.gui_template_rotator ~= 0 then
             local item = button.Data
             local activeTemplate = item.template.templateData
-            local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+            local worldview = import("/lua/ui/game/worldview.lua").viewLeft
             local oldHandleEvent = worldview.HandleEvent
             worldview.HandleEvent = function(self, event)
                 if event.Type == 'ButtonPress' then
@@ -1529,11 +1537,11 @@ function OnClickHandler(button, modifiers)
                     UIUtil.QuickDialog(GetFrame(0), "<LOC enhancedlg_0000>Choosing this enhancement will destroy the existing enhancement in this slot.  Are you sure?",
                         "<LOC _Yes>",
                         function()
-                            OrderEnhancement(item, clean, true)
+                            safecall("OrderEnhancement", OrderEnhancement, item, clean, true)
                         end,
                         "<LOC _No>",
                         function()
-                            OrderEnhancement(item, clean, false)
+                            safecall("OrderEnhancement", OrderEnhancement, item, clean, false)
                         end,
                         nil, nil,
                         true,  {worldCover = true, enterButton = 1, escapeButton = 2})
@@ -1922,7 +1930,7 @@ function CreateExtraControls(controlType)
                 break
             end
             if i == 1 then
-                local factions = import('/lua/factions.lua').Factions
+                local factions = import("/lua/factions.lua").Factions
                 for _, factionData in factions do
                     if v:IsInCategory(factionData.Category) then
                         faction = factionData.Category
@@ -1955,7 +1963,7 @@ function updateCommandQueue()
     OnQueueChanged(currentCommandQueue)
 end
 
-local insertIntoTableLowestTechFirst = import('/lua/ui/game/selectionsort.lua').insertIntoTableLowestTechFirst
+local insertIntoTableLowestTechFirst = import("/lua/ui/game/selectionsort.lua").insertIntoTableLowestTechFirst
 function FormatData(unitData, type)
     local retData = {}
     if type == 'construction' then
@@ -1999,7 +2007,7 @@ function FormatData(unitData, type)
         table.insert(sortedUnits, EntityCategoryFilterDown(miscCats, unitData))
 
         -- Get function for checking for restricted units
-        local IsRestricted = import('/lua/game.lua').IsRestricted
+        local IsRestricted = import("/lua/game.lua").IsRestricted
 
         -- This section adds the arrows in for a build icon which is an upgrade from the
         -- selected unit. If there is an upgrade chain, it will display them split by arrows.

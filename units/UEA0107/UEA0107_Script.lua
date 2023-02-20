@@ -8,16 +8,17 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local explosion = import('/lua/defaultexplosions.lua')
-local util = import('/lua/utilities.lua')
+local explosion = import("/lua/defaultexplosions.lua")
+local util = import("/lua/utilities.lua")
 
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
-local DummyWeapon = import('/lua/aeonweapons.lua').AAASonicPulseBatteryWeapon
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local DummyWeapon = import("/lua/aeonweapons.lua").AAASonicPulseBatteryWeapon
 
-UEA0107 = Class(AirTransport) {
+---@class UEA0107 : AirTransport
+UEA0107 = ClassUnit(AirTransport) {
 
         Weapons = {
-            GuidanceSystem = Class(DummyWeapon) {},
+            GuidanceSystem = ClassWeapon(DummyWeapon) {},
         },
 
         AirDestructionEffectBones = { 'Front_Right_Exhaust','Front_Left_Exhaust','Back_Right_Exhaust','Back_Left_Exhaust',
@@ -25,27 +26,18 @@ UEA0107 = Class(AirTransport) {
 
         BeamExhaustCruise = '/effects/emitters/transport_thruster_beam_01_emit.bp',
         BeamExhaustIdle = '/effects/emitters/transport_thruster_beam_02_emit.bp',
-
-        DestructionTicks = 250,
         EngineRotateBones = {'Front_Right_Engine', 'Front_Left_Engine', 'Back_Left_Engine', 'Back_Right_Engine', },
 
         PlayDestructionEffects = true,
-        DamageEffectPullback = 0.25,
-        DestroySeconds = 7.5,
 
         OnStopBeingBuilt = function(self,builder,layer)
             AirTransport.OnStopBeingBuilt(self,builder,layer)
-            self.EngineManipulators = {}
 
-            --  create the engine thrust manipulators
-            for k, v in self.EngineRotateBones do
-                table.insert(self.EngineManipulators, CreateThrustController(self, "thruster", v))
-            end
-
-            -- set up the thursting arcs for the engines
-            for keys,values in self.EngineManipulators do
-                --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
-                values:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
+            -- create the engine thrust manipulators
+            for _, bone in self.EngineRotateBones do
+                local controller = CreateThrustController(self, 'Thruster', bone)
+                controller:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
+                self.Trash:Add(controller)
             end
 
             self.LandingAnimManip = CreateAnimator(self)

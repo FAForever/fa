@@ -11,6 +11,35 @@
 -- Armor Type Definitions
 --
 
+---@alias DamageType
+---| "CzarBeam"
+---| "DeathExplosion"
+---| "Deathnuke"
+---| "EMP"
+---| "ExperimentalFootfall"
+---| "FireBeetleExplosion"
+---| "Normal"
+---| "Nuke"
+---| "OtheTacticalBomb"
+---| "Overcharge"
+---| "Reclaimed"
+---| "Spell"
+---| "Stun"
+---| "TacticalMissile"
+---| "TreeFire"
+---| "TreeForce"
+
+---@alias ArmorType
+---| "ASF"
+---| "Commander"
+---| "Default"
+---| "Experimental"
+---| "ExperimentalStructure"
+---| "Light"
+---| "Normal"
+---| "Structure"
+---| "TMD"
+
 armordefinition = {
 
     {   -- Armor Type Name

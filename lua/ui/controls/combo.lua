@@ -2,17 +2,41 @@
 -- this is a custom control as it its default has very game specific look to it
 -- Combo box will need to have its width set, but height will be auto based on the bitmaps
 
-local LazyVar = import('/lua/lazyvar.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local UIMain = import('/lua/ui/uimain.lua')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local LazyVar = import("/lua/lazyvar.lua")
+local UIMain = import("/lua/ui/uimain.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
-local activeCombo = nil
+
+---@class ComboBitmaps
+---@field button ComboButtonSideBitmaps
+---@field list ComboBorderBitmaps
+
+---@class ComboButtonSideBitmaps
+---@field left ComboButtonBitmaps
+---@field mid ComboButtonBitmaps
+---@field right ComboButtonBitmaps
+
+---@class ComboBorderBitmaps
+---@field ul Lazy<FileName>
+---@field um Lazy<FileName>
+---@field ur Lazy<FileName>
+---@field l Lazy<FileName>
+---@field m Lazy<FileName>
+---@field r Lazy<FileName>
+---@field ll Lazy<FileName>
+---@field lm Lazy<FileName>
+---@field lr Lazy<FileName>
+
+---@class ComboButtonBitmaps
+---@field up Lazy<FileName>
+---@field down Lazy<FileName>
+---@field over Lazy<FileName>
+---@field dis Lazy<FileName>
+
 
 local defaultBitmaps = {
     button = {
@@ -49,28 +73,68 @@ local defaultBitmaps = {
 }
 
 
+local activeCombo = nil
 
----------------------------------------------------------------------------------------------------------------------------------------- COMBO
+
+
 ---@class Combo : Group
-Combo = Class(Group) {
-    __init = function(self, parent, pointSize, maxVisibleItems, staticTitle, bitmaps, rolloverCue, clickCue, itemCue, debugName, EnableColor)
+---@field _btnLeft Button
+---@field _btnMid Button
+---@field _btnRight Button
+---@field _dropdown Group
+---@field _list ItemList
+---@field _scrollbar? Scrollbar
+---@field _text Text
+---
+---@field _visibleItems LazyVar<number>
+---
+---@field buttonBitmaps ComboButtonSideBitmaps
+---@field EnableColor? boolean if the default title color is used when the default item is selected
+---@field mClickCue? string
+---@field mItemCue string
+---@field mRolloverCue? string
+---@field _defaultIndex? number
+---@field _listhidden boolean
+---@field _maxVisibleItems number
+---@field _scrollbarOffsetRight number defaults to -22
+---@field _scrollbarOffsetBottom number defaults to -6
+---@field _scrollbarOffsetTop number defaults to -6
+---@field _staticTitle? boolean the title will not be set to the selected item when true
+---@field _titleColor? Color
+---@field _titleDefaultColor? Color the title color used when the default item is selected (and `EnableColor` is true)
+Combo = ClassUI(Group) {
+    ---@param self Combo
+    ---@param parent Control
+    ---@param pointSize? number defaults to 12
+    ---@param maxVisibleItems? number defaults to 10
+    ---@param staticTitle? boolean
+    ---@param bitmaps? ComboBitmaps defaults to the bitmaps for `/widgets/drop-down/`
+    ---@param rolloverCue? string
+    ---@param clickCue? string
+    ---@param itemCue? string defaults to `"UI_Tab_Click_01"`
+    ---@param debugName? string defaults to `"Combo"`
+    ---@param enableColor? boolean defaults to true
+    __init = function(self, parent, pointSize, maxVisibleItems, staticTitle, bitmaps, rolloverCue, clickCue, itemCue, debugName, enableColor)
+        pointSize = pointSize or 12
+        maxVisibleItems = maxVisibleItems or 10
+        bitmaps = bitmaps or defaultBitmaps
+        itemCue = itemCue or "UI_Tab_Click_01"
+        debugName = debugName or "Combo"
+        if enableColor == nil then enableColor = true end
+
         Group.__init(self, parent)
-        self:SetName(debugName or "Combo")
+        self:SetName(debugName)
         self.mRolloverCue = rolloverCue
         self.mClickCue = clickCue
-        self.mItemCue = itemCue or "UI_Tab_Click_01"
-        self.EnableColor = EnableColor or true
+        self.mItemCue = itemCue
+        self.buttonBitmaps = bitmaps.button
+        self.EnableColor = enableColor
 
         -- sets the offsets to the auto-attached scrollbar
         -- these are the better defaults for the FAF design
         self._scrollbarOffsetRight = -22
         self._scrollbarOffsetBottom = -6
         self._scrollbarOffsetTop = -6
-
-        bitmaps = bitmaps or defaultBitmaps
-
-        pointSize = pointSize or 12
-        maxVisibleItems = maxVisibleItems or 10
 
         -- this sets if the title is fixed or changes when a new selection is made
         self._staticTitle = staticTitle
@@ -82,10 +146,8 @@ Combo = Class(Group) {
         self._btnRight:DisableHitTest()
         self._btnMid:DisableHitTest()
 
-        LayoutHelpers.AtLeftIn(self._btnLeft, self)
-        LayoutHelpers.AtTopIn(self._btnLeft, self)
-        LayoutHelpers.AtRightIn(self._btnRight, self)
-        LayoutHelpers.AtTopIn(self._btnRight, self)
+        LayoutHelpers.AtLeftTopIn(self._btnLeft, self)
+        LayoutHelpers.AtRightTopIn(self._btnRight, self)
         LayoutHelpers.AtTopIn(self._btnMid, self)
         LayoutHelpers.AnchorToRight(self._btnMid, self._btnLeft, -1)
         self._btnMid.Right:Set(self._btnRight.Left)
@@ -94,81 +156,86 @@ Combo = Class(Group) {
         self._text:DisableHitTest()
 
         -- text control is height of text/font, and from left to button
-        self.Height:Set(function() return math.max(self._text.Height(), self._btnMid.Height()) end)
+        self.Height:Set(function()
+            return math.max(self._text.Height(), self._btnMid.Height())
+        end)
         self._text.Top:Set(self._btnMid.Top)
         LayoutHelpers.AtLeftIn(self._text, self._btnLeft, 5)
         LayoutHelpers.AtRightIn(self._text, self._btnMid, -5)
         self._text:SetClipToWidth(true)
         self._text:SetDropShadow(true)
 
-        self._dropdown = Group(self._text)
-        self._dropdown.Top:Set(self.Bottom)
-        self._dropdown.Right:Set(function() return self.Right() end)
-        self._dropdown.Width:Set(function() return self.Width() - LayoutHelpers.ScaleNumber(5) end)
+        local dropdown = Group(self._text)
+        dropdown.Top:Set(self.Bottom)
+        dropdown.Right:Set(self.Right)
+        dropdown.Width:Set(function()
+            return self.Width() - LayoutHelpers.ScaleNumber(5)
+        end)
+        self._dropdown = dropdown
 
-        local ddul = Bitmap(self._dropdown, bitmaps.list.ul)
-        local ddum = Bitmap(self._dropdown, bitmaps.list.um)
-        local ddur = Bitmap(self._dropdown, bitmaps.list.ur)
-        local ddl = Bitmap(self._dropdown, bitmaps.list.l)
-        local ddm = Bitmap(self._dropdown, bitmaps.list.m)
-        local ddr = Bitmap(self._dropdown, bitmaps.list.r)
-        local ddll = Bitmap(self._dropdown, bitmaps.list.ll)
-        local ddlm = Bitmap(self._dropdown, bitmaps.list.lm)
-        local ddlr = Bitmap(self._dropdown, bitmaps.list.lr)
+        local border = bitmaps.list
+        local ddul = Bitmap(dropdown, border.ul)
+        local ddum = Bitmap(dropdown, border.um)
+        local ddur = Bitmap(dropdown, border.ur)
+        local ddl = Bitmap(dropdown, border.l)
+        local ddm = Bitmap(dropdown, border.m)
+        local ddr = Bitmap(dropdown, border.r)
+        local ddll = Bitmap(dropdown, border.ll)
+        local ddlm = Bitmap(dropdown, border.lm)
+        local ddlr = Bitmap(dropdown, border.lr)
 
         -- top part is fixed under self
-        LayoutHelpers.AtLeftIn(ddul, self._dropdown)
-        LayoutHelpers.AtTopIn(ddul, self._dropdown)
-        LayoutHelpers.AtRightIn(ddur, self._dropdown)
-        LayoutHelpers.AtTopIn(ddur, self._dropdown)
-        LayoutHelpers.AtTopIn(ddum, self._dropdown)
+        LayoutHelpers.AtLeftTopIn(ddul, dropdown)
+        LayoutHelpers.AtRightTopIn(ddur, dropdown)
+        LayoutHelpers.AtTopIn(ddum, dropdown)
         ddum.Left:Set(ddul.Right)
         ddum.Right:Set(ddur.Left)
 
-        self._list = ItemList(ddm)   -- make list depth over text so if you have them stacked, you see list
-        self._list:SetFont(UIUtil.bodyFont, pointSize)
-        self._list:SetColors(UIUtil.fontColor, "Black", UIUtil.fontColor, "Black")
+        local list = ItemList(ddm)   -- make list depth over text so if you have them stacked, you see list
+        list:SetFont(UIUtil.bodyFont, pointSize)
+        list:SetColors(UIUtil.fontColor, "Black", UIUtil.fontColor, "Black")
         if staticTitle then
-            self._list:ShowSelection(false)
+            list:ShowSelection(false)
         end
-        self._list:ShowMouseoverItem(true)
+        list:ShowMouseoverItem(true)
+        self._list = list
 
         -- middle part is fixed to width, set to height of item list
         ddl.Top:Set(ddul.Bottom)
-        ddl.Left:Set(self._dropdown.Left)
+        ddl.Left:Set(dropdown.Left)
         ddr.Top:Set(ddur.Bottom)
-        ddr.Right:Set(self._dropdown.Right)
+        ddr.Right:Set(dropdown.Right)
         ddm.Top:Set(ddum.Bottom)
         ddm.Left:Set(ddl.Right)
         ddm.Right:Set(ddr.Left)
-        ddm.Height:Set(self._list.Height)
-        ddl.Height:Set(self._list.Height)
-        ddr.Height:Set(self._list.Height)
-        ddll.Bottom:Set(self._dropdown.Bottom)
-        ddll.Left:Set(self._dropdown.Left)
-        ddlr.Bottom:Set(self._dropdown.Bottom)
-        ddlr.Right:Set(self._dropdown.Right)
-        ddlm.Bottom:Set(self._dropdown.Bottom)
+        ddm.Height:Set(list.Height)
+        ddl.Height:Set(list.Height)
+        ddr.Height:Set(list.Height)
+        ddll.Bottom:Set(dropdown.Bottom)
+        ddll.Left:Set(dropdown.Left)
+        ddlr.Bottom:Set(dropdown.Bottom)
+        ddlr.Right:Set(dropdown.Right)
+        ddlm.Bottom:Set(dropdown.Bottom)
         ddlm.Left:Set(ddll.Right)
         ddlm.Right:Set(ddlr.Left)
 
         -- list is always under the control and the width (scrollbar under button)
-        self._list.Top:Set(ddm.Top)
-        self._list.Left:Set(ddm.Left)
-        self._list.Right:Set(ddm.Right)
+        list.Top:Set(ddm.Top)
+        list.Left:Set(ddm.Left)
+        list.Right:Set(ddm.Right)
 
-        self._list.HandleEvent = function(control, event)
+        list.HandleEvent = function(_, event)
             if event.Type == 'MouseExit' then
                 self:OnMouseExit()
             end
         end
 
-        -- hide the list by default
+        -- hide the list on creation
         self._listhidden = true
-        self._dropdown:Hide()
+        dropdown:Hide()
 
         -- supress show when list is in hidden state
-        self._dropdown.OnHide = function(ctrl, hidden)
+        dropdown.OnHide = function(self_dropdown, hidden)
             if not hidden and self._listhidden then
                 return true
             end
@@ -179,10 +246,11 @@ Combo = Class(Group) {
                 return
             end
 
+            local button_bitmap = self.buttonBitmaps
             if not hidden then
-                self._btnLeft:SetTexture(bitmaps.button.left.down)
-                self._btnRight:SetTexture(bitmaps.button.right.down)
-                self._btnMid:SetTexture(bitmaps.button.mid.down)
+                self._btnLeft:SetTexture(button_bitmap.left.down)
+                self._btnRight:SetTexture(button_bitmap.right.down)
+                self._btnMid:SetTexture(button_bitmap.mid.down)
                 self._text:SetColor("Black")
                 self:OnMouseExit()
                 if activeCombo and activeCombo ~= self then
@@ -190,12 +258,16 @@ Combo = Class(Group) {
                     activeCombo._dropdown:SetHidden(true)
                 end
                 activeCombo = self
-                self._dropdown.Depth:Set(self:GetRootFrame():GetTopmostDepth() + 1)
+                self_dropdown.Depth:Set(self:GetRootFrame():GetTopmostDepth() + 1)
             else
-                self._btnLeft:SetTexture(bitmaps.button.left.up)
-                self._btnRight:SetTexture(bitmaps.button.right.up)
-                self._btnMid:SetTexture(bitmaps.button.mid.up)
-                self._text:SetColor(self._titleColor or UIUtil.fontColor)
+                self._btnLeft:SetTexture(button_bitmap.left.up)
+                self._btnRight:SetTexture(button_bitmap.right.up)
+                self._btnMid:SetTexture(button_bitmap.mid.up)
+                if self.EnableColor and self._list:GetSelection() + 1 == self._defaultIndex then
+                    self._text:SetColor(self._titleDefaultColor or 'DBDBBA') -- Yellow
+                else
+                    self._text:SetColor(self._titleColor or UIUtil.fontColor)
+                end
                 activeCombo = nil
                 self:OnHide()
             end
@@ -204,143 +276,90 @@ Combo = Class(Group) {
         -- set the height of the list based on the number of items visible and the font metrics
         self._maxVisibleItems = maxVisibleItems
         self._visibleItems = LazyVar.Create()
-        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading()) end)
-        self._dropdown.Height:Set(function() return self._list.Height() + ddum.Height() + ddlm.Height() end)
-        self._visibleItems:Set(1)
-
-        -- set up button logic
-        self.HandleEvent = function(ctrl, event)
-            local eventHandled = false
-
-            if self:IsDisabled() then
-                return eventHandled
-            end
-
-            if event.Type == 'MouseEnter' then
-                if self._dropdown:IsHidden() then
-                    self._btnLeft:SetTexture(bitmaps.button.left.over)
-                    self._btnRight:SetTexture(bitmaps.button.right.over)
-                    self._btnMid:SetTexture(bitmaps.button.mid.over)
-                    if not self.EnableColor then self._text:SetColor(self._titleColor or UIUtil.fontColor) end
-                    if self.mRolloverCue then
-                        local sound = Sound({Cue = self.mRolloverCue, Bank = "Interface",})
-                        PlaySound(sound)
-                    end
-                end
-                eventHandled = true
-            elseif event.Type == 'MouseExit' then
-                if self._dropdown:IsHidden() then
-                    self._btnLeft:SetTexture(bitmaps.button.left.up)
-                    self._btnRight:SetTexture(bitmaps.button.right.up)
-                    self._btnMid:SetTexture(bitmaps.button.mid.up)
-                    if not self.EnableColor then self._text:SetColor(self._titleColor or UIUtil.fontColor) end
-                end
-                self:OnMouseExit()
-                eventHandled = true
-            elseif event.Type == 'ButtonPress' then
-                self._listhidden = not self._dropdown:IsHidden()
-                self._dropdown:SetHidden(not self._dropdown:IsHidden())
-                eventHandled = true
-                if self.mClickCue then
-                    local sound = Sound({Cue = self.mClickCue, Bank = "Interface",})
-                    PlaySound(sound)
-                end
-            end
-            self:OnEvent(event)
-
-            return eventHandled
-        end
-
-        self.OnDisable = function(self)
-            self._btnLeft:SetTexture(bitmaps.button.left.dis)
-            self._btnRight:SetTexture(bitmaps.button.right.dis)
-            self._btnMid:SetTexture(bitmaps.button.mid.dis)
-            if not self.EnableColor then self._text:SetColor(self._titleColor or UIUtil.fontColor) end
-            self._dropdown:Hide()
-        end
-
-        self.OnEnable = function(self)
-            self._btnLeft:SetTexture(bitmaps.button.left.up)
-            self._btnRight:SetTexture(bitmaps.button.right.up)
-            self._btnMid:SetTexture(bitmaps.button.mid.up)
-            if not self.EnableColor then self._text:SetColor(self._titleColor or UIUtil.fontColor) end
-        end
+        list.Height:Set(function()
+            local text = self._text
+            return self._visibleItems() * (text.FontAscent() + text.FontDescent() + text.FontExternalLeading()) + 1
+        end)
+        dropdown.Height:Set(function()
+            return self._list.Height() + ddum.Height() + ddlm.Height()
+        end)
 
         -- set up selection logic
-        self._list.OnClick = function(list, row)
-            ItemList.OnClick(self._list, row)
-            if not self._staticTitle then self._text:SetText(self._list:GetItem(row)) end
-            self:OnClick(row + 1, self._list:GetItem(row))
+        list.OnClick = function(self_list, row)
+            self:SetItem(row + 1)
+            self:OnClick(row + 1, self_list:GetItem(row))
             self._listhidden = true
             self._dropdown:SetHidden(true)
         end
 
-        self._list.OnMouseoverItem = function(list, row)
+        list.OnMouseoverItem = function(self_list, row)
             if self.mItemCue then
-                local sound = Sound({Cue = self.mItemCue, Bank = "Interface",})
-                PlaySound(sound)
+                PlaySound(Sound {
+                    Cue = self.mItemCue,
+                    Bank = "Interface",
+                })
             end
             if row == -1 then
                 self:OnOverItem(-1, nil)
             else
-                self:OnOverItem(row + 1, self._list:GetItem(row))
+                self:OnOverItem(row + 1, self_list:GetItem(row))
             end
         end
 
-        OnGlobalMouseClick = function(event)
-            if self and self._list then
-                if not self._listhidden then
-                    local rightCheck
-                    if self._scrollbar then
-                        rightCheck = self._scrollbar.Right()
-                    else
-                        rightCheck = self.Right()
-                    end
-                    if (event.x < self.Left() or event.x > rightCheck) or (event.y < self.Top() or event.y > self._dropdown.Bottom()) then
-                        self._listhidden = not self._dropdown:IsHidden()
-                        self._dropdown:SetHidden(not self._dropdown:IsHidden())
-                    end
+        local OnGlobalMouseClick = function(event)
+            if self._list and not self._listhidden then
+                local rightCheck
+                if self._scrollbar then
+                    rightCheck = self._scrollbar.Right()
+                else
+                    rightCheck = self.Right()
+                end
+                local x, y = event.x, event.y
+                if x < self.Left() or x > rightCheck or y < self.Top() or y > self._dropdown.Bottom() then
+                    local new_state = not self._dropdown:IsHidden()
+                    self._listhidden = new_state
+                    self._dropdown:SetHidden(new_state)
                 end
             end
         end
 
         UIMain.AddOnMouseClickedFunc(OnGlobalMouseClick)
-
-        self.OnDestroy = function(self)
-            UIMain.RemoveOnMouseClickedFunc(OnGlobalMouseClick)
-        end
+        self._globalMouseClickFn = OnGlobalMouseClick -- keep for removal on destruction
     end,
 
-    -- remove old items and replace with a table of strings, also set the visible size
-    -- defaultItemIndex is 1 based
-    AddItems = function(self, textArray, defaultItemIndex, realDefValue)
-        local numItems = table.getn(textArray)
-        local defaultItemIndex = defaultItemIndex or 1
+    --- Adds an array of strings, and also sets the visible size
+    ---@param self Combo
+    ---@param textArray UnlocalizedString[]
+    ---@param selectedIndex? integer defaults to 1
+    ---@param defaultIndex? integer defaults to no default item
+    AddItems = function(self, textArray, selectedIndex, defaultIndex)
+        selectedIndex = selectedIndex or 1
+        self._defaultIndex = defaultIndex
 
-        self._visibleItems:Set(math.min(numItems, self._maxVisibleItems))
+        local numItems = self._visibleItems() + table.getn(textArray)
+        local visibleItems = math.min(numItems, self._maxVisibleItems)
+        self._visibleItems:Set(visibleItems)
+        local list = self._list
 
-        if self._scrollbar then
-            self._scrollbar:Destroy()
-        end
-        if numItems > self._visibleItems() then
-            self._scrollbar = UIUtil.CreateVertScrollbarFor(self._list, self._scrollbarOffsetRight, nil, self._scrollbarOffsetBottom, self._scrollbarOffsetTop)
-        end
-
-        local realDefFinded = false
-        for i, text in ipairs(textArray) do
-            if realDefValue and i == realDefValue then
-                if i == defaultItemIndex then realDefFinded = true end
-                self._list:AddItem(LOC(text)..' (default)')
-            elseif i ~= realDefValue then
-                self._list:AddItem(LOC(text))
+        if numItems > visibleItems then
+            if not self._scrollbar then
+                self._scrollbar = UIUtil.CreateVertScrollbarFor(list, self._scrollbarOffsetRight,
+                        nil, self._scrollbarOffsetBottom, self._scrollbarOffsetTop)
             end
+        elseif self._scrollbar then
+            self._scrollbar:Destroy()
+            self._scrollbar = nil
         end
 
-        if self.EnableColor and realDefFinded then
-            self._text:SetColor('DBDBBA') -- Yellow
+        for i, text in ipairs(textArray) do
+            local item = LOC(text)
+            if i == defaultIndex then
+                item = LOC("<LOC gameui_0010>%s (default)"):format(item)
+            end
+            list:AddItem(item)
         end
 
-        self:SetItem(defaultItemIndex)
+        self:SetItem(selectedIndex)
     end,
 
     -- helper function to (re)set scrollbar offsets for dialogs or UI parts using Vanila design (Replays, Multiplayer LAN, etc)
@@ -364,7 +383,12 @@ Combo = Class(Group) {
     -- set the index selected (1 based!)
     SetItem = function(self, index)
         ItemList.OnClick(self._list, index - 1)
-        if not self._staticTitle then self._text:SetText(self._list:GetItem(index - 1)) end
+        if not self._staticTitle then
+            self._text:SetText(self._list:GetItem(index - 1))
+            if self.EnableColor and index == self._defaultIndex then
+                self._text:SetColor(self._titleDefaultColor or 'DBDBBA') -- Yellow
+            end
+        end
     end,
 
     -- get the index selected (1 based!) and the item
@@ -381,8 +405,17 @@ Combo = Class(Group) {
         self._text:SetText(text)
     end,
 
-    SetTitleTextColor = function(self, color)
+    ---@param self Combo
+    ---@param color Color
+    ---@param defaultColor? Color color use for when the default item is selected
+    SetTitleTextColor = function(self, color, defaultColor)
         self._titleColor = color
+        if defaultColor then
+            self._titleDefaultColor = defaultColor
+            if self._list:GetSelection() + 1 == self._defaultIndex then
+                color = defaultColor
+            end
+        end
         self._text:SetColor(color)
     end,
 
@@ -404,6 +437,83 @@ Combo = Class(Group) {
     -- Triggered when the dropdown list is hidden
     OnHide = function()
     end,
+
+    OnDisable = function(self)
+        local button = self.buttonBitmaps
+        self._btnLeft:SetTexture(button.left.dis)
+        self._btnRight:SetTexture(button.right.dis)
+        self._btnMid:SetTexture(button.mid.dis)
+        if not self.EnableColor then
+            self._text:SetColor(self._titleColor or UIUtil.fontColor)
+        end
+        self._dropdown:Hide()
+    end,
+
+    OnEnable = function(self)
+        local button = self.buttonBitmaps
+        self._btnLeft:SetTexture(button.left.up)
+        self._btnRight:SetTexture(button.right.up)
+        self._btnMid:SetTexture(button.mid.up)
+        if not self.EnableColor then
+            self._text:SetColor(self._titleColor or UIUtil.fontColor)
+        end
+    end,
+
+    HandleEvent = function(self, event)
+        local eventHandled = false
+
+        if self:IsDisabled() then
+            return eventHandled
+        end
+
+        local buttonBitmaps = self.buttonBitmaps
+        if event.Type == 'MouseEnter' then
+            if self._dropdown:IsHidden() then
+                self._btnLeft:SetTexture(buttonBitmaps.left.over)
+                self._btnRight:SetTexture(buttonBitmaps.right.over)
+                self._btnMid:SetTexture(buttonBitmaps.mid.over)
+                if not self.EnableColor then self._text:SetColor(self._titleColor or UIUtil.fontColor) end
+                if self.mRolloverCue then
+                    PlaySound(Sound {
+                        Cue = self.mRolloverCue,
+                        Bank = "Interface",
+                    })
+                end
+            end
+            eventHandled = true
+        elseif event.Type == 'MouseExit' then
+            if self._dropdown:IsHidden() then
+                self._btnLeft:SetTexture(buttonBitmaps.left.up)
+                self._btnRight:SetTexture(buttonBitmaps.right.up)
+                self._btnMid:SetTexture(buttonBitmaps.mid.up)
+                if not self.EnableColor then
+                    self._text:SetColor(self._titleColor or UIUtil.fontColor)
+                end
+            end
+            self:OnMouseExit()
+            eventHandled = true
+        elseif event.Type == 'ButtonPress' then
+            self._listhidden = not self._dropdown:IsHidden()
+            self._dropdown:SetHidden(not self._dropdown:IsHidden())
+            if self.mClickCue then
+                PlaySound(Sound {
+                    Cue = self.mClickCue,
+                    Bank = "Interface",
+                })
+            end
+            eventHandled = true
+        end
+        self:OnEvent(event)
+
+        return eventHandled
+    end,
+
+    OnDestroy = function(self)
+        if self._globalMouseClickFn then
+            UIMain.RemoveOnMouseClickedFunc(self._globalMouseClickFn)
+            self._globalMouseClickFn = nil
+        end
+    end,
 }
 
 ---------------------------------------------------------------------------------------------------------------------------------------- BITMAP COMBO
@@ -411,19 +521,37 @@ Combo = Class(Group) {
 -- NOTE: At some point a flexible control combo that uses grid should be made so anything can be in it
 -- bitmap array expects an array of bitmap names or colors
 ---@class BitmapCombo : Group
-BitmapCombo = Class(Group) {
+---@field ddm Bitmap
+---@field _bitmap Bitmap
+---@field _btnLeft Button
+---@field _btnMid Bitmap
+---@field _btnRight Button
+---@field _dropdown Group
+---@field _list? Group[]
+---
+---@field mRolloverCue? string
+---@field mClickCue? string
+---@field _array FileName[] | Color[]
+---@field _bitmaps ComboBitmaps
+---@field _curIndex number
+---@field _ddhidden? boolean
+---@field _globalMouseClickFn function
+---@field _isColor? boolean
+BitmapCombo = ClassUI(Group) {
     __init = function(self, parent, bitmapArray, defaultIndex, isColor, bitmaps, rolloverCue, clickCue, debugName)
+        bitmaps = bitmaps or defaultBitmaps
+        debugName = debugName or "BitmapCombo"
+
         Group.__init(self, parent)
-        self:SetName(debugName or "BitmapCombo")
+        self:SetName(debugName)
 
         self.mRolloverCue = rolloverCue
         self.mClickCue = clickCue
+        self._bitmaps = bitmaps
 
-        self._bitmaps = bitmaps or defaultBitmaps
-
-        self._btnLeft = Bitmap(self, self._bitmaps.button.left.up)
-        self._btnRight = Bitmap(self, self._bitmaps.button.right.up)
-        self._btnMid = Bitmap(self, self._bitmaps.button.mid.up)
+        self._btnLeft = Bitmap(self, bitmaps.button.left.up)
+        self._btnRight = Bitmap(self, bitmaps.button.right.up)
+        self._btnMid = Bitmap(self, bitmaps.button.mid.up)
         self._btnLeft:DisableHitTest()
         self._btnRight:DisableHitTest()
         self._btnMid:DisableHitTest()
@@ -446,23 +574,18 @@ BitmapCombo = Class(Group) {
         LayoutHelpers.DepthOverParent(self._dropdown, self._bitmap, 1)
         self._dropdown:Hide()
 
-        self._dropdown.HandleEvent = function(control, event)
-            if event.Type == 'MouseExit' then
-                self:OnMouseExit()
-            end
-        end
-
         -- Create the dropdown background. It's a crude approximation to a nine-patch.
-        local ddul = Bitmap(self._dropdown, self._bitmaps.list.ul)
-        local ddum = Bitmap(self._dropdown, self._bitmaps.list.um)
-        local ddur = Bitmap(self._dropdown, self._bitmaps.list.ur)
-        local ddl = Bitmap(self._dropdown, self._bitmaps.list.l)
+        local border = bitmaps.list
+        local ddul = Bitmap(self._dropdown, border.ul)
+        local ddum = Bitmap(self._dropdown, border.um)
+        local ddur = Bitmap(self._dropdown, border.ur)
+        local ddl = Bitmap(self._dropdown, border.l)
         self.ddm = Bitmap(self._dropdown)
         self.ddm:SetSolidColor("black")
-        local ddr = Bitmap(self._dropdown, self._bitmaps.list.r)
-        local ddll = Bitmap(self._dropdown, self._bitmaps.list.ll)
-        local ddlm = Bitmap(self._dropdown, self._bitmaps.list.lm)
-        local ddlr = Bitmap(self._dropdown, self._bitmaps.list.lr)
+        local ddr = Bitmap(self._dropdown, border.r)
+        local ddll = Bitmap(self._dropdown, border.ll)
+        local ddlm = Bitmap(self._dropdown, border.lm)
+        local ddlr = Bitmap(self._dropdown, border.lr)
 
         -- top part is fixed under self
         LayoutHelpers.AnchorToBottom(ddul, self._btnMid)
@@ -503,8 +626,14 @@ BitmapCombo = Class(Group) {
         self:SetItem(defaultIndex)
         self._curIndex = defaultIndex
 
+
+        self._dropdown.HandleEvent = function(_, event)
+            if event.Type == 'MouseExit' then
+                self:OnMouseExit()
+            end
+        end
         -- supress show when list is in hidden state
-        self._dropdown.OnHide = function(ctrl, hidden)
+        self._dropdown.OnHide = function(_, hidden)
             if not hidden and self._ddhidden then
                 return true
             end
@@ -515,92 +644,37 @@ BitmapCombo = Class(Group) {
                 return
             end
 
+            local bitmapButton = self._bitmaps.button
             if not hidden then
-                self._btnLeft:SetTexture(self._bitmaps.button.left.down)
-                self._btnRight:SetTexture(self._bitmaps.button.right.down)
-                self._btnMid:SetTexture(self._bitmaps.button.mid.down)
+                self._btnLeft:SetTexture(bitmapButton.left.down)
+                self._btnRight:SetTexture(bitmapButton.right.down)
+                self._btnMid:SetTexture(bitmapButton.mid.down)
                 if activeCombo and activeCombo ~= self then
                     activeCombo._ddhidden = true
                     activeCombo._dropdown:SetHidden(true)
                 end
                 activeCombo = self
             else
-                self._btnLeft:SetTexture(self._bitmaps.button.left.up)
-                self._btnRight:SetTexture(self._bitmaps.button.right.up)
-                self._btnMid:SetTexture(self._bitmaps.button.mid.up)
+                self._btnLeft:SetTexture(bitmapButton.left.up)
+                self._btnRight:SetTexture(bitmapButton.right.up)
+                self._btnMid:SetTexture(bitmapButton.mid.up)
                 activeCombo = nil
             end
         end
 
-        -- set up control logic
-        self.HandleEvent = function(ctrl, event)
-            local eventHandled = false
-
-            if self:IsDisabled() then
-                return
-            end
-
-            if event.Type == 'MouseEnter' then
-                if self._dropdown:IsHidden() then
-                    self._btnLeft:SetTexture(self._bitmaps.button.left.over)
-                    self._btnRight:SetTexture(self._bitmaps.button.right.over)
-                    self._btnMid:SetTexture(self._bitmaps.button.mid.over)
-                    if self.mRolloverCue then
-                        local sound = Sound({Cue = self.mRolloverCue, Bank = "Interface",})
-                        PlaySound(sound)
-                    end
-                end
-                eventHandled = true
-            elseif event.Type == 'MouseExit' then
-                if self._dropdown:IsHidden() then
-                    self._btnLeft:SetTexture(self._bitmaps.button.left.up)
-                    self._btnRight:SetTexture(self._bitmaps.button.right.up)
-                    self._btnMid:SetTexture(self._bitmaps.button.mid.up)
-                end
-                eventHandled = true
-            elseif event.Type == 'ButtonPress' then
-                self._ddhidden = not self._dropdown:IsHidden()
-                self._dropdown:SetHidden(not self._dropdown:IsHidden())
-                eventHandled = true
-                if self.mClickCue then
-                    local sound = Sound({Cue = self.mClickCue, Bank = "Interface",})
-                    PlaySound(sound)
-                end
-            end
-            self:OnEvent(event)
-
-            return eventHandled
-        end
-
-        self.OnDisable = function(self)
-            self._btnLeft:SetTexture(self._bitmaps.button.left.dis)
-            self._btnRight:SetTexture(self._bitmaps.button.right.dis)
-            self._btnMid:SetTexture(self._bitmaps.button.mid.dis)
-            self._dropdown:Hide()
-        end
-
-        self.OnEnable = function(self)
-            self._btnLeft:SetTexture(self._bitmaps.button.left.up)
-            self._btnRight:SetTexture(self._bitmaps.button.right.up)
-            self._btnMid:SetTexture(self._bitmaps.button.mid.up)
-        end
-
-        OnGlobalMouseClick = function(event)
-            if self and self._dropdown then
-                if not self._ddhidden then
-                    if (event.x < self.Left() or event.x > self.Right()) or (event.y < self.Top() or event.y > self._dropdown.Bottom()) then
-                        self._ddhidden = not self._dropdown:IsHidden()
-                        self._dropdown:SetHidden(not self._dropdown:IsHidden())
-                    end
+        local OnGlobalMouseClick = function(event)
+            if self and self._dropdown and not self._ddhidden then
+                local x, y = event.x, event.y
+                if x < self.Left() or x > self.Right() or y < self.Top() or y > self._dropdown.Bottom() then
+                    local new_state = not self._dropdown:IsHidden()
+                    self._ddhidden = new_state
+                    self._dropdown:SetHidden(new_state)
                 end
             end
         end
 
         UIMain.AddOnMouseClickedFunc(OnGlobalMouseClick)
-
-        self.OnDestroy = function(self)
-            UIMain.RemoveOnMouseClickedFunc(OnGlobalMouseClick)
-        end
+        self._globalMouseClickFn = OnGlobalMouseClick
     end,
 
     -- Nuke the old bitmap array and replace it
@@ -642,7 +716,7 @@ BitmapCombo = Class(Group) {
             -- The key in the input array with which the corresponding bitmap was associated.
             local elementIndex = index
 
-            local mouseEventHandler = function(ctrl, event)
+            local mouseEventHandler = function(_, event)
                 if event.Type == 'MouseEnter' then
                     highlight:SetSolidColor('44FFFFFF')
                     self:OnOverItem(elementIndex, self._array[elementIndex])
@@ -702,6 +776,7 @@ BitmapCombo = Class(Group) {
 
     OnEvent = function(self)
     end,
+
     -- overload to get the selection
     OnClick = function(self, index, name)
     end,
@@ -713,4 +788,74 @@ BitmapCombo = Class(Group) {
     OnOverItem = function(self, index, name)
     end,
 
+    OnDisable = function(self)
+        local bitmap_button = self._bitmaps.button
+        self._btnLeft:SetTexture(bitmap_button.left.dis)
+        self._btnRight:SetTexture(bitmap_button.right.dis)
+        self._btnMid:SetTexture(bitmap_button.mid.dis)
+        self._dropdown:Hide()
+    end,
+
+    OnEnable = function(self)
+        local bitmap_button = self._bitmaps.button
+        self._btnLeft:SetTexture(bitmap_button.left.up)
+        self._btnRight:SetTexture(bitmap_button.right.up)
+        self._btnMid:SetTexture(bitmap_button.mid.up)
+    end,
+
+    -- set up control logic
+    HandleEvent = function(self, event)
+        if self:IsDisabled() then
+            return
+        end
+        local eventHandled = false
+
+        local bitmap_button = self._bitmaps.button
+        if event.Type == 'MouseEnter' then
+            if self._dropdown:IsHidden() then
+                self._btnLeft:SetTexture(bitmap_button.left.over)
+                self._btnRight:SetTexture(bitmap_button.right.over)
+                self._btnMid:SetTexture(bitmap_button.mid.over)
+                if self.mRolloverCue then
+                    PlaySound(Sound {
+                        Cue = self.mRolloverCue,
+                        Bank = "Interface",
+                    })
+                end
+            end
+            eventHandled = true
+        elseif event.Type == 'MouseExit' then
+            if self._dropdown:IsHidden() then
+                self._btnLeft:SetTexture(bitmap_button.left.up)
+                self._btnRight:SetTexture(bitmap_button.right.up)
+                self._btnMid:SetTexture(bitmap_button.mid.up)
+            end
+            eventHandled = true
+        elseif event.Type == 'ButtonPress' then
+            local new_state = not self._dropdown:IsHidden()
+            self._ddhidden = new_state
+            self._dropdown:SetHidden(new_state)
+            if self.mClickCue then
+                PlaySound(Sound {
+                    Cue = self.mClickCue,
+                    Bank = "Interface",
+                })
+            end
+            eventHandled = true
+        end
+        self:OnEvent(event)
+
+        return eventHandled
+    end,
+
+    OnDestroy = function(self)
+        if self._globalMouseClickFn then
+            UIMain.RemoveOnMouseClickedFunc(self._globalMouseClickFn)
+            self._globalMouseClickFn = nil
+        end
+    end,
 }
+
+-- kept for mod backwards compatibility
+local Text = import("/lua/maui/text.lua").Text
+local Dragger = import("/lua/maui/dragger.lua").Dragger

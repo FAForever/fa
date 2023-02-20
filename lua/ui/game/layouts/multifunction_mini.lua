@@ -1,11 +1,11 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 function SetLayout()
-    local controls = import('/lua/ui/game/multifunction.lua').controls
-    local savedParent = import('/lua/ui/game/multifunction.lua').savedParent
-    local econControl = import('/lua/ui/game/economy.lua').GUI.bg
+    local controls = import("/lua/ui/game/multifunction.lua").controls
+    local savedParent = import("/lua/ui/game/multifunction.lua").savedParent
+    local econControl = import("/lua/ui/game/economy.lua").GUI.bg
 
     controls.bg.panel:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/filter-ping-panel02_bmp.dds'))
     controls.bg.leftBrace:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-left_bmp.dds'))

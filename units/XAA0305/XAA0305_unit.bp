@@ -75,15 +75,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 50,
     Categories = {
         'PRODUCTFA',
@@ -214,9 +205,9 @@ UnitBlueprint {
         FuelUseTime = 800,
         GroundCollisionOffset = 1.6,
         MaxSpeed = 0.5,
-        MeshExtentsX = 1.75,
+        MeshExtentsX = 1.3,
         MeshExtentsY = 0.5,
-        MeshExtentsZ = 1.75,
+        MeshExtentsZ = 1.5,
         MotionType = 'RULEUMT_Air',
     },
     SelectionSizeX = 1.4,

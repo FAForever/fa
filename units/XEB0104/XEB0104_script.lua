@@ -7,8 +7,9 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TPodTowerUnit = import('/lua/terranunits.lua').TPodTowerUnit
+local TPodTowerUnit = import("/lua/terranunits.lua").TPodTowerUnit
 
-XEB0104 = Class(TPodTowerUnit) {}
+---@class XEB0104 : TPodTowerUnit
+XEB0104 = ClassUnit(TPodTowerUnit) {}
 
 TypeClass = XEB0104

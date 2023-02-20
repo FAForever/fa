@@ -12,15 +12,15 @@
 --* Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local innerMilAll = {0.03,3.0}
-local outerMilAll = {0.06,6.0}
-local innerMilitary = {0.02,2.0}
-local outerMilitary = {0.04,4.0}
+local innerMilAll = {0.03, 3.0}
+local outerMilAll = {0.06, 6.0}
+local innerMilitary = {0.02, 2.0}
+local outerMilitary = {0.04, 4.0}
 
-local innerIntelAll = {1,1} -- Not really used
-local outerIntelAll = {0.03,3.0}
-local innerIntel = {1,1} -- Not really used
-local outerIntel = {0.02,2.0}
+local innerIntelAll = {1, 1} -- Not really used
+local outerIntelAll = {0.03, 3.0}
+local innerIntel = {1, 1} -- Not really used
+local outerIntel = {0.02, 2.0}
 
 local glowAllNormal = '00'
 local glowAllSelect = '08'
@@ -34,7 +34,20 @@ local glowIntelNormal = '00'
 local glowIntelSelect = '08'
 local glowIntelOver = '10'
 
+---@class RangeOverlay
+---@field key string
+---@field Label string
+---@field Categories moho.EntityCategory
+---@field NormalColor Color
+---@field SelectColor Color
+---@field RolloverColor Color
+---@field Inner number[]
+---@field Outer number[]
+---@field Type number
+---@field Combo? boolean
+---@field Tooltip string
 
+---@type table<string, RangeOverlay>
 RangeOverlayParams = {
     AllMilitary = {
         key = 'allmilitary',

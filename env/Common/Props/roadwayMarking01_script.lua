@@ -1,7 +1,7 @@
 --
 -- RoadwayMarking01
 --
-local Prop = import('/lua/sim/Prop.lua').Prop
+local Prop = import("/lua/sim/prop.lua").Prop
 
 RoadwayMarking01 = Class(Prop) {
     OnCreate = function(self)

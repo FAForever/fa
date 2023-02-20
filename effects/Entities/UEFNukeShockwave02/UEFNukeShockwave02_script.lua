@@ -1,7 +1,7 @@
 --
 -- script for projectile BoneAttached
 --
-local EmitterProjectile = import('/lua/sim/defaultprojectiles.lua').EmitterProjectile
+local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 
 UEFNukeShockwave02 = Class(EmitterProjectile) {
     FxTrails = {'/effects/emitters/nuke_blanket_smoke_01_emit.bp',},

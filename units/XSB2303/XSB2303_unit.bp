@@ -21,15 +21,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 140,
     Categories = {
         'PRODUCTFA',
@@ -115,8 +106,8 @@ UnitBlueprint {
         UniformScale = 0.03,
     },
     Economy = {
-        BuildCostEnergy = 14250,
-        BuildCostMass = 1995,
+        BuildCostEnergy = 14300,
+        BuildCostMass = 2000,
         BuildTime = 1600,
         RebuildBonusIds = {
             'xsb2303',
@@ -199,28 +190,22 @@ UnitBlueprint {
             AboveWaterTargetsOnly = true,
             ArtilleryShieldBlocks = true,
             Audio = {
+                BarrelLoop = Sound {
+                    Bank = 'XSB',
+                    Cue = 'XSB2303_Turret_Artillery_Loop',
+                    LodCutoff = 'Weapon_LodCutoff',
+                },
+                BarrelStart = Sound {
+                    Bank = 'XSB',
+                    Cue = 'XSB2303_Turret_Artillery_Start',
+                    LodCutoff = 'Weapon_LodCutoff',
+                },
                 Fire = Sound {
                     Bank = 'XSB_Weapon',
                     Cue = 'XSB2303_Zthuthaam_Cannon',
                     LodCutoff = 'Weapon_LodCutoff',
                 },
-            },
-            BarrelStart = {
-                Fire = Sound {
-                    Bank = 'XSB',
-                    Cue = 'XSB2303_Turret_Artillery_Start',
-                    LodCutoff = 'Weapon_LodCutoff',
-                },
-            },
-            BarrelLoop = {
-                Fire = Sound {
-                    Bank = 'XSB',
-                    Cue = 'XSB2303_Turret_Artillery_Loop',
-                    LodCutoff = 'Weapon_LodCutoff',
-                },
-            },
-            MuzzleChargeStart = {
-                Fire = Sound {
+                MuzzleChargeStart = Sound {
                     Bank = 'XSB_Weapon',
                     Cue = 'XSB2303_Charge',
                     LodCutoff = 'Weapon_LodCutoff',
@@ -239,13 +224,12 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 1.5,
+            FiringRandomness = 1.75,
             FiringTolerance = 1,
             Label = 'MainGun',
             MaxRadius = 128,
             MinRadius = 50,
             MuzzleChargeDelay = 1,
-            MuzzleSalvoChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 26.13,

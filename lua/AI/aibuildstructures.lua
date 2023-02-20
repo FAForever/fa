@@ -1,34 +1,29 @@
---****************************************************************************
---**
---**  File     :  /lua/AI/aibuildstructures.lua
---**  Author(s): John Comes
---**
---**  Summary  : Foundation script for all structure building in the AI.
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-local BaseTmplFile = import('/lua/basetemplates.lua')
-local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local Utils = import('/lua/utilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local StructureUpgradeTemplates = import('/lua/upgradeTemplates.lua').StructureUpgradeTemplates
-local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
-local RebuildStructuresTemplate = import('/lua/BuildingTemplates.lua').RebuildStructuresTemplate
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
+-- File     :  /lua/AI/aibuildstructures.lua
+-- Author(s): John Comes
+-- Summary  : Foundation script for all structure building in the AI.
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------------
+
+local BaseTmplFile = lazyimport("/lua/basetemplates.lua")
+local StructureTemplates = import("/lua/buildingtemplates.lua")
+local Utils = import("/lua/utilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local aiEconomy
 local allowedEnergyStorageRatio = 0.7
 local allowedMassStorageRatio = 0.6
 
-local TriggerFile = import('/lua/scenariotriggers.lua')
+local TriggerFile = import("/lua/scenariotriggers.lua")
 
+---@param aiBrain AIBrain
 function AISetEconomyNumbers(aiBrain)
     --LOG('*AI DEBUG: SETTING ECONOMY NUMBERS FROM AIBRAIN ', repr(aiBrain))
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     aiEconomy = econ
 end
 
+---@param aiBrain AIBrain
+---@param unitBP UnitBlueprint
 function AIModEconomyNumbers(aiBrain, unitBP)
     --LOG('*AI DEBUG: MODDING ECON NUMBERS, BRAIN = ', repr(aiBrain), ' UNITBP = ', repr(unitBP))
     --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND BEFORE = ', repr(aiEconomy.EnergyTrend))
@@ -40,6 +35,9 @@ function AIModEconomyNumbers(aiBrain, unitBP)
     --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND AFTER = ', repr(aiEconomy.EnergyTrend * 0.1))
 end
 
+---@param aiBrain AIBrain
+---@param techLevel number
+---@return unknown
 function AIGetBuilder(aiBrain, techLevel)
     local builderTechLevel = categories.TECH1 * categories.ENGINEER
     if techLevel == 2 then
@@ -55,6 +53,10 @@ function AIGetBuilder(aiBrain, techLevel)
     return builder
 end
 
+---@param aiBrain AIBrain
+---@param techLevel number
+---@param inclCDR CommandUnit
+---@return unknown
 function AIGetAnyBuilder(aiBrain, techLevel, inclCDR)
     local builder = AIGetBuilder(aiBrain, techLevel)
     if not builder then
@@ -72,7 +74,11 @@ function AIGetAnyBuilder(aiBrain, techLevel, inclCDR)
     return builder
 end
 
-
+---@param aiBrain AIBrain
+---@param builder Unit
+---@param whatToBuild any
+---@param buildLocation Vector
+---@param relative any
 function AddToBuildQueue(aiBrain, builder, whatToBuild, buildLocation, relative)
     if not builder.EngineerBuildQueue then
         builder.EngineerBuildQueue = {}
@@ -93,19 +99,36 @@ end
 
 -- Build locations (from FindPlaceToBuild) come in as {x,z,dist},
 -- so we need to convert those to an actual 2D location format
+---@param location Vector
+---@return table
 function BuildToNormalLocation(location)
     return {location[1], 0, location[2]}
 end
+
+---@param location Vector
+---@return table
 function NormalToBuildLocation(location)
     return {location[1], location[3], 0}
 end
 
+---@param buildingType string
+---@return boolean
 function IsResource(buildingType)
     return buildingType == 'Resource' or buildingType == 'T1HydroCarbon' or
             buildingType == 'T1Resource' or buildingType == 'T2Resource' or buildingType == 'T3Resource'
 end
 
 local AntiSpamList = {}
+---@param aiBrain AIBrain
+---@param builder Unit
+---@param buildingType string
+---@param closeToBuilder boolean
+---@param relative any
+---@param buildingTemplate any
+---@param baseTemplate any
+---@param reference any
+---@param NearMarkerType any
+---@return boolean
 function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)
     local factionIndex = aiBrain:GetFactionIndex()
     local whatToBuild = aiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
@@ -116,7 +139,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         end
         local FactionIndexToName = {[1] = 'UEF', [2] = 'AEON', [3] = 'CYBRAN', [4] = 'SERAPHIM', [5] = 'NOMADS' }
         local AIFactionName = FactionIndexToName[factionIndex]
-        SPEW('*AIExecuteBuildStructure: We cant decide whatToBuild! AI-faction: '..AIFactionName..', Building Type: '..repr(buildingType)..', engineer-faction: '..repr(builder.factionCategory))
+        SPEW('*AIExecuteBuildStructure: We cant decide whatToBuild! AI-faction: '..AIFactionName..', Building Type: '..repr(buildingType)..', engineer-faction: '..repr(builder.Blueprint.FactionCategory))
         -- Get the UnitId for the actual buildingType
         local BuildUnitWithID
         for Key, Data in buildingTemplate do
@@ -129,7 +152,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         -- If we can't find a template, then return
         if not BuildUnitWithID then
             AntiSpamList[buildingType] = true
-            WARN('*AIExecuteBuildStructure: No '..repr(builder.factionCategory)..' unit found for template: '..repr(buildingType)..'! ')
+            WARN('*AIExecuteBuildStructure: No '..repr(builder.Blueprint.FactionCategory)..' unit found for template: '..repr(buildingType)..'! ')
             return false
         end
         -- get the needed tech level to build buildingType
@@ -173,7 +196,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
             SPEW('*AIExecuteBuildStructure: Engineer with Techlevel ('..HasTech..') can build TECH'..NeedTech..' BuildUnitWithID: '..repr(BuildUnitWithID))
         end
 
-        HasFaction = builder.factionCategory
+        HasFaction = builder.Blueprint.FactionCategory
         NeedFaction = string.upper(__blueprints[string.lower(BuildUnitWithID)].General.FactionName)
         if HasFaction ~= NeedFaction then
             WARN('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', ('..HasFaction..') engineers can\'t build ('..NeedFaction..') structures!')
@@ -182,14 +205,14 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
             SPEW('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', Engineer with faction ('..HasFaction..') can build faction ('..NeedFaction..') - BuildUnitWithID: '..repr(BuildUnitWithID))
         end
 
-        local IsRestricted = import('/lua/game.lua').IsRestricted
+        local IsRestricted = import("/lua/game.lua").IsRestricted
         if IsRestricted(BuildUnitWithID, GetFocusArmy()) then
-            WARN('*AIExecuteBuildStructure: Unit is Restricted!!! Building Type: '..repr(buildingType)..', faction: '..repr(builder.factionCategory)..' - Unit:'..BuildUnitWithID)
+            WARN('*AIExecuteBuildStructure: Unit is Restricted!!! Building Type: '..repr(buildingType)..', faction: '..repr(builder.Blueprint.FactionCategory)..' - Unit:'..BuildUnitWithID)
             AntiSpamList[buildingType] = true
             return false
         end
 
-        WARN('*AIExecuteBuildStructure: DecideWhatToBuild call failed for Building Type: '..repr(buildingType)..', faction: '..repr(builder.factionCategory)..' - Unit:'..BuildUnitWithID)
+        WARN('*AIExecuteBuildStructure: DecideWhatToBuild call failed for Building Type: '..repr(buildingType)..', faction: '..repr(builder.Blueprint.FactionCategory)..' - Unit:'..BuildUnitWithID)
         return false
     end
     -- find a place to build it (ignore enemy locations if it's a resource)
@@ -220,7 +243,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
     end
     -- if we have no place to build, then maybe we have a modded/new buildingType. Lets try 'T1LandFactory' as dummy and search for a place to build near base
     if not location and not IsResource(buildingType) and builder.BuilderManagerData and builder.BuilderManagerData.EngineerManager then
-        --LOG('*AIExecuteBuildStructure: Find no place to Build! - buildingType '..repr(buildingType)..' - ('..builder.factionCategory..') Trying again with T1LandFactory and RandomIter. Searching near base...')
+        --LOG('*AIExecuteBuildStructure: Find no place to Build! - buildingType '..repr(buildingType)..' - ('..builder.Blueprint.FactionCategory..') Trying again with T1LandFactory and RandomIter. Searching near base...')
         relativeTo = builder.BuilderManagerData.EngineerManager:GetLocationCoords()
         for num,offsetCheck in RandomIter({1,2,3,4,5,6,7,8}) do
             location = aiBrain:FindPlaceToBuild('T1LandFactory', whatToBuild, BaseTmplFile['MovedTemplates'..offsetCheck][factionIndex], relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
@@ -232,7 +255,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
     end
     -- if we still have no place to build, then maybe we have really no place near the base to build. Lets search near engineer position
     if not location and not IsResource(buildingType) then
-        --LOG('*AIExecuteBuildStructure: Find still no place to Build! - buildingType '..repr(buildingType)..' - ('..builder.factionCategory..') Trying again with T1LandFactory and RandomIter. Searching near Engineer...')
+        --LOG('*AIExecuteBuildStructure: Find still no place to Build! - buildingType '..repr(buildingType)..' - ('..builder.Blueprint.FactionCategory..') Trying again with T1LandFactory and RandomIter. Searching near Engineer...')
         relativeTo = builder:GetPosition()
         for num,offsetCheck in RandomIter({1,2,3,4,5,6,7,8}) do
             location = aiBrain:FindPlaceToBuild('T1LandFactory', whatToBuild, BaseTmplFile['MovedTemplates'..offsetCheck][factionIndex], relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
@@ -256,6 +279,16 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
     return false
 end
 
+---@param aiBrain AIBrain
+---@param builder Unit
+---@param buildingType any
+---@param closeToBuilder any
+---@param relative any
+---@param buildingTemplate any
+---@param baseTemplate any
+---@param reference any
+---@param NearMarkerType any
+---@return unknown
 function AIBuildBaseTemplate(aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)
     local whatToBuild = aiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
     if whatToBuild then
@@ -269,7 +302,9 @@ function AIBuildBaseTemplate(aiBrain, builder, buildingType , closeToBuilder, re
     end
 end
 
---Per-unit AI logic for buildings defined in constructiondata
+--- Per-unit AI logic for buildings defined in constructiondata
+---@param buildingType string
+---@param builder Unit
 function DoHackyLogic(buildingType, builder)
     if buildingType == 'T2StrategicMissile' then
         local unitInstance = false
@@ -295,7 +330,16 @@ function DoHackyLogic(buildingType, builder)
     end
 end
 
-
+---@param aiBrain AIBrain
+---@param builder Unit
+---@param buildingType string
+---@param closeToBuilder any
+---@param relative any
+---@param buildingTemplate any
+---@param baseTemplate any
+---@param reference any
+---@param NearMarkerType any
+---@return boolean
 function AIBuildBaseTemplateOrdered(aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)
     local factionIndex = aiBrain:GetFactionIndex()
     local whatToBuild = aiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
@@ -321,6 +365,9 @@ function AIBuildBaseTemplateOrdered(aiBrain, builder, buildingType , closeToBuil
     return -- unsuccessful build
 end
 
+---@param baseTemplate any
+---@param location Vector
+---@return table
 function AIBuildBaseTemplateFromLocation(baseTemplate, location)
     local baseT = {}
     if location and baseTemplate then
@@ -341,6 +388,16 @@ function AIBuildBaseTemplateFromLocation(baseTemplate, location)
     return baseT
 end
 
+---@param aiBrain AIBrain
+---@param builder Unit
+---@param buildingType any
+---@param closeToBuilder any
+---@param relative any
+---@param buildingTemplate any
+---@param baseTemplate any
+---@param reference any
+---@param NearMarkerType any
+---@return boolean
 function AIBuildAdjacency(aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)
     local whatToBuild = aiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
     if whatToBuild then
@@ -398,6 +455,11 @@ function AIBuildAdjacency(aiBrain, builder, buildingType , closeToBuilder, relat
     return false
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@param position Vector
+---@param builder Unit
+---@param constructionData any
 function AINewExpansionBase(aiBrain, baseName, position, builder, constructionData)
     local radius = constructionData.ExpansionRadius or 100
     -- PBM Style expansion bases here
@@ -481,7 +543,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
 
         -- Setup base
         --SPEW('*AI DEBUG: AINewExpansionBase(): ARMY ' .. aiBrain:GetArmyIndex() .. ': Expanding using - ' .. pick .. ' at location ' .. baseName)
-        import('/lua/ai/AIAddBuilderTable.lua').AddGlobalBaseTemplate(aiBrain, baseName, pick)
+        import("/lua/ai/aiaddbuildertable.lua").AddGlobalBaseTemplate(aiBrain, baseName, pick)
 
         -- If air base switch to building an air factory rather than land
         if (string.find(pick, 'Air') or string.find(pick, 'Water')) then
@@ -500,6 +562,9 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
     end
 end
 
+---@param typeString string
+---@param typeTable table
+---@return boolean
 function CheckExpansionType(typeString, typeTable)
     if not typeTable then
         return true
@@ -513,13 +578,23 @@ function CheckExpansionType(typeString, typeTable)
     return true
 end
 
+---@param pos Vector
+---@return table
 function FindNearestIntegers(pos)
     local x = math.floor(pos[1])
     local z = math.floor(pos[3])
     return { x, z }
 end
 
-
+---@param aiBrain AIBrain
+---@param builder Unit
+---@param buildingType string
+---@param closeToBuilder any
+---@param relative any
+---@param buildingTemplate any
+---@param baseTemplate any
+---@param reference any
+---@param NearMarkerType any
 function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)
     if not reference then
         return
@@ -579,6 +654,9 @@ function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, 
     return
 end
 
+---@param main any
+---@param loc Vector
+---@return table
 function GetBuildingDirection(main, loc)
     local distance = Utils.XZDistanceTwoVectors(main, loc)
     local cutoff = distance / 2
@@ -618,20 +696,22 @@ function GetBuildingDirection(main, loc)
     return points
 end
 
+---@param aiBrain AIBrain
+---@param location Vector
+---@return table
 function BuildWallsAtLocation(aiBrain, location)
     local mainPos = aiBrain:PBMGetLocationCoords('MAIN')
     return GetBuildingDirection(mainPos, location)
 end
 
-
-
-
-
 ------ OPERATION STUFF BELOW ------
 
------- Takes a group of <name> from <army> in the save file.
------- Populates a base template from this save file.
+--- Takes a group of <name> from <army> in the save file.
+--- Populates a base template from this save file.
 ------ Stores the template naming it <name> in the brain.
+---@param brain AIBrain
+---@param army Army
+---@param name string
 function CreateBuildingTemplate(brain, army, name)
     local list = {}
     local template = {}
@@ -641,7 +721,7 @@ function CreateBuildingTemplate(brain, army, name)
         LOG('*ERROR AIBUILDSTRUCTURES - Group: ', repr(name), ' not found for Army: ', repr(army))
     else
         for i,unit in tblUnit do
-            for k, unitId in RebuildStructuresTemplate[factionIndex] do
+            for k, unitId in StructureTemplates.RebuildStructuresTemplate[factionIndex] do
                 if unit.type == unitId[1] then
                     unit.buildtype = unitId[2]
                     break
@@ -652,7 +732,7 @@ function CreateBuildingTemplate(brain, army, name)
             end
         end
         for i, unit in tblUnit do
-            for j,buildList in BuildingTemplates[factionIndex] do
+            for j,buildList in StructureTemplates.BuildingTemplates[factionIndex] do
                 local unitPos = { unit.Position[1], unit.Position[3], 0 }
                 if unit.buildtype == buildList[2] and buildList[1] ~= 'T3Sonar' then
                     local inserted = false
@@ -676,9 +756,13 @@ function CreateBuildingTemplate(brain, army, name)
     end
 end
 
------- Takes a group of <name> from <army> in the save file.
------- Populates a base template from this save file.
------- Appends the template named <templateName> in the brain with new data
+--- Takes a group of <name> from <army> in the save file.
+--- Populates a base template from this save file.
+--- Appends the template named <templateName> in the brain with new data
+---@param brain AIBrain
+---@param army Army
+---@param name string
+---@param templateName string
 function AppendBuildingTemplate(brain, army, name, templateName)
     local tblUnit = ScenarioUtils.AssembleArmyGroup(army, name)
     local factionIndex = brain:GetFactionIndex()
@@ -692,7 +776,7 @@ function AppendBuildingTemplate(brain, army, name, templateName)
     else
         -- Convert building to the proper type to be built if needed (ex: T2 and T3 factories to T1)
         for i,unit in tblUnit do
-            for k, unitId in RebuildStructuresTemplate[factionIndex] do
+            for k, unitId in StructureTemplates.RebuildStructuresTemplate[factionIndex] do
                 if unit.type == unitId[1] then
                     unit.buildtype = unitId[2]
                     break
@@ -703,7 +787,7 @@ function AppendBuildingTemplate(brain, army, name, templateName)
             end
         end
         for i, unit in tblUnit do
-            for j,buildList in BuildingTemplates[factionIndex] do -- buildList[1] is type ("T1LandFactory"); buildList[2] is unitId (ueb0101)
+            for j,buildList in StructureTemplates.BuildingTemplates[factionIndex] do -- buildList[1] is type ("T1LandFactory"); buildList[2] is unitId (ueb0101)
                 local unitPos = { unit.Position[1], unit.Position[3], 0 }
                 if unit.buildtype == buildList[2] and buildList[1] ~= 'T3Sonar' then -- if unit to be built is the same id as the buildList unit it needs to be added
                     local inserted = false
@@ -726,6 +810,8 @@ function AppendBuildingTemplate(brain, army, name, templateName)
     end
 end
 
+---@param unitName string
+---@return boolean
 function StructureCheck(unitName)
     local bp = ArmyBrains[1]:GetUnitBlueprint(unitName)
     if bp.CategoriesHash.BUILTBYTIER1ENGINEER then
@@ -738,9 +824,14 @@ function StructureCheck(unitName)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param builder Unit
+---@param buildingTemplate any
+---@param brainBaseTemplate any
+---@return boolean
 function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTemplate)
     if not buildingTemplate then
-        buildingTemplate = BuildingTemplates[aiBrain:GetFactionIndex()]
+        buildingTemplate = StructureTemplates.BuildingTemplates[aiBrain:GetFactionIndex()]
     end
     for k,v in brainBaseTemplate.List do
         if builder:CanBuild(v.StructureCategory) then
@@ -771,3 +862,6 @@ function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTempla
     end
     return false
 end
+
+-- Kept for Mod Support
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")

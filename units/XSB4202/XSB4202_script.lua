@@ -6,9 +6,10 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local SShieldStructureUnit = import('/lua/seraphimunits.lua').SShieldStructureUnit
+local SShieldStructureUnit = import("/lua/seraphimunits.lua").SShieldStructureUnit
 
-XSB4202 = Class(SShieldStructureUnit) {
+---@class XSB4202 : SShieldStructureUnit
+XSB4202 = ClassUnit(SShieldStructureUnit) {
     ShieldEffects = {
         '/effects/emitters/seraphim_shield_generator_t2_01_emit.bp',
         '/effects/emitters/seraphim_shield_generator_t3_03_emit.bp',

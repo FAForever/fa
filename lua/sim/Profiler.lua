@@ -1,9 +1,13 @@
 
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 -- Useful sources to read: 
--- - https://www.lua.org/pil/23.1.html
+-- https://www.lua.org/pil/23.1.html
 
 local Statistics = import("/lua/shared/statistics.lua")
-local CreateEmptyProfilerTable = import("/lua/shared/Profiler.lua").CreateEmptyProfilerTable
+local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 
 -- upvalue for performance
 local SPEW = SPEW
@@ -14,12 +18,14 @@ local getinfo = debug.getinfo
 local isProfiling = false
 
 --- Thread to keep the simulation synced with the UI
-local thread = false 
+local thread = false
 
 --- Data that we send over to the UI
 local data = CreateEmptyProfilerTable()
 
 --- Toggles the profiler on / off
+---@param army integer
+---@param forceEnable boolean
 function ToggleProfiler(army, forceEnable)
 
     -- basic checks for toggling the profiler
@@ -28,30 +34,30 @@ function ToggleProfiler(army, forceEnable)
     local isReplay = SessionIsReplay()
 
     -- exception to allow toggling the profiler
-    local gameHasJip = false 
-    for k, brain in ArmyBrains do 
+    local gameHasJip = false
+    for k, brain in ArmyBrains do
         gameHasJip = gameHasJip or string.lower(brain.Nickname) == "jip"
-    end 
+    end
 
     -- return if conditions are not met
-    if not (gameHasAIs or cheatsEnabled or gameHasJip or isReplay) then 
+    if not (gameHasAIs or cheatsEnabled or gameHasJip or isReplay) then
         return
     end
 
     -- inform us why profiler can be toggled
-    if gameHasAIs then 
+    if gameHasAIs then
         SPEW("Profiler can be toggled: game has AIs")
     end
 
-    if cheatsEnabled then 
+    if cheatsEnabled then
         SPEW("Profiler can be toggled: game has cheats enabled")
     end
 
-    if gameHasJip then 
+    if gameHasJip then
         SPEW("Profiler can be toggled: a game developer is in the game")
     end
 
-    if isReplay then 
+    if isReplay then
         SPEW("Profiler can be toggled: session is a replay")
     end
 
@@ -59,18 +65,18 @@ function ToggleProfiler(army, forceEnable)
     SPEW("Profiler has been toggled on by army: " .. tostring(army))
 
     -- if we're not the ones that initiated this call, get out
-    if GetFocusArmy() ~= army then 
-        return 
+    if GetFocusArmy() ~= army then
+        return
     end
 
     -- allows us to remain enabled
-    if forceEnable and isProfiling then 
-        return 
+    if forceEnable and isProfiling then
+        return
     end
 
-    if not isProfiling then 
+    if not isProfiling then
 
-        isProfiling = true 
+        isProfiling = true
 
         -- Thread to sync information gathered to the UI
         if not thread then 
@@ -109,7 +115,7 @@ function ToggleProfiler(army, forceEnable)
                 --         traces[trace] = traces[trace] or 0  
                 --         LOG(tostring(traces[trace]) .. ": " .. trace)
                 --     end
-                    
+
                 --     traces[trace] = traces[trace] + 1
                 -- end
 
@@ -125,7 +131,7 @@ function ToggleProfiler(army, forceEnable)
             -- only track on function calls
             , "c")
 
-    else 
+    else
         isProfiling = false
 
         -- Inform us in case of abuse
@@ -139,9 +145,9 @@ end
 local yield = coroutine.yield
 
 function SyncThread()
-    while true do 
+    while true do
 
-        if isProfiling then 
+        if isProfiling then
             -- pass along the profiler information
             Sync.ProfilerData = data
 
@@ -159,6 +165,7 @@ local FunctionsToExclude = {
     ["__moduleinfo"] = true
 }
 
+---@param army integer
 function FindBenchmarks(army)
 
     SPEW("Benchmarks have been searched for by army: " .. tostring(army))
@@ -169,7 +176,7 @@ function FindBenchmarks(army)
     local function AddBenchmarksFromFolder(path)
         local files = DiskFindFiles(path, "*.lua")
 
-        for k, file in files do 
+        for k, file in files do
 
             -- retrieve category file
             local category
@@ -179,21 +186,21 @@ function FindBenchmarks(army)
                 end
             )
 
-            if ok then 
+            if ok then
 
                 -- retrieve benchmarks in category file
                 local benchmarks = { }
                 local bHead = 1
 
-                for k, benchmark in category do 
+                for k, benchmark in category do
 
                         -- exclude these functions
-                        if FunctionsToExclude[k] then 
-                            continue 
+                        if FunctionsToExclude[k] then
+                            continue
                         end
 
                     -- only look at functions
-                    if type(benchmark) == "function" then 
+                    if type(benchmark) == "function" then
 
                         local code = debug.listcode(benchmark)
                         local maxstack = code.maxstack
@@ -203,12 +210,12 @@ function FindBenchmarks(army)
                                 name = k
                             , code = code 
                             , maxstack = maxstack
-                            , faulty = false 
+                            , faulty = false
                             , message = ""
                         }
 
                         bHead = bHead + 1
-                    else 
+                    else
 
                         -- add faulty entry
                         benchmarks[bHead] = {
@@ -226,7 +233,7 @@ function FindBenchmarks(army)
                 -- add correct category
                 categories[head] = { folder = path, file = file, benchmarks = benchmarks, faulty = false, message = "" }
                 head = head + 1
-            else 
+            else
                 -- add faulty category
                 categories[head] = { folder = path, file = file, benchmarks = { }, faulty = true, message = msg }
                 head = head + 1
@@ -248,6 +255,7 @@ end
 local benchmarkOutput = { }
 local benchmarkRuns = 30
 
+---@param info any
 function RunBenchmarks(info)
 
     -- localize for performance
@@ -256,13 +264,13 @@ function RunBenchmarks(info)
     -- keep track of all output
     local output = { }
 
-    for k, element in info do 
+    for k, element in info do
 
         -- import the benchmark
         local benchmark = import(element.file)[element.benchmark]
 
         -- run benchmark multiple times
-        for k = 1, benchmarkRuns do 
+        for k = 1, benchmarkRuns do
             benchmarkOutput[k] = benchmark()
         end
 
@@ -274,7 +282,7 @@ function RunBenchmarks(info)
         local o = { }
         local c = 1 
         for k = 1, benchmarkRuns do 
-            if abs(benchmarkOutput[k] - mean) < 2 * devation then 
+            if abs(benchmarkOutput[k] - mean) < 2 * devation then
                 o[c] = benchmarkOutput[k]
                 c = c + 1
             end

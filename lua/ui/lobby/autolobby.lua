@@ -12,13 +12,13 @@
 --* through command line arguments.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
-local gameColors = import('/lua/gameColors.lua').GameColors
-local utils = import('/lua/system/utils.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local LobbyComm = import("/lua/ui/lobby/lobbycomm.lua")
+local gameColors = import("/lua/gamecolors.lua").GameColors
+local utils = import("/lua/system/utils.lua")
 
 local ConnectionStatus = import("/lua/ui/lobby/autolobby-classes.lua").ConnectionStatus
 
@@ -92,7 +92,7 @@ local function MakeLocalPlayerInfo(name)
     local result = LobbyComm.GetDefaultPlayerOptions(name)
     result.Human = true
 
-    local factionData = import('/lua/factions.lua')
+    local factionData = import("/lua/factions.lua")
 
     for index, tbl in factionData.Factions do
         if HasCommandLineArg("/" .. tbl.Key) then
@@ -107,6 +107,8 @@ local function MakeLocalPlayerInfo(name)
     result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""
     result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""
     result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
+    result.DIV = (GetCommandLineArg("/division", 1)[1]) or ""
+    result.SUBDIV = (GetCommandLineArg("/subdivision", 1)[1]) or ""
     result.PL = math.floor(result.MEAN - 3 * result.DEV)
     LOG('Local player info: ' .. repr(result))
     return result
@@ -209,9 +211,11 @@ local function CheckForLaunch()
     end
 
     local allRatings = {}
+    local allDivisions = {}
     for k,v in gameInfo.PlayerOptions do
         if v.Human and v.PL then
             allRatings[v.PlayerName] = v.PL
+            allDivisions[v.PlayerName]= v.DIV .. v.SUBDIV
             -- Initialize peer launch statuses
             peerLaunchStatuses[v.OwnerID] = false
         end
@@ -219,6 +223,7 @@ local function CheckForLaunch()
     -- We don't need to wait for a launch status from ourselves
     peerLaunchStatuses[localPlayerID] = nil
     gameInfo.GameOptions['Ratings'] = allRatings
+    gameInfo.GameOptions['Divisions'] = allDivisions
 
     LOG("Host launching game.")
     lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
@@ -237,6 +242,9 @@ end
 
 
 local function CreateUI()
+
+    LOG("Don't mind me x2")
+
     if currentDialog ~= false then
         MenuCommon.MenuCleanup()
         currentDialog:Destroy()
@@ -248,7 +256,7 @@ local function CreateUI()
 
     local background = MenuCommon.SetupBackground(GetFrame(0))
 
-    SetDialog(parent, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
+    SetDialog(parent, "<LOC lobui_0201>Setting up automatch...")
 
     -- construct the connection status GUI and position it right below the dialog
     connectionStatusGUI = ConnectionStatus(GetFrame(0))
@@ -259,7 +267,7 @@ end
 
 --  LobbyComm Callbacks
 local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-    local LobCreateFunc = import('/lua/ui/lobby/lobbyComm.lua').CreateLobbyComm
+    local LobCreateFunc = import("/lua/ui/lobby/lobbycomm.lua").CreateLobbyComm
     local lob = LobCreateFunc(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     if not lob then
         error('Creating lobby using protocol ' .. repr(protocol) .. ' and port ' .. tostring(localPort) .. ' failed.')
@@ -388,15 +396,9 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     if not parent then parent = UIUtil.CreateScreenGroup(GetFrame(0), "CreateLobby ScreenGroup") end
     -- don't parent background to screen group so it doesn't get destroyed until we leave the menus
     local background = MenuCommon.SetupBackground(GetFrame(0))
-    local function OnAbort()
-        MenuCommon.MenuCleanup()
-        parent:Destroy()
-        parent = false
-        ExitApplication()
-    end
 
     -- construct the initial dialog
-    SetDialog(parent, Strings.TryingToConnect, Strings.AbortConnect, OnAbort)
+    SetDialog(parent, Strings.TryingToConnect)
 
     InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 

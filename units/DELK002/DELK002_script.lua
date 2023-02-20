@@ -1,22 +1,20 @@
---****************************************************************************
---**
---**  Author(s):  Mikko Tyster
---**
---**  Summary  :  UEF T3 Anti-Air
---**
---**  Copyright © 2008 Blade Braver!
---****************************************************************************
-local TLandUnit = import('/lua/terranunits.lua').TLandUnit
-local TWeapons = import('/lua/terranweapons.lua')
+-----------------------------------------------------
+-- Author(s):  Mikko Tyster
+-- Summary  :  UEF T3 Anti-Air
+-- Copyright © 2008 Blade Braver!
+-----------------------------------------------------
+local TLandUnit = import("/lua/terranunits.lua").TLandUnit
+local TWeapons = import("/lua/terranweapons.lua")
 local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon
-local TAAPhalanxWeapon = import('/lua/kirvesweapons.lua').TAAPhalanxWeapon
+local TAAPhalanxWeapon = import("/lua/kirvesweapons.lua").TAAPhalanxWeapon
+local EffectUtils = import("/lua/effectutilities.lua")
+local Effects = import("/lua/effecttemplates.lua")
 
-local EffectUtils = import('/lua/effectutilities.lua')
-local Effects = import('/lua/effecttemplates.lua')
 
-DELK002 = Class(TLandUnit) {
+---@class DELK002 : TLandUnit
+DELK002 = ClassUnit(TLandUnit) {
     Weapons = {
-        GatlingCannon = Class(TAAPhalanxWeapon)
+        GatlingCannon = ClassWeapon(TAAPhalanxWeapon)
         {
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip1 then
@@ -25,8 +23,8 @@ DELK002 = Class(TLandUnit) {
                 if self.SpinManip2 then
                     self.SpinManip2:SetTargetSpeed(0)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Muzzle', self.unit.Army, Effects.WeaponSteam01)
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TAAPhalanxWeapon.PlayFxWeaponPackSequence(self)
             end,
 
@@ -57,14 +55,11 @@ DELK002 = Class(TLandUnit) {
                 if self.SpinManip2 then
                     self.SpinManip2:SetTargetSpeed(200)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Muzzle', self.unit.Army, Effects.WeaponSteam01)
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TAAPhalanxWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },
-
     },
-
 }
-
 TypeClass = DELK002

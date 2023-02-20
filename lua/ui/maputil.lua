@@ -6,10 +6,76 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local OutdatedMaps = import('/etc/faf/mapblacklist.lua').MapBlacklist
-local Utils = import('/lua/system/utils.lua')
+---@class UIScenarioConfiguration
+---@field teams {name: string, armies: string[]}
+---@field customprops table<string, string>
+
+---@class UIScenarioInfo
+---@field AdaptiveMap boolean
+---@field description string
+---@field map string
+---@field map_version number
+---@field name string
+---@field norushradius number
+---@field norushoffsetX_ARMY_1? number
+---@field norushoffsetY_ARMY_1? number
+---@field norushoffsetX_ARMY_2? number
+---@field norushoffsetY_ARMY_2? number
+---@field norushoffsetX_ARMY_3? number
+---@field norushoffsetY_ARMY_3? number
+---@field norushoffsetX_ARMY_4? number
+---@field norushoffsetY_ARMY_4? number
+---@field norushoffsetX_ARMY_5? number
+---@field norushoffsetY_ARMY_5? number
+---@field norushoffsetX_ARMY_6? number
+---@field norushoffsetY_ARMY_6? number
+---@field norushoffsetX_ARMY_7? number
+---@field norushoffsetY_ARMY_7? number
+---@field norushoffsetX_ARMY_8? number
+---@field norushoffsetY_ARMY_8? number
+---@field norushoffsetX_ARMY_9? number
+---@field norushoffsetY_ARMY_9? number
+---@field norushoffsetX_ARMY_10? number
+---@field norushoffsetY_ARMY_10? number
+---@field norushoffsetX_ARMY_11? number
+---@field norushoffsetY_ARMY_11? number
+---@field norushoffsetX_ARMY_12? number
+---@field norushoffsetY_ARMY_12? number
+---@field norushoffsetX_ARMY_13? number
+---@field norushoffsetY_ARMY_13? number
+---@field norushoffsetX_ARMY_14? number
+---@field norushoffsetY_ARMY_14? number
+---@field norushoffsetX_ARMY_15? number
+---@field norushoffsetY_ARMY_15? number
+---@field norushoffsetX_ARMY_16? number
+---@field norushoffsetY_ARMY_16? number
+---@field preview string
+---@field save string
+---@field script string
+---@field size {[1]: number, [2]: number}
+---@field starts boolean
+---@field type string
+---@field Configurations table<string, UIScenarioConfiguration>
+---@field file string
+---@field Outdated boolean
+--- Additional map options supplied by the map `options.lua` file, if it exists.
+--- These are the lobby option-factory type of options, not the actual `<key, value>` pairs
+--- that the lobby ends up defining.
+---@field options? ScenarioOption[]
+--- These are the actual `<key, value>` pairs that the lobby defines, not the option-factory type
+--- objects the lobby uses
+---@field Options? GameOptions
+---
+---@field PlayableAreaWidth number
+---@field PlayableAreaHeight number
+
+
+local OutdatedMaps = import("/etc/faf/mapblacklist.lua").MapBlacklist
+local Utils = import("/lua/system/utils.lua")
 
 -- load a scenario based on a scenario file name
+---@param scenName string
+---@return UIScenarioInfo
 function LoadScenario(scenName)
     -- TODO - expose FILE_IsAbsolute and if it's not, add the path and the _scenario.lua
 
@@ -39,6 +105,16 @@ function LoadScenario(scenName)
         doscript(optionsFileName, optionsEnv)
         if optionsEnv.options ~= nil then
             env.ScenarioInfo.options = optionsEnv.options
+        end
+    end
+
+    -- Check if the map has mission briefing data
+    local stringsFileName = string.sub(scenName, 1, string.len(scenName) - string.len("scenario.lua")) .. "strings.lua"
+    if DiskGetFileInfo(stringsFileName) then
+        local stringsEnv = {}
+        doscript(stringsFileName, stringsEnv)
+        if stringsEnv.BriefingData ~= nil then
+            env.ScenarioInfo.hasBriefing = true
         end
     end
 

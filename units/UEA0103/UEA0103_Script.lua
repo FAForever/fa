@@ -10,18 +10,15 @@
 --
 -- Terran Bomber Script : UEA0103
 --
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local TIFCarpetBombWeapon = import('/lua/terranweapons.lua').TIFCarpetBombWeapon
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local TIFCarpetBombWeapon = import("/lua/terranweapons.lua").TIFCarpetBombWeapon
 
 
-UEA0103 = Class(TAirUnit) {
+---@class UEA0103 : TAirUnit
+UEA0103 = ClassUnit(TAirUnit) {
     Weapons = {
-        Bomb = Class(TIFCarpetBombWeapon) {
-            },
-        },
---    DestructionPartsLowToss = {'P01', 'P02', 'P03', 'P04', 'P05', 'P06', },
---    DestructionTicks = 50,
-    DamageEffectPullback = 0.5,
+        Bomb = ClassWeapon(TIFCarpetBombWeapon) {},
+    },
 }
 
 TypeClass = UEA0103

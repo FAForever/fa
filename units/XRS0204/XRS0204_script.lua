@@ -8,18 +8,19 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CSubUnit = import('/lua/cybranunits.lua').CSubUnit
-local WeaponsFile = import('/lua/cybranweapons.lua')
+local CSubUnit = import("/lua/cybranunits.lua").CSubUnit
+local WeaponsFile = import("/lua/cybranweapons.lua")
 local CANNaniteTorpedoWeapon = WeaponsFile.CANNaniteTorpedoWeapon
 local CIFSmartCharge = WeaponsFile.CIFSmartCharge
 
-XRS0204 = Class(CSubUnit) {
+---@class XRS0204 : CSubUnit
+XRS0204 = ClassUnit(CSubUnit) {
     DeathThreadDestructionWaitTime = 0,
 
     Weapons = {
-        Torpedo01 = Class(CANNaniteTorpedoWeapon) {},
-        AntiTorpedo01 = Class(CIFSmartCharge) {},
-        AntiTorpedo02 = Class(CIFSmartCharge) {},
+        Torpedo01 = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        AntiTorpedo01 = ClassWeapon(CIFSmartCharge) {},
+        AntiTorpedo02 = ClassWeapon(CIFSmartCharge) {},
     },
     OnCreate = function(self)
         CSubUnit.OnCreate(self)

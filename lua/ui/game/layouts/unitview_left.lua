@@ -1,9 +1,9 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
-local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
+local NinePatch = import("/lua/ui/controls/ninepatch.lua").NinePatch
 
 local iconPositions = {
     [1] = {Left = 70, Top = 55},
@@ -27,7 +27,7 @@ local iconTextures = {
 }
 
 function SetLayout()
-    local controls = import('/lua/ui/game/unitview.lua').controls
+    local controls = import("/lua/ui/game/unitview.lua").controls
     controls.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/build-over-back_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
@@ -83,6 +83,16 @@ function SetLayout()
     controls.vetBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     controls.vetBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
 
+    LayoutHelpers.AtLeftTopIn(controls.vetBar, controls.bg, 192, 68)
+    LayoutHelpers.SetDimensions(controls.vetBar, 56, 3)
+    controls.vetBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
+    controls.vetBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
+
+    LayoutHelpers.AtLeftTopIn(controls.ReclaimGroup, controls.bg, 192, 68)
+    LayoutHelpers.SetDimensions(controls.ReclaimGroup, 200, 200)
+    LayoutHelpers.FillParent(controls.ReclaimGroup.MassIcon, controls.ReclaimGroup)
+    controls.ReclaimGroup.MassIcon:SetSolidColor('ffffffff')
+    
     LayoutHelpers.Below(controls.nextVet, controls.vetBar)
     controls.nextVet:SetDropShadow(true)
     LayoutHelpers.Above(controls.vetTitle, controls.vetBar)
@@ -145,8 +155,8 @@ function SetBG(controls)
 end
 
 function PositionWindow()
-    local controls = import('/lua/ui/game/unitview.lua').controls
-    local consControl = import('/lua/ui/game/construction.lua').controls.constructionGroup
+    local controls = import("/lua/ui/game/unitview.lua").controls
+    local consControl = import("/lua/ui/game/construction.lua").controls.constructionGroup
     if consControl:IsHidden() then
         LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
         LayoutHelpers.AtLeftIn(controls.bg, consControl, 18)

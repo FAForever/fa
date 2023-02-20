@@ -8,13 +8,14 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CIFNaniteTorpedoWeapon = import('/lua/cybranweapons.lua').CIFNaniteTorpedoWeapon
+local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
+local CIFNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CIFNaniteTorpedoWeapon
 
 
-URA0204 = Class(CAirUnit) {
+---@class URA0204 : CAirUnit
+URA0204 = ClassUnit(CAirUnit) {
     Weapons = {
-        Bomb = Class(CIFNaniteTorpedoWeapon) {},
+        Bomb = ClassWeapon(CIFNaniteTorpedoWeapon) {},
     },
 }
 

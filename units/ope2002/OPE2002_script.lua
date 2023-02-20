@@ -8,9 +8,10 @@
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TWallStructureUnit = import('/lua/terranunits.lua').TWallStructureUnit
+local TWallStructureUnit = import("/lua/terranunits.lua").TWallStructureUnit
 
-OPE2002 = Class(TWallStructureUnit) {
+---@class OPE2002 : TWallStructureUnit
+OPE2002 = ClassUnit(TWallStructureUnit) {
 }
 
 TypeClass = OPE2002

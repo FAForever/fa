@@ -84,15 +84,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 45,
-            Level3 = 80,
-            Level4 = 115,
-            Level5 = 145,
-        },
-    },
     BuildIconSortPriority = 110,
     Categories = {
         'PRODUCTSC1',
@@ -103,7 +94,6 @@ UnitBlueprint {
         'MOBILE',
         'AIR',
         'DIRECTFIRE',
-        'ANTINAVY',
         'ANTIAIR',
         'HIGHALTAIR',
         'EXPERIMENTAL',
@@ -185,7 +175,7 @@ UnitBlueprint {
         UniformScale = 0.04,
     },
     Economy = {
-        BuildCostEnergy = 731250,
+        BuildCostEnergy = 1530000,
         BuildCostMass = 45000,
         BuildRate = 180,
         BuildTime = 50625,
@@ -877,7 +867,7 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 10000,
+            Damage = 7000,
             DamageFriendly = true,
             DamageRadius = 15,
             DamageType = 'Normal',

@@ -6,6 +6,12 @@ WATER = 0x08
 AIR = 0x10
 ORBIT = 0x20
 
+---@class FootprintSpec : FootprintBlueprint
+---@field Name string
+---@field Caps integer
+---@field MaxWaterDepth? number
+---@field Flags? number
+
 -- Flags
 IgnoreStructures = 0x01
 

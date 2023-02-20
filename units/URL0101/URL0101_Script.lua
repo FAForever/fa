@@ -7,10 +7,11 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local Entity = import('/lua/sim/Entity.lua').Entity
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local Entity = import("/lua/sim/entity.lua").Entity
 
-URL0101 = Class(CWalkingLandUnit) {
+---@class URL0101 : CWalkingLandUnit
+URL0101 = ClassUnit(CWalkingLandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         --entity used for radar

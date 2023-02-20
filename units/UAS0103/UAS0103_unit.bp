@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 60,
+        GuardScanRadius = 40,
     },
     Audio = {
         AmbientMove = Sound {
@@ -27,15 +28,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
         },
     },
     BuildIconSortPriority = 40,
@@ -146,9 +138,9 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 2900,
-        BuildCostMass = 290,
-        BuildTime = 1450,
+        BuildCostEnergy = 2800,
+        BuildCostMass = 280,
+        BuildTime = 1400,
     },
     Footprint = {
         SizeX = 2,
@@ -264,7 +256,7 @@ UnitBlueprint {
             HeadingArcCenter = 0,
             HeadingArcRange = 150,
             Label = 'MainGun',
-            MaxRadius = 31,
+            MaxRadius = 33,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -330,7 +322,7 @@ UnitBlueprint {
             HeadingArcCenter = 180,
             HeadingArcRange = 150,
             Label = 'MainGun2',
-            MaxRadius = 31,
+            MaxRadius = 33,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,

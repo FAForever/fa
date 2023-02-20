@@ -7,12 +7,13 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
-local SDFOhCannon = import('/lua/seraphimweapons.lua').SDFOhCannon
+local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
+local SDFOhCannon = import("/lua/seraphimweapons.lua").SDFOhCannon
 
-XSB2101 = Class(SStructureUnit) {
+---@class XSB2101 : SStructureUnit
+XSB2101 = ClassUnit(SStructureUnit) {
     Weapons = {
-        MainGun = Class(SDFOhCannon) {},
+        MainGun = ClassWeapon(SDFOhCannon) {},
     },
 }
 TypeClass = XSB2101

@@ -1,9 +1,9 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
 
 local teamIcons = {
     '/lobby/team_icons/team_no_icon.dds',
@@ -20,7 +20,7 @@ local teamIcons = {
 --- A small button representing an ACU, with support for showing colour and team affiliation, with
 -- an exciting pulsating blue mouse-over effect.
 ---@class ACUButton : Group
-ACUButton = Class(Group) {
+ACUButton = ClassUI(Group) {
     __init = function(self, parent, enabled)
         Group.__init(self, parent)
         LayoutHelpers.SetDimensions(self, 8, 10)
@@ -46,7 +46,7 @@ ACUButton = Class(Group) {
         local buttonImage = UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds')
         local markerOverlay = Button(colourBmp, buttonImage, buttonImage, buttonImage, buttonImage)
         LayoutHelpers.AtCenterIn(markerOverlay, colourBmp)
-        markerOverlay.OnClick = function(this, modifiers)
+        markerOverlay.OnClick = function(control, modifiers)
             if not self:IsEnabled() then
                 return
             end
@@ -58,7 +58,7 @@ ACUButton = Class(Group) {
             end
         end
 
-        markerOverlay.OnRolloverEvent = function(this, state)
+        markerOverlay.OnRolloverEvent = function(control, state)
         -- Don't respond to events if the control is disabled.
             if not self:IsEnabled() then
                 return
@@ -82,26 +82,26 @@ ACUButton = Class(Group) {
         indicator.Depth:Set(function() return colourBmp.Depth() - 1 end)
         indicator:Hide()
         indicator:DisableHitTest()
-        indicator.Play = function(this)
+        indicator.Play = function(control)
             if not self:IsEnabled() then
                 return
             end
-            this:SetAlpha(1)
-            this:Show()
-            this:SetNeedsFrameUpdate(true)
-            this.time = 0
-            this.OnFrame = function(control, time)
+            control:SetAlpha(1)
+            control:Show()
+            control:SetNeedsFrameUpdate(true)
+            control.time = 0
+            control.OnFrame = function(control, time)
                 control.time = control.time + (time*4)
                 control:SetAlpha(MATH_Lerp(math.sin(control.time), -.5, .5, 0.3, 0.5))
             end
         end
-        indicator.Stop = function(this)
+        indicator.Stop = function(control)
             if not self:IsEnabled() then
                 return
             end
-            this:SetAlpha(0)
-            this:Hide()
-            this:SetNeedsFrameUpdate(false)
+            control:SetAlpha(0)
+            control:Hide()
+            control:SetNeedsFrameUpdate(false)
         end
 
         self.indicator = indicator
@@ -110,14 +110,15 @@ ACUButton = Class(Group) {
         textOverlay:SetFont(UIUtil.bodyFont, 20)
         LayoutHelpers.AtCenterIn(textOverlay, self)
         self.textOverlay = textOverlay
+    end,
 
-        self.OnHide = function(self, hidden)
-            self.markerOverlay:SetHidden(hidden)
-            self.marker:SetHidden(hidden)
-            self.teamIndicator:SetHidden(hidden)
-            self.textOverlay:SetHidden(hidden)
-            return true
-        end
+    OnHide = function(self, hidden)
+        self:ApplyFunction(function (control)
+            if control ~= self then
+                control:SetHidden(hidden)
+            end
+        end)
+        return true
     end,
 
     --- Returns true if the control is enabled.

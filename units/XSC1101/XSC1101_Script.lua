@@ -7,9 +7,10 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local ACivilianStructureUnit = import('/lua/aeonunits.lua').ACivilianStructureUnit
+local ACivilianStructureUnit = import("/lua/aeonunits.lua").ACivilianStructureUnit
 
-UAC1101 = Class(ACivilianStructureUnit) {
+---@class UAC1101 : ACivilianStructureUnit
+UAC1101 = ClassUnit(ACivilianStructureUnit) {
 
 	BoneB01 = 'Energy_Beam_01',
 	BoneSetE01 = {

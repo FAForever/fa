@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CConstructionUnit = import('/lua/cybranunits.lua').CConstructionUnit
+local CConstructionUnit = import("/lua/cybranunits.lua").CConstructionUnit
 
-URL0208 = Class(CConstructionUnit) {
+---@class URL0208 : CConstructionUnit
+URL0208 = ClassUnit(CConstructionUnit) {
     Treads = {
         ScrollTreads = true,
         BoneName = 'URL0208',

@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CRadarUnit = import('/lua/cybranunits.lua').CRadarUnit
+local CRadarUnit = import("/lua/cybranunits.lua").CRadarUnit
 
-URB3104 = Class(CRadarUnit) {
+---@class URB3104 : CRadarUnit
+URB3104 = ClassUnit(CRadarUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CRadarUnit.OnStopBeingBuilt(self,builder,layer)
@@ -18,8 +19,8 @@ URB3104 = Class(CRadarUnit) {
         -- move the dishes about
     end,
 
-    OnIntelDisabled = function(self)
-        CRadarUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        CRadarUnit.OnIntelDisabled(self, intel)
         if (self.Thread1) then
             KillThread(self.Thread1)
             self.Thread1 = nil
@@ -40,8 +41,8 @@ URB3104 = Class(CRadarUnit) {
     end,
 
 
-    OnIntelEnabled = function(self)
-        CRadarUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        CRadarUnit.OnIntelEnabled(self, intel)
         if not self.MainRotator then
             self.MainRotator = CreateRotator(self, 'Spinner', 'z')
             self.Trash:Add(self.MainRotator)

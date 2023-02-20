@@ -1,30 +1,29 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/DEL0204/DEL0204_script.lua
-----**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
-----**
-----**  Summary  :  UEF Mongoose Gatling Bot
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
-local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
-local TWeapons = import('/lua/terranweapons.lua')
+------------------------------------------------------------------------------
+-- File     :  /cdimage/units/DEL0204/DEL0204_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
+-- Summary  :  UEF Mongoose Gatling Bot
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------------
+local TWalkingLandUnit = import("/lua/terranunits.lua").TWalkingLandUnit
+local TWeapons = import("/lua/terranweapons.lua")
 local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon
 local TIFFragLauncherWeapon = TWeapons.TDFFragmentationGrenadeLauncherWeapon
 
-local EffectUtils = import('/lua/effectutilities.lua')
-local Effects = import('/lua/effecttemplates.lua')
+local EffectUtils = import("/lua/effectutilities.lua")
+local Effects = import("/lua/effecttemplates.lua")
 
-DEL0204 = Class(TWalkingLandUnit) 
+
+---@class DEL0204 : TWalkingLandUnit
+DEL0204 = ClassUnit(TWalkingLandUnit)
 {
     Weapons = {
-        GatlingCannon = Class(TDFPlasmaCannonWeapon) 
+        GatlingCannon = ClassWeapon(TDFPlasmaCannonWeapon) 
         {
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(0)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxWeaponPackSequence(self)
             end,
 
@@ -33,7 +32,7 @@ DEL0204 = Class(TWalkingLandUnit)
                     self.SpinManip = CreateRotator(self.unit, 'Left_Arm_Barrel', 'z', nil, 270, 180, 60)
                     self.unit.Trash:Add(self.SpinManip)
                 end
-                
+
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(500)
                 end
@@ -44,13 +43,11 @@ DEL0204 = Class(TWalkingLandUnit)
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(200)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                self.ExhaustEffects = EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },
-
-        Grenade = Class(TIFFragLauncherWeapon) {}
+        Grenade = ClassWeapon(TIFFragLauncherWeapon) {}
     },
 }
-
 TypeClass = DEL0204

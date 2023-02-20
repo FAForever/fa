@@ -8,15 +8,16 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
-local WeaponsFile = import('/lua/aeonweapons.lua')
+local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
+local WeaponsFile = import("/lua/aeonweapons.lua")
 local AAAZealotMissileWeapon = WeaponsFile.AAAZealotMissileWeapon
 
-UAS0303 = Class(AircraftCarrier) {
+---@class UAS0303 : AircraftCarrier
+UAS0303 = ClassUnit(AircraftCarrier) {
 
     Weapons = {
-        AntiAirMissiles01 = Class(AAAZealotMissileWeapon) {},
-        AntiAirMissiles02 = Class(AAAZealotMissileWeapon) {},
+        AntiAirMissiles01 = ClassWeapon(AAAZealotMissileWeapon) {},
+        AntiAirMissiles02 = ClassWeapon(AAAZealotMissileWeapon) {},
     },
 
     BuildAttachBone = 'UAS0303',

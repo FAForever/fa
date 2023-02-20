@@ -1,103 +1,11 @@
-local WeatherDefinition = import('/lua/weatherdefinitions.lua')
+local WeatherDefinition = import("/lua/weatherdefinitions.lua")
 local MapStyleList = WeatherDefinition.MapStyleList
 local MapWeatherList = WeatherDefinition.MapWeatherList
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local util = import('/lua/utilities.lua')
-local Entity = import('/lua/sim/Entity.lua').Entity
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local util = import("/lua/utilities.lua")
+local Entity = import("/lua/sim/entity.lua").Entity
 
--- CreateWeather, this is the entry point for map script, OnPopulate to
--- generate weather. We spawn a thread here so we can do dynamic movement
-function CreateWeather()
-    ForkThread( CreateWeatherThread )
-end
-
-function CreateWeatherThread()
-    -- read out the markers with regard to the weather
-    local definitions, clusters = GetWeatherMarkerData(ScenarioInfo.size)
-
-    local nd = table.getn(definitions)
-    local nc = table.getn(clusters)
-
-    -- early opt: no definitions, no clusters
-    if nd == 0 and nc == 0 then
-        WARN('Intention to generate weather but the corresponding [Weather Definition] and [Weather Generator] markers are not placed in map, aborting weather generation.')
-        return
-    end
-
-    -- early opt out: no clusters
-    if nd > 0 and nc == 0 then
-        WARN('Intention to generate weather but there are no [Weather Generator] markers placed in map, aborting weather generation.')
-        return
-    end
-
-    -- early opt out: no definitions
-    if nd == 0 and nc > 0 then
-        WARN('Intention to generate weather but there are no [Weather Definition] markers placed in map, aborting weather generation.')
-        return
-    end
-
-    -- a heads up that multiple definitions make no sense
-    local definition = definitions[1]
-    if nd > 1 then
-        WARN('Multiple [Weather Definition] markers in map - only the first one in the _save.lua file is used.')
-    end
-
-    -- early opt out: map style is unknown
-    local style = definition.MapStyle
-    if not table.find(MapStyleList, style) then
-        WARN(
-            'Intention to generate weather but the chosen map style ' .. style .. ' is not known, aborting weather generation.',
-            'A full list of available styles is: \r\n' .. repr(MapStyleList)
-        )
-        return
-    end
-
-    -- early opt out: definition tries to use a type that is not part of the style
-    if not (definition.WeatherTypes[1].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[1].Type] then
-        WARN('Intention to generate weather but type 1 \'' .. definition.WeatherTypes[1].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
-        return
-    end
-
-    if not (definition.WeatherTypes[2].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[2].Type] then
-        WARN('Intention to generate weather but type 2 \'' .. definition.WeatherTypes[2].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
-        return
-    end
-
-    if not (definition.WeatherTypes[3].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[3].Type] then
-        WARN('Intention to generate weather but type 3 \'' .. definition.WeatherTypes[3].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
-        return
-    end
-
-    if not (definition.WeatherTypes[4].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[4].Type] then
-        WARN('Intention to generate weather but type 4 \'' .. definition.WeatherTypes[4].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
-        return
-    end
-
-    -- early opt out: a generator tries to force a type that is not part of the style
-    for k, cluster in clusters do
-        if not (cluster.forceType == "None") then
-            if not MapWeatherList[style][cluster.forceType] then
-                WARN(
-                    'Intention to generate weather but a forced type \'' .. cluster.forceType .. '\'  of \'' .. k .. '\' cluster is not part of the map style \'' .. style .. '\' , aborting weather generation.',
-                    'A full list of available weather types of \'' .. style .. '\' is: \r\n' .. repr(MapWeatherList[style])
-                )
-            end
-        end
-    end
-
-    -- determine the global weather type and do an early opt out
-    local globalType = GetRandomWeatherEffectType(definition)
-    if globalType == "None" then
-        LOG("Intention to generate weather but the \'None\' weather type was randomly chosen from the definition, aborting weather generation.")
-        return
-    end
-
-    -- determine the weather effects per marker, clusters are send by reference and therefore changed in place.
-    SetClusterEffectData(MapWeatherList, style, globalType, clusters)
-
-    -- spawn 'dem rainy weather!
-    ClustersToEmitters( clusters, style, type )
-end
+local TableGetN = table.getn
 
 function GetWeatherMarkerData(mapScale)
     -- find all the weather definition and weather generator markers
@@ -199,17 +107,17 @@ function SetClusterEffectData(weather, style, globalType, clusters)
     for _, cluster in clusters do
         if cluster.forceType == "None" then
             local emitters = weather[style][globalType]
-            cluster.effects = emitters[util.GetRandomInt(1,table.getn(emitters))]
+            cluster.effects = emitters[util.GetRandomInt(1,TableGetN(emitters))]
         else
             local emitters = weather[style][cluster.forceType]
-            cluster.effects = emitters[util.GetRandomInt(1,table.getn(emitters))]
+            cluster.effects = emitters[util.GetRandomInt(1,TableGetN(emitters))]
         end
     end
 end
 
 function ClustersToEmitters( clusters )
 
-    local nc = table.getn(clusters)
+    local nc = TableGetN(clusters)
 
     -- for each cluster...
     for _, cluster in clusters do
@@ -273,13 +181,98 @@ function ClustersToEmitters( clusters )
     end
 end
 
--- GenerateWeatherGroups
--- - Generates spread of clusters
---
--- Returns a cluster list table { {xpos, zpos}, ... }, which is just
--- full of unique paired coordinates for the map
-function GenerateWeatherGroups( mapScaleX, mapScaleZ, numClusters )
-    return GenerateClusterCoords(0,0,mapScaleX, mapScaleZ, numClusters )
+function CreateWeatherThread()
+    -- read out the markers with regard to the weather
+    local definitions, clusters = GetWeatherMarkerData(ScenarioInfo.size)
+
+    local nd = TableGetN(definitions)
+    local nc = TableGetN(clusters)
+
+    -- early opt: no definitions, no clusters
+    if nd == 0 and nc == 0 then
+        WARN('Intention to generate weather but the corresponding [Weather Definition] and [Weather Generator] markers are not placed in map, aborting weather generation.')
+        return
+    end
+
+    -- early opt out: no clusters
+    if nd > 0 and nc == 0 then
+        WARN('Intention to generate weather but there are no [Weather Generator] markers placed in map, aborting weather generation.')
+        return
+    end
+
+    -- early opt out: no definitions
+    if nd == 0 and nc > 0 then
+        WARN('Intention to generate weather but there are no [Weather Definition] markers placed in map, aborting weather generation.')
+        return
+    end
+
+    -- a heads up that multiple definitions make no sense
+    local definition = definitions[1]
+    if nd > 1 then
+        WARN('Multiple [Weather Definition] markers in map - only the first one in the _save.lua file is used.')
+    end
+
+    -- early opt out: map style is unknown
+    local style = definition.MapStyle
+    if not table.find(MapStyleList, style) then
+        WARN(
+            'Intention to generate weather but the chosen map style ' .. style .. ' is not known, aborting weather generation.',
+            'A full list of available styles is: \r\n' .. repr(MapStyleList)
+        )
+        return
+    end
+
+    -- early opt out: definition tries to use a type that is not part of the style
+    if not (definition.WeatherTypes[1].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[1].Type] then
+        WARN('Intention to generate weather but type 1 \'' .. definition.WeatherTypes[1].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+        return
+    end
+
+    if not (definition.WeatherTypes[2].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[2].Type] then
+        WARN('Intention to generate weather but type 2 \'' .. definition.WeatherTypes[2].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+        return
+    end
+
+    if not (definition.WeatherTypes[3].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[3].Type] then
+        WARN('Intention to generate weather but type 3 \'' .. definition.WeatherTypes[3].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+        return
+    end
+
+    if not (definition.WeatherTypes[4].Type == "None") and not MapWeatherList[style][definition.WeatherTypes[4].Type] then
+        WARN('Intention to generate weather but type 4 \'' .. definition.WeatherTypes[4].Type .. '\' is not part of the map style \'' .. style .. '\' , aborting weather generation.')
+        return
+    end
+
+    -- early opt out: a generator tries to force a type that is not part of the style
+    for k, cluster in clusters do
+        if not (cluster.forceType == "None") then
+            if not MapWeatherList[style][cluster.forceType] then
+                WARN(
+                    'Intention to generate weather but a forced type \'' .. cluster.forceType .. '\'  of \'' .. k .. '\' cluster is not part of the map style \'' .. style .. '\' , aborting weather generation.',
+                    'A full list of available weather types of \'' .. style .. '\' is: \r\n' .. repr(MapWeatherList[style])
+                )
+            end
+        end
+    end
+
+    -- determine the global weather type and do an early opt out
+    local globalType = GetRandomWeatherEffectType(definition)
+    if globalType == "None" then
+        LOG("Intention to generate weather but the \'None\' weather type was randomly chosen from the definition, aborting weather generation.")
+        return
+    end
+
+    -- determine the weather effects per marker, clusters are send by reference and therefore changed in place.
+    SetClusterEffectData(MapWeatherList, style, globalType, clusters)
+
+    -- spawn 'dem rainy weather!
+    ClustersToEmitters( clusters, style, type )
+end
+
+-- CreateWeather, this is the entry point for map script, OnPopulate to
+-- generate weather. We spawn a thread here so we can do dynamic movement
+function CreateWeather()
+    ForkThread( CreateWeatherThread )
 end
 
 -- Local constant definition, used to make sure we don't subdivide too small,
@@ -341,4 +334,13 @@ function GenerateClusterCoords( xStart, zStart, xEnd, zEnd, numClusters )
     end
 
     return clusterList
+end
+
+-- GenerateWeatherGroups
+-- - Generates spread of clusters
+--
+-- Returns a cluster list table { {xpos, zpos}, ... }, which is just
+-- full of unique paired coordinates for the map
+function GenerateWeatherGroups( mapScaleX, mapScaleZ, numClusters )
+    return GenerateClusterCoords(0,0,mapScaleX, mapScaleZ, numClusters )
 end

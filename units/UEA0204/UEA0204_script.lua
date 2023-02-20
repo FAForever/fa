@@ -8,13 +8,14 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
 
 
-UEA0204 = Class(TAirUnit) {
+---@class UEA0204 : TAirUnit
+UEA0204 = ClassUnit(TAirUnit) {
     Weapons = {
-        Torpedo = Class(TANTorpedoAngler) {
+        Torpedo = ClassWeapon(TANTorpedoAngler) {
         },
     },
 }

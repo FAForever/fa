@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TSonarUnit = import('/lua/terranunits.lua').TSonarUnit
+local TSonarUnit = import("/lua/terranunits.lua").TSonarUnit
 
-UEB3202 = Class(TSonarUnit) {
+---@class UEB3202 : TSonarUnit
+UEB3202 = ClassUnit(TSonarUnit) {
     TimedSonarTTIdleEffects = {
         {
             Bones = {

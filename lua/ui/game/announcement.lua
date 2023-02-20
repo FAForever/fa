@@ -3,18 +3,18 @@
 --* Author: Ted Snook
 --* Summary: Announcement UI for sending general messages to the user
 --*
---* Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 local bg = false
 
 function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
-    local scoreDlg = import('/lua/ui/dialogs/score.lua')
+    local scoreDlg = import("/lua/ui/dialogs/score.lua")
     if scoreDlg.dialog then
         if onFinished then
             onFinished()
@@ -125,7 +125,7 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
             bg = false
         end
     end
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         bg:Hide()
     end
 end

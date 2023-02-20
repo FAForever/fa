@@ -1,123 +1,146 @@
---- Class CameraImpl
--- @classmod User.CameraImpl
+---@meta
+
+---@class Camera
+local CameraImpl = {}
+
+
+---@class UserCameraSettings 
+---@field Zoom number       # See also `CameraImpl:GetFocusPosition()`
+---@field Pitch number
+---@field Heading number
+---@field Focus Vector      # See also `CameraImpl:GetFocusPosition()`
+
+---@alias UserCameraAccelerationModes 'Linear' | 'FastInSlowOut' | 'SlowInOut'
 
 ---
---  Camera:EnableEaseInOut()
 function CameraImpl:EnableEaseInOut()
 end
 
----
---  Camera:GetFocusPosition()
+--- Returns the focus point (on the terrain) of the center of the screen
+---@return Vector
 function CameraImpl:GetFocusPosition()
 end
 
----
---  Camera:GetMaxZoom()
+--- Returns the highest possible zoom distance
+---@return number
 function CameraImpl:GetMaxZoom()
 end
 
----
---  Camera:GetMinZoom()
+--- Returns the lowest possible zoom distance
+---@return number
 function CameraImpl:GetMinZoom()
 end
 
----
---  Camera:GetTargetZoom()
+--- Returns the target zoom distance
+---@return number
 function CameraImpl:GetTargetZoom()
 end
 
----
---  Camera:GetZoom()
+--- Returns the current zoom distance
+---@return number
 function CameraImpl:GetZoom()
 end
 
----
---  Camera:HoldRotation()
+--- Disables rotating the camera
 function CameraImpl:HoldRotation()
 end
 
----
---  Camera:MoveTo(position, orientationHPR, zoom, seconds)
-function CameraImpl:MoveTo(position,  orientationHPR,  zoom,  seconds)
+--- Transforms the camera to the given position, orientation and zoom
+---@param position Vector
+---@param orientationHPR Vector
+---@param zoom number
+---@param seconds number
+function CameraImpl:MoveTo(position, orientationHPR, zoom, seconds)
 end
 
----
---  Camera:MoveTo(region[,seconds])
-function CameraImpl:MoveToRegion()
+--- Transforms the camera to be able to view the entire region
+---@param region Rectangle
+---@param seconds? number
+function CameraImpl:MoveToRegion(region, seconds)
 end
 
----
---  Camera:NoseCam(ent,pitchAdjust,zoom,seconds,transition)
+--- Third-person like camera movement
+---@param ent Unit
+---@param pitchAdjust boolean
+---@param zoom number
+---@param seconds number
+---@param transition any
 function CameraImpl:NoseCam(ent, pitchAdjust, zoom, seconds, transition)
 end
 
----
---  Camera:Reset()
+--- Resets the camera, including console commands applied to it
 function CameraImpl:Reset()
 end
 
----
---  Camera:RestoreSettings(settings)
+--- Applies the provided settings to the camera
+---@see `CameraImpl:SaveSettings` to retrieve the settings
+---@param settings UserCameraSettings
 function CameraImpl:RestoreSettings(settings)
 end
 
----
---  Camera:RevertRotation()
+--- Reverts the camera to the basic rotation scheme
 function CameraImpl:RevertRotation()
 end
 
----
---  Camera:SaveSettings()
+--- Returns the current camera settings
+---@see `CameraImpl:RestoreSettings` to apply the settings
+---@return UserCameraSettings
 function CameraImpl:SaveSettings()
 end
 
----
---  Camera:SetAccMode(accTypeName)
+--- ???
+---@param accTypeName UserCameraAccelerationModes
 function CameraImpl:SetAccMode(accTypeName)
 end
 
----
---  Camera:SetMaxZoomMult() - set zoom scale to allow zooming past or before the point where map fills control
+--- Sets zoom scale to allow zooming past or before the point where map fills control
 function CameraImpl:SetMaxZoomMult()
 end
 
----
---  Camera:SetTargetZoom(zoom)
+--- 
+---@param zoom any
 function CameraImpl:SetTargetZoom(zoom)
 end
 
----
---  Camera:SetZoom(zoom,seconds)
+--- Zooms the camera
+---@param zoom any
+---@param seconds any
 function CameraImpl:SetZoom(zoom, seconds)
 end
 
----
---  Camera:SnapTo(position, orientationHPR, zoom)
-function CameraImpl:SnapTo(position,  orientationHPR,  zoom)
+--- Snaps the camera to the given position, orientation and zoom
+---@param position any
+---@param orientationHPR any
+---@param zoom any
+function CameraImpl:SnapTo(position, orientationHPR, zoom)
 end
 
----
---  Camera:Spin(headingRate[,zoomRate])
-function CameraImpl:Spin(headingRate[, zoomRate])
+--- Spins and rotates the camera
+---@param headingRate number
+---@param zoomRate? number
+function CameraImpl:Spin(headingRate, zoomRate)
 end
 
----
---  Camera:TargetEntities(ents,zoom,seconds)
+--- ???
+---@param ents UserUnit[]
+---@param zoom number
+---@param seconds number
 function CameraImpl:TargetEntities(ents, zoom, seconds)
 end
 
----
---  Camera:TrackEntities(ents,zoom,seconds)
+--- Tracks several entities at a given zoom
+---@param ents UserUnit[]
+---@param zoom number
+---@param seconds number
 function CameraImpl:TrackEntities(ents, zoom, seconds)
 end
 
----
---  Camera:UseGameClock()
+--- Use the game clock for interval checks, useful if the game is slowed down during a cinemation. Defaults to using the system clock
 function CameraImpl:UseGameClock()
 end
 
----
---  Camera:UseSystemClock()
+--- use the system clock for interval checks, useful if the game is slowed down during a cinemation
 function CameraImpl:UseSystemClock()
 end
 
+return CameraImpl

@@ -1,3 +1,4 @@
+---@diagnostic disable:local-limit
 -- ****************************************************************************
 -- **
 -- **  File     :  /data/lua/EffectTemplates.lua
@@ -9,6 +10,11 @@
 -- ****************************************************************************
 EmtBpPath = '/effects/emitters/'
 EmitterTempEmtBpPath = '/effects/emitters/temp/'
+
+NoEffects = { }
+DefaultPolyTrailOffset1 = { 0 }
+DefaultPolyTrailOffset2 = { 0, 0 }
+DefaultPolyTrailOffset3 = { 0, 0, 0 }
 
 -- For gatling gun cooldown
 WeaponSteam01 = {
@@ -660,6 +666,13 @@ AQuantumGateAmbient = {
     EmtBpPath .. 'aeon_gate_02_emit.bp',
     EmtBpPath .. 'aeon_gate_03_emit.bp',
 }
+
+ATractorAmbient = {
+    EmtBpPath .. 'tractor_01_emit.bp',
+    EmtBpPath .. 'tractor_02_emit.bp',
+    EmtBpPath .. 'tractor_03_emit.bp',
+}
+
 
 AResourceGenAmbient = {
     EmtBpPath .. 'aeon_rgen_ambient_01_emit.bp',
@@ -1346,8 +1359,8 @@ CCorsairMissileUnitHit01 = {
     EmtBpPath .. 'cybran_corsair_missile_hit_ring.bp',
     EmtBpPath .. 'unit_shrapnel_hit_01_emit.bp',
 }
-CCorsairMissileFxTrails01 = {}
-CCorsairMissilePolyTrail01= EmtBpPath .. 'cybran_corsair_missile_polytrail_01_emit.bp'
+CCorsairMissileFxTrails01 = NoEffects
+CCorsairMissilePolyTrail01 = EmtBpPath .. 'cybran_corsair_missile_polytrail_01_emit.bp'
 
 
 

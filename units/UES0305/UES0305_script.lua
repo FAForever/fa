@@ -7,13 +7,14 @@
 ----**
 ----**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
-local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
-local CreateBuildCubeThread = import('/lua/EffectUtilities.lua').CreateBuildCubeThread
+local TSeaUnit = import("/lua/terranunits.lua").TSeaUnit
+local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
+local CreateBuildCubeThread = import("/lua/effectutilities.lua").CreateBuildCubeThread
 
-UES0305 = Class(TSeaUnit) {
+---@class UES0305 : TSeaUnit
+UES0305 = ClassUnit(TSeaUnit) {
     Weapons = {
-        Torpedo01 = Class(TANTorpedoAngler) {},
+        Torpedo01 = ClassWeapon(TANTorpedoAngler) {},
     },
 
     TimedSonarTTIdleEffects = {

@@ -1,9 +1,9 @@
 --
 -- Aeon Serpentine Missile
 --
-local AMissileSerpentineProjectile = import('/lua/aeonprojectiles.lua').AMissileSerpentineProjectile
+local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
 
-AIFMissileSerpentine02 = Class(AMissileSerpentineProjectile) {
+AIFMissileSerpentine02 = ClassProjectile(AMissileSerpentineProjectile) {
 
     FxWaterHitScale = 1.65,
 
@@ -14,12 +14,11 @@ AIFMissileSerpentine02 = Class(AMissileSerpentineProjectile) {
     end,
 
     MovementThread = function(self)        
-        self.WaitTime = 0.1
         self:SetTurnRate(8)
         WaitSeconds(0.3)        
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(1)
         end
     end,
 

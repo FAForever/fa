@@ -9,20 +9,19 @@
 local CreateBuilderArmController = CreateBuilderArmController
 
 -- upvalued moho functions for performance
-local BuilderArmManipulator = _G.moho.BuilderArmManipulator 
-local BuilderArmManipulatorSetAimingArc = BuilderArmManipulator.SetAimingArc
-local BuilderArmManipulatorSetPrecedence = BuilderArmManipulator.SetPrecedence
-BuilderArmManipulator = nil 
+local BuilderArmManipulatorSetAimingArc = _G.moho.BuilderArmManipulator.SetAimingArc
+local BuilderArmManipulatorSetPrecedence = _G.moho.BuilderArmManipulator.SetPrecedence
 
 -- upvalued trashbag functions for performance
-local TrashBag = _G.TrashBag
-local TrashBagAdd = TrashBag.Add
+local TrashBagAdd = _G.TrashBag.Add
 
-local CBuildBotUnit = import('/lua/cybranunits.lua').CBuildBotUnit
-URA0001O = Class(CBuildBotUnit) { 
-
+local CBuildBotUnit = import("/lua/cybranunits.lua").CBuildBotUnit
+URA0001O = ClassDummyUnit(CBuildBotUnit) { 
     OnCreate = function(self)
         CBuildBotUnit.OnCreate(self)
+
+        -- prevent collisions
+        self:SetCollisionShape('None')
 
         -- make the drone aim for the target
         local BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
@@ -30,6 +29,5 @@ URA0001O = Class(CBuildBotUnit) {
         BuilderArmManipulatorSetPrecedence(BuildArmManipulator, 5)
         TrashBagAdd(self.Trash, BuildArmManipulator)
     end,
-
 }
 TypeClass = URA0001O

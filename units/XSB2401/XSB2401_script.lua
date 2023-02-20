@@ -5,15 +5,16 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
-local SIFExperimentalStrategicMissile = import('/lua/seraphimweapons.lua').SIFExperimentalStrategicMissile
-local CreateSeraphimExperimentalBuildBaseThread = import('/lua/EffectUtilitiesSeraphim.lua').CreateSeraphimExperimentalBuildBaseThread
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
+local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
+local SIFExperimentalStrategicMissile = import("/lua/seraphimweapons.lua").SIFExperimentalStrategicMissile
+local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
 
-XSB2401 = Class(SStructureUnit) {
+---@class XSB2401 : SStructureUnit
+XSB2401 = ClassUnit(SStructureUnit) {
     Weapons = {
-        ExperimentalNuke = Class(SIFExperimentalStrategicMissile) {
+        ExperimentalNuke = ClassWeapon(SIFExperimentalStrategicMissile) {
             OnWeaponFired = function(self)
                 self.unit:ForkThread(self.unit.HideMissile)
             end,
@@ -23,7 +24,7 @@ XSB2401 = Class(SStructureUnit) {
                 SIFExperimentalStrategicMissile.PlayFxWeaponUnpackSequence(self)
             end,
         },
-        DeathWeapon = Class(DeathNukeWeapon) {},
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
     },
 
     StartBeingBuiltEffects = function(self, builder, layer)

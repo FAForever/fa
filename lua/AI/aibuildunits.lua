@@ -1,26 +1,20 @@
---****************************************************************************
---**
---**  File     :  /lua/AI/aibuildunits.lua
---**  Author(s): John Comes
---**
---**  Summary  :
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local Utils = import('/lua/utilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local StructureUpgradeTemplates = import('/lua/upgradeTemplates.lua').StructureUpgradeTemplates
-local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
+-- File     :  /lua/AI/aibuildunits.lua
+-- Author(s): John Comes
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------
+
+local AIUtils = import("/lua/ai/aiutilities.lua")
 local aiEconomy
 
+---@param aiBrain AIBrain
 function AISetEconomyNumbers(aiBrain)
     --LOG('*AI DEBUG: SETTING ECONOMY NUMBERS FROM AIBRAIN ', repr(aiBrain))
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     aiEconomy = econ
 end
 
+---@param aiBrain AIBrain
+---@param unitBP UnitBlueprint
 function AIModEconomyNumbers(aiBrain, unitBP)
     --LOG('*AI DEBUG: MODDING ECON NUMBERS, BRAIN = ', repr(aiBrain), ' UNITBP = ', repr(unitBP))
     --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND BEFORE = ', repr(aiEconomy.EnergyTrend))
@@ -32,7 +26,9 @@ function AIModEconomyNumbers(aiBrain, unitBP)
     --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND AFTER = ', repr(aiEconomy.EnergyTrend * 0.1))
 end
 
-
+---@param aiBrain AIBrain
+---@param unitPlan any
+---@param aIPlatoonTemplates any
 function AIExecutePlanUnitList(aiBrain, unitPlan, aIPlatoonTemplates)
     for k, v in unitPlan do
         --Convert the name of the platoonTemplate to the actual platoon template
@@ -47,6 +43,10 @@ function AIExecutePlanUnitList(aiBrain, unitPlan, aIPlatoonTemplates)
     end
 end
 
+---@param aiBrain AIBrain
+---@param templateTable any
+---@param name string
+---@return boolean
 function AIGetPlatoonTemplate(aiBrain, templateTable, name)
     for k, v in templateTable do
         if v[1] == name then
@@ -57,6 +57,8 @@ function AIGetPlatoonTemplate(aiBrain, templateTable, name)
     return false
 end
 
+---@param bp Blueprint
+---@return number
 function UnitBuildCheck( bp )
     local lowest = 4
     for k,v in bp.Categories do
@@ -71,6 +73,8 @@ function UnitBuildCheck( bp )
     return lowest
 end
 
+---@param aiBrain AIBrain
+---@param unitPlan any
 function AIExecutePlanUnitListTwo(aiBrain, unitPlan)
     for k, v in unitPlan do
         --Convert the name of the platoonTemplate to the actual platoon template
@@ -86,3 +90,5 @@ function AIExecutePlanUnitListTwo(aiBrain, unitPlan)
     end
 end
 
+--- used for backwards compatibility
+local Utils = import("/lua/utilities.lua")

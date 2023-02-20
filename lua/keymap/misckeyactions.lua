@@ -1,6 +1,7 @@
 -- This file contains key bindable actions that don't fit elsewhere
 
-local Prefs = import('/lua/user/prefs.lua')
+local Prefs = import("/lua/user/prefs.lua")
+local SelectionUtils = import("/lua/ui/game/selection.lua")
 
 local lockZoomEnable = false
 function lockZoom()
@@ -15,7 +16,6 @@ function lockZoom()
         lockZoomEnable = true
     end
 end
-
 
 function airNoTransports()
     UISelectionByCategory("AIR + MOBILE", false, false, false, false) SelectUnits(EntityCategoryFilterDown(categories.ALLUNITS - categories.TRANSPORTATION, GetSelectedUnits()))
@@ -109,7 +109,7 @@ function toggleOverlay(type)
     end
 
     Prefs.SetToCurrentProfile('activeFilters', currentFilters)
-    import('/lua/ui/game/multifunction.lua').UpdateActiveFilters()
+    import("/lua/ui/game/multifunction.lua").UpdateActiveFilters()
 end
 
 --- Function builder for "Get next factory of type" functions
@@ -161,7 +161,7 @@ end
 
 -- This function might be too slow in larger games, needs testing
 function GetSimilarUnits()
-    local enhance = import('/lua/enhancementcommon.lua')
+    local enhance = import("/lua/enhancementcommon.lua")
     local curSelection = GetSelectedUnits()
     if curSelection then
         -- Find out what enhancements the current unit has
@@ -211,7 +211,7 @@ function ACUAppendCG()
     AddSelectUnits(selection)
 end
 
-local GetDistanceBetweenTwoVectors = import('/lua/utilities.lua').GetDistanceBetweenTwoVectors
+local GetDistanceBetweenTwoVectors = import("/lua/utilities.lua").GetDistanceBetweenTwoVectors
 function GetNearestIdleEngineerNotACU()
     local idleEngineers = GetIdleEngineers()
     if not idleEngineers then
@@ -372,9 +372,13 @@ function CreateTemplateFactory()
     if selection and table.getn(selection) == 1 and selection[1]:IsInCategory('FACTORY') then
         currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
     end
-    import('/lua/ui/templates_factory.lua').CreateBuildTemplate(currentCommandQueue)
+    import("/lua/ui/templates_factory.lua").CreateBuildTemplate(currentCommandQueue)
 end
 
+--- Creates a sim callback to set the priorities of the selected units
+---@param prioritiesString string A string of categories
+---@param name string Name of the priority set, used when printing on screen
+---@param exclusive boolean ??
 function SetWeaponPriorities(prioritiesString, name, exclusive)
     local priotable
     if type(prioritiesString) == 'string' then
@@ -390,6 +394,158 @@ function SetWeaponPriorities(prioritiesString, name, exclusive)
     SimCallback({Func = 'WeaponPriorities', Args = {SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }})
 end
 
+--- Sets selected units to target the unit (and similar units) that is hovered over
+function SetWeaponPrioritiesToUnitType()
+    local info = GetRolloverInfo()
+    if info and info.blueprintId ~= "unknown" then
+
+        local bpId = info.blueprintId
+        local text = LOC(__blueprints[bpId].General.UnitName)
+        if not text then
+            text = LOC(__blueprints[bpId].Interface.HelpText)
+        end
+
+        SetWeaponPriorities(findPriority(bpId), text, false)
+    end
+end
+
+--- Sets selected units to their default target priority
+function SetDefaultWeaponPriorities()
+    SetWeaponPriorities(0, "Default", false)
+end
+
+local categoriesToCheck = {
+    ['tech'] = {"TECH1", "TECH2", "TECH3", "EXPERIMENTAL", 'COMMAND'},
+    ['faction'] = {"CYBRAN", "UEF", "AEON", "SERAPHIM"},
+    ['type'] = {"FACTORY", 'SCOUT', "DIRECTFIRE", 'INDIRECTFIRE', 'DEFENSE', "ANTIAIR", 'TRANSPORTATION', "ENGINEER",},
+    ['layer'] = {"NAVAL", "AIR", "LAND", "STRUCTURE"},
+}
+
+--- Creates a target priority that includes the tech, faction, type, and layer of a unit
+---@param bpId string The ID of the unit which is to be targetted
+function findPriority(bpID)
+
+    local bp = __blueprints[bpID]
+    if bp then
+
+        local categories = bp.CategoriesHash
+        local tech, faction, unitType, layer
+
+        for _, c in categoriesToCheck['tech'] do
+            if categories[c] then tech = c end
+        end
+
+        for _, c in categoriesToCheck['faction'] do
+            if categories[c] then faction = c end
+        end
+
+        for _, c in categoriesToCheck['type'] do
+            if categories[c] then unitType = c end
+        end
+
+        for _, c in categoriesToCheck['layer'] do
+            if categories[c] then layer = c end
+        end
+
+        if not (tech and faction and unitType and layer) then
+            return string.format("{categories.%s}", bpID)
+        end
+
+        local a = string.format("categories.%s * categories.%s * categories.%s * categories.%s", tech, faction, unitType, layer)
+        local b = string.format("categories.%s * categories.%s * categories.%s", tech, unitType, layer)
+        local c = string.format("categories.%s * categories.%s", unitType, layer)
+        local d = string.format("categories.%s", layer)
+
+        local priorities = string.format("{categories.%s, %s, %s, %s, %s}", bpID, a, b, c, d)
+        return priorities
+    else
+        -- go to defaults, not sure what happened here but unit id is unknown
+        return nil
+    end
+end
+
 function RecheckTargetsOfWeapons()
     SimCallback({Func = 'RecheckTargetsOfWeapons', Args = { }}, true)
 end
+
+function SelectAllUpgradingExtractors()
+
+    -- by default, hide playing the selection sound
+    SelectionUtils.EnableSelectionSound(false)
+
+    -- try and find extractors
+    local oldSelection = GetSelectedUnits()
+    UISelectionByCategory("MASSEXTRACTION", false, false, false, false)
+    local selection = GetSelectedUnits()
+    if selection then
+
+        -- try and find extractors that are upgrading
+        local upgrading = { }
+        for k, unit in selection do
+            if unit:GetWorkProgress() > 0 then
+                table.insert(upgrading, unit)
+            end
+        end
+
+        if next(upgrading) then
+            SelectionUtils.EnableSelectionSound(true)
+            SelectUnits(upgrading)
+        end
+    else 
+        SelectUnits(oldSelection)
+    end
+
+    SelectionUtils.EnableSelectionSound(true)
+end
+
+function SelectHighestEngineerAndAssist()
+    local selection = GetSelectedUnits()
+
+    if selection then
+
+        local tech1 = EntityCategoryFilterDown(categories.TECH1 - categories.COMMAND, selection)
+        local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
+        local tech3 = EntityCategoryFilterDown(categories.TECH3 - categories.COMMAND, selection)
+        local sACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER - categories.COMMAND, selection)
+
+        if next(sACUs) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = sACUs[1]:GetEntityId() }}, true)
+            SelectUnits({sACUs[1]})
+        elseif next(tech3) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech3[1]:GetEntityId() }}, true)
+            SelectUnits({tech3[1]})
+        elseif next(tech2) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech2[1]:GetEntityId() }}, true)
+            SelectUnits({tech2[1]})
+        else
+            -- do nothing
+        end
+    end
+end
+
+local hardMoveEnabled = false
+function ToggleHardMove()
+    ---@type WorldView
+    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    if hardMoveEnabled then
+        import('/lua/ui/game/commandmode.lua').RestoreCommandMode()
+        view:SetDefaultSelectTolerance()
+        view:DefaultCursor()
+        hardMoveEnabled = false
+    else
+        import('/lua/ui/game/commandmode.lua').CacheAndClearCommandMode()
+        view:SetIgnoreSelectTolerance()
+        view:OverrideCursor('RULEUCC_Move')
+        hardMoveEnabled = true
+    end
+end
+
+-- untoggle hard move when we have no units selected
+import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
+    function(selectionInfo)
+        if hardMoveEnabled and table.getn(selectionInfo.newSelection) == 0 then
+            ToggleHardMove()
+        end
+    end,
+    'KeyActionHardMove'
+)

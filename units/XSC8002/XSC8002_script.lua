@@ -5,9 +5,10 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SCivilianStructureUnit = import('/lua/seraphimunits.lua').SCivilianStructureUnit
+local SCivilianStructureUnit = import("/lua/seraphimunits.lua").SCivilianStructureUnit
 
-XSC8002 = Class(SCivilianStructureUnit) {
+---@class XSC8002 : SCivilianStructureUnit
+XSC8002 = ClassUnit(SCivilianStructureUnit) {
 }
 
 

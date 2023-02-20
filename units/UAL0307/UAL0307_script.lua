@@ -8,22 +8,28 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AShieldHoverLandUnit = import('/lua/aeonunits.lua').AShieldHoverLandUnit
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local AShieldHoverLandUnit = import("/lua/aeonunits.lua").AShieldHoverLandUnit
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
+local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
-UAL0307 = Class(AShieldHoverLandUnit) {
+---@class UAL0307 : AShieldHoverLandUnit
+UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
     
     Weapons = {        
-        TargetPointer = Class(DefaultProjectileWeapon) {},
+        TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
     },
     
     ShieldEffects = {
         '/effects/emitters/aeon_shield_generator_mobile_01_emit.bp',
     },
+
+    OnCreate = function(self)
+        AShieldHoverLandUnit.OnCreate(self)
+        ShieldEffectsComponent.OnCreate(self)
+    end,
     
     OnStopBeingBuilt = function(self,builder,layer)
         AShieldHoverLandUnit.OnStopBeingBuilt(self,builder,layer)
-        self.ShieldEffectsBag = {}
         
         self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
         self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
@@ -32,35 +38,22 @@ UAL0307 = Class(AShieldHoverLandUnit) {
     
     OnShieldEnabled = function(self)
         AShieldHoverLandUnit.OnShieldEnabled(self)
+        ShieldEffectsComponent.OnShieldEnabled(self)
+
         if not self.Animator then
             self.Animator = CreateAnimator(self)
             self.Trash:Add(self.Animator)
             self.Animator:PlayAnim(self:GetBlueprint().Display.AnimationOpen)
         end
         self.Animator:SetRate(1)
-                
-        if self.ShieldEffectsBag then
-            for k, v in self.ShieldEffectsBag do
-                v:Destroy()
-            end
-            self.ShieldEffectsBag = {}
-        end
-        for k, v in self.ShieldEffects do
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 0, self.Army, v ) )
-        end
     end,
 
     OnShieldDisabled = function(self)
         AShieldHoverLandUnit.OnShieldDisabled(self)
+        ShieldEffectsComponent.OnShieldDisabled(self)
+        
         if self.Animator then
             self.Animator:SetRate(-1)
-        end
-         
-        if self.ShieldEffectsBag then
-            for k, v in self.ShieldEffectsBag do
-                v:Destroy()
-            end
-            self.ShieldEffectsBag = {}
         end
     end,
     
@@ -89,8 +82,11 @@ UAL0307 = Class(AShieldHoverLandUnit) {
     OnLayerChange = function(self, new, old)
         AShieldHoverLandUnit.OnLayerChange(self, new, old)
         
-        if self.PointerEnabled == false then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+        if not IsDestroyed(self.TargetPointer) then
+            if self.PointerEnabled == false then
+                -- since its reset on layer change we need to do this, unfortunate
+                self.TargetPointer:SetFireTargetLayerCaps('None') 
+            end
         end
     end,
 }

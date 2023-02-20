@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AEnergyCreationUnit = import('/lua/aeonunits.lua').AEnergyCreationUnit
-UAB1102 = Class(AEnergyCreationUnit) {
+local AEnergyCreationUnit = import("/lua/aeonunits.lua").AEnergyCreationUnit
+---@class UAB1102 : AEnergyCreationUnit
+UAB1102 = ClassUnit(AEnergyCreationUnit) {
 
     AirEffects = {'/effects/emitters/hydrocarbon_smoke_01_emit.bp',},
     AirEffectsBones = {'Extension02'},

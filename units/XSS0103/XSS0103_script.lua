@@ -7,13 +7,14 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit
-local SWeapon = import('/lua/seraphimweapons.lua')
+local SSeaUnit = import("/lua/seraphimunits.lua").SSeaUnit
+local SWeapon = import("/lua/seraphimweapons.lua")
 
-XSS0103 = Class(SSeaUnit) {
+---@class XSS0103 : SSeaUnit
+XSS0103 = ClassUnit(SSeaUnit) {
     Weapons = {
-        MainGun = Class(SWeapon.SDFShriekerCannon){},
-        AntiAir = Class(SWeapon.SAAShleoCannonWeapon){},
+        MainGun = ClassWeapon(SWeapon.SDFShriekerCannon){},
+        AntiAir = ClassWeapon(SWeapon.SAAShleoCannonWeapon){},
     },
 }
 TypeClass = XSS0103

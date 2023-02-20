@@ -7,10 +7,11 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TriggerFile = import('/lua/scenariotriggers.lua')
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local TriggerFile = import("/lua/scenariotriggers.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
+---@class TriggerManager
 Manager = {
 
     TriggerList = {},
@@ -399,7 +400,7 @@ Manager = {
             error('TRIGGER MANAGER ERROR: No StatName defined for EconStats trigger named- ' .. spec.Name, 2)
             return false
         elseif not params.EconType then
-            errro('TRIGGER MANAGER ERROR: No EconType defined for EconStats trigger named- ' .. spec.Name, 2)
+            error('TRIGGER MANAGER ERROR: No EconType defined for EconStats trigger named- ' .. spec.Name, 2)
             return false
         elseif not params.Number then
             error('TRIGGER MANAGER ERROR: No Number defined for EconStats trigger named- ' .. spec.Name, 2)

@@ -9,12 +9,15 @@
 -- Note: Border textures assume a texture border of 1.
 -- Note: Adjacent corner textures must have matching witdhs and heights
 -- Note: SetTextures will set the BorderWidth and BorderHeight lazy
--- vars.  You can change 'em afterwards if you want to streatch your
+-- vars.  You can change 'em afterwards if you want to stretch your
 -- border textures.
 
-local Control = import('control.lua').Control
+local Control = import("/lua/maui/control.lua").Control
 
-Border = Class(moho.border_methods, Control) {
+---@class MauiBorder : moho.border_methods, Control, InternalObject
+---@field BorderWidth LazyVar
+---@field BorderHeight LazyVar
+Border = ClassUI(moho.border_methods, Control) {
 
     __init = function(self, parent, debugname)
         InternalCreateBorder(self, parent)
@@ -22,7 +25,7 @@ Border = Class(moho.border_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import('/lua/lazyvar.lua')
+        local LazyVar = import("/lua/lazyvar.lua")
         self._v = LazyVar.Create()
         self._v.OnDirty = function(var)
             self:SetNewTextures(var(), nil, nil, nil, nil, nil)

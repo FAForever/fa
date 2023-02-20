@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SMassStorageUnit = import('/lua/seraphimunits.lua').SMassStorageUnit
+local SMassStorageUnit = import("/lua/seraphimunits.lua").SMassStorageUnit
 
-XSB1106 = Class(SMassStorageUnit) {
+---@class XSB1106 : SMassStorageUnit
+XSB1106 = ClassUnit(SMassStorageUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         SMassStorageUnit.OnStopBeingBuilt(self,builder,layer)

@@ -80,15 +80,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTSC1',
@@ -253,7 +244,7 @@ UnitBlueprint {
     SelectionSizeX = 1.1,
     SelectionSizeZ = 1,
     SelectionThickness = 0.42,
-    SizeSphere = 2,
+    SizeSphere = 2.2,
     SizeX = 1,
     SizeY = 0.3,
     SizeZ = 1.3,
@@ -302,7 +293,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0.2,
             MuzzleSalvoSize = 2,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             ProjectileId = '/projectiles/TDFGinsu01/TDFGinsu01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             RackBones = {

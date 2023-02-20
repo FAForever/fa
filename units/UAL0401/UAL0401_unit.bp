@@ -7,10 +7,6 @@ UnitBlueprint {
             'Left_Leg_B01',
             'Right_Leg_B01',
         },
-        AddTargetBones = {
-            'AttachSpecial01',
-            'AttachSpecial02',
-        },
     },
     Audio = {
         Destroyed = Sound {
@@ -44,15 +40,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 60,
-            Level3 = 115,
-            Level4 = 165,
-            Level5 = 215,
-        },
-    },
     BuildIconSortPriority = 100,
     Categories = {
         'PRODUCTSC1',
@@ -71,6 +58,7 @@ UnitBlueprint {
         'RECLAIMABLE',
         'DRAGBUILD',
         'OVERLAYDIRECTFIRE',
+        'OVERLAYINDIRECTFIRE',
         'OVERLAYOMNI',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
         'SNIPEMODE',
@@ -383,6 +371,11 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+            AlwaysRecheckTarget = false,
+            TrackingRadius = 1.1,
+
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             Audio = {
@@ -408,7 +401,7 @@ UnitBlueprint {
             HeadingArcCenter = -35,
             HeadingArcRange = 40,
             Label = 'RightArmTractor',
-            MaxRadius = 40,
+            MaxRadius = 41,
             MinRadius = 2,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
@@ -431,15 +424,15 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.15,
+            RangeCategory = 'UWRC_IndirectFire',
+            RateOfFire = 2,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE',
+            TargetRestrictDisallow = 'UNTARGETABLE,STRUCTURE,COMMAND,EXPERIMENTAL,NAVAL,SUBCOMMANDER',
             TurretBoneMuzzle = 'Right_Arm_Muzzle01',
             TurretBonePitch = 'Right_Arm_B02',
             TurretBoneYaw = 'Right_Arm_B01',
@@ -456,6 +449,11 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             Audio = {
@@ -496,7 +494,7 @@ UnitBlueprint {
             HeadingArcCenter = 35,
             HeadingArcRange = 40,
             Label = 'LeftArmTractor',
-            MaxRadius = 40,
+            MaxRadius = 41,
             MinRadius = 2,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
@@ -519,15 +517,15 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.15,
+            RangeCategory = 'UWRC_IndirectFire',
+            RateOfFire = 2,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE',
+            TargetRestrictDisallow = 'UNTARGETABLE,STRUCTURE,COMMAND,EXPERIMENTAL,NAVAL,SUBCOMMANDER',
             TurretBoneMuzzle = 'Left_Arm_Muzzle01',
             TurretBonePitch = 'Left_Arm_B02',
             TurretBoneYaw = 'Left_Arm_B01',

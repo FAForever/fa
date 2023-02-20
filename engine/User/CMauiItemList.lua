@@ -1,99 +1,107 @@
----@declare-global
----@class moho.item_list_methods
+---@meta
+
+---@class moho.item_list_methods : moho.control_methods
 local CMauiItemList = {}
+
+---@param text LocalizedString
+function CMauiItemList:AddItem(text)
+end
+
 ---
---  itemlist = ItemList:DeleteAllItems()
+---@return ItemList
 function CMauiItemList:DeleteAllItems()
 end
 
 ---
---  itemlist = ItemList:DeleteItem(index)
+---@param index number
+---@return ItemList
 function CMauiItemList:DeleteItem(index)
 end
 
 ---
---  bool ItemList:Empty()
+---@return boolean
 function CMauiItemList:Empty()
 end
 
 ---
---  item = ItemList:GetItem(index)
+---@param index number
+---@return number
 function CMauiItemList:GetItem(index)
 end
 
 ---
---  int ItemList:GetItemCount()
+---@return number
 function CMauiItemList:GetItemCount()
 end
 
 ---
---  float ItemList:GetRowHeight()
+---@return number
 function CMauiItemList:GetRowHeight()
 end
 
----
---  index = ItemList:GetSelection()
+--- Returns the index of the currently selected item, using 0-based counting
+---@return number
 function CMauiItemList:GetSelection()
 end
 
----
---  number ItemList:GetAdvance(string) - get the advance of a string using the same font as the control
-function CMauiItemList:GetStringAdvance()
+--- Gets the advance of a string using the same font as the control
+---@param text string
+---@return number
+function CMauiItemList:GetStringAdvance(text)
 end
 
 ---
---  itemlist = ItemList:ModifyItem(index, string)
-function CMauiItemList:ModifyItem(index,  string)
+---@param index number
+---@param string string
+---@return ItemList
+function CMauiItemList:ModifyItem(index, string)
 end
 
----
---  bool NeedsScrollBar() - returns true if a scrollbar is needed, else false
+--- Returns if a scrollbar is needed
+---@return boolean
 function CMauiItemList:NeedsScrollBar()
 end
 
 ---
---  ItemList:ScrollToBottom()
 function CMauiItemList:ScrollToBottom()
 end
 
 ---
---  ItemList:ScrollToTop()
 function CMauiItemList:ScrollToTop()
 end
 
 ---
---  ItemList:SetNewColors(foreground, background, selected_foreground, selected_background)
-function CMauiItemList:SetNewColors(foreground,  background,  selected_foreground,  selected_background)
+---@param foreground Color
+---@param background Color
+---@param selectedForeground Color
+---@param selectedBackground Color
+function CMauiItemList:SetNewColors(foreground, background, selectedForeground, selectedBackground)
+end
+
+--- Sets the font to use in this ItemList control
+---@param family string
+---@param pointsize number
+function CMauiItemList:SetNewFont(family, pointsize)
 end
 
 ---
---  ItemList:SetNewFont(family, pointsize) -- set the font to use in this ItemList control
-function CMauiItemList:SetNewFont(family,  pointsize)
-end
-
----
---  ItemList:SetSelection(index)
+---@param index number
 function CMauiItemList:SetSelection(index)
 end
 
 ---
---  ItemList:ShowItem(index)
+---@param index number
 function CMauiItemList:ShowItem(index)
 end
 
----
---  ShowMouseoverItem(bool) - enable or disable the showing of the mouseover item
-function CMauiItemList:ShowMouseoverItem(bool)
+--- Enables or disables the showing of the mouseover item
+---@param show boolean
+function CMauiItemList:ShowMouseoverItem(show)
 end
 
----
---  ShowSelection(bool) - enable or disable the highlighting of the selected item
-function CMauiItemList:ShowSelection(bool)
-end
-
----
---  derived from CMauiControl
-function CMauiItemList:base()
+--- Enables or disables the highlighting of the selected item
+---@param show boolean
+function CMauiItemList:ShowSelection(show)
 end
 
 return CMauiItemList

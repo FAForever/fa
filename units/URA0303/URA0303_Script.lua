@@ -8,15 +8,16 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CAAMissileNaniteWeapon = import('/lua/cybranweapons.lua').CAAMissileNaniteWeapon
+local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
+local CAAMissileNaniteWeapon = import("/lua/cybranweapons.lua").CAAMissileNaniteWeapon
 
-URA0303 = Class(CAirUnit) {
+---@class URA0303 : CAirUnit
+URA0303 = ClassUnit(CAirUnit) {
     ExhaustBones = { 'Exhaust', },
     ContrailBones = { 'Contrail_L', 'Contrail_R', },
     Weapons = {
-        Missiles1 = Class(CAAMissileNaniteWeapon) {},
-        Missiles2 = Class(CAAMissileNaniteWeapon) {},
+        Missiles1 = ClassWeapon(CAAMissileNaniteWeapon) {},
+        Missiles2 = ClassWeapon(CAAMissileNaniteWeapon) {},
     },
     OnStopBeingBuilt = function(self,builder,layer)
         CAirUnit.OnStopBeingBuilt(self,builder,layer)

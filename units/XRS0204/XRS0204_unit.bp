@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 30,
         TargetBones = {
             'XRS0204',
         },
@@ -55,15 +55,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Cybran_Select_Sub',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
         },
     },
     BuildIconSortPriority = 20,
@@ -298,7 +289,7 @@ UnitBlueprint {
     SelectionSizeX = 0.6,
     SelectionSizeZ = 1.8,
     SelectionThickness = 0.37,
-    SizeX = 0.6,
+    SizeX = 0.66,
     SizeY = 0.5,
     SizeZ = 3,
     StrategicIconName = 'icon_sub2_antinavy',

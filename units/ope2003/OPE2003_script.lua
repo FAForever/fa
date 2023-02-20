@@ -8,9 +8,10 @@
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TLandUnit = import('/lua/terranunits.lua').TLandUnit
+local TLandUnit = import("/lua/terranunits.lua").TLandUnit
 
-OPE2003 = Class(TLandUnit) {
+---@class OPE2003 : TLandUnit
+OPE2003 = ClassUnit(TLandUnit) {
     KickupBones = {'Kickup_R','Kickup_L'},
 }
 

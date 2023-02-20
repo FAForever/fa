@@ -1,30 +1,22 @@
---****************************************************************************
---**
---**  File     :  /data/projectiles/SIFLaanseTacticalMissile04/SIFLaanseTacticalMissile04_script.lua
---**  Author(s):  Gordon Duclos, Aaron Lundquist
---**
---**  Summary  :  Laanse Tactical Missile Projectile script, XSB2108
---**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
-local SLaanseTacticalMissile = import('/lua/seraphimprojectiles.lua').SLaanseTacticalMissile
-
-SIFLaanseTacticalMissile04 = Class(SLaanseTacticalMissile) {
-    
+-- File     :  /data/projectiles/SIFLaanseTacticalMissile04/SIFLaanseTacticalMissile04_script.lua
+-- Author(s):  Gordon Duclos, Aaron Lundquist
+-- Summary  :  Laanse Tactical Missile Projectile script, XSB2108
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+---------------------------------------------------------------------------------------------------
+local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
+SIFLaanseTacticalMissile04 = ClassProjectile(SLaanseTacticalMissile) {
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self:ForkThread( self.MovementThread )
+        self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
-    MovementThread = function(self)        
-        self.WaitTime = 0.1
+    MovementThread = function(self)
         self:SetTurnRate(8)
-        WaitSeconds(0.3)        
+        WaitTicks(4)        
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 
@@ -33,21 +25,21 @@ SIFLaanseTacticalMissile04 = Class(SLaanseTacticalMissile) {
         --Get the nuke as close to 90 deg as possible
         if dist > 50 then        
             --Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+            WaitTicks(21)
             self:SetTurnRate(20)
         elseif dist > 128 and dist <= 213 then
 						-- Increase check intervals
 						self:SetTurnRate(30)
-						WaitSeconds(1.5)
+						WaitTicks(16)
             self:SetTurnRate(30)
         elseif dist > 43 and dist <= 107 then
 						-- Further increase check intervals
-            WaitSeconds(0.3)
+                        WaitTicks(4)
             self:SetTurnRate(50)
 				elseif dist > 0 and dist <= 43 then
 						-- Further increase check intervals            
-            self:SetTurnRate(100)   
-            KillThread(self.MoveThread)         
+            self:SetTurnRate(100)
+            KillThread(self.MoveThread)
         end
     end,        
 

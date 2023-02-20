@@ -8,12 +8,13 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SRadarUnit = import('/lua/seraphimunits.lua').SRadarUnit
+local SRadarUnit = import("/lua/seraphimunits.lua").SRadarUnit
 
-XSB3201 = Class(SRadarUnit) {
+---@class XSB3201 : SRadarUnit
+XSB3201 = ClassUnit(SRadarUnit) {
 
-    OnIntelDisabled = function(self)
-        SRadarUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        SRadarUnit.OnIntelDisabled(self, intel)
         if self.Rotator1 then
             self.Rotator1:SetSpinDown(true)
         end
@@ -23,8 +24,8 @@ XSB3201 = Class(SRadarUnit) {
         end
     end,
 
-    OnIntelEnabled = function(self)
-        SRadarUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        SRadarUnit.OnIntelEnabled(self, intel)
 
         if(not self.Rotator1) then
             self.Rotator1 = CreateRotator(self, 'Array01', 'y')

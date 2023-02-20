@@ -7,19 +7,20 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
+local SSubUnit = import("/lua/seraphimunits.lua").SSubUnit
+local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SDFUltraChromaticBeamGenerator = SeraphimWeapons.SDFUltraChromaticBeamGenerator02
 local SANAnaitTorpedo = SeraphimWeapons.SANAnaitTorpedo
 local SDFAjelluAntiTorpedoDefense = SeraphimWeapons.SDFAjelluAntiTorpedoDefense
 
-XSS0201 = Class(SSubUnit) {
+---@class XSS0201 : SSubUnit
+XSS0201 = ClassUnit(SSubUnit) {
     BackWakeEffect = {},
     Weapons = {
-        FrontTurret = Class(SDFUltraChromaticBeamGenerator) {},
-        BackTurret = Class(SDFUltraChromaticBeamGenerator) {},
-        Torpedo1 = Class(SANAnaitTorpedo) {},
-        AntiTorpedo = Class(SDFAjelluAntiTorpedoDefense) {},
+        FrontTurret = ClassWeapon(SDFUltraChromaticBeamGenerator) {},
+        BackTurret = ClassWeapon(SDFUltraChromaticBeamGenerator) {},
+        Torpedo1 = ClassWeapon(SANAnaitTorpedo) {},
+        AntiTorpedo = ClassWeapon(SDFAjelluAntiTorpedoDefense) {},
     },
 
     OnKilled = function(self, instigator, type, overkillRatio)

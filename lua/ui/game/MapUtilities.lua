@@ -1,9 +1,13 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
 
-local Group = import('/lua/maui/group.lua').Group
-local Window = import('/lua/maui/window.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+
+local Group = import("/lua/maui/group.lua").Group
+local Window = import("/lua/maui/window.lua")
 
 local sessionInfo = SessionGetScenarioInfo()
 
@@ -123,9 +127,9 @@ function OpenWindow()
         end
 
         -- -- add various content to the tabs
-        State.GUITabs.Resources = import("/lua/ui/game/MapUtilitiesResourcesTab.lua").CreateUI(State, window, groupNavigation)
-        State.GUITabs.Grid = import("/lua/ui/game/MapUtilitiesGridTab.lua").CreateUI(State, window, groupNavigation)
-        State.GUITabs.Markers = import("/lua/ui/game/MapUtilitiesMarkersTab.lua").CreateUI(State, window, groupNavigation)
+        State.GUITabs.Resources = import("/lua/ui/game/maputilitiesresourcestab.lua").CreateUI(State, window, groupNavigation)
+        State.GUITabs.Grid = import("/lua/ui/game/maputilitiesgridtab.lua").CreateUI(State, window, groupNavigation)
+        State.GUITabs.Markers = import("/lua/ui/game/maputilitiesmarkerstab.lua").CreateUI(State, window, groupNavigation)
 
         -- switch to initial tab
         SwitchTab(State.ActiveTab)

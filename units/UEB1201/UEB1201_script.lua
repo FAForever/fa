@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
+local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
-UEB1201 = Class(TEnergyCreationUnit) {
+---@class UEB1201 : TEnergyCreationUnit
+UEB1201 = ClassUnit(TEnergyCreationUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         TEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
         ChangeState(self, self.ActiveState)

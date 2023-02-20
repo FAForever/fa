@@ -1,8 +1,8 @@
 --
 -- Terran Anti Air basic projectile
 --
-TAARailgun01 = Class(import('/lua/terranprojectiles.lua').TRailGunProjectile) {
-    FxTrails = {},
+TAARailgun01 = ClassProjectile(import("/lua/terranprojectiles.lua").TRailGunProjectile) {
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
 }
 
 TypeClass = TAARailgun01

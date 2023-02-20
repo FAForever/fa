@@ -5,13 +5,11 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
-local WeaponsFile = import ('/lua/aeonweapons.lua')
+local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
+local WeaponsFile = import("/lua/aeonweapons.lua")
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
-local utilities = import('/lua/utilities.lua')
-local explosion = import('/lua/defaultexplosions.lua')
-
+local explosion = import("/lua/defaultexplosions.lua")
 local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
 
 -- upvalue for performance
@@ -24,11 +22,25 @@ local MathSin = math.sin
 local ZeroDegrees = Vector(0, 0, 1)
 local SignCheck = Vector(1, 0, 0)
 
-UAL0401 = Class(AWalkingLandUnit) {
+---@class UAL0401 : AWalkingLandUnit
+UAL0401 = ClassUnit(AWalkingLandUnit) {
     Weapons = {
-        EyeWeapon = Class(ADFPhasonLaser) {},
-        RightArmTractor = Class(ADFTractorClaw) {},
-        LeftArmTractor = Class(ADFTractorClaw) {},
+        EyeWeapon = ClassWeapon(ADFPhasonLaser) {
+            CreateProjectileAtMuzzle = function(self, muzzle)
+                ADFPhasonLaser.CreateProjectileAtMuzzle(self, muzzle)
+
+                -- if possible, try not to fire on units that we're tractoring
+                local target = self:GetCurrentTarget()
+                if target then
+                    local unit = (IsUnit(target) and target) or target:GetSource()
+                    if unit and unit.Tractored then
+                        self:ResetTarget()
+                    end
+                end
+            end,
+        },
+        RightArmTractor = ClassWeapon(ADFTractorClaw) {},
+        LeftArmTractor = ClassWeapon(ADFTractorClaw) {},
     },
 
     OnCreate = function (self, spec)
@@ -43,7 +55,7 @@ UAL0401 = Class(AWalkingLandUnit) {
         while not self.Dead do 
 
             -- only perform this logic if the unit is on the move
-            if self:IsUnitState("Moving") then 
+            if self:IsUnitState("Moving") then
 
                 -- compute the direction of the heading
                 local sx, sy, sz = self:GetPositionXYZ()
@@ -101,10 +113,9 @@ UAL0401 = Class(AWalkingLandUnit) {
     end,
 
     DeathThread = function(self, overkillRatio , instigator)
-        local size = self.Size
         self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ})
         WaitSeconds(2)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         WaitSeconds(0.1)
@@ -149,14 +160,14 @@ UAL0401 = Class(AWalkingLandUnit) {
         -- hopes that this will look better in the future.. =)
         if self.ShowUnitDestructionDebris and overkillRatio then
             if overkillRatio <= 1 then
-                self.CreateUnitDestructionDebris(self, true, true, false)
+                self:CreateUnitDestructionDebris(true, true, false)
             elseif overkillRatio <= 2 then
-                self.CreateUnitDestructionDebris(self, true, true, false)
+                self:CreateUnitDestructionDebris(true, true, false)
             elseif overkillRatio <= 3 then
-                self.CreateUnitDestructionDebris(self, true, true, true)
-                self.CreateUnitDestructionDebris(self, true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
             else -- Vaporized
-                self.CreateUnitDestructionDebris(self, true, true, true)
+                self:CreateUnitDestructionDebris(true, true, true)
             end
         end
 
@@ -165,3 +176,6 @@ UAL0401 = Class(AWalkingLandUnit) {
 }
 
 TypeClass = UAL0401
+
+-- Kept for Mod Backwards Compatability
+local Utilities = import("/lua/utilities.lua")

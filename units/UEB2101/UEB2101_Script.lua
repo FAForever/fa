@@ -8,12 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TDFLightPlasmaCannonWeapon = import('/lua/terranweapons.lua').TDFLightPlasmaCannonWeapon
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TDFLightPlasmaCannonWeapon = import("/lua/terranweapons.lua").TDFLightPlasmaCannonWeapon
 
-UEB2101 = Class(TStructureUnit) {
+---@class UEB2101 : TStructureUnit
+UEB2101 = ClassUnit(TStructureUnit) {
     Weapons = {
-        MainGun = Class(TDFLightPlasmaCannonWeapon) {}
+        MainGun = ClassWeapon(TDFLightPlasmaCannonWeapon) {}
     },
 }
 

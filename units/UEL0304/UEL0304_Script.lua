@@ -8,13 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TLandUnit = import('/lua/terranunits.lua').TLandUnit
-local TIFArtilleryWeapon = import('/lua/terranweapons.lua').TIFArtilleryWeapon
+local TLandUnit = import("/lua/terranunits.lua").TLandUnit
+local TIFArtilleryWeapon = import("/lua/terranweapons.lua").TIFArtilleryWeapon
 
-UEL0304 = Class(TLandUnit) {
+---@class UEL0304 : TLandUnit
+UEL0304 = ClassUnit(TLandUnit) {
     Weapons = {
-        MainGun = Class(TIFArtilleryWeapon) {
-        }
+        MainGun = ClassWeapon(TIFArtilleryWeapon) {}
     },
 }
 

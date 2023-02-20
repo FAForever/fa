@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 30,
         TargetBones = {
             'URS0201',
             'Muzzle_Back',
@@ -64,15 +64,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
-        },
-    },
     BuildIconSortPriority = 25,
     Categories = {
         'PRODUCTSC1',
@@ -102,8 +93,8 @@ UnitBlueprint {
         AirThreatLevel = 8,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 6050,
-        MaxHealth = 6050,
+        Health = 6500,
+        MaxHealth = 6500,
         RegenRate = 0,
         SubThreatLevel = 21,
         SurfaceThreatLevel = 45,
@@ -432,7 +423,7 @@ UnitBlueprint {
             TurretPitchRange = 30,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 140,
+            TurretYawRange = 145,
             TurretYawSpeed = 90,
             Turreted = true,
             WeaponCategory = 'Direct Fire Naval',

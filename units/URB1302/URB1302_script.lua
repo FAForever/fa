@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CMassCollectionUnit = import('/lua/cybranunits.lua').CMassCollectionUnit
+local CMassCollectionUnit = import("/lua/cybranunits.lua").CMassCollectionUnit
 
-URB1302 = Class(CMassCollectionUnit) {
+---@class URB1302 : CMassCollectionUnit
+URB1302 = ClassUnit(CMassCollectionUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CMassCollectionUnit.OnStopBeingBuilt(self,builder,layer)

@@ -7,17 +7,18 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
-local aWeapons = import('/lua/aeonweapons.lua')
+local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
+local aWeapons = import("/lua/aeonweapons.lua")
 local AAASonicPulseBatteryWeapon = aWeapons.AAASonicPulseBatteryWeapon
 
-UAA0102 = Class(AAirUnit) {
+---@class UAA0102 : AAirUnit
+UAA0102 = ClassUnit(AAirUnit) {
 
     Weapons = {
-        SonicPulseBattery1 = Class(AAASonicPulseBatteryWeapon) {
+        SonicPulseBattery1 = ClassWeapon(AAASonicPulseBatteryWeapon) {
 			FxMuzzleFlash = {'/effects/emitters/sonic_pulse_muzzle_flash_02_emit.bp',},
         },
-        SonicPulseBattery2 = Class(AAASonicPulseBatteryWeapon) {
+        SonicPulseBattery2 = ClassWeapon(AAASonicPulseBatteryWeapon) {
 			FxMuzzleFlash = {'/effects/emitters/sonic_pulse_muzzle_flash_02_emit.bp',},
         },
     }, 

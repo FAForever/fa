@@ -8,20 +8,16 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveEqualToUnitsWithCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: int      numReq     	= 0					doc = "docs for param1"
--- parameter 2: expr   category        = categories.ALLUNITS			doc = "param2 docs"
--- parameter 3: bool   idleReq       = false         doc = "docs for param3"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param numReq number
+---@param category EntityCategory
+---@param idleReq boolean
+---@return boolean
 function HaveEqualToUnitsWithCategory(aiBrain, numReq, category, idleReq)
     local numUnits
     local testCat = category
@@ -39,15 +35,11 @@ function HaveEqualToUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveGreaterThanUnitsWithCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string   aiBrain		    = "default_brain"
--- parameter 1: int      numReq     = 0					doc = "docs for param1"
--- parameter 2: expr   category        = categories.ALLUNITS		doc = "param2 docs"
--- parameter 3: expr   idleReq       = false         doc = "docs for param3"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param numReq number
+---@param category EntityCategory
+---@param idleReq boolean
+---@return boolean
 function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     local numUnits
     local testCat = category
@@ -65,15 +57,11 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveLessThanUnitsWithCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: int	numReq          = 0				doc = "docs for param1"
--- parameter 2: expr   category        = categories.ALLUNITS		doc = "param2 docs"
--- parameter 3: expr   idleReq       = false         doc = "docs for param3"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param numReq number
+---@param category EntityCategory
+---@param idleReq boolean
+---@return boolean
 function HaveLessThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     local numUnits
     local testCat = category
@@ -91,15 +79,11 @@ function HaveLessThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveLessThanUnitsWithCategoryInArea = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain	        = "default_brain"
--- parameter 1: int      numReq          = 0				doc = "docs for param1"
--- parameter 2: expr   category        = categories.ALLUNITS		doc = "param2 docs"
--- parameter 3: string   area            = "Area_1"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param numReq number
+---@param category EntityCategory
+---@param area Area
+---@return boolean
 function HaveLessThanUnitsWithCategoryInArea(aiBrain, numReq, category, area)
     local numUnits = ScenarioFramework.NumCatUnitsInArea(category, ScenarioUtils.AreaToRect(area), aiBrain)
     if numUnits < numReq then
@@ -108,25 +92,19 @@ function HaveLessThanUnitsWithCategoryInArea(aiBrain, numReq, category, area)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: NumUnitsLessNearBase = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain         = "default_brain"
--- parameter 1: string	baseName        = "MAIN"			doc = "docs for param1"
--- parameter 2: expr   category        = categories.ALLUNITS
--- parameter 3: int      num             = 1
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param baseName string
+---@param category EntityCategory
+---@param num number
+---@return boolean
 function NumUnitsLessNearBase(aiBrain, baseName, category, num)
-    if brain.BaseTemplates[baseName].Location == nil then
+    if aiBrain.BaseTemplates[baseName].Location == nil then
         return false
     else
-        local unitList = brain:GetUnitsAroundPoint(category,
-                                                   brain.BaseTemplates[baseName].Location,
-                                                   brain.BaseTemplates[baseName].Radius, 'Ally')
+        local unitList = aiBrain:GetUnitsAroundPoint(category,aiBrain.BaseTemplates[baseName].Location,aiBrain.BaseTemplates[baseName].Radius, 'Ally')
         local count = 0
         for i,unit in unitList do
-            if unit:GetAIBrain() == brain then
+            if unit:GetAIBrain() == aiBrain then
                 count = count + 1
             end
         end
@@ -137,15 +115,10 @@ function NumUnitsLessNearBase(aiBrain, baseName, category, num)
     end
 end
 
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveLessThanUnitComparison = BuildCondition	doc = "Check to see if the number of units in category 1 is less than the number of units in category 2"
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: expr	category1    = categories.ALLUNITS       doc = "Category of units to compare"
--- parameter 2: expr     category2    = categories.ALLUNITS       doc = "Category of units to compare against"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param category1 EntityCategory
+---@param category2 EntityCategory
+---@return boolean
 function HaveLessThanUnitComparison(aiBrain, category1, category2)
     local testCat1 = category1
     if type(category1) == 'string' then
@@ -163,14 +136,10 @@ function HaveLessThanUnitComparison(aiBrain, category1, category2)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveGreaterThanUnitComparison = BuildCondition	doc = "Check to see if the number of units in category 1 is greater than the number of units in category 2"
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: expr	category1    = categories.ALLUNITS       doc = "Category of units to compare"
--- parameter 2: expr     category2    = categories.ALLUNITS       doc = "Category of units to compare against"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param category1 EntityCategory
+---@param category2 EntityCategory
+---@return boolean
 function HaveGreaterThanUnitComparison(aiBrain, category1, category2)
     local testCat1 = category1
     if type(category1) == 'string' then
@@ -188,14 +157,10 @@ function HaveGreaterThanUnitComparison(aiBrain, category1, category2)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveLessThanVarTableUnitsWithCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: string	varName     = "VarName"     			doc = "VarTable Name"
--- parameter 2: expr     category    = categories.ALLUNITS		doc = "param2 docs"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param varName string
+---@param category EntityCategory
+---@return boolean
 function HaveLessThanVarTableUnitsWithCategory(aiBrain, varName, category)
     local testCat = category
     if type(category) == 'string' then
@@ -210,14 +175,10 @@ function HaveLessThanVarTableUnitsWithCategory(aiBrain, varName, category)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveGreaterThanVarTableUnitsWithCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: string	varName     = "VarName"     			doc = "VarTable Name"
--- parameter 2: expr     category    = categories.ALLUNITS		doc = "param2 docs"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param varName string
+---@param category EntityCategory
+---@return boolean
 function HaveGreaterThanVarTableUnitsWithCategory(aiBrain, varName, category)
     local testCat = category
     if type(category) == 'string' then
@@ -231,15 +192,12 @@ function HaveGreaterThanVarTableUnitsWithCategory(aiBrain, varName, category)
     end
     return false
 end
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveLessThanVarTableUnitsWithCategoryInArea = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: string	varName     = "VarName"     			doc = "VarTable Name"
--- parameter 2: expr     category    = categories.ALLUNITS		doc = "param2 docs"
--- parameter 3: string   area            = "Area_1"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---@param aiBrain AIBrain
+---@param varName string
+---@param category EntityCategory
+---@param area string
+---@return boolean
 function HaveLessThanVarTableUnitsWithCategoryInArea(aiBrain, varName, category, area)
     local testCat = category
     if type(category) == 'string' then
@@ -253,15 +211,12 @@ function HaveLessThanVarTableUnitsWithCategoryInArea(aiBrain, varName, category,
     end
     return false
 end
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveGreaterThanVarTableUnitsWithCategoryInArea = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: string	varName     = "VarName"     			doc = "VarTable Name"
--- parameter 2: expr     category    = categories.ALLUNITS		doc = "param2 docs"
--- parameter 3: string   area            = "Area_1"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---@param aiBrain AIBrain
+---@param varName string
+---@param category EntityCategory
+---@param area string
+---@return boolean
 function HaveGreaterThanVarTableUnitsWithCategoryInArea(aiBrain, varName, category, area)
     local testCat = category
     if type(category) == 'string' then
@@ -276,14 +231,11 @@ function HaveGreaterThanVarTableUnitsWithCategoryInArea(aiBrain, varName, catego
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveGreaterThanUnitsInCategoryBeingBuilt = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: int      numReq     	= 0					doc = "docs for param1"
--- parameter 2: expr   category        = categories.ALLUNITS			doc = "param2 docs"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param numReq number
+---@param category EntityCategory
+---@param constructionCat EntityCategory
+---@return boolean
 function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numReq, category, constructionCat)
     local cat = category
     if type(category) == 'string' then
@@ -308,15 +260,10 @@ function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numReq, category, con
     return false
 end
 
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveLessThanUnitsInCategoryBeingBuilt = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: int      numReq     	= 0					doc = "docs for param1"
--- parameter 2: expr   category        = categories.ALLUNITS			doc = "param2 docs"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param numunits number
+---@param category EntityCategory
+---@return boolean
 function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
     --DUNCAN - rewritten, credit to Sorian
     if type(category) == 'string' then
@@ -350,23 +297,19 @@ function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveLessThanUnitsAroundMarkerCategory = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string	aiBrain		= "default_brain"
--- parameter 1: string   markerType  = "Mass"
--- parameter 2: int      markerRadius = 50
--- parameter 3: string   locationType = "MAIN"
--- parameter 4: int      locationRadius = 50
--- parameter 5: int      unitCount    = 1
--- parameter 6: string   unitCategory = "ALLUNITS"
--- parameter 7: expr     threatMin = false
--- parameter 8: expr     threatMax = false
--- parameter 9: expr     threatRings = false
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-function HaveLessThanUnitsAroundMarkerCategory(aiBrain, markerType, markerRadius, locationType, locationRadius,
-    unitCount, unitCategory, threatMin, threatMax, threatRings, threatType)
+---@param aiBrain AIBrain
+---@param markerType string
+---@param markerRadius number
+---@param locationType string
+---@param locationRadius number
+---@param unitCount number
+---@param unitCategory string
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@return boolean
+function HaveLessThanUnitsAroundMarkerCategory(aiBrain, markerType, markerRadius, locationType, locationRadius,unitCount, unitCategory, threatMin, threatMax, threatRings, threatType)
     local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
         return false
@@ -382,6 +325,14 @@ function HaveLessThanUnitsAroundMarkerCategory(aiBrain, markerType, markerRadius
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param locationRadius number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@return boolean
 function StartLocationNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     local pos, name = AIUtils.AIFindStartLocationNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     if pos then
@@ -390,6 +341,14 @@ function StartLocationNeedsEngineer(aiBrain, locationType, locationRadius, threa
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param locationRadius number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@return boolean
 function StartLocationsFull(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     local pos, name = AIUtils.AIFindStartLocationNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     if not pos then
@@ -398,6 +357,14 @@ function StartLocationsFull(aiBrain, locationType, locationRadius, threatMin, th
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param locationRadius number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@return boolean
 function ExpansionAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     local pos, name = AIUtils.AIFindExpansionAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     if pos then
@@ -406,6 +373,14 @@ function ExpansionAreaNeedsEngineer(aiBrain, locationType, locationRadius, threa
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param locationRadius number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@return boolean
 function NavalAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     local pos, name = AIUtils.AIFindNavalAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     if pos then
@@ -414,6 +389,14 @@ function NavalAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param locationRadius number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@return boolean
 function NavalAreasFull(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     local pos, name = AIUtils.AIFindNavalAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
     if not pos then
@@ -422,6 +405,17 @@ function NavalAreasFull(aiBrain, locationType, locationRadius, threatMin, threat
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param locationRadius number
+---@param category EntityCategory
+---@param markerRadius number
+---@param unitMax number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@return boolean
 function DefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
     local pos, name = AIUtils.AIFindDefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
     if pos then
@@ -430,6 +424,17 @@ function DefensivePointNeedsStructure(aiBrain, locationType, locationRadius, cat
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param locationRadius number
+---@param category EntityCategory
+---@param markerRadius number
+---@param unitMax number
+---@param threatMin number 
+---@param threatMax number 
+---@param threatRings number
+---@param threatType string
+---@return boolean
 function NavalDefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
     local pos, name = AIUtils.AIFindNavalDefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
     if pos then
@@ -438,6 +443,16 @@ function NavalDefensivePointNeedsStructure(aiBrain, locationType, locationRadius
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param locationRadius number
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@return boolean
 function HaveAreaWithUnitsFewWalls(aiBrain, locationType, locationRadius, unitCount, unitCategory, threatMin, threatMax, threatRings, threatType)
     local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
@@ -469,18 +484,12 @@ function HaveAreaWithUnitsFewWalls(aiBrain, locationType, locationRadius, unitCo
     return false
 end
 
-
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: HaveUnitsWithCategoryAndAlliance = BuildCondition	doc = "Please work function docs."
---
--- parameter 0: string   aiBrain		    = "default_brain"
--- parameter 1: bool   greater           = true          doc = "true = greater, false = less"
--- parameter 2: int    numReq     = 0					doc = "docs for param1"
--- parameter 3: expr   category        = categories.ALLUNITS		doc = "param2 docs"
--- parameter 4: expr   alliance       = false         doc = "docs for param3"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param greater boolean
+---@param numReq number
+---@param category EntityCategory
+---@param alliance string
+---@return boolean
 function HaveUnitsWithCategoryAndAlliance(aiBrain, greater, numReq, category, alliance)
     local testCat = category
     if type(category) == 'string' then
@@ -495,7 +504,9 @@ function HaveUnitsWithCategoryAndAlliance(aiBrain, greater, numReq, category, al
     return false
 end
 
-
+---@param aiBrain AIBrain
+---@param locationType string
+---@return boolean
 function EngineersNeedGuard(aiBrain, locationType)
     local units = aiBrain:GetListOfUnits(categories.ENGINEER - categories.COMMAND, false)
     for k,v in units do
@@ -509,6 +520,13 @@ end
 -- =========================================== --
 --     Builder Manager Generic Unit Counts
 -- =========================================== --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param compareType string
+---@return boolean
 function HaveUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, compareType)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
@@ -523,10 +541,20 @@ function HaveUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCate
     return CompareBody(numUnits, unitCount, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@return boolean
 function UnitsLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
     return HaveUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '<')
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@return boolean
 function UnitsGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
     return HaveUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>')
 end
@@ -534,6 +562,13 @@ end
 -- ============================================ --
 --     Builder Manager Location Pool Counts
 -- ============================================ --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param compareType string
+---@return boolean
 function HavePoolUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, compareType)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
@@ -549,10 +584,20 @@ function HavePoolUnitComparisonAtLocation(aiBrain, locationType, unitCount, unit
     return CompareBody(numUnits, unitCount, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@return boolean
 function PoolLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
     return HavePoolUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '<')
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@return boolean
 function PoolGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
     return HavePoolUnitComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>')
 end
@@ -560,6 +605,13 @@ end
 -- ======================================= --
 --     Builder Manager Engineer Counts
 -- ======================================= --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param compareType string
+---@return boolean
 function EngineerComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, compareType)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
@@ -574,10 +626,20 @@ function EngineerComparisonAtLocation(aiBrain, locationType, unitCount, unitCate
     return CompareBody(numUnits, unitCount, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@return boolean
 function EngineerLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
     return EngineerComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '<')
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@return boolean
 function EngineerGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
     return EngineerComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>')
 end
@@ -585,6 +647,13 @@ end
 -- ====================================== --
 --     Factory Manager Factory Counts
 -- ====================================== --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param compareType string
+---@return boolean
 function FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, compareType)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     local testCat = unitCategory
@@ -599,10 +668,20 @@ function FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCateg
     return CompareBody(numUnits, unitCount, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@return boolean
 function FactoryLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
     return FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '<')
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@return boolean
 function FactoryGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
     return FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>')
 end
@@ -610,6 +689,13 @@ end
 -- ====================================== --
 --     Factory Manager Factory Ratios
 -- ====================================== --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCategory EntityCategory
+---@param unitCategory2 EntityCategory
+---@param compareType string
+---@return boolean
 function FactoryRatioComparisonAtLocation(aiBrain, locationType, unitCategory, unitCategory2, compareType)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     local testCat = unitCategory
@@ -629,10 +715,20 @@ function FactoryRatioComparisonAtLocation(aiBrain, locationType, unitCategory, u
     return CompareBody(numUnits, numUnits2, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCategory EntityCategory
+---@param unitCategory2 EntityCategory
+---@return boolean
 function FactoryRatioLessAtLocation(aiBrain, locationType, unitCategory, unitCategory2)
     return FactoryRatioComparisonAtLocation(aiBrain, locationType, unitCategory, unitCategory2, '<')
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCategory EntityCategory
+---@param unitCategory2 EntityCategory
+---@return boolean
 function FactoryRatioGreaterAtLocation(aiBrain, locationType, unitCategory, unitCategory2)
     return FactoryRatioComparisonAtLocation(aiBrain, locationType, unitCategory, unitCategory2, '>')
 end
@@ -640,6 +736,14 @@ end
 -- ============================== --
 --     Manager Builing Counts
 -- ============================== --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param compareType string
+---@param builderCat EntityCategory
+---@return boolean
 function LocationBuildingComparison(aiBrain, locationType, unitCount, unitCategory, compareType, builderCat)
     local platoonFormManager = aiBrain.BuilderManagers[locationType].PlatoonFormManager
     local testCat = unitCategory
@@ -658,10 +762,22 @@ function LocationBuildingComparison(aiBrain, locationType, unitCount, unitCatego
     return CompareBody(numUnits, unitCount, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param builderCat EntityCategory
+---@return boolean
 function BuildingLessAtLocation(aiBrain, locationType, unitCount, unitCategory, builderCat)
     return LocationBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '<', builderCat)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param builderCat EntityCategory
+---@return boolean
 function BuildingGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory, builderCat)
     return LocationBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '>', builderCat)
 end
@@ -669,6 +785,14 @@ end
 -- ============================================ --
 --     Factory Manager Building Unit Counts
 -- ============================================ --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param compareType string
+---@param facCat EntityCategory
+---@return boolean
 function LocationFactoriesBuildingComparison(aiBrain, locationType, unitCount, unitCategory, compareType, facCat)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     local testCat = unitCategory
@@ -689,10 +813,22 @@ function LocationFactoriesBuildingComparison(aiBrain, locationType, unitCount, u
     return CompareBody(numUnits, unitCount, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param facCat EntityCategory
+---@return boolean
 function LocationFactoriesBuildingLess(aiBrain, locationType, unitCount, unitCategory, facCat)
     return LocationFactoriesBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '<', facCat)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param facCat EntityCategory
+---@return boolean
 function LocationFactoriesBuildingGreater(aiBrain, locationType, unitCount, unitCategory, facCat)
     return LocationFactoriesBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '>', facCat)
 end
@@ -700,6 +836,14 @@ end
 -- ============================================= --
 --     Engineer Manager Building Unit Counts
 -- ============================================= --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param compareType string
+---@param engCat EntityCategory
+---@return boolean
 function LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, unitCategory, compareType, engCat)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
@@ -720,10 +864,22 @@ function LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, u
     return CompareBody(numUnits, unitCount, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param engCat EntityCategory
+---@return boolean
 function LocationEngineersBuildingLess(aiBrain, locationType, unitCount, unitCategory, engCat)
     return LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '<', engCat)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param engCat EntityCategory
+---@return boolean
 function LocationEngineersBuildingGreater(aiBrain, locationType, unitCount, unitCategory, engCat)
     return LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '>', engCat)
 end
@@ -731,6 +887,13 @@ end
 -- ===================================================== --
 --     Engineers Wanting Assistance Build Conditions
 -- ===================================================== --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCategory EntityCategory
+---@param compareType string
+---@param engCat EntityCategory
+---@return boolean
 function LocationEngineersBuildingAssistanceComparison(aiBrain, locationType, unitCategory, compareType, engCat)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local testCat = unitCategory
@@ -751,10 +914,22 @@ function LocationEngineersBuildingAssistanceComparison(aiBrain, locationType, un
     return CompareBody(numUnits, 0, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param engCat EntityCategory
+---@return boolean
 function LocationEngineersBuildingAssistanceLess(aiBrain, locationType, unitCount, unitCategory, engCat)
     return LocationEngineersBuildingAssistanceComparison(aiBrain, locationType, unitCategory, '<', engCat)
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param engCat EntityCategory
+---@return boolean
 function LocationEngineersBuildingAssistanceGreater(aiBrain, locationType, unitCount, unitCategory, engCat)
     return LocationEngineersBuildingAssistanceComparison(aiBrain, locationType, unitCategory, '>', engCat)
 end
@@ -762,6 +937,11 @@ end
 -- ==================================================== --
 --     Factory Manager Check Maximum Factory Number
 -- ==================================================== --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param factoryType string
+---@return boolean
 function FactoryCapCheck(aiBrain, locationType, factoryType)
     local catCheck = false
     if factoryType == 'Land' then
@@ -793,6 +973,11 @@ end
 -- ===================================================== --
 --     Engineer Manager Check Maximum Factory Number
 -- ===================================================== --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param techLevel number
+---@return boolean
 function EngineerCapCheck(aiBrain, locationType, techLevel)
     local catCheck = false
     if techLevel == 'Tech1' then
@@ -822,6 +1007,13 @@ end
 -- ======================================================================================= --
 --     Adjacency Check - Ensures a building category can have something adjacent to it
 -- ======================================================================================= --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param category EntityCategory
+---@param radius number
+---@param testUnit Unit
+---@return boolean
 function AdjacencyCheck(aiBrain, locationType, category, radius, testUnit)
     local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
     if not factoryManager then
@@ -875,6 +1067,13 @@ end
 -- ================== --
 --     Unit Ratio
 -- ================== --
+
+---@param aiBrain AIBrain
+---@param ratio number
+---@param categoryOne EntityCategory
+---@param compareType string
+---@param categoryTwo EntityCategory
+---@return unknown
 function HaveUnitRatio(aiBrain, ratio, categoryOne, compareType, categoryTwo)
     local testCatOne = categoryOne
     if type(testCatOne) == 'string' then
@@ -891,6 +1090,11 @@ function HaveUnitRatio(aiBrain, ratio, categoryOne, compareType, categoryTwo)
     return CompareBody(numOne / numTwo, ratio, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param ratio number
+---@param categoryOne EntityCategory
+---@param categoryTwo EntityCategory
+---@return boolean
 function HaveUnitRatioGreaterThan(aiBrain, ratio, categoryOne, categoryTwo)
     local numOne = aiBrain:GetCurrentUnits(categoryOne)
     local numTwo = aiBrain:GetCurrentUnits(categoryTwo)
@@ -903,6 +1107,10 @@ end
 -- ================ --
 --     Unit Cap
 -- ================ --
+
+---@param aiBrain AIBrain
+---@param percent number
+---@return boolean
 function UnitCapCheckGreater(aiBrain, percent)
     local currentCount = GetArmyUnitCostTotal(aiBrain:GetArmyIndex())
     local cap = GetArmyUnitCap(aiBrain:GetArmyIndex())
@@ -912,6 +1120,9 @@ function UnitCapCheckGreater(aiBrain, percent)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param percent number
+---@return boolean
 function UnitCapCheckLess(aiBrain, percent)
     local currentCount = GetArmyUnitCostTotal(aiBrain:GetArmyIndex())
     local cap = GetArmyUnitCap(aiBrain:GetArmyIndex())
@@ -924,10 +1135,17 @@ end
 -- =================== --
 --     UNIT RANGES     --
 -- =================== --
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitType string
+---@param category EntityCategory
+---@param factionIndex number
+---@return boolean
 function CheckUnitRange(aiBrain, locationType, unitType, category, factionIndex)
 
     -- Find the unit's blueprint
-    local template = import('/lua/BuildingTemplates.lua').BuildingTemplates[factionIndex or aiBrain:GetFactionIndex()]
+    local template = import("/lua/buildingtemplates.lua").BuildingTemplates[factionIndex or aiBrain:GetFactionIndex()]
     local buildingId = false
     for k,v in template do
         if v[1] == unitType then
@@ -968,6 +1186,13 @@ function CheckUnitRange(aiBrain, locationType, unitType, category, factionIndex)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param unitCategory EntityCategory
+---@param compareType string
+---@param large any
+---@param small any
+---@param naval any
+---@return any
 function UnitToExpansionsValue(aiBrain, unitCategory, compareType, large, small, naval)
     local needCount = aiBrain:GetManagerCount('Start Location') * large
 
@@ -984,16 +1209,28 @@ function UnitToExpansionsValue(aiBrain, unitCategory, compareType, large, small,
     return CompareBody(unitCount, needCount, compareType)
 end
 
+---@param aiBrain AIBrain
+---@param unitCategory EntityCategory
+---@param large any
+---@param small any
+---@param naval any
+---@return any
 function UnitsGreaterThanExpansionValue(aiBrain, unitCategory, large, small, naval)
     return UnitToExpansionsValue(aiBrain, unitCategory, '>=', large, small, naval)
 end
 
+---comment
+---@param aiBrain AIBrain
+---@return any
 function ExpansionBaseCheck(aiBrain)
     -- Removed automatic setting of Land-Expasions-allowed. We have a Game-Option for this.
     local checkNum = tonumber(ScenarioInfo.Options.LandExpansionsAllowed) or 3
     return ExpansionBaseCount(aiBrain, '<', checkNum)
 end
 
+---comment
+---@param aiBrain AIBrain
+---@return any
 function NavalBaseCheck(aiBrain)
     -- Removed automatic setting of naval-Expasions-allowed. We have a Game-Option for this.
     local checkNum = tonumber(ScenarioInfo.Options.NavalExpansionsAllowed) or 2
@@ -1001,6 +1238,11 @@ function NavalBaseCheck(aiBrain)
 end
 
 --DUNCAN - added to limit expansion bases.
+---comment
+---@param aiBrain AIBrain
+---@param compareType string
+---@param checkNum number
+---@return any
 function ExpansionBaseCount(aiBrain, compareType, checkNum)
        local expBaseCount = aiBrain:GetManagerCount('Start Location')
        expBaseCount = expBaseCount + aiBrain:GetManagerCount('Expansion Area')
@@ -1011,13 +1253,21 @@ function ExpansionBaseCount(aiBrain, compareType, checkNum)
        return CompareBody(expBaseCount, checkNum, compareType)
 end
 
---DUNCAN - added to limit naval bases.
+--- added to limit naval bases.
+---@param aiBrain AIBrain
+---@param compareType string
+---@param checkNum number
+---@return any
 function NavalBaseCount(aiBrain, compareType, checkNum)
        local expBaseCount = aiBrain:GetManagerCount('Naval Area')
        --LOG('*AI DEBUG: Naval base count is ' .. expBaseCount .. ' checkNum is ' .. checkNum)
        return CompareBody(expBaseCount, checkNum, compareType)
 end
 
+---@param numOne number
+---@param numTwo number
+---@param compareType string
+---@return boolean
 function CompareBody(numOne, numTwo, compareType)
     if compareType == '>' then
         if numOne > numTwo then
@@ -1042,7 +1292,11 @@ function CompareBody(numOne, numTwo, compareType)
     return false
 end
 
---DUNCAN - credit to Sorian.
+--- credit to Sorian.
+---@param aiBrain AIBrain
+---@param upgrade string
+---@param has boolean
+---@return boolean
 function CmdrHasUpgrade(aiBrain, upgrade, has)
     local units = aiBrain:GetListOfUnits(categories.COMMAND, false)
     for k,v in units do
@@ -1055,7 +1309,19 @@ function CmdrHasUpgrade(aiBrain, upgrade, has)
     return false
 end
 
---DUNCAN - moved here from Markerbuildconditions so its evaluated instantly.
+--- moved here from Markerbuildconditions so its evaluated instantly.
+---@param aiBrain AIBrain
+---@param locationType string
+---@param radius number
+---@param markerType string
+---@param tMin number
+---@param tMax number
+---@param tRings number
+---@param tType string
+---@param maxUnits number
+---@param unitCat EntityCategory
+---@param markerRadius number
+---@return boolean
 function CanBuildFirebase(aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
     local ref, refName = AIUtils.AIFindFirebaseLocation(aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
     if not ref then
@@ -1064,7 +1330,10 @@ function CanBuildFirebase(aiBrain, locationType, radius, markerType, tMin, tMax,
     return true
 end
 
---DUNCAN - added for guard unit AI
+--- added for guard unit AI
+---@param aiBrain AIBrain
+---@param category EntityCategory
+---@return boolean
 function UnitsNeedGuard(aiBrain, category)
     local testCat = category
     if type(category) == 'string' then
@@ -1081,7 +1350,8 @@ function UnitsNeedGuard(aiBrain, category)
     return false
 end
 
---DUNCAN - credit to sorian
+---@param aiBrain AIBrain
+---@return boolean
 function T4BuildingCheck(aiBrain)
     if aiBrain.T4Building then
         return false
@@ -1089,6 +1359,9 @@ function T4BuildingCheck(aiBrain)
     return true
 end
 
+---@param aiBrain AIBrain
+---@param locationtype string
+---@return boolean
 function DamagedStructuresInArea(aiBrain, locationtype)
     local engineerManager = aiBrain.BuilderManagers[locationtype].EngineerManager
     if not engineerManager then
@@ -1105,6 +1378,10 @@ function DamagedStructuresInArea(aiBrain, locationtype)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param category EntityCategory
+---@return boolean
 function UnfinishedUnits(aiBrain, locationType, category)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
@@ -1120,6 +1397,9 @@ function UnfinishedUnits(aiBrain, locationType, category)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param Unit Unit
+---@return number
 function GetGuards(aiBrain, Unit)
     local engs = aiBrain:GetUnitsAroundPoint(categories.ENGINEER, Unit:GetPosition(), 10, 'Ally')
     local count = 0
@@ -1139,7 +1419,10 @@ function GetGuards(aiBrain, Unit)
     return count
 end
 
--- Buildcondition to check if a platoon is still delayed
+--- Buildcondition to check if a platoon is still delayed
+---@param aiBrain AIBrain
+---@param PlatoonName string
+---@return boolean
 function CheckBuildPlattonDelay(aiBrain, PlatoonName)
     if aiBrain.DelayEqualBuildPlattons[PlatoonName] and aiBrain.DelayEqualBuildPlattons[PlatoonName] > GetGameTimeSeconds() then
         return false
@@ -1147,3 +1430,48 @@ function CheckBuildPlattonDelay(aiBrain, PlatoonName)
     return true
 end
 
+--- Buildcondition to limit the number of factories 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCategory EntityCategory
+---@param pathType string
+---@param unitCount number
+---@return boolean
+function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount)
+    local currentEnemy = aiBrain:GetCurrentEnemy()
+    if not currentEnemy then
+        return true
+    end
+    local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    local selfIndex = aiBrain:GetArmyIndex()
+    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
+        return false
+    end
+    return true
+end
+
+--- Buildcondition to decide if radars should upgrade based on other radar locations.
+---@param aiBrain AIBrain
+---@param locationType string
+---@param radarTech string
+---@return boolean
+function ShouldUpgradeRadar(aiBrain, locationType, radarTech)
+
+    -- loop over radars that are one tech higher
+    local basePos = aiBrain.BuilderManagers[locationType].Position
+    local otherRadars = aiBrain.Radars[radarTech]
+    for _, other in otherRadars do
+        -- determine if we're too close to higher tech radars
+        local range = other.Blueprint.Intel.RadarRadius
+        if range then
+            local squared = 0.64 * (range * range)
+            local ox, _, oz = other:GetPositionXYZ()
+            local dx = ox - basePos[1]
+            local dz = oz - basePos[3]
+            if dx * dx + dz * dz < squared then
+                return false
+            end
+        end
+    end
+    return true
+end

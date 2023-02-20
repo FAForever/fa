@@ -8,12 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CDFRocketIridiumWeapon = import('/lua/cybranweapons.lua').CDFRocketIridiumWeapon
+local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
+local CDFRocketIridiumWeapon = import("/lua/cybranweapons.lua").CDFRocketIridiumWeapon
 
-URA0203 = Class(CAirUnit) {
+---@class URA0203 : CAirUnit
+URA0203 = ClassUnit(CAirUnit) {
     Weapons = {
-        Missile01 = Class(CDFRocketIridiumWeapon) {},
+        Missile01 = ClassWeapon(CDFRocketIridiumWeapon) {},
     },
 
     DestructionPartsChassisToss = {'URA0203',},

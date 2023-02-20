@@ -4,15 +4,15 @@
 -- Summary  :  Cybran Mobile Bomb Script
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CMobileKamikazeBombWeapon = import('/lua/cybranweapons.lua').CMobileKamikazeBombWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local CMobileKamikazeBombWeapon = import("/lua/cybranweapons.lua").CMobileKamikazeBombWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
+local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 --- A unique death weapon for the Fire Beetle
-local DeathWeaponKamikaze = Class(Weapon) {
+local DeathWeaponKamikaze = ClassWeapon(Weapon) {
     OnFire = function(self)
         -- do regular death weapon of unit if we didn't already
         if not self.unit.Dead then 
@@ -22,7 +22,7 @@ local DeathWeaponKamikaze = Class(Weapon) {
 }
 
 --- A unique death weapon for the Fire Beetle
-local DeathWeaponEMP = Class(Weapon) {
+local DeathWeaponEMP = ClassWeapon(Weapon) {
 
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
@@ -61,7 +61,8 @@ local DeathWeaponEMP = Class(Weapon) {
     end,
 }
 
-XRL0302 = Class(CWalkingLandUnit) {
+---@class XRL0302 : CWalkingLandUnit
+XRL0302 = ClassUnit(CWalkingLandUnit) {
 
     IntelEffects = {
         Cloak = {
@@ -76,8 +77,8 @@ XRL0302 = Class(CWalkingLandUnit) {
     },
 
     Weapons = {
-        Suicide = Class(DeathWeaponKamikaze) {},
-        DeathWeapon = Class(DeathWeaponEMP) {},
+        Suicide = ClassWeapon(DeathWeaponKamikaze) {},
+        DeathWeapon = ClassWeapon(DeathWeaponEMP) {},
     },
 
     AmbientExhaustBones = {
@@ -94,7 +95,7 @@ XRL0302 = Class(CWalkingLandUnit) {
 
         self.EffectsBagXRL = TrashBag()
         self.AmbientExhaustEffectsBagXRL = TrashBag()
-        self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
+        self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBagXRL)
         self.PeriodicFXThread = self:ForkThread(self.EmitPeriodicEffects)
     end,
 

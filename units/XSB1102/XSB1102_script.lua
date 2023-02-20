@@ -7,8 +7,9 @@
 ----**
 ----**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local SEnergyCreationUnit = import('/lua/seraphimunits.lua').SEnergyCreationUnit
-XSB1102 = Class(SEnergyCreationUnit) {
+local SEnergyCreationUnit = import("/lua/seraphimunits.lua").SEnergyCreationUnit
+---@class XSB1102 : SEnergyCreationUnit
+XSB1102 = ClassUnit(SEnergyCreationUnit) {
     AirEffects = {
         '/effects/emitters/hydrocarbon_heatshimmer_01_emit.bp'
     },

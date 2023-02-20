@@ -7,18 +7,19 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CWeapons = import('/lua/cybranweapons.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local CWeapons = import("/lua/cybranweapons.lua")
 local CDFHeavyDisintegratorWeapon = CWeapons.CDFHeavyDisintegratorWeapon
-local CANNaniteTorpedoWeapon = import('/lua/cybranweapons.lua').CANNaniteTorpedoWeapon
-local CIFSmartCharge = import('/lua/cybranweapons.lua').CIFSmartCharge
+local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedoWeapon
+local CIFSmartCharge = import("/lua/cybranweapons.lua").CIFSmartCharge
 
-XRL0305 = Class(CWalkingLandUnit)
+---@class XRL0305 : CWalkingLandUnit
+XRL0305 = ClassUnit(CWalkingLandUnit)
 {
     Weapons = {
-        Disintigrator = Class(CDFHeavyDisintegratorWeapon) {},
-        Torpedo = Class(CANNaniteTorpedoWeapon) {},
-        AntiTorpedo = Class(CIFSmartCharge) {},
+        Disintigrator = ClassWeapon(CDFHeavyDisintegratorWeapon) {},
+        Torpedo = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        AntiTorpedo = ClassWeapon(CIFSmartCharge) {},
     },
 }
 TypeClass = XRL0305

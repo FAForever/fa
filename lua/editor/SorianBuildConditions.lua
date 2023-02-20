@@ -7,22 +7,14 @@
 --**             Build conditions always return true or false
 --**
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local MABC = import('/lua/editor/MarkerBuildConditions.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local MABC = import("/lua/editor/markerbuildconditions.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: IsBadMap = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 2: bool     bool            = true = is a bad map, false = is not a bad map
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+---@param aiBrain AIBrain
+---@param bool boolean
+---@return boolean
 function IsBadMap(aiBrain, bool)
     if not SUtils.CheckForMapMarkers(aiBrain) and bool then
         return true
@@ -32,6 +24,9 @@ function IsBadMap(aiBrain, bool)
     return false
 end
 
+---@param aiBrain AIBrain unused
+---@param resTable string
+---@return boolean
 function CategoriesNotRestricted(aiBrain, resTable)
     local restrictions = ScenarioInfo.Options.RestrictedCategories
     if not restrictions then return false end
@@ -45,14 +40,9 @@ function CategoriesNotRestricted(aiBrain, resTable)
     return true
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: IsWaterMap = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 2: bool     bool            = true = is a water map, false = is not a water map
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+---@param aiBrain AIBrain
+---@param bool boolean
+---@return boolean
 function IsWaterMap(aiBrain, bool)
     local startX, startZ = aiBrain:GetArmyStartPos()
     local navalMarker = AIUtils.AIGetClosestMarkerLocation(aiBrain, 'Naval Area', startX, startZ)
@@ -64,14 +54,9 @@ function IsWaterMap(aiBrain, bool)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: IsIslandMap = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 2: bool     bool            = true = is a island map, false = is not a island map
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+---@param aiBrain AIBrain
+---@param bool boolean
+---@return boolean
 function IsIslandMap(aiBrain, bool)
     local startX, startZ = aiBrain:GetArmyStartPos()
     local enemyX, enemyZ
@@ -93,15 +78,10 @@ function IsIslandMap(aiBrain, bool)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: AIType = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: string   aitype          = "AI Personality"
--- parameter 2: bool     bool            = true = aitype matches, false = aitype does not match
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+---@param aiBrain AIBrain
+---@param aitype string
+---@param bool boolean
+---@return boolean
 function AIType(aiBrain, aitype, bool)
     local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
     if aitype == per and bool then
@@ -112,6 +92,12 @@ function AIType(aiBrain, aitype, bool)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param markerTypes string
+---@param distance number
+---@param checkForBad boolean
+---@return boolean
 function MarkerLessThan(aiBrain, locationType, markerTypes, distance, checkForBad)
     if checkForBad and not SUtils.CheckForMapMarkers(aiBrain) then
         return true
@@ -132,13 +118,9 @@ function MarkerLessThan(aiBrain, locationType, markerTypes, distance, checkForBa
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: GreaterThanGameTime = BuildCondition  doc = "Please work function docs."
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: int  num             = 1         doc = "docs for param1"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param num number
+---@return boolean
 function GreaterThanGameTime(aiBrain, num)
     local time = GetGameTimeSeconds()
     local cheatmult = tonumber(ScenarioInfo.Options.CheatMult) or 2
@@ -152,31 +134,23 @@ function GreaterThanGameTime(aiBrain, num)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: LessThanGameTime = BuildCondition  doc = "Please work function docs."
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: int  num             = 1         doc = "docs for param1"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param num number
+---@return boolean
 function LessThanGameTime(aiBrain, num)
     return (not GreaterThanGameTime(aiBrain, num))
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: EnemiesLessThan = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: integer  num             = "Number of enemies"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param num number
+---@return boolean
 function EnemyToAllyRatioLessOrEqual(aiBrain, num)
     local enemies = 0
     local allies = 0
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             enemies = enemies + 1
-        elseif v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        elseif not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             allies = allies + 1
         end
     end
@@ -186,6 +160,12 @@ function EnemyToAllyRatioLessOrEqual(aiBrain, num)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param threatValue number
+---@param threatType string
+---@param rings number
+---@return boolean
 function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
     local testRings = rings or 10
     local FactoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
@@ -199,13 +179,12 @@ function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, thre
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: ReclaimablesInArea = BuildCondition   doc = "Please work function docs."
---
--- parameter 0: string   aiBrain     = "default_brain"
--- parameter 1: string   locType     = "MAIN"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param locType string
+---@param threatValue number
+---@param threatType string
+---@param rings number
+---@return boolean
 function ReclaimablesInArea(aiBrain, locType, threatValue, threatType, rings)
     if aiBrain:GetEconomyStoredRatio('MASS') > .5 and aiBrain:GetEconomyStoredRatio('ENERGY') > .5 then
         return false
@@ -226,18 +205,14 @@ function ReclaimablesInArea(aiBrain, locType, threatValue, threatType, rings)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: ClosestEnemyLessThan = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: integer  distance        = "distance"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param distance number
+---@return boolean
 function ClosestEnemyLessThan(aiBrain, distance)
     local startX, startZ = aiBrain:GetArmyStartPos()
     local closest
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             local estartX, estartZ = v:GetArmyStartPos()
             local tempDistance = VDist2Sq(startX, startZ, estartX, estartZ)
             if not closest or tempDistance < closest then
@@ -251,6 +226,9 @@ function ClosestEnemyLessThan(aiBrain, distance)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationtype string
+---@return boolean
 function DamagedStructuresInArea(aiBrain, locationtype)
     local engineerManager = aiBrain.BuilderManagers[locationtype].EngineerManager
     if not engineerManager then
@@ -267,6 +245,16 @@ function DamagedStructuresInArea(aiBrain, locationtype)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param markerType string
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@param startX number
+---@param startZ number
+---@return boolean
 function MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType, startX, startZ)
     if not startX and not startZ then
          startX, startZ = aiBrain:GetArmyStartPos()
@@ -285,6 +273,15 @@ function MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threat
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@param maxNum number
+---@return boolean
 function CanBuildOnHydroLessThanDistance(aiBrain, locationType, distance, threatMin, threatMax, threatRings, threatType, maxNum)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
@@ -299,18 +296,24 @@ function CanBuildOnHydroLessThanDistance(aiBrain, locationType, distance, threat
     return false
 end
 
+---@param aiBrain AIBrain
+---@param markerType string
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@param startX number
+---@param startZ number
+---@return boolean
 function NoMarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType, startX, startZ)
     return not MABC.MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType, startX, startZ)
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: MapGreaterThan = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: integer  sizeX           = "sizeX"
--- parameter 2: integer  sizeZ           = "sizeZ"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param sizeX number
+---@param sizeZ number
+---@return boolean
 function MapGreaterThan(aiBrain, sizeX, sizeZ)
     local mapSizeX, mapSizeZ = GetMapSize()
     if mapSizeX > sizeX or mapSizeZ > sizeZ then
@@ -321,14 +324,10 @@ function MapGreaterThan(aiBrain, sizeX, sizeZ)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: MapLessThan = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: integer  sizeX           = "sizeX"
--- parameter 2: integer  sizeZ           = "sizeZ"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param sizeX number
+---@param sizeZ number
+---@return boolean
 function MapLessThan(aiBrain, sizeX, sizeZ)
     local mapSizeX, mapSizeZ = GetMapSize()
     if mapSizeX < sizeX and mapSizeZ < sizeZ then
@@ -339,17 +338,13 @@ function MapLessThan(aiBrain, sizeX, sizeZ)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: PoolThreatGreaterThanEnemyBase = BuildCondition
---
--- parameter 0: string   aiBrain        = "default_brain"
--- parameter 1: string	  locationType   = "loactionType"
--- parameter 2: string   ucat            = "Unit Category"
--- parameter 3: string   ttype           = "Enemy Threat Type"
--- parameter 4: string   uttype          = "Unit Threat Type"
--- parameter 5: integer divideby        = "Divide Unit Threat by"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param locationType string
+---@param ucat EntityCategory
+---@param ttype string
+---@param uttype string
+---@param divideby number
+---@return boolean
 function PoolThreatGreaterThanEnemyBase(aiBrain, locationType, ucat, ttype, uttype, divideby)
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
@@ -376,14 +371,10 @@ function PoolThreatGreaterThanEnemyBase(aiBrain, locationType, ucat, ttype, utty
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: LessThanThreatAtEnemyBase = BuildCondition
---
--- parameter 0: string   aiBrain        = "default_brain"
--- parameter 3: string   ttype          = "Enemy Threat Type"
--- parameter 5: integer number         = "Threat Amount"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param ttype string
+---@param number number
+---@return boolean
 function LessThanThreatAtEnemyBase(aiBrain, ttype, number)
     if aiBrain:GetCurrentEnemy() then
         enemy = aiBrain:GetCurrentEnemy()
@@ -401,19 +392,20 @@ function LessThanThreatAtEnemyBase(aiBrain, ttype, number)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param ttype string
+---@param number number
+---@return boolean
 function GreaterThanThreatAtEnemyBase(aiBrain, ttype, number)
     return not LessThanThreatAtEnemyBase(aiBrain, ttype, number)
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: GreaterThanEnemyUnitsAroundBase = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: integer  numUnits        = "Number of Units"
--- parameter 2: integer  radius          = "radius"
--- parameter 3: integer  unitCat         = "Unit Category"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param locationtype string
+---@param numUnits number
+---@param unitCat EntityCategory
+---@param radius number
+---@return boolean
 function GreaterThanEnemyUnitsAroundBase(aiBrain, locationtype, numUnits, unitCat, radius)
     local engineerManager = aiBrain.BuilderManagers[locationtype].EngineerManager
     if not engineerManager then
@@ -429,14 +421,10 @@ function GreaterThanEnemyUnitsAroundBase(aiBrain, locationtype, numUnits, unitCa
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: UnfinishedUnits = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: integer  radius          = "radius"
--- parameter 2: string   category        = "Unit category"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param locationType string
+---@param category EntityCategory
+---@return boolean
 function UnfinishedUnits(aiBrain, locationType, category)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
@@ -452,13 +440,9 @@ function UnfinishedUnits(aiBrain, locationType, category)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: ShieldDamaged = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: integer  radius          = "radius"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param locationType string
+---@return boolean
 function ShieldDamaged(aiBrain, locationType)
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
@@ -476,6 +460,9 @@ function ShieldDamaged(aiBrain, locationType)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param timeLeft number
+---@return boolean
 function NoRushTimeCheck(aiBrain, timeLeft)
     if ScenarioInfo.Options.NoRushOption and ScenarioInfo.Options.NoRushOption != 'Off' then
         if tonumber(ScenarioInfo.Options.NoRushOption) * 60 < GetGameTimeSeconds() + timeLeft then
@@ -489,6 +476,8 @@ function NoRushTimeCheck(aiBrain, timeLeft)
     return true
 end
 
+---@param aiBrain AIBrain unused
+---@return boolean
 function NoRush(aiBrain)
     if ScenarioInfo.Options.NoRushOption and ScenarioInfo.Options.NoRushOption != 'Off' then
         if tonumber(ScenarioInfo.Options.NoRushOption) * 60 > GetGameTimeSeconds() then
@@ -502,6 +491,12 @@ function NoRush(aiBrain)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param greater number
+---@param myCategory EntityCategory
+---@param eCategory EntityCategory
+---@param alliance string
+---@return boolean
 function HaveComparativeUnitsWithCategoryAndAlliance(aiBrain, greater, myCategory, eCategory, alliance)
     if type(eCategory) == 'string' then
         eCategory = ParseEntityCategory(eCategory)
@@ -522,6 +517,13 @@ function HaveComparativeUnitsWithCategoryAndAlliance(aiBrain, greater, myCategor
     return false
 end
 
+---@param aiBrain AIBrain
+---@param less number
+---@param ratio number
+---@param myCategory EntityCategory
+---@param eCategory EntityCategory
+---@param alliance string
+---@return boolean
 function HaveRatioUnitsWithCategoryAndAlliance(aiBrain, less, ratio, myCategory, eCategory, alliance)
     if type(eCategory) == 'string' then
         eCategory = ParseEntityCategory(eCategory)
@@ -542,6 +544,13 @@ function HaveRatioUnitsWithCategoryAndAlliance(aiBrain, less, ratio, myCategory,
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationtype string
+---@param greater number
+---@param myCategory EntityCategory
+---@param eCategory EntityCategory
+---@param alliance string
+---@return boolean
 function HaveComparativeUnitsWithCategoryAndAllianceAtLocation(aiBrain, locationtype, greater, myCategory, eCategory, alliance)
     if type(eCategory) == 'string' then
         eCategory = ParseEntityCategory(eCategory)
@@ -566,13 +575,10 @@ function HaveComparativeUnitsWithCategoryAndAllianceAtLocation(aiBrain, location
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: CmdrHasUpgrade = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 1: string   upgrade         = "upgrade"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param upgrade string
+---@param has boolean
+---@return boolean
 function CmdrHasUpgrade(aiBrain, upgrade, has)
     local units = aiBrain:GetListOfUnits(categories.COMMAND, false)
     for k,v in units do
@@ -585,6 +591,9 @@ function CmdrHasUpgrade(aiBrain, upgrade, has)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param upgrade string
+---@return boolean
 function SCUNeedsUpgrade(aiBrain, upgrade)
     local units = aiBrain:GetListOfUnits(categories.SUBCOMMANDER, false)
     local needsUpgrade = false
@@ -599,6 +608,10 @@ function SCUNeedsUpgrade(aiBrain, upgrade)
     return needsUpgrade
 end
 
+---@param aiBrain AIBrain
+---@param t4types string
+---@param t4cats EntityCategory
+---@return boolean
 function T4ThreatExists(aiBrain, t4types, t4cats)
     for k,v in t4types do
         if aiBrain.T4ThreatFound[v] then
@@ -618,6 +631,18 @@ function T4ThreatExists(aiBrain, t4types, t4cats)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param radius number
+---@param markerType string
+---@param tMin number
+---@param tMax number
+---@param tRings number
+---@param tType string
+---@param maxUnits number
+---@param unitCat EntityCategory
+---@param markerRadius number
+---@return boolean
 function CanBuildFirebase(aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
     local ref, refName = AIUtils.AIFindFirebaseLocationSorian(aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
     if not ref then
@@ -626,6 +651,10 @@ function CanBuildFirebase(aiBrain, locationType, radius, markerType, tMin, tMax,
     return true
 end
 
+---@param aiBrain AIBrain
+---@param numReq number
+---@param category EntityCategory
+---@return boolean
 function TargetHasLessThanUnitsWithCategory(aiBrain, numReq, category)
     local testCat = category
     local enemyBrain = aiBrain:GetCurrentEnemy()
@@ -649,6 +678,10 @@ function TargetHasLessThanUnitsWithCategory(aiBrain, numReq, category)
     return true
 end
 
+---@param aiBrain AIBrain
+---@param numReq number
+---@param category EntityCategory
+---@return boolean
 function TargetHasGreaterThanUnitsWithCategory(aiBrain, numReq, category)
     local testCat = category
     local enemyBrain = aiBrain:GetCurrentEnemy()
@@ -672,13 +705,10 @@ function TargetHasGreaterThanUnitsWithCategory(aiBrain, numReq, category)
     return false
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: EnemyInT3ArtilleryRange = BuildCondition
---
--- parameter 0: string   aiBrain         = "default_brain"
--- parameter 0: boolean  inrange         = "true = in range, false = not in range"
---
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param aiBrain AIBrain
+---@param locationtype string
+---@param inrange boolean
+---@return boolean
 function EnemyInT3ArtilleryRange(aiBrain, locationtype, inrange)
     local engineerManager = aiBrain.BuilderManagers[locationtype].EngineerManager
     if not engineerManager then
@@ -699,7 +729,7 @@ function EnemyInT3ArtilleryRange(aiBrain, locationtype, inrange)
         radius = 825 + offset
     end
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if not v:IsDefeated() and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
             local estartX, estartZ = v:GetArmyStartPos()
             if (VDist2Sq(start[1], start[3], estartX, estartZ) <= radius * radius) and inrange then
                 return true
@@ -711,6 +741,9 @@ function EnemyInT3ArtilleryRange(aiBrain, locationtype, inrange)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param bool boolean
+---@return boolean
 function AIOutnumbered(aiBrain, bool)
     local cheatmult = tonumber(ScenarioInfo.Options.CheatMult) or 2
     local buildmult = tonumber(ScenarioInfo.Options.BuildMult) or 2
@@ -727,7 +760,7 @@ function AIOutnumbered(aiBrain, bool)
     end
 
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
+        if not v:IsDefeated() and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
             local armyTeam = ScenarioInfo.ArmySetup[v.Name].Team
             --LOG('*AI DEBUG: '..v.Nickname..' is on team '..armyTeam)
             if v.CheatEnabled then
@@ -754,3 +787,9 @@ function AIOutnumbered(aiBrain, bool)
     end
     return false
 end
+
+
+-- Moved Unused Imports to bottom for mod support
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")

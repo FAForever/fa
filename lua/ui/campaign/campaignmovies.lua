@@ -1,18 +1,17 @@
---*****************************************************************************
---* File: lua/modules/ui/campaign/campaignmovies.lua
---* Author: Chris Blackwell
---* Summary: Play campaign movies on demand
---*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
+-------------------------------------------------------------------------------
+--- File: lua/modules/ui/campaign/campaignmovies.lua
+--- Author: Chris Blackwell
+--- Summary: Play campaign movies on demand
+--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------------------
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local WrapText = import('/lua/maui/text.lua').WrapText
-local Movie = import('/lua/maui/movie.lua').Movie
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local WrapText = import("/lua/maui/text.lua").WrapText
+local Movie = import("/lua/maui/movie.lua").Movie
+local Prefs = import("/lua/user/prefs.lua")
 
 local creditsMovies = {
     uef = 'FMV_UEF_Credits',
@@ -20,7 +19,7 @@ local creditsMovies = {
     cybran = 'FMV_Cybran_Credits',
 }
 
-local subtitleThread = false
+local subtitleThread = nil
 
 function DisplaySubtitles(textControl,captions)
     subtitleThread = ForkThread(
@@ -43,13 +42,12 @@ function DisplaySubtitles(textControl,captions)
     )
 end
 
--- Call this to play a full screen campaign movie
---  movieName = name of movie (no directory or extension required)
---  cueName = name of wavebank cue, if blank then use movieName
---  over = control to play above (to make sure depth is correct)
---  exitBehavior = function that will get called when the movie is done playing (optional)
-
--- returns true if movie played, else false
+--- # Call this to play a full screen campaign movie
+--- - movieName = name of movie (no directory or extension required)
+--- - cueName = name of wavebank cue, if blank then use movieName
+--- - over = control to play above (to make sure depth is correct)
+--- - exitBehavior = function that will get called when the movie is done playing (optional)
+--- - returns `true` if movie played, else `false`
 function PlayCampaignMovie(movieName, over, exitBehavior, cue, voice)
 
     GetCursor():Hide()
@@ -90,7 +88,7 @@ function PlayCampaignMovie(movieName, over, exitBehavior, cue, voice)
     local useSubtitles = Prefs.GetOption('subtitles') or not HasLocalizedVO(__language)
     local captions = false
     if useSubtitles then
-        local strings = import('/lua/ui/game/vo_fmv.lua')
+        local strings = import("/lua/ui/game/vo_fmv.lua")
         for k,v in strings do
             if string.lower(k) == string.lower(subtitleKey) then
                 captions = v.captions
@@ -145,4 +143,3 @@ function PlayCampaignMovie(movieName, over, exitBehavior, cue, voice)
 
     return true
 end
-

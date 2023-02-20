@@ -8,24 +8,25 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
-local AeonWeapons = import('/lua/aeonweapons.lua')
+local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
+local AeonWeapons = import("/lua/aeonweapons.lua")
 local ADFCannonQuantumWeapon = AeonWeapons.ADFCannonQuantumWeapon
 local AIFQuasarAntiTorpedoWeapon = AeonWeapons.AIFQuasarAntiTorpedoWeapon
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 
-UAS0103 = Class(ASeaUnit) {
+---@class UAS0103 : ASeaUnit
+UAS0103 = ClassUnit(ASeaUnit) {
 
     Weapons = {
-        MainGun = Class(ADFCannonQuantumWeapon) {
+        MainGun = ClassWeapon(ADFCannonQuantumWeapon) {
             FxMuzzleFlash = EffectTemplate.AQuantumCannonMuzzle02
         },
-        MainGun2 = Class(ADFCannonQuantumWeapon) {
+        MainGun2 = ClassWeapon(ADFCannonQuantumWeapon) {
             FxMuzzleFlash = EffectTemplate.AQuantumCannonMuzzle02
         },
-        AntiTorpedo01 = Class(AIFQuasarAntiTorpedoWeapon) {},
-        AntiTorpedo02 = Class(AIFQuasarAntiTorpedoWeapon) {},
+        AntiTorpedo01 = ClassWeapon(AIFQuasarAntiTorpedoWeapon) {},
+        AntiTorpedo02 = ClassWeapon(AIFQuasarAntiTorpedoWeapon) {},
     },
 }
 

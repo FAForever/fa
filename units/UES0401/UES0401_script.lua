@@ -5,24 +5,25 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
-local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
-local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
+local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
+local TSAMLauncher = import("/lua/terranweapons.lua").TSAMLauncher
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 
-UES0401 = Class(AircraftCarrier) {
+---@class UES0401 : AircraftCarrier
+UES0401 = ClassUnit(AircraftCarrier) {
     BuildAttachBone = 'UES0401',
 
     Weapons = {
-        Torpedo01 = Class(TANTorpedoAngler) {},
-        Torpedo02 = Class(TANTorpedoAngler) {},
-        Torpedo03 = Class(TANTorpedoAngler) {},
-        Torpedo04 = Class(TANTorpedoAngler) {},
-        MissileRack01 = Class(TSAMLauncher) {},
-        MissileRack02 = Class(TSAMLauncher) {},
-        MissileRack03 = Class(TSAMLauncher) {},
-        MissileRack04 = Class(TSAMLauncher) {},
+        Torpedo01 = ClassWeapon(TANTorpedoAngler) {},
+        Torpedo02 = ClassWeapon(TANTorpedoAngler) {},
+        Torpedo03 = ClassWeapon(TANTorpedoAngler) {},
+        Torpedo04 = ClassWeapon(TANTorpedoAngler) {},
+        MissileRack01 = ClassWeapon(TSAMLauncher) {},
+        MissileRack02 = ClassWeapon(TSAMLauncher) {},
+        MissileRack03 = ClassWeapon(TSAMLauncher) {},
+        MissileRack04 = ClassWeapon(TSAMLauncher) {},
     },
 
     OnKilled = function(self, instigator, type, overkillRatio)

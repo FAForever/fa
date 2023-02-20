@@ -7,9 +7,10 @@
 --**
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local HoverLandUnit = import('/lua/defaultunits.lua').HoverLandUnit
+local HoverLandUnit = import("/lua/defaultunits.lua").HoverLandUnit
 
-OPC2002 = Class(HoverLandUnit) {
+---@class OPC2002 : HoverLandUnit
+OPC2002 = ClassUnit(HoverLandUnit) {
     
     OnStopBeingBuilt = function(self, builder, layer)
         HoverLandUnit.OnStopBeingBuilt(self, builder, layer)

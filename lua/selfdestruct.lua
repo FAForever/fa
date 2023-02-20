@@ -13,6 +13,7 @@ local TableInsert = table.insert
 local countdownDuration = 5
 
 --- Destroys the given unit after a set duration
+---@param unit Unit
 local function SelfDestructThread(unit)
     WaitSeconds(countdownDuration)
     if unit:BeenDestroyed() then 
@@ -23,6 +24,8 @@ local function SelfDestructThread(unit)
 end
 
 --- Toggles the destruction of the units
+---@param data table
+---@param units Unit
 function ToggleSelfDestruct(data, units)
 
     -- suppress self destruct in tutorial missions as they screw up the mission end

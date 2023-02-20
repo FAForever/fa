@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
+local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
 
-UAA0101 = Class(AAirUnit) {
+---@class UAA0101 : AAirUnit
+UAA0101 = ClassUnit(AAirUnit) {
 }
 
 TypeClass = UAA0101

@@ -55,35 +55,28 @@ AIRESULT = {
     Ignored=3,
 }
 
+---@class ScriptTask : moho.ScriptTask_Methods
 ScriptTask = Class(moho.ScriptTask_Methods) {
 
     -- Called immediately when task is created
+    ---@param self ScriptTask
+    ---@param commandData any
     OnCreate = function(self,commandData)
         self.CommandData = commandData
     end,
-    
-    -- Called by the engine every tick. Function must return a value in
-    -- TaskStatus
+
+    -- Called by the engine every tick. Function must return a value in TaskStatus
+    ---@param self ScriptTask
+    ---@return integer
     TaskTick = function(self)
         LOG('tick')
         self:SetAIResult(AIRESULT.Fail)
         error('ScriptTask.TaskTick called. Did you forget to add TaskName to your command lua param table?')
         return TASKSTATUS.Done
     end,
-    
-    -- Called by the engine when the task is destroyed. This could be it naturally
-    -- going away after completion or because it was cancelled by another task.
+
+    -- Called by the engine when the task is destroyed. This could be it naturally going away after completion or because it was cancelled by another task.
+    ---@param self ScriptTask
     OnDestroy = function(self)
     end,
-    
-    --
-    -- Native method reference
-    --
-    -- ScriptTask.SetAIResult(bool)  -- Set the AI result, success or fail
-    -- ScriptTask.GetUnit()          -- Get the unit that is executing this task
-    
-    --
-    -- Native support functions reference
-    --
-    -- LUnitMove - Latent move
 }

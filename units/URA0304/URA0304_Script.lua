@@ -2,18 +2,19 @@
 --  File     :  /cdimage/units/URA0304/URA0304_script.lua
 --  Author(s):  John Comes, David Tomandl
 --  Summary  :  Cybran Strategic Bomber Script
---  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 
-local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CIFBombNeutronWeapon = import('/lua/cybranweapons.lua').CIFBombNeutronWeapon
-local CAAAutocannon = import('/lua/cybranweapons.lua').CAAAutocannon
+local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
+local CIFBombNeutronWeapon = import("/lua/cybranweapons.lua").CIFBombNeutronWeapon
+local CAAAutocannon = import("/lua/cybranweapons.lua").CAAAutocannon
 
-URA0304 = Class(CAirUnit) {
+---@class URA0304 : CAirUnit
+URA0304 = ClassUnit(CAirUnit) {
     Weapons = {
-        Bomb = Class(CIFBombNeutronWeapon) {},
-        AAGun1 = Class(CAAAutocannon) {},
-        AAGun2 = Class(CAAAutocannon) {},
+        Bomb = ClassWeapon(CIFBombNeutronWeapon) {},
+        AAGun1 = ClassWeapon(CAAAutocannon) {},
+        AAGun2 = ClassWeapon(CAAAutocannon) {},
     },
     ContrailBones = {'Left_Exhaust','Center_Exhaust','Right_Exhaust'},
     ExhaustBones = {'Left_Exhaust','Center_Exhaust','Right_Exhaust'},

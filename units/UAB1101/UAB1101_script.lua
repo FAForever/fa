@@ -7,9 +7,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AEnergyCreationUnit = import('/lua/aeonunits.lua').AEnergyCreationUnit
+local AEnergyCreationUnit = import("/lua/aeonunits.lua").AEnergyCreationUnit
 
-UAB1101 = Class(AEnergyCreationUnit) {
+---@class UAB1101 : AEnergyCreationUnit
+UAB1101 = ClassUnit(AEnergyCreationUnit) {
     AmbientEffects = 'AT1PowerAmbient',
     
 }
