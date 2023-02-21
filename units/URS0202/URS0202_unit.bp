@@ -361,9 +361,9 @@ UnitBlueprint {
             RackBones = {
                 {
                     MuzzleBones = {
-                        'launcher_turret',
+                         'Right_Launcher_Muzzle01',
                     },
-                    RackBone = 'launcher_turret',
+                    RackBone =  'launcher_barrel',
                 },
             },
             RackFireTogether = false,
@@ -384,8 +384,8 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TurretBoneMuzzle = 'launcher_turret',
-            TurretBonePitch = 'launcher_turret',
+            TurretBoneMuzzle = 'Right_Launcher_Muzzle01',
+            TurretBonePitch = 'launcher_barrel',
             TurretBoneYaw = 'launcher_turret',
             TurretDualManipulators = false,
             TurretPitch = 0,

@@ -21,7 +21,6 @@ URS0202 = ClassUnit(CSeaUnit) {
                 if not self.AA then
                     self.unit:SetWeaponEnabledByLabel('GroundGun', false)
                     self.unit:SetWeaponEnabledByLabel('AAGun', true)
-                    self.unit:GetWeaponManipulatorByLabel('AAGun'):SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel('GroundGun'):GetHeadingPitch())
                     self.AA = true
                 end
                 TargetingLaser.OnWeaponFired(self)
@@ -31,8 +30,7 @@ URS0202 = ClassUnit(CSeaUnit) {
                 -- Start with the AA gun off to reduce twitching of ground fire
                 Main = function(self)
                     self.unit:SetWeaponEnabledByLabel('GroundGun', true)
-                    self.unit:SetWeaponEnabledByLabel('AAGun', false)
-                    self.unit:GetWeaponManipulatorByLabel('GroundGun'):SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel('AAGun'):GetHeadingPitch())
+                    self.unit:SetWeaponEnabledByLabel('AAGun', true)
                     self.AA = false
                     TargetingLaser.IdleState.Main(self)
                 end,
