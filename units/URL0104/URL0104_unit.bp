@@ -3,7 +3,7 @@ UnitBlueprint {
         TargetBones = {
             'Turret',
         },
-    },    
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',
