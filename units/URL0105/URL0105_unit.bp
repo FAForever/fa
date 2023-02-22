@@ -1,5 +1,10 @@
 UnitBlueprint {
     AI = {
+        TargetBones = {
+            'Target',
+        },
+    },
+    AI = {
         GuardScanRadius = 26, -- allows for factory reclaim bug 
     },
     Audio = {

@@ -1,6 +1,9 @@
 UnitBlueprint {
     AI = {
         GuardScanRadius = 26, -- Dummy Weapon range so that the scout doesn't suicide when attack moved into T1 tanks that are not Aurora
+        TargetBones = {
+            'B01',
+        },
     },
     Audio = {
         AmbientMove = Sound {

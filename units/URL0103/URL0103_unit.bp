@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Turret',
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',
