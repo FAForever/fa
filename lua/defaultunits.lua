@@ -75,13 +75,14 @@ StructureUnit = ClassUnit(Unit) {
         local flatten = physicsBlueprint.FlattenSkirt
         if flatten then
             self:FlattenSkirt()
-    end
+        end
 
         -- check for terrain orientation
         if not (
                 physicsBlueprint.AltitudeToTerrain or
                 physicsBlueprint.StandUpright
             ) and (flatten or physicsBlueprint.AlwaysAlignToTerrain)
+            and self.Layer == 'Land'
         then
             -- rotate structure to match terrain gradient
             local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
@@ -90,8 +91,8 @@ StructureUnit = ClassUnit(Unit) {
                 blueprint.Footprint.SizeZ or physicsBlueprint.SkirtSizeZ
             )
 
-            -- do not orientate structures that are on essentially flat ground
-            if MathAbs(a1) > 0.02 or MathAbs(a2) > 0.02 then
+            -- do not orientate structures that are on flat ground
+            if a1 != 0 or a2 != 0 then
                 self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
 
                 -- technically obsolete, but as this is part of an integration we don't want to break
