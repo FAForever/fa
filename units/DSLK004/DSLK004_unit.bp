@@ -146,9 +146,6 @@ UnitBlueprint {
         BuildCostEnergy = 12800,
         BuildCostMass = 960,
         BuildTime = 4800,
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
     },
     General = {
         Category = 'Anti Air',

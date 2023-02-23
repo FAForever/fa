@@ -112,9 +112,6 @@ UnitBlueprint {
         BuildCostEnergy = 3000,
         BuildCostMass = 400,
         BuildTime = 2400,
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
     },
     General = {
         Category = 'Indirect Fire',

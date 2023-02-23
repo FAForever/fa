@@ -175,9 +175,6 @@ UnitBlueprint {
         BuildRate = 5,
         BuildTime = 3600,
         MaintenanceConsumptionPerSecondEnergy = 30,
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
     },
     General = {
         BuildBones = {

@@ -204,9 +204,6 @@ UnitBlueprint {
         MaintenanceConsumptionPerSecondEnergy = 15,
         StorageEnergy = 200,
         StorageMass = 30,
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
     },
     General = {
         BuildBones = {

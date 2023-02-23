@@ -168,9 +168,6 @@
         BuildCostEnergy = 4000000,
         BuildCostMass = 220000,
         BuildTime = 240000,
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
     },
     Footprint = {
         SizeX = 5,

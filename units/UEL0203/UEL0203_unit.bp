@@ -201,12 +201,9 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 1650,-- 1980
+        BuildCostEnergy = 1650,
         BuildCostMass = 320,
-        BuildTime = 1420,-- 1320
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
+        BuildTime = 1420,
     },
     General = {
         Category = 'Direct Fire',

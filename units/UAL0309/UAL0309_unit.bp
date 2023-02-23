@@ -198,9 +198,6 @@ UnitBlueprint {
         SacrificeMassMult = 0.6,
         StorageEnergy = 0,
         StorageMass = 40,
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
     },
     General = {
         Category = 'Construction',

@@ -159,9 +159,6 @@ UnitBlueprint {
         BuildCostEnergy = 5250,
         BuildCostMass = 480,
         BuildTime = 2400,
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
     },
     Footprint = {
         SizeX = 1,

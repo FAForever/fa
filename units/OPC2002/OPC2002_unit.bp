@@ -92,9 +92,6 @@ UnitBlueprint {
         BuildCostEnergy = 260,
         BuildCostMass = 52,
         BuildTime = 130,
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
     },
     General = {
         CommandCaps = {

@@ -223,9 +223,6 @@ UnitBlueprint {
         MaxBuildDistance = 5,
         StorageEnergy = 0,
         StorageMass = 10,
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
     },
     General = {
         BuildBones = {

@@ -128,9 +128,6 @@ UnitBlueprint {
         BuildCostEnergy = 1300,
         BuildCostMass = 190,
         BuildTime = 700,
-        TeleportEnergyMod = 0.15,
-        TeleportMassMod = 1,
-        TeleportTimeMod = 0.01,
     },
     General = {
         Category = 'Utility',
