@@ -518,6 +518,20 @@ options = {
                     },
                 },
             },
+
+            {
+                title = "<LOC ASSIST_TO_UPGRADE>Hold alt to force attack move",
+                key = 'alt_to_force_attack_move',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>Off", key = 'Off'},
+                        {text = "<LOC _On>On", key = 'On'},
+                    },
+                },
+            },
+
             {
                 title = "<LOC OPTIONS_0273>Automated Structure Ringing",
                 key = 'structure_capping_feature_01',

@@ -207,7 +207,7 @@ local orderToCursorCallback = {
 ---@field CursorLastEvent any
 ---@field CursorLastIdentifier CommandCap
 ---@field CursorOverride CommandCap
----@field CursorDecals UserDecal[]
+---@field CursorDecalTrash UserDecal[]
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
@@ -231,7 +231,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         self.CursorLastIdentifier = nil
 
         --- Cursor related decals
-        self.CursorDecals = { }
+        self.CursorDecalTrash = TrashBag()
 
         --- Flag that indicates whether the cursor is over the world (instead of the UI)
         self.CursorOverWorld = false
@@ -329,17 +329,19 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         local selection = GetSelectedUnits()
         local command_mode, command_data = unpack(CommandMode.GetCommandMode())     -- is set when we issue orders manually, try to build something, etc
         local orderViaMouse = self:GetRightMouseButtonOrder()                       -- is set when our mouse is over a hostile unit, reclaim, etc and not in command mode
+        local holdAltToAttackMove = Prefs.GetFromCurrentProfile('options.alt_to_force_attack_move')
 
         -- process precedence hierarchy
         ---@type CommandCap | 'CommandHighlight'
         local order
 
-        -- attack move that ignores everything
-        if IsKeyDown(KeyCodeAlt) and selection then
-            order = 'RULEUCC_AttackAlt'
-
-        elseif self.CursorOverride then
+        -- special override 
+        if self.CursorOverride then
             order = self.CursorOverride
+
+        -- special override
+        elseif holdAltToAttackMove and IsKeyDown(KeyCodeAlt) and selection then
+            order = 'RULEUCC_AttackAlt'
 
         -- usual order structure
         else
@@ -356,6 +358,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
             -- 3. then whatever is below the mouse
             elseif orderViaMouse and orderViaMouse != 'RULEUCC_Move' then
                 order = orderViaMouse
+            -- 4. then if we hold alt, we'll show the attack cursor
+            elseif IsKeyDown(KeyCodeAlt) and selection then
+                order = 'RULEUCC_Attack'
             end
         end
 
@@ -404,26 +409,25 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 -- prepare decals based on the selection
                 local data = getDecalsBasedOnSelection()
                 if data then
+                    -- clear out old decals, if they exist
+                    self.CursorDecalTrash:Destroy();
                     for k, instance in data do
                         local decal = UserDecal()
                         decal:SetTexture(instance.texture)
                         decal:SetScale({ instance.scale, 1, instance.scale })
-                        self.CursorDecals[k] = decal
+                        self.CursorDecalTrash:Add(decal);
                         self.Trash:Add(decal)
                     end
                 end
             end
 
             -- update their locations
-            for k, decal in self.CursorDecals do
+            for k, decal in self.CursorDecalTrash do
                 decal:SetPosition(GetMouseWorldPos())
             end
         else
             -- command ended, destroy the current decals to make room for new decals
-            for k, decal in self.CursorDecals do
-                decal:Destroy()
-                self.CursorDecals[k] = nil
-            end
+            self.CursorDecalTrash:Destroy();
         end
     end,
 
