@@ -35,6 +35,7 @@ Flare = Class(Entity){
     ---@param self Flare
     ---@param spec FlareSpec
     OnCreate = function(self, spec)
+        self.totalRedirected = 0
         self.Army = self:GetArmy()
         self.Owner = spec.Owner
         self.Radius = spec.Radius or 5
@@ -51,8 +52,9 @@ Flare = Class(Entity){
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self,other)
-        if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and self.Army ~= other.Army and IsAlly(self.Army, other.Army) == false then
+        if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and self.Army ~= other.Army and IsAlly(self.Army, other.Army) == false and self.totalRedirected < 2 then
             other:SetNewTarget(self.Owner)
+            self.totalRedirected = self.totalRedirected + 1
         end
         return false
     end,

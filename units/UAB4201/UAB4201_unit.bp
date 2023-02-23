@@ -203,7 +203,7 @@ UnitBlueprint {
             Flare = {
                 Category = 'MISSILE TACTICAL',
                 Radius = 15,
-                Stack = true,   -- Special flag to trigger multi-sphere collision
+                Stack = false,   -- Special flag to trigger multi-sphere collision
                 OffsetMult = 1.33,
             },
             Label = 'AntiMissile',
