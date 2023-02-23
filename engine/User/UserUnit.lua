@@ -1,6 +1,8 @@
 ---@meta
 
 ---@class UserUnit
+---@field ThreadUnpause? thread
+---@field ThreadUnpauseCandidates? table<EntityId, boolean>
 local UserUnit = {}
 
 ---@class MissileInfo
@@ -61,7 +63,7 @@ function UserUnit:GetEconData()
 end
 
 ---
----@return string
+---@return number
 function UserUnit:GetEntityId()
 end
 

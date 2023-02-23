@@ -495,25 +495,48 @@ local function OnGuardUnpause(guardees, target)
         prefs == 'ExtractorsAndRadars' and
             EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, target))
     then
-        for k, guardee in guardees do
 
-            -- for correct upvalue scope
-            ---@type UserUnit
-            local engineer = guardee
-
-            ForkThread(
-                function()
-                    while not (IsDestroyed(engineer) or IsDestroyed(target)) do
-                        WaitSeconds(1.0)
-
-                        local focus = engineer:GetFocus()
-                        if focus == target:GetFocus() then
-                            SetPaused({ target }, false)
-                            break
+        -- start a single thread to keep track of when to unpause, logic feels a bit convoluted
+        -- but that is purely to guarantee that we still have access to the user units as the
+        -- game progresses
+        if not target.ThreadUnpause then
+            local id = target:GetEntityId()
+            target.ThreadUnpause = ForkThread(
+                function ()
+                    WaitSeconds(1.0)
+                    local target = GetUnitById(id)
+                    while target do
+                        local candidates = target.ThreadUnpauseCandidates
+                        if (candidates and not table.empty(candidates)) then
+                            for id, _ in candidates do
+                                local engineer = GetUnitById(id)
+                                if engineer then
+                                    local focus = engineer:GetFocus()
+                                    if focus == target:GetFocus() then
+                                        candidates[id] = nil
+                                        SetPaused({ target }, false)
+                                        break
+                                    end
+                                -- engineer died or we switched armies
+                                else
+                                    candidates[id] = nil
+                                end
+                            end
+                        else
+                            break;
                         end
+
+                        WaitSeconds(1.0)
+                        target = GetUnitById(id)
                     end
                 end
             )
+        end
+
+        -- add these to keep track
+        target.ThreadUnpauseCandidates = target.ThreadUnpauseCandidates or { }
+        for k, guardee in guardees do
+            target.ThreadUnpauseCandidates[guardee:GetEntityId()] = true
         end
     end
 end
