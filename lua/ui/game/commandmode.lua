@@ -510,19 +510,22 @@ local function OnGuardUnpause(guardees, target)
                         if (candidates and not table.empty(candidates)) then
                             for id, _ in candidates do
                                 local engineer = GetUnitById(id)
-                                if engineer then
+                                if engineer and not engineer:IsIdle() then
                                     local focus = engineer:GetFocus()
                                     if focus == target:GetFocus() then
-                                        candidates[id] = nil
+                                        target.ThreadUnpauseCandidates = nil
+                                        target.ThreadUnpause = nil
                                         SetPaused({ target }, false)
                                         break
                                     end
-                                -- engineer died or we switched armies
+                                -- engineer is idle, died, we switch armies, ...
                                 else
                                     candidates[id] = nil
                                 end
                             end
                         else
+                            target.ThreadUnpauseCandidates = nil
+                            target.ThreadUnpause = nil
                             break;
                         end
 
