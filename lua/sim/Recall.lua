@@ -271,8 +271,6 @@ local function ArmyRequestRecall(army, teammates)
             SyncOpenRecallVote(teammates + 1, army)
         end
     else
-        -- the bug probably occurs here, or in how observers are handled up to here
-
         -- it's just us; recall our army
         SPEW("Recalling " .. brain.Nickname)
         brain:RecallAllCommanders()

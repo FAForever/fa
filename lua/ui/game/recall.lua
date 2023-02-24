@@ -37,7 +37,7 @@ function SetLayout()
             -- we need to make sure the right amount of space *is* available.
             -- Note that it would have been easier to make the components layout relative to
             -- theirselves if there was only one layout to begin with, but since various components
-            -- can be hidden, I figured it was either to do it all in one place here.
+            -- can be hidden, I figured it was easier to do it all in one place here.
             local panel = panel
             local Scale = LayoutHelpers.ScaleNumber
             local height = Scale(-4) + panel.label.Height() + Scale(5) + panel.votes.Height()
