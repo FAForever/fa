@@ -38,10 +38,12 @@ local drawOffered = false
 ---@type CannotRecallReason
 local CannotRequestRecallReason = false
 
+---@return CannotRecallReason
 function GetCannotRequestRecallReason()
     return CannotRequestRecallReason
 end
 
+---@param reason CannotRecallReason
 function SetCannotRequestRecallReason(reason)
     CannotRequestRecallReason = reason
     if parent then
@@ -479,8 +481,17 @@ function BuildPlayerLines()
                 import("/lua/ui/game/tabs.lua").CollapseWindow()
             end
             recallButton.OnClick = function(self, modifiers)
+                -- the sim will only start a vote if there are teammates
+                local txt = "<LOC diplomacy_0027>Are you sure you want to recall from battle?"
+                local focusArmy = GetFocusArmy()
+                for index, playerInfo in GetArmiesTable().armiesTable do
+                    if index ~= focusArmy and not playerInfo.outOfGame and not playerInfo.civilian and IsAlly(focusArmy, index) then
+                        txt = "<LOC diplomacy_0019>Are you sure you're ready to recall from battle? This will send a request to your team."
+                        break
+                    end
+                end
                 UIUtil.QuickDialog(GetFrame(0),
-                    "<LOC diplomacy_0019>Are you sure you're ready to recall from battle? This will send a request to your team.",
+                    txt,
                     "<LOC _Yes>",
                     OnAcceptRecall,
                     "<LOC _No>", nil, nil, nil, nil,

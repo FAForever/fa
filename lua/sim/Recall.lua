@@ -162,6 +162,7 @@ function ArmyRecallRequestCooldown(army)
     end
     -- if someone adds a feature that gates in commanders at different times, that time should be
     -- added as an argument to this method call
+    -- note that this logic doesn't currently take into account the gate-in times of other teammates
     return RecallRequestCooldown(lastTeamVote, lastPlayerRequest)
 end
 
@@ -211,7 +212,7 @@ local function RecallVotingThread(requestingArmy)
         }
     end
     local listTeam = team[1].Nickname
-    for i = 2, table.getn(team) do
+    for i = 2, teammates do
         listTeam = listTeam .. ", " .. team[i].Nickname
     end
     if recallPassed then

@@ -1167,7 +1167,6 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     OnRecalled = function(self)
-        LOG("On Recalled!")
         self.Status = "Recalled"
 
         local army = self.Army
