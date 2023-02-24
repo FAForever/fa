@@ -1335,6 +1335,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
+
+        -- invulnerable little fella
+        if not (self.CanBeKilled) then
+            return
+        end
+
         VeterancyComponent.VeterancyDispersal(self)
         local layer = self.Layer
         self.Dead = true
