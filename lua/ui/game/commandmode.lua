@@ -549,7 +549,6 @@ end
 ---@param unit UserUnit
 local function OnGuard(guardees, unit)
     if unit:GetArmy() == GetFocusArmy() then
-        LOG("Correct army")
         OnGuardUpgrade(guardees, unit)
         OnGuardUnpause(guardees, unit)
     end
