@@ -493,6 +493,8 @@ TreadComponent = ClassSimple {
     end,
 }
 
+local MathMin = math.min
+
 local VeterancyToTech = {
     TECH1 = 1,
     TECH2 = 2,
@@ -538,7 +540,26 @@ VeterancyComponent = ClassSimple {
     end,
 
     ---@param self VeterancyComponent | Unit
-    OnKilled = function(self, instigator, type, overkillRatio)
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        amount = MathMin(amount, self:GetMaxHealth())
+        self.VetDamageTaken = self.VetDamageTaken + amount
+        if instigator and instigator.IsUnit and not IsDestroyed(instigator) then
+            local entityId = instigator.EntityId
+            local vetInstigators = self.VetInstigators
+            local vetDamage = self.VetDamage
+
+            vetInstigators[entityId] = instigator
+            vetDamage[entityId] = (vetDamage[entityId] or 0) + amount
+        end
+    end,
+
+    --- Disperses the veterancy, expects to be only called once
+    ---@param self VeterancyComponent | Unit
+    VeterancyDispersal = function(self)
         local vetWorth = self:GetFractionComplete() * self:GetTotalMassCost()
         local vetDamage = self.VetDamage
         local vetInstigators = self.VetInstigators
@@ -551,26 +572,7 @@ VeterancyComponent = ClassSimple {
         end
     end,
 
-    ---@param self VeterancyComponent | Unit
-    ---@param instigator Unit
-    ---@param amount number
-    ---@param vector Vector
-    ---@param damageType DamageType
-    DoTakeDamage = function(self, instigator, amount, vector, damageType)
-        self.VetDamageTaken = self.VetDamageTaken + amount
-        if instigator and instigator.IsUnit and not IsDestroyed(instigator) then
-            local entityId = instigator.EntityId
-            local vetInstigators = self.VetInstigators
-            local vetDamage = self.VetDamage
-
-            vetInstigators[entityId] = instigator
-            vetDamage[entityId] = (vetDamage[entityId] or 0) + math.min(amount, self:GetMaxHealth())
-        end
-    end,
-
-    --         ArmyBrains[self.Army]:AddUnitStat(unitKilled.UnitId, "kills", 1)
-
-    -- Use this to set a veterancy level directly, usually used by a scenario
+    -- Adds experience to a unit
     ---@param self Unit | VeterancyComponent
     ---@param experience number
     ---@param noLimit boolean
@@ -627,6 +629,7 @@ VeterancyComponent = ClassSimple {
         end
     end,
 
+    --- Adds a single level of veterancy
     ---@param self Unit | VeterancyComponent
     AddVetLevel = function(self)
         local blueprint = self.Blueprint
@@ -677,7 +680,29 @@ VeterancyComponent = ClassSimple {
         self.Brain:OnBrainUnitVeterancyLevel(self, nextLevel)
     end,
 
+    ---@param self Unit | VeterancyComponent
+    ---@param level number
+    SetVeterancy = function(self, level)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level, 5)] or 0, true)
+    end,
+
     -- kept for backwards compatibility with mods, but should really not be used anymore
+
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
+    ---@param instigator Unit
+    OnKilledUnit = function (self, unitThatIsDying, experience)
+        if not experience then
+            return
+        end
+
+        if not IsDestroyed(unitThatIsDying) then
+            local vetWorth = unitThatIsDying:GetFractionComplete() * unitThatIsDying:GetTotalMassCost()
+            self:AddVetExperience(vetWorth, false)
+        end
+    end,
 
     ---@deprecated
     ---@param self Unit | VeterancyComponent
@@ -699,21 +724,14 @@ VeterancyComponent = ClassSimple {
         self:AddVetExperience(massKilled, noLimit)
     end,
 
-    ---@param self Unit | VeterancyComponent
-    ---@param level number
-    SetVeterancy = function(self, level)
-        self.VetExperience = 0
-        self.VetLevel = 0
-        self:AddVetExperience(self.Blueprint.VetThresholds[math.min(level, 5)] or 0, true)
-    end,
-
+    ---@see AddVetLevel
     ---@deprecated
     ---@param self Unit | VeterancyComponent
     ---@param level number
     SetVeteranLevel = function(self, level)
         self.VetExperience = 0
         self.VetLevel = 0
-        self:AddVetExperience(self.Blueprint.VetThresholds[math.min(level, 5)] or 0, true)
+        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level, 5)] or 0, true)
     end,
 
     ---@deprecated

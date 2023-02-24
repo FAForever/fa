@@ -657,7 +657,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if not isOldSelection then
         import("/lua/ui/game/selection.lua").PlaySelectionSound(added)
         import("/lua/ui/game/rallypoint.lua").OnSelectionChanged(newSelection)
-        if Prefs.GetFromCurrentProfile('options.repeatbuild') then
+        if Prefs.GetFromCurrentProfile('options.repeatbuild') == 'On' then
             local factories = EntityCategoryFilterDown(categories.STRUCTURE * categories.FACTORY, added) -- find all newly selected factories
             for _, factory in factories do
                 if not factory.HasBeenSelected then

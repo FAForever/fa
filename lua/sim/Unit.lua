@@ -84,7 +84,7 @@ SyncMeta = {
 }
 
 local cUnit = moho.unit_methods
----@class Unit : moho.unit_methods, IntelComponent
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent
 ---@field Brain AIBrain
 ---@field Blueprint UnitBlueprint
 ---@field Trash TrashBag
@@ -1335,7 +1335,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
-        VeterancyComponent.OnKilled(self, instigator, type, overkillRatio)
+
+        -- invulnerable little fella
+        if not (self.CanBeKilled) then
+            return
+        end
+
+        VeterancyComponent.VeterancyDispersal(self)
         local layer = self.Layer
         self.Dead = true
 

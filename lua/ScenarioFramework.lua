@@ -951,6 +951,7 @@ function FakeTeleportUnits(units, killUnits)
             end
         end
     end
+
     WaitSeconds(2)
 
     for _, unit in units do
@@ -962,6 +963,7 @@ function FakeTeleportUnits(units, killUnits)
             unit:PlayTeleportOutEffects()
         end
     end
+
     WaitSeconds(1)
 
     if killUnits then
