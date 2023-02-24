@@ -504,7 +504,9 @@ function BuildPlayerLines()
         local recallIcon = CreateBitmapStd(recallButton, "/game/recall-panel/icon-recall")
         Layouter(recallIcon)
             :DisableHitTest()
-            :AtCenterIn(recallButton)
+            :AtCenterIn(recallButton, 1)
+            :Width(20)
+            :Height(25)
             :Over(recallButton, 5)
         recallButton.label = recallIcon
 
