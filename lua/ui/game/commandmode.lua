@@ -548,8 +548,10 @@ end
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
 local function OnGuard(guardees, unit)
-    OnGuardUpgrade(guardees, unit)
-    OnGuardUnpause(guardees, unit)
+    if unit:GetArmy() == GetFocusArmy() then
+        OnGuardUpgrade(guardees, unit)
+        OnGuardUnpause(guardees, unit)
+    end
 end
 
 --- Called by the engine when a new command has been issued by the player.
