@@ -111,9 +111,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
         -- B E F O R E
         local numNukes = unit:GetNukeSiloAmmoCount() -- nuclear missiles; SML or SMD
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
-        local unitSync = unit.Sync
-        local massKilled = unitSync.totalMassKilled
-        local massKilledTrue = unitSync.totalMassKilledTrue
+        local massKilled = unit.VetExperience
         local unitHealth = unit:GetHealth()
         local shieldIsOn = false
         local shieldHealth = 0
@@ -197,7 +195,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
 
         -- A F T E R
         if massKilled and massKilled > 0 then
-            unit:CalculateVeterancyLevelAfterTransfer(massKilled, massKilledTrue)
+            unit:CalculateVeterancyLevelAfterTransfer(massKilled, true)
         end
         if activeEnhancements then
             for _, enh in activeEnhancements do

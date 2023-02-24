@@ -3,6 +3,7 @@ local BlueprintNameToIntel = {
     CloakField = 'CloakField',
     CloakFieldRadius = 'CloakField',
     JammerBlips = 'Jammer',
+    OmniRadius = 'Omni',
 
     RadarRadius = 'Radar',
     RadarStealth = 'RadarStealth',
