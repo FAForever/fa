@@ -14,8 +14,6 @@ local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
 
-GetCommandLineArg("/division"
-
 ---@class UIReclaimDataPoint
 ---@field mass number
 ---@field position Vector
