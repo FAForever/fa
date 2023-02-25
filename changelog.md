@@ -1,6 +1,19 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3752 (25th of February, 2022)
+
+See the patch notes of 3751 for the full patch notes.
+
+## Bug fixes
+
+- (#4736) Attempt at fixing the autolobby options missmatch
+
+## Contributors
+
+- Jip (#4736)
+- Sheikah (#4736)
+
 # Game version 3751 (25th of February, 2022)
 
 In this first development update of 2023, we introduce three month's work of bugfixes, quality of life changes, and assorted improvements. It is, by far, the most exciting patch we've released so far. While the full changes are detailed below, a quick summary of those changes we think you'll find most important:
@@ -29,14 +42,14 @@ Jip
 - (#4474) Ground attack now ignores all props/units
     You can now assign a ground attack exactly where you clicked without it accidentally snapping to props or units
 
-- (3e34599) Prevent being able to issue 'empty' reclaim orders
+- (3dd620c) Prevent being able to issue 'empty' reclaim orders
     It is now impossible to create a reclaim order with no prop or unit attached to it
 
 - (#4474) Move command mode no longer creates patrol orders by accident
     When you specifically issue move commands using the hotkey (usually 'm') or by clicking on the move command button it now ignores the 'convert to patrol' functionality
 
-- (3e34599) Remove the use of CTRL to issue commands with formations
-    When you hold control units first move towards each other and create a formation before they would go to where you told them to. This is a hidden feature of the engine and often players were not aware. We patched this out because often people use the same key for hotkeys, after which players (usually accidentally) would issue a formation order instead of a regular move or attack move order
+- (3dd620c) Remove the use of CTRL to issue commands with formations
+    When you hold control units first move towards each other and create a formation before they would go to where you told them to. This is a hidden feature of the engine and often players were not aware. We patched this out because often people use the same key for hotkeys, after which players (usually accidentally) would issue a formation order instead of a regular move or attack move order. You can still create formation orders by holding the right mouse button
 
 - (#4510) Add a game option to set the zoom threshold at which reclaim values are grouped together in the reclaim-overlay
 
@@ -212,7 +225,7 @@ We've been consistently improving the performance of the game by re-implementing
 - (#4451) Reduce overhead of passing regeneration values to UI
     These values are no longer passed via the sync, but attached to the state of the unit instead
 
-- (#4466, #4492, #4597, 3e34599, 9c9dda3) Reduce traffic between the sim and the UI layers
+- (#4466, #4492, #4597, 3dd620c, 9c9dda3) Reduce traffic between the sim and the UI layers
     Every bit of data we send to the UI is (deep) copied and usually thrown away afterwards. This involves a lot of memory management and that is the most expensive type of logic that a computer can run these days.
 
 - (#4517, #4534, #4532, #4533, #4531, #4528, #4529, #4530, #4582, #4552, #4585, #4549, #4596, #4611)
@@ -301,6 +314,8 @@ If you have that interest and/or experience and you'd like to help out then you 
 - (#4688) Add a code of conduct to the repository
 
 - (#4731) Fix the auto balance button in the lobby being too large
+
+- (3e34599) Remove logging of console commands
 
 ## Mod incompatibility
 
