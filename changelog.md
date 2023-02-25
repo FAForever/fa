@@ -1,6 +1,26 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3753 (25th of February, 2022)
+
+See the patch notes of 3751 for the full patch notes.
+
+## Bug fixes
+
+- (#4741) Fix build preview of underwater storages
+
+- (#4739) Fix tactical defense disinteresting into taking down the tactical missile from the Aloha
+
+- (#4740) Fix reclaim values of wreckages
+
+- (acc6893) Enforce UTF8 encoding of preference file
+    We weren't entirely aware that we stopped enforcing the encoding of the preference file. As a result a lot of people encountered issues. We hope by enforcing it again that those issues are resolved
+
+## Contributors
+
+- Jip (#4741, #4739, #4740)
+- KionX (acc6893)
+
 # Game version 3752 (25th of February, 2022)
 
 See the patch notes of 3751 for the full patch notes.
