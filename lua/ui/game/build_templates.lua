@@ -20,12 +20,12 @@ function CreateBuildTemplate()
     if next(template) then
         local str1bp = __blueprints[ template[3][1] ]
         local s1Xoffset = TemplateAxisOffset(str1bp, 'SizeX')
-        local s1Yoffset = TemplateAxisOffset(str1bp, 'SizeZ')
+        local s1Zoffset = TemplateAxisOffset(str1bp, 'SizeZ')
         if s1Xoffset ~= 0 or s1Yoffset ~= 0 then
             for i=3, table.getn(template) do
                 local str = template[i]
-                str[3] = str[3] + s1Xoffset
-                str[4] = str[4] + s1Yoffset
+                str[3] = str[3] + s1Zoffset
+                str[4] = str[4] + s1Xoffset
             end
         end
         AddTemplate(template)
