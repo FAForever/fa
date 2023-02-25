@@ -1,4 +1,4 @@
-last_version = 3752
+last_version = 3753
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -13,9 +13,36 @@ last_version = 3752
 ---@type PatchNotes[]
 gamePatches = {
     {
+        version = 3753,
+        name = "Hotfix",
+        description = {
+            "",
+            "# Game version 3753 (25th of February, 2022)",
+            "",
+            "See the patch notes of 3751 for the full patch notes.",
+            "",
+            "## Bug fixes",
+            "",
+            "- (#4741) Fix build preview of underwater storages",
+            "",
+            "- (#4739) Fix Aloha being ignored by tactical missile defenses",
+            "",
+            "- (#4740) Fix reclaim values of wreckages",
+            "",
+            "- (acc6893) Enforce UTF8 encoding of preference file",
+            "    We weren't entirely aware that we stopped enforcing the encoding of the preference file. As a result a lot of people encountered issues. We hope by enforcing it again that those issues are resolved",
+            "",
+            "## Contributors",
+            "",
+            "- Jip (#4741, #4739, #4740)",
+            "- KionX (acc6893)",
+        }
+    },
+    {
         version = 3752,
         name = "Hotfix",
         description = {
+            "",
             "# Game version 3752 (25th of February, 2022)",
             "",
             "See the patch notes of 3751 for the full patch notes.",
