@@ -1,6 +1,12 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3752 (25th of February, 2022)
+
+We forgot to set the executable ready for a release too. See the patch notes of 3751 for the full release information.
+
+Jip
+
 # Game version 3751 (25th of February, 2022)
 
 In this first development update of 2023, we introduce three month's work of bugfixes, quality of life changes, and assorted improvements. It is, by far, the most exciting patch we've released so far. While the full changes are detailed below, a quick summary of those changes we think you'll find most important:
