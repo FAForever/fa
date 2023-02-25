@@ -1,4 +1,7 @@
 
+# Checklist before doing a release:
+# - [ ] If required, is the executable set for a release?
+
 git checkout faforever/deploy/fafdevelop 
 git pull faforever deploy/fafdevelop 
 
