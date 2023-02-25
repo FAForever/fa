@@ -8,7 +8,7 @@ local ScenarioFramework = import('/lua/scenarioframework.lua')
 
 -- === utility function === --
 
----@param time integer
+---@param time number
 ---@param name string
 function UnlockTimer(time, name)
     WaitSeconds( time )
@@ -16,7 +16,7 @@ function UnlockTimer(time, name)
 end
 
 ---@param pName string
----@param time integer
+---@param time number
 function PlatoonDeathUnlockThread( pName, time )
     if time > 0 then
         WaitSeconds(time)
@@ -68,7 +68,7 @@ end
 --- AMUnlockPlatoonTimer = BuildCallback
 ---@param brain AIBrain
 ---@param platoon Platoon
----@param duration integer
+---@param duration number
 function AMUnlockPlatoonTimer(brain, platoon, duration)
     local callback = function()
         if ScenarioInfo.AMLockTable and ScenarioInfo.AMLockTable[platoon.PlatoonData.PlatoonName] then

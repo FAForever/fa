@@ -21,6 +21,7 @@
 --******************************************************************************************************
 
 local Shared = import("/lua/shared/navgenerator.lua")
+local MarkerGenerator = import("/lua/sim/markergenerator.lua")
 
 ---@alias NavTerrainCache number[][]
 ---@alias NavDepthCache number[][]
@@ -67,13 +68,8 @@ NavGrids = {}
 ---@field Layer NavLayers
 ---@field NumberOfExtractors number
 ---@field NumberOfHydrocarbons number
----@field ExtractorMarkers MarkerData[]
----@field HydrocarbonMarkers MarkerData[]
--- ---@field NumberOfSpawns number
--- ---@field NumberOfExpansions number
--- ---@field NumberOfDefensePoints number
--- ---@field ExpansionMarkers MarkerData[]
--- ---@field DefensePointMarkers MarkerData[]
+---@field ExtractorMarkers MarkerResource[]
+---@field HydrocarbonMarkers MarkerResource[]
 
 ---@type table<number, NavLabelMetadata>
 NavLabels = {}
@@ -82,13 +78,6 @@ local Generated = false
 ---@return boolean
 function IsGenerated()
     return Generated
-end
-
-local CompressedTreeIdentifier = 0
----@return number
-local function GenerateCompressedTreeIdentifier()
-    CompressedTreeIdentifier = CompressedTreeIdentifier + 1
-    return CompressedTreeIdentifier
 end
 
 local LabelIdentifier = 0
@@ -1095,9 +1084,8 @@ local function GenerateMarkerMetadata()
         Amphibious = NavGrids['Amphibious']
     }
 
-    local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
-    for k = 1, en do
-        local extractor = extractors[k]
+    local extractors = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    for id, extractor in extractors do
         for layer, grid in grids do
             local label = grid:FindLeaf(extractor.position).Label
 
@@ -1113,9 +1101,8 @@ local function GenerateMarkerMetadata()
         end
     end
 
-    local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
-    for k = 1, hn do
-        local hydro = hydrocarbons[k]
+    local hydrocarbons = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
+    for id, hydro in hydrocarbons do
         for layer, grid in grids do
             local label = grid:FindLeaf(hydro.position).Label
 
@@ -1131,6 +1118,8 @@ local function GenerateMarkerMetadata()
         end
     end
 end
+
+
 
 --- Generates a navigational mesh based on the heightmap
 function Generate()
@@ -1152,10 +1141,16 @@ function Generate()
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
 
     ---@type number
-    local compressionThreshold = 4
+    local compressionThreshold = 1
 
-    if MapSize > 1024 then
-        compressionThreshold = 8
+    -- 20x20+
+    if MapSize >= 1024 then
+        compressionThreshold = 2 * compressionThreshold
+    end
+
+    -- 40x40+
+    if MapSize >= 2048 then
+        compressionThreshold = 2 * compressionThreshold
     end
 
     NavGrids['Land'] = NavGrid('Land', CompressionTreeSize)
@@ -1199,15 +1194,19 @@ function Generate()
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    -- local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
-    -- local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
+    local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
+    local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
 
-    -- SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
-    -- SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
+    SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
+    SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
 
     Sync.NavLayerData = NavLayerData
     Generated = true
 
     -- allows debugging tools to function
     import("/lua/sim/navdebug.lua")
+end
+
+function GenerateMarkers()
+    MarkerGenerator.GenerateExpansions()
 end

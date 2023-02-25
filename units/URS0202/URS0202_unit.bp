@@ -247,12 +247,12 @@ UnitBlueprint {
     StrategicIconName = 'icon_ship2_antiair',
     StrategicIconSortPriority = 155,
     Transport = {
-        Class1AttachSize = 1,
         Class2AttachSize = 1,
         Class3AttachSize = 1,
         DockingSlots = 1,
         RepairRate = 0.1,
         TransportClass = 10,
+        Class1Capacity = 1,
     },
     Veteran = {
         Level1 = 16,
@@ -356,7 +356,7 @@ UnitBlueprint {
             MaxRadius = 75,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            PreferPrimaryWeaponTarget = true,
+            PrefersPrimaryWeaponTarget = true,
             ProjectileLifetimeUsesMultiplier = 1.15,
             RackBones = {
                 {

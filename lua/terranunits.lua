@@ -365,21 +365,21 @@ TStructureUnit = ClassUnit(DefaultUnitsFile.StructureUnit) {}
 
 ---@class TRadarJammerUnit : RadarJammerUnit
 ---@field MySpinner? moho.RotateManipulator
-TRadarJammerUnit = ClassUnit() {
+TRadarJammerUnit = ClassUnit(DefaultUnitsFile.RadarJammerUnit) {
 
     ---@param self TRadarJammerUnit
-    OnIntelEnabled = function(self)
+    OnIntelEnabled = function(self, intel)
         if not self.MySpinner then
             self.MySpinner = CreateRotator(self, 'Spinner', 'y', nil, 0, 45, 180)
             self.Trash:Add(self.MySpinner)
         end
-        RadarJammerUnit.OnIntelEnabled(self)
+        RadarJammerUnit.OnIntelEnabled(self, intel)
         self.MySpinner:SetTargetSpeed(180)
     end,
 
     ---@param self TRadarJammerUnit
-    OnIntelDisabled = function(self)
-        RadarJammerUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        RadarJammerUnit.OnIntelDisabled(self, intel)
         self.MySpinner:SetTargetSpeed(0)
     end,
 }

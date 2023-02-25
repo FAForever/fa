@@ -6,7 +6,7 @@ MeshBlueprint {
             AlbedoName = '/units/uec1301_Tundra/uec1301_Tundra_Albedo.dds',
             NormalsName = '/units/uec1301_Tundra/uec1301_Tundra_normalsTS.dds',
             SpecularName = '/units/uec1301_Tundra/uec1301_Tundra_SpecTeam.dds',
-            Shader = 'TMeshAlpha',
+            ShaderName = 'TMeshAlpha',
             LODCutoff = 195,
         },
     },

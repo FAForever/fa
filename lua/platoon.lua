@@ -13,7 +13,7 @@
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local Utilities = import("/lua/utilities.lua")
 local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
-local UpgradeTemplates = lazyimport("/lua/upgradetemplates.lua")
+local UpgradeTemplates = import("/lua/upgradetemplates.lua")
 local Behaviors = import("/lua/ai/aibehaviors.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
@@ -838,7 +838,7 @@ Platoon = Class(moho.platoon_methods) {
 
         AIAttackUtils.GetMostRestrictiveLayer(self)
         self:SetPlatoonFormationOverride(PlatoonFormation)
-        local markerLocations, en = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
+        local markerLocations = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
 
         local bestMarker = false
 
@@ -6943,3 +6943,8 @@ Platoon = Class(moho.platoon_methods) {
         return commands
     end,
 }
+
+-- backwards compatibility with mods
+
+local UnitUpgradeTemplates = UpgradeTemplates.UnitUpgradeTemplates
+local StructureUpgradeTemplates = UpgradeTemplates.StructureUpgradeTemplates

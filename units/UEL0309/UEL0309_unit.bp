@@ -1,9 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardScanRadius = 26, -- allows for factory reclaim bug 
-        TargetBones = {
-            'Turret',
-        },
     },
     Audio = {
         AmbientMove = Sound {
@@ -199,7 +196,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 1560,
         BuildCostMass = 312,
-        BuildRate = 30,
+        BuildRate = 32.5,
         BuildTime = 1560,
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER UEF',
@@ -256,7 +253,7 @@ UnitBlueprint {
     LifeBarOffset = 0.35,
     LifeBarSize = 1,
     Physics = {
-        BackUpDistance = 4,
+        BackUpDistance = 12,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -267,10 +264,10 @@ UnitBlueprint {
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
-        MaxAcceleration = 1.9,
-        MaxBrake = 1.9,
+        MaxAcceleration = 3.8,
+        MaxBrake = 3.8,
         MaxSpeed = 1.9,
-        MaxSpeedReverse = 1.4,
+        MaxSpeedReverse = 1.9,
         MaxSteerForce = 15,
         MeshExtentsX = 1,
         MeshExtentsY = 2.6,

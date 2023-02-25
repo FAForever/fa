@@ -162,30 +162,6 @@ CANNaniteTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
         '/effects/emitters/torpedo_underwater_launch_01_emit.bp',
     },
-
-    ---@param self CANNaniteTorpedoWeapon
-    ---@param bone Bone
-    ---@return Projectile|nil
-    CreateProjectileForWeapon = function(self, bone)
-        local projectile = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local bp = self.Blueprint
-        local data = {
-            Instigator = self.unit,
-            Damage = bp.DoTDamage,
-            Duration = bp.DoTDuration,
-            Frequency = bp.DoTFrequency,
-            Type = 'Normal',
-            PreDamageEffects = {},
-            DuringDamageEffects = {},
-            PostDamageEffects = {},
-        }
-        if projectile and not projectile:BeenDestroyed() then
-            projectile:PassData(data)
-            projectile:PassDamageData(damageTable)
-        end
-        return projectile
-    end,
 }
 
 ---@class CDFMissileMesonWeapon : DefaultProjectileWeapon
@@ -279,26 +255,6 @@ CAABurstCloudFlakArtilleryWeapon = ClassWeapon(DefaultProjectileWeapon) {
         '/effects/emitters/default_muzzle_flash_02_emit.bp'
     },
     FxMuzzleFlashScale = 1.5,
-
-    CreateProjectileForWeapon = function(self, bone)
-        local projectile = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self.Blueprint
-        local data = {
-            Instigator = self.unit,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Radius = blueprint.DamageRadius,
-            Type = 'Normal',
-            DamageFriendly = blueprint.DamageFriendly,
-        }
-        if projectile and not projectile:BeenDestroyed() then
-            projectile:PassData(data)
-            projectile:PassDamageData(damageTable)
-        end
-        return projectile
-    end,
 }
 
 ---@class CAAMissileNaniteWeapon : DefaultProjectileWeapon
@@ -333,31 +289,6 @@ CIFBombNeutronWeapon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class CIFNaniteTorpedoWeapon : DefaultProjectileWeapon
 CIFNaniteTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
-
-    ---@param self CIFNaniteTorpedoWeapon
-    ---@param bone Bone
-    ---@return Projectile|nil
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local bp = self.Blueprint
-        local data = {
-            Instigator = self.unit,
-            Damage = bp.DoTDamage,
-            Duration = bp.DoTDuration,
-            Frequency = bp.DoTFrequency,
-            Type = 'Normal',
-            PreDamageEffects = {},
-            DuringDamageEffects = {},
-            PostDamageEffects = {},
-        }
-
-        if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
-        end
-        return proj
-    end,
 }
 
 ---@class CIFMissileLoaWeapon : DefaultProjectileWeapon
