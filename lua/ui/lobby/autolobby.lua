@@ -304,7 +304,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     end
 
     lobbyComm.DataReceived = function(self, data)
-        LOG('DATA RECEIVED: ', repr(data))
+        LOG('DATA RECEIVED: ', reprsl(data))
 
         if data.Type == 'LaunchStatus' then
             peerLaunchStatuses[data.SenderID] = data.Status
@@ -319,15 +319,26 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         else
             --  Non-Host Messages
             if data.Type == 'Launch' then
-                LOG(repr(data.GameInfo))
+                -- The client compares the game options with those of the host. They both look like the local 'gameInfo' as defined 
+                -- above, but the host adds these fields upon launch so that we can display them on the scoreboard. A client won't have
+                -- this information attached, and therefore we remove it manually here
                 local hostOptions = table.copy(data.GameInfo.GameOptions)
-                -- The host options contain some extra data that we don't care about
                 hostOptions['Ratings'] = nil
                 hostOptions['ScenarioFile'] = nil
+                hostOptions['Divisions'] = nil
+
                 -- This is a sanity check so we don't accidentally launch games
                 -- with the wrong game settings because the host is using a
                 -- client that doesn't support game options for matchmaker.
                 if not table.equal(gameInfo.GameOptions, hostOptions) then
+                    WARN("Game options missmatch!")
+
+                    LOG("Client settings: ")
+                    reprsl(gameInfo.GameOptions)
+
+                    LOG("Host settings: ")
+                    reprsl(hostOptions)
+
                     SetDialog(parent, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
 
                     self:BroadcastData({ Type = 'LaunchStatus', Status = 'Rejected' })
