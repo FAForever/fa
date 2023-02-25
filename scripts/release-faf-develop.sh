@@ -1,6 +1,10 @@
 
 # Checklist before doing a release:
-# - [ ] If required, is the executable set for a release?
+
+echo "Press enter if the executable is set to release, if required"
+read
+
+# Doing the release
 
 git checkout faforever/deploy/fafdevelop 
 git pull faforever deploy/fafdevelop 
