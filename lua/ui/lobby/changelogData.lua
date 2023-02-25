@@ -1,4 +1,4 @@
-last_version = 3751
+last_version = 3752
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -12,6 +12,24 @@ last_version = 3751
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3752,
+        name = "Hotfix",
+        description = {
+            "# Game version 3752 (25th of February, 2022)",
+            "",
+            "See the patch notes of 3751 for the full patch notes.",
+            "",
+            "## Bug fixes",
+            "",
+            "- (#4736) Attempt at fixing the autolobby options missmatch",
+            "",
+            "## Contributors",
+            "",
+            "- Jip (#4736)",
+            "- Sheikah (#4736)",
+        }
+    },
     {
         version = 3751,
         name = "Developers patch",
@@ -66,6 +84,7 @@ gamePatches = {
             "    When you hold control units first move towards each other and create a formation before they would go to where you told them to. ",
             "    This is a hidden feature of the engine and often players were not aware. We patched this out because often people use the same key ",
             "    for hotkeys, after which players (usually accidentally) would issue a formation order instead of a regular move or attack move order",
+            "    You can still create formation orders by holding the right mouse button",
             "",
             "- (#4510) Add a game option to set the zoom threshold at which reclaim values are grouped together in the reclaim-overlay",
             "",
