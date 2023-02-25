@@ -320,8 +320,8 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
             --  Non-Host Messages
             if data.Type == 'Launch' then
                 -- The client compares the game options with those of the host. They both look like the local 'gameInfo' as defined 
-                -- above, but the host adds these fields upon launch so that we can display them on the scoreboard. A client won't have
-                -- this information attached, and therefore we remove it manually here
+                -- above, but the host adds these fields upon launch (see: CheckForLaunch) so that we can display them on the scoreboard. 
+                -- A client won't have this information attached, and therefore we remove it manually here
                 local hostOptions = table.copy(data.GameInfo.GameOptions)
                 hostOptions['Ratings'] = nil
                 hostOptions['ScenarioFile'] = nil
