@@ -42,7 +42,7 @@ Jip
     When you specifically issue move commands using the hotkey (usually 'm') or by clicking on the move command button it now ignores the 'convert to patrol' functionality
 
 - (3e34599) Remove the use of CTRL to issue commands with formations
-    When you hold control units first move towards each other and create a formation before they would go to where you told them to. This is a hidden feature of the engine and often players were not aware. We patched this out because often people use the same key for hotkeys, after which players (usually accidentally) would issue a formation order instead of a regular move or attack move order
+    When you hold control units first move towards each other and create a formation before they would go to where you told them to. This is a hidden feature of the engine and often players were not aware. We patched this out because often people use the same key for hotkeys, after which players (usually accidentally) would issue a formation order instead of a regular move or attack move order. You can still create formation orders by holding the right mouse button
 
 - (#4510) Add a game option to set the zoom threshold at which reclaim values are grouped together in the reclaim-overlay
 
