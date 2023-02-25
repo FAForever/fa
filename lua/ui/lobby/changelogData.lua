@@ -16,6 +16,7 @@ gamePatches = {
         version = 3751,
         name = "Developers patch",
         description = {
+            "# Game version 3751 (25th of February, 2022)",
             "",
             "In this first development update of 2023, we introduce three month's work of bugfixes, quality of life changes, and assorted ",
             "improvements. It is, by far, the most exciting patch we've released so far. While the full changes are detailed below, a quick summary ",
