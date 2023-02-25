@@ -25,7 +25,7 @@ gamePatches = {
             "",
             "- (#4741) Fix build preview of underwater storages",
             "",
-            "- (#4739) Fix tactical defense disinteresting into taking down the tactical missile from the Aloha",
+            "- (#4739) Fix Aloha being ignored by tactical missile defenses",
             "",
             "- (#4740) Fix reclaim values of wreckages",
             "",
