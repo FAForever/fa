@@ -9524,9 +9524,7 @@ float4 PBR_Seraphim(
     float3 normal,
     uniform bool hiDefShadows) : COLOR0
 {
-    // Calculate lookup texture for falloff ramp
-    float NdotV = saturate(dot( normalize(vertex.viewDirection), normal ));
-    float4 fallOff = tex2D( falloffSampler, float2(pow(1 - NdotV, 0.6),vertex.material.x));
+    float NdotV = saturate(dot(normalize(vertex.viewDirection), normal));
     NdotV = 2 * pow(NdotV, 6) - 2 * NdotV + 1.5;
     float3 teamColor = NdotV * vertex.color.rgb;
 	
