@@ -9533,13 +9533,14 @@ float4 PBR_Seraphim(
     // There are also white highlights in the albedo texture in some models
     float3 whiteness = saturate(albedo.rgb - float3 (0.4,0.4,0.4));
 
-    albedo.rgb = (albedo.rgb + float3(0.4, 0.43, 0.47)) * 0.6;
+    albedo.rgb = (albedo.rgb + float3(0.4, 0.43, 0.47)) * 0.8;
     albedo.rgb = lerp(albedo.rgb, teamColor, albedo.a);
 
-    float metallic = 0.8;
-    float roughness = saturate((1 - pow(specular.g, 0.5) + 0.15) * 0.6);
+    float metallic = 1;
+    float roughness = saturate((1 - pow(specular.g, 0.5) + 0.3) * 0.7);
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows).rgb;
-    
+    color = lerp(color, teamColor * 0.5, albedo.a - 0.2);
+ 
     float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness * 2;
     color += emission * albedo;
 
@@ -9551,7 +9552,7 @@ float4 PBR_Seraphim(
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
     teamColorGlow = albedo.a * (1 - teamColorGlow) * 0.06;
-    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow;
+    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness * 0.2;
     
     return float4(color, alpha);
 }
