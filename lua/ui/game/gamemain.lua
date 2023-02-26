@@ -191,6 +191,7 @@ function CreateUI(isReplay)
 
     ConExecute('net_SendDelay 1')
     ConExecute('net_AckDelay 1')
+    ConExecute('net_ResendDelayBias 1')
 
     -- enable experimental graphics
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
