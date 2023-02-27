@@ -335,7 +335,7 @@ Callbacks.CapStructure = function(data, units)
             -- determine build location using cached value
             buildLocation[1] = cx + location[1]
             buildLocation[3] = cz + location[2]
-            buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
+            buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[3])
 
             -- check all skirts manually as brain:CanBuildStructureAt(...) is unreliable when structures have been upgraded
             local freeToBuild = true

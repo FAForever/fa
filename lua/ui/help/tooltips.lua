@@ -635,6 +635,11 @@ Tooltips = {
         description = "<LOC ASSIST_TO_UPGRADE_DESCRIPTION>When enabled structures automatically queue and pause their upgrade when you issue an assist order",
     },
 
+    options_alt_to_force_attack_move = {
+        title = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>Hold alt to force attack move",
+        description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>When enabled holding alt will always turn orders into an attack move order"
+    },
+
     options_assist_to_unpause = {
         title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to Unpause",
         description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled structures automatically unpause as engineers start assisting it.",

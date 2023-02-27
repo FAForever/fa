@@ -178,7 +178,7 @@ Prop = Class(moho.prop_methods) {
         self.MaxMassReclaim = mass
         self.MaxEnergyReclaim = energy
         self.TimeReclaim = time
-        self.ReclaimLeft = self.ReclaimLeft or 1
+        self:UpdateReclaimLeft()
 
         if self.MaxMassReclaim * self.ReclaimLeft >= 10 then
             self:SetupUILabel()
@@ -196,6 +196,8 @@ Prop = Class(moho.prop_methods) {
             -- we have to take into account if the wreck has been partly reclaimed by an engineer
             self.ReclaimLeft = ratio * self:GetFractionComplete()
             self:UpdateUILabel()
+        else
+            self.ReclaimLeft = 0
         end
     end,
 
@@ -356,7 +358,7 @@ Prop = Class(moho.prop_methods) {
     SetupUILabel = function(self)
         if not self.SyncData then
             self.SyncData = {
-                mass = self.MaxMassReclaim,
+                mass = self.MaxMassReclaim * (self.ReclaimLeft or 1),
                 position = self.CachePosition
             }
             Sync.Reclaim[self.EntityId] = self.SyncData
