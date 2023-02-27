@@ -299,7 +299,6 @@ UnitBlueprint {
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 10,
             MuzzleVelocityReduceDistance = 30,
-            PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CAANanoDartExGr/CAANanoDartExGr_proj.bp',
             ProjectileLifetime = 3,
             RackBones = {
