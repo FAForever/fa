@@ -132,6 +132,7 @@ keyDescriptions = {
     ['launch_tactical'] = '<LOC key_desc_0054>Launch a Tactical Missile',
     ['overcharge'] = '<LOC key_desc_0055>Overcharge',
     ['move'] = '<LOC key_desc_0065>Move',
+    ['move_hard'] = '<LOC KEY_MOVE_HARD>Move order that you can consistently issue without queueing',
     ['nuke'] = '<LOC key_desc_0063>Nuke',
     ['mode'] = '<LOC key_desc_0101>Cycle through all of the available fire states.',
     ['dock'] = '<LOC key_desc_0405>Dock',
@@ -496,4 +497,6 @@ keyDescriptions = {
     ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
 
     ['recheck_targets_of_weapons'] = 'Recheck targets of weapons of selected units',
+    ['set_target_priority'] = 'Set weapon target priorities to the type of unit that you hover over with the mouse',
+    ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
 }

@@ -938,23 +938,32 @@ end
 function FakeTeleportUnits(units, killUnits)
     IssueStop(units)
     IssueClearCommands(units)
+
     for _, unit in units do
-        unit.CanBeKilled = false
-        unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
-        unit:PlayUnitSound('GateCharge')
+        if not IsDestroyed(unit) then
+            unit.CanBeKilled = false
+            unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
+            unit:PlayUnitSound('GateCharge')
+        end
     end
+
     WaitSeconds(2)
 
     for _, unit in units do
-        unit:CleanupTeleportChargeEffects()
-        unit:PlayTeleportOutEffects()
-        unit:PlayUnitSound('GateOut')
+        if not IsDestroyed(unit) then
+            unit:CleanupTeleportChargeEffects()
+            unit:PlayTeleportOutEffects()
+            unit:PlayUnitSound('GateOut')
+        end
     end
+
     WaitSeconds(1)
 
     if killUnits then
         for _, unit in units do
-            unit:Destroy()
+            if not IsDestroyed(unit) then
+                unit:Destroy()
+            end
         end
     end
 end
@@ -1067,6 +1076,12 @@ function RemoveRestriction(army, categories, isSilent)
         -- Remove scenario restriction from game restrictions
         Game.RemoveRestriction(categories, army)
         Sync.Restrictions = Game.GetRestrictions()
+
+        ---@type AIBrain
+        local brain = ArmyBrains[army]
+        if brain then
+            brain:ReEvaluateHQSupportFactoryRestrictions()
+        end
     end
 end
 

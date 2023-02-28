@@ -1,26 +1,11 @@
---***************************************************************************
---*
---**  File     :  /lua/ai/SorianStrategyBuilders.lua
---**
---**  Summary  : Default Naval structure builders for skirmish
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
-local BBTmplFile = '/lua/basetemplates.lua'
-local BuildingTmpl = 'BuildingTemplates'
-local BaseTmpl = 'BaseTemplates'
-local ExBaseTmpl = 'ExpansionBaseTemplates'
-local Adj2x2Tmpl = 'Adjacency2x2'
+-- File     :  /lua/ai/SorianStrategyBuilders.lua
+-- Summary  : Default Naval structure builders for skirmish
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local UCBC = '/lua/editor/unitcountbuildconditions.lua'
 local MIBC = '/lua/editor/miscbuildconditions.lua'
 local MABC = '/lua/editor/markerbuildconditions.lua'
-local IBC = '/lua/editor/instantbuildconditions.lua'
-local OAUBC = '/lua/editor/otherarmyunitcountbuildconditions.lua'
 local EBC = '/lua/editor/economybuildconditions.lua'
-local PCBC = '/lua/editor/platooncountbuildconditions.lua'
-local SAI = '/lua/scenarioplatoonai.lua'
-local PlatoonFile = '/lua/platoon.lua'
 local SBC = '/lua/editor/SorianBuildConditions.lua'
 local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 local AIUtils = import("/lua/ai/aiutilities.lua")
@@ -31,6 +16,7 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 
 local econThread
 
+---@param aiBrain AIBrain
 function EconWatch(aiBrain)
     local factionIndex = aiBrain:GetFactionIndex()
     local cats = {
@@ -1696,3 +1682,15 @@ BuilderGroup {
         AddBuilders = {}
     },
 }
+
+-- Kept for Mod Support
+local BBTmplFile = '/lua/basetemplates.lua'
+local BuildingTmpl = 'BuildingTemplates'
+local BaseTmpl = 'BaseTemplates'
+local ExBaseTmpl = 'ExpansionBaseTemplates'
+local Adj2x2Tmpl = 'Adjacency2x2'
+local IBC = '/lua/editor/instantbuildconditions.lua'
+local OAUBC = '/lua/editor/otherarmyunitcountbuildconditions.lua'
+local PCBC = '/lua/editor/platooncountbuildconditions.lua'
+local SAI = '/lua/scenarioplatoonai.lua'
+local PlatoonFile = '/lua/platoon.lua'

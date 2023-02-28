@@ -59,8 +59,6 @@ URL0303 = ClassUnit(CWalkingLandUnit) {
         WaitSeconds(blueprint.SecondsBeforeChargeKicksIn)
 
         self.ChargingInProgress = true
-        self:SetWeaponEnabledByLabel('Disintigrator', false)
-        self:SetWeaponEnabledByLabel('HeavyBolter', false)
         self:SetAccMult(blueprint.Physics.ChargeAccMult)
         self:SetSpeedMult(blueprint.Physics.ChargeSpeedMult)
         -- EMP duration mult added in DoDeathWeapon 

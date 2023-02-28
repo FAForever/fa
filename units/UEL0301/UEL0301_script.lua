@@ -134,8 +134,8 @@ UEL0301 = ClassUnit(CommandUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -175,8 +175,8 @@ UEL0301 = ClassUnit(CommandUnit) {
         end
     end,
 
-    OnIntelEnabled = function(self)
-        CommandUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        CommandUnit.OnIntelEnabled(self, intel)
         if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
@@ -187,8 +187,8 @@ UEL0301 = ClassUnit(CommandUnit) {
         end
     end,
 
-    OnIntelDisabled = function(self)
-        CommandUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        CommandUnit.OnIntelDisabled(self, intel)
         if self.RadarJammerEnh and not self:IsIntelEnabled('Jammer') then
             self:SetMaintenanceConsumptionInactive()
             if self.IntelEffectsBag then

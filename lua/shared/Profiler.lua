@@ -1,4 +1,8 @@
 
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 --- Constructs an empty table that the profiler can populate.
 function CreateEmptyProfilerTable() 
     return {

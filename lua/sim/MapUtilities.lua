@@ -1,3 +1,7 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 local MarkerUtilities = import("/lua/sim/markerutilities.lua")
 local MapResourceCheckApplied = false
 
@@ -72,7 +76,7 @@ function MapResourceCheck()
 
             yield(2)
 
-            for k, marker in hydro do 
+            for k, marker in hydro do
                 local x, y, z = marker.position[1], marker.position[2], marker.position[3]
                 TryUnit(x, y, z, "uab1102")
             end

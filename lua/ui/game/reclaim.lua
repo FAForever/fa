@@ -14,7 +14,6 @@ local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
 
-
 ---@class UIReclaimDataPoint
 ---@field mass number
 ---@field position Vector

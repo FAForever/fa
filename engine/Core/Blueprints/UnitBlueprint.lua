@@ -65,11 +65,12 @@
 --- if defined, the collision shape will be a sphere of this radius using the
 --- `CollisionSphereOffset` species of collision offsets
 ---@field SizeSphere? number
+--- Whether this unit uses the mass-based veterancy system
+---@field VetEnabled boolean
+--- Defines threshold when 
+---@field VetThresholds table<number, number>
 --- overrides the veterancy instant heal multiplier per level (which is 0.1)
 ---@field VeteranHealingMult? number[]
---- Other units will multiply the veterancy gained from destroying this unit by this value.
---- Defaults to `1`
----@field VeteranImportanceMult? number
 --- Additional mass needed to get to the veterancy level of the index in the table, relative to the
 --- cumulative mass of the previous levels (or 0 for level 1)
 --- takes precedence over `VeteranMassMult`
@@ -448,6 +449,10 @@
 
 
 ---@class UnitBlueprintDisplay
+--- Used by the Aeon build animation for a custom mercury pool
+---@field AeonMercuryPool? string
+--- Used by the Aeon build animation to offset the mercury pool
+---@field AeonMercuryPoolOffset? number
 --- Backup abilities shown by the unit view, if the detected ones don't cover them.
 ---@field Abilities UnlocalizedString[]
 --- names that the AI can use to name the unit, provided the AI is programmed to do this
@@ -659,6 +664,7 @@
 ---@field FadeOut number
 ---@field Length number
 ---@field Normal FileName
+---@field Glow FileName
 ---@field Orientations number[]
 ---@field RemoveWhenDead boolean
 ---@field Width number
@@ -848,8 +854,17 @@
 ---@field PitchBone Bone
 ---@field YawBone Bone
 
+---@class UnitIntelStatus
+---@field RechargeThread thread?
+---@field AllIntel table<IntelType, boolean>
+---@field AllIntelRecharging table<IntelType, boolean>
+---@field AllIntelMaintenanceFree table<IntelType, boolean>
+---@field AllIntelFromEnhancements table<IntelType, boolean>
+---@field AllIntelDisabledByEvent table<IntelType, table<string, boolean>>
 
 ---@class UnitBlueprintIntel
+--- intel status that is deep-copied for each unit instance
+---@field State? UnitIntelStatus
 --- intel types set to true in this table cannot be disabled
 ---@field ActiveIntel? table<IntelType, boolean>
 --- single unit cloaking
@@ -902,13 +917,14 @@
 --- how far the unit can see underwater
 ---@field WaterVisionRadius number
 
-
 ---@class UnitBlueprintInterface
 ---@field HelpText string
 ---@field Selectable? boolean
 
 
 ---@class UnitBlueprintPhysics
+--- forces terrain alignment for structures
+---@field AlwaysAlignToTerrain boolean
 --- alternate method of locomotion
 ---@field AltMotionType? UnitMotionType
 --- preferred attack height when attacking ground targets (used by dive bombers)
