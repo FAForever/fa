@@ -81,20 +81,24 @@ UnitBlueprint {
         },
         AnimationBuild = '/units/urb0202/urb0202_abuild.sca',
         AnimationFinishBuildLand = '/units/urb0202/urb0202_aplatform.sca',
-        AnimationUpgrade = '/units/urb0202/urb0202_aupgrade.sca',
+        AnimationUpgrade = '/units/zrb9502/zrb9502_aupgrade.sca',
         BuildAttachBone = 'Build_Point',
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
+                    AlbedoName = '/units/urb0102/URB0102_Albedo.dds',
+                    NormalsName = '/units/urb0102/URB0102_NormalsTS.dds',
+                    SpecularName = '/units/urb0102/URB0102_SpecTeam.dds',
                     LODCutoff = 200,
                     ShaderName = 'Insect',
                 },
                 {
-                    AlbedoName = 'zrb9502_lod1_albedo.dds',
+                    AlbedoName = '/units/urb0102/URB0102_lod1_Albedo.dds',
+                    NormalsName = '/units/urb0102/URB0102_lod1_NormalsTS.dds',
+                    SpecularName = '/units/urb0102/URB0102_lod1_SpecTeam.dds',
                     LODCutoff = 500,
                     ShaderName = 'Insect',
-                    SpecularName = 'zrb9502_lod1_specteam.dds',
                 },
             },
         },

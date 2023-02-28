@@ -1,3 +1,6 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
 
 local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
 
@@ -211,4 +214,6 @@ local function MatchStateThread()
 
 end
 
-ForkThread(MatchStateThread)
+function Setup()
+    ForkThread(MatchStateThread)
+end

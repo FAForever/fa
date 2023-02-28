@@ -23,9 +23,8 @@ local TableSort = table.sort
 --- Determines the size in bytes of the given element
 ---@param element any
 ---@param ignore table<string, boolean>     # List of key names to ignore of all (referenced) tables
----@param seen? table<table, any>           # List of strings and / or tables that we've seen so far. Should be nil by default
 ---@return integer
-function ToBytes(element, ignore, seen)
+function ToBytes(element, ignore)
 
     -- has no allocated bytes
     if element == nil then
@@ -33,25 +32,44 @@ function ToBytes(element, ignore, seen)
     end
 
     -- applies to tables and strings, to prevent counting them multiple times
-    seen = seen or { }
-    if seen[element] then
-        return 0
-    end
+    local seen = { }
 
-    -- determine size
-    local allocatedSize = debug.allocatedsize(element)
-    if allocatedSize == 0 then
-        return 8
-    elseif type(element) ~= 'table' then
-        seen[element] = true
-        return allocatedSize
-    end
+    -- prepare stack to prevent recursion
+    local allocatedSize = 0
+    local stack = { element }
+    local head = 2
 
-    -- at this point we know it is a table
-    seen[element] = true
-    for k, v in element do
-        if not ignore[k] then
-            allocatedSize = allocatedSize + ToBytes(v, ignore, seen)
+    while head > 1 do
+
+        head = head - 1
+        local value = stack[head]
+        stack[head] = nil
+
+        local size = debug.allocatedsize(value)
+
+        -- size of usual value
+        if size == 0 then
+            allocatedSize = allocatedSize + 8
+
+        -- size of string
+        elseif type(value) ~= 'table' then
+            if not seen[value] then
+                seen[value] = true
+                allocatedSize = allocatedSize + size
+            end
+
+        -- size of table
+        else
+            if not seen[value] then
+                allocatedSize = allocatedSize + size
+                seen[value] = true
+                for k, v in value do
+                    if not ignore[k] then
+                        stack[head] = v
+                        head = head + 1
+                    end
+                end
+            end
         end
     end
 

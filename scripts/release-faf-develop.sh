@@ -1,4 +1,11 @@
 
+# Checklist before doing a release:
+
+echo "Press enter if the executable is set to release, if required"
+read
+
+# Doing the release
+
 git checkout faforever/deploy/fafdevelop 
 git pull faforever deploy/fafdevelop 
 

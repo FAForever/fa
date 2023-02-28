@@ -335,7 +335,7 @@ Callbacks.CapStructure = function(data, units)
             -- determine build location using cached value
             buildLocation[1] = cx + location[1]
             buildLocation[3] = cz + location[2]
-            buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
+            buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[3])
 
             -- check all skirts manually as brain:CanBuildStructureAt(...) is unreliable when structures have been upgraded
             local freeToBuild = true
@@ -428,11 +428,6 @@ Callbacks.BoxFormationSpawn = function(data)
         -- dummy units do not have this function
         if unit.SetVeterancy then 
             unit:SetVeterancy(data.veterancy)
-        end
-
-        -- only structures have this function
-        if unit.CreateTarmac and __blueprints[data.bpId].Display and __blueprints[data.bpId].Display.Tarmacs then
-            unit:CreateTarmac(true,true,true,false,false)
         end
     end
 end
@@ -794,29 +789,6 @@ local function GetCargoSlots(unit)
     -- cache it and return
     GetCargoSlotsCache[unit.UnitId] = slots
     return slots
-end
-
-Callbacks.LoadIntoTransports = function(data, selection)
-    if selection then
-
-        local uTransports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
-
-        -- retrieve usable data about transports
-        local dTransports = { }
-        for k, transport in uTransports do
-            local cargoSlots = GetCargoSlots(transport)
-            table.insert(dTransports, {
-                Transport = transport,
-                Cargo = { },
-                Small = cargoSlots.Small,
-                Medium = cargoSlots.Medium,
-                Large = cargoSlots.Large,
-            })
-        end
-
-        local uCargo = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
-
-    end
 end
 
 Callbacks.NavToggleScanLayer = import("/lua/sim/navdebug.lua").ToggleScanLayer

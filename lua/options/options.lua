@@ -348,7 +348,7 @@ options = {
                 title = "<LOC OPTIONS_0233>All Faction Templates",
                 key = 'gui_all_race_templates',
                 type = 'toggle',
-                default = 0,
+                default = 1,
                 custom = {
                     states = {
                         {text = "<LOC _Off>", key = 0 },
@@ -408,11 +408,11 @@ options = {
                 title = "<LOC selectionsets0001>Steal from other control groups",
                 key = 'steal_from_other_control_groups',
                 type = 'toggle',
-                default = false,
+                default = 'Off',
                 custom = {
                     states = {
-                        {text = "<LOC _No>No", key = false },
-                        {text = "<LOC _Yes>Yes", key = true },
+                        {text = "<LOC _Off>Off", key = 'Off' },
+                        {text = "<LOC _On>On", key = 'On' },
                     },
                 },
             },
@@ -421,11 +421,11 @@ options = {
                 title = "<LOC selectionsets0004>Add to factory control group",
                 key = 'add_to_factory_control_group',
                 type = 'toggle',
-                default = false,
+                default = 'Off',
                 custom = {
                     states = {
-                        {text = "<LOC _No>No", key = false },
-                        {text = "<LOC _Yes>Yes", key = true },
+                        {text = "<LOC _Off>Off", key = 'Off' },
+                        {text = "<LOC _On>On", key = 'On' },
                     },
                 },
             },
@@ -510,14 +510,28 @@ options = {
                 title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
                 key = 'repeatbuild',
                 type = 'toggle',
-                default = false,
+                default = 'Off',
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
+                        {text = "<LOC _Off>", key = 'Off'},
+                        {text = "<LOC _On>", key = 'On'},
                     },
                 },
             },
+
+            {
+                title = "<LOC ASSIST_TO_UPGRADE>Hold alt to force attack move",
+                key = 'alt_to_force_attack_move',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>Off", key = 'Off'},
+                        {text = "<LOC _On>On", key = 'On'},
+                    },
+                },
+            },
+
             {
                 title = "<LOC OPTIONS_0273>Automated Structure Ringing",
                 key = 'structure_capping_feature_01',
