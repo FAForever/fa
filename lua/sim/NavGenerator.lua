@@ -460,7 +460,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
         -- scan left-top -> left-bottom
         for k = z1, z2 - 1 do
-            z = k + 0.5
+            local z = k + 0.5
             -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x1Outside, z)
             if neighbor then
@@ -476,7 +476,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
         -- scan right-top -> right-bottom
         for k = z1, z2 - 1 do
-            z = k + 0.5
+            local z = k + 0.5
             -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x2Outside, z)
             if neighbor then
