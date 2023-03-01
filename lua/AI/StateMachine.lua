@@ -9,33 +9,37 @@ end
 ---@class AIStateMachine
 ---@field Identifier string
 ---@field StateTrash TrashBag
----@field Platoon Platoon
+---@field Units Unit[]
+---@field Brain AIBrain
 ---@field Debug boolean
 StateMachine = ClassSimple {
 
-    Identifier = 'Default',
     Debug = false,
+    Identifier = 'Default',
 
     ---@param self AIStateMachine
-    ---@param platoon Platoon
-    __init = function(self, platoon)
+    ---@param brain AIBrain
+    ---@param units Unit[]
+    __init = function(self, brain, units)
         self.Identifier = string.format("%s - %d", self.Identifier, GetUniqueIdentifier())
         self.StateTrash = TrashBag()
-        self.Platoon = platoon
+        self.Units = units
+        self.Brain = brain
         self.StateName = ''
+
+        -- prepare unit identifiers for debugging
+        local unitIdentifiers = {}
+        for k, unit in units do
+            unit:SetStat(unit:GetStat('AIStateMachineIdentifier', ''), self.Identifier)
+            unitIdentifiers[k] = unit:GetEntityId()
+        end
 
         -- prepare sync and inform UI that we exist
         self.StateSync = { Tick = GetGameTick() }
-        self:ToSync('Created', self.Identifier)
+        self:ToSync('Created', { Identifier = self.Identifier, UnitIdentifiers = unitIdentifiers })
 
-        -- prepare unit identifiers for debugging
-        local identifiers = {}
-        local units = self.Platoon:GetPlatoonUnits()
-        for k, unit in units do
-            unit:SetStat(unit:GetStat('AIStateMachineIdentifier', ''), self.Identifier)
-            identifiers[k] = unit:GetEntityId()
-        end
-        self:ToSync('UnitIdentifiers', identifiers)
+        -- allow UI to find us
+        StateMachines[self.Identifier] = self
     end,
 
     ---@param self AIStateMachine
@@ -46,9 +50,11 @@ StateMachine = ClassSimple {
         local state = self[name]
         if state then
             self.StateName = name
+            self:ToSync('ChangedState', name)
             ChangeState(self, state)
         else
             self.StateName = 'Error'
+            self:ToSync('ChangedState', name)
             ChangeState(self, state)
         end
     end,
@@ -83,13 +89,6 @@ StateMachine = ClassSimple {
     end,
 
     -- # Default states # --
-
-    Start = State {
-        ---@param self AIStateMachine
-        Main = function(self)
-            self:ToState('Error')
-        end,
-    },
 
     Blank = State {
         ---@param self AIStateMachine
