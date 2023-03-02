@@ -1081,7 +1081,9 @@ local function GenerateMarkerMetadata()
         Land = NavGrids['Land'],
         Amphibious = NavGrids['Amphibious'],
         Hover = NavGrids['Hover'],
-        Naval = NavGrids['Naval'],
+
+        -- also tackled with amphibious layer 
+        -- Naval = NavGrids['Naval'],
     }
 
     local extractors = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
