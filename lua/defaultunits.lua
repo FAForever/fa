@@ -71,6 +71,7 @@ StructureUnit = ClassUnit(Unit) {
         self:HideLandBones()
         self.FxBlinkingLightsBag = { }
 
+        local layer = self.Layer
         local blueprint = self.Blueprint
         local physicsBlueprint = blueprint.Physics
         local flatten = physicsBlueprint.FlattenSkirt
@@ -78,13 +79,12 @@ StructureUnit = ClassUnit(Unit) {
             self:FlattenSkirt()
         end
 
-
         -- check for terrain orientation
         if not (
                 physicsBlueprint.AltitudeToTerrain or
                 physicsBlueprint.StandUpright
             ) and (flatten or physicsBlueprint.AlwaysAlignToTerrain)
-            and self.Layer == 'Land'
+            and (layer == 'Land' or layer == 'Seabed')
         then
             -- rotate structure to match terrain gradient
             local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
