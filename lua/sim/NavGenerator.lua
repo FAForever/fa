@@ -460,7 +460,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
         -- scan left-top -> left-bottom
         for k = z1, z2 - 1 do
-            z = k + 0.5
+            local z = k + 0.5
             -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x1Outside, z)
             if neighbor then
@@ -476,7 +476,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
         -- scan right-top -> right-bottom
         for k = z1, z2 - 1 do
-            z = k + 0.5
+            local z = k + 0.5
             -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x2Outside, z)
             if neighbor then
@@ -1045,7 +1045,7 @@ local function GenerateCullLabels()
     local count = 1
     for k, _ in navLabels do
         local metadata = navLabels[k]
-        if metadata.Area < 0.2 and metadata.NumberOfExtractors == 0 and metadata.NumberOfHydrocarbons == 0 then
+        if metadata.Area < 0.16 and metadata.NumberOfExtractors == 0 and metadata.NumberOfHydrocarbons == 0 then
             culledLabels = culledLabels + 1
 
             -- cull node
@@ -1079,7 +1079,11 @@ local function GenerateMarkerMetadata()
 
     local grids = {
         Land = NavGrids['Land'],
-        Amphibious = NavGrids['Amphibious']
+        Amphibious = NavGrids['Amphibious'],
+        Hover = NavGrids['Hover'],
+
+        -- also tackled with amphibious layer 
+        -- Naval = NavGrids['Naval'],
     }
 
     local extractors = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
