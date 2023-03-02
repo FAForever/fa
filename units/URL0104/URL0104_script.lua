@@ -13,28 +13,23 @@ local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaserInvisible
 ---@class URL0104 : CLandUnit
 URL0104 = ClassUnit(CLandUnit) {
     Weapons = {
-        TargetPainter = ClassWeapon(TargetingLaser) {
-            -- Unit in range. Cease ground fire and turn on AA
-            OnWeaponFired = function(self)
-                if not self.AA then
+       AAGun = ClassWeapon(CAANanoDartWeapon) {
+            IdleState = State (CAANanoDartWeapon.IdleState) {
+                OnGotTarget = function(self)
+                    CAANanoDartWeapon.IdleState.OnGotTarget(self)
+                    LOG("OnGotTarget")
                     self.unit:SetWeaponEnabledByLabel('GroundGun', false)
-                    self.unit:SetWeaponEnabledByLabel('AAGun', true)
-                    self.AA = true
-                end
-            TargetingLaser.OnWeaponFired(self)
-            end,
-
-            IdleState = State(TargetingLaser.IdleState) {
-                -- Default Ground weapon on
-                Main = function(self)
-                    self.unit:SetWeaponEnabledByLabel('GroundGun', true)
-                    self.unit:SetWeaponEnabledByLabel('AAGun', true)
-                    self.AA = false
-            TargetingLaser.IdleState.Main(self)
-            end,
+                    self.unit:GetWeaponManipulatorByLabel('AAGun'):SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel('GroundGun'):GetHeadingPitch())
+                end,
             },
+
+            OnLostTarget = function(self)
+                CAANanoDartWeapon.OnLostTarget(self)
+                LOG("OnLostTarget")
+                self.unit:SetWeaponEnabledByLabel('GroundGun', true)
+                self.unit:GetWeaponManipulatorByLabel('GroundGun'):SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel('AAGun'):GetHeadingPitch())
+            end,
         },
-        AAGun = ClassWeapon(CAANanoDartWeapon) {},
         GroundGun = ClassWeapon(CAANanoDartWeapon) {},
     },
 }
