@@ -1045,7 +1045,7 @@ local function GenerateCullLabels()
     local count = 1
     for k, _ in navLabels do
         local metadata = navLabels[k]
-        if metadata.Area < 0.2 and metadata.NumberOfExtractors == 0 and metadata.NumberOfHydrocarbons == 0 then
+        if metadata.Area < 0.16 and metadata.NumberOfExtractors == 0 and metadata.NumberOfHydrocarbons == 0 then
             culledLabels = culledLabels + 1
 
             -- cull node
@@ -1079,7 +1079,9 @@ local function GenerateMarkerMetadata()
 
     local grids = {
         Land = NavGrids['Land'],
-        Amphibious = NavGrids['Amphibious']
+        Amphibious = NavGrids['Amphibious'],
+        Hover = NavGrids['Hover'],
+        Naval = NavGrids['Naval'],
     }
 
     local extractors = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
