@@ -2,7 +2,6 @@
 
 local AeonT1Eng = {
     ['L'] = 'uab0101',
-    ['R'] = 'dab2102',
     ['A'] = 'uab0102',
     ['S'] = 'uab0103',
     ['E'] = 'uab1103',
@@ -20,6 +19,9 @@ local AeonT1Eng = {
 }
 
 local AeonT2Eng = {
+    ['L'] = 'zab9501',
+    ['A'] = 'zab9502',
+    ['S'] = 'zab9503',
     ['E'] = 'uab1202',
     ['P'] = 'uab1201',
     ['D'] = 'uab2301',
@@ -36,6 +38,9 @@ local AeonT2Eng = {
 }
 
 local AeonT3Eng = {
+    ['L'] = 'zab9601',
+    ['A'] = 'zab9602',
+    ['S'] = 'zab9603',
     ['E'] = 'uab1302',
     ['D'] = 'xab2307',
     ['C'] = 'xab3301',
@@ -152,7 +157,10 @@ local UEFT1Eng = {
 }
 
 local UEFT2Eng = {
-    ['A'] = 'xeb0104',
+    ['L'] = 'zeb9501',
+    ['A'] = 'zeb9502',
+    ['S'] = 'zeb9503',
+    ['Q'] = 'xeb0104',
     ['E'] = 'ueb1202',
     ['P'] = 'ueb1201',
     ['D'] = 'ueb2301',
@@ -167,8 +175,11 @@ local UEFT2Eng = {
     ['I'] = 'ueb3201',
     ['O'] = 'ueb3202',
 }
-
+ 
 local UEFT3Eng = {
+    ['L'] = 'zeb9601',
+    ['A'] = 'zeb9602',
+    ['S'] = 'zeb9603',    
     ['D'] = 'xeb2306',
     ['E'] = 'ueb1302',
     ['F'] = 'ueb1303',
@@ -287,7 +298,10 @@ local CybranT1Eng = {
 }
 
 local CybranT2Eng = {
-    ['A'] = 'xrb0104',
+    ['L'] = 'zrb9501',
+    ['A'] = 'zrb9502',
+    ['S'] = 'zrb9503',     
+    ['Q'] = 'xrb0104',
     ['E'] = 'urb1202',
     ['P'] = 'urb1201',
     ['D'] = 'urb2301',
@@ -304,6 +318,9 @@ local CybranT2Eng = {
 }
 
 local CybranT3Eng = {
+    ['L'] = 'zrb9601',
+    ['A'] = 'zrb9602',
+    ['S'] = 'zrb9603',      
     ['C'] = 'xrb3301',
     ['T'] = 'xrb2308',
     ['E'] = 'urb1302',
@@ -427,6 +444,9 @@ local SeraphimT1Eng = {
 }
 
 local SeraphimT2Eng = {
+    ['L'] = 'zsb9501',
+    ['A'] = 'zsb9502',
+    ['S'] = 'zsb9503',    
     ['E'] = 'xsb1202',
     ['P'] = 'xsb1201',
     ['D'] = 'xsb2301',
@@ -443,6 +463,9 @@ local SeraphimT2Eng = {
 }
 
 local SeraphimT3Eng = {
+    ['L'] = 'zsb9601',
+    ['A'] = 'zsb9602',
+    ['S'] = 'zsb9603',  
     ['E'] = 'xsb1302',
     ['F'] = 'xsb1303',
     ['P'] = 'xsb1301',
@@ -696,6 +719,12 @@ buildModeKeys = {
     ['uab0304'] = {
         [3] = {
             ['C'] = 'ual0301',
+            ['F'] = 'ual0301_ras',
+            ['T'] = 'ual0301_simplecombat',
+            ['E'] = 'ual0301_engineer',
+            ['N'] = 'ual0301_nanocombat',
+            ['S'] = 'ual0301_shieldcombat',
+            ['R'] = 'ual0301_rambo',
         },
     },
     -- T1 Mass Extractor
@@ -794,7 +823,7 @@ buildModeKeys = {
         [4] = UEFT4Eng,
     },
     -- subcommander - intel jammer preset
-    ['uel0301_intelkammer'] = {
+    ['uel0301_inteljammer'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
@@ -912,6 +941,13 @@ buildModeKeys = {
     ['ueb0304'] = {
         [3] = {
             ['C'] = 'uel0301',
+            ['F'] = 'uel0301_ras',
+            ['T'] = 'uel0301_combat',
+            ['E'] = 'uel0301_engineer',
+            ['R'] = 'uel0301_rambo',
+            ['S'] = 'uel0301_bubbleshield',
+            ['J'] = 'uel0301_inteljammer',
+
         },
     },
     -- T1 Mass Extractor
@@ -1126,6 +1162,13 @@ buildModeKeys = {
     ['urb0304'] = {
         [3] = {
             ['C'] = 'url0301',
+            ['F'] = 'url0301_ras',
+            ['T'] = 'url0301_combat',
+            ['E'] = 'url0301_engineer',
+            ['R'] = 'url0301_rambo',
+            ['S'] = 'url0301_stealth',
+            ['K'] = 'url0301_cloak',
+            ['A'] = 'url0301_antiair',
         },
     },
     -- T1 Mass Extractor
@@ -1342,6 +1385,12 @@ buildModeKeys = {
     ['xsb0304'] = {
         [3] = {
             ['C'] = 'xsl0301',
+            ['T'] = 'xsl0301_combat',
+            ['E'] = 'xsl0301_engineer',
+            ['N'] = 'xsl0301_nanocombat',
+            ['A'] = 'xsl0301_advancedcombat',
+            ['R'] = 'xsl0301_rambo',
+            ['M'] = 'xsl0301_missile',
         },
     },
     -- T1 Mass Extractor
