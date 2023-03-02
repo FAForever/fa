@@ -48,6 +48,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     },
     FxMuzzleFlashScale = 1,
 
+    OnGotTarget = function(self)
+        DefaultProjectileWeapon.OnGotTarget(self)
+        reprsl(debug.traceback())
+    end,
+    
     -- Called when the weapon is created, almost always when the owning unit is created
     ---@param self DefaultProjectileWeapon
     ---@return boolean

@@ -320,6 +320,7 @@ Weapon = ClassWeapon(moho.weapon_methods) {
 
     ---@param self Weapon
     OnGotTarget = function(self)
+        LOG("Hellooo")
         local animator = self.unit.Animator
         if self.DisabledFiringBones and animator then
             for _, value in self.DisabledFiringBones do
