@@ -7,9 +7,9 @@
 --
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
-local SZhanaseeBombProjectile = import('/lua/seraphimprojectiles.lua').SZhanaseeBombProjectile
-local DefaultExplosion = import('/lua/defaultexplosions.lua')
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local SZhanaseeBombProjectile = import("/lua/seraphimprojectiles.lua").SZhanaseeBombProjectile
+local DefaultExplosion = import("/lua/defaultexplosions.lua")
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 SBOZhanaseeBombProjectile01 = Class(SZhanaseeBombProjectile){
     OnImpact = function(self, targetType, targetEntity)        

@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
-local ADFGravitonProjectorWeapon = import('/lua/aeonweapons.lua').ADFGravitonProjectorWeapon
+local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
+local ADFGravitonProjectorWeapon = import("/lua/aeonweapons.lua").ADFGravitonProjectorWeapon
 
+---@class UAB2101 : AStructureUnit
 UAB2101 = Class(AStructureUnit) {
     Weapons = {
         MainGun = Class(ADFGravitonProjectorWeapon) {},

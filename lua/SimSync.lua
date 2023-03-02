@@ -77,7 +77,7 @@ function RemoveAllUnitEnhancements(unit)
 end
 
 function SyncUnitEnhancements()
-    import('/lua/enhancementcommon.lua').SetEnhancementTable(SimUnitEnhancements)
+    import("/lua/enhancementcommon.lua").SetEnhancementTable(SimUnitEnhancements)
     local sync = {}
 
     for id, slots in SimUnitEnhancements do
@@ -92,14 +92,14 @@ function SyncUnitEnhancements()
 end
 
 function DebugMoveCamera(x0,y0,x1,y1)
-    local Camera = import('/lua/SimCamera.lua').SimCamera
+    local Camera = import("/lua/simcamera.lua").SimCamera
     local cam = Camera("WorldCamera")
 --    cam:ScaleMoveVelocity(0.02)
     cam:MoveTo(Rect(x0,y0,x1,y1),5.0)
 end
 
 function SyncPlayableRect(rect)
-    local Camera = import('/lua/SimCamera.lua').SimCamera
+    local Camera = import("/lua/simcamera.lua").SimCamera
     local cam = Camera("WorldCamera")
     cam:SyncPlayableRect(rect)
 end
@@ -124,13 +124,13 @@ end
 
 function NoteFocusArmyChanged(new, old)
     --LOG('NoteFocusArmyChanged(new=' .. repr(new) .. ', old=' .. repr(old) .. ')')
-    import('/lua/SimPing.lua').OnArmyChange()
+    import("/lua/simping.lua").OnArmyChange()
+    import("/lua/sim/recall.lua").OnArmyChange()
     for entityID, data in UnitData do
         if new == -1 or data.OwnerArmy == new then
             Sync.UnitData[entityID] = data.Data
         elseif old == -1 or data.OwnerArmy == old then
             Sync.ReleaseIds[entityID] = true
-        else
         end
     end
     SyncUnitEnhancements()
@@ -184,7 +184,7 @@ function ChangeCameraZoom(newMult)
 end
 
 function CreateCameraMarker(position)
-    return import('/lua/simcameramarkers.lua').AddCameraMarker(position)
+    return import("/lua/simcameramarkers.lua").AddCameraMarker(position)
 end
 
 function EndDemo()
@@ -202,5 +202,5 @@ function PrintText(text, fontSize, fontColor, duration, location)
 end
 
 function CreateDialogue(text, buttonText, position)
-    return import('/lua/SimDialogue.lua').Create(text, buttonText, position)
+    return import("/lua/simdialogue.lua").Create(text, buttonText, position)
 end

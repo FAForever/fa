@@ -23,12 +23,12 @@ local SAI = '/lua/ScenarioPlatoonAI.lua'
 local PlatoonFile = '/lua/platoon.lua'
 local SBC = '/lua/editor/SorianBuildConditions.lua'
 local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Behaviors = import('/lua/ai/aibehaviors.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
-local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Behaviors = import("/lua/ai/aibehaviors.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 local econThread
 

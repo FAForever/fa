@@ -1,7 +1,7 @@
 --
 -- Cybran disintegrator laser
 --
-local CDisintegratorLaserProjectile = import('/lua/cybranprojectiles.lua').CDisintegratorLaserProjectile
+local CDisintegratorLaserProjectile = import("/lua/cybranprojectiles.lua").CDisintegratorLaserProjectile
 
 CDFLaserDisintegrator03 = Class(CDisintegratorLaserProjectile) {
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)

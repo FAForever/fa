@@ -8,8 +8,9 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
-local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
+local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
+---@class UEB1102 : TEnergyCreationUnit
 UEB1102 = Class(TEnergyCreationUnit) {
     DestructionPartsHighToss = {'Exhaust01',},
     DestructionPartsLowToss = {'Exhaust01','Exhaust02','Exhaust03','Exhaust04','Exhaust05',},

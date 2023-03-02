@@ -24,14 +24,8 @@ PropBlueprint {
         ReclaimMassMax = 0.5,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 0,
-    },
     Interface = {
         HelpText = 'Small Pod',
-    },
-    Physics = {
-        BlockPath = false,
     },
     SizeX = 0.3,
     SizeY = 0.25,

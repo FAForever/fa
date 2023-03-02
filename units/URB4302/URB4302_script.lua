@@ -8,11 +8,12 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CAMEMPMissileWeapon = import('/lua/cybranweapons.lua').CAMEMPMissileWeapon
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
+local CAMEMPMissileWeapon = import("/lua/cybranweapons.lua").CAMEMPMissileWeapon
+local EffectTemplate = import("/lua/effecttemplates.lua")
 local nukeFiredOnGotTarget = false
 
+---@class URB4302 : CStructureUnit
 URB4302 = Class(CStructureUnit) {
     Weapons = {
         MissileRack = Class(CAMEMPMissileWeapon) {

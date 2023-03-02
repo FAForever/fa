@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CRadarJammerUnit = import('/lua/cybranunits.lua').CRadarJammerUnit
+local CRadarJammerUnit = import("/lua/cybranunits.lua").CRadarJammerUnit
 
+---@class URB4203 : CRadarJammerUnit
 URB4203 = Class(CRadarJammerUnit) {
     IntelEffects = {
 		{

@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TRadarUnit = import('/lua/terranunits.lua').TRadarUnit
+local TRadarUnit = import("/lua/terranunits.lua").TRadarUnit
 
+---@class UEB3101 : TRadarUnit
 UEB3101 = Class(TRadarUnit) {
 
 }

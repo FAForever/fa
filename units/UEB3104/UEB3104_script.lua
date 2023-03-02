@@ -7,8 +7,9 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TRadarUnit = import('/lua/terranunits.lua').TRadarUnit
+local TRadarUnit = import("/lua/terranunits.lua").TRadarUnit
 
+---@class UEB3104 : TRadarUnit
 UEB3104 = Class(TRadarUnit) {
 
     OnIntelDisabled = function(self)

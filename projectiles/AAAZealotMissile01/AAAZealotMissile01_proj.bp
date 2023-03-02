@@ -53,7 +53,7 @@ ProjectileBlueprint {
         Acceleration = 6,
         DestroyOnWater = true,
         InitialSpeed = 30,
-        LeadTarget = true,
+        LeadTarget = false,
         Lifetime = 4,
         MaxSpeed = 50,
         OnLostTargetLifetime = 0.7,

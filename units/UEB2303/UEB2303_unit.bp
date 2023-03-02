@@ -22,15 +22,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 140,
     Categories = {
         'PRODUCTSC1',
@@ -105,8 +96,8 @@ UnitBlueprint {
         UniformScale = 0.35,
     },
     Economy = {
-        BuildCostEnergy = 13500,
-        BuildCostMass = 1890,
+        BuildCostEnergy = 13585,
+        BuildCostMass = 1900,
         BuildTime = 1600,
         RebuildBonusIds = {
             'ueb2303',
@@ -213,7 +204,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 2,
+            FiringRandomness = 2.25,
             FiringTolerance = 1,
             Label = 'MainGun',
             MaxRadius = 128,

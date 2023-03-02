@@ -14,11 +14,11 @@ for index, language in __installedlanguages do
 end
 
 
--- Do global init
+-- # Global (and shared) init
 doscript '/lua/globalInit.lua'
 
 -- Do we have an custom language set inside user-options ?
-local selectedlanguage = import('/lua/user/prefs.lua').GetFromCurrentProfile('options').selectedlanguage
+local selectedlanguage = import("/lua/user/prefs.lua").GetFromCurrentProfile('options').selectedlanguage
 if selectedlanguage ~= nil then
     __language = selectedlanguage
     SetPreference('options_overrides.language', __language)
@@ -90,11 +90,11 @@ function PrintText(textData)
         if type(textData) == 'string' then
             data = {text = textData, size = 14, color = 'ffffffff', duration = 5, location = 'center'}
         end
-        import('/lua/ui/game/textdisplay.lua').PrintToScreen(data)
+        import("/lua/ui/game/textdisplay.lua").PrintToScreen(data)
     end
 end
 
-local replayID = import('/lua/ui/uiutil.lua').GetReplayId()
+local replayID = import("/lua/ui/uiutil.lua").GetReplayId()
 if replayID then
     LOG("REPLAY ID: " .. replayID)
 end

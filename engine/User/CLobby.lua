@@ -1,91 +1,113 @@
----@declare-global
----@class moho.lobby_methods
+---@meta
+
+---@class moho.lobby_methods : Destroyable
 local CLobby = {}
 
+---@alias GPGNetAddress string | number
+
+---@class Peer
+---@field establishedPeers string[]
+---@field id string
+---@field ping number
+---@field name string
+---@field quiet number
+---@field status string
+
 ---
---  void CLobby.ConnectToPeer(self,address,name,uid
-function CLobby:ConnectToPeer()
+---@param data CommunicationData
+function CLobby:BroadcastData(data)
 end
 
 ---
---  void CLobby.DebugDump()
+---@param address GPGNetAddress # includes the port
+---@param name string
+---@param uid string
+function CLobby:ConnectToPeer(address, name, uid)
+end
+
+---
 function CLobby:DebugDump()
 end
 
 ---
---  CLobby.Destroy(self)
-function CLobby:Destroy(self)
+function CLobby:Destroy()
 end
 
 ---
---  void CLobby.DisconnectFromPeer(self,uid
-function CLobby:DisconnectFromPeer()
+---@param uid string
+function CLobby:DisconnectFromPeer(uid)
 end
 
 ---
---  void CLobby.EjectPeer(self,targetID,reason)
-function CLobby:EjectPeer(self, targetID, reason)
+---@param targetID string
+---@param reason string
+function CLobby:EjectPeer(targetID, reason)
 end
 
 ---
---  int CLobby.GetLocalPlayerID(self)
-function CLobby:GetLocalPlayerID(self)
+---@return number
+function CLobby:GetLocalPlayerID()
 end
 
 ---
---  string CLobby.GetLocalPlayerName(self)
-function CLobby:GetLocalPlayerName(self)
+---@return string
+function CLobby:GetLocalPlayerName()
 end
 
 ---
---  int-or-nil CLobby.GetLocalPort(self)
-function CLobby:GetLocalPort(self)
+---@return number | nil
+function CLobby:GetLocalPort()
 end
 
 ---
---  table CLobby.GetPeer(self,uid)
-function CLobby:GetPeer(self, uid)
+---@param uid string
+---@return Peer
+function CLobby:GetPeer(uid)
 end
 
 ---
---  table CLobby.GetPeers(self)
-function CLobby:GetPeers(self)
+---@return Peer[]
+function CLobby:GetPeers()
 end
 
 ---
---  void CLobby.HostGame(self)
-function CLobby:HostGame(self)
+function CLobby:HostGame()
 end
 
 ---
---  bool CLobby.IsHost(self)
-function CLobby:IsHost(self)
+---@return boolean
+function CLobby:IsHost()
 end
 
 ---
---  void CLobby.JoinGame(self, string-or-boxedInt32 address, string-or-nil remotePlayerName, string remotePlayerUID)
-function CLobby:JoinGame(self,  string-or-boxedInt32 address,  string-or-nil remotePlayerName,  string remotePlayerUID)
+---@param address GPGNetAddress
+---@param remotePlayerName string | nil
+---@param remotePlayerUID string
+function CLobby:JoinGame(address, remotePlayerName, remotePlayerUID)
 end
 
 ---
---  void CLobby.LaunchGame(self,gameConfig)
-function CLobby:LaunchGame(self, gameConfig)
+---@param gameConfig GameData
+function CLobby:LaunchGame(gameConfig)
 end
 
 ---
---  string CLobby.MakeValidGameName(self,origName)
-function CLobby:MakeValidGameName(self, origName)
+---@param origName string
+---@return string
+function CLobby:MakeValidGameName(origName)
 end
 
 ---
---  string CLobby.MakeValidPlayerName(self,uid,origName)
-function CLobby:MakeValidPlayerName(self, uid, origName)
+---@param uid string
+---@param origName string
+---@return string
+function CLobby:MakeValidPlayerName(uid, origName)
 end
 
 ---
---  void CLobby.SendData(self,targetID,table)
-function CLobby:SendData(self, targetID, table)
+---@param targetID string
+---@param data CommunicationData
+function CLobby:SendData(targetID, data)
 end
 
 return CLobby
-

@@ -1,7 +1,7 @@
-local Group = import('/lua/maui/group.lua').Group
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local Group = import("/lua/maui/group.lua").Group
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 ---@class RadioButton : Group
 RadioButton = Class(Group) {
@@ -103,9 +103,9 @@ RadioButton = Class(Group) {
         -- the group should be sized so we can click on the control if desired
         self.Height:Set(function() return height + 12 end)
         self.Width:Set(maxWidth + 12)
-        self.Right:Set(function() return self.Left() + self.Width() end)
-        self.Bottom:Set(function() return self.Top() + self.Height() end)
-
+        LayoutHelpers.ResetBottom(self)
+        LayoutHelpers.ResetRight(self)
+        
         -- add the buttons to the layout
         local isFirst = true
         local lastButton

@@ -2,8 +2,8 @@
 -- Terran Land-Based Cruise Missile : XEL0306 (UEF T3 MML)
 --
 
-local TMissileCruiseProjectile = import('/lua/terranprojectiles.lua').TMissileCruiseProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 TIFMissileCruise05 = Class(TMissileCruiseProjectile) {
 

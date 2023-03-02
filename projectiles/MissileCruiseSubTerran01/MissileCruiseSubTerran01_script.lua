@@ -1,7 +1,7 @@
 --
 -- script for projectile Missile
 --
-local TMissileCruiseSubProjectile = import('/lua/terranprojectiles.lua').TMissileCruiseSubProjectile
+local TMissileCruiseSubProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseSubProjectile
 
 MissileCruiseSubTerran01 = Class(TMissileCruiseSubProjectile) {
     FxSplashScale = 0.5,

@@ -8,8 +8,8 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
-local THeavyPlasmaCannonProjectile = import('/lua/terranprojectiles.lua').THeavyPlasmaCannonProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local THeavyPlasmaCannonProjectile = import("/lua/terranprojectiles.lua").THeavyPlasmaCannonProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 TDFPlasmaHeavy02 = Class(THeavyPlasmaCannonProjectile) {
     FxTrails = EffectTemplate.TPlasmaCannonHeavyMunition02,

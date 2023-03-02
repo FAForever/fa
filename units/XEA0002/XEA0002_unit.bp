@@ -197,6 +197,9 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {

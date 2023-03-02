@@ -2,7 +2,7 @@
 -- Cybran "Loa" Tactical Missile, child missiles that create when the mother projectile is shot down by
 -- enemy anti-missile systems
 --
-local CLOATacticalChildMissileProjectile = import('/lua/cybranprojectiles.lua').CLOATacticalChildMissileProjectile
+local CLOATacticalChildMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalChildMissileProjectile
 
 CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile) {
 

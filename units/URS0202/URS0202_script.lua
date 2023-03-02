@@ -5,13 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFProtonCannonWeapon = CybranWeaponsFile.CDFProtonCannonWeapon
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local CAMZapperWeapon03 = CybranWeaponsFile.CAMZapperWeapon03
-local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaserInvisible
+local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaserInvisible
 
+---@class URS0202 : CSeaUnit
 URS0202 = Class(CSeaUnit) {
     Weapons = {
         TargetPainter = Class(TargetingLaser) {

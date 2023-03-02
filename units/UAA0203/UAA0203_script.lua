@@ -7,9 +7,10 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
-local ADFLaserLightWeapon = import('/lua/aeonweapons.lua').ADFLaserLightWeapon
+local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
+local ADFLaserLightWeapon = import("/lua/aeonweapons.lua").ADFLaserLightWeapon
 
+---@class UAA0203 : AAirUnit
 UAA0203 = Class(AAirUnit) {
     Weapons = {
         Turret = Class(ADFLaserLightWeapon) {

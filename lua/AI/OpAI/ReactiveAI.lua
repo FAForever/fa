@@ -6,11 +6,11 @@
 ----**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-local OpAI = import('/lua/ai/OpAI/BaseOpAI.lua').OpAI
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
+local OpAI = import("/lua/ai/opai/baseopai.lua").OpAI
 
 local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
 local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
@@ -49,7 +49,7 @@ TrackingCategories = {
     MassedAir = { categories.AIR * categories.MOBILE * ( categories.TECH2 + categories.TECH3 ), },
 }
 
-
+---@class ReactiveAI : OpAI
 ReactiveAI = Class(OpAI) {
     Create = function(self, brain, location, triggeringEventType, reactionType, name, data)
         -- With the actionType and responseType, we must create a builderType with proper builderData to create
@@ -59,7 +59,11 @@ ReactiveAI = Class(OpAI) {
         local builderType = self:GetBuilderType( triggeringEventType, reactionType )
 
         -- At this point we need to combine the passed in data with our own data to create the OpAI
-        local builderData = builderType.PlatoonData or {}
+        local builderData = {
+            MasterPlatoonFunction = builderType.PlatoonAIFunction,
+            PlatoonData = builderType.PlatoonData,
+            Priority = builderType.Priority,
+        }
         if data then
             for k,v in data do
                 builderData[k] = v
@@ -79,7 +83,7 @@ ReactiveAI = Class(OpAI) {
         end
         for k,v in builderType.TriggeringBuildConditions do
             self:AddBuildCondition( unpack(v) )
-        end        
+        end
     end,
     
     ReactionData = {
@@ -87,7 +91,7 @@ ReactiveAI = Class(OpAI) {
         AirRetaliation = {
             ExperimentalAir = { 
                 OpAI = 'AirAttacks', 
-                Children = { 'AirSuperiority', 'FighterBomber', 'Interceptors', },
+                Children = { 'AirSuperiority', 'FighterBombers', 'Interceptors', },
                 Priority = 1200,
                 ChildCount = 4,
                 PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },

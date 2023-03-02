@@ -2,12 +2,13 @@
 -- File     :  /cdimage/units/XSC9002/XSC9002_script.lua
 -- Author   :  Greg Kohne
 -- Summary  :  Jamming Crystal
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
-local SSJammerCrystalAmbient = import('/lua/EffectTemplates.lua').SJammerCrystalAmbient
+local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
+local SSJammerCrystalAmbient = import("/lua/effecttemplates.lua").SJammerCrystalAmbient
 
+---@class XSC9002 : SStructureUnit
 XSC9002 = Class(SStructureUnit) {
     OnCreate = function(self, builder, layer)
         -- Place emitters on certain light bones on the mesh.

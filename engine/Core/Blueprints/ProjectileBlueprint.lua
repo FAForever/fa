@@ -1,0 +1,66 @@
+---@meta
+
+---@class ProjectileBlueprint : EntityBlueprint
+---@field DevStatus unknown                   Development status 
+---@field Display ProjectileBlueprintDisplay  Display information for the Projectile
+---@field Economy ProjectileBlueprintEconomy  Economy information for the unit
+---@field Physics ProjectileBlueprintPhysics  Physics information for the Projectile
+
+---@class ProjectileBlueprintDisplay
+---@field MeshBlueprint string             Mesh to use as the display of this projectile
+---@field UniformScale number              Uniform scale to apply to mesh
+---@field MeshScaleRange number            range uniform scale of this projectile
+---@field MeshScaleVelocity number         rate at which scale changes
+---@field MeshScaleVelocityRange number    range rate at which scale changes
+---@field CameraFollowsProjectile boolean  Set if tracking camera should follow this projectile when it's created.
+---@field CameraFollowTimeout number       After I die, how long until we snap the camera back to the launcher?
+---@field StrategicIconSize number         How large is the strategic icon square for the projectile
+
+---@class ProjectileBlueprintEconomy
+---@field BuildCostEnergy number   Energy cost to build this projectile
+---@field BuildCostMass   number   Mass cost to build this projectile
+---@field BuildTime       number   Time in seconds to build this projectile
+
+---@class ProjectileBlueprintPhysics
+---@field CollideSurface boolean          Whether to check the projectile for collisions against terrain/water
+---@field CollideEntity boolean           Whether to check the projectile for collisions against other entities
+---@field TrackTarget boolean             True if projectile should turn to track its target
+---@field VelocityAlign boolean           True if projectile should always face the direction its moving
+---@field StayUpright boolean             True if projectile should always remain upright
+---@field LeadTarget boolean              Whether projectiles should lead their target. Applies only to tracking projectiles.
+---@field StayUnderwater boolean          Whether projectiles should try to stay underwater. Applies only to tracking projectiles.
+---@field UseGravity boolean              True if the projectile is initially affected by gravity.
+---@field DetonateAboveHeight number      Projectile will detonate when going above this height above ground.
+---@field DetonateBelowHeight number      Projectile will detonate when dipping under this height above ground.
+---@field TurnRate number                 Max turn rate for the projectile, in degrees per second. Applies only to tracking and velocity-aligned projectiles.
+---@field TurnRateRange number            Random variation around TurnRate
+---@field Lifetime number                 Numbers of seconds I'm alive
+---@field LifetimeRange number            Random variation around Lifetime
+---@field InitialSpeed number             Initial speed for the projectile.
+---@field InitialSpeedRange number        Random variation around InitialSpeed
+---@field MaxSpeed number                 Maximum speed for the Projectile
+---@field MaxSpeedRange number            Random variation around MaxSpeed
+---@field Acceleration number             Forward acceleration of the Projectile
+---@field AccelerationRange number        Random variation around Acceleration
+---@field PositionX number                Initial Position offset X component
+---@field PositionXRange number           Random variation around PositionX
+---@field PositionY number                Initial Position offset Y component
+---@field PositionYRange number           Random variation around PositionY
+---@field PositionZ number                Initial Position offset Z component
+---@field PositionZRange number           Random variation around PositionZ
+---@field DirectionX number               Initial Direction X component
+---@field DirectionXRange number          Random variation around DirectionX
+---@field DirectionY number               Initial Direction Y component
+---@field DirectionYRange number          Random variation around DirectionY
+---@field DirectionZ number               Initial Direction Z component
+---@field DirectionZRange number          Random variation around DirectionZ
+---@field RotationalVelocity number       rotation rate in random direction
+---@field RotationalVelocityRange number  range rotation rate in random direction
+---@field MinBounceCount number           Minimum times to bounce on terrain before impact
+---@field MaxBounceCount number           Maximum times to bounce on terrain before impact
+---@field BounceVelDamp number            Bounce velocity dampening. .75 loses 75% velocity, def: 0.5f
+---@field DestroyOnWater boolean          Destroy this entity if it touches water
+---@field MaxZigZag number                Max amount of zig-zag deflection
+---@field ZigZagFrequency number          Frequency of zig-zag directional changes in seconds
+---@field RealisticOrdinance boolean      Realistic free fall ordinance type weapon
+---@field StraightDownOrdinance boolean   bombs that always drop stright down

@@ -4,8 +4,9 @@
 -- Summary  :  Cybran Engineering tower
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local CConstructionStructureUnit = import('/lua/cybranunits.lua').CConstructionStructureUnit
+local CConstructionStructureUnit = import("/lua/cybranunits.lua").CConstructionStructureUnit
 
+---@class XRB0304 : CConstructionStructureUnit
 XRB0304 = Class(CConstructionStructureUnit) {
     OnStartBeingBuilt = function(self, builder, layer)
         CConstructionStructureUnit.OnStartBeingBuilt(self, builder, layer)

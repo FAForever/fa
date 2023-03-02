@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
+local TSeaFactoryUnit = import("/lua/terranunits.lua").TSeaFactoryUnit
 
+---@class UEB0203 : TSeaFactoryUnit
 UEB0203 = Class(TSeaFactoryUnit) {
     OnCreate = function(self)
         TSeaFactoryUnit.OnCreate(self)

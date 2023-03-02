@@ -1,10 +1,10 @@
 -- This file is called from gamemain.lua when a game launches
 -- It assigns unit IDs and order strings to the basic key (The key without modifiers) bound to them
 
-local unitkeygroups = import('/lua/keymap/unitkeygroups.lua').unitkeygroups
-local construction = import('/lua/ui/game/construction.lua')
-local orders = import('/lua/ui/game/orders.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local unitkeygroups = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
+local construction = import("/lua/ui/game/construction.lua")
+local orders = import("/lua/ui/game/orders.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
 -- Turn engine string reference to certain symbols into the actual symbol
 local signs = {
@@ -114,9 +114,9 @@ function getKeyTables()
 
     -- Get them from the building tab
     for groupName, groupItems in unitkeygroups do -- Since this file hardcodes all unit ids that can be affected by hotbuild, helpidrelations will get them all
-        local g = groupName.lower(groupName)
+        local g = groupName:lower()
         for _, item in groupItems do
-            local i = item.lower(item)
+            local i = item:lower()
 
             if __blueprints[i] then
                 if not helpIdRelations[i] then
@@ -139,7 +139,7 @@ function getKeyTables()
         for key, value in group do
             if otherRelations[value] then -- Check if the group contained more than just unit IDs
                 for ids, values in pairs(otherRelations[value]) do
-                    table.insert(helpIdRelations[id], values.lower(values))
+                    table.insert(helpIdRelations[id], values:lower())
                 end
             end
         end
@@ -225,17 +225,17 @@ function getKeyUse(key)
     local colour = 1
     if string.find(key, "Shift*") then
         -- No colour change for shift
-        key = key.gsub(key, "Shift.", "")
+        key = key:gsub("Shift.", "")
     end
 
     if string.find(key, "Ctrl*") then
         colour = colour + 1
-        key = key.gsub(key, "Ctrl.", "")
+        key = key:gsub("Ctrl.", "")
     end
 
     if string.find(key, "Alt*") then
         colour = colour + 2
-        key = key.gsub(key, "Alt.", "")
+        key = key:gsub("Alt.", "")
     end
 
     return key, colours[colour]

@@ -1,23 +1,46 @@
-function PlaySelectionSound(newSelection)
-    for k, v in newSelection do
-        local bp = v:GetBlueprint()
-        if bp.Audio.UISelection then
-            PlaySound(bp.Audio.UISelection)
-            return
-        end
-    end
-end
 
+local Prefs = import("/lua/user/prefs.lua")
+
+---@alias SelectionSetDoubleTapBehavior
+--- | 'none'                        # When you double tap it will have no effect
+--- | 'translate-zoom'              # When you double tap the camera translates and zooms to the units, default behavior
+--- | 'translate-zoom-out-only'     # When you double tap the camera translates and zooms to the units, but it won't zoom in
+--- | 'translate'                   # When you double tap the camera only translates
+
+-- used to re-use memory where possible
+local cache = { }
+local cacheHead = 1
+
+-- needs to be global in order to be saved
 selectionSets = {}
 local selectionSetCallbacks = {}
 local lastSelectionName = nil
 local lastSelectionTime = 0
 
--- add a function to get called when a selection set changes
--- with parameters function(name, unitArray, applied)
--- name: name of the selection set
--- unitArray: the actual array of units
--- applied: true if the set was applied, false if it was just created
+local playSelectionSound = true
+
+--- Enables or disables the sound played upon selecting units
+---@param flag boolean
+function EnableSelectionSound(flag)
+    playSelectionSound = flag
+end
+
+--- Attempts to play the selection sound, performs an early exit when it should not be played
+---@param newSelection UserUnit[]
+function PlaySelectionSound(newSelection)
+    if playSelectionSound then
+        for k, v in newSelection do
+            local bp = v:GetBlueprint()
+            if bp.Audio.UISelection then
+                PlaySound(bp.Audio.UISelection)
+                return
+            end
+        end
+    end
+end
+
+--- Registers a callback that is called when a selection is set (flag set to false) and when it is used (flag set to true)
+---@param func function<UserUnit[], boolean>
 function RegisterSelectionSetCallback(func)
     -- see if this function is already in here
     for i,v in selectionSetCallbacks do
@@ -29,6 +52,8 @@ function RegisterSelectionSetCallback(func)
     table.insert(selectionSetCallbacks, func)
 end
 
+--- Removes a callback that is called when a selection is set
+---@param func function<UserUnit[], boolean>
 function WithdrawSelectionSetCallback(func)
     for i,v in selectionSetCallbacks do
         if v == func then
@@ -38,154 +63,334 @@ function WithdrawSelectionSetCallback(func)
     end
 end
 
--- add a unit to an existing selection set
-function AddUnitToSelectionSet(name, unit)    
-    if selectionSets[name] then
-        table.insert(selectionSets[name],unit)
+
+
+--- Removes all entries from a hash-based table, returns the hash-based table
+---@param hash table<UserUnit, boolean>
+---@return table<UserUnit, boolean>
+local function EmptyHash(hash)
+    for unit, _ in hash do
+        hash[unit] = nil
     end
+
+    return hash
 end
 
--- add a selection set based on the current selection
-function AddCurrentSelectionSet(name)
-    AddSelectionSet(name, GetSelectedUnits())
+--- Converts an array-based table to a hash-based table, returns the cache
+---@param array UserUnit[]
+---@param cache table<UserUnit, boolean>
+---@return table<UserUnit, boolean>
+local function ToHash(array, cache)
+    for _, unit in array do
+        cache[unit] = true
+    end
+
+    return cache
 end
 
--- add a selection set based on an array of units
--- if selectedUnits is nil, clears the selection set
-function AddSelectionSet(name, unitArray)
-    -- remove units from the selection set if it already exists
-    if selectionSets[name] then
-        for index, unit in selectionSets[name] do
-            unit:RemoveSelectionSet(name)
-        end
+--- Removes all entries from an array-based table, returns the array-based table
+---@param array UserUnit[]
+---@return UserUnit[]
+local function EmptyArray(array)
+    for k = 1, cacheHead do
+        array[k] = nil
     end
-    
-    selectionSets[name] = unitArray
 
-    -- add new units to selection set (unitArray could be nil, so check first)
-    if selectionSets[name] then
-        for index, unit in selectionSets[name] do
-            unit:AddSelectionSet(name)
-        end
-    end
-    
-    for i,v in selectionSetCallbacks do
-        v(name, unitArray, false)
-    end
+    cacheHead = 1
+
+    return array
 end
 
--- select a specified selection set in the session
-function ApplySelectionSet(name)
-    -- get a filtered list of only valid units back from the function
-    if not selectionSets[name] then return end
-    selectionSets[name] = ValidateUnitsList(selectionSets[name])
-    local selection = EntityCategoryFilterDown(categories.ALLUNITS - (categories.FACTORY - categories.MOBILE) , selectionSets[name])
-    if table.getsize(selection) == 0 then 
-        selection = EntityCategoryFilterDown(categories.FACTORY - categories.MOBILE, selectionSets[name])
-        if table.getsize(selection) == 0 then
-            AddSelectionSet(name, nil)
-            return
-        end
+--- Converts an hash-based table to an array-based table, returns the cache
+---@param hash table<UserUnit, boolean>
+---@param cache UserUnit[]
+---@return UserUnit[]
+local function ToArray(hash, cache)
+    for unit, _ in hash do
+        cache[cacheHead] = unit
+        cacheHead = cacheHead + 1
     end
-    if table.getn(selection) > 0 then
-        SelectUnits(selection)
-        local unitIDs = {}
-        for _, unit in selection do
-            table.insert(unitIDs, unit:GetEntityId())
-        end
-        SimCallback({Func = 'OnControlGroupApply', Args = unitIDs})
-    
-        -- Time the difference between the 2 selection application to
-        -- determine if this is a double tap selection
-        local curTime = GetSystemTimeSeconds()
-        local diffTime = curTime - lastSelectionTime
-        if diffTime > 1.0 then
-            lastSelectionName = nil
-        end
-        lastSelectionTime = curTime
-    
-        -- If this is a double tap then we want to soom in onto the central unit of the group
-        if name == lastSelectionName then
-            if selection then
-                UIZoomTo(selection)
-            end
-            lastSelectionName = nil
-        else
-            lastSelectionName = name
-        end        
-       
-        -- if we are out of units. just set our set to nil
-        if table.getn(selection) == 0 then
-            selectionSets[name] = nil
-        else        
-            for i,v in selectionSetCallbacks do
-                v(name, selectionSets[name], true)
-            end
-        end
-    end
+
+    return cache
 end
 
-function AppendSetToSelection(name)
-    -- get a filtered list of only valid units back from the function
-    local setID = tostring(name)
-    selectionSets[setID] = ValidateUnitsList(selectionSets[setID])
-    local selectionSet = EntityCategoryFilterDown(categories.ALLUNITS - categories.FACTORY, selectionSets[setID])
-    local curSelection = GetSelectedUnits()
-    if curSelection and selectionSet then
-        for i, unit in selectionSet do
-            table.insert(curSelection, unit)
-        end
-        SelectUnits(curSelection)
-    
-        -- Time the difference between the 2 selection application to
-        -- determine if this is a double tap selection
-        local curTime = GetSystemTimeSeconds()
-        local diffTime = curTime - lastSelectionTime
-        if diffTime > 1.0 then
-            lastSelectionName = nil
-        end
-        lastSelectionTime = curTime
-    
-        -- If this is a double tap then we want to soom in onto the central unit of the group
-        if name == lastSelectionName then
-            UIZoomTo(curSelection)
-            lastSelectionName = nil
-        else
-            lastSelectionName = name
-        end
-    elseif selectionSet then
-        ApplySelectionSet(setID)
-    end
-end
+--- Manages and applies the double tap behavior
+---@param units any
+local function DoubleTapBehavior(name, units)
 
-function FactorySelection(name)
-    -- get a filtered list of only valid units back from the function
-    local setID = tostring(name)
-    selectionSets[setID] = ValidateUnitsList(selectionSets[setID])
-    local selectionSet = EntityCategoryFilterDown(categories.FACTORY, selectionSets[setID])
-    
-    SelectUnits(selectionSet)
-    
-    -- Time the difference between the 2 selection application to
-    -- determine if this is a double tap selection
+    ---@type SelectionSetDoubleTapBehavior
+    local doubleTapbehavior = Prefs.GetFromCurrentProfile('options.selection_sets_double_tap_behavior')
+
+    -- don't do anything
+    if doubleTapbehavior == 'none' then
+        return
+    end
+
+    -- time window in which we consider it to be a double tab
     local curTime = GetSystemTimeSeconds()
     local diffTime = curTime - lastSelectionTime
-    if diffTime > 1.0 then
+    if diffTime > 0.001 * Prefs.GetFromCurrentProfile('options.selection_sets_double_tap_decay') then
         lastSelectionName = nil
     end
     lastSelectionTime = curTime
 
-    -- If this is a double tap then we want to soom in onto the central unit of the group
+    -- move camera to the selection in the case of a double tab
     if name == lastSelectionName then
-        UIZoomTo(selectionSet)
+
+        if next(units) then
+
+            -- retrieve camera and its settings
+            local cam = GetCamera('WorldCamera')
+            local settings = cam:SaveSettings()
+
+            UIZoomTo(units)
+
+            -- only zoom out, but not in
+            if doubleTapbehavior == 'translate-zoom-out-only' then
+                local zoom = cam:GetZoom()
+                if zoom < settings.Zoom then
+                    cam:SetZoom(settings.Zoom, 0)
+                end
+
+            -- do not adjust the zoom
+            elseif doubleTapbehavior == 'translate' then
+                cam:SetZoom(settings.Zoom, 0)
+            end
+
+            -- guarantee it looks like it should
+            cam:RevertRotation()
+        end
+
         lastSelectionName = nil
     else
         lastSelectionName = name
     end
 end
 
-function ResetSelectionSets(new_sets)
-    selectionSets = new_sets
+--- Processes the selection set from its hash-based layout to an index-based layout
+---@param name string
+---@return UserUnit[]
+local function ProcessSelectionSet(name)
+
+    -- guarantee one exists
+    selectionSets[name] = selectionSets[name] or { }
+
+    -- clear out the cache
+    EmptyArray(cache)
+    local aUnits = ToArray(selectionSets[name], cache)
+
+    -- validate units
+    local aValidUnits = ValidateUnitsList(aUnits)
+
+    -- clean up the cache
+    EmptyHash(selectionSets[name])
+    ToHash(aValidUnits, selectionSets[name])
+
+    return aValidUnits
+end
+
+--- Add a unit to an existing selection set, called by the engine to add units that are being built to the selection group of the factory. The function userunit:AddSelectionSet(name) has already been applied at this point
+---@param name string | number
+---@param unit UserUnit
+function AddUnitToSelectionSet(name, unit)
+
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
+    if Prefs.GetFromCurrentProfile('options.selection_sets_production_behavior') then
+
+        -- remove it from existing selection sets
+        if Prefs.GetFromCurrentProfile('options.selection_sets_add_behavior') then
+            local others = unit:GetSelectionSets()
+            for k, other in others do
+                if selectionSets[other] then
+                    unit:RemoveSelectionSet(other)
+                    selectionSets[other][unit] = nil
+                end
+            end
+        end
+
+        -- guarantee that a table exists
+        selectionSets[name] = selectionSets[name] or { }
+        selectionSets[name][unit] = true
+        unit:AddSelectionSet(name)
+    else 
+        unit:RemoveSelectionSet(name)
+    end
+end
+
+--- Replaces the selection set with the provided units
+---@param name string | number
+---@param unitArray UserUnit[]
+function AddSelectionSet(name, unitArray)
+
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
+    -- guarantee that a table exists
+    selectionSets[name] = selectionSets[name] or { }
+
+    -- remove the current units in the set
+    for unit, _ in selectionSets[name] do
+        unit:RemoveSelectionSet(name)
+        selectionSets[name][unit] = nil
+    end
+
+    -- add the new units to the set
+    if unitArray then
+        for _, unit in unitArray do
+
+            -- remove it from existing selection sets
+            if Prefs.GetFromCurrentProfile('options.selection_sets_add_behavior') then
+                local others = unit:GetSelectionSets()
+                for k, other in others do
+                    unit:RemoveSelectionSet(other)
+                    selectionSets[other][unit] = nil
+                end
+            end
+
+            unit:AddSelectionSet(name)
+            selectionSets[name][unit] = true
+        end
+    end
+
+    -- peform selection set callbacks
+    for i, v in selectionSetCallbacks do
+        v(name, unitArray, false)
+    end
+end
+
+--- Adds the current selection to the selection set
+---@param name string | number
+function AddCurrentSelectionSet(name)
+    AddSelectionSet(name, GetSelectedUnits())
+end
+
+local oldSelection = { }
+
+--- Selects the selection set provided
+---@param name string | number
+function ApplySelectionSet(name)
+    
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
+    -- validate units, remove the ones that got transformed into wrecks
+    local aValidUnits = ProcessSelectionSet(name)
+    local aSelection = EntityCategoryFilterDown(categories.ALLUNITS - (categories.FACTORY - categories.MOBILE) , aValidUnits)
+    if table.getsize(aSelection) == 0 then
+        aSelection = EntityCategoryFilterDown(categories.FACTORY - categories.MOBILE, aValidUnits)
+        if table.getsize(aSelection) == 0 then
+            AddSelectionSet(name, nil)
+            return
+        end
+    end
+
+    oldSelection = GetSelectedUnits()
+    SelectUnits(aSelection)
+    DoubleTapBehavior(name, aSelection)
+
+    -- perform callbacks
+    for i, v in selectionSetCallbacks do
+        v(name, aSelection, true)
+    end
+end
+
+--- Reverts the selection to the one before applying (recalling) a selection set
+function RevertSelectionSet()
+    local aValidUnits = ValidateUnitsList(oldSelection)
+    SelectUnits(aValidUnits)
+
+    -- prevent accidental double tab
+    lastSelectionName = nil
+end
+
+--- Attempts to select the factories of the selection set
+---@param name string | number
+function FactorySelection(name)
+
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
+    -- validate units, remove the ones that got transformed into wrecks
+    local aValidUnits = ProcessSelectionSet(name)
+    local aSelection = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
+
+    oldSelection = GetSelectedUnits()
+    SelectUnits(aSelection)
+end
+
+--- Appends the selection set to the selection
+---@param name string | number
+function AppendSetToSelection(name)
+
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
+    -- retrieve the two groups of units
+    local aValidUnits = ProcessSelectionSet(name)
+    local aSelectedUnits = GetSelectedUnits()
+
+    if aSelectedUnits then
+
+        -- append the selection set
+        for k, unit in aValidUnits do
+            table.insert(aSelectedUnits, unit)
+        end
+
+        -- select them together
+        SelectUnits(aSelectedUnits)
+        DoubleTapBehavior(aSelectedUnits)
+    end
+end
+
+--- Appends the selection to the selection set
+---@param name string | number
+function AppendSelectionToSet (name)
+
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
+    -- retrieve the two groups of units
+    local aValidUnits = ProcessSelectionSet(name)
+    local aSelectedUnits = GetSelectedUnits()
+
+    if aSelectedUnits then
+
+        -- append the selection set
+        for k, unit in aValidUnits do
+            table.insert(aSelectedUnits, unit)
+        end
+
+        -- turn that into the new selection set
+        AddSelectionSet(name, aSelectedUnits)
+        DoubleTapBehavior(aSelectedUnits)
+    end
+end
+
+--- Adds the selection to the selection set and selects the entire selection set
+---@param name string | number
+function CombineSelectionAndSet(name)
+
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
+    -- retrieve the two groups of units
+    local aValidUnits = ProcessSelectionSet(name)
+    local aSelectedUnits = GetSelectedUnits()
+
+    if aSelectedUnits then
+
+        -- append the selection set
+        for k, unit in aValidUnits do
+            table.insert(aSelectedUnits, unit)
+        end
+
+        -- turn that into the new selection set and select it
+        AddSelectionSet(name, aSelectedUnits)
+        SelectUnits(aSelectedUnits)
+        DoubleTapBehavior(aSelectedUnits)
+    end
 end
 
 local hidden_select = false
@@ -194,7 +399,7 @@ function IsHidden()
 end
 
 function Hidden(callback)
-    local CM = import('/lua/ui/game/commandmode.lua')
+    local CM = import("/lua/ui/game/commandmode.lua")
     local current_command = CM.GetCommandMode()
     local old_selection = GetSelectedUnits() or {}
 

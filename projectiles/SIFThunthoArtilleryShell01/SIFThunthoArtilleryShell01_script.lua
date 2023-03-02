@@ -8,8 +8,8 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SThunthoArtilleryShell = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShell
-local SThunderStormCannonProjectileSplitFx = import('/lua/EffectTemplates.lua').SThunderStormCannonProjectileSplitFx 
+local SThunthoArtilleryShell = import("/lua/seraphimprojectiles.lua").SThunthoArtilleryShell
+local SThunderStormCannonProjectileSplitFx = import("/lua/effecttemplates.lua").SThunderStormCannonProjectileSplitFx 
 
 -- upvalue for performance
 local CreateTrail = CreateTrail

@@ -5,11 +5,11 @@
 --**
 --**  Summary  :  Aeon Quantic Cluster Fragmentation Sensor shell script,XAB2307
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local AArtilleryFragmentationSensorShellProjectile = import('/lua/aeonprojectiles.lua').AArtilleryFragmentationSensorShellProjectile
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 AIFFragmentationSensorShell01 = Class(AArtilleryFragmentationSensorShellProjectile) {
                

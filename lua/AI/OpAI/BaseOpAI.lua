@@ -7,21 +7,22 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local RebuildStructuresTemplate = import('/lua/BuildingTemplates.lua').RebuildStructuresTemplate
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
+local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local RebuildStructuresTemplate = import("/lua/buildingtemplates.lua").RebuildStructuresTemplate
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
 
 local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
 local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
 local MIBC = '/lua/editor/MiscBuildConditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
 
-OpAI = Class {
+---@class OpAI
+OpAI = ClassSimple {
         -- Set up variables local to this OpAI instance
         PreCreate = function(self)
             if self.PreCreateFinished then

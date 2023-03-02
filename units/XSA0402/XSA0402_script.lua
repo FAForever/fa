@@ -8,13 +8,14 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
+local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
+local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeapon
 local SB0OhwalliExperimentalStrategicBombWeapon = SeraphimWeapons.SB0OhwalliExperimentalStrategicBombWeapon
-local CreateSeraphimExperimentalBuildBaseThread = import('/lua/EffectUtilitiesSeraphim.lua').CreateSeraphimExperimentalBuildBaseThread
-local explosion = import('/lua/defaultexplosions.lua')
+local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
+local explosion = import("/lua/defaultexplosions.lua")
 
+---@class XSA0402 : SAirUnit
 XSA0402 = Class(SAirUnit) {
     DestroyNoFallRandomChance = 1.1,
     

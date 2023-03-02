@@ -1,7 +1,7 @@
 --
 -- Sub-Based Torpedo Script
 --
-local CTorpedoSubProjectile = import('/lua/cybranprojectiles.lua').CTorpedoSubProjectile
+local CTorpedoSubProjectile = import("/lua/cybranprojectiles.lua").CTorpedoSubProjectile
 
 CANTorpedoNanite01 = Class(CTorpedoSubProjectile) {
 

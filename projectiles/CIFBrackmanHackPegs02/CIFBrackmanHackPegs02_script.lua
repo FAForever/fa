@@ -6,23 +6,23 @@
 --**
 --**  Summary  :  Brackman Peg Launching Projectile script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TargetPos
-local RandomInt = import('/lua/utilities.lua').GetRandomInt
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local RandomInt = import("/lua/utilities.lua").GetRandomInt
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ------This one should just like be something kind of new compared to the older version
-CIFBrackmanHackPegs02 = Class(import('/lua/cybranprojectiles.lua').CDFBrackmanHackPegProjectile02) {
+CIFBrackmanHackPegs02 = Class(import("/lua/cybranprojectiles.lua").CDFBrackmanHackPegProjectile02) {
 
     OnImpact = function(self, TargetType, TargetEntity)
         ------CDFBrackmanHackPegProjectile02.OnImpact(TargetType,TargetEntity) 
         self:SetVelocity(0)
         self:SetBallisticAcceleration(0)
         self:ForkThread(self.WaitingForDeath)
-        self.CreateImpactEffects( self, self:GetArmy(), self.FxImpactLand, 1 )
+        self:CreateImpactEffects(self:GetArmy(), self.FxImpactLand, 1 )
         for k, v in EffectTemplate.CBrackmanCrabPegAmbient01 do
 			CreateEmitterOnEntity( self, self:GetArmy(), v )
 		end			

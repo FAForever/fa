@@ -27,15 +27,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 140,
     Categories = {
         'PRODUCTSC1',
@@ -108,7 +99,7 @@ UnitBlueprint {
         UniformScale = 0.125,
     },
     Economy = {
-        BuildCostEnergy = 915000,
+        BuildCostEnergy = 1372500,
         BuildCostMass = 73200,
         BuildTime = 120000,
         RebuildBonusIds = {
@@ -232,7 +223,7 @@ UnitBlueprint {
             DoTPulses = 2,
             DoTTime = 2,
             EnergyDrainPerSecond = 4250,
-            EnergyRequired = 8500,
+            EnergyRequired = 17000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',

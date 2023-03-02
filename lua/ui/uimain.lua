@@ -6,12 +6,12 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
 local UIFile = UIUtil.UIFile
-local Prefs = import('/lua/user/prefs.lua')
-local Text = import('/lua/maui/text.lua').Text
-local OnlineProvider = import('/lua/multiplayer/onlineprovider.lua')
-local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
+local Prefs = import("/lua/user/prefs.lua")
+local Text = import("/lua/maui/text.lua").Text
+local OnlineProvider = import("/lua/multiplayer/onlineprovider.lua")
+local CampaignManager = import("/lua/ui/campaign/campaignmanager.lua")
 
 local console = false
 local alreadySetup = false
@@ -40,7 +40,7 @@ end
 -- THEY ARE CALLED FROM THE ENGINE AND EXPECT A DIFFERENT LUA STATE
 function StartSplashScreen()
     console = false
-    import('/lua/ui/splash/splash.lua').CreateUI()
+    import("/lua/ui/splash/splash.lua").CreateUI()
 end
 
 function StartFrontEndUI()
@@ -48,7 +48,7 @@ function StartFrontEndUI()
     
     -- make sure cheat keys are disabled if needed
     if not DebugFacilitiesEnabled() then
-        local keyMap = import('/lua/keymap/defaultKeyMap.lua')
+        local keyMap = import("/lua/keymap/defaultkeymap.lua")
         IN_RemoveKeyMapTable(keyMap.debugKeyMap)                
     end    
     
@@ -56,10 +56,10 @@ function StartFrontEndUI()
     if GetFrontEndData('NextOpBriefing') then
         CampaignManager.LaunchBriefing(GetFrontEndData('NextOpBriefing'))
     else
-        import('/lua/ui/menus/main.lua').CreateUI()
+        import("/lua/ui/menus/main.lua").CreateUI()
     end
     if GetNumRootFrames() > 1 then
-        import('/lua/ui/game/multihead.lua').ShowLogoInHead1()
+        import("/lua/ui/game/multihead.lua").ShowLogoInHead1()
     end
 end
 
@@ -67,14 +67,14 @@ end
 --Used by command line to host a game
 function StartHostLobbyUI(protocol, port, playerName, gameName, mapName, natTraversalProvider)
     LOG("Command line hostlobby")
-    local lobby = import('/lua/ui/lobby/lobby.lua')
+    local lobby = import("/lua/ui/lobby/lobby.lua")
     lobby.CreateLobby(protocol, port, playerName, nil, natTraversalProvider, GetFrame(0), StartFrontEndUI)
     lobby.HostGame(gameName, mapName, false)
 end
 
 --Used by command line to join a game
 function StartJoinLobbyUI(protocol, address, playerName, natTraversalProvider)
-    local lobby = import('/lua/ui/lobby/lobby.lua')
+    local lobby = import("/lua/ui/lobby/lobby.lua")
     local port = 0
     lobby.CreateLobby(protocol, port, playerName, nil, natTraversalProvider, GetFrame(0), StartFrontEndUI)
     lobby.JoinGame(address, false)
@@ -82,7 +82,7 @@ end
 
 function StartGameUI()
     console = false
-    import('/lua/ui/game/gamemain.lua').CreateWldUIProvider()
+    import("/lua/ui/game/gamemain.lua").CreateWldUIProvider()
 end
 -- END SHOULD NOT BE CALLED FROM LUA CODE
 
@@ -95,7 +95,7 @@ function ToggleConsole()
             console:Hide()
         end
     else
-        console = import('/lua/ui/dialogs/console.lua').CreateDialog()
+        console = import("/lua/ui/dialogs/console.lua").CreateDialog()
         console:Show()
     end
 end
@@ -105,7 +105,7 @@ end
 
 -- context sensitive exit dialog
 function ShowEscapeDialog(yesNoOnly)
-    import('/lua/ui/dialogs/eschandler.lua').HandleEsc(yesNoOnly)
+    import("/lua/ui/dialogs/eschandler.lua").HandleEsc(yesNoOnly)
 end
 
 -- when escape is pressed and it's not captured by any controls, this defines the behvaior of what should occur
@@ -117,11 +117,11 @@ end
 
 -- called by the engine when escape is pressed but there's no specific handler for it
 function EscapeHandler()
-    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog != true) then
+    if not WorldIsLoading() and (import("/lua/ui/game/gamemain.lua").supressExitDialog != true) then
         if escapeHandler then
             escapeHandler()
         else
-            import('/lua/ui/dialogs/eschandler.lua').HandleEsc()
+            import("/lua/ui/dialogs/eschandler.lua").HandleEsc()
         end
     end
 end
@@ -129,7 +129,7 @@ end
 -- network disconnection/boot dialog
 local prevDisconnectModule
 function UpdateDisconnectDialog()
-    local module = import('/lua/ui/dialogs/disconnect.lua')
+    local module = import("/lua/ui/dialogs/disconnect.lua")
     if prevDisconnectModule and prevDisconnectModule != module then
         pcall(prevDisconnectModule.DestroyDialog)
     end
@@ -145,20 +145,19 @@ function NoteGameSpeedChanged(clientIndex, newSpeed)
     -- deadline, I'd change to to be some UI loc tag.  But we are, so
     -- I'm not going to change it and risk the wrath of the producers.
     print(LOCF("<LOC Engine0006>%s: adjusting game speed to %+d", client.name, newSpeed))
-    import('/lua/ui/game/score.lua').NoteGameSpeedChanged(newSpeed)
+    import("/lua/ui/game/score.lua").NoteGameSpeedChanged(newSpeed)
+    import('/lua/ui/game/objectives2.lua').NoteGameSpeedChanged(newSpeed)
 end
 
 function NoteGameOver()
     SetFocusArmy(-1)
-    if not import('/lua/ui/dialogs/score.lua').scoreScreenActive then
+    if not import("/lua/ui/dialogs/score.lua").scoreScreenActive then
         GetCursor():Show()
     end
     if SessionIsReplay() then
-        --local scoreDlg = import('/lua/ui/dialogs/score.lua').dialog
-        --import('/lua/ui/game/gameresult.lua').OnReplayEnd()
-        import('/lua/ui/game/score.lua').ArmyAnnounce(1, '<LOC _Replay_over>Replay over.')
+        import("/lua/ui/game/score.lua").ArmyAnnounce(1, '<LOC _Replay_over>Replay over.')
     else
-        import('/lua/ui/game/score.lua').ArmyAnnounce(1, '<LOC _Game_over>Game over.')
+        import("/lua/ui/game/score.lua").ArmyAnnounce(1, '<LOC _Game_over>Game over.')
     end
 end
 
@@ -193,7 +192,7 @@ end
 
 -- network desync info
 function ShowDesyncDialog(beatNumber, strings)
-    import('/lua/ui/dialogs/desync.lua').UpdateDialog(beatNumber, strings)
+    import("/lua/ui/dialogs/desync.lua").UpdateDialog(beatNumber, strings)
 end
 
 --* The following functions are invoked by the engine to show some text at a certain location
@@ -247,13 +246,13 @@ function StopCursorText()
 end
 
 function IncreaseGameSpeed()
-    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog != true) then
+    if not WorldIsLoading() and (import("/lua/ui/game/gamemain.lua").supressExitDialog != true) then
         ConExecute('WLD_IncreaseSimRate')
     end    
 end
 
 function DecreaseGameSpeed()
-    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog != true) then
+    if not WorldIsLoading() and (import("/lua/ui/game/gamemain.lua").supressExitDialog != true) then
         ConExecute('WLD_DecreaseSimRate')
     end    
 end

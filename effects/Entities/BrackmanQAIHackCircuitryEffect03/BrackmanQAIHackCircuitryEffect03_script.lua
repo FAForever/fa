@@ -8,8 +8,8 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EmitterProjectile = import('/lua/sim/defaultprojectiles.lua').EmitterProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 
 BrackmanQAIHackCircuitryEffect03 = Class(EmitterProjectile) {
 	FxImpactTrajectoryAligned = true,

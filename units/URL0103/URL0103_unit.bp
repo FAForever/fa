@@ -26,15 +26,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 60,
     Categories = {
         'PRODUCTSC1',
@@ -123,7 +114,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 180,
         BuildCostMass = 36,
-        BuildTime = 180,
+        BuildTime = 200,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -232,7 +223,7 @@ UnitBlueprint {
                     AppliedToTarget = true,
                     BuffType = 'STUN',
                     Duration = 2,
-                    Radius = 2,
+                    Radius = 2.55,
                     TargetAllow = 'TECH2',
                     TargetDisallow = 'WALL',  -- added for bug fix [162]
                 },

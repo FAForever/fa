@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Shaft',
+        },
+    },
     Audio = {
         DeathExplosion = Sound {
             Bank = 'URLDestroy',

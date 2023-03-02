@@ -5,13 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
-local AWeapons = import('/lua/aeonweapons.lua')
+local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
+local AWeapons = import("/lua/aeonweapons.lua")
 local ADFReactonCannon = AWeapons.ADFReactonCannon
-local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
+local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
 
+---@class UAL0301 : CommandUnit
 UAL0301 = Class(CommandUnit) {
     Weapons = {
         RightReactonCannon = Class(ADFReactonCannon) {},

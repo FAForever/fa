@@ -1,8 +1,8 @@
 --
 -- Depth Charge Script
 --
-local ADepthChargeProjectile = import('/lua/aeonprojectiles.lua').ADepthChargeProjectile
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
 AANDepthCharge03 = Class(ADepthChargeProjectile) {
 
@@ -21,7 +21,7 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
         WaitSeconds(self.CountdownLength)
 
         if not self.HasImpacted then
-            self.OnImpact(self, 'Underwater', nil)
+            self:OnImpact('Underwater', nil)
         end
     end,
 

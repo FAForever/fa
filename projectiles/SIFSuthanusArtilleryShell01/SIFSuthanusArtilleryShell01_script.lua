@@ -8,7 +8,7 @@
 --
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
-local SSuthanusMobileArtilleryShell = import('/lua/seraphimprojectiles.lua').SSuthanusMobileArtilleryShell
+local SSuthanusMobileArtilleryShell = import("/lua/seraphimprojectiles.lua").SSuthanusMobileArtilleryShell
 
 SIFSuthanusArtilleryShell01 = Class(SSuthanusMobileArtilleryShell) {
     OnImpact = function(self, targetType, targetEntity) 

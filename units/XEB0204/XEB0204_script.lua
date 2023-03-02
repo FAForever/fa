@@ -7,8 +7,9 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TPodTowerUnit = import('/lua/terranunits.lua').TPodTowerUnit
+local TPodTowerUnit = import("/lua/terranunits.lua").TPodTowerUnit
 
+---@class XEB0204 : TPodTowerUnit
 XEB0204 = Class(TPodTowerUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         TPodTowerUnit.OnStopBeingBuilt(self,builder,layer)

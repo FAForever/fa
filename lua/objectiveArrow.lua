@@ -1,7 +1,10 @@
-local Entity = import('/lua/sim/Entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 
+---@class ObjectiveArrow : Entity
 ObjectiveArrow = Class(Entity) {
 
+    ---@param self ObjectiveArrow
+    ---@param spec table
     OnCreate = function(self,spec)
         self.BounceTime = 0.0
         self.Size = spec.Size or 1.0
@@ -41,6 +44,7 @@ ObjectiveArrow = Class(Entity) {
         self:SetDrawScale(0.4 * self.Size * unitScale)
     end,
 
+    ---@param self ObjectiveArrow
     BounceThread = function(self)
         while true do
             if self:BeenDestroyed() then

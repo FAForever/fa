@@ -154,13 +154,13 @@ BaseBuilderTemplate {
 
         --DUNCAN - Add island check
         local isIsland = false
-        local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
+        local islandMarker = import("/lua/ai/aiutilities.lua").AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then
             isIsland = true
         end
 
-        local navalMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Naval Area', startX, startZ)
-        local navalExclude = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Naval Exclude', startX, startZ)
+        local navalMarker = import("/lua/ai/aiutilities.lua").AIGetClosestMarkerLocation(aiBrain, 'Naval Area', startX, startZ)
+        local navalExclude = import("/lua/ai/aiutilities.lua").AIGetClosestMarkerLocation(aiBrain, 'Naval Exclude', startX, startZ)
         if not navalMarker or aiBrain:GetMapWaterRatio() < .5 or navalExclude then
             return 0, 'rushnaval'
         end

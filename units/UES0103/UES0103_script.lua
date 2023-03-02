@@ -7,11 +7,12 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
-local TAALinkedRailgun = import('/lua/terranweapons.lua').TAALinkedRailgun
-local TDFGaussCannonWeapon = import('/lua/terranweapons.lua').TDFGaussCannonWeapon
-local Entity = import('/lua/sim/Entity.lua').Entity
+local TSeaUnit = import("/lua/terranunits.lua").TSeaUnit
+local TAALinkedRailgun = import("/lua/terranweapons.lua").TAALinkedRailgun
+local TDFGaussCannonWeapon = import("/lua/terranweapons.lua").TDFGaussCannonWeapon
+local Entity = import("/lua/sim/entity.lua").Entity
 
+---@class UES0103 : TSeaUnit
 UES0103 = Class(TSeaUnit) {
     Weapons = {
         MainGun = Class(TDFGaussCannonWeapon) {

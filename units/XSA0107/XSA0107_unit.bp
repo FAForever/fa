@@ -114,7 +114,7 @@ UnitBlueprint {
         'TRANSPORTFOCUS',
         'CANNOTUSEAIRSTAGING',
     },
-    CollisionOffsetY = -2,
+    CollisionOffsetY = -0.1,
     CollisionOffsetZ = 1.5,
     Defense = {
         AirThreatLevel = 4,
@@ -201,7 +201,7 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 4,
+        SizeX = 1,
         SizeZ = 4,
     },
     General = {
@@ -260,7 +260,7 @@ UnitBlueprint {
     SelectionSizeZ = 4.5,
     SelectionThickness = 0.23,
     SizeX = 4.5,
-    SizeY = 3,
+    SizeY = 1.7,
     SizeZ = 7,
     StrategicIconName = 'icon_gunship1_transport',
     StrategicIconSortPriority = 65,

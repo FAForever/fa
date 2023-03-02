@@ -5,9 +5,9 @@
 --**
 --**  Summary  :  Terran Torpedo, XES0102
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TTorpedoSubProjectile = import('/lua/terranprojectiles.lua').TTorpedoSubProjectile
+local TTorpedoSubProjectile = import("/lua/terranprojectiles.lua").TTorpedoSubProjectile
 
 TANAnglerTorpedo04 = Class(TTorpedoSubProjectile) {}
 TypeClass = TANAnglerTorpedo04

@@ -9,20 +9,20 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
-local CollisionBeamFile = import('defaultcollisionbeams.lua')
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local OverchargeWeapon = WeaponFile.OverchargeWeapon
 
-local Explosion = import('defaultexplosions.lua')
+local Explosion = import("/lua/defaultexplosions.lua")
 local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
 local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
 local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class SANAnaitTorpedo : DefaultProjectileWeapon
 SANAnaitTorpedo = Class(DefaultProjectileWeapon) {

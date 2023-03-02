@@ -5,7 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local DefaultUnitsFile = import('defaultunits.lua')
+local DefaultUnitsFile = import("/lua/defaultunits.lua")
 local FactoryUnit = DefaultUnitsFile.FactoryUnit
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -28,11 +28,11 @@ local StructureUnit = DefaultUnitsFile.StructureUnit
 local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateSeraphimFactoryBuildingEffects = EffectUtil.CreateSeraphimFactoryBuildingEffects
 
 -- FACTORIES
@@ -96,26 +96,15 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     CreateRollOffEffects = function(self)
-        local unitB = self.UnitBeingBuilt
-        if not self.ReleaseEffectsBag then self.ReleaseEffectsBag = {} end
-        for _, v in self.RollOffBones do
-            local fx = AttachBeamEntityToEntity(self, v, unitB, -1, self.Army, EffectTemplate.TTransportBeam01)
-            table.insert(self.ReleaseEffectsBag, fx)
-            self.Trash:Add(fx)
-            fx = AttachBeamEntityToEntity(unitB, -1, self, v, self.Army, EffectTemplate.TTransportBeam02)
-            table.insert(self.ReleaseEffectsBag, fx)
-            self.Trash:Add(fx)
-            fx = CreateEmitterAtBone(self, v, self.Army, EffectTemplate.TTransportGlow01)
-            table.insert(self.ReleaseEffectsBag, fx)
-            self.Trash:Add(fx)
-        end
     end,
 
     DestroyRollOffEffects = function(self)
-        for _, v in self.ReleaseEffectsBag do
-            v:Destroy()
+        if self.ReleaseEffectsBag then 
+            for _, v in self.ReleaseEffectsBag do
+                v:Destroy()
+            end
+            self.ReleaseEffectsBag = {}
         end
-        self.ReleaseEffectsBag = {}
     end,
 
     RollOffUnit = function(self)
@@ -134,32 +123,32 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
         if not EntityCategoryContains(categories.LAND, unitBuilding) then
             AirFactoryUnit.RolloffBody(self)
         else
-            -- Engineers need to be slid off the factory
-            local bp = self:GetBlueprint()
-            if not self.AttachmentSliderManip then
-                self.AttachmentSliderManip = CreateSlider(self, bp.Display.BuildAttachBone or 0)
-            end
 
-            self:CreateRollOffEffects()
-            self.AttachmentSliderManip:SetSpeed(50)  -- Was 30, increased to help engineers move faster off of it
-            self.AttachmentSliderManip:SetGoal(0, 0, 60)
-            WaitFor(self.AttachmentSliderManip)
-
-            self.AttachmentSliderManip:SetGoal(0, -55, 60)
-            WaitFor(self.AttachmentSliderManip)
-
-            if not unitBuilding.Dead then
+            if not IsDestroyed(unitBuilding) then
                 unitBuilding:DetachFrom(true)
-                self:DetachAll(bp.Display.BuildAttachBone or 0)
+                self:DetachAll(self.Blueprint.Display.BuildAttachBone or 0)
+
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                unitBuilding:HideBone(0, true)
             end
 
-            if self.AttachmentSliderManip then
-                self.AttachmentSliderManip:Destroy()
-                self.AttachmentSliderManip = nil
+            WaitTicks(4)
+
+            if not IsDestroyed(unitBuilding) then
+                CreateLightParticle(unitBuilding, -1, unitBuilding.Army, 4, 12, 'glow_02', 'ramp_blue_22')
+                unitBuilding:ShowBone(0, true)
+
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_04_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_05_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_06_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_08_emit.bp'):OffsetEmitter(0, -1, 0)
             end
-            self:DestroyRollOffEffects()
+
+            WaitTicks(8)
+
             self:SetBusy(false)
-
             ChangeState(self, self.IdleState)
         end
     end,
@@ -335,6 +324,7 @@ SEnergyCreationUnit = Class(EnergyCreationUnit) {
 SEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
 -- HOVERING LAND UNITS
+---@class SHoverLandUnit : HoverLandUnit
 SHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
     FxHoverScale = 1,
     HoverEffects = nil,
@@ -422,6 +412,7 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
 }
 
 -- LAND UNITS
+---@class SLandUnit : LandUnit
 SLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
@@ -525,6 +516,7 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
 }
 
 -- SEA UNITS
+---@class SSeaUnit : SeaUnit
 SSeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
 
 -- SHIELD LAND UNITS
@@ -562,18 +554,22 @@ SShieldStructureUnit = Class(ShieldStructureUnit) {
 SStructureUnit = Class(StructureUnit) {}
 
 -- SUBMARINE UNITS
+---@class SSubUnit : SubUnit
 SSubUnit = Class(DefaultUnitsFile.SubUnit) {
     IdleSubBones = {},
     IdleSubEffects = {}
 }
 
 -- TRANSPORT BEACON UNITS
+---@class STransportBeaconUnit : TransportBeaconUnit
 STransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
 
 -- WALKING LAND UNITS
+---@class SWalkingLandUnit : WalkingLandUnit
 SWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 -- WALL  STRUCTURES
+---@class SWallStrutureUnit : WallStructureUnit
 SWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES
@@ -595,6 +591,7 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
 
     OnCreate = function(self)
         SHoverLandUnit.OnCreate(self)
+        self:SetUnSelectable(true)
         self.CanTakeDamage = false
         self.CanBeKilled = false
         self:PlayUnitSound('Spawn')

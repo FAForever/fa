@@ -5,15 +5,16 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local ASubUnit = import('/lua/aeonunits.lua').ASubUnit
-local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
-local WeaponsFile = import('/lua/aeonweapons.lua')
+local ASubUnit = import("/lua/aeonunits.lua").ASubUnit
+local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
+local WeaponsFile = import("/lua/aeonweapons.lua")
 local ADFCannonOblivionWeapon = WeaponsFile.ADFCannonOblivionWeapon02
 local AANChronoTorpedoWeapon = WeaponsFile.AANChronoTorpedoWeapon
 local AIFQuasarAntiTorpedoWeapon = WeaponsFile.AIFQuasarAntiTorpedoWeapon
 
 local CreateAeonTempestBuildingEffects = import("/lua/effectutilities.lua").CreateAeonTempestBuildingEffects
 
+---@class UAS0401 : ASeaUnit
 UAS0401 = Class(ASeaUnit) {
     BuildAttachBone = 'Attachpoint01',
 

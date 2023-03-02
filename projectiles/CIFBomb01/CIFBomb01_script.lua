@@ -1,4 +1,4 @@
-local CBombProjectile = import('/lua/cybranprojectiles.lua').CBombProjectile
+local CBombProjectile = import("/lua/cybranprojectiles.lua").CBombProjectile
 
 CIFBomb01 = Class(CBombProjectile) {
 

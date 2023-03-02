@@ -2,15 +2,13 @@
 -- this is a custom control as it its default has very game specific look to it
 -- Combo box will need to have its width set, but height will be auto based on the bitmaps
 
-local LazyVar = import('/lua/lazyvar.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local UIMain = import('/lua/ui/uimain.lua')
+local LazyVar = import("/lua/lazyvar.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local UIMain = import("/lua/ui/uimain.lua")
 
 local activeCombo = nil
 
@@ -82,10 +80,8 @@ Combo = Class(Group) {
         self._btnRight:DisableHitTest()
         self._btnMid:DisableHitTest()
 
-        LayoutHelpers.AtLeftIn(self._btnLeft, self)
-        LayoutHelpers.AtTopIn(self._btnLeft, self)
-        LayoutHelpers.AtRightIn(self._btnRight, self)
-        LayoutHelpers.AtTopIn(self._btnRight, self)
+        LayoutHelpers.AtLeftTopIn(self._btnLeft, self)
+        LayoutHelpers.AtRightTopIn(self._btnRight, self)
         LayoutHelpers.AtTopIn(self._btnMid, self)
         LayoutHelpers.AnchorToRight(self._btnMid, self._btnLeft, -1)
         self._btnMid.Right:Set(self._btnRight.Left)
@@ -103,7 +99,7 @@ Combo = Class(Group) {
 
         self._dropdown = Group(self._text)
         self._dropdown.Top:Set(self.Bottom)
-        self._dropdown.Right:Set(function() return self.Right() end)
+        self._dropdown.Right:Set(self.Right)
         self._dropdown.Width:Set(function() return self.Width() - LayoutHelpers.ScaleNumber(5) end)
 
         local ddul = Bitmap(self._dropdown, bitmaps.list.ul)
@@ -117,10 +113,8 @@ Combo = Class(Group) {
         local ddlr = Bitmap(self._dropdown, bitmaps.list.lr)
 
         -- top part is fixed under self
-        LayoutHelpers.AtLeftIn(ddul, self._dropdown)
-        LayoutHelpers.AtTopIn(ddul, self._dropdown)
-        LayoutHelpers.AtRightIn(ddur, self._dropdown)
-        LayoutHelpers.AtTopIn(ddur, self._dropdown)
+        LayoutHelpers.AtLeftTopIn(ddul, self._dropdown)
+        LayoutHelpers.AtRightTopIn(ddur, self._dropdown)
         LayoutHelpers.AtTopIn(ddum, self._dropdown)
         ddum.Left:Set(ddul.Right)
         ddum.Right:Set(ddur.Left)
@@ -204,9 +198,8 @@ Combo = Class(Group) {
         -- set the height of the list based on the number of items visible and the font metrics
         self._maxVisibleItems = maxVisibleItems
         self._visibleItems = LazyVar.Create()
-        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading()) end)
+        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading()) + 1 end)
         self._dropdown.Height:Set(function() return self._list.Height() + ddum.Height() + ddlm.Height() end)
-        self._visibleItems:Set(1)
 
         -- set up button logic
         self.HandleEvent = function(ctrl, event)
@@ -712,5 +705,8 @@ BitmapCombo = Class(Group) {
     -- overload to get rolled over item index
     OnOverItem = function(self, index, name)
     end,
-
 }
+
+-- kept for mod backwards compatibility
+local Text = import("/lua/maui/text.lua").Text
+local Dragger = import("/lua/maui/dragger.lua").Dragger

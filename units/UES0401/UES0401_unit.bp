@@ -5,6 +5,7 @@ UnitBlueprint {
         RepairConsumeEnergy = 30,
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
+        GuardReturnRadius = 0,
         TargetBones = {
             'Front_Left_Projectile02',
             'Front_Right_Projectile02',
@@ -66,15 +67,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'UEF_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 10,
-            Level2 = 35,
-            Level3 = 65,
-            Level4 = 90,
-            Level5 = 115,
         },
     },
     BuildIconSortPriority = 20,

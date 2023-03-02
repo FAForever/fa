@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TIFArtilleryWeapon = import('/lua/terranweapons.lua').TIFArtilleryWeapon
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TIFArtilleryWeapon = import("/lua/terranweapons.lua").TIFArtilleryWeapon
 
+---@class UEB2401 : TStructureUnit
 UEB2401 = Class(TStructureUnit) {
     Weapons = {
         MainGun = Class(TIFArtilleryWeapon) {

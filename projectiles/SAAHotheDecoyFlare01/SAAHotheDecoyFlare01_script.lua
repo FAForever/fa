@@ -5,10 +5,10 @@
 --**
 --**  Summary  : Seraphim Hothe Decoy Flare
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local Flare = import('/lua/defaultantiprojectile.lua').Flare
-local SAAHotheFlareProjectile = import('/lua/seraphimprojectiles.lua').SAAHotheFlareProjectile
+local Flare = import("/lua/defaultantiprojectile.lua").Flare
+local SAAHotheFlareProjectile = import("/lua/seraphimprojectiles.lua").SAAHotheFlareProjectile
 
 SAAHotheDecoyFlare01 = Class(SAAHotheFlareProjectile) {
     OnCreate = function(self)

@@ -1169,7 +1169,7 @@ local mods = { Cached = {}, Active = {}, Changed = false }
 -- Checks if game mods have changed between consecutive calls to this function
 -- Thus returns whether or not blueprints need to be reloaded
 function DidModsChanged()
-    mods.All = import('/lua/mods.lua').GetGameMods()
+    mods.All = import("/lua/mods.lua").GetGameMods()
     mods.Active = {}
     mods.Changed = false
 

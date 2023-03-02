@@ -5,17 +5,17 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Utilities = import('/lua/utilities.lua')
-local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
-local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
-local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
-local TriggerFile = import('/lua/scenariotriggers.lua')
-local UCBC = import('/lua/editor/UnitCountBuildConditions.lua')
-local SBC = import('/lua/editor/SorianBuildConditions.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Utilities = import("/lua/utilities.lua")
+local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
+local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local TriggerFile = import("/lua/scenariotriggers.lua")
+local UCBC = import("/lua/editor/unitcountbuildconditions.lua")
+local SBC = import("/lua/editor/sorianbuildconditions.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 -- CDR ADD BEHAVIORS
 function CDRRunAway(aiBrain, cdr)
@@ -85,8 +85,6 @@ function CDROverCharge(aiBrain, cdr)
         end
     end
 
-    cdr.UnitBeingBuiltBehavior = false
-
     -- Added for ACUs starting near each other
     if GetGameTimeSeconds() < 60 then
         return
@@ -128,6 +126,7 @@ function CDROverCharge(aiBrain, cdr)
     end
 
     if numUnits > 0 or (not cdr.DistressCall and distressLoc and Utilities.XZDistanceTwoVectors(distressLoc, cdrPos) < distressRange) then
+        cdr.Combat = true
         if cdr.UnitBeingBuilt then
             cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
         end
@@ -234,12 +233,6 @@ function CDROverCharge(aiBrain, cdr)
         until not continueFighting or not aiBrain:PlatoonExists(plat)
 
         IssueClearCommands({cdr})
-
-        -- Finish the unit
-        if cdr.UnitBeingBuiltBehavior and not cdr.UnitBeingBuiltBehavior:BeenDestroyed() and cdr.UnitBeingBuiltBehavior:GetFractionComplete() < 1 then
-            IssueRepair({cdr}, cdr.UnitBeingBuiltBehavior)
-        end
-        cdr.UnitBeingBuiltBehavior = false
     end
 end
 
@@ -268,8 +261,12 @@ function CDRReturnHome(aiBrain, cdr)
             WaitSeconds(7)
         until cdr.Dead or VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) <= distSqAway
 
+        cdr.Combat = false
         cdr.GoingHome = false
         IssueClearCommands({cdr})
+    end
+    if not cdr.Dead and cdr.Combat and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) < distSqAway then
+        cdr.Combat = false
     end
 end
 
@@ -308,6 +305,10 @@ function CommanderThread(cdr, platoon)
         if not cdr.Dead then CDRReturnHome(aiBrain, cdr) end
         WaitTicks(1)
 
+        if not cdr.Dead and not cdr.Combat and cdr.UnitBeingBuiltBehavior then
+            cdr:ForkThread(CDRFinishUnit)
+        end
+
         -- Call platoon resume building deal...
         if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Building")
         and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing")
@@ -338,6 +339,10 @@ function CommanderThreadImproved(cdr, platoon)
         -- Go back to base
         if not cdr.Dead then CDRReturnHome(aiBrain, cdr) end
         WaitTicks(1)
+
+        if not cdr.Dead and not cdr.Combat and cdr.UnitBeingBuiltBehavior then
+            cdr:ForkThread(CDRFinishUnit)
+        end
 
         -- Call platoon resume building deal...
         if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Moving")
@@ -1904,7 +1909,7 @@ function CDRReturnHomeSorian(aiBrain, cdr, Mult)
 end
 
 function CDRFinishUnit(cdr)
-    if cdr.UnitBeingBuiltBehavior and not cdr.UnitBeingBuiltBehavior:BeenDestroyed() then
+    if cdr.UnitBeingBuiltBehavior and (not cdr.UnitBeingBuiltBehavior:BeenDestroyed()) then
         IssueClearCommands({cdr})
         IssueRepair({cdr}, cdr.UnitBeingBuiltBehavior)
         repeat
@@ -1915,7 +1920,13 @@ function CDRFinishUnit(cdr)
         until cdr:IsIdleState()
 
         IssueClearCommands({cdr})
-        cdr.UnitBeingBuiltBehavior = false
+        if cdr.UnitBeingBuiltBehavior and (not cdr.UnitBeingBuiltBehavior:BeenDestroyed()) then
+            if cdr.UnitBeingBuiltBehavior:GetFractionComplete() == 1 then
+                cdr.UnitBeingBuiltBehavior = false
+            end
+        else
+            cdr.UnitBeingBuiltBehavior = false
+        end
     end
 end
 

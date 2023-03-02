@@ -60,11 +60,45 @@ end
 -- mods that have been integrated, based on folder name 
 local integratedMods = { }
 integratedMods["nvidia fix"] = true
+
 integratedMods = LowerHashTable(integratedMods)
 
--- mods that are deprecated, based on folder name
-local deprecatedMods = { }
+-- take care that the folder name is properly spelled and Capitalized
+-- deprecatedMods["Mod Folder Name"] = deprecation status
+--   true: deprecated regardless of mod version
+--   versionstring: lower or equal version numbers are deprecated, eg: "3.10"
+local deprecatedMods = {}
+
+-- mods that are deprecated, based on mod folder name
 deprecatedMods["simspeed++"] = true
+deprecatedMods["#quality of performance 2022"] = true
+deprecatedMods["em"] = "11"
+
+-- as per #4119 the control groups (called selection sets in code) are completely overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["group_split"] = "0.1"
+deprecatedMods["Control Group Zoom Mod"] = "2"
+deprecatedMods["additionalControlGroupStuff"] = true
+
+-- as per #4124 the cursor and command interactions are complete overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["additionalCameraStuff"] = "3"
+deprecatedMods["RUI"] = "1.0"
+
+-- as per #4232 the reclaim view is completely overhauled
+deprecatedMods["Advanced Reclaim&Selection Info"] = "1"
+deprecatedMods["AdvancedReclaimInfo"] = "1"
+deprecatedMods["BetterReclaimView"] = "2"
+deprecatedMods["disableReclaimUI"] = "2"
+deprecatedMods["DynamicReclaimGrouping"] = "1"
+deprecatedMods["EzReclaim"] = "1.0"
+deprecatedMods["OnScreenReclaimCounter"] = "8"
+deprecatedMods["ORV"] = "1"
+deprecatedMods["SmartReclaimSupport"] = "3"
+deprecatedMods["DrimsUIPack"] = "3"
+deprecatedMods["Rheclaim"] = "2"
+
+-- convert all mod folder name keys to lower case to prevent typos
 deprecatedMods = LowerHashTable(deprecatedMods)
 
 -- typical FA packages
@@ -140,8 +174,8 @@ local function MountAllowedContent(dir, pattern, allowedAssets)
     for _,entry in IoDir(dir .. pattern) do
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
-            if allowedAssets[mp] then 
-                LOG("Mounting content: " .. entry)
+            if (not allowedAssets) or allowedAssets[mp] then
+                LOG("mounting content: " .. entry)
                 MountDirectory(dir .. "/" .. entry, '/')
             end
         end
@@ -289,6 +323,67 @@ local function MountMapContent(dir)
     end
 end
 
+
+--- Parses a `major.minor` string into its numeric parts, where the minor portion is optional
+---@param version string
+---@return number major
+---@return number? minor
+local function ParseVersion(version)
+    local major, minor
+    local dot_pos1 = version:find('.', 1, true)
+    if dot_pos1 then
+        major = tonumber(version:sub(1, dot_pos1 - 1))
+		-- we aren't looking for the build number, but we still need to be able to parse
+		-- the minor number properly if it does exist
+		local dot_pos2 = version:find('.', dot_pos1 + 1, true)
+		if dot_pos2 then
+			minor = tonumber(version:sub(dot_pos1 + 1, dot_pos2 - 1))
+		else
+			minor = tonumber(version:sub(dot_pos1 + 1))
+		end
+    else
+        major = tonumber(version)
+    end
+    return major, minor
+end
+
+---@param majorA number
+---@param minorA number | nil
+---@param majorB number
+---@param minorB number | nil
+---@return number
+local function CompareVersions(majorA, minorA, majorB, minorB)
+    if majorA ~= majorB then
+        return majorA - majorB
+    end
+    minorA = minorA or 0
+    minorB = minorB or 0
+    return minorA - minorB
+end
+
+--- Returns the version string found in the mod info file (which can be `nil`), or `false` if the
+--- file cannot be read
+---@param modinfo FileName
+---@return string|nil | false
+local function GetModVersion(modinfo)
+    local handle = io.open(modinfo, 'rb')
+    if not handle then
+        return false -- can't read file
+    end
+
+    local _,version
+    for line in handle:lines() do
+        -- find the version
+        _,_,version = line:find("^%s*version%s*=%s*v?([%d.]*)")
+		if version then
+            break -- stop if found
+        end
+    end
+
+    handle:close()
+    return version
+end
+
 --- keep track of what mods are loaded to prevent collisions
 local loadedMods = { }
 
@@ -306,37 +401,56 @@ local function MountModContent(dir)
             continue 
         end
 
+        local moddir = dir .. '/' .. mod
+
         -- do not load integrated mods
         if integratedMods[mod] then 
             LOG("Prevented loading a mod that is integrated: " .. mod )
             continue 
         end 
 
-        -- do not load deprecated mods
-        if deprecatedMods[mod] then 
-            LOG("Prevented loading a mod that is deprecated: " .. mod )
-            continue 
-        end 
-
         -- do not load archives as mods
         local extension = StringSub(mod, -4)
         if extension == ".zip" or extension == ".scd" or extension == ".rar" then
-            LOG("Prevented loading a mod inside a zip / scd / rar file: " .. dir .. "/" .. mod)
+            LOG("Prevented loading a mod inside a zip / scd / rar file: " .. moddir)
             continue 
         end
 
-        -- check if the folder contains a _info.lua
-        local infoFile = false 
-        for _, file in IoDir(dir .. "/" .. mod .. "/*") do 
-            if StringSub(file, -9) == '_info.lua' then 
-                infoFile = file 
-            end
-        end
+        -- check if the folder contains a `mod_info.lua` file
+        local modinfo_file = IoDir(moddir .. "/mod_info.lua")[1]
 
         -- check if it has a scenario file
-        if not infoFile then 
-            LOG("Mod doesn't have an info file: " .. dir .. "/" .. mod)
-            continue 
+        if not modinfo_file then
+            LOG("Prevented loading an invalid mod: " .. mod .. " does not have an info file: " .. moddir)
+            continue
+        end
+        modinfo_file = moddir .. '/' .. modinfo_file
+
+        -- do not load deprecated mods
+        local deprecation_status = deprecatedMods[mod]
+        if deprecation_status then
+            if deprecation_status == true then
+                -- deprecated regardless of version
+                LOG("Prevented loading a deprecated mod: " .. mod)
+                continue
+            elseif type(deprecation_status) == "string" then
+                -- depcreated only when the mod version is less than or equal to the deprecation version
+                local mod_version = GetModVersion(modinfo_file)
+                if mod_version == false then
+                    LOG("Prevented loading a deprecated mod: " .. mod .. " does not have readable mod info (" .. modinfo_file .. ')')
+                    continue
+                end
+                if mod_version == nil then
+                    LOG("Prevented loading a deprecated mod version: " .. mod .. " does not specify a version number (must be higher than version " .. deprecation_status .. ')')
+                    continue
+                end
+                local mod_major, mod_minor = ParseVersion(mod_version)
+                local dep_major, dep_minor = ParseVersion(deprecation_status)
+                if not mod_major or CompareVersions(mod_major, mod_minor, dep_major, dep_minor) <= 0 then
+                    LOG("Prevented loading a deprecated mod version: " .. mod .. " version " .. mod_version .. " (must be higher than version " .. deprecation_status .. ')')
+                    continue
+                end
+            end
         end
 
         -- do not load mods twice
@@ -403,8 +517,8 @@ end
 -- @param path The root folder for the maps and mods
 local function LoadVaultContent(path)
     -- load in additional things, like sounds and 
-	MountMapContent(path .. '/maps')
-	MountModContent(path .. '/mods')
+    MountMapContent(path .. '/maps')
+    MountModContent(path .. '/mods')
 end
 
 -- END OF COPY --
@@ -457,3 +571,6 @@ MountDirectory(fa_path .. "/movies", '/movies')
 MountDirectory(fa_path .. "/sounds", '/sounds')
 MountDirectory(fa_path .. "/maps", '/maps')
 MountDirectory(fa_path .. "/fonts", '/fonts')
+
+-- Please do not delete these lines. This is necessary for testing.
+table.insert(path, 1, { dir = InitFileDir .. '\\..\\DevData', mountpoint = '/' })

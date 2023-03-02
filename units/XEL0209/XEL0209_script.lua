@@ -7,10 +7,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
-local TDFRiotWeapon = import('/lua/terranweapons.lua').TDFRiotWeapon
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
+local TDFRiotWeapon = import("/lua/terranweapons.lua").TDFRiotWeapon
 
+---@class XEL0209 : TConstructionUnit
 XEL0209 = Class(TConstructionUnit) {
     Weapons = {
         Riotgun01 = Class(TDFRiotWeapon) {

@@ -2655,6 +2655,12 @@ float4 CommandFeedbackPS0( VERTEXNORMAL_VERTEX vertex, uniform bool fade ) : COL
     return float4(color.rgb, fade ? saturate(color.a * vertex.material.x) : color.a );
 }
 
+float4 FakeRingsPS( VERTEXNORMAL_VERTEX vertex, uniform float alpha) : COLOR0
+{
+    float4 color = tex2D( albedoSampler, vertex.texcoord0.xy);
+    return float4(color.rgb, vertex.material.y );
+}
+
 float4 CommandFeedbackPS1( VERTEXNORMAL_VERTEX vertex, uniform float glow) : COLOR0
 {
     return float4(0,0,0,glow);
@@ -5274,12 +5280,60 @@ technique RallyPoint
     }
 }
 
+technique FakeRingsNoDepth
+<
+    string cartographicTechnique = "CartographicFeedback";
+
+    int renderStage = STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )    // if RGBA is written, then you get glow, just RGB is no glow
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Disable )
+
+#ifndef DIRECT3D10
+        AlphaTestEnable = true;
+        AlphaRef = 0x23;
+        AlphaFunc = Greater;
+        ZEnable = false;
+#endif
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 FakeRingsPS(false);
+    }
+}
+
+technique FakeRings
+<
+    string cartographicTechnique = "CartographicFeedback";
+
+    int renderStage = STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )    // if RGBA is written, then you get glow, just RGB is no glow
+        RasterizerState( Rasterizer_Cull_CW )
+
+#ifndef DIRECT3D10
+        AlphaTestEnable = true;
+        AlphaRef = 0x23;
+#endif
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 FakeRingsPS(false);
+    }
+}
+
 technique CommandFeedback2
 <
     string cartographicTechnique = "CartographicFeedback";
 
     int renderStage = STAGE_POSTWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_LIFETIME;
 >
 {
     pass P0
@@ -7006,7 +7060,21 @@ struct NOMADSBUILD_VERTEX
     float4 shadow : TEXCOORD2;
     float4 color : COLOR0;
     float4 material : TEXCOORD1;    /// various uses
-    float2 screenPos : TEXCOORD7;
+    float3 screenPos : TEXCOORD7;
+};
+
+struct NOMADSBUILDMESH_VERTEX
+{
+    float4 position : POSITION0;
+    float3 normal : TEXCOORD3;
+    float3 tangent : TEXCOORD4;
+    float3 binormal : TEXCOORD5;
+    float4 texcoord0 : TEXCOORD0;
+    float3 viewDirection : TEXCOORD6;
+    float4 shadow : TEXCOORD2;
+    float4 color : COLOR0;
+    float4 material : TEXCOORD1;    /// various uses
+    float3 relativePos : TEXCOORD7;
 };
 
 // VERTEX SHADERS ---------------------------------------------------------------------------------------------
@@ -7032,9 +7100,7 @@ NOMADSBUILD_VERTEX NOMADSBuildVS(
     CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-
     vertex.position = mul( float4(position,1), worldMatrix);
-
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
@@ -7052,6 +7118,50 @@ NOMADSBUILD_VERTEX NOMADSBuildVS(
 
     // An extra step to pass the screen position to the pixel shader
     vertex.screenPos = vertex.position.xyz / vertex.position.w;
+
+    return vertex;
+}
+
+//like the above, but it passes a a mesh relative position instead of a screen position.
+NOMADSBUILDMESH_VERTEX NOMADSBuildMeshVS(
+    float3 position : POSITION0,
+    float3 normal : NORMAL0,
+    float3 tangent : TANGENT0,
+    float3 binormal : BINORMAL0,
+    float4 texcoord0 : TEXCOORD0,
+    int boneIndex[4] : BLENDINDICES,
+    float3 row0 : TEXCOORD1,
+    float3 row1 : TEXCOORD2,
+    float3 row2 : TEXCOORD3,
+    float3 row3 : TEXCOORD4,
+    anim_t anim : TEXCOORD5,
+    float4 material : TEXCOORD6,
+    float4 color : COLOR0,
+    float1 colorLookup : TEXCOORD7
+)
+{
+    NOMADSBUILDMESH_VERTEX vertex = (NOMADSBUILDMESH_VERTEX)0;
+    CompatSwizzle(color);
+
+    float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
+    vertex.position = mul( float4(position,1), worldMatrix);
+    vertex.shadow = ComputeShadowTexcoord( vertex.position);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
+
+    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
+    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+
+    vertex.texcoord0 = ( anim.w > 0.5 ) ? ComputeScrolledTexcoord( texcoord0, material) : texcoord0;
+    vertex.color = color;
+    vertex.material = float4( time - material.x, material.yzw);
+
+    float3x3 rotationMatrix = (float3x3)worldMatrix;
+    vertex.normal = mul( normal, rotationMatrix);
+    vertex.tangent = mul( tangent, rotationMatrix);
+    vertex.binormal = mul( binormal, rotationMatrix);
+
+    // We pass the vertex coordinates to the pixel shader, and have to normalize them to ensure that different size structures all work.
+    vertex.relativePos = normalize( position.xyz);
 
     return vertex;
 }
@@ -7126,6 +7236,7 @@ float4 NomadsFactoryBuildHologramPS( NOMADSBUILD_VERTEX vertex ) : COLOR0
     // The holographic colour
     float3 holo = float3(1.0, 0.5, 0.0);
     float alpha = 0.22;
+
     return float4(holo, alpha);
 }
 
@@ -7134,23 +7245,52 @@ float4 StunnedUnit( VERTEXNORMAL_VERTEX vertex ) : COLOR
     return float4( 0, 0, 0, 0.66 );
 }
 
-// creates an orange see through version of the unit
-float4 NomadsBuildHologramPS( NOMADSBUILD_VERTEX vertex,
+//TODO: merge the two nomads build shaders together by using a bool.
+
+// creates a build-band hologram that reveals the unit
+float4 NomadsBuildHologramPS( NOMADSBUILDMESH_VERTEX vertex,
                     uniform bool FadeAlmostDone ) : COLOR0
 {
     // The holographic colour
     float3 holo = float3(1.0, 0.5, 0.0);
-
-    //Alpha channel, fade in til 5% completion, fade out from 90% again. The other shaders start to fade in at 90% so this is a nice overlap
-    float alpha = 0.22;
-    if (vertex.material.y < 0.5)
+    float alpha = 0.25;
+    
+    //Alpha channel creates a scanning band as the unit is being built.
+    float height = 0.1 + vertex.material.y - vertex.relativePos.y;
+    float band = 0.1 -(height * height * 30);  
+    if (vertex.material.y < 0.9)
     {
-        alpha = alpha * (vertex.material.y / 0.5);
+        alpha = clamp(4 * band, 0, 1) + min(20 * height, 0.1) ; 
     }
     else if (FadeAlmostDone && vertex.material.y > 0.9)
     {
         alpha = alpha * (10 * (1 - vertex.material.y));
     }
+    
+
+    return float4(holo, alpha);
+}
+
+// creates a build-band hologram that reveals the unit. this one is for factories, where the banding is horizontal.
+float4 NomadsBuildHologramUnitPS( NOMADSBUILDMESH_VERTEX vertex,
+                    uniform bool FadeAlmostDone ) : COLOR0
+{
+    // The holographic colour
+    float3 holo = float3(1.0, 0.5, 0.0);
+    float alpha = 0.25;
+
+    //Alpha channel creates a scanning band as the unit is being built.
+    float height = 0.1 + 2*vertex.material.y - (1 - vertex.relativePos.z);
+    float band = 0.1 -(height * height * 30);  
+    if (vertex.material.y < 0.9)
+    {
+        alpha = clamp(4 * band, 0, 1) + min(20 * height, 0.1) ; 
+    }
+    else if (FadeAlmostDone && vertex.material.y > 0.9)
+    {
+        alpha = alpha * (10 * (1 - vertex.material.y));
+    }
+    
 
     return float4(holo, alpha);
 }
@@ -7170,7 +7310,7 @@ float4 NomadsBuildNoisePS( NOMADSBUILD_VERTEX vertex,
 
     //Alpha channel
     float alpha = 0.5f;
-    if (vertex.material.y < 0.5)
+    if (vertex.material.y < 0.9)
     {
         alpha = alpha * (vertex.material.y / 0.5);
     }
@@ -7389,6 +7529,90 @@ technique CybranPhaseShield_HighFidelity
 // ====================================================================================================================================================================
 // All nomads shader techniques
 
+technique NOMADSBuildUnit_MediumFidelity
+<
+    string abstractTechnique = "NomadsBuildUnit";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    // A note: Without STAGE_DEPTH, shadow and lighting info is not passed
+    int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    // Glow first as it does not use depth
+    // A pass afterwards must write the depth buffer
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_None )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        ZEnable = true;
+        ZWriteEnable = false;
+
+        VertexShader = compile vs_1_1 NOMADSBuildMeshVS();
+        PixelShader = compile ps_2_a NomadsBuildHologramUnitPS(true);
+    }
+    pass P1
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        ZEnable = true;
+        ZWriteEnable = true;
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NomadsBuildPS(true);
+    }
+    pass P2
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        ZEnable = true;
+        ZWriteEnable = true;
+
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(true);
+    }
+}
+
+technique NOMADSBuildUnit_LowFidelity
+<
+    string abstractTechnique = "NomadsBuildUnit";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    // A note: Without STAGE_DEPTH, shadow and lighting info is not passed
+    int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    // Glow first as it does not use depth
+    // A pass afterwards must write the depth buffer
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        ZEnable = true;
+        ZWriteEnable = true;
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NomadsBuildPS(true);
+    }
+    pass P1
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        ZEnable = true;
+        ZWriteEnable = true;
+
+        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        PixelShader = compile ps_2_a NomadsBuildNoisePS(true);
+    }
+}
+
 technique NOMADSBuild_MediumFidelity
 <
     string abstractTechnique = "NomadsBuild";
@@ -7411,7 +7635,7 @@ technique NOMADSBuild_MediumFidelity
         ZEnable = true;
         ZWriteEnable = false;
 
-        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        VertexShader = compile vs_1_1 NOMADSBuildMeshVS();
         PixelShader = compile ps_2_a NomadsBuildHologramPS(true);
     }
     pass P1
@@ -7473,6 +7697,7 @@ technique NOMADSBuild_LowFidelity
     }
 }
 
+// Is this used?
 // Orange holographic style
 // Like NOMADSBuild but without fade to texture
 technique OrangeHolo_HighFidelity
@@ -7497,7 +7722,7 @@ technique OrangeHolo_HighFidelity
         ZEnable = true;
         ZWriteEnable = false;
 
-        VertexShader = compile vs_1_1 NOMADSBuildVS();
+        VertexShader = compile vs_1_1 NOMADSBuildMeshVS();
         PixelShader = compile ps_2_a NomadsBuildHologramPS(false);
     }
     pass P1
@@ -7541,7 +7766,7 @@ technique NomadsFactoryBuildRect_HighFidelity
     }
 }
 
-// NOMAD UNIT
+// NOMADS UNIT
 // Don't forget to also update the personal shield techniques!
 technique NomadsUnit_HighFidelity
 <
@@ -7559,7 +7784,7 @@ technique NomadsUnit_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(
             true,  // mask albedo
             true,  // glow
             true,  // hi def shadows
@@ -7586,7 +7811,7 @@ technique NomadsUnit_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
     }
 }
 
@@ -7627,7 +7852,7 @@ technique NomadsUnitStunned_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(
             true,  // mask albedo
             true,  // glow
             true,  // hi def shadows
@@ -7662,7 +7887,7 @@ technique NomadsUnitStunned_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
     {
@@ -7714,7 +7939,7 @@ technique NomadsPowerArmor_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(true,true,true, false,0,0 );
     }
     pass P1
     {
@@ -7743,7 +7968,7 @@ technique NomadsPowerArmor_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
     {
@@ -7803,7 +8028,7 @@ technique NomadsPhaseShield_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a NomadsNormalMappedPS(true,true,true, false,0,0 );
     }
     pass P1
     {
@@ -7832,7 +8057,7 @@ technique NomadsPhaseShield_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
+        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
     }
     pass P1
     {
@@ -8005,340 +8230,6 @@ technique ShieldNomadsStealth_LowFidelity
     }
 }
 
-// ====================================================================================================================================================================
-// all nomads techniques using a changed pixel shader and with the 's' added
-
-// NOMAD UNIT
-// Don't forget to also update the personal shield techniques!
-technique NomadsUnit2_HighFidelity
-<
-    string abstractTechnique = "NomadsUnit2";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadsNormalMappedPS(
-            true,  // mask albedo
-            true,  // glow
-            true,  // hi def shadows
-            false, // alpha test enable
-            0, // alpha func
-            0 // alpha ref
-        );
-    }
-}
-
-technique NomadsUnit2_MedFidelity
-<
-    string abstractTechnique = "NomadsUnit2";
-    int fidelity = FIDELITY_MEDIUM;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
-    }
-}
-
-technique NomadsUnit2_LowFidelity
-<
-    string abstractTechnique = "NomadsUnit2";
-    int fidelity = FIDELITY_LOW;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 VertexNormalVS();
-        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
-    }
-}
-
-technique NomadsUnitStunned2_HighFidelity
-<
-    string abstractTechnique = "NomadsUnitStunned2";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadsNormalMappedPS(
-            true,  // mask albedo
-            true,  // glow
-            true,  // hi def shadows
-            false, // alpha test enable
-            0, // alpha func
-            0 // alpha ref
-        );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a StunnedUnit();
-    }
-}
-
-technique NomadsUnitStunned2_MedFidelity
-<
-    string abstractTechnique = "NomadsUnitStunned2";
-    int fidelity = FIDELITY_MEDIUM;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a StunnedUnit();
-    }
-}
-
-technique NomadsUnitStunned2_LowFidelity
-<
-    string abstractTechnique = "NomadsUnitStunned2";
-    int fidelity = FIDELITY_LOW;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 VertexNormalVS();
-        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
-    }
-}
-
-/// Nomads powered armor
-/// Don't forget to also update the unit shader techniques (if the P0 pass is changed)!
-technique NomadsPowerArmor2_HighFidelity
-<
-    string abstractTechnique = "NomadsPowerArmor2";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONHEALTH;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadsNormalMappedPS(true,true,true, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
-    }
-}
-
-technique NomadsPowerArmor2_MedFidelity
-<
-    string abstractTechnique = "NomadsPowerArmor2";
-    int fidelity = FIDELITY_MEDIUM;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONHEALTH;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
-    }
-}
-
-technique NomadsPowerArmor2_LowFidelity
-<
-    string abstractTechnique = "NomadsPowerArmor2";
-    int fidelity = FIDELITY_LOW;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONHEALTH;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 VertexNormalVS();
-        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadsPowerArmorPS();
-    }
-}
-
-/// Nomad personal shield
-///
-technique NomadsPhaseShield2_HighFidelity
-<
-    string abstractTechnique = "NomadsPhaseShield2";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONHEALTH;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NomadsNormalMappedPS(true,true,true, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
-    }
-}
-
-technique NomadsPhaseShield2_MedFidelity
-<
-    string abstractTechnique = "NomadsPhaseShield2";
-    int fidelity = FIDELITY_MEDIUM;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONHEALTH;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NomadsNormalMappedPS(true,true,false, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
-    }
-}
-
-technique NomadsPhaseShield2_LowFidelity
-<
-    string abstractTechnique = "NomadsPhaseShield2";
-    int fidelity = FIDELITY_LOW;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONHEALTH;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 VertexNormalVS();
-        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.01);
-        PixelShader = compile ps_2_0 NomadsPhaseShieldPS();
-    }
-}
 
 /////////////////////
 // TA Build Shader //
@@ -8822,12 +8713,10 @@ technique TACloak_LowFidelity
 }
 
 
-
-
 // Old build shader with scanline effect, pulsing glow,  noise
 // This might come in handy at some point if we want these in the new shader
 
-//float4 NomadBuildOldPS( ORANGEHOLO_VERTEX vertex,
+//float4 NomadsBuildOldPS( ORANGEHOLO_VERTEX vertex,
 //                       uniform bool hiDefShadows ) : COLOR0
 //{
 ////    if ( 1 == mirrored ) clip(vertex.depth.x);
@@ -8863,7 +8752,7 @@ technique TACloak_LowFidelity
 //    return float4( color.rgb, alpha );
 //}
 
-// Glow overlau for nomad build shader
+// Glow overlay for nomad build shader
 //float4 NomadBuildGlowPS( FLAT_VERTEX vertex ) : COLOR0
 //{
 //

@@ -1,5 +1,5 @@
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
 
 --- A Group for arranging controls horizontally in fixed-width columns.
 ---@class ColumnLayout : Group

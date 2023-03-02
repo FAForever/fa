@@ -8,7 +8,7 @@
 --    Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AReactonCannonProjectile = import('/lua/aeonprojectiles.lua').AReactonCannonProjectile
+local AReactonCannonProjectile = import("/lua/aeonprojectiles.lua").AReactonCannonProjectile
 
 ADFReactonCannon01 = Class(AReactonCannonProjectile) {
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)

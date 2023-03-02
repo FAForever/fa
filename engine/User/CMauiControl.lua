@@ -1,127 +1,128 @@
----@declare-global
----@class moho.control_methods
+---@meta
+
+---@class moho.control_methods : Destroyable
 local CMauiControl = {}
 
+---
+function CMauiControl:AbandonKeyboardFocus()
+end
+
+---
 ---@param blocksKeyDown boolean
 function CMauiControl:AcquireKeyboardFocus(blocksKeyDown)
 end
 
----
---  ApplyFunction(func) - applys a function to this control and all children, function will recieve the control object as the only parameter
+--- Applies a function to this control and all children, function will recieve the control object as the only parameter
 function CMauiControl:ApplyFunction(func)
 end
 
 ---
---  ClearChildren()
 function CMauiControl:ClearChildren()
 end
 
----
---  Control:Destroy() -- destroy a control.
+--- Destroys a control
 function CMauiControl:Destroy()
 end
 
----hit testing will be skipped for this control
----@param recursive boolean?
+--- Hit testing will be skipped for this control
+---@param recursive? boolean
 function CMauiControl:DisableHitTest(recursive)
 end
 
 ---
---  Dump
 function CMauiControl:Dump()
 end
 
----hit testing will be checked for this control
----@param recursive boolean?
+--- Hit testing will be checked for this control
+---@param recursive? boolean defaults to `true`
 function CMauiControl:EnableHitTest(recursive)
 end
 
 ---
---  float GetAlpha()
+---@return number
 function CMauiControl:GetAlpha()
 end
 
 ---
---  GetCurrentFocusControl()
 function CMauiControl:GetCurrentFocusControl()
 end
 
 ---
---  string GetName()
+---@return string
 function CMauiControl:GetName()
 end
 
----
---  Control:GetParent() -- return the parent of this control, or nil if it doesn't have one.
+--- Returns the parent of this control, or `nil` if it doesn't have one
+---@return Control
 function CMauiControl:GetParent()
 end
 
 ---
---  int GetRenderPass()
+---@return number
 function CMauiControl:GetRenderPass()
 end
 
 ---
---  Frame GetRootFrame()
+---@return Frame
 function CMauiControl:GetRootFrame()
 end
 
----
---  Control:Hide() -- stop rendering and hit testing the control
+--- Stops rendering and hit testing the control
 function CMauiControl:Hide()
 end
 
----
---  bool HitTest(x, y) - given x,y coordinates, tells you if the control is under the coordinates
-function CMauiControl:HitTest(x,  y)
+--- Given x,y coordinates, tells you if the control is under the coordinates
+---@return boolean
+function CMauiControl:HitTest(x, y)
 end
 
----
---  Control:IsHidden() -- determine if the control is hidden
+--- Returns if the control is hidden
+---@return boolean
 function CMauiControl:IsHidden()
 end
 
----
---  Control:IsHitTestDisabled() -- determine if hit testing is disabled
+--- Returns if hit testing is disabled
+---@return boolean
 function CMauiControl:IsHitTestDisabled()
 end
 
 ---
---  bool NeedsFrameUpdate()
+---@return boolean
 function CMauiControl:NeedsFrameUpdate()
 end
 
----
---  SetAlpha(float, children) - Set the alpha of a given control, if children is true, also sets childrens alpha
-function CMauiControl:SetAlpha(float,  children)
+--- Sets the alpha of a given control, if children is true, also set children's alpha
+---@param alpha number
+---@param children boolean
+function CMauiControl:SetAlpha(alpha, children)
 end
 
----
---  Control:SetHidden() -- set the hidden state of the control
+--- Sets the hidden state of the control
 function CMauiControl:SetHidden()
 end
 
 ---
---  SetName(string)
-function CMauiControl:SetName(string)
+---@param name string
+function CMauiControl:SetName(name)
 end
 
+---
 ---@param needsIt boolean
 function CMauiControl:SetNeedsFrameUpdate(needsIt)
 end
 
----
---  Control:SetParent(newParentControl) -- change the control's parent
+--- Changes the control's parent
+---@param newParentControl Control
 function CMauiControl:SetParent(newParentControl)
 end
 
 ---
---  int SetRenderPass()
-function CMauiControl:SetRenderPass()
+---@param pass number
+---@return number
+function CMauiControl:SetRenderPass(pass)
 end
 
----
---  Control:Show() -- start rendering and hit testing the control
+--- Starts rendering and hit testing the control
 function CMauiControl:Show()
 end
 

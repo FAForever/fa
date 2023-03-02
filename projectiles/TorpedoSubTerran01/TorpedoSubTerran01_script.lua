@@ -1,6 +1,6 @@
 -- Sub-Based Torpedo Script
 
-local TTorpedoSubProjectile = import('/lua/terranprojectiles.lua').TTorpedoSubProjectile
+local TTorpedoSubProjectile = import("/lua/terranprojectiles.lua").TTorpedoSubProjectile
 
 --- Unused
 ---@class TorpedoSubTerran01 : TTorpedoSubProjectile

@@ -9,9 +9,10 @@
 --****************************************************************************
 
 --changes from ALandUnit to AHoverLandUnit
-local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
-local ADFDisruptorCannonWeapon = import('/lua/aeonweapons.lua').ADFDisruptorWeapon
+local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
+local ADFDisruptorCannonWeapon = import("/lua/aeonweapons.lua").ADFDisruptorWeapon
 
+---@class DAL0310 : AHoverLandUnit
 DAL0310 = Class(AHoverLandUnit) {
     Weapons = {
         MainGun = Class(ADFDisruptorCannonWeapon) {

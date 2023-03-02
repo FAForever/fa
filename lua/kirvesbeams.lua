@@ -1,8 +1,8 @@
-local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local CustomEffectTemplate = import('/lua/kirveseffects.lua')
-local SCCollisionBeam = import('/lua/defaultcollisionbeams.lua').SCCollisionBeam
-local Util = import('/lua/utilities.lua')
+local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local CustomEffectTemplate = import("/lua/kirveseffects.lua")
+local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
+local Util = import("/lua/utilities.lua")
 
 ---@class EmptyCollisionBeam : CollisionBeam
 EmptyCollisionBeam = Class(CollisionBeam) {
@@ -15,7 +15,6 @@ EmptyCollisionBeam = Class(CollisionBeam) {
     FxImpactShield = {},
     FxImpactNone = {},
 }
-
 
 ---@class TargetingCollisionBeam : EmptyCollisionBeam
 TargetingCollisionBeam = Class(EmptyCollisionBeam) {
@@ -42,10 +41,14 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.25,
 
+    ---@param self UnstablePhasonLaserCollisionBeam
+    ---@param impactType ImpactType
+    ---@param targetEntity Projectile
     OnImpact = function(self, impactType, targetEntity)
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 
+    ---@param self UnstablePhasonLaserCollisionBeam
     OnDisable = function(self)
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
@@ -65,6 +68,9 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.25,
 
+    ---@param self UnstablePhasonLaserCollisionBeam
+    ---@param impactType ImpactType
+    ---@param targetEntity Projectile
     OnImpact = function(self, impactType, targetEntity)
         if impactType == 'Terrain' then
             if self.Scorching == nil then
@@ -77,12 +83,14 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
         CollisionBeam.OnImpact(self, impactType, targetEntity)
    end,
 
+   ---@param self UnstablePhasonLaserCollisionBeam
     OnDisable = function(self)
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil
     end,
 
+    ---@param self UnstablePhasonLaserCollisionBeam
     ScorchThread = function(self)
         local size = 1 + (Random() * 1.1)
         local CurrentPosition = self:GetPosition(1)

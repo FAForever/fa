@@ -16,15 +16,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 110,
     Categories = {
         'PRODUCTSC1',
@@ -97,9 +88,9 @@ UnitBlueprint {
         UniformScale = 0.2,
     },
     Economy = {
-        BuildCostEnergy = 3600,
+        BuildCostEnergy = 3780,
         BuildCostMass = 540,
-        BuildTime = 664,
+        BuildTime = 675,
         RebuildBonusIds = {
             'ueb2301',
         },

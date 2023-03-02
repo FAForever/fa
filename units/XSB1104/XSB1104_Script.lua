@@ -8,8 +8,9 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SMassFabricationUnit = import('/lua/seraphimunits.lua').SMassFabricationUnit
+local SMassFabricationUnit = import("/lua/seraphimunits.lua").SMassFabricationUnit
 
+---@class XSB1104 : SMassFabricationUnit
 XSB1104 = Class(SMassFabricationUnit) {
 
     OnCreate = function(self)

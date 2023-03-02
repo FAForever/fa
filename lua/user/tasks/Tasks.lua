@@ -1,6 +1,6 @@
 -- Keeps some administrative values and has generic validation functions.
 
-local AbilityDefinition = import('/lua/abilitydefinition.lua').abilities
+local AbilityDefinition = import("/lua/abilitydefinition.lua").abilities
 
 
 function GetUnitsScript(TaskName, SelectedUnits, data)

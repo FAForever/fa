@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ARadarJammerUnit = import('/lua/aeonunits.lua').ARadarJammerUnit
+local ARadarJammerUnit = import("/lua/aeonunits.lua").ARadarJammerUnit
 
+---@class UAB4203 : ARadarJammerUnit
 UAB4203 = Class(ARadarJammerUnit) {
     IntelEffects = {
 		{

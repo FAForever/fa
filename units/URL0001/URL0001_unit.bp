@@ -115,20 +115,12 @@ UnitBlueprint {
         },
     },
     BuildBotTotal = 2,
-    Buffs = {
-        Regen = {
-            Level1 = 4,
-            Level2 = 8,
-            Level3 = 12,
-            Level4 = 16,
-            Level5 = 20,
-        },
-    },
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
         'CYBRAN',
         'MOBILE',
+        'AMPHIBIOUS',
         'ECONOMIC',
         'COMMAND',
         'MASSPRODUCTION',

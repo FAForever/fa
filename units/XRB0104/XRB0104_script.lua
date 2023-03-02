@@ -7,8 +7,9 @@
 -- **
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
-local CConstructionStructureUnit = import('/lua/cybranunits.lua').CConstructionStructureUnit
+local CConstructionStructureUnit = import("/lua/cybranunits.lua").CConstructionStructureUnit
 
+---@class XRB0104 : CConstructionStructureUnit
 XRB0104 = Class(CConstructionStructureUnit) {
 }
 

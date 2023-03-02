@@ -24,14 +24,8 @@ PropBlueprint {
         ReclaimMassMax = 1,
         ReclaimTime = 1,
     },
-    Footprint = {
-        OccupancyCaps = 0,
-    },
     Interface = {
         HelpText = 'Very Large Rock - Theta Bridge',
-    },
-    Physics = {
-        BlockPath = false,
     },
     SizeX = 12,
     SizeY = 5.5,

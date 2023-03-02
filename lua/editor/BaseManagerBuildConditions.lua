@@ -3,16 +3,15 @@
 -- Author(s): Dru Staltman, John Comes
 -- Summary  : Generic AI Platoon Build Conditions
 --           Build conditions always return true or false
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
--- function: NeedAnyStructure = BuildCondition    doc = "Please work function docs."
--- parameter 0: string    aiBrain        = "default_brain"
--- parameter 1: string    baseName = "base_name"
+---NeedAnyStructure = BuildCondition
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function NeedAnyStructure(aiBrain, baseName)
     if not aiBrain.BaseManagers[baseName] then
         return false
@@ -55,11 +54,12 @@ function NeedAnyStructure(aiBrain, baseName)
     return false
 end
 
--- function: NumUnitsLessNearBase = BuildCondition doc = "Please work function docs."
--- parameter 0: string aiBrain = "default_brain"
--- parameter 1: string baseName = "MAIN" doc = "docs for param1"
--- parameter 2: expr category = categories.ALLUNITS
--- parameter 3: string varName = "VariableName"
+---NumUnitsLessNearBase = BuildCondition
+---@param aiBrain AIBrain
+---@param baseName string
+---@param category EntityCategory
+---@param varName string
+---@return boolean
 function NumUnitsLessNearBase(aiBrain, baseName, category, varName)
     if aiBrain.BaseManagers[baseName] == nil then
         return false
@@ -89,6 +89,9 @@ function NumUnitsLessNearBase(aiBrain, baseName, category, varName)
     end
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function BaseManagerNeedsEngineers(aiBrain, baseName)
     if not aiBrain.BaseManagers[baseName] then
         return false
@@ -100,6 +103,9 @@ function BaseManagerNeedsEngineers(aiBrain, baseName)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function ExpansionBasesNeedEngineers(aiBrain, baseName)
     if not aiBrain.BaseManagers[baseName] then
         return false
@@ -122,7 +128,11 @@ function ExpansionBasesNeedEngineers(aiBrain, baseName)
     return false
 end
 
--- Check if specific expansion base needs engineers
+--- Check if specific expansion base needs engineers
+---@param aiBrain AIBrain
+---@param baseName string
+---@param eBaseName string
+---@return boolean
 function NumEngiesInExpansionBase(aiBrain, baseName, eBaseName)
     if not aiBrain.BaseManagers[baseName] or not aiBrain.BaseManagers[eBaseName] then
         return false
@@ -146,6 +156,9 @@ function NumEngiesInExpansionBase(aiBrain, baseName, eBaseName)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function CDRInPoolNeedAnyStructure(aiBrain, baseName)
     if not aiBrain.BaseManagers[baseName] then
         return false
@@ -191,6 +204,9 @@ function CDRInPoolNeedAnyStructure(aiBrain, baseName)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
     if not aiBrain.BaseManagers[baseName] then
         return false
@@ -239,6 +255,10 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@param catTable string
+---@return boolean
 function CategoriesBeingBuilt(aiBrain, baseName, catTable)
     if not aiBrain.BaseManagers[baseName] then
         return false
@@ -270,6 +290,10 @@ function CategoriesBeingBuilt(aiBrain, baseName, catTable)
     return false
 end
 
+---@param aiBrain ArmiesTable
+---@param level integer
+---@param baseName string
+---@return boolean
 function HighestFactoryLevel(aiBrain, level, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then
@@ -294,6 +318,12 @@ function HighestFactoryLevel(aiBrain, level, baseName)
     return true
 end
 
+---@param aiBrain AIBrain
+---@param techLevel integer
+---@param engQuantity integer
+---@param pType string
+---@param baseName string
+---@return boolean
 function FactoryCountAndNeed(aiBrain, techLevel, engQuantity, pType, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then
@@ -326,10 +356,15 @@ function FactoryCountAndNeed(aiBrain, techLevel, engQuantity, pType, baseName)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param platoonData PlatoonData
 function BaseManagerEngineersStarted(aiBrain, platoonData)
     aiBrain.BaseManagers[platoonData.BaseName]:SetEngineersBuilding(platoonData.NumBuilding)
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function UnfinishedBuildingsCheck(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then
@@ -338,17 +373,6 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
     -- Return out if the list is empty or all buildings are finished
     if table.empty(bManager.UnfinishedBuildings) then
         return false
-    else
-        local allFinished = true
-        for _, v in bManager.UnfinishedBuildings do
-            if v then
-               allFinished = false
-               break
-            end
-        end
-        if allFinished then
-            return false
-        end
     end
 
     -- Check list
@@ -362,9 +386,9 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
         end
     end
 
-    for k, v in bManager.UnfinishedBuildings do
-        if v and ScenarioInfo.UnitNames[armyIndex][k] and not ScenarioInfo.UnitNames[armyIndex][k].Dead then
-            if not beingBuiltList[k] then
+    for unitName, _ in bManager.UnfinishedBuildings do
+        if ScenarioInfo.UnitNames[armyIndex][unitName] and not ScenarioInfo.UnitNames[armyIndex][unitName].Dead then
+            if not beingBuiltList[unitName] then
                 return true
             end
         end
@@ -372,6 +396,11 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
     return false
 end
 
+---@param aiBrain AIBrain
+---@param level integer
+---@param baseName string
+---@param type string
+---@return boolean
 function HighestFactoryLevelType(aiBrain, level, baseName, type)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then
@@ -405,63 +434,96 @@ function HighestFactoryLevelType(aiBrain, level, baseName, type)
     return true
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function BaseActive(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
     return bManager.Active
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function BaseReclaimEnabled(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
     return bManager.FunctionalityStates.EngineerReclaiming
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function BasePatrollingEnabled(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
     return bManager.FunctionalityStates.Patrolling
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function BaseBuildingEngineers(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
     return bManager.FunctionalityStates.BuildEngineers
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function BaseEngineersEnabled(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
     return bManager.FunctionalityStates.Engineers
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function LandScoutingEnabled(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
     return bManager.FunctionalityStates.LandScouting
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function AirScoutingEnabled(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
     return bManager.FunctionalityStates.AirScouting
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function ExpansionBasesEnabled(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
     return bManager.FunctionalityStates.ExpansionBases
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function TMLsEnabled(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
     return bManager.FunctionalityStates.TMLs
 end
 
+---@param aiBrain AIBrain
+---@param baseName string
+---@return boolean
 function NukesEnabled(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
     if not bManager then return false end
     return bManager.FunctionalityStates.Nukes
 end
 
+--- Moved Unused Imports for mod compatibility
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")

@@ -5,16 +5,17 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TMobileFactoryUnit = import('/lua/terranunits.lua').TMobileFactoryUnit
-local WeaponsFile = import('/lua/terranweapons.lua')
+local TMobileFactoryUnit = import("/lua/terranunits.lua").TMobileFactoryUnit
+local WeaponsFile = import("/lua/terranweapons.lua")
 local TDFGaussCannonWeapon = WeaponsFile.TDFLandGaussCannonWeapon
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 local TAALinkedRailgun = WeaponsFile.TAALinkedRailgun
 local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
+---@class UEL0401 : TMobileFactoryUnit
 UEL0401 = Class(TMobileFactoryUnit) {
     FxDamageScale = 2.5,
     PrepareToBuildAnimRate = 5,

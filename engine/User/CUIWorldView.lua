@@ -1,90 +1,100 @@
----@declare-global
----@class moho.UIWorldView
+---@meta
+
+---@class moho.UIWorldView : moho.control_methods
 local CUIWorldView = {}
 
 ---
---  EnableResourceRendering(bool)
-function CUIWorldView:EnableResourceRendering(bool)
+---@param parentControl Control
+---@param cameraName string
+---@param depth number
+---@param isMiniMap boolean
+---@param trackCamera boolean
+function CUIWorldView:__init(parentControl, cameraName, depth, isMiniMap, trackCamera)
 end
 
 ---
---  string moho.UIWorldView:GetRightMouseButtonOrder()
+function CUIWorldView:CameraReset()
+end
+
+---
+---@param enable boolean
+function CUIWorldView:EnableResourceRendering(enable)
+end
+
+---
+---@return string
 function CUIWorldView:GetRightMouseButtonOrder()
 end
 
 ---
---  (vector2f|nil) = GetScreenPos(unit)
+---@param unit Unit
+---@return Vector2 | nil
 function CUIWorldView:GetScreenPos(unit)
 end
 
 ---
---  moho.UIWorldView:GetsGlobalCameraCommands(bool getsCommands)
-function CUIWorldView:GetsGlobalCameraCommands(bool getsCommands)
+---@param getsCommands boolean
+function CUIWorldView:GetsGlobalCameraCommands(getsCommands)
 end
 
 ---
---  bool moho.UIWorldView:HasHighlightCommand()
+---@return boolean
 function CUIWorldView:HasHighlightCommand()
 end
 
 ---
---  bool IsCartographic()
+---@return boolean
 function CUIWorldView:IsCartographic()
 end
 
 ---
---  IsInputLocked(camera)
+---@param camera Camera
 function CUIWorldView:IsInputLocked(camera)
 end
 
 ---
---  bool IsResourceRenderingEnabled()
+---@return boolean
 function CUIWorldView:IsResourceRenderingEnabled()
 end
 
 ---
---  LockInput(camera)
+---@param camera Camera
 function CUIWorldView:LockInput(camera)
 end
 
----
---  VECTOR2 Project(self,VECTOR3) - given a point in world space, projects the point to control space
-function CUIWorldView:Project(self, VECTOR3)
+--- Given a point in world space, project the point to control space
+---@param position Vector
+---@return Vector2
+function CUIWorldView:Project(position)
 end
 
 ---
---  SetCartographic(bool)
-function CUIWorldView:SetCartographic(bool)
+---@param cartographic boolean
+function CUIWorldView:SetCartographic(cartographic)
 end
 
 ---
---  SetHighlightEnabled(bool)
-function CUIWorldView:SetHighlightEnabled(bool)
+---@param enabled boolean
+function CUIWorldView:SetHighlightEnabled(enabled)
 end
 
 ---
---  bool moho.UIWorldView:ShowConvertToPatrolCursor()
+---@return boolean
 function CUIWorldView:ShowConvertToPatrolCursor()
 end
 
 ---
---  UnlockInput(camera)
+---@param camera Camera
 function CUIWorldView:UnlockInput(camera)
 end
 
----
---  ZoomScale(x, y, wheelRot, wheelDelta) - cause the world to zoom based on wheel rotation event
-function CUIWorldView:ZoomScale(x,  y,  wheelRot,  wheelDelta)
+--- Cause the world to zoom based on wheel rotation event
+---@param x number
+---@param y number
+---@param wheelRot number
+---@param wheelDelta number
+function CUIWorldView:ZoomScale(x, y, wheelRot, wheelDelta)
 end
 
----
---  moho.UIWorldView:__init(parent_control, cameraName, depth, isMiniMap, trackCamera)
-function CUIWorldView:__init(parent_control,  cameraName,  depth,  isMiniMap,  trackCamera)
-end
-
----
---  derived from CMauiControl
-function CUIWorldView:base()
-end
 
 return CUIWorldView

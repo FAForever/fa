@@ -476,9 +476,9 @@ function printField(k, v, tblName, printer)
 end
 
 --- Prints keys and values of a table and sub-tables if present
---- @param tbl specifies a table to print
---- @param tblPrefix specifies optional table prefix/name
---- @param printer specifies optional message printer: LOG, WARN, error, etc.
+--- @param tbl? table specifies a table to print
+--- @param tblPrefix? string specifies optional table prefix/name
+--- @param printer? function specifies optional message printer: LOG, WARN, error, etc.
 --- e.g. table.print(categories)
 ---      table.print(categories, 'categories')
 ---      table.print(categories, 'categories', 'WARN')
@@ -610,7 +610,7 @@ end
 function StringSplitCamel(str)
     local first = str:sub(1, 1)
     local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
-    return split:gsub("^.", string.upper)
+    return (split:gsub("^.", string.upper))
 end
 
 --- Reverses order of letters for specified string
@@ -672,7 +672,9 @@ end
 
 --- Clamps numeric value to specified Min and Max range
 function math.clamp(v, min, max)
-    return math.max(min, math.min(max, v))
+    if v <= min then return min end
+    if v >= max then return max end
+    return v
 end
 
 -- Return a table parsed from key:value pairs passed on the command line

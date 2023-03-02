@@ -6,13 +6,13 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local WrapText = import('/lua/maui/text.lua').WrapText
-local Movie = import('/lua/maui/movie.lua').Movie
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local WrapText = import("/lua/maui/text.lua").WrapText
+local Movie = import("/lua/maui/movie.lua").Movie
+local Prefs = import("/lua/user/prefs.lua")
 
 local creditsMovies = {
     uef = 'FMV_UEF_Credits',
@@ -20,7 +20,7 @@ local creditsMovies = {
     cybran = 'FMV_Cybran_Credits',
 }
 
-local subtitleThread = false
+local subtitleThread = nil
 
 function DisplaySubtitles(textControl,captions)
     subtitleThread = ForkThread(
@@ -90,7 +90,7 @@ function PlayCampaignMovie(movieName, over, exitBehavior, cue, voice)
     local useSubtitles = Prefs.GetOption('subtitles') or not HasLocalizedVO(__language)
     local captions = false
     if useSubtitles then
-        local strings = import('/lua/ui/game/vo_fmv.lua')
+        local strings = import("/lua/ui/game/vo_fmv.lua")
         for k,v in strings do
             if string.lower(k) == string.lower(subtitleKey) then
                 captions = v.captions

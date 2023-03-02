@@ -2,8 +2,8 @@
 -- Aeon T2 Artillery Projectile : uab2303
 --
 
-local AMiasmaProjectile = import('/lua/aeonprojectiles.lua').AMiasmaProjectile
-local utilities = import('/lua/utilities.lua')
+local AMiasmaProjectile = import("/lua/aeonprojectiles.lua").AMiasmaProjectile
+local utilities = import("/lua/utilities.lua")
 
 AIFMiasmaShell01 = Class(AMiasmaProjectile) {
     OnImpact = function(self, targetType, targetEntity) 

@@ -8,8 +8,9 @@
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
+local CLandUnit = import("/lua/cybranunits.lua").CLandUnit
 
+---@class URC0001 : CLandUnit
 URC0001 = Class(CLandUnit) {
 }
 

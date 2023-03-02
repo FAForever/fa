@@ -1,7 +1,7 @@
 --
 -- Terran Gauss Cannon Projectile (UEL0401) Fatboy
 --
-local TDFGaussCannonProjectile = import('/lua/terranprojectiles.lua').TDFBigLandGaussCannonProjectile
+local TDFGaussCannonProjectile = import("/lua/terranprojectiles.lua").TDFBigLandGaussCannonProjectile
 TDFGauss04 = Class(TDFGaussCannonProjectile) {
     
     FxUnitHitScale = 0.9,

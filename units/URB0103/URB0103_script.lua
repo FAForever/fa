@@ -8,7 +8,8 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CSeaFactoryUnit = import('/lua/cybranunits.lua').CSeaFactoryUnit
+local CSeaFactoryUnit = import("/lua/cybranunits.lua").CSeaFactoryUnit
+---@class URB0103 : CSeaFactoryUnit
 URB0103 = Class(CSeaFactoryUnit) {
 
     StartArmsMoving = function(self)
@@ -17,7 +18,6 @@ URB0103 = Class(CSeaFactoryUnit) {
             self.ArmSlider = CreateSlider(self, 'Right_Arm03')
             self.Trash:Add(self.ArmSlider)
         end
-        
     end,
 
     MovingArmsThread = function(self)
@@ -34,6 +34,8 @@ URB0103 = Class(CSeaFactoryUnit) {
     
     StopArmsMoving = function(self)
         CSeaFactoryUnit.StopArmsMoving(self)
+        if not self.ArmSlider then return end
+
         self.ArmSlider:SetGoal(0, 0, 0)
         self.ArmSlider:SetSpeed(40)
     end,

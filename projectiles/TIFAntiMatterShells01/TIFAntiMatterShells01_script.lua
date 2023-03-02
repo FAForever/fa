@@ -2,8 +2,8 @@
 -- UEF T3 Artillery Anti-Matter Shells : ueb2302
 --
 
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local TArtilleryAntiMatterProjectile02 = import('/lua/terranprojectiles.lua').TArtilleryAntiMatterProjectile02
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local TArtilleryAntiMatterProjectile02 = import("/lua/terranprojectiles.lua").TArtilleryAntiMatterProjectile02
 TIFAntiMatterShells01 = Class(TArtilleryAntiMatterProjectile02) {
     OnImpact = function(self, targetType, targetEntity)
         TArtilleryAntiMatterProjectile02.OnImpact(self, targetType, targetEntity)

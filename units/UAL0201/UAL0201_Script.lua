@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
-local ADFDisruptorCannonWeapon = import('/lua/aeonweapons.lua').ADFDisruptorCannonWeapon
+local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
+local ADFDisruptorCannonWeapon = import("/lua/aeonweapons.lua").ADFDisruptorCannonWeapon
 
+---@class UAL0201 : AHoverLandUnit
 UAL0201 = Class(AHoverLandUnit) {
     Weapons = {
         MainGun = Class(ADFDisruptorCannonWeapon) {}

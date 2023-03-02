@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 30,
     },
     Audio = {
         AmbientMove = Sound {
@@ -27,15 +27,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
         },
     },
     BuildIconSortPriority = 30,
@@ -67,8 +58,8 @@ UnitBlueprint {
         AirThreatLevel = 8,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 7500,
-        MaxHealth = 7500,
+        Health = 7200,
+        MaxHealth = 7200,
         RegenRate = 0,
         SubThreatLevel = 21,
         SurfaceThreatLevel = 45,
@@ -262,7 +253,7 @@ UnitBlueprint {
             FiringRandomness = 0.25,
             FiringTolerance = 2,
             Label = 'FrontTurret',
-            MaxRadius = 80,
+            MaxRadius = 70,
             MuzzleChargeDelay = 0.1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,

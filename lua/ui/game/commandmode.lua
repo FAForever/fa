@@ -6,19 +6,15 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Construction = import('/lua/ui/game/construction.lua')
-local UIMain = import('/lua/ui/uimain.lua')
-local Orders = import('/lua/ui/game/orders.lua')
-local commandMeshResources = import('/lua/ui/game/commandmeshes.lua').commandMeshResources
-local Prefs = import('/lua/user/prefs.lua')
+local commandMeshResources = import("/lua/ui/game/commandmeshes.lua").commandMeshResources
+local Prefs = import("/lua/user/prefs.lua")
 
-local watchForQueueChange = import('/lua/ui/game/construction.lua').watchForQueueChange
-local checkBadClean = import('/lua/ui/game/construction.lua').checkBadClean
-local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
+local watchForQueueChange = import("/lua/ui/game/construction.lua").watchForQueueChange
+local checkBadClean = import("/lua/ui/game/construction.lua").checkBadClean
+local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
-local WorldView = import('/lua/ui/controls/worldview.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
+local WorldView = import("/lua/ui/controls/worldview.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
 -- upvalue globals for performance
 local IsKeyDown = IsKeyDown
@@ -30,59 +26,70 @@ local EntityCategoryFilterDown = EntityCategoryFilterDown
 local AddCommandFeedbackBlip = AddCommandFeedbackBlip
 
 -- upvalue table operations for performance
-local TableInsert = table.insert 
-local TableEmpty = table.empty 
+local TableInsert = table.insert
+local TableEmpty = table.empty
 local TableGetN = table.getn 
 local MathPi = math.pi
 local MathAtan = math.atan
 
+---@class MeshInfo
+---@field Position Vector
+---@field Blueprint string
+---@field TextureName string
+---@field ShaderName string
+---@field UniformScale number
 
 -- When this file is reloaded (using /EnableDiskWatch) the cursor no longer changes
 -- during command mode (e.g., when you do a move order it turns your cursor into
 -- the blue move marker). This is fixed by reloading the game.
 
---- Can be one of three values:
--- - order (called when performing an order)
--- - build (called when trying to build something)
--- - buildanchored (called when ... ?)
+---@alias CommandMode 'order' | 'build' | 'buildanchored' | false
+
+---@class CommandModeDataBase
+---@field cursor? string
+
+---@class CommandModeDataOrder : CommandModeDataBase
+---@field name CommandCap
+
+---@class CommandModeDataBuild : CommandModeDataBase
+---@field name string # blueprint id of the unit being built
+
+---@class CommandModeDataBuildAnchored : CommandModeDataBase
+
+---@alias CommandModeData CommandModeDataOrder | CommandModeDataBuild | CommandModeDataBuildAnchored | false
+
+---@type CommandMode
 local commandMode = false
 
---- Contains additional information for the current command mode:
--- - order -> name (order type, e.g., RULEUCC_Move)
--- - build -> name (blueprint type, e.g., xsb1101)
--- - buildanchored -> ?
+---@type CommandModeData
 local modeData = false
 
 --- Auto-disable command mode right after one command - used when shift is not pressed down.
 local issuedOneCommand = false
-
---- Behavior to run when entering command mode. If f is a function, it is called as f(commandMode, modeData).
 local startBehaviors = {}
-
---- Behavior to run when exiting command mode. If f is a function, it is called as f(commandMode, modeData).
 local endBehaviors = {}
 
---- Adds a starting behavior.
--- @param behavior The behavior to add, called as behavior(commandMode, modeData).
+--- Callback triggers when command mode starts
+--- @param behavior function<CommandMode, CommandModeData>
 function AddStartBehavior(behavior)
     TableInsert(startBehaviors, behavior)
 end
 
---- Adds a starting behavior.
--- @param behavior The behavior to add, called as behavior(commandMode, modeData).
+--- Callback triggers when command mode ends
+--- @param behavior function<CommandMode, CommandModeData>
 function AddEndBehavior(behavior)
     TableInsert(endBehaviors, behavior)
 end
 
---- ???
+--- usually changing selection ends the command mode, this allows us to ignore that
 local ignoreSelection = false
 function SetIgnoreSelection(ignore)
     ignoreSelection = ignore
 end
 
 --- Called when the command mode starts and initialises all the data.
--- @param newCommandMode The new command mode.
--- @param data The new mode data.
+---@param newCommandMode CommandMode
+---@param data CommandModeData
 function StartCommandMode(newCommandMode, data)
 
     -- clean up previous command mode
@@ -98,53 +105,57 @@ function StartCommandMode(newCommandMode, data)
     for i,v in startBehaviors do
         v(commandMode, modeData)
     end
-
-    -- update cursor
-    WorldView.OnStartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
 -- @param isCancel Is set to true when it cancels a current command mode for a new one.
 function EndCommandMode(isCancel)
 
-    --- ???
     if ignoreSelection then
         return
     end
+    
+    -- in case we want to end the command mode, without knowing it has already ended or not
+    if  modeData then
+        -- regain selection if we were cheating in units
+        if modeData.cheat then
+            if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
+                local modeData = table.deepcopy(modeData)
+                ForkThread(
+                    function()
+                        WaitSeconds(0.0001)
 
-    -- regain selection if we were cheating in units
-    if modeData.cheat then 
-        if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
-            local modeData = table.deepcopy(modeData)
-            ForkThread(
-                function()
-                    WaitSeconds(0.0001)
-
-                    modeData.name = modeData.ids[modeData.index]
-                    modeData.bpId = modeData.ids[modeData.index]
-                    modeData.index = modeData.index + 1
-        
-                    StartCommandMode("build", modeData)
+                        modeData.name = modeData.ids[modeData.index]
+                        modeData.bpId = modeData.ids[modeData.index]
+                        modeData.index = modeData.index + 1
+            
+                        StartCommandMode("build", modeData)
+                    end
+                )
+            else 
+                if modeData.selection then
+                    SelectUnits(modeData.selection)
                 end
-            )
-        else 
-            if modeData.selection then
-                SelectUnits(modeData.selection)
+            end
+
+            -- we can end up here because we re-start the command mode
+            if not modeData then
+                return
             end
         end
-    end
 
-    -- add information to modeData for end behavior
-    modeData.isCancel = isCancel or false
+        -- add information to modeData for end behavior
+        modeData.isCancel = isCancel or false
+
+        -- ???
+        if modeData.isCancel then
+            ClearBuildTemplates()
+        end
+    end
 
     -- do end behaviors
     for i,v in endBehaviors do
         v(commandMode, modeData)
-    end
-
-    -- ???
-    if modeData.isCancel then
-        ClearBuildTemplates()
     end
 
     -- update our local state
@@ -157,10 +168,17 @@ end
 local commandModeTable = { }
 
 --- Retrieves the current command mode information.
+---@return { [1]: CommandModeDataOrder, [2]: CommandModeData }
 function GetCommandMode()
     commandModeTable[1] = commandMode
     commandModeTable[2] = modeData
     return commandModeTable
+end
+
+--- Returns true if we are in command mode
+---@return boolean
+function InCommandMode()
+    return commandMode ~= false
 end
 
 --- A helper function to add the correct feedback animation.
@@ -411,12 +429,17 @@ local categoriesStructure = categories.STRUCTURE
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
-
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
     if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then 
         if not IsKeyDown('Shift') then 
             SimCallback({ Func = 'ImmediateHiveUpgrade', Args = { UpgradeTo = command.Blueprint } }, true )
         end
+    end
+
+    -- unusual command, where we use the build interface
+    if modeData.callback and command.CommandType == "BuildMobile" and (not command.Units[1]) then
+        modeData.callback(modeData, command)
+        return false
     end
         
     -- part of the cheat menu
@@ -531,7 +554,7 @@ function OnCommandIssued(command)
     end
 
     -- used by spread attack to keep track of the orders of units
-    import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
+    import("/lua/spreadattack.lua").MakeShadowCopyOrders(command)
 end
 
 --- ???
@@ -544,59 +567,8 @@ end
 
 GameMain.AddBeatFunction(OnCommandModeBeat)
 
--- The follow tables are just for reference and are not used:
-
--- -- All possible values for commandMode
--- local commandModes = {
---      "order",
---      "build",
---      "buildanchored",
---  }
-
--- -- A subset of possible values for the 'name' value of modeData
--- local orderModes = {
-
---     -- unit general rules
---     RULEUCC_Move                = (1 << 0),
---     RULEUCC_Stop                = (1 << 1),
---     RULEUCC_Attack              = (1 << 2),
---     RULEUCC_Guard               = (1 << 3),
---     RULEUCC_Patrol              = (1 << 4),
---     RULEUCC_RetaliateToggle     = (1 << 5),
-
---     -- unit specific rules
---     RULEUCC_Repair              = (1 << 6),
---     RULEUCC_Capture             = (1 << 7),
---     RULEUCC_Transport           = (1 << 8),
---     RULEUCC_CallTransport       = (1 << 9),
---     RULEUCC_Nuke                = (1 << 10),
---     RULEUCC_Tactical            = (1 << 11),
---     RULEUCC_Teleport            = (1 << 12),
---     RULEUCC_Ferry               = (1 << 13),
---     RULEUCC_SiloBuildTactical   = (1 << 14),
---     RULEUCC_SiloBuildNuke       = (1 << 15),
---     RULEUCC_Sacrifice           = (1 << 16),
---     RULEUCC_Pause               = (1 << 17),
---     RULEUCC_Overcharge          = (1 << 18),
---     RULEUCC_Dive                = (1 << 19),
---     RULEUCC_Reclaim             = (1 << 20),
---     RULEUCC_SpecialAction       = (1 << 21),
---     RULEUCC_Dock                = (1 << 22),
-
---     -- unit general
---     RULEUCC_Script              = (1 << 23),
---  }
-
--- -- ???
--- local toggleModes = {
---     -- unit toggle rules
---     RULEUTC_ShieldToggle        = (1 << 0),
---     RULEUTC_WeaponToggle        = (1 << 1),
---     RULEUTC_JammingToggle       = (1 << 2),
---     RULEUTC_IntelToggle         = (1 << 3),
---     RULEUTC_ProductionToggle    = (1 << 4),
---     RULEUTC_StealthToggle       = (1 << 5),
---     RULEUTC_GenericToggle       = (1 << 6),
---     RULEUTC_SpecialToggle       = (1 << 7),
---     RULEUTC_CloakToggle         = (1 << 8),
--- }
+-- kept for mod backwards compatibility
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Construction = import("/lua/ui/game/construction.lua")
+local UIMain = import("/lua/ui/uimain.lua")
+local Orders = import("/lua/ui/game/orders.lua")

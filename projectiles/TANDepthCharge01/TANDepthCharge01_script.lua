@@ -1,7 +1,7 @@
 --
 -- Depth Charge Script
 --
-local TTorpedoSubProjectile = import('/lua/terranprojectiles.lua').TTorpedoSubProjectile
+local TTorpedoSubProjectile = import("/lua/terranprojectiles.lua").TTorpedoSubProjectile
 TANDepthCharge01 = Class(TTorpedoSubProjectile) {
 }
 

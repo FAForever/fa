@@ -4,6 +4,28 @@
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@alias ObjectiveType 'primary' | 'secondary' | 'Bonus'
+---@alias ObjectiveStatus 'complete' | 'incomplete'
+---@alias ArmyStatistic "Units_Active" | "Units_Killed" | "Units_History" | "Enemies_Killed" | "Economy_TotalProduced_Energy" | "Economy_TotalConsumed_Energy" | "Economy_Income_Energy" | "Economy_Output_Energy" | "Economy_Stored_Energy" | "Economy_Reclaimed_Energy" | "Economy_MaxStorage_Energy" | "Economy_PeakStorage_Energy" | "Economy_TotalProduced_Mass" | "Economy_TotalConsumed_Mass" | "Economy_Income_Mass" | "Economy_Output_Mass" | "Economy_Stored_Mass" | "Economy_Reclaimed_Mass" | "Economy_MaxStorage_Mass" | "Economy_PeakStorage_Mass",
+
+---@class Objective
+---@field Tag string                    # Unique identifier used to sync between sim <-> UI
+---@field Active boolean                # Flag to indicate the objective is in progress 
+---@field Complete boolean              # Flag to indicate success or failure
+---@field Hidden boolean                # Flag to indicate hiding the objective from screen 
+---@field Decals table<string, Decal>   # Table of decals associated with the objective
+---@field IconOverrides string[]        # Array of strings to override the strategical icon
+---@field VizMarkers VizMarker[]        # Array of visibility markers associated with the objective
+---@field UnitMarkers ObjectiveArrow[]  # Array of unit markers associated with the objective
+---@field Decal Decal                   # A single decal
+---@field NextTargetTag any             # ???
+---@field PositionUpdateThreads any     # ???
+---@field Title string                  # Title of the object, supports strings with LOC
+---@field Description string            # Description of the object, supports strings with LOC
+---@field SimStartTime number           # Set when the objective starts
+---@field AddProgressCallback function  # Adds a progression callback
+---@field AddResultCallback function    # Adds a completion callback
+
 -- SUPPORTED OBJECTIVE TYPES:
 -- Kill
 -- Capture
@@ -21,9 +43,9 @@
 -- Unknown
 -- Camera
 
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Triggers = import('/lua/scenariotriggers.lua')
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Triggers = import("/lua/scenariotriggers.lua")
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 local objNum = 0 -- Used to create unique tags for objectives
 local DecalLOD = 4000
 local objectiveDecal = '/env/utility/decals/objective_debug_albedo.dds'
@@ -74,7 +96,7 @@ function Camera(objectiveType, completeState, title, description, positionTable)
 
     for i, v in positionTable do
         numMarkers = numMarkers + 1
-        local newMark = import('/lua/simcameramarkers.lua').AddCameraMarker(v)
+        local newMark = import("/lua/simcameramarkers.lua").AddCameraMarker(v)
         newMark:AddCallback(RemoveMarker)
     end
 
@@ -131,7 +153,7 @@ function ControlGroup(Type, Complete, Title, Description, Target)
                             if EntityCategoryContains(requirement.Category, unit) then
                                 if not unit.Marked and objective.MarkUnits then
                                     unit.Marked = true
-                                    local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                                    local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                                     local arrow = ObjectiveArrow {AttachTo = unit}
                                     objective:AddUnitTarget(unit)
                                 end
@@ -225,7 +247,20 @@ function CreateGroup(name, userCallback, numRequired)
     return objectiveGroup
 end
 
--- Kill units
+--- Adds a kill objective
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Units                 | Table of units to kill
+--- | MarkUnits             | Flag to to mark the units with an objective arrow the units are marked with an objective arrow
+--- | Hidden                | Flag to hide the objective from the UI
+--- | FlashVisible          | Flag to give a short visibility burst
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function Kill(Type, Complete, Title, Description, Target)
     Target.killed = 0
     Target.total = table.getn(Target.Units)
@@ -275,7 +310,7 @@ function Kill(Type, Complete, Title, Description, Target)
         if not unit.Dead then
             -- Mark the units unless MarkUnits == false
             if Target.MarkUnits == nil or Target.MarkUnits then
-                local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                 local arrow = ObjectiveArrow {AttachTo = unit}
             end
             if Target.FlashVisible then
@@ -293,11 +328,21 @@ function Kill(Type, Complete, Title, Description, Target)
     return objective
 end
 
--- Capture units
--- Target = {
---  Units = <units>,
---  NumRequired = <x>,
--- }
+--- Adds a capture objective
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Units                 | Table of units to capture
+--- | NumRequired           | Number of units required for the objective to pass
+--- | MarkUnits             | Flag to to mark the units with an objective arrow the units are marked with an objective arrow
+--- | Hidden                | Flag to hide the objective from the UI
+--- | FlashVisible          | Flag to give a short visibility burst
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function Capture(Type, Complete, Title, Description, Target)
     Target.captured = 0
     Target.total = table.getn(Target.Units)
@@ -360,7 +405,7 @@ function Capture(Type, Complete, Title, Description, Target)
         if not unit.Dead then
             -- Mark the units unless MarkUnits == false
             if Target.MarkUnits == nil or Target.MarkUnits then
-                local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                 local arrow = ObjectiveArrow {AttachTo = unit}
             end
 
@@ -380,7 +425,21 @@ function Capture(Type, Complete, Title, Description, Target)
     return objective
 end
 
--- Kill or Capture units
+--- Adds a kill or capture objective
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Units                 | Table of units to kill or capture
+--- | NumRequired           | Number of units required for the objective to pass
+--- | MarkUnits             | Flag to to mark the units with an objective arrow the units are marked with an objective arrow
+--- | Hidden                | Flag to hide the objective from the UI
+--- | FlashVisible          | Flag to give a short visibility burst
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function KillOrCapture(Type, Complete, Title, Description, Target)
     local KilledOrCaptured = 0
     local Total = table.getn(Target.Units)
@@ -484,7 +543,7 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
         if not unit.Dead then
             -- Mark the units unless MarkUnits == false
             if Target.MarkUnits == nil or Target.MarkUnits then
-                local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                 local arrow = ObjectiveArrow {AttachTo = unit}
             end
 
@@ -502,7 +561,21 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
     return objective
 end
 
--- Reclaim units
+--- Adds a reclaim objective for units
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Units                 | Table of units to reclaim
+--- | NumRequired           | Number of units required for the objective to pass
+--- | MarkUnits             | Flag to to mark the units with an objective arrow the units are marked with an objective arrow
+--- | Hidden                | Flag to hide the objective from the UI
+--- | FlashVisible          | Flag to give a short visibility burst
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function Reclaim(Type, Complete, Title, Description, Target)
     Target.reclaimed = 0
     Target.total = table.getn(Target.Units)
@@ -566,7 +639,7 @@ function Reclaim(Type, Complete, Title, Description, Target)
     end
 
     for _, unit in Target.Units do
-        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+        local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
         local arrow = ObjectiveArrow {AttachTo = unit}
         CreateTriggers(unit, objective)
     end
@@ -577,7 +650,19 @@ function Reclaim(Type, Complete, Title, Description, Target)
     return objective
 end
 
--- ReclaimProp
+--- Adds a reclaim objective for props
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Wrecks                | Table of props to reclaim
+--- | NumRequired           | Number of units required for the objective to pass
+--- | MarkUnits             | Flag to to mark the units with an objective arrow the units are marked with an objective arrow
+--- | Hidden                | Flag to hide the objective from the UI
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
 function ReclaimProp(Type, Complete, Title, Description, Target)
     Target.reclaimed = 0
     Target.total = table.getn(Target.Wrecks)
@@ -623,7 +708,7 @@ function ReclaimProp(Type, Complete, Title, Description, Target)
     for _, wreck in Target.Wrecks do
         -- Mark the units if MarkUnits == true
         if Target.MarkUnits then
-            local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+            local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
             local arrow = ObjectiveArrow {AttachTo = unit}
         end
         Triggers.CreatePropReclaimedTrigger(OnPropReclaimed, wreck)
@@ -636,7 +721,21 @@ function ReclaimProp(Type, Complete, Title, Description, Target)
     return objective
 end
 
--- Locate units
+--- Adds a locate objective, instructing the player to scout and trace down the units
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Units                 | Table of units to reclaim
+--- | Wrecks                | Table of props to reclaim
+--- | NumRequired           | Number of units required for the objective to pass
+--- | MarkUnits             | Flag to to mark the units with an objective arrow the units are marked with an objective arrow
+--- | Hidden                | Flag to hide the objective from the UI
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function Locate(Type, Complete, Title, Description, Target)
     Target.located = 0
     Target.total = table.getn(Target.Units)
@@ -679,10 +778,21 @@ function Locate(Type, Complete, Title, Description, Target)
     return objective
 end
 
--- SpecificUnitsInArea
--- Complete when specified units are in the target area. We don't care how
--- they got there (cheat teleport, etc), we just check if they're in there
--- ShowProgress, optional:
+--- Adds an objective to have a specific set of units in an area
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Units                 | Table of units to reclaim
+--- | Area                  | String reference to an area
+--- | NumRequired           | Number of units required for the objective to pass
+--- | MarkUnits             | Flag to to mark the units with an objective arrow the units are marked with an objective arrow
+--- | Hidden                | Flag to hide the objective from the UI
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function SpecificUnitsInArea(Type, Complete, Title, Description, Target)
     local image = GetActionIcon('Move')
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
@@ -774,24 +884,31 @@ function SpecificUnitsInArea(Type, Complete, Title, Description, Target)
     return objective
 end
 
--- CategoriesInArea
--- Complete when specified units matching the target blueprint types are in
--- the target area. We don't care exactly which units they are (pre-built or
--- newly constructed) or how they got there (cheat teleport, etc). We just check
--- the area for what units are inside and look at the blueprints (and optionally
--- match the army, use -1 for don't care)
--- New: Add a table with armies instead of a single ArmyIndex. ex: {'Army_1', 'Army_2', ...}
--- Use 'HumanPlayers' when you want to use all Human controlled armies.
---
--- Target = {
--- Requirements = {
---  {Area = <areaName>, Category=<cat1>, CompareOp=<op>, Value=<x>, [ArmyIndex=<index>], [Armies=<armyTable>]},
---  {Area = <areaName>, Category=<cat2>, CompareOp=<op>, Value=<y>, [ArmyIndex=<index>], [Armies=<armyTable>]},
---  ...
---  {Area = <areaName>, Category=<cat3>, CompareOp=<op>, Value=<z>, [ArmyIndex=<index>], [Armies=<armyTable>]},
--- }
--- }
--- op is one of: '<=', '>=', '<', '>', or '=='
+--- Adds an objective to have a specific set of categories in an area
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Units                 | Table of units to reclaim
+--- | Requirements          | Table of requirements, see the 'Requirements data' table
+--- | MarkUnits             | Flag to to mark the units with an objective arrow the units are marked with an objective arrow
+--- | MarkArea              | Flag to mark the areas that need to match the requirements using a decal
+--- | Hidden                | Flag to hide the objective from the UI
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+--- | ShowFaction           | ???
+---
+--- | Requirements data     | description   |
+--- | --------------------- | ------------- |
+--- | Area                  | String reference to an area
+--- | Category              | Category of units that add to the count
+--- | ArmyIndex             | Army of units that add to the count, can also be a table to support multiple armies
+--- | CompareOp             | Compare operator to add flexibility: '<=', '>=', '<', '>', or '=='
+--- | Value                 | Second argument to the compare operator (where the first is the number of units with the matching categories in the area)
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Action string             # Action icon to use, see `GetActionIcon`
+---@param Target table              # Objective data, see the description
+---@return Objective
 function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
     local image = GetActionIcon(Action)
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
@@ -825,7 +942,7 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
                                 if EntityCategoryContains(requirement.Category, unit) then
                                     if not unit.Marked and objective.MarkUnits then
                                         unit.Marked = true
-                                        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                                        local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                                         local arrow = ObjectiveArrow {AttachTo = unit}
                                         objective:AddUnitTarget(unit)
                                     end
@@ -914,18 +1031,22 @@ function CreateArmiesList(armies)
     return armiesList
 end
 
--- ArmyStatCompare
--- Army stat is compared <=, >=, >, <, or == to some value.
--- Target = {
---  Army=<index>,
---  Armies=[<string>, <string>, ...] --table of army names and HumanPlayers
---  StatName=<name>,
---  CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
---  Value=<value>,
---  [Category=<category>], -- optional to compare to a blueprint stat
---  ShowProgress, optional: shows --/--. may not make sense for all compare types
--- }
--- Note: Be careful when using '==' as the stat is only checked every 5 ticks.
+--- Adds an army stat objective, used to compare number of total units, resources, etc
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Army                  | Army to compare with
+--- | StatName              | Statistic of army to compare with, see the alias `ArmyStatistic`
+--- | CompareOp             | Compare operator, one of the following: '<=', '>=', '<', '>', or '=='. Be careful with '==' as the check interval is only two times a second
+--- | Value                 | Second argument to the compare operator (where the first is the number of value of the army statistics)
+--- | Category              | Optional category argument when comparing unit statistics
+--- | Hidden                | Flag to hide the objective from the UI
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function ArmyStatCompare(Type, Complete, Title, Description, Action, Target)
     local image = GetActionIcon(Action)
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
@@ -1013,15 +1134,21 @@ function MakeListFromTarget(Target)
     return resultList
 end
 
--- UnitStatCompare
--- A specified units stat is <=, >=, >, <, or == to some value.
--- Target = {
---  Unit=<unit>,
---  StatName=<name>,
---  CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
---  Value=<value>,
--- }
--- Note: Be careful when using '==' as the stat is only checked every 5 ticks.
+--- Adds an unit stat objective, used to compare number statistics of a given unit
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Unit                  | Unit to compare statistics with
+--- | StatName              | Statistic of the unit to compare with, uses `unit.GetStat` to retrieve the statistic
+--- | CompareOp             | Compare operator, one of the following: '<=', '>=', '<', '>', or '=='. Be careful with '==' as the check interval is only two times a second
+--- | Value                 | Second argument to the compare operator (where the first is the number of value of the army statistics)
+--- | Hidden                | Flag to hide the objective from the UI
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function UnitStatCompare(Type, Complete, Title, Description, Action, Target)
     local image = GetActionIcon(Action)
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
@@ -1046,17 +1173,22 @@ function UnitStatCompare(Type, Complete, Title, Description, Action, Target)
     return objective
 end
 
--- CategoryStatCompare
--- Some unit belonging to specified category has a stat <=, >=, >, <, or ==
--- to some value.
--- Target = {
---  Army=<index>,
---  Category=<unit>,
---  StatName=<name>,
---  CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
---  Value=<value>,
--- }
--- Note: Be careful when using '==' as the stat is only checked every 5 ticks.
+--- Adds an unit stat objective but only for the units that meet the categories set, used to compare number statistics of a given unit
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Arm,y                 | Army to search for units
+--- | Category              | Optional category argument when comparing unit statistics
+--- | StatName              | Statistic of the unit to compare with, uses `unit.GetStat` to retrieve the statistic
+--- | CompareOp             | Compare operator, one of the following: '<=', '>=', '<', '>', or '=='. Be careful with '==' as the check interval is only two times a second
+--- | Value                 | Second argument to the compare operator (where the first is the number of value of the army statistics)
+--- | Hidden                | Flag to hide the objective from the UI
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function CategoryStatCompare(Type, Complete, Title, Description, Action, Target)
     local image = GetActionIcon(Action)
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
@@ -1089,14 +1221,22 @@ function CategoryStatCompare(Type, Complete, Title, Description, Action, Target)
     return objective
 end
 
--- Protect
--- Fails if -- of units in list falls below NumRequired before the timer expires
--- or, in the case of no timer, the objective is manually update to complete.
--- Target = {
---  Units = {},
---  Timer = <seconds> or nil,   -- if nil, requires manual completion
---  NumRequired = <-->,          -- how many must survive
--- }
+--- Adds a protect objective to protect a table of units. Completes when the timer finishes
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Units                 | Table of units to reclaim
+--- | NumRequired           | Number of units required for the objective to pass
+--- | MarkUnits             | Flag to to mark the units with an objective arrow the units are marked with an objective arrow
+--- | Hidden                | Flag to hide the objective from the UI
+--- | FlashVisible          | Flag to give a short visibility burst
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+--- | Timer                 | Time to indicate how long you need to protect the units
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function Protect(Type, Complete, Title, Description, Target)
 
     local image = GetActionIcon("protect")
@@ -1167,7 +1307,7 @@ function Protect(Type, Complete, Title, Description, Target)
     end
 
     if Target.Timer then
-        timer = import('/lua/ScenarioTriggers.lua').CreateTimerTrigger(
+        timer = import("/lua/scenariotriggers.lua").CreateTimerTrigger(
             OnExpired,
             Target.Timer,
             true,
@@ -1177,7 +1317,11 @@ function Protect(Type, Complete, Title, Description, Target)
     end
 
     for _, unit in Target.Units do
-        CreateTriggers(unit, objective, true)
+        if not unit.Dead then
+            CreateTriggers(unit, objective, true)
+        else
+            objective.OnUnitKilled(unit)
+        end
     end
 
     if Target.ShowProgress then
@@ -1191,13 +1335,18 @@ function Protect(Type, Complete, Title, Description, Target)
     return objective
 end
 
--- Timer
--- OnResult() is called when the timer expires. The result depends on whether
--- ExpireResult is set to complete or failed.
--- Target = {
---  Timer = <seconds>
---  ExpireResult = 'complete' or 'failed'
--- }
+--- Adds a timer objective
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | ShowProgress          | Flag to update the description of the objective in the UI
+--- | Timer                 | Time to indicate how long you need to protect the units
+--- | ExpireResult          | Either 'complete' or 'failed'
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function Timer(Type, Complete, Title, Description, Target)
     local image = GetActionIcon("timer")
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
@@ -1233,7 +1382,7 @@ function Timer(Type, Complete, Title, Description, Target)
         Sync.ObjectiveTimer = 0
     end
 
-    timer = import('/lua/ScenarioTriggers.lua').CreateTimerTrigger(
+    timer = import("/lua/scenariotriggers.lua").CreateTimerTrigger(
         OnExpired,
         Target.Timer,
         false,
@@ -1244,6 +1393,12 @@ function Timer(Type, Complete, Title, Description, Target)
     return objective
 end
 
+--- Adds an unknown objective
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@return Objective
 function Unknown(Type, Complete, Title, Description)
     local objective = AddObjective(Type, Complete, Title, Description)
 
@@ -1262,6 +1417,19 @@ function Unknown(Type, Complete, Title, Description)
     return objective
 end
 
+--- Adds a basic objective that allows you to quickly mark units and areas
+--- | Objective data        | Description   |
+--- | --------------------- | ------------- |
+--- | Units                 | Table of units 
+--- | MarkUnits             | Flag to mark the units with an objective arrow
+--- | Area                  | String reference of an area
+--- | MarkArea              | Flag to mark the area with an objective decal
+---@param Type ObjectiveType        # Type of objective, used for the strategic icon in the UI
+---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
+---@param Title string              # Title of the objective, supports strings with LOC
+---@param Description string        # Description of the objective, supports strings with LOC
+---@param Target table              # Objective data, see the description
+---@return Objective
 function Basic(Type, Complete, Title, Description, Image, Target)
     local objective = AddObjective(Type, Complete, Title, Description, Image, Target)
 
@@ -1279,7 +1447,7 @@ function Basic(Type, Complete, Title, Description, Image, Target)
 
     objective.AddBasicUnitTarget = function(self, unit)
         objective:AddUnitTarget(unit)
-        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+        local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
         local arrow = ObjectiveArrow {AttachTo = unit}
         table.insert(objective.UnitMarkers, arrow)
     end
@@ -1319,7 +1487,7 @@ function Basic(Type, Complete, Title, Description, Image, Target)
             if target.MarkUnits then
                 for _, unit in target.Units do
                     if not unit.Dead then
-                        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                        local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                         local arrow = ObjectiveArrow {AttachTo = unit}
                         table.insert(objective.UnitMarkers, arrow)
                         if target.AlwaysVisible then
@@ -1342,7 +1510,16 @@ function Basic(Type, Complete, Title, Description, Image, Target)
 end
 
 
--- Adds objective for the objectives screen
+-- Adds and tracks an objective, should not be used directly
+---@param Type ObjectiveType
+---@param Complete Objective
+---@param Title string
+---@param Description string
+---@param ActionImage string
+---@param Target table
+---@param IsLoading boolean
+---@param loadedTag string
+---@return Objective
 function AddObjective(Type,         -- 'primary', 'bonus', etc
                       Complete,     -- 'complete', 'incomplete'
                       Title,        -- e.g. "Destroy Radar Stations"
@@ -1369,7 +1546,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
         table.insert(SavedList, {AddArgs = {Type, Complete, Title, Description, ActionImage, Target, true, tag, n=8}, Tag=tag})
     end
 
-    -- Set up objective table to return.
+    ---@type Objective
     local objective = {
         -- Used to synchronize sim objectives with user side objectives
         Tag = tag,
@@ -1941,7 +2118,7 @@ end
 function BasicUnitTarget(objective, unit, markUnits)
     objective:AddUnitTarget(unit)
     if markUnits then
-        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+        local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
         local arrow = ObjectiveArrow {AttachTo = unit}
         table.insert(objective.UnitMarkers, arrow)
     end
@@ -1966,7 +2143,7 @@ function CreateTriggers(unit, objective, useOnKilledWhenReclaimed)
 end
 
 function CreateIntelTriggers(unit, objective, isAlreadyLocated)
-    local IntelTrigger = import('/lua/ScenarioTriggers.lua').CreateArmyIntelTrigger
+    local IntelTrigger = import("/lua/scenariotriggers.lua").CreateArmyIntelTrigger
     if objective.OnUnitGiven then
         Triggers.CreateUnitGivenTrigger(objective.OnUnitGiven, unit)
     end

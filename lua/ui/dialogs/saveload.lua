@@ -3,16 +3,16 @@
 --* Author: Chris Blackwell
 --* Summary: Load and save game UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Prefs = import('/lua/user/prefs.lua')
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local FilePicker = import('/lua/ui/controls/filepicker.lua').FilePicker
-local IsNISMode = import('/lua/ui/game/gamemain.lua').IsNISMode
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Prefs = import("/lua/user/prefs.lua")
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local FilePicker = import("/lua/ui/controls/filepicker.lua").FilePicker
+local IsNISMode = import("/lua/ui/game/gamemain.lua").IsNISMode
 
 local function CreateDialog(over, isLoad, callback, exitBehavior, fileType)
     fileType = fileType or "SaveGame"

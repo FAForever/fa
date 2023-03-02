@@ -8,13 +8,14 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
-local WeaponFile = import('/lua/terranweapons.lua')
+local TSeaUnit = import("/lua/terranunits.lua").TSeaUnit
+local WeaponFile = import("/lua/terranweapons.lua")
 local TAALinkedRailgun = WeaponFile.TAALinkedRailgun
 local TDFGaussCannonWeapon = WeaponFile.TDFGaussCannonWeapon
 local TANTorpedoAngler = WeaponFile.TANTorpedoAngler
 local TIFSmartCharge = WeaponFile.TIFSmartCharge
 
+---@class UES0201 : TSeaUnit
 UES0201 = Class(TSeaUnit) {
     DestructionTicks = 200,
 

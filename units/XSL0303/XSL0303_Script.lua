@@ -8,13 +8,14 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
-local WeaponsFile = import('/lua/seraphimweapons.lua')
+local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+local WeaponsFile = import("/lua/seraphimweapons.lua")
 local SDFThauCannon = WeaponsFile.SDFThauCannon
 local SDFAireauBolter = WeaponsFile.SDFAireauBolterWeapon
 local SANUallCavitationTorpedo = WeaponsFile.SANUallCavitationTorpedo
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectUtil = import("/lua/effectutilities.lua")
 
+---@class XSL0303 : SLandUnit
 XSL0303 = Class(SLandUnit) {
     Weapons = {
         MainTurret = Class(SDFThauCannon) {},

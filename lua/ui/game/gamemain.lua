@@ -6,18 +6,18 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local utils = import('/lua/system/utils.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local WldUIProvider = import('/lua/ui/game/wlduiprovider.lua').WldUIProvider
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Movie = import('/lua/maui/movie.lua').Movie
-local Prefs = import('/lua/user/prefs.lua')
+local utils = import("/lua/system/utils.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local WldUIProvider = import("/lua/ui/game/wlduiprovider.lua").WldUIProvider
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Movie = import("/lua/maui/movie.lua").Movie
+local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 
-local controls = import('/lua/ui/controls.lua').Get()
+local controls = import("/lua/ui/controls.lua").Get()
 
 local gameParent = controls.gameParent
 local controlClusterGroup = controls.cluster
@@ -32,18 +32,18 @@ local NISActive = false
 local isReplay = false
 local waitingDialog = false
 
-local sendChat = import('/lua/ui/game/chat.lua').ReceiveChatFromSim
+local sendChat = import("/lua/ui/game/chat.lua").ReceiveChatFromSim
 local oldData = {}
 local lastObserving
 
 local ignoreSelection = false
 function SetIgnoreSelection(ignore)
     ignoreSelection = ignore
-    import('/lua/ui/game/commandmode.lua').SetIgnoreSelection(ignore)
+    import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(ignore)
 end
 
 -- generating hotbuild modifier shortcuts on the fly
-modifiersKeys = import('/lua/keymap/keymapper.lua').GenerateHotbuildModifiers()
+modifiersKeys = import("/lua/keymap/keymapper.lua").GenerateHotbuildModifiers()
 IN_AddKeyMapTable(modifiersKeys)
 
 -- check this flag to see if it's valid to show the exit dialog
@@ -73,46 +73,54 @@ function KillWaitingDialog()
 end
 
 function SetLayout(layout)
-    import('/lua/ui/game/unitviewDetail.lua').Hide()
-    import('/lua/ui/game/construction.lua').SetLayout(layout)
-    import('/lua/ui/game/borders.lua').SetLayout(layout)
-    import('/lua/ui/game/multifunction.lua').SetLayout(layout)
+    import("/lua/ui/game/unitviewdetail.lua").Hide()
+    import("/lua/ui/game/construction.lua").SetLayout(layout)
+    import("/lua/ui/game/borders.lua").SetLayout(layout)
+    import("/lua/ui/game/multifunction.lua").SetLayout(layout)
     if not isReplay then
-        import('/lua/ui/game/orders.lua').SetLayout(layout)
+        import("/lua/ui/game/orders.lua").SetLayout(layout)
     end
-    import('/lua/ui/game/avatars.lua').SetLayout()
-    import('/lua/ui/game/unitview.lua').SetLayout(layout)
+    import("/lua/ui/game/avatars.lua").SetLayout()
+    import("/lua/ui/game/unitview.lua").SetLayout(layout)
     import('/lua/ui/game/objectives2.lua').SetLayout(layout)
-    import('/lua/ui/game/unitviewDetail.lua').SetLayout(layout, mapGroup)
-    import('/lua/ui/game/economy.lua').SetLayout(layout)
-    import('/lua/ui/game/missiontext.lua').SetLayout()
-    import('/lua/ui/game/helptext.lua').SetLayout()
-    import('/lua/ui/game/score.lua').SetLayout()
-    import('/lua/ui/game/tabs.lua').SetLayout()
-    import('/lua/ui/game/controlgroups.lua').SetLayout()
-    import('/lua/ui/game/chat.lua').SetLayout()
-    import('/lua/ui/game/minimap.lua').SetLayout()
+    import("/lua/ui/game/unitviewdetail.lua").SetLayout(layout, mapGroup)
+    import("/lua/ui/game/economy.lua").SetLayout(layout)
+    import("/lua/ui/game/missiontext.lua").SetLayout()
+    import("/lua/ui/game/helptext.lua").SetLayout()
+    import("/lua/ui/game/score.lua").SetLayout()
+    import("/lua/ui/game/tabs.lua").SetLayout()
+    import("/lua/ui/game/controlgroups.lua").SetLayout()
+    import("/lua/ui/game/chat.lua").SetLayout()
+    import("/lua/ui/game/minimap.lua").SetLayout()
+    import("/lua/ui/game/massfabs.lua").SetLayout()
+    import("/lua/ui/game/recall.lua").SetLayout()
 end
 
 function OnFirstUpdate()
-    import('/lua/keymap/hotbuild.lua').init()
+    import("/lua/keymap/hotbuild.lua").init()
     EnableWorldSounds()
-    import('/lua/UserMusic.lua').StartPeaceMusic()
+    import("/lua/usermusic.lua").StartPeaceMusic()
 
     local avatars = GetArmyAvatars()
+    local armiesInfo = GetArmiesTable()
+    local focusArmy = armiesInfo.focusArmy
+    local playerArmy = armiesInfo.armiesTable[focusArmy]
     if avatars and avatars[1]:IsInCategory("COMMAND") then
-        local armiesInfo = GetArmiesTable()
-        local focusArmy = armiesInfo.focusArmy
-        local playerName = armiesInfo.armiesTable[focusArmy].nickname
-        avatars[1]:SetCustomName(playerName)
-        PlaySound(Sound { Bank='AmbientTest', Cue='AMB_Planet_Rumble_zoom'})
+        avatars[1]:SetCustomName(playerArmy.nickname)
+        PlaySound(Sound {
+            Bank = 'AmbientTest',
+            Cue = 'AMB_Planet_Rumble_zoom'
+        })
         ForkThread(function()
             WaitSeconds(1)
+
             UIZoomTo(avatars, 1)
             WaitSeconds(1.5)
+
             local selected = false
             repeat
                 WaitSeconds(0.1)
+
                 if not gameUIHidden then
                     SelectUnits(avatars)
                     selected = GetSelectedUnits()
@@ -123,20 +131,19 @@ function OnFirstUpdate()
 
     FlushEvents()
     if not IsNISMode() then
-        import('/lua/ui/game/worldview.lua').UnlockInput()
+        import("/lua/ui/game/worldview.lua").UnlockInput()
     end
 
-    if not import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
-        import('/lua/ui/game/score.lua').CreateScoreUI()
+    if not import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
+        import("/lua/ui/game/score.lua").CreateScoreUI()
     end
 
     if Prefs.GetOption('skin_change_on_start') ~= 'no' then
-        local focusarmy = GetFocusArmy()
-        local armyInfo = GetArmiesTable()
-        if focusarmy >= 1 then
-            local factions = import('/lua/factions.lua').Factions
-            if factions[armyInfo.armiesTable[focusarmy].faction+1].DefaultSkin then
-                UIUtil.SetCurrentSkin(factions[armyInfo.armiesTable[focusarmy].faction+1].DefaultSkin)
+        if focusArmy >= 1 then
+            local factionSkin = import("/lua/factions.lua").Factions[playerArmy.faction + 1].DefaultSkin
+            if factionSkin then
+                UIUtil.SetCurrentSkin(factionSkin)
+                return
             end
         end
     end
@@ -144,10 +151,24 @@ function OnFirstUpdate()
 end
 
 function CreateUI(isReplay)
+    -- overwrite some globals for performance / safety
 
-    -- override some UI globals
-    import("/lua/ui/override/ArmiesTable.lua").Setup()
-    import("/lua/ui/override/SessionClients.lua").Setup()
+    import("/lua/ui/override/exit.lua")
+    import("/lua/ui/override/armiestable.lua")
+    import("/lua/ui/override/sessionclients.lua")
+
+    -- start long-running threads
+
+    import("/lua/system/performance.lua")
+    import("/lua/ui/game/cursor/depth.lua")
+    import("/lua/ui/game/cursor/hover.lua")
+
+    -- casting tools 
+
+    import("/lua/ui/game/casting/mouse.lua")
+    import("/lua/ui/game/casting/painting.lua")
+
+    -- overwrite some globals for performance / safety
 
     -- ensure logger is turned off for the average user
     if not GetPreference('debug.enable_debug_facilities') then
@@ -157,41 +178,50 @@ function CreateUI(isReplay)
             Warn = false,
             Error = false,
             Custom = false,
-            Filter = '*debug:'})
+            Filter = '*debug:',
+        })
     end
 
     -- prevents the nvidia stuttering bug with their more recent drivers
-    ConExecute('d3d_WindowsCursor on')  
+    ConExecute('d3d_WindowsCursor on')
+
+    -- tweak networking parameters
+    ConExecute('net_MinResendDelay 100')
+    ConExecute('net_MaxResendDelay 1000')
+
+    ConExecute('net_MaxSendRate 8192')
+    ConExecute('net_MaxBacklog 8192')
+
+    ConExecute('net_SendDelay 5')
+    ConExecute('net_AckDelay 5')
 
     -- enable experimental graphics
-    if      Prefs.GetFromCurrentProfile('options.fidelity') >= 2 
-        and Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1 then 
+    if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
+        Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1
+    then
+        ForkThread(function()
+            WaitSeconds(1.0)
 
-        ForkThread(
-            function() 
+            LOG("Experimental graphics enabled, use at your own risk: ")
 
-                WaitSeconds(1.0)
-
-                LOG("Experimental graphics enabled, use at your own risk: ")
-
-                if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
-                    -- allow meshes and effects to be seen from further away
-                    ConExecute("cam_SetLOD WorldCamera 0.65")
-                end
-
-                if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
-
-                    -- improve shadow LOD and resolution
-                    ConExecute("ren_ShadowLOD 1024")
-                    ConExecute("ren_ShadowSize 2048")
-                end
+            if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
+                -- allow meshes and effects to be seen from further away
+                ConExecute("cam_SetLOD WorldCamera 0.65")
             end
-        )
+
+            if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
+                -- improve shadow LOD and resolution
+                ConExecute("ren_ShadowLOD 1024")
+                ConExecute("ren_ShadowSize 2048")
+            end
+        end)
     end
 
+    local focusArmy = GetFocusArmy()
+
     -- keep track of the original focus army
-    import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
-    OriginalFocusArmy = GetFocusArmy()
+    import("/lua/ui/game/ping.lua").OriginalFocusArmy = focusArmy
+    OriginalFocusArmy = focusArmy
 
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
@@ -200,9 +230,8 @@ function CreateUI(isReplay)
     UIUtil.changeLayoutFunction = SetLayout
 
     -- Update loc table with player's name
-    local focusarmy = GetFocusArmy()
-    if focusarmy >= 1 then
-        LocGlobals.PlayerName = GetArmiesTable().armiesTable[focusarmy].nickname
+    if focusArmy >= 1 then
+        LocGlobals.PlayerName = GetArmiesTable().armiesTable[focusArmy].nickname
     end
 
     GameCommon.InitializeUnitIconBitmaps(prefetchTable.batch_textures)
@@ -210,7 +239,7 @@ function CreateUI(isReplay)
     controls.gameParent = UIUtil.CreateScreenGroup(GetFrame(0), "GameMain ScreenGroup")
     gameParent = controls.gameParent
 
-    controlClusterGroup, statusClusterGroup, mapGroup, windowGroup = import('/lua/ui/game/borders.lua').SetupBorderControl(gameParent)
+    controlClusterGroup, statusClusterGroup, mapGroup, windowGroup = import("/lua/ui/game/borders.lua").SetupBorderControl(gameParent)
 
     controls.cluster = controlClusterGroup
     controls.status = statusClusterGroup
@@ -223,48 +252,49 @@ function CreateUI(isReplay)
         OnFirstUpdate()
     end
 
-    import('/lua/ui/game/worldview.lua').CreateMainWorldView(gameParent, mapGroup)
-    import('/lua/ui/game/worldview.lua').LockInput()
+    import("/lua/ui/game/worldview.lua").CreateMainWorldView(gameParent, mapGroup)
+    import("/lua/ui/game/worldview.lua").LockInput()
 
-    local massGroup, energyGroup = import('/lua/ui/game/economy.lua').CreateEconomyBar(statusClusterGroup)
-    import('/lua/ui/game/tabs.lua').Create(mapGroup)
+    import("/lua/ui/game/economy.lua").CreateEconomyBar(statusClusterGroup)
+    import("/lua/ui/game/tabs.lua").Create(mapGroup)
 
-    mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
+    mfdControl = import("/lua/ui/game/multifunction.lua").Create(controlClusterGroup)
     controls.mfd = mfdControl
 
-    controls.mfp = import('/lua/ui/game/massfabs.lua').Create(statusClusterGroup)
+    controls.mfp = import("/lua/ui/game/massfabs.lua").Create(statusClusterGroup)
+    controls.recall = import("/lua/ui/game/recall.lua").Create(statusClusterGroup)
 
     if not isReplay then
-        ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
+        ordersControl = import("/lua/ui/game/orders.lua").SetupOrdersControl(controlClusterGroup, mfdControl)
         controls.ordersControl = ordersControl
     end
 
-    import('/lua/ui/game/avatars.lua').CreateAvatarUI(mapGroup)
-    import('/lua/ui/game/construction.lua').SetupConstructionControl(controlClusterGroup, mfdControl, ordersControl)
-    import('/lua/ui/game/unitview.lua').SetupUnitViewLayout(mapGroup, ordersControl)
-    import('/lua/ui/game/unitviewDetail.lua').SetupUnitViewLayout(mapGroup, mapGroup)
-    import('/lua/ui/game/controlgroups.lua').CreateUI(mapGroup)
-    import('/lua/ui/game/transmissionlog.lua').CreateTransmissionLog()
-    import('/lua/ui/game/helptext.lua').CreateHelpText(mapGroup)
-    import('/lua/ui/game/timer.lua').CreateTimerDialog(mapGroup)
-    import('/lua/ui/game/consoleecho.lua').CreateConsoleEcho(mapGroup)
-    import('/lua/ui/game/build_templates.lua').Init()
-    import('/lua/ui/game/taunt.lua').Init()
+    import("/lua/ui/game/avatars.lua").CreateAvatarUI(mapGroup)
+    import("/lua/ui/game/construction.lua").SetupConstructionControl(controlClusterGroup, mfdControl, ordersControl)
+    import("/lua/ui/game/unitview.lua").SetupUnitViewLayout(mapGroup, ordersControl)
+    import("/lua/ui/game/unitviewdetail.lua").SetupUnitViewLayout(mapGroup, mapGroup)
+    import("/lua/ui/game/controlgroups.lua").CreateUI(mapGroup)
+    import("/lua/ui/game/transmissionlog.lua").CreateTransmissionLog()
+    import("/lua/ui/game/helptext.lua").CreateHelpText(mapGroup)
+    import("/lua/ui/game/timer.lua").CreateTimerDialog(mapGroup)
+    import("/lua/ui/game/consoleecho.lua").CreateConsoleEcho(mapGroup)
+    import("/lua/ui/game/build_templates.lua").Init()
+    import("/lua/ui/game/taunt.lua").Init()
 
-    import('/lua/ui/game/chat.lua').SetupChatLayout(windowGroup)
-    import('/lua/ui/game/minimap.lua').CreateMinimap(windowGroup)
+    import("/lua/ui/game/chat.lua").SetupChatLayout(windowGroup)
+    import("/lua/ui/game/minimap.lua").CreateMinimap(windowGroup)
 
-    if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+    if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
         import('/lua/ui/game/objectives2.lua').CreateUI(mapGroup)
     end
 
     if GetNumRootFrames() > 1 then
-        import('/lua/ui/game/multihead.lua').CreateSecondView()
+        import("/lua/ui/game/multihead.lua").CreateSecondView()
     end
 
     controlClusterGroup.HandleEvent = function(self, event)
         if event.Type == "WheelRotation" then
-            import('/lua/ui/game/worldview.lua').ForwardMouseWheelInput(event)
+            import("/lua/ui/game/worldview.lua").ForwardMouseWheelInput(event)
             return true
         end
         return false
@@ -272,7 +302,7 @@ function CreateUI(isReplay)
 
     statusClusterGroup.HandleEvent = function(self, event)
         if event.Type == "WheelRotation" then
-            import('/lua/ui/game/worldview.lua').ForwardMouseWheelInput(event)
+            import("/lua/ui/game/worldview.lua").ForwardMouseWheelInput(event)
             return true
         end
         return false
@@ -286,21 +316,20 @@ function CreateUI(isReplay)
     if SessionIsReplay() then
         ForkThread(SendChat)
         lastObserving = true
-        import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
-        import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
+        import("/lua/ui/game/economy.lua").ToggleEconPanel(false)
+        import("/lua/ui/game/avatars.lua").ToggleAvatars(false)
         AddBeatFunction(UiBeat)
     end
 
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
-        import('/lua/ui/game/launchconsolecommands.lua').Init()
+        import("/lua/ui/game/launchconsolecommands.lua").Init()
     end
 
     RegisterChatFunc(SendResumedBy, 'SendResumedBy')
 
-    local hotkeyLabelsInit = import('/lua/keymap/hotkeylabels.lua').init
-    hotkeyLabelsInit()
-
-    import('/lua/ui/notify/customiser.lua').init(isReplay, import('/lua/ui/game/borders.lua').GetMapGroup())
+    import("/lua/keymap/hotkeylabels.lua").init()
+    import("/lua/ui/notify/customiser.lua").init(isReplay, import("/lua/ui/game/borders.lua").GetMapGroup())
+    import("/lua/ui/game/reclaim.lua").SetMapSize()
 end
 
 -- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
@@ -328,7 +357,7 @@ local function LoadDialog(parent)
     local movieFile = '/movies/UEF_load.sfd'
     local color = 'FFbadbdb'
     local loadingPref = Prefs.GetFromCurrentProfile('LoadingFaction')
-    local factions = import('/lua/factions.lua').Factions
+    local factions = import("/lua/factions.lua").Factions
     if factions[loadingPref] and factions[loadingPref].loadingMovie then
         movieFile = factions[loadingPref].loadingMovie
         color = factions[loadingPref].loadingColor
@@ -344,7 +373,7 @@ local function LoadDialog(parent)
     textControl:SetColor(color)
     textControl:SetDropShadow(true)
     LayoutHelpers.AtCenterIn(textControl, parent, 200)
-    import('/lua/maui/effecthelpers.lua').Pulse(textControl, 1, 0, .8)
+    import("/lua/maui/effecthelpers.lua").Pulse(textControl, 1, 0, .8)
 
     if Prefs.GetOption('loading_tips') then
         local tipControl = UIUtil.CreateText(movie, '', 20, UIUtil.bodyFont)
@@ -353,7 +382,7 @@ local function LoadDialog(parent)
         LayoutHelpers.CenteredBelow(tipControl, textControl, 40)
         ForkThread(
             function(control)
-                local tipsTbl = import('/lua/ui/help/loadingtips.lua').Tips
+                local tipsTbl = import("/lua/ui/help/loadingtips.lua").Tips
                 local tipsSize = table.getn(tipsTbl)
                 while WorldIsLoading() do
                     control:SetText(LOC(tipsTbl[Random(1, tipsSize)]))
@@ -402,23 +431,23 @@ function CreateWldUIProvider()
 
     provider.StopLoadingDialog = function(self)
         local function InitialAnimations()
-            import('/lua/ui/game/tabs.lua').InitialAnimation()
+            import("/lua/ui/game/tabs.lua").InitialAnimation()
             WaitSeconds(.15)
             if not SessionIsReplay() then
-                import('/lua/ui/game/economy.lua').InitialAnimation()
+                import("/lua/ui/game/economy.lua").InitialAnimation()
             end
-            import('/lua/ui/game/score.lua').InitialAnimation()
+            import("/lua/ui/game/score.lua").InitialAnimation()
             WaitSeconds(.15)
-            import('/lua/ui/game/multifunction.lua').InitialAnimation()
+            import("/lua/ui/game/multifunction.lua").InitialAnimation()
             if not SessionIsReplay() then
-                import('/lua/ui/game/avatars.lua').InitialAnimation()
+                import("/lua/ui/game/avatars.lua").InitialAnimation()
             end
-            import('/lua/ui/game/controlgroups.lua').InitialAnimation()
+            import("/lua/ui/game/controlgroups.lua").InitialAnimation()
             WaitSeconds(.15)
             HideGameUI('off')
         end
         local loadingPref = Prefs.GetFromCurrentProfile('LoadingFaction')
-        local factions = import('/lua/factions.lua').Factions
+        local factions = import("/lua/factions.lua").Factions
         local texture = '/UEF_load.dds'
         local color = 'FFbadbdb'
         if factions[loadingPref] and factions[loadingPref].loadingTexture then
@@ -438,7 +467,7 @@ function CreateWldUIProvider()
                 if newAlpha < 0 then
                     newAlpha = 0
                     self:Destroy()
-                    if not import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+                    if not import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
                         ForkThread(InitialAnimations)
                     end
                 end
@@ -476,7 +505,7 @@ function CreateWldUIProvider()
             frame1Logo = false
         end
         CreateUI(isReplay)
-        if not import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+        if not import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
             HideGameUI('on')
         end
         supressExitDialog = false
@@ -489,11 +518,11 @@ function CreateWldUIProvider()
         for _, func in OnDestroyFuncs do
             func()
         end
-        import('rallypoint.lua').ClearAllRallyPoints()
+        import("/lua/ui/game/rallypoint.lua").ClearAllRallyPoints()
     end
 
     provider.GetPrefetchTextures = function(self)
-        return import('/lua/ui/game/prefetchtextures.lua').prefetchTextures
+        return import("/lua/ui/game/prefetchtextures.lua").prefetchTextures
     end
 
 end
@@ -550,7 +579,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         return
     end
 
-    if import('/lua/ui/game/selection.lua').IsHidden() then
+    if import("/lua/ui/game/selection.lua").IsHidden() then
         return
     end
 
@@ -562,10 +591,10 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     ObserveSelection:Set(cachedSelection)
 
     if not hotkeyLabelsOnSelectionChanged then
-        hotkeyLabelsOnSelectionChanged = import('/lua/keymap/hotkeylabels.lua').onSelectionChanged
+        hotkeyLabelsOnSelectionChanged = import("/lua/keymap/hotkeylabels.lua").onSelectionChanged
     end
     if not upgradeTab then
-        upgradeTab = import('/lua/keymap/upgradeTab.lua').upgradeTab
+        upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
     end
 
     -- Deselect Selens if necessary. Also do work on Hotbuild labels
@@ -580,20 +609,31 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             return
         end
 
-        -- This bit is for the Hotbuild labels
+        -- This bit is for the Hotbuild labels. See the buildActionUpgrade() function in hotbuild.lua for a bit more 
+        -- documentation
         local bp = newSelection[1]:GetBlueprint()
         local upgradesTo = nil
-        local potentialUpgrades = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
+        local potentialUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
         if potentialUpgrades then
-            if type(potentialUpgrades) == "string" then
-                upgradesTo = potentialUpgrades
-            elseif type(potentialUpgrades) == "table" then
-                local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
-                for _, v in potentialUpgrades do
-                    if EntityCategoryContains(buildableCategories, v) then
-                        upgradesTo = v
+            local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
+            for _, upgr in potentialUpgrades do
+                if EntityCategoryContains(buildableCategories, upgr) then
+                    upgradesTo = upgr
+                    break
+                end
+                local nextSuccessiveUpgrade = __blueprints[upgr].General.UpgradesTo
+                while nextSuccessiveUpgrade do
+                    -- Note: Should we ever add a structure that has different upgrade path choices on a non-base 
+                    -- version of the structure, e.g. different choices for the 4th cybran shield upgrade or something 
+                    -- like it, the way we find the correct icon to put the hotbuild upgrade keybind label using this 
+                    -- while loop will break. As there currently is no such structure in the game, and I don't know how
+                    -- the general case of finding that correct icon should work in such an imaginary case, I'll leave
+                    -- it at this, currently working, code.
+                    if EntityCategoryContains(buildableCategories, nextSuccessiveUpgrade) then
+                        upgradesTo = nextSuccessiveUpgrade
                         break
                     end
+                    nextSuccessiveUpgrade = __blueprints[nextSuccessiveUpgrade].General.UpgradesTo
                 end
             end
         end
@@ -610,15 +650,15 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
     if not gameUIHidden then
         if not isReplay then
-            import('/lua/ui/game/orders.lua').SetAvailableOrders(availableOrders, availableToggles, newSelection)
+            import("/lua/ui/game/orders.lua").SetAvailableOrders(availableOrders, availableToggles, newSelection)
         end
         -- TODO change the current command mode if no longer available? or set to nil?
-        import('/lua/ui/game/construction.lua').OnSelection(buildableCategories,newSelection,isOldSelection)
+        import("/lua/ui/game/construction.lua").OnSelection(buildableCategories,newSelection,isOldSelection)
     end
 
     if not isOldSelection then
-        import('/lua/ui/game/selection.lua').PlaySelectionSound(added)
-        import('/lua/ui/game/rallypoint.lua').OnSelectionChanged(newSelection)
+        import("/lua/ui/game/selection.lua").PlaySelectionSound(added)
+        import("/lua/ui/game/rallypoint.lua").OnSelectionChanged(newSelection)
     end
 
     if newSelection then
@@ -626,7 +666,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
         -- if something died in selection, restore command mode
         if n > 0 and not table.empty(removed) and table.empty(added) then
-            local CM = import('/lua/ui/game/commandmode.lua')
+            local CM = import("/lua/ui/game/commandmode.lua")
             local mode, data = unpack(CM.GetCommandMode())
 
             if mode then
@@ -637,12 +677,12 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         end
     end
 
-    import('/lua/ui/game/unitview.lua').OnSelection(newSelection)
+    import("/lua/ui/game/unitview.lua").OnSelection(newSelection)
 end
 
 function OnQueueChanged(newQueue)
     if not gameUIHidden then
-        import('/lua/ui/game/construction.lua').OnQueueChanged(newQueue)
+        import("/lua/ui/game/construction.lua").OnQueueChanged(newQueue)
     end
 end
 
@@ -652,8 +692,8 @@ function OnPause(pausedBy, timeoutsRemaining)
     PauseSound("World",true)
     PauseSound("Music",true)
     PauseVoice("VO",true)
-    import('/lua/ui/game/tabs.lua').OnPause(true, pausedBy, timeoutsRemaining)
-    import('/lua/ui/game/missiontext.lua').OnGamePause(true)
+    import("/lua/ui/game/tabs.lua").OnPause(true, pausedBy, timeoutsRemaining)
+    import("/lua/ui/game/missiontext.lua").OnGamePause(true)
 end
 
 -- Called after the Sim has confirmed that the game has resumed.
@@ -666,15 +706,15 @@ function OnResume()
     PauseSound("World",false)
     PauseSound("Music",false)
     PauseVoice("VO",false)
-    import('/lua/ui/game/tabs.lua').OnPause(false, ResumedBy)
-    import('/lua/ui/game/missiontext.lua').OnGamePause(false)
+    import("/lua/ui/game/tabs.lua").OnPause(false, ResumedBy)
+    import("/lua/ui/game/missiontext.lua").OnGamePause(false)
     ResumedBy = nil
 end
 
 -- Called immediately when the user hits the pause button on the machine
 -- that initiated the pause and other network players won't call this function
 function OnUserPause(pause)
-    local Tabs = import('/lua/ui/game/tabs.lua')
+    local Tabs = import("/lua/ui/game/tabs.lua")
     local focus = GetArmiesTable().focusArmy
     if Tabs.CanUserPause() then
         if focus == -1 and not SessionIsReplay() then
@@ -682,9 +722,9 @@ function OnUserPause(pause)
         end
 
         if pause then
-            import('/lua/ui/game/missiontext.lua').PauseTransmission()
+            import("/lua/ui/game/missiontext.lua").PauseTransmission()
         else
-            import('/lua/ui/game/missiontext.lua').ResumeTransmission()
+            import("/lua/ui/game/missiontext.lua").ResumeTransmission()
         end
     end
 end
@@ -754,42 +794,42 @@ function HideGameUI(state)
             gameUIHidden = false
             controlClusterGroup:Show()
             statusClusterGroup:Show()
-            import('/lua/ui/game/worldview.lua').Contract()
-            import('/lua/ui/game/borders.lua').HideBorder(false)
-            import('/lua/ui/game/unitview.lua').Expand()
-            import('/lua/ui/game/economy.lua').Expand()
-            import('/lua/ui/game/score.lua').Expand()
+            import("/lua/ui/game/worldview.lua").Contract()
+            import("/lua/ui/game/borders.lua").HideBorder(false)
+            import("/lua/ui/game/unitview.lua").Expand()
+            import("/lua/ui/game/economy.lua").Expand()
+            import("/lua/ui/game/score.lua").Expand()
             import('/lua/ui/game/objectives2.lua').Expand()
-            import('/lua/ui/game/multifunction.lua').Expand()
-            import('/lua/ui/game/controlgroups.lua').Expand()
-            import('/lua/ui/game/tabs.lua').Expand()
-            import('/lua/ui/game/announcement.lua').Expand()
-            import('/lua/ui/game/minimap.lua').Expand()
-            import('/lua/ui/game/construction.lua').Expand()
+            import("/lua/ui/game/multifunction.lua").Expand()
+            import("/lua/ui/game/controlgroups.lua").Expand()
+            import("/lua/ui/game/tabs.lua").Expand()
+            import("/lua/ui/game/announcement.lua").Expand()
+            import("/lua/ui/game/minimap.lua").Expand()
+            import("/lua/ui/game/construction.lua").Expand()
             if not SessionIsReplay() then
-                import('/lua/ui/game/avatars.lua').Expand()
-                import('/lua/ui/game/orders.lua').Expand()
+                import("/lua/ui/game/avatars.lua").Expand()
+                import("/lua/ui/game/orders.lua").Expand()
             end
         else
             gameUIHidden = true
             controlClusterGroup:Hide()
             statusClusterGroup:Hide()
-            import('/lua/ui/game/worldview.lua').Expand()
-            import('/lua/ui/game/borders.lua').HideBorder(true)
-            import('/lua/ui/game/unitview.lua').Contract()
-            import('/lua/ui/game/unitviewDetail.lua').Contract()
-            import('/lua/ui/game/economy.lua').Contract()
-            import('/lua/ui/game/score.lua').Contract()
+            import("/lua/ui/game/worldview.lua").Expand()
+            import("/lua/ui/game/borders.lua").HideBorder(true)
+            import("/lua/ui/game/unitview.lua").Contract()
+            import("/lua/ui/game/unitviewdetail.lua").Contract()
+            import("/lua/ui/game/economy.lua").Contract()
+            import("/lua/ui/game/score.lua").Contract()
             import('/lua/ui/game/objectives2.lua').Contract()
-            import('/lua/ui/game/multifunction.lua').Contract()
-            import('/lua/ui/game/controlgroups.lua').Contract()
-            import('/lua/ui/game/tabs.lua').Contract()
-            import('/lua/ui/game/announcement.lua').Contract()
-            import('/lua/ui/game/minimap.lua').Contract()
-            import('/lua/ui/game/construction.lua').Contract()
+            import("/lua/ui/game/multifunction.lua").Contract()
+            import("/lua/ui/game/controlgroups.lua").Contract()
+            import("/lua/ui/game/tabs.lua").Contract()
+            import("/lua/ui/game/announcement.lua").Contract()
+            import("/lua/ui/game/minimap.lua").Contract()
+            import("/lua/ui/game/construction.lua").Contract()
             if not SessionIsReplay() then
-                import('/lua/ui/game/avatars.lua').Contract()
-                import('/lua/ui/game/orders.lua').Contract()
+                import("/lua/ui/game/avatars.lua").Contract()
+                import("/lua/ui/game/orders.lua").Contract()
             end
         end
     end
@@ -803,7 +843,7 @@ function OnDetectAdjacencyBonus(userUnit, otherBp)
 end
 
 function OnFocusArmyUnitDamaged(unit)
-    import('/lua/UserMusic.lua').NotifyBattle()
+    import("/lua/usermusic.lua").NotifyBattle()
 end
 
 local NISControls = {
@@ -822,13 +862,13 @@ function NISMode(state)
     NISActive = state
     local worldView = import("/lua/ui/game/worldview.lua")
     if state == 'on' then
-        import('/lua/ui/dialogs/saveload.lua').OnNISBegin()
-        import('/lua/ui/dialogs/options.lua').OnNISBegin()
-        import('/lua/ui/game/consoleecho.lua').ToggleOutput(false)
-        import('/lua/ui/game/multifunction.lua').PreNIS()
-        import('/lua/ui/game/tooltip.lua').DestroyMouseoverDisplay()
-        import('/lua/ui/game/chat.lua').OnNISBegin()
-        import('/lua/ui/game/unitviewDetail.lua').OnNIS()
+        import("/lua/ui/dialogs/saveload.lua").OnNISBegin()
+        import("/lua/ui/dialogs/options.lua").OnNISBegin()
+        import("/lua/ui/game/consoleecho.lua").ToggleOutput(false)
+        import("/lua/ui/game/multifunction.lua").PreNIS()
+        import("/lua/ui/game/tooltip.lua").DestroyMouseoverDisplay()
+        import("/lua/ui/game/chat.lua").OnNISBegin()
+        import("/lua/ui/game/unitviewdetail.lua").OnNIS()
         HideGameUI(state)
         ShowNISBars()
         if worldView.viewRight then
@@ -855,8 +895,8 @@ function NISMode(state)
         SelectUnits({})
         RenderOverlayEconomy(false)
     else
-        import('/lua/ui/game/worldview.lua').UnlockInput()
-        import('/lua/ui/game/multifunction.lua').PostNIS()
+        import("/lua/ui/game/worldview.lua").UnlockInput()
+        import("/lua/ui/game/multifunction.lua").PostNIS()
         HideGameUI(state)
         HideNISBars()
         if preNISSettings.restoreSplitScreen then
@@ -879,9 +919,9 @@ function NISMode(state)
             SetGameSpeed(preNISSettings.gameSpeed)
         end
         SelectUnits(preNISSettings.Units)
-        import('/lua/ui/game/consoleecho.lua').ToggleOutput(true)
+        import("/lua/ui/game/consoleecho.lua").ToggleOutput(true)
     end
-    import('/lua/ui/game/missiontext.lua').SetLayout()
+    import("/lua/ui/game/missiontext.lua").SetLayout()
 end
 
 function ShowNISBars()
@@ -967,7 +1007,7 @@ function QuickSave(filename)
         not IsNISMode() then
 
         local saveType
-        if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+        if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
             saveType = "CampaignSave"
         else
             saveType = "SaveGame"
@@ -995,7 +1035,7 @@ function SimChangeCameraZoom(newMult)
         not IsNISMode() then
 
         defaultZoom = newMult
-        local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
+        local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
         for _, viewControl in views do
             if viewControl._cameraName ~= 'MiniMap' then
                 GetCamera(viewControl._cameraName):SetMaxZoomMult(newMult)
@@ -1008,7 +1048,7 @@ function UiBeat()
     local observing = (GetFocusArmy() == -1)
     if (observing ~= lastObserving) then
         lastObserving = observing
-        import('/lua/ui/game/economy.lua').ToggleEconPanel(not observing)
+        import("/lua/ui/game/economy.lua").ToggleEconPanel(not observing)
     end
     if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
         GpgNetSend("BEAT",GameTick(),GetGameSpeed())

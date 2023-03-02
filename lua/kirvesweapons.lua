@@ -1,14 +1,9 @@
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
-local KamikazeWeapon = WeaponFile.KamikazeWeapon
-local BareBonesWeapon = WeaponFile.BareBonesWeapon
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
-local OriginalEffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectTemplate = import('/lua/kirveseffects.lua')
-
-local CollisionBeamFile = import('/lua/kirvesbeams.lua')
-
-
+local OriginalEffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/kirveseffects.lua")
+local CollisionBeamFile = import("/lua/kirvesbeams.lua")
 
 ---@class TargetingLaser : DefaultBeamWeapon
 TargetingLaser = Class(DefaultBeamWeapon) {
@@ -28,6 +23,8 @@ TAAPhalanxWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TPhalanxGunMuzzleFlash,
     FxShellEject  = EffectTemplate.TPhalanxGunShells,
 
+    ---@param self TAAPhalanxWeapon
+    ---@param muzzle Bone
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         for k, v in self.FxShellEject do
@@ -46,7 +43,6 @@ SDFUnstablePhasonBeam = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffectScale = 0.2,
 }
 
-
 ---@class SDFUnstablePhasonBeam2 : DefaultBeamWeapon
 SDFUnstablePhasonBeam2 = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam2,
@@ -63,3 +59,7 @@ Dummy = Class(DefaultBeamWeapon) {
 
     FxBeamEndPointScale = 0.01,
 }
+
+-- kept for mod backwards compatibility
+local KamikazeWeapon = WeaponFile.KamikazeWeapon
+local BareBonesWeapon = WeaponFile.BareBonesWeapon

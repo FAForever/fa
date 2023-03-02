@@ -31,7 +31,7 @@ PropBlueprint {
         HelpText = 'Huge Crystal',
     },
     Physics = {
-        BlockPath = true,
+        Blockpath = true
     },
     SizeX = 2,
     SizeY = 1,

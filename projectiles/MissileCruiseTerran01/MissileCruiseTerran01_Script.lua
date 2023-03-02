@@ -1,7 +1,7 @@
 --
 -- script for projectile Missile
 --
-local Projectile = import('/lua/sim/Projectile.lua').Projectile
+local Projectile = import("/lua/sim/projectile.lua").Projectile
 
 MissileCruiseTerran01 = Class(Projectile) {
     MissileExhaust = {},

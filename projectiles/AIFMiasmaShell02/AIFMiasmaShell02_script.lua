@@ -10,7 +10,7 @@
 --
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
-local AMiasmaProjectile02 = import('/lua/aeonprojectiles.lua').AMiasmaProjectile02
+local AMiasmaProjectile02 = import("/lua/aeonprojectiles.lua").AMiasmaProjectile02
 
 AIFMiasmaShell02 = Class(AMiasmaProjectile02) { }
 

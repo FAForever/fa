@@ -5,12 +5,12 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CLandUnit = import("/lua/cybranunits.lua").CLandUnit
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFElectronBolterWeapon = CybranWeaponsFile.CDFElectronBolterWeapon
 local CDFMissileMesonWeapon = CybranWeaponsFile.CDFMissileMesonWeapon
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
-local SlowAmphibious = import('/lua/defaultunits.lua').SlowAmphibiousLandUnit
+local SlowAmphibious = import("/lua/defaultunits.lua").SlowAmphibiousLandUnit
 
 URL0203 = Class(CLandUnit, SlowAmphibious) {
 

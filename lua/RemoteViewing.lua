@@ -7,7 +7,7 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
 -- TODO: make sure each new instance is using a previous metatable
 function RemoteViewing(SuperClass)

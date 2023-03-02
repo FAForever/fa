@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SMassFabricationUnit = import('/lua/seraphimunits.lua').SMassFabricationUnit
+local SMassFabricationUnit = import("/lua/seraphimunits.lua").SMassFabricationUnit
 
+---@class XSB1303 : SMassFabricationUnit
 XSB1303 = Class(SMassFabricationUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)

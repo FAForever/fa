@@ -3,13 +3,13 @@
 --* Author: Ted Snook
 --* Summary: On screen objective Countdown timer
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local controls = {
     bg = false,
@@ -92,23 +92,10 @@ function ResetTimer()
 end
 
 function FormatTime(seconds)
-    local hours = math.floor(seconds / 3600)
-    local minutes = math.floor(seconds / 60)
-    local remseconds = (seconds - ((hours * 3600) + (minutes * 60)))
-    if hours < 10 then
-        hours = "0" .. tostring(hours)
-    else
-        hours = tostring(hours)
-    end
-    if minutes < 10 then
-        minutes = "0" .. tostring(minutes)
-    else
-        minutes = tostring(minutes)
-    end
-    if remseconds < 10 then
-        remseconds = "0" .. tostring(remseconds)
-    else
-        remseconds = tostring(remseconds)
-    end
-    return string.format("%s:%s:%s", hours, minutes, remseconds)
+    local MathFloor = math.floor
+    local hours = MathFloor(seconds / 3600)
+    seconds = seconds - hours * 3600
+    local minutes = MathFloor(seconds / 60)
+    seconds = MathFloor(seconds - minutes * 60)
+    return ("%02d:%02d:%02d"):format(hours, minutes, seconds)
 end

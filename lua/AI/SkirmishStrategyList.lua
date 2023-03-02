@@ -9,5 +9,5 @@
 
 -- Put all strategies here in the StrategyList table
 StrategyList = {
-    import('/lua/ai/Strategy-Test.lua').Strategy,
+    import("/lua/ai/strategy-test.lua").Strategy,
 }

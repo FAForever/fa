@@ -1,11 +1,11 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Edit = import('/lua/maui/edit.lua').Edit
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua").Text
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Edit = import("/lua/maui/edit.lua").Edit
+local Prefs = import("/lua/user/prefs.lua")
 
 -- maximum accepted file name size
 maxFilenameSize = 30
@@ -599,7 +599,7 @@ FilePicker = Class(Group) {
         self._filenameErrorMsg:SetText("")
 
         if self._selectAction then
-            self._selectAction(self, self:GetFileInfo())
+            self:_selectAction(self:GetFileInfo())
         end
 
         return true

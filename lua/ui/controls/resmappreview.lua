@@ -1,11 +1,11 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local MapUtil = import('/lua/ui/maputil.lua')
-local TexturePool = import('/lua/ui/texturepool.lua').TexturePool
-local ACUButton = import('/lua/ui/controls/acubutton.lua').ACUButton
-local gameColors = import('/lua/gameColors.lua').GameColors
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local MapUtil = import("/lua/ui/maputil.lua")
+local TexturePool = import("/lua/ui/texturepool.lua").TexturePool
+local ACUButton = import("/lua/ui/controls/acubutton.lua").ACUButton
+local gameColors = import("/lua/gamecolors.lua").GameColors
 
 -- The default size of the mass/hydrocarbon icons
 local DEFAULT_HYDROCARBON_ICON_SIZE = 14

@@ -138,15 +138,14 @@ Scenario = {
             'OST_NavalAttacks_T3Platoon2',
             '',
             { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
-            { 'ues0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
-            { 'ues0103', -1, 1, 'attack', 'AttackFormation' }, -- Frigates
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
         },
         ['OST_NavalAttacks_T3Platoon3'] = {
             'OST_NavalAttacks_T3Platoon3',
             '',
             { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
             { 'ues0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
-            { 'ues0203', -1, 1, 'attack', 'AttackFormation' }, -- Submarines
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
         },
         ['OST_NavalAttacks_T3Platoon4'] = {
             'OST_NavalAttacks_T3Platoon4',
@@ -154,8 +153,70 @@ Scenario = {
             { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
             { 'ues0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
             { 'ues0103', -1, 1, 'attack', 'AttackFormation' }, -- Frigates
+        },
+        ['OST_NavalAttacks_T3Platoon5'] = {
+            'OST_NavalAttacks_T3Platoon5',
+            '',
+            { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
+            { 'ues0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
             { 'ues0203', -1, 1, 'attack', 'AttackFormation' }, -- Submarines
         },
+        ['OST_NavalAttacks_T3Platoon6'] = {
+            'OST_NavalAttacks_T3Platoon6',
+            '',
+            { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
+            { 'ues0103', -1, 1, 'attack', 'AttackFormation' }, -- Frigates
+        },
+        ['OST_NavalAttacks_T3Platoon7'] = {
+            'OST_NavalAttacks_T3Platoon7',
+            '',
+            { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
+            { 'ues0203', -1, 1, 'attack', 'AttackFormation' }, -- Submarines
+        },
+        ['OST_NavalAttacks_T3Platoon8'] = {
+            'OST_NavalAttacks_T3Platoon8',
+            '',
+            { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
+            { 'ues0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
+            { 'ues0103', -1, 1, 'attack', 'AttackFormation' }, -- Frigates
+        },
+        ['OST_NavalAttacks_T3Platoon9'] = {
+            'OST_NavalAttacks_T3Platoon9',
+            '',
+            { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
+            { 'ues0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
+            { 'ues0203', -1, 1, 'attack', 'AttackFormation' }, -- Submarines
+        },
+        ['OST_NavalAttacks_T3Platoon10'] = {
+            'OST_NavalAttacks_T3Platoon10',
+            '',
+            { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
+            { 'ues0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
+            { 'ues0103', -1, 1, 'attack', 'AttackFormation' }, -- Frigates
+            { 'ues0203', -1, 1, 'attack', 'AttackFormation' }, -- Submarines
+        },
+        ['OST_NavalAttacks_T3Platoon11'] = {
+            'OST_NavalAttacks_T3Platoon11',
+            '',
+            { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
+            { 'ues0103', -1, 1, 'attack', 'AttackFormation' }, -- Frigates
+            { 'ues0203', -1, 1, 'attack', 'AttackFormation' }, -- Submarines
+        },
+        ['OST_NavalAttacks_T3Platoon12'] = {
+            'OST_NavalAttacks_T3Platoon12',
+            '',
+            { 'ues0302', -1, 1, 'attack', 'AttackFormation' }, -- Battleships
+            { 'ues0201', -1, 1, 'attack', 'AttackFormation' }, -- Destroyers
+            { 'ues0202', -1, 1, 'attack', 'AttackFormation' }, -- Cruisers
+            { 'ues0103', -1, 1, 'attack', 'AttackFormation' }, -- Frigates
+            { 'ues0203', -1, 1, 'attack', 'AttackFormation' }, -- Submarines
+        },
+
 
 
         -- Mixed
@@ -904,7 +965,7 @@ Scenario = {
                                 {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
                             }},
                         },
-                        ChildrenType = {'Battleships', 'Destroyers', 'Frigates'},
+                        ChildrenType = {'Battleships', 'Cruisers'},
                     },
                     ['OSB_Child_NavalAttacks_T3Platoon3'] =  {
                         PlatoonTemplate = 'OST_NavalAttacks_T3Platoon3',
@@ -932,7 +993,7 @@ Scenario = {
                                 {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
                             }},
                         },
-                        ChildrenType = {'Battleships', 'Destroyers', 'Submarines'},
+                        ChildrenType = {'Battleships', 'Destroyers', 'Cruisers'},
                     },
                     ['OSB_Child_NavalAttacks_T3Platoon4'] =  {
                         PlatoonTemplate = 'OST_NavalAttacks_T3Platoon4',
@@ -960,7 +1021,231 @@ Scenario = {
                                 {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
                             }},
                         },
+                        ChildrenType = {'Battleships', 'Destroyers', 'Frigates'},
+                    },
+                    ['OSB_Child_NavalAttacks_T3Platoon5'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T3Platoon5',
+                        Priority = 696,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Sea',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'Battleships', 'Destroyers', 'Submarines'},
+                    },
+                    ['OSB_Child_NavalAttacks_T3Platoon6'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T3Platoon6',
+                        Priority = 696,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Sea',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'Battleships', 'Cruisers', 'Frigates'},
+                    },
+                    ['OSB_Child_NavalAttacks_T3Platoon7'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T3Platoon7',
+                        Priority = 696,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Sea',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'Battleships', 'Cruisers', 'Submarines'},
+                    },
+                    ['OSB_Child_NavalAttacks_T3Platoon8'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T3Platoon8',
+                        Priority = 696,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Sea',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'Battleships', 'Destroyers', 'Cruisers', 'Frigates'},
+                    },
+                    ['OSB_Child_NavalAttacks_T3Platoon9'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T3Platoon9',
+                        Priority = 696,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Sea',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'Battleships', 'Destroyers', 'Cruisers', 'Submarines'},
+                    },
+                    ['OSB_Child_NavalAttacks_T3Platoon10'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T3Platoon10',
+                        Priority = 696,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Sea',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
+                            }},
+                        },
                         ChildrenType = {'Battleships', 'Destroyers', 'Frigates', 'Submarines'},
+                    },
+                    ['OSB_Child_NavalAttacks_T3Platoon11'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T3Platoon11',
+                        Priority = 696,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Sea',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'Battleships', 'Cruisers', 'Frigates', 'Submarines'},
+                    },
+                    ['OSB_Child_NavalAttacks_T3Platoon12'] =  {
+                        PlatoonTemplate = 'OST_NavalAttacks_T3Platoon12',
+                        Priority = 696,
+                        InstanceCount = 1,
+                        LocationType = 'MAIN',
+                        PlatoonType = 'Sea',
+                        RequiresConstruction = true,
+                        PlatoonAIFunction = {'/lua/ScenarioPlatoonAI.lua', 'DefaultOSBasePatrol',
+                            {'default_platoon'},
+                            {'default_platoon'}
+                        },
+                        BuildConditions = {
+                            [0] = {'/lua/ai/opai/navalattacks_editorfunctions.lua', 'NavalAttacksChildCountDifficulty',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                            [1] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                                {'default_brain','default_master'},
+                                {'default_brain','default_master'}
+                            },
+                        },
+                        PlatoonData = {
+                            {type = 5, name = 'AMPlatoons', value = {
+                                {type = 2, name = 'String_0',  value = 'OSB_Master_NavalAttacks'},
+                            }},
+                        },
+                        ChildrenType = {'Battleships', 'Destroyers', 'Cruisers', 'Frigates', 'Submarines'},
                     },
 
 

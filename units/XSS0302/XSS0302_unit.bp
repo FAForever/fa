@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 60,
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 15,
         TargetBones = {
             'xss0302',
             'Back_Turret01',
@@ -42,15 +42,6 @@ UnitBlueprint {
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
         },
     },
     BuildIconSortPriority = 20,
@@ -522,6 +513,7 @@ UnitBlueprint {
             HeadingArcRange = 100,
             Label = 'AntiMissileLeft',
             MaxRadius = 50,
+            MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
@@ -582,6 +574,7 @@ UnitBlueprint {
             HeadingArcRange = 100,
             Label = 'AntiMissileRight',
             MaxRadius = 50,
+            MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,

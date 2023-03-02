@@ -1,7 +1,7 @@
 --
 -- Terran Sub-Launched Cruise Missile
 --
-local TMissileCruiseSubProjectile = import('/lua/terranprojectiles.lua').TMissileCruiseSubProjectile
+local TMissileCruiseSubProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseSubProjectile
 
 TIFMissileCruise02 = Class(TMissileCruiseSubProjectile) {
 

@@ -7,12 +7,12 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local Utils = import('/lua/utilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local StructureUpgradeTemplates = import('/lua/upgradeTemplates.lua').StructureUpgradeTemplates
-local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
+local BaseTemplates = import("/lua/basetemplates.lua").BaseTemplates
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local Utils = import("/lua/utilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local UnitUpgradeTemplates = import("/lua/upgradetemplates.lua").UnitUpgradeTemplates
 local aiEconomy
 
 function AISetEconomyNumbers(aiBrain)

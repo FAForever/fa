@@ -8,13 +8,13 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local UnitTemplates = import("/lua/unittemplates.lua").UnitTemplates
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
 --for sorian ai
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local SUtils = import("/lua/ai/sorianutilities.lua")
 --end sorian ai import
 
 -- types of threat to look at based on composition of platoon
@@ -694,19 +694,9 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
     end
 
     if path then
-        local pathSize = table.getn(path)
-        -- store path
         platoon.LastAttackDestination = path
         -- move to new location
-        for wpidx,waypointPath in path do
-            if wpidx == pathSize then
-                platoon:AggressiveMoveToLocation(waypointPath)
-                --platoon:MoveToLocation(waypointPath, false)
-            else
-                platoon:AggressiveMoveToLocation(waypointPath)
-                --platoon:MoveToLocation(waypointPath, false)
-            end
-        end
+        platoon:IssueAggressiveMoveAlongRoute(path)
     end
 
     -- return current command queue
@@ -815,16 +805,13 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
                 -- force reevaluation
                 platoon.LastAttackDestination = {attackPos}
             else
-                local pathSize = table.getn(path)
                 -- store path
                 platoon.LastAttackDestination = path
                 -- move to new location
-                for wpidx,waypointPath in path do
-                    if wpidx == pathSize or bAggro then
-                        platoon:AggressiveMoveToLocation(waypointPath)
-                    else
-                        platoon:MoveToLocation(waypointPath, false)
-                    end
+                if bAggro then
+                    platoon:IssueAggressiveMoveAlongRoute(path)
+                else
+                    platoon:IssueMoveAlongRoute(path)
                 end
             end
         end

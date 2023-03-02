@@ -5,10 +5,11 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
-local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
-local ADFLaserHighIntensityWeapon = import('/lua/aeonweapons.lua').ADFLaserHighIntensityWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
+local ADFLaserHighIntensityWeapon = import("/lua/aeonweapons.lua").ADFLaserHighIntensityWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
 
+---@class UAL0303 : AWalkingLandUnit
 UAL0303 = Class(AWalkingLandUnit) {
     Weapons = {
         FrontTurret01 = Class(ADFLaserHighIntensityWeapon) {}

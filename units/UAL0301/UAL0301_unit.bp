@@ -113,15 +113,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
-        },
-    },
     BuildIconSortPriority = 10,
     Categories = {
         'PRODUCTSC1',
@@ -426,7 +417,7 @@ UnitBlueprint {
             BuildCostEnergy = 100000,
             BuildCostMass = 1800,
             BuildTime = 7000,
-            Icon = 'htsg',
+            Icon = 'phtsg',
             ImpactEffects = 'AeonShieldHit01',
             MaintenanceConsumptionPerSecondEnergy = 600,
             Name = '<LOC enhancements_0029>Heavy Personal Shield Generator',

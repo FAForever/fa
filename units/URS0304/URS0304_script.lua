@@ -5,12 +5,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CSubUnit = import('/lua/cybranunits.lua').CSubUnit
-local CybranWeapons = import('/lua/cybranweapons.lua')
+local CSubUnit = import("/lua/cybranunits.lua").CSubUnit
+local CybranWeapons = import("/lua/cybranweapons.lua")
 local CIFMissileLoaWeapon = CybranWeapons.CIFMissileLoaWeapon
 local CIFMissileStrategicWeapon = CybranWeapons.CIFMissileStrategicWeapon
 local CANTorpedoLauncherWeapon = CybranWeapons.CANTorpedoLauncherWeapon
 
+---@class URS0304 : CSubUnit
 URS0304 = Class(CSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {

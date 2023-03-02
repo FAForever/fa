@@ -7,11 +7,12 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
-local SeraphimWeapons = import('/lua/seraphimweapons.lua')
+local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
+local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SAAShleoCannonWeapon = SeraphimWeapons.SAAShleoCannonWeapon
 local SDFBombOtheWeapon = SeraphimWeapons.SDFBombOtheWeapon
 
+---@class XSA0202 : SAirUnit
 XSA0202 = Class(SAirUnit) {
     Weapons = {
         ShleoAAGun01 = Class(SAAShleoCannonWeapon) {

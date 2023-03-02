@@ -1,8 +1,9 @@
---- Class CDecalHandle
--- @classmod Sim.CDecalHandle
+---@meta
 
----
---
-function CDecalHandle:moho.CDecalHandle()
+---@class moho.CDecalHandle : Destroyable
+local CDecalHandle = {}
+
+function CDecalHandle:Destroy()
 end
 
+return CDecalHandle

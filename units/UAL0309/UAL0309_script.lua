@@ -10,7 +10,8 @@
 --
 -- AEON TECH 3 ENGINEER
 --
-local AConstructionUnit = import('/lua/aeonunits.lua').AConstructionUnit
+local AConstructionUnit = import("/lua/aeonunits.lua").AConstructionUnit
+---@class UAL0309 : AConstructionUnit
 UAL0309 = Class(AConstructionUnit) {
 }
 

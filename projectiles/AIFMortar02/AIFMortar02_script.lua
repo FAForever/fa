@@ -5,8 +5,8 @@
 --**
 --**  Summary  :  Aeon Mortar, DAB2102
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-AIFMortar02 = Class(import('/lua/aeonprojectiles.lua').AIFBallisticMortarProjectile02) {
+AIFMortar02 = Class(import("/lua/aeonprojectiles.lua").AIFBallisticMortarProjectile02) {
 }
 TypeClass = AIFMortar02

@@ -5,7 +5,7 @@
 --
 
 
-local TTorpedoShipProjectile = import('/lua/terranprojectiles.lua').TTorpedoShipProjectile
+local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
 
 -- unused
 ---@class TIMSonarBuoyCreator01 : TTorpedoShipProjectile

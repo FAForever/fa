@@ -7,9 +7,9 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-SBOZhanaseeBombEffect02 = Class(import('/lua/sim/defaultprojectiles.lua').MultiPolyTrailProjectile) {
+SBOZhanaseeBombEffect02 = Class(import("/lua/sim/defaultprojectiles.lua").MultiPolyTrailProjectile) {
 	FxTrails = {},
 	PolyTrails = EffectTemplate.SZhanaseeBombHitSpiralFxPolyTrails,
 	PolyTrailOffset = {0},   

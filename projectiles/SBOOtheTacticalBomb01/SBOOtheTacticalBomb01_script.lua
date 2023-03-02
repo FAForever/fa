@@ -8,7 +8,7 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
-local SOtheTacticalBomb = import('/lua/seraphimprojectiles.lua').SOtheTacticalBomb
+local SOtheTacticalBomb = import("/lua/seraphimprojectiles.lua").SOtheTacticalBomb
 
 SBOOtheTacticalBomb01 = Class(SOtheTacticalBomb) { }
 TypeClass = SBOOtheTacticalBomb01

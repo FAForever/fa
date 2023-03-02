@@ -8,10 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
-local WeaponsFile = import('/lua/aeonweapons.lua')
+local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
+local WeaponsFile = import("/lua/aeonweapons.lua")
 local AAAZealotMissileWeapon = WeaponsFile.AAAZealotMissileWeapon
 
+---@class UAS0303 : AircraftCarrier
 UAS0303 = Class(AircraftCarrier) {
 
     Weapons = {

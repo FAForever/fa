@@ -2,9 +2,9 @@
 -- Aeon T3 Static Artillery Projectile : uab2302
 --
 
-local AArtilleryProjectile = import('/lua/aeonprojectiles.lua').AArtilleryProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local AArtilleryProjectile = import("/lua/aeonprojectiles.lua").AArtilleryProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 AIFSonanceShell02 = Class(AArtilleryProjectile) {
     

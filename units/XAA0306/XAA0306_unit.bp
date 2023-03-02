@@ -82,15 +82,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTFA',
@@ -100,6 +91,7 @@ UnitBlueprint {
         'MOBILE',
         'AIR',
         'HIGHALTAIR',
+        'BOMBER',
         'TECH3',
         'ANTINAVY',
         'VISIBLETORECON',
@@ -254,7 +246,7 @@ UnitBlueprint {
     SelectionSizeX = 1.6,
     SelectionSizeZ = 1.2,
     SelectionThickness = 0.43,
-    SizeSphere = 1.6,
+    SizeSphere = 2.0,
     SizeX = 1.5,
     SizeY = 0.4,
     SizeZ = 1.5,

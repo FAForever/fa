@@ -8,11 +8,12 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
-local explosion = import('/lua/defaultexplosions.lua')
-local util = import('/lua/utilities.lua')
-local DummyWeapon = import('/lua/aeonweapons.lua').AAASonicPulseBatteryWeapon
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local explosion = import("/lua/defaultexplosions.lua")
+local util = import("/lua/utilities.lua")
+local DummyWeapon = import("/lua/aeonweapons.lua").AAASonicPulseBatteryWeapon
 
+---@class URA0107 : AirTransport
 URA0107 = Class(AirTransport) {
 
     Weapons = {

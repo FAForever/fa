@@ -10,7 +10,7 @@
 ---------------------------------------------------------------------------
 -- TERRAN DEFAULT UNITS
 ---------------------------------------------------------------------------
-local DefaultUnitsFile = import('defaultunits.lua')
+local DefaultUnitsFile = import("/lua/defaultunits.lua")
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
 local AirUnit = DefaultUnitsFile.AirUnit
@@ -40,7 +40,7 @@ local ShieldSeaUnit = DefaultUnitsFile.ShieldSeaUnit
 local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
 local AmphibiousLandUnit = DefaultUnitsFile.AmphibiousLandUnit
 
-local EffectUtil = import('EffectUtilities.lua')
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
@@ -436,7 +436,7 @@ TPodTowerUnit = Class(TStructureUnit) {
 
                 -- store off the pod name so we can give to new unit
                 local podName = k
-                local newPod = import('/lua/ScenarioFramework.lua').GiveUnitToArmy(v.PodHandle, captor.Army)
+                local newPod = import("/lua/scenarioframework.lua").GiveUnitToArmy(v.PodHandle, captor.Army)
                 newPod.PodName = podName
 
                 -- create a callback for when the unit is flipped.  set creator for the new pod to the new tower

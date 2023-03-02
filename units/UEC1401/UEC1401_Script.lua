@@ -7,13 +7,14 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TCivilianStructureUnit = import('/lua/terranunits.lua').TCivilianStructureUnit
+local TCivilianStructureUnit = import("/lua/terranunits.lua").TCivilianStructureUnit
 
+---@class UEC1401 : TCivilianStructureUnit
 UEC1401 = Class(TCivilianStructureUnit) {
 
 	OnCreate = function(self)
 		TCivilianStructureUnit.OnCreate(self)
-        self.WindowEntity = import('/lua/sim/Entity.lua').Entity({Owner = self,})
+        self.WindowEntity = import("/lua/sim/entity.lua").Entity({Owner = self,})
         self.WindowEntity:AttachBoneTo( -1, self, 'UEC1401' )
         self.WindowEntity:SetMesh('/effects/Entities/UEC1401_WINDOW/UEC1401_WINDOW_mesh')
         self.WindowEntity:SetDrawScale(0.1)

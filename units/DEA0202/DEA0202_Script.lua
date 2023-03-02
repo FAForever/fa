@@ -8,10 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local TAirToAirLinkedRailgun = import('/lua/terranweapons.lua').TAirToAirLinkedRailgun
-local TIFCarpetBombWeapon = import('/lua/terranweapons.lua').TIFCarpetBombWeapon
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local TAirToAirLinkedRailgun = import("/lua/terranweapons.lua").TAirToAirLinkedRailgun
+local TIFCarpetBombWeapon = import("/lua/terranweapons.lua").TIFCarpetBombWeapon
 
+---@class DEA0202 : TAirUnit
 DEA0202 = Class(TAirUnit) {
     Weapons = {
         RightBeam = Class(TAirToAirLinkedRailgun) {},

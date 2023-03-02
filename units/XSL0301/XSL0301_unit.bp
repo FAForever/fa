@@ -1,11 +1,10 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 26, -- allows for factory reclaim bug 
+        GuardScanRadius = 26, -- allows for factory reclaim bug
         TargetBones = {
-            'Back_Upgrade',
             'Torso',
-            'AttachPoint',
         },
+        InitialAutoMode = true,
     },
     Audio = {
         CaptureLoop = Sound {
@@ -119,15 +118,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
-        },
-    },
     BuildIconSortPriority = 10,
     Categories = {
         'PRODUCTFA',
@@ -157,7 +147,6 @@ UnitBlueprint {
         'USEBUILDPRESETS',
         'SHOWATTACKRETICLE',
     },
-    CollisionOffsetX = -0.04,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -740,9 +729,9 @@ UnitBlueprint {
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
     SelectionYOffset = 0,
-    SizeX = 1.1,
+    SizeX = 1.2,
     SizeY = 2.2,
-    SizeZ = 1.1,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_subcommander',
     StrategicIconSortPriority = 1,
     Transport = {

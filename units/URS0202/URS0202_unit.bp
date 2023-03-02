@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 0,
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 30,
         StagingPlatformScanRadius = 300,
         RefuelingMultiplier = 50,
         RefuelingRepairAmount = 500,
@@ -39,15 +39,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Cybran_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
         },
     },
     BuildIconSortPriority = 30,
@@ -499,6 +490,7 @@ UnitBlueprint {
             FiringTolerance = 5,
             Label = 'Zapper',
             MaxRadius = 50,
+            MinRadius = 2,
             MaximumBeamLength = 60,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,

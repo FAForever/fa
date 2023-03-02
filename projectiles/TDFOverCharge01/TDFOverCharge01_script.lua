@@ -1,8 +1,8 @@
 -- UEF Blaster
 
-local TLaserBotProjectile = import('/lua/terranprojectiles.lua').TLaserBotProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local OverchargeProjectile = import('/lua/sim/DefaultProjectiles.lua').OverchargeProjectile
+local TLaserBotProjectile = import("/lua/terranprojectiles.lua").TLaserBotProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local OverchargeProjectile = import("/lua/sim/defaultprojectiles.lua").OverchargeProjectile
 
 TDFOverCharge01 = Class(TLaserBotProjectile, OverchargeProjectile) {
     FxTrails = EffectTemplate.TCommanderOverchargeFXTrail01,

@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 60,
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 15,
         TargetBones = {
             'Front_Turret01',
             'Front_Turret02',
@@ -33,15 +33,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'UEF_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
         },
     },
     BuildIconSortPriority = 20,
@@ -252,6 +243,9 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = false,
             Audio = {
@@ -326,6 +320,9 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.2,
+
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = false,
             Audio = {
@@ -483,6 +480,7 @@ UnitBlueprint {
             FiringTolerance = 5,
             Label = 'PhalanxGun',
             MaxRadius = 50,
+            MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 100,

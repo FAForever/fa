@@ -1,22 +1,22 @@
 -- This is the primary hotbuild file. It controls what happens when a hotbuild action is clicked
 -- It also controls the cycle UI
 
-local KeyMapper = import('/lua/keymap/keymapper.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local KeyMapper = import("/lua/keymap/keymapper.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
-local CommandMode = import('/lua/ui/game/commandmode.lua')
-local Construction = import('/lua/ui/game/construction.lua')
-local Templates = import('/lua/ui/game/build_templates.lua')
-local FactoryTemplates = import('/lua/ui/templates_factory.lua')
+local CommandMode = import("/lua/ui/game/commandmode.lua")
+local Construction = import("/lua/ui/game/construction.lua")
+local Templates = import("/lua/ui/game/build_templates.lua")
+local FactoryTemplates = import("/lua/ui/templates_factory.lua")
 
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Effect = import('/lua/maui/effecthelpers.lua')
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Effect = import("/lua/maui/effecthelpers.lua")
 
-local upgradeTab = import('/lua/keymap/upgradeTab.lua').upgradeTab
-local ModifyBuildables = import('/lua/ui/notify/enhancementqueue.lua').ModifyBuildablesForACU
+local upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
+local ModifyBuildables = import("/lua/ui/notify/enhancementqueue.lua").ModifyBuildablesForACU
 
 local unitkeygroups
 local cyclePos
@@ -27,7 +27,7 @@ local cycleButtons = {}
 local oldSelection
 
 local modifiersKeys = {}
-local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+local worldview = import("/lua/ui/game/worldview.lua").viewLeft
 local oldHandleEvent = worldview.HandleEvent
 
 
@@ -126,15 +126,15 @@ function resetCycle(commandMode, modeData)
     -- Commandmode = false is when a building is built (left click with mouse)
     -- modeData.isCancel = false is when building is aborted by a right click... whyever
     -- modeData.isCancel = true when "canceling" by releasing shift
-    if commandMode == false or modeData.isCancel == false then
+    if commandMode == false or (not modeData) or not (modeData.isCancel) then
+        -- Set to 0, first one is 1 but it will be incremented!
         cyclePos = 0
-    -- Set to 0, first one is 1 but it will be incremented!
     end
 end
 
 -- Non state changing getters
 function getUnitKeyGroups()
-    local btSource = import('/lua/keymap/unitkeygroups.lua').unitkeygroups
+    local btSource = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
     local groups = {}
     for name, values in btSource do
         groups[name] = {}
@@ -161,7 +161,7 @@ end
 
 function addModifiers()
     -- generating modifiers shortcuts on the fly.
-    modifiersKeys = import('/lua/keymap/keymapper.lua').GenerateHotbuildModifiers()
+    modifiersKeys = import("/lua/keymap/keymapper.lua").GenerateHotbuildModifiers()
     IN_AddKeyMapTable(modifiersKeys)
 end
 
@@ -386,8 +386,7 @@ function buildActionFactoryTemplate(modifier)
     local selection = GetSelectedUnits()
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
     local buildable = EntityCategoryGetUnitList(buildableCategories)
-
-    effectiveTemplates, effectiveIcons = availableTemplate(allFactoryTemplates, buildable)
+    local effectiveTemplates, effectiveIcons = availableTemplate(allFactoryTemplates, buildable)
 
     local maxPos = table.getsize(effectiveTemplates)
     if maxPos == 0 then
@@ -495,7 +494,7 @@ function buildActionTemplate(modifier)
 
     if options.gui_template_rotator ~= 0 then
         -- Rotating templates
-        local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+        local worldview = import("/lua/ui/game/worldview.lua").viewLeft
         local oldHandleEvent = worldview.HandleEvent
         worldview.HandleEvent = function(self, event)
             if event.Type == 'ButtonPress' then
@@ -572,7 +571,36 @@ function buildActionUnit(name, modifier)
     end
 end
 
--- Does not upgrade T1 facs that are currently upgrading to T2 to T3 when issued
+-- Helper function for the buildActionUpgrade() function below. 
+-- Recursively finds and tries to order possible upgrades from highest tech to lowest tech. This allows queuing upgrades
+-- successively using keybinds, even if the previous upgrade isn't finished yet.
+-- Doing this fully recursively is probably overkill as the support fac / HQ is the only time when there are more than
+-- two possible upgrade paths, and the cybran shield is the only building with more than two successive upgrades, but
+-- hacking it together didn't feel right, hence the 'better' recursive solution.
+function IssueUpgradeCommand(upgrades, buildableCategories)
+    local success = false
+    for _, u in upgrades do
+        local bp = __blueprints[u]
+        local successiveUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
+        if successiveUpgrades then
+            success = IssueUpgradeCommand(successiveUpgrades, buildableCategories)
+            if success then
+                break
+            end
+        end
+        if not success then
+            if EntityCategoryContains(buildableCategories, u) then
+                -- Queue the upgrade of the selected structure, if possible
+                IssueBlueprintCommand("UNITCOMMAND_Upgrade", u, 1, false)
+                success = true
+                break
+            end
+        end
+    end
+    return success 
+end
+
+-- Does support upgrading T1 structures (facs, radars, etc.) that are currently upgrading to T2 to T3 when issued
 function buildActionUpgrade()
     local selectedUnits = GetSelectedUnits()
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selectedUnits)
@@ -580,24 +608,13 @@ function buildActionUpgrade()
 
     for index, unit in selectedUnits do
         local bp = unit:GetBlueprint()
-        local cmd = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
-
+        -- If upgradeTab[bp.BlueprintId] returns a table, there are two or more possible upgrades, e.g. HQ and 
+        -- support factory. If instead bp.General.UpgradesTo returns a string, then there is only one possible 
+        -- upgrade, e.g. for a radar. For our helper function IssueUpgradeCommand we want a table, hence the { } 
+        -- brackets
+        local upgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
         SelectUnits({unit})
-        local success = false
-        if type(cmd) == "table" then -- Issue the first upgrade command that we may build
-            for k,v in cmd do
-                if EntityCategoryContains(buildableCategories, v) then
-                    IssueBlueprintCommand("UNITCOMMAND_Upgrade", v, 1, false)
-                    success = true
-                    break
-                end
-            end
-        elseif type(cmd) == "string" then -- Direct upgrade path
-            if EntityCategoryContains(buildableCategories, cmd) then
-                IssueBlueprintCommand("UNITCOMMAND_Upgrade", cmd, 1, false)
-                success = true
-            end
-        end
+        local success = IssueUpgradeCommand(upgrades, buildableCategories)
         if not success then
             result = false
         end

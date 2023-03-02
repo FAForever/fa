@@ -1,7 +1,7 @@
 --
 -- script for projectile TankShell
 --
-local Projectile = import('/lua/sim/Projectile.lua').Projectile
+local Projectile = import("/lua/sim/projectile.lua").Projectile
 ShellTankTerran01 = Class(Projectile) {
     FxUnitHitScale = 1,
     FxImpactUnit = {},

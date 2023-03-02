@@ -8,10 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CSubUnit = import('/lua/cybranunits.lua').CSubUnit
-local CANNaniteTorpedoWeapon = import('/lua/cybranweapons.lua').CANNaniteTorpedoWeapon
-local CDFLaserHeavyWeapon = import('/lua/cybranweapons.lua').CDFLaserHeavyWeapon
+local CSubUnit = import("/lua/cybranunits.lua").CSubUnit
+local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedoWeapon
+local CDFLaserHeavyWeapon = import("/lua/cybranweapons.lua").CDFLaserHeavyWeapon
 
+---@class URS0203 : CSubUnit
 URS0203 = Class(CSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     

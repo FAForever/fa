@@ -5,10 +5,11 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------
 
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
-local TDFRiotWeapon = import('/lua/terranweapons.lua').TDFRiotWeapon
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local TDFRiotWeapon = import("/lua/terranweapons.lua").TDFRiotWeapon
 
+---@class UEA0203 : AirTransport
 UEA0203 = Class(AirTransport) {
     EngineRotateBones = {'Jet_Front', 'Jet_Back',},
 

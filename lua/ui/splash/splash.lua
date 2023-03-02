@@ -3,12 +3,12 @@
 --* Author: Chris Blackwell
 --* Summary: create and control pre-game splash screens
 --*
---* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Movie = import('/lua/maui/movie.lua').Movie
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Movie = import("/lua/maui/movie.lua").Movie
 
 
 local movies = {

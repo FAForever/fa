@@ -8,8 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CEnergyCreationUnit = import('/lua/cybranunits.lua').CEnergyCreationUnit
+local CEnergyCreationUnit = import("/lua/cybranunits.lua").CEnergyCreationUnit
 
+---@class URB1201 : CEnergyCreationUnit
 URB1201 = Class(CEnergyCreationUnit) {
     AmbientEffects = 'CT2PowerAmbient',
     

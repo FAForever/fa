@@ -8,10 +8,11 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
-local ADFQuadLaserLightWeapon = import('/lua/aeonweapons.lua').ADFQuadLaserLightWeapon
-local AAAZealot02MissileWeapon = import('/lua/aeonweapons.lua').AAAZealot02MissileWeapon
+local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
+local ADFQuadLaserLightWeapon = import("/lua/aeonweapons.lua").ADFQuadLaserLightWeapon
+local AAAZealot02MissileWeapon = import("/lua/aeonweapons.lua").AAAZealot02MissileWeapon
 
+---@class XAA0305 : AAirUnit
 XAA0305 = Class(AAirUnit) {
     Weapons = {
         Turret = Class(ADFQuadLaserLightWeapon) {},

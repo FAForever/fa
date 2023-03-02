@@ -4,18 +4,76 @@
 ---- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
+---@alias SaveFile "AirAttacks" | "AirScout" | "BasicLandAttack" | "BomberEscort" | "HeavyLandAttack" | "LandAssualt" | "LeftoverCleanup" | "LightAirAttack" | "NavalAttacks" | "NavalFleet"
 
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+-- types that originate from the map
 
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local RebuildStructuresTemplate = import('/lua/BuildingTemplates.lua').RebuildStructuresTemplate
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local Buff = import('/lua/sim/Buff.lua')
+---@class MarkerChain: string                   # Name reference to a marker chain as defined in the map
+---@class Area: string                          # Name reference to a area as defined in the map
+---@class Marker: string                        # Name reference to a marker as defined in the map
+---@class UnitGroup: string                     # Name reference to a unit group as defined in the map
 
-local BaseOpAI = import('/lua/ai/opai/baseopai.lua')
-local ReactiveAI = import('/lua/ai/opai/ReactiveAI.lua')
-local NavalOpAI = import('/lua/ai/opai/NavalOpAI.lua')
+-- types commonly used in repository
+
+---@class FileName: string
+---@class FunctionName: string
+
+---@class BuildCondition
+---@field [1] FileName
+---@field [2] FunctionName
+---@field [3] any
+
+---@class FileFunctionRef
+---@field [1] FileName
+---@field [2] FunctionName
+
+---@class BuildGroup
+---@field Name UnitGroup
+---@field Priority number
+
+-- types used by AddOpAI
+
+---@class MasterPlatoonFunction
+---@field [1] FileName
+---@field [2] FunctionName
+
+---@class PlatoonData
+---@field TransportReturn Marker                # Location for transports to return to
+---@field PatrolChains MarkerChain[]            # Selection of patrol chains to guide the constructed units
+---@field PatrolChain MarkerChain               # Patrol chain to guide the construced units
+---@field AttackChain MarkerChain               # Attack chain to guide the constructed units
+---@field LandingChain MarkerChain              # Landing chain to guide the transports carrying the constructed units
+---@field Area Area                             # An area, use depends on master platoon function
+---@field Location Marker                       # A location, use depends on master platoon function
+
+---@class AddOpAIData
+---@field MasterPlatoonFunction FileFunctionRef     # Behavior of instances upon completion
+---@field PlatoonData PlatoonData                   # Parameters of the master platoon function
+---@field Priority number                           # Priority over other builders
+
+-- types used by AddUnitAI
+
+---@class AddUnitAIData
+---@field Amount number                         # Number of engineers that can assist building
+---@field KeepAlive boolean                     # ??
+---@field BuildCondition BuildCondition[]       # Build conditions that must be met before building can start, can be empty
+---@field PlatoonAIFunction FileFunctionRef     # A { file, function } reference to the platoon AI function
+---@field MaxAssist number                      # Number of engineers that can assist construction
+---@field Retry boolean                         # Flag that allows the AI to retry
+---@field PlatoonData PlatoonData               # Parameters of the platoon AI function
+
+local AIUtils = import("/lua/ai/aiutilities.lua")
+
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local RebuildStructuresTemplate = import("/lua/buildingtemplates.lua").RebuildStructuresTemplate
+local StructureUpgradeTemplates = import("/lua/upgradetemplates.lua").StructureUpgradeTemplates
+local Buff = import("/lua/sim/buff.lua")
+
+local BaseOpAI = import("/lua/ai/opai/baseopai.lua")
+local ReactiveAI = import("/lua/ai/opai/reactiveai.lua")
+local NavalOpAI = import("/lua/ai/opai/navalopai.lua")
 
 local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
@@ -41,29 +99,58 @@ local BuildingCounterDefaultValues = {
         T2Radar = 5,
         T3Radar = 5,
 
-        T1LandFactory = 5,
-        T2LandFactory = 5,
-        T3LandFactory = 5,
+        T2AirStagingPlatform = 3,
+
+        T2EngineerSupport = 5,
+
+        T1LandFactory = 10,
+        T2LandFactory = 10,
+        T3LandFactory = 10,
+        T2SupportLandFactory = 10,
+        T3SupportLandFactory = 10,
 
         T1AirFactory = 10,
         T2AirFactory = 10,
         T3AirFactory = 10,
+        T2SupportAirFactory = 10,
+        T3SupportAirFactory = 10,
 
         T1SeaFactory = 10,
         T2SeaFactory = 10,
         T3SeaFactory = 10,
+        T2SupportSeaFactory = 10,
+        T3SupportSeaFactory = 10,
 
-        T3QuantumGate = 10,
+        T3QuantumGate = 5,
 
         T1HydroCarbon = 10,
         T1EnergyProduction = 10,
         T2EnergyProduction = 10,
         T3EnergyProduction = 10,
 
-        T1MassExtraction = 10,
-        T2MassExtraction = 10,
-        T3MassExtraction = 10,
+        T1Resource = 10,
+        T2Resource = 10,
+        T3Resource = 10,
 
+        MassStorage = 5,
+        EnergyStorage = 5,
+
+        T1GroundDefense = 3,
+        T2GroundDefense = 3,
+        T3GroundDefense = 3,
+
+        T1AADefense = 3,
+        T2AADefense = 3,
+        T3AADefense = 3,
+
+        T1NavalDefense = 3,
+        T2NavalDefense = 3,
+        T3NavalDefense = 3,
+
+        T2ShieldDefense = 3,
+        T3ShieldDefense = 3,
+
+        T2MissileDefense = 3,
         T3StrategicMissileDefense = 1,
     },
 
@@ -73,14 +160,36 @@ local BuildingCounterDefaultValues = {
     },
 }
 
-BaseManager = Class {
-    -- TO DO LIST:
-    -- Expansion at mass positions (Probably a must, but may not fit here - perhaps an OpAI which is enable/disable through bool)
-    -- Maybe build T2 shields if no T3 engs are available for Seraphim/UEF
-    -- Artillery, Nukes, and TML control (At least toggling nukes and TML required, much want for control of where to attack)
-    -- Engineer counts when needing higher tech level engineers (possibly not needed since recovery is hard and not always wanted)
+---@alias Enhancement string --TODO
 
-    -- This function just sets up variables local to the new BaseManager Instance
+---@class LevelName
+---@field Name UnitGroup
+---@field Priority number
+
+---@class BaseManager
+---@field Trash TrashBag
+---@field AIBrain AIBrain
+---@field Active boolean
+---@field BaseName UnitGroup
+---@field Position Vector
+---@field Radius number
+---@field CurrentEngineerCount integer
+---@field EngineerQuantity integer
+---@field EngineersBuilding integer
+---@field NumPermanentAssisting integer
+---@field PermanentAssistCount integer
+---@field MaximumConstructionEngineers integer
+---@field Initialized boolean
+---@field UpgradeTable table<string|"DefaultACU"|"DefaultSACU", Enhancement[]>
+---@field OpAITable table<string, OpAI>
+---@field ConditionalBuildTable table[] --TODO
+---@field LevelNames LevelName[]
+---@field ConstructionEngineers Unit[]
+BaseManager = ClassSimple {
+
+    --- Introduces all the relevant fields to the base manager, internally called by the engine
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return nil
     Create = function(self)
         self.Trash = TrashBag()
 
@@ -103,6 +212,7 @@ BaseManager = Class {
         self.EngineersBuilding = 0
         self.NumPermanentAssisting = 0
         self.PermanentAssistCount = 0
+        self.PermanentAssisters = {}
         self.MaximumConstructionEngineers = 2
 
         self.BuildingCounterData = {
@@ -152,17 +262,21 @@ BaseManager = Class {
         self.ConditionalBuildTable = {} -- Used to build an op unit once the conditions are met
 
         self.ConditionalBuildData = {
-            IsInitiated = false,        -- True if a unit has been issued the build command but has not yet begun building
-            IsBuilding = false,        -- True if a conditional build is going on, else false
-            NumAssisting = 0,           -- Number of engies assisting the conditional build
-            MaxAssisting = 1,           -- Maximum units to assist the current conditional build
-            Unit = false,            -- The actual unit being constructed currently
-            MainBuilder = false,     -- False if there is currently not a main conditional builder, else the unit building
-            Index = 0,               -- Stores the index of the current conditional being built
+            IsInitiated = false, -- True if a unit has been issued the build command but has not yet begun building
+            IsBuilding = false, -- True if a conditional build is going on, else false
+            NumAssisting = 0, -- Number of engies assisting the conditional build
+            MaxAssisting = 1, -- Maximum units to assist the current conditional build
+            Unit = false, -- The actual unit being constructed currently
+            MainBuilder = false, -- False if there is currently not a main conditional builder, else the unit building
+            Index = 0, -- Stores the index of the current conditional being built
             WaitSecondsAfterDeath = false, -- Time to wait after conditional build's death before starting a new one.
 
-            IncrementAssisting = function() self.ConditionalBuildData.NumAssisting = self.ConditionalBuildData.NumAssisting + 1 end,
-            DecrementAssisting = function() self.ConditionalBuildData.NumAssisting = self.ConditionalBuildData.NumAssisting - 1 end,
+            IncrementAssisting = function()
+                self.ConditionalBuildData.NumAssisting = self.ConditionalBuildData.NumAssisting + 1
+            end,
+            DecrementAssisting = function()
+                self.ConditionalBuildData.NumAssisting = self.ConditionalBuildData.NumAssisting - 1
+            end,
 
             Reset = function()
                 self.ConditionalBuildData.IsInitiated = false
@@ -176,15 +290,22 @@ BaseManager = Class {
             end,
 
             NeedsMoreBuilders = function()
-                return self.ConditionalBuildData.IsBuilding and (self.ConditionalBuildData.NumAssisting < self.ConditionalBuildData.MaxAssisting)
+                return self.ConditionalBuildData.IsBuilding and
+                    (self.ConditionalBuildData.NumAssisting < self.ConditionalBuildData.MaxAssisting)
             end,
         }
     end,
 
-    -- Level Table format
-    -- {
-    --     GroupName = Priority, -- Name not in quotes
-    -- }
+    --- Initialises the base manager.
+    ---@see See the functions StartNonZeroBase, StartDifficultyBase, StartBase or StartEmptyBase to the initial state of the base
+    ---@param self BaseManager          # An instance of the BaseManager class
+    ---@param brain AIBrain             # An instance of the Brain class that we're managing a base for
+    ---@param baseName UnitGroup        # Name reference to a unit group as defined in the map that represnts the base, usually appended with _D1, _D2 or _D3
+    ---@param markerName Marker         # Name reference to a marker as defined in the map that represents the center of the base
+    ---@param radius number             # Radius of the base - any structure that is within this distance to the center of the base is considered part of the base
+    ---@param levelTable any            # A table of { { UnitGroup, Priority } } that represents the priority of various sections of the base
+    ---@param diffultySeparate any      # Flag that indicates we have a base that expands based on difficulty
+    ---@return nil
     Initialize = function(self, brain, baseName, markerName, radius, levelTable, diffultySeparate)
         self.Active = true
         if self.Initialized then
@@ -221,36 +342,56 @@ BaseManager = Class {
         self:ForkThread(self.UpgradeCheckThread) -- Start the thread to see if any buildings need upgrades
 
         -- Check for a default chains for engineers' patrol and scouting
-        if Scenario.Chains[baseName..'_EngineerChain'] then
-            self:SetDefaultEngineerPatrolChain(baseName..'_EngineerChain')
+        if Scenario.Chains[baseName .. '_EngineerChain'] then
+            self:SetDefaultEngineerPatrolChain(baseName .. '_EngineerChain')
         end
 
-        if Scenario.Chains[baseName..'_AirScoutChain'] then
-            self:SetDefaultAirScoutPatrolChain(baseName..'_AirScoutChain')
+        if Scenario.Chains[baseName .. '_AirScoutChain'] then
+            self:SetDefaultAirScoutPatrolChain(baseName .. '_AirScoutChain')
         end
 
-        if Scenario.Chains[baseName..'_LandScoutChain'] then
-            self:SetDefaultLandScoutPatrolChain(baseName..'_LandScoutChain')
+        if Scenario.Chains[baseName .. '_LandScoutChain'] then
+            self:SetDefaultLandScoutPatrolChain(baseName .. '_LandScoutChain')
         end
     end,
 
+    --- Checks whether this base manager has been initialised, note - throws an error.
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return nil
     InitializedCheck = function(self)
         if not self.Initialized then
-            error('*AI ERROR: BaseManager named "'..self.BaseName..'" is not inialized', 2)
+            error('*AI ERROR: BaseManager named "' .. self.BaseName .. '" is not inialized', 2)
         end
     end,
 
-    -- If base is inactive, all functionality at the base manager should stop
+    --- Enables or disables the base entirely, it may take a while before all base functionality is stopped
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param status boolean        # Flag that indicates whether the base should be active
+    ---@return nil
     BaseActive = function(self, status)
         self.Active = status
     end,
 
-    -- Allows LD to pass in tables with Difficulty tags at the end of table names ('_D1', '_D2', '_D3')
+    --- Initialises the base manager using the _D1, _D2 and _D3 difficulty tables.
+    ---@see See the functions StartNonZeroBase, StartDifficultyBase, StartBase or StartEmptyBase to the initial state of the base
+    ---@param self BaseManager          # An instance of the BaseManager class
+    ---@param brain AIBrain             # An instance of the Brain class that we're managing a base for
+    ---@param baseName UnitGroup        # Name reference to a unit group as defined in the map that represnts the base, usually appended with _D1, _D2 or _D3
+    ---@param markerName Marker         # Name reference to a marker as defined in the map that represents the center of the base
+    ---@param radius number             # Radius of the base - any structure that is within this distance to the center of the base is considered part of the base
+    ---@param levelTable any            # A table of { { UnitGroup, Priority } } that represents the priority of various sections of the base
+    ---@return nil
     InitializeDifficultyTables = function(self, brain, baseName, markerName, radius, levelTable)
         self:Initialize(brain, baseName, markerName, radius, levelTable, true)
     end,
 
     -- Auto trashbags all threads on a base manager
+
+    --- Allocates a thread running the function where the base manager is prepended as the first argument. The thread is inserted in the trashbag of the base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param fn function           # A function to run on the forked thread
+    ---@param ... unknown           # Parameters of the function where the base manager is prepended as the first argument
+    ---@return thread?              # An instance of the Thread class
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -261,28 +402,52 @@ BaseManager = Class {
         end
     end,
 
-    -- When the condition function evaluates to true, the unit with the specified name will be built.
-    -- if OnBuilt is specified, that function will be called when the unit is successfully built
-    ConditionalBuild = function(self, sUnitName, bRetry, nNumEngineers, tPlatoonAIFunction, tPlatoonData,  fCondition, bKeepAlive)
+    --- Instructs the base to attempt to build a specific unit group as defined in the map. These are usually experimentals
+    ---@param self BaseManager                      # An instance of the BaseManager class
+    ---@param sUnitName UnitGroup                   # Name reference to a unit group as defined in the map
+    ---@param bRetry boolean                        # Whether or not we should retry after failing to build
+    ---@param nNumEngineers number                  # Number of engineers that can assist building
+    ---@param tPlatoonAIFunction FileFunctionRef    # A { file, function } reference to the platoon AI function
+    ---@param tPlatoonData PlatoonData              # Parameters of the platoon AI function
+    ---@param fCondition BuildCondition[]           # Build conditions that must be met before building can start, can be empty
+    ---@param bKeepAlive boolean                    # ??
+    ---@return nil
+    ConditionalBuild = function(self, sUnitName, bRetry, nNumEngineers, tPlatoonAIFunction, tPlatoonData, fCondition,
+                                bKeepAlive)
         if type(fCondition) ~= 'function' then error('Parameter fCondition must be a function.') return end
 
         table.insert(self.ConditionalBuildTable,
-        {
-            name = sUnitName,
-            data =
             {
-                MaxAssist = nNumEngineers,
-                BuildCondition = fCondition,
-                PlatoonAIFunction = tPlatoonAIFunction,
-                PlatoonData = tPlatoonData,
-                Retry = bRetry,
-                KeepAlive = bKeepAlive,
-                Amount = 1,
-            },
-        })
+                name = sUnitName,
+                data =
+                {
+                    MaxAssist = nNumEngineers,
+                    BuildCondition = fCondition,
+                    PlatoonAIFunction = tPlatoonAIFunction,
+                    PlatoonData = tPlatoonData,
+                    Retry = bRetry,
+                    KeepAlive = bKeepAlive,
+                    Amount = 1,
+                },
+            })
     end,
 
-    -- Note: if "type" is a unit name, then this creates an AI to build the unit when the conditions are met.
+    --- Instructs the base to attempt to build a specific unit group as defined in the map. These are usually experimentals.
+    ---@see Functionally the same as ConditionalBuild
+    ---@param self BaseManager          # An instance of the BaseManager class
+    ---@param unit UnitGroup            # Name reference to a unit group as defined in the map
+    ---@param data AddUnitAIData        # Parameters that describe the build conditions, the platoon function and the data of the platoon function
+    ---@return boolean                  # True or false to indicate success
+    AddUnitAI = function(self, unit, data)
+        return self:AddOpAI(unit, data)
+    end,
+
+    --- Attaches an OpAI instance to the base manager that uses the base to build platoons.
+    ---@param self BaseManager          # An instance of the BaseManager class
+    ---@param ptype SaveFile | UnitGroup         # Save file that is used to find child quantities
+    ---@param name string | AddUnitAIData        # A name set by you to allow you to retrieve the returned AI instance
+    ---@param data AddOpAIData?         # Parameters that describe the build conditions, the platoon function and the data of the platoon function
+    ---@return OpAI | boolean           # An instance of the OpAI class or false
     AddOpAI = function(self, ptype, name, data)
         if not self.AIBrain then
             error('*AI ERROR: No AI Brain for base manager')
@@ -292,12 +457,12 @@ BaseManager = Class {
         -- If it's a table of unit names, or a single unit name
         if (type(ptype) == 'table' and not ptype.Platoons)
             or (type(ptype) == 'string' and ScenarioUtils.FindUnit(ptype, Scenario.Armies[self.AIBrain.Name].Units)) then
-                table.insert(self.ConditionalBuildTable,
+            table.insert(self.ConditionalBuildTable,
                 {
                     name = ptype,
                     data = name,
                 })
-                return true
+            return true
         end
 
         if not self:CheckOpAIName(name) then return false end
@@ -307,6 +472,10 @@ BaseManager = Class {
         return self.OpAITable[name]
     end,
 
+    --- Retrieves a previously made OpAI instance
+    ---@param self BaseManager  # An instance of the BaseManager class
+    ---@param name string       # A name previously set by you to attach an OpAI instance to the base manager
+    ---@return OpAI | boolean   # An instance of the OpAI class or false
     GetOpAI = function(self, name)
         if self.OpAITable[name] then
             return self.OpAITable[name]
@@ -315,7 +484,10 @@ BaseManager = Class {
         end
     end,
 
-    -- Make sure name of OpAI doesn't already exist
+    --- Checks whether the intended OpAI name is unique. Only useful when hooking / modding an existing mission
+    ---@param self BaseManager  # An instance of the BaseManager class
+    ---@param name string       # A name to check
+    ---@return boolean          # True of unique, otherwise false
     CheckOpAIName = function(self, name)
         if self.OpAITable[name] then
             error('*AI ERROR: Duplicate OpAI name: ' .. name .. ' - for base manager: ' .. self.BaseName)
@@ -331,7 +503,8 @@ BaseManager = Class {
 
         if not self:CheckOpAIName(name) then return false end
 
-        self.OpAITable[name] = ReactiveAI.CreateReactiveAI(self.AIBrain, self.BaseName, triggeringType, reactionType, name, data)
+        self.OpAITable[name] = ReactiveAI.CreateReactiveAI(self.AIBrain, self.BaseName, triggeringType, reactionType,
+            name, data)
 
         return self.OpAITable[name]
     end,
@@ -349,14 +522,21 @@ BaseManager = Class {
         return self.OpAITable[name]
     end,
 
-    -- Add a group created in the editor to the base manager to be maintained by the manager
+    --- Adds a build group to the base manager that it needs to maintain
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param groupName UnitGroup   # Name reference to a unit group as defined in the map that represents the unit group to build
+    ---@param priority number       # Priority that indicates how important this build group is in comparison to others
+    ---@param spawn boolean         # Flag that indicates whether the build group is immediately spawned
+    ---@param initial boolean       # ??
+    ---@return nil
     AddBuildGroup = function(self, groupName, priority, spawn, initial)
         -- Make sure the group exists
         if not self:FindGroup(groupName) then
-            table.insert(self.LevelNames, {Name = groupName, Priority = priority})
+            table.insert(self.LevelNames, { Name = groupName, Priority = priority })
 
             -- Setup the brain base template for use in the base manager (Don't create so we can get a unitnames table)
-            self.AIBrain.BaseTemplates[self.BaseName .. groupName] = {Template={}, List={}, UnitNames = {}, BuildCounter = {}}
+            self.AIBrain.BaseTemplates[self.BaseName .. groupName] = { Template = {}, List = {}, UnitNames = {},
+                BuildCounter = {} }
 
             -- Now that we have a group name find it and add data
             self:AddToBuildingTemplate(groupName, self.BaseName .. groupName)
@@ -374,16 +554,31 @@ BaseManager = Class {
         end
     end,
 
+    --- Adds a build group based based on difficult to the base manager that it needs to maintain
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param groupName UnitGroup   # Name reference to a unit group as defined in the map that represents the unit group to build, appends the _D1, _D2 or _D3 to indicate difficulty
+    ---@param priority number       # Priority that indicates how important this build group is in comparison to others
+    ---@param spawn boolean         # Flag that indicates whether the build group is immediately spawned
+    ---@param initial boolean       # ??
+    ---@return nil
     AddBuildGroupDifficulty = function(self, groupName, priority, spawn, initial)
         groupName = groupName .. '_D' .. ScenarioInfo.Options.Difficulty
         self:AddBuildGroup(groupName, priority, spawn, initial)
     end,
 
+    --- Removes a build group from the base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param groupName UnitGroup   # Name reference to a unit group as defined in the map that represents the unit group to be removed
+    ---@return nil
     ClearGroupTemplate = function(self, groupName)
-        self.AIBrain.BaseTemplate[self.BaseName .. groupLevel] = {Template = {}, List = {}, UnitNames = {}, BuildCounter = {}}
+        self.AIBrain.BaseTemplate[self.BaseName .. groupName] = { Template = {}, List = {}, UnitNames = {},
+            BuildCounter = {} }
     end,
 
-    -- Find a build group in the class
+    --- Finds a build group from the base manager
+    ---@param self BaseManager          # An instance of the BaseManager class
+    ---@param groupName UnitGroup       # Name reference to a unit group as defined in the map that represents the unit group to be removed
+    ---@return BuildGroup | boolean     # The build group in linked to the unit group or false
     FindGroup = function(self, groupName)
         for num, data in self.LevelNames do
             if data.Name == groupName then
@@ -393,14 +588,24 @@ BaseManager = Class {
         return false
     end,
 
+    --- Retrieves the center of the base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return Vector               # A { x, y, z } array-based table
     GetPosition = function(self)
         return self.Position
     end,
 
+    --- Retrieves the radius of the base manager, which is used to search for factories and engineers
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return number
     GetRadius = function(self)
         return self.Radius
     end,
 
+    --- Defines the radius of the base manager, which is used to search for factories and engineers
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param rad number            # New radius of the base manager
+    ---@return nil
     SetRadius = function(self, rad)
         self.Radius = rad
     end,
@@ -408,32 +613,45 @@ BaseManager = Class {
     ---------------------------------------------------------------------------
     -- Functions for tracking the number of engineers working in a base manager
     ---------------------------------------------------------------------------
+
+    --- Add to the engineer count, useful when gifting the base engineers.
+    ---@param self BaseManager  # An instance of the BaseManager class
+    ---@param num integer       # Amount to add to the engineer count.
     AddCurrentEngineer = function(self, num)
-        if not num then
-            num = 1
-        end
-        self.CurrentEngineerCount = self.CurrentEngineerCount + num
+        self.CurrentEngineerCount = self.CurrentEngineerCount + (num or 1)
     end,
 
+    --- Subtract from the engineer count
+    ---@param self BaseManager  # An instance of the BaseManager class
+    ---@param num integer       # Amount to subtract from the engineer count.
     SubtractCurrentEngineer = function(self, num)
-        if not num then
-            num = 1
-        end
-        self.CurrentEngineerCount = self.CurrentEngineerCount - 1
+        self.CurrentEngineerCount = self.CurrentEngineerCount - (num or 1)
     end,
 
+    --- Retrieve the engineer count
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return integer              # Number of active engineers
     GetCurrentEngineerCount = function(self)
         return self.CurrentEngineerCount
     end,
 
+    --- Retrieve the maximum number of engineers, the base manager won't build more engineers than this
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return integer              # Maximum number of engineers for this base manager
     GetMaximumEngineers = function(self)
         return self.EngineerQuantity
     end,
 
+    --- Add an engineer to the engineer pool of the base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param unit Unit             # Engineer to add
     AddConstructionEngineer = function(self, unit)
         table.insert(self.ConstructionEngineers, unit)
     end,
 
+    --- Remove an engineer from the engineer pool of the base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param unit Unit             # Engineer to remove
     RemoveConstructionEngineer = function(self, unit)
         for k, v in self.ConstructionEngineers do
             if v.EntityId == unit.EntityId then
@@ -443,26 +661,44 @@ BaseManager = Class {
         end
     end,
 
+    --- Defines the maximum number of construction engineers
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param num integer           # New maximum number of construction engineers
     SetMaximumConstructionEngineers = function(self, num)
         self.MaximumConstructionEngineers = num
     end,
 
+    --- Retrieves the maximum number of construction engineers
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return integer              # Maximum number of construction engineers
     GetConstructionEngineerMaximum = function(self)
         return self.MaximumConstructionEngineers
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return integer
     GetConstructionEngineerCount = function(self)
         return table.getn(self.ConstructionEngineers)
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param bool boolean
     SetConstructionAlwaysAssist = function(self, bool)
         self.ConstructionAssistBool = bool
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return boolean
     ConstructionAlwaysAssist = function(self)
         return self.ConstructionAssistBool
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return boolean
     ConstructionNeedsAssister = function(self)
         if not self:ConstructionAlwaysAssist() or self:GetConstructionEngineerCount() == 0 then
             return false
@@ -470,6 +706,10 @@ BaseManager = Class {
         return true
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param unit Unit
+    ---@return boolean
     IsConstructionUnit = function(self, unit)
         if not unit or unit.Dead then
             return false
@@ -484,6 +724,9 @@ BaseManager = Class {
         return false
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param num integer
     SetPermanentAssistCount = function(self, num)
         if num > self.EngineerQuantity then
             error('*Base Manager Error: More permanent assisters than total engineers')
@@ -491,35 +734,65 @@ BaseManager = Class {
         self.PermanentAssistCount = num
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return integer
     GetPermanentAssistCount = function(self)
         return self.PermanentAssistCount
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param num integer
     SetNumPermanentAssisting = function(self, num)
         self.NumPermanentAssisting = num
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return integer
     IncrementPermanentAssisting = function(self)
         self.NumPermanentAssisting = self.NumPermanentAssisting + 1
         return self.NumPermanentAssisting
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return integer
     DecrementPermanentAssisting = function(self)
         self.NumPermanentAssisting = self.NumPermanentAssisting - 1
         return self.NumPermanentAssisting
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return integer
     GetNumPermanentAssisting = function(self)
         return self.NumPermanentAssisting
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return boolean
     NeedPermanentFactoryAssist = function(self)
-        if table.getn(self:GetAllBaseFactories()) >= 1 and self:GetPermanentAssistCount() > self:GetNumPermanentAssisting() then
+        if table.getn(self:GetAllBaseFactories()) >= 1 and
+            self:GetPermanentAssistCount() > self:GetNumPermanentAssisting() then
             return true
         end
         return false
     end,
 
+    SetEngineerCountByDifficulty = function(self, count)
+
+    end,
+
+    SetEngineerCountAlt = function(self, count)
+
+    end,
+
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param count integer | table
     SetEngineerCount = function(self, count)
         -- If we have a table, we have various possible ways of counting engineers
         -- {tNum1, tNum2, tNum3} - This is a difficulty defined total number of engs
@@ -531,14 +804,14 @@ BaseManager = Class {
             if type(count[1]) == 'table' then
                 self:SetTotalEngineerCount(count[1][ScenarioInfo.Options.Difficulty])
                 self:SetPermanentAssistCount(count[2][ScenarioInfo.Options.Difficulty])
-            -- Table with 3 entries is a dificulty table
+                -- Table with 3 entries is a dificulty table
             elseif table.getn(count) == 3 then
                 self:SetTotalEngineerCount(count[ScenarioInfo.Options.Difficulty])
-            -- Table with 2 entries means first is total engs, 2nd is num permanent assisting
+                -- Table with 2 entries means first is total engs, 2nd is num permanent assisting
             elseif table.getn(count) == 2 then
                 self:SetTotalEngineerCount(count[1])
                 self:SetPermanentAssistCount(count[2])
-            -- Unknown number of entries
+                -- Unknown number of entries
             else
                 error('*Base Manager Error: Unknown number of entries passed to SetEngineerCount')
             end
@@ -547,27 +820,45 @@ BaseManager = Class {
         end
     end,
 
+    --- Defines the total engineer count of this base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param num integer           #
     SetTotalEngineerCount = function(self, num)
         self.EngineerQuantity = num
         ScenarioInfo.VarTable[self.BaseName .. '_EngineerNumber'] = num
     end,
 
+    --- Retrieves the amount of engineers that are building
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return integer              # Amount of engineers that are building
     GetEngineersBuilding = function(self)
         return self.EngineersBuilding
     end,
 
+    --- Adds or subtracts from the number of engineers that are building
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param count integer         # Amount to add or subtract
     SetEngineersBuilding = function(self, count)
         self.EngineersBuilding = self.EngineersBuilding + count
     end,
 
+    --- Defines the number of support command units this base manager should maintain
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param count number          # Number of support command units
     SetSupportACUCount = function(self, count)
-        ScenarioInfo.VarTable[self.BaseName ..'_sACUNumber'] = count
+        ScenarioInfo.VarTable[self.BaseName .. '_sACUNumber'] = count
     end,
 
+    --- Defines the factory build rate buff that is applied to all factories
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param buffName string       # Name of a buff instance
     SetFactoryBuildRateBuff = function(self, buffName)
         self.FactoryBuildRateBuff = buffName
     end,
 
+    --- Defines the engineer build rate buff that is applied to all engineers
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param buffName string       # Name of a buff instance
     SetEngineerBuildRateBuff = function(self, buffName)
         self.EngineerBuildRateBuff = buffName
     end,
@@ -625,11 +916,9 @@ BaseManager = Class {
     -- baseData is a field that does nothing currently.  If we ever need more data (transports maybe) it would
     -- be housed there.
     AddExpansionBase = function(self, baseName, engQuantity, baseData)
-        if not engQuantity then
-            engQuantity = 1
-        end
 
-        table.insert(self.ExpansionBaseData, {BaseName = baseName, Engineers = engQuantity, IncomingEngineers = 0})
+        table.insert(self.ExpansionBaseData,
+            { BaseName = baseName, Engineers = (engQuantity or 1), IncomingEngineers = 0 })
         self.FunctionalityStates.ExpansionBases = true
         if baseData then
             -- Setup base here
@@ -658,7 +947,8 @@ BaseManager = Class {
                     table.insert(units, v)
                 end
             elseif unitName == 'DefaultSACU' then
-                for k, v in AIUtils.GetOwnUnitsAroundPoint(self.AIBrain, categories.SUBCOMMANDER, self.Position, self.Radius) do
+                for k, v in AIUtils.GetOwnUnitsAroundPoint(self.AIBrain, categories.SUBCOMMANDER, self.Position,
+                    self.Radius) do
                     table.insert(units, v)
                 end
             end
@@ -700,18 +990,20 @@ BaseManager = Class {
             if bpUpgrade then
                 if not unit:HasEnhancement(upgradeName) then
                     -- If we already have upgarde at that slot, remove it first
-                    if SimUnitEnhancements and SimUnitEnhancements[unit.EntityId] and SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] then
+                    if SimUnitEnhancements and SimUnitEnhancements[unit.EntityId] and
+                        SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] then
                         return SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] .. 'Remove'
-                    -- Check for required upgrades
+                        -- Check for required upgrades
                     elseif bpUpgrade.Prerequisite and not unit:HasEnhancement(bpUpgrade.Prerequisite) then
                         return bpUpgrade.Prerequisite
-                    -- No requirement and stop available, return upgrade name
+                        -- No requirement and stop available, return upgrade name
                     else
                         return upgradeName
                     end
                 end
             else
-                error('*Base Manager Error: ' .. self.BaseName .. ', enhancement: ' .. upgradeName .. ' was not found in the unit\'s bp.')
+                error('*Base Manager Error: ' ..
+                    self.BaseName .. ', enhancement: ' .. upgradeName .. ' was not found in the unit\'s bp.')
             end
         end
 
@@ -734,7 +1026,11 @@ BaseManager = Class {
                     local unit = ScenarioInfo.UnitNames[armyIndex][v.UnitName]
                     if unit and not unit.Dead then
                         -- Cybran engie stations are never in 'Idle' state but in 'AssistingCommander' state
-                        if not EntityCategoryContains(ParseEntityCategory(v.FinalUnit), unit) and (unit:IsIdleState() or unit:IsUnitState('AssistingCommander')) and not unit:IsBeingBuilt() then
+                        -- Factories are not in Idle state when assisting other factories (so gotta une unit.UnitBeingBuilt to make sure they're not building anything),
+                        -- so if the basemanager grabs the factory for assisting before this upgrade thread, then it would never get upgraded
+                        if unit.UnitId ~= v.FinalUnit and
+                            (unit:IsIdleState() or unit:IsUnitState('AssistingCommander') or not unit.UnitBeingBuilt) and
+                            not unit:IsBeingBuilt() then
                             self:ForkThread(self.BaseManagerUpgrade, unit, v.UnitName)
                         end
                     end
@@ -784,7 +1080,6 @@ BaseManager = Class {
             if self.EngineerBuildRateBuff then
                 Buff.ApplyBuff(v, self.EngineerBuildRateBuff)
             end
-            self:DecrementUnitBuildCounter(v.UnitName)
             if uncapturable then
                 v:SetCapturable(false)
                 v:SetReclaimable(false)
@@ -808,7 +1103,7 @@ BaseManager = Class {
 
     -- Sets Engineer Count, spawns in all groups that have priority greater than zero
     StartNonZeroBase = function(self, engineerNumber, uncapturable)
-        if not engineerNumber and not ScenarioInfo.VarTable[self.BaseName ..'_EngineerNumber'] then
+        if not engineerNumber and not ScenarioInfo.VarTable[self.BaseName .. '_EngineerNumber'] then
             self:SetEngineerCount(0)
         elseif engineerNumber then
             self:SetEngineerCount(engineerNumber)
@@ -817,7 +1112,7 @@ BaseManager = Class {
         for num, data in self.LevelNames do
             if data.Priority and data.Priority > 0 then
                 if ScenarioInfo.LoadBalance and ScenarioInfo.LoadBalance.Enabled then
-                    table.insert(ScenarioInfo.LoadBalance.SpawnGroups, {self, data.Name, uncapturable})
+                    table.insert(ScenarioInfo.LoadBalance.SpawnGroups, { self, data.Name, uncapturable })
                 else
                     self:SpawnGroup(data.Name, uncapturable)
                 end
@@ -835,7 +1130,7 @@ BaseManager = Class {
 
     -- Sets engineer count, spawns in all groups passed in in groupNames table
     StartBase = function(self, groupNames, engineerNumber, uncapturable)
-        if not engineerNumber and not ScenarioInfo.VarTable[self.BaseName ..'_EngineerNumber'] then
+        if not engineerNumber and not ScenarioInfo.VarTable[self.BaseName .. '_EngineerNumber'] then
             self:SetEngineerCount(0)
         elseif engineerNumber then
             self:SetEngineerCount(engineerNumber)
@@ -853,7 +1148,7 @@ BaseManager = Class {
 
     -- Sets engineer count and spawns in no groups
     StartEmptyBase = function(self, engineerNumber)
-        if not engineerNumber and not ScenarioInfo.VarTable[self.BaseName ..'_EngineerNumber'] then
+        if not engineerNumber and not ScenarioInfo.VarTable[self.BaseName .. '_EngineerNumber'] then
             self:SetEngineerCount(1)
         elseif engineerNumber then
             self:SetEngineerCount(engineerNumber)
@@ -867,8 +1162,8 @@ BaseManager = Class {
         local armyIndex = aiBrain:GetArmyIndex()
         local upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, StructureUpgradeTemplates[factionIndex])
         if upgradeID then
-            IssueClearCommands({unit})
-            IssueUpgrade({unit}, upgradeID)
+            IssueClearCommands({ unit })
+            IssueUpgrade({ unit }, upgradeID)
         end
 
         local upgrading = true
@@ -908,7 +1203,7 @@ BaseManager = Class {
             for i, unit in tblUnit do
                 for k, unitId in RebuildStructuresTemplate[factionIndex] do
                     if unit.type == unitId[1] then
-                        table.insert(self.UpgradeTable, {FinalUnit = unit.type, UnitName = i,})
+                        table.insert(self.UpgradeTable, { FinalUnit = unit.type, UnitName = i, })
                         unit.buildtype = unitId[2]
                         break
                     end
@@ -920,7 +1215,7 @@ BaseManager = Class {
             for i, unit in tblUnit do
                 self:StoreStructureName(i, unit, unitNames)
                 for j, buildList in BuildingTemplates[factionIndex] do -- BuildList[1] is type ("T1LandFactory"); buildList[2] is unitId (ueb0101)
-                    local unitPos = {unit.Position[1], unit.Position[3], 0}
+                    local unitPos = { unit.Position[1], unit.Position[3], 0 }
                     if unit.buildtype == buildList[2] and buildList[1] ~= 'T3Sonar' then -- If unit to be built is the same id as the buildList unit it needs to be added
                         self:StoreBuildCounter(buildCounter, buildList[1], buildList[2], unitPos, i)
 
@@ -934,8 +1229,9 @@ BaseManager = Class {
                             end
                         end
                         if not inserted then -- If section doesn't exist create new one
-                            table.insert(template, {{buildList[1]}, unitPos}) -- add new build type to list with new unit
-                            list[unit.buildtype] =  {StructureType = buildList[1], StructureCategory = unit.buildtype, AmountNeeded = 0, AmountWanted = 1, CloseToBuilder = nil} -- add new section of build list with new unit type information
+                            table.insert(template, { { buildList[1] }, unitPos }) -- add new build type to list with new unit
+                            list[unit.buildtype] = { StructureType = buildList[1], StructureCategory = unit.buildtype,
+                                AmountNeeded = 0, AmountWanted = 1, CloseToBuilder = nil } -- add new section of build list with new unit type information
                         end
                         break
                     end
@@ -945,25 +1241,24 @@ BaseManager = Class {
     end,
 
     StoreStructureName = function(self, unitName, unitData, namesTable)
-        if not namesTable[unitData.Position[1]] then
-            namesTable[unitData.Position[1]] = {}
+        if not namesTable[ unitData.Position[1] ] then
+            namesTable[ unitData.Position[1] ] = {}
         end
-        namesTable[unitData.Position[1]][unitData.Position[3]] = unitName
+        namesTable[ unitData.Position[1] ][ unitData.Position[3] ] = unitName
     end,
 
     StoreBuildCounter = function(self, buildCounter, buildingType, buildingId, unitPos, unitName)
-        if not buildCounter[unitPos[1]] then
-            buildCounter[unitPos[1]] = {}
+        if not buildCounter[ unitPos[1] ] then
+            buildCounter[ unitPos[1] ] = {}
         end
-        buildCounter[unitPos[1]][unitPos[2]] = {}
-        buildCounter[unitPos[1]][unitPos[2]].BuildingID = buildingId
-        buildCounter[unitPos[1]][unitPos[2]].BuildingType = buildingType
-        buildCounter[unitPos[1]][unitPos[2]].Position = unitPos
-        if unitName then
-            buildCounter[unitPos[1]][unitPos[2]].UnitName = unitName
-        end
+        buildCounter[ unitPos[1] ][ unitPos[2] ] = {
+            BuildingID = buildingId,
+            BuildingType = buildingType,
+            Position = unitPos,
+            UnitName = unitName,
+        }
         if self.BuildingCounterData.Default then
-            buildCounter[unitPos[1]][unitPos[2]].Counter = self:BuildingCounterDifficultyDefault(buildingType)
+            buildCounter[ unitPos[1] ][ unitPos[2] ].Counter = self:BuildingCounterDifficultyDefault(buildingType)
         end
     end,
 
@@ -1016,8 +1311,8 @@ BaseManager = Class {
 
     -- Enable/Disable functionality of base parts through functions
     SetActive = function(self, actType, val)
-        if self.ActivationFunctions[actType..'Active'] then
-            self.ActivationFunctions[actType..'Active'](self, val)
+        if self.ActivationFunctions[actType .. 'Active'] then
+            self.ActivationFunctions[actType .. 'Active'](self, val)
         else
             error('*AI DEBUG: Invalid Activation type type - ' .. actType, 2)
         end
@@ -1025,7 +1320,8 @@ BaseManager = Class {
 
     ActivationFunctions = {
         ShieldsActive = function(self, val)
-            local shields = AIUtils.GetOwnUnitsAroundPoint(self.AIBrain, categories.SHIELD * categories.STRUCTURE, self.Position, self.Radius)
+            local shields = AIUtils.GetOwnUnitsAroundPoint(self.AIBrain, categories.SHIELD * categories.STRUCTURE,
+                self.Position, self.Radius)
             for k, v in shields do
                 if val then
                     v:OnScriptBitSet(0) -- If turning on shields
@@ -1037,7 +1333,8 @@ BaseManager = Class {
         end,
 
         FabricationActive = function(self, val)
-            local fabs = AIUtils.GetOwnUnitsAroundPoint(self.AIBrain, categories.MASSFABRICATION * categories.STRUCTURE, self.Position, self.Radius)
+            local fabs = AIUtils.GetOwnUnitsAroundPoint(self.AIBrain, categories.MASSFABRICATION * categories.STRUCTURE,
+                self.Position, self.Radius)
             for k, v in fabs do
                 if val then
                     v:OnScriptBitClear(4) -- If turning on
@@ -1049,7 +1346,9 @@ BaseManager = Class {
         end,
 
         IntelActive = function(self, val)
-            local intelUnits = AIUtils.GetOwnUnitsAroundPoint(self.AIBrain, (categories.RADAR + categories.SONAR + categories.OMNI) * categories.STRUCTURE, self.Position, self.Radius)
+            local intelUnits = AIUtils.GetOwnUnitsAroundPoint(self.AIBrain,
+                (categories.RADAR + categories.SONAR + categories.OMNI) * categories.STRUCTURE, self.Position,
+                self.Radius)
             for k, v in intelUnits do
                 if val then
                     v:OnScriptBitClear(3) -- If turning on
@@ -1061,7 +1360,8 @@ BaseManager = Class {
         end,
 
         CounterIntelActive = function(self, val)
-            local intelUnits = AIUtils.GetOwnUnitsAroundPoint(self.AIBrain, categories.COUNTERINTELLIGENCE * categories.STRUCTURE, self.Position, self.Radius)
+            local intelUnits = AIUtils.GetOwnUnitsAroundPoint(self.AIBrain,
+                categories.COUNTERINTELLIGENCE * categories.STRUCTURE, self.Position, self.Radius)
             for k, v in intelUnits do
                 if val then
                     v:OnScriptBitClear(3) -- If turning on intel
@@ -1102,8 +1402,8 @@ BaseManager = Class {
         if not self.Active then
             return false
         end
-        if self.BuildFunctions['Build'..buildType] then
-            self.BuildFunctions['Build'..buildType](self, val)
+        if self.BuildFunctions['Build' .. buildType] then
+            self.BuildFunctions['Build' .. buildType](self, val)
         else
             error('*AI DEBUG: Invalid build type - ' .. buildType, 2)
         end
@@ -1277,13 +1577,13 @@ BaseManager = Class {
         -- The Engineer AI Thread
         for i = 1, 3 do
             defaultBuilder = {
-                BuilderName = 'T'..i..'BaseManaqer_EngineersWork_' .. self.BaseName,
+                BuilderName = 'T' .. i .. 'BaseManaqer_EngineersWork_' .. self.BaseName,
                 PlatoonTemplate = self:CreateEngineerPlatoonTemplate(i),
                 Priority = 1,
-                PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit'},
+                PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit' },
                 BuildConditions = {
-                    {BMBC, 'BaseManagerNeedsEngineers', {self.BaseName}},
-                    {BMBC, 'BaseActive', {self.BaseName}},
+                    { BMBC, 'BaseManagerNeedsEngineers', { self.BaseName } },
+                    { BMBC, 'BaseActive', { self.BaseName } },
                 },
                 PlatoonData = {
                     BaseName = self.BaseName,
@@ -1298,9 +1598,9 @@ BaseManager = Class {
         -- Disband platoons - engineers built here
         for i = 1, 3 do
             for j = 1, 5 do
-                for num, pType in {'Air', 'Land', 'Sea'} do
+                for num, pType in { 'Air', 'Land', 'Sea' } do
                     defaultBuilder = {
-                        BuilderName = 'T'..i..'BaseManagerEngineerDisband_' .. j .. 'Count_' .. self.BaseName,
+                        BuilderName = 'T' .. i .. 'BaseManagerEngineerDisband_' .. j .. 'Count_' .. self.BaseName,
                         PlatoonAIPlan = 'DisbandAI',
                         PlatoonTemplate = self:CreateEngineerPlatoonTemplate(i, j),
                         Priority = 300 * i,
@@ -1312,13 +1612,13 @@ BaseManager = Class {
                             BaseName = self.BaseName,
                         },
                         BuildConditions = {
-                            {BMBC, 'BaseEngineersEnabled', {self.BaseName}},
-                            {BMBC, 'BaseBuildingEngineers', {self.BaseName}},
-                            {BMBC, 'HighestFactoryLevel', {i, self.BaseName}},
-                            {BMBC, 'FactoryCountAndNeed', {i, j, pType, self.BaseName}},
-                            {BMBC, 'BaseActive', {self.BaseName}},
+                            { BMBC, 'BaseEngineersEnabled', { self.BaseName } },
+                            { BMBC, 'BaseBuildingEngineers', { self.BaseName } },
+                            { BMBC, 'HighestFactoryLevel', { i, self.BaseName } },
+                            { BMBC, 'FactoryCountAndNeed', { i, j, pType, self.BaseName } },
+                            { BMBC, 'BaseActive', { self.BaseName } },
                         },
-                        PlatoonBuildCallbacks = {{BMBC, 'BaseManagerEngineersStarted'},},
+                        PlatoonBuildCallbacks = { { BMBC, 'BaseManagerEngineersStarted' }, },
                         InstanceCount = 3,
                         BuildTimeOut = 10, -- Timeout really fast because they dont need to really finish
                     }
@@ -1339,11 +1639,11 @@ BaseManager = Class {
             LocationType = self.BaseName,
             PlatoonAddFunctions = {
                 -- {'/lua/ai/opai/OpBehaviors.lua', 'CDROverchargeBehavior'}, -- TODO: Re-add once it doesnt interfere with BM engineer thread
-                {BMPT, 'UnitUpgradeBehavior'},
+                { BMPT, 'UnitUpgradeBehavior' },
             },
-            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerSingleEngineerPlatoon'},
+            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerSingleEngineerPlatoon' },
             BuildConditions = {
-                {BMBC, 'BaseActive', {self.BaseName}},
+                { BMBC, 'BaseActive', { self.BaseName } },
             },
             PlatoonData = {
                 BaseName = self.BaseName,
@@ -1362,11 +1662,11 @@ BaseManager = Class {
             RequiresConstruction = false,
             LocationType = self.BaseName,
             PlatoonAddFunctions = {
-                {BMPT, 'UnitUpgradeBehavior'},
+                { BMPT, 'UnitUpgradeBehavior' },
             },
-            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerSingleEngineerPlatoon'},
+            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerSingleEngineerPlatoon' },
             BuildConditions = {
-                {BMBC, 'BaseActive', {self.BaseName}},
+                { BMBC, 'BaseActive', { self.BaseName } },
             },
             PlatoonData = {
                 BaseName = self.BaseName,
@@ -1384,10 +1684,11 @@ BaseManager = Class {
             RequiresConstruction = true,
             LocationType = self.BaseName,
             BuildConditions = {
-                    {BMBC, 'BaseEngineersEnabled', {self.BaseName}},
-                    {BMBC, 'NumUnitsLessNearBase', {self.BaseName, ParseEntityCategory('SUBCOMMANDER'), self.BaseName ..'_sACUNumber'}},
-                    {BMBC, 'BaseActive', {self.BaseName}},
-                },
+                { BMBC, 'BaseEngineersEnabled', { self.BaseName } },
+                { BMBC, 'NumUnitsLessNearBase',
+                    { self.BaseName, ParseEntityCategory('SUBCOMMANDER'), self.BaseName .. '_sACUNumber' } },
+                { BMBC, 'BaseActive', { self.BaseName } },
+            },
             InstanceCount = 2,
             BuildTimeOut = 10, -- Timeout really fast because they dont need to really finish
         }
@@ -1400,10 +1701,10 @@ BaseManager = Class {
             BuilderName = 'BaseManager_LandScout_' .. self.BaseName,
             PlatoonTemplate = self:CreateLandScoutPlatoon(),
             Priority = 500,
-            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI'},
+            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
             BuildConditions = {
-                {BMBC, 'LandScoutingEnabled', {self.BaseName,}},
-                {BMBC, 'BaseActive', {self.BaseName}},
+                { BMBC, 'LandScoutingEnabled', { self.BaseName, } },
+                { BMBC, 'BaseActive', { self.BaseName } },
             },
             PlatoonData = {
                 BaseName = self.BaseName,
@@ -1420,11 +1721,11 @@ BaseManager = Class {
             BuilderName = 'BaseManager_T1AirScout_' .. self.BaseName,
             PlatoonTemplate = self:CreateAirScoutPlatoon(1),
             Priority = 500,
-            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI'},
+            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
             BuildConditions = {
-                {BMBC, 'HighestFactoryLevelType', {1, self.BaseName, 'Air'}},
-                {BMBC, 'AirScoutingEnabled', {self.BaseName,}},
-                {BMBC, 'BaseActive', {self.BaseName}},
+                { BMBC, 'HighestFactoryLevelType', { 1, self.BaseName, 'Air' } },
+                { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
+                { BMBC, 'BaseActive', { self.BaseName } },
             },
             PlatoonData = {
                 BaseName = self.BaseName,
@@ -1441,11 +1742,11 @@ BaseManager = Class {
             BuilderName = 'BaseManager_T2AirScout_' .. self.BaseName,
             PlatoonTemplate = self:CreateAirScoutPlatoon(2),
             Priority = 750,
-            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI'},
+            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
             BuildConditions = {
-                {BMBC, 'HighestFactoryLevelType', {2, self.BaseName, 'Air'}},
-                {BMBC, 'AirScoutingEnabled', {self.BaseName,}},
-                {BMBC, 'BaseActive', {self.BaseName}},
+                { BMBC, 'HighestFactoryLevelType', { 2, self.BaseName, 'Air' } },
+                { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
+                { BMBC, 'BaseActive', { self.BaseName } },
             },
             PlatoonData = {
                 BaseName = self.BaseName,
@@ -1462,11 +1763,11 @@ BaseManager = Class {
             BuilderName = 'BaseManager_T3AirScout_' .. self.BaseName,
             PlatoonTemplate = self:CreateAirScoutPlatoon(3),
             Priority = 1000,
-            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI'},
+            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
             BuildConditions = {
-                {BMBC, 'HighestFactoryLevelType', {3, self.BaseName, 'Air'}},
-                {BMBC, 'AirScoutingEnabled', {self.BaseName,}},
-                {BMBC, 'BaseActive', {self.BaseName}},
+                { BMBC, 'HighestFactoryLevelType', { 3, self.BaseName, 'Air' } },
+                { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
+                { BMBC, 'BaseActive', { self.BaseName } },
             },
             PlatoonData = {
                 BaseName = self.BaseName,
@@ -1487,10 +1788,10 @@ BaseManager = Class {
             PlatoonType = 'Any',
             RequiresConstruction = false,
             LocationType = self.BaseName,
-            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerTMLAI'},
+            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerTMLAI' },
             BuildConditions = {
-                {BMBC, 'BaseActive', {self.BaseName}},
-                {BMBC, 'TMLsEnabled', {self.BaseName}},
+                { BMBC, 'BaseActive', { self.BaseName } },
+                { BMBC, 'TMLsEnabled', { self.BaseName } },
             },
             PlatoonData = {
                 BaseName = self.BaseName,
@@ -1507,10 +1808,10 @@ BaseManager = Class {
             PlatoonType = 'Any',
             RequiresConstruction = false,
             LocationType = self.BaseName,
-            PlatoonAIFunction = {'/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerNukeAI'},
+            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerNukeAI' },
             BuildConditions = {
-                {BMBC, 'BaseActive', {self.BaseName}},
-                {BMBC, 'NukesEnabled', {self.BaseName}},
+                { BMBC, 'BaseActive', { self.BaseName } },
+                { BMBC, 'NukesEnabled', { self.BaseName } },
             },
             PlatoonData = {
                 BaseName = self.BaseName,
@@ -1524,7 +1825,7 @@ BaseManager = Class {
         local template = {
             'TMLTemplate',
             'NoPlan',
-            {'ueb2108', 1, 1, 'Attack', 'None'},
+            { 'ueb2108', 1, 1, 'Attack', 'None' },
         }
         template = ScenarioUtils.FactionConvert(template, faction)
 
@@ -1536,7 +1837,7 @@ BaseManager = Class {
         local template = {
             'NukeTemplate',
             'NoPlan',
-            {'ueb2305', 1, 1, 'Attack', 'None'},
+            { 'ueb2305', 1, 1, 'Attack', 'None' },
         }
         template = ScenarioUtils.FactionConvert(template, faction)
 
@@ -1548,7 +1849,7 @@ BaseManager = Class {
         local template = {
             'LandScoutTemplate',
             'NoPlan',
-            {'uel0101', 1, 1, 'Scout', 'None'},
+            { 'uel0101', 1, 1, 'Scout', 'None' },
         }
         template = ScenarioUtils.FactionConvert(template, faction)
 
@@ -1560,7 +1861,7 @@ BaseManager = Class {
         local template = {
             'AirScoutTemplate',
             'NoPlan',
-            {'uea', 1, 1, 'Scout', 'None'},
+            { 'uea', 1, 1, 'Scout', 'None' },
         }
 
         if techLevel == 3 then
@@ -1579,7 +1880,7 @@ BaseManager = Class {
         local template = {
             'CommanderTemplate',
             'NoPlan',
-            {'uel0001', 1, 1, 'Support', 'None'},
+            { 'uel0001', 1, 1, 'Support', 'None' },
         }
         template = ScenarioUtils.FactionConvert(template, faction)
 
@@ -1591,7 +1892,7 @@ BaseManager = Class {
         local template = {
             'CommanderTemplate',
             'NoPlan',
-            {'uel0301', 1, 1, 'Support', 'None'},
+            { 'uel0301', 1, 1, 'Support', 'None' },
         }
         template = ScenarioUtils.FactionConvert(template, faction)
 
@@ -1604,7 +1905,7 @@ BaseManager = Class {
         local template = {
             'EngineerThing',
             'NoPlan',
-            {'uel', 1, size, 'Support', 'None'},
+            { 'uel', 1, size, 'Support', 'None' },
         }
 
         if techLevel == 1 then
@@ -1621,9 +1922,19 @@ BaseManager = Class {
     end,
 }
 
+--- Prepares a base manager, note that you still need to call one of the Start functions
+---@param brain AIBrain
+---@param baseName string
+---@param markerName Marker
+---@param radius number
+---@param levelTable any
+---@return BaseManager
 function CreateBaseManager(brain, baseName, markerName, radius, levelTable)
+
+    ---@type BaseManager
     local bManager = BaseManager()
     bManager:Create()
+
     if brain and baseName and markerName and radius then
         bManager:Initialize(brain, baseName, markerName, radius, levelTable)
     end

@@ -1,6 +1,8 @@
 -- 
 --  Lobby communications and common services
 -- 
+
+
 quietTimeout = 30000.0 -- milliseconds to wait before booting people
 maxPlayerSlots = 16
 maxConnections = 16 -- count doesn't include ourself.
@@ -37,7 +39,7 @@ function GetDefaultPlayerOptions(playerName)
         ArmyColor = 1,
         StartSpot = 1,
         Ready = false,
-        Faction = table.getn(import('/lua/factions.lua').Factions) + 1, -- max faction + 1 tells lobby to pick random faction
+        Faction = table.getn(import("/lua/factions.lua").Factions) + 1, -- max faction + 1 tells lobby to pick random faction
         PlayerName = playerName or "player",
         AIPersonality = "",
         Human = true,
@@ -45,19 +47,19 @@ function GetDefaultPlayerOptions(playerName)
     }
 end
 
----@class DiscoveryService
+---@class DiscoveryService : moho.discovery_service_methods
 DiscoveryService = Class(moho.discovery_service_methods) {
     RemoveGame = function(self, index)
-                     LOG('DiscoveryService.RemoveGame(' .. tostring(index) .. ')')
-                 end,
+        LOG('DiscoveryService.RemoveGame(' .. tostring(index) .. ')')
+    end,
     GameFound = function(self, index, gameConfig)
-                    LOG('DiscoveryService.GameFound(' .. tostring(index) .. ')')
-                    LOG(repr(gameConfig))
-                end,
+        LOG('DiscoveryService.GameFound(' .. tostring(index) .. ')')
+        LOG(repr(gameConfig))
+    end,
     GameUpdated = function(self, index, gameConfig)
-                      LOG('DiscoveryService.GameUpdated(' .. tostring(index) .. ')')
-                      LOG(repr(gameConfig))
-                  end,
+        LOG('DiscoveryService.GameUpdated(' .. tostring(index) .. ')')
+        LOG(repr(gameConfig))
+    end,
 }
 
 function CreateDiscoveryService()
@@ -66,41 +68,29 @@ function CreateDiscoveryService()
     return service
 end
 
+--- Will have other fields attached to it, depending on `Type`
+---@class CommunicationData
+---@field SenderID number
+---@field Type string
+
 ---@class LobbyComm : moho.lobby_methods
 LobbyComm = Class(moho.lobby_methods) {
 
     --  General events you should override
     Hosting = function(self) end,
     ConnectionFailed = function(self, reason) end,
-    ConnectionToHostEstablished = function(self,ourID,hostID) end,
+    ConnectionToHostEstablished = function(self, ourID, hostID) end,
     GameLaunched = function(self) end,
-    Ejected = function(self,reason) end,
-    SystemMessage = function(self, text) LOG('System: ' .. text) end,
+    Ejected = function(self, reason) end,
+    SystemMessage = function(self, text)
+        LOG('System: ' .. text)
+    end,
     DataReceived = function(self, data)  end,
     GameConfigRequested = function(self) end,
-    PeerDisconnected = function(self,peerName,uid) LOG ('Peer Disconnected : (name=' .. peerName .. ', uid=' .. uid .. ')') end,
-    LaunchFailed = function(self,reasonKey) end,
-
-    --  native void SendData(self, targetID, data)
-    --  native void BroadcastData(self,data)
-    --  native void Destroy(self)
-    --  native bool IsHost(self)
-    --  native table GetPeers(self)
-    --  native int GetPlayerCount(self)
-    --  native string GetLocalPlayerName(self)
-    --  native void EjectPeer(self, targetID, reason)
-    --  native string MakeValidGameName(self,desiredName)
-    --  native string MakeValidPlayerName(self,uid,desiredName)
-    --  native void HostGame(self)
-    --  native void JoinGame(self, addressStr, string-or-nil remotePlayerName, remotePlayerUIDStr)
-    --  native void LaunchGame(self,gameInfo)
-    --  native void DebugDump(self)
-    --  native string GetLocalPlayerID(self)
-    --  native int-or-nil GetLocalPort(self)
-
-    --  Used by GPGNET
-    --  native void ConnectToPeer(addressStr,port,name,uidStr)
-    --  native void DisconnectFromPeer(uidStr)
+    PeerDisconnected = function(self, peerName, uid)
+        LOG('Peer Disconnected : (name=' .. peerName .. ', uid=' .. uid .. ')')
+    end,
+    LaunchFailed = function(self, reasonKey) end,
 }
 
 function CreateLobbyComm(protocol, localport, localPlayerName, localPlayerUID, natTraversalProvider)

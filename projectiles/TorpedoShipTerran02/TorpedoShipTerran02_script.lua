@@ -1,6 +1,6 @@
 -- Terran Land-based torpedo
 
-local TTorpedoShipProjectile = import('/lua/terranprojectiles.lua').TTorpedoShipProjectile
+local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
 
 --- Unused
 ---@class TorpedoShipTerran02 : TTorpedoShipProjectile

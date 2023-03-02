@@ -1,17 +1,17 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
-local Prefs = import('/lua/user/prefs.lua')
-local Tooltips = import('/lua/ui/game/tooltip.lua')
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
+local Prefs = import("/lua/user/prefs.lua")
+local Tooltips = import("/lua/ui/game/tooltip.lua")
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
 
-local cmdMode = import('/lua/ui/game/commandmode.lua')
+local cmdMode = import("/lua/ui/game/commandmode.lua")
 local ObjectivesGroup = import('/lua/ui/game/objectives2.lua').controls.bg
-local UIPing = import('/lua/ui/game/ping.lua')
+local UIPing = import("/lua/ui/game/ping.lua")
 
 local ActiveGroups = {}
 

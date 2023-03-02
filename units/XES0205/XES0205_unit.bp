@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardReturnRadius = 30,
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XES',
@@ -57,8 +60,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 750,
-        MaxHealth = 750,
+        Health = 550,
+        MaxHealth = 550,
         RegenRate = 0,
         Shield = {
             ImpactEffects = 'UEFShieldHit01',
@@ -67,8 +70,8 @@ UnitBlueprint {
             MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 8000,
-            ShieldRechargeTime = 40,
+            ShieldMaxHealth = 5500,
+            ShieldRechargeTime = 30,
             ShieldRegenRate = 80,
             ShieldRegenStartTime = 3,
             ShieldSize = 120,
@@ -151,10 +154,10 @@ UnitBlueprint {
         UniformScale = 0.135,
     },
     Economy = {
-        BuildCostEnergy = 13000,
-        BuildCostMass = 1300,
-        BuildTime = 5200,
-        MaintenanceConsumptionPerSecondEnergy = 150,
+        BuildCostEnergy = 9000,
+        BuildCostMass = 900,
+        BuildTime = 3600,
+        MaintenanceConsumptionPerSecondEnergy = 100,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,

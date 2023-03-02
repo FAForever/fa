@@ -5,9 +5,9 @@
 --**
 --**  Summary  :  Heavy Phasic Autogun Projectile script, XSA0104
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-SDFHeavyPhasicAutogun01 = Class(import('/lua/seraphimprojectiles.lua').SHeavyPhasicAutogun) {
+SDFHeavyPhasicAutogun01 = Class(import("/lua/seraphimprojectiles.lua").SHeavyPhasicAutogun) {
 }
 TypeClass = SDFHeavyPhasicAutogun01

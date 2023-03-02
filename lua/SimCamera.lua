@@ -10,7 +10,7 @@
 --
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 
-SingleEvent = import('/lua/system/SingleEvent.lua').SingleEvent
+SingleEvent = import("/lua/system/singleevent.lua").SingleEvent
 
 -- Name / Object table for cameras
 Cameras = {}
@@ -21,6 +21,7 @@ function OnCameraFinish(name)
     Cameras[name]:EventSet()
 end
 
+---@class SimCamera : SingleEvent
 SimCamera = Class(SingleEvent) {
     __init = function(self,name)
         self.CameraName = name

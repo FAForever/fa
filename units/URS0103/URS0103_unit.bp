@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardScanRadius = 40,
         TargetBones = {
             'Front_Turret',
             'Back_Turret',
@@ -32,15 +33,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -52,7 +44,6 @@ UnitBlueprint {
         'MOBILE',
         'NAVAL',
         'TECH1',
-        'ANTIAIR',
         'DIRECTFIRE',
         'INTELLIGENCE',
         'RADAR',
@@ -151,9 +142,9 @@ UnitBlueprint {
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 2500,
-        BuildCostMass = 250,
-        BuildTime = 1250,
+        BuildCostEnergy = 2600,
+        BuildCostMass = 260,
+        BuildTime = 1300,
     },
     Footprint = {
         SizeX = 2,
@@ -264,7 +255,7 @@ UnitBlueprint {
             FiringRandomness = 0.2,
             FiringTolerance = 2,
             Label = 'ProtonCannon',
-            MaxRadius = 28,
+            MaxRadius = 26,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,

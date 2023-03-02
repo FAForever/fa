@@ -8,10 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TAMInterceptorWeapon = import('/lua/terranweapons.lua').TAMInterceptorWeapon
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TAMInterceptorWeapon = import("/lua/terranweapons.lua").TAMInterceptorWeapon
 local nukeFiredOnGotTarget = false
 
+---@class UEB4302 : TStructureUnit
 UEB4302 = Class(TStructureUnit) {
     Weapons = {
         AntiNuke = Class(TAMInterceptorWeapon) {

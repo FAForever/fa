@@ -1,7 +1,7 @@
 --
 -- Aeon Very Fast Anti-Missile Missile
 --
-local AIMFlareProjectile = import('/lua/aeonprojectiles.lua').AIMFlareProjectile
+local AIMFlareProjectile = import("/lua/aeonprojectiles.lua").AIMFlareProjectile
 
 AIMAntiMissile01 = Class(AIMFlareProjectile) {
     OnCreate = function(self)

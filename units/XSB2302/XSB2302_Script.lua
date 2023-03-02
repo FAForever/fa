@@ -7,9 +7,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
-local SIFSuthanusArtilleryCannon = import('/lua/seraphimweapons.lua').SIFSuthanusArtilleryCannon
+local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
+local SIFSuthanusArtilleryCannon = import("/lua/seraphimweapons.lua").SIFSuthanusArtilleryCannon
 
+---@class XSB2302 : SStructureUnit
 XSB2302 = Class(SStructureUnit) {
     Weapons = {
         MainGun = Class(SIFSuthanusArtilleryCannon) {

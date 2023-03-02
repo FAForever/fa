@@ -7,9 +7,7 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua').Builder
-
+local Builder = import("/lua/sim/builder.lua").Builder
 
 -- StrategyBuilderSpec
 -- This is the spec to have analyzed by the StrategyManager
@@ -21,12 +19,19 @@ local Builder = import('/lua/sim/Builder.lua').Builder
 
 ---@class StrategyBuilder : Builder
 StrategyBuilder = Class(Builder) {
+    ---@param self StrategyBuilder
+    ---@param brain AIBrain
+    ---@param data table
+    ---@param locationType string
+    ---@return boolean
     Create = function(self,brain,data,locationType)
         Builder.Create(self,brain,data,locationType)
         self:SetStrategyActive(false)
         return true
     end,
 
+    ---@param self StrategyBuilder
+    ---@param bool boolean
     SetStrategyActive = function(self, bool)
         if bool then
             self.Active = true
@@ -41,10 +46,14 @@ StrategyBuilder = Class(Builder) {
         end
     end,
 
+    ---@param self StrategyBuilder
+    ---@return boolean
     IsStrategyActive = function(self)
         return self.Active
     end,
 
+    ---@param self StrategyBuilder
+    ---@return Builder|false
     GetActivateBuilders = function(self)
         if Builders[self.BuilderName].AddBuilders then
             return Builders[self.BuilderName].AddBuilders
@@ -52,6 +61,8 @@ StrategyBuilder = Class(Builder) {
         return false
     end,
 
+    ---@param self StrategyBuilder
+    ---@return Builder|false
     GetRemoveBuilders = function(self)
         if Builders[self.BuilderName].RemoveBuilders then
             return Builders[self.BuilderName].RemoveBuilders
@@ -59,6 +70,8 @@ StrategyBuilder = Class(Builder) {
         return false
     end,
 
+    ---@param self StrategyBuilder
+    ---@return Builder|false
     GetStrategyTime = function(self)
         if Builders[self.BuilderName].StrategyTime then
             return Builders[self.BuilderName].StrategyTime
@@ -66,6 +79,8 @@ StrategyBuilder = Class(Builder) {
         return false
     end,
 
+    ---@param self StrategyBuilder
+    ---@return boolean
     IsInterruptStrategy = function(self)
         if Builders[self.BuilderName].InterruptStrategy then
             return true
@@ -73,6 +88,8 @@ StrategyBuilder = Class(Builder) {
         return false
     end,
 
+    ---@param self StrategyBuilder
+    ---@return Builder|false
     GetStrategyType = function(self)
         if Builders[self.BuilderName].StrategyType then
             return Builders[self.BuilderName].StrategyType
@@ -80,6 +97,9 @@ StrategyBuilder = Class(Builder) {
         return false
     end,
 
+    ---@param self StrategyBuilder
+    ---@param builderManager BuilderManager
+    ---@return boolean
     CalculatePriority = function(self, builderManager)
         self.PriorityAltered = false
         -- Builders can have a function to update the priority
@@ -103,6 +123,10 @@ StrategyBuilder = Class(Builder) {
     end,
 }
 
+---@param brain AIBrain
+---@param data table
+---@param locationType string
+---@return string|false
 function CreateStrategy(brain, data, locationType)
     local builder = StrategyBuilder()
     if builder:Create(brain, data, locationType) then
@@ -110,3 +134,6 @@ function CreateStrategy(brain, data, locationType)
     end
     return false
 end
+
+-- imports kept for backwards compatibility with mods
+local AIUtils = import("/lua/ai/aiutilities.lua")

@@ -2,8 +2,8 @@
 -- Cybran Scathis Projectile : url0401
 --
 
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local CArtilleryProtonProjectile = import('/lua/cybranprojectiles.lua').CArtilleryProtonProjectile
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local CArtilleryProtonProjectile = import("/lua/cybranprojectiles.lua").CArtilleryProtonProjectile
 
 CIFArtilleryProton03 = Class(CArtilleryProtonProjectile) {
     FxLandHitScale = 1.6,

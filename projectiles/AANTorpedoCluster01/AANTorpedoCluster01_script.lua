@@ -5,11 +5,11 @@
 --**
 --**  Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ATorpedoCluster = import('/lua/aeonprojectiles.lua').ATorpedoCluster
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
 -- cache specification table 
 local CachedSpecifications = {
@@ -27,7 +27,7 @@ local CreateTrail = CreateTrail
 
 AANTorpedoCluster01 = Class(ATorpedoCluster) {
 
-    FxTrail = import('/lua/EffectTemplates.lua').ATorpedoPolyTrails01,
+    FxTrail = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01,
 
     FxEnterWater= { 
         '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
@@ -62,4 +62,4 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
 TypeClass = AANTorpedoCluster01
 
 -- kept for mod backwards compatibility
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat

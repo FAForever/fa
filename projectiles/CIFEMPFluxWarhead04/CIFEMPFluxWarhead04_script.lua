@@ -1,7 +1,7 @@
 --
 -- script for projectile Missile Used on Sub
 --
-local CEMPFluxWarheadProjectile = import('/lua/cybranprojectiles.lua').CEMPFluxWarheadProjectile
+local CEMPFluxWarheadProjectile = import("/lua/cybranprojectiles.lua").CEMPFluxWarheadProjectile
 
 CIFEMPFluxWarhead04 = Class(CEMPFluxWarheadProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',

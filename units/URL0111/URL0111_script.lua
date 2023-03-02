@@ -8,9 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
-local CIFMissileLoaWeapon = import('/lua/cybranweapons.lua').CIFMissileLoaWeapon
+local CLandUnit = import("/lua/cybranunits.lua").CLandUnit
+local CIFMissileLoaWeapon = import("/lua/cybranweapons.lua").CIFMissileLoaWeapon
 
+---@class URL0111 : CLandUnit
 URL0111 = Class(CLandUnit) {
     Weapons = {
         MissileRack = Class(CIFMissileLoaWeapon) {},

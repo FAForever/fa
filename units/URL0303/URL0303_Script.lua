@@ -5,12 +5,12 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
-local cWeapons = import('/lua/cybranweapons.lua')
+local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local cWeapons = import("/lua/cybranweapons.lua")
 local CDFLaserDisintegratorWeapon = cWeapons.CDFLaserDisintegratorWeapon01
 local CDFElectronBolterWeapon = cWeapons.CDFElectronBolterWeapon
-local MissileRedirect = import('/lua/defaultantiprojectile.lua').MissileRedirect
+local MissileRedirect = import("/lua/defaultantiprojectile.lua").MissileRedirect
 
 local EMPDeathWeapon = Class(Weapon) {
     OnCreate = function(self)
@@ -25,6 +25,7 @@ local EMPDeathWeapon = Class(Weapon) {
     end,
 }
 
+---@class URL0303 : CWalkingLandUnit
 URL0303 = Class(CWalkingLandUnit) {
     PlayEndAnimDestructionEffects = false,
 
@@ -58,8 +59,6 @@ URL0303 = Class(CWalkingLandUnit) {
         WaitSeconds(blueprint.SecondsBeforeChargeKicksIn)
 
         self.ChargingInProgress = true
-        self:SetWeaponEnabledByLabel('Disintigrator', false)
-        self:SetWeaponEnabledByLabel('HeavyBolter', false)
         self:SetAccMult(blueprint.Physics.ChargeAccMult)
         self:SetSpeedMult(blueprint.Physics.ChargeSpeedMult)
         -- EMP duration mult added in DoDeathWeapon 

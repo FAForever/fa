@@ -1,9 +1,9 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 function SetLayout()
-    local controls = import('/lua/ui/game/controlgroups.lua').controls
+    local controls = import("/lua/ui/game/controlgroups.lua").controls
 
     controls.bgTop:SetTexture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_t.dds'))
     controls.bgStretch:SetTexture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_m.dds'))
@@ -36,8 +36,8 @@ function SetLayout()
 end
 
 function LayoutGroups()
-    local controls = import('/lua/ui/game/controlgroups.lua').controls
-    local groupOrder = import('/lua/ui/game/controlgroups.lua').groupOrder
+    local controls = import("/lua/ui/game/controlgroups.lua").controls
+    local groupOrder = import("/lua/ui/game/controlgroups.lua").groupOrder
     local prevControl = false
     local firstControlTop = 0
     for index, key in groupOrder do

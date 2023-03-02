@@ -5,14 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- --------------------------------------------------------------
 
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local AIBehaviors = import('/lua/ai/AIBehaviors.lua')
+local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local UnitTemplates = import("/lua/unittemplates.lua").UnitTemplates
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local AIBehaviors = import("/lua/ai/aibehaviors.lua")
 
 ---@param aiBrain AIBrain
 function AIGetEconomyNumbers(aiBrain)
@@ -34,16 +34,12 @@ function AIGetEconomyNumbers(aiBrain)
     econ.MassStorage = aiBrain:GetEconomyStored('MASS')
 
     if aiBrain.EconomyMonitorThread then
-        local econTime = aiBrain:GetEconomyOverTime()
-
-        econ.EnergyRequestOverTime = econTime.EnergyRequested
-        econ.MassRequestOverTime = econTime.MassRequested
-
-        econ.EnergyIncomeOverTime = SUtils.Round(econTime.EnergyIncome, 2)
-        econ.MassIncomeOverTime = SUtils.Round(econTime.MassIncome, 2)
-
-        econ.EnergyEfficiencyOverTime = math.min(econTime.EnergyIncome / econTime.EnergyRequested, 2)
-        econ.MassEfficiencyOverTime = math.min(econTime.MassIncome / econTime.MassRequested, 2)
+        econ.EnergyRequestOverTime = aiBrain.EconomyOverTimeCurrent.EnergyRequested
+        econ.MassRequestOverTime = aiBrain.EconomyOverTimeCurrent.MassRequested
+        econ.EnergyIncomeOverTime = aiBrain.EconomyOverTimeCurrent.EnergyIncome
+        econ.MassIncomeOverTime = aiBrain.EconomyOverTimeCurrent.MassIncome
+        econ.EnergyEfficiencyOverTime = aiBrain.EconomyOverTimeCurrent.EnergyEfficiencyOverTime
+        econ.MassEfficiencyOverTime = aiBrain.EconomyOverTimeCurrent.MassEfficiencyOverTime
     end
 
     if econ.MassStorageRatio ~= 0 then

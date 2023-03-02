@@ -5,6 +5,11 @@
 --**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+---@alias CheatBuffType
+---| 'CheatBuildRate'
+---| 'CheatIncome'
+---| 'CheatIntel'
+
 BuffBlueprint {
     Name = 'CheatBuildRate',
     DisplayName = 'CheatBuildRate',

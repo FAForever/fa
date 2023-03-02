@@ -7,13 +7,21 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Builder = import("/lua/sim/builder.lua")
+
+local TableGetn = table.getn
 
 ---@class FactoryBuilderManager : BuilderManager
 FactoryBuilderManager = Class(BuilderManager) {
+    ---@param self FactoryBuilderManager
+    ---@param brain AIBrain
+    ---@param lType any
+    ---@param location Vector
+    ---@param radius number
+    ---@param useCenterPoint boolean
+    ---@return boolean
     Create = function(self, brain, lType, location, radius, useCenterPoint)
         BuilderManager.Create(self,brain)
 
@@ -43,6 +51,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         self:ForkThread(self.RallyPointMonitor)
     end,
 
+    ---@param self FactoryBuilderManager
     RallyPointMonitor = function(self)
         while true do
             if self.LocationActive and self.RallyPoint then
@@ -82,6 +91,10 @@ FactoryBuilderManager = Class(BuilderManager) {
         end
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param builderData table
+    ---@param locationType string
+    ---@return boolean
     AddBuilder = function(self, builderData, locationType)
         local newBuilder = Builder.CreateFactoryBuilder(self.Brain, builderData, locationType)
         if newBuilder:GetBuilderType() == 'All' then
@@ -94,17 +107,24 @@ FactoryBuilderManager = Class(BuilderManager) {
         return newBuilder
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@return Platoon
     HasPlatoonList = function(self)
         return self.PlatoonListEmpty
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@return integer
     GetNumFactories = function(self)
         if self.FactoryList then
-            return table.getn(self.FactoryList)
+            return TableGetn(self.FactoryList)
         end
         return 0
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param category EntityCategory
+    ---@return number
     GetNumCategoryFactories = function(self, category)
         if self.FactoryList then
             return EntityCategoryCount(category, self.FactoryList)
@@ -112,10 +132,18 @@ FactoryBuilderManager = Class(BuilderManager) {
         return 0
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param category EntityCategory
+    ---@param facCategory EntityCategory
+    ---@return integer
     GetNumCategoryBeingBuilt = function(self, category, facCategory)
-        return table.getn(self:GetFactoriesBuildingCategory(category, facCategory))
+        return TableGetn(self:GetFactoriesBuildingCategory(category, facCategory))
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param category EntityCategory
+    ---@param facCategory EntityCategory
+    ---@return table
     GetFactoriesBuildingCategory = function(self, category, facCategory)
         local units = {}
         for k,v in EntityCategoryFilterDown(facCategory, self.FactoryList) do
@@ -141,6 +169,10 @@ FactoryBuilderManager = Class(BuilderManager) {
         return units
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param category EntityCategory
+    ---@param facCatgory EntityCategory
+    ---@return table
     GetFactoriesWantingAssistance = function(self, category, facCatgory)
         local testUnits = self:GetFactoriesBuildingCategory(category, facCatgory)
 
@@ -150,7 +182,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 continue
             end
 
-            if v.NumAssistees and table.getn(v:GetGuards()) >= v.NumAssistees then
+            if v.NumAssistees and TableGetn(v:GetGuards()) >= v.NumAssistees then
                 continue
             end
 
@@ -159,11 +191,16 @@ FactoryBuilderManager = Class(BuilderManager) {
         return retUnits
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param category EntityCategory
+    ---@return UserUnit[]|nil
     GetFactories = function(self, category)
         local retUnits = EntityCategoryFilterDown(category, self.FactoryList)
         return retUnits
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param unit Unit
     AddFactory = function(self,unit)
         if not self:FactoryAlreadyExists(unit) then
             table.insert(self.FactoryList, unit)
@@ -181,6 +218,9 @@ FactoryBuilderManager = Class(BuilderManager) {
         end
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param factory Unit
+    ---@return boolean
     FactoryAlreadyExists = function(self, factory)
         for k,v in self.FactoryList do
             if v == factory then
@@ -190,11 +230,17 @@ FactoryBuilderManager = Class(BuilderManager) {
         return false
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param unit Unit
+    ---@param bType string
     SetupNewFactory = function(self,unit,bType)
         self:SetupFactoryCallbacks({unit}, bType)
         self:ForkThread(self.DelayRallyPoint, unit)
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param factories string[]
+    ---@param bType string
     SetupFactoryCallbacks = function(self,factories,bType)
         for k,v in factories do
             if not v.BuilderManagerData then
@@ -204,7 +250,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                                             -- Call function on builder manager; let it handle death of factory
                                             self:FactoryDestroyed(v)
                                         end
-                import('/lua/ScenarioTriggers.lua').CreateUnitDestroyedTrigger(factoryDestroyed, v)
+                import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(factoryDestroyed, v)
 
                 local factoryNewlyCaptured = function(unit, captor)
                                             local aiBrain = captor:GetAIBrain()
@@ -216,20 +262,23 @@ FactoryBuilderManager = Class(BuilderManager) {
                                                 end
                                             end
                                         end
-                import('/lua/ScenarioTriggers.lua').CreateUnitCapturedTrigger(nil, factoryNewlyCaptured, v)
+                import("/lua/scenariotriggers.lua").CreateUnitCapturedTrigger(nil, factoryNewlyCaptured, v)
 
                 local factoryWorkFinish = function(v, finishedUnit)
                                             -- Call function on builder manager; let it handle the finish of work
                                             self:FactoryFinishBuilding(v, finishedUnit)
                                         end
-                import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(factoryWorkFinish, v, categories.ALLUNITS)
+                import("/lua/scenariotriggers.lua").CreateUnitBuiltTrigger(factoryWorkFinish, v, categories.ALLUNITS)
             end
             self:ForkThread(self.DelayBuildOrder, v, bType, 0.1)
         end
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param factory Unit
     FactoryDestroyed = function(self, factory)
         local guards = factory:GetGuards()
+        local factoryDestroyed = false
         for k,v in guards do
             if not v.Dead and v.AssistPlatoon then
                 if self.Brain:PlatoonExists(v.AssistPlatoon) then
@@ -240,9 +289,13 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
         end
         for k,v in self.FactoryList do
-            if v == factory then
+            if IsDestroyed(v) then
                 self.FactoryList[k] = nil
+                factoryDestroyed = true
             end
+        end
+        if factoryDestroyed then
+            self.FactoryList = self:RebuildTable(self.FactoryList)
         end
         for k,v in self.FactoryList do
             if not v.Dead then
@@ -252,6 +305,10 @@ FactoryBuilderManager = Class(BuilderManager) {
         self.LocationActive = false
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param factory Unit
+    ---@param bType string
+    ---@param time number
     DelayBuildOrder = function(self,factory,bType,time)
         local guards = factory:GetGuards()
         for k,v in guards do
@@ -272,6 +329,9 @@ FactoryBuilderManager = Class(BuilderManager) {
         self:AssignBuildOrder(factory,bType)
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param factory Unit
+    ---@return string|false
     GetFactoryFaction = function(self, factory)
         if EntityCategoryContains(categories.UEF, factory) then
             return 'UEF'
@@ -287,6 +347,9 @@ FactoryBuilderManager = Class(BuilderManager) {
         return false
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param factory FactoryBuilderManager
+    ---@return Categories|nil
     UnitFromCustomFaction = function(self, factory)
         local customFactions = self.Brain.CustomFactions
         for k,v in customFactions do
@@ -296,6 +359,10 @@ FactoryBuilderManager = Class(BuilderManager) {
         end
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param templateName string
+    ---@param factory Unit
+    ---@return boolean
     GetFactoryTemplate = function(self, templateName, factory)
         local templateData = PlatoonTemplates[templateName]
         if not templateData then
@@ -354,6 +421,11 @@ FactoryBuilderManager = Class(BuilderManager) {
         return template
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param template any
+    ---@param templateName string
+    ---@param faction Unit
+    ---@return boolean|table
     GetCustomReplacement = function(self, template, templateName, faction)
         local retTemplate = false
         local templateData = self.Brain.CustomUnits[templateName]
@@ -368,7 +440,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 end
             end
             if not table.empty(possibles) then
-                rand = Random(1,table.getn(possibles))
+                rand = Random(1,TableGetn(possibles))
                 local customUnitID = possibles[rand]
                 -- LOG('*AI DEBUG: Replaced with '..customUnitID)
                 retTemplate = { customUnitID, template[2], template[3], template[4], template[5] }
@@ -377,6 +449,9 @@ FactoryBuilderManager = Class(BuilderManager) {
         return retTemplate
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param factory Unit
+    ---@param bType string
     AssignBuildOrder = function(self,factory,bType)
         -- Find a builder the factory can build
         if factory.Dead then
@@ -393,16 +468,28 @@ FactoryBuilderManager = Class(BuilderManager) {
         end
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param factory Unit
+    ---@param finishedUnit Unit
     FactoryFinishBuilding = function(self,factory,finishedUnit)
         if EntityCategoryContains(categories.ENGINEER, finishedUnit) then
             self.Brain.BuilderManagers[self.LocationType].EngineerManager:AddUnit(finishedUnit)
-        elseif EntityCategoryContains(categories.FACTORY, finishedUnit) then
-            self:AddFactory(finishedUnit)
-        end
+        elseif EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit ) then
+			if finishedUnit:GetFractionComplete() == 1 then
+				self:AddFactory(finishedUnit )			
+				factory.Dead = true
+                factory.Trash:Destroy()
+				return self:FactoryDestroyed(factory)
+			end
+		end
         self:AssignBuildOrder(factory, factory.BuilderManagerData.BuilderType)
     end,
 
     -- Check if given factory can build the builder
+    ---@param self FactoryBuilderManager
+    ---@param builder Unit
+    ---@param params any
+    ---@return boolean
     BuilderParamCheck = function(self,builder,params)
         -- params[1] is factory, no other params
         local template = self:GetFactoryTemplate(builder:GetPlatoonTemplate(), params[1])
@@ -412,7 +499,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         end
 
         -- This faction doesn't have unit of this type
-        if table.getn(template) == 2 then
+        if TableGetn(template) == 2 then
             return false
         end
 
@@ -423,6 +510,8 @@ FactoryBuilderManager = Class(BuilderManager) {
         return self.Brain:CanBuildPlatoon(template, params)
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param factory Unit
     DelayRallyPoint = function(self, factory)
         WaitSeconds(1)
         if not factory.Dead then
@@ -430,6 +519,9 @@ FactoryBuilderManager = Class(BuilderManager) {
         end
     end,
 
+    ---@param self FactoryBuilderManager
+    ---@param factory Unit
+    ---@return boolean
     SetRallyPoint = function(self, factory)
         local position = factory:GetPosition()
         local rally = false
@@ -477,9 +569,17 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 }
 
+---@param brain AIBrain
+---@param lType string
+---@param location Vector
+---@param radius number
+---@param useCenterPoint boolean
+---@return FactoryBuilderManager
 function CreateFactoryBuilderManager(brain, lType, location, radius, useCenterPoint)
     local fbm = FactoryBuilderManager()
     fbm:Create(brain, lType, location, radius, useCenterPoint)
     return fbm
 end
 
+--- Moved Unsused Imports to bottome for mod support 
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")

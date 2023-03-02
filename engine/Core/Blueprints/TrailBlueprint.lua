@@ -1,0 +1,16 @@
+---@meta
+
+---@class TrailBlueprint : EmitterBlueprint
+---@field Lifetime number            Lifetime of emitter
+---@field TrailLength number         Trail Length
+---@field Size number
+---@field Startsize number
+---@field SortOrder number           Sort Order
+---@field BlendMode number           unlike emitters, mode is uppercase
+---@field TextureRepeatRate number   Texture repeat rate in units
+---@field LODCutoff number           cutoff distance
+---@field EmitIfVisible boolean      Emit particles ONLY if this is emitter is visible
+---@field CatchupEmit boolean        catchup particles for the ticks that we weren't visible
+---@field RepeatTexture string       name of texture that repeats
+---@field RampTexture string
+---@field RampTextureName string

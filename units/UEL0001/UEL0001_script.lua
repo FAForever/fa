@@ -5,16 +5,17 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local Shield = import('/lua/shield.lua').Shield
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
-local TerranWeaponFile = import('/lua/terranweapons.lua')
+local Shield = import("/lua/shield.lua").Shield
+local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
+local TerranWeaponFile = import("/lua/terranweapons.lua")
 local TDFZephyrCannonWeapon = TerranWeaponFile.TDFZephyrCannonWeapon
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
 local TIFCruiseMissileLauncher = TerranWeaponFile.TIFCruiseMissileLauncher
 local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
+local EffectUtil = import("/lua/effectutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
 
+---@class UEL0001 : ACUUnit
 UEL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(DeathNukeWeapon) {},

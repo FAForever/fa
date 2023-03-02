@@ -8,10 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
-local AAMSaintWeapon = import('/lua/aeonweapons.lua').AAMSaintWeapon
+local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
+local AAMSaintWeapon = import("/lua/aeonweapons.lua").AAMSaintWeapon
 local nukeFiredOnGotTarget = false
 
+---@class UAB4302 : AStructureUnit
 UAB4302 = Class(AStructureUnit) {
 
     Weapons = {

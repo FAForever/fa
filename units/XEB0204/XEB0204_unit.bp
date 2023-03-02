@@ -62,8 +62,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 35,
-        Health = 3000,
-        MaxHealth = 3000,
+        Health = 2500,
+        MaxHealth = 2500,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -123,10 +123,11 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 2500,
-        BuildCostMass = 500,
-        BuildRate = 20,
+        BuildCostEnergy = 5250,
+        BuildCostMass = 1050,
+        BuildRate = 30,
         BuildTime = 2000,
+        DifferentialUpgradeCostCalculation = true,
         EngineeringPods = {
             {
                 CreateWithUnit = true,

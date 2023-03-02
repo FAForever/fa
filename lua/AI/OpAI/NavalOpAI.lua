@@ -6,19 +6,20 @@
 ----**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-local OpAI = import('/lua/ai/OpAI/BaseOpAI.lua').OpAI
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
+local OpAI = import("/lua/ai/opai/baseopai.lua").OpAI
 
-local GenerateNavalOSB = import('/lua/ai/OpAI/GenerateNaval.lua')
+local GenerateNavalOSB = import("/lua/ai/opai/generatenaval.lua")
 
 local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
 local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
 local MIBC = '/lua/editor/MiscBuildConditions.lua'
 local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
 
+---@class NavalOpAI : OpAI
 NavalOpAI = Class(OpAI) {
     Create = function(self, brain, location, name, data)
         local bManager = brain.BaseManagers[location]

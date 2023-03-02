@@ -4,7 +4,7 @@
 -- * Summary    : Contains logic for notifying UI about progress of single or multiple tasks
 -- ==========================================================================================
 -- how to use TaskNotifier:
--- local taskNotifier = import('/lua/ui/lobby/TaskNotifier.lua').Create()
+-- local taskNotifier = import("/lua/ui/lobby/tasknotifier.lua").Create()
 -- -- set callback function for updating UI when a task's progress is changed
 -- taskNotifier.OnProgressCallback = OnTaskProgress
 -- -- set callback function for updating UI
@@ -33,6 +33,7 @@
 -- end
 
 function Create()
+    ---@class TaskNotifier
     return {
         tasks = {},
         currentUpdate = 0,

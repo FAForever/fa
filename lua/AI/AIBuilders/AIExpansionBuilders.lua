@@ -24,6 +24,8 @@ local PlatoonFile = '/lua/platoon.lua'
 
 local ExtractorToFactoryRatio = 3
 
+---@alias BuilderGroupsExpansion 'EngineerExpansionBuildersFull' | 'EngineerExpansionBuildersFull - Naval' | 'EngineerExpansionBuildersSmall' | 'EngineerFirebaseBuilders' 
+
 BuilderGroup {
     BuilderGroupName = 'EngineerExpansionBuildersFull',
     BuildersType = 'EngineerBuilder',
@@ -173,7 +175,7 @@ BuilderGroup {
             { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
-            { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, categories.MASSEXTRACTION, '>=', categories.FACTORY } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
@@ -298,7 +300,7 @@ BuilderGroup {
             { UCBC, 'ExpansionBaseCheck', { } },
             { UCBC, 'StartLocationNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
-            { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, categories.MASSEXTRACTION, '>=', categories.FACTORY } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
@@ -463,7 +465,7 @@ BuilderGroup {
             { UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             --{ UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .7 } },
-            { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, categories.MASSEXTRACTION, '>=', categories.FACTORY } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
@@ -505,7 +507,7 @@ BuilderGroup {
             { UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             --{ UCBC, 'StartLocationsFull', { 'LocationType', 1000, -1000, 0, 2, 'StructuresNotMex' } },
             { UCBC, 'UnitCapCheckLess', { .7 } },
-            { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, 'MASSEXTRACTION', '>=','FACTORY' } },
+            { UCBC, 'HaveUnitRatio', { ExtractorToFactoryRatio, categories.MASSEXTRACTION, '>=', categories.FACTORY } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
         },
         BuilderType = 'Any',
@@ -549,7 +551,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'CanBuildFirebase', { 'LocationType', 256, 'Expansion Area', -1000, 5, 1, 'AntiSurface', 1, 'DEFENSE TECH2', 20} },
             { UCBC, 'UnitCapCheckLess', { .85 } },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -591,7 +593,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'CanBuildFirebase', { 'LocationType', 256, 'Expansion Area', -1000, 5, 1, 'AntiSurface', 1, 'DEFENSE TECH2', 20} },
             { UCBC, 'UnitCapCheckLess', { .85 } },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
         },
         BuilderType = 'Any',
         BuilderData = {

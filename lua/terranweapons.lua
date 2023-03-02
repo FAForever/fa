@@ -8,16 +8,17 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
-local CollisionBeams = import('defaultcollisionbeams.lua')
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
+local CollisionBeams = import("/lua/defaultcollisionbeams.lua")
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local GinsuCollisionBeam = CollisionBeams.GinsuCollisionBeam
 local OrbitalDeathLaserCollisionBeam = CollisionBeams.OrbitalDeathLaserCollisionBeam
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-TDFFragmentationGrenadeLauncherWeapon= Class(DefaultProjectileWeapon) {
+---@class TDFFragmentationGrenadeLauncherWeapon : DefaultProjectileWeapon
+TDFFragmentationGrenadeLauncherWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.THeavyFragmentationGrenadeMuzzleFlash,
 }
 
@@ -241,10 +242,12 @@ TIFCarpetBombWeapon = Class(DefaultProjectileWeapon) {
     -- Called from inside RackSalvoFiringState
     CreateProjectileAtMuzzle = function(self, muzzle)
         -- Adapt this function to keep the correct target lock during carpet bombing
-        local BallisticsList = import('/lua/sim/CalcBallisticAcceleration.lua').bomb_data
-        local data = BallisticsList[self.unit.EntityId]
-        if data and data.usestore and data.targetpos then -- We are repeating, and have lost our original target
-            self:SetTargetGround(data.targetpos)
+        local data = self.CurrentSalvoData
+        if data and data.usestore then
+            local pos = data.targetpos
+            if pos then -- We are repeating, and have lost our original target
+                self:SetTargetGround(pos)
+            end
         end
 
         DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)

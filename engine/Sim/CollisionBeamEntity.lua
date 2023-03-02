@@ -1,30 +1,31 @@
----@declare-global
----@class moho.CollisionBeamEntity
-local CollisionBeamEntity = {}
+---@meta
+
+---@class moho.CollisionBeamEntity : moho.entity_methods
+local CCollisionBeamEntity = {}
 
 ---
 --  CollisionBeamEntity:Enable()
-function CollisionBeamEntity:Enable()
+function CCollisionBeamEntity:Enable()
 end
 
 ---
---  CollisionBeamEntity:GetLauncher()
-function CollisionBeamEntity:GetLauncher()
+--  CCollisionBeamEntity:GetLauncher()
+function CCollisionBeamEntity:GetLauncher()
 end
 
 ---
---  bool = CollisionBeamEntity:IsEnabled()
-function CollisionBeamEntity:IsEnabled()
+--  bool = CCollisionBeamEntity:IsEnabled()
+function CCollisionBeamEntity:IsEnabled()
 end
 
 ---
---  CollisionBeamEntity:SetBeamFx(beamEmitter, checkCollision) -- set an emitter to be controlled by this beam. Its length parameter will be set from the beam entity's collision distance.
-function CollisionBeamEntity:SetBeamFx(beamEmitter,  checkCollision)
+--  CCollisionBeamEntity:SetBeamFx(beamEmitter, checkCollision) -- set an emitter to be controlled by this beam. Its length parameter will be set from the beam entity's collision distance.
+function CCollisionBeamEntity:SetBeamFx(beamEmitter,  checkCollision)
 end
 
 ---
 --  beam = CreateCollisionBeam(spec)spec is a table with the following fields defined:
-function CollisionBeamEntity:__init()
+function CCollisionBeamEntity:__init()
 end
 
-return CollisionBeamEntity
+return CCollisionBeamEntity

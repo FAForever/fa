@@ -5,9 +5,9 @@
 --
 --    Summary  : Aeon Reacton Cannon Area of Effect Projectile
 --
---    Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--    Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AReactonCannonAOEProjectile = import('/lua/aeonprojectiles.lua').AReactonCannonAOEProjectile
+local AReactonCannonAOEProjectile = import("/lua/aeonprojectiles.lua").AReactonCannonAOEProjectile
 
 ADFReactonCannon02 = Class(AReactonCannonAOEProjectile) {}
 TypeClass = ADFReactonCannon02

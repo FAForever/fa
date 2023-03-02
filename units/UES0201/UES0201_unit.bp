@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         AttackAngle = 90,
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 30,
         TargetBones = {
             'UES0202',
             'Back_Wake',
@@ -36,15 +36,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 5,
-            Level2 = 10,
-            Level3 = 15,
-            Level4 = 20,
-            Level5 = 25,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTSC1',
@@ -72,8 +63,8 @@ UnitBlueprint {
         AirThreatLevel = 8,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 7200,
-        MaxHealth = 7200,
+        Health = 8000,
+        MaxHealth = 8000,
         RegenRate = 0,
         SubThreatLevel = 21,
         SurfaceThreatLevel = 45,

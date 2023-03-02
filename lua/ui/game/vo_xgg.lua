@@ -1,4 +1,4 @@
-
+---@diagnostic disable:local-limit
 --*****************************************************************************
 --* File: C:\work\rts\main\data\lua\ui\game\vo_xgg.lua
 --* Author: (BOT)Sam Demulling 

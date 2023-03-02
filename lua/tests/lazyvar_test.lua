@@ -1,6 +1,8 @@
 require '../tests/testutils.lua'
 require '../modules/lazyvar.lua'
 
+local expect_equal
+local Create
 
 function test_lazyvars()
 
@@ -44,6 +46,5 @@ function test_lazyvars()
     expect_equal(plus_two_calls, 2)
     expect_equal(minus_two_calls, 1)
 end
-
 
 auto_run_unit_tests()

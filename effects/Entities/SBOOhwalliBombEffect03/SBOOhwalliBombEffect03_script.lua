@@ -8,7 +8,7 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-SBOOhwalliBombEffect03 = Class(import('/lua/sim/defaultprojectiles.lua').EmitterProjectile) {
-	FxTrails = import('/lua/EffectTemplates.lua').SOhwalliBombHitRingProjectileFxTrails03,
+SBOOhwalliBombEffect03 = Class(import("/lua/sim/defaultprojectiles.lua").EmitterProjectile) {
+	FxTrails = import("/lua/effecttemplates.lua").SOhwalliBombHitRingProjectileFxTrails03,
 }
 TypeClass = SBOOhwalliBombEffect03

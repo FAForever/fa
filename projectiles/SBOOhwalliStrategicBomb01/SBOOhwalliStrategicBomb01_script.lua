@@ -7,7 +7,7 @@
 --
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
-local SOhwalliStrategicBombProjectile = import('/lua/seraphimprojectiles.lua').SOhwalliStrategicBombProjectile
+local SOhwalliStrategicBombProjectile = import("/lua/seraphimprojectiles.lua").SOhwalliStrategicBombProjectile
 
 SBOOhwalliStategicBomb01 = Class(SOhwalliStrategicBombProjectile){
     OnImpact = function(self, targetType, targetEntity)
