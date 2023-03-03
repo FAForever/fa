@@ -414,7 +414,7 @@ end
 -- @param data A shallow copy of the modeData to make the function pure data-wise
 local function CheatSpawn(command, data)
     SimCallback({
-        Func = data.prop and 'BoxFormationProp' or 'CheatSpawnUnit',
+        Func = data.prop and 'CheatBoxSpawnProp' or 'CheatSpawnUnit',
         Args = {
             army = data.army,
             pos = command.Target.Position,
