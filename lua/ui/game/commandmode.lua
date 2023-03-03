@@ -126,30 +126,8 @@ function EndCommandMode(isCancel)
     -- in case we want to end the command mode, without knowing it has already ended or not
     if modeData then
         -- regain selection if we were cheating in units
-        if modeData.cheat then
-            if modeData.ids and modeData.index <= table.getn(modeData.ids) then
-                local modeData = table.deepcopy(modeData)
-                ForkThread(
-                    function()
-                        WaitSeconds(0.0001)
-
-                        modeData.name = modeData.ids[modeData.index]
-                        modeData.bpId = modeData.ids[modeData.index]
-                        modeData.index = modeData.index + 1
-
-                        StartCommandMode("build", modeData)
-                    end
-                )
-            else
-                if modeData.selection then
-                    SelectUnits(modeData.selection)
-                end
-            end
-
-            -- we can end up here because we re-start the command mode
-            if not modeData then
-                return
-            end
+        if modeData.cheat and modeData.selection then
+            SelectUnits(modeData.selection)
         end
 
         -- add information to modeData for end behavior
@@ -436,21 +414,20 @@ end
 -- @param data A shallow copy of the modeData to make the function pure data-wise
 local function CheatSpawn(command, data)
     SimCallback({
-        Func = 'BoxFormationSpawn',
+        Func = data.prop and 'BoxFormationProp' or 'CheatSpawnUnit',
         Args = {
-            bpId = data.bpId,
-            count = data.count,
             army = data.army,
             pos = command.Target.Position,
-            veterancy = data.vet,
+            bpId = data.unit or data.prop or command.Blueprint,
+            count = data.count,
             yaw = data.yaw,
+            rand = data.rand,
+            veterancy = data.vet,
+            CreateTarmac = data.CreateTarmac,
+            MeshOnly = data.MeshOnly,
+            UnitIconCameraMode = data.UnitIconCameraMode,
         }
     }, true)
-
-    -- if we hold shift then we get to place another unit!
-    if not IsKeyDown('Shift') then
-        EndCommandMode(true)
-    end
 end
 
 -- cached category strings for performance
