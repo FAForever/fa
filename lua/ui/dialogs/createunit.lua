@@ -7,7 +7,6 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Edit = import('/lua/maui/edit.lua').Edit
 local getOptions = function() return import('/lua/user/prefs.lua').GetFromCurrentProfile('options') end
 local options = getOptions()
-local smallSliderBG = '/textures/ui/common/dialogs/spawn_menu/slider-back_bmp.dds'
 
 local DummyUnitID = 'ura0001'
 local DialogMode = options.spawn_menu_main_mode or 'units' --or 'props' or 'templates'
@@ -1012,7 +1011,7 @@ function CreateDialog()
                     UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
                     UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
                     UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
-                    smallSliderBG--UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds')
+                    '/textures/ui/common/dialogs/spawn_menu/slider-back_bmp.dds'
                 )
 
                 slider._currentValue:Set(inputdata.default)
