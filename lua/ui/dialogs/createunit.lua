@@ -7,15 +7,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Edit = import('/lua/maui/edit.lua').Edit
 local getOptions = function() return import('/lua/user/prefs.lua').GetFromCurrentProfile('options') end
 local options = getOptions()
-local smallSliderBG = '/slider-back_bmp.dds'
-do
-    for i, mod in __active_mods do
-        if mod.name == "BrewLAN UI: Spawn Menu" then
-            smallSliderBG = mod.location..smallSliderBG
-            break
-        end
-    end
-end
+local smallSliderBG = '/textures/ui/common/dialogs/spawn_menu/slider-back_bmp.dds'
 
 local DummyUnitID = 'ura0001'
 local DialogMode = options.spawn_menu_main_mode or 'units' --or 'props' or 'templates'
