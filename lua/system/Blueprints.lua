@@ -789,16 +789,6 @@ local function NewOffset(offset, foot, reduced)
     return offset-(foot-reduced)/2
 end
 
-local nilMeshPath = '/mods/brewlan/meshes/nil_mesh'
-local function FindNilMesh(meshes)
-    for id, bp in pairs(meshes) do
-        if id:sub(-9) == '/nil_mesh' then
-            nilMeshPath = id
-            return
-        end
-    end
-end
-
 local function SpawnMenuDummyChanges(all_bps)
     for id, bp in pairs(all_bps) do
         if bp.Categories and not table.find(bp.Categories, 'DRAGBUILD') then
@@ -822,8 +812,8 @@ local function SpawnMenuDummyChanges(all_bps)
                         'UNSPAWNABLE',
                     },
                     Display = {
-                        BuildMeshBlueprint = nilMeshPath,
-                        MeshBlueprint = nilMeshPath,
+                        BuildMeshBlueprint = '/meshes/game/nil_mesh',
+                        MeshBlueprint = '/meshes/game/nil_mesh',
                         UniformScale = 0,
                         HideLifebars = true,
                     },
