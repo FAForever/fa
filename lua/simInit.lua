@@ -270,8 +270,8 @@ function BeginSession()
     import("/lua/sim/scenarioutilities.lua").CreateProps()
     import("/lua/sim/scenarioutilities.lua").CreateResources()
 
-    BeginSessionGenerateMarkers()
     BeginSessionGenerateNavMesh()
+    BeginSessionGenerateMarkers()
 
     import("/lua/sim/score.lua").init()
     import("/lua/sim/recall.lua").init()

@@ -9,6 +9,8 @@
 
 -- Engineer platoons to be formed
 
+WARN("Hellooo")
+
 PlatoonTemplate {
     Name = 'CommanderAssist',
     Plan = 'ManagerEngineerAssistAI',
