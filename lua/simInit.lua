@@ -313,7 +313,7 @@ function BeginSessionGenerateNavMesh()
     if ScenarioInfo.GameHasAIs then
         for k, brain in ArmyBrains do
             if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
-                import('/lua/sim/navgenerator.lua').Generate()
+                import('/lua/sim/navutils.lua').Generate()
                 break
             end
         end
