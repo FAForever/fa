@@ -793,6 +793,7 @@ end
 
 Callbacks.NavToggleScanLayer = import("/lua/sim/navdebug.lua").ToggleScanLayer
 Callbacks.NavToggleScanLabels = import("/lua/sim/navdebug.lua").ToggleScanLabels
+Callbacks.NavDebugStatisticsToUI = import("/lua/sim/navdebug.lua").StatisticsToUI
 Callbacks.NavDebugCanPathTo = import("/lua/sim/navdebug.lua").CanPathTo
 Callbacks.NavDebugPathTo = import("/lua/sim/navdebug.lua").PathTo
 Callbacks.NavDebugGetLabel = import("/lua/sim/navdebug.lua").GetLabel
