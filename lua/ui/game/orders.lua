@@ -539,7 +539,7 @@ local function AttackMoveBehavior(self, modifiers)
             name="RULEUCC_Script",
             AbilityName='AttackMove',
             TaskName='AttackMove',
-            cursor = 'ATTACK_MOVE',
+            Cursor = 'ATTACK_MOVE',
         }
         CommandMode.StartCommandMode("order", modeData)
     end
