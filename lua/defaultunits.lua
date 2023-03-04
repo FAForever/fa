@@ -97,7 +97,7 @@ StructureUnit = ClassUnit(Unit) {
             if a1 != 0 or a2 != 0 then
                 -- quaternion magic incoming, be prepared! Note that the yaw axis is inverted, but then
                 -- re-inverted again by multiplying it with the original orientation
-                local quatSlope = Quaternion.fromAngle({ p = 0, y = 0 - a2, r = -1 * a1})
+                local quatSlope = Quaternion.fromAngle(0, 0 - a2,-1 * a1)
                 local quatOrient = setmetatable(self:GetOrientation(), Quaternion)
                 local quat = quatOrient * quatSlope
                 self:SetOrientation(quat, true)
