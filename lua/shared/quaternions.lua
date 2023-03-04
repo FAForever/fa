@@ -2,7 +2,7 @@
 
 -- faster access to some math library functions
 local abs   = math.abs
-local Round = math.Round
+-- local Round = math.Round
 local sqrt  = math.sqrt
 local exp   = math.exp
 local log   = math.log
@@ -20,11 +20,19 @@ local delta = 0.0000001000000
 Quaternion = {}
 Quaternion.__index = Quaternion
 
+---@param q number
+---@param r number
+---@param s number
+---@param t number
+---@return Quaternion
 function Quaternion.new(q,r,s,t)
 	return setmetatable({q,r,s,t},Quaternion)
 end
 local quat_new = Quaternion.new
 
+---@param lhs Quaternion
+---@param rhs Quaternion
+---@return Quaternion
 local function qmul(lhs, rhs)
 	local lhs1, lhs2, lhs3, lhs4 = lhs[1], lhs[2], lhs[3], lhs[4]
 	local rhs1, rhs2, rhs3, rhs4 = rhs[1], rhs[2], rhs[3], rhs[4]
@@ -37,6 +45,8 @@ local function qmul(lhs, rhs)
 end
 Quaternion.__mul = qmul
 
+---@param q Quaternion
+---@return Quaternion
 local function qexp(q)
 	local m = sqrt(q[2]*q[2] + q[3]*q[3] + q[4]*q[4])
 	local u1, u2, u3 = 0, 0, 0
@@ -49,6 +59,8 @@ local function qexp(q)
 	return quat_new(r*cos(m), r*u1, r*u2, r*u3)
 end
 
+---@param q Quaternion
+---@return Quaternion
 local function qlog(q)
 	local l = sqrt(q[1]*q[1] + q[2]*q[2] + q[3]*q[3] + q[4]*q[4])
 	if l == 0 then return { -1e+100, 0, 0, 0 } end
@@ -64,73 +76,89 @@ end
 Quaternion.log = qlog
 
 --- Converts <ang> to a quaternion
-function Quaternion.fromAngle(ang)
-	local p, y, r = ang.p, ang.y, ang.r
-	p = p*deg2rad*0.5
-	y = y*deg2rad*0.5
-	r = r*deg2rad*0.5
-	local qr = {cos(r), sin(r), 0, 0}
-	local qp = {cos(p), 0, sin(p), 0}
-	local qy = {cos(y), 0, 0, sin(y)}
+---@param pitch number
+---@param yaw number
+---@param roll number
+---@return Quaternion
+function Quaternion.fromAngle(pitch, yaw, roll)
+	pitch = pitch*deg2rad*0.5
+	yaw = yaw*deg2rad*0.5
+	roll = roll*deg2rad*0.5
+	local qr = {cos(roll), sin(roll), 0, 0}
+	local qp = {cos(pitch), 0, sin(pitch), 0}
+	local qy = {cos(yaw), 0, 0, sin(yaw)}
 	return qmul(qy,qmul(qp,qr))
 end
 
-function Quaternion.fromVectors(forward, up)
-	local x = forward
-	local z = up
-	local y = z:Cross(x):GetNormalized() --up x forward = left
+-- ---@param forward Vector
+-- ---@param up Vector
+-- ---@return Quaternion
+-- function Quaternion.fromVectors(forward, up)
+-- 	local x = forward
+-- 	local z = up
+-- 	local y = z:Cross(x):GetNormalized() --up x forward = left
 	
-	local ang = x:Angle()
-	if ang.p > 180 then ang.p = ang.p - 360 end
-	if ang.y > 180 then ang.y = ang.y - 360 end
+-- 	local ang = x:Angle()
+-- 	if ang.p > 180 then ang.p = ang.p - 360 end
+-- 	if ang.y > 180 then ang.y = ang.y - 360 end
 	
-	local yyaw = Vector(0,1,0)
-	yyaw:Rotate(Angle(0,ang.y,0))
+-- 	local yyaw = Vector(0,1,0)
+-- 	yyaw:Rotate(Angle(0,ang.y,0))
 	
-	local roll = acos(y:Dot(yyaw))*rad2deg
+-- 	local roll = acos(y:Dot(yyaw))*rad2deg
 	
-	local dot = y:Dot(z)
-	if dot < 0 then roll = -roll end
+-- 	local dot = y:Dot(z)
+-- 	if dot < 0 then roll = -roll end
 	
-	local p, y, r = ang.p, ang.y, roll
-	p = p*deg2rad*0.5
-	y = y*deg2rad*0.5
-	r = r*deg2rad*0.5
-	local qr = {cos(r), sin(r), 0, 0}
-	local qp = {cos(p), 0, sin(p), 0}
-	local qy = {cos(y), 0, 0, sin(y)}
-	return qmul(qy,qmul(qp,qr))
-end
+-- 	local p, y, r = ang.p, ang.y, roll
+-- 	p = p*deg2rad*0.5
+-- 	y = y*deg2rad*0.5
+-- 	r = r*deg2rad*0.5
+-- 	local qr = {cos(r), sin(r), 0, 0}
+-- 	local qp = {cos(p), 0, sin(p), 0}
+-- 	local qy = {cos(y), 0, 0, sin(y)}
+-- 	return qmul(qy,qmul(qp,qr))
+-- end
 
 --- Returns quaternion for rotation about axis <axis> by angle <ang>. If ang is left out, then it is computed as the magnitude of <axis>
-function Quaternion.fromRotation(axis, ang)
-	-- if ang then
-	-- 	axis:Normalize()
-	-- 	local ang2 = ang*deg2rad*0.5
-	-- 	return quat_new( cos(ang2), axis.x*sin(ang2), axis.y*sin(ang2), axis.z*sin(ang2) )
-	-- else
-	-- 	local angSquared = axis:LengthSqr()
-	-- 	if angSquared == 0 then return quat_new( 1, 0, 0, 0 ) end
-	-- 	local len = sqrt(angSquared)
-	-- 	local ang = (len + 180) % 360 - 180
-	-- 	local ang2 = ang*deg2rad*0.5
-	-- 	local sang2len = sin(ang2) / len
-	-- 	return quat_new( cos(ang2), rv1[1] * sang2len , rv1[2] * sang2len, rv1[3] * sang2len )
-	-- end
-end
+-- function Quaternion.fromRotation(axis, ang)
+-- 	-- if ang then
+-- 	-- 	axis:Normalize()
+-- 	-- 	local ang2 = ang*deg2rad*0.5
+-- 	-- 	return quat_new( cos(ang2), axis.x*sin(ang2), axis.y*sin(ang2), axis.z*sin(ang2) )
+-- 	-- else
+-- 	-- 	local angSquared = axis:LengthSqr()
+-- 	-- 	if angSquared == 0 then return quat_new( 1, 0, 0, 0 ) end
+-- 	-- 	local len = sqrt(angSquared)
+-- 	-- 	local ang = (len + 180) % 360 - 180
+-- 	-- 	local ang2 = ang*deg2rad*0.5
+-- 	-- 	local sang2len = sin(ang2) / len
+-- 	-- 	return quat_new( cos(ang2), rv1[1] * sang2len , rv1[2] * sang2len, rv1[3] * sang2len )
+-- 	-- end
+-- end
 
+---@return Quaternion
 function Quaternion:__neg()
 	return quat_new( -self[1], -self[2], -self[3], -self[4] )
 end
 
+---@param lhs Quaternion
+---@param rhs Quaternion
+---@return Quaternion
 function Quaternion.__add(lhs, rhs)
 	return quat_new( lhs[1] + rhs[1], lhs[2] + rhs[2], lhs[3] + rhs[3], lhs[4] + rhs[4] )
 end
 
+---@param lhs Quaternion
+---@param rhs Quaternion
+---@return Quaternion
 function Quaternion.__sub(lhs, rhs)
 	return quat_new( lhs[1] - rhs[1], lhs[2] - rhs[2], lhs[3] - rhs[3], lhs[4] - rhs[4] )
 end
 
+---@param lhs Quaternion
+---@param rhs Quaternion
+---@return Quaternion
 function Quaternion.__mul(lhs, rhs)
 	if type(rhs) == "number" then
 		return quat_new( rhs * lhs[1], rhs * lhs[2], rhs * lhs[3], rhs * lhs[4] )
@@ -155,6 +183,9 @@ function Quaternion.__mul(lhs, rhs)
 	end
 end
 
+---@param lhs Quaternion
+---@param rhs Quaternion
+---@return Quaternion
 function Quaternion.__div(lhs, rhs)
 	local lhs1, lhs2, lhs3, lhs4 = lhs[1], lhs[2], lhs[3], lhs[4]
 	return quat_new(
@@ -165,11 +196,17 @@ function Quaternion.__div(lhs, rhs)
 	)
 end
 
+---@param lhs Quaternion
+---@param rhs Quaternion
+---@return Quaternion
 function Quaternion.__pow(lhs, rhs)
 	local l = qlog(lhs)
 	return qexp({ l[1]*rhs, l[2]*rhs, l[3]*rhs, l[4]*rhs })
 end
 
+---@param lhs Quaternion
+---@param rhs Quaternion
+---@return boolean
 function Quaternion.__eq(lhs, rhs)
 	if getmetatable(lhs) ~= Quaternion or getmetatable(lhs) ~= getmetatable(rhs) then return false end
 	local rvd1, rvd2, rvd3, rvd4 = lhs[1] - rhs[1], lhs[2] - rhs[2], lhs[3] - rhs[3], lhs[4] - rhs[4]
@@ -180,16 +217,19 @@ function Quaternion.__eq(lhs, rhs)
 end
 
 --- Returns absolute value of self
+---@return number
 function Quaternion:abs()
 	return sqrt(self[1]*self[1] + self[2]*self[2] + self[3]*self[3] + self[4]*self[4])
 end
 
 --- Returns the conjugate of self
+---@return Quaternion
 function Quaternion:conj()
 	return quat_new(self[1], -self[2], -self[3], -self[4])
 end
 
 --- Returns the inverse of self
+---@return Quaternion
 function Quaternion:inv()
 	local l = self[1]*self[1] + self[2]*self[2] + self[3]*self[3] + self[4]*self[4]
 	return quat_new( self[1]/l, -self[2]/l, -self[3]/l, -self[4]/l )
@@ -197,21 +237,28 @@ end
 
 
 --- Raises Euler's constant e to the power self
+---@return Quaternion
 function Quaternion:exp()
 	return qexp(self)
 end
 
 --- Calculates natural logarithm of self
+---@return Quaternion
 function Quaternion:log()
 	return qlog(self)
 end
 
 --- Changes quaternion <self> so that the represented rotation is by an angle between 0 and 180 degrees (by coder0xff)
+---@return Quaternion?
 function Quaternion:mod()
 	if self[1]<0 then return quat_new(-self[1], -self[2], -self[3], -self[4]) else return quat_new(self[1], self[2], self[3], self[4]) end
 end
 
 --- Performs spherical linear interpolation between <q0> and <q1>. Returns <q0> for <t>=0, <q1> for <t>=1
+---@param q0 Quaternion
+---@param q1 Quaternion
+---@param t number
+---@return Quaternion
 function Quaternion.slerp(q0, q1, t)
 	local dot = q0[1]*q1[1] + q0[2]*q1[2] + q0[3]*q1[3] + q0[4]*q1[4]
 	local q11
@@ -230,17 +277,19 @@ function Quaternion.slerp(q0, q1, t)
 end
 
 --- Returns vector pointing forward for <self>
+---@return Vector
 function Quaternion:forward()
 	local this1, this2, this3, this4 = self[1], self[2], self[3], self[4]
 	local t2, t3, t4 = this2 * 2, this3 * 2, this4 * 2
-	return {
+	return Vector (
 		this1 * this1 + this2 * this2 - this3 * this3 - this4 * this4,
 		t3 * this2 + t4 * this1,
 		t4 * this2 - t3 * this1
-	}
+	)
 end
 
 --- Returns vector pointing right for <self>
+---@return Vector
 function Quaternion:right()
 	local this1, this2, this3, this4 = self[1], self[2], self[3], self[4]
 	local t2, t3, t4 = this2 * 2, this3 * 2, this4 * 2
@@ -252,6 +301,7 @@ function Quaternion:right()
 end
 
 --- Returns vector pointing up for <self>
+---@return Vector
 function Quaternion:up()
 	local this1, this2, this3, this4 = self[1], self[2], self[3], self[4]
 	local t2, t3, t4 = this2 * 2, this3 * 2, this4 * 2
@@ -263,6 +313,7 @@ function Quaternion:up()
 end
 
 --- Returns the angle of rotation in degrees
+---@return number
 function Quaternion:rotationAngle()
 	local l2 = self[1]*self[1] + self[2]*self[2] + self[3]*self[3] + self[4]*self[4]
 	if l2 == 0 then return 0 end
@@ -273,6 +324,7 @@ function Quaternion:rotationAngle()
 end
 
 --- Returns the axis of rotation
+---@return Vector
 function Quaternion:rotationAxis()
 	local m2 = self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
 	if m2 == 0 then return Vector( 0, 0, 1 ) end
@@ -281,33 +333,35 @@ function Quaternion:rotationAxis()
 end
 
 --- Returns angle represented by <self>
-function Quaternion:toAngle()
-	local l = sqrt(self[1]*self[1]+self[2]*self[2]+self[3]*self[3]+self[4]*self[4])
-	local q1, q2, q3, q4 = self[1]/l, self[2]/l, self[3]/l, self[4]/l
-	
-	local x = Vector(q1*q1 + q2*q2 - q3*q3 - q4*q4,
-		2*q3*q2 + 2*q4*q1,
-		2*q4*q2 - 2*q3*q1)
-		
-	local y = Vector(2*q2*q3 - 2*q4*q1,
-		q1*q1 - q2*q2 + q3*q3 - q4*q4,
-		2*q2*q1 + 2*q3*q4)
-		
-	local ang = x:Angle()
-	if ang.p > 180 then ang.p = ang.p - 360 end
-	if ang.y > 180 then ang.y = ang.y - 360 end
-	
-	local yyaw = Vector(0,1,0)
-	yyaw:Rotate(Angle(0,ang.y,0))
-	
-	local roll = acos(y:Dot(yyaw))*rad2deg
-	
-	local dot = q2*q1 + q3*q4
-	if dot < 0 then roll = -roll end
-	
-	return Angle(ang.p, ang.y, roll)
-end
+---@return unknown
+-- function Quaternion:toAngle()
+-- 	local l = sqrt(self[1]*self[1]+self[2]*self[2]+self[3]*self[3]+self[4]*self[4])
+-- 	local q1, q2, q3, q4 = self[1]/l, self[2]/l, self[3]/l, self[4]/l
 
+-- 	local x = Vector(q1*q1 + q2*q2 - q3*q3 - q4*q4,
+-- 		2*q3*q2 + 2*q4*q1,
+-- 		2*q4*q2 - 2*q3*q1)
+
+-- 	local y = Vector(2*q2*q3 - 2*q4*q1,
+-- 		q1*q1 - q2*q2 + q3*q3 - q4*q4,
+-- 		2*q2*q1 + 2*q3*q4)
+
+-- 	local ang = x:Angle()
+-- 	if ang.p > 180 then ang.p = ang.p - 360 end
+-- 	if ang.y > 180 then ang.y = ang.y - 360 end
+
+-- 	local yyaw = Vector(0,1,0)
+-- 	yyaw:Rotate(Angle(0,ang.y,0))
+
+-- 	local roll = acos(y:Dot(yyaw))*rad2deg
+
+-- 	local dot = q2*q1 + q3*q4
+-- 	if dot < 0 then roll = -roll end
+
+-- 	return Angle(ang.p, ang.y, roll)
+-- end
+
+---@return string
 function Quaternion:__tostring()
 	return string.format("<%d,%d,%d,%d>",self[1],self[2],self[3],self[4])
 end
