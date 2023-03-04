@@ -213,7 +213,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
             },
             FiringRandomness = 1.5,
-            FiringTolerance = 2,
+            FiringTolerance = 0.1,
             Label = 'GroundGun',
             MaxRadius = 18,
             MuzzleSalvoDelay = 0,
