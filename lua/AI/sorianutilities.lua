@@ -248,7 +248,7 @@ function AIHandleLandIntel(aiBrain, intel)
         end
     end
     -- Mark location for a defensive point
-    nextBase = (table.getn(aiBrain.TacticalBases) + 1)
+    local nextBase = (table.getn(aiBrain.TacticalBases) + 1)
     table.insert(aiBrain.TacticalBases,
         {
         Position = intel.Position,
@@ -563,7 +563,7 @@ end
 ---@param aiBrain AIBrain
 function AIRandomizeTaunt(aiBrain)
     local factionIndex = aiBrain:GetFactionIndex()
-    tauntid = Random(1,table.getn(AITaunts[factionIndex]))
+    local tauntid = Random(1,table.getn(AITaunts[factionIndex]))
     aiBrain.LastVocTaunt = GetGameTimeSeconds()
     AISendChat('all', aiBrain.Nickname, '/'..AITaunts[factionIndex][tauntid])
 end
@@ -642,7 +642,7 @@ end
 ---@param pingData table
 function AIHandlePing(aiBrain, pingData)
     if pingData.Type == 'move' then
-        nextping = (table.getn(aiBrain.TacticalBases) + 1)
+        local nextping = (table.getn(aiBrain.TacticalBases) + 1)
         table.insert(aiBrain.TacticalBases,
             {
             Position = pingData.Location,
@@ -1073,7 +1073,7 @@ function FindUnfinishedUnits(aiBrain, locationType, buildCat)
     local unfinished = aiBrain:GetUnitsAroundPoint(buildCat, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     local retUnfinished = false
     for num, unit in unfinished do
-        donePercent = unit:GetFractionComplete()
+        local donePercent = unit:GetFractionComplete()
         if donePercent < 1 and GetGuards(aiBrain, unit) < 1 and not unit:IsUnitState('Upgrading') then
             retUnfinished = unit
             break
@@ -1093,7 +1093,7 @@ function FindDamagedShield(aiBrain, locationType, buildCat)
     local retShield = false
     for num, unit in shields do
         if not unit.Dead and unit:ShieldIsOn() then
-            shieldPercent = (unit.MyShield:GetHealth() / unit.MyShield:GetMaxHealth())
+            local shieldPercent = (unit.MyShield:GetHealth() / unit.MyShield:GetMaxHealth())
             if shieldPercent < 1 and GetGuards(aiBrain, unit) < 3 then
                 retShield = unit
                 break
@@ -1177,6 +1177,8 @@ end
 ---@param places number Number of places to round to
 ---@return number
 function Round(x, places)
+    local result
+    local shift
     if places then
         shift = 10 ^ places
         result = math.floor(x * shift + 0.5) / shift
