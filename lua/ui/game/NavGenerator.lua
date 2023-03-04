@@ -576,8 +576,14 @@ NavUILayerStatistics = ClassUI(Group) {
         self.ToggleLabelGrid.OnClick = function()
             SimCallback({ Func = 'NavToggleScanLabels', Args = { Layer = layer }}, false)
         end
-    
 
+        -- tell sim to send the known stats
+        SimCallback({
+            Func = "NavDebugStatisticsToUI",
+            Args = { }
+        })
+
+        -- list to sim sending us stats
         AddOnSyncCallback(
             function(Sync)
                 if Sync.NavLayerData then

@@ -262,7 +262,6 @@ function BeginSession()
     import("/lua/sim/matchstate.lua").Setup()
     import("/lua/sim/markerutilities.lua").Setup()
 
-    BeginSessionGenerateNavMesh()
     BeginSessionAI()
     BeginSessionMapSetup()
     BeginSessionEffects()
@@ -272,6 +271,7 @@ function BeginSession()
     import("/lua/sim/scenarioutilities.lua").CreateResources()
 
     BeginSessionGenerateMarkers()
+    BeginSessionGenerateNavMesh()
 
     import("/lua/sim/score.lua").init()
     import("/lua/sim/recall.lua").init()

@@ -90,7 +90,7 @@ end
 -- Shared data with UI
 
 ---@type NavLayerData
-local NavLayerData = Shared.CreateEmptyNavLayerData()
+NavLayerData = Shared.CreateEmptyNavLayerData()
 
 local tl = { 0, 0, 0 }
 local tr = { 0, 0, 0 }
@@ -1182,6 +1182,11 @@ function Generate()
     then
         SPEW("Hover grid equals land grid - ditching hover grid")
         NavGrids['Hover'] = NavGrids['Land']
+        NavLayerData['Hover'].Labels = 0
+        NavLayerData['Hover'].Neighbors = 0
+        NavLayerData['Hover'].PathableLeafs = 0
+        NavLayerData['Hover'].Subdivisions = 0
+        NavLayerData['Hover'].UnpathableLeafs = 0
     end
 
     if  NavLayerData['Land'].Labels == NavLayerData['Amphibious'].Labels and
@@ -1192,6 +1197,11 @@ function Generate()
     then
         SPEW("Amphibious grid equals land grid - ditching amphibious grid")
         NavGrids['Amphibious'] = NavGrids['Land']
+        NavLayerData['Amphibious'].Labels = 0
+        NavLayerData['Amphibious'].Neighbors = 0
+        NavLayerData['Amphibious'].PathableLeafs = 0
+        NavLayerData['Amphibious'].Subdivisions = 0
+        NavLayerData['Amphibious'].UnpathableLeafs = 0
     end
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
