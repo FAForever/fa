@@ -485,7 +485,7 @@ UnitBlueprint {
                 Water = 'Land|Water|Seabed',
             },
             FiringRandomness = 0.9,
-            FiringTolerance = 2,
+            FiringTolerance = 0.1,
             Label = 'GroundGun',
             LeadTarget = true,
             MaxRadius = 80,
