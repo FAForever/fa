@@ -22,6 +22,7 @@ TIFMissileCruise01 = ClassProjectile(TMissileCruiseProjectile) {
 
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
     

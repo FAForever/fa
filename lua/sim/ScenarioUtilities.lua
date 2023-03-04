@@ -664,7 +664,7 @@ function InitializeArmies()
                             -- behavior is easiest spotted on Seton's clutch
                             local dummy = CreateUnitHPR('xsl0101', civ, 0, 0, 0, 0, 0, 0)
                             SetAlliance(civ, army, "Ally")
-                            WaitTicks(5)
+                            WaitTicks(20)
 
                             -- revert army status and destroy the dummy unit
                             SetAlliance(civ, army, real_state)

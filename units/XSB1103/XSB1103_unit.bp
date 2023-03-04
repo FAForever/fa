@@ -171,6 +171,7 @@ UnitBlueprint {
     LifeBarOffset = 0.5,
     LifeBarSize = 0.9,
     Physics = {
+        AlwaysAlignToTerrain = true,
         MaxGroundVariation = 512,
         FlattenSkirt = false,
         BankingSlope = 0,
