@@ -1730,21 +1730,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@return boolean
     ShallSink = function(self)
         local layer = self.Layer
-
-        -- simple cases
-        if layer == 'Water' or layer == 'Sub' and not self.Blueprint.CategoriesHash['STRUCTURE'] then
-            return true
-        end
-
-        -- unit died underwater but is in the 'air'
-        if layer == 'Air' then
-            local x, y, z = self:GetPositionXYZ()
-            if y < GetSurfaceHeight(x, z) and y > GetTerrainHeight(x, z) then
-                return true
-            end
-        end
-
-        return false
+        local shallSink = (
+            (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
+            not EntityCategoryContains(categories.STRUCTURE, self)  -- Exclude structures
+        )
+        return shallSink
     end,
 
     ---@param self Unit
