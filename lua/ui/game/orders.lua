@@ -553,7 +553,7 @@ local function AbilityButtonBehavior(self, modifiers)
             name="RULEUCC_Script",
             AbilityName=self._script,
             TaskName=self._script,
-            cursor = self._cursor,
+            Cursor = self._cursor,
         }
         CommandMode.StartCommandMode("order", modeData)
     end
