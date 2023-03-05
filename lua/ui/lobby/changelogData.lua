@@ -21,7 +21,7 @@ gamePatches = {
             "",
             "## Bug fixes",
             "",
-            "- (#4786) Revert the tweaking of network parameters back to their usual settings",
+            "- (#4786) Revert the network parameters back to their usual values",
             "",
             "## Contributors",
             "",
