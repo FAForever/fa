@@ -69,8 +69,6 @@ styles = {
     cursorFunc = UIUtil.GetCursor,
 }
 
-reprsl(styles)
-
 ---@class Window : Group
 Window = ClassUI(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
