@@ -877,18 +877,7 @@ function CreateDialog()
         nil, --lock position
         'spawn_window', -- pref ID
         DefaultWindowLocation,
-        {
-            tl = UIUtil.UIFile('/game/options_brd/options_brd_ul.dds'),
-            tr = UIUtil.UIFile('/game/options_brd/options_brd_ur.dds'),
-            tm = UIUtil.UIFile('/game/options_brd/options_brd_horz_um.dds'),
-            ml = UIUtil.UIFile('/game/options_brd/options_brd_vert_l.dds'),
-            m = UIUtil.UIFile('/game/options_brd/options_brd_m.dds'),
-            mr = UIUtil.UIFile('/game/options_brd/options_brd_vert_r.dds'),
-            bl = UIUtil.UIFile('/game/options_brd/options_brd_ll.dds'),
-            bm = UIUtil.UIFile('/game/options_brd/options_brd_lm.dds'),
-            br = UIUtil.UIFile('/game/options_brd/options_brd_lr.dds'),
-            borderColor = 'ff415055',
-        }
+        nil
     )
     dialog:SetWindowAlpha((options.spawn_menu_alpha or 80)/100)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
@@ -1835,18 +1824,7 @@ function CreateDebugConfig()
         false, --lock position
         'spawn_config_window', -- pref ID
         { Top = 50, Left = 50, Right = 350, Bottom = 100 }, --Default position
-        {
-            tl = UIUtil.UIFile('/game/options_brd/options_brd_ul.dds'),
-            tr = UIUtil.UIFile('/game/options_brd/options_brd_ur.dds'),
-            tm = UIUtil.UIFile('/game/options_brd/options_brd_horz_um.dds'),
-            ml = UIUtil.UIFile('/game/options_brd/options_brd_vert_l.dds'),
-            m = UIUtil.UIFile('/game/options_brd/options_brd_m.dds'),
-            mr = UIUtil.UIFile('/game/options_brd/options_brd_vert_r.dds'),
-            bl = UIUtil.UIFile('/game/options_brd/options_brd_ll.dds'),
-            bm = UIUtil.UIFile('/game/options_brd/options_brd_lm.dds'),
-            br = UIUtil.UIFile('/game/options_brd/options_brd_lr.dds'),
-            borderColor = 'ff415055',
-        }
+        nil
     )
     debugConfig:SetWindowAlpha((options.spawn_menu_alpha or 80)/100)
     debugConfig.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
