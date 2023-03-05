@@ -610,10 +610,10 @@ VeterancyComponent = ClassSimple {
             while currLevel < 5 and upperThreshold <= experience do
                 self:AddVetLevel()
                 currLevel = currLevel + 1
-                lowerThreshold = vetThresholds[currLevel + 1]
+                upperThreshold = vetThresholds[currLevel + 1]
             end
 
-            -- case where we do have a limit (usual gameplay approach)
+        -- case where we do have a limit (usual gameplay approach)
         else
             if experience > diffThreshold then
                 experience = diffThreshold
@@ -688,6 +688,15 @@ VeterancyComponent = ClassSimple {
         self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level, 5)] or 0, true)
     end,
 
+    ---@param self Unit | VeterancyComponent
+    ---@param massKilled number
+    ---@param noLimit boolean
+    CalculateVeterancyLevelAfterTransfer = function(self, massKilled, noLimit)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(massKilled, noLimit)
+    end,
+
     -- kept for backwards compatibility with mods, but should really not be used anymore
 
     ---@deprecated
@@ -709,16 +718,6 @@ VeterancyComponent = ClassSimple {
     ---@param massKilled number
     ---@param noLimit boolean
     CalculateVeterancyLevel = function(self, massKilled, noLimit)
-        self.VetExperience = 0
-        self.VetLevel = 0
-        self:AddVetExperience(massKilled, noLimit)
-    end,
-
-    ---@deprecated
-    ---@param self Unit | VeterancyComponent
-    ---@param massKilled number
-    ---@param noLimit boolean
-    CalculateVeterancyLevelAfterTransfer = function(self, massKilled, noLimit)
         self.VetExperience = 0
         self.VetLevel = 0
         self:AddVetExperience(massKilled, noLimit)
