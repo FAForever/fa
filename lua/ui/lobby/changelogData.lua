@@ -1,4 +1,4 @@
-last_version = 3754
+last_version = 3755
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -12,6 +12,22 @@ last_version = 3754
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3755,
+        name = "Hotfix",
+        description = {
+            "",
+            "See the patch notes of 3751 for the full patch notes.",
+            "",
+            "## Bug fixes",
+            "",
+            "- (#4786) Revert the tweaking of network parameters back to their usual settings",
+            "",
+            "## Contributors",
+            "",
+            "Jip (#4786)",
+        }
+    },
     {
         version = 3754,
         name = "Hotfix",
