@@ -1,6 +1,16 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3755 (5th of March, 2023)
+
+## Bug fixes
+
+- (#4786) Revert the network parameters back to their usual values
+
+## Contributors
+
+Jip (#4786)
+
 # Game version 3754 (5th of March, 2023)
 
 See the patch notes of 3751 for the full patch notes.
