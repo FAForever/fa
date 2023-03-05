@@ -607,7 +607,7 @@ VeterancyComponent = ClassSimple {
             self.VetExperience = currExperience
             self:SetStat('VetExperience', currExperience)
 
-            while currLevel < 5 and upperThreshold <= experience do
+            while currLevel < 5 and upperThreshold and upperThreshold <= experience do
                 self:AddVetLevel()
                 currLevel = currLevel + 1
                 upperThreshold = vetThresholds[currLevel + 1]
