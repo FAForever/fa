@@ -415,6 +415,11 @@ function OnSync()
         import("/lua/ui/dialogs/hotstats.lua").scoreData = Sync.ScoreAccum
     end
 
+    if Sync.AcuKill then
+        local victim, instigator = Sync.AcuKill.victim, Sync.AcuKill.instigator
+        import("/lua/ui/game/gameresult.lua").DoGameResultKills(victim, instigator)
+    end
+
     -- Game <-> server communications
 
     -- Adjusting the behavior of this part of the sync is strictly forbidden and is considered

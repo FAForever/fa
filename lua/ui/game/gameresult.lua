@@ -74,3 +74,11 @@ function DoGameResult(armyIndex, result)
             {escapeButton = 2, enterButton = 1, worldCover = true})
     end)
 end
+
+function DoGameResultKills(victim, instigator)
+    -- Uncommenting the lines below will show a kill notification without using mods
+    -- local tabs = import("/lua/ui/game/tabs.lua")
+    
+    -- local armies = GetArmiesTable().armiesTable
+    -- tabs.TabAnnouncement('main', tostring(armies[victim].nickname) .. " has been defeated by" .. tostring(armies[instigator].nickname))
+end
