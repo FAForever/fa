@@ -877,7 +877,18 @@ function CreateDialog()
         nil, --lock position
         'spawn_window', -- pref ID
         DefaultWindowLocation,
-        nil -- texture table
+        {
+            tl = UIUtil.UIFile('/game/options_brd/options_brd_ul.dds'),
+            tr = UIUtil.UIFile('/game/options_brd/options_brd_ur.dds'),
+            tm = UIUtil.UIFile('/game/options_brd/options_brd_horz_um.dds'),
+            ml = UIUtil.UIFile('/game/options_brd/options_brd_vert_l.dds'),
+            m = UIUtil.UIFile('/game/options_brd/options_brd_m.dds'),
+            mr = UIUtil.UIFile('/game/options_brd/options_brd_vert_r.dds'),
+            bl = UIUtil.UIFile('/game/options_brd/options_brd_ll.dds'),
+            bm = UIUtil.UIFile('/game/options_brd/options_brd_lm.dds'),
+            br = UIUtil.UIFile('/game/options_brd/options_brd_lr.dds'),
+            borderColor = 'ff415055',
+        }
     )
     dialog:SetWindowAlpha((options.spawn_menu_alpha or 80)/100)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
@@ -987,8 +998,7 @@ function CreateDialog()
     local footerGroup = Group(windowGroup)
     footerGroup.Width:Set(windowGroup.Width)
     LayoutHelpers.AtBottomIn(footerGroup, windowGroup)
-    footerGroup.Width = windowGroup.Width
-    -- LayoutHelpers.SetWidth(footerGroup, windowGroup.Width())
+    LayoutHelpers.SetWidth(footerGroup, windowGroup.Width)
     LayoutHelpers.AtLeftIn(footerGroup, windowGroup)
     footerGroup.Top:Set(footerGroup.Bottom)
 
@@ -1351,7 +1361,6 @@ function CreateDialog()
         local index = filterSetCombo:GetItem()
         if index >= 1 then
             local delName = filterSetCombo.itemArray[index]
-            LOG(delName)
             local oldFilterSets = GetPreference('CreateUnitFilters')
             if oldFilterSets[delName] then
                 oldFilterSets[delName] = nil
@@ -1826,7 +1835,18 @@ function CreateDebugConfig()
         false, --lock position
         'spawn_config_window', -- pref ID
         { Top = 50, Left = 50, Right = 350, Bottom = 100 }, --Default position
-        nil -- texture table
+        {
+            tl = UIUtil.UIFile('/game/options_brd/options_brd_ul.dds'),
+            tr = UIUtil.UIFile('/game/options_brd/options_brd_ur.dds'),
+            tm = UIUtil.UIFile('/game/options_brd/options_brd_horz_um.dds'),
+            ml = UIUtil.UIFile('/game/options_brd/options_brd_vert_l.dds'),
+            m = UIUtil.UIFile('/game/options_brd/options_brd_m.dds'),
+            mr = UIUtil.UIFile('/game/options_brd/options_brd_vert_r.dds'),
+            bl = UIUtil.UIFile('/game/options_brd/options_brd_ll.dds'),
+            bm = UIUtil.UIFile('/game/options_brd/options_brd_lm.dds'),
+            br = UIUtil.UIFile('/game/options_brd/options_brd_lr.dds'),
+            borderColor = 'ff415055',
+        }
     )
     debugConfig:SetWindowAlpha((options.spawn_menu_alpha or 80)/100)
     debugConfig.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
