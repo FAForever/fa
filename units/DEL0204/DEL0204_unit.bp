@@ -272,7 +272,7 @@ UnitBlueprint {
             RackReloadTimeout = 0,
             RackSalvoChargeTime = 1,
             RackSalvoFiresAfterCharge = false,
-            RackSalvoReloadTime = 1,
+            RackSalvoReloadTime = 2,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
