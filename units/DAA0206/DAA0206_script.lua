@@ -5,32 +5,34 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 
-local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
-local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
-
----@class DAA0206 : AAirUnit
-DAA0206 = ClassUnit(AAirUnit) {
-    --ContrailEffects = {
-    --    '/effects/emitters/contrail_ser_ohw_polytrail_01_emit.bp',
-    --},
-
-    Weapons = {
-        Suicide = ClassWeapon(DefaultProjectileWeapon) {}
-    },
-
-    OnRunOutOfFuel = function(self)
-        self:Kill()
-    end,
-
-    ProjectileFired = function(self)
-        self:GetWeapon(1).IdleState.Main = function(self) end
-        self:PlayUnitSound('Killed')
-		self:PlayUnitSound('Destroyed')
-        self:Destroy()
-    end,
-}
-TypeClass = DAA0206
-
+local AAirUnits = import("/lua/aeonunits.lua")
+local DefaultWeapons = import("/lua/sim/defaultweapons.lua")
 -- Kept for Mod Backwards Compatablity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtils = import('/lua/effectutilities.lua')
+local weapon = ClassWeapon(DefaultWeapons.DefaultProjectileWeapon) {} --cached
+
+local function f_OnRunOutOfFuel(self)
+    self:Kill()
+end
+
+local function f_projectileFired(self)
+    local playSound = self.PlayUnitSound --maybe could be cached global?
+    weapon.IdleState.Main = nil
+    playSound(self, 'Killed')
+    playSound(self, 'Destroyed')
+    self:Destroy()
+end
+
+---@class DAA0206 : AAirUnit
+local DAA0206 = ClassUnit(AAirUnits.AAirUnit) {
+    Weapons = {
+        Suicide = weapon,
+    },
+    --ContrailEffects = {
+    --    '/effects/emitters/contrail_ser_ohw_polytrail_01_emit.bp',
+    --},
+    OnRunOutOfFuel = f_OnRunOutOfFuel,
+    ProjectileFired = f_projectileFired,
+}
+TypeClass = DAA0206
