@@ -1,7 +1,117 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
-# Game version 3753 (25th of February, 2022)
+# Game version 3755 (5th of March, 2023)
+
+## Bug fixes
+
+- (#4786) Revert the network parameters back to their usual values
+
+## Contributors
+
+Jip (#4786)
+
+# Game version 3754 (5th of March, 2023)
+
+See the patch notes of 3751 for the full patch notes.
+
+We would like to remind people that we're always open to feedback. Specifically for the changes surrounding the factories we made a few topics for you to give feedback on the various line ups. You can find them here:
+
+- https://forum.faforever.com/topic/5790/redesign-of-all-hq-and-support-factories
+
+If you can't click on that link then navigate to `General Discussion -> Suggestions` on the forums. The overview topic is pinned at the top.
+
+At the moment there is a game-breaking issue with Nomads. The maintainer has been informed.
+
+With kind regards,
+
+Jip
+
+## Features
+
+- (#4745, #4779, #4781) Tweaking of network parameters in an attempt to reduce lag
+
+## Bug fixes
+
+- (#4755, #4783) Fix various issues with build mode
+
+- (#4756) Fix extractors not aligning with the terrain
+
+- (#4743) Fix civilians not being revealed
+
+- (#4752) Fix auto balance button when no faction is selected
+
+- (#4757) Fix hot build not being reset after a build order
+
+- (#4759) Fix beam weapons continiously restarting as they ground fire
+    This also fixes the bug where beam weapons that are firing on the ground apply the damage twice
+
+- (#4763) Fix veterancy triggering before death weapons do
+
+- (#4771) Fix a typo in `CreateIntelTriggers`
+
+- (#4777) Fix a bug where reclaiming props with no value could prevent the ACU from shooting
+
+- (#4778) Fix tractor beams from making units invulnerable
+
+- (#4768) Fix orientation of structures with pre-defined orientations (from the editor)
+
+- (#4782) Fix cursor not changing when you manually issue an attack order
+
+- (#4719) Fix significant weapon delay on the anti air gun of the Sky Slammer, Siren and Bouncer
+
+- (#4784) Fix units receiving full vet after being transferred
+
+## AI
+
+We would like to remind people that there are various mods that provide different AI experiences. We can highly recommend you to download them from the vault and give them a spin.
+
+A short list of AIs we recommend at this point:
+
+- M27: made by Maudlin
+- RNGAI, as made by Relent0r
+- Sorian Edit, as made by Marlo
+- Uveso AI, as made by Uveso
+- Dilli Dalli, as made by Softles
+- Swarm AI, as made by Azraeel
+
+And not to forget the AI that ships with the Total Annihilation mod that is maintained by Dragun.
+
+- (#4674) Fix base AI logic running with AIs from the vault
+
+## Navigational mesh
+
+The navigational mesh is an abstract representation of a map. The AI can use that representation to gain an understanding of what the map 'looks like'. The navigational mesh is generated at the start of the map and works on any map.  
+
+- (#4761) Fix labels being culled even though they have resources
+
+- (#4762) Introduce a search threshold when searching for a valid leaf
+
+- (#4776) Fix navigational mesh being able to be generated multiple times
+
+- (#4780) Fix order of execution so that expansion markers are properly generated
+
+## Physics Based Rendering (PBR)
+
+We're slowly but surely preparing the game for a significant visual improvement. This is a long term project that is going to consume hundreds of hours. We're hoping to find additional contributors that have an interesting in creating (and fixing) meshes and textures. If you have that interest and/or experience and you'd like to help out then you can introduce yourself in the dedicated channels in the official Discord channel!
+
+- (#4713) Fix animation problems with the Cybran air factory line up
+
+## Other changes
+
+- (#4758) Add division icon for the unlisted 'division'
+
+## Contributors
+
+RabidPope (#4719)
+Relentor (#4674)
+Rowey (#4752)
+Jip (#4745, #4756, #4743, #4757, #4759, #4761, #4763, #4762, #4778, #4777, #4776, #4768, #4780, #4782, #4719)
+Wotan (#4745)
+SlinkingAnt (#4755, #4783)
+4z0t (#4771, #4758)
+
+# Game version 3753 (25th of February, 2023)
 
 See the patch notes of 3751 for the full patch notes.
 
@@ -21,7 +131,7 @@ See the patch notes of 3751 for the full patch notes.
 - Jip (#4741, #4739, #4740)
 - KionX (acc6893)
 
-# Game version 3752 (25th of February, 2022)
+# Game version 3752 (25th of February, 2023)
 
 See the patch notes of 3751 for the full patch notes.
 
@@ -34,7 +144,7 @@ See the patch notes of 3751 for the full patch notes.
 - Jip (#4736)
 - Sheikah (#4736)
 
-# Game version 3751 (25th of February, 2022)
+# Game version 3751 (25th of February, 2023)
 
 In this first development update of 2023, we introduce three month's work of bugfixes, quality of life changes, and assorted improvements. It is, by far, the most exciting patch we've released so far. While the full changes are detailed below, a quick summary of those changes we think you'll find most important:
 
@@ -118,7 +228,7 @@ A short list of AIs we recommend at this point:
 - RNGAI, as made by Relent0r
 - Sorian Edit, as made by Marlo
 - Uveso AI, as made by Uveso
-- Dilli Dally, as made by Softles
+- Dilli Dalli, as made by Softles
 - Swarm AI, as made by Azraeel
 
 And not to forget the AI that ships with the Total Annihilation mod that is maintained by Dragun.

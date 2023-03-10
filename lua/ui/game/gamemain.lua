@@ -183,15 +183,14 @@ function CreateUI(isReplay)
     ConExecute('d3d_WindowsCursor on')
 
     -- tweak networking parameters
-    ConExecute('net_MinResendDelay 10')
-    ConExecute('net_MaxResendDelay 100')
+    ConExecute('net_MinResendDelay 100')
+    ConExecute('net_MaxResendDelay 1000')
 
-    ConExecute('net_MaxSendRate 32768')
-    ConExecute('net_MaxBacklog 32768')
+    ConExecute('net_MaxSendRate 8192')
+    ConExecute('net_MaxBacklog 8192')
 
-    ConExecute('net_SendDelay 1')
-    ConExecute('net_AckDelay 1')
-    ConExecute('net_ResendDelayBias 1')
+    ConExecute('net_SendDelay 5')
+    ConExecute('net_AckDelay 5')
 
     -- enable experimental graphics
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
@@ -199,8 +198,6 @@ function CreateUI(isReplay)
     then
         ForkThread(function()
             WaitSeconds(1.0)
-
-            LOG("Experimental graphics enabled, use at your own risk: ")
 
             if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
                 -- allow meshes and effects to be seen from further away

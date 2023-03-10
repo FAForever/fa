@@ -1398,6 +1398,9 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
 }
 
 ---@class DefaultBeamWeapon : DefaultProjectileWeapon
+---@field DisableBeamThreadInstance? thread
+---@field Beams { Beam: CollisionBeam, Muzzle: string, Destroyables: table}[]
+---@field BeamStarted boolean
 DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,
 
@@ -1473,37 +1476,47 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     ---@param muzzle string
     PlayFxBeamStart = function(self, muzzle)
         local bp = self.Blueprint
-        local beam
-        self.BeamDestroyables = {}
 
+        -- find beam that matches the muzzle
+        local beam
         for _, v in self.Beams do
             if v.Muzzle == muzzle then
                 beam = v.Beam
+                break
             end
         end
+
+        -- edge case: no beam that matches the muzzle
         if not beam then
             error('*ERROR: We have a beam created that does not coincide with a muzzle bone.  Internal Error, aborting beam weapon.', 2)
             return
         end
 
-        if beam:IsEnabled() then return end
+        -- edge case: we're already enabled
+        if beam:IsEnabled() then
+            return
+        end
+
+        -- enable the beam
         beam:Enable()
-        self.Trash:Add(beam)
 
-        -- Deal with continuous and non-continuous beams
+        -- non-continious beams that just end
         if bp.BeamLifetime > 0 then
-            self:ForkThread(self.BeamLifetimeThread, beam, bp.BeamLifetime or 1)    -- Non-continuous only
-        end
-        if bp.BeamLifetime == 0 then
-            self.HoldFireThread = self:ForkThread(self.WatchForHoldFire, beam)      -- Continuous only
+            self:ForkThread(self.BeamLifetimeThread, beam, bp.BeamLifetime or 1)
         end
 
+        -- continious beams
+        if bp.BeamLifetime == 0 then
+            self.HoldFireThread = self:ForkThread(self.WatchForHoldFire, beam)
+        end
+
+        -- manage audio of the beam
         local audio = bp.Audio
         local beamStart = audio.BeamStart
-        -- Deal with beam audio cues
         if beamStart then
             self:PlaySound(beamStart)
         end
+
         local beamLoop = audio.BeamLoop
         if beamLoop then
             -- should be `beam.Beam` but `PlayFxBeamEnd` wouldn't get enough muzzle info to stop the sound
@@ -1512,30 +1525,39 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
                 b:SetAmbientSound(beamLoop, nil)
             end
         end
+
         self.BeamStarted = true
     end,
 
-    -- Kill the beam if hold fire is requested
     ---@param self DefaultBeamWeapon
-    ---@param beam CollisionBeam
-    WatchForHoldFire = function(self, beam)
-        local unit = self.unit
-        local hasTargetPrev = true
-        while not (IsDestroyed(self) or IsDestroyed(unit)) do
-
-            local hasTarget = self:GetCurrentTarget() != nil
-            if   -- check for hold fire
-                (unit:GetFireState() == 1) or
-                 -- check if we have a target still, relevant for beam weapons that work indefinitely
-                (not (hasTarget or hasTargetPrev))
-            then
-                self.BeamStarted = false
-                self:PlayFxBeamEnd(beam)
+    OnGotTarget = function (self)
+        DefaultProjectileWeapon.OnGotTarget(self)
+        local blueprint = self.Blueprint
+        if blueprint.BeamLifetime == 0 then
+            local disableBeamThread = self.DisableBeamThreadInstance
+            if disableBeamThread then
+                disableBeamThread:Destroy()
             end
-
-            hasTargetPrev = hasTarget
-            WaitSeconds(0.5)
         end
+    end,
+
+    ---@param self DefaultBeamWeapon
+    OnLostTarget = function(self)
+        DefaultProjectileWeapon.OnLostTarget(self)
+        if self.Blueprint.BeamLifetime == 0 then
+            local thread = ForkThread(self.DisableBeamThread, self)
+            self.Trash:Add(thread)
+            self.DisableBeamThreadInstance = thread
+        end
+    end,
+
+    ---@param self DefaultBeamWeapon
+    DisableBeamThread = function(self)
+        WaitTicks(11)
+        for _, info in self.Beams do
+            self:PlayFxBeamEnd(info.Beam)
+        end
+        self.DisableBeamThreadInstance = nil
     end,
 
     -- Force the beam to last the proper amount of time
@@ -1581,6 +1603,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
             end
             self.BeamStarted = false
         end
+
         local thread = self.HoldFireThread
         if thread then
             KillThread(thread)
@@ -1601,13 +1624,11 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
     ---@param self DefaultBeamWeapon
     OnHaltFire = function(self)
-        for _, beam in self.Beams do
-            -- Only halt fire on the beams that are currently enabled
-            local b = beam.Beam
-            if not b:IsEnabled() then
-                continue
+        for _, info in self.Beams do
+            local b = info.Beam
+            if b:IsEnabled() then
+                self:PlayFxBeamEnd(b)
             end
-            self:PlayFxBeamEnd(b)
         end
     end,
 
@@ -1663,6 +1684,13 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
             return false
         end
         return true
+    end,
+
+    -- Kill the beam if hold fire is requested
+    ---@deprecated
+    ---@param self DefaultBeamWeapon
+    ---@param beam CollisionBeam
+    WatchForHoldFire = function(self, beam)
     end,
 }
 

@@ -582,9 +582,7 @@ function OnCommandIssued(command)
     if not command.Clear then
         issuedOneCommand = true
     else
-        if modeData and not modeData.consistent then
-            EndCommandMode(true)
-        end
+        EndCommandMode(true)
     end
 
     -- called when:
