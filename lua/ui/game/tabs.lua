@@ -793,7 +793,10 @@ end
 function OnGameOver()
     gameOver = true
     for i, tab in controls.tabs do
-        if tab.Data.disableForObserver then
+        if tab.Data.disableForObserver and 
+            -- do not disable buttons in a replay
+            not SessionIsReplay() 
+        then
             tab:Disable()
         end
     end
