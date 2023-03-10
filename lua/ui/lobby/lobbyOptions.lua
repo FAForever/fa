@@ -190,7 +190,7 @@ teamOptions =
 ---@type ScenarioOption[]
 globalOpts = {
     {
-         default = 2,
+         default = 1,
          label = "<LOC lobui_0740>Share Conditions",
          help = "<LOC lobui_0741>Set what happens to a player's units when they are defeated",
          key = 'Share',
