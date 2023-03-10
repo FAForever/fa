@@ -77,8 +77,8 @@ local TableGetn = table.getn
 ---@field EnergyExcessThread thread
 ---@field EnergyExcessUnitsEnabled table<EntityId, MassFabricationUnit>
 ---@field EnergyExcessUnitsDisabled table<EntityId, MassFabricationUnit>
----@field EnergyDependingUnits Shield[]
----@field EnergyDependingUnitsHead number
+---@field EnergyDependingUnits table<EntityId, Unit | Shield>
+---@field EnergyDepleted boolean
 ---@field EconomyTicksMonitor number
 ---@field HasPlatoonList boolean
 ---@field HQs table<HqFaction, table<HqLayer, table<HqTech, number>>>
@@ -324,9 +324,7 @@ AIBrain = Class(moho.aibrain_methods) {
         -- add initial trigger and assume we're not depleted
         self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
         self.EnergyDepleted = false 
-        self.EnergyDependingUnits = { }
-        self.EnergyDependingUnits.__mode = 'v'
-        self.EnergyDependingUnitsHead = 1
+        self.EnergyDependingUnits = setmetatable({ }, { __mode = 'v' })
 
         --- Units that we toggle on / off depending on whether we have excess energy
         self.EnergyExcessConsumed = 0
@@ -429,9 +427,6 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Place resource structures down
             for k, v in resourceStructures do
                 local unit = self:CreateResourceBuildingNearest(v, posX, posY)
-                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
-                    unit:CreateTarmac(true, true, true, false, false)
-                end
             end
         end
 
@@ -439,9 +434,6 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Place initial units down
             for k, v in initialUnits do
                 local unit = self:CreateUnitNearSpot(v, posX, posY)
-                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
-                    unit:CreateTarmac(true, true, true, false, false)
-                end
             end
         end
 
@@ -670,44 +662,38 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
     ---@param self AIBrain
-    ---@param entity Shield
+    ---@param entity Unit | Shield
     AddEnergyDependingEntity = function(self, entity)
-        self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity 
-        self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
+        self.EnergyDependingUnits[entity.EntityId] = entity
+
+        -- guarantee callback when entity is depleted
+        if self.EnergyDepleted then
+            entity:OnEnergyDepleted()
+        end
     end,
 
     ---@param self AIBrain
     ---@param triggerName string
     OnEnergyTrigger = function(self, triggerName)
-        if triggerName == "EnergyDepleted" then 
+        if triggerName == "EnergyDepleted" then
             -- add trigger when we can recover units
             self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyViable', 'GreaterThanOrEqual', 0.1)
-            self.EnergyDepleted = true 
+            self.EnergyDepleted = true
 
             -- recurse over the list of units and do callbacks accordingly
-            local index = 1 
-            for k = 1, self.EnergyDependingUnitsHead - 1 do 
-                local entity = self.EnergyDependingUnits[k]
-
-                if not entity:BeenDestroyed() then 
-                    self.EnergyDependingUnits[index] = entity 
-                    index = index + 1
+            for id, entity in self.EnergyDependingUnits do
+                if not IsDestroyed(entity) then 
                     entity:OnEnergyDepleted()
                 end
             end
         else 
             -- add trigger when we're depleted
             self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
-            self.EnergyDepleted = false 
+            self.EnergyDepleted = false
 
             -- recurse over the list of units and do callbacks accordingly
-            local index = 1 
-            for k = 1, self.EnergyDependingUnitsHead - 1 do 
-                local entity = self.EnergyDependingUnits[k]
-
-                if entity and not entity:BeenDestroyed() then 
-                    self.EnergyDependingUnits[index] = entity 
-                    index = index + 1
+            for id, entity in self.EnergyDependingUnits do
+                if not IsDestroyed(entity) then
                     entity:OnEnergyViable()
                 end
             end
@@ -769,8 +755,8 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param reconType ReconTypes
     ---@param val boolean
     OnIntelChange = function(self, blip, reconType, val)
-        if reconType == 'LOSNow' or reconType == 'Omni' then
-            if not val then
+        if not val then
+            if reconType == 'LOSNow' or reconType == 'Omni' then
                 local unit = blip:GetSource()
                 if unit.Blueprint.Intel.JammerBlips > 0 then
                     unit.ResetJammer = self.JammerResetTime
@@ -3702,7 +3688,9 @@ AIBrain = Class(moho.aibrain_methods) {
             PlatoonAlertSounded = false,
         }
         self:ForkThread(self.BaseMonitorThread)
-        self:ForkThread(self.CanPathToCurrentEnemy)
+        if self:IsBaseAI() then
+            self:ForkThread(self.CanPathToCurrentEnemy)
+        end
     end,
 
     ---@param self AIBrain

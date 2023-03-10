@@ -965,7 +965,9 @@ function ReloadBlueprint(file)
     safecall("Blueprints Reloading... " .. file, doscript, file)
 
     ExtractAllMeshBlueprints()
+    PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
+    PostModBlueprints(original_blueprints)
     RegisterAllBlueprints(original_blueprints)
     original_blueprints = nil
 end
