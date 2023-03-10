@@ -13,10 +13,7 @@ CANTorpedoMeson01 = ClassProjectile(CTorpedoShipProjectile) {
 
     OnEnterWater = function(self)
         CTorpedoShipProjectile.OnEnterWater(self)
-        local army = self.Army
-        for i in self.FxExitWaterEmitter do --splash
-            CreateEmitterAtEntity(self,army,self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
-        end
+        
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetBallisticAcceleration(0)

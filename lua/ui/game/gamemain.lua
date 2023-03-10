@@ -199,8 +199,6 @@ function CreateUI(isReplay)
         ForkThread(function()
             WaitSeconds(1.0)
 
-            LOG("Experimental graphics enabled, use at your own risk: ")
-
             if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
                 -- allow meshes and effects to be seen from further away
                 ConExecute("cam_SetLOD WorldCamera 0.65")
@@ -657,7 +655,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if not isOldSelection then
         import("/lua/ui/game/selection.lua").PlaySelectionSound(added)
         import("/lua/ui/game/rallypoint.lua").OnSelectionChanged(newSelection)
-        if Prefs.GetFromCurrentProfile('options.repeatbuild') then
+        if Prefs.GetFromCurrentProfile('options.repeatbuild') == 'On' then
             local factories = EntityCategoryFilterDown(categories.STRUCTURE * categories.FACTORY, added) -- find all newly selected factories
             for _, factory in factories do
                 if not factory.HasBeenSelected then
