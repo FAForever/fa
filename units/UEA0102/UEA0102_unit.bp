@@ -234,7 +234,7 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = false,
         },
-        Elevation = 18,
+        Elevation = 14,
         FuelRechargeRate = 5,
         FuelUseTime = 300,
         GroundCollisionOffset = 1.6,
