@@ -20,7 +20,7 @@ StatusBar = ClassUI(Bitmap) {
     ---@param vertical boolean # When true, the bar grows vertically instead of horizontally
     ---@param negative boolean # When true, the bar grows in the other direction
     ---@param background Lazy<FileName>
-    ---@param bar any
+    ---@param bar FileName
     ---@param stretchTextures boolean
     ---@param debugname string
     __init = function(self, parent, rangeMin, rangeMax, vertical, negative, background, bar, stretchTextures, debugname)
@@ -36,8 +36,8 @@ StatusBar = ClassUI(Bitmap) {
         self._stretch = stretchTextures or false
         self._bar = Bitmap(self, bar)
 
-        if self._vertical then
-            if self._negative then
+        if vertical then
+            if negative then
                 self._bar.Top:SetFunction(self.Top)
                 self._bar.Bottom:SetFunction(
                     function()
@@ -63,7 +63,7 @@ StatusBar = ClassUI(Bitmap) {
             self._bar.Left:SetFunction(self.Left)
             self._bar.Width:SetFunction(self.Width)
         else
-            if self._negative then
+            if negative then
                 self._bar.Right:SetFunction(self.Right)
                 self._bar.Left:SetFunction(
                     function()
