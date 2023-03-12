@@ -161,6 +161,7 @@ function OnSync()
     end
 
     if Sync.FocusArmyChanged then
+        import("/lua/ui/game/recall.lua").FocusArmyChanged()
         import("/lua/ui/game/massfabs.lua").FocusArmyChanged()
         import("/lua/ui/game/avatars.lua").FocusArmyChanged()
         import("/lua/ui/game/multifunction.lua").FocusArmyChanged()

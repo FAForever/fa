@@ -25,6 +25,15 @@ function Create(parent)
     return panel
 end
 
+function FocusArmyChanged()
+    local focusArmy = GetFocusArmy()
+    if focusArmy == -1 then
+        if panel then
+            panel:Hide()
+        end
+    end
+end
+
 function SetLayout()
     Layouter(panel)
         :AtLeftIn(panel.parent, panel:LoadPosition().left)
