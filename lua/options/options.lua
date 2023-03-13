@@ -649,7 +649,7 @@ options = {
             },
 
             {
-                title = "<LOC WATER_DEPTH_ASSISTANCE>Water depth assistance",
+                title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",
                 key = 'cursor_depth_scanning',
                 type = 'toggle',
                 default = 'off',
@@ -669,7 +669,7 @@ options = {
             },
 
             {
-                title = "<LOC PLANE_HEIGHT_ASSISTANCE>Plane height assistance",
+                title = "<LOC PLANE_HEIGHT_ASSISTANCE_TITLE>Plane height indication",
                 key = 'cursor_hover_scanning',
                 type = 'toggle',
                 default = 'off',
