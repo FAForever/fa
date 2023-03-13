@@ -142,7 +142,7 @@ local function SendData(Sync)
     -- TODO: add check if we've actually moved the mouse
 
     -- do not send nils
-    if position and position[1] then
+    if position and position[1] and table.getn(clients) > 0 then
 
         ---@type CastingMouseMessage
         local msg = {
@@ -158,33 +158,49 @@ local function SendData(Sync)
     end
 end
 
+--- Allow player to disable or start thread that shows mouse locations
+local displayRendering = import("/lua/user/prefs.lua").GetFromCurrentProfile('options.share_mouse') == 'on'
+function UpdatePreferenceOption(value)
+    displayRendering = value == 'on'
+end
+
 --- Interpolates the mouse position between updates
 local function DisplayThread()
     while true do
-        for id, entity in Entities do
-            local next = LocationTarget[id]
-            local curr = LocationCurrent[id]
+        if displayRendering then
+            for id, entity in Entities do
+                local next = LocationTarget[id]
+                local curr = LocationCurrent[id]
 
-            local x = next[1] * 0.1 + curr[1] * 0.9
-            local y = next[2] * 0.1 + curr[2] * 0.9
-            local z = next[3] * 0.1 + curr[3] * 0.9
+                local x = next[1] * 0.1 + curr[1] * 0.9
+                local y = next[2] * 0.1 + curr[2] * 0.9
+                local z = next[3] * 0.1 + curr[3] * 0.9
 
-            local position = {x, y, z}
-            LocationCurrent[id] = position
+                local position = {x, y, z}
+                LocationCurrent[id] = position
 
-            -- update everything
+                -- update everything
+                if x and y and z then
+                    entity:SetStance(position)
 
-            if x and y and z then
-                entity:SetStance(position)
-
-                local label = Labels[id]
-                local screen = WorldViewManager.viewLeft:Project(position)
-                label.Left:Set(screen[1] - 0.5 * label.Width())
-                label.Top:Set(screen[2] - 30)
+                    local label = Labels[id]
+                    local screen = WorldViewManager.viewLeft:Project(position)
+                    label.Left:SetValue(screen[1] - 0.5 * label.Width())
+                    label.Top:SetValue(screen[2] - 30)
+                end
             end
-        end
 
-        WaitFrames(1)
+            -- interpolate position each frame
+            WaitFrames(1)
+        else
+            for id, entity in Entities do
+                entity:SetHidden(true)
+                Labels[id]:Hide()
+            end
+
+            -- wait a few frames before checking again
+            WaitFrames(100)
+        end
     end
 end
 
