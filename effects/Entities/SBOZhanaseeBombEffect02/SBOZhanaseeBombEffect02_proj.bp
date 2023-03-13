@@ -23,10 +23,10 @@ ProjectileBlueprint {
     },
     Display = {
         CameraFollowTimeout = 2,
-        CameraFollowsProjectile = true,    
+        CameraFollowsProjectile = true,
         ImpactEffects = {
             Type = 'Small01',
-        },    
+        },
         StrategicIconSize = 1,
     },
     General = {
@@ -46,7 +46,7 @@ ProjectileBlueprint {
         StayUpright = false,
         Lifetime = 0.5,
         UseGravity = false,
-        RotationalVelocity= 2400,
+        RotationalVelocity = 2400,
         RotationalAcceleration = 0,
         Acceleration = 0,
     },

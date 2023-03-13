@@ -8,7 +8,7 @@ local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProje
 
 BrackmanQAIHackCircuitryEffect01 = Class(EmitterProjectile) {
 	FxImpactTrajectoryAligned = true,
-	FxTrajectoryAligned= true,
+	FxTrajectoryAligned = true,
 	FxTrails = EffectTemplate.CBrackmanQAIHackCircuitryEffectFxtrailsALL[1],
 }
 TypeClass = BrackmanQAIHackCircuitryEffect01

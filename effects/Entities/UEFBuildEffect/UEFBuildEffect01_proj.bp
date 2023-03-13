@@ -6,7 +6,7 @@ ProjectileBlueprint {
                     MeshName = '/meshes/generic/cube01_lod0.scm',
                     ShaderName = 'TMeshGlow',
                     AlbedoName = '/meshes/generic/cube01_albedo.dds',
-                    SpecularName =  '/meshes/generic/cube01_specteam.dds',
+                    SpecularName = '/meshes/generic/cube01_specteam.dds',
                     LODCutoff = 300,
                 },
             },

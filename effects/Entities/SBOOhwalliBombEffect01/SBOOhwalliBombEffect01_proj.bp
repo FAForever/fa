@@ -10,7 +10,7 @@ ProjectileBlueprint {
         StayUpright = false,
         Lifetime = 8.5,
         UseGravity = false,
-        RotationalVelocity= 450,
+        RotationalVelocity = 450,
         RotationalAcceleration = 0,
         Acceleration = 0,
     },

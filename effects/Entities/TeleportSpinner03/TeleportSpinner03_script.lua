@@ -11,7 +11,7 @@ TeleportSpinner03 = Class(NullShell) {
         NullShell.OnCreate(self)
         local army = self.Army
         for k, v in EffectTemplate.CSGTestSpinner3 do
-            CreateEmitterOnEntity( self, army, v )
+            CreateEmitterOnEntity(self, army, v)
         end
     end,
 }

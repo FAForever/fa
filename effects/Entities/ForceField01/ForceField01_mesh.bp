@@ -1,5 +1,4 @@
 -- used by ueb0304
-
 MeshBlueprint {
     LODs = {
         {

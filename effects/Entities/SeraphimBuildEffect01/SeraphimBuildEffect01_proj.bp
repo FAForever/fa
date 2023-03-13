@@ -1,7 +1,7 @@
 ProjectileBlueprint {
     Display = {
         UniformScale = 1,
-    },    
+    },
     Physics = {
         Acceleration = 0,
         AccelerationRange = 0,

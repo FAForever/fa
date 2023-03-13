@@ -6,7 +6,6 @@ MeshBlueprint {
             AlbedoName = 'CybranPhalanxSphere01_Albedo.dds',
             NormalsName = 'CybranPhalanxSphere01_Normals.dds',
             LODCutoff = 200,
-            
         },
     },
     SortOrder = 999,
