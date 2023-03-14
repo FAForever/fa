@@ -112,6 +112,7 @@ UnitBlueprint {
         BuildCostEnergy = 160000,
         BuildCostMass = 10000,
         BuildTime = 30000,
+        MaintenanceConsumptionPerSecondEnergy = 350,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -142,6 +143,9 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
+        ActiveIntel = {
+            Radar = true,
+        },
         RadarRadius = 200,
         OmniRadius = 60,
         VisionRadius = 60,
