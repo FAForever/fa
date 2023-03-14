@@ -125,17 +125,17 @@ function EndCommandMode(isCancel)
 
     -- in case we want to end the command mode, without knowing it has already ended or not
     if modeData then
-        -- regain selection if we were cheating in units
-        if modeData.cheat and modeData.selection then
-            SelectUnits(modeData.selection)
-        end
-
         -- add information to modeData for end behavior
         modeData.isCancel = isCancel or false
 
         -- ???
         if modeData.isCancel then
             ClearBuildTemplates()
+        end
+
+        -- regain selection if we were cheating in units
+        if modeData.cheat and modeData.selection then
+            SelectUnits(modeData.selection)
         end
     end
 

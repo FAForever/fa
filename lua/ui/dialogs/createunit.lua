@@ -1846,7 +1846,7 @@ function CreateDebugConfig()
         {style = 'title',        name = 'Unit spawn settings:' },
         {style = 'configtoggle', name = 'Spawn structure tarmacs',                    prefid = 'spawn_menu_tarmacs_enabled', },
         {style = 'configtoggle', name = 'Spawn mesh entites instead of units',        prefid = 'spawn_menu_mesh_only', },
-        {style = 'toggle',       name = 'Clear spawned entity meshes', activate = function() SimCallback{Func = 'ClearSpawneMeshes'} end },
+        {style = 'toggle',       name = 'Clear spawned entity meshes', activate = function() SimCallback{Func = 'ClearSpawnedMeshes'} end },
         {style = 'configtoggle', name = 'Position camera for build icon on spawn',    prefid = 'spawn_menu_unit_icon_camera' },
         {style = 'configtoggle', name = 'Ignore terrain blocking (disables preview)', prefid = 'spawn_menu_force_dummy_spawn'},
 

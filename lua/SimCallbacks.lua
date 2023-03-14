@@ -418,7 +418,7 @@ local function SetWorldCameraToUnitIconAngle(location, zoom)
     })
 end
 
-Callbacks.ClearSpawneMeshes = function()
+Callbacks.ClearSpawnedMeshes = function()
     for i, v in SpawnedMeshes do
         v:Destroy()
     end
