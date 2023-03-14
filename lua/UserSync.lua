@@ -414,18 +414,7 @@ function OnSync()
         LOG("Score data received!")
         import("/lua/ui/dialogs/hotstats.lua").scoreData = Sync.ScoreAccum
     end
-
-    local events = Sync.Events
-    if events then
-        local acuDestroyed = events.ACUDestroyed
-        if acuDestroyed then
-            for k, event in acuDestroyed do
-                local victim, instigator = event.KilledArmy, event.InstigatorArmy
-                import("/lua/ui/game/gameresult.lua").DoGameResultKills(victim, instigator)
-            end
-        end
-    end
-
+    
     -- Game <-> server communications
 
     -- Adjusting the behavior of this part of the sync is strictly forbidden and is considered
