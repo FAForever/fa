@@ -2016,7 +2016,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     ---@param label string
-    ---@return Weapon | nil
+    ---@return moho.AimManipulator | nil
     GetWeaponManipulatorByLabel = function(self, label)
         local weapon = self:GetWeaponByLabel(label)
         if weapon then 

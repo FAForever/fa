@@ -109,6 +109,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
         local categoriesHash = bp.CategoriesHash
 
         -- B E F O R E
+        local orientation = unit:GetOrientation()
         local numNukes = unit:GetNukeSiloAmmoCount() -- nuclear missiles; SML or SMD
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
         local massKilled = unit.VetExperience
@@ -194,28 +195,36 @@ function TransferUnitsOwnership(units, toArmy, captured)
         unit.oldowner = oldowner
 
         -- A F T E R
+        unit:SetOrientation(orientation, true)
+
         if massKilled and massKilled > 0 then
             unit:CalculateVeterancyLevelAfterTransfer(massKilled, true)
         end
+
         if activeEnhancements then
             for _, enh in activeEnhancements do
                 unit:CreateEnhancement(enh)
             end
         end
+
         local maxHealth = unit:GetMaxHealth()
         if unitHealth > maxHealth then
             unitHealth = maxHealth
         end
+
         unit:SetHealth(unit, unitHealth)
         if hasFuel then
             unit:SetFuelRatio(fuelRatio)
         end
+
         if numNukes and numNukes > 0 then
             unit:GiveNukeSiloAmmo(numNukes - unit:GetNukeSiloAmmoCount())
         end
+
         if numTacMsl and numTacMsl > 0 then
             unit:GiveTacticalSiloAmmo(numTacMsl - unit:GetTacticalSiloAmmoCount())
         end
+
         local newShield = unit.MyShield
         if newShield then
             newShield:SetHealth(unit, shieldHealth)
@@ -225,6 +234,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
                 unit:DisableShield()
             end
         end
+        
         if EntityCategoryContains(categoriesENGINEERSTATION, unit) then
             if not upgradeBuildTimeComplete or not shareUpgrades then
                 if categoriesHash.UEF then
