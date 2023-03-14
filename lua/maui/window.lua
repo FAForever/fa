@@ -503,6 +503,17 @@ Window = ClassUI(Group) {
         end
     end,
 
+    ---@param self Window
+    ---@param alpha number
+    ---@param affectChildren boolean
+    SetAlpha = function(self, alpha, affectChildren)
+        affectChildren = affectChildren or false
+        Group.SetAlpha(self, alpha, affectChildren)
+
+        -- guarantee that the resize bars remain transparent
+        self._resizeGroup:SetAlpha(0, true)
+    end,
+
     SaveWindowLocation = function(self)
         if self._pref then
             Prefs.SetToCurrentProfile(
