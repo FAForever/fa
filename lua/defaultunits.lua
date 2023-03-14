@@ -2926,10 +2926,21 @@ ACUUnit = ClassUnit(CommandUnit) {
             if IsAlly(self.Army, instigator.Army) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
                 WARN('Teamkill detected')
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
-            else
-                -- Store who performed the Acu kill, so it can be handed down to the ui layer
-                Sync.AcuKill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
             end
+
+            -- prepare sync
+            local sync = Sync
+            local events = sync.Events or { }
+            sync.Events = events
+            local acuDestroyed = events.ACUDestroyed or { }
+            events.ACUDestroyed = acuDestroyed
+
+            -- sync the event
+            table.insert(acuDestroyed, {
+                Timestamp = GetGameTimeSeconds(),
+                InstigatorArmy = instigator.Army,
+                KilledArmy = self.Army
+            })
 
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
