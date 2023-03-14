@@ -9323,10 +9323,11 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
     if (specular.r < 0.4)
         metallic = saturate(mapRange(specular.r, 0.2267, 0.3643, 0, 1));
     else
-        metallic = saturate(mapRange(specular.r, 0.4129, 0.5384, 1, 0));
+        metallic = min(max(mapRange(specular.r, 0.4129, 0.5384, 1, 0), 0.3), 1);
+    metallic = saturate(metallic - specular.a);
 
-    albedo *= 1 + metallic * 1;
-    // We need to make the dark areas darker
+    albedo = pow(albedo, (1 - metallic * 0.8));
+     // We need to make the dark areas darker
     // Should find something that offers more control over the result
     float x = albedo.r;
     albedo = (pow(x, 3) - 3 * pow(x, 2) + 3 * x) * albedo;
@@ -9348,7 +9349,7 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
     float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount).rgb;
 
     float emission = specular.b + (pow(specular.a, 2) * 0.13);
-    color += emission * albedo;
+    color += emission;
     float alpha = mirrored ? 0.5 : emission * 0.5;
 
     return float4(color, alpha);
