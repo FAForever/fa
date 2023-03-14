@@ -420,6 +420,8 @@ local function SetWorldCameraToUnitIconAngle(location, zoom)
 end
 
 Callbacks.ClearSpawnedMeshes = function()
+    if not CheatsEnabled() then return end
+
     for i, v in SpawnedMeshes do
         v:Destroy()
     end
