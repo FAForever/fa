@@ -1012,8 +1012,12 @@ Tooltips = {
         description = "<LOC OPTIONS_0302>Shows a splash damage indicator when an attack command is possible, usually when you attempt to ground-fire with a unit with splash damage, like a bomber.\r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
     },
     options_cursor_depth_scanning = {
-        title = "<LOC OPTIONS_0303>Depth Scanning",
-        description = "<LOC OPTIONS_0304>Visualizes the height difference between the water surface and the ocean floor on the cursor cursor.",
+        title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",
+        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor.",
+    },
+    options_cursor_hover_scanning = {
+        title = "<LOC PLANE_HEIGHT_ASSISTANCE_TITLE>Plane height indication",
+        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the terrain surface and the (expected) height of the selected air unit at the position of the cursor. \r\nIs only applied when you have one unit selected.",
     },
     options_share_mouse = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',

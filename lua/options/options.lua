@@ -649,18 +649,41 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0303>Depth Scanning",
+                title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",
                 key = 'cursor_depth_scanning',
                 type = 'toggle',
                 default = 'off',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 'off'},
+                        {text = "<LOC _Off>Off", key = 'off'},
                         {text = "<LOC _OnlyWhenBuilding>Only when building", key = 'building' },
                         {text = "<LOC _CommandMode>When you issue commands", key = 'commands' },
-                        {text = "<LOC _Always>Always", key = 'always' },
+                        {text = "<LOC _On>On", key = 'on' },
                     },
                 },
+                set = function(key,value,startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/cursor/depth.lua").UpdatePreferenceOption(value)
+                    end
+                end,
+            },
+
+            {
+                title = "<LOC PLANE_HEIGHT_ASSISTANCE_TITLE>Plane height indication",
+                key = 'cursor_hover_scanning',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>Off", key = 'off'},
+                        {text = "<LOC _On>On", key = 'on' },
+                    },
+                },
+                set = function(key,value,startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/cursor/hover.lua").UpdatePreferenceOption(value)
+                    end
+                end,
             },
 
             {
@@ -1178,6 +1201,12 @@ options = {
                         {text = "<LOC _Off>", key = 'off'},
                     },
                 },
+
+                set = function(control, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/casting/mouse.lua").UpdatePreferenceOption(value)
+                    end
+                end,
             },
         },
     },
