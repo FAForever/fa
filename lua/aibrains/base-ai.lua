@@ -1,9 +1,3 @@
------------------------------------------------------------------
--- File     :  /lua/aibrain.lua
--- Author(s):
--- Summary  :
--- Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
------------------------------------------------------------------
 
 -- AIBrain Lua Module
 local AIDefaultPlansList = import("/lua/aibrainplans.lua").AIPlansList
