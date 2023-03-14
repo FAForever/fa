@@ -20,8 +20,6 @@ local UpdateReclaim = reclaim.UpdateReclaim
 local sendEnhancementMessage = import("/lua/ui/notify/notify.lua").sendEnhancementMessage
 local SetPlayableArea = reclaim.SetPlayableArea
 
-local isReplay = SessionIsReplay()
-
 local SyncCallbacks = { }
 
 function AddOnSyncCallback(cb, identifier)
@@ -45,7 +43,7 @@ function OnSync()
     -- game manipulation and / or rating manipulation. See also the in-game rules:
     -- - https://www.faforever.com/rules
 
-    if not isReplay then
+    if not SessionIsReplay() then
 
         -- Send the defeat / victory / draw game results over to the server
         if Sync.GameResult then
