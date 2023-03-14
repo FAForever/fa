@@ -452,6 +452,8 @@ Callbacks.CheatBoxSpawnProp = function(data)
 end
 
 Callbacks.CheatSpawnUnit = function(data)
+    if not CheatsEnabled() then return end
+    
     local pos = data.pos
     if data.MeshOnly then
         SpawnUnitMesh(data.bpId, pos[1], pos[2], pos[3], 0, data.yaw, 0)
