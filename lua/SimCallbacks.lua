@@ -402,6 +402,7 @@ local function SetWorldCameraToUnitIconAngle(location, zoom)
     -- Note: The maths for setting zoom is kinda all over the place, and is just 'good enough' for what I used it for.
     --_ALERT(location[2], GetSurfaceHeight(location[1], location[3]), th)
     --_ALERT(zoom, th)
+    Sync.CameraRequests = Sync.CameraRequests or { }
     table.insert( Sync.CameraRequests, {
         Name = 'WorldCamera',
         Type = 'CAMERA_UNIT_SPIN',
@@ -453,7 +454,7 @@ end
 
 Callbacks.CheatSpawnUnit = function(data)
     if not CheatsEnabled() then return end
-    
+
     local pos = data.pos
     if data.MeshOnly then
         SpawnUnitMesh(data.bpId, pos[1], pos[2], pos[3], 0, data.yaw, 0)
