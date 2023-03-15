@@ -16,22 +16,36 @@ local WeakKeyMeta = { __mode = 'k' }
 ---@alias Lazy<T> T | LazyVar<T> | fun(): T
 
 ---@class LazyVar<T> : Destroyable, OnDirtyListener, function
----@field [1] any           # Cached result of what we represent
----@field busy? boolean
----@field trace string
----@field compute function
----@field uses table<LazyVar, boolean>
----@field used_by table<LazyVar, boolean>
 ---@field OnDirty? function
+---@field [1] any                           # Cached result of what we represent
+---@field [2] boolean                       # Flag whether the lazy var is busy
+---@field [3] string                        # Optional trace when `ExtendedErrorMessages` is set
+---@field [4] function                      # Optional compute value when lazy var represents a function
+---@field [5] table<LazyVar, boolean>       # Table of lazy vars that we use
+---@field [6] table<LazyVar, boolean>       # Table of lazy vars that use us
+---@field [7] LazyVar?       # Lazy var that is dirty
+---@field [8] LazyVar?       # Lazy var that is dirty
+---@field [9] LazyVar?       # Lazy var that is dirty
+---@field [10] LazyVar?      # Lazy var that is dirty
+---@field [11] LazyVar?      # Lazy var that is dirty
+---@field [12] LazyVar?      # Lazy var that is dirty
+---@field [13] LazyVar?      # Lazy var that is dirty
+---@field [14] LazyVar?      # Lazy var that is dirty
+---@field [15] LazyVar?      # Lazy var that is dirty
+---@field [16] LazyVar?      # Lazy var that is dirty
+---@field [17] LazyVar?      # Lazy var that is dirty
+---@field [18] LazyVar?      # Lazy var that is dirty
+---@field [19] LazyVar?      # Lazy var that is dirty
+---@field [20] LazyVar?      # Lazy var that is dirty
 LazyVarMetaTable = {
     __call = function(self)
         local value = self[1]
         if value == nil then
 
             -- track circular dependencies and error them out
-            if self.busy then
-                local trace = self.trace
-                if self.compute then
+            if self[2] then
+                local trace = self[3]
+                if self[4] then
                     trace = trace or "[Set lazyvar.ExtendedErrorMessages for extra trace info]"
                 else
                     trace = trace or ""
@@ -40,10 +54,10 @@ LazyVarMetaTable = {
             end
 
             -- clean up where we're used and what we use
-            local uses = self.uses
+            local uses = self[5]
             if not TableEmpty(uses) then
                 for use in uses do
-                    use.used_by[self] = nil
+                    use[6][self] = nil
                 end
 
                 for k, v in uses do
@@ -53,18 +67,18 @@ LazyVarMetaTable = {
 
             -- compute the value of this lazy var, this populates the `uses` and `user_by` fields again
             local currentContext = EvalContext
-            self.busy = true
+            self[2] = true
             EvalContext = self
-            local okay, value = pcall(self.compute)
+            local okay, value = pcall(self[4])
             EvalContext = currentContext
-            self.busy = nil
+            self[2] = nil
 
             -- check if it worked out
             if okay then
                 self[1] = value
             else
-                local trace = self.trace
-                if iscallable(self.compute) then
+                local trace = self[3]
+                if iscallable(self[4]) then
                     trace = trace or "[Set lazyvar.ExtendedErrorMessages for extra trace info]"
                 else
                     trace = trace or ""
@@ -74,8 +88,8 @@ LazyVarMetaTable = {
 
             -- keep track of who is using us
             if currentContext then
-                currentContext.uses[self] = true
-                self.used_by[currentContext] = true
+                currentContext[5][self] = true
+                self[6][currentContext] = true
             end
 
             return value
@@ -84,8 +98,8 @@ LazyVarMetaTable = {
         -- keep track of who is using us
         local currentContext = EvalContext
         if currentContext then
-            currentContext.uses[self] = true
-            self.used_by[currentContext] = true
+            currentContext[5][self] = true
+            self[6][currentContext] = true
         end
 
         return value
@@ -94,16 +108,22 @@ LazyVarMetaTable = {
     --- Gather all lazy variables that respond to being re-evaluated
     ---@param self LazyVar
     ---@param onDirtyList LazyVar[]
-    SetDirty = function(self, onDirtyList)
+    ---@return number
+    SetDirty = function(self, onDirtyList, head)
         if self[1] ~= nil then
+
             if self.OnDirty then
-                TableInsert(onDirtyList, self)
+                onDirtyList[head] = self
+                head = head + 1
             end
+
             self[1] = nil
-            for use in self.used_by do
-                use:SetDirty(onDirtyList)
+            for use in self[6] do
+                head = use:SetDirty(onDirtyList, head)
             end
         end
+
+        return head
     end,
 
     --- Lazy variable represents a function, the result is cached
@@ -117,31 +137,30 @@ LazyVarMetaTable = {
         end
 
         -- gather all those that use us
-        local onDirtyList
+        local head = 7
         if self[1] ~= nil then
-            onDirtyList = {}
             self[1] = nil
-            for use in self.used_by do
-                use:SetDirty(onDirtyList)
+            for use in self[6] do
+                head = use:SetDirty(self, head)
             end
         end
 
         -- setup internal state for a function
-        self.compute = func
+        self[4] = func
         if ExtendedErrorMessages then
-            self.trace = debug.traceback('set from:')
+            self[3] = debug[3]back('set from:')
         end
 
-        -- tell all those that use us that they're dirty and that they can re-compute their values
-        if onDirtyList then
-            local onDirty = self.OnDirty
-            if onDirty then
-                onDirty(self)
-            end
+        -- tell ourself that we have a new value
+        local onDirty = self.OnDirty
+        if onDirty then
+            onDirty(self)
+        end
 
-            for _, listener in onDirtyList do
-                listener:OnDirty()
-            end
+        -- tell those that use us that we have a new value
+        for k = 7, head - 1 do
+            self[k]:OnDirty()
+            self[k] = nil
         end
     end,
 
@@ -155,39 +174,38 @@ LazyVarMetaTable = {
         end
 
         -- gather all those that use us
-        local onDirtyList
+        local head = 7
         if self[1] ~= nil then
-            onDirtyList = {}
             self[1] = nil
-            for use in self.used_by do
-                use:SetDirty(onDirtyList)
+            for use in self[6] do
+                head = use:SetDirty(self, head)
             end
         end
 
         -- setup internal state for a value
-        self.compute = nil
-        self.trace = nil
+        self[4] = nil
+        self[3] = nil
         self[1] = value
 
         -- now remove us from the `used_by` lists for any lazy vars we used to compute our value
-        local uses = self.uses
+        local uses = self[5]
         if not TableEmpty(uses) then
             for use in uses do
-                use.used_by[self] = nil
+                use[6][self] = nil
             end
-            self.uses = {}
+            self[5] = {}
         end
 
-        -- tell all those that use us that they're dirty and that they can re-compute their values
-        if onDirtyList then
-            local onDirty = self.OnDirty
-            if onDirty then
-                onDirty(self)
-            end
+        -- tell ourself that we have a new value
+        local onDirty = self.OnDirty
+        if onDirty then
+            onDirty(self)
+        end
 
-            for _, listener in onDirtyList do
-                listener:OnDirty()
-            end
+        -- tell those that use us that we have a new value
+        for k = 7, head - 1 do
+            self[k]:OnDirty()
+            self[k] = nil
         end
     end,
 
@@ -211,7 +229,7 @@ LazyVarMetaTable = {
     ---@param self any
     Destroy = function(self)
         self.OnDirty = nil
-        self.compute = nil
+        self[4] = nil
         local val = self[1]
         self[1] = nil
         if val then
@@ -245,8 +263,8 @@ function Create(initial)
     ---@diagnostic disable-next-line:assign-type-mismatch,miss-symbol,exp-in-action,unknown-symbol
     local result = {&4 initial} -- preallocate table with hashsize=4, arraysize=1
     setmetatable(result, LazyVarMetaTable)
-    result.used_by = setmetatable({ }, WeakKeyMeta)
-    result.uses = setmetatable({ }, WeakKeyMeta)
+    result[6] = setmetatable({ }, WeakKeyMeta)
+    result[5] = setmetatable({ }, WeakKeyMeta)
 
     return result
 end
