@@ -40,7 +40,7 @@ gamePatches = {
             "",
             "- (#4807) Add a check before applying a platoon function to fix a co-op problem",
             "",
-            "- (#4804, #4813) Fix various options not listening to the game settins",
+            "- (#4804, #4813) Fix various options not listening to the game settings",
             "    This includes the following options:",
             "",
             "     - Options for the water depth indicator",
