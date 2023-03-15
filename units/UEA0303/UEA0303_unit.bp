@@ -21,7 +21,7 @@ UnitBlueprint {
         KTurn = 1.5,
         KTurnDamping = 2.3,
         LiftFactor = 7,
-        MaxAirspeed = 22,
+        MaxAirspeed = 20,
         MinAirspeed = 8,
         StartTurnDistance = 5,
         TightTurnMultiplier = 1.03,
@@ -101,8 +101,8 @@ UnitBlueprint {
         AirThreatLevel = 9,
         ArmorType = 'ASF', -- Light
         EconomyThreatLevel = 0,
-        Health = 1800,
-        MaxHealth = 1800,
+        Health = 1620,
+        MaxHealth = 1620,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -180,8 +180,8 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 40000,
-        BuildCostMass = 350,
+        BuildCostEnergy = 36000,
+        BuildCostMass = 385,
         BuildTime = 3000,
     },
     Footprint = {
@@ -279,7 +279,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 200,
+            Damage = 115,
             DamageFriendly = false,
             DamageRadius = 0,
             DamageType = 'Normal',
@@ -337,7 +337,7 @@ UnitBlueprint {
        
         {
             AboveWaterTargetsOnly = true,
-            Damage = 200,
+            Damage = 115,
             DamageFriendly = true,
             DamageRadius = 2,
             DamageType = 'Normal',
