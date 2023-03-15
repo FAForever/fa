@@ -76,6 +76,8 @@ end
 --but before any armies are created.
 function SetupSession()
 
+    import("/lua/ai/gridreclaim.lua").Setup()
+
     ScenarioInfo.TriggerManager = import("/lua/triggermanager.lua").Manager
     TriggerManager = ScenarioInfo.TriggerManager
 
@@ -222,6 +224,7 @@ end
 -- The global variable "ArmyBrains" contains an array of AI brains, one for each army.
 function OnCreateArmyBrain(index, brain, name, nickname)
 
+    import("/lua/ai/gridreclaim.lua").Setup(brain)
     import("/lua/sim/scenarioutilities.lua").InitializeStartLocation(name)
     import("/lua/sim/scenarioutilities.lua").SetPlans(name)
 
@@ -324,9 +327,6 @@ end
 function BeginSessionAI()
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
     if ScenarioInfo.GameHasAIs then
-
-
-
         local simMods = __active_mods or {}
         for Index, ModData in simMods do
             ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')

@@ -5125,6 +5125,14 @@ AIBrain = Class(moho.aibrain_methods) {
         AIAttackUtils.NavalAttackCheck(self)
 
     end,
+
+    ---@param self AIBrain
+    ---@param grid AIGridReclaim
+    ---@param cell AIGridReclaimCell
+    ---@param rectangle Rectangle
+    OnReclaimUpdate = function(self, grid, cell, rectangle)
+        -- do things with it
+    end,
 }
 
 -- kept for mod backwards compatibility
