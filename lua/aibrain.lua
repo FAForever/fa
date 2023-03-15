@@ -5129,8 +5129,7 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     ---@param grid AIGridReclaim
     ---@param cell AIGridReclaimCell
-    ---@param rectangle Rectangle
-    OnReclaimUpdate = function(self, grid, cell, rectangle)
+    OnReclaimUpdate = function(self, grid, cell)
         -- do things with it
     end,
 }

@@ -83,7 +83,7 @@ GridReclaim = Class (Grid) {
                 -- inform ai brains of changes
                 for k, brain in self.Brains do
                     if brain.OnReclaimUpdate then
-                        brain:OnReclaimUpdate(self, cell, self:ToRectangle(cell.X, cell.Z))
+                        brain:OnReclaimUpdate(self, cell)
                     end
                 end
 
