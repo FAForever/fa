@@ -159,15 +159,31 @@ local function SendData(Sync)
 end
 
 --- Allow player to disable or start thread that shows mouse locations
-local displayRendering = import("/lua/user/prefs.lua").GetFromCurrentProfile('options.share_mouse') == 'on'
+local displayRendering = import("/lua/user/prefs.lua").GetFromCurrentProfile('options.share_mouse')
 function UpdatePreferenceOption(value)
-    displayRendering = value == 'on'
+    displayRendering = value
+
+    if value == 'on' then
+        for id, entity in Entities do
+            entity:SetHidden(false)
+            Labels[id]:Show()
+        end
+    else
+        for id, entity in Entities do
+            entity:SetHidden(true)
+            Labels[id]:Hide()
+        end
+    end
 end
 
 --- Interpolates the mouse position between updates
 local function DisplayThread()
+
+    -- update with existing value to initially show / hide the mesh and controls
+    UpdatePreferenceOption(displayRendering)
+
     while true do
-        if displayRendering then
+        if displayRendering == 'on' then
             for id, entity in Entities do
                 local next = LocationTarget[id]
                 local curr = LocationCurrent[id]
@@ -193,11 +209,6 @@ local function DisplayThread()
             -- interpolate position each frame
             WaitFrames(1)
         else
-            for id, entity in Entities do
-                entity:SetHidden(true)
-                Labels[id]:Hide()
-            end
-
             -- wait a few frames before checking again
             WaitFrames(100)
         end
