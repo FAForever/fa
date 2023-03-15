@@ -16,11 +16,13 @@ local WeakKeyMeta = { __mode = 'k' }
 ---@alias Lazy<T> T | LazyVar<T> | fun(): T
 
 ---@class LazyVar<T> : Destroyable, OnDirtyListener, function
+---@field [1] any           # Cached result of what we represent
 ---@field busy? boolean
 ---@field trace string
 ---@field compute function
 ---@field uses table<LazyVar, boolean>
 ---@field used_by table<LazyVar, boolean>
+---@field OnDirty? function
 LazyVarMetaTable = {
     __call = function(self)
         local value = self[1]
