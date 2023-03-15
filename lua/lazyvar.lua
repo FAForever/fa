@@ -115,6 +115,7 @@ LazyVarMetaTable = {
             if self.OnDirty then
                 onDirtyList[head] = self
                 head = head + 1
+                LOG("OnDirty")
             end
 
             self[1] = nil
@@ -145,10 +146,14 @@ LazyVarMetaTable = {
             end
         end
 
+        if head - 7 > 0 then
+            LOG(head - 7)
+        end
+
         -- setup internal state for a function
         self[4] = func
         if ExtendedErrorMessages then
-            self[3] = debug[3]back('set from:')
+            self[3] = debug.traceback('set from:')
         end
 
         -- tell ourself that we have a new value
