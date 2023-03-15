@@ -83,10 +83,13 @@ local function FindLeaf(grid, position)
             ---@type CompressedLabelTreeLeaf
             local neighbor = leaf[k]
             if neighbor.Label > 0 then
+                local size = 2 * neighbor.Size
+                size = size * size
+
                 local dx = px - neighbor.px
                 local dz = pz - neighbor.pz
                 local d = dx * dx + dz * dz
-                if d < distance then
+                if d < distance and d < size then
                     distance = d
                     nearest = neighbor
                 end

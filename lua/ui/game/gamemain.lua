@@ -199,8 +199,6 @@ function CreateUI(isReplay)
         ForkThread(function()
             WaitSeconds(1.0)
 
-            LOG("Experimental graphics enabled, use at your own risk: ")
-
             if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
                 -- allow meshes and effects to be seen from further away
                 ConExecute("cam_SetLOD WorldCamera 0.65")

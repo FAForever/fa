@@ -1341,7 +1341,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return
         end
 
-        VeterancyComponent.VeterancyDispersal(self)
         local layer = self.Layer
         self.Dead = true
 
@@ -1379,6 +1378,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if self.DeathWeaponEnabled ~= false then
             self:DoDeathWeapon()
         end
+
+        -- veterancy computations should happen after triggering death weapons
+        VeterancyComponent.VeterancyDispersal(self)
 
         self:DisableShield()
         self:DisableUnitIntel('Killed')
@@ -2014,7 +2016,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     ---@param label string
-    ---@return Weapon | nil
+    ---@return moho.AimManipulator | nil
     GetWeaponManipulatorByLabel = function(self, label)
         local weapon = self:GetWeaponByLabel(label)
         if weapon then 
