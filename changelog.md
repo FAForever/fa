@@ -35,7 +35,7 @@ Jip
 
 - (#4809) Re-order the sync in an attempt to mitigate 'unknown results' of ladder games
 
-- (#4812) Fix overcharge not scaling with your power supply
+- (#4812) Fix overcharge damage not scaling with your power supply
 
 ## Other changes
 
