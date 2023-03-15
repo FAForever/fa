@@ -1,4 +1,4 @@
-last_version = 3755
+last_version = 3756
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -12,6 +12,62 @@ last_version = 3755
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3756,
+        name = "Hotfix",
+        description = {
+            "",
+            "Hopefully this is the last hotfix for now. Includes various fixes of recent and longstanding bugs.",
+            "",
+            "Jip",
+            "",
+            "## Features",
+            "",
+            "- (#4770) Overhaul of the cheat menu",
+            "    The menu now inherits from the Window class, as a result it can be moved around and rescaled. Units",
+            "    can now be dragged into the game, instead of the old box spawn formation. Includes a section to",
+            "    spawn in props, meshes and a new section to preview and spawn in entire templates.",
+            "",
+            "    This was long over due. The new cheat window is configurable, note the little wench next to the title.",
+            "",
+            "## Bug fixes",
+            "",
+            "- (#4805) Fix orientation of structures being applied multiple times after gifting or capturing",
+            "",
+            "- (#4793) Fix disabling of the tabs (in the center) when you are in a replay and your focus army is defeated",
+            "",
+            "- (#4806) Fix lingering draggers around window controls such as the chat and console window",
+            "",
+            "- (#4807) Add a check before applying a platoon function to fix a co-op problem",
+            "",
+            "- (#4804, #4813) Fix various options not listening to the game settins",
+            "    This includes the following options:",
+            "",
+            "     - Options for the water depth indicator",
+            "     - Options for the plane height indicator",
+            "     - Toggle for rendering mouse positions when observing",
+            "",
+            "- (#4809) Re-order the sync in an attempt to mitigate 'unknown results' of ladder games",
+            "",
+            "- (#4812) Fix overcharge not scaling with your power supply",
+            "",
+            "## Other changes",
+            "",
+            "- (#4795) Lobby option to share unit cap now defaults to share the unit cap to all allies",
+            "",
+            "- (#4800) Auto-hide the mass fab panel when you change to the observers view",
+            "",
+            "- (#4789) Forward the old ACU-kill event to the UI layer",
+            "",
+            "## Contributors",
+            "",
+            "- Balthazar (#4770)",
+            "",
+            "- Jip (#4805, #4793, #4806, #4807, #4795, #4800, #4770, #4789, #4804, #4809, #4812)",
+            "",
+            "- Rigomate (#4789)",
+        },
+    },
     {
         version = 3755,
         name = "Hotfix",
