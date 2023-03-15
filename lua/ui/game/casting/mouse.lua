@@ -183,7 +183,7 @@ local function DisplayThread()
     UpdatePreferenceOption(displayRendering)
 
     while true do
-        if displayRendering then
+        if displayRendering == 'on' then
             for id, entity in Entities do
                 local next = LocationTarget[id]
                 local curr = LocationCurrent[id]
