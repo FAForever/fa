@@ -171,9 +171,9 @@ UnitBlueprint {
         UniformScale = 0.125,
     },
     Economy = {
-        BuildCostEnergy = 2050,
-        BuildCostMass = 90,
-        BuildTime = 500,
+        BuildCostEnergy = 1435,
+        BuildCostMass = 63,
+        BuildTime = 350,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -280,7 +280,7 @@ UnitBlueprint {
                 },
             },
             CollideFriendly = false,
-            Damage = 200,
+            Damage = 160,
             DamageFriendly = true,
             DamageRadius = 4,
             DamageType = 'Normal',

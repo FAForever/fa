@@ -183,9 +183,9 @@ UnitBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 2050,
-        BuildCostMass = 90,
-        BuildTime = 500,
+        BuildCostEnergy = 1435,
+        BuildCostMass = 63,
+        BuildTime = 350,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -276,7 +276,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 3,
             CollideFriendly = false,
-            Damage = 50,
+            Damage = 35,
             DamageFriendly = true,
             DamageRadius = 3,
             DamageType = 'Normal',
