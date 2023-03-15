@@ -33,7 +33,7 @@ local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
         RateOfFire=         {-0.0625, -0.0625,  -0.0625, -0.0625,  -0.0625},
     },
     T3PowerGenerator={
-        EnergyActive=       {-0.1875, -0.1875,  -0.1875, -0.1875,  -0.05},
+        EnergyActive=       {-0.15, -0.15,  -0.15, -0.15,  -0.05},
         EnergyMaintenance=  {-0.1875, -0.1875,  -0.1875, -0.1875,  -0.1875},
         EnergyWeapon=       {-0.075,  -0.075,   -0.075,  -0.075,   -0.075},
         RateOfFire=         {-0.1,    -0.1,     -0.1,    -0.1,     -0.1},
