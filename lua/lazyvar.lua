@@ -231,7 +231,7 @@ LazyVarMetaTable = {
         end
     end,
 
-    ---@param self any
+    ---@param self LazyVar
     Destroy = function(self)
         self.OnDirty = nil
         self[4] = nil
@@ -248,6 +248,37 @@ LazyVarMetaTable = {
             onDestroy(self)
             self.OnDestroy = nil
         end
+    end,
+
+    ---@param self LazyVar
+    ---@return boolean?
+    GetBusy = function(self)
+        return self[2]
+    end,
+
+    ---@see This value is empty when `ExtendedErrorMessages` is set to false
+    ---@param self LazyVar
+    ---@return string
+    GetTrace = function(self)
+        return self[3]
+    end,
+
+    ---@param self LazyVar
+    ---@return function?
+    GetCompute = function(self)
+        return self[4]
+    end,
+
+    ---@param self LazyVar
+    ---@return table<LazyVar, boolean>
+    GetUses = function(self)
+        return self[5]
+    end,
+
+    ---@param self LazyVar
+    ---@return table<LazyVar, boolean>
+    GetUsedBy = function(self)
+        return self[6]
     end,
 }
 
