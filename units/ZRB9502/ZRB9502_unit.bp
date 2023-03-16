@@ -79,8 +79,8 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
         },
-        AnimationBuild = '/units/urb0202/urb0202_abuild.sca',
-        AnimationFinishBuildLand = '/units/urb0202/urb0202_aplatform.sca',
+        AnimationBuild = '/units/zrb9502/zrb9502_abuild.sca',
+        AnimationFinishBuildLand = '/units/zrb9502/zrb9502_aplatform.sca',
         AnimationUpgrade = '/units/zrb9502/zrb9502_aupgrade.sca',
         BuildAttachBone = 'Build_Point',
         Mesh = {

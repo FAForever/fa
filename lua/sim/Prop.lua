@@ -248,12 +248,15 @@ Prop = Class(moho.prop_methods) {
     ---@return number energy to reclaim
     ---@return number mass to reclaim
     GetReclaimCosts = function(self, reclaimer)
-        local maxValue = self.MaxMassReclaim
-        if self.MaxEnergyReclaim > maxValue then
-            maxValue = self.MaxEnergyReclaim
+        local maxMass = self.MaxMassReclaim or 0
+        local maxEnergy = self.MaxEnergyReclaim or  0
+        local timeReclaim = self.TimeReclaim or 0
+        local maxValue = maxMass
+        if maxEnergy > maxValue then
+            maxValue = maxEnergy
         end
 
-        local time = self.TimeReclaim * (maxValue / reclaimer:GetBuildRate())
+        local time = (timeReclaim or 0) * (maxValue / reclaimer:GetBuildRate())
         time = time / 10
 
         -- prevent division by 0 when the prop has no value
@@ -261,7 +264,7 @@ Prop = Class(moho.prop_methods) {
             time = 0.0001
         end
 
-        return time, self.MaxEnergyReclaim, self.MaxMassReclaim
+        return time, maxEnergy, maxMass
     end,
 
     --- Split this prop into multiple sub-props, placing one at each of our bone locations.

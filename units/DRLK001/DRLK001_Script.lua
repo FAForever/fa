@@ -35,10 +35,39 @@ DRLK001 = ClassUnit(CWalkingLandUnit) {
                         GetWeaponManipulatorByLabel('AAGun'):GetHeadingPitch())
                     self.AA = false
                     TargetingLaser.IdleState.Main(self)
+            FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_02_emit.bp'}, 
+        },
+        
+	      AAGun = ClassWeapon(CAANanoDartWeapon) {
+            IdleState = State (CAANanoDartWeapon.IdleState) {
+                OnGotTarget = function(self)
+                    CAANanoDartWeapon.IdleState.OnGotTarget(self)
+
+                    -- copy over heading / pitch from ground gun to aa gun
+                    local unit = self.unit
+                    local aa = unit:GetWeaponManipulatorByLabel('AAGun') --[[@as moho.AimManipulator]]
+                    local ground = unit:GetWeaponManipulatorByLabel('GroundGun') --[[@as moho.AimManipulator]]
+                    aa:SetHeadingPitch(ground:GetHeadingPitch())
+
+                    unit:SetWeaponEnabledByLabel('GroundGun', false)
                 end,
             },
+
+            OnLostTarget = function(self)
+                CAANanoDartWeapon.OnLostTarget(self)
+
+                -- copy over heading / pitch from aa gun to ground gun
+                local unit = self.unit
+                local aa = unit:GetWeaponManipulatorByLabel('AAGun') --[[@as moho.AimManipulator]]
+                local ground = unit:GetWeaponManipulatorByLabel('GroundGun') --[[@as moho.AimManipulator]]
+                ground:SetHeadingPitch(aa:GetHeadingPitch())
+
+                -- reset heading / pitch of aa gun to prevent twitching
+                aa:SetHeadingPitch(0, 0)
+
+                unit:SetWeaponEnabledByLabel('GroundGun', true)
+            end,
         },
-        AAGun = ClassWeapon(CAANanoDartWeapon) {},
         GroundGun = ClassWeapon(CAANanoDartWeapon) {},
     },
 }
