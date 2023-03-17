@@ -12,26 +12,26 @@ local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
 local ExBaseTmpl = 'ExpansionBaseTemplates'
 local Adj2x2Tmpl = 'Adjacency2x2'
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local MABC = '/lua/editor/MarkerBuildConditions.lua'
-local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
-local EBC = '/lua/editor/EconomyBuildConditions.lua'
-local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
-local SAI = '/lua/ScenarioPlatoonAI.lua'
-local IBC = '/lua/editor/InstantBuildConditions.lua'
-local TBC = '/lua/editor/ThreatBuildConditions.lua'
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
+local MABC = '/lua/editor/markerbuildconditions.lua'
+local OAUBC = '/lua/editor/otherarmyunitcountbuildconditions.lua'
+local EBC = '/lua/editor/economybuildconditions.lua'
+local PCBC = '/lua/editor/platooncountbuildconditions.lua'
+local SAI = '/lua/scenarioplatoonai.lua'
+local IBC = '/lua/editor/instantbuildconditions.lua'
+local TBC = '/lua/editor/threatbuildconditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 local SBC = '/lua/editor/SorianBuildConditions.lua'
 
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
-local AIAddBuilderTable = import('/lua/ai/AIAddBuilderTable.lua')
+local AIAddBuilderTable = import("/lua/ai/aiaddbuildertable.lua")
 
 function T4LandAttackCondition(aiBrain, locationType, targetNumber)
-    local UC = import('/lua/editor/UnitCountBuildConditions.lua')
-    local SInBC = import('/lua/editor/SorianInstantBuildConditions.lua')
+    local UC = import("/lua/editor/unitcountbuildconditions.lua")
+    local SInBC = import("/lua/editor/sorianinstantbuildconditions.lua")
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
@@ -65,8 +65,8 @@ function T4LandAttackCondition(aiBrain, locationType, targetNumber)
 end
 
 function T4AirAttackCondition(aiBrain, locationType, targetNumber)
-    local UC = import('/lua/editor/UnitCountBuildConditions.lua')
-    local SInBC = import('/lua/editor/SorianInstantBuildConditions.lua')
+    local UC = import("/lua/editor/unitcountbuildconditions.lua")
+    local SInBC = import("/lua/editor/sorianinstantbuildconditions.lua")
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then

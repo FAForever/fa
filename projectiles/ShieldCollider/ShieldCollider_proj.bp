@@ -31,7 +31,7 @@ ProjectileBlueprint {
     },
     Physics = {
         CollideEntity = false,
-        DestroyOnWater = true,
+        DestroyOnWater = false,
         InitialSpeed = 0,
         LeadTarget = false,
         Lifetime = 10, -- Projectile should be alive long enough to hit ground

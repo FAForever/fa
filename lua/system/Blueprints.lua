@@ -67,6 +67,7 @@ doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
 doscript("/lua/system/blueprints-projectiles.lua")
 doscript("/lua/system/blueprints-units.lua")
+doscript("/lua/system/blueprints-props.lua")
 doscript("/lua/system/blueprints-weapons.lua")
 
 ---@class PreGameData
@@ -104,7 +105,7 @@ local function LoadPreGameData()
 end
 
 ---@class BlueprintIconAssignment
----@field BlueprintId string
+---@field BlueprintId BlueprintId
 ---@field IconSet? string
 ---@field TypeId? string
 
@@ -773,12 +774,84 @@ end
 function ModBlueprints(all_bps)
 end
 
+local NewDummies = {}
+
+local function GetFoot(bp, axe) return math.ceil(bp.Footprint and bp.Footprint[axe] or bp[axe] or 1) end
+local function GetSkirt(bp, axe) return math.max((bp.Physics and bp.Physics['Skirt'..axe] or 1), GetFoot(bp, axe)) end
+local function GetOffset(bp, axe) return (bp.Physics and bp.Physics['SkirtOffset'..axe] or 0) end
+
+local function ReduceFoot(val)
+    local modded = math.mod(val, 2)
+    return modded == 0 and 2 or modded
+end
+
+local function NewOffset(offset, foot, reduced)
+    return offset-(foot-reduced)/2
+end
+
+local function SpawnMenuDummyChanges(all_bps)
+    for id, bp in pairs(all_bps) do
+        if bp.Categories and not table.find(bp.Categories, 'DRAGBUILD') then
+            table.insert(bp.Categories, 'DRAGBUILD')
+        end
+        if bp.Physics and bp.Physics.MotionType ~= 'RULEUMT_Air' then
+            local FootX, FootZ = GetFoot(bp, 'SizeX'), GetFoot(bp, 'SizeZ')
+            local SkirtX, SkirtZ = GetSkirt(bp, 'SizeX'), GetSkirt(bp, 'SizeZ')
+            local ReducedFootX, ReducedFootZ = ReduceFoot(FootX), ReduceFoot(FootZ)
+
+            local SOffsetX, SOffsetZ = NewOffset(GetOffset(bp, 'X'), FootX, ReducedFootX), NewOffset(GetOffset(bp, 'Z'), FootZ, ReducedFootZ)
+
+            local DummyID = 'spawn_dummy_'..SkirtX..SkirtZ..'_'..SOffsetX..SOffsetZ..'_'..ReducedFootX..ReducedFootZ
+
+
+            if not NewDummies[DummyID] then
+                NewDummies[DummyID] = {
+                    BlueprintId = DummyID,
+                    Categories = {
+                        'DRAGBUILD',
+                        'UNSPAWNABLE',
+                    },
+                    Display = {
+                        BuildMeshBlueprint = '/meshes/game/nil_mesh',
+                        MeshBlueprint = '/meshes/game/nil_mesh',
+                        UniformScale = 0,
+                        HideLifebars = true,
+                    },
+                    Physics = {
+                        SkirtOffsetX = SOffsetX,
+                        SkirtOffsetZ = SOffsetZ,
+                        SkirtSizeX = SkirtX,
+                        SkirtSizeZ = SkirtZ,
+                        MotionType = 'RULEUMT_Air',
+                        MaxSpeed = 0.5,
+                    },
+                    --ScriptClass = 'BrewLANFootprintDummyUnit',
+                    --ScriptModule = '/lua/defaultunits.lua',
+                    SizeX = ReducedFootX,
+                    SizeY = 1,
+                    SizeZ = ReducedFootZ,
+                    Source = bp.Source,
+                }
+            end
+            bp.SpawnDummyId = DummyID
+        else
+            bp.SpawnDummyId = id -- Aircraft can be themselves.
+        end
+    end
+    for id, bp in NewDummies do
+        all_bps[id] = bp
+    end
+end
+
+
 ---@param all_bps BlueprintsTable
 function PostModBlueprints(all_bps)
     -- Brute51: Modified code for ship wrecks and added code for SCU presets.
     -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
     local preset_bps = {}
 
+    SpawnMenuDummyChanges(all_bps.Unit)
+    
     for _, bp in all_bps.Unit do
         -- skip units without categories
         if not bp.Categories then
@@ -830,9 +903,8 @@ function PostModBlueprints(all_bps)
     -- post process units and projectiles for easier access to information and sanitizing some fields
     PostProcessProjectiles(all_bps.Projectile)
     PostProcessUnits(all_bps.Unit)
+    PostProcessProps(all_bps.Prop)
 end
-
-
 
 --- Loads all blueprints with optional parameters  
 --- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side  
@@ -861,7 +933,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     LOG('Blueprints Loading... \'' .. tostring(pattern) .. '\' files')
 
     if not mods then
-        mods = __active_mods or import('/lua/mods.lua').GetGameMods()
+        mods = __active_mods or import("/lua/mods.lua").GetGameMods()
     end
     InitOriginalBlueprints()
 
@@ -965,7 +1037,9 @@ function ReloadBlueprint(file)
     safecall("Blueprints Reloading... " .. file, doscript, file)
 
     ExtractAllMeshBlueprints()
+    PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
+    PostModBlueprints(original_blueprints)
     RegisterAllBlueprints(original_blueprints)
     original_blueprints = nil
 end

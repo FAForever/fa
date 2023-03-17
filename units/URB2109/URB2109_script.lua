@@ -8,14 +8,14 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CANNaniteTorpedoWeapon = import('/lua/cybranweapons.lua').CANNaniteTorpedoWeapon
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
+local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedoWeapon
 
 
 ---@class URB2109 : CStructureUnit
-URB2109 = Class(CStructureUnit) {
+URB2109 = ClassUnit(CStructureUnit) {
     Weapons = {
-        Turret01 = Class(CANNaniteTorpedoWeapon) {},
+        Turret01 = ClassWeapon(CANNaniteTorpedoWeapon) {},
     },
 }
 

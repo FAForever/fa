@@ -8,9 +8,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SSeaFactoryUnit = import('/lua/seraphimunits.lua').SSeaFactoryUnit
+local SSeaFactoryUnit = import("/lua/seraphimunits.lua").SSeaFactoryUnit
 ---@class ZSB9603 : SSeaFactoryUnit
-ZSB9603 = Class(SSeaFactoryUnit) {
+ZSB9603 = ClassUnit(SSeaFactoryUnit) {
     OnCreate = function(self)
         SSeaFactoryUnit.OnCreate(self)
         local bp = self:GetBlueprint()

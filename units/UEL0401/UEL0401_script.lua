@@ -5,42 +5,40 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TMobileFactoryUnit = import('/lua/terranunits.lua').TMobileFactoryUnit
-local WeaponsFile = import('/lua/terranweapons.lua')
+local TMobileFactoryUnit = import("/lua/terranunits.lua").TMobileFactoryUnit
+local WeaponsFile = import("/lua/terranweapons.lua")
 local TDFGaussCannonWeapon = WeaponsFile.TDFLandGaussCannonWeapon
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 local TAALinkedRailgun = WeaponsFile.TAALinkedRailgun
 local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
 ---@class UEL0401 : TMobileFactoryUnit
-UEL0401 = Class(TMobileFactoryUnit) {
-    FxDamageScale = 2.5,
+UEL0401 = ClassUnit(TMobileFactoryUnit) {
     PrepareToBuildAnimRate = 5,
     BuildAttachBone = 'Build_Attachpoint',
     RollOffBones = {'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter', },
 
     Weapons = {
-        RightTurret01 = Class(TDFGaussCannonWeapon) {},
-        RightTurret02 = Class(TDFGaussCannonWeapon) {},
-        LeftTurret01 = Class(TDFGaussCannonWeapon) {},
-        LeftTurret02 = Class(TDFGaussCannonWeapon) {},
-        RightRiotgun = Class(TDFRiotWeapon) {
+        RightTurret01 = ClassWeapon(TDFGaussCannonWeapon) {},
+        RightTurret02 = ClassWeapon(TDFGaussCannonWeapon) {},
+        LeftTurret01 = ClassWeapon(TDFGaussCannonWeapon) {},
+        LeftTurret02 = ClassWeapon(TDFGaussCannonWeapon) {},
+        RightRiotgun = ClassWeapon(TDFRiotWeapon) {
             FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFxTank
         },
-        LeftRiotgun = Class(TDFRiotWeapon) {
+        LeftRiotgun = ClassWeapon(TDFRiotWeapon) {
             FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFxTank
         },
-        RightAAGun = Class(TAALinkedRailgun) {},
-        LeftAAGun = Class(TAALinkedRailgun) {},
-        Torpedo = Class(TANTorpedoAngler) {},
+        RightAAGun = ClassWeapon(TAALinkedRailgun) {},
+        LeftAAGun = ClassWeapon(TAALinkedRailgun) {},
+        Torpedo = ClassWeapon(TANTorpedoAngler) {},
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
         TMobileFactoryUnit.OnStopBeingBuilt(self, builder, layer)
-        self.EffectsBag = {}
         self.PrepareToBuildManipulator = CreateAnimator(self)
         self.PrepareToBuildManipulator:PlayAnim(self:GetBlueprint().Display.AnimationBuild, false):SetRate(0)
         self.ReleaseEffectsBag = {}

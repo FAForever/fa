@@ -1,6 +1,6 @@
 
-local Prefs = import('/lua/user/prefs.lua')
-local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
+local WorldView = import("/lua/ui/game/worldview.lua")
+local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
 
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
@@ -10,6 +10,12 @@ local MeshesInbetweenCount = 4
 local MeshFadeDistance = 300
 
 local Trash = TrashBag()
+
+--- Allow player to disable or start thread that shows mouse locations
+local option = import("/lua/user/prefs.lua").GetFromCurrentProfile('options.cursor_depth_scanning')
+function UpdatePreferenceOption(value)
+    option = value
+end
 
 --- Retrieves cursor information from the engine statistics
 ---@return table
@@ -35,10 +41,13 @@ end
 
 --- Checks conditions for scanning
 local function CheckConditions(CommandMode)
-    local option = Prefs.GetFromCurrentProfile('options.cursor_depth_scanning')
+
+    if WorldView.viewLeft and not WorldView.viewLeft.CursorOverWorld then
+        return false
+    end
 
     -- easy picking
-    if option == 'always' then
+    if option == 'on' then
         return true
     end
 
@@ -82,8 +91,8 @@ end
 local function DepthScanningThread()
 
     local scenario = SessionGetScenarioInfo()
-    local Exit = import('/lua/ui/override/Exit.lua')
-    local CommandMode = import('/lua/ui/game/commandmode.lua')
+    local Exit = import("/lua/ui/override/exit.lua")
+    local CommandMode = import("/lua/ui/game/commandmode.lua")
     
     -- clear out all entities before we exit
     Exit.AddOnExitCallback(

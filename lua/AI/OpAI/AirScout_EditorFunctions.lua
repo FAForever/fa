@@ -1,26 +1,15 @@
---****************************************************************************
---**
---**  File     :  /lua/ai/OpAI/AirScout_EditorFunctions
---**  Author(s): Dru Staltman
---**
---**  Summary  : Generic AI Platoon Build Conditions
---**             Build conditions always return true or false
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
+-----------------------------------------------------------------------------------------------
+-- File     :  /lua/ai/OpAI/AirScout_EditorFunctions
+-- Author(s): Dru Staltman
+-- Summary  : Generic AI Platoon Build Conditions Build conditions always return true or false
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------------------------------------
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
 
-
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: AirScoutPatrol = AddFunction   doc = "Please work function docs."
--- 
--- parameter 0: string   platoon         = "default_platoon" 
--- 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- AirScoutPatrol = AddFunction   doc = "Please work function docs."
+---@param platoon Platoon
 function AirScoutPatrol(platoon)
     local aiBrain = platoon:GetBrain()
     local master = string.sub(platoon.PlatoonData.BuilderName, 12)
@@ -40,12 +29,8 @@ function AirScoutPatrol(platoon)
     end
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: AirScoutPatrolRandom = AddFunction   doc = "Please work function docs."
--- 
--- parameter 0: string   platoon         = "default_platoon" 
--- 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- AirScoutPatrolRandom = AddFunction   doc = "Please work function docs."
+---@param platoon Platoon default_platoon
 function AirScoutPatrolRandom(platoon)
     local aiBrain = platoon:GetBrain()
     local master = string.sub(platoon.PlatoonData.BuilderName, 12)
@@ -66,14 +51,9 @@ function AirScoutPatrolRandom(platoon)
     end
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: AirScoutDeath = BuildCallback   doc = "Please work function docs."
--- 
--- 
--- parameter 0: string	brain		= "default_brain"		
--- parameter 1: string	platoon  	= "default_platoon"		doc = "docs for param1"
--- 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- AirScoutDeath = BuildCallback   doc = "Please work function docs."
+---@param brain AIBrain default_brain
+---@param platoon Platoon default_platoon
 function AirScoutDeath(brain, platoon)
     local delay = 300
 
@@ -87,7 +67,8 @@ function AirScoutDeath(brain, platoon)
     ForkThread( AirScoutUnlockTimer, platoonName, delay )
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---@param platoonName string
+---@param delay number
 function AirScoutUnlockTimer(platoonName, delay)
 
     WaitSeconds( delay )

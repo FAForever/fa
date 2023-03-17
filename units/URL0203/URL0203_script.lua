@@ -5,20 +5,25 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
+local CLandUnit = import("/lua/cybranunits.lua").CLandUnit
+local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFElectronBolterWeapon = CybranWeaponsFile.CDFElectronBolterWeapon
 local CDFMissileMesonWeapon = CybranWeaponsFile.CDFMissileMesonWeapon
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
-local SlowAmphibious = import('/lua/defaultunits.lua').SlowAmphibiousLandUnit
+local SlowAmphibious = import("/lua/defaultunits.lua").SlowAmphibiousLandUnit
 
-URL0203 = Class(CLandUnit, SlowAmphibious) {
+URL0203 = ClassUnit(CLandUnit, SlowAmphibious) {
 
     Weapons = {
-        Bolter = Class(CDFElectronBolterWeapon) {},
-        Rocket = Class(CDFMissileMesonWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
+        Bolter = ClassWeapon(CDFElectronBolterWeapon) {},
+        Rocket = ClassWeapon(CDFMissileMesonWeapon) {},
+        Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
     },
+
+	OnCreate = function(self)
+		CLandUnit.OnCreate(self)
+		SlowAmphibious.OnCreate(self)
+	end,
     
     OnStopBeingBuilt = function(self, builder, layer)
         CLandUnit.OnStopBeingBuilt(self,builder,layer)

@@ -8,13 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
-local AAAZealotMissileWeapon = import('/lua/aeonweapons.lua').AAAZealotMissileWeapon
+local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
+local AAAZealotMissileWeapon = import("/lua/aeonweapons.lua").AAAZealotMissileWeapon
 
 ---@class UAB2304 : AStructureUnit
-UAB2304 = Class(AStructureUnit) {
+UAB2304 = ClassUnit(AStructureUnit) {
     Weapons = {
-        AntiAirMissiles = Class(AAAZealotMissileWeapon) {},
+        AntiAirMissiles = ClassWeapon(AAAZealotMissileWeapon) {},
     },
 }
 

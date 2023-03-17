@@ -8,7 +8,7 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SIFHuAntiNuke = import('/lua/seraphimprojectiles.lua').SIFKhuAntiNukeTendril
+local SIFHuAntiNuke = import("/lua/seraphimprojectiles.lua").SIFKhuAntiNukeTendril
 SIFHuAntiNuke02 = Class(SIFHuAntiNuke) {
 
     OnCreate = function(self)

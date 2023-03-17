@@ -9,14 +9,14 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
 
 ---@param aiBrain AIBrain
 ---@param markerType string
 ---@param distance number
 ---@param threatMin number
 ---@param threatMax number
----@param threatRings integer
+---@param threatRings number
 ---@param threatType string
 ---@param startX number
 ---@param startZ number
@@ -42,7 +42,7 @@ end
 ---@param distance number
 ---@param threatMin number
 ---@param threatMax number
----@param threatRings integer
+---@param threatRings number
 ---@param threatType string
 ---@param startX number
 ---@param startZ number
@@ -70,7 +70,7 @@ end
 ---@param distance number
 ---@param threatMin number
 ---@param threatMax number
----@param threatRings integer
+---@param threatRings number
 ---@param threatType string
 ---@param maxNum number
 ---@return boolean
@@ -97,7 +97,7 @@ end
 ---@param tMax number
 ---@param tRings number
 ---@param tType string
----@param maxUnits integer
+---@param maxUnits number
 ---@param unitCat any
 ---@param markerRadius number
 ---@return boolean

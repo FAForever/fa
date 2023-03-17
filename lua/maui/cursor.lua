@@ -8,7 +8,7 @@
 ---@field _hotspotY number
 ---@field _filename LazyVar<FileName>
 ---@field _animThread? thread
-Cursor = Class(moho.cursor_methods) {
+Cursor = ClassUI(moho.cursor_methods) {
     ---@param self Cursor
     ---@param defaultTexture FileName
     ---@param defaultHotspotX number
@@ -21,7 +21,7 @@ Cursor = Class(moho.cursor_methods) {
         self._hotspotX = 0
         self._hotspotY = 0
 
-        self._filename = import('/lua/lazyvar.lua').Create()
+        self._filename = import("/lua/lazyvar.lua").Create()
         self._filename.OnDirty = function(var)
             self:SetNewTexture(var(), self._hotspotX, self._hotspotY)
         end

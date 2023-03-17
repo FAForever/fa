@@ -1,14 +1,14 @@
 --
 -- script for projectile BoneAttached
 --
-local GenericDebris = import('/lua/genericdebris.lua').GenericDebris
+local GenericDebris = import("/lua/genericdebris.lua").GenericDebris
 DebrisBoneAttachHigh01 = Class(GenericDebris) {
     FxUnitHitScale = 0.25,
     FxWaterHitScale = 0.25,
     FxUnderWaterHitScale = 0.25,
     FxNoneHitScale = 0.25,
     FxLandHitScale = 0.5,
-    FxTrails = {},
+    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
     FxTrailScale = 1,
 }
 

@@ -1,14 +1,14 @@
-local Control = import('/lua/maui/control.lua').Control
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local LazyVar = import('/lua/lazyvar.lua')
+local Control = import("/lua/maui/control.lua").Control
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua").Text
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local LazyVar = import("/lua/lazyvar.lua")
 
 --TODO make scrollable
 --TODO word wrap
 
 ---@class MultiLineText : Group
-MultiLineText = Class(Group) {
+MultiLineText = ClassUI(Group) {
     __init = function(self, parent, font, pointSize, color)
         Group.__init(self, parent)
 
@@ -69,7 +69,7 @@ MultiLineText = Class(Group) {
 
     SetText = function(self, text)
         self:Clear()
-        local wrappedText = import('text.lua').WrapText(text, self:Width(), 
+        local wrappedText = import("/lua/maui/text.lua").WrapText(text, self:Width(), 
             function(text) 
                 return self._text[1]:GetStringAdvance(text) 
             end)

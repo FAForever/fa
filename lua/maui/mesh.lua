@@ -1,10 +1,10 @@
 -- Methods exposed from C++
 -- SetMesh(meshBPName) the blueprint ID of the mesh you wish to render
 
-local Control = import('/lua/maui/control.lua').Control
+local Control = import("/lua/maui/control.lua").Control
 
 ---@class Mesh : moho.mesh_methods, Control, InternalObject
-Mesh = Class(moho.mesh_methods, Control) {
+Mesh = ClassUI(moho.mesh_methods, Control) {
     ---@param self Mesh
     ---@param parent Control
     ---@param debugname? string

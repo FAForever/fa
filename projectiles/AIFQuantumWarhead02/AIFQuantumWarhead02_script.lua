@@ -4,20 +4,20 @@
 -- Summary  :  EMP Flux Warhead Impact effects projectile
 -- Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-AIFQuantumWarhead02 = Class(NullShell) {
+AIFQuantumWarhead02 = ClassProjectile(NullShell) {
     NormalEffects = {'/effects/emitters/quantum_warhead_01_emit.bp',},
     CloudFlareEffects = EffectTemplate.CloudFlareEffects01,
 
     EffectThread = function(self)
         CreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
 
-        self:ForkThread(self.ShakeAndBurnMe, self.Army)
-        self:ForkThread(self.InnerCloudFlares, self.Army)
-        self:ForkThread(self.DistortionField)
+        self.Trash:Add(ForkThread(self.ShakeAndBurnMe,self, self.Army))
+        self.Trash:Add(ForkThread(self.InnerCloudFlares,self, self.Army))
+        self.Trash:Add(ForkThread(self.DistortionField,self))
 
         for k, v in self.NormalEffects do
             CreateEmitterAtEntity(self, self.Army, v)
@@ -26,13 +26,12 @@ AIFQuantumWarhead02 = Class(NullShell) {
 
     ShakeAndBurnMe = function(self, army)
         self:ShakeCamera(75, 3, 0, 10)
-        WaitSeconds(0.5)
-        -- CreateDecal(position, heading, textureName, type, sizeX, sizeZ, lodParam, duration, army)");
+        WaitTicks(6)
         local orientation = RandomFloat(0,2*math.pi)
         CreateDecal(self:GetPosition(), orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, army)
         CreateDecal(self:GetPosition(), orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, army)
         self:ShakeCamera(105, 10, 0, 2)
-        WaitSeconds(2)
+        WaitTicks(21)
         self:ShakeCamera(75, 1, 0, 15)
     end,
 
@@ -41,11 +40,11 @@ AIFQuantumWarhead02 = Class(NullShell) {
         local angle = (2*math.pi) / numFlares
         local angleInitial = 0.0
         local angleVariation = (2*math.pi)
+        local emit, x, y, z = nil,nil,nil,nil
 
-        local emit, x, y, z = nil
         local DirectionMul = 0.02
         local OffsetMul = 4
-        local army = self.Army 
+        local army = self.Army
 
         for i = 0, (numFlares - 1) do
             x = math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
@@ -64,21 +63,20 @@ AIFQuantumWarhead02 = Class(NullShell) {
                 CreateLightParticle(self, -1, army, 13, 3, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
             end
 
+            --TODO
             WaitSeconds(RandomFloat(0.05, 0.15))
         end
-
         CreateLightParticle(self, -1, army, 13, 3, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
         CreateEmitterAtEntity(self, army, '/effects/emitters/quantum_warhead_ring_01_emit.bp')
     end,
 
     DistortionField = function(self)
         local proj = self:CreateProjectile('/effects/QuantumWarhead/QuantumWarheadEffect01_proj.bp')
-        local scale = proj:GetBlueprint().Display.UniformScale
+        local scale = proj.Blueprint.Display.UniformScale
 
         proj:SetScaleVelocity(0.123 * scale,0.123 * scale,0.123 * scale)
-        WaitSeconds(17.0)
+        WaitTicks(171)
         proj:SetScaleVelocity(0.01 * scale,0.01 * scale,0.01 * scale)
     end,
 }
-
 TypeClass = AIFQuantumWarhead02

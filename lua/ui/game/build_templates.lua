@@ -2,31 +2,45 @@
 -- File: lua/modules/ui/game/build_templates.lua
 -- Author: Ted Snook
 -- Summary: Build Templates UI
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
-local Prefs = import('/lua/user/prefs.lua')
+local Prefs = import("/lua/user/prefs.lua")
 local templates = Prefs.GetFromCurrentProfile('build_templates') or {}
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+
+local function TemplateAxisOffset(unitbp, axe)
+    return (math.mod(math.ceil(unitbp.Footprint and unitbp.Footprint[axe] or unitbp[axe] or 1), 2) == 1 and 0 or 0.5)
+end
 
 function CreateBuildTemplate()
     GenerateBuildTemplateFromSelection()
     local template = GetActiveBuildTemplate()
     ClearBuildTemplates()
-    if not table.empty(template) then
+    if next(template) then
+        local str1bp = __blueprints[ template[3][1] ]
+        local s1Xoffset = TemplateAxisOffset(str1bp, 'SizeX')
+        local s1Yoffset = TemplateAxisOffset(str1bp, 'SizeZ')
+        if s1Xoffset ~= 0 or s1Yoffset ~= 0 then
+            for i=3, table.getn(template) do
+                local str = template[i]
+                str[3] = str[3] + s1Xoffset
+                str[4] = str[4] + s1Yoffset
+            end
+        end
         AddTemplate(template)
     end
 end
 
 function Init()
-    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(ReceiveTemplate, 'Template')
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveTemplate, 'Template')
 end
 
 function ReceiveTemplate(sender, msg)
     if Prefs.GetOption('accept_build_templates') ~= 'yes' then return end
-    local tab = import('/lua/ui/game/construction.lua').GetTabByID('templates')
+    local tab = import("/lua/ui/game/construction.lua").GetTabByID('templates')
     if tab then
-        import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC('<LOC template_0000>Build Template Received'), tab, LOCF('<LOC template_0001>From %s', sender))
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC template_0000>Build Template Received'), tab, LOCF('<LOC template_0001>From %s', sender))
     end
     AddTemplate(msg.data)
 end

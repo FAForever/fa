@@ -5,8 +5,8 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local DummyUnit = import('/lua/sim/unit.lua').DummyUnit
-local DefaultUnitsFile = import('defaultunits.lua')
+local DummyUnit = import("/lua/sim/unit.lua").DummyUnit
+local DefaultUnitsFile = import("/lua/defaultunits.lua")
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
 local AirUnit = DefaultUnitsFile.AirUnit
@@ -23,8 +23,8 @@ local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local CommandUnit = DefaultUnitsFile.CommandUnit
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateCybranBuildBeams = false
 
 -- upvalued effect utility functions for performance
@@ -272,7 +272,7 @@ CConstructionTemplate = ClassSimple {
 --- The build bot class for drones. It removes a lot of
 -- the basic functionality of a unit to save on performance.
 ---@class CBuildBotUnit : DummyUnit
-CBuildBotUnit = Class(DummyUnit) {
+CBuildBotUnit = ClassDummyUnit(DummyUnit) {
 
     -- Keep track of the builder that made the bot
     SpawnedBy = false,
@@ -281,13 +281,13 @@ CBuildBotUnit = Class(DummyUnit) {
     ---@param self CBuildBotUnit
     OnPreCreate = function(self) 
         self.Trash = TrashBag()
-    end,             
+    end,         
 
     --- only initialise what we need
     ---@param self CBuildBotUnit
     OnCreate = function(self)
         DummyUnit.OnCreate(self)
-        
+
         -- prevent drone from consuming anything
         UnitSetConsumptionActive(self, false)
     end,
@@ -295,14 +295,14 @@ CBuildBotUnit = Class(DummyUnit) {
     --- short-cut when being destroyed
     ---@param self CBuildBotUnit
     OnDestroy = function(self) 
-        self.Dead = true 
+        self.Dead = true
         self.Trash:Destroy()
 
         if self.SpawnedBy then 
             self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
         end
     end,
-    
+
     ---@param self CBuildBotUnit
     Kill = function(self)
         -- make it go boom
@@ -346,7 +346,7 @@ CBuildBotUnit = Class(DummyUnit) {
 
 -- AIR FACTORY STRUCTURES
 ---@class CAirFactoryUnit : AirFactoryUnit
-CAirFactoryUnit = Class(AirFactoryUnit) {
+CAirFactoryUnit = ClassUnit(AirFactoryUnit) {
 
     ---@param self CAirFactoryUnit
     ---@param unitBeingBuilt Unit
@@ -395,19 +395,19 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
 
 -- AIR STAGING STRUCTURES
 ---@class CAirStagingPlatformUnit : AirStagingPlatformUnit
-CAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
+CAirStagingPlatformUnit = ClassUnit(AirStagingPlatformUnit) {}
 
 -- AIR UNITS
 ---@class CAirUnit : AirUnit
-CAirUnit = Class(AirUnit) {}
+CAirUnit = ClassUnit(AirUnit) {}
 
 -- WALL STRUCTURES
 ---@class CConcreteStructureUnit : ConcreteStructureUnit
-CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
+CConcreteStructureUnit = ClassUnit(ConcreteStructureUnit) {}
 
 -- CONSTRUCTION UNITS
 ---@class CConstructionUnit : ConstructionUnit, CConstructionTemplate
-CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
+CConstructionUnit = ClassUnit(ConstructionUnit, CConstructionTemplate){
 
     ---@param self CConstructionUnit
     OnCreate = function(self)
@@ -496,7 +496,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 
 -- ENERGY CREATION UNITS
 ---@class CEnergyCreationUnit : EnergyCreationUnit
-CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
+CEnergyCreationUnit = ClassUnit(DefaultUnitsFile.EnergyCreationUnit) {
 
     ---@param self CEnergyCreationUnit
     ---@param builder Unit
@@ -513,11 +513,11 @@ CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
 
 -- ENERGY STORAGE STRUCTURES
 ---@class CEnergyStorageUnit : EnergyStorageUnit
-CEnergyStorageUnit = Class(EnergyStorageUnit) {}
+CEnergyStorageUnit = ClassUnit(EnergyStorageUnit) {}
 
 -- LAND FACTORY STRUCTURES
 ---@class CLandFactoryUnit : LandFactoryUnit
-CLandFactoryUnit = Class(LandFactoryUnit) {
+CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
 
     ---@param self CLandFactoryUnit
     ---@param unitBeingBuilt Unit
@@ -569,31 +569,31 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
 
 -- LAND UNITS
 ---@class CLandUnit : LandUnit
-CLandUnit = Class(DefaultUnitsFile.LandUnit) {}
+CLandUnit = ClassUnit(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
 ---@class CMassCollectionUnit : MassCollectionUnit
-CMassCollectionUnit = Class(DefaultUnitsFile.MassCollectionUnit) {}
+CMassCollectionUnit = ClassUnit(DefaultUnitsFile.MassCollectionUnit) {}
 
 --  MASS FABRICATION UNITS
 ---@class CMassFabricationUnit : MassFabricationUnit
-CMassFabricationUnit = Class(DefaultUnitsFile.MassFabricationUnit) {}
+CMassFabricationUnit = ClassUnit(DefaultUnitsFile.MassFabricationUnit) {}
 
 --  MASS STORAGE UNITS
 ---@class CMassStorageUnit : MassStorageUnit
-CMassStorageUnit = Class(DefaultUnitsFile.MassStorageUnit) {}
+CMassStorageUnit = ClassUnit(DefaultUnitsFile.MassStorageUnit) {}
 
 -- RADAR STRUCTURES
 ---@class CRadarUnit : RadarUnit
-CRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
+CRadarUnit = ClassUnit(DefaultUnitsFile.RadarUnit) {}
 
 -- SONAR STRUCTURES
 ---@class CSonarUnit : SonarUnit
-CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
+CSonarUnit = ClassUnit(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
 ---@class CSeaFactoryUnit : SeaFactoryUnit
-CSeaFactoryUnit = Class(SeaFactoryUnit) {
+CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     ---@param unitBeingBuilt Unit
@@ -604,22 +604,22 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     OnPaused = function(self)
+        StructureUnit.OnPaused(self)
         if not self.Dead and self:GetFractionComplete() == 1 then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StopArmsMoving()
         end
-        StructureUnit.OnPaused(self)
     end,
 
     ---@param self CSeaFactoryUnit
     OnUnpaused = function(self)
+        StructureUnit.OnUnpaused(self)
         if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') and self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
             self:StartBuildingEffects(self.UnitBeingBuilt)
             self:StartArmsMoving()
         end
-        StructureUnit.OnUnpaused(self)
     end,
 
     ---@param self CSeaFactoryUnit
@@ -669,27 +669,27 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
 -- SEA UNITS
 ---@class CSeaUnit : SeaUnit
-CSeaUnit = Class(SeaUnit) {}
+CSeaUnit = ClassUnit(SeaUnit) {}
 
 -- SHIELD LAND UNITS
 ---@class CShieldLandUnit : ShieldLandUnit
-CShieldLandUnit = Class(ShieldLandUnit) {}
+CShieldLandUnit = ClassUnit(ShieldLandUnit) {}
 
 -- SHIELD STRUCTURES
 ---@class CShieldStructureUnit : ShieldStructureUnit
-CShieldStructureUnit = Class(ShieldStructureUnit) {}
+CShieldStructureUnit = ClassUnit(ShieldStructureUnit) {}
 
 -- STRUCTURES
 ---@class CStructureUnit : StructureUnit
-CStructureUnit = Class(StructureUnit) {}
+CStructureUnit = ClassUnit(StructureUnit) {}
 
 -- SUBMARINE UNITS
 ---@class CSubUnit : SubUnit
-CSubUnit = Class(DefaultUnitsFile.SubUnit) {}
+CSubUnit = ClassUnit(DefaultUnitsFile.SubUnit) {}
 
 -- TRANSPORT BEACON UNITS
 ---@class CTransportBeaconUnit : TransportBeaconUnit
-CTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
+CTransportBeaconUnit = ClassUnit(DefaultUnitsFile.TransportBeaconUnit) {}
 
 -- WALKING LAND UNITS
 ---@class CWalkingLandUnit : WalkingLandUnit
@@ -697,22 +697,22 @@ CWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 -- WALL STRUCTURES
 ---@class CWallStructureUnit : WallStructureUnit
-CWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
+CWallStructureUnit = ClassUnit(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES
 ---@class CCivilianStructureUnit : CStructureUnit
-CCivilianStructureUnit = Class(CStructureUnit) {}
+CCivilianStructureUnit = ClassUnit(CStructureUnit) {}
 
 -- QUANTUM GATE UNITS
 ---@class CQuantumGateUnit : QuantumGateUnit
-CQuantumGateUnit = Class(QuantumGateUnit) {}
+CQuantumGateUnit = ClassUnit(QuantumGateUnit) {}
 
 -- RADAR JAMMER UNITS
 ---@class CRadarJammerUnit : RadarJammerUnit
-CRadarJammerUnit = Class(RadarJammerUnit) {}
+CRadarJammerUnit = ClassUnit(RadarJammerUnit) {}
 
 ---@class CConstructionEggUnit : CStructureUnit
-CConstructionEggUnit = Class(CStructureUnit) {
+CConstructionEggUnit = ClassUnit(CStructureUnit) {
 
     ---@param self CConstructionEggUnit
     ---@param builder Unit
@@ -762,7 +762,7 @@ CConstructionEggUnit = Class(CStructureUnit) {
 -- TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
 -- CConstructionStructureUnit
 ---@class CConstructionStructureUnit : CStructureUnit, CConstructionTemplate
-CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
+CConstructionStructureUnit = ClassUnit(CStructureUnit, CConstructionTemplate) {
 
     ---@param self CConstructionStructureUnit
     OnCreate = function(self)
@@ -774,7 +774,6 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         local bp = self:GetBlueprint()
 
         -- Construction stuff
-        self.EffectsBag = {}
         if bp.General.BuildBones then
             self:SetupBuildBones()
         end
@@ -924,7 +923,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
 ---# CCommandUnit
 ---Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
 ---@class CCommandUnit : CommandUnit
-CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
+CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
 
     ---@param self CCommandUnit
     OnCreate = function(self)
@@ -994,4 +993,4 @@ CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
 }
 
 -- kept for mod backwards compatibility
-local Util = import('utilities.lua')
+local Util = import("/lua/utilities.lua")

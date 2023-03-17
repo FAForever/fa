@@ -1,9 +1,9 @@
 --
 -- Terran Nuke Missile
 --
-local TIFMissileNuke = import('/lua/terranprojectiles.lua').TIFMissileNuke
+local TIFMissileNuke = import("/lua/terranprojectiles.lua").TIFMissileNuke
 
-TIFMissileNuke02 = Class(TIFMissileNuke) {
+TIFMissileNuke02 = ClassProjectile(TIFMissileNuke) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',
     InitialEffects = {'/effects/emitters/nuke_munition_launch_trail_02_emit.bp',},
     LaunchEffects = {

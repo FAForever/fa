@@ -2,21 +2,21 @@
 -- These tests are run via 'ScalpD MauiTestOne', etc.
 --
 
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
-local Border = import('/lua/maui/border.lua').Border
-local Group = import('/lua/maui/group.lua').Group
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Edit = import('/lua/maui/edit.lua').Edit
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local RadioButtons = import('/lua/maui/radiobuttons.lua').RadioButtons
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
-local Slider = import('/lua/maui/slider.lua').Slider
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
+local Border = import("/lua/maui/border.lua").Border
+local Group = import("/lua/maui/group.lua").Group
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Edit = import("/lua/maui/edit.lua").Edit
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local RadioButtons = import("/lua/maui/radiobuttons.lua").RadioButtons
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
+local Slider = import("/lua/maui/slider.lua").Slider
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
 
 function TestOne(root)
 

@@ -27,9 +27,9 @@
 -- - EnergyDrainedState
 -- - DeadState
 
-local Entity = import('/lua/sim/Entity.lua').Entity
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local Util = import('utilities.lua')
+local Entity = import("/lua/sim/entity.lua").Entity
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local Util = import("/lua/utilities.lua")
 
 local DeprecatedWarnings = { }
 
@@ -132,7 +132,7 @@ end
 
 ---@class Shield : moho.shield_methods, Entity
 ---@field Brain AIBrain
-Shield = Class(moho.shield_methods, Entity) {
+Shield = ClassShield(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
         spec.Size = spec.ShieldSize
@@ -1025,7 +1025,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
 --- A bubble shield attached to a single unit.
 ---@class PersonalBubble : Shield
-PersonalBubble = Class(Shield) {
+PersonalBubble = ClassShield(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
 
@@ -1097,7 +1097,7 @@ PersonalBubble = Class(Shield) {
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
 ---@class TransportShield : Shield
-TransportShield = Class(Shield) {
+TransportShield = ClassShield(Shield) {
 
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1171,7 +1171,7 @@ TransportShield = Class(Shield) {
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
 ---@class PersonalShield : Shield
-PersonalShield = Class(Shield){
+PersonalShield = ClassShield(Shield){
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
 
@@ -1269,7 +1269,7 @@ PersonalShield = Class(Shield){
 }
 
 ---@class AntiArtilleryShield : Shield
-AntiArtilleryShield = Class(Shield) {
+AntiArtilleryShield = ClassShield(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
         self.ShieldType = 'AntiArtillery'
@@ -1316,7 +1316,7 @@ AntiArtilleryShield = Class(Shield) {
 
 -- Pretty much the same as personal shield (no collisions), but has its own mesh and special effects.
 ---@class CzarShield : PersonalShield
-CzarShield = Class(PersonalShield) {
+CzarShield = ClassShield(PersonalShield) {
     OnCreate = function(self, spec)
         PersonalShield.OnCreate(self, spec)
 
@@ -1390,3 +1390,6 @@ CzarShield = Class(PersonalShield) {
         self:SetCollisionShape('None')
     end,
 }
+
+-- kept for mod backwards compatibility
+UnitShield = PersonalShield

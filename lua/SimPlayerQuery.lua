@@ -7,6 +7,9 @@
 --
 --------------------------------------------------------------------------------
 
+local SyncPlayerQuery = import("/lua/simsyncutils.lua").SyncPlayerQuery
+local SyncQueryResult = import("/lua/simsyncutils.lua").SyncQueryResult
+
 -- Listeners interested in specific incoming queries (the query itself, not the
 -- result)
 local QueryListeners = {}
@@ -37,7 +40,7 @@ function OnPlayerQuery( queryData )
         end
     end
 
-    table.insert(Sync.PlayerQueries, queryData )
+    SyncPlayerQuery(queryData)
 end
 
 -- Called by the engine whenever a query result has been sent. All players
@@ -50,5 +53,5 @@ function OnPlayerQueryResult( resultData )
         end
     end
 
-    table.insert(Sync.QueryResults, resultData)
+    SyncQueryResult(resultData)
 end

@@ -4,17 +4,17 @@
 -- Summary  :  Cybran Builder bot units
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CreateCybranBuildBeamsOpti = import('/lua/EffectUtilities.lua').CreateCybranBuildBeamsOpti
-local EffectUtil = import('/lua/EffectUtilities.lua')
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
+local CreateCybranBuildBeamsOpti = import("/lua/effectutilities.lua").CreateCybranBuildBeamsOpti
+local EffectUtil = import("/lua/effectutilities.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local DeprecatedWarnings = { }
 
 -- Kept after --3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
 
 ---@class URA0001 : CAirUnit
-URA0001 = Class(CAirUnit) {
+URA0001 = ClassUnit(CAirUnit) {
     spawnedBy = nil,
 
     OnCreate = function(self)

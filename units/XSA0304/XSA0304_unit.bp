@@ -297,7 +297,6 @@ UnitBlueprint {
             DamageFriendly = true,
             DamageRadius = 6,
             DamageType = 'Normal',
-            Display = 'Zhanasee Strategic Bomb',
             DisplayName = 'Zhanasee Strategic Bomb',
             EffectiveRadius = 25,
             FireTargetLayerCapsTable = {

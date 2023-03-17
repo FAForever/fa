@@ -3,20 +3,20 @@
 --* Author: Ted Snook
 --* Summary: Various UI functions for the tutorial
 --*
---* Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
 
 function HighlightPanels(panels)
     local validPanels = {
         economy = {
             bitmap = UIUtil.UIFile('/game/resource-tutorial/resource_tutorial_bmp.dds'), 
-            control = import('/lua/ui/game/economy.lua').GUI.bg,
+            control = import("/lua/ui/game/economy.lua").GUI.bg,
         },
     }
     for _, panel in panels do
@@ -97,7 +97,7 @@ function AddCameraMarkers(inMarkers)
     if not clearFuncAdded then
         clearFuncAdded = true
         CheckForMarkersInFrame()
-        import('/lua/ui/game/gamemain.lua').AddOnUIDestroyedFunction(ClearMeshes)
+        import("/lua/ui/game/gamemain.lua").AddOnUIDestroyedFunction(ClearMeshes)
     end
 end
 
@@ -111,7 +111,7 @@ function CheckForMarkersInFrame()
     markerGroup:DisableHitTest()
     markerGroup.OnFrame = function(self, delta)
         if table.getsize(markers) > 0 then
-            local view = import('/lua/ui/game/worldview.lua').viewLeft
+            local view = import("/lua/ui/game/worldview.lua").viewLeft
             for markerid, markerInfo in markers do
                 if markerInfo.AlreadySeen then continue end
                 local coords = view:Project(markerInfo.position)

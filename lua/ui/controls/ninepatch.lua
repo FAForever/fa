@@ -1,6 +1,6 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 
 ---@class NinePatch : Group
 ---@field center? Bitmap
@@ -12,7 +12,7 @@ local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 ---@field r Bitmap
 ---@field t Bitmap
 ---@field b Bitmap
-NinePatch = Class(Group) {
+NinePatch = ClassUI(Group) {
     ---@param self NinePatch
     ---@param parent Control
     ---@param center Lazy<FileName> | nil

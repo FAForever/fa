@@ -6,8 +6,8 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local DiskGetFileInfo = import('/lua/ui/uiutil.lua').DiskGetFileInfo
+local UIUtil = import("/lua/ui/uiutil.lua")
+local DiskGetFileInfo = import("/lua/ui/uiutil.lua").DiskGetFileInfo
 
 iconBmpHeight = 48
 iconBmpWidth = 48
@@ -87,7 +87,7 @@ end
 -- supress showing when coming back from hidden UI
 function SupressShowingWhenRestoringUI(self, hidden)
     if not hidden then
-        if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+        if import("/lua/ui/game/gamemain.lua").gameUIHidden then
             self:Hide()
             return true
         end

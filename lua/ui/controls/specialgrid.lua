@@ -2,13 +2,13 @@
 -- this is a custom control as it its default has very game specific look to it
 -- Combo box will need to have its width set, but height will be auto based on the bitmaps
 
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
 
 local TableGetN = table.getn
 
 ---@class SpecialGrid : Group
-SpecialGrid = Class(Group) {
+SpecialGrid = ClassUI(Group) {
     __init = function(self, parent, isVertical)
         Group.__init(self, parent)
         self.top = 1
@@ -167,8 +167,8 @@ SpecialGrid = Class(Group) {
 }
 
 -- kept for mod backwards compatibility
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Text = import('/lua/maui/text.lua').Text
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Dragger = import('/lua/maui/dragger.lua').Dragger
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Text = import("/lua/maui/text.lua").Text
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Dragger = import("/lua/maui/dragger.lua").Dragger

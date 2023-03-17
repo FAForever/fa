@@ -4,10 +4,10 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
+local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
 
 ---@class UEA0003 : TConstructionUnit
-UEA0003 = Class(TConstructionUnit) {
+UEA0003 = ClassUnit(TConstructionUnit) {
     Parent = nil,
 
     OnScriptBitSet = function(self, bit)

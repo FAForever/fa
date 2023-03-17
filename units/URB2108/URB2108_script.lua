@@ -5,13 +5,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CIFMissileLoaTacticalWeapon = import('/lua/cybranweapons.lua').CIFMissileLoaTacticalWeapon
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
+local CIFMissileLoaTacticalWeapon = import("/lua/cybranweapons.lua").CIFMissileLoaTacticalWeapon
 
 ---@class URB2108 : CStructureUnit
-URB2108 = Class(CStructureUnit) {
+URB2108 = ClassUnit(CStructureUnit) {
     Weapons = {
-        CruiseMissile = Class(CIFMissileLoaTacticalWeapon) {},
+        CruiseMissile = ClassWeapon(CIFMissileLoaTacticalWeapon) {},
     },
 }
 

@@ -1,6 +1,6 @@
 
-local Prefs = import('/lua/user/prefs.lua')
-local WorldMesh = import('/lua/ui/controls/worldmesh.lua').WorldMesh
+local WorldView = import("/lua/ui/game/worldview.lua")
+local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
 
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 local meshCylinder = '/meshes/game/PathRing_LOD0.scm'
@@ -9,41 +9,47 @@ local MeshCylinder = nil
 local MeshOnTerrain = nil
 local MeshesInBetween = { }
 local MeshesInbetweenCount = 4
-local MeshFadeDistance = 300
+local MeshFadeDistance = 450
 
 local Trash = TrashBag()
 local Selection = { }
 
+--- Allow player to disable or start thread that shows mouse locations
+local option = import("/lua/user/prefs.lua").GetFromCurrentProfile('options.cursor_hover_scanning')
+function UpdatePreferenceOption(value)
+    option = value
+end
+
 --- Checks conditions for scanning
 local function CheckConditions()
-    local option = Prefs.GetFromCurrentProfile('options.cursor_hover_scanning')
+    if WorldView.viewLeft and not WorldView.viewLeft.CursorOverWorld then
+        return false
+    end
 
-    -- easy picking
     if option == 'on' then
         return true
     end
 
-    if option == 'off' then
-        return false
-    end
-
-    return true
+    return false
 end
 
 --- Defines the transparency curve
 ---@param camera Camera
 ---@param distance number
----@param terrainHeight number
----@param surfaceHeight number
+---@param unitPosition Vector
+---@param mousePosition Vector
 ---@return number
-local function ComputeTransparency(camera, distance, terrainHeight, surfaceHeight)
+local function ComputeTransparency(camera, distance, unitPosition, mousePosition)
     -- visibility based on camera distance
     local zoom = camera:GetZoom()
     local f1 = math.max(0, 1 - (zoom / distance))
 
-    -- visibility based on terrain difference
-    local f2 = math.clamp(surfaceHeight - terrainHeight - 1, 0, 1)
-    return f1
+    -- visibility based on unit distance
+    local dx = unitPosition[1] - mousePosition[1]
+    local dz = unitPosition[3] - mousePosition[3]
+    local d = dx * dx + dz * dz
+    local f2 = math.max(0, 1 - (d / distance))
+    return f1 * f2
 end
 
 --- Runs a depth scanning process to help the player understand where his cursor 
@@ -51,7 +57,7 @@ end
 local function HoverScanningThread()
 
     local scenario = SessionGetScenarioInfo()
-    local Exit = import('/lua/ui/override/Exit.lua')
+    local Exit = import("/lua/ui/override/exit.lua")
     
     -- clear out all entities before we exit
     Exit.AddOnExitCallback(
@@ -62,7 +68,7 @@ local function HoverScanningThread()
     )
 
     -- keep track of the current selection
-    import('/lua/ui/game/gamemain.lua').ObserveSelection:AddObserver(
+    import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
         function(selectionData)
             Selection = selectionData.newSelection
         end
@@ -106,7 +112,7 @@ local function HoverScanningThread()
     end
 
     -- pre-allocate all locals for performance
-    local camera, position, elevation, transparency, location, size
+    local camera, mousePosition, unitPosition, elevation, transparency, location, size
     location = { }
     while true do
         
@@ -126,23 +132,24 @@ local function HoverScanningThread()
             if blueprint.CategoriesHash['BOMBER'] then
 
                 camera = GetCamera('WorldCamera')
-                position = GetMouseWorldPos()
+                mousePosition = GetMouseWorldPos()
+                unitPosition = Selection[1]:GetPosition()
                 elevation = blueprint.Physics.Elevation
                 size = 0.1 * (blueprint.SizeSphere or math.max(blueprint.SizeX or 1, blueprint.SizeY or 1, blueprint.SizeZ or 1))
 
                 -- check if we have all the data required
-                if position and position[1] and elevation and size and CheckConditions() then
+                if unitPosition and unitPosition[1] and mousePosition and mousePosition[1] and elevation and size and CheckConditions() then
 
-                    position[1] = math.clamp(position[1], 0, scenario.size[1])
-                    position[3] = math.clamp(position[3], 0, scenario.size[2])
+                    mousePosition[1] = math.clamp(mousePosition[1], 0, scenario.size[1])
+                    mousePosition[3] = math.clamp(mousePosition[3], 0, scenario.size[2])
 
                     -- determine location on the terrain
-                    location[1] = position[1]
-                    location[2] = position[2] + elevation
-                    location[3] = position[3]
+                    location[1] = mousePosition[1]
+                    location[2] = mousePosition[2] + elevation
+                    location[3] = mousePosition[3]
 
                     -- update visibility terrain mesh
-                    transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
+                    transparency = ComputeTransparency(camera, MeshFadeDistance, unitPosition, mousePosition)
                     if transparency > 0.05 then
                         MeshOnTerrain:SetHidden(false)
                         MeshOnTerrain:SetStance(location)
@@ -160,9 +167,7 @@ local function HoverScanningThread()
                     -- update visiblity intermediate dots
                     for k = 1, MeshesInbetweenCount do
                         local bit = MeshesInBetween[k]
-                        location[2] = position[2] + (0.2 * k) * elevation
-
-                        transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
+                        location[2] = mousePosition[2] + (0.2 * k) * elevation
                         if transparency > 0.05 then
                             bit:SetHidden(false)
                             bit:SetStance(location)

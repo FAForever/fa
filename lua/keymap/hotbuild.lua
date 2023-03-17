@@ -1,22 +1,22 @@
 -- This is the primary hotbuild file. It controls what happens when a hotbuild action is clicked
 -- It also controls the cycle UI
 
-local KeyMapper = import('/lua/keymap/keymapper.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local KeyMapper = import("/lua/keymap/keymapper.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
-local CommandMode = import('/lua/ui/game/commandmode.lua')
-local Construction = import('/lua/ui/game/construction.lua')
-local Templates = import('/lua/ui/game/build_templates.lua')
-local FactoryTemplates = import('/lua/ui/templates_factory.lua')
+local CommandMode = import("/lua/ui/game/commandmode.lua")
+local Construction = import("/lua/ui/game/construction.lua")
+local Templates = import("/lua/ui/game/build_templates.lua")
+local FactoryTemplates = import("/lua/ui/templates_factory.lua")
 
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Effect = import('/lua/maui/effecthelpers.lua')
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Effect = import("/lua/maui/effecthelpers.lua")
 
-local upgradeTab = import('/lua/keymap/upgradeTab.lua').upgradeTab
-local ModifyBuildables = import('/lua/ui/notify/enhancementqueue.lua').ModifyBuildablesForACU
+local upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
+local ModifyBuildables = import("/lua/ui/notify/enhancementqueue.lua").ModifyBuildablesForACU
 
 local unitkeygroups
 local cyclePos
@@ -27,7 +27,7 @@ local cycleButtons = {}
 local oldSelection
 
 local modifiersKeys = {}
-local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+local worldview = import("/lua/ui/game/worldview.lua").viewLeft
 local oldHandleEvent = worldview.HandleEvent
 
 
@@ -126,15 +126,15 @@ function resetCycle(commandMode, modeData)
     -- Commandmode = false is when a building is built (left click with mouse)
     -- modeData.isCancel = false is when building is aborted by a right click... whyever
     -- modeData.isCancel = true when "canceling" by releasing shift
-    if commandMode == false or modeData.isCancel == false then
+    if commandMode == false or (not modeData) or not (modeData.isCancel) then
+        -- Set to 0, first one is 1 but it will be incremented!
         cyclePos = 0
-    -- Set to 0, first one is 1 but it will be incremented!
     end
 end
 
 -- Non state changing getters
 function getUnitKeyGroups()
-    local btSource = import('/lua/keymap/unitkeygroups.lua').unitkeygroups
+    local btSource = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
     local groups = {}
     for name, values in btSource do
         groups[name] = {}
@@ -161,7 +161,7 @@ end
 
 function addModifiers()
     -- generating modifiers shortcuts on the fly.
-    modifiersKeys = import('/lua/keymap/keymapper.lua').GenerateHotbuildModifiers()
+    modifiersKeys = import("/lua/keymap/keymapper.lua").GenerateHotbuildModifiers()
     IN_AddKeyMapTable(modifiersKeys)
 end
 
@@ -494,7 +494,7 @@ function buildActionTemplate(modifier)
 
     if options.gui_template_rotator ~= 0 then
         -- Rotating templates
-        local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+        local worldview = import("/lua/ui/game/worldview.lua").viewLeft
         local oldHandleEvent = worldview.HandleEvent
         worldview.HandleEvent = function(self, event)
             if event.Type == 'ButtonPress' then

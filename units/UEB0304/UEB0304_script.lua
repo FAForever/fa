@@ -7,15 +7,15 @@
 ----**
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local TQuantumGateUnit = import('/lua/terranunits.lua').TQuantumGateUnit
+local TQuantumGateUnit = import("/lua/terranunits.lua").TQuantumGateUnit
 
 ---@class UEB0304 : TQuantumGateUnit
-UEB0304 = Class(TQuantumGateUnit) {
+UEB0304 = ClassUnit(TQuantumGateUnit) {
     GateEffectVerticalOffset = 0.35,
     GateEffectScale = 0.42,
 
     OnStopBeingBuilt = function(self, builder, layer)
-        self.GateEffectEntity = import('/lua/sim/Entity.lua').Entity()
+        self.GateEffectEntity = import("/lua/sim/entity.lua").Entity()
         self.GateEffectEntity:AttachBoneTo(-1, self, 'UEB0304')
         self.GateEffectEntity:SetMesh('/effects/entities/ForceField01/ForceField01_mesh')
         self.GateEffectEntity:SetDrawScale(self.GateEffectScale)

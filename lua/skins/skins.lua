@@ -12,6 +12,48 @@
 --  disabledColor: text disabled color
 --  panelColor: default color when drawing a panel
 
+---@alias CursorType
+---| "RULEUCC_Attack"
+---| "RULEUCC_CallTransport"
+---| "RULEUCC_Capture"
+---| "RULEUCC_Ferry"
+---| "RULEUCC_Guard"
+---| "RULEUCC_Move"
+---| "RULEUCC_Nuke"
+---| "RULEUCC_Tactical"
+---| "RULEUCC_Overcharge"
+---| "RULEUCC_SpecialAction"
+---| "RULEUCC_Patrol"
+---| "RULEUCC_Reclaim"
+---| "RULEUCC_ReclaimDisabled"
+---| "RULEUCC_Repair"
+---| "RULEUCC_Sacrifice"
+---| "RULEUCC_Transport"
+---| "RULEUCC_Teleport"
+---| "RULEUCC_Script"
+---| "RULEUCC_Invalid"
+---| "COORDINATED_ATTACK"
+---| "MESSAGE"
+---| "BUILD"
+---| "HOVERCOMMAND"
+---| "DRAGCOMMAND"
+---| "MOVE2PATROLCOMMAND"
+---| "DEFAULT"
+---| "NE_SW"
+---| "NW_SE"
+---| "N_S"
+---| "W_E"
+---| "MOVE_WINDOW"
+---| "ATTACK_MOVE"
+---| "OVERCHARGE_ORANGE"
+---| "OVERCHARGE_GREY
+
+---@class CursorDefinition
+---@field [1] FileName texture name
+---@field [2] number hotspotx
+---@field [3] number hotspoty
+---@field [4]? number num frames
+---@field [5]? number fps
 
 skins = {
     uef = {

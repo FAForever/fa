@@ -45,14 +45,8 @@ PropBlueprint {
         ReclaimMassMax = 0.5,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 0,
-    },
     Interface = {
         HelpText = 'Aeon Streetlight',
-    },
-    Physics = {
-        BlockPath = false,
     },
     ScriptClass = 'Tree',
     ScriptModule = '/lua/proptree.lua',

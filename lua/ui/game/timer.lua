@@ -6,10 +6,10 @@
 --* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local controls = {
     bg = false,

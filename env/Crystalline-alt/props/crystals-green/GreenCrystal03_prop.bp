@@ -32,9 +32,6 @@ PropBlueprint {
     Interface = {
         HelpText = 'Crystal Formation',
     },
-    Physics = {
-        BlockPath = true,
-    },
     SizeX = 2,
     SizeY = 2.25,
     SizeZ = 3,

@@ -8,14 +8,14 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local ALandUnit = import('/lua/aeonunits.lua').ALandUnit
-local ADFCannonQuantumWeapon = import('/lua/aeonweapons.lua').ADFCannonQuantumWeapon
+local ALandUnit = import("/lua/aeonunits.lua").ALandUnit
+local ADFCannonQuantumWeapon = import("/lua/aeonweapons.lua").ADFCannonQuantumWeapon
 
 ---@class UAL0202 : ALandUnit
-UAL0202 = Class(ALandUnit) {
+UAL0202 = ClassUnit(ALandUnit) {
 
     Weapons = {
-        MainGun = Class(ADFCannonQuantumWeapon) {}
+        MainGun = ClassWeapon(ADFCannonQuantumWeapon) {}
     },
     
 }

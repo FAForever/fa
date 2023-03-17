@@ -8,13 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
-local SAALosaareAutoCannonWeapon = import('/lua/seraphimweapons.lua').SAALosaareAutoCannonWeapon
+local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
+local SAALosaareAutoCannonWeapon = import("/lua/seraphimweapons.lua").SAALosaareAutoCannonWeapon
 
 ---@class XSB2304 : SStructureUnit
-XSB2304 = Class(SStructureUnit) {
+XSB2304 = ClassUnit(SStructureUnit) {
     Weapons = {
-        AntiAirMissiles = Class(SAALosaareAutoCannonWeapon) {},
+        AntiAirMissiles = ClassWeapon(SAALosaareAutoCannonWeapon) {},
     },
 }
 

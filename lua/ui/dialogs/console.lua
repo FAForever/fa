@@ -6,14 +6,14 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Edit = import('/lua/maui/edit.lua').Edit
-local Control = import('/lua/maui/control.lua').Control
-local Window = import('/lua/maui/window.lua').Window
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Edit = import("/lua/maui/edit.lua").Edit
+local Control = import("/lua/maui/control.lua").Control
+local Window = import("/lua/maui/window.lua").Window
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local Prefs = import("/lua/user/prefs.lua")
 
 local commandDeque = {}
 local maxCommandDequeSize = 10
@@ -249,7 +249,7 @@ function CreateDialog()
 end
 
 -- kept for mod backwards compatibility
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
-local Border = import('/lua/maui/border.lua').Border
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
+local Border = import("/lua/maui/border.lua").Border

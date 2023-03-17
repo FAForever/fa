@@ -43,9 +43,9 @@
 -- Unknown
 -- Camera
 
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Triggers = import('/lua/scenariotriggers.lua')
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Triggers = import("/lua/scenariotriggers.lua")
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 local objNum = 0 -- Used to create unique tags for objectives
 local DecalLOD = 4000
 local objectiveDecal = '/env/utility/decals/objective_debug_albedo.dds'
@@ -96,7 +96,7 @@ function Camera(objectiveType, completeState, title, description, positionTable)
 
     for i, v in positionTable do
         numMarkers = numMarkers + 1
-        local newMark = import('/lua/simcameramarkers.lua').AddCameraMarker(v)
+        local newMark = import("/lua/simcameramarkers.lua").AddCameraMarker(v)
         newMark:AddCallback(RemoveMarker)
     end
 
@@ -153,7 +153,7 @@ function ControlGroup(Type, Complete, Title, Description, Target)
                             if EntityCategoryContains(requirement.Category, unit) then
                                 if not unit.Marked and objective.MarkUnits then
                                     unit.Marked = true
-                                    local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                                    local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                                     local arrow = ObjectiveArrow {AttachTo = unit}
                                     objective:AddUnitTarget(unit)
                                 end
@@ -310,7 +310,7 @@ function Kill(Type, Complete, Title, Description, Target)
         if not unit.Dead then
             -- Mark the units unless MarkUnits == false
             if Target.MarkUnits == nil or Target.MarkUnits then
-                local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                 local arrow = ObjectiveArrow {AttachTo = unit}
             end
             if Target.FlashVisible then
@@ -405,7 +405,7 @@ function Capture(Type, Complete, Title, Description, Target)
         if not unit.Dead then
             -- Mark the units unless MarkUnits == false
             if Target.MarkUnits == nil or Target.MarkUnits then
-                local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                 local arrow = ObjectiveArrow {AttachTo = unit}
             end
 
@@ -543,7 +543,7 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
         if not unit.Dead then
             -- Mark the units unless MarkUnits == false
             if Target.MarkUnits == nil or Target.MarkUnits then
-                local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                 local arrow = ObjectiveArrow {AttachTo = unit}
             end
 
@@ -639,7 +639,7 @@ function Reclaim(Type, Complete, Title, Description, Target)
     end
 
     for _, unit in Target.Units do
-        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+        local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
         local arrow = ObjectiveArrow {AttachTo = unit}
         CreateTriggers(unit, objective)
     end
@@ -708,7 +708,7 @@ function ReclaimProp(Type, Complete, Title, Description, Target)
     for _, wreck in Target.Wrecks do
         -- Mark the units if MarkUnits == true
         if Target.MarkUnits then
-            local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+            local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
             local arrow = ObjectiveArrow {AttachTo = unit}
         end
         Triggers.CreatePropReclaimedTrigger(OnPropReclaimed, wreck)
@@ -942,7 +942,7 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
                                 if EntityCategoryContains(requirement.Category, unit) then
                                     if not unit.Marked and objective.MarkUnits then
                                         unit.Marked = true
-                                        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                                        local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                                         local arrow = ObjectiveArrow {AttachTo = unit}
                                         objective:AddUnitTarget(unit)
                                     end
@@ -1307,7 +1307,7 @@ function Protect(Type, Complete, Title, Description, Target)
     end
 
     if Target.Timer then
-        timer = import('/lua/ScenarioTriggers.lua').CreateTimerTrigger(
+        timer = import("/lua/scenariotriggers.lua").CreateTimerTrigger(
             OnExpired,
             Target.Timer,
             true,
@@ -1382,7 +1382,7 @@ function Timer(Type, Complete, Title, Description, Target)
         Sync.ObjectiveTimer = 0
     end
 
-    timer = import('/lua/ScenarioTriggers.lua').CreateTimerTrigger(
+    timer = import("/lua/scenariotriggers.lua").CreateTimerTrigger(
         OnExpired,
         Target.Timer,
         false,
@@ -1447,7 +1447,7 @@ function Basic(Type, Complete, Title, Description, Image, Target)
 
     objective.AddBasicUnitTarget = function(self, unit)
         objective:AddUnitTarget(unit)
-        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+        local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
         local arrow = ObjectiveArrow {AttachTo = unit}
         table.insert(objective.UnitMarkers, arrow)
     end
@@ -1487,7 +1487,7 @@ function Basic(Type, Complete, Title, Description, Image, Target)
             if target.MarkUnits then
                 for _, unit in target.Units do
                     if not unit.Dead then
-                        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                        local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
                         local arrow = ObjectiveArrow {AttachTo = unit}
                         table.insert(objective.UnitMarkers, arrow)
                         if target.AlwaysVisible then
@@ -2118,7 +2118,7 @@ end
 function BasicUnitTarget(objective, unit, markUnits)
     objective:AddUnitTarget(unit)
     if markUnits then
-        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+        local ObjectiveArrow = import("/lua/objectivearrow.lua").ObjectiveArrow
         local arrow = ObjectiveArrow {AttachTo = unit}
         table.insert(objective.UnitMarkers, arrow)
     end
@@ -2143,11 +2143,11 @@ function CreateTriggers(unit, objective, useOnKilledWhenReclaimed)
 end
 
 function CreateIntelTriggers(unit, objective, isAlreadyLocated)
-    local IntelTrigger = import('/lua/ScenarioTriggers.lua').CreateArmyIntelTrigger
+    local IntelTrigger = import("/lua/scenariotriggers.lua").CreateArmyIntelTrigger
     if objective.OnUnitGiven then
         Triggers.CreateUnitGivenTrigger(objective.OnUnitGiven, unit)
     end
-    if objective.OnUnitGiven then
+    if objective.OnUnitLocated then
         if isAlreadyLocated then
             return true
         else

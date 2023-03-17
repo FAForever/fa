@@ -5,7 +5,7 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
 ---@alias NamedTriggerCallback            fun(manager: TriggerManager, name: string)
 ---@alias NamedUnitTriggerCallback        fun(manager: TriggerManager, name: string, trigger: Unit)

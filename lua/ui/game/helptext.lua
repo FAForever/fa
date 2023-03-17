@@ -6,18 +6,18 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local Prefs = import('/lua/user/prefs.lua')
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local MissionText = import('/lua/ui/game/missiontext.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Combo = import('/lua/ui/controls/combo.lua').Combo
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+local Prefs = import("/lua/user/prefs.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local MissionText = import("/lua/ui/game/missiontext.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Combo = import("/lua/ui/controls/combo.lua").Combo
 
 function GetHelpFiles()
     local helpFiles = DiskFindFiles('/tutorials', '*.lua')
@@ -43,7 +43,7 @@ local currentCat = 'Basic'
 local helpPromptQueue = {}
 local helpmap = {}
 local parent = false
-local worldView = import('/lua/ui/game/borders.lua').GetMapGroup()
+local worldView = import("/lua/ui/game/borders.lua").GetMapGroup()
 
 controls = {
     mainWindowBG = false,
@@ -226,7 +226,7 @@ function OnHelpDClick(helpdata)
     controls.mainWindowDescription:DeleteAllItems()
     if string then
         local textBoxWidth = controls.mainWindowDescription.Width()
-        local tempTable = import('/lua/maui/text.lua').WrapText(string, textBoxWidth,
+        local tempTable = import("/lua/maui/text.lua").WrapText(string, textBoxWidth,
         function(text)
             return controls.hiddenText:GetStringAdvance(text)
         end)
@@ -246,7 +246,7 @@ function OnHelpClick(helpdata)
     controls.mainWindowDescription:DeleteAllItems()
     if string then
         local textBoxWidth = controls.mainWindowDescription.Width()
-        local tempTable = import('/lua/maui/text.lua').WrapText(string, textBoxWidth,
+        local tempTable = import("/lua/maui/text.lua").WrapText(string, textBoxWidth,
         function(text)
             return controls.hiddenText:GetStringAdvance(text)
         end)

@@ -8,11 +8,11 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TRadarJammerUnit = import('/lua/terranunits.lua').TRadarJammerUnit
+local TRadarJammerUnit = import("/lua/terranunits.lua").TRadarJammerUnit
 
 ---@class UEB4203 : TRadarJammerUnit
-UEB4203 = Class(TRadarJammerUnit) {
-    IntelEffects = {
+UEB4203 = ClassUnit(TRadarJammerUnit) {
+	IntelEffects = {
 		{
 			Bones = {
 				'UEB4203',

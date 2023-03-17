@@ -1,13 +1,18 @@
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local ColorHSV = import("/lua/shared/color.lua").ColorHSV
+
+local Prefs = import("/lua/user/prefs.lua")
+local options = Prefs.GetFromCurrentProfile('options')
+
+local MathClamp = math.clamp
+local MathLog = math.log
+local MathSqrt = math.sqrt
 local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
-
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local options = Prefs.GetFromCurrentProfile('options')
 
 ---@class UIReclaimDataPoint
 ---@field mass number
@@ -20,7 +25,7 @@ local options = Prefs.GetFromCurrentProfile('options')
 ---@field max number
 
 ---@type number
-local HeightRatio = 0.012
+local HeightRatio = 0.020
 
 --- Reclaim is no longer combined once this threshold is met, the value (150) is the same
 --- camera distance that allows for the reclaim command to work. Guarantees that the
@@ -30,7 +35,7 @@ local ZoomThreshold = 150
 
 --- TODO: remove the options
 ---@type number
-local MaxLabels = 500
+local MaxLabels = 1000
 
 ---@type table<EntityId, UIReclaimDataPoint>
 local Reclaim = {}
@@ -56,7 +61,7 @@ local PlayableArea
 ---@field position Vector
 ---@field mass Bitmap
 ---@field text Text
-local WorldLabel = Class(Group) {
+local WorldLabel = ClassUI(Group) {
     __init = function(self, parent, position)
         Group.__init(self, parent)
         self.parent = parent
@@ -83,19 +88,107 @@ local WorldLabel = Class(Group) {
         self:SetNeedsFrameUpdate(true)
     end,
 
-    --- Adjusts the world label based on the value it represents
+    --- Returns the color of the reclaim label
     ---@param self WorldLabel
-    ---@param value any
-    AdjustToValue = function(self, value)
-        if value < 100 then
-            self.text:SetColor('ffc7ff8f')
-        elseif value < 300 then
-            self.text:SetColor('FFFFEE8F')
-        elseif value < 1000 then
-            self.text:SetColor('FFFFBA8F')
-        else
-            self.text:SetColor('FFFF6F6F')
+    ---@param reclaimData UIReclaimDataCombined
+    ---@return Color
+    CalculateTextColor = function(self, reclaimData)
+        local mass = reclaimData.mass
+        local max = reclaimData.max or mass
+        mass = mass - 10 -- fit to minimum
+        if mass <= 0 then
+            return "7FC7FF8F"
         end
+
+        -- We'd like to scale the hue of the label based on the logarithm of the mass value clamped
+        -- to 1 at some cutoff point. We'd also like to approximate this in the more commonly-used
+        -- small end of the scale using a proportional quadratic function up to a threshold. This
+        -- also ends up flattening it into something more useful, rather than a quarter of the
+        -- function being between 0 and 5.
+        -- 
+        -- Thus, we have three parameters to consider for our function
+        --    base: how quickly the function scales a mass value to hue
+        --    cutoff: when the function meets 1
+        --    thres: when the logarithm stops being approximated
+        --
+        -- We use the nominal logarithm scaling function
+        --    nominal(x) = log_{base}(x / scale + 1)
+        --               = ln(x + scale)/ln(base) - ln(scale)/ln(base)
+        -- where `scale` depends on the cutoff value:
+        --             1 = nominal(cutoff)
+        --             1 = log_{base}(cutoff / scale + 1)
+        --         scale = cutoff / (base - 1)
+        -- 
+        -- The approximating function is `a x^2 + b x` where we choose `a` and `b` such that the
+        -- slopes of the approximating function and the nominal function are smooth up to the first
+        -- derivative at the threshold point:
+        --     approx(thres) = nominal(thres)
+        --     approx'(thres) = nominal'(thres)
+        -- "it is left as an exercise to the reader to validate the solutions for `a` and `b`:"
+        --     a = -((ln(thres + scale) - ln(scale)) / thres - 1 / (thres + scale)) / ln(base)thres
+        --     b = (2(ln(thres + scale) - ln(scale)) / thres - 1 / (thres + scale)) / ln(base)
+        --
+        -- We now up it all together in a piecewise function for the hue:
+        --        hue(x) = { x <= thres  : approx(x)     => A x (x + B)
+        --                 { x >= cutoff : 1
+        --                 { else        : nominal(x)    => ln(x + S) * C + D
+        -- where
+        --             S = cutoff / (base - 1)
+        --             C = 1 / ln(base)
+        --             D = -C ln(S)
+        --             A = -((C ln(thres + S) + D) / thres - C / (thres + S)) / thres
+        --             B = (2(C ln(thres + S) + D) / thres - C / (thres + S)) / A
+        --
+        -- the current parameter values are:
+        --     threshold = 94.5692754978 (chosen to split the function in half)
+        --          base = 100000
+        --        cutoff = 30000
+        -- which yield the following constants:
+        --         scale = 0.30000300003
+        --             A = -0.0000462260645186
+        --             B = -208.944779635
+        --             C = 0.0868588963807
+        --             D = 0.104574880463
+
+        local hue
+        if mass <= 94.5692754978 then
+            hue = -0.0000462260645186 * mass * (mass - 208.944779635)
+        elseif mass >= 30000 then
+            hue = 1
+        else
+            hue = MathLog(mass + 0.30000300003) * 0.0868588963807 + 0.104574880463
+        end
+
+        -- saturation will just be an abstract indicator of how "compact" the label is
+        local sat = MathClamp(max / mass, 0, 1)
+
+        -- we now have a number 0-1 of the hue & saturation range we want to use; transform them
+        -- into the proper ranges
+        hue = 0.31 - 0.3 * hue
+        sat = 0.75 + 0.25 * sat
+        return ColorHSV(hue, sat)
+    end,
+
+    --- Returns the color of the reclaim label
+    ---@param self WorldLabel
+    ---@param reclaimData UIReclaimDataCombined
+    ---@return number
+    CalculateFontSizeFromMass = function(self, reclaimData)
+        local scaling = 0.02 * Prefs.GetFromCurrentProfile('options.reclaim_overview_size_scale')
+        if scaling == 0 then
+            return 10
+        end
+        
+        local minSize = 10
+        local maxSize = 30
+        local mass = reclaimData.mass
+        mass = mass - 10 -- fit to minimum
+        if mass <= 0 then
+            return minSize
+        end
+
+        local value = MathClamp(0.25 * MathSqrt(mass) * scaling + minSize, minSize, maxSize)
+        return value ^ 0
     end,
 
     ---@param self WorldLabel
@@ -104,7 +197,20 @@ local WorldLabel = Class(Group) {
         local proj = view:Project(self.position)
         self.Left:SetValue(proj.x - 0.5 * self.Width())
         self.Top:SetValue(proj.y - 0.5 * self.Height() + 1)
+    end,    
+    
+    --- Updates the reclaim that this label displays
+    ---@param self WorldLabel
+    ---@param r UIReclaimDataCombined
+    UpdateLabel = function(self, r)
+        local mass = tostring(math.floor(0.5 + r.mass))
+        self.text:SetText(mass)
+        self.text:SetColor(self:CalculateTextColor(r))
+        self.text:SetFont(UIUtil.bodyFont, self:CalculateFontSizeFromMass(r))
+        self.text.Depth:Set(0.001 * r.mass)
+        self.mass.Depth:Set(0.001 * r.mass)
     end,
+
     --- Updates the reclaim that this label displays
     ---@param self WorldLabel
     ---@param r UIReclaimDataCombined
@@ -116,10 +222,8 @@ local WorldLabel = Class(Group) {
         self.position = r.position
         self:ProjectToScreen()
         if r.mass ~= self.oldMass then
-            local mass = tostring(math.floor(0.5 + r.mass))
-            self.text:SetText(mass)
+            self:UpdateLabel(r)
             self.oldMass = r.mass
-            self:AdjustToValue(r.mass)
         end
     end,
 
@@ -218,7 +322,7 @@ end
 function UpdateReclaim(reclaimPoints)
     ReclaimChanged = true
     for id, reclaimPoint in reclaimPoints do
-        if not reclaimPoint.mass then
+        if not reclaimPoint then
             Reclaim[id] = nil
             OutsidePlayableAreaReclaim[id] = nil
         else
@@ -253,44 +357,50 @@ local function SumReclaim(r1, r2)
     return r1
 end
 
----@param reclaim UIReclaimDataPoint
+
+---@param reclaim UIReclaimDataPoint[]
+---@return boolean | number         # Returns the number of labels, or false if the zoom threshold is
+local function _CopyReclaim(reclaim)
+    totalReclaimData = 0
+    for _, r in reclaim do
+        totalReclaimData = totalReclaimData + 1
+        reclaimDataPool[totalReclaimData] = r
+    end
+
+    return totalReclaimData
+end
+
+---@param reclaim UIReclaimDataPoint[]
 ---@return boolean | number         # Returns the number of labels, or false if the zoom threshold is
 local function _CombineReclaim(reclaim)
 
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
 
-    if zoom < ZoomThreshold then
+    if zoom < (Prefs.GetFromCurrentProfile('options.reclaim_batching_distance_treshold') or ZoomThreshold) then
         return false
     end
 
     local minDist = zoom * HeightRatio
+
+
     local minDistSq = minDist * minDist
     local index = 0
-
-    local added
-
-    local x1
-    local x2
-    local y1
-    local y2
-    local dx
-    local dy
 
     --- O(n)
     for _, r in reclaim do
 
-        added = false
-        x1 = r.position[1]
-        y1 = r.position[3]
+        local added = false
+        local x1 = r.position[1]
+        local y1 = r.position[3]
 
         --- TODO: use a basic grid query (quad tree overcomplicates it) -> O(k), where k is strictly smaller than n
         --- O(n)
         for i = 1, index do
-            cr = reclaimDataPool[i]
-            x2 = cr.position[1]
-            y2 = cr.position[3]
-            dx = x1 - x2
-            dy = y1 - y2
+            local cr = reclaimDataPool[i]
+            local x2 = cr.position[1]
+            local y2 = cr.position[3]
+            local dx = x1 - x2
+            local dy = y1 - y2
             if dx * dx + dy * dy < minDistSq then
                 added = true
                 SumReclaim(cr, r)
@@ -341,13 +451,12 @@ local function ContainsWholeMap(minX, minY, maxX, maxY)
 end
 
 function UpdateLabels()
-
     if table.getn(Reclaim) < totalReclaimData then
         totalReclaimData = 0
         reclaimDataPool = {}
     end
 
-    local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
+    local view = import("/lua/ui/game/worldview.lua").viewLeft -- Left screen's camera
     local onScreenReclaimIndex = 1
     local onScreenReclaims = {}
 
@@ -356,11 +465,6 @@ function UpdateLabels()
     local br = UnProject(view, Vector2(view.Right(), view.Bottom()))
     local bl = UnProject(view, Vector2(view.Left(), view.Bottom()))
 
-
-
-
-    local x0
-    local y0
     local x1 = tl[1]
     local y1 = tl[3]
     local x2 = tr[1]
@@ -386,21 +490,16 @@ function UpdateLabels()
     local x43 = (x4 - x3)
     local x14 = (x1 - x4)
 
-    local s1
-    local s2
-    local s3
-    local s4
-
     local function Contains(point)
-        x0 = point[1]
-        y0 = point[3]
+        local x0 = point[1]
+        local y0 = point[3]
         if x0 < minX or x0 > maxX or y0 < minY or y0 > maxY then
             return false
         end
-        s1 = (x1 - x0) * y21 - x21 * (y1 - y0)
-        s2 = (x2 - x0) * y32 - x32 * (y2 - y0)
-        s3 = (x3 - x0) * y43 - x43 * (y3 - y0)
-        s4 = (x4 - x0) * y14 - x14 * (y4 - y0)
+        local s1 = (x1 - x0) * y21 - x21 * (y1 - y0)
+        local s2 = (x2 - x0) * y32 - x32 * (y2 - y0)
+        local s3 = (x3 - x0) * y43 - x43 * (y3 - y0)
+        local s4 = (x4 - x0) * y14 - x14 * (y4 - y0)
         return (s1 > 0 and s2 > 0 and s3 > 0 and s4 > 0)
     end
 
@@ -411,8 +510,12 @@ function UpdateLabels()
         end
     end
 
-
-    local size = _CombineReclaim(onScreenReclaims)
+    local size
+    if Prefs.GetFromCurrentProfile('options.reclaim_overview_batching') == 1 then
+        size = _CombineReclaim(onScreenReclaims)
+    else
+        size = _CopyReclaim(onScreenReclaims)
+    end
 
     table.sort(reclaimDataPool, CompareMass)
 
@@ -435,7 +538,6 @@ function UpdateLabels()
             label:DisplayReclaim(recl)
             labelIndex = labelIndex + 1
         end
-
     else
         for _, recl in onScreenReclaims do
             if labelIndex > MaxLabels then
@@ -467,9 +569,8 @@ function UpdateLabels()
     end
 end
 
-local ReclaimThread
 function ShowReclaim(show)
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
     view.ShowingReclaim = show
 
     if show and not view.ReclaimThread then
@@ -505,7 +606,7 @@ function InitReclaimGroup(view)
 end
 
 function ShowReclaimThread(watch_key)
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
     local camera = GetCamera("WorldCamera")
 
     InitReclaimGroup(view)
@@ -548,13 +649,13 @@ function ShowReclaimThread(watch_key)
 end
 
 function ToggleReclaim()
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
     ShowReclaim(not view.ShowingReclaim)
 end
 
 local CommandGraphActive = false
 function OnCommandGraphShow(bool)
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    local view = import("/lua/ui/game/worldview.lua").viewLeft
     if view.ShowingReclaim and not CommandGraphActive then return end -- if on by toggle key
 
     CommandGraphActive = bool

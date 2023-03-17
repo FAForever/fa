@@ -6,8 +6,8 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
 campaignSequence = {
     uef = {
@@ -51,12 +51,12 @@ diffKeyToDiffInt = {
 -- this is sync'd from the sim, so it should be authoritative
 campaignMode = false
 
--- Campaign table format:
--- campaignID - one for each campaign
---      completedOperationID - each operation completed will have an entry
---           difficulty - one entry for each difficulty completed
---              allPrimary  - bool true if all primary objectives completed for this difficulty
---              allSecondary - bool true if all secondary objectives completed for this difficulty
+--- # Campaign table format:
+--- - campaignID - one for each campaign
+--- - completedOperationID - each operation completed will have an entry
+--- - difficulty - one entry for each difficulty completed
+--- - allPrimary - `bool` true if all primary objectives completed for this difficulty
+--- - allSecondary - `bool` true if all secondary objectives completed for this difficulty
 local function GetCampaignTable()
     local cmpt = Prefs.GetFromCurrentProfile('campaign')
     if not cmpt then cmpt = {} end
@@ -156,14 +156,14 @@ function IsOperationFinished(campaign, operation, difficulty)
     return false
 end
 
--- Operation victory table contains the following fields
---  string opKey - unique identifier for the current operation (ie SCCA_E01 would be a good key)
---  bool success - instructs UI which dialog to show
---  int difficulty - 1,2,3 currently supported
---  bool allPrimary - true if all primary objectives completed, otherwise, false
---  bool allSecondary - true if all secondary objectives completed, otherwise, false
---  bool allBonus - true if all bonus objectives completed, otherwise, false
---  int factionVideo - Opt.  If present, display this factions end game video
+--- # Operation victory table contains the following fields
+--- - `string` opKey - unique identifier for the current operation (ie SCCA_E01 would be a good key)
+--- - `bool` success - instructs UI which dialog to show
+--- - `int` difficulty - 1,2,3 currently supported
+--- - `bool` allPrimary - true if all primary objectives completed, otherwise, false
+--- - `bool` allSecondary - true if all secondary objectives completed, otherwise, false
+--- - `bool` allBonus - true if all bonus objectives completed, otherwise, false
+--- - `int` factionVideo - Opt.  If present, display this factions end game video
 function OperationVictory(ovTable, skipDialog)
     local resultText
     if ovTable.success == true then
@@ -173,7 +173,7 @@ function OperationVictory(ovTable, skipDialog)
     end
 
     if not skipDialog then
-        import('/lua/ui/game/worldview.lua').UnlockInput()
+        import("/lua/ui/game/worldview.lua").UnlockInput()
 
         if ovTable.success then
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Victory'}))
@@ -185,7 +185,7 @@ function OperationVictory(ovTable, skipDialog)
             resultText,
             "<LOC _Ok>",
             function()
-                import('/lua/ui/dialogs/score.lua').CreateDialog(ovTable.success, true, ovTable)
+                import("/lua/ui/dialogs/score.lua").CreateDialog(ovTable.success, true, ovTable)
             end,
             true)
     end
@@ -195,7 +195,7 @@ function LaunchBriefing(nextOpData)
     local opID = nextOpData.opID
     if DiskGetFileInfo('/maps/'..opID..'/'..opID..'_operation.lua') then
         local opData = import('/maps/'..opID..'/'..opID..'_operation.lua')
-        import('/lua/ui/campaign/operationbriefing.lua').CreateUI(opID, opData.operationData, nextOpData.campaignID, nextOpData.difficulty)
+        import("/lua/ui/campaign/operationbriefing.lua").CreateUI(opID, opData.operationData, nextOpData.campaignID, nextOpData.difficulty)
         return true
     end
     return false
@@ -233,4 +233,4 @@ function InstaWin()
 end
 
 -- kept for mod backwards compatibility
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap

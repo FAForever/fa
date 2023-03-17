@@ -6,11 +6,11 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Movie = import('/lua/maui/movie.lua').Movie
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Movie = import("/lua/maui/movie.lua").Movie
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
 
 -- TODO: add credits music if any
 function CreateDialog(exitBehavior)

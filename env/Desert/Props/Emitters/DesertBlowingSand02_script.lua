@@ -1,7 +1,7 @@
 --
 -- DesertBlowingSand02
 --
-local Prop = import('/lua/sim/Prop.lua').Prop
+local Prop = import("/lua/sim/prop.lua").Prop
 
 DesertBlowingSand02 = Class(Prop) {
     OnCreate = function(self)

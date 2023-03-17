@@ -6,7 +6,7 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 
 -- Create a radio group, which is a group of checkboxes and associtated labels that have
 -- a mutually exclusive checked state.

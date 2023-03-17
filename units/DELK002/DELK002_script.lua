@@ -1,23 +1,20 @@
---****************************************************************************
---**
---**  Author(s):  Mikko Tyster
---**
---**  Summary  :  UEF T3 Anti-Air
---**
---**  Copyright © 2008 Blade Braver!
---****************************************************************************
-local TLandUnit = import('/lua/terranunits.lua').TLandUnit
-local TWeapons = import('/lua/terranweapons.lua')
+-----------------------------------------------------
+-- Author(s):  Mikko Tyster
+-- Summary  :  UEF T3 Anti-Air
+-- Copyright © 2008 Blade Braver!
+-----------------------------------------------------
+local TLandUnit = import("/lua/terranunits.lua").TLandUnit
+local TWeapons = import("/lua/terranweapons.lua")
 local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon
-local TAAPhalanxWeapon = import('/lua/kirvesweapons.lua').TAAPhalanxWeapon
+local TAAPhalanxWeapon = import("/lua/kirvesweapons.lua").TAAPhalanxWeapon
+local EffectUtils = import("/lua/effectutilities.lua")
+local Effects = import("/lua/effecttemplates.lua")
 
-local EffectUtils = import('/lua/effectutilities.lua')
-local Effects = import('/lua/effecttemplates.lua')
 
 ---@class DELK002 : TLandUnit
-DELK002 = Class(TLandUnit) {
+DELK002 = ClassUnit(TLandUnit) {
     Weapons = {
-        GatlingCannon = Class(TAAPhalanxWeapon)
+        GatlingCannon = ClassWeapon(TAAPhalanxWeapon)
         {
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip1 then

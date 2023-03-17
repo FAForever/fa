@@ -5,16 +5,16 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local explosion = import('/lua/defaultexplosions.lua')
-local util = import('/lua/utilities.lua')
-local WeaponsFile = import('/lua/terranweapons.lua')
-local AirTransport = import('/lua/defaultunits.lua').AirTransport
-local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
-local TWeapons = import('/lua/terranweapons.lua')
+local explosion = import("/lua/defaultexplosions.lua")
+local util = import("/lua/utilities.lua")
+local WeaponsFile = import("/lua/terranweapons.lua")
+local AirTransport = import("/lua/defaultunits.lua").AirTransport
+local TSAMLauncher = import("/lua/terranweapons.lua").TSAMLauncher
+local TWeapons = import("/lua/terranweapons.lua")
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 
 ---@class XEA0306 : AirTransport
-XEA0306 = Class(AirTransport) {
+XEA0306 = ClassUnit(AirTransport) {
     AirDestructionEffectBones = {'FrontRight_Engine_Exhaust','FrontLeft_Engine_Exhaust','BackRight_Engine_Exhaust','BackLeft_Engine_Exhaust'},
 
     ShieldEffects = {
@@ -26,15 +26,14 @@ XEA0306 = Class(AirTransport) {
     BeamExhaustIdle = '/effects/emitters/transport_thruster_beam_02_emit.bp',
 
     Weapons = {
-        MissleRackFrontLeft = Class(TSAMLauncher) {},
-        MissleRackBackLeft = Class(TSAMLauncher) {},
-        MissleRackBackRight = Class(TSAMLauncher) {},
-        MissleRackFrontRight = Class(TSAMLauncher) {},
-        PlasmaLeft = Class(TDFHeavyPlasmaCannonWeapon) {},
-        PlasmaRight = Class(TDFHeavyPlasmaCannonWeapon) {},
+        MissleRackFrontLeft = ClassWeapon(TSAMLauncher) {},
+        MissleRackBackLeft = ClassWeapon(TSAMLauncher) {},
+        MissleRackBackRight = ClassWeapon(TSAMLauncher) {},
+        MissleRackFrontRight = ClassWeapon(TSAMLauncher) {},
+        PlasmaLeft = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {},
+        PlasmaRight = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {},
     },
 
-    DestructionTicks = 250,
     EngineRotateBones = {'FrontRight_Engine', 'FrontLeft_Engine', 'BackRight_Engine', 'BackLeft_Engine', },
 
     OnCreate = function(self)

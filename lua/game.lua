@@ -6,8 +6,8 @@
 -----------------------------------------------------------------
 
 ---@class UnitRestrictions
----@field Global table<UnitId, boolean>
----@field PerArmy table<UnitId, boolean>[]
+---@field Global table<BlueprintId, boolean>
+---@field PerArmy table<BlueprintId, boolean>[]
 
 
 
@@ -91,7 +91,7 @@ local bps = {
 }
 
 -- Function for converting categories to string
-local ToString = import('/lua/sim/CategoryUtils.lua').ToString
+local ToString = import("/lua/sim/categoryutils.lua").ToString
 
 -- Gets army index for specified army name
 -- e.g. GetArmyIndex('ARMY_1') -> 1
@@ -209,7 +209,7 @@ local function SortUnits(bp1, bp2)
 end
 
 -- Checks for valid unit blueprints (not projectiles/effects)
-local IsValidUnit = import('/lua/ui/lobby/UnitsAnalyzer.lua').IsValidUnit
+local IsValidUnit = import("/lua/ui/lobby/unitsanalyzer.lua").IsValidUnit
 
 --- Gets blueprints that can be upgraded, e.g. MEX, Shield, Radar structures
 ---@return UnitBlueprint[]

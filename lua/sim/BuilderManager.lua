@@ -7,7 +7,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local Builder = import('/lua/sim/Builder.lua')
+local Builder = import("/lua/sim/builder.lua")
 
 ---@class BuilderManager
 BuilderManager = ClassSimple {
@@ -375,9 +375,26 @@ BuilderManager = ClassSimple {
             end
         end
     end,
+    
+    ---@param self, BuilderManager
+    ---@param oldtable, Table
+    ---@return tempTable, Table
+    RebuildTable = function(self, oldtable)
+        local temptable = {}
+        for k, v in oldtable do
+            if v ~= nil then
+                if type(k) == 'string' then
+                    temptable[k] = v
+                else
+                    table.insert(temptable, v)
+                end
+            end
+        end
+        return temptable
+    end,
 }
 
 
 -- kept for mod backwards compatibility
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")

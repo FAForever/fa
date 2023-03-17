@@ -12,23 +12,23 @@ local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
 local ExBaseTmpl = 'ExpansionBaseTemplates'
 local Adj2x2Tmpl = 'Adjacency2x2'
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local MABC = '/lua/editor/MarkerBuildConditions.lua'
-local IBC = '/lua/editor/InstantBuildConditions.lua'
-local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
-local EBC = '/lua/editor/EconomyBuildConditions.lua'
-local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
-local TBC = '/lua/editor/ThreatBuildConditions.lua'
-local SAI = '/lua/ScenarioPlatoonAI.lua'
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
+local MABC = '/lua/editor/markerbuildconditions.lua'
+local IBC = '/lua/editor/instantbuildconditions.lua'
+local OAUBC = '/lua/editor/otherarmyunitcountbuildconditions.lua'
+local EBC = '/lua/editor/economybuildconditions.lua'
+local PCBC = '/lua/editor/platooncountbuildconditions.lua'
+local TBC = '/lua/editor/threatbuildconditions.lua'
+local SAI = '/lua/scenarioplatoonai.lua'
 local PlatoonFile = '/lua/platoon.lua'
 local SBC = '/lua/editor/SorianBuildConditions.lua'
 local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 
-local SUtils = import('/lua/AI/sorianutilities.lua')
+local SUtils = import("/lua/ai/sorianutilities.lua")
 
 function LandAttackCondition(aiBrain, locationType, targetNumber)
-    local UC = import('/lua/editor/UnitCountBuildConditions.lua')
+    local UC = import("/lua/editor/unitcountbuildconditions.lua")
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
@@ -268,7 +268,7 @@ BuilderGroup {
         PlatoonTemplate = 'T1LandDFTank',
         Priority = 900,
         BuilderConditions = {
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Land', 1 } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Land' } },
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH1 } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, 'FACTORY TECH2, FACTORY TECH3' }},
@@ -474,7 +474,7 @@ BuilderGroup {
         PlatoonTemplate = 'T2AttackTankSorian',
         Priority = 925,
         BuilderConditions = {
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Land', 1 } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Land' } },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'FACTORY TECH3' }},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH2 } },
             { IBC, 'BrainNotLowPowerMode', {} },
@@ -674,7 +674,7 @@ BuilderGroup {
         PlatoonTemplate = 'T3ArmoredAssaultSorian',
         Priority = 945,
         BuilderConditions = {
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Land', 1 } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Land' } },
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH3 } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'NoRushTimeCheck', { 600 }},
@@ -688,7 +688,7 @@ BuilderGroup {
         PlatoonTemplate = 'T3LandBot',
         Priority = 935,
         BuilderConditions = {
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Land', 1 } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Land' } },
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH3 } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'NoRushTimeCheck', { 600 }},

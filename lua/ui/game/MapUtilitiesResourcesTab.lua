@@ -1,9 +1,9 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Group = import('/lua/maui/group.lua').Group
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Group = import("/lua/maui/group.lua").Group
 
 --- Creates the UI for the resources tab
 -- @param state Complete state of the window

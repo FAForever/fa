@@ -1,14 +1,14 @@
 
-local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
+local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
 
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
-local data = import('/lua/ui/lobby/changelogData.lua')
+local data = import("/lua/ui/lobby/changelogdata.lua")
 
 --- Test if we should display the changelog of the new game version.
 -- @return true/false
@@ -23,10 +23,10 @@ local debugInterface = false
 --- A bit of a hack, but allows us to keep track of whether the changelog is open or not. The lobby
 -- is (almost aggressively) trying to keep control of the keyboard on the chat box to prevent hotkeys
 -- from working :sad:
-isOpen = false 
+isOpen = false
 
 ---@class Changelog : Group
-Changelog = Class(Group) {
+Changelog = ClassUI(Group) {
 
     __init = function(self, parent)
         Group.__init(self, parent)
@@ -66,7 +66,7 @@ Changelog = Class(Group) {
         LayoutHelpers.FillParent(self.Background, GetFrame(0))
 
         self.DialogBackground = Bitmap(self.CommonUI)
-        self.DialogBackground:SetSolidColor("ff111111")
+        self.DialogBackground:SetSolidColor("99111111")
         LayoutHelpers.FillParent(self.DialogBackground, self.CommonUI)
 
         -- header

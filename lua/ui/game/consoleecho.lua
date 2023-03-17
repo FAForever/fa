@@ -3,13 +3,13 @@
 --* Author: Ted Snook
 --* Summary: Dev console echo display on screen
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Prefs = import("/lua/user/prefs.lua")
 
 local CONSOLE_LINES = Prefs.GetFromCurrentProfile("console_size") or 5
 local CONSOLE_FADE_DELAY = Prefs.GetFromCurrentProfile("console_fade_delay") or 3

@@ -2,10 +2,10 @@
 -- Terran Land-Based Cruise Missile : UEL0111 (UEF T2 MML)
 --
 
-local TMissileCruiseProjectile = import('/lua/terranprojectiles.lua').TMissileCruiseProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
-TIFMissileCruise03 = Class(TMissileCruiseProjectile) {
+TIFMissileCruise03 = ClassProjectile(TMissileCruiseProjectile) {
 
     FxTrails = EffectTemplate.TMissileExhaust01,
     FxTrailOffset = -0.85,
@@ -25,17 +25,16 @@ TIFMissileCruise03 = Class(TMissileCruiseProjectile) {
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)        
-        self.MoveThread = self:ForkThread(self.MovementThread)
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
     MovementThread = function(self)        
-        self.WaitTime = 0.1
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
-        WaitSeconds(0.3)        
+        WaitTicks(4)        
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 
@@ -43,23 +42,23 @@ TIFMissileCruise03 = Class(TMissileCruiseProjectile) {
         local dist = self:GetDistanceToTarget()
         if dist > self.Distance then
         	self:SetTurnRate(75)
-        	WaitSeconds(3)
+        	WaitTicks(31)
         	self:SetTurnRate(8)
         	self.Distance = self:GetDistanceToTarget()
         end
         -- Get the nuke as close to 90 deg as possible
         if dist > 50 then        
             -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+            WaitTicks(21)
             self:SetTurnRate(10)
         elseif dist > 30 and dist <= 50 then
 						-- Increase check intervals
 						self:SetTurnRate(12)
-						WaitSeconds(1.5)
+						WaitTicks(16)
             self:SetTurnRate(12)
         elseif dist > 10 and dist <= 25 then
 						-- Further increase check intervals
-            WaitSeconds(0.3)
+                        WaitTicks(4)
             self:SetTurnRate(50)
 				elseif dist > 0 and dist <= 10 then
 						-- Further increase check intervals            

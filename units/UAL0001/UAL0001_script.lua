@@ -8,23 +8,33 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
-local AWeapons = import('/lua/aeonweapons.lua')
+---@alias AeonACUEnhancementBuffType
+---| "DamageStabilization"
+---| "ACUBUILDRATE"
+
+---@alias AeonACUEnhancementBuffName          # BuffType
+---| "AeonACUChronoDampener"                  # DamageStabilization
+---| "AeonACUT2BuildRate"                     # ACUBUILDRATE
+---| "AeonACUT3BuildRate"                     # ACUBUILDRATE
+
+
+local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
+local AWeapons = import("/lua/aeonweapons.lua")
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
-local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
 local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
-local Buff = import('/lua/sim/Buff.lua')
+local Buff = import("/lua/sim/buff.lua")
 
 ---@class UAL0001 : ACUUnit
-UAL0001 = Class(ACUUnit) {
+UAL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        RightDisruptor = Class(ADFDisruptorCannonWeapon) {},
-        ChronoDampener = Class(ADFChronoDampener) {},
-        OverCharge = Class(ADFOverchargeWeapon) {},
-        AutoOverCharge = Class(ADFOverchargeWeapon) {},
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        RightDisruptor = ClassWeapon(ADFDisruptorCannonWeapon) {},
+        ChronoDampener = ClassWeapon(ADFChronoDampener) {},
+        OverCharge = ClassWeapon(ADFOverchargeWeapon) {},
+        AutoOverCharge = ClassWeapon(ADFOverchargeWeapon) {},
     },
 
     __init = function(self)
@@ -61,8 +71,8 @@ UAL0001 = Class(ACUUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -71,8 +81,8 @@ UAL0001 = Class(ACUUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationAdvancedRemove' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)

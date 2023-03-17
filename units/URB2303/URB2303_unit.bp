@@ -91,7 +91,7 @@ UnitBlueprint {
         UniformScale = 0.5,
     },
     Economy = {
-        BuildCostEnergy = 12000,
+        BuildCostEnergy = 12012,
         BuildCostMass = 1680,
         BuildTime = 1600,
         RebuildBonusIds = {
@@ -191,7 +191,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 2.5,
+            FiringRandomness = 2.75,
             FiringTolerance = 1,
             Label = 'MainGun',
             MaxRadius = 128,

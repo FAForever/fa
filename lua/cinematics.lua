@@ -12,9 +12,9 @@
 -- If you do, and you move the camera to a marker in the new area, the engine
 -- may not handle it well.
 
-SimCamera = import('/lua/simcamera.lua').SimCamera
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
+SimCamera = import("/lua/simcamera.lua").SimCamera
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 function IsOpEnded()
     if ScenarioInfo.OpEnded then

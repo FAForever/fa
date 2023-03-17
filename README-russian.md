@@ -13,6 +13,16 @@ Forged Alliance Forever — это [проект](https://github.com/FAForever) 
 
 Скачать клиент можно на нашем [сайте](https://faforever.com/). Чтобы играть, вам нужно будет синхронизировать свою учетную запись со Steam, чтобы подтвердить, что у вас есть копия [Supreme Commander: Forged Aliance](https://store.steampowered.com/app/9420/Supreme_Commander_Forged_Alliance/). Вы можете связаться с сообществом через [форумы](https://forum.faforever.com/) и официальный сервер [Discord](https://discord.gg/mXahVSKGVb). Чат разработчиков можно найти на [Zulip](https://zulip.com/) — вы можете запросить доступ у администратора этого репозитория. Проект поддерживается за счет пожертвований на [Patreon](https://www.patreon.com/faf).
 
+Список изменений
+---------
+
+Вот полный [список изменений](changelog.md). Существует [альтернативный журнал изменений](http://patchnotes.faforever.com/), особенно для патчей баланса, в удобном для пользователя виде.
+
+Помощь сообществу
+------------
+
+Есть инструкции на [английском](setup/setup-english.md) и [русском](setup/setup-russian.md) языках, которые помогут настроить среду разработки. Пожалуйста, ознакомьтесь с [правилами помощи сообществу](CONTRIBUTING.md) и [правилами перевода](loc/guidelines.md) перед тем, как делать ваш первый PR.
+
 Об этом репозитории
 ---------------------
 
@@ -43,13 +53,3 @@ Forged Alliance Forever — это [проект](https://github.com/FAForever) 
  - [Исполняемый патчер](https://github.com/FAForever/FA_Patcher)
  - [Исполняемые патчи](https://github.com/FAForever/FA-Binary-Patches)
  - [Отладчик](https://github.com/FAForever/FADeepProbe) помогающий с исключениями
-
-Список изменений
----------
-
-Вот полный [список изменений](changelog.md). Существует [альтернативный журнал изменений](http://patchnotes.faforever.com/), особенно для патчей баланса, в удобном для пользователя виде.
-
-Помощь сообществу
-------------
-
-Есть инструкции на [английском](setup/setup-english.md) и [русском](setup/setup-russian.md) языках, которые помогут настроить среду разработки. Пожалуйста, ознакомьтесь с [правилами помощи сообществу](CONTRIBUTING.md) и [правилами перевода](loc/guidelines.md) перед тем, как делать ваш первый PR.

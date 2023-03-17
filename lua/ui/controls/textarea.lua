@@ -1,7 +1,7 @@
-local Text = import('/lua/maui/text.lua')
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Text = import("/lua/maui/text.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 --- A multi-line textfield
 --
@@ -15,7 +15,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 -- self-harm long enough to finish writing this class so we can call this a solved problem and never
 -- look in this file ever again.
 ---@class TextArea : ItemList
-TextArea = Class(ItemList) {
+TextArea = ClassUI(ItemList) {
     __init = function(self, parent, width, height)
         ItemList.__init(self, parent)
 

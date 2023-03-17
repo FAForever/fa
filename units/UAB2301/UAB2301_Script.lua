@@ -8,12 +8,12 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
+local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 
 ---@class UAB2301 : AStructureUnit
-UAB2301 = Class(AStructureUnit) {
+UAB2301 = ClassUnit(AStructureUnit) {
     Weapons = {
-        MainGun = Class(import('/lua/aeonweapons.lua').ADFCannonOblivionWeapon03) {}
+        MainGun = ClassWeapon(import("/lua/aeonweapons.lua").ADFCannonOblivionWeapon03) {}
     },
 }
 

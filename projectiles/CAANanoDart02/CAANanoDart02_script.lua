@@ -2,14 +2,14 @@
 -- Cybran Anti Air Projectile
 --
 
-CAANanoDartProjectile = import('/lua/cybranprojectiles.lua').CAANanoDartProjectile
+CAANanoDartProjectile = import("/lua/cybranprojectiles.lua").CAANanoDartProjectile
 
-CAANanoDart02 = Class(CAANanoDartProjectile) {
+CAANanoDart02 = ClassProjectile(CAANanoDartProjectile) {
 
    OnCreate = function(self)
         CAANanoDartProjectile.OnCreate(self)
         for k, v in self.FxTrails do
-            CreateEmitterOnEntity(self,self:GetArmy(),v )
+            CreateEmitterOnEntity(self,self.Army,v )
         end
    end,
 }

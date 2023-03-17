@@ -7,9 +7,9 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
+local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Builder = import("/lua/sim/builder.lua")
 
 ---@class PlatoonFormManager : BuilderManager
 PlatoonFormManager = Class(BuilderManager) {
@@ -172,7 +172,7 @@ PlatoonFormManager = Class(BuilderManager) {
 
                 if builder:GetPlatoonAddBehaviors() then
                     for pafk, pafv in builder:GetPlatoonAddBehaviors() do
-                        hndl:ForkThread(import('/lua/ai/AIBehaviors.lua')[pafv])
+                        hndl:ForkThread(import("/lua/ai/aibehaviors.lua")[pafv])
                     end
                 end
 
@@ -205,4 +205,4 @@ function CreatePlatoonFormManager(brain, lType, location, radius)
 end
 
 --- Moved Unsused imports to bottome for mod support
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")

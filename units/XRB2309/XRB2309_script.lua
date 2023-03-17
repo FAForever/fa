@@ -5,15 +5,15 @@
 -- Copyright ? 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CKrilTorpedoLauncherWeapon = import('/lua/cybranweapons.lua').CKrilTorpedoLauncherWeapon
-local utilities = import('/lua/utilities.lua')
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
+local CKrilTorpedoLauncherWeapon = import("/lua/cybranweapons.lua").CKrilTorpedoLauncherWeapon
+local utilities = import("/lua/utilities.lua")
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
 ---@class XRB2309 : CStructureUnit
-XRB2309 = Class(CStructureUnit) {
+XRB2309 = ClassUnit(CStructureUnit) {
     Weapons = {
-        Turret01 = Class(CKrilTorpedoLauncherWeapon) {},
+        Turret01 = ClassWeapon(CKrilTorpedoLauncherWeapon) {},
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -109,10 +109,6 @@ XRB2309 = Class(CStructureUnit) {
         local shallSink = true -- This unit should definitely sink, no need to check cats.
 
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
-        self:DestroyAllDamageEffects()
-        self:DestroyIdleEffects()
-        self:DestroyBeamExhaust()
-        self:DestroyAllBuildEffects()
 
         -- BOOM!
         if self.PlayDestructionEffects then

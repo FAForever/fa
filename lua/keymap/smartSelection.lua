@@ -1,9 +1,9 @@
 -- example usage: select all idle air units, excluding transports and bombers
 -- smartSelect("AIR MOBILE +idle -TRANSPORTATION -BOMBER")
 -- to bind this as a hotkey in your game.prefs make an action like this:
--- UI_Lua import("/lua/keymap/smartSelection.lua").smartSelect("AIR MOBILE +idle -TRANSPORTATION -BOMBER")
+-- UI_Lua import("/lua/keymap/smartselection.lua").smartSelect("AIR MOBILE +idle -TRANSPORTATION -BOMBER")
 
-local utils = import('/lua/system/utils.lua')
+local utils = import("/lua/system/utils.lua")
 
 
 -- sets selection as per string expression

@@ -1,30 +1,25 @@
---
 -- URL0111 : cybran MML
 -- Cybran "Loa" Tactical Missile, mobile unit launcher variant of this missile, lower and straighter trajectory. 
 -- Splits into child projectile if it takes enough damage.
---
 
-local CLOATacticalMissileProjectile = import('/lua/cybranprojectiles.lua').CLOATacticalMissileProjectile
+local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
 
-CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
-
+CIFMissileTactical01 = ClassProjectile(CLOATacticalMissileProjectile) {
     NumChildMissiles = 3,
-
     OnCreate = function(self)
         CLOATacticalMissileProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
         self.Split = false
-        self.MoveThread = self:ForkThread(self.MovementThread)
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 0.1
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
-        WaitSeconds(0.3)
+        WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 
@@ -32,20 +27,20 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
         local dist = self:GetDistanceToTarget()
         if dist > self.Distance then
             self:SetTurnRate(75)
-            WaitSeconds(3)
+            WaitTicks(31)
             self:SetTurnRate(8)
             self.Distance = self:GetDistanceToTarget()
         end
         if dist > 50 then
             -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+            WaitTicks(21)
             self:SetTurnRate(10)
         elseif dist > 30 and dist <= 50 then
             self:SetTurnRate(12)
-            WaitSeconds(1.5)
+            WaitTicks(16)
             self:SetTurnRate(12)
         elseif dist > 10 and dist <= 30 then
-            WaitSeconds(0.3)
+            WaitTicks(4)
             self:SetTurnRate(50)
         elseif dist > 0 and dist <= 10 then
             self:SetTurnRate(100)
@@ -59,18 +54,17 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
         local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
         return dist
     end,
-    
+
     OnImpact = function(self, targetType, targetEntity)       
         CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
-            
         -- if it collide with terrain dont split
         if targetType != 'Projectile' then
             self.Split = true
         end
-        
+
         CLOATacticalMissileProjectile.OnImpact(self, targetType, targetEntity)
     end,
-    
+
     OnDamage = function(self, instigator, amount, vector, damageType)
         if not self.Split and (amount >= self:GetHealth()) then
             self.Split = true
@@ -91,7 +85,7 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
                 local proj = self:CreateChildProjectile(ChildProjectileBP)
                 proj:SetVelocity(xVec,yVec,zVec)
                 proj:SetVelocity(velocity)
-                proj:PassDamageData(self.DamageData)
+                proj.DamageData = self.DamageData
             end
         end
         CLOATacticalMissileProjectile.OnDamage(self, instigator, amount, vector, damageType)

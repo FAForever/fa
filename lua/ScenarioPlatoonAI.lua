@@ -5,10 +5,10 @@
 --- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------
 
-local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
-local ScenarioFramework = import('/lua/ScenarioFramework.lua')
-local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local StructureTemplates = import("/lua/buildingtemplates.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
 --- Retrieves all human brains that are hostile to the given army index
 ---@param armyIndex number Army index to check alliance with
@@ -535,7 +535,7 @@ function EngineersBuildPlatoon(platoon)
     local buildingData
     local unitBeingBuilt = false
     local busy = false
-    local buildingTemplate = BuildingTemplates[aiBrain:GetFactionIndex()]
+    local buildingTemplate = StructureTemplates.BuildingTemplates[aiBrain:GetFactionIndex()]
 
     if not data.PlatoonsTable then
         error('*SCENARIO PLATOON AI ERROR: EngineersBuildPlatoon requires PlatoonsTable', 2)
@@ -656,9 +656,9 @@ function EngineersBuildPlatoon(platoon)
                     end
                 end
                 if buildingData.ScenPlatoonAI then
-                    plat:ForkAIThread(import('/lua/ScenarioPlatoonAI.lua')[buildingData.ScenPlatoonAI])
+                    plat:ForkAIThread(import("/lua/scenarioplatoonai.lua")[buildingData.ScenPlatoonAI])
                 elseif buildingData.PlatoonAI then
-                    plat:ForkAIThread(import('/lua/platoon.lua')[buildingData.PlatoonAI])
+                    plat:ForkAIThread(import("/lua/platoon.lua")[buildingData.PlatoonAI])
                 elseif buildingData.LocalFunction and buildingData.ScenName then
                     plat:ForkAIThread(import('/maps/'..buildingData.ScenName..'/'..buildingData.ScenName..'_script.lua')[LocalFunction])
                 end
@@ -1364,7 +1364,7 @@ end
 function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, buildingTemplate)
     local structureCategory
     if not buildingTemplate then
-        buildingTemplate = BuildingTemplates[aiBrain:GetFactionIndex()]
+        buildingTemplate = StructureTemplates.BuildingTemplates[aiBrain:GetFactionIndex()]
     end
     for _, v in buildingTemplate do
         if building == v[1] then
@@ -2027,9 +2027,9 @@ function PlatoonChooseRandomNonNegative(aiBrain, locationList, ringSize)
             table.insert(landingList, v)
         end
     end
-    local loc = landingList[Random(1, table.getn(landingList))]
+    local loc = table.random(landingList)
     if not loc then
-        loc = locationList[Random(1, table.getn(locationList))]
+        loc = table.random(locationList)
     end
     return loc
 end
@@ -2414,4 +2414,4 @@ end
 
 -- kept for mod backwards compatibility
 
-local Utilities = import('/lua/utilities.lua')
+local Utilities = import("/lua/utilities.lua")

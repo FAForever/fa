@@ -7,10 +7,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SRadarJammerUnit = import('/lua/seraphimunits.lua').SRadarJammerUnit
+local SRadarJammerUnit = import("/lua/seraphimunits.lua").SRadarJammerUnit
 
 ---@class XSB4203 : SRadarJammerUnit
-XSB4203 = Class(SRadarJammerUnit) {
+XSB4203 = ClassUnit(SRadarJammerUnit) {
     IntelEffects = {
 		{
 			Bones = {

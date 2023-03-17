@@ -4,17 +4,17 @@
 --* Summary: Dialog to allow user to select what units they would like to disable
 --* in a skirmish game
 --*
---* Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 
-local restrictedUnits = import('/lua/ui/lobby/restrictedUnitsData.lua').restrictedUnits
+local restrictedUnits = import("/lua/ui/lobby/restrictedUnitsData.lua").restrictedUnits
 
 function CreateDialog(parent, initialRestrictions, OnOk, OnCancel, isHost)
      
@@ -184,7 +184,7 @@ function CreateDialog(parent, initialRestrictions, OnOk, OnCancel, isHost)
         return bg
     end
 
-    local sortOrder = import('/lua/ui/lobby/restrictedUnitsData.lua').sortOrder
+    local sortOrder = import("/lua/ui/lobby/restrictedUnitsData.lua").sortOrder
     for index, key in sortOrder do
         if restrictedUnits[key] then
             table.insert(scrollGroup.controlList, CreateListElement(scrollGroup, key))

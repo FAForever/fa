@@ -8,9 +8,9 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
-local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local Util = import('utilities.lua')
+local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local Util = import("/lua/utilities.lua")
 
 -------------------------------
 --   Base class that defines supreme commander specific defaults
@@ -18,13 +18,13 @@ local Util = import('utilities.lua')
 ---@class SCCollisionBeam : CollisionBeam
 SCCollisionBeam = Class(CollisionBeam) {
     FxImpactUnit = EffectTemplate.DefaultProjectileLandUnitImpact,
-    FxImpactLand = {},-- EffectTemplate.DefaultProjectileLandImpact,
+    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,-- EffectTemplate.DefaultProjectileLandImpact,
     FxImpactWater = EffectTemplate.DefaultProjectileWaterImpact,
     FxImpactUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
     FxImpactAirUnit = EffectTemplate.DefaultProjectileAirUnitImpact,
-    FxImpactProp = {},
-    FxImpactShield = {},    
-    FxImpactNone = {},
+    FxImpactProp = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactShield = import("/lua/effecttemplates.lua").NoEffects,    
+    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
 }
 
 -------------------------------
@@ -42,7 +42,6 @@ GinsuCollisionBeam = Class(SCCollisionBeam) {
     FxImpactLand = {'/effects/emitters/destruction_land_hit_puff_01_emit.bp',
                     '/effects/emitters/destruction_explosion_flash_01_emit.bp'},
     FxLandHitScale = 0.1625,
-    FxImpactUnderWater = {},
 }
 
 ------------------------------------

@@ -1,12 +1,12 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 function SetLayout()
-    local controls = import('/lua/ui/game/missiontext.lua').controls
+    local controls = import("/lua/ui/game/missiontext.lua").controls
     
     if controls.movieBrackets then
-        if import('/lua/ui/game/gamemain.lua').IsNISMode() then
+        if import("/lua/ui/game/gamemain.lua").IsNISMode() then
             import(UIUtil.GetLayoutFilename('missiontextnis')).SetLayout()
         else
             LayoutHelpers.AtLeftTopIn(controls.movieBrackets, GetFrame(0), 2, 147)

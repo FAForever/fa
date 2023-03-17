@@ -7,15 +7,15 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
-local AAASonicPulseBatteryWeapon = import('/lua/aeonweapons.lua').AAASonicPulseBatteryWeapon
+local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
+local AAASonicPulseBatteryWeapon = import("/lua/aeonweapons.lua").AAASonicPulseBatteryWeapon
 
 
 ---@class UAL0104 : AHoverLandUnit
-UAL0104 = Class(AHoverLandUnit) {
+UAL0104 = ClassUnit(AHoverLandUnit) {
 
     Weapons = {
-        AAGun = Class(AAASonicPulseBatteryWeapon) {},
+        AAGun = ClassWeapon(AAASonicPulseBatteryWeapon) {},
     },
 }
 

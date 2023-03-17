@@ -7,7 +7,7 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local Builder = import('/lua/sim/Builder.lua').Builder
+local Builder = import("/lua/sim/builder.lua").Builder
 
 -- StrategyBuilderSpec
 -- This is the spec to have analyzed by the StrategyManager
@@ -136,4 +136,4 @@ function CreateStrategy(brain, data, locationType)
 end
 
 -- imports kept for backwards compatibility with mods
-local AIUtils = import('/lua/ai/aiutilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")

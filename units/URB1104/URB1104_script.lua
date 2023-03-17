@@ -7,10 +7,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CMassFabricationUnit = import('/lua/cybranunits.lua').CMassFabricationUnit
+local CMassFabricationUnit = import("/lua/cybranunits.lua").CMassFabricationUnit
 
 ---@class URB1104 : CMassFabricationUnit
-URB1104 = Class(CMassFabricationUnit) {
+URB1104 = ClassUnit(CMassFabricationUnit) {
     DestructionPartsLowToss = {'Blade',},
 
     OnStopBeingBuilt = function(self,builder,layer)

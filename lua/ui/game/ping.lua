@@ -1,11 +1,11 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local Button = import('/lua/maui/button.lua').Button
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Edit = import('/lua/maui/edit.lua').Edit
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Edit = import("/lua/maui/edit.lua").Edit
 
 --- The dialog used to define marker-pings.
 local dialog = false
@@ -28,12 +28,36 @@ OriginalFocusArmy = -1
 --- List of marker-pings with text underneath.
 local markers = {}
 
+local clients = GetSessionClients()
+local armies = GetArmiesTable().armiesTable
+
+---comment
+---@return table
+local function GetAlliedAndObserverClients()
+
+    local focusArmy = OriginalFocusArmy
+    if focusArmy == -1 then
+        return {}
+    end
+
+    local recipients = { }
+    for k, client in clients do
+        for l, source in client.authorizedCommandSources do
+            if IsAlly(focusArmy, source) then
+                recipients[source] = true
+            end
+        end
+    end
+
+    return table.keys(recipients)
+end
+
 --- Performs a ping operation.
 -- @param pingType can be 'alert', 'move', 'attack' or 'marker'.
 function DoPing(pingType)
 
     -- can't ping in replays
-    if SessionIsReplay() or import('/lua/ui/game/gamemain.lua').supressExitDialog then 
+    if SessionIsReplay() or import("/lua/ui/game/gamemain.lua").supressExitDialog then 
         WARN("You can not ping in a replay.")
         return 
     end
@@ -83,6 +107,20 @@ function DoPing(pingType)
                 local armies = GetArmiesTable()
                 data.Color = armies.armiesTable[armies.focusArmy].color
                 SimCallback({Func = 'SpawnPing', Args = data})
+
+                -- carefully chosen settings at the given zoom (for full hd)
+                local cameraSettings = GetCamera('WorldCamera'):SaveSettings()
+                cameraSettings.Zoom = 211.12
+                cameraSettings.Pitch = 1.2807490825653
+                cameraSettings.Heading = 3.1415927410126
+                cameraSettings.Focus = position
+
+                SessionSendChatMessage(GetAlliedAndObserverClients(), {
+                    to = 'allies',
+                    text = tostring(name),
+                    camera = cameraSettings,
+                    Chat = true,
+                })
             end)
         end
 
@@ -126,7 +164,7 @@ end
 -- @param data A table where each element is data about a ping.
 function DisplayPing(data)
     --Table of all map views to display pings in
-    local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
+    local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
 
     -- for each ping
     for index, ping in data do

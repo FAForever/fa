@@ -248,9 +248,6 @@ function CreateArmyUnit(strArmy, strUnit)
             tblUnit.Position[1], tblUnit.Position[2], tblUnit.Position[3],
             tblUnit.Orientation[1], tblUnit.Orientation[2], tblUnit.Orientation[3]
         )
-        if unit:GetBlueprint().Physics.FlattenSkirt then
-            unit:CreateTarmac(true, true, true, false, false)
-        end
         local platoon
         if tblUnit.platoon ~= nil and tblUnit.platoon ~= '' then
             local i = 3
@@ -391,7 +388,7 @@ function CreateInitialArmyGroup(strArmy, createCommander)
 
     if createCommander and (tblGroup == nil or 0 == table.getn(tblGroup)) then
         local factionIndex = GetArmyBrain(strArmy):GetFactionIndex()
-        local initialUnitName = import('/lua/factions.lua').Factions[factionIndex].InitialUnit
+        local initialUnitName = import("/lua/factions.lua").Factions[factionIndex].InitialUnit
         cdrUnit = CreateInitialArmyUnit(strArmy, initialUnitName)
         if EntityCategoryContains(categories.COMMAND, cdrUnit) then
             if ScenarioInfo.Options['PrebuiltUnits'] == 'Off' then
@@ -585,7 +582,7 @@ function InitializeArmies()
     local FindUnitGroup = FindUnitGroup
     local CreatePlatoons = CreatePlatoons
     local CreateWreckageUnit = CreateWreckageUnit
-    local LocalSetAlliance = SetAlliance
+    local SetAlliance = SetAlliance
 
     local armySetups = ScenarioInfo.ArmySetup
     local civOpt = ScenarioInfo.Options.CivilianAlliance
@@ -637,39 +634,46 @@ function InitializeArmies()
                 end
             end
 
-            ----[ irumsey                                                         ]--
-            ----[ Temporary defaults.  Make sure some fighting will break out.    ]--
+
             for iEnemy, _ in tblArmy do
-                -- only do it once for each pair
+
+                -- only run this logic once for each pair
                 if iEnemy >= iArmy then
                     continue
                 end
+
+                -- by default we are enemies
                 local state = "Enemy"
                 if armyIsCiv then
+
+                    -- or neutral, to the neutral civilians
                     if civOpt == "neutral" or strArmy == "NEUTRAL_CIVILIAN" then
                         state = "Neutral"
                     end
 
+                    -- temporarily ally them to gain vision
                     if revealCivilians then
                         ForkThread(function(civ, army)
-                            WaitSeconds(0.1)
-
+                            -- keep track of army status
                             local real_state = IsAlly(civ, army) and "Ally" or IsEnemy(civ, army) and "Enemy" or "Neutral"
-                            GetArmyBrain(army):SetupArmyIntelTrigger({
-                                Category = categories.ALLUNITS,
-                                Type = "LOSNow",
-                                Value = true,
-                                OnceOnly = true,
-                                TargetAIBrain = GetArmyBrain(civ),
-                                CallbackFunction = function()
-                                    SetAlliance(civ, army, real_state)
-                                end,
-                            })
+
+                            -- guarantee the army has _some_ vision at _some_ point, to prevent them from
+                            -- having complete vision. The intel / vision system defaults to giving complete
+                            -- vision over a map when an army did not have a single unit at some point. This 
+                            -- prevents the triggering of intel for each unit creation of every player. The
+                            -- behavior is easiest spotted on Seton's clutch
+                            local dummy = CreateUnitHPR('xsl0101', civ, 0, 0, 0, 0, 0, 0)
                             SetAlliance(civ, army, "Ally")
+                            WaitTicks(20)
+
+                            -- revert army status and destroy the dummy unit
+                            SetAlliance(civ, army, real_state)
+                            dummy:Destroy()
                         end, iArmy, iEnemy)
                     end
                 end
-                LocalSetAlliance(iArmy, iEnemy, state)
+
+                SetAlliance(iArmy, iEnemy, state)
             end
         end
     end
@@ -698,11 +702,11 @@ function InitializeScenarioArmies()
     local scenarioArmies = Scenario.Armies
     local tblArmy = ListArmies()
     local shouldCreateInitial = ShouldCreateInitialArmyUnits()
-    local factionCount = table.getsize(import('/lua/factions.lua').Factions)
+    local factionCount = table.getsize(import("/lua/factions.lua").Factions)
 
     ScenarioInfo.CampaignMode = true
     Sync.CampaignMode = true
-    import('/lua/sim/simuistate.lua').IsCampaign(true)
+    import("/lua/sim/simuistate.lua").IsCampaign(true)
 
     local armies = {}
     for i, name in tblArmy do
@@ -936,9 +940,6 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
                                  tblData.Position[1], tblData.Position[2], tblData.Position[3],
                                  tblData.Orientation[1], tblData.Orientation[2], tblData.Orientation[3]
                              )
-            if unit:GetBlueprint().Physics.FlattenSkirt then
-                unit:CreateTarmac(true, true, true, false, false)
-            end
             table.insert(tblResult, unit)
             treeResult[strName] = unit
             if ScenarioInfo.UnitNames[armyIndex] then
@@ -1105,9 +1106,6 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
                                  tblData.Position[1], tblData.Position[2], tblData.Position[3],
                                  tblData.Orientation[1], tblData.Orientation[2], tblData.Orientation[3]
                              )
-            if unit:GetBlueprint().Physics.FlattenSkirt then
-                unit:CreateTarmac(true, true, true, false, false)
-            end
             if ScenarioInfo.UnitNames[armyIndex] then
                 ScenarioInfo.UnitNames[armyIndex][strName] = unit
             end
@@ -1869,4 +1867,4 @@ end
 
 
 -- kept for mod backwards compatibility
-local Entity = import('/lua/sim/entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity

@@ -7,14 +7,14 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local CCivilianStructureUnit = import('/lua/cybranunits.lua').CCivilianStructureUnit
+local CCivilianStructureUnit = import("/lua/cybranunits.lua").CCivilianStructureUnit
 
 ---@class URC1401 : CCivilianStructureUnit
-URC1401 = Class(CCivilianStructureUnit) {
+URC1401 = ClassUnit(CCivilianStructureUnit) {
 	OnCreate = function(self)
 		CCivilianStructureUnit.OnCreate(self)
 
-        self.WindowEntity = import('/lua/sim/Entity.lua').Entity({Owner = self,})
+        self.WindowEntity = import("/lua/sim/entity.lua").Entity({Owner = self,})
         self.WindowEntity:AttachBoneTo( -1, self, 'URC1401' )
         self.WindowEntity:SetMesh('/effects/Entities/URC1401_WINDOW/URC1401_WINDOW_mesh')
         self.WindowEntity:SetDrawScale(0.1)

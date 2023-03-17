@@ -5,25 +5,25 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Grid = import('/lua/maui/grid.lua').Grid
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Button = import('/lua/maui/button.lua').Button
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local TooltipInfo = import('/lua/ui/help/tooltips.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local UIMain = import('/lua/ui/uimain.lua')
-local Select = import('/lua/ui/game/selection.lua')
-local EnhancementQueue = import('/lua/ui/notify/enhancementqueue.lua')
-local SetWeaponPriorities = import('/lua/keymap/misckeyactions.lua').SetWeaponPriorities
-local CommandMode = import('/lua/ui/game/commandmode.lua')
-local Construction = import('/lua/ui/game/construction.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Grid = import("/lua/maui/grid.lua").Grid
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Button = import("/lua/maui/button.lua").Button
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local TooltipInfo = import("/lua/ui/help/tooltips.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local UIMain = import("/lua/ui/uimain.lua")
+local Select = import("/lua/ui/game/selection.lua")
+local EnhancementQueue = import("/lua/ui/notify/enhancementqueue.lua")
+local SetWeaponPriorities = import("/lua/keymap/misckeyactions.lua").SetWeaponPriorities
+local CommandMode = import("/lua/ui/game/commandmode.lua")
+local Construction = import("/lua/ui/game/construction.lua")
 
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
 
 -- Positioning controls, don't belong to file
 local layoutVar = false
@@ -65,7 +65,7 @@ local function CreateOrderGlow(parent)
     end
 end
 
-local hotkeyLabel_addLabel = import('/lua/keymap/hotkeylabelsUI.lua').addLabel
+local hotkeyLabel_addLabel = import("/lua/keymap/hotkeylabelsui.lua").addLabel
 local orderKeys = {}
 
 function setOrderKeys(orderKeys_)
@@ -539,7 +539,7 @@ local function AttackMoveBehavior(self, modifiers)
             name="RULEUCC_Script",
             AbilityName='AttackMove',
             TaskName='AttackMove',
-            cursor = 'ATTACK_MOVE',
+            Cursor = 'ATTACK_MOVE',
         }
         CommandMode.StartCommandMode("order", modeData)
     end
@@ -553,7 +553,7 @@ local function AbilityButtonBehavior(self, modifiers)
             name="RULEUCC_Script",
             AbilityName=self._script,
             TaskName=self._script,
-            cursor = self._cursor,
+            Cursor = self._cursor,
         }
         CommandMode.StartCommandMode("order", modeData)
     end
@@ -948,7 +948,7 @@ local function OverchargeFrame(self, deltaTime)
         if self:IsDisabled() then
             self:Enable()
             local armyTable = GetArmiesTable()
-            local facStr = import('/lua/factions.lua').Factions[armyTable.armiesTable[armyTable.focusArmy].faction + 1].SoundPrefix
+            local facStr = import("/lua/factions.lua").Factions[armyTable.armiesTable[armyTable.focusArmy].faction + 1].SoundPrefix
             local sound = Sound({Bank = 'XGG', Cue = 'Computer_Computer_Basic_Orders_01173'})
             if not lastOCTime[unit:GetArmy()] then
                 lastOCTime[unit:GetArmy()] = GetGameTimeSeconds() - 2
@@ -965,6 +965,13 @@ local function OverchargeFrame(self, deltaTime)
     end
 end
 
+
+---@alias CommandCap EngineCommandCap
+---| "AttackMove"
+---| "DroneL"
+---| "DroneR"
+
+---@alias ToggleCap EngineToggleCap
 
 ---@class OrderInfo
 ---@field helpText string
@@ -1228,7 +1235,7 @@ function AddAbilityButtons(standardOrdersTable, availableOrders, units)
                 for abilityIndex, ability in tempBP.Abilities do
                     if ability.Active ~= false then
                         table.insert(availableOrders, abilityIndex)
-                        standardOrdersTable[abilityIndex] = table.merged(ability, import('/lua/abilitydefinition.lua').abilities[abilityIndex])
+                        standardOrdersTable[abilityIndex] = table.merged(ability, import("/lua/abilitydefinition.lua").abilities[abilityIndex])
                         standardOrdersTable[abilityIndex].behavior = AbilityButtonBehavior
                     end
                 end

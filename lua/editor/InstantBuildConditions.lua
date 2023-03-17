@@ -27,7 +27,7 @@ function NotPreBuilt(aiBrain)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq boolean
 ---@return boolean
@@ -45,7 +45,7 @@ function HaveEqualToUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq EntityCategory
 ---@return boolean
@@ -63,7 +63,7 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq EntityCategory
 ---@return boolean
@@ -99,7 +99,7 @@ function BrainNotLowMassMode(aiBrain)
 end
 
 -- Moved Unused Imports to bottom for mod support
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")

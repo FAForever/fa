@@ -1,6 +1,6 @@
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local UIUtil = import('/lua/ui/uiutil.lua')
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local UIUtil = import("/lua/ui/uiutil.lua")
 
 ---@class Button : Bitmap
 ---@field mNormal FileName
@@ -10,7 +10,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 ---@field mMouseOver boolean
 ---@field mClickCue string
 ---@field mRolloverCue string
-Button = Class(Bitmap) {
+Button = ClassUI(Bitmap) {
     ---@param self Button
     ---@param parent Control
     ---@param normal FileName
@@ -133,7 +133,7 @@ Button = Class(Bitmap) {
 -- for the retarded construction UI, and can probably be got rid of when we think of a better way of
 -- doing this. For now this at least gets this bollocks out of the Button class.
 ---@class FixableButton : Button
-FixableButton = Class(Button) {
+FixableButton = ClassUI(Button) {
     SetOverrideTexture = function(self, texture)
         self.textureOverride = texture
     end,

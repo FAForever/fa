@@ -5,49 +5,47 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
-local GameVersion = import('/lua/version.lua').GetVersion
-local UIUtil = import('/lua/ui/uiutil.lua')
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local MapUtil = import('/lua/ui/maputil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local RadioButton = import('/lua/ui/controls/radiobutton.lua').RadioButton
-local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local Slider = import('/lua/maui/slider.lua').Slider
-local PlayerData = import('/lua/ui/lobby/data/playerdata.lua').PlayerData
-local GameInfo = import('/lua/ui/lobby/data/gamedata.lua')
-local WatchedValueArray = import('/lua/ui/lobby/data/watchedvalue/watchedvaluearray.lua').WatchedValueArray
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local ToggleButton = import('/lua/ui/controls/togglebutton.lua').ToggleButton
-local Edit = import('/lua/maui/edit.lua').Edit
-local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Mods = import('/lua/mods.lua')
-local FactionData = import('/lua/factions.lua')
-local Text = import('/lua/maui/text.lua').Text
-local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
-local Border = import('/lua/ui/controls/border.lua').Border
+local GameVersion = import("/lua/version.lua").GetVersion
+local UIUtil = import("/lua/ui/uiutil.lua")
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local MapUtil = import("/lua/ui/maputil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local RadioButton = import("/lua/ui/controls/radiobutton.lua").RadioButton
+local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
+local ResourceMapPreview = import("/lua/ui/controls/resmappreview.lua").ResourceMapPreview
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
+local Slider = import("/lua/maui/slider.lua").Slider
+local PlayerData = import("/lua/ui/lobby/data/playerdata.lua").PlayerData
+local GameInfo = import("/lua/ui/lobby/data/gamedata.lua")
+local WatchedValueArray = import("/lua/ui/lobby/data/watchedvalue/watchedvaluearray.lua").WatchedValueArray
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local ToggleButton = import("/lua/ui/controls/togglebutton.lua").ToggleButton
+local Edit = import("/lua/maui/edit.lua").Edit
+local LobbyComm = import("/lua/ui/lobby/lobbycomm.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Mods = import("/lua/mods.lua")
+local FactionData = import("/lua/factions.lua")
+local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
-local utils = import('/lua/system/utils.lua')
+local utils = import("/lua/system/utils.lua")
 
-local Trueskill = import('/lua/ui/lobby/trueskill.lua')
+local Trueskill = import("/lua/ui/lobby/trueskill.lua")
 local round = Trueskill.round
 local Player = Trueskill.Player
 local Rating = Trueskill.Rating
-local ModBlacklist = import('/etc/faf/blacklist.lua').Blacklist
+local ModBlacklist = import("/etc/faf/blacklist.lua").Blacklist
 local Teams = Trueskill.Teams
-local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
-local CountryTooltips = import('/lua/ui/help/tooltips-country.lua').tooltip
-local SetUtils = import('/lua/system/setutils.lua')
-local JSON = import('/lua/system/dkson.lua').json
-local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
-local Changelog = import('/lua/ui/lobby/changelog.lua')
-local UTF =  import('/lua/UTF.lua')
+local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
+local CountryTooltips = import("/lua/ui/help/tooltips-country.lua").tooltip
+local SetUtils = import("/lua/system/setutils.lua")
+local JSON = import("/lua/system/dkson.lua").json
+local UnitsAnalyzer = import("/lua/ui/lobby/unitsanalyzer.lua")
+local Changelog = import("/lua/ui/lobby/changelog.lua")
+local UTF =  import("/lua/utf.lua")
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
 local AIKeys = {}
@@ -56,12 +54,11 @@ local AITooltips = {}
 
 
 
-
 function GetAITypes()
     AIKeys = {}
     AIStrings = {}
     AITooltips = {}
-    aitypes = import('/lua/ui/lobby/aitypes.lua').GetAItypes()
+    aitypes = import("/lua/ui/lobby/aitypes.lua").GetAItypes()
     for _, aidata in aitypes do
         table.insert(AIKeys, aidata.key)
         table.insert(AIStrings, aidata.name)
@@ -75,22 +72,22 @@ GetAITypes()
 
 local IsSyncReplayServer = false
 
-local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
+local AddUnicodeCharToEditText = import("/lua/utf.lua").AddUnicodeCharToEditText
 
 if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
     IsSyncReplayServer = true
 end
 
-local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
-local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
-local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
-local gameColors = import('/lua/gameColors.lua').GameColors
+local globalOpts = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts
+local teamOpts = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions
+local AIOpts = import("/lua/ui/lobby/lobbyoptions.lua").AIOpts
+local gameColors = import("/lua/gamecolors.lua").GameColors
 
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
 -- Add lobby options from AI mods
 function ImportModAIOptions()
-    local simMods = import('/lua/mods.lua').AllMods()
+    local simMods = import("/lua/mods.lua").AllMods()
     local OptionData
     local alreadyStored
     for Index, ModData in simMods do
@@ -473,6 +470,17 @@ function GetAIPlayerData(name, AIPersonality, slot)
     if not AIColor then
         AIColor = GetAvailableColor()
     end
+
+    -- retrieve properties from AI table
+    local baseAI = false
+    local requiresNavMesh = false
+    for k, entry in aitypes do 
+        if entry.key == AIPersonality then
+            requiresNavMesh = requiresNavMesh or entry.requiresNavMesh
+            baseAI = baseAI or entry.baseAI
+        end
+    end
+
     return PlayerData(
         {
             OwnerID = hostID,
@@ -482,6 +490,10 @@ function GetAIPlayerData(name, AIPersonality, slot)
             AIPersonality = AIPersonality,
             PlayerColor = AIColor,
             ArmyColor = AIColor,
+
+            -- properties from AI table
+            RequiresNavMesh = requiresNavMesh,
+            BaseAI = baseAI
         }
 )
 end
@@ -642,7 +654,7 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
 
     -- Store off the validated playername
     localPlayerName = lobbyComm:GetLocalPlayerName()
-    local Prefs = import('/lua/user/prefs.lua')
+    local Prefs = import("/lua/user/prefs.lua")
     local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
     SetWindowedLobby(windowed == 'true')
 
@@ -680,7 +692,7 @@ end
 function StartSyncReplaySession(replayID)
     SetFrontEndData('syncreplayid', replayID)
     local dl = UIUtil.QuickDialog(GetFrame(0), "Downloading the replay file...")
-    LaunchReplaySession('gpgnet://' .. GetCommandLineArg('/gpgnet',1)[1] .. '/' .. import('/lua/user/prefs.lua').GetFromCurrentProfile('Name'))
+    LaunchReplaySession('gpgnet://' .. GetCommandLineArg('/gpgnet',1)[1] .. '/' .. import("/lua/user/prefs.lua").GetFromCurrentProfile('Name'))
     dl:Destroy()
     UIUtil.QuickDialog(GetFrame(0), "You dont have this map.", "Exit", function() ExitApplication() end)
 end
@@ -965,7 +977,7 @@ local function refreshObserverList()
     end
 end
 
-local WVT = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua')
+local WVT = import("/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua")
 
 -- update the data in a player slot
 -- TODO: With lazyvars, this function should be eliminated. Lazy-value-callbacks should be used
@@ -1794,7 +1806,7 @@ local function AssignAutoTeams()
 end
 
 local function AssignAINames()
-    local aiNames = import('/lua/ui/lobby/aiNames.lua').ainames
+    local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
     local nameSlotsTaken = {}
     for index, faction in FactionData.Factions do
         nameSlotsTaken[index] = {}
@@ -1830,7 +1842,7 @@ function ReturnToMenu(reconnect)
         exitfn()
     else
         local ipnumber = GetCommandLineArg("/joincustom", 1)[1]
-        import('/lua/ui/uimain.lua').StartJoinLobbyUI("UDP", ipnumber, localPlayerName)
+        import("/lua/ui/uimain.lua").StartJoinLobbyUI("UDP", ipnumber, localPlayerName)
     end
 end
 
@@ -2225,6 +2237,15 @@ local function UpdateGame()
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
 
+            -- Briefing button takes priority over the patch notes if the map has a briefing
+            if scenarioInfo.hasBriefing then
+                GUI.briefingButton:Show()
+                GUI.patchnotesButton:Hide()
+            else
+                GUI.briefingButton:Hide()
+                GUI.patchnotesButton:Show()
+            end
+
             -- contains information that is available during blueprint loading
             local preGameData = {}
 
@@ -2308,14 +2329,12 @@ local function UpdateGame()
 
             -- PREFETCHING --
 
-            -- we can't prefetch in combination with PreGameData as the prefs file
-            -- is not updated accordingly, as a result when it is retrieved in
-            -- blueprints.lua it may use the old values. As it is more relevant
-            -- to have custom icon support over having a slightly faster loading
-            -- time we skip the prefetching
+            -- Note that the PreGameData is not properly updated,
+            -- hence we can not rely on mod and / or lobby option
+            -- changes to be present.
 
-            -- local mods = Mods.GetGameMods(gameInfo.GameMods)
-            -- PrefetchSession(scenarioInfo.map, mods, true)
+            local mods = Mods.GetGameMods(gameInfo.GameMods)
+            PrefetchSession(scenarioInfo.map, mods, true)
 
         else
             AlertHostMapMissing()
@@ -2333,6 +2352,7 @@ local function UpdateGame()
         local notReady = not playerOptions.Ready
 
         UIUtil.setEnabled(GUI.becomeObserver, notReady)
+        UIUtil.setEnabled(GUI.briefingButton, notReady)
         -- This button is enabled for all non-host players to view the configuration, and for the
         -- host to select presets (rather confusingly, one object represents both potential buttons)
         UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
@@ -2548,9 +2568,9 @@ end
 function autoMap()
     local randomAutoMap
     if gameInfo.GameOptions['RandomMap'] == 'Official' then
-        randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(true)
+        randomAutoMap = import("/lua/ui/dialogs/mapselect.lua").randomAutoMap(true)
     else
-        randomAutoMap = import('/lua/ui/dialogs/mapselect.lua').randomAutoMap(false)
+        randomAutoMap = import("/lua/ui/dialogs/mapselect.lua").randomAutoMap(false)
     end
 end
 
@@ -2605,10 +2625,10 @@ local playersToSwap = false
 
 -- set up player "slots" which is the line representing a player and player specific options
 function CreateSlotsUI(makeLabel)
-    local Combo = import('/lua/ui/controls/combo.lua').Combo
-    local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
-    local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-    local ColumnLayout = import('/lua/ui/controls/columnlayout.lua').ColumnLayout
+    local Combo = import("/lua/ui/controls/combo.lua").Combo
+    local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
+    local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+    local ColumnLayout = import("/lua/ui/controls/columnlayout.lua").ColumnLayout
 
     -- The dimensions of the columns used for slot UI controls.
     local COLUMN_POSITIONS = {1, 21, 47, 91, 133, 395, 465, 535, 605, 677, 749}
@@ -2688,7 +2708,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.HandleEvent = defaultHandler
 
         -- Slot number
-        local slotNumber = UIUtil.CreateText(newSlot, tostring(i), 14, 'Arial')
+        local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
         newSlot.slotNumber = slotNumber
         LayoutHelpers.SetWidth(slotNumber, COLUMN_WIDTHS[1])
         slotNumber.Height:Set(newSlot.Height)
@@ -2923,16 +2943,16 @@ end
 
 -- create UI won't typically be called directly by another module
 function CreateUI(maxPlayers)
-    local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-    local Text = import('/lua/maui/text.lua').Text
-    local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
-    local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-    local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-    local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-    local ItemList = import('/lua/maui/itemlist.lua').ItemList
-    local Prefs = import('/lua/user/prefs.lua')
-    local Tooltip = import('/lua/ui/game/tooltip.lua')
-    local Combo = import('/lua/ui/controls/combo.lua')
+    local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+    local Text = import("/lua/maui/text.lua").Text
+    local ResourceMapPreview = import("/lua/ui/controls/resmappreview.lua").ResourceMapPreview
+    local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
+    local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+    local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+    local ItemList = import("/lua/maui/itemlist.lua").ItemList
+    local Prefs = import("/lua/user/prefs.lua")
+    local Tooltip = import("/lua/ui/game/tooltip.lua")
+    local Combo = import("/lua/ui/controls/combo.lua")
 
     local isHost = lobbyComm:IsHost()
     local lastFaction = GetSanitisedLastFaction()
@@ -3171,7 +3191,7 @@ function CreateUI(maxPlayers)
     else
         tooltipText['body'] = LOC("<LOC lobui_0771>Left click ACU icon to move yourself.")
     end
-    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText, 0,198)
+    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText)
 
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 813, 325)
@@ -3215,6 +3235,18 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
     GUI.patchnotesButton.OnClick = function(self, event)
         Changelog.Changelog(GUI)
+    end
+
+    -- Create mission briefing button
+    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Briefing")
+    GUI.briefingButton = briefingButton
+    LayoutHelpers.AtBottomIn(GUI.briefingButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.briefingButton, GUI.optionsPanel, -55)
+    briefingButton.OnClick = function(self, modifiers)
+        GUI.briefing = Group(GUI)
+        GUI.briefing.Depth:Set(function() return GUI.Depth() + 20 end)
+        LayoutHelpers.FillParent(GUI.briefing, GUI)
+        import('/lua/ui/campaign/operationbriefing.lua').CreateUI(GUI.briefing, gameInfo.GameOptions.ScenarioFile)
     end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
@@ -3270,7 +3302,7 @@ function CreateUI(maxPlayers)
 
             GUI.chatEdit:AbandonFocus()
 
-            mapSelectDialog = import('/lua/ui/dialogs/mapselect.lua').CreateDialog(
+            mapSelectDialog = import("/lua/ui/dialogs/mapselect.lua").CreateDialog(
                 selectBehavior,
                 exitBehavior,
                 GUI,
@@ -3283,13 +3315,13 @@ function CreateUI(maxPlayers)
         end
     else
         local modsManagerCallback = function(active_sim_mods, active_ui_mods)
-            import('/lua/mods.lua').SetSelectedMods(SetUtils.Union(active_sim_mods, active_ui_mods))
+            import("/lua/mods.lua").SetSelectedMods(SetUtils.Union(active_sim_mods, active_ui_mods))
             RefreshOptionDisplayData()
             GUI.chatEdit:AcquireFocus()
         end
         GUI.gameoptionsButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', LOC("<LOC _Mod_Manager>"))
         GUI.gameoptionsButton.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/ModsManager.lua').CreateDialog(GUI, false, nil, modsManagerCallback)
+            import("/lua/ui/lobby/modsmanager.lua").CreateDialog(GUI, false, nil, modsManagerCallback)
         end
         Tooltip.AddButtonTooltip(GUI.gameoptionsButton, 'Lobby_Mods')
     end
@@ -3301,7 +3333,7 @@ function CreateUI(maxPlayers)
     -- set up chat display
     ---------------------------------------------------------------------------
 
-    GUI.chatDisplay = import('/lua/ui/lobby/chatarea.lua').ChatArea(
+    GUI.chatDisplay = import("/lua/ui/lobby/chatarea.lua").ChatArea(
         GUI.chatPanel,
         function() return GUI.chatPanel.Width() - 20 end,
         function() return GUI.chatPanel.Height() - GUI.chatBG.Height() end
@@ -3363,7 +3395,7 @@ function CreateUI(maxPlayers)
         return self.top >= self:GetScrollLastPage()
     end
     -- this function set how many chat lines can fit per scroll page (chatPanel)
-    GUI.chatPanel.LinesOnPage = import('/lua/lazyvar.lua').Create()
+    GUI.chatPanel.LinesOnPage = import("/lua/lazyvar.lua").Create()
     GUI.chatPanel.LinesOnPage.OnDirty = function(var)
         GUI.chatPanel.linesPerScrollPage = var()
     end
@@ -3593,7 +3625,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtVerticalCenterIn(GUI.loadButton, launchGameButton, 7)
     LayoutHelpers.AtHorizontalCenterIn(GUI.loadButton, GUI.optionsPanel)
     loadButton.OnClick = function(self, modifiers)
-        import('/lua/ui/dialogs/saveload.lua').CreateLoadDialog(GUI)
+        import("/lua/ui/dialogs/saveload.lua").CreateLoadDialog(GUI)
     end
     Tooltip.AddButtonTooltip(loadButton, 'Lobby_Load')
 
@@ -3612,7 +3644,7 @@ function CreateUI(maxPlayers)
     else
         GUI.restrictedUnitsOrPresetsBtn.label:SetText(LOC("<LOC lobui_0332>Unit Manager"))
         GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
-            import('/lua/ui/lobby/UnitsManager.lua').CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
+            import("/lua/ui/lobby/unitsmanager.lua").CreateDialog(GUI.panel, gameInfo.GameOptions.RestrictedCategories, function() end, function() end, false)
         end
         Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'lob_RestrictedUnitsClient')
     end
@@ -3692,7 +3724,7 @@ function CreateUI(maxPlayers)
             autoRandMap = false
 
             -- Load the set of all available maps, with a slight evil hack on the mapselect module.
-            local mapDialog = import('/lua/ui/dialogs/mapselect.lua')
+            local mapDialog = import("/lua/ui/dialogs/mapselect.lua")
             local allMaps = mapDialog.LoadScenarios()  -- Result will be cached.
 
             -- Only include maps which have enough slots for the players we have.
@@ -4282,6 +4314,9 @@ function CreateUI(maxPlayers)
             WaitSeconds(1)
         end
     end)
+    if false then
+        import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
+    end
 end
 
 function setupChatEdit(chatPanel)
@@ -4385,9 +4420,9 @@ function setupChatEdit(chatPanel)
 end
 
 function RefreshOptionDisplayData(scenarioInfo)
-    local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
-    local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
-    local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
+    local globalOpts = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts
+    local teamOptions = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions
+    local AIOpts = import("/lua/ui/lobby/lobbyoptions.lua").AIOpts
     if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     end
@@ -4683,7 +4718,7 @@ function AddChatText(text, playerID, scrollToBottom)
             if not chatPlayerColor then
               nameFont = UIUtil.bodyFont
                 if Prefs.GetOption('faction_font_color') then
-                    nameColor = import('/lua/skins/skins.lua').skins[ FACTION_NAMES[GetLocalPlayerData():AsTable().Faction] ].fontColor
+                    nameColor = import("/lua/skins/skins.lua").skins[ FACTION_NAMES[GetLocalPlayerData():AsTable().Faction] ].fontColor
                     textColor = nameColor
                 else
                     nameColor = nil
@@ -4790,10 +4825,11 @@ function ConfigureMapListeners(mapCtrl, scenario)
         local marker = mapCtrl.startPositions[inSlot]
 
         marker.OnRollover = function(self, state)
+            local slotName = GUI.slots[slot].name
             if state == 'enter' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseEnter'})
+                slotName:HandleEvent({Type = 'MouseEnter'})
             elseif state == 'exit' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseExit'})
+                slotName:HandleEvent({Type = 'MouseExit'})
             end
         end
 
@@ -5217,7 +5253,7 @@ local MessageHandlers = {
 
             UpdateClientModStatus(data.GameMods)
             UpdateGame()
-            import('/lua/ui/lobby/ModsManager.lua').UpdateClientModStatus(gameInfo.GameMods)
+            import("/lua/ui/lobby/modsmanager.lua").UpdateClientModStatus(gameInfo.GameMods)
         end
     },
     SlotClosed = {
@@ -5466,7 +5502,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         -- determine if cheat keys should be mapped
         if not DebugFacilitiesEnabled() then
             IN_ClearKeyMap()
-            IN_AddKeyMapTable(import('/lua/keymap/keymapper.lua').GetKeyMappings(gameInfo.GameOptions['CheatsEnabled']=='true'))
+            IN_AddKeyMapTable(import("/lua/keymap/keymapper.lua").GetKeyMappings(gameInfo.GameOptions['CheatsEnabled']=='true'))
         end
     end
 
@@ -5662,7 +5698,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             HostedBy = localPlayerName,
             PlayerCount = GetPlayerCount(),
             GameName = gameName,
-            ProductCode = import('/lua/productcode.lua').productCode,
+            ProductCode = import("/lua/productcode.lua").productCode,
         }
     end
 end
@@ -6256,7 +6292,7 @@ function RefreshLobbyBackground(faction)
     elseif LobbyBackground == 3 then -- Screenshot
         GUI.background = Bitmap(GUI, "/textures/ui/common/BACKGROUND/scrn/scrn-background-paint" .. math.random(1, 14) .. "_bmp.dds")
     elseif LobbyBackground == 4 then -- Map
-        local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
+        local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
         GUI.background = MapPreview(GUI) -- Background map
         if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= '') then
             local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
@@ -6282,7 +6318,7 @@ end
 
 function ShowLobbyOptionsDialog()
     local dialogContent = Group(GUI)
-    LayoutHelpers.SetDimensions(dialogContent, 420, 260)
+    LayoutHelpers.SetDimensions(dialogContent, 420, 310)
 
     local dialog = Popup(GUI, dialogContent)
     GUI.lobbyOptionsDialog = dialog
@@ -6344,6 +6380,30 @@ function ShowLobbyOptionsDialog()
             GUI.chatPanel:ScrollToBottom()
         end
     end
+    if true then
+        --snowflakes count
+        local currentSnowFlakesCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
+        local slider_SnowFlakes_Count_TEXT = UIUtil.CreateText(dialogContent,'Snowflakes count '.. currentSnowFlakesCount, 14, 'Arial', true)
+        LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count_TEXT, dialogContent, 27, 202)
+
+        -- slider for changing chat font size
+        local slider_SnowFlakes_Count = Slider(dialogContent, false, 100, 1000,
+            UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
+            UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+            LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count, dialogContent, 20, 222)
+        slider_SnowFlakes_Count:SetValue(currentSnowFlakesCount)
+        slider_SnowFlakes_Count.OnValueChanged = function(self, newValue)
+            local sliderValue = math.floor(newValue)
+            slider_SnowFlakes_Count_TEXT:SetText('Snowflakes count '.. sliderValue)
+            Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
+            import("/lua/ui/events/SnowFlake.lua").Clear()
+            import("/lua/ui/events/SnowFlake.lua").CreateSnowFlakes(GUI, sliderValue)
+        end
+    end
+
+
     --
     local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0402>Windowed mode"))
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialogContent, 20, 42)

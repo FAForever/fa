@@ -1,4 +1,4 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
 
 --* Percentage versus offset
 --* Percentages are specified as a float, with 0.00 to 1.00 the normal ranges
@@ -475,5 +475,5 @@ function PulseOnceAndFade(control, time, alphaBtm, alphaTop, initialAlpha)
 end
 
 -- kept for mod backwards compatibility
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group

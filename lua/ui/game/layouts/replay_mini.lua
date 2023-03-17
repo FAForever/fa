@@ -1,9 +1,9 @@
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 
 function CreateControls(controls)
     if not controls.bg then
@@ -25,9 +25,9 @@ function CreateControls(controls)
 end
 
 function SetLayout()
-    CreateControls(import('/lua/ui/game/replay.lua').controls)
+    CreateControls(import("/lua/ui/game/replay.lua").controls)
     
-    local controls = import('/lua/ui/game/replay.lua').controls
+    local controls = import("/lua/ui/game/replay.lua").controls
     
     controls.bg:SetTexture(UIUtil.SkinnableFile('/game/replay/panel_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.controlClusterGroup, 6)

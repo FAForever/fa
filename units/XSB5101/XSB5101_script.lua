@@ -7,9 +7,9 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SWallStructureUnit = import('/lua/seraphimunits.lua').SWallStructureUnit
+local SWallStructureUnit = import("/lua/seraphimunits.lua").SWallStructureUnit
 
 ---@class XSB5101 : SWallStructureUnit
-XSB5101 = Class(SWallStructureUnit) {}
+XSB5101 = ClassUnit(SWallStructureUnit) {}
 
 TypeClass = XSB5101
