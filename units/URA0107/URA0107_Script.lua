@@ -12,12 +12,15 @@ local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local explosion = import("/lua/defaultexplosions.lua")
 local util = import("/lua/utilities.lua")
 local DummyWeapon = import("/lua/aeonweapons.lua").AAASonicPulseBatteryWeapon
+local cWeapons = import("/lua/cybranweapons.lua")
+local CAAAutocannon = cWeapons.CAAAutocannon
 
 ---@class URA0107 : AirTransport
 URA0107 = ClassUnit(AirTransport) {
 
     Weapons = {
         GuidanceSystem = ClassWeapon(DummyWeapon) {},
+        AAAutocannon = ClassWeapon(CAAAutocannon) {},
     },
 
     AirDestructionEffectBones = { 'Left_Exhaust', 'Right_Exhaust', 'Char04', 'Char03', 'Char02', 'Char01',
