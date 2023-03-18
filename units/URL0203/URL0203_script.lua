@@ -19,6 +19,11 @@ URL0203 = ClassUnit(CLandUnit, SlowAmphibious) {
         Rocket = ClassWeapon(CDFMissileMesonWeapon) {},
         Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
     },
+
+	OnCreate = function(self)
+		CLandUnit.OnCreate(self)
+		SlowAmphibious.OnCreate(self)
+	end,
     
     OnStopBeingBuilt = function(self, builder, layer)
         CLandUnit.OnStopBeingBuilt(self,builder,layer)

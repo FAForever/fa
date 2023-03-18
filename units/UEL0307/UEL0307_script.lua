@@ -13,6 +13,7 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
         TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
     },
 
+    ShieldEffectsBone = 0,
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_mobile_01_emit.bp',
         '/effects/emitters/terran_shield_generator_mobile_02_emit.bp',
@@ -25,18 +26,14 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         TShieldLandUnit.OnStopBeingBuilt(self, builder, layer)
-
-        -- save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
-        self.TargetPointer = self:GetWeapon(1)
-        -- we save this to the unit table so dont have to call every time.
-        self.TargetLayerCaps = self.Blueprint.Weapon[1].FireTargetLayerCapsTable
-        -- a flag to let our thread know whether we should turn on our pointer.
-        self.PointerEnabled = true
+        self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
+        self.TargetLayerCaps = self.Blueprint.Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
+        self.PointerEnabled = true --a flag to let our thread know whether we should turn on our pointer.
     end,
 
     OnShieldEnabled = function(self)
         TShieldLandUnit.OnShieldEnabled(self)
-        ShieldEffectsComponent.OnShieldDisabled(self)
+        ShieldEffectsComponent.OnShieldEnabled(self)
 
         KillThread(self.DestroyManipulatorsThread)
         if not self.RotatorManipulator then
@@ -65,6 +62,12 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
         if self.RotatorManipulator then
             self.RotatorManipulator:SetAccel(10)
             self.RotatorManipulator:SetTargetSpeed(0)
+            -- Unless it goes smoothly back to its original position,
+            -- it will snap there when the manipulator is destroyed.
+            -- So for now, we'll just keep it on.
+            --WaitFor( self.RotatorManipulator )
+            --self.RotatorManipulator:Destroy()
+            --self.RotatorManipulator = nil
         end
         if self.AnimationManipulator then
             self.AnimationManipulator:SetRate(-1)
@@ -75,8 +78,7 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
     end,
 
     DisablePointer = function(self)
-        -- this disables the stop feature - note that its reset on layer change!
-        self.TargetPointer:SetFireTargetLayerCaps('None')
+        self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
         self.PointerRestartThread = self.Trash:Add(ForkThread(self.PointerRestart, self))
     end,
 
@@ -102,5 +104,4 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
         end
     end,
 }
-
 TypeClass = UEL0307

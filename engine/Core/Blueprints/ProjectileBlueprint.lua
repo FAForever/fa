@@ -9,8 +9,14 @@
 ---@field Economy ProjectileBlueprintEconomy
 --- Physics information for the Projectile
 ---@field Physics ProjectileBlueprintPhysics
+--- Defense information for the projectile
+---@field Defense ProjectileBlueprintDefense
+
+---@class ProjectileBlueprintDefense
+---@field MaxHealth number
 
 ---@class ProjectileBlueprintDisplay
+---@field Mesh MeshBlueprint
 --- mesh to use as the display of this projectile
 ---@field MeshBlueprint FileName
 --- uniform scale to apply to mesh

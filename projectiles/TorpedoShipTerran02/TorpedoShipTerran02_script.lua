@@ -18,14 +18,6 @@ TorpedoShipTerran02 = ClassProjectile(TTorpedoShipProjectile) {
     OnEnterWater = function(self)
         TTorpedoShipProjectile.OnEnterWater(self)
 
-        for i in self.FxExitWaterEmitter do --splash
-            if self.FxSplashScale ~= 1 then
-                CreateEmitterAtEntity(self, self.Army, self.FxExitWaterEmitter[i])
-            else
-                CreateEmitterAtEntity(self, self.Army, self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
-            end
-        end
-
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetTurnRate(60)

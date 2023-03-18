@@ -18,6 +18,7 @@ EnabledMarkerTypes.Pathing["Land Path Node"] = false
 EnabledMarkerTypes.Pathing["Air Path Node"] = false
 EnabledMarkerTypes.Pathing["Water Path Node"] = false
 EnabledMarkerTypes.Pathing["Amphibious Path Node"] = false
+EnabledMarkerTypes.AI["Spawn"] = false
 EnabledMarkerTypes.AI["Rally Point"] = false
 EnabledMarkerTypes.AI["Expansion Area"] = false
 EnabledMarkerTypes.AI["Large Expansion Area"] = false

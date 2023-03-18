@@ -39,7 +39,6 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         TMobileFactoryUnit.OnStopBeingBuilt(self, builder, layer)
-        self.EffectsBag = {}
         self.PrepareToBuildManipulator = CreateAnimator(self)
         self.PrepareToBuildManipulator:PlayAnim(self.Blueprint.Display.AnimationBuild, false):SetRate(0)
         self.ReleaseEffectsBag = {}

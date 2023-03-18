@@ -1,0 +1,389 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Patch 3650</title>
+	<link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="patchnotes.css">
+</head>
+<body>
+<table id="container"><tr>
+	<td id="main">
+		<div id="intro">
+			<h1>Patch 3650</h1>
+			<p>Welcome to the beta patchnotes for 3650. It's been a while since the last balance patch, but after the restructuring of FAF and the establishment of the new council of setons, a balance team is now finally in place. We wanted to release a patch that solves the biggest and most widely accepted problems as fast as possible to make sure you can already have more fun with the game while we are working on the next changes. Some of the problems are a fairly complex, and to completely solve them without delaying the patch or creating new problems was not possible, but we put some changes in place that should tone them down until we can solve them for good.
+
+			<p>In addition we fixed a few of the more difficult remaining bugs as much as possible: Hitboxes for SCUs and the drop behaviour of torpedo bombers.
+
+			<p>We worked hard to improve your gaming experience with FA and hope you'll enjoy playing with the new patch even more than before. 
+
+			<p>Thanks to the testing team, the coding team and everyone else who helped testing or made suggestions and ideas in the forums.
+			
+			<p>
+			
+			<p>-- Foley, Nombringer, Nyx, pip, Sheeo, Vee, ZLO, Zock</p>
+		</div>
+			
+		<h2>TMLs</h2>
+			
+		<div id="acutml" class="card">
+			<h3><img src="images/acutml.png"> ACU TML (UEF and Seraphim) / Seraphim SCU TML</h3>
+			Not much needs to be said much about the ACU TML and it's negative impact on teamgames. We are removing some of the reasons that made it so superior to normal TML launchers against TMDs. Making the upgrade count should now require a much smarter use of it's advantages instead of getting an immensely powerful weapon for little investment.
+			<ul>
+			<li>Missle hitpoints: <strike>3 hp</strike> → 2 hp
+			<li>Flying height: now similar to normal TML
+			<li>Mass cost: <strike>1000</strike> → 1500
+			<li>Minimal range: <strike>5</strike> → 15
+			<li>Muzzle velocity to 7
+			</ul>
+			
+			Only for Seraphim:
+			
+			<ul>
+				<li>Area of effect: <strike>3</strike> → 2
+				<li>The flying arc at close range will now be similar to the UEF ACU TML
+			</ul>
+		</div>
+		
+		<div id="cybrantml" class="card">
+			<h3><img src="images/cybrantml.png"> Cybran TML</h3>
+			We wanted to keep Cybrans advantage of killing targets next to TMDs with several missiles, which is a compensation for their weak defence. However, this should not allow the Cybran player to easily take out the TMD itself with the unit that they are supposed to counter. We are adding a special armor-type against cybran missiles to TMDs, allowing them to survive a single missile with low hp. This means that sooner or later you will still need two of them to be completely safe, but you will have more time to get them (or repair the damaged one after a failed attempt to kill it), and it will take double the effort and resources to take the ones out you have.
+			
+			<ul>			
+			<li>TMDs (except Aeon) will now survive a single cybran tactical missile if they have full HP
+			</ul>
+		</div>
+		
+		<div id="cybrantml" class="card">
+			<h3><img src="images/cybrantml.png"> TML friendly fire</h3>
+			Teamkilling or intentionally inflicting damage to teammates is not only rude towards the target, but often ruins the game for all other teammates and opponents too. That's why it is, among with offensive language, a bannable offense in FAF and should be reported to the moderators. We are going to make it harder to get banned by removing the most popular and easiest tool for teamkilling, giving you the opportunity to calm down and think about if punishing this guy for his behaviour or skill is really worth risking a ban and ruining a game for everyone. 
+			<ul>			
+			<li>TML missiles no longer deal friendly fire
+			</ul>
+		</div>
+		
+		<h2>Land</h2>
+		
+		<div id="scus" class="card">
+			<h3>SCUs</h3>
+			After years in uselessness, SCUs became a unit worth to build in previous FAF patches - probably too much. We improved issues with the hitbox that made SCUs hard and sometimes impossible to hit and fine-tuned some of the upgrades that were simply too strong. Another advantage they had over normal units was the lack of reclaim you would get for destroying them inside your territory. They will now leave wreckage like other units, but be careful; multiple SCUs might just reclaim the leftovers of their comrades, but at least they can't shoot while doing so, giving you time to destroy them before they steal your mass or get a second line of defence up. To make it easier to get RAS SCUs on the field, RAS presets have been added. 
+
+			<p>More changes to SCUs might come in the future that help to define their role better (or decide what this role should be), but until it is decided if this is necessary, reducing their strength can’t be a bad idea. 
+
+			<ul>			
+			<li>Hitbox: lasers can now hit SCUs more reliably
+			<li>SCUs now leave a normal wreckage with 81% of their mass value when destroyed
+			<li>A RAS preset for UEF, Cybran and Aeon is now available for production from the Quantum Gateways.
+			</ul>
+			
+			<h3><img src="images/aeonscu.png"> Aeon SCU</h3>
+			<ul>			
+			<li>Reacton Cannon (Gun upgrade) energy cost: <strike>36000</strike> → 46200, build time: <strike>5040</strike> → 6048
+			<li>Heavy Personal Shield hitpoints: <strike>35000</strike> → 40000, mass cost = <strike>1500</strike> → 1800 	
+			</ul>
+			
+			<h3><img src="images/uefscu.png"> UEF SCU</h3>
+			<ul>			
+			<li>Personal Shield Generator HP: <strike>32000</strike> → 26000 HP
+			<li>Heavy Plasma Cannon (Gun Upgrade) rate of fire <strike>x2.5</strike> → x1.82 (DPS <strike>750</strike> → 546), AOE: <strike>2.5</strike> → 2
+			<li>Radar Jammer mass cost: <strike>600</strike> → 300, energy cost = <strike>18000</strike> → 8000 
+			<li>Bubble shield energy cost: <strike>400000</strike> → 360800	
+			</ul>
+			
+			<h3><img src="images/cybranscu.png"> Cybran SCU</h3>
+			<ul>			
+			<li>Nano-Repair System regeneration rate: <strike>400 hp/s</strike> → 375 hp/s, mass cost: <strike>2000</strike> → 2200
+			<li>Focus Convertor (Gun upgrade) adds damage: <strike>250</strike> → 200 
+			<li>Nanite Missile System (SAM Upgrade) DPS: <strike>272</strike> → 400
+			<li>EMP duration for Tech1/Tech2/Tech3/SCU: <strike>4/4/4/0</strike> → 4/3.5/3/0.3
+			<li>Stealth upgrade mass cost: <strike>600</strike> → 400, energy cost: <strike>18000</strike> → 7400 
+			<li>Cloak upgrade energy cost: <strike>500000</strike> → 382200	
+			</ul>
+			
+			<h3><img src="images/serascu.png"> Seraphim SCU</h3>
+			
+			<ul>			
+			<li>Overcharge: now tracks (like ACU overcharge)
+			<li>Overcharge reload time: <strike>5 seconds</strike> → 7.5 seconds
+			<li>Overcharge damage: <strike>12000</strike> → 10000
+			<li>Overcharge DPS: <strike>2400</strike> → 1333
+			<li>Shield mass cost: <strike>1500</strike> → 1200, shield hitpoints: <strike>25000</strike> → 20000
+			</ul>
+		</div>
+		
+		<div id="hover" class="card">
+			<h3>Hover tanks</h3>
+			The advantage of hoverunits is their great flexibility, enabling them to be used both on water and on land. However if they are so effective that even pure naval units have significant trouble with large amounts of hoverunits, something is wrong. Furthermore their fast speed makes it unreasonably tiresome to defend against them on raiding-vulnerable island maps. Their buildtime has been increased, and their movement speed while on water has been decreased.			
+			<h3><img src="images/serahover.png"> Seraphim (Yenzyne)</h3>
+			<ul>			
+			<li>Build time: <strike>880 </strike> → 1050
+			<li>Speed on water: <strike>4.3</strike> → 3
+			</ul>
+			
+			<h3><img src="images/aeonhover.png"> Aeon (Blaze)</h3>
+			<ul>			
+			<li>Build time: <strike>880</strike> → 1050
+			<li>Speed on water: <strike>4.3</strike> → 3
+			</ul>
+			
+			<h3><img src="images/uefhover.png"> UEF (Riptide)</h3>
+			<ul>			
+			<li>Build time: <strike>1320</strike> → 1600 
+			<li>Speed on water: <strike>3.7</strike> → 3
+			<li>Mass cost: <strike>362</strike> → 360 
+			<li>Energy cost: <strike>1980</strike> → 2000 
+			</ul>
+			
+			<h3><img src="images/hoverflak.png"> Hover flak (Seraphim and Aeon)</h3>
+			<ul>			
+			<li>Speed: <strike>3.6</strike> → 3
+			</ul>
+		</div>
+		
+		<div id="chickenbot" class="card">
+			<h3>Seraphim Tech 2 bot and Tech 3 Tank Changes</h3>
+			We like the diversity that a strong t2 and a weak t3 stage brings to the game, but on some maps Seraphim is just a little bit too dominant on t2, while on others too helpless on t3. We are carefully toning down both areas while keeping the idea behind it intact.
+			
+			<h3><img src="images/chickenbot.png"> Ilshavoh</h3>
+			<ul>			
+			<li>Turret turn rate: <strike>180°/s</strike> → 70°/s
+			</ul>
+			
+			<h3><img src="images/othuum.png"> Othuum</h3>
+			<ul>			
+			<li>Speed: <strike>2.5</strike> → 2.6
+			</ul>
+		</div>
+		
+		<div id="harb" class="card">
+			<h3><img src="images/harb.png"> Harbinger</h3>
+			Harbingers are a complicated unit, while being immensely dominant in the early t3 stages, they already lose in bigger numbers to other t3 tanks. Straight out nerfing them would not only lower their early game advantage (and the very satisfying feeling of the unit) but also cause potential problems in the lategame. Increasing the buildtime to the same mass/BT ratio of Percivals and Bricks will make it harder to produce many Harbinger too early and will give the opponent more time to bring their own counters in place, but should not hurt Aeon too much later. 
+			
+			<p>The problems behind the power of the Harbinger lie deeper than this, but it will require more time to solve them. Until then, this change should make the life of non-aeons a little bit easier.
+			
+			<ul>			
+			<li>Veterancy: <strike>15/30/45/60/75</strike> → 18/36/54/72/90
+			<li>Build time: <strike>3600</strike> → 4500</font>
+			<li>Can no longer fire while reclaiming
+			</ul>
+		</div>
+		
+		<div id="serasniper" class="card">
+			<h3><img src="images/serasniper.png"> Sniper bots (Seraphim and Aeon)</h3>
+			It is annoying when sniper bots lose all their damage while moving and trying to shoot. They will hit more often now, even though using them stationary will still lead to the best results. 
+			
+			<ul>			
+			<li>Firing randomness when moving: <strike>0.8</strike> → 0.5
+			</ul>
+		</div>
+		
+		<div id="ueft3aa" class="card">
+			<h3><img src="images/ueft3aa.png"> UEF T3MAA</h3>
+			Other faction’s T3 MAA were hitting much better than the UEF one. This change is improving its accuracy to similar levels. 
+			
+			<ul>			
+			<li>Slight tracking added with small turn rate (20)
+			<li>Muzzle velocity: <strike>100</strike> → 110
+			</ul>
+		</div>
+		
+		<h2>Navy</h2>
+		
+		<div id="summit" class="card">
+			<h3><img src="images/summit.png"> Summit</h3>
+			Once your UEF opponent reaches the t3 stage, you are playing against a time-bomb. As UEF pays for this with a weak t2 navy, there is nothing wrong with this, except that this time-bomb is ticking a bit too fast. Making the main reason for the UEF dominance more expensive will give other factions more time to beat them before they are able to gather a critical mass of battleships that can use their range in combination with their great support units to dominate the sea.
+			
+			<ul>			
+			<li>Mass cost: <strike>9000</strike> → 10500
+			<li>Energy cost: <strike>54000</strike> → 62000
+			<li>Build time: <strike>28800</strike> → 33000
+			<li>Area of effect: <strike>3</strike> → 2
+			</ul>
+		</div>
+		
+		<div id="aeonfrigate" class="card">
+			<h3><img src="images/aeonfrigate.png"> Aeon frigates</h3>
+			Unlike other factions, aeon has no tool to effectively deal with hover units. We made some adjustments to the frigate that will help it against them, but won’t make it stronger against ships. 
+			
+			<ul>
+			<li>Hit points: <strike>1800</strike> → 1850
+			<li>Damage per shot: <strike>140</strike> → 50
+			<li>Reload time: <strike>5 seconds</strike> → 1.7 seconds (DPS: <strike>56</strike> → 58)
+			<li>MuzzleChargeDelay: <strike>0.5</strike> → 0
+			<li>Anti-torpedo weapon reload time: <strike>10</strike> → 12.5
+			</ul>
+		</div>
+		
+		<h2>Air</h2>
+		
+		<div id="uefstrat" class="card">
+			<h3><img src="images/uefstrat.png"> Strategic bombers (all factions)</h3>
+			Strat rushes can easily decide a game if the opponent is not t3 yet. This is a complex problem and a real solution would break the boundaries of this patch, but we acknowledge the issue and are trying to reduce it until a real solution is in place. We are increasing the energy cost to the same mass/energy ratio of ASFs, to avoid the ability to rush a strat without sufficient amounts of power (t3 PG or RAS). 
+			
+			<ul>			
+			<li>Energy cost: <strike>105000</strike> → 144000
+			<li>Build time: <strike>8400</strike> → 9600
+			</ul>
+		</div>
+		
+		<div id="corsair" class="card">
+			<h3><img src="images/corsair.png"> Corsair</h3>
+			In the last patch, Corsairs received a range decrease to prevent them from killing mobile flak too easily without getting shot. However, this also reduced the distance their projectile had to travel to reach the target, effectively making it harder to dodge. We are keeping the nerf against mobile flak, but reducing the speed of their projectiles to make them as easy (or hard) to dodge as they were before.
+			
+			<ul>			
+			<li>muzzle velocity: <strike>35</strike> → 30
+			</ul>
+		</div>
+		
+		<div id="torps" class="card">
+			<h3>Torpedo bombers</h3>
+			Torpedo bombers used to hit very inconsistently near the shore and very often their torpedos would disappear completely in shallow waters. We made several adjustments to solve this problems, while we weren’t able to completely remove them, torpedo bombers should deliver their torpedos successfully much more often. 
+			
+			<ul>			
+			<li>Reload time for all torpedo bombers: <strike>12.5</strike> → 10
+			</ul>
+			
+			<h3><img src="images/seratorp.png"> Uosioz (Seraphim Torpedo Bomber)</h3>
+			<ul>			
+			<li>Torpedos get now dropped in front of the bomber (like all other bombers)
+			<li>Range: <strike>42</strike> → 35
+			<li>Amount of volleys: <strike>2</strike> → 3
+			<li>Now ignores torpedo defence (like all other torpedo bombers)
+			<li>Multiple adjustments to torpedos make them less likely to crash on the ground in shallow water
+			</ul>
+			
+			<h3><img src="images/aeontorp.png"> Skimmer (Aeon T2 Torpedo Bomber)</h3>
+			<ul>			
+			<li>Depth charges get now dropped in front of the bomber (like all other bombers)
+			<li>Range: <strike>42</strike> → 35
+			<li>Amount of volleys: <strike>2</strike> → 3
+			<li>Multiple adjustments to depth charges make them less likely to crash on the ground in shallow water
+			</ul>
+			
+			<h3><img src="images/solace.png"> Solace (Aeon T3 Torpedo Bomber)</h3>
+			<ul>			
+			<li>Range: <strike>42</strike> → 32
+			<li>Projectile turn rate increased
+			</ul><h3></h3>
+			
+		</div>
+		
+		<div id="awhassa" class="card">
+			<h3><img src="images/awhassa.png"> Awhassa</h3>
+			Similar to the changes with the CZAR-Beam last patch, ASF can't be so easily destroyed anymore by abusing the splash of an anti-ground weapon with ground fire. Additionally, we are applying some nerfs to veterancy, and the amount of extra-dps you can get get by hoverbombing.
+			
+			<ul>			
+			<li>Added armour to ASF to guard them from the bomb, reducing their damage taken to 10%
+			<li>Veterancy: <strike>50/100/150/200/250</strike> → 100/200/300/400/500
+			<li>Reload time: <strike>10</strike> → 12
+			</ul>
+		</div>
+		
+		<h2>Other</h2>
+		
+		<div id="quantumgate" class="card">
+			<h3><img src="images/quantumgate.png"> Quantum Gateway</h3>
+			To avoid getting the powerful and expensive SCU presets (especially the new RAS preset) a lot cheaper than intended, we are reducing the adjacency bonus for massfabs next to Quantum Gates to a more normal level.
+			
+			<ul>
+			<li>Tech 2 mass fabricator: <strike>2.5%</strike> → 0.75%
+			<li>Tech 3 mass fabricator: <strike>15%</strike> → 2.25%
+			<li>Tech 3 power generator: <strike>18.75%</strike> → 5%
+			<li>Preset names improved
+			</ul>
+		</div>
+		
+		<div id="hqs" class="card">
+			<h3><img src="images/t3hq.png"> T3 Land HQ</h3>
+			<p>By increasing the T3 HQ buildtime, we hope to address the problem of early T3 units cutting the T2 stage short. An early T3 upgrade was rendering the opponents T2 units obsolete before they were given the opportunity to do any significant damage to punish the early upgrade. 
+			
+			<p>An increase in buildtime should delay the presence of T3 units on the battlefield slightly to allow a T2 army a better chance to properly mount an effective attack. 
+			More specifically in conjunction with Harbinger changes, this should address the related problem of the overly dominant Harbinger rush.
+
+			<p>The change should not significantly affect the T2-T3 transition at a later stage when bottleneck created by buildpower is less pronounced.
+
+			<ul>			
+			<li>Build time: <strike>9400</strike> → 11000
+			</ul>
+		</div>
+		
+		<div id="sonars" class="card">
+			<h3>Sonars</h3>
+			For the amount of intel sonars offer, they were incredible cheap. We brought them a bit more in line with their land based counterparts.
+			<h3><img src="images/t2sonar.png"> T2 sonar</h3>
+			<ul>			
+			<li>Mass cost: <strike>120</strike> → 150 (sera stays 180)
+			<li>Energy drain: <strike>100</strike> → 150
+			</ul>
+			
+			<h3><img src="images/t3sonar.png"> UEF/Aeon T3 sonar</h3>
+			<ul>			
+			<li>Mass cost: <strike>400</strike> → 1000
+			<li>Energy drain: <strike>100</strike> → 250
+			</ul>
+			
+			<h3><img src="images/cybsonar.png"> Cybran T3 sonar</h3>
+			<ul>			
+			<li>Mass cost: <strike>480</strike> → 1200
+			<li>Energy drain: <strike>250</strike> → 400
+			</ul>
+		</div>
+		
+		<div id="ecofix" class="card">
+			<h3><img src="images/ecofix.png"> Energy/Mass overflow</h3>
+			The bug, that caused resources to disappear when they got shared to several teammates and one of them had full storage does not exist and is a FAF urban legend. If a teammate has full storage, the resources get properly shared to a different teammate instead. It is not needed to use any mods to prevent ressources from getting lost or to inform others about this "bug".<p>
+			<ul>
+			<li>No change required
+			</ul>
+		</div>
+		
+		<p style="height: 1000px">
+	</td>
+	
+	<td id="sidebar">
+		<div id="icongrid">
+		<h2><a href="#container">Contents</a></h2>
+		
+		<p>TMLs<br>
+		<a href="#acutml"><img src="images/acutml.png"></a>
+		<a href="#cybrantml"><img src="images/cybrantml.png"></a>
+		
+		<p>Land<br>
+		<a href="#scus"><img src="images/aeonscu.png"></a>
+		<a href="#scus"><img src="images/uefscu.png"></a>
+		<a href="#scus"><img src="images/cybranscu.png"></a>
+		<a href="#scus"><img src="images/serascu.png"></a><br>
+		<a href="#hover"><img src="images/serahover.png"></a>
+		<a href="#hover"><img src="images/aeonhover.png"></a>
+		<a href="#hover"><img src="images/uefhover.png"></a>
+		<a href="#hover"><img src="images/hoverflak.png"></a><br>
+		<a href="#chickenbot"><img src="images/chickenbot.png"></a>
+		<a href="#chickenbot"><img src="images/othuum.png"></a>
+		<a href="#harb"><img src="images/harb.png"></a><br>
+		<a href="#serasniper"><img src="images/serasniper.png"></a>
+		<a href="#ueft3aa"><img src="images/ueft3aa.png"></a>
+		
+		<p>Navy<br>
+		<a href="#summit"><img src="images/summit.png"></a>
+		<a href="#aeonfrigate"><img src="images/aeonfrigate.png"></a>
+		
+		<p>Air<br>
+		<a href="#uefstrat"><img src="images/uefstrat.png"></a>
+		<a href="#corsair"><img src="images/corsair.png"></a>
+		<a href="#torps"><img src="images/seratorp.png"></a>
+		<a href="#torps"><img src="images/aeontorp.png"></a>
+		<a href="#torps"><img src="images/solace.png"></a>
+		<a href="#awhassa"><img src="images/awhassa.png"></a>
+		
+		<p>Other<br>
+		<a href="#quantumgate"><img src="images/quantumgate.png"></a>
+		<a href="#hqs"><img src="images/t3hq.png"></a>
+		<a href="#sonars"><img src="images/t2sonar.png"></a>
+		<a href="#sonars"><img src="images/t3sonar.png"></a>
+		<a href="#sonars"><img src="images/cybsonar.png"></a>
+		<a href="#ecofix"><img src="images/ecofix.png"></a>
+		</div>
+	</td>
+</tr></table>
+</body>
+</html>

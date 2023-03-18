@@ -81,7 +81,7 @@ NavUIGetLabel = ClassUI(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -282,7 +282,7 @@ NavUIPathTo = ClassUI(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -311,7 +311,7 @@ NavUIPathTo = ClassUI(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -406,7 +406,7 @@ NavUICanPathTo = ClassUI(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -435,7 +435,7 @@ NavUICanPathTo = ClassUI(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -576,8 +576,14 @@ NavUILayerStatistics = ClassUI(Group) {
         self.ToggleLabelGrid.OnClick = function()
             SimCallback({ Func = 'NavToggleScanLabels', Args = { Layer = layer }}, false)
         end
-    
 
+        -- tell sim to send the known stats
+        SimCallback({
+            Func = "NavDebugStatisticsToUI",
+            Args = { }
+        })
+
+        -- list to sim sending us stats
         AddOnSyncCallback(
             function(Sync)
                 if Sync.NavLayerData then
