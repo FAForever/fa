@@ -7,8 +7,8 @@ local CRadarUnit = import("/lua/cybranunits.lua").CRadarUnit
 
 ---@class URB3101 : CRadarUnit
 URB3101 = ClassUnit(CRadarUnit) {
-    OnIntelDisabled = function(self)
-        CRadarUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        CRadarUnit.OnIntelDisabled(self, intel)
         if (self.Thread1) then
             KillThread(self.Thread1)
             self.Thread1 = nil

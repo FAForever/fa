@@ -18,9 +18,6 @@ SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
     OnEnterWater = function(self)
         SHeavyCavitationTorpedo.OnEnterWater(self)
 
-        for i in self.FxEnterWaterEmitter do --splash
-            CreateEmitterAtEntity(self,self.Army,self.FxEnterWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
-        end
         self.AirTrails:Destroy()
         CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
 

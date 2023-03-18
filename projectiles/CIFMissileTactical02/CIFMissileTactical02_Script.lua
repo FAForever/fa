@@ -15,7 +15,6 @@ CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
         CLOATacticalMissileProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Split = false
-        self.MovementTurnLevel = 1
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
@@ -57,12 +56,11 @@ CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 2
         self:SetTurnRate(8)
         WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitTicks(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 

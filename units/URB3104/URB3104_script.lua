@@ -17,8 +17,8 @@ URB3104 = ClassUnit(CRadarUnit) {
         CRadarUnit.OnStopBeingBuilt(self, builder, layer)
     end,
 
-    OnIntelDisabled = function(self)
-        CRadarUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        CRadarUnit.OnIntelDisabled(self, intel)
         if (self.Thread1) then
             KillThread(self.Thread1)
             self.Thread1 = nil
@@ -39,8 +39,8 @@ URB3104 = ClassUnit(CRadarUnit) {
     end,
 
 
-    OnIntelEnabled = function(self)
-        CRadarUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        CRadarUnit.OnIntelEnabled(self, intel)
         if not self.MainRotator then
             self.MainRotator = CreateRotator(self, 'Spinner', 'z')
             self.Trash:Add(self.MainRotator)
