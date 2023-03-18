@@ -8,8 +8,9 @@ local OverchargeProjectile = import("/lua/sim/DefaultProjectiles.lua").Overcharg
 
 SDFChronatronCannon02 = ClassProjectile(SChronatronCannonOverCharge, OverchargeProjectile) {
     OnImpact = function(self, targetType, targetEntity)
-        SChronatronCannonOverCharge.OnImpact(self, targetType, targetEntity)
+        -- we need to run this the overcharge logic before running the usual on impact because that is where the damage is determined
         OverchargeProjectile.OnImpact(self, targetType, targetEntity)
+        SChronatronCannonOverCharge.OnImpact(self, targetType, targetEntity)
     end,
 
     OnCreate = function(self)

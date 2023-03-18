@@ -291,6 +291,8 @@ keyActions = {
         category = 'orders', order = 23,},
     ['move'] = {action = 'StartCommandMode order RULEUCC_Move',
         category = 'orders', order = 11,},
+    ['move_hard'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleHardMove()',
+        category = 'orders', order = 11,},
     ['nuke'] = {action = 'StartCommandMode order RULEUCC_Nuke',
         category = 'orders', order = 15,},
     ['shift_repair'] = {action = 'StartCommandMode order RULEUCC_Repair',

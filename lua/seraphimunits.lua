@@ -51,12 +51,12 @@ SFactoryUnit = ClassUnit(FactoryUnit) {
     end,
 
     OnPaused = function(self)
+        StructureUnit.OnPaused(self)
         -- When factory is paused take some action
         if self:IsUnitState('Building') and self.UnitBeingBuilt then
             self:StopUnitAmbientSound('ConstructLoop')
-            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            self:StopBuildingEffects(self, self.UnitBeingBuilt)
         end
-        StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
@@ -70,13 +70,10 @@ SFactoryUnit = ClassUnit(FactoryUnit) {
 -- AIR STRUCTURES
 ---@class SAirFactoryUnit : AirFactoryUnit
 SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    StartBuildFxUnpause = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
-    end,
+    StartBuildFx = SFactoryUnit.StartBuildFx,
+    StartBuildFxUnpause = SFactoryUnit.StartBuildFxUnpause,
+    OnPaused = SFactoryUnit.OnPaused,
+    OnUnpaused = SFactoryUnit.OnUnpaused,
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
@@ -99,12 +96,6 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     end,
 
     DestroyRollOffEffects = function(self)
-        if self.ReleaseEffectsBag then 
-            for _, v in self.ReleaseEffectsBag do
-                v:Destroy()
-            end
-            self.ReleaseEffectsBag = {}
-        end
     end,
 
     RollOffUnit = function(self)
@@ -212,14 +203,6 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
            end
         end,
     },
-
-    OnPaused = function(self)
-        SFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        SFactoryUnit.OnUnpaused(self)
-    end,
 }
 
 -- AIR UNITS
@@ -334,13 +317,10 @@ SHoverLandUnit = ClassUnit(DefaultUnitsFile.HoverLandUnit) {
 -- LAND FACTORY STRUCTURES
 ---@class SLandFactoryUnit : LandFactoryUnit
 SLandFactoryUnit = ClassUnit(LandFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    StartBuildFxUnpause = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
-    end,
+    StartBuildFx = SFactoryUnit.StartBuildFx,
+    StartBuildFxUnpause = SFactoryUnit.StartBuildFxUnpause,
+    OnPaused = SFactoryUnit.OnPaused,
+    OnUnpaused = SFactoryUnit.OnUnpaused,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
@@ -401,14 +381,6 @@ SLandFactoryUnit = ClassUnit(LandFactoryUnit) {
            end
         end,
     },
-
-    OnPaused = function(self)
-        SFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        SFactoryUnit.OnUnpaused(self)
-    end,
 }
 
 -- LAND UNITS
@@ -438,13 +410,10 @@ SSonarUnit = ClassUnit(SonarUnit) {}
 -- SEA FACTORY STRUCTURES
 ---@class SSeaFactoryUnit : SeaFactoryUnit
 SSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    StartBuildFxUnpause = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
-    end,
+    StartBuildFx = SFactoryUnit.StartBuildFx,
+    StartBuildFxUnpause = SFactoryUnit.StartBuildFxUnpause,
+    OnPaused = SFactoryUnit.OnPaused,
+    OnUnpaused = SFactoryUnit.OnUnpaused,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
@@ -505,14 +474,6 @@ SSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
            end
         end,
     },
-
-    OnPaused = function(self)
-        SFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        SFactoryUnit.OnUnpaused(self)
-    end,
 }
 
 -- SEA UNITS

@@ -38,6 +38,9 @@ local EffectOffsetEmitter = EffectMethods.OffsetEmitter
 local EffectSetEmitterCurveParam = EffectMethods.SetEmitterCurveParam
 
 ---@class Tree : Prop
+---@field Fallen? boolean
+---@field Burning? boolean
+---@field NoBurn? boolean
 Tree = Class(Prop) {
 
     ---@param self Tree
@@ -50,6 +53,14 @@ Tree = Class(Prop) {
         end
     end,
 
+    --- Collision check with projectiles
+    ---@param self Tree
+    ---@param other Projectile
+    ---@return boolean
+    OnCollisionCheck = function(self, other)
+        return not self.Fallen
+    end,
+
     --- Collision check with units
     ---@param self Tree
     ---@param other Unit
@@ -58,11 +69,11 @@ Tree = Class(Prop) {
     ---@param nz number
     ---@param depth number
     OnCollision = function(self, other, nx, ny, nz, depth)
-        if not self:BeenDestroyed() then
+        if self.Fallen then
             return
         end
 
-        if self.Fallen then
+        if self:BeenDestroyed() then
             return
         end
 
@@ -263,8 +274,7 @@ TreeGroup = Class(Prop) {
     ---@param other string
     ---@return boolean
     OnCollisionCheck = function(self, other)
-        self:Breakup()
-        return false
+        return true
     end,
 
     --- Break when colliding with something / someone
@@ -291,15 +301,15 @@ TreeGroup = Class(Prop) {
     ---@param amount number
     ---@param direction Vector
     ---@param type DamageType
-    ---@return Tree[]
-    Breakup = function(self, instigator, amount, direction, type)
+    ---@return (Tree[])?
+    Breakup = function(self)
         -- can't do much when we're destroyed
         if EntityBeenDestroyed(self) then
             return
         end
 
         -- a group with a single prop type in it
-        if self.blueprint.SingleTreeBlueprint then
+        if self.Blueprint.SingleTreeBlueprint then
             return SplitProp(self, self.Blueprint.SingleTreeBlueprint)
         -- a group with multiple prop types in it
         else 
