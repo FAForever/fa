@@ -330,6 +330,7 @@ function MapLessThan(aiBrain, sizeX, sizeZ)
 end
 
 --- Buildcondition to check pathing to current enemy 
+--- Note this requires the CanPathToCurrentEnemy thread to be running
 ---@param aiBrain AIBrain
 ---@param locationType string
 ---@param pathType string

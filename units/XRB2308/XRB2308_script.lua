@@ -75,10 +75,6 @@ XRB2308 = ClassUnit(CStructureUnit) {
         local shallSink = true
 
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
-        self:DestroyAllDamageEffects()
-        self:DestroyIdleEffects()
-        self:DestroyBeamExhaust()
-        self:DestroyAllBuildEffects()
 
         if self.PlayDestructionEffects then
             self:CreateDestructionEffects(overkillRatio)

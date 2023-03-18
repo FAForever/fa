@@ -15,8 +15,9 @@ TDFOverCharge01 = ClassProjectile(TLaserBotProjectile, OverchargeProjectile) {
     FxImpactAirUnit =  EffectTemplate.TCommanderOverchargeHit01,
 
     OnImpact = function(self, targetType, targetEntity)
-        TLaserBotProjectile.OnImpact(self, targetType, targetEntity)
+        -- we need to run this the overcharge logic before running the usual on impact because that is where the damage is determined
         OverchargeProjectile.OnImpact(self, targetType, targetEntity)
+        TLaserBotProjectile.OnImpact(self, targetType, targetEntity)
     end,
     
     OnCreate = function(self)

@@ -1,3 +1,7 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local NinePatch = import("/lua/ui/controls/ninepatch.lua")
 local Prefs = import("/lua/user/prefs.lua")

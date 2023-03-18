@@ -34,6 +34,15 @@ function ToggleControl()
     end
 end
 
+function FocusArmyChanged()
+    local focusArmy = GetFocusArmy()
+    if focusArmy == -1 then
+        if panel then
+            panel:Hide()
+        end
+    end
+end
+
 ---@class MassFabPanel : Group
 MassFabPanel = ClassUI(Group) {
 

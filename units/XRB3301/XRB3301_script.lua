@@ -18,19 +18,22 @@ XRB3301 = ClassUnit(CRadarUnit) {
     },
     ExpandingVisionDisableCount = 0,
 
-    OnStopBeingBuilt = function(self)
-        CRadarUnit.OnStopBeingBuilt(self)
+    OnCreate = function(self)
+        CRadarUnit.OnCreate(self)
+        self.OmniEffectsBag = TrashBag()
+    end,
+
+    DestroyAllTrashBags = function(self)
+        CRadarUnit.DestroyAllTrashBags(self)
+        self.OmniEffectsBag:Destroy()
+    end,
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        CRadarUnit.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.ExpandingVision)
 
-        if self.OmniEffectsBag then
-            for k, v in self.OmniEffectsBag do
-                v:Destroy()
-            end
-        end
-        self.OmniEffectsBag = {}
-
         for k, v in CSoothSayerAmbient do
-            table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
+            self.OmniEffectsBag:Add(CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
         end
     end,
 
@@ -66,31 +69,21 @@ XRB3301 = ClassUnit(CRadarUnit) {
         entity:Destroy()
     end,
 
-    OnIntelEnabled = function(self)
+    OnIntelEnabled = function(self, intel)
         self.ExpandingVisionDisableCount = self.ExpandingVisionDisableCount - 1
         if self.ExpandingVisionDisableCount == 0 then
-            if self.OmniEffectsBag then
-                for k, v in self.OmniEffectsBag do
-                    v:Destroy()
-                end
-                self.OmniEffectsBag = {}
-            end
+            self.OmniEffectsBag:Destroy()
             for k, v in CSoothSayerAmbient do
-                table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
+                self.OmniEffectsBag:Add(CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
             end
             ChangeState(self, self.ExpandingVision)
         end
     end,
 
-    OnIntelDisabled = function(self)
+    OnIntelDisabled = function(self, intel)
         self.ExpandingVisionDisableCount = self.ExpandingVisionDisableCount + 1
         if self.ExpandingVisionDisableCount == 1 then
-            if self.OmniEffectsBag then
-                for k, v in self.OmniEffectsBag do
-                    v:Destroy()
-                end
-                self.OmniEffectsBag = {}
-            end
+            self.OmniEffectsBag:Destroy()
             ChangeState(self, self.ContractingVision)
         end
     end,

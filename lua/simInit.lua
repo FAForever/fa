@@ -76,6 +76,8 @@ end
 --but before any armies are created.
 function SetupSession()
 
+    import("/lua/ai/gridreclaim.lua").Setup()
+
     ScenarioInfo.TriggerManager = import("/lua/triggermanager.lua").Manager
     TriggerManager = ScenarioInfo.TriggerManager
 
@@ -222,6 +224,7 @@ end
 -- The global variable "ArmyBrains" contains an array of AI brains, one for each army.
 function OnCreateArmyBrain(index, brain, name, nickname)
 
+    import("/lua/ai/gridreclaim.lua").Setup(brain)
     import("/lua/sim/scenarioutilities.lua").InitializeStartLocation(name)
     import("/lua/sim/scenarioutilities.lua").SetPlans(name)
 
@@ -259,8 +262,8 @@ end
 function BeginSession()
 
     -- imported for side effects
-    import("/lua/sim/matchstate.lua")
-    import("/lua/sim/markerutilities.lua")
+    import("/lua/sim/matchstate.lua").Setup()
+    import("/lua/sim/markerutilities.lua").Setup()
 
     BeginSessionAI()
     BeginSessionMapSetup()
@@ -269,6 +272,9 @@ function BeginSession()
 
     import("/lua/sim/scenarioutilities.lua").CreateProps()
     import("/lua/sim/scenarioutilities.lua").CreateResources()
+
+    BeginSessionGenerateMarkers()
+    BeginSessionGenerateNavMesh()
 
     import("/lua/sim/score.lua").init()
     import("/lua/sim/recall.lua").init()
@@ -305,18 +311,22 @@ function BeginSession()
     OnStartOffMapPreventionThread()
 end
 
---- Setup for AI related logic and data
-function BeginSessionAI()
+function BeginSessionGenerateNavMesh()
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
     if ScenarioInfo.GameHasAIs then
-
         for k, brain in ArmyBrains do
             if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
                 import('/lua/sim/navutils.lua').Generate()
                 break
             end
         end
+    end
+end
 
+--- Setup for AI related logic and data
+function BeginSessionAI()
+    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+    if ScenarioInfo.GameHasAIs then
         local simMods = __active_mods or {}
         for Index, ModData in simMods do
             ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
@@ -343,6 +353,18 @@ function BeginSessionAI()
 
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
             import(file)
+        end
+    end
+end
+
+function BeginSessionGenerateMarkers()
+    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+    if ScenarioInfo.GameHasAIs then
+        for k, brain in ArmyBrains do
+            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
+                import('/lua/sim/navgenerator.lua').GenerateMarkers()
+                break
+            end
         end
     end
 end
@@ -411,6 +433,16 @@ end
 
 --- Setup for common army, where all teams are batched together into one army
 function BeginSessionCommonArmy()
+    local teams = {}
+    for name,army in ScenarioInfo.ArmySetup do
+        if army.Team > 1 then
+            if not teams[army.Team] then
+                teams[army.Team] = {}
+            end
+            table.insert(teams[army.Team],army.ArmyIndex)
+        end
+    end
+
     local humanIndex = 0
     local IsHuman = {}
     for _, brain in ArmyBrains do
@@ -421,6 +453,7 @@ function BeginSessionCommonArmy()
             table.insert(IsHuman, false)
         end
     end
+
     local teamIndex = 1
     for _, armyIndices in teams do
         for _, i in armyIndices do
@@ -481,7 +514,6 @@ function BeginSessionEffects()
 end
 
 function GameTimeLogger()
-    local time
     while true do
         GTS = GetGameTimeSeconds()
         hours   = math.floor(GTS / 3600);
@@ -513,7 +545,10 @@ function OnPostLoad()
     end
 end
 
--- due to cyclic dependencies we need to import these files to break the cycle them
+-- these imports break cycle dependencies of import sequences of mods
 
-import('/lua/ScenarioFramework.lua')
-import('/lua/sim/ScenarioUtilities.lua')
+import('/lua/scenarioframework.lua')
+import('/lua/sim/scenarioutilities.lua')
+import("/lua/ai/aiutilities.lua")
+import("/lua/ai/sorianutilities.lua")
+import("/lua/ai/aiattackutilities.lua")

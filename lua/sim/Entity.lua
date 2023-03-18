@@ -17,7 +17,7 @@
 --- TODO
 ---@alias EntitySpec number
 
----@class Entity : moho.entity_methods
+---@class Entity : moho.entity_methods, InternalObject
 Entity = Class(moho.entity_methods) {
 
     --- Called during class initialisation
