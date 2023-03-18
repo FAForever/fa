@@ -308,8 +308,8 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     end,
 
     ---@param self ARadarJammerUnit
-    OnIntelEnabled = function(self)
-        RadarJammerUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        RadarJammerUnit.OnIntelEnabled(self, intel)
         if self.OpenAnim then
             self.OpenAnim:SetRate(1)
         end
@@ -322,8 +322,8 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     end,
 
     ---@param self ARadarJammerUnit
-    OnIntelDisabled = function(self)
-        RadarJammerUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        RadarJammerUnit.OnIntelDisabled(self, intel)
         if self.OpenAnim then
             self.OpenAnim:SetRate(-1)
         end

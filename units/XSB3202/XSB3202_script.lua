@@ -29,7 +29,8 @@ XSB3202 = ClassUnit(SSubUnit) {
 
     CreateIdleEffects = function(self)
         SSeaUnit.CreateIdleEffects(self)
-        self.TimedSonarEffectsThread = self.Trash:Add(ForkThread(self.TimedIdleSonarEffects,self))
+        local idleEffectsThread = ForkThread(self.TimedIdleSonarEffects, self)
+        self.IdleEffectsBag:Add(idleEffectsThread)
     end,
 
     OnMotionVertEventChange = function(self, new, old)
@@ -65,14 +66,5 @@ XSB3202 = ClassUnit(SSubUnit) {
             end
         end
     end,
-
-    DestroyIdleEffects = function(self)
-        self.TimedSonarEffectsThread:Destroy()
-        SSeaUnit.DestroyIdleEffects(self)
-    end,
 }
-
 TypeClass = XSB3202
-
--- Kept for mod support
-local SSonarUnit = import("/lua/seraphimunits.lua").SSonarUnit

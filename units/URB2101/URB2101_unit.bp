@@ -117,6 +117,7 @@ UnitBlueprint {
     LifeBarOffset = 0.25,
     LifeBarSize = 0.75,
     Physics = {
+        AlwaysAlignToTerrain = true,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
