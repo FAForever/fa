@@ -3535,10 +3535,6 @@ Platoon = Class(moho.platoon_methods) {
             import("/lua/scenariotriggers.lua").CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDone, eng)
             eng.CaptureDoneCallbackSet = true
         end
-        if eng and not eng.Dead and not eng.ReclaimDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import("/lua/scenariotriggers.lua").CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDone, eng)
-            eng.ReclaimDoneCallbackSet = true
-        end
         if eng and not eng.Dead and not eng.FailedToBuildCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import("/lua/scenariotriggers.lua").CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuild, eng)
             eng.FailedToBuildCallbackSet = true
@@ -6941,6 +6937,113 @@ Platoon = Class(moho.platoon_methods) {
         table.insert(commands, IssueFormAggressiveMove(units, path[count], formation, angles[count]))
 
         return commands
+    end,
+
+    SampleReclaimPlatoon = function(self)
+
+        
+        local locationType = self.PlatoonData.LocationType
+        local aiBrain = self:GetBrain()
+        local GridIntelInstance = import("/lua/ai/gridintel.lua").GridIntelInstance
+        local intelGrid = GridIntelInstance.Cells
+        local gridSize = GridIntelInstance.IntelGridSize * GridIntelInstance.IntelGridSize
+        local intelGridXRes = GridIntelInstance.IntelGridXRes
+        local intelGridzRes = GridIntelInstance.IntelGridZRes
+        
+        local eng = self:GetPlatoonUnits()[1]
+        while aiBrain:PlatoonExists(self) do
+            WaitTicks(10)
+            IssueClearCommands({eng})
+            LOG('Searching for reclaim')
+            local engPos = eng:GetPosition()
+            local gridX, gridZ = GridIntelInstance:ToCellIndices(engPos[1],engPos[3])
+            local searchRange = 1
+            local cancelSearch = false
+            local reclaimTargetX, reclaimTargetZ
+            for i=1, searchRange do
+                for x = math.max(GridIntelInstance.IntelGridXMin, gridX - searchRange), math.min(GridIntelInstance.IntelGridXMax, gridX + searchRange) do
+                    for z = math.max(GridIntelInstance.IntelGridZMin, gridZ - searchRange), math.min(GridIntelInstance.IntelGridXMax, gridZ + searchRange) do
+                        LOG('Searching cell X:'..x..' Z:'..z)
+                        if intelGrid[x][z].MassReclaim > 10 then
+                            if not intelGrid[x][z].ReclaimEngineerAssigned or intelGrid[x][z].ReclaimEngineerAssigned.Dead then
+                                reclaimTargetX, reclaimTargetZ = x, z
+                                cancelSearch = true
+                                LOG('Engineer is going to try and reclaim from this cell '..repr(intelGrid[x][z]))
+                                break
+                            else
+                                LOG('Engineer already assigned to cell location, moving to next')
+                            end
+                        end
+                    end
+                    if cancelSearch then
+                        break
+                    end
+                end
+                if not cancelSearch then
+                    searchRange = searchRange + 1
+                end
+                LOG('SearchRange loop '..searchRange)
+            end
+            if reclaimTargetX and reclaimTargetZ then
+                LOG('Assigning engineer to reclaim grid')
+                intelGrid[reclaimTargetX][reclaimTargetZ].ReclaimEngineerAssigned = eng
+                LOG('reclaimTargets')
+                LOG(repr(reclaimTargetX))
+                LOG(repr(reclaimTargetZ))
+                local moveLocation = intelGrid[reclaimTargetX][reclaimTargetZ].Position
+                LOG('Move to location is '..repr(moveLocation))
+                IssueMove({eng}, moveLocation)
+                local moveCounter = 0
+                local engStuckCount = 0
+                local Lastdist
+                local dist = VDist3Sq(eng:GetPosition(), moveLocation)
+                LOG('Current Distance to location '..dist)
+                LOG('Needed distance '..gridSize)
+                while not IsDestroyed(eng) and dist > gridSize do
+                    WaitTicks(15)
+                    dist = VDist3Sq(eng:GetPosition(), moveLocation)
+                    LOG('Eng moving, current distance '..dist)
+                    if Lastdist ~= dist then
+                        engStuckCount = 0
+                        Lastdist = dist
+                    else
+                        engStuckCount = engStuckCount + 1
+                        LOG('* AI: * SampleReclaim: has no moved during move to build position look, adding one, current is '..engStuckCount)
+                        if engStuckCount > 15 and not eng:IsUnitState('Reclaiming') then
+                            LOG('* AI: * SampleReclaim: Stuck while moving to build position. Stuck='..engStuckCount)
+                            break
+                        end
+                    end
+                end
+                if IsDestroyed(eng) then
+                    return
+                end
+                if dist <= gridSize then
+                    local time = 0
+                    while time < 30 do
+                        LOG('Issued attack move')
+                        LOG('Cell location X:'..reclaimTargetX..' Z:'..reclaimTargetZ)
+                        IssueClearCommands({eng})
+                        IssueAggressiveMove({eng}, moveLocation)
+                        time = time + 1
+                        WaitTicks(30)
+                        LOG('Current reclaim at target grid '..intelGrid[reclaimTargetX][reclaimTargetZ].MassReclaim)
+                        if intelGrid[reclaimTargetX][reclaimTargetZ].MassReclaim < 10  or aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
+                            break
+                        end
+                    end
+                end
+            end
+            
+            if reclaimTargetX and reclaimTargetZ then
+                LOG('Unassigning engineer from reclaim grid X:'..reclaimTargetX..' Z:'..reclaimTargetZ)
+                intelGrid[reclaimTargetX][reclaimTargetZ].ReclaimEngineerAssigned = false
+            end
+            if aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
+                return
+            end
+            WaitTicks(100)
+        end
     end,
 }
 

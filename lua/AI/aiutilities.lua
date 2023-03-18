@@ -3508,3 +3508,94 @@ function ShiftPosition(pos1, pos2, dist, reverse)
     z = math.min(ScenarioInfo.size[2]-5,math.max(5,z))
     return {x,GetSurfaceHeight(x,z),z}
 end
+
+CalculateTeamdata = function(aiBrain)
+    local allyCount = 0
+    local enemyCount = 0
+    local teamTable = {}
+    local teamKey = 1
+    local teams = 0
+    local teamStarts = {}
+    local selfIndex = aiBrain:GetArmyIndex()
+    for _, v in ArmyBrains do
+        local armyIndex = v:GetArmyIndex()
+        local army
+        for _,b in ScenarioInfo.ArmySetup do
+            if b.ArmyIndex == armyIndex then
+                army = b
+            end
+        end
+        if not ArmyIsCivilian(armyIndex) then
+            local startx, startz = v:GetArmyStartPos()
+            if IsAlly(selfIndex, armyIndex) then
+                allyCount = allyCount + 1
+                LOG('One Ally '..v.Nickname)
+                if army.Team and army.Team ~= 1 then
+                    teamTable[army.Team] = true
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = army.Team
+                        }
+                    end
+                elseif not teamTable[teamKey] then
+                    --RNGLOG('Settings teams index 2 to true')
+                    teamTable[teamKey] = true
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = teamKey
+                        }
+                    end
+                    teamKey = teamKey + 1
+                else
+                    teamKey = teamKey + 1
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = teamKey
+                        }
+                    end
+                    teamTable[teamKey] = true
+                end
+            elseif IsEnemy(selfIndex, armyIndex) then
+                enemyCount = enemyCount + 1
+                LOG('One Enemy '..v.Nickname)
+                if army.Team and army.Team ~= 1 then
+                    teamTable[army.Team] = true
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = army.Team
+                        }
+                    end
+                elseif not teamTable[teamKey] then
+                    --RNGLOG('Settings teams index 2 to true')
+                    teamTable[teamKey] = true
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = teamKey
+                        }
+                    end
+                    teamKey = teamKey + 1
+                else
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = teamKey
+                        }
+                    end
+                    teamKey = teamKey + 1
+                    teamTable[teamKey] = true
+                end
+            end
+        end
+    end
+    for _, v in teamTable do
+        if v then
+            teams = teams + 1
+        end
+    end
+    return teams, teamStarts, allyCount, enemyCount
+end
