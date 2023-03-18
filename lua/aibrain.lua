@@ -5156,12 +5156,12 @@ AIBrain = Class(moho.aibrain_methods) {
         self.IntelFramework.AllyCount = allyCount
         self.IntelFramework.EnemyCount = enemyCount
         if massCount > 0 and enemyCount > 0 then
-            self.IntelFramework.TeamMassShare = math.ceil(massCount / teamCount)
+            self.IntelFramework.TeamMassShare = math.floor(massCount / teamCount)
         else
             self.IntelFramework.TeamMassShare = massCount
         end
         if allyCount > 0 and enemyCount > 0 and massCount > 0 then
-            self.IntelFramework.PlayerMassShare = math.ceil(massCount / (allyCount + enemyCount))
+            self.IntelFramework.PlayerMassShare = math.floor(massCount / (allyCount + enemyCount))
         else
             self.IntelFramework.PlayerMassShare = massCount
         end
