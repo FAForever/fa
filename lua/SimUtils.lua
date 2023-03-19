@@ -206,7 +206,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
         if unitHealth > maxHealth then
             unitHealth = maxHealth
         end
-        newUnit:SetHealth(unit, unitHealth)
+        newUnit:SetHealth(newUnit, unitHealth)
         if hasFuel then
             newUnit:SetFuelRatio(fuelRatio)
         end
