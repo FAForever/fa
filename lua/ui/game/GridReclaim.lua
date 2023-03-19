@@ -14,9 +14,7 @@ local Root = false
 ---@field Z number
 
 ---@class GridReclaimUIDebugUpdate
----@field Tick number
 ---@field Time number
----@field Memory number
 ---@field Updates number
 ---@field Processed number
 

@@ -1,6 +1,8 @@
 
 local Grid = import("/lua/ai/grid.lua").Grid
 
+local WeakValue = { __mode = 'v' }
+
 local Debug = false
 function EnableDebugging()
     if ScenarioInfo.GameHasAIs or CheatsEnabled() then
@@ -25,7 +27,6 @@ local DebugCellData = {
 
 ---@type GridReclaimUIDebugUpdate
 local DebugUpdateData = {
-     Memory = -1,
      Processed = -1,
      Time = -1,
      Updates = -1,
@@ -56,7 +57,7 @@ GridReclaim = Class (Grid) {
                 cell.TotalMass = 0
                 cell.TotalEnergy = 0
                 cell.ReclaimCount = 0
-                cell.Reclaim = { }
+                cell.Reclaim = setmetatable({ }, WeakValue)
             end
         end
 
@@ -76,6 +77,53 @@ GridReclaim = Class (Grid) {
     end,
 
     ---@param self AIGridReclaim
+    ---@param cell AIGridReclaimCell
+    UpdateCell = function(self, cell)
+        local count = 0
+        local totalMass = 0
+        local totalEnergy = 0
+
+        for id, reclaim in cell.Reclaim do
+            count = count + 1
+            local fraction = reclaim.ReclaimLeft or 0
+            totalMass = totalMass + fraction * (reclaim.MaxMassReclaim or 0)
+            totalEnergy = totalEnergy + fraction * (reclaim.MaxEnergyReclaim or 0)
+        end
+
+        cell.TotalMass = totalMass
+        cell.TotalEnergy = totalEnergy
+        cell.ReclaimCount = count
+
+        if Debug then
+            DebugUpdateData.Processed = DebugUpdateData.Processed + cell.ReclaimCount
+            DebugUpdateData.Updates = DebugUpdateData.Updates + 1
+            self:DebugCellUpdate(cell.X, cell.Z)
+        end
+    end,
+
+    ---@param self AIGridReclaim
+    UpdateCells = function(self, limit)
+        local updates = 0
+        for id, cell in self.UpdateList do
+            -- only update up to 8 cells
+            updates = updates + 1
+            if updates > limit then
+                break
+            end
+
+            self.UpdateList[id] = nil
+            self:UpdateCell(cell)
+
+            -- inform ai brains of changes
+            for k, brain in self.Brains do
+                if brain.OnReclaimUpdate then
+                    brain:OnReclaimUpdate(self, cell)
+                end
+            end
+        end
+    end,
+
+    ---@param self AIGridReclaim
     UpdateThread = function(self)
         while true do
             WaitTicks(6)
@@ -89,46 +137,11 @@ GridReclaim = Class (Grid) {
                 DebugUpdateData.Updates = 0
             end
 
-            -- update cells
-            for id, cell in self.UpdateList do
-                self.UpdateList[id] = nil
-
-                local count = 0
-                local totalMass = 0
-                local totalEnergy = 0
-
-                for id, reclaim in cell.Reclaim do
-                    count = count + 1
-                    local fraction = reclaim.ReclaimLeft or 0
-                    totalMass = totalMass + fraction * (reclaim.MaxMassReclaim or 0)
-                    totalEnergy = totalEnergy + fraction * (reclaim.MaxEnergyReclaim or 0)
-                end
-
-                cell.TotalMass = totalMass
-                cell.TotalEnergy = totalEnergy
-                cell.ReclaimCount = count
-
-                -- inform ai brains of changes
-                for k, brain in self.Brains do
-                    if brain.OnReclaimUpdate then
-                        brain:OnReclaimUpdate(self, cell)
-                    end
-                end
-
-                -- update accumulative fields
-                if Debug then
-                    DebugUpdateData.Processed = DebugUpdateData.Processed + cell.ReclaimCount
-                    DebugUpdateData.Updates = DebugUpdateData.Updates + 1
-
-                    self:DebugCellUpdate(cell.X, cell.Z)
-                end
-            end
+            self:UpdateCells(8)
 
             if Debug then
                 -- DebugUpdateData.Memory = import("/lua/system/utils.lua").ToBytes(self, { Reclaim = true }) / (1024 * 1024)
-                DebugUpdateData.Tick = GetGameTick()
                 DebugUpdateData.Time = GetSystemTimeSecondsOnlyForProfileUse() - start
-
                 Sync.GridReclaimUIDebugUpdate = DebugUpdateData
             end
         end
