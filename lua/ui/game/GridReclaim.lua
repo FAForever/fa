@@ -18,29 +18,27 @@ local Root = false
 ---@field Updates number
 ---@field Processed number
 
+---@class GridReclaimUICell : Group
+---@field Title Text
+---@field Mass Text
+---@field Energy Text
+---@field Count Text
 GridReclaimUICell = ClassUI(Group) {
+
+    ---@param self GridReclaimUICell
+    ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent, 'GridReclaimUICell')
+        self:SetupLogic()
+        self:SetupLayout()
+    end,
 
-        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Scanning information', 14))
-            :Over(self, 5)
-            :AtLeftTopIn(self, 14, 4)
-            :End()
-
-        self.Mass = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Mass in cell: ...', 12))
-            :Over(self, 5)
-            :Below(self.Title, 4)
-            :End()
-
-        self.Energy = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Energy in cell: ...', 12))
-            :Over(self, 5)
-            :Below(self.Mass, 2)
-            :End()
-
-        self.Count = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Number of reclaim: ...', 12))
-            :Over(self, 5)
-            :Below(self.Energy, 2)
-            :End()
+    ---@param self GridReclaimUICell
+    SetupLogic = function(self)
+        self.Title = UIUtil.CreateText(self, 'Scanning information', 14)
+        self.Mass = UIUtil.CreateText(self, 'Mass in cell: ...', 12)
+        self.Energy = UIUtil.CreateText(self, 'Energy in cell: ...', 12)
+        self.Count = UIUtil.CreateText(self, 'Number of reclaim: ...', 12)
 
         AddOnSyncHashedCallback(
         ---@param data GridReclaimUIDebugCell
@@ -52,32 +50,55 @@ GridReclaimUICell = ClassUI(Group) {
                 end
             end, 'GridReclaimUIDebugCell', 'Alice'
         )
-    end
-}
+    end,
 
-GridReclaimUIUpdate = ClassUI(Group) {
-    __init = function(self, parent)
-        Group.__init(self, parent, 'GridReclaimUIUpdate')
-
-        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Update information', 14))
+    ---@param self GridReclaimUICell
+    SetupLayout = function(self)
+        LayoutHelpers.LayoutFor(self.Title)
             :Over(self, 5)
             :AtLeftTopIn(self, 14, 4)
             :End()
 
-        self.Time = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Time to compute: ... (ms)', 12))
+        LayoutHelpers.LayoutFor(self.Mass)
             :Over(self, 5)
             :Below(self.Title, 4)
             :End()
 
-        self.Updates = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Updates processed: ...', 12))
+        LayoutHelpers.LayoutFor(self.Energy)
             :Over(self, 5)
-            :Below(self.Time, 2)
+            :Below(self.Mass, 2)
             :End()
 
-        self.Processed = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Props processed: ...', 12))
+        LayoutHelpers.LayoutFor(self.Count)
             :Over(self, 5)
-            :Below(self.Updates, 2)
+            :Below(self.Energy, 2)
             :End()
+    end,
+}
+
+---@class GridReclaimUIUpdate : Group
+---@field Title Text
+---@field Time Text
+---@field Updates Text
+---@field Processed Text
+GridReclaimUIUpdate = ClassUI(Group) {
+
+    ---@param self GridReclaimUIUpdate
+    ---@param parent Control
+    __init = function(self, parent)
+        Group.__init(self, parent, 'GridReclaimUIUpdate')
+
+        self:SetupLogic()
+        self:SetupLayout()
+    end,
+
+    ---@param self GridReclaimUIUpdate
+    SetupLogic = function(self)
+
+        self.Title = UIUtil.CreateText(self, 'Update information', 14)
+        self.Time = UIUtil.CreateText(self, 'Time to compute: ... (ms)', 12)
+        self.Updates = UIUtil.CreateText(self, 'Updates processed: ...', 12)
+        self.Processed = UIUtil.CreateText(self, 'Props processed: ...', 12)
 
         AddOnSyncHashedCallback(
         ---@param data GridReclaimUIDebugUpdate
@@ -89,7 +110,30 @@ GridReclaimUIUpdate = ClassUI(Group) {
                 end
             end, 'GridReclaimUIDebugUpdate', 'Alice'
         )
-    end
+    end,
+
+    ---@param self GridReclaimUIUpdate
+    SetupLayout = function(self)
+        LayoutHelpers.LayoutFor(self.Title)
+            :Over(self, 5)
+            :AtLeftTopIn(self, 14, 4)
+            :End()
+
+        LayoutHelpers.LayoutFor(self.Time)
+            :Over(self, 5)
+            :Below(self.Title, 4)
+            :End()
+
+        LayoutHelpers.LayoutFor(self.Updates)
+            :Over(self, 5)
+            :Below(self.Time, 2)
+            :End()
+
+        LayoutHelpers.LayoutFor(self.Processed)
+            :Over(self, 5)
+            :Below(self.Updates, 2)
+            :End()
+    end,
 }
 
 ---@class GridReclaimUI : Window
