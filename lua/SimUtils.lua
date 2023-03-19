@@ -256,7 +256,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
             upgradeUnits[upgradeUnitCount] = newUnit
         end
 
-        newUnit.IsBeingTransferred = nil
+        unit.IsBeingTransferred = nil
 
         if unit.OnGiven then
             unit:OnGiven(newUnit)
