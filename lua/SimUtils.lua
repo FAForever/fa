@@ -171,7 +171,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
 
         -- changing owner
         local newUnit = ChangeUnitArmy(unit, toArmy)
-        if not unit then
+        if not newUnit then
             continue
         end
 
