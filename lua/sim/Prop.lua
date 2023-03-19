@@ -1,5 +1,6 @@
 
 local PlayReclaimEndEffects = import("/lua/effectutilities.lua").PlayReclaimEndEffects
+local GridReclaimInstance = import("/lua/AI/GridReclaim.lua").GridReclaimInstance
 
 -- upvalue for performance
 local type = type
@@ -61,6 +62,9 @@ Prop = Class(moho.prop_methods) {
 
         self:SetMaxHealth(maxHealth)
         self:SetHealth(self, maxHealth)
+
+        -- track in reclaim grid
+
     end,
 
     ---@param self Prop 
@@ -127,6 +131,11 @@ Prop = Class(moho.prop_methods) {
     OnDestroy = function(self)
         self:CleanupUILabel()
         self.Trash:Destroy()
+
+        -- keep track of reclaim
+        if GridReclaimInstance then
+            GridReclaimInstance:OnReclaimDestroyed(self)
+        end
     end,
 
     ---@param self Prop
@@ -198,6 +207,11 @@ Prop = Class(moho.prop_methods) {
             self:UpdateUILabel()
         else
             self.ReclaimLeft = 0
+        end
+
+        -- keep track of reclaim
+        if GridReclaimInstance then
+            GridReclaimInstance:OnReclaimUpdate(self)
         end
     end,
 

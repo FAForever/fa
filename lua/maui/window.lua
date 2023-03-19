@@ -17,27 +17,27 @@ local Prefs = import("/lua/user/prefs.lua")
 styles = {
     backgrounds = {
         notitle = {
-            tl = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_ul.dds'),
-            tr = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_ur.dds'),
-            tm = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_horz_um.dds'),
-            ml = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_vert_l.dds'),
-            m = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_m.dds'),
-            mr = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_vert_r.dds'),
-            bl = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_ll.dds'),
-            bm = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_lm.dds'),
-            br = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_lr.dds'),
+            tl = UIUtil.SkinnableFile('/game/mini-map-brd01/mini-map_brd_ul.dds'),
+            tr = UIUtil.SkinnableFile('/game/mini-map-brd01/mini-map_brd_ur.dds'),
+            tm = UIUtil.SkinnableFile('/game/mini-map-brd01/mini-map_brd_horz_um.dds'),
+            ml = UIUtil.SkinnableFile('/game/mini-map-brd01/mini-map_brd_vert_l.dds'),
+            m = UIUtil.SkinnableFile('/game/mini-map-brd01/mini-map_brd_m.dds'),
+            mr = UIUtil.SkinnableFile('/game/mini-map-brd01/mini-map_brd_vert_r.dds'),
+            bl = UIUtil.SkinnableFile('/game/mini-map-brd01/mini-map_brd_ll.dds'),
+            bm = UIUtil.SkinnableFile('/game/mini-map-brd01/mini-map_brd_lm.dds'),
+            br = UIUtil.SkinnableFile('/game/mini-map-brd01/mini-map_brd_lr.dds'),
             borderColor = 'ff415055',
         },
         title = {
-            tl = UIUtil.UIFile('/game/options_brd/options_brd_ul.dds'),
-            tr = UIUtil.UIFile('/game/options_brd/options_brd_ur.dds'),
-            tm = UIUtil.UIFile('/game/options_brd/options_brd_horz_um.dds'),
-            ml = UIUtil.UIFile('/game/options_brd/options_brd_vert_l.dds'),
-            m = UIUtil.UIFile('/game/options_brd/options_brd_m.dds'),
-            mr = UIUtil.UIFile('/game/options_brd/options_brd_vert_r.dds'),
-            bl = UIUtil.UIFile('/game/options_brd/options_brd_ll.dds'),
-            bm = UIUtil.UIFile('/game/options_brd/options_brd_lm.dds'),
-            br = UIUtil.UIFile('/game/options_brd/options_brd_lr.dds'),
+            tl = UIUtil.SkinnableFile('/game/options_brd/options_brd_ul.dds'),
+            tr = UIUtil.SkinnableFile('/game/options_brd/options_brd_ur.dds'),
+            tm = UIUtil.SkinnableFile('/game/options_brd/options_brd_horz_um.dds'),
+            ml = UIUtil.SkinnableFile('/game/options_brd/options_brd_vert_l.dds'),
+            m = UIUtil.SkinnableFile('/game/options_brd/options_brd_m.dds'),
+            mr = UIUtil.SkinnableFile('/game/options_brd/options_brd_vert_r.dds'),
+            bl = UIUtil.SkinnableFile('/game/options_brd/options_brd_ll.dds'),
+            bm = UIUtil.SkinnableFile('/game/options_brd/options_brd_lm.dds'),
+            br = UIUtil.SkinnableFile('/game/options_brd/options_brd_lr.dds'),
             borderColor = 'ff415055',
         },
     },
@@ -501,6 +501,17 @@ Window = ClassUI(Group) {
                 self.Right:Set(defaultPosition.Right)
             end
         end
+    end,
+
+    ---@param self Window
+    ---@param alpha number
+    ---@param affectChildren boolean
+    SetAlpha = function(self, alpha, affectChildren)
+        affectChildren = affectChildren or false
+        Group.SetAlpha(self, alpha, affectChildren)
+
+        -- guarantee that the resize bars remain transparent
+        self._resizeGroup:SetAlpha(0, true)
     end,
 
     SaveWindowLocation = function(self)
