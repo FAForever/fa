@@ -9,7 +9,7 @@ local setmetatable = setmetatable
 
 -- Set this true to get tracebacks in error messages. It slows down lazyvars a lot,
 -- so don't use except when debugging.
-local ExtendedErrorMessages = false
+ExtendedErrorMessages = false
 local EvalContext = nil
 local WeakKeyMeta = { __mode = 'k' }
 
@@ -144,7 +144,7 @@ LazyVarMetaTable = {
                 head = use:SetDirty(self, head)
             end
         end
-        
+
         -- setup internal state for a function
         self[4] = func
         if ExtendedErrorMessages then
