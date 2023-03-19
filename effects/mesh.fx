@@ -9327,7 +9327,7 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
     metallic = saturate(metallic - specular.a);
 
     albedo = pow(albedo, (1 - metallic * 0.8));
-     // We need to make the dark areas darker
+    // We need to make the dark areas darker
     // Should find something that offers more control over the result
     float x = albedo.r;
     albedo = (pow(x, 3) - 3 * pow(x, 2) + 3 * x) * albedo;
