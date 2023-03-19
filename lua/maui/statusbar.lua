@@ -45,7 +45,7 @@ StatusBar = ClassUI(Bitmap) {
                         if not self._stretch then
                             self._bar:SetUV(0, 1 - rangePercent, 1, 1)
                         end
-                        return MathFloor(self.Top() + (rangePercent * (self.Bottom() - self.Top())))
+                        return (self.Top() + (rangePercent * (self.Bottom() - self.Top()))) ^ 0
                     end
                 )
             else
@@ -56,7 +56,7 @@ StatusBar = ClassUI(Bitmap) {
                         if not self._stretch then
                             self._bar:SetUV(0, 0, 1, rangePercent)
                         end
-                        return MathFloor(self.Bottom() - (rangePercent * (self.Bottom() - self.Top())))
+                        return (self.Bottom() - (rangePercent * (self.Bottom() - self.Top()))) ^ 0
                     end
                 )
             end
@@ -71,7 +71,7 @@ StatusBar = ClassUI(Bitmap) {
                         if not self._stretch then
                             self._bar:SetUV(0, 0, rangePercent, 1)
                         end
-                        return MathFloor(self.Right() - (rangePercent * (self.Right() - self.Left())))
+                        return (self.Right() - (rangePercent * (self.Right() - self.Left()))) ^ 0
                     end
                 )
             else
@@ -82,7 +82,7 @@ StatusBar = ClassUI(Bitmap) {
                         if not self._stretch then
                             self._bar:SetUV(1 - rangePercent, 0, 1, 1)
                         end
-                        return MathFloor(self.Left() + (rangePercent * (self.Right() - self.Left())))
+                        return (self.Left() + (rangePercent * (self.Right() - self.Left()))) ^ 0
                     end
                 )
             end
@@ -138,7 +138,7 @@ StatusBar = ClassUI(Bitmap) {
         if minSlidePercent == 0 then
             return (value - min) / (range)
         else
-            return MathFloor(((value - min) / (range)) / minSlidePercent) * minSlidePercent
+            return ((((value - min) / (range)) / minSlidePercent) ^ 0)* minSlidePercent
         end
     end,
 
