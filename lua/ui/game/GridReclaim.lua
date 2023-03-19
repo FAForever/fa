@@ -3,8 +3,6 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Window = import("/lua/maui/window.lua").Window
 local Group = import("/lua/maui/group.lua").Group
-local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local Combo = import("/lua/ui/controls/combo.lua").Combo
 
 local Root = false
 

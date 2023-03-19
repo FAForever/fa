@@ -3,11 +3,15 @@ local Grid = import("/lua/ai/grid.lua").Grid
 
 local Debug = false
 function EnableDebugging()
-    Debug = true
+    if ScenarioInfo.GameHasAIs or CheatsEnabled() then
+        Debug = true
+    end
 end
 
 function DisableDebugging()
-    Debug = false
+    if ScenarioInfo.GameHasAIs or CheatsEnabled() then
+        Debug = false
+    end
 end
 
 ---@type GridReclaimUIDebugCell
