@@ -1,15 +1,35 @@
 
 local Grid = import("/lua/ai/grid.lua").Grid
 
-local Debug = true
-function SetDebug(value)
-    Debug = value
+local Debug = false
+function EnableDebugging()
+    Debug = true
 end
+
+function DisableDebugging()
+    Debug = false
+end
+
+---@type GridReclaimUIDebugCell
+local DebugCellData = {
+    ReclaimCount = -1,
+    TotalEnergy = -1,
+    TotalMass = -1,
+    X = -1,
+    Z = -1,
+}
+
+---@type GridReclaimUIDebugUpdate
+local DebugUpdateData = {
+     Memory = -1,
+     Processed = -1,
+     Time = -1,
+     Updates = -1,
+}
 
 ---@class AIGridReclaimCell : AIGridCell
 ---@field TotalMass number
 ---@field TotalEnergy number
----@field TotalTime number
 ---@field ReclaimCount number
 ---@field Reclaim table<EntityId, Prop>
 
@@ -31,7 +51,6 @@ GridReclaim = Class (Grid) {
                 local cell = cells[k][l]
                 cell.TotalMass = 0
                 cell.TotalEnergy = 0
-                cell.TotalTime = 0
                 cell.ReclaimCount = 0
                 cell.Reclaim = { }
             end
@@ -57,7 +76,15 @@ GridReclaim = Class (Grid) {
         while true do
             WaitTicks(6)
 
-            local start = GetSystemTimeSecondsOnlyForProfileUse()
+            local start
+            if Debug then
+                start = GetSystemTimeSecondsOnlyForProfileUse()
+
+                -- reset accumulative fields
+                DebugUpdateData.Processed = 0
+                DebugUpdateData.Updates = 0
+            end
+
             -- update cells
             for id, cell in self.UpdateList do
                 self.UpdateList[id] = nil
@@ -65,19 +92,16 @@ GridReclaim = Class (Grid) {
                 local count = 0
                 local totalMass = 0
                 local totalEnergy = 0
-                local totalTime = 0
 
                 for id, reclaim in cell.Reclaim do
                     count = count + 1
                     local fraction = reclaim.ReclaimLeft or 0
                     totalMass = totalMass + fraction * (reclaim.MaxMassReclaim or 0)
                     totalEnergy = totalEnergy + fraction * (reclaim.MaxEnergyReclaim or 0)
-                    totalTime = totalTime + fraction * (reclaim.TimeReclaim or 0)
                 end
 
                 cell.TotalMass = totalMass
                 cell.TotalEnergy = totalEnergy
-                cell.TotalTime = totalTime
                 cell.ReclaimCount = count
 
                 -- inform ai brains of changes
@@ -87,11 +111,22 @@ GridReclaim = Class (Grid) {
                     end
                 end
 
-                self:DebugCellUpdate(cell.X, cell.Z)
+                -- update accumulative fields
+                if Debug then
+                    DebugUpdateData.Processed = DebugUpdateData.Processed + cell.ReclaimCount
+                    DebugUpdateData.Updates = DebugUpdateData.Updates + 1
+
+                    self:DebugCellUpdate(cell.X, cell.Z)
+                end
             end
 
-            local time = GetSystemTimeSecondsOnlyForProfileUse() - start
-            LOG(time)
+            if Debug then
+                -- DebugUpdateData.Memory = import("/lua/system/utils.lua").ToBytes(self, { Reclaim = true }) / (1024 * 1024)
+                DebugUpdateData.Tick = GetGameTick()
+                DebugUpdateData.Time = GetSystemTimeSecondsOnlyForProfileUse() - start
+
+                Sync.GridReclaimUIDebugUpdate = DebugUpdateData
+            end
         end
     end,
 
@@ -172,12 +207,14 @@ GridReclaim = Class (Grid) {
                     self:DrawCell(bx, bz, math.log(totalEnergy) - 1, 'B4C400')
                 end
 
-                local totalTime = cell.TotalTime
-                if totalTime and totalTime > 1 then
-                    self:DrawCell(bx, bz, math.log(totalTime) - 1, '7F7F7D')
-                end
-
                 self:DrawCell(bx, bz, 0, 'ffffff')
+
+                DebugCellData.ReclaimCount = cell.ReclaimCount
+                DebugCellData.TotalEnergy = cell.TotalEnergy
+                DebugCellData.TotalMass = cell.TotalMass
+                DebugCellData.X = cell.X
+                DebugCellData.Z = cell.Z
+                Sync.GridReclaimUIDebugCell = DebugCellData
             end
         end
     end,

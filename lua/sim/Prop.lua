@@ -19,7 +19,7 @@ local TableInsert = table.insert
 ---@field CachePosition Vector
 ---@field MaxMassReclaim number
 ---@field MaxEnergyReclaim number
----@field TimeReclaim number
+---@field TimeReclaim number        # This is a multiplier and not the actual total time
 ---@field ReclaimLeft number
 ---@field SyncData? table
 ---@field Extents? table
