@@ -96,17 +96,14 @@ StatusBar = ClassUI(Bitmap) {
     SetValue = function(self, value)
         local min = self._rangeMin
         local max = self._rangeMax
-        local lazy = self._value
 
         if value < min then
             value = min
-        end
-
-        if value > max then
+        elseif value > max then
             value = max
         end
 
-        lazy:SetValue(value)
+        self._value:SetValue(value)
     end,
 
     ---@param self StatusBar
@@ -152,9 +149,7 @@ StatusBar = ClassUI(Bitmap) {
 
         if value < min then
             return min
-        end
-
-        if value > max then
+        elseif value > max then
             return max
         end
 
