@@ -306,4 +306,6 @@ Setup = function(brain)
     if brain then
         GridReclaimInstance:RegisterBrain(brain)
     end
+
+    return GridReclaimInstance
 end

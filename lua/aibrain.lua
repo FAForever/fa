@@ -169,6 +169,9 @@ AIBrain = Class(moho.aibrain_methods) {
     OnCreateAI = function(self, planName)
         self:CreateBrainShared(planName)
 
+        -- add reference to grid reclaim
+        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+
         local civilian = false
         for name, data in ScenarioInfo.ArmySetup do
             if name == self.Name then
