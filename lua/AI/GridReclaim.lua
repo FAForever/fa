@@ -1,5 +1,6 @@
-
 local Grid = import("/lua/ai/grid.lua").Grid
+
+local TableInsert = table.insert
 
 local WeakValue = { __mode = 'v' }
 
@@ -27,9 +28,9 @@ local DebugCellData = {
 
 ---@type GridReclaimUIDebugUpdate
 local DebugUpdateData = {
-     Processed = -1,
-     Time = -1,
-     Updates = -1,
+    Processed = -1,
+    Time = -1,
+    Updates = -1,
 }
 
 ---@class AIGridReclaimCell : AIGridCell
@@ -41,8 +42,9 @@ local DebugUpdateData = {
 ---@class AIGridReclaim : AIGrid
 ---@field Cells AIGridReclaimCell[][]
 ---@field UpdateList table<string, AIGridReclaimCell>
+---@field OrderedCells AIGridReclaimCell[]
 ---@field Brains table<number, AIBrain>
-GridReclaim = Class (Grid) {
+GridReclaim = Class(Grid) {
 
     ---@param self AIGridReclaim
     __init = function(self)
@@ -50,6 +52,7 @@ GridReclaim = Class (Grid) {
 
         local cellCount = self.CellCount
         local cells = self.Cells
+        local orderedCells = {}
 
         for k = 1, cellCount do
             for l = 1, cellCount do
@@ -57,12 +60,15 @@ GridReclaim = Class (Grid) {
                 cell.TotalMass = 0
                 cell.TotalEnergy = 0
                 cell.ReclaimCount = 0
-                cell.Reclaim = setmetatable({ }, WeakValue)
+                cell.Reclaim = setmetatable({}, WeakValue)
+
+                TableInsert(orderedCells, cell)
             end
         end
 
-        self.UpdateList = { }
-        self.Brains = { }
+        self.OrderedCells = orderedCells
+        self.UpdateList = {}
+        self.Brains = {}
 
         self:Update()
         self:DebugUpdate()
@@ -120,6 +126,20 @@ GridReclaim = Class (Grid) {
                     brain:OnReclaimUpdate(self, cell)
                 end
             end
+        end
+
+        -- sort the cells
+        if updates > 0 then
+            table.sort(
+                self.OrderedCells,
+
+                ---@param a AIGridReclaimCell
+                ---@param b AIGridReclaimCell
+                ---@return boolean
+                function(a, b)
+                    return a.TotalMass > b.TotalMass
+                end
+            )
         end
     end,
 
@@ -232,6 +252,12 @@ GridReclaim = Class (Grid) {
                 DebugCellData.X = cell.X
                 DebugCellData.Z = cell.Z
                 Sync.GridReclaimUIDebugCell = DebugCellData
+
+                -- draw most valuable cells
+                for k = 1, 8 do 
+                    local cell = self.OrderedCells[k]
+                    self:DrawCell(cell.X, cell.Z, 0, 'ff0000')
+                end
             end
         end
     end,

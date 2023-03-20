@@ -29,12 +29,7 @@ GridReclaimUICell = ClassUI(Group) {
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent, 'GridReclaimUICell')
-        self:SetupLogic()
-        self:SetupLayout()
-    end,
 
-    ---@param self GridReclaimUICell
-    SetupLogic = function(self)
         self.Title = UIUtil.CreateText(self, 'Scanning information', 14)
         self.Mass = UIUtil.CreateText(self, 'Mass in cell: ...', 12)
         self.Energy = UIUtil.CreateText(self, 'Energy in cell: ...', 12)
@@ -52,8 +47,7 @@ GridReclaimUICell = ClassUI(Group) {
         )
     end,
 
-    ---@param self GridReclaimUICell
-    SetupLayout = function(self)
+    __post_init = function(self)
         LayoutHelpers.LayoutFor(self.Title)
             :Over(self, 5)
             :AtLeftTopIn(self, 14, 4)
@@ -88,13 +82,6 @@ GridReclaimUIUpdate = ClassUI(Group) {
     __init = function(self, parent)
         Group.__init(self, parent, 'GridReclaimUIUpdate')
 
-        self:SetupLogic()
-        self:SetupLayout()
-    end,
-
-    ---@param self GridReclaimUIUpdate
-    SetupLogic = function(self)
-
         self.Title = UIUtil.CreateText(self, 'Update information', 14)
         self.Time = UIUtil.CreateText(self, 'Time to compute: ... (ms)', 12)
         self.Updates = UIUtil.CreateText(self, 'Updates processed: ...', 12)
@@ -112,8 +99,7 @@ GridReclaimUIUpdate = ClassUI(Group) {
         )
     end,
 
-    ---@param self GridReclaimUIUpdate
-    SetupLayout = function(self)
+    __post_init = function(self)
         LayoutHelpers.LayoutFor(self.Title)
             :Over(self, 5)
             :AtLeftTopIn(self, 14, 4)
