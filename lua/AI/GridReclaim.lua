@@ -246,6 +246,9 @@ GridReclaim = Class(Grid) {
 
                 self:DrawCell(bx, bz, 0, 'ffffff')
 
+                local px, pz = self:ToWorldSpace(bx, bz)
+                DrawCircle({px, GetSurfaceHeight(px, pz), pz}, 4, '000000')
+
                 DebugCellData.ReclaimCount = cell.ReclaimCount
                 DebugCellData.TotalEnergy = cell.TotalEnergy
                 DebugCellData.TotalMass = cell.TotalMass
