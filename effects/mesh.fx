@@ -9494,7 +9494,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
 
-    float emission = pow(max(specular.b - 0.06, 0.0), 0.5);
+    float emission = pow(max(specular.b - 0.04, 0.0), 0.5);
     color += emission * albedo;
     float alpha = mirrored ? 0.5 : emission;
 
