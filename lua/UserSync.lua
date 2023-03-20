@@ -13,7 +13,6 @@ PreviousSync = {}
 -- the Sync.UnitData table into this table each sync (if there's new data)
 UnitData = {}
 
-local utils = import("/lua/system/utils.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
 local reclaim = import("/lua/ui/game/reclaim.lua")
 local UpdateReclaim = reclaim.UpdateReclaim
@@ -21,13 +20,33 @@ local sendEnhancementMessage = import("/lua/ui/notify/notify.lua").sendEnhanceme
 local SetPlayableArea = reclaim.SetPlayableArea
 
 local SyncCallbacks = { }
-
 function AddOnSyncCallback(cb, identifier)
     SyncCallbacks[identifier] = cb
 end
 
 function RemoveOnSyncCallback(identifier)
     SyncCallbacks[identifier] = nil
+end
+
+---@type table<string, table<string, function>>
+local HashedSyncCallbacks = { }
+
+--- Adds a callback
+---@param cb function
+---@param cat string        # Category to listen to (e.g., Sync.ArmyTransfer)
+---@param id string         # Identifier to allow us to be replaced
+function AddOnSyncHashedCallback(cb, cat, id)
+    HashedSyncCallbacks[cat] = HashedSyncCallbacks[cat] or { }
+    HashedSyncCallbacks[cat][id] = cb
+end
+
+--- Removes a callback
+---@param cat string        # Sync category to listen to
+---@param id string
+function RemoveOnSyncHashedCallback(cat, id)
+    if HashedSyncCallbacks[cat] then
+        HashedSyncCallbacks[cat][id] = nil
+    end
 end
 
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
@@ -91,15 +110,7 @@ function OnSync()
         end
     end
 
-    if Sync.GameResult then
-        for _, gameResult in Sync.GameResult do
-            local armyIndex, result = unpack(gameResult)
-            import("/lua/ui/game/gameresult.lua").DoGameResult(armyIndex, result)
-        end
-    end
-
-    -- sync callbacks
-
+    -- old sync callbacks
     for k, callback in SyncCallbacks do 
         local ok, msg = pcall(callback, Sync)
 
@@ -110,7 +121,24 @@ function OnSync()
         end
     end
 
+    -- new sync callbacks
+    for k, data in Sync do
+        local callbacks = HashedSyncCallbacks[k]
+        if callbacks then
+            for l, callback in callbacks do
+                callback(data)
+            end
+        end
+    end
+
     -- everything else
+
+    if Sync.GameResult then
+        for _, gameResult in Sync.GameResult do
+            local armyIndex, result = unpack(gameResult)
+            import("/lua/ui/game/gameresult.lua").DoGameResult(armyIndex, result)
+        end
+    end
 
     if Sync.ArmyTransfer then 
         local army = GetFocusArmy()

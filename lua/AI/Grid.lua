@@ -72,6 +72,19 @@ Grid = ClassSimple {
         return bx, bz
     end,
 
+    --- Converts a grid position to a position in world space
+    ---@param self AIGrid
+    ---@param bx number     # in grid space
+    ---@param bz number     # in grid space
+    ---@return number       # in world space
+    ---@return number       # in world space
+    ToWorldSpace = function(self, bx, bz)
+        local cellSize = self.CellSize
+        local px = (bx - 1) * cellSize + 0.5 * cellSize
+        local pz = (bz - 1) * cellSize + 0.5 * cellSize
+        return px, pz
+    end,
+
     --- Converts a cell into a rectangle
     ---@param self AIGrid
     ---@param bx number     # in grid space
