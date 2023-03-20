@@ -225,8 +225,13 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     if (not info.Human) and (info.AIPersonality != '') then
         -- assign unique metatable for AI instance
         local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
-        local instance = keyToBrain[name] or keyToBrain["default"]
-        setmetatable(brain, instance)
+        local instance = keyToBrain[info.AIPersonality]
+        reprsl(keyToBrain)
+        if instance then
+            LOG("Found an instance!!")
+            reprsl(info)
+            setmetatable(brain, instance)
+        end
     end
 
     import("/lua/sim/scenarioutilities.lua").InitializeStartLocation(name)
