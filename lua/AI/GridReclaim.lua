@@ -298,6 +298,7 @@ GridReclaim = Class(Grid) {
 GridReclaimInstance = false
 
 ---@param brain AIBrain
+---@return AIGridReclaim
 Setup = function(brain)
     if not GridReclaimInstance then
         GridReclaimInstance = GridReclaim() --[[@as AIGridReclaim]]

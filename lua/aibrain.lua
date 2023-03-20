@@ -104,6 +104,7 @@ local TableGetn = table.getn
 ---@field UnitBuiltTriggerList table
 ---@field UnitStats table<EntityId, table<string, number>>
 ---@field VeterancyTriggerList table
+---@field GridReclaim? AIGridReclaim
 AIBrain = Class(moho.aibrain_methods) {
     -- The state of the brain in the match
     Status = 'InProgress',
