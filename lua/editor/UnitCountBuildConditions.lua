@@ -1454,11 +1454,10 @@ function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount
         if factoryManager.LocationActive then
             local numUnits = factoryManager:GetNumCategoryFactories(testCat) or 0
             if numUnits > unitCount then
-                LOG('numunits greater than unit count')
                 return false
             end
             local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
-            for unitNum, unit in unitsBuilding do
+            for _, unit in unitsBuilding do
                 if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
                     local buildingUnit = unit.UnitBeingBuilt
                     if buildingUnit and not buildingUnit:BeenDestroyed() and EntityCategoryContains(unitCategory, buildingUnit) then
@@ -1467,7 +1466,6 @@ function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount
                 end
             end
             if numUnits > unitCount then
-                LOG('numUnits being built and numunits greater than unit count')
                 return false
             end
         end
