@@ -601,6 +601,7 @@ function InitializeArmies()
         if tblData then
             local setup = armySetups[strArmy]
             local brain = GetArmyBrain(strArmy)
+            LOG('Initialize Armies brain nickname is '..brain.Nickname)
 
             local econ = tblData.Economy
             SetArmyEconomy(strArmy, econ.mass, econ.energy)
@@ -1001,6 +1002,7 @@ end
 ---@return table|nil
 ---@return Platoon[]|nil
 function CreateArmyGroup(strArmy,strGroup,wreckage, balance)
+    LOG('CreateArmy group '..repr(strArmy))
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)

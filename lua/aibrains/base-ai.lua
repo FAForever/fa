@@ -348,7 +348,7 @@ AIBrain = Class(StandardBrain) {
         }
 
         self:IMAPConfiguration()
-            self:ForkThread(self.MapAnalysis)
+        self:ForkThread(self.MapAnalysis)
     end,
 
     ---Removes bases that have no engineers or factories.  This is a sorian AI function
