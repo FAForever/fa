@@ -2246,61 +2246,6 @@ function ApplyCheatBuffs(unit)
 end
 
 ---@param aiBrain AIBrain
----@param eng Unit
----@param pos Vector
----@return boolean
-function EngineerTryReclaimCaptureAreaSorian(aiBrain, eng, pos)
-    if not pos then
-        return false
-    end
-
-    -- Check if enemy units are at location
-    local checkCats = {categories.ENGINEER - categories.COMMAND, categories.STRUCTURE + (categories.MOBILE * categories.LAND - categories.ENGINEER - categories.COMMAND)}
-    for k, v in checkCats do
-        local checkUnits = aiBrain:GetUnitsAroundPoint(v, pos, 10, 'Enemy')
-        for num, unit in checkUnits do
-            if not unit.Dead and EntityCategoryContains(categories.ENGINEER, unit) then
-                unit.CaptureInProgress = true
-                IssueCapture({eng}, unit)
-                return true
-            elseif not unit.Dead and not EntityCategoryContains(categories.ENGINEER, unit) then
-                unit.ReclaimInProgress = true
-                IssueReclaim({eng}, unit)
-                return true
-            end
-        end
-    end
-
-    return false
-end
-
----@param aiBrain AIBrain
----@param locationType string
----@param assisteeType string
----@param buildingCategory string
----@param assisteeCategory string
----@return unknown
-function GetAssisteesSorian(aiBrain, locationType, assisteeType, buildingCategory, assisteeCategory)
-    if assisteeType == 'Factory' then
-        -- Sift through the factories in the location
-        local manager = aiBrain.BuilderManagers[locationType].FactoryManager
-        return manager:GetFactoriesWantingAssistance(buildingCategory, assisteeCategory)
-    elseif assisteeType == 'Engineer' then
-        local manager = aiBrain.BuilderManagers[locationType].EngineerManager
-        return manager:GetEngineersWantingAssistance(buildingCategory, assisteeCategory)
-    elseif assisteeType == 'Structure' then
-        local manager = aiBrain.BuilderManagers[locationType].PlatoonFormManager
-        return manager:GetUnitsBeingBuilt(buildingCategory, assisteeCategory)
-    elseif assisteeType == 'NonUnitBuildingStructure' then
-        return GetUnitsBeingBuilt(aiBrain, locationType, assisteeCategory)
-    else
-        WARN('*AI ERROR: Invalid assisteeType - ' .. assisteeType)
-    end
-
-    return false
-end
-
----@param aiBrain AIBrain
 ---@param locationType string
 ---@param assisteeCategory string
 ---@return boolean
@@ -2325,8 +2270,6 @@ function GetUnitsBeingBuilt(aiBrain, locationType, assisteeCategory)
 
     return retUnits
 end
-
-
 
 ---@param building boolean
 ---@return boolean

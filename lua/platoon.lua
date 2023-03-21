@@ -4026,21 +4026,6 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    ---@param self Platoon
-    NameUnitsSorian = function(self)
-        local units = self:GetPlatoonUnits()
-        local AINames = import("/lua/ai/sorianlang.lua").AINames
-        if units and not table.empty(units) then
-            for k, v in units do
-                local ID = v.UnitId
-                if AINames[ID] then
-                    local num = Random(1, table.getn(AINames[ID]))
-                    v:SetCustomName(AINames[ID][num])
-                end
-            end
-        end
-    end,
-
     --- Patrols the platoon along the path, orientating at each node to match the line from the previous node to the current node.
     ---@param self Platoon
     ---@param path Vector[] path A table of positions, preferably of type Vector. Converted otherwise.
