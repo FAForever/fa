@@ -221,16 +221,14 @@ end
 -- use it to store off various useful bits of info.
 -- The global variable "ArmyBrains" contains an array of AI brains, one for each army.
 function OnCreateArmyBrain(index, brain, name, nickname)
+
+    -- switch out brains for non-human armies
     local info = ScenarioInfo.ArmySetup[name]
     if (not info.Human) and (info.AIPersonality != '') then
-        -- assign unique metatable for AI instance
-        LOG('Personality is '..repr(info.AIPersonality))
         local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
         local instance = keyToBrain[info.AIPersonality]
-        
+
         if instance then
-            LOG("Found an instance!!")
-            reprsl(info)
             setmetatable(brain, instance)
         end
     end
