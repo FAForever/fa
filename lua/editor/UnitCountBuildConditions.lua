@@ -1444,8 +1444,33 @@ function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount
     end
     local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
     local selfIndex = aiBrain:GetArmyIndex()
-    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
-        return false
+    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] ~= pathType then
+        local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
+        local testCat = unitCategory
+        if not factoryManager then
+            WARN('*AI WARNING: FactoryComparisonAtLocation - Invalid location - ' .. locationType)
+            return false
+        end
+        if factoryManager.LocationActive then
+            local numUnits = factoryManager:GetNumCategoryFactories(testCat) or 0
+            if numUnits > unitCount then
+                LOG('numunits greater than unit count')
+                return false
+            end
+            local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
+            for unitNum, unit in unitsBuilding do
+                if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
+                    local buildingUnit = unit.UnitBeingBuilt
+                    if buildingUnit and not buildingUnit:BeenDestroyed() and EntityCategoryContains(unitCategory, buildingUnit) then
+                        numUnits = numUnits + 1
+                    end
+                end
+            end
+            if numUnits > unitCount then
+                LOG('numUnits being built and numunits greater than unit count')
+                return false
+            end
+        end
     end
     return true
 end
