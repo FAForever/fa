@@ -121,9 +121,9 @@ function AIGetSortedScoutingLocations(aiBrain, maxNum)
     local markers = AISortMarkersFromStartPos(aiBrain, markerList, maxNum or 1000)
     local retMarkers = {}
     local numMarkers = table.getn(markers)
-    local rand
+
     for i = 1, numMarkers do
-        rand = Random(1, numMarkers + 1 - i)
+        local rand = Random(1, numMarkers + 1 - i)
         table.insert(retMarkers, markers[rand])
         table.remove(markers, rand)
     end

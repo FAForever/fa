@@ -1180,7 +1180,7 @@ function Round(x, places)
     local result
     local shift
     if places then
-        shift = 10 ^ places
+        shift = math.pow(10, places)
         result = math.floor(x * shift + 0.5) / shift
         return result
     else
