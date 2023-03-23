@@ -42,7 +42,6 @@ FireCloudSml01 = {
 }
 
 FireCloudMed01 = {
-    EmtBpPath .. 'fire_cloud_06_emit.bp',
     EmtBpPath .. 'explosion_fire_sparks_01_emit.bp',
     EmtBpPath .. 'small_test_sonic.bp',
     EmtBpPath .. 'small_test_fire.bp',
