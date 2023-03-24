@@ -2331,7 +2331,6 @@ end
 ---@param start Vector                  # table representing starting location
 ---@param destination Vector            # table representing the destination location
 ---@param optThreatWeight any           # the importance of threat when choosing a path. High weight generates longer, safer paths.
----@param optMaxMarkerDist any          # the maximum distance away a platoon should look for a pathing marker
 ---@return boolean
 ---@return string
 ---@return table                        # a table of locations representing the safest path to get to the specified destination
