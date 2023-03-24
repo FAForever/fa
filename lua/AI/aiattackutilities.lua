@@ -2336,31 +2336,15 @@ end
 ---@return string
 ---@return table                        # a table of locations representing the safest path to get to the specified destination
 function PlatoonGenerateSafePathToNavMesh(aiBrain, platoonLayer, start, destination, optThreatWeight)
-    -- if we don't have markers for the platoonLayer, then we can't build a path.
+    -- This function generates a path using the Nav Mesh, the majority of the error and path complexity happens within that so
+    -- this comes across as a much simplified version of the original
     local NavUtils = import("/lua/sim/navutils.lua")
-    LOG('Requesting path generation for ')
-    LOG('Start '..repr(start))
-    LOG('Destination '..repr(destination))
-
     optThreatWeight = optThreatWeight or 1 -- lets figure out something we can do for this later.
-
-    --If we are within 100 units of the destination, don't bother pathing. (Sorian and Duncan AI)
     if VDist2Sq(start[1], start[3], destination[1], destination[3]) <= 225 and NavUtils.CanPathTo(platoonLayer, start, destination) then
         local pathDest = {destination}
         return pathDest
     end
     local path, head, distance = NavUtils.PathTo(platoonLayer, start, destination)
-    if head then
-        LOG('head '..repr(head))
-    else
-        LOG('No head')
-    end
-    if distance then
-        LOG('distance '..distance)
-    else
-        LOG('no distance')
-    end
-
     if path then
         return path, distance
     end
