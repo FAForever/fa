@@ -2386,10 +2386,10 @@ end
 ---@param aggro any
 ---@param pathDist any
 ---@return boolean
-ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
+ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro)
     local cmd = false
     local platoonUnits = platoon:GetPlatoonUnits()
-    local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, layer, platoon:GetPlatoonPosition(), dest, nil, nil, pathDist)
+    local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, layer, platoon:GetPlatoonPosition(), dest, nil, nil)
     if not path then
         if aggro == 'AttackMove' then
             cmd = platoon:AggressiveMoveToLocation(dest)
@@ -2436,7 +2436,7 @@ CzarBehaviorSorian = function(self)
                 IssueClearCommands(platoonUnits)
                 WaitTicks(5)
 
-                cmd = ExpPathToLocation(aiBrain, self, 'Air', targetUnit:GetPosition(), false, 62500)
+                cmd = ExpPathToLocation(aiBrain, self, 'Air', targetUnit:GetPosition(), false)
                 cmd = self:AttackTarget(targetUnit)
             else
                 IssueClearCommands(platoonUnits)
@@ -2487,7 +2487,7 @@ AhwassaBehaviorSorian = function(self)
         self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
         if targetLocation and targetLocation ~= oldTargetLocation then
             IssueClearCommands(platoonUnits)
-            cmd = ExpPathToLocation(aiBrain, self, 'Air', targetLocation, 'AttackDest', 62500)
+            cmd = ExpPathToLocation(aiBrain, self, 'Air', targetLocation, 'AttackDest')
             IssueAttack(platoonUnits, targetLocation)
             WaitSeconds(25)
         end
@@ -2518,7 +2518,7 @@ TickBehaviorSorian = function(self)
         self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
         if (targetLocation and targetLocation ~= oldTargetLocation) or not self:IsCommandsActive(cmd) then
             IssueClearCommands(platoonUnits)
-            cmd = ExpPathToLocation(aiBrain, self, 'Air', targetLocation, false, 62500)
+            cmd = ExpPathToLocation(aiBrain, self, 'Air', targetLocation, false)
             WaitSeconds(25)
         end
         WaitSeconds(1)

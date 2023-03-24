@@ -420,7 +420,7 @@ BuilderGroup {
             Builders[self.BuilderName].Running = true
             local x,z = aiBrain:GetArmyStartPos()
             local ex, ez = aiBrain:GetCurrentEnemy():GetArmyStartPos()
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Land', {x,0,z}, {ex,0,ez}, 10)
+            local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, 'Land', {x,0,z}, {ex,0,ez}, 10)
             if path then
                 for pathnum,waypoint in path do
                     local nextbase = (table.getn(aiBrain.TacticalBases) + 1)

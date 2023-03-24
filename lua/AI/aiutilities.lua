@@ -1873,7 +1873,7 @@ function UseTransports(units, transports, location, transportPlatoon)
         if location then
             -- Adding Surface Height, so the transporter get not confused, because the target is under the map (reduces unload time)
             location = {location[1], GetSurfaceHeight(location[1],location[3]), location[3]}
-            local safePath = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', transports[1]:GetPosition(), location, 200)
+            local safePath, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, 'Air', transports[1]:GetPosition(), location, 200)
             if safePath then
                 for _, p in safePath do
                     IssueMove(transports, p)
@@ -2012,7 +2012,7 @@ function ReturnTransportsToPool(units, move)
     local aiBrain = unit:GetAIBrain()
     local x, z = aiBrain:GetArmyStartPos()
     local position = RandomLocation(x, z)
-    local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', unit:GetPosition(), position, 200)
+    local safePath, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, 'Air', unit:GetPosition(), position, 200)
     for k, unit in units do
         if not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) then
             aiBrain:AssignUnitsToPlatoon('ArmyPool', {unit}, 'Scout', 'None')
@@ -2105,7 +2105,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
 
     -- If we're here, we haven't used transports and we can path to the destination
     if result then
-        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', pos, destination)
+        local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, 'Amphibious', pos, destination)
         if path then
             local pathSize = table.getn(path)
             -- Move to way points (but not to destination... leave that for the final command)
@@ -2489,7 +2489,7 @@ function EngineerMoveWithSafePathSorian(aiBrain, unit, destination)
 
     -- If we're here, we haven't used transports and we can path to the destination
     if result then
-        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', unit:GetPosition(), destination, 10)
+        local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, 'Amphibious', unit:GetPosition(), destination, 10)
         if path then
             local pathSize = table.getn(path)
             -- Move to way points (but not to destination... leave that for the final command)

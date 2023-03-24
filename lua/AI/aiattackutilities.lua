@@ -595,7 +595,7 @@ function AINavalPlanB(aiBrain, platoon)
             continue
         end
 
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), marker.Position, platoon.PlatoonData.NodeWeight or 10)
+        local path, reason, pathDistance = PlatoonGenerateSafePathToNavMesh(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), marker.Position, platoon.PlatoonData.NodeWeight or 10)
 
         if path then
             return path, reason
@@ -622,14 +622,14 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
     --end
 
     local oldPathSize = table.getn(platoon.LastAttackDestination)
-    local path, reason
+    local path, reason, pathDistance
 
     -- if we don't have an old path or our old destination and new destination are different
     if attackPos and (oldPathSize == 0 or attackPos[1] != platoon.LastAttackDestination[oldPathSize][1] or
     attackPos[3] != platoon.LastAttackDestination[oldPathSize][3]) then
 
         -- check if we can path to here safely... give a large threat weight to sort by threat first
-        path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
+        path, reason, pathDistance = PlatoonGenerateSafePathToNavMesh(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
 
         -- clear command queue
         platoon:Stop()
@@ -718,29 +718,27 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
 
         GetMostRestrictiveLayer(platoon)
         -- check if we can path to here safely... give a large threat weight to sort by threat first
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
+        local path, reason, pathDistance = PlatoonGenerateSafePathToNavMesh(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
 
         -- clear command queue
         platoon:Stop()
 
         local usedTransports = false
         local position = platoon:GetPlatoonPosition()
-        if (not path and reason == 'NoPath') or bNeedTransports then
+        if (not path and reason == 'Not reachable for this layer') or bNeedTransports then
             usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, true)
         -- Require transports over 500 away
-        elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 512*512 then
+        elseif pathDistance > 512 then
             usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, true)
         -- use if possible at 250
-        elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 256*256 then
+        elseif pathDistance > 256 then
             usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, false)
         end
 
         if not usedTransports then
             if not path then
-                if reason == 'NoStartNode' or reason == 'NoEndNode' then
                     --Couldn't find a valid pathing node. Just use shortest path.
-                    platoon:AggressiveMoveToLocation(attackPos)
-                end
+                platoon:AggressiveMoveToLocation(attackPos)
                 -- force reevaluation
                 platoon.LastAttackDestination = {attackPos}
             else
@@ -903,7 +901,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
         end
 
         -- path from transport drop off to end location
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, useGraph, transportLocation, destination, 200)
+        local path, reason, pathDistance = PlatoonGenerateSafePathToNavMesh(aiBrain, useGraph, transportLocation, destination, 200)
         -- use the transport!
         AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), transportLocation, platoon)
 
@@ -1093,7 +1091,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
         end
 
         -- path from transport drop off to end location
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, useGraph, transportLocation, destination, 200)
+        local path, reason, pathDistance = PlatoonGenerateSafePathToNavMesh(aiBrain, useGraph, transportLocation, destination, 200)
         -- use the transport!
         AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), transportLocation, platoon)
 
@@ -1918,7 +1916,7 @@ function AIPlatoonSquadAttackVectorSorian(aiBrain, platoon, bAggro)
 
         GetMostRestrictiveLayer(platoon)
         -- check if we can path to here safely... give a large threat weight to sort by threat first
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
+        local path, reason, pathDistance = PlatoonGenerateSafePathToNavMesh(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
 
         -- clear command queue
         platoon:Stop()
@@ -1935,22 +1933,19 @@ function AIPlatoonSquadAttackVectorSorian(aiBrain, platoon, bAggro)
         if homeBase and VDist2Sq(position[1], position[3], homeBase[1], homeBase[3]) < 100*100 then
             inBase = true
         end
-        if (not path and reason == 'NoPath') or bNeedTransports then
+        if (not path and reason == 'Not reachable for this layer') or bNeedTransports then
             usedTransports = SendPlatoonWithTransportsSorian(aiBrain, platoon, attackPos, true, false, true)
         -- Require transports over 512 away
-        elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 512*512 and inBase then
+        elseif pathDistance > 512 and inBase then
             usedTransports = SendPlatoonWithTransportsSorian(aiBrain, platoon, attackPos, true, false, false)
         -- use if possible at 256
-        elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 256*256 and inBase then
+        elseif pathDistance > 256 and inBase then
             usedTransports = SendPlatoonWithTransportsSorian(aiBrain, platoon, attackPos, false, false, false)
         end
 
         if not usedTransports then
             if not path then
-                if reason == 'NoStartNode' or reason == 'NoEndNode' then
-                    --Couldn't find a valid pathing node. Just use shortest path.
-                    platoon:AggressiveMoveToLocation(attackPos)
-                end
+                platoon:AggressiveMoveToLocation(attackPos)
                 -- force reevaluation
                 platoon.LastAttackDestination = {attackPos}
             else
@@ -2004,7 +1999,7 @@ function AIPlatoonNavalAttackVectorSorian(aiBrain, platoon)
     attackPos[3] != platoon.LastAttackDestination[oldPathSize][3] then
 
         -- check if we can path to here safely... give a large threat weight to sort by threat first
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
+        local path, reason, pathDistance = PlatoonGenerateSafePathToNavMesh(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
 
         -- clear command queue
         platoon:Stop()
@@ -2210,7 +2205,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
         end
 
         -- path from transport drop off to end location
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, useGraph, transportLocation, destination, 200)
+        local path, reason, pathDistance = PlatoonGenerateSafePathToNavMesh(aiBrain, useGraph, transportLocation, destination, 200)
         -- use the transport!
         AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), transportLocation, platoon)
 
@@ -2327,6 +2322,50 @@ function NavalAttackCheck(aiBrain)
         end
         aiBrain.IntelData.FrigateRaidMassMarkers = frigateRaidMarkers
     end
+end
+
+--- If there are pathing nodes available to this platoon's most restrictive movement type, then a path to the destination
+--- can be generated while avoiding other high threat areas along the way.
+---@param aiBrain AIBrain               # aiBrain to use
+---@param platoonLayer Platoon          # layer to use to generate safe path... e.g. 'Air', 'Land', etc.
+---@param start Vector                  # table representing starting location
+---@param destination Vector            # table representing the destination location
+---@param optThreatWeight any           # the importance of threat when choosing a path. High weight generates longer, safer paths.
+---@param optMaxMarkerDist any          # the maximum distance away a platoon should look for a pathing marker
+---@return boolean
+---@return string
+---@return table                        # a table of locations representing the safest path to get to the specified destination
+function PlatoonGenerateSafePathToNavMesh(aiBrain, platoonLayer, start, destination, optThreatWeight)
+    -- if we don't have markers for the platoonLayer, then we can't build a path.
+    local NavUtils = import("/lua/sim/navutils.lua")
+    LOG('Requesting path generation for ')
+    LOG('Start '..repr(start))
+    LOG('Destination '..repr(destination))
+
+    optThreatWeight = optThreatWeight or 1 -- lets figure out something we can do for this later.
+
+    --If we are within 100 units of the destination, don't bother pathing. (Sorian and Duncan AI)
+    if VDist2Sq(start[1], start[3], destination[1], destination[3]) <= 225 and NavUtils.CanPathTo(platoonLayer, start, destination) then
+        local pathDest = {destination}
+        return pathDest
+    end
+    local path, head, distance = NavUtils.PathTo(platoonLayer, start, destination)
+    if head then
+        LOG('head '..repr(head))
+    else
+        LOG('No head')
+    end
+    if distance then
+        LOG('distance '..distance)
+    else
+        LOG('no distance')
+    end
+
+    if path then
+        return path, distance
+    end
+
+    return nil, head
 end
 
 -- Deprecated functions / unused

@@ -634,7 +634,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             if bestBase and bestDefense < threshold then
-                local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
+                local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
 
                 IssueClearCommands(self:GetPlatoonUnits())
 
@@ -942,14 +942,13 @@ Platoon = Class(moho.platoon_methods) {
             self.LastMarker[2] = self.LastMarker[1]
             self.LastMarker[1] = bestMarker.position
             --LOG("GuardMarker: Attacking " .. bestMarker.Name)
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestMarker.position, 200)
-            local success, bestGoalPos = AIAttackUtils.CheckPlatoonPathingEx(self, bestMarker.position)
+            local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestMarker.position, 200)
             IssueClearCommands(self:GetPlatoonUnits())
             if path then
                 local position = self:GetPlatoonPosition()
-                if not success or VDist2(position[1], position[3], bestMarker.position[1], bestMarker.position[3]) > 512 then
+                if pathDistance > 512 then
                     usedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, true)
-                elseif VDist2(position[1], position[3], bestMarker.position[1], bestMarker.position[3]) > 256 then
+                elseif pathDistance > 256 then
                     usedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, false)
                 end
                 if not usedTransports then
@@ -962,7 +961,7 @@ Platoon = Class(moho.platoon_methods) {
                         end
                     end
                 end
-            elseif (not path and reason == 'NoPath') and self.MovementLayer ~= 'Water' then
+            elseif (not path and reason == 'Not reachable for this layer') and self.MovementLayer ~= 'Water' then
                 --LOG('Guardmarker requesting transports')
                 local foundTransport = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, true)
                 --DUNCAN - if we need a transport and we cant get one the disband
@@ -977,7 +976,7 @@ Platoon = Class(moho.platoon_methods) {
                 return
             end
 
-            if (not path or not success) and not usedTransports then
+            if (not path) and not usedTransports then
                 self:PlatoonDisband()
                 return
             end
@@ -1142,7 +1141,7 @@ Platoon = Class(moho.platoon_methods) {
             --Is there someplace we should scout?
             if targetData then
                 --Can we get there safely?
-                local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 400) --DUNCAN - Increase threatwieght from 100
+                local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 400) --DUNCAN - Increase threatwieght from 100
 
                 IssueClearCommands(self:GetPlatoonUnits())
 
@@ -2619,7 +2618,7 @@ Platoon = Class(moho.platoon_methods) {
             elseif not target and hadtarget then
                 local x,z = aiBrain:GetArmyStartPos()
                 local position = AIUtils.RandomLocation(x,z)
-                local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
+                local safePath, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
                 if safePath then
                     for _,p in safePath do
                         self:MoveToLocation(p, false)
@@ -2763,6 +2762,7 @@ Platoon = Class(moho.platoon_methods) {
     --- to wreck havoc on air units
     ---@param self Platoon
     CarrierAI = function(self)
+        
         local aiBrain = self:GetBrain()
         if not aiBrain then
             return
@@ -2783,11 +2783,11 @@ Platoon = Class(moho.platoon_methods) {
         if not self.LastAttackDestination then
             self.LastAttackDestination = {}
         end
+        local NavUtils = import("/lua/sim/navutils.lua")
 
         while aiBrain:PlatoonExists(self) do
             -- this table is sorted already from highest to lowest threat...
             local threatTable = aiBrain:GetThreatsAroundPosition(self:GetPlatoonPosition(), 16, true, 'Air')
-
             local attackPos = nil
             -- so go through until we find the first threat that's pathable
             for tidx,threat in threatTable do
@@ -2822,7 +2822,7 @@ Platoon = Class(moho.platoon_methods) {
             if attackPos and oldPathSize == 0 or attackPos[1] != self.LastAttackDestination[oldPathSize][1] or attackPos[3] != self.LastAttackDestination[oldPathSize][3] then
                 AIAttackUtils.GetMostRestrictiveLayer(self)
                 -- check if we can path to here safely... give a large threat weight to sort by threat first
-                local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), attackPos, self.PlatoonData.NodeWeight or 10)
+                local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), attackPos, self.PlatoonData.NodeWeight or 10)
 
                 -- clear command queue
                 self:Stop()
@@ -3274,7 +3274,7 @@ Platoon = Class(moho.platoon_methods) {
             else
                 returnPos = bestBase.Position
             end
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), returnPos, 200)
+            local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), returnPos, 200)
             -- remove any formation settings to ensure a quick return to base.
             self:SetPlatoonFormationOverride('NoFormation')
             self:Stop()
@@ -4356,7 +4356,7 @@ Platoon = Class(moho.platoon_methods) {
             elseif not target and hadtarget then
                 local x,z = aiBrain:GetArmyStartPos()
                 local position = AIUtils.RandomLocation(x,z)
-                local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
+                local safePath, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
                 if safePath then
                     for _,p in safePath do
                         self:MoveToLocation(p, false)
@@ -4406,7 +4406,7 @@ Platoon = Class(moho.platoon_methods) {
                     end
                 end
                 if bestTarget then
-                    local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', self:GetPlatoonPosition(), bestTarget, 200)
+                    local safePath, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, 'Air', self:GetPlatoonPosition(), bestTarget, 200)
                     if safePath then
                         local pathSize = table.getn(path)
                         for wpidx,waypointPath in path do
@@ -4636,14 +4636,14 @@ Platoon = Class(moho.platoon_methods) {
             self.LastMarker[2] = self.LastMarker[1]
             self.LastMarker[1] = bestMarker.Position
             --LOG("GuardMarker: Attacking " .. bestMarker.Name)
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestMarker.Position, 200)
+            local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestMarker.Position, 200)
             --local success, bestGoalPos = AIAttackUtils.CheckPlatoonPathingEx(self, bestMarker.Position)
             IssueClearCommands(self:GetPlatoonUnits())
             if path then
                 local position = self:GetPlatoonPosition()
-                if VDist2(position[1], position[3], bestMarker.Position[1], bestMarker.Position[3]) > 512 then
+                if pathDistance > 512 then
                     usedTransports = AIAttackUtils.SendPlatoonWithTransportsSorian(aiBrain, self, bestMarker.Position, true, false, false)
-                elseif VDist2(position[1], position[3], bestMarker.Position[1], bestMarker.Position[3]) > 256 then
+                elseif pathDistance > 256 then
                     usedTransports = AIAttackUtils.SendPlatoonWithTransportsSorian(aiBrain, self, bestMarker.Position, false, false, false)
                 end
                 if not usedTransports then
@@ -4656,7 +4656,7 @@ Platoon = Class(moho.platoon_methods) {
                         end
                     end
                 end
-            elseif (not path and reason == 'NoPath') then
+            elseif (not path and reason == 'Not reachable for this layer') then
                 usedTransports = AIAttackUtils.SendPlatoonWithTransportsSorian(aiBrain, self, bestMarker.Position, true, false, true)
             else
                 self:PlatoonDisband()
@@ -5245,7 +5245,7 @@ Platoon = Class(moho.platoon_methods) {
             --Is there someplace we should scout?
             if targetData then
                 --Can we get there safely?
-                local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 100)
+                local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 100)
 
                 IssueClearCommands(self:GetPlatoonUnits())
 
@@ -5842,7 +5842,7 @@ Platoon = Class(moho.platoon_methods) {
 
         if bestBase then
             AIAttackUtils.GetMostRestrictiveLayer(self)
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
+            local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
             IssueClearCommands(self:GetPlatoonUnits())
 
             if path then
@@ -5936,7 +5936,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
                 if target and (target != oldTarget or movingToScout) then
                     oldTarget = target
-                    local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), target:GetPosition(), 10)
+                    local path, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), target:GetPosition(), 10)
                     self:Stop()
                     if not path then
                         if reason == 'NoStartNode' or reason == 'NoEndNode' then
@@ -5968,7 +5968,7 @@ Platoon = Class(moho.platoon_methods) {
                     else
                         local x,z = aiBrain:GetArmyStartPos()
                         local position = AIUtils.RandomLocation(x,z)
-                        local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
+                        local safePath, reason, pathDistance = AIAttackUtils.PlatoonGenerateSafePathToNavMesh(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
                         if safePath then
                             for _,p in safePath do
                                 self:MoveToLocation(p, false)
