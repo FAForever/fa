@@ -118,6 +118,8 @@ local TableGetn = table.getn
 ---@field BaseManagers table<string, BaseManager>
 ---@field EconomyMonitorThread thread?
 ---@field EconomyOverTimeCurrent EconomyOverTime
+---@field Jammers table<integer, Unit>
+---@field JammerResetTime number
 AIBrain = Class(moho.aibrain_methods) {
     -- The state of the brain in the match
     Status = 'InProgress',
@@ -353,21 +355,18 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyExcessRequired = 0
         self.EnergyExcessConverted = 0
 
-        self.EnergyExcessUnitsEnabled = {}
-        setmetatable(self.EnergyExcessUnitsEnabled, { __mode = 'v' })
-        self.EnergyExcessUnitsDisabled = {}
-        setmetatable(self.EnergyExcessUnitsDisabled, { __mode = 'v' })
+        self.EnergyExcessUnitsEnabled = setmetatable({}, { __mode = 'v' })
+        self.EnergyExcessUnitsDisabled = setmetatable({}, { __mode = 'v' })
 
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
 
-        self.Jammers = {}
-        setmetatable(self.Jammers, { __mode = 'v' })
+        self.Jammers = setmetatable({}, { __mode = 'v' })
 
         self.JammerResetTime = 15
 
-        ForkThread(self.JammingToggleThread, self)
+       ForkThread(self.JammingToggleThread, self)
 
         -- populate the possible HQs per faction, layer and tech
         self.HQs = {}
@@ -550,17 +549,6 @@ AIBrain = Class(moho.aibrain_methods) {
     --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
     ---@param self AIBrain
     ToggleEnergyExcessUnitsThread = function(self)
-
-        -- allow for protected calls without closures
-        ---@param unitToProcess MassFabricationUnit
-        local function ProtectedOnExcessEnergy(unitToProcess)
-            unitToProcess:OnExcessEnergy()
-        end
-
-        ---@param unitToProcess MassFabricationUnit
-        local function ProtectedOnNoExcessEnergy(unitToProcess)
-            unitToProcess:OnNoExcessEnergy()
-        end
 
         local fabricatorParameters = import("/lua/shared/fabricatorbehaviorparams.lua")
         local disableRatio = fabricatorParameters.DisableRatio
@@ -1495,7 +1483,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     ---@param string string
-    ---@param sound SoundHandle
+    ---@param sound? SoundHandle
     PlayVOSound = function(self, string, sound)
         if not self.VOTable then self.VOTable = {} end
 

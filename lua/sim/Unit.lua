@@ -100,6 +100,8 @@ local cUnit = moho.unit_methods
 ---@field UnitBeingBuilt Unit?
 ---@field SoundEntity? Unit | Entity
 ---@field Dead boolean
+---@field CanTakeDamage boolean
+---@field CanBeKilled boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     IsUnit = true,
