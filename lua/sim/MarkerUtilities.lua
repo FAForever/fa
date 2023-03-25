@@ -24,7 +24,7 @@
 local StringSplit = import("/lua/system/utils.lua").StringSplit
 local TableDeepCopy = table.deepcopy
 
----@alias MarkerType 'Mass' | 'Hydrocarbon' | 'Spawn' | 'Air Path Node' | 'Land Path Node' | 'Water Path Node' | 'Ampibious Path Node' | 'Transport Marker' | 'Naval Area' | 'Naval Link' | 'Rally Point' | 'Large Expansion Area' | 'Expansion Area' | 'Protected Experimental Construction'
+---@alias MarkerType 'Mass' | 'Hydrocarbon' | 'Spawn' | 'Start Location' | 'Air Path Node' | 'Land Path Node' | 'Water Path Node' | 'Ampibious Path Node' | 'Transport Marker' | 'Naval Area' | 'Naval Link' | 'Rally Point' | 'Large Expansion Area' | 'Expansion Area' | 'Protected Experimental Construction'
 
 ---@class MarkerData
 ---@field size number
@@ -72,6 +72,17 @@ local MarkerCache = {
 --- Represents a cache of chains to prevent re-populating tables
 local ChainCache = {}
 
+--- Converts the marker type to add support for legacy names
+---@param type MarkerType
+---@return MarkerType
+local function MapMarkerType(type)
+    if type == 'Start Location' then
+        return 'Spawn'
+    end
+
+    return type
+end
+
 ---@return MarkerData[]
 function GetAllMarkers()
     return AllMarkers
@@ -84,9 +95,11 @@ function GetMarker(name)
     return AllMarkers[name]
 end
 
+---@param type MarkerType
 ---@return MarkerData[]
 ---@return number
 function GetMarkersByType(type)
+    type = MapMarkerType(type)
 
     -- check if it is cached and return that
     local cache = MarkerCache[type]
@@ -124,6 +137,8 @@ end
 ---@param type MarkerType
 ---@param markers any
 function OverwriteMarkerByType(type, markers)
+    type = MapMarkerType(type)
+
     local ms = {}
     local n = 1
 
@@ -143,6 +158,7 @@ end
 -- existing references.
 ---@param type MarkerType The type to flush.
 function FlushMarkerCacheByType(type)
+    type = MapMarkerType(type)
 
     -- give developer a warning, you can't do this
     if type == "Mass" or type == "Hydrocarbon" or type == "Spawn" then
@@ -210,11 +226,11 @@ end
 -- chain does not exist. This is a deep copy and involves
 -- a lot of additional allocations. Do not use this unless
 -- you strictly need to.
----@param type MarkerChain The type of marker to retrieve.
+---@param name MarkerChain The name of chain to retrieve.
 ---@return MarkerData[]
 ---@return number
-function GetMarkersInChainDeep(type)
-    local markers, count = GetMarkersInChain(type)
+function GetMarkersInChainDeep(name)
+    local markers, count = GetMarkersInChain(name)
     return TableDeepCopy(markers), count
 end
 
@@ -456,7 +472,7 @@ function Setup()
             MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
         end
     end
-    
+
     -- hook to catch created resources
     local OldCreateResourceDeposit = _G.CreateResourceDeposit
     _G.CreateResourceDeposit = function(type, x, y, z, size)
