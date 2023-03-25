@@ -1720,7 +1720,7 @@ end
 ---@param units Unit[]
 ---@param transports AirUnit[]
 ---@param location Vector
----@param transportPlatoon Platoon
+---@param transportPlatoon? Platoon
 ---@return boolean
 function UseTransports(units, transports, location, transportPlatoon)
     local aiBrain

@@ -188,7 +188,7 @@ end
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector
----@param options NavPathToOptions
+---@param options? NavPathToOptions
 ---@return Vector[]?            # List of positions
 ---@return (string | number)?   # Error message, or the number of positions
 ---@return number?              # Length of path

@@ -612,7 +612,6 @@ BaseManager = ClassSimple {
     --- Defines the radius of the base manager, which is used to search for factories and engineers
     ---@param self BaseManager      # An instance of the BaseManager class
     ---@param rad number            # New radius of the base manager
-    ---@return nil
     SetRadius = function(self, rad)
         self.Radius = rad
     end,
@@ -623,14 +622,14 @@ BaseManager = ClassSimple {
 
     --- Add to the engineer count, useful when gifting the base engineers.
     ---@param self BaseManager  # An instance of the BaseManager class
-    ---@param num integer       # Amount to add to the engineer count.
+    ---@param num? integer       # Amount to add to the engineer count.
     AddCurrentEngineer = function(self, num)
         self.CurrentEngineerCount = self.CurrentEngineerCount + (num or 1)
     end,
 
     --- Subtract from the engineer count
     ---@param self BaseManager  # An instance of the BaseManager class
-    ---@param num integer       # Amount to subtract from the engineer count.
+    ---@param num? integer       # Amount to subtract from the engineer count.
     SubtractCurrentEngineer = function(self, num)
         self.CurrentEngineerCount = self.CurrentEngineerCount - (num or 1)
     end,
@@ -1124,7 +1123,7 @@ BaseManager = ClassSimple {
     ---@param self BaseManager
     ---@param groupName string
     ---@param uncapturable boolean
-    ---@param balance number
+    ---@param balance? boolean
     SpawnGroup = function(self, groupName, uncapturable, balance)
         local unitGroup = ScenarioUtils.CreateArmyGroup(self.AIBrain.Name, groupName, nil, balance)
 
@@ -1160,8 +1159,8 @@ BaseManager = ClassSimple {
 
     --- Sets Engineer Count, spawns in all groups that have priority greater than zero
     ---@param self BaseManager
-    ---@param engineerNumber number|table
-    ---@param uncapturable boolean
+    ---@param engineerNumber integer|table
+    ---@param uncapturable? boolean
     StartNonZeroBase = function(self, engineerNumber, uncapturable)
         if not engineerNumber and not ScenarioInfo.VarTable[self.BaseName .. '_EngineerNumber'] then
             self:SetEngineerCount(0)
@@ -1411,7 +1410,7 @@ BaseManager = ClassSimple {
     -- Enable/Disable functionality of base parts through functions
     ---@param self BaseManager
     ---@param actType string
-    ---@param val number
+    ---@param val boolean
     SetActive = function(self, actType, val)
         if self.ActivationFunctions[actType .. 'Active'] then
             self.ActivationFunctions[actType .. 'Active'](self, val)
@@ -1517,7 +1516,7 @@ BaseManager = ClassSimple {
 
     -- Disable all buildings
     ---@param self BaseManager
-    ---@param val number
+    ---@param val boolean
     SetBuildAllStructures = function(self, val)
         for k, v in self.BuildFunctions do
             if k ~= 'BuildEngineers' then

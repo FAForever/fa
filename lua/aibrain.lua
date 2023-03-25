@@ -55,7 +55,7 @@ local TableGetn = table.getn
 ---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
 ---@alias BrainType "AI" | "Human"
 ---@alias ReconTypes 'Radar' | 'Sonar' | 'Omni' | 'LOSNow'
----@alias PlatoonType 'Air' | 'Land' | 'Sea'
+---@alias PlatoonType 'Air' | 'Land' | 'Sea' | "Gate" | "Any"
 ---@alias AllianceStatus 'Ally' | 'Enemy' | 'Neutral'
 
 ---@class AIBrain: moho.aibrain_methods
@@ -105,6 +105,7 @@ local TableGetn = table.getn
 ---@field UnitStats table<EntityId, table<string, number>>
 ---@field VeterancyTriggerList table
 ---@field GridReclaim? AIGridReclaim
+---@field BaseManagers table<string, BaseManager>
 AIBrain = Class(moho.aibrain_methods) {
     -- The state of the brain in the match
     Status = 'InProgress',

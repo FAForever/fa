@@ -872,7 +872,7 @@ end
 ---@param platoonList Platoon[]
 ---@param currPlatoon Platoon
 ---@param treeResult table
----@param balance number
+---@param balance? boolean
 ---@return nil|Platoon
 ---@return nil|Unit[]
 ---@return nil|table
@@ -1002,8 +1002,8 @@ end
 ---Creates the specified group in game.
 ---@param strArmy string
 ---@param strGroup string
----@param wreckage Wreckage
----@param balance number
+---@param wreckage? boolean
+---@param balance? boolean
 ---@return Unit[]|nil
 ---@return table|nil
 ---@return Platoon[]|nil
@@ -1068,9 +1068,9 @@ end
 ---@param strArmy string
 ---@param strGroup string
 ---@param formation any
----@param tblNode table
----@param platoon Platoon
----@param balance any
+---@param tblNode? table
+---@param platoon? Platoon
+---@param balance? boolean
 ---@return Platoon|nil
 function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon, balance)
     if ScenarioInfo.LoadBalance.Enabled then
