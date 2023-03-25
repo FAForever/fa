@@ -762,6 +762,14 @@ function PreModBlueprints(all_bps)
             }
         end
 
+        if bp.Intel.VisionRadius then
+            bp.Intel.VisionRadius = math.floor(1.2*bp.Intel.VisionRadius)
+        end
+
+        if bp.Intel.RadarRadius then
+            bp.Intel.RadarRadius = math.floor(1.2*bp.Intel.RadarRadius)
+        end
+
         -- Synchronize hashed categories with actual categories
         bp.Categories = table.unhash(bp.CategoriesHash)
 
