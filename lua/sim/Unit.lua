@@ -4138,20 +4138,38 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
 
-        local bp = self.Blueprint.Economy
+        local bp = self.Blueprint
+        local teleDelay = bp.General.TeleportDelay
+        local bpEco = bp.Economy
         local energyCost, time
-        if bp then
-            local mass = (bp.TeleportMassCost or bp.BuildCostMass or 1) * (bp.TeleportMassMod or 0.01)
-            local energy = (bp.TeleportEnergyCost or bp.BuildCostEnergy or 1) * (bp.TeleportEnergyMod or 0.01)
+        
+        if bpEco then
+            local mass = (bpEco.TeleportMassCost or bpEco.BuildCostMass or 1) * (bpEco.TeleportMassMod or 0.01)
+            local energy = (bpEco.TeleportEnergyCost or bpEco.BuildCostEnergy or 1) * (bpEco.TeleportEnergyMod or 0.01)
             energyCost = mass + energy
-            time = energyCost * (bp.TeleportTimeMod or 0.01)
+            time = energyCost * (bpEco.TeleportTimeMod or 0.01)
         end
 
-        self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+        if teleDelay then
+            energyCostMod = (time + teleDelay) / time
+            time = time + teleDelay
+            energyCost = energyCost * energyCostMod
 
-        -- Create teleport charge effect
-        self:PlayTeleportChargeEffects(location, orientation)
-        WaitFor(self.TeleportDrain)
+            self.TeleportDestChargeBag = nil
+            self.TeleportCybranSphere = nil  -- this fixes some "...Game object has been destroyed" bugs in EffectUtilities.lua:TeleportChargingProgress
+
+            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+
+            -- Create teleport charge effect + exit animation delay
+            self:PlayTeleportChargeEffects(location, orientation, teleDelay)
+            WaitFor(self.TeleportDrain)
+        else
+            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+
+            -- Create teleport charge effect
+            self:PlayTeleportChargeEffects(location, orientation)
+            WaitFor(self.TeleportDrain)
+        end
 
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)
@@ -4166,10 +4184,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if self:IsUnitState('Teleporting') and self:TestCommandCaps('RULEUCC_Teleport') then
             Warp(self, location, orientation)
             self:PlayTeleportInEffects()
-        else 
+        else
             IssueClearCommands({self})
         end
-        
+
         self:SetWorkProgress(0.0)
         self:CleanupRemainingTeleportChargeEffects()
 

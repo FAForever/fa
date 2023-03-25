@@ -9,9 +9,10 @@
 
 local SShieldHoverLandUnit = import("/lua/seraphimunits.lua").SShieldHoverLandUnit
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
----@class XSL0307 : SShieldHoverLandUnit
-XSL0307 = ClassUnit(SShieldHoverLandUnit) {
+---@class XSL0307 : SShieldHoverLandUnit, ShieldEffectsComponent
+XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
     
     Weapons = {        
         TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
@@ -21,45 +22,42 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit) {
         '/effects/emitters/aeon_shield_generator_mobile_01_emit.bp',
     },
     
+    ---@param self XSL0307
+    OnCreate = function(self) -- Are these missng on purpose?
+        SShieldHoverLandUnit.OnCreate(self)
+        ShieldEffectsComponent.OnCreate(self)
+    end,
+
+    ---@param self XSL0307
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self,builder,layer)
         SShieldHoverLandUnit.OnStopBeingBuilt(self,builder,layer)
-        self.ShieldEffectsBag = {}
         
         self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
         self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
         self.PointerEnabled = true --a flag to let our thread know whether we should turn on our pointer.
     end,
     
+    ---@param self XSL0307
     OnShieldEnabled = function(self)
         SShieldHoverLandUnit.OnShieldEnabled(self)
-                
-        if self.ShieldEffectsBag then
-            for k, v in self.ShieldEffectsBag do
-                v:Destroy()
-            end
-            self.ShieldEffectsBag = {}
-        end
-        for k, v in self.ShieldEffects do
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter( self, 0, self.Army, v ) )
-        end
+        ShieldEffectsComponent.OnShieldEnabled(self)
     end,
 
+    ---@param self XSL0307
     OnShieldDisabled = function(self)
         SShieldHoverLandUnit.OnShieldDisabled(self)
-         
-        if self.ShieldEffectsBag then
-            for k, v in self.ShieldEffectsBag do
-                v:Destroy()
-            end
-            self.ShieldEffectsBag = {}
-        end
+        ShieldEffectsComponent.OnShieldDisabled(self)
     end,
 
+    ---@param self XSL0307
     DisablePointer = function(self)
         self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
         self.PointerRestartThread = self:ForkThread( self.PointerRestart )
     end,
     
+    ---@param self XSL0307
     PointerRestart = function(self)
     --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
         while self.PointerEnabled == false do
@@ -77,6 +75,7 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit) {
         end
     end,
     
+    ---@param self XSL0307
     OnLayerChange = function(self, new, old)
         SShieldHoverLandUnit.OnLayerChange(self, new, old)
         

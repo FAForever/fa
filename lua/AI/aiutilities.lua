@@ -121,8 +121,9 @@ function AIGetSortedScoutingLocations(aiBrain, maxNum)
     local markers = AISortMarkersFromStartPos(aiBrain, markerList, maxNum or 1000)
     local retMarkers = {}
     local numMarkers = table.getn(markers)
+
     for i = 1, numMarkers do
-        rand = Random(1, numMarkers + 1 - i)
+        local rand = Random(1, numMarkers + 1 - i)
         table.insert(retMarkers, markers[rand])
         table.remove(markers, rand)
     end
@@ -1358,7 +1359,7 @@ function GetNearestPathingPoint(position)
     end
     local x = math.floor(position[1] / 8)
     local z = math.floor(position[3] / 8)
-    retPos = {(x * 8) , 0,  (z * 8)}
+    local retPos = {(x * 8) , 0,  (z * 8)}
     if retPos[1] == 0 then
         retPos[1] = 1
     elseif retPos[1] == ScenarioInfo.size[1] then
@@ -2580,6 +2581,7 @@ function AIFindPingTargetInRangeSorian(aiBrain, platoon, squad, maxRange, atkPri
             end
             if retUnit and targetShields > 0 then
                 local platoonUnits = platoon:GetPlatoonUnits()
+                local unit
                 for _, w in platoonUnits do
                     if not w.Dead then
                         unit = w
@@ -2629,6 +2631,7 @@ function AIFindAirAttackTargetInRangeSorian(aiBrain, platoon, squad, atkPri, pos
             end
         end
         if retUnit and targetShields > 0 then
+            local unit
             local platoonUnits = platoon:GetPlatoonUnits()
             for _, v in platoonUnits do
                 if not v.Dead then
@@ -2757,6 +2760,7 @@ function AIFindBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRange, atkPr
             end
         end
         if retUnit and targetShields > 0 then
+            local unit
             local platoonUnits = platoon:GetPlatoonUnits()
             for _, w in platoonUnits do
                 if not w.Dead then
@@ -2809,6 +2813,7 @@ function AIFindUndefendedBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRa
             end
         end
         if retUnit and targetShields > 0 then
+            local unit
             local platoonUnits = platoon:GetPlatoonUnits()
             for _, w in platoonUnits do
                 if not w.Dead then
