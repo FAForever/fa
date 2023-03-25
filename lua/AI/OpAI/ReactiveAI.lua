@@ -46,9 +46,9 @@ TrackingCategories = {
 ---@class ReactiveAI : OpAI
 ReactiveAI = Class(OpAI) {
 
-    ---@param self OpAI
+    ---@param self ReactiveAI
     ---@param brain AIBrain
-    ---@param location Vector
+    ---@param location Marker
     ---@param triggeringEventType any
     ---@param reactionType any
     ---@param name string
@@ -179,7 +179,7 @@ ReactiveAI = Class(OpAI) {
         -- End of AirRetaliation block
     },
 
-    ---@param self OpAI
+    ---@param self ReactiveAI
     ---@param builderData any
     ---@param typeData any
     ---@param builderType any
@@ -188,7 +188,7 @@ ReactiveAI = Class(OpAI) {
     GetBuilderData = function( self, builderData, typeData, builderType, triggeringEventType, reactionType )
     end,
 
-    ---@param self OpAI
+    ---@param self ReactiveAI
     ---@param triggeringEventType any
     ---@param reactionType any
     ---@return any
@@ -207,13 +207,14 @@ ReactiveAI = Class(OpAI) {
 }
 
 ---@param brain AIBrain
----@param location Vector
+---@param location Marker
 ---@param triggeringEventType any
 ---@param reactionType any
 ---@param name string
 ---@param data any
----@return any
+---@return ReactiveAI
 function CreateReactiveAI(brain, location, triggeringEventType, reactionType, name, data)
+    ---@type ReactiveAI
     local reactAI = ReactiveAI()
     reactAI:Create(brain, location, triggeringEventType, reactionType, name, data)
     return reactAI

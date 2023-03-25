@@ -917,7 +917,7 @@ BaseManager = ClassSimple {
 
     --- Returns all factories working at a base manager
     ---@param self BaseManager
-    ---@param category EntityCategory
+    ---@param category? EntityCategory
     ---@return any
     GetAllBaseFactories = function(self, category)
         if not category then
@@ -1122,7 +1122,7 @@ BaseManager = ClassSimple {
     --- Spawns a group, tracks number of times it has been built, gives nuke and anti-nukes ammo
     ---@param self BaseManager
     ---@param groupName string
-    ---@param uncapturable boolean
+    ---@param uncapturable? boolean
     ---@param balance? boolean
     SpawnGroup = function(self, groupName, uncapturable, balance)
         local unitGroup = ScenarioUtils.CreateArmyGroup(self.AIBrain.Name, groupName, nil, balance)
@@ -2028,7 +2028,7 @@ BaseManager = ClassSimple {
 
     ---@param self BaseManager
     ---@param techLevel number
-    ---@param platoonSize number
+    ---@param platoonSize? number
     ---@return any
     CreateEngineerPlatoonTemplate = function(self, techLevel, platoonSize)
         local faction = self.AIBrain:GetFactionIndex()

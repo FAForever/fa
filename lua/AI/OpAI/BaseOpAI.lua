@@ -736,7 +736,7 @@ OpAI = ClassSimple {
                 error('*OpAI ERROR: No OpAI Global named: '..self.BuilderType, 2)
             end
             for k,v in builders do
-                local startCheck = false
+                local startCheck
                 if string.sub(k, 1, 10) == 'OSB_Child_' then
                     startCheck = 11
                 end
