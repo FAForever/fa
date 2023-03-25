@@ -1389,7 +1389,7 @@ function UnfinishedUnits(aiBrain, locationType, category)
     end
     local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     for num, unit in unfinished do
-        donePercent = unit:GetFractionComplete()
+        local donePercent = unit:GetFractionComplete()
         if donePercent < 1 and GetGuards(aiBrain, unit) < 1 then
             return true
         end
