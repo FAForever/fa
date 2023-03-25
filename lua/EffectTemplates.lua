@@ -249,8 +249,10 @@ DustDebrisLand01 = {
     EmtBpPath .. 'destruction_explosion_debris_05_emit.bp',
 }
 GenericDebrisLandImpact01 = {
-    EmtBpPath .. 'dirtchunks_01_emit.bp',
-    EmtBpPath .. 'dust_cloud_05_emit.bp',
+    EmtBpPath .. 'dust_cloud_02_emit.bp',
+    EmtBpPath .. 'dust_cloud_04_emit.bp',
+    EmtBpPath .. 'destruction_explosion_debris_04_emit.bp',
+    EmtBpPath .. 'destruction_explosion_debris_05_emit.bp',
 }
 GenericDebrisTrails01 = {
     EmtBpPath .. 'destruction_explosion_debris_trail_01_emit.bp',

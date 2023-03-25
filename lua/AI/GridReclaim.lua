@@ -1,23 +1,50 @@
-
 local Grid = import("/lua/ai/grid.lua").Grid
 
-local Debug = true
-function SetDebug(value)
-    Debug = value
+local TableInsert = table.insert
+
+local WeakValue = { __mode = 'v' }
+
+local Debug = false
+function EnableDebugging()
+    if ScenarioInfo.GameHasAIs or CheatsEnabled() then
+        Debug = true
+    end
 end
+
+function DisableDebugging()
+    if ScenarioInfo.GameHasAIs or CheatsEnabled() then
+        Debug = false
+    end
+end
+
+---@type GridReclaimUIDebugCell
+local DebugCellData = {
+    ReclaimCount = -1,
+    TotalEnergy = -1,
+    TotalMass = -1,
+    X = -1,
+    Z = -1,
+}
+
+---@type GridReclaimUIDebugUpdate
+local DebugUpdateData = {
+    Processed = -1,
+    Time = -1,
+    Updates = -1,
+}
 
 ---@class AIGridReclaimCell : AIGridCell
 ---@field TotalMass number
 ---@field TotalEnergy number
----@field TotalTime number
 ---@field ReclaimCount number
 ---@field Reclaim table<EntityId, Prop>
 
 ---@class AIGridReclaim : AIGrid
 ---@field Cells AIGridReclaimCell[][]
 ---@field UpdateList table<string, AIGridReclaimCell>
+---@field OrderedCells AIGridReclaimCell[]
 ---@field Brains table<number, AIBrain>
-GridReclaim = Class (Grid) {
+GridReclaim = Class(Grid) {
 
     ---@param self AIGridReclaim
     __init = function(self)
@@ -25,20 +52,23 @@ GridReclaim = Class (Grid) {
 
         local cellCount = self.CellCount
         local cells = self.Cells
+        local orderedCells = {}
 
         for k = 1, cellCount do
             for l = 1, cellCount do
                 local cell = cells[k][l]
                 cell.TotalMass = 0
                 cell.TotalEnergy = 0
-                cell.TotalTime = 0
                 cell.ReclaimCount = 0
-                cell.Reclaim = { }
+                cell.Reclaim = setmetatable({}, WeakValue)
+
+                TableInsert(orderedCells, cell)
             end
         end
 
-        self.UpdateList = { }
-        self.Brains = { }
+        self.OrderedCells = orderedCells
+        self.UpdateList = {}
+        self.Brains = {}
 
         self:Update()
         self:DebugUpdate()
@@ -53,45 +83,87 @@ GridReclaim = Class (Grid) {
     end,
 
     ---@param self AIGridReclaim
+    ---@param cell AIGridReclaimCell
+    UpdateCell = function(self, cell)
+        local count = 0
+        local totalMass = 0
+        local totalEnergy = 0
+
+        for id, reclaim in cell.Reclaim do
+            count = count + 1
+            local fraction = reclaim.ReclaimLeft or 0
+            totalMass = totalMass + fraction * (reclaim.MaxMassReclaim or 0)
+            totalEnergy = totalEnergy + fraction * (reclaim.MaxEnergyReclaim or 0)
+        end
+
+        cell.TotalMass = totalMass
+        cell.TotalEnergy = totalEnergy
+        cell.ReclaimCount = count
+
+        if Debug then
+            DebugUpdateData.Processed = DebugUpdateData.Processed + cell.ReclaimCount
+            DebugUpdateData.Updates = DebugUpdateData.Updates + 1
+            self:DebugCellUpdate(cell.X, cell.Z)
+        end
+    end,
+
+    ---@param self AIGridReclaim
+    UpdateCells = function(self, limit)
+        local updates = 0
+        for id, cell in self.UpdateList do
+            -- only update up to 8 cells
+            updates = updates + 1
+            if updates > limit then
+                break
+            end
+
+            self.UpdateList[id] = nil
+            self:UpdateCell(cell)
+
+            -- inform ai brains of changes
+            for k, brain in self.Brains do
+                if brain.OnReclaimUpdate then
+                    brain:OnReclaimUpdate(self, cell)
+                end
+            end
+        end
+
+        -- sort the cells
+        if updates > 0 then
+            table.sort(
+                self.OrderedCells,
+
+                ---@param a AIGridReclaimCell
+                ---@param b AIGridReclaimCell
+                ---@return boolean
+                function(a, b)
+                    return a.TotalMass > b.TotalMass
+                end
+            )
+        end
+    end,
+
+    ---@param self AIGridReclaim
     UpdateThread = function(self)
         while true do
             WaitTicks(6)
 
-            local start = GetSystemTimeSecondsOnlyForProfileUse()
-            -- update cells
-            for id, cell in self.UpdateList do
-                self.UpdateList[id] = nil
+            local start
+            if Debug then
+                start = GetSystemTimeSecondsOnlyForProfileUse()
 
-                local count = 0
-                local totalMass = 0
-                local totalEnergy = 0
-                local totalTime = 0
-
-                for id, reclaim in cell.Reclaim do
-                    count = count + 1
-                    local fraction = reclaim.ReclaimLeft or 0
-                    totalMass = totalMass + fraction * (reclaim.MaxMassReclaim or 0)
-                    totalEnergy = totalEnergy + fraction * (reclaim.MaxEnergyReclaim or 0)
-                    totalTime = totalTime + fraction * (reclaim.TimeReclaim or 0)
-                end
-
-                cell.TotalMass = totalMass
-                cell.TotalEnergy = totalEnergy
-                cell.TotalTime = totalTime
-                cell.ReclaimCount = count
-
-                -- inform ai brains of changes
-                for k, brain in self.Brains do
-                    if brain.OnReclaimUpdate then
-                        brain:OnReclaimUpdate(self, cell)
-                    end
-                end
-
-                self:DebugCellUpdate(cell.X, cell.Z)
+                -- reset accumulative fields
+                DebugUpdateData.Processed = 0
+                DebugUpdateData.Updates = 0
             end
 
-            local time = GetSystemTimeSecondsOnlyForProfileUse() - start
-            LOG(time)
+            self:UpdateCells(8)
+
+            if Debug then
+                -- DebugUpdateData.Memory = import("/lua/system/utils.lua").ToBytes(self, { Reclaim = true }) / (1024 * 1024)
+                DebugUpdateData.Time = GetSystemTimeSecondsOnlyForProfileUse() - start
+                Sync.GridReclaimUIDebugUpdate = DebugUpdateData
+            end
         end
     end,
 
@@ -172,12 +244,23 @@ GridReclaim = Class (Grid) {
                     self:DrawCell(bx, bz, math.log(totalEnergy) - 1, 'B4C400')
                 end
 
-                local totalTime = cell.TotalTime
-                if totalTime and totalTime > 1 then
-                    self:DrawCell(bx, bz, math.log(totalTime) - 1, '7F7F7D')
-                end
-
                 self:DrawCell(bx, bz, 0, 'ffffff')
+
+                local px, pz = self:ToWorldSpace(bx, bz)
+                DrawCircle({px, GetSurfaceHeight(px, pz), pz}, 4, '000000')
+
+                DebugCellData.ReclaimCount = cell.ReclaimCount
+                DebugCellData.TotalEnergy = cell.TotalEnergy
+                DebugCellData.TotalMass = cell.TotalMass
+                DebugCellData.X = cell.X
+                DebugCellData.Z = cell.Z
+                Sync.GridReclaimUIDebugCell = DebugCellData
+
+                -- draw most valuable cells
+                for k = 1, 8 do 
+                    local cell = self.OrderedCells[k]
+                    self:DrawCell(cell.X, cell.Z, 0, 'ff0000')
+                end
             end
         end
     end,
@@ -215,6 +298,7 @@ GridReclaim = Class (Grid) {
 GridReclaimInstance = false
 
 ---@param brain AIBrain
+---@return AIGridReclaim
 Setup = function(brain)
     if not GridReclaimInstance then
         GridReclaimInstance = GridReclaim() --[[@as AIGridReclaim]]
@@ -223,4 +307,6 @@ Setup = function(brain)
     if brain then
         GridReclaimInstance:RegisterBrain(brain)
     end
+
+    return GridReclaimInstance
 end
