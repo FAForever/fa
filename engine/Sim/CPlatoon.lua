@@ -125,6 +125,7 @@ function CPlatoon:GetAIPlan()
 end
 
 --- Returns army brain of the platoon.
+---@return AIBrain
 function CPlatoon:GetBrain()
 end
 
@@ -147,18 +148,21 @@ function CPlatoon:GetPlatoonLifetimeStats()
 end
 
 --- Returns platoon position
--- @return Table with position {x, y, z}.
+---@return Vector
 function CPlatoon:GetPlatoonPosition()
 end
 
 --- Returns platoon unique name if it has it.
--- To return the name, it has to be set by CPlatoon:UniquelyNamePlatoon(name) function.
--- @return strName.
+-- To return the name, it has to be set by 
+--- ```lua
+--- CPlatoon:UniquelyNamePlatoon(name)
+--- ```
+---@return string
 function CPlatoon:GetPlatoonUniqueName()
 end
 
 --- Returns list of units in theh platoon.
--- @return Table containing units.
+---@return Unit[]
 function CPlatoon:GetPlatoonUnits()
 end
 
@@ -177,7 +181,7 @@ end
 --- Orders platoon to assist the target unit.
 -- If squad is specified, assists the unit only with the squad.
 ---@param target Unit
----@param squad PlatoonSquadType
+---@param squad? PlatoonSquadType
 ---@return PlatoonCommand
 function CPlatoon:GuardTarget(target, squad)
 end
@@ -207,7 +211,6 @@ function CPlatoon:IsMoving(squad)
 end
 
 --- TODO.
--- @return true/false
 ---@return boolean
 function CPlatoon:IsOpponentAIRunning()
 end
@@ -228,7 +231,7 @@ end
 -- If squad is specified, moves only the squad.
 ---@param position Vector Table with position {x, y, z}.
 ---@param useTransports boolean true/false
----@param squad PlatoonSquadType
+---@param squad? PlatoonSquadType
 ---@return PlatoonCommand
 function CPlatoon:MoveToLocation(position, useTransports, squad)
 end
@@ -237,7 +240,7 @@ end
 -- If squad is specified, move only with the squad.
 ---@param target Unit Unit to move to.
 ---@param useTransports boolean true/false
----@param squad PlatoonSquadType
+---@param squad? PlatoonSquadType
 ---@return PlatoonCommand
 function CPlatoon:MoveToTarget(target, useTransports, squad)
 end
@@ -245,7 +248,7 @@ end
 --- Orders platoon to patrol at target position.
 -- If squad is specified, patrols only with the squad.
 ---@param position Vector Table with position {x, y, z}.
----@param squad PlatoonSquadType
+---@param squad? PlatoonSquadType
 ---@return PlatoonCommand
 function CPlatoon:Patrol(position, squad)
 end
@@ -265,7 +268,7 @@ function CPlatoon:PlatoonCategoryCountAroundPosition(category, position, radius)
 end
 
 --- Changes platoon's formation for all squads.
----@param formation string Types: 'AttackFormation', 'GrowthFormation', 'NoFormation'.
+---@param formation UnitFormations
 function CPlatoon:SetPlatoonFormationOverride(formation)
 end
 
@@ -278,7 +281,7 @@ end
 --- Orders platoon to stop, cancels all commands.
 -- If squad is specified, stops only the squad.
 -- Cancels all commands.
----@param squad PlatoonSquadType
+---@param squad? PlatoonSquadType
 function CPlatoon:Stop(squad)
 end
 
