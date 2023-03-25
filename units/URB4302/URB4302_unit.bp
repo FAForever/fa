@@ -210,9 +210,6 @@ UnitBlueprint {
     StrategicIconSortPriority = 195,
     Weapon = {
         {
-            -- sim-performance related values
-            TargetCheckInterval = 0.5,
-
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',
@@ -259,7 +256,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
-            RateOfFire = 0.1,
+            RateOfFire = 0.6,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'STRATEGIC MISSILE',
             TargetType = 'RULEWTT_Projectile',
