@@ -22,11 +22,9 @@ URB4202 = ClassUnit(CShieldStructureUnit, ShieldEffectsComponent) {
     ShieldEffectsBone = 'Shaft',
     
     ---@param self URB4202
-    OnCreate = function(self) -- Are these missng on purpose?
-        -- self.ShieldEffectsBone = 'Shaft'
+    OnCreate = function(self)
         CShieldStructureUnit.OnCreate(self)
         ShieldEffectsComponent.OnCreate(self)
-        -- LOG(self.ShieldEffectsBone)
     end,
 
     ---@param self URB4202
@@ -35,7 +33,6 @@ URB4202 = ClassUnit(CShieldStructureUnit, ShieldEffectsComponent) {
     OnStopBeingBuilt = function(self, builder, layer)
         CShieldStructureUnit.OnStopBeingBuilt(self, builder, layer)
         self.Rotator1 = CreateRotator(self, 'Shaft', 'z', nil, 30, 5, 30)
-        -- LOG(self.ShieldEffectsBone)
         self.Trash:Add(self.Rotator1)
     end,
 

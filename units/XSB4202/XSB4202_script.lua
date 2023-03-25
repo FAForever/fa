@@ -9,13 +9,15 @@
 local SShieldStructureUnit = import("/lua/seraphimunits.lua").SShieldStructureUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
----@class XSB4202 : SShieldStructureUnit
+---@class XSB4202 : SShieldStructureUnit, ShieldEffectsComponent
 XSB4202 = ClassUnit(SShieldStructureUnit, ShieldEffectsComponent) {
     ShieldEffects = {
         '/effects/emitters/seraphim_shield_generator_t2_01_emit.bp',
         '/effects/emitters/seraphim_shield_generator_t3_03_emit.bp',
         '/effects/emitters/seraphim_shield_generator_t2_03_emit.bp',
     },
+
+    ShieldEffectsScale = 0.75,
 
     ---@param self XSB4202
     OnCreate = function(self) -- Are these missng on purpose?
@@ -46,9 +48,7 @@ XSB4202 = ClassUnit(SShieldStructureUnit, ShieldEffectsComponent) {
     OnKilled = function(self, instigator, type, overkillRatio)
         SShieldStructureUnit.OnKilled(self, instigator, type, overkillRatio)
         if self.ShieldEffectsBag then
-            for k,v in self.ShieldEffectsBag do
-                v:Destroy()
-            end
+            ShieldEffectsComponent.OnShieldDisabled(self)
         end
     end,
 }

@@ -10,9 +10,9 @@
 local CShieldStructureUnit = import("/lua/cybranunits.lua").CShieldStructureUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
----@class URB4206 : CShieldStructureUnit
+---@class URB4206 : CShieldStructureUnit, ShieldEffectsComponent
 ---@field Rotator1? moho.RotateManipulator
-URB4206 = ClassUnit(CShieldStructureUnit) {
+URB4206 = ClassUnit(CShieldStructureUnit,ShieldEffectsComponent) {
     ShieldEffects = { 
         '/effects/emitters/cybran_shield_04_generator_01_emit.bp',
         '/effects/emitters/cybran_shield_04_generator_02_emit.bp',
@@ -22,7 +22,7 @@ URB4206 = ClassUnit(CShieldStructureUnit) {
     ShieldEffectsBone = 'Shaft',
 
     ---@param self URB4206
-    OnCreate = function(self) -- Are these missng on purpose?
+    OnCreate = function(self)
         CShieldStructureUnit.OnCreate(self)
         ShieldEffectsComponent.OnCreate(self)
     end,
