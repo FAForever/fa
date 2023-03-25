@@ -1323,11 +1323,11 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Engineer Reclaim',
         PlatoonTemplate = 'EngineerBuilder',
-        PlatoonAIPlan = 'ReclaimAI',
-        Priority = 900, --DUNCAN - was 950
-        InstanceCount = 3,
+        PlatoonAIPlan = 'ReclaimGridAI',
+        Priority = 1000,
+        InstanceCount = 2,
         BuilderConditions = {
-                { MIBC, 'ReclaimablesInArea', { 'LocationType', }},
+                { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', }},
             },
         BuilderData = {
             LocationType = 'LocationType',
@@ -1337,15 +1337,14 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Engineer Reclaim Excess',
         PlatoonTemplate = 'EngineerBuilder',
-        PlatoonAIPlan = 'ReclaimAI',
-        Priority = 2, --DUNCAN - was 1
+        PlatoonAIPlan = 'ReclaimGridAI',
+        Priority = 3, --DUNCAN - was 1
         InstanceCount = 10,
         BuilderConditions = {
-                { MIBC, 'ReclaimablesInArea', { 'LocationType', }},
+                { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', true}},
             },
         BuilderData = {
             LocationType = 'LocationType',
-            ReclaimTime = 30,
         },
         BuilderType = 'Any',
     },

@@ -3535,10 +3535,6 @@ Platoon = Class(moho.platoon_methods) {
             import("/lua/scenariotriggers.lua").CreateUnitStopCaptureTrigger(eng.PlatoonHandle.EngineerCaptureDone, eng)
             eng.CaptureDoneCallbackSet = true
         end
-        if eng and not eng.Dead and not eng.ReclaimDoneCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
-            import("/lua/scenariotriggers.lua").CreateUnitStopReclaimTrigger(eng.PlatoonHandle.EngineerReclaimDone, eng)
-            eng.ReclaimDoneCallbackSet = true
-        end
         if eng and not eng.Dead and not eng.FailedToBuildCallbackSet and eng.PlatoonHandle and eng:GetAIBrain():PlatoonExists(eng.PlatoonHandle) then
             import("/lua/scenariotriggers.lua").CreateOnFailedToBuildTrigger(eng.PlatoonHandle.EngineerFailedToBuild, eng)
             eng.FailedToBuildCallbackSet = true
@@ -6941,6 +6937,116 @@ Platoon = Class(moho.platoon_methods) {
         table.insert(commands, IssueFormAggressiveMove(units, path[count], formation, angles[count]))
 
         return commands
+    end,
+
+    ReclaimGridAI = function(self)
+        -- note ReclaimEngineerAssigned is currently disabled as we need a method of assigning engineers to the reclaim grid.
+        -- Waiting a few days to see if Jip has ideas to making this possible via the gridinstance. If not then I can design a method.
+        local NavUtils = import("/lua/sim/navutils.lua")
+        AIAttackUtils.GetMostRestrictiveLayer(self)
+        local locationType = self.PlatoonData.LocationType
+        local aiBrain = self:GetBrain()
+        local reclaimGridInstance = aiBrain.GridReclaim
+        local gridSize = reclaimGridInstance.CellSize * reclaimGridInstance.CellSize
+        local searchType = self.PlatoonData.SearchType
+            -- Placeholders this part is temporary until the ReclaimGrid defines the playable area min and max grid sizes
+        local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
+        local minCellX = 0
+        local minCellZ = 0
+        local maxCellX = 16
+        local maxCellZ = 16
+        local searchRange = 16
+        if maxmapdimension == 256 then
+            maxCellX = 8
+            maxCellZ = 8
+            searchRange = 8
+        end
+        ---
+        local eng = self:GetPlatoonUnits()[1]
+        while aiBrain:PlatoonExists(self) do
+            WaitTicks(10)
+            IssueClearCommands({eng})
+            local engPos = eng:GetPosition()
+            local gridX, gridZ = reclaimGridInstance:ToCellIndices(engPos[1],engPos[3])
+            local searchLoop = 0
+            local cancelSearch = false
+            local reclaimTargetX, reclaimTargetZ
+            while searchLoop < searchRange do 
+                WaitTicks(1)
+                for x = math.max(minCellX, gridX - searchLoop), math.min(maxCellX, gridX + searchLoop), 1 do
+                    for z = math.max(minCellZ, gridZ - searchLoop), math.min(maxCellZ, gridZ + searchLoop), 1 do
+                        if reclaimGridInstance.Cells[x][z].TotalMass > 10 or reclaimGridInstance.Cells[x][z].TotalEnergy > 100 then
+                            -- Need a method of assigning engineers to reclaim grids.
+                            --if not reclaimGridInstance.Cells[x][z].ReclaimEngineerAssigned or reclaimGridInstance.Cells[x][z].ReclaimEngineerAssigned.Dead then
+                            local reclaimLocationX, reclaimLocationZ = reclaimGridInstance:ToWorldSpace(x, z)
+                            local reclaimLocation = {reclaimLocationX, GetTerrainHeight(reclaimLocationX, reclaimLocationZ), reclaimLocationZ}
+                            if NavUtils.CanPathTo(self.MovementLayer, engPos, reclaimLocation) then
+                                reclaimTargetX, reclaimTargetZ = x, z
+                                cancelSearch = true
+                                break
+                            end
+                            --else
+                                --LOG('Engineer already assigned to cell location, moving to next')
+                            --end
+                        end
+                        searchLoop = searchLoop + 1
+                    end
+                    if cancelSearch then
+                        break
+                    end
+                end
+                if cancelSearch then
+                    break
+                end
+            end
+            if reclaimTargetX and reclaimTargetZ then
+                --reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].ReclaimEngineerAssigned = eng
+                local moveLocationX, moveLocationZ = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
+                local moveLocation = {moveLocationX, GetTerrainHeight(moveLocationX, moveLocationZ), moveLocationZ}
+                IssueMove({eng}, moveLocation)
+                local moveCounter = 0
+                local engStuckCount = 0
+                local Lastdist
+                local dist = VDist3Sq(eng:GetPosition(), moveLocation)
+                while not IsDestroyed(eng) and dist > gridSize do
+                    WaitTicks(25)
+                    dist = VDist3Sq(eng:GetPosition(), moveLocation)
+                    if Lastdist ~= dist then
+                        engStuckCount = 0
+                        Lastdist = dist
+                    else
+                        engStuckCount = engStuckCount + 1
+                        LOG('* AI: * SampleReclaim: has no moved during move to build position look, adding one, current is '..engStuckCount)
+                        if engStuckCount > 15 and not eng:IsUnitState('Reclaiming') then
+                            LOG('* AI: * SampleReclaim: Stuck while moving to build position. Stuck='..engStuckCount)
+                            break
+                        end
+                    end
+                end
+                if IsDestroyed(eng) then
+                    return
+                end
+                if dist <= gridSize then
+                    local time = 0
+                    while time < 30 do
+                        IssueClearCommands({eng})
+                        IssueAggressiveMove({eng}, moveLocation)
+                        time = time + 1
+                        WaitTicks(30)
+                        if reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass < 10  or aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
+                            break
+                        end
+                    end
+                end
+            end
+            if reclaimTargetX and reclaimTargetZ then
+                --intelGrid[reclaimTargetX][reclaimTargetZ].ReclaimEngineerAssigned = false
+            end
+            if aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
+                return
+            end
+            WaitTicks(100)
+        end
     end,
 }
 
