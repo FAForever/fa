@@ -95,7 +95,7 @@ XRL0403 = ClassUnit(CWalkingLandUnit) {
                 WaitSeconds(self.AnimationManipulator:GetAnimationDuration() * self.AnimationManipulator:GetRate())
                 self:SetUnSelectable(false)
                 self.AnimationManipulator:Destroy()
-            end,self))
+            end, self))
         end
     end,
 
@@ -127,9 +127,13 @@ XRL0403 = ClassUnit(CWalkingLandUnit) {
             local blanketX = math.sin(i * blanketAngle)
             local blanketZ = math.cos(i * blanketAngle)
 
-            local Blanketparts = self:CreateProjectile('/effects/entities/DestructionDust01/DestructionDust01_proj.bp',
-                blanketX, 1.5, blanketZ + 4, blanketX, 0, blanketZ)
-                :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
+            local Blanketparts = self:CreateProjectile(
+                '/effects/entities/DestructionDust01/DestructionDust01_proj.bp',
+                blanketX, 1.5,
+                blanketZ + 4,
+                blanketX, 0,
+                blanketZ
+            ):SetVelocity(blanketVelocity):SetAcceleration(-0.3)
         end
     end,
 
@@ -143,8 +147,15 @@ XRL0403 = ClassUnit(CWalkingLandUnit) {
             velocity.x = velocity.x + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.z = velocity.z + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.y = velocity.y + utilities.GetRandomFloat(0.0, 0.3)
-            proj = self:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp',
-                offset.x, offset.y + yBoneOffset, offset.z, velocity.x, velocity.y, velocity.z)
+            proj = self:CreateProjectile(
+                '/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp',
+                offset.x,
+                offset.y + yBoneOffset,
+                offset.z,
+                velocity.x,
+                velocity.y,
+                velocity.z
+            )
             proj:SetBallisticAcceleration(utilities.GetRandomFloat(-1, -2)):SetVelocity(utilities.GetRandomFloat(3, 4)):
                 SetCollision(false)
 
@@ -167,8 +178,8 @@ XRL0403 = ClassUnit(CWalkingLandUnit) {
         explosion.CreateFlash(self, 'Left_Leg01_B01', 4.5, army)
         CreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/destruction_explosion_concussion_ring_03_emit.bp')
             :OffsetEmitter(0, 5, 0)
-        CreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/explosion_fire_sparks_02_emit.bp'):OffsetEmitter(0
-            , 5, 0)
+        CreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/explosion_fire_sparks_02_emit.bp')
+            :OffsetEmitter(0, 5, 0)
         CreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/distortion_ring_01_emit.bp')
         self:CreateFirePlumes(army, { 'XRL0403' }, 0)
         self:CreateFirePlumes(army, { 'Right_Leg01_B01', 'Right_Leg02_B01', 'Left_Leg02_B01', }, 0.5)

@@ -9,15 +9,7 @@ local SIFSuthanusArtilleryCannon = import("/lua/seraphimweapons.lua").SIFSuthanu
 ---@class XSB2302 : SStructureUnit
 XSB2302 = ClassUnit(SStructureUnit) {
     Weapons = {
-        MainGun = ClassWeapon(SIFSuthanusArtilleryCannon) {
-            CreateProjectileAtMuzzle = function(self, muzzle)
-                local proj = SIFSuthanusArtilleryCannon.CreateProjectileAtMuzzle(self, muzzle)
-                local data = self.Blueprint.ShieldDamage
-                if proj and not proj:BeenDestroyed() then
-                    proj:PassMetaDamage(data)
-                end
-            end,
-        },
+        MainGun = ClassWeapon(SIFSuthanusArtilleryCannon) { },
     },
 }
 TypeClass = XSB2302

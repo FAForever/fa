@@ -36,7 +36,6 @@ XSB2401 = ClassUnit(SStructureUnit) {
 
         local bp = self.Blueprint
         self.Trash:Add(CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
-        self.Trash:Add(ForkThread(self.PlayArmSounds,self))
         local missileBone = bp.Display.MissileBone
         if missileBone then
             if not self.MissileSlider then

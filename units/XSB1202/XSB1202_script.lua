@@ -7,15 +7,6 @@ local SMassCollectionUnit = import("/lua/seraphimunits.lua").SMassCollectionUnit
 
 ---@class XSB1202 : SMassCollectionUnit
 XSB1202 = ClassUnit(SMassCollectionUnit) {
-
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        SMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(0)
-        self.AnimationManipulator:Destroy()
-        self.AnimationManipulator = nil
-    end,
-
     PlayActiveAnimation = function(self)
         SMassCollectionUnit.PlayActiveAnimation(self)
         if not self.AnimationManipulator then
@@ -36,6 +27,5 @@ XSB1202 = ClassUnit(SMassCollectionUnit) {
         if not self.AnimationManipulator then return end
         self.AnimationManipulator:SetRate(1)
     end,
-
 }
 TypeClass = XSB1202
