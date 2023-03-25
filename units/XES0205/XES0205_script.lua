@@ -8,44 +8,45 @@
 ----**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local TShieldSeaUnit = import("/lua/terranunits.lua").TShieldSeaUnit
+local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
 ---@class XES0205 : TShieldSeaUnit
-XES0205 = ClassUnit(TShieldSeaUnit) {
+XES0205 = ClassUnit(TShieldSeaUnit, ShieldEffectsComponent) {
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_shipmobile_01_emit.bp',
         '/effects/emitters/terran_shield_generator_shipmobile_02_emit.bp',
     },
 
+    ShieldEffectsBone = 'XES0205',
+
+    ---@param self XES0205
+    OnCreate = function(self) -- Are these missng on purpose?
+        TShieldSeaUnit.OnCreate(self)
+        ShieldEffectsComponent.OnCreate(self)
+    end,
+
+    ---@param self XES0205
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         TShieldSeaUnit.OnStopBeingBuilt(self, builder, layer)
-        self.ShieldEffectsBag = {}
     end,
 
+    ---@param self XES0205
     OnShieldEnabled = function(self)
         TShieldSeaUnit.OnShieldEnabled(self)
-
-        if self.ShieldEffectsBag then
+        ShieldEffectsComponent.OnShieldEnabled(self)
+        if self.ShieldEffectsBag then 
             for _, v in self.ShieldEffectsBag do
-                v:Destroy()
+                v:OffsetEmitter(0, -0.15, 0.35)
             end
-            self.ShieldEffectsBag = {}
-        end
-        for _, v in self.ShieldEffects do
-            local emitter = CreateAttachedEmitter(self, 'XES0205', self:GetArmy(), v)
-            emitter:OffsetEmitter(0, -0.15, 0.35)
-            table.insert(self.ShieldEffectsBag, emitter)
         end
     end,
 
+    ---@param self XES0205
     OnShieldDisabled = function(self)
         TShieldSeaUnit.OnShieldDisabled(self)
-
-        if self.ShieldEffectsBag then
-            for _, v in self.ShieldEffectsBag do
-                v:Destroy()
-            end
-            self.ShieldEffectsBag = {}
-        end
+        ShieldEffectsComponent.OnShieldDisabled(self)
     end,
 }
 
