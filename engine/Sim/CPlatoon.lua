@@ -288,7 +288,7 @@ end
 
 --- Gives a unique name to the platoon.
 -- That platoon can be later returned by aiBrain:GetPlatoonUniquelyNamed(name) function
----@param name string String.
+---@param name string
 function CPlatoon:UniquelyNamePlatoon(name)
 end
 

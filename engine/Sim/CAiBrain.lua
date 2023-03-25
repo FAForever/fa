@@ -107,7 +107,7 @@ end
 ---@unknown
 function CAiBrain:FindClosestArmyWithBase()
 end
- 
+
 --- Find a free build place
 -- @param buildingType Type of building (T1LandFactory, T4AirExperimental1, T1HydroCarbon etc)
 -- @param whatToBuild UnitID
@@ -119,8 +119,10 @@ end
 -- @param BuildLocationZ
 -- @param optIgnoreThreatUnder Ignores enemy threat under value
 -- @return PlaceToBuild {x, z, y}
-function CAiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, optIgnoreAlliance, BuildLocationX, BuildLocationZ, optIgnoreThreatUnder)
+function CAiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, optIgnoreAlliance,
+                                   BuildLocationX, BuildLocationZ, optIgnoreThreatUnder)
 end
+
 --- Returns a unit that matches the categories, if available
 ---@param category EntityCategory
 ---@param needToBeIdle boolean
@@ -206,27 +208,27 @@ function CAiBrain:GetCurrentUnits(category)
 end
 
 --- Returns current resource income.
--- @param resource 'ENERGY' or 'MASS'.
--- @return Number.
+---@param resource 'ENERGY' | 'MASS'
+---@return number
 function CAiBrain:GetEconomyIncome(resource)
 end
 
 --- Return how much of the resource the brains wants to use.
 -- This is used for calculating Paragon's production.
--- @param resource 'ENERGY' or 'MASS'.
--- @return Number.
+---@param resource 'ENERGY' | 'MASS'
+---@return number
 function CAiBrain:GetEconomyRequested(resource)
 end
 
 --- Return current resource amout in storage.
--- @param resource 'ENERGY' or 'MASS'.
--- @return Number.
+---@param resource 'ENERGY' | 'MASS'
+---@return number
 function CAiBrain:GetEconomyStored(resource)
 end
 
---- Returns the ratio between resource in storage to maximum storage amout.
--- @param resource 'ENERGY' or 'MASS'.
--- @return Float Number 0.0 - 1
+--- Returns the ratio between resource in storage to maximum storage amout. 
+---@param resource 'ENERGY' | 'MASS'
+---@return number @ float from 0 to 1
 function CAiBrain:GetEconomyStoredRatio(resource)
 end
 
@@ -253,7 +255,7 @@ end
 --- Always reports a threatvalue of zero for Allies or self.
 --- threatType and armyIndex are not required.
 --- @param ring number 1 or 2
---- 1 = Single, 2 = With surrounding IMPA blocks 
+--- 1 = Single, 2 = With surrounding IMPA blocks
 --- ..........   ..........
 --- ..........   ....xxx...
 --- .....X....   ....xXx...
@@ -276,7 +278,7 @@ function CAiBrain:GetListOfUnits(category, needToBeIdle, requireBuilt)
 end
 
 --- Returns a ratio between water and land.
----@return number 0.0 - 1.0
+---@return number @ float from 0 to 1
 function CAiBrain:GetMapWaterRatio()
 end
 
@@ -317,7 +319,7 @@ function CAiBrain:GetPlatoonUniquelyNamed(name)
 end
 
 --- Returns brain's platoons
--- @return tblPlatoons Table containing platoons.
+---@return Platoon[]
 function CAiBrain:GetPlatoonsList()
 end
 
@@ -373,14 +375,14 @@ function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
 end
 
 --- Gives resources to brain.
--- @param type 'Energy', 'Mass'.
--- @param amout Number, how much to give.
+---@param type ResourceType
+---@param amount number @ how much to give.
 function CAiBrain:GiveResource(type, amount)
 end
 
 --- Gives storage to brain.
--- @param type 'Energy', 'Mass'.
--- @param amout Number, how much to give.
+---@param type ResourceType
+---@param amount number @ how much to give.
 function CAiBrain:GiveStorage(type, amount)
 end
 
@@ -394,25 +396,26 @@ function CAiBrain:IsOpponentAIRunning()
 end
 
 --- Creates a new platoon.
--- @param name or '', custom platoon name
--- @param aiPlan Plan to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
--- @return Platoon.
+---@param name string @ custom platoon name
+---@param aiPlan string @ to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
+---@return Platoon
 function CAiBrain:MakePlatoon(name, aiPlan)
 end
 
 --- Return number of unit's categories being built.
--- @param entityCategoryOfBuildee Unit's category that is being built.
--- @param entityCategoryOfBuilder Unit's category of the unit building, example: categories.CONSTRUCTION .
--- @return Number.
-function CAiBrain:NumCurrentlyBuilding(entityCategoryOfBuildee, entityCategoryOfBuilder)
+---@param entityCategoryOfBeingBuilt EntityCategory @ Unit's category that is being built.
+---@param entityCategoryOfBuilder EntityCategory @ Unit's category of the unit building, example: categories.CONSTRUCTION .
+---@return integer
+function CAiBrain:NumCurrentlyBuilding(entityCategoryOfBeingBuilt, entityCategoryOfBuilder)
 end
 
 --- TODO.
 function CAiBrain:PickBestAttackVector()
 end
 
---- Returns true if platoon exists.
--- @return true/false.
+---Returns true if platoon exists.
+---@param platoon Platoon
+---@return boolean
 function CAiBrain:PlatoonExists(platoon)
 end
 
@@ -451,7 +454,7 @@ function CAiBrain:SetGreaterOf(statname, val)
 end
 
 --- Set if the brain should share resources to the allies.
--- @param bool ture/false
+---@param bool boolean
 function CAiBrain:SetResourceSharing(bool)
 end
 
@@ -460,8 +463,8 @@ function CAiBrain:SetUpAttackVectorsToArmy(category)
 end
 
 --- Removes resources from brain.
--- @param type 'Energy', 'Mass'.
--- @param amout Number, how much to take.
+---@param type ResourceType
+---@param amount number @ how much to take.
 function CAiBrain:TakeResource(type, amount)
 end
 
