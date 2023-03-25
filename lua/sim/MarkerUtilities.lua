@@ -77,7 +77,7 @@ local ChainCache = {}
 ---@return MarkerType
 local function MapMarkerType(type)
     if type == 'Start Location' then
-        type = 'Spawn'
+        return 'Spawn'
     end
 
     return type
