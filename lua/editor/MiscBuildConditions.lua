@@ -389,7 +389,6 @@ function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
         local gridSize = 0
         if aiBrain:GetEconomyStoredRatio("MASS") <= 0.7 then
             while gridSize < searchRange do
-                WaitTicks(1)
                 for x = math.max(minCellX, cellX - gridSize), math.min(maxCellX, cellX + gridSize), 1 do
                     for z = math.max(minCellZ, cellZ - gridSize), math.min(maxCellZ, cellZ + gridSize), 1 do
                         if reclaimGridInstance.Cells[x][z].TotalMass > 10 or reclaimGridInstance.Cells[x][z].TotalEnergy then
