@@ -2651,7 +2651,7 @@ end
 
 --- We use both Blank Marker that are army names as well as the new Large Expansion Area to determine big expansion bases
 ---@param aiBrain AIBrain
----@param locationType string
+---@param locationType Marker
 ---@param radius number
 ---@param tMin number
 ---@param tMax number
@@ -2659,7 +2659,7 @@ end
 ---@param tType string
 ---@param eng Unit
 ---@return boolean
----@return string|unknown
+---@return string?
 function AIFindStartLocationNeedsEngineerSorian(aiBrain, locationType, radius, tMin, tMax, tRings, tType, eng)
     local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
