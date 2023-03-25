@@ -299,7 +299,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 6,
+            Damage = 8,
             DamageType = 'Normal',
             DisplayName = 'Linked Railgun',
             FireTargetLayerCapsTable = {
@@ -308,7 +308,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'AAgun',
-            MaxRadius = 20,
+            MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 35,

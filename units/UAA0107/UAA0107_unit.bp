@@ -285,7 +285,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 3,
+            Damage = 5,
             DamageType = 'Normal',
             DisplayName = 'Sonic Pulse Battery',
             FireTargetLayerCapsTable = {
@@ -294,7 +294,7 @@ UnitBlueprint {
             },
             FiringTolerance = 0.5,
             Label = 'SonicPulseBattery1',
-            MaxRadius = 20,
+            MaxRadius = 30,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 3,
             MuzzleVelocity = 35,

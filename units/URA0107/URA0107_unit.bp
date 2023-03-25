@@ -313,7 +313,7 @@ UnitBlueprint {
             FiringTolerance = 0.2,
             Label = 'AAAutocannon',
             LeadTarget = true,
-            MaxRadius = 20,
+            MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 35,
