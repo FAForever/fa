@@ -260,7 +260,7 @@ GridReclaim = Class(Grid) {
     ---@param prop Prop
     OnReclaimDestroyed = function(self, prop)
         local position = prop.CachePosition or prop:GetPosition()
-        local bx, bz = self:ToCellIndices(position[1], position[3])
+        local bx, bz = self:ToGridSpace(position[1], position[3])
 
         local cell = self.Cells[bx][bz]
         cell.Reclaim[prop.EntityId] = nil
@@ -275,7 +275,7 @@ GridReclaim = Class(Grid) {
     ---@param prop Prop
     OnReclaimUpdate = function(self, prop)
         local position = prop.CachePosition or prop:GetPosition()
-        local bx, bz = self:ToCellIndices(position[1], position[3])
+        local bx, bz = self:ToGridSpace(position[1], position[3])
 
         local cell = self.Cells[bx][bz]
         cell.Reclaim[prop.EntityId] = prop
@@ -319,7 +319,7 @@ GridReclaim = Class(Grid) {
             -- mouse scanning
             if Debug then
                 local mouse = GetMouseWorldPos()
-                local bx, bz = self:ToCellIndices(mouse[1], mouse[3])
+                local bx, bz = self:ToGridSpace(mouse[1], mouse[3])
                 local cell = self.Cells[bx][bz]
 
                 local totalMass = cell.TotalMass

@@ -42,28 +42,38 @@ Grid = ClassSimple {
         self.Cells = cells
     end,
 
+    --- Converts a world position to a cell
+    ---@param self AIGrid
+    ---@param wx number     # in world space
+    ---@param wz number     # in world space
+    ---@return AIGridCell
+    ToCell = function(self, wx, wz)
+        local gx, gz = self:ToGridSpace(wx, wz)
+        return self.Cells[gx][gz]
+    end,
+
     --- Converts a world position to a grid position, always returns a valid position
     ---@param self AIGrid
-    ---@param px number     # in world space
-    ---@param pz number     # in world space
+    ---@param wx number     # in world space
+    ---@param wz number     # in world space
     ---@return number       # in grid space
     ---@return number       # in grid space
-    ToCellIndices = function(self, px, pz)
+    ToGridSpace = function(self, wx, wz)
         local cellCount = self.CellCount
         local cellSize = self.CellSize
         local inverse = 1 / cellSize
 
         local bx = 1
-        if px > 0 then
-            bx = ((px * inverse) ^ 0) + 1
+        if wx > 0 then
+            bx = ((wx * inverse) ^ 0) + 1
             if bx > cellCount then
                 bx = cellCount
             end
         end
 
         local bz = 1
-        if pz > 0 then
-            bz = ((pz * inverse) ^ 0) + 1
+        if wz > 0 then
+            bz = ((wz * inverse) ^ 0) + 1
             if bz > cellCount then
                 bz = cellCount
             end

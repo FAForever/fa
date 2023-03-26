@@ -6969,7 +6969,7 @@ Platoon = Class(moho.platoon_methods) {
             WaitTicks(10)
             IssueClearCommands({eng})
             local engPos = eng:GetPosition()
-            local gridX, gridZ = reclaimGridInstance:ToCellIndices(engPos[1],engPos[3])
+            local gridX, gridZ = reclaimGridInstance:ToGridSpace(engPos[1],engPos[3])
             local searchLoop = 0
             local cancelSearch = false
             local reclaimTargetX, reclaimTargetZ
