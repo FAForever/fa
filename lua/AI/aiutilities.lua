@@ -3513,3 +3513,92 @@ function ShiftPosition(pos1, pos2, dist, reverse)
     z = math.min(ScenarioInfo.size[2]-5,math.max(5,z))
     return {x,GetSurfaceHeight(x,z),z}
 end
+
+function EngAvoidLocalDanger(aiBrain, eng)
+    local engPos = eng:GetPosition()
+    local enemyUnits = aiBrain:GetUnitsAroundPoint(categories.LAND * categories.MOBILE, engPos, 45, 'Enemy')
+    local action = false
+    for _, unit in enemyUnits do
+        local enemyUnitPos = unit:GetPosition()
+        if EntityCategoryContains(categories.SCOUT + categories.ENGINEER * (categories.TECH1 + categories.TECH2) - categories.COMMAND, unit) then
+            if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 144 then
+                if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
+                    if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
+                        IssueClearCommands({eng})
+                        IssueReclaim({eng}, unit)
+                        action = true
+                        break
+                    end
+                end
+            end
+        elseif EntityCategoryContains(categories.LAND * categories.MOBILE - categories.SCOUT, unit) then
+            if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 81 then
+                if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
+                    if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
+                        IssueClearCommands({eng})
+                        IssueReclaim({eng}, unit)
+                        action = true
+                        break
+                    end
+                end
+            else
+                IssueClearCommands({eng})
+                IssueMove({eng}, ShiftPosition(enemyUnitPos, engPos, 50, false))
+                coroutine.yield(60)
+                action = true
+            end
+        end
+    end
+    return action
+end
+
+function EngLocalExtractorBuild(aiBrain, eng)
+    local action = false
+    local bool,markers=CanBuildOnLocalMassPoints(aiBrain, eng:GetPosition(), 25)
+    if bool then
+        IssueClearCommands({eng})
+        local factionIndex = aiBrain:GetFactionIndex()
+        local buildingTmplFile = import('/lua/BuildingTemplates.lua')
+        local buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
+        local whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
+        for _,massMarker in markers do
+            EngineerTryReclaimCaptureArea(aiBrain, eng, massMarker.Position, 2)
+            EngineerTryRepair(aiBrain, eng, whatToBuild, massMarker.Position)
+            if massMarker.BorderWarning then
+                IssueBuildMobile({eng}, massMarker.Position, whatToBuild, {})
+                action = true
+            else
+                aiBrain:BuildStructure(eng, whatToBuild, {massMarker.Position[1], massMarker.Position[3], 0}, false)
+                action = true
+            end
+        end
+        while eng and not eng.Dead and (0<table.getn(eng:GetCommandQueue()) or eng:IsUnitState('Building') or eng:IsUnitState("Moving")) do
+            coroutine.yield(20)
+        end
+        return action
+    end
+end
+
+function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
+    local pointDistance = distance * distance
+    local massMarkers = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    local validMassMarkers = {}
+    for _, v in massMarkers do
+        if v.type == 'Mass' then
+            local massBorderWarn = false
+            if v.position[1] <= 8 or v.position[1] >= ScenarioInfo.size[1] - 8 or v.position[3] <= 8 or v.position[3] >= ScenarioInfo.size[2] - 8 then
+                massBorderWarn = true
+            end 
+            local mexDistance = VDist2Sq( v.position[1],v.position[3], engPos[1], engPos[3] )
+            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) then
+                table.insert(validMassMarkers, {Position = v.position, Distance = mexDistance , MassSpot = v, BorderWarning = massBorderWarn})
+            end
+        end
+    end
+    table.sort(validMassMarkers, function(a,b) return a.Distance < b.Distance end)
+    if table.getn(validMassMarkers) > 0 then
+        return true, validMassMarkers
+    else
+        return false
+    end
+end

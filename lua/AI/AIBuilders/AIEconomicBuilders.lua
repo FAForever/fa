@@ -1322,8 +1322,7 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'T1 Engineer Reclaim',
-        PlatoonTemplate = 'EngineerBuilder',
-        PlatoonAIPlan = 'ReclaimGridAI',
+        PlatoonTemplate = 'T1EngineerGridReclaimer',
         Priority = 1000,
         InstanceCount = 2,
         BuilderConditions = {
@@ -1336,8 +1335,7 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'T1 Engineer Reclaim Excess',
-        PlatoonTemplate = 'EngineerBuilder',
-        PlatoonAIPlan = 'ReclaimGridAI',
+        PlatoonTemplate = 'T1EngineerGridReclaimer',
         Priority = 3, --DUNCAN - was 1
         InstanceCount = 10,
         BuilderConditions = {

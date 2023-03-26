@@ -6942,6 +6942,7 @@ Platoon = Class(moho.platoon_methods) {
     ReclaimGridAI = function(self)
         -- note ReclaimEngineerAssigned is currently disabled as we need a method of assigning engineers to the reclaim grid.
         -- Waiting a few days to see if Jip has ideas to making this possible via the gridinstance. If not then I can design a method.
+        -- Note where state machine actions would happen.
         local NavUtils = import("/lua/sim/navutils.lua")
         AIAttackUtils.GetMostRestrictiveLayer(self)
         local locationType = self.PlatoonData.LocationType
@@ -6963,6 +6964,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         ---
         local eng = self:GetPlatoonUnits()[1]
+        eng.Combat = true
         while aiBrain:PlatoonExists(self) do
             WaitTicks(10)
             IssueClearCommands({eng})
@@ -7008,17 +7010,34 @@ Platoon = Class(moho.platoon_methods) {
                 local engStuckCount = 0
                 local Lastdist
                 local dist = VDist3Sq(eng:GetPosition(), moveLocation)
+                -- Statemachine switch for engineer moving to location
                 while not IsDestroyed(eng) and dist > gridSize do
                     WaitTicks(25)
+                    if aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.MOBILE, eng:GetPosition(), 45, 'Enemy') > 0 then
+                        -- Statemachine switch to avoiding/reclaiming danger
+                        local actionTaken = AIUtils.EngAvoidLocalDanger(aiBrain, eng)
+                        if actionTaken then
+                            -- Statemachine switch to evaluating next action to take
+                            IssueMove({eng}, moveLocation)
+                        end
+                    else
+                        -- Jip discussed potentially getting navmesh to return mass points along the path rather than this.
+                        -- Potential Statemachine switch to building extractors
+                        local actionTaken = AIUtils.EngLocalExtractorBuild(aiBrain, eng)
+                        if actionTaken then
+                            -- Statemachine switch to evaluating next action to take
+                            IssueMove({eng}, moveLocation)
+                        end
+                    end
                     dist = VDist3Sq(eng:GetPosition(), moveLocation)
                     if Lastdist ~= dist then
                         engStuckCount = 0
                         Lastdist = dist
-                    else
+                    elseif not eng:IsUnitState('Reclaiming') then
                         engStuckCount = engStuckCount + 1
-                        LOG('* AI: * SampleReclaim: has no moved during move to build position look, adding one, current is '..engStuckCount)
+                        LOG('* AI: * SampleReclaim: has not moved during move to reclaim position look, adding one, current is '..engStuckCount)
                         if engStuckCount > 15 and not eng:IsUnitState('Reclaiming') then
-                            LOG('* AI: * SampleReclaim: Stuck while moving to build position. Stuck='..engStuckCount)
+                            LOG('* AI: * SampleReclaim: Stuck while moving to reclaim position. Stuck='..engStuckCount)
                             break
                         end
                     end
@@ -7027,12 +7046,21 @@ Platoon = Class(moho.platoon_methods) {
                     return
                 end
                 if dist <= gridSize then
+                    -- Statemachine switch to reclaiming state
                     local time = 0
                     while time < 30 do
                         IssueClearCommands({eng})
                         IssueAggressiveMove({eng}, moveLocation)
                         time = time + 1
                         WaitTicks(30)
+                        if aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.MOBILE, eng:GetPosition(), 45, 'Enemy') > 0 then
+                            -- Statemachine switch to avoiding/reclaiming danger
+                            local actionTaken = AIUtils.EngAvoidLocalDanger(aiBrain, eng)
+                            if actionTaken then
+                                -- Statemachine switch to evaluating next action to take
+                                IssueAggressiveMove({eng}, moveLocation)
+                            end
+                        end
                         if reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass < 10  or aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
                             break
                         end
@@ -7043,7 +7071,9 @@ Platoon = Class(moho.platoon_methods) {
                 --intelGrid[reclaimTargetX][reclaimTargetZ].ReclaimEngineerAssigned = false
             end
             if aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
-                return
+                eng:SetCustomName('Engineer is exiting reclaim loop')
+                eng.Combat = false
+                self:PlatoonDisband()
             end
             WaitTicks(100)
         end
