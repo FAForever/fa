@@ -42,6 +42,7 @@ local function SortLambda (a, b)
 end
 
 ---@class AIGridReclaimCell : AIGridCell
+---@field Grid AIGridReclaim
 ---@field TotalMass number
 ---@field TotalEnergy number
 ---@field ReclaimCount number
@@ -80,6 +81,16 @@ GridReclaim = Class(Grid) {
 
         self:Update()
         self:DebugUpdate()
+    end,
+
+    --- Converts a world position to a cell
+    ---@param self AIGrid
+    ---@param wx number     # in world space
+    ---@param wz number     # in world space
+    ---@return AIGridReclaimCell
+    ToCell = function(self, wx, wz)
+        local gx, gz = self:ToGridSpace(wx, wz)
+        return self.Cells[gx][gz]
     end,
 
     ---@param self AIGridReclaim

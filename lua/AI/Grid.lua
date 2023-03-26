@@ -5,6 +5,7 @@ local bl = { 0, 0, 0 }
 local br = { 0, 0, 0 }
 
 ---@class AIGridCell
+---@field Grid AIGrid
 ---@field Identifier string
 ---@field X number
 ---@field Z number
@@ -31,6 +32,7 @@ Grid = ClassSimple {
             cells[x] = {}
             for z = 1, cellCount do
                 cells[x][z] = {
+                    Grid = self,
                     X = x, Z = z,
                     Identifier = string.format('%d - %d', x, z),
                 }
