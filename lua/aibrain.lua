@@ -105,6 +105,7 @@ local TableGetn = table.getn
 ---@field UnitStats table<EntityId, table<string, number>>
 ---@field VeterancyTriggerList table
 ---@field GridReclaim? AIGridReclaim
+---@field GridBrain? AIGridBrain
 AIBrain = Class(moho.aibrain_methods) {
     -- The state of the brain in the match
     Status = 'InProgress',
@@ -172,6 +173,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         -- add reference to grid reclaim
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
 
         local civilian = false
         for name, data in ScenarioInfo.ArmySetup do
