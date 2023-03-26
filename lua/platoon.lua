@@ -6955,11 +6955,25 @@ Platoon = Class(moho.platoon_methods) {
         if not (reclaimGridInstance and brainGridInstance) then
             return
         end
+        -- @Jip this is the callback I think I can use for removal of assignment on death.
+        local deathFunction = function(unit)
+            if unit.CellAssigned then
+                -- Brain is assigned on unit create, if issues use eng:GetAIBrain()
+                local brainGridInstance = unit.Brain.GridBrain
+                local brainCell = brainGridInstance:ToCellFromGridSpace(unit.CellAssigned[1], unit.CellAssigned[3])
+                -- confirm engineer is removed from cell during debug
+                brainGridInstance:RemoveReclaimingEngineer(brainCell, unit)
+            end
+        end
+
+        import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(deathFunction, eng)
 
         local gridSize = reclaimGridInstance.CellSize * reclaimGridInstance.CellSize
         local searchType = self.PlatoonData.SearchType
             -- Placeholders this part is temporary until the ReclaimGrid defines the playable area min and max grid sizes
         local eng = self:GetPlatoonUnits()[1]
+        eng.CellAssigned = false
+        -- Combat is added to stop the engineer manager from doing anything with the engineer
         eng.Combat = true
         while aiBrain:PlatoonExists(self) do
             WaitTicks(10)
@@ -6975,48 +6989,21 @@ Platoon = Class(moho.platoon_methods) {
 
             -- @Relent0r I have not tested this code, you'll have to tell me how to run it next time we talk. Then I can test it as I write it ^^
 
-            local engPos = eng:GetPosition()
-            local gx, gz = reclaimGridInstance:ToGridSpace(engPos[1],engPos[3])
-            local searchRadius = 0
-            local reclaimTargetX, reclaimTargetZ
-            while searchRadius < searchRange and (not (reclaimTargetX and reclaimTargetZ)) do 
-                WaitTicks(1)
-
-                -- retrieve a list of cells with some mass value
-                local cells, count = reclaimGridInstance:FilterAndSortInRadius(gx, gz, searchRadius, 10)
-
-                -- find out if we can path to the center of the cell
-                for k = 1, count do
-                    local cell = cells[k] --[[@as AIGridReclaimCell]]
-                    local centerOfCell = reclaimGridInstance:ToWorldSpace(cell.X, cell.Z)
-                    if NavUtils.CanPathTo(self.MovementLayer, engPos, centerOfCell) then
-                        reclaimTargetX, reclaimTargetZ = cell.X, cell.Z
-                        break
-                    end
-                end
-
-                searchRadius = searchRadius + 1
-            end
+            local engPos = eng:GetPosition()           
+            local reclaimTargetX, reclaimTargetZ = AIUtils.EngFindReclaimCell(aiBrain, eng, self.MovementLayer)
 
             -----------------------------------------------
             -- navigate to cell where we want to reclaim --
 
             if reclaimTargetX and reclaimTargetZ then
 
-                -- @Relent0r instead of this:
-                --reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].ReclaimEngineerAssigned = eng
-
                 -- @Relent0r we can do this:
                 local brainCell = brainGridInstance:ToCellFromGridSpace(reclaimTargetX, reclaimTargetZ)
+                -- Assign engineer to cell
+                -- Check count to make sure this updates during debug
+                eng.CellAssigned = {reclaimTargetX, reclaimTargetZ}
                 brainGridInstance:AddReclaimingEngineer(brainCell, eng)
 
-                -- @Relent0r and to query it we can do this:
-                local engineersInCell = brainGridInstance:CountReclaimingEngineers(brainCell)
-
-                -- @Relent0r or to remove the engineer again (doing something else, got killed, etc)
-                brainGridInstance:RemoveReclaimingEngineer(brainCell, eng)
-
-                -- @Relent0r the previous two statements make no sense here, but it is there to help you get an idea how we can work with the API
                 local moveLocation = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
                 IssueMove({eng}, moveLocation)
                 local moveCounter = 0
@@ -7091,11 +7078,15 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             if reclaimTargetX and reclaimTargetZ then
-                --intelGrid[reclaimTargetX][reclaimTargetZ].ReclaimEngineerAssigned = false
+                -- remove engineer from cell assignment
+                -- check this is updating during debug
+                brainGridInstance:RemoveReclaimingEngineer(brainCell, eng)
+                eng.CellAssigned = false
             end
 
             if aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
                 eng:SetCustomName('Engineer is exiting reclaim loop')
+                -- Combat is back to false so the engineer manager can assign things to the engineer
                 eng.Combat = false
                 self:PlatoonDisband()
             end

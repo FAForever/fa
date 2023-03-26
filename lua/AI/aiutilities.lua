@@ -3638,49 +3638,40 @@ end
 function EngFindReclaimCell(aiBrain, eng, movementLayer)
     local CanPathTo = import("/lua/sim/navutils.lua").CanPathTo
     local reclaimGridInstance = aiBrain.GridReclaim
+    local brainGridInstance = aiBrain.GridBrain
     local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
-    local minCellX = 0
-    local minCellZ = 0
-    local maxCellX = 16
-    local maxCellZ = 16
-    local searchRange = 16
+    local searchRadius = 16
     if maxmapdimension == 256 then
-        maxCellX = 8
-        maxCellZ = 8
-        searchRange = 8
+        searchRadius = 8
     end
     local searchLoop = 0
     local cancelSearch = false
     local reclaimTargetX, reclaimTargetZ
     local engPos = eng:GetPosition()
-    local gridX, gridZ = reclaimGridInstance:ToCellIndices(engPos[1],engPos[3])
-    while searchLoop < searchRange do 
+    local gx, gz = reclaimGridInstance:ToGridSpace(engPos[1],engPos[3])
+    while searchLoop < searchRadius and (not (reclaimTargetX and reclaimTargetZ)) do 
         WaitTicks(1)
-        for x = math.max(minCellX, gridX - searchLoop), math.min(maxCellX, gridX + searchLoop), 1 do
-            for z = math.max(minCellZ, gridZ - searchLoop), math.min(maxCellZ, gridZ + searchLoop), 1 do
-                if reclaimGridInstance.Cells[x][z].TotalMass > 10 or reclaimGridInstance.Cells[x][z].TotalEnergy > 100 then
-                    -- Need a method of assigning engineers to reclaim grids.
-                    --if not reclaimGridInstance.Cells[x][z].ReclaimEngineerAssigned or reclaimGridInstance.Cells[x][z].ReclaimEngineerAssigned.Dead then
-                    local reclaimLocationX, reclaimLocationZ = reclaimGridInstance:ToWorldSpace(x, z)
-                    local reclaimLocation = {reclaimLocationX, GetTerrainHeight(reclaimLocationX, reclaimLocationZ), reclaimLocationZ}
-                    if CanPathTo(movementLayer, engPos, reclaimLocation) then
-                        reclaimTargetX, reclaimTargetZ = x, z
-                        cancelSearch = true
-                        break
-                    end
-                    --else
-                        --LOG('Engineer already assigned to cell location, moving to next')
-                    --end
+        
+        -- retrieve a list of cells with some mass value
+        local cells, count = reclaimGridInstance:FilterAndSortInRadius(gx, gz, searchRadius, 10)
+
+        -- find out if we can path to the center of the cell and check engineer maximums
+        for k = 1, count do
+            local cell = cells[k] --[[@as AIGridReclaimCell]]
+            local centerOfCell = reclaimGridInstance:ToWorldSpace(cell.X, cell.Z)
+            local maxEngineers = math.min(math.Ceil(cell.TotalMass / 250), 8)
+            if CanPathTo(movementLayer, engPos, centerOfCell) then
+                local brainCell = brainGridInstance:ToCellFromGridSpace(cell.X, cell.Z)
+                -- Get a count of the current engineers assigned to this cell
+                -- Note check this is changing on removal and death
+                local engineersInCell = brainGridInstance:CountReclaimingEngineers(brainCell)
+                if engineersInCell < maxEngineers then
+                    reclaimTargetX, reclaimTargetZ = cell.X, cell.Z
+                    break
                 end
-                searchLoop = searchLoop + 1
-            end
-            if cancelSearch then
-                break
             end
         end
-        if cancelSearch then
-            break
-        end
+        searchLoop = searchLoop + 1
     end
     if reclaimTargetX and reclaimTargetZ then
         return reclaimTargetX, reclaimTargetZ
