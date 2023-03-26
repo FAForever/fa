@@ -3602,3 +3602,87 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
         return false
     end
 end
+
+function EngPerformReclaim(eng, minimumReclaim)
+    local engPos = eng:GetPosition()
+    local rectDef = Rect(engPos[1] - 10, engPos[3] - 10, engPos[1] + 10, engPos[3] + 10)
+    local reclaimRect = GetReclaimablesInRect(rectDef)
+    local maxReclaimCount = 0
+    local action = false
+    if reclaimRect then
+        local closeReclaim = {}
+        for _, v in reclaimRect do
+            if not IsProp(v) then continue end
+            if v.MaxMassReclaim and v.MaxMassReclaim > minimumReclaim then
+                if VDist2Sq(engPos[1],engPos[3], v.CachePosition[1], v.CachePosition[3]) <= 100 then
+                    table.insert(closeReclaim, v)
+                    maxReclaimCount = maxReclaimCount + 1
+                end
+            end
+            if maxReclaimCount > 10 then
+                break
+            end
+        end
+        if table.getn(closeReclaim) > 0 then
+            --RNGLOG('Close Reclaim, attempting to clear and reclaim')
+            IssueClearCommands({eng})
+            for _, rec in closeReclaim do
+                IssueReclaim({eng}, rec)
+            end
+            action = true
+        end
+    end
+    return action
+end
+
+function EngFindReclaimCell(aiBrain, eng, movementLayer)
+    local CanPathTo = import("/lua/sim/navutils.lua").CanPathTo
+    local reclaimGridInstance = aiBrain.GridReclaim
+    local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
+    local minCellX = 0
+    local minCellZ = 0
+    local maxCellX = 16
+    local maxCellZ = 16
+    local searchRange = 16
+    if maxmapdimension == 256 then
+        maxCellX = 8
+        maxCellZ = 8
+        searchRange = 8
+    end
+    local searchLoop = 0
+    local cancelSearch = false
+    local reclaimTargetX, reclaimTargetZ
+    local engPos = eng:GetPosition()
+    local gridX, gridZ = reclaimGridInstance:ToCellIndices(engPos[1],engPos[3])
+    while searchLoop < searchRange do 
+        WaitTicks(1)
+        for x = math.max(minCellX, gridX - searchLoop), math.min(maxCellX, gridX + searchLoop), 1 do
+            for z = math.max(minCellZ, gridZ - searchLoop), math.min(maxCellZ, gridZ + searchLoop), 1 do
+                if reclaimGridInstance.Cells[x][z].TotalMass > 10 or reclaimGridInstance.Cells[x][z].TotalEnergy > 100 then
+                    -- Need a method of assigning engineers to reclaim grids.
+                    --if not reclaimGridInstance.Cells[x][z].ReclaimEngineerAssigned or reclaimGridInstance.Cells[x][z].ReclaimEngineerAssigned.Dead then
+                    local reclaimLocationX, reclaimLocationZ = reclaimGridInstance:ToWorldSpace(x, z)
+                    local reclaimLocation = {reclaimLocationX, GetTerrainHeight(reclaimLocationX, reclaimLocationZ), reclaimLocationZ}
+                    if CanPathTo(movementLayer, engPos, reclaimLocation) then
+                        reclaimTargetX, reclaimTargetZ = x, z
+                        cancelSearch = true
+                        break
+                    end
+                    --else
+                        --LOG('Engineer already assigned to cell location, moving to next')
+                    --end
+                end
+                searchLoop = searchLoop + 1
+            end
+            if cancelSearch then
+                break
+            end
+        end
+        if cancelSearch then
+            break
+        end
+    end
+    if reclaimTargetX and reclaimTargetZ then
+        return reclaimTargetX, reclaimTargetZ
+    end
+end

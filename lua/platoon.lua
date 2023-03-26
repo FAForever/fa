@@ -6943,7 +6943,6 @@ Platoon = Class(moho.platoon_methods) {
         -- note ReclaimEngineerAssigned is currently disabled as we need a method of assigning engineers to the reclaim grid.
         -- Waiting a few days to see if Jip has ideas to making this possible via the gridinstance. If not then I can design a method.
         -- Note where state machine actions would happen.
-        local NavUtils = import("/lua/sim/navutils.lua")
         AIAttackUtils.GetMostRestrictiveLayer(self)
         local locationType = self.PlatoonData.LocationType
         local aiBrain = self:GetBrain()
@@ -6951,56 +6950,13 @@ Platoon = Class(moho.platoon_methods) {
         local gridSize = reclaimGridInstance.CellSize * reclaimGridInstance.CellSize
         local searchType = self.PlatoonData.SearchType
             -- Placeholders this part is temporary until the ReclaimGrid defines the playable area min and max grid sizes
-        local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
-        local minCellX = 0
-        local minCellZ = 0
-        local maxCellX = 16
-        local maxCellZ = 16
-        local searchRange = 16
-        if maxmapdimension == 256 then
-            maxCellX = 8
-            maxCellZ = 8
-            searchRange = 8
-        end
-        ---
         local eng = self:GetPlatoonUnits()[1]
         eng.Combat = true
         while aiBrain:PlatoonExists(self) do
             WaitTicks(10)
             IssueClearCommands({eng})
-            local engPos = eng:GetPosition()
-            local gridX, gridZ = reclaimGridInstance:ToCellIndices(engPos[1],engPos[3])
-            local searchLoop = 0
             local cancelSearch = false
-            local reclaimTargetX, reclaimTargetZ
-            while searchLoop < searchRange do 
-                WaitTicks(1)
-                for x = math.max(minCellX, gridX - searchLoop), math.min(maxCellX, gridX + searchLoop), 1 do
-                    for z = math.max(minCellZ, gridZ - searchLoop), math.min(maxCellZ, gridZ + searchLoop), 1 do
-                        if reclaimGridInstance.Cells[x][z].TotalMass > 10 or reclaimGridInstance.Cells[x][z].TotalEnergy > 100 then
-                            -- Need a method of assigning engineers to reclaim grids.
-                            --if not reclaimGridInstance.Cells[x][z].ReclaimEngineerAssigned or reclaimGridInstance.Cells[x][z].ReclaimEngineerAssigned.Dead then
-                            local reclaimLocationX, reclaimLocationZ = reclaimGridInstance:ToWorldSpace(x, z)
-                            local reclaimLocation = {reclaimLocationX, GetTerrainHeight(reclaimLocationX, reclaimLocationZ), reclaimLocationZ}
-                            if NavUtils.CanPathTo(self.MovementLayer, engPos, reclaimLocation) then
-                                reclaimTargetX, reclaimTargetZ = x, z
-                                cancelSearch = true
-                                break
-                            end
-                            --else
-                                --LOG('Engineer already assigned to cell location, moving to next')
-                            --end
-                        end
-                        searchLoop = searchLoop + 1
-                    end
-                    if cancelSearch then
-                        break
-                    end
-                end
-                if cancelSearch then
-                    break
-                end
-            end
+            local reclaimTargetX, reclaimTargetZ = AIUtils.EngFindReclaimCell(aiBrain, eng, self.MovementLayer)
             if reclaimTargetX and reclaimTargetZ then
                 --reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].ReclaimEngineerAssigned = eng
                 local moveLocationX, moveLocationZ = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
@@ -7023,8 +6979,14 @@ Platoon = Class(moho.platoon_methods) {
                     else
                         -- Jip discussed potentially getting navmesh to return mass points along the path rather than this.
                         -- Potential Statemachine switch to building extractors
-                        local actionTaken = AIUtils.EngLocalExtractorBuild(aiBrain, eng)
-                        if actionTaken then
+                        local reclaimAction = AIUtils.EngPerformReclaim(eng, 10)
+                        if reclaimAction then
+                            WaitTicks(30)
+                            -- Statemachine switch to evaluating next action to take
+                            IssueMove({eng}, moveLocation)
+                        end
+                        local extractorAction = AIUtils.EngLocalExtractorBuild(aiBrain, eng)
+                        if extractorAction then
                             -- Statemachine switch to evaluating next action to take
                             IssueMove({eng}, moveLocation)
                         end
