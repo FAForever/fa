@@ -255,6 +255,13 @@
         Level4 = 200,
         Level5 = 250,
     },
+    VeteranMass = {
+        220000,
+        220000,
+        220000,
+        220000,
+        220000,
+    },
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
