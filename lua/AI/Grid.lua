@@ -27,12 +27,12 @@ Grid = ClassSimple {
         end
 
         local cells = {}
-        for k = 1, cellCount do
-            cells[k] = {}
-            for l = 1, cellCount do
-                cells[k][l] = {
-                    X = k, Z = l,
-                    Identifier = string.format('%d - %d', k, l),
+        for x = 1, cellCount do
+            cells[x] = {}
+            for z = 1, cellCount do
+                cells[x][z] = {
+                    X = x, Z = z,
+                    Identifier = string.format('%d - %d', x, z),
                 }
             end
         end

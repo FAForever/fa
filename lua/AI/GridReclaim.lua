@@ -1,6 +1,7 @@
 local Grid = import("/lua/ai/grid.lua").Grid
 
 local TableInsert = table.insert
+local TableSort = table.sort
 
 local WeakValue = { __mode = 'v' }
 
@@ -32,6 +33,13 @@ local DebugUpdateData = {
     Time = -1,
     Updates = -1,
 }
+
+---@param a AIGridReclaimCell
+---@param b AIGridReclaimCell
+---@return boolean
+local function SortLambda (a, b)
+    return a.TotalMass > b.TotalMass
+end
 
 ---@class AIGridReclaimCell : AIGridCell
 ---@field TotalMass number
@@ -130,16 +138,7 @@ GridReclaim = Class(Grid) {
 
         -- sort the cells
         if updates > 0 then
-            table.sort(
-                self.OrderedCells,
-
-                ---@param a AIGridReclaimCell
-                ---@param b AIGridReclaimCell
-                ---@return boolean
-                function(a, b)
-                    return a.TotalMass > b.TotalMass
-                end
-            )
+            TableSort(self.OrderedCells, SortLambda)
         end
     end,
 
@@ -165,6 +164,92 @@ GridReclaim = Class(Grid) {
                 Sync.GridReclaimUIDebugUpdate = DebugUpdateData
             end
         end
+    end,
+
+    ---@param self AIGridReclaim   
+    ---@param bx number             # in grid space
+    ---@param bz number             # in grid space
+    ---@param radius number         # in grid space
+    ---@return AIGridReclaimCell    # most valuable cell in radius
+    MaximumInRadius = function(self, bx, bz, radius)
+        -- negative radius or a radius of 0
+        local cells = self.Cells
+        if radius <= 0 then
+            return cells[bx][bz]
+        end
+
+        local candidate = nil
+        local value = 0
+
+        -- non-negative radius, search for most valuable cell
+        for lx = -radius, radius do
+            local column = cells[bx + lx]
+            if column then
+                for lz = -radius, radius do
+                    local cell = column[bz + lz]
+                    if cell then
+                        -- any candidate is a good candidate
+                        if not candidate then
+                            candidate = cell
+                            value = cell.TotalMass
+                        -- compare if the cell we're evaluating is better
+                        else
+                            local alt = cell.TotalMass
+                            if alt > value then
+                                candidate = cell
+                                value = alt
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        return candidate
+    end,
+
+    ---@param self AIGridReclaim   
+    ---@param bx number                 # in grid space
+    ---@param bz number                 # in grid space
+    ---@param radius number             # in grid space
+    ---@param threshold number          # 
+    ---@param cache? table               # optional value, allows you to re-use memory in hot spots
+    ---@return AIGridReclaimCell[]      # all cells that meet the threhsold
+    ---@return number                   # number of cells found
+    FilterInRadius = function(self, bx, bz, radius, threshold, cache)
+        local candidates = cache or { }
+        local head = 1
+        local cells = self.Cells
+        for lx = -radius, radius do
+            local column = cells[bx + lx]
+            if column then
+                for lz = -radius, radius do
+                    local cell = column[bz + lz]
+                    if cell then
+                        if cell.TotalMass >= threshold then
+                            candidates[head] = cell
+                            head = head + 1
+                        end
+                    end
+                end
+            end
+        end
+
+        return candidates, head - 1
+    end,
+
+    ---@param self AIGridReclaim   
+    ---@param bx number                 # in grid space
+    ---@param bz number                 # in grid space
+    ---@param radius number             # in grid space
+    ---@param threshold number          # 
+    ---@param cache? table               # optional value, allows you to re-use memory in hot spots
+    ---@return AIGridReclaimCell[]      # all cells that meet the threhsold
+    ---@return number                   # number of cells found
+    FilterAndSortInRadius = function(self, bx, bz, radius, threshold, cache)
+        local filtered, count = self:FilterInRadius(bx, bz, radius, threshold, cache)
+        TableSort(filtered, SortLambda)
+        return filtered, count
     end,
 
     -------------------------------
@@ -225,6 +310,9 @@ GridReclaim = Class(Grid) {
     --- Allows us to scan the map
     ---@param self AIGridReclaim
     DebugUpdateThread = function(self)
+
+        local ColorRGB = import("/lua/shared/color.lua").ColorRGB
+
         while true do
             WaitTicks(1)
 
@@ -260,6 +348,19 @@ GridReclaim = Class(Grid) {
                 for k = 1, 8 do 
                     local cell = self.OrderedCells[k]
                     self:DrawCell(cell.X, cell.Z, 0, 'ff0000')
+                end
+
+                -- draw most valuable cell in range
+                local maximum = self:MaximumInRadius(bx, bz, 1)
+                self:DrawCell(maximum.X, maximum.Z, 1, '0000ff')
+
+                -- draw filtered and sorted cells
+                local filtered, count = self:FilterAndSortInRadius(bx, bz, 1, 500)
+                for k, cell in filtered do
+                    local factor = 1 - ((k - 1) / count)
+                    local color = ColorRGB(factor, factor, factor)
+                    self:DrawCell(cell.X, cell.Z, 2, color)
+                    self:DrawCell(cell.X, cell.Z, 2.5, color)
                 end
             end
         end
