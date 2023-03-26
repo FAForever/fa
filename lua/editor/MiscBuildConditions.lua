@@ -385,7 +385,7 @@ function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
         else
             searchRange = math.floor((engineerManager.Radius * 2) / reclaimGridInstance.CellSize)
         end
-        local cellX, cellZ = reclaimGridInstance:ToCellIndices(engineerManager.Location[1],engineerManager.Location[3])
+        local cellX, cellZ = reclaimGridInstance:ToGridSpace(engineerManager.Location[1],engineerManager.Location[3])
         local gridSize = 0
         if aiBrain:GetEconomyStoredRatio("MASS") <= 0.7 then
             while gridSize < searchRange do

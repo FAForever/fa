@@ -6939,14 +6939,23 @@ Platoon = Class(moho.platoon_methods) {
         return commands
     end,
 
+    ---@param self Platoon
     ReclaimGridAI = function(self)
         -- note ReclaimEngineerAssigned is currently disabled as we need a method of assigning engineers to the reclaim grid.
         -- Waiting a few days to see if Jip has ideas to making this possible via the gridinstance. If not then I can design a method.
         -- Note where state machine actions would happen.
         AIAttackUtils.GetMostRestrictiveLayer(self)
         local locationType = self.PlatoonData.LocationType
+
         local aiBrain = self:GetBrain()
         local reclaimGridInstance = aiBrain.GridReclaim
+        local brainGridInstance = aiBrain.GridBrain
+
+        -- we don't have the datastructures to run this platoon
+        if not (reclaimGridInstance and brainGridInstance) then
+            return
+        end
+
         local gridSize = reclaimGridInstance.CellSize * reclaimGridInstance.CellSize
         local searchType = self.PlatoonData.SearchType
             -- Placeholders this part is temporary until the ReclaimGrid defines the playable area min and max grid sizes
@@ -6955,17 +6964,68 @@ Platoon = Class(moho.platoon_methods) {
         while aiBrain:PlatoonExists(self) do
             WaitTicks(10)
             IssueClearCommands({eng})
-            local cancelSearch = false
-            local reclaimTargetX, reclaimTargetZ = AIUtils.EngFindReclaimCell(aiBrain, eng, self.MovementLayer)
+
+            -----------------------------------
+            -- find a nearby cell to reclaim --
+
+            -- @Relent0r this uses the newly introduced API to find nearby cells. Short descriptions:
+            -- `MaximumInRadius`            Finds most valuable cell to reclaim in a radius
+            -- `FilterInRadius`             Finds all cells that meets some threshold
+            -- `FilterAndSortInRadius`      Finds all cells that meets some threshold and sorts the list of cells from high value to low value
+
+            -- @Relent0r I have not tested this code, you'll have to tell me how to run it next time we talk. Then I can test it as I write it ^^
+
+            local engPos = eng:GetPosition()
+            local gx, gz = reclaimGridInstance:ToGridSpace(engPos[1],engPos[3])
+            local searchRadius = 0
+            local reclaimTargetX, reclaimTargetZ
+            while searchRadius < searchRange and (not (reclaimTargetX and reclaimTargetZ)) do 
+                WaitTicks(1)
+
+                -- retrieve a list of cells with some mass value
+                local cells, count = reclaimGridInstance:FilterAndSortInRadius(gx, gz, searchRadius, 10)
+
+                -- find out if we can path to the center of the cell
+                for k = 1, count do
+                    local cell = cells[k] --[[@as AIGridReclaimCell]]
+                    local centerOfCell = reclaimGridInstance:ToWorldSpace(cell.X, cell.Z)
+                    if NavUtils.CanPathTo(self.MovementLayer, engPos, centerOfCell) then
+                        reclaimTargetX, reclaimTargetZ = cell.X, cell.Z
+                        break
+                    end
+                end
+
+                searchRadius = searchRadius + 1
+            end
+
+            -----------------------------------------------
+            -- navigate to cell where we want to reclaim --
+
             if reclaimTargetX and reclaimTargetZ then
+
+                -- @Relent0r instead of this:
                 --reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].ReclaimEngineerAssigned = eng
-                local moveLocationX, moveLocationZ = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
-                local moveLocation = {moveLocationX, GetTerrainHeight(moveLocationX, moveLocationZ), moveLocationZ}
+
+                -- @Relent0r we can do this:
+                local brainCell = brainGridInstance:ToCellFromGridSpace(reclaimTargetX, reclaimTargetZ)
+                brainGridInstance:AddReclaimingEngineer(brainCell, eng)
+
+                -- @Relent0r and to query it we can do this:
+                local engineersInCell = brainGridInstance:CountReclaimingEngineers(brainCell)
+
+                -- @Relent0r or to remove the engineer again (doing something else, got killed, etc)
+                brainGridInstance:RemoveReclaimingEngineer(brainCell, eng)
+
+                -- @Relent0r the previous two statements make no sense here, but it is there to help you get an idea how we can work with the API
+                local moveLocation = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
                 IssueMove({eng}, moveLocation)
                 local moveCounter = 0
                 local engStuckCount = 0
                 local Lastdist
                 local dist = VDist3Sq(eng:GetPosition(), moveLocation)
+
+                -- @Relent0r I've not looke da the logic past this comment yet, just so that you're aware of that
+
                 -- Statemachine switch for engineer moving to location
                 while not IsDestroyed(eng) and dist > gridSize do
                     WaitTicks(25)
@@ -7029,14 +7089,17 @@ Platoon = Class(moho.platoon_methods) {
                     end
                 end
             end
+
             if reclaimTargetX and reclaimTargetZ then
                 --intelGrid[reclaimTargetX][reclaimTargetZ].ReclaimEngineerAssigned = false
             end
+
             if aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
                 eng:SetCustomName('Engineer is exiting reclaim loop')
                 eng.Combat = false
                 self:PlatoonDisband()
             end
+
             WaitTicks(100)
         end
     end,
