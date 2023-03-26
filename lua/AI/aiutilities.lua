@@ -3659,7 +3659,7 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer)
         for k = 1, count do
             local cell = cells[k] --[[@as AIGridReclaimCell]]
             local centerOfCell = reclaimGridInstance:ToWorldSpace(cell.X, cell.Z)
-            local maxEngineers = math.min(math.Ceil(cell.TotalMass / 250), 8)
+            local maxEngineers = math.min(math.ceil(cell.TotalMass / 250), 8)
             if CanPathTo(movementLayer, engPos, centerOfCell) then
                 local brainCell = brainGridInstance:ToCellFromGridSpace(cell.X, cell.Z)
                 -- Get a count of the current engineers assigned to this cell
