@@ -88,8 +88,17 @@ GridReclaim = Class(Grid) {
     ---@param wx number     # in world space
     ---@param wz number     # in world space
     ---@return AIGridReclaimCell
-    ToCell = function(self, wx, wz)
+    ToCellFromWorldSpace = function(self, wx, wz)
         local gx, gz = self:ToGridSpace(wx, wz)
+        return self.Cells[gx][gz]
+    end,
+
+    --- Converts a grid position to a cell
+    ---@param self AIGridReclaim
+    ---@param gx number     # in grid space
+    ---@param gz number     # in grid space
+    ---@return AIGridReclaimCell
+    ToCellFromGridSpace = function(self, gx, gz)
         return self.Cells[gx][gz]
     end,
 
@@ -224,7 +233,7 @@ GridReclaim = Class(Grid) {
     ---@param bz number                 # in grid space
     ---@param radius number             # in grid space
     ---@param threshold number          # 
-    ---@param cache? table               # optional value, allows you to re-use memory in hot spots
+    ---@param cache? table              # optional value, allows you to re-use memory in hot spots
     ---@return AIGridReclaimCell[]      # all cells that meet the threhsold
     ---@return number                   # number of cells found
     FilterInRadius = function(self, bx, bz, radius, threshold, cache)
@@ -345,8 +354,7 @@ GridReclaim = Class(Grid) {
 
                 self:DrawCell(bx, bz, 0, 'ffffff')
 
-                local px, pz = self:ToWorldSpace(bx, bz)
-                DrawCircle({px, GetSurfaceHeight(px, pz), pz}, 4, '000000')
+                DrawCircle(self:ToWorldSpace(bx, bz), 4, '000000')
 
                 DebugCellData.ReclaimCount = cell.ReclaimCount
                 DebugCellData.TotalEnergy = cell.TotalEnergy

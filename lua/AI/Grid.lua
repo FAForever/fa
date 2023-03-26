@@ -49,8 +49,17 @@ Grid = ClassSimple {
     ---@param wx number     # in world space
     ---@param wz number     # in world space
     ---@return AIGridCell
-    ToCell = function(self, wx, wz)
+    ToCellFromWorldSpace = function(self, wx, wz)
         local gx, gz = self:ToGridSpace(wx, wz)
+        return self.Cells[gx][gz]
+    end,
+
+    --- Converts a grid position to a cell
+    ---@param self AIGrid
+    ---@param gx number     # in grid space
+    ---@param gz number     # in grid space
+    ---@return AIGridCell
+    ToCellFromGridSpace = function(self, gx, gz)
         return self.Cells[gx][gz]
     end,
 
@@ -88,13 +97,19 @@ Grid = ClassSimple {
     ---@param self AIGrid
     ---@param bx number     # in grid space
     ---@param bz number     # in grid space
-    ---@return number       # in world space
-    ---@return number       # in world space
-    ToWorldSpace = function(self, bx, bz)
+    ---@param cache? Vector # optional value, allows you to re-use memory in hot spots
+    ---@return Vector       # in world space
+    ToWorldSpace = function(self, bx, bz, cache)
         local cellSize = self.CellSize
         local px = (bx - 1) * cellSize + 0.5 * cellSize
         local pz = (bz - 1) * cellSize + 0.5 * cellSize
-        return px, pz
+
+        local position = cache or { }
+        position[1] = px
+        position[2] = GetSurfaceHeight(px, pz)
+        position[3] = pz
+
+        return position
     end,
 
     --- Converts a cell into a rectangle

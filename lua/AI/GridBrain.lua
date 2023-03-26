@@ -43,8 +43,17 @@ GridBrain = Class(Grid) {
     ---@param wx number     # in world space
     ---@param wz number     # in world space
     ---@return AIGridBrainCell
-    ToCell = function(self, wx, wz)
+    ToCellFromWorldSpace = function(self, wx, wz)
         local gx, gz = self:ToGridSpace(wx, wz)
+        return self.Cells[gx][gz]
+    end,
+
+    --- Converts a grid position to a cell
+    ---@param self AIGridBrain
+    ---@param gx number     # in grid space
+    ---@param gz number     # in grid space
+    ---@return AIGridBrainCell
+    ToCellFromGridSpace = function(self, gx, gz)
         return self.Cells[gx][gz]
     end,
 
