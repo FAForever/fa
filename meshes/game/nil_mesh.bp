@@ -1,0 +1,10 @@
+MeshBlueprint {
+    LODs = {
+        {
+            ShaderName = 'Unit',
+            LODCutoff = 1,
+        },
+    },
+    IconFadeInZoom = 100,
+    UniformScale = 0,
+}

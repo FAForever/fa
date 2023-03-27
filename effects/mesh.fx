@@ -9421,6 +9421,58 @@ float4 PBR_AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
     return float4( color, alpha );
 }
 
+float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+
+    float metallic = saturate((specular.r - 0.02) * 4 - specular.a * 5);
+
+    albedo.rgb *= 1 + metallic; 
+    // We need to make the dark areas darker
+    // Should find something that offers more control over the result
+    float x = albedo.r;
+    albedo.rgb = (pow(x, 3) - 3 * pow(x, 2) + 3 * x) * albedo.rgb;
+
+    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.8, specular.a);
+
+    if (specular.g < 0.45)
+        specular.g = 0.022 * (exp(6 * specular.g) - 1) + 0.023 + specular.a * 0.2;
+    else
+        specular.g = 0.762 * specular.g - 0.014;
+    float teamcolorBorder = saturate(mapRange(specular.a, 0.54, 0.6, 0, 1));
+    float darkAreas = 0;
+    if (specular.r < 0.18)
+        darkAreas = saturate(0.7 - pow(specular.r, 0.6));
+    float roughness = lerp(specular.g, 0.03, teamcolorBorder);
+    roughness = max(roughness, darkAreas);
+
+    float specularAmount = lerp(0.08, 0, darkAreas);
+    specularAmount = lerp(specularAmount, 0.04, saturate(specular.a * 3));
+
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, specularAmount).rgb;
+
+    float emission = specular.b + (pow(specular.a, 2) * 0.1);
+    color += emission * albedo.rgb;
+
+    float2 texcoord = vertex.texcoord0.xy * 60;
+    texcoord.x -= vertex.material.x * 0.16;
+    texcoord.y -= vertex.material.x * 0.01;
+    float2 texcoord2 = vertex.texcoord0.xy * 30;
+    texcoord2.x += vertex.material.x * 0.08;
+    texcoord2.y -= vertex.material.x * 0.005;
+    float3 secondary = tex2D( secondarySampler, texcoord );
+    float3 secondary2 = tex2D( secondarySampler, texcoord2 );
+    color += float3(0.2,0.7,1) * (secondary.b + secondary2.g )* (1-albedo.a);
+
+    float alpha = mirrored ? 0.5 : specular.b + ((secondary.b + secondary2.g )* (1-albedo.a))+ glowMinimum;
+    return float4(color, alpha);
+}
+
 float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool hiDefShadows) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth);
@@ -9611,6 +9663,26 @@ technique PBR_Aeon_Navy
 
         VertexShader = compile vs_1_1 NormalMappedVS();
         PixelShader = compile ps_2_a PBR_AeonPS(true);
+    }
+}
+
+technique PBR_AeonCZAR
+<
+    string abstractTechnique = "PBR_AeonCZAR";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_AeonCZARPS(true);
     }
 }
 

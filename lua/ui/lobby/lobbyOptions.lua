@@ -276,7 +276,7 @@ globalOpts = {
     },
 
     {
-        default = 1,
+        default = 2,
         label = "<LOC lobui_0434>Share Unit Cap at Death",
         help = "<LOC lobui_0435>Enable this to share unitcap when a player dies",
         key = 'ShareUnitCap',
