@@ -6950,6 +6950,7 @@ Platoon = Class(moho.platoon_methods) {
         local aiBrain = self:GetBrain()
         local reclaimGridInstance = aiBrain.GridReclaim
         local brainGridInstance = aiBrain.GridBrain
+        local eng = self:GetPlatoonUnits()[1]
 
         -- we don't have the datastructures to run this platoon
         if not (reclaimGridInstance and brainGridInstance) then
@@ -6960,7 +6961,7 @@ Platoon = Class(moho.platoon_methods) {
             if unit.CellAssigned then
                 -- Brain is assigned on unit create, if issues use eng:GetAIBrain()
                 local brainGridInstance = unit.Brain.GridBrain
-                local brainCell = brainGridInstance:ToCellFromGridSpace(unit.CellAssigned[1], unit.CellAssigned[3])
+                local brainCell = brainGridInstance:ToCellFromGridSpace(unit.CellAssigned[1], unit.CellAssigned[2])
                 -- confirm engineer is removed from cell during debug
                 brainGridInstance:RemoveReclaimingEngineer(brainCell, unit)
             end
@@ -6971,7 +6972,7 @@ Platoon = Class(moho.platoon_methods) {
         local gridSize = reclaimGridInstance.CellSize * reclaimGridInstance.CellSize
         local searchType = self.PlatoonData.SearchType
             -- Placeholders this part is temporary until the ReclaimGrid defines the playable area min and max grid sizes
-        local eng = self:GetPlatoonUnits()[1]
+        
         eng.CellAssigned = false
         -- Combat is added to stop the engineer manager from doing anything with the engineer
         eng.Combat = true
@@ -6990,7 +6991,7 @@ Platoon = Class(moho.platoon_methods) {
             -- @Relent0r I have not tested this code, you'll have to tell me how to run it next time we talk. Then I can test it as I write it ^^
 
             local engPos = eng:GetPosition()           
-            local reclaimTargetX, reclaimTargetZ = AIUtils.EngFindReclaimCell(aiBrain, eng, self.MovementLayer)
+            local reclaimTargetX, reclaimTargetZ = AIUtils.EngFindReclaimCell(aiBrain, eng, self.MovementLayer, searchType)
 
             -----------------------------------------------
             -- navigate to cell where we want to reclaim --
@@ -7080,6 +7081,7 @@ Platoon = Class(moho.platoon_methods) {
             if reclaimTargetX and reclaimTargetZ then
                 -- remove engineer from cell assignment
                 -- check this is updating during debug
+                local brainCell = brainGridInstance:ToCellFromGridSpace(eng.CellAssigned[1], eng.CellAssigned[2])
                 brainGridInstance:RemoveReclaimingEngineer(brainCell, eng)
                 eng.CellAssigned = false
             end

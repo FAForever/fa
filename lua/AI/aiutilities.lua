@@ -3624,7 +3624,6 @@ function EngPerformReclaim(eng, minimumReclaim)
             end
         end
         if table.getn(closeReclaim) > 0 then
-            --RNGLOG('Close Reclaim, attempting to clear and reclaim')
             IssueClearCommands({eng})
             for _, rec in closeReclaim do
                 IssueReclaim({eng}, rec)
@@ -3635,7 +3634,7 @@ function EngPerformReclaim(eng, minimumReclaim)
     return action
 end
 
-function EngFindReclaimCell(aiBrain, eng, movementLayer)
+function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
     local CanPathTo = import("/lua/sim/navutils.lua").CanPathTo
     local reclaimGridInstance = aiBrain.GridReclaim
     local brainGridInstance = aiBrain.GridBrain
@@ -3643,6 +3642,9 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer)
     local searchRadius = 16
     if maxmapdimension == 256 then
         searchRadius = 8
+    end
+    if searchType == 'MAIN' then
+        searchRadius = aiBrain.IMAPConfig.Rings
     end
     local searchLoop = 0
     local cancelSearch = false
@@ -3659,7 +3661,7 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer)
         for k = 1, count do
             local cell = cells[k] --[[@as AIGridReclaimCell]]
             local centerOfCell = reclaimGridInstance:ToWorldSpace(cell.X, cell.Z)
-            local maxEngineers = math.min(math.ceil(cell.TotalMass / 250), 8)
+            local maxEngineers = math.min(math.ceil(cell.TotalMass / 500), 8)
             if CanPathTo(movementLayer, engPos, centerOfCell) then
                 local brainCell = brainGridInstance:ToCellFromGridSpace(cell.X, cell.Z)
                 -- Get a count of the current engineers assigned to this cell

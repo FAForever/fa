@@ -1330,6 +1330,7 @@ BuilderGroup {
             },
         BuilderData = {
             LocationType = 'LocationType',
+            SearchType   = 'MAIN',
         },
         BuilderType = 'Any',
     },
