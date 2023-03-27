@@ -912,7 +912,7 @@ end
 
 --- Run teleport effect then delete unit if told to do so
 ---@param unit Unit
----@param killUnit boolean
+---@param killUnit? boolean
 function FakeTeleportUnit(unit, killUnit)
     IssueStop({unit})
     IssueClearCommands({unit})
@@ -934,27 +934,43 @@ end
 
 --- Run teleport effect then delete unit if told to do so
 ---@param units Unit
----@param killUnits boolean
+---@param killUnits? boolean
 function FakeTeleportUnits(units, killUnits)
     IssueStop(units)
     IssueClearCommands(units)
+    local buildingUnits = {}
     for _, unit in units do
-        unit.CanBeKilled = false
-        unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
-        unit:PlayUnitSound('GateCharge')
+        if not IsDestroyed(unit) then
+            unit.CanBeKilled = false
+            -- if an SCU is currently gating in, it's already getting teleport effects
+            if unit:GetFractionComplete() < 1 then
+                buildingUnits[unit] = true
+            else
+                unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
+                unit:PlayUnitSound('GateCharge')
+            end
+        end
     end
+
     WaitSeconds(2)
 
     for _, unit in units do
-        unit:CleanupTeleportChargeEffects()
-        unit:PlayTeleportOutEffects()
-        unit:PlayUnitSound('GateOut')
+        if not IsDestroyed(unit) then
+            if not buildingUnits[unit] then
+                unit:CleanupTeleportChargeEffects()
+                unit:PlayUnitSound('GateOut')
+            end
+            unit:PlayTeleportOutEffects()
+        end
     end
+
     WaitSeconds(1)
 
     if killUnits then
         for _, unit in units do
-            unit:Destroy()
+            if not IsDestroyed(unit) then
+                unit:Destroy()
+            end
         end
     end
 end
@@ -1067,6 +1083,12 @@ function RemoveRestriction(army, categories, isSilent)
         -- Remove scenario restriction from game restrictions
         Game.RemoveRestriction(categories, army)
         Sync.Restrictions = Game.GetRestrictions()
+
+        ---@type AIBrain
+        local brain = ArmyBrains[army]
+        if brain then
+            brain:ReEvaluateHQSupportFactoryRestrictions()
+        end
     end
 end
 

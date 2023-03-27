@@ -4,6 +4,7 @@ UnitBlueprint {
         TargetBones = {
             'Torso',
         },
+        InitialAutoMode = true,
     },
     Audio = {
         CaptureLoop = Sound {

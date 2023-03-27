@@ -12,7 +12,6 @@ local instantBuildConditionsUpperCase = { }
 instantBuildConditionsUpperCase['/lua/editor/InstantBuildConditions.lua'] = true
 instantBuildConditionsUpperCase['/lua/editor/UnitCountBuildConditions.lua'] = true
 instantBuildConditionsUpperCase['/lua/editor/EconomyBuildConditions.lua'] = true
-instantBuildConditionsUpperCase['/lua/editor/SorianInstantBuildConditions.lua'] = true
 
 ---@type table<FileReference, boolean>
 local instantBuildConditions = { }

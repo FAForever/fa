@@ -238,24 +238,24 @@ UnitBlueprint {
                     TreadMarks = {
                         {
                             TreadMarks = 'tank_treads06_albedo',
-                            TreadMarksInterval = 0.6,
+                            TreadMarksInterval = 0.3,
                             TreadMarksSizeX = 5,
                             TreadMarksSizeZ = 5.5,
                             TreadOffset = {
                                 0,
                                 0,
-                                -1.5,
+                                -0.5,
                             },
                         },
                         {
                             TreadMarks = 'tank_treads06_albedo',
-                            TreadMarksInterval = 0.6,
+                            TreadMarksInterval = 0.3,
                             TreadMarksSizeX = 5.5,
                             TreadMarksSizeZ = 5.5,
                             TreadOffset = {
                                 0,
                                 0,
-                                -5.5,
+                                -4.5,
                             },
                         },
                     },

@@ -4,24 +4,17 @@
 --  Summary  :  Aeon Long Range Sonar Script
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
-local SSonarUnit = import("/lua/seraphimunits.lua").SSonarUnit
 local SSubUnit = import("/lua/seraphimunits.lua").SSubUnit
 local SSeaUnit = import("/lua/seraphimunits.lua").SSeaUnit
 
 ---@class XSB3202 : SSubUnit
 XSB3202 = ClassUnit(SSubUnit) {
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        SSubUnit.OnStopBeingBuilt(self,builder,layer)
-        
-        -- enable sonar economy
+    OnStopBeingBuilt = function(self, builder, layer)
+        SSubUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
-        
-        -- Unless we're gifted, we should have an original builder.
-        -- Remains to be seen if this property is actually copied during gift
         if self.originalBuilder then
-            IssueDive({self})
+            IssueDive({ self })
         end
     end,
 
@@ -33,14 +26,15 @@ XSB3202 = ClassUnit(SSubUnit) {
             Type = 'SonarBuoy01',
         },
     },
-    
+
     CreateIdleEffects = function(self)
         SSeaUnit.CreateIdleEffects(self)
-        self.TimedSonarEffectsThread = self:ForkThread( self.TimedIdleSonarEffects )
+        local idleEffectsThread = ForkThread(self.TimedIdleSonarEffects, self)
+        self.IdleEffectsBag:Add(idleEffectsThread)
     end,
-    
+
     OnMotionVertEventChange = function(self, new, old)
-        local mult = self:GetBlueprint().Physics.SubSpeedMultiplier
+        local mult = self.Blueprint.Physics.SubSpeedMultiplier
         SSubUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then
             self:SetSpeedMult(1)
@@ -48,34 +42,29 @@ XSB3202 = ClassUnit(SSubUnit) {
             self:SetSpeedMult(mult)
         end
     end,
-    
-    
-    TimedIdleSonarEffects = function( self )
+
+    TimedIdleSonarEffects = function(self)
         local layer = self.Layer
         local pos = self:GetPosition()
         if self.TimedSonarTTIdleEffects then
             while not self.Dead do
                 for kTypeGroup, vTypeGroup in self.TimedSonarTTIdleEffects do
-                    local effects = self.GetTerrainTypeEffects( 'FXIdle', layer, pos, vTypeGroup.Type, nil )
-                    
+                    local effects = self.GetTerrainTypeEffects('FXIdle', layer, pos, vTypeGroup.Type, nil)
+
                     for kb, vBone in vTypeGroup.Bones do
                         for ke, vEffect in effects do
-                            emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
+                            emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale
+                                or 1)
                             if vTypeGroup.Offset then
-                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,vTypeGroup.Offset[3] or 0)
+                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,
+                                    vTypeGroup.Offset[3] or 0)
                             end
                         end
-                    end                    
+                    end
                 end
-                WaitSeconds( 6.0 )                
+                WaitTicks(61)
             end
         end
     end,
-
-    DestroyIdleEffects = function(self)
-        self.TimedSonarEffectsThread:Destroy()
-        SSeaUnit.DestroyIdleEffects(self)
-    end,
 }
-
 TypeClass = XSB3202

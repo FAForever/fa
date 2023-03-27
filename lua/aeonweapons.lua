@@ -239,14 +239,14 @@ ADFTractorClaw = ClassWeapon(Weapon) {
                     unit:DetachAll(muzzle)
                     slider:Destroy()
 
-                    -- remove the shield, if it is there
+                    -- turn off any shields
                     if target.MyShield then
                         target.MyShield:TurnOff()
                     end
 
                     -- create thread to take into account the fall
-                    self:ForkThread(self.TargetFallThread, target, trash, muzzle)
                     self:ResetTarget()
+                    self:ForkThread(self.TargetFallThread, target, trash, muzzle)
                 else 
                     self:MakeVulnerable(target)
                     trash:Destroy()
@@ -283,26 +283,29 @@ ADFTractorClaw = ClassWeapon(Weapon) {
         end
 
         -- air units drop on their own
-        if target.Blueprint.CategoriesHash.AIR then
+        if target.Blueprint.CategoriesHash["AIR"] then
             target:Kill()
         -- assist land units with a natural drop
-        else 
+        else
             -- let it create the wreck, with the rotator manipulators attached
             target.PlayDeathAnimation = false
             target.DestructionExplosionWaitDelayMin = 0
             target.DestructionExplosionWaitDelayMax = 0
 
-            -- create a projectile that matches the velocity / orientation 
-            local vx, vy, vz = target:GetVelocity()
+            -- create a projectile to help identify when the unit is on the terrain
             local projectile = target:CreateProjectileAtBone('/effects/entities/ADFTractorFall01/ADFTractorFall01_proj.bp', 0)
-            projectile:SetVelocity(10 * vx, 10 * vy, 10 * vz)
-            Warp(projectile, target:GetPosition(), target:GetOrientation())
 
-            -- happens when the projectile is created underwater
-            if IsDestroyed(projectile) then
-                target:Kill()
+            -- is not defined when the projectile is created underwater
+            if not projectile.Blueprint then
+                Explosion.CreateScalableUnitExplosion(target, 0, true)
+                target:Destroy()
+                return
             end
 
+            -- match velocity and orientation of unit
+            local vx, vy, vz = target:GetVelocity()
+            projectile:SetVelocity(10 * vx, 10 * vy, 10 * vz)
+            Warp(projectile, target:GetPosition(), target:GetOrientation())
             projectile.OnImpact = function(projectile)
                 if not IsDestroyed(target) then
                     target.CanTakeDamage = true
@@ -469,7 +472,7 @@ AIFArtilleryMiasmaShellWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class AIFArtillerySonanceShellWeapon : DefaultProjectileWeapon
 AIFArtillerySonanceShellWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {
+    FxChargeMuzzleFlash = {
         '/effects/emitters/aeon_sonance_muzzle_01_emit.bp',
         '/effects/emitters/aeon_sonance_muzzle_02_emit.bp',
         '/effects/emitters/aeon_sonance_muzzle_03_emit.bp',
@@ -658,6 +661,16 @@ AIFQuanticArtillery = ClassWeapon(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = EffectTemplate.Aeon_QuanticClusterChargeMuzzleFlash,
 }
 
+--- AEON DESTROYER PROJECTILE
+---@class ASDCannonOblivionNaval : DefaultProjectileWeapon
+ADFCannonOblivionNaval = Class(DefaultProjectileWeapon) {
+    FxMuzzleFlash = {
+        '/effects/emitters/oblivion_cannon_naval_01_emit.bp',  -- Stream effect
+        '/effects/emitters/oblivion_cannon_naval_02_emit.bp',  -- Gas effect
+        '/effects/emitters/oblivion_cannon_naval_03_emit.bp',  -- Sparkle effect
+        '/effects/emitters/oblivion_cannon_naval_04_emit.bp',  -- Sphere effect
+    },
+}
 
 -- kept for mod backwards compatibility
 local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
