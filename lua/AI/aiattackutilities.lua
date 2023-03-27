@@ -465,6 +465,8 @@ end
 function GetNavalPlatoonMaxRange(aiBrain, platoon)
     local maxRange = 0
     local platoonUnits = platoon:GetPlatoonUnits()
+    local isTech1 = false
+    
     for _,unit in platoonUnits do
         if unit.Dead then
             continue

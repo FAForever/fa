@@ -104,6 +104,7 @@ local TableGetn = table.getn
 ---@field UnitBuiltTriggerList table
 ---@field UnitStats table<EntityId, table<string, number>>
 ---@field VeterancyTriggerList table
+---@field GridReclaim? AIGridReclaim
 AIBrain = Class(moho.aibrain_methods) {
     -- The state of the brain in the match
     Status = 'InProgress',
@@ -168,6 +169,9 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param planName string
     OnCreateAI = function(self, planName)
         self:CreateBrainShared(planName)
+
+        -- add reference to grid reclaim
+        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
 
         local civilian = false
         for name, data in ScenarioInfo.ArmySetup do
@@ -884,9 +888,18 @@ AIBrain = Class(moho.aibrain_methods) {
     SetResult = function(self, result)
     end,
 
+    -- TODO: put repeated code from `OnDefeat` and `OnRecalled` in one place
+
     ---@param self AIBrain
     OnDefeat = function(self)
         self.Status = 'Defeat'
+
+        for _, ally in ArmyBrains do
+            if IsAlly(self.Army, ally.Army) and ally.recallVotingThread then
+                ally.VoteCancelled = true
+                ResumeThread(ally.recallVotingThread)
+            end
+        end
 
         import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
         import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
@@ -1292,9 +1305,9 @@ AIBrain = Class(moho.aibrain_methods) {
             TransferUnitsToHighestBrain(enemies)
         end
 
-       -- Kill all units left over
-       local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-       if tokill then
+        -- Kill all units left over
+        local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+        if tokill then
             for _, unit in tokill do
                 unit:Kill()
             end
@@ -5124,6 +5137,13 @@ AIBrain = Class(moho.aibrain_methods) {
         local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
         AIAttackUtils.NavalAttackCheck(self)
 
+    end,
+
+    ---@param self AIBrain
+    ---@param grid AIGridReclaim
+    ---@param cell AIGridReclaimCell
+    OnReclaimUpdate = function(self, grid, cell)
+        -- do things with it
     end,
 }
 

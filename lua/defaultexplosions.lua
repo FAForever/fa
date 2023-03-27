@@ -879,7 +879,7 @@ end
 ---@return Projectile
 function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVelocity, Lifetime, velX, velY, VelZ, orientRot, orientX, orientY, orientZ)
 
-    proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
+    local proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
     proj:SetScale(scale,scale,scale):SetScaleVelocity(scaleVelocity):SetLifetime(Lifetime):SetVelocity(velX, velY, VelZ)
 
     local orient = {0, 0, 0, 0}

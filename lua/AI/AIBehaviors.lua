@@ -53,7 +53,7 @@ function CDRRunAway(aiBrain, cdr)
                         if canTeleport then
                             IssueTeleport({cdr}, runSpot)
                         else
-                            cmd = plat:MoveToLocation(runSpot, false)
+                            plat:MoveToLocation(runSpot, false)
                         end
                     end
                 end
@@ -149,11 +149,13 @@ function CDROverCharge(aiBrain, cdr)
         local counter = 0
         local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 60
         local enemyThreat
+        local enemyCdrThreat 
+        local friendlyThreat
         repeat
             overCharging = false
             if counter >= 5 or not target or target.Dead or Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) > maxRadius then
                 counter = 0
-                searchRadius = 30
+                local searchRadius = 30
                 repeat
                     searchRadius = searchRadius + 30
                     for k, v in priList do
@@ -1086,7 +1088,7 @@ TempestBehavior = function(self)
         if aiBrain:PlatoonExists(self) and not self.Patrolling then
             self:Stop()
             self.Patrolling = true
-            scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())
+            local scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())
             for k, v in scoutPath do
                 self:Patrol(v)
             end
@@ -1654,6 +1656,7 @@ function CDROverChargeSorian(aiBrain, cdr)
     local distressRange = 100
     local maxRadius = weapon.MaxRadius * 4.55
     local weapRange = weapon.MaxRadius
+    local shieldPercent
     cdr.UnitBeingBuiltBehavior = false
 
     local cdrPos = cdr.CDRHome
@@ -1728,6 +1731,8 @@ function CDROverChargeSorian(aiBrain, cdr)
         local counter = 0
         local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 60
         local enemyThreat
+        local enemyCdrThreat
+        local friendlyThreat
         repeat
             overCharging = false
             local cdrCurrentPos = cdr:GetPosition()
@@ -1943,8 +1948,8 @@ function CommanderThreadSorian(cdr, platoon)
         SUtils.AISendChat('all', ArmyBrains[aiBrain:GetArmyIndex()].Nickname, 'badmap')
     end
 
-    moveOnNext = false
-    moveWait = 0
+    local moveOnNext = false
+    local moveWait = 0
     local Mult = cdr.Mult or 1
     local Delay = platoon.PlatoonData.Delay or 165
     local WaitTaunt = 600 + Random(1, 600)
@@ -2487,7 +2492,7 @@ AhwassaBehaviorSorian = function(self)
         self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
         if targetLocation and targetLocation ~= oldTargetLocation then
             IssueClearCommands(platoonUnits)
-            cmd = ExpPathToLocation(aiBrain, self, 'Air', targetLocation, 'AttackDest', 62500)
+            ExpPathToLocation(aiBrain, self, 'Air', targetLocation, 'AttackDest', 62500)
             IssueAttack(platoonUnits, targetLocation)
             WaitSeconds(25)
         end

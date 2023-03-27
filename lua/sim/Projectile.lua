@@ -891,6 +891,8 @@ Projectile = ClassProjectile(moho.projectile_methods) {
 --- A dummy projectile that solely inherits what it needs. Useful for
 -- effects that require projectiles without additional overhead.
 ---@class DummyProjectile : moho.projectile_methods
+---@field Blueprint ProjectileBlueprint
+---@field Army Army
 DummyProjectile = Class(moho.projectile_methods) {
 
     ---@param self DummyProjectile
