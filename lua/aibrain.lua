@@ -530,6 +530,10 @@ local AIBrainEnergyComponent = ClassSimple {
 
 }
 
+local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local CategoriesDummyUnit = categories.DUMMYUNIT
+
 ---@class AIBrain: AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Status BrainState
