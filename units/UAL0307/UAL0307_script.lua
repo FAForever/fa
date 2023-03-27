@@ -1,12 +1,8 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UAL0307/UAL0307_script.lua
---**  Author(s):  John Comes, David Tomandl
---**
---**  Summary  :  Aeon Mobile Shield Generator Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /cdimage/units/UAL0307/UAL0307_script.lua
+-- Author(s):  John Comes, David Tomandl
+-- Summary  :  Aeon Mobile Shield Generator Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 
 local AShieldHoverLandUnit = import("/lua/aeonunits.lua").AShieldHoverLandUnit
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
@@ -39,7 +35,7 @@ UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
         if not self.Animator then
             self.Animator = CreateAnimator(self)
             self.Trash:Add(self.Animator)
-            self.Animator:PlayAnim(self:GetBlueprint().Display.AnimationOpen)
+            self.Animator:PlayAnim(self.Blueprint.Display.AnimationOpen)
         end
         self.Animator:SetRate(1)
     end,
@@ -83,5 +79,4 @@ UAL0307 = ClassUnit(AShieldHoverLandUnit, ShieldEffectsComponent) {
         end
     end,
 }
-
 TypeClass = UAL0307
