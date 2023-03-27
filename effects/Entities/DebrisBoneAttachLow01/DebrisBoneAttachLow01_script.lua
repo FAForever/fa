@@ -1,7 +1,7 @@
 -- script for projectile BoneAttached
 
 local GenericDebris = import("/lua/genericdebris.lua").GenericDebris
-DebrisBoneAttachLow01 = Class(GenericDebris) {
+DebrisBoneAttachLow01 = ClassDummyProjectile(GenericDebris) {
     FxUnitHitScale = 0.25,
     FxUnderWaterHitScale = 0.25,
     FxNoneHitScale = 0.25,
