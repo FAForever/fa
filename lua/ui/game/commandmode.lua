@@ -125,39 +125,17 @@ function EndCommandMode(isCancel)
 
     -- in case we want to end the command mode, without knowing it has already ended or not
     if modeData then
-        -- regain selection if we were cheating in units
-        if modeData.cheat then
-            if modeData.ids and modeData.index <= table.getn(modeData.ids) then
-                local modeData = table.deepcopy(modeData)
-                ForkThread(
-                    function()
-                        WaitSeconds(0.0001)
-
-                        modeData.name = modeData.ids[modeData.index]
-                        modeData.bpId = modeData.ids[modeData.index]
-                        modeData.index = modeData.index + 1
-
-                        StartCommandMode("build", modeData)
-                    end
-                )
-            else
-                if modeData.selection then
-                    SelectUnits(modeData.selection)
-                end
-            end
-
-            -- we can end up here because we re-start the command mode
-            if not modeData then
-                return
-            end
-        end
-
         -- add information to modeData for end behavior
         modeData.isCancel = isCancel or false
 
         -- ???
         if modeData.isCancel then
             ClearBuildTemplates()
+        end
+
+        -- regain selection if we were cheating in units
+        if modeData.cheat and modeData.selection then
+            SelectUnits(modeData.selection)
         end
     end
 
@@ -436,21 +414,20 @@ end
 -- @param data A shallow copy of the modeData to make the function pure data-wise
 local function CheatSpawn(command, data)
     SimCallback({
-        Func = 'BoxFormationSpawn',
+        Func = data.prop and 'CheatBoxSpawnProp' or 'CheatSpawnUnit',
         Args = {
-            bpId = data.bpId,
-            count = data.count,
             army = data.army,
             pos = command.Target.Position,
-            veterancy = data.vet,
+            bpId = data.unit or data.prop or command.Blueprint,
+            count = data.count,
             yaw = data.yaw,
+            rand = data.rand,
+            veterancy = data.vet,
+            CreateTarmac = data.CreateTarmac,
+            MeshOnly = data.MeshOnly,
+            UnitIconCameraMode = data.UnitIconCameraMode,
         }
     }, true)
-
-    -- if we hold shift then we get to place another unit!
-    if not IsKeyDown('Shift') then
-        EndCommandMode(true)
-    end
 end
 
 -- cached category strings for performance
@@ -495,25 +472,51 @@ local function OnGuardUnpause(guardees, target)
         prefs == 'ExtractorsAndRadars' and
             EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, target))
     then
-        for k, guardee in guardees do
 
-            -- for correct upvalue scope
-            ---@type UserUnit
-            local engineer = guardee
-
-            ForkThread(
-                function()
-                    while not (IsDestroyed(engineer) or IsDestroyed(target)) do
-                        WaitSeconds(1.0)
-
-                        local focus = engineer:GetFocus()
-                        if focus == target:GetFocus() then
-                            SetPaused({ target }, false)
-                            break
+        -- start a single thread to keep track of when to unpause, logic feels a bit convoluted
+        -- but that is purely to guarantee that we still have access to the user units as the
+        -- game progresses
+        if not target.ThreadUnpause then
+            local id = target:GetEntityId()
+            target.ThreadUnpause = ForkThread(
+                function ()
+                    WaitSeconds(1.0)
+                    local target = GetUnitById(id)
+                    while target do
+                        local candidates = target.ThreadUnpauseCandidates
+                        if (candidates and not table.empty(candidates)) then
+                            for id, _ in candidates do
+                                local engineer = GetUnitById(id)
+                                if engineer and not engineer:IsIdle() then
+                                    local focus = engineer:GetFocus()
+                                    if focus == target:GetFocus() then
+                                        target.ThreadUnpauseCandidates = nil
+                                        target.ThreadUnpause = nil
+                                        SetPaused({ target }, false)
+                                        break
+                                    end
+                                -- engineer is idle, died, we switch armies, ...
+                                else
+                                    candidates[id] = nil
+                                end
+                            end
+                        else
+                            target.ThreadUnpauseCandidates = nil
+                            target.ThreadUnpause = nil
+                            break;
                         end
+
+                        WaitSeconds(1.0)
+                        target = GetUnitById(id)
                     end
                 end
             )
+        end
+
+        -- add these to keep track
+        target.ThreadUnpauseCandidates = target.ThreadUnpauseCandidates or { }
+        for k, guardee in guardees do
+            target.ThreadUnpauseCandidates[guardee:GetEntityId()] = true
         end
     end
 end
@@ -522,8 +525,10 @@ end
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
 local function OnGuard(guardees, unit)
-    OnGuardUpgrade(guardees, unit)
-    OnGuardUnpause(guardees, unit)
+    if unit:GetArmy() == GetFocusArmy() then
+        OnGuardUpgrade(guardees, unit)
+        OnGuardUnpause(guardees, unit)
+    end
 end
 
 --- Called by the engine when a new command has been issued by the player.
@@ -554,9 +559,7 @@ function OnCommandIssued(command)
     if not command.Clear then
         issuedOneCommand = true
     else
-        if modeData and not modeData.consistent then
-            EndCommandMode(true)
-        end
+        EndCommandMode(true)
     end
 
     -- called when:

@@ -105,19 +105,19 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','OSB_Master_AirScout'},
                                 {'default_brain','OSB_Master_AirScout'}
                             },
                         },
                         PlatoonBuildCallbacks = {
-                            [0] = {'/lua/ai/opai/airscout_editorfunctions.lua', 'AirScoutDeath',
+                            {'/lua/ai/opai/airscout_editorfunctions.lua', 'AirScoutDeath',
                                 {'default_brain','default_platoon'},
                                 {'default_brain','default_platoon'}
                             },
                         },
                         PlatoonAddFunctions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMLockPlatoon',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMLockPlatoon',
                                 {'default_platoon'},
                                 {'default_platoon'}
                             },
@@ -136,7 +136,7 @@ Scenario = {
                         PlatoonType = 'Air',
                         RequiresConstruction = true,
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -156,7 +156,7 @@ Scenario = {
                         PlatoonType = 'Air',
                         RequiresConstruction = true,
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },

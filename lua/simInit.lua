@@ -76,6 +76,8 @@ end
 --but before any armies are created.
 function SetupSession()
 
+    import("/lua/ai/gridreclaim.lua").Setup()
+
     ScenarioInfo.TriggerManager = import("/lua/triggermanager.lua").Manager
     TriggerManager = ScenarioInfo.TriggerManager
 
@@ -221,7 +223,6 @@ end
 -- use it to store off various useful bits of info.
 -- The global variable "ArmyBrains" contains an array of AI brains, one for each army.
 function OnCreateArmyBrain(index, brain, name, nickname)
-
     -- switch out brains for non-human armies
     local info = ScenarioInfo.ArmySetup[name]
     if (not info.Human) and (info.AIPersonality != '') then
@@ -276,7 +277,6 @@ function BeginSession()
     import("/lua/sim/matchstate.lua").Setup()
     import("/lua/sim/markerutilities.lua").Setup()
 
-    BeginSessionGenerateNavMesh()
     BeginSessionAI()
     BeginSessionMapSetup()
     BeginSessionEffects()
@@ -286,6 +286,7 @@ function BeginSession()
     import("/lua/sim/scenarioutilities.lua").CreateResources()
 
     BeginSessionGenerateMarkers()
+    BeginSessionGenerateNavMesh()
 
     import("/lua/sim/score.lua").init()
     import("/lua/sim/recall.lua").init()
@@ -327,7 +328,7 @@ function BeginSessionGenerateNavMesh()
     if ScenarioInfo.GameHasAIs then
         for k, brain in ArmyBrains do
             if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
-                import('/lua/sim/navgenerator.lua').Generate()
+                import('/lua/sim/navutils.lua').Generate()
                 break
             end
         end
@@ -338,9 +339,6 @@ end
 function BeginSessionAI()
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
     if ScenarioInfo.GameHasAIs then
-
-
-
         local simMods = __active_mods or {}
         for Index, ModData in simMods do
             ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')

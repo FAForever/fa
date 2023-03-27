@@ -923,6 +923,10 @@
 
 
 ---@class UnitBlueprintPhysics
+--- Forces terrain alignment for structures
+---@field AltitudeToTerrain boolean
+--- forces terrain alignment for structures
+---@field AlwaysAlignToTerrain boolean
 --- alternate method of locomotion
 ---@field AltMotionType? UnitMotionType
 --- preferred attack height when attacking ground targets (used by dive bombers)

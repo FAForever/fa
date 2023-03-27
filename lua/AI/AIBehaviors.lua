@@ -51,7 +51,7 @@ function CDRRunAway(aiBrain, cdr)
                         if canTeleport then
                             IssueTeleport({cdr}, runSpot)
                         else
-                            cmd = plat:MoveToLocation(runSpot, false)
+                            plat:MoveToLocation(runSpot, false)
                         end
                     end
                 end
@@ -147,11 +147,13 @@ function CDROverCharge(aiBrain, cdr)
         local counter = 0
         local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 60
         local enemyThreat
+        local enemyCdrThreat 
+        local friendlyThreat
         repeat
             overCharging = false
             if counter >= 5 or not target or target.Dead or Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) > maxRadius then
                 counter = 0
-                searchRadius = 30
+                local searchRadius = 30
                 repeat
                     searchRadius = searchRadius + 30
                     for k, v in priList do
@@ -1084,7 +1086,7 @@ TempestBehavior = function(self)
         if aiBrain:PlatoonExists(self) and not self.Patrolling then
             self:Stop()
             self.Patrolling = true
-            scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())
+            local scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())
             for k, v in scoutPath do
                 self:Patrol(v)
             end
@@ -1362,10 +1364,11 @@ end
 ---@param cdr CommandUnit
 function CDRHideBehavior(aiBrain, cdr)
     if cdr:IsIdleState() then
+
         cdr.GoingHome = false
         cdr.Fighting = false
         cdr.Upgrading = false
-
+        
         local category = false
         local runShield = false
         local runPos = false

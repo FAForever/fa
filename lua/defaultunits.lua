@@ -15,6 +15,9 @@ local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
+local Quaternion = import("/lua/shared/quaternions.lua").Quaternion
+
+local MathAbs = math.abs
 
 local FactionToTarmacIndex = {
     UEF = 1,
@@ -67,35 +70,46 @@ StructureUnit = ClassUnit(Unit) {
         Unit.OnCreate(self)
         self:HideLandBones()
         self.FxBlinkingLightsBag = { }
-        if self.Blueprint.Physics.FlattenSkirt then
+
+        local layer = self.Layer
+        local blueprint = self.Blueprint
+        local physicsBlueprint = blueprint.Physics
+        local flatten = physicsBlueprint.FlattenSkirt
+        if flatten then
             self:FlattenSkirt()
         end
 
         -- check for terrain orientation
-        local bp = self.Blueprint
         if not (
-                bp.Physics.AltitudeToTerrain or
-                bp.Physics.StandUpright
-            ) and self.Layer == 'Land'
+                physicsBlueprint.AltitudeToTerrain or
+                physicsBlueprint.StandUpright
+            ) and (flatten or physicsBlueprint.AlwaysAlignToTerrain)
+            and (layer == 'Land' or layer == 'Seabed')
         then
             -- rotate structure to match terrain gradient
-            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
+            local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
                 self:GetPosition(),
-                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
-                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+                blueprint.Footprint.SizeX or physicsBlueprint.SkirtSizeX,
+                blueprint.Footprint.SizeZ or physicsBlueprint.SkirtSizeZ
             )
 
-            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
+            -- do not orientate structures that are on flat ground
+            if a1 != 0 or a2 != 0 then
+                -- quaternion magic incoming, be prepared! Note that the yaw axis is inverted, but then
+                -- re-inverted again by multiplying it with the original orientation
+                local quatSlope = Quaternion.fromAngle(0, 0 - a2,-1 * a1)
+                local quatOrient = setmetatable(self:GetOrientation(), Quaternion)
+                local quat = quatOrient * quatSlope
+                self:SetOrientation(quat, true)
 
-            -- technically obsolete, but as this is part of an integration we don't want to break
-            -- the mod package that it originates from. Originates from the BrewLan mod suite
-            if not bp.Physics.FlattenSkirt then
+                -- technically obsolete, but as this is part of an integration we don't want to break
+                -- the mod package that it originates from. Originates from the BrewLan mod suite
                 self.TerrainSlope = {}
             end
         end
 
         -- create decal below structure
-        if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
+        if flatten and not self:HasTarmac() and blueprint.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
                 self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
             else
@@ -186,7 +200,6 @@ StructureUnit = ClassUnit(Unit) {
         Unit.OnStartBeingBuilt(self, builder, layer)
 
         -- rotate weaponry towards enemy
-        local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         end
@@ -246,7 +259,7 @@ StructureUnit = ClassUnit(Unit) {
         -- hold up one tick to allow upgrades to pass the tarmac bag
         WaitTicks(1)
 
-        -- upgrades pass the tarmac bag, in which case we do nothing
+        -- upgrades pass the tarmac bag, in which case we take ownership and do nothing
         if self:HasTarmac() then
             self.TarmacBag.OwnedByEntity = self.EntityId
             return
@@ -881,6 +894,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildBoneRotator = CreateRotator(self, self.Blueprint.Display.BuildAttachBone or 0, 'y', 0, 10000)
+        self.BuildBoneRotator:SetPrecedence(1000)
+
         self.Trash:Add(self.BuildBoneRotator)
         self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         self.BuildingUnit = false
@@ -1271,15 +1286,23 @@ FactoryUnit = ClassUnit(StructureUnit) {
     BuildingState = State {
         ---@param self FactoryUnit
         Main = function(self)
+            -- to help prevent a 1-tick rotation on most units
+            local hasEnhancements = self.UnitBeingBuilt.Blueprint.Enhancements
+            if not hasEnhancements then
+                self.UnitBeingBuilt:HideBone(0, true)
+            end
+
             local spin = self:CalculateRollOffPoint()
             self.BuildBoneRotator:SetGoal(spin)
-
-            WaitTicks(1)
-
-            local bone = self.Blueprint.Display.BuildAttachBone or 0
-            self:DetachAll(bone)
-            self.UnitBeingBuilt:AttachBoneTo(-2, self, bone)
+            self.UnitBeingBuilt:AttachBoneTo(-2, self, self.Blueprint.Display.BuildAttachBone or 0)
             self:StartBuildFx(self.UnitBeingBuilt)
+
+            -- prevents a 1-tick rotating visual 'glitch' of unit
+            -- as it is being attached and the rotator is applied
+            WaitTicks(3)
+            if not hasEnhancements then
+                self.UnitBeingBuilt:ShowBone(0, true)
+            end
         end,
     },
 
@@ -1692,7 +1715,6 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self SeaFactoryUnit
     CalculateRollOffPoint = function(self)
-
         -- backwards compatible, don't try and fix mods that rely on the old logic
         if not self.Blueprint.Physics.ComputeRollOffPoint then
             return FactoryUnit.CalculateRollOffPoint(self)
@@ -2162,9 +2184,7 @@ AirUnit = ClassUnit(MobileUnit) {
             proj:Start(self, 0)
             self.Trash:Add(proj)
 
-            if self.totalDamageTaken > 0 and not self.veterancyDispersed then
-                self:VeterancyDispersal(not instigator or not IsUnit(instigator))
-            end
+            self:VeterancyDispersal()
         else
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
@@ -2907,6 +2927,21 @@ ACUUnit = ClassUnit(CommandUnit) {
                 WARN('Teamkill detected')
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
             end
+
+            -- prepare sync
+            local sync = Sync
+            local events = sync.Events or { }
+            sync.Events = events
+            local acuDestroyed = events.ACUDestroyed or { }
+            events.ACUDestroyed = acuDestroyed
+
+            -- sync the event
+            table.insert(acuDestroyed, {
+                Timestamp = GetGameTimeSeconds(),
+                InstigatorArmy = instigator.Army,
+                KilledArmy = self.Army
+            })
+
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
     end,

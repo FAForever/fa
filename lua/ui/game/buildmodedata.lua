@@ -2,7 +2,6 @@
 
 local AeonT1Eng = {
     ['L'] = 'uab0101',
-    ['R'] = 'dab2102',
     ['A'] = 'uab0102',
     ['S'] = 'uab0103',
     ['E'] = 'uab1103',
@@ -16,9 +15,13 @@ local AeonT1Eng = {
     ['T'] = 'uab2109',
     ['I'] = 'uab3101',
     ['O'] = 'uab3102',
+    ['G'] = 'uab5202',
 }
 
 local AeonT2Eng = {
+    ['L'] = 'zab9501',
+    ['A'] = 'zab9502',
+    ['S'] = 'zab9503',
     ['E'] = 'uab1202',
     ['P'] = 'uab1201',
     ['D'] = 'uab2301',
@@ -32,10 +35,12 @@ local AeonT2Eng = {
     ['C'] = 'uab4203',
     ['I'] = 'uab3201',
     ['O'] = 'uab3202',
-    ['G'] = 'uab5202',
 }
 
 local AeonT3Eng = {
+    ['L'] = 'zab9601',
+    ['A'] = 'zab9602',
+    ['S'] = 'zab9603',
     ['E'] = 'uab1302',
     ['D'] = 'xab2307',
     ['C'] = 'xab3301',
@@ -148,10 +153,14 @@ local UEFT1Eng = {
     ['T'] = 'ueb2109',
     ['I'] = 'ueb3101',
     ['O'] = 'ueb3102',
+    ['G'] = 'ueb5202',
 }
 
 local UEFT2Eng = {
-    ['A'] = 'xeb0104',
+    ['L'] = 'zeb9501',
+    ['A'] = 'zeb9502',
+    ['S'] = 'zeb9503',
+    ['Q'] = 'xeb0104',
     ['E'] = 'ueb1202',
     ['P'] = 'ueb1201',
     ['D'] = 'ueb2301',
@@ -165,10 +174,12 @@ local UEFT2Eng = {
     ['C'] = 'ueb4203',
     ['I'] = 'ueb3201',
     ['O'] = 'ueb3202',
-    ['G'] = 'ueb5202',
 }
-
+ 
 local UEFT3Eng = {
+    ['L'] = 'zeb9601',
+    ['A'] = 'zeb9602',
+    ['S'] = 'zeb9603',    
     ['D'] = 'xeb2306',
     ['E'] = 'ueb1302',
     ['F'] = 'ueb1303',
@@ -283,10 +294,14 @@ local CybranT1Eng = {
     ['T'] = 'urb2109',
     ['I'] = 'urb3101',
     ['O'] = 'urb3102',
+    ['G'] = 'urb5202',
 }
 
 local CybranT2Eng = {
-    ['A'] = 'xrb0104',
+    ['L'] = 'zrb9501',
+    ['A'] = 'zrb9502',
+    ['S'] = 'zrb9503',     
+    ['Q'] = 'xrb0104',
     ['E'] = 'urb1202',
     ['P'] = 'urb1201',
     ['D'] = 'urb2301',
@@ -300,11 +315,13 @@ local CybranT2Eng = {
     ['C'] = 'urb4203',
     ['I'] = 'urb3201',
     ['O'] = 'urb3202',
-    ['G'] = 'urb5202',
 }
 
 local CybranT3Eng = {
-    ['V'] = 'xrb3301',
+    ['L'] = 'zrb9601',
+    ['A'] = 'zrb9602',
+    ['S'] = 'zrb9603',      
+    ['C'] = 'xrb3301',
     ['T'] = 'xrb2308',
     ['E'] = 'urb1302',
     ['F'] = 'urb1303',
@@ -313,6 +330,7 @@ local CybranT3Eng = {
     ['R'] = 'urb2302',
     ['M'] = 'urb2305',
     ['K'] = 'urb4302',
+    ['V'] = 'urb4206',
     ['O'] = 'urs0305',
     ['I'] = 'urb3104',
     ['Q'] = 'urb0304',
@@ -422,9 +440,13 @@ local SeraphimT1Eng = {
     ['T'] = 'xsb2109',
     ['I'] = 'xsb3101',
     ['O'] = 'xsb3102',
+    ['G'] = 'xsb5202',
 }
 
 local SeraphimT2Eng = {
+    ['L'] = 'zsb9501',
+    ['A'] = 'zsb9502',
+    ['S'] = 'zsb9503',    
     ['E'] = 'xsb1202',
     ['P'] = 'xsb1201',
     ['D'] = 'xsb2301',
@@ -438,10 +460,12 @@ local SeraphimT2Eng = {
     ['C'] = 'xsb4203',
     ['I'] = 'xsb3201',
     ['O'] = 'xsb3202',
-    ['G'] = 'xsb5202',
 }
 
 local SeraphimT3Eng = {
+    ['L'] = 'zsb9601',
+    ['A'] = 'zsb9602',
+    ['S'] = 'zsb9603',  
     ['E'] = 'xsb1302',
     ['F'] = 'xsb1303',
     ['P'] = 'xsb1301',
@@ -539,43 +563,50 @@ buildModeKeys = {
         [3] = AeonT3Eng,
         [4] = AeonT4Eng,
     },
+    -- subcommander
+    ['ual0301'] = {
+        [1] = AeonT1Eng,
+        [2] = AeonT2Eng,
+        [3] = AeonT3Eng,
+        [4] = AeonT4Eng,
+    },    
     -- subcommander - ras preset
-    ['ual0301_RAS'] = {
+    ['ual0301_ras'] = {
         [1] = AeonT1Eng,
         [2] = AeonT2Eng,
         [3] = AeonT3Eng,
         [4] = AeonT4Eng,
     },
     -- subcommander - combatant preset
-    ['ual0301_SimpleCombat'] = {
+    ['ual0301_simplecombat'] = {
         [1] = AeonT1Eng,
         [2] = AeonT2Eng,
         [3] = AeonT3Eng,
         [4] = AeonT4Eng,
     },
     -- subcommander - engineer preset
-    ['ual0301_Engineer'] = {
+    ['ual0301_engineer'] = {
         [1] = AeonT1Eng,
         [2] = AeonT2Eng,
         [3] = AeonT3Eng,
         [4] = AeonT4Eng,
     },
     -- subcommander - nano combatant preset
-    ['ual0301_NanoCombat'] = {
+    ['ual0301_nanocombat'] = {
         [1] = AeonT1Eng,
         [2] = AeonT2Eng,
         [3] = AeonT3Eng,
         [4] = AeonT4Eng,
     },
     -- subcommander - shield combatant preset
-    ['ual0301_ShieldCombat'] = {
+    ['ual0301_shieldcombat'] = {
         [1] = AeonT1Eng,
         [2] = AeonT2Eng,
         [3] = AeonT3Eng,
         [4] = AeonT4Eng,
     },
     -- subcommander - rambo preset
-    ['ual0301_Rambo'] = {
+    ['ual0301_rambo'] = {
         [1] = AeonT1Eng,
         [2] = AeonT2Eng,
         [3] = AeonT3Eng,
@@ -688,6 +719,12 @@ buildModeKeys = {
     ['uab0304'] = {
         [3] = {
             ['C'] = 'ual0301',
+            ['F'] = 'ual0301_ras',
+            ['T'] = 'ual0301_simplecombat',
+            ['E'] = 'ual0301_engineer',
+            ['N'] = 'ual0301_nanocombat',
+            ['S'] = 'ual0301_shieldcombat',
+            ['R'] = 'ual0301_rambo',
         },
     },
     -- T1 Mass Extractor
@@ -751,42 +788,42 @@ buildModeKeys = {
         [4] = UEFT4Eng,
     },
     -- subcommander - resource allocation preset
-    ['uel0301_RAS'] = {
+    ['uel0301_ras'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
     -- subcommander - combatant preset
-    ['uel0301_Combat'] = {
+    ['uel0301_combat'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
     -- subcommander - engineer preset
-    ['uel0301_Engineer'] = {
+    ['uel0301_engineer'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
     -- subcommander - rambo preset
-    ['uel0301_Rambo'] = {
+    ['uel0301_rambo'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
     -- subcommander - shield preset
-    ['uel0301_BubbleShield'] = {
+    ['uel0301_bubbleshield'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
         [4] = UEFT4Eng,
     },
     -- subcommander - intel jammer preset
-    ['uel0301_IntelJammer'] = {
+    ['uel0301_inteljammer'] = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
         [3] = UEFT3Eng,
@@ -904,6 +941,13 @@ buildModeKeys = {
     ['ueb0304'] = {
         [3] = {
             ['C'] = 'uel0301',
+            ['F'] = 'uel0301_ras',
+            ['T'] = 'uel0301_combat',
+            ['E'] = 'uel0301_engineer',
+            ['R'] = 'uel0301_rambo',
+            ['S'] = 'uel0301_bubbleshield',
+            ['J'] = 'uel0301_inteljammer',
+
         },
     },
     -- T1 Mass Extractor
@@ -963,49 +1007,49 @@ buildModeKeys = {
         [4] = CybranT4Eng,
     },
     -- subcommander - ras preset
-    ['url0301_RAS'] = {
+    ['url0301_ras'] = {
         [1] = CybranT1Eng,
         [2] = CybranT2Eng,
         [3] = CybranT3Eng,
         [4] = CybranT4Eng,
     },
     -- subcommander - combatant preset
-    ['url0301_Combat'] = {
+    ['url0301_combat'] = {
         [1] = CybranT1Eng,
         [2] = CybranT2Eng,
         [3] = CybranT3Eng,
         [4] = CybranT4Eng,
     },
     -- subcommander - engineer preset
-    ['url0301_Engineer'] = {
+    ['url0301_engineer'] = {
         [1] = CybranT1Eng,
         [2] = CybranT2Eng,
         [3] = CybranT3Eng,
         [4] = CybranT4Eng,
     },
     -- subcommander - rambo preset
-    ['url0301_Rambo'] = {
+    ['url0301_rambo'] = {
         [1] = CybranT1Eng,
         [2] = CybranT2Eng,
         [3] = CybranT3Eng,
         [4] = CybranT4Eng,
     },
     -- subcommander - stealth preset
-    ['url0301_Stealth'] = {
+    ['url0301_stealth'] = {
         [1] = CybranT1Eng,
         [2] = CybranT2Eng,
         [3] = CybranT3Eng,
         [4] = CybranT4Eng,
     },
     -- subcommander - cloak preset
-    ['url0301_Cloak'] = {
+    ['url0301_cloak'] = {
         [1] = CybranT1Eng,
         [2] = CybranT2Eng,
         [3] = CybranT3Eng,
         [4] = CybranT4Eng,
     },
     -- subcommander - anti-air preset
-    ['url0301_AntiAir'] = {
+    ['url0301_antiair'] = {
         [1] = CybranT1Eng,
         [2] = CybranT2Eng,
         [3] = CybranT3Eng,
@@ -1118,6 +1162,13 @@ buildModeKeys = {
     ['urb0304'] = {
         [3] = {
             ['C'] = 'url0301',
+            ['F'] = 'url0301_ras',
+            ['T'] = 'url0301_combat',
+            ['E'] = 'url0301_engineer',
+            ['R'] = 'url0301_rambo',
+            ['S'] = 'url0301_stealth',
+            ['K'] = 'url0301_cloak',
+            ['A'] = 'url0301_antiair',
         },
     },
     -- T1 Mass Extractor
@@ -1186,42 +1237,42 @@ buildModeKeys = {
         [4] = SeraphimT4Eng,
     },
     -- subcommander - combatant preset
-    ['xsl0301_Combat'] = {
+    ['xsl0301_combat'] = {
         [1] = SeraphimT1Eng,
         [2] = SeraphimT2Eng,
         [3] = SeraphimT3Eng,
         [4] = SeraphimT4Eng,
     },
     -- subcommander - engineer preset
-    ['xsl0301_Engineer'] = {
+    ['xsl0301_engineer'] = {
         [1] = SeraphimT1Eng,
         [2] = SeraphimT2Eng,
         [3] = SeraphimT3Eng,
         [4] = SeraphimT4Eng,
     },
     -- subcommander - nano combatant preset
-    ['xsl0301_NanoCombat'] = {
+    ['xsl0301_nanocombat'] = {
         [1] = SeraphimT1Eng,
         [2] = SeraphimT2Eng,
         [3] = SeraphimT3Eng,
         [4] = SeraphimT4Eng,
     },
     -- subcommander - advanced combatant preset
-    ['xsl0301_AdvancedCombat'] = {
+    ['xsl0301_advancedcombat'] = {
         [1] = SeraphimT1Eng,
         [2] = SeraphimT2Eng,
         [3] = SeraphimT3Eng,
         [4] = SeraphimT4Eng,
     },
     -- subcommander - rambo preset
-    ['xsl0301_Rambo'] = {
+    ['xsl0301_rambo'] = {
         [1] = SeraphimT1Eng,
         [2] = SeraphimT2Eng,
         [3] = SeraphimT3Eng,
         [4] = SeraphimT4Eng,
     },
     -- subcommander - missile preset
-    ['xsl0301_Missile'] = {
+    ['xsl0301_missile'] = {
         [1] = SeraphimT1Eng,
         [2] = SeraphimT2Eng,
         [3] = SeraphimT3Eng,
@@ -1334,6 +1385,12 @@ buildModeKeys = {
     ['xsb0304'] = {
         [3] = {
             ['C'] = 'xsl0301',
+            ['T'] = 'xsl0301_combat',
+            ['E'] = 'xsl0301_engineer',
+            ['N'] = 'xsl0301_nanocombat',
+            ['A'] = 'xsl0301_advancedcombat',
+            ['R'] = 'xsl0301_rambo',
+            ['M'] = 'xsl0301_missile',
         },
     },
     -- T1 Mass Extractor

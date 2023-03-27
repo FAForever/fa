@@ -307,7 +307,7 @@ function DoHackyLogic(buildingType, builder)
                 if not unitInstance then
                     unitInstance = builder.UnitBeingBuilt
                 end
-                aiBrain = builder:GetAIBrain()
+                local aiBrain = builder:GetAIBrain()
                 if unitInstance then
                     TriggerFile.CreateUnitStopBeingBuiltTrigger(function(unitBeingBuilt)
                         local newPlatoon = aiBrain:MakePlatoon('', '')

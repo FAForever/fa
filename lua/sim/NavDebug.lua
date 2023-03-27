@@ -53,6 +53,10 @@ function ToggleScanLabels(data)
     ScanState[keyLayer] = false
 end
 
+function StatisticsToUI()
+    Sync.NavLayerData = NavGenerator.NavLayerData
+end
+
 ---@type NavDebugCanPathToState
 local CanPathToState = { }
 
