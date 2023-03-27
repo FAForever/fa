@@ -38,14 +38,36 @@ local drawOffered = false
 ---@type CannotRecallReason
 local CannotRequestRecallReason = false
 
+---@return CannotRecallReason
 function GetCannotRequestRecallReason()
     return CannotRequestRecallReason
 end
 
-function SetCannotRequestRecallReason(canRequest)
-    CannotRequestRecallReason = canRequest
+---@param reason CannotRecallReason
+function SetCannotRequestRecallReason(reason)
+    CannotRequestRecallReason = reason
     if parent then
-        BuildPlayerLines()
+        local button = parent.personalGroup.button
+        local tooltipID
+        if reason then
+            if not button:IsDisabled() then
+                local over = button.mMouseOver
+                button:Disable()
+                button:EnableHitTest() -- let the tooltip show
+                button.mMouseOver = over
+            end
+            tooltipID = "dip_recall_request_dis_" .. reason
+        else
+            if button:IsDisabled() then
+                button:Enable()
+            end
+            tooltipID = "dip_recall_request"
+        end
+        Tooltip.AddButtonTooltip(button, tooltipID)
+        if button.mMouseOver then
+            Tooltip.DestroyMouseoverDisplay()
+            Tooltip.CreateMouseoverDisplay(button, tooltipID, nil, true, nil)
+        end
     end
 end
 
@@ -288,9 +310,7 @@ local function CreateDiplomacyEntry(parent, data, isAlly)
     entry:SetSolidColor('00000000')
     entry.Data = data
 
-    local typeIcon
-    local factionIcon
-    local colorIcon
+    local typeIcon, factionIcon, colorIcon
     if isHuman then
         typeIcon = "/game/options-diplomacy-panel/icon-person"
     else
@@ -440,6 +460,7 @@ function BuildPlayerLines()
 
         if reason then
             recallButton:Disable()
+            recallButton:EnableHitTest() -- let the tooltip show
             Tooltip.AddButtonTooltip(recallButton, "dip_recall_request_dis_" .. reason)
         else
             local function OnAcceptRecall()
@@ -460,8 +481,17 @@ function BuildPlayerLines()
                 import("/lua/ui/game/tabs.lua").CollapseWindow()
             end
             recallButton.OnClick = function(self, modifiers)
+                -- the sim will only start a vote if there are teammates
+                local txt = "<LOC diplomacy_0027>Are you sure you want to recall from battle?"
+                local focusArmy = GetFocusArmy()
+                for index, playerInfo in GetArmiesTable().armiesTable do
+                    if index ~= focusArmy and not playerInfo.outOfGame and not playerInfo.civilian and IsAlly(focusArmy, index) then
+                        txt = "<LOC diplomacy_0019>Are you sure you're ready to recall from battle? This will send a request to your team."
+                        break
+                    end
+                end
                 UIUtil.QuickDialog(GetFrame(0),
-                    "<LOC diplomacy_0019>Are you sure you're ready to recall from battle? This will send a request to your team.",
+                    txt,
                     "<LOC _Yes>",
                     OnAcceptRecall,
                     "<LOC _No>", nil, nil, nil, nil,
@@ -473,8 +503,10 @@ function BuildPlayerLines()
 
         local recallIcon = CreateBitmapStd(recallButton, "/game/recall-panel/icon-recall")
         Layouter(recallIcon)
-            --:DisableHitTest()
-            :AtCenterIn(recallButton)
+            :DisableHitTest()
+            :AtCenterIn(recallButton, 1)
+            :Width(20)
+            :Height(25)
             :Over(recallButton, 5)
         recallButton.label = recallIcon
 
