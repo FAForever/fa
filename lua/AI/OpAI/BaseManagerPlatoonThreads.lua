@@ -285,7 +285,10 @@ function ConditionalBuildSuccessful(conditionalUnit)
     aiBrain:AssignUnitsToPlatoon(newPlatoon, {conditionalUnit}, 'Attack', 'None')
     newPlatoon:StopAI()
     newPlatoon:SetPlatoonData(selectedBuild.data.PlatoonData)
-    newPlatoon:ForkAIThread(import(selectedBuild.data.PlatoonAIFunction[1])[selectedBuild.data.PlatoonAIFunction[2]])
+
+    if selectedBuild.data.PlatoonAIFunction then
+        newPlatoon:ForkAIThread(import(selectedBuild.data.PlatoonAIFunction[1])[selectedBuild.data.PlatoonAIFunction[2]])
+    end
 
     -- Set up a death wait thing for it to rebuild
     if bManager.ConditionalBuildData.WaitSecondsAfterDeath then

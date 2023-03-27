@@ -4,7 +4,6 @@
 -- Summary  :  Seraphim Tactical Missile Launcher Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
 local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
 local SIFExperimentalStrategicMissile = import("/lua/seraphimweapons.lua").SIFExperimentalStrategicMissile
 local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
@@ -16,11 +15,11 @@ XSB2401 = ClassUnit(SStructureUnit) {
     Weapons = {
         ExperimentalNuke = ClassWeapon(SIFExperimentalStrategicMissile) {
             OnWeaponFired = function(self)
-                self.unit:ForkThread(self.unit.HideMissile)
+                self.unit.Trash:Add(ForkThread(self.unit.HideMissile,self.unit))
             end,
 
             PlayFxWeaponUnpackSequence = function(self)
-                self.unit:ForkThread(self.unit.ChargeNukeSound)
+                self.unit.Trash:Add(ForkThread(self.unit.ChargeNukeSound,self.unit))
                 SIFExperimentalStrategicMissile.PlayFxWeaponUnpackSequence(self)
             end,
         },
@@ -28,17 +27,15 @@ XSB2401 = ClassUnit(SStructureUnit) {
     },
 
     StartBeingBuiltEffects = function(self, builder, layer)
-        -- triggers the effect twice, one is larger than the other
         SStructureUnit.StartBeingBuiltEffects(self, builder, layer)
-        self:ForkThread( CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 2 )
+        self.Trash:Add(ForkThread( CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 2, self ))
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         SStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.Trash:Add(CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
-        self:ForkThread(self.PlayArmSounds)
         local missileBone = bp.Display.MissileBone
         if missileBone then
             if not self.MissileSlider then
@@ -49,18 +46,16 @@ XSB2401 = ClassUnit(SStructureUnit) {
     end,
 
     OnSiloBuildStart = function(self, weapon)
-        self:ForkThread(self.RaiseMissile)
-        self:ForkThread(self.WatchBuild)
+        self.Trash:Add(ForkThread(self.RaiseMissile,self))
+        self.Trash:Add(ForkThread(self.WatchBuild,self))
         self.MissileBuilt = false
         self:PlayBuildEffects()
-
         SStructureUnit.OnSiloBuildStart(self, weapon)
     end,
 
     OnSiloBuildEnd = function(self, weapon)
         self.MissileBuilt = true
         self:StopBuildEffects()
-
         SStructureUnit.OnSiloBuildEnd(self,weapon)
     end,
 
@@ -69,7 +64,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
             self.MissileEffect = {}
         end
 
-        local effectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+        local effectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         for bidx, bone in effectBones do
             for k, v in EffectTemplate.SJammerCrystalAmbient do
                 if not self.MissileEffect[bidx] then
@@ -83,7 +78,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
     end,
 
     StopBuildEffects = function(self)
-        local effectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+        local effectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         for bidx, bone in effectBones do
             for k, v in EffectTemplate.SJammerCrystalAmbient do
                 self.MissileEffect[bidx][k]:Destroy()
@@ -95,9 +90,9 @@ XSB2401 = ClassUnit(SStructureUnit) {
 
     RaiseMissile = function(self)
         self.NotCancelled = true
-        WaitSeconds(0.5)
+        WaitTicks(6)
 
-        local missileBone = self:GetBlueprint().Display.MissileBone
+        local missileBone = self.Blueprint.Display.MissileBone
         if missileBone and self.NotCancelled then
             self:ShowBone(missileBone, true)
             if self.MissileSlider then
@@ -108,12 +103,12 @@ XSB2401 = ClassUnit(SStructureUnit) {
     end,
 
     HideMissile = function(self)
-        WaitSeconds(0.1)
+        WaitTicks(2)
         self:RetractMissile()
     end,
 
     RetractMissile = function(self)
-        local missileBone = self:GetBlueprint().Display.MissileBone
+        local missileBone = self.Blueprint.Display.MissileBone
         if missileBone then
             self:HideBone(missileBone, true)
             if self.MissileSlider then
@@ -136,9 +131,9 @@ XSB2401 = ClassUnit(SStructureUnit) {
     end,
 
     ChargeNukeSound = function(self)
-        WaitSeconds(1.5)
+        WaitTicks(16)
         self:PlayUnitAmbientSound('NukeCharge')
-        WaitSeconds(9.5)
+        WaitTicks(96)
         self:StopUnitAmbientSound('NukeCharge')
     end,
 }

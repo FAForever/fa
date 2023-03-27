@@ -13,15 +13,21 @@ ShieldEffectsComponent = ClassSimple {
 
     ---@param self ShieldEffectsComponent
     OnCreate = function(self)
-        self.ShieldEffectsBag = TrashBag()
-        self.Trash:Add(self.ShieldEffectsBag)
+        local bag = TrashBag()
+        self.ShieldEffectsBag = bag
+        self.Trash:Add(bag)
     end,
 
     ---@param self ShieldEffectsComponent
     OnShieldEnabled = function(self)
-        self.ShieldEffectsBag:Destroy()
-        for _, v in self.ShieldEffects do
-            self.ShieldEffectsBag:Add(CreateAttachedEmitter(self, self.ShieldEffectsBone, self.Army, v):ScaleEmitter(self.ShieldEffectsScale))
+        local bag = self.ShieldEffectsBag
+        local bone = self.ShieldEffectsBone
+        local scale = self.ShieldEffectsScale
+        local army = self.Army
+
+        bag:Destroy()
+        for _, effect in self.ShieldEffects do
+            bag:Add(CreateAttachedEmitter(self, bone, army, effect):ScaleEmitter(scale))
         end
     end,
 

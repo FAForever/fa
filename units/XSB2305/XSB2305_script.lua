@@ -16,19 +16,19 @@ XSB2305 = ClassUnit(SStructureUnit) {
             LaunchEffects = function(self)
                 local FxLaunch = EffectTemplate.SIFInainoPreLaunch01
 
-                WaitSeconds(1.5)
+                WaitTicks(16)
                 self.unit:PlayUnitAmbientSound('NukeCharge')
 
                 for k, v in FxLaunch do
                     CreateEmitterAtEntity(self.unit, self.unit.Army, v)
                 end
 
-                WaitSeconds(9.5)
+                WaitTicks(96)
                 self.unit:StopUnitAmbientSound('NukeCharge')
             end,
 
             PlayFxWeaponUnpackSequence = function(self)
-                self:ForkThread(self.LaunchEffects)
+                self.Trash:Add(ForkThread(self.LaunchEffects,self))
                 SIFInainoWeapon.PlayFxWeaponUnpackSequence(self)
             end,
         },

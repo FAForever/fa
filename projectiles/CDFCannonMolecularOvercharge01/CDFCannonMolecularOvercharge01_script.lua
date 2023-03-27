@@ -14,8 +14,9 @@ CDFCannonMolecular01 = ClassProjectile(CMolecularCannonProjectile, OverchargePro
     FxImpactLand = EffectTemplate.CCommanderOverchargeHit01,
 
     OnImpact = function(self, targetType, targetEntity)
-        CMolecularCannonProjectile.OnImpact(self, targetType, targetEntity)
+        -- we need to run this the overcharge logic before running the usual on impact because that is where the damage is determined
         OverchargeProjectile.OnImpact(self, targetType, targetEntity)
+        CMolecularCannonProjectile.OnImpact(self, targetType, targetEntity)
     end,
     
     OnCreate = function(self)
