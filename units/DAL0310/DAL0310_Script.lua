@@ -17,7 +17,7 @@ DAL0310 = ClassUnit(AHoverLandUnit) {
                 local proj = ADFDisruptorCannonWeapon.CreateProjectileAtMuzzle(self, muzzle)
                 local data = self.Blueprint.DamageToShields
                 if proj and not proj:BeenDestroyed() then
-                    proj:PassMetaDamage(data)
+                    proj:PassMetaDamage(self, data)
                 end
             end,
           }
