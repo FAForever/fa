@@ -1498,3 +1498,26 @@ function ShouldUpgradeRadar(aiBrain, locationType, radarTech)
     end
     return true
 end
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@param maxNum number
+---@return boolean
+function CanBuildOnHydroLessThanDistance(aiBrain, locationType, distance, threatMin, threatMax, threatRings, threatType, maxNum)
+    local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
+    if not engineerManager then
+        return false
+    end
+    local position = engineerManager:GetLocationCoords()
+
+    local markerTable = AIUtils.AIGetSortedHydroLocations(aiBrain, maxNum, threatMin, threatMax, threatRings, threatType, position)
+    if markerTable[1] and VDist3(markerTable[1], position) < distance then
+        return true
+    end
+    return false
+end
