@@ -7027,11 +7027,13 @@ Platoon = Class(moho.platoon_methods) {
                     else
                         -- Jip discussed potentially getting navmesh to return mass points along the path rather than this.
                         -- Potential Statemachine switch to building extractors
-                        local reclaimAction = AIUtils.EngPerformReclaim(eng, 10)
-                        if reclaimAction then
-                            WaitTicks(30)
-                            -- Statemachine switch to evaluating next action to take
-                            IssueMove({eng}, moveLocation)
+                        if not eng:IsUnitState('Reclaiming') then
+                            local reclaimAction = AIUtils.EngPerformReclaim(eng, 10)
+                            if reclaimAction then
+                                WaitTicks(45)
+                                -- Statemachine switch to evaluating next action to take
+                                IssueMove({eng}, moveLocation)
+                            end
                         end
                         local extractorAction = AIUtils.EngLocalExtractorBuild(aiBrain, eng)
                         if extractorAction then
@@ -7046,7 +7048,7 @@ Platoon = Class(moho.platoon_methods) {
                     elseif not eng:IsUnitState('Reclaiming') then
                         engStuckCount = engStuckCount + 1
                         LOG('* AI: * SampleReclaim: has not moved during move to reclaim position look, adding one, current is '..engStuckCount)
-                        if engStuckCount > 15 and not eng:IsUnitState('Reclaiming') then
+                        if engStuckCount > 15 then
                             LOG('* AI: * SampleReclaim: Stuck while moving to reclaim position. Stuck='..engStuckCount)
                             break
                         end

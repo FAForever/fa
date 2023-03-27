@@ -3514,6 +3514,9 @@ function ShiftPosition(pos1, pos2, dist, reverse)
     return {x,GetSurfaceHeight(x,z),z}
 end
 
+---@param aiBrain AIBrain
+---@param eng unit
+---@return boolean
 function EngAvoidLocalDanger(aiBrain, eng)
     local engPos = eng:GetPosition()
     local enemyUnits = aiBrain:GetUnitsAroundPoint(categories.LAND * categories.MOBILE, engPos, 45, 'Enemy')
@@ -3552,7 +3555,13 @@ function EngAvoidLocalDanger(aiBrain, eng)
     return action
 end
 
+---@param aiBrain AIBrain
+---@param eng Unit
+---@return boolean
 function EngLocalExtractorBuild(aiBrain, eng)
+    -- Will get an engineer to build a mass extractor on nearby mass markers
+    -- if the marker is too close to the border then it will use IssueBuildMobile to avoid issues
+    -- requires the engineer to not have the default EngineerBuildAI OnUnitBuilt callback set
     local action = false
     local bool,markers=CanBuildOnLocalMassPoints(aiBrain, eng:GetPosition(), 25)
     if bool then
@@ -3579,7 +3588,15 @@ function EngLocalExtractorBuild(aiBrain, eng)
     end
 end
 
+---@param aiBrain AIBrain
+---@param engPos table
+---@param distance number
+---@return boolean
+---@return table
 function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
+    -- Checks if an engineer can build on mass points close to its location
+    -- will return a bool if it found anything and if it did then a table of mass markers
+    -- the BorderWarning is used to tell the AI that the mass marker is too close to the map border
     local pointDistance = distance * distance
     local massMarkers = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     local validMassMarkers = {}
@@ -3603,7 +3620,15 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
     end
 end
 
+---@param eng Unit
+---@param minimumReclaim number
+---@return boolean
 function EngPerformReclaim(eng, minimumReclaim)
+    -- Will get an engineer to search within its reclaim range for any close reclaim 
+    -- and issue reclaim commands if it is above the minimumReclaim requires the
+    -- engineer to not have the EngineerBuildAi OnReclaimed callback set also requires
+    -- the delay for reclaim time when the return is true
+    -- Could be improved with a OnStartReclaim callback utilized
     local engPos = eng:GetPosition()
     local rectDef = Rect(engPos[1] - 10, engPos[3] - 10, engPos[1] + 10, engPos[3] + 10)
     local reclaimRect = GetReclaimablesInRect(rectDef)
@@ -3634,7 +3659,16 @@ function EngPerformReclaim(eng, minimumReclaim)
     return action
 end
 
+---@param aiBrain AIBrain
+---@param eng Unit
+---@param movementLayer string
+---@return number
+---@return number
 function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
+    -- Will find a reclaim grid cell to target for reclaim engineers
+    -- requires the GridReclaim and GridBrain to have an instance against the 
+    -- AI Brain, movementLayer is included for mods that have different layer engineers
+    -- searchRadius could be improved to be dynamic
     local CanPathTo = import("/lua/sim/navutils.lua").CanPathTo
     local reclaimGridInstance = aiBrain.GridReclaim
     local brainGridInstance = aiBrain.GridBrain
@@ -3647,7 +3681,6 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
         searchRadius = aiBrain.IMAPConfig.Rings
     end
     local searchLoop = 0
-    local cancelSearch = false
     local reclaimTargetX, reclaimTargetZ
     local engPos = eng:GetPosition()
     local gx, gz = reclaimGridInstance:ToGridSpace(engPos[1],engPos[3])
@@ -3656,7 +3689,6 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
         
         -- retrieve a list of cells with some mass value
         local cells, count = reclaimGridInstance:FilterAndSortInRadius(gx, gz, searchRadius, 10)
-
         -- find out if we can path to the center of the cell and check engineer maximums
         for k = 1, count do
             local cell = cells[k] --[[@as AIGridReclaimCell]]
@@ -3664,8 +3696,6 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
             local maxEngineers = math.min(math.ceil(cell.TotalMass / 500), 8)
             if CanPathTo(movementLayer, engPos, centerOfCell) then
                 local brainCell = brainGridInstance:ToCellFromGridSpace(cell.X, cell.Z)
-                -- Get a count of the current engineers assigned to this cell
-                -- Note check this is changing on removal and death
                 local engineersInCell = brainGridInstance:CountReclaimingEngineers(brainCell)
                 if engineersInCell < maxEngineers then
                     reclaimTargetX, reclaimTargetZ = cell.X, cell.Z
