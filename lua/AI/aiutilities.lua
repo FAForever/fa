@@ -3534,7 +3534,7 @@ CalculateTeamdata = function(aiBrain)
             local startx, startz = v:GetArmyStartPos()
             if IsAlly(selfIndex, armyIndex) then
                 allyCount = allyCount + 1
-                LOG('One Ally '..v.Nickname)
+                LOG(allyCount..' Ally '..v.Nickname)
                 if army.Team and army.Team ~= 1 then
                     teamTable[army.Team] = true
                     if not teamStarts[armyIndex] then
@@ -3565,7 +3565,7 @@ CalculateTeamdata = function(aiBrain)
                 end
             elseif IsEnemy(selfIndex, armyIndex) then
                 enemyCount = enemyCount + 1
-                LOG('One Enemy '..v.Nickname)
+                LOG(enemyCount..' Enemy '..v.Nickname)
                 if army.Team and army.Team ~= 1 then
                     teamTable[army.Team] = true
                     if not teamStarts[armyIndex] then

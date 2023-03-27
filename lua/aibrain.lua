@@ -172,7 +172,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         -- add reference to grid reclaim
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
-
+        
         local civilian = false
         for name, data in ScenarioInfo.ArmySetup do
             if name == self.Name then
@@ -5144,86 +5144,15 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param grid AIGridReclaim
     ---@param cell AIGridReclaimCell
     OnReclaimUpdate = function(self, grid, cell)
-        if self.IntelFramework.IntelGrid then
-            local intelFrameworkCell = self.IntelFramework.IntelGrid[cell.X][cell.Z]
-            intelFrameworkCell.MassReclaim = cell.TotalMass
-            intelFrameworkCell.EnergyReclaim = cell.TotalEnergy
-            --LOG('IntelGridCell '..repr(intelFrameworkCell))
-        end
+        --This will do things on reclaim updates
     end,
 
     InitializeIntelFramework = function(self)
-        if not self.IntelFramework then
-            self.IntelFramework = {}
-            self.IntelFramework.PlayableArea = ScenarioInfo.MapData.PlayableRect or {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
-            self.IntelFramework.StartPosition = self:GetStartVector3f()
-        end
-        --AIUtils.CreateIntelGrid(self, self.IntelFramework.PlayableArea)
-        self.IntelFramework.IntelGrid = import("/lua/ai/gridintel.lua").Setup(self)
-        LOG('IntelGrid '..repr(self.IntelFramework.IntelGrid))
-        --self:ForkThread(self.IntelFrameworkThread)
-        local massPoints, massCount = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
-        local teamCount, teamStarts, allyCount, enemyCount = AIUtils.CalculateTeamdata(self)
-        self.IntelFramework.TeamCount = teamCount
-        self.IntelFramework.StartPositions = teamStarts
-        self.IntelFramework.AllyCount = allyCount
-        self.IntelFramework.EnemyCount = enemyCount
-        if massCount > 0 and enemyCount > 0 then
-            self.IntelFramework.TeamMassShare = math.floor(massCount / teamCount)
-        else
-            self.IntelFramework.TeamMassShare = massCount
-        end
-        if allyCount > 0 and enemyCount > 0 and massCount > 0 then
-            self.IntelFramework.PlayerMassShare = math.floor(massCount / (allyCount + enemyCount))
-        else
-            self.IntelFramework.PlayerMassShare = massCount
-        end
-        LOG('Total Mass Count '..massCount)
-        LOG('Team Count '..self.IntelFramework.TeamCount)
-        LOG('StartPositions '..repr(self.IntelFramework.StartPositions))
-        LOG('Ally Count '..self.IntelFramework.AllyCount)
-        LOG('Enemy Count '..self.IntelFramework.EnemyCount)
-        LOG('Team Mass Share '..self.IntelFramework.TeamMassShare)
-        LOG('Player Mass Share '..self.IntelFramework.PlayerMassShare)
-        import("/lua/ai/gridreclaim.lua").Setup(self)
+        -- A wait is required for the other brains to initialize correctly
+        WaitTicks(math.random(15,30))
+        self.IntelFramework = import("/lua/ai/intelframework.lua").Setup(self)
     end,
 
-    IntelFrameworkThread = function(self)
-        LOG('Starting Intel Thread')
-        WaitTicks(math.random(10,30))
-        local intelFramework = self.IntelFramework
-        while not self.Status ~= 'defeat' do
-            local threatTypes = {
-                'Land',
-                'AntiAir',
-                'Naval',
-                'StructuresNotMex',
-                'Experimental',
-                'AntiSurface'
-            }
-            local gameTick = GetGameTick()
-            for _, t in threatTypes do
-                local rawThreats = self:GetThreatsAroundPosition( self.BuilderManagers.MAIN.Position, 16, true, t)
-                for _, raw in rawThreats do
-                    local gridx, gridz = AIUtils.GetIntelGrid(self.IntelFramework, {raw[1], 0, raw[2]})
-                    if self.IntelFramework.IntelGrid[gridx][gridz][t] then
-                        self.IntelFramework.IntelGrid[gridx][gridz][t] = raw[3]
-                        self.IntelFramework.IntelGrid[gridx][gridz].LastThreatCheck = gameTick
-                    end
-                end
-            end
-            for x=intelFramework.IntelGrid.IntelGridXMin, intelFramework.IntelGrid.IntelGridXMax do
-                for z=intelFramework.IntelGrid.IntelGridZMin, intelFramework.IntelGrid.IntelGridZMax do
-                    if intelFramework.IntelGrid[x][z].LastThreatCheck > 0 and intelFramework.IntelGrid[x][z].LastThreatCheck + 1200 > gameTick then
-                        intelFramework.IntelGrid[x][z].Land = 0
-                        intelFramework.IntelGrid[x][z].AntiAir = 0
-                        intelFramework.IntelGrid[x][z].AntiSurface = 0
-                    end
-                end
-            end
-            WaitTicks(60)
-        end
-    end,
 }
 
 -- kept for mod backwards compatibility
