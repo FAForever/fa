@@ -87,6 +87,9 @@ AIBrain = Class(StandardBrain) {
     OnCreateAI = function(self, planName)
         StandardBrain.OnCreateAI(self, planName)
 
+        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
+
         local civilian = false
         for name, data in ScenarioInfo.ArmySetup do
             if name == self.Name then
