@@ -391,7 +391,7 @@ function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
             while gridSize < searchRange do
                 for x = math.max(minCellX, cellX - gridSize), math.min(maxCellX, cellX + gridSize), 1 do
                     for z = math.max(minCellZ, cellZ - gridSize), math.min(maxCellZ, cellZ + gridSize), 1 do
-                        if reclaimGridInstance.Cells[x][z].TotalMass > 10 or reclaimGridInstance.Cells[x][z].TotalEnergy then
+                        if reclaimGridInstance.Cells[x][z].TotalMass > 10 then
                             return true
                         end
                         gridSize = gridSize + 1
