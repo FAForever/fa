@@ -183,13 +183,7 @@ UnitBlueprint {
         Level4 = 120,
         Level5 = 150,
     },
-    VeteranMass = {
-        73200,
-        73200,
-        73200,
-        73200,
-        73200,
-    },
+    VeteranMassMult = 1,
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
