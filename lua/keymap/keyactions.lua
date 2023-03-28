@@ -365,6 +365,8 @@ keyActions = {
         category = 'debug', order = 24},
     ['toggle_navui'] = {action = 'UI_Lua import("/lua/ui/game/navgenerator.lua").OpenWindow()',
         category = 'debug', order = 24},
+    ['toggle_ai_reclaim_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridreclaim.lua").OpenWindow()',
+        category = 'debug', order = 24},
     ['toggle_profiler_window'] = {action = 'UI_Lua import("/lua/ui/game/profiler.lua").OpenWindow()',
         category = 'debug', order = 24},
     ['toggle_repeat_build'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild()',

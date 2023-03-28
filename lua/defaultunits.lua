@@ -2927,6 +2927,21 @@ ACUUnit = ClassUnit(CommandUnit) {
                 WARN('Teamkill detected')
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
             end
+
+            -- prepare sync
+            local sync = Sync
+            local events = sync.Events or { }
+            sync.Events = events
+            local acuDestroyed = events.ACUDestroyed or { }
+            events.ACUDestroyed = acuDestroyed
+
+            -- sync the event
+            table.insert(acuDestroyed, {
+                Timestamp = GetGameTimeSeconds(),
+                InstigatorArmy = instigator.Army,
+                KilledArmy = self.Army
+            })
+
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
     end,

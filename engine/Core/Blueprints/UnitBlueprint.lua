@@ -923,6 +923,8 @@
 
 
 ---@class UnitBlueprintPhysics
+--- Forces terrain alignment for structures
+---@field AltitudeToTerrain boolean
 --- forces terrain alignment for structures
 ---@field AlwaysAlignToTerrain boolean
 --- alternate method of locomotion

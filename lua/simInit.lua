@@ -76,6 +76,8 @@ end
 --but before any armies are created.
 function SetupSession()
 
+    import("/lua/ai/gridreclaim.lua").Setup()
+
     ScenarioInfo.TriggerManager = import("/lua/triggermanager.lua").Manager
     TriggerManager = ScenarioInfo.TriggerManager
 
@@ -221,6 +223,16 @@ end
 -- use it to store off various useful bits of info.
 -- The global variable "ArmyBrains" contains an array of AI brains, one for each army.
 function OnCreateArmyBrain(index, brain, name, nickname)
+    -- switch out brains for non-human armies
+    local info = ScenarioInfo.ArmySetup[name]
+    if (not info.Human) and (info.AIPersonality != '') then
+        local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
+        local instance = keyToBrain[info.AIPersonality]
+
+        if instance then
+            setmetatable(brain, instance)
+        end
+    end
 
     import("/lua/sim/scenarioutilities.lua").InitializeStartLocation(name)
     import("/lua/sim/scenarioutilities.lua").SetPlans(name)
@@ -228,6 +240,9 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     ArmyBrains[index] = brain
     ArmyBrains[index].Name = name
     ArmyBrains[index].Nickname = nickname
+    ArmyBrains[index].AI = info.AI
+    ArmyBrains[index].Human = info.Human
+    ArmyBrains[index].Civilian = info.Civilian
     ScenarioInfo.PlatoonHandles[index] = {}
     ScenarioInfo.UnitGroups[index] = {}
     ScenarioInfo.UnitNames[index] = {}
@@ -324,9 +339,6 @@ end
 function BeginSessionAI()
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
     if ScenarioInfo.GameHasAIs then
-
-
-
         local simMods = __active_mods or {}
         for Index, ModData in simMods do
             ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
