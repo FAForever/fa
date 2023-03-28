@@ -349,6 +349,7 @@ AIBrain = Class(StandardBrain) {
 
         self:IMAPConfiguration()
         self:ForkThread(self.MapAnalysis)
+        self:ForkThread(self.InitializeIntelFramework)
     end,
 
     ---Removes bases that have no engineers or factories.  This is a sorian AI function
@@ -3312,6 +3313,12 @@ AIBrain = Class(StandardBrain) {
         local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
         AIAttackUtils.NavalAttackCheck(self)
 
+    end,
+
+    InitializeIntelFramework = function(self)
+        -- A wait is required for the other brains to initialize correctly
+        WaitTicks(math.random(15,30))
+        self.IntelFramework = import("/lua/ai/intelframework.lua").Setup(self)
     end,
 }
 
