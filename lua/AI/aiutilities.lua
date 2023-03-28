@@ -3327,6 +3327,13 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
     -- requires the GridReclaim and GridBrain to have an instance against the 
     -- AI Brain, movementLayer is included for mods that have different layer engineers
     -- searchRadius could be improved to be dynamic
+        -----------------------------------
+    -- find a nearby cell to reclaim --
+
+    -- @Relent0r this uses the newly introduced API to find nearby cells. Short descriptions:
+    -- `MaximumInRadius`            Finds most valuable cell to reclaim in a radius
+    -- `FilterInRadius`             Finds all cells that meets some threshold
+    -- `FilterAndSortInRadius`      Finds all cells that meets some threshold and sorts the list of cells from high value to low value
     local CanPathTo = import("/lua/sim/navutils.lua").CanPathTo
     local reclaimGridInstance = aiBrain.GridReclaim
     local brainGridInstance = aiBrain.GridBrain
@@ -3352,7 +3359,8 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
             local cell = cells[k] --[[@as AIGridReclaimCell]]
             local centerOfCell = reclaimGridInstance:ToWorldSpace(cell.X, cell.Z)
             local maxEngineers = math.min(math.ceil(cell.TotalMass / 500), 8)
-            if CanPathTo(movementLayer, engPos, centerOfCell) then
+            -- make sure we can path to it and it doesnt have high threat e.g Point Defense
+            if CanPathTo(movementLayer, engPos, centerOfCell) and aiBrain:GetThreatAtPosition(centerOfCell, 0, true, 'AntiSurface') < 10 then
                 local brainCell = brainGridInstance:ToCellFromGridSpace(cell.X, cell.Z)
                 local engineersInCell = brainGridInstance:CountReclaimingEngineers(brainCell)
                 if engineersInCell < maxEngineers then

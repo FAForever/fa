@@ -4323,40 +4323,18 @@ Platoon = Class(moho.platoon_methods) {
         while aiBrain:PlatoonExists(self) do
             WaitTicks(10)
             IssueClearCommands({eng})
-
-            -----------------------------------
-            -- find a nearby cell to reclaim --
-
-            -- @Relent0r this uses the newly introduced API to find nearby cells. Short descriptions:
-            -- `MaximumInRadius`            Finds most valuable cell to reclaim in a radius
-            -- `FilterInRadius`             Finds all cells that meets some threshold
-            -- `FilterAndSortInRadius`      Finds all cells that meets some threshold and sorts the list of cells from high value to low value
-
-            -- @Relent0r I have not tested this code, you'll have to tell me how to run it next time we talk. Then I can test it as I write it ^^
-
-            local engPos = eng:GetPosition()           
+            -- Find a cell we want to reclaim from
             local reclaimTargetX, reclaimTargetZ = AIUtils.EngFindReclaimCell(aiBrain, eng, self.MovementLayer, searchType)
-
-            -----------------------------------------------
-            -- navigate to cell where we want to reclaim --
-
             if reclaimTargetX and reclaimTargetZ then
-
-                -- @Relent0r we can do this:
                 local brainCell = brainGridInstance:ToCellFromGridSpace(reclaimTargetX, reclaimTargetZ)
                 -- Assign engineer to cell
-                -- Check count to make sure this updates during debug
                 eng.CellAssigned = {reclaimTargetX, reclaimTargetZ}
                 brainGridInstance:AddReclaimingEngineer(brainCell, eng)
-
                 local moveLocation = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
                 IssueMove({eng}, moveLocation)
-                local moveCounter = 0
                 local engStuckCount = 0
                 local Lastdist
                 local dist = VDist3Sq(eng:GetPosition(), moveLocation)
-
-                -- @Relent0r I've not looke da the logic past this comment yet, just so that you're aware of that
 
                 -- Statemachine switch for engineer moving to location
                 while not IsDestroyed(eng) and dist > gridSize do
@@ -4391,9 +4369,7 @@ Platoon = Class(moho.platoon_methods) {
                         Lastdist = dist
                     elseif not eng:IsUnitState('Reclaiming') then
                         engStuckCount = engStuckCount + 1
-                        LOG('* AI: * SampleReclaim: has not moved during move to reclaim position look, adding one, current is '..engStuckCount)
                         if engStuckCount > 15 then
-                            LOG('* AI: * SampleReclaim: Stuck while moving to reclaim position. Stuck='..engStuckCount)
                             break
                         end
                     end
@@ -4404,12 +4380,13 @@ Platoon = Class(moho.platoon_methods) {
                 if dist <= gridSize then
                     -- Statemachine switch to reclaiming state
                     local time = 0
+                    IssueClearCommands({eng})
                     while time < 30 do
-                        IssueClearCommands({eng})
                         IssueAggressiveMove({eng}, moveLocation)
                         time = time + 1
-                        WaitTicks(30)
-                        if aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.MOBILE, eng:GetPosition(), 45, 'Enemy') > 0 then
+                        WaitTicks(50)
+                        local engPos = eng:GetPosition()
+                        if aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.MOBILE, engPos, 45, 'Enemy') > 0 then
                             -- Statemachine switch to avoiding/reclaiming danger
                             local actionTaken = AIUtils.EngAvoidLocalDanger(aiBrain, eng)
                             if actionTaken then
@@ -4420,20 +4397,26 @@ Platoon = Class(moho.platoon_methods) {
                         if reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass < 10  or aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
                             break
                         end
+                        if VDist3Sq(engPos, moveLocation) < 4 and reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass > 5 then
+                            for _, v in reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].Reclaim do
+                                if IsProp(v) and v.MaxMassReclaim > 0 then
+                                    moveLocation = v:GetPosition()
+                                    IssueClearCommands({eng})
+                                    break
+                                end
+                            end
+                        end
                     end
                 end
             end
 
             if reclaimTargetX and reclaimTargetZ then
-                -- remove engineer from cell assignment
-                -- check this is updating during debug
                 local brainCell = brainGridInstance:ToCellFromGridSpace(eng.CellAssigned[1], eng.CellAssigned[2])
                 brainGridInstance:RemoveReclaimingEngineer(brainCell, eng)
                 eng.CellAssigned = false
             end
 
             if aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
-                eng:SetCustomName('Engineer is exiting reclaim loop')
                 -- Combat is back to false so the engineer manager can assign things to the engineer
                 eng.Combat = false
                 self:PlatoonDisband()
