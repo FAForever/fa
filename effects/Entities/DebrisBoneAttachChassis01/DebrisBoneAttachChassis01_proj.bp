@@ -1,7 +1,5 @@
 ProjectileBlueprint {
     Physics = {
-        MinBounceCount = 15,
-        MaxBounceCount = 15,
         BounceVelDamp = 0.5,
         CollideEntity = false,
         CollideSurface = true,

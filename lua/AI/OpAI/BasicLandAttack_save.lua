@@ -451,11 +451,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -479,15 +479,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3 , 0 },
                                 {'default_brain','3','0'}
                             },
@@ -511,15 +511,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4 },
                                 {'default_brain','1','2','4'}
                             },
@@ -543,15 +543,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3 , 0 },
                                 {'default_brain','3','0'}
                             },
@@ -575,15 +575,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4 },
                                 {'default_brain','1','2','4'}
                             },
@@ -607,11 +607,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -635,15 +635,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3 , 0 },
                                 {'default_brain','3','0'}
                             },
@@ -667,15 +667,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4 },
                                 {'default_brain','1','2','4'}
                             },
@@ -704,11 +704,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -732,15 +732,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4 },
                                 {'default_brain','1','2','4'}
                             },
@@ -764,15 +764,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3 , 0 },
                                 {'default_brain','3','0'}
                             },
@@ -796,15 +796,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4 },
                                 {'default_brain','1','2','4'}
                             },
@@ -828,15 +828,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3 , 0 },
                                 {'default_brain','3','0'}
                             },
@@ -860,11 +860,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -888,11 +888,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -916,11 +916,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -944,11 +944,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -972,15 +972,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4 },
                                 {'default_brain','1','2','4'}
                             },
@@ -1004,15 +1004,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3 , 0 },
                                 {'default_brain','3','0'}
                             },
@@ -1036,15 +1036,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4 },
                                 {'default_brain','1','2','4'}
                             },
@@ -1068,15 +1068,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3 , 0 },
                                 {'default_brain','3','0'}
                             },
@@ -1105,15 +1105,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3 , 0 },
                                 {'default_brain','3','0'}
                             },
@@ -1137,15 +1137,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4 },
                                 {'default_brain','1','2','4'}
                             },
@@ -1169,11 +1169,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1197,11 +1197,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1225,11 +1225,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1261,16 +1261,16 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
                             --[[
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 3, 4 },
                                 {'default_brain','1','3','4'}
                             },
@@ -1295,11 +1295,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1323,11 +1323,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1351,11 +1351,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1379,15 +1379,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4 },
                                 {'default_brain','1','2','4'}
                             },
@@ -1411,15 +1411,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3 , 0 },
                                 {'default_brain','3','0'}
                             },
@@ -1448,11 +1448,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1476,11 +1476,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1504,11 +1504,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1534,15 +1534,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 2, 0},
                                 {'default_brain','2','0'}
                             },
@@ -1569,11 +1569,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1597,11 +1597,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1625,11 +1625,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -1653,15 +1653,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4},
                                 {'default_brain', '1', '2', '4'}
                             },
@@ -1685,15 +1685,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1 , 2, 4},
                                 {'default_brain', '1', '2', '4'}
                             },
@@ -1717,15 +1717,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 2, 4, 0},
                                 {'default_brain','2','4','0'}
                             },
@@ -1749,15 +1749,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 2, 4, 0},
                                 {'default_brain','2','4','0'}
                             },
@@ -1781,15 +1781,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 2, 4, 0},
                                 {'default_brain','2','4','0'}
                             },
@@ -1813,15 +1813,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1, 3, 0},
                                 {'default_brain','1','3','0'}
                             },
@@ -1845,15 +1845,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1, 3, 0},
                                 {'default_brain','1','3','0'}
                             },
@@ -1877,15 +1877,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1, 3, 0},
                                 {'default_brain','1','3','0'}
                             },
@@ -1910,15 +1910,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3, 0},
                                 {'default_brain', '3', '0'}
                             },
@@ -1942,15 +1942,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3, 0},
                                 {'default_brain', '3', '0'}
                             },
@@ -1974,15 +1974,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 3, 0},
                                 {'default_brain', '3', '0'}
                             },
@@ -2008,15 +2008,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1, 0 },
                                 {'default_brain', '1', '0'}
                             },
@@ -2040,15 +2040,15 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [2] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1, 0},
                                 {'default_brain', '1', '0'},
                             },
@@ -2073,11 +2073,11 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/ai/opai/BasicLandAttack_editorfunctions.lua', 'NeedTransports',
+                            {'/lua/ai/opai/BasicLandAttack_editorfunctions.lua', 'NeedTransports',
                                 {'default_brain','default_master','default_location_type'},
                                 {'default_brain','default_master','default_location_type'}
                             },
-                            [1] = {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
+                            {'/lua/editor/miscbuildconditions.lua', 'FactionIndex',
                                 {'default_brain', 1, 0 },
                                 {'default_brain','1', '0'}
                             },
@@ -2098,7 +2098,7 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/ai/opai/BasicLandAttack_editorfunctions.lua', 'NeedTransports',
+                            {'/lua/ai/opai/BasicLandAttack_editorfunctions.lua', 'NeedTransports',
                                 {'default_brain','default_master','default_location_type'},
                                 {'default_brain','default_master','default_location_type'}
                             },
@@ -2119,7 +2119,7 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/ai/opai/BasicLandAttack_editorfunctions.lua', 'NeedTransports',
+                            {'/lua/ai/opai/BasicLandAttack_editorfunctions.lua', 'NeedTransports',
                                 {'default_brain','default_master','default_location_type'},
                                 {'default_brain','default_master','default_location_type'}
                             },
@@ -2148,23 +2148,23 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackMasterCountDifficulty',
+                            {'/lua/ai/opai/basiclandattack_editorfunctions.lua', 'BasicLandAttackMasterCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
                         },
                         PlatoonBuildCallbacks = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMUnlockPlatoon',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMUnlockPlatoon',
                                 {'default_brain','default_platoon'},
                                 {'default_brain','default_platoon'}
                             },
                         },
                         PlatoonAddFunctions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMLockPlatoon',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMLockPlatoon',
                                 {'default_platoon'},
                                 {'default_platoon'}
                             },
