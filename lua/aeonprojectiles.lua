@@ -1,12 +1,9 @@
 ------------------------------------------------------------
 --  File     :  /lua/aeonprojectiles.lua
 --  Author(s):  John Comes, Gordon Duclos
---
 --  Summary  : Aeon base projectile definitions
---
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
-
 local DefaultProjectileFile = import("/lua/sim/defaultprojectiles.lua")
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
 local OnWaterEntryEmitterProjectile = DefaultProjectileFile.OnWaterEntryEmitterProjectile
@@ -395,6 +392,7 @@ AQuantumDisruptorProjectile = ClassProjectile(SinglePolyTrailProjectile) {
 
 --- AEON AA PROJECTILES
 ---@class AAAQuantumDisplacementCannonProjectile : NullShell
+---@field TrailEmitters table
 AAAQuantumDisplacementCannonProjectile = ClassProjectile(NullShell) {
     PolyTrail = '/effects/emitters/quantum_displacement_cannon_polytrail_01_emit.bp',
     FxImpactUnit = EffectTemplate.AQuantumDisplacementHit01,
@@ -408,10 +406,9 @@ AAAQuantumDisplacementCannonProjectile = ClassProjectile(NullShell) {
     ---@param self AAAQuantumDisplacementCannonProjectile
     OnCreate = function(self)
         NullShell.OnCreate(self)
-
         self.TrailEmitters = {}
         self:CreateTrailFX()
-        self:ForkThread(self.UpdateThread)
+        self.Trash:Add(ForkThread(self.UpdateThread,self))
     end,
 
     ---@param self AAAQuantumDisplacementCannonProjectile
@@ -441,13 +438,13 @@ AAAQuantumDisplacementCannonProjectile = ClassProjectile(NullShell) {
 
     ---@param self AAAQuantumDisplacementCannonProjectile
     UpdateThread = function(self)
-        WaitSeconds(0.3)
+        WaitTicks(4)
         self:DestroyTrailFX()
         self:CreateTeleportFX(self.Army)
         local emit = CreateEmitterOnEntity(self, self.Army, self.FxInvisible)
-        WaitSeconds(0.45)
+        WaitTicks(5)
         emit:Destroy()
-        self:CreateTeleportFX()
+        self:CreateTeleportFX(self.Army)
         self:CreateTrailFX()
     end,
 }
@@ -557,7 +554,7 @@ ASonicPulseProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     FxImpactLand = EffectTemplate.ASonicPulseHitLand01,
 }
 
----## AEON SONIC PULSE AA PROJECTILES
+--- AEON SONIC PULSE AA PROJECTILES
 --- Custom version of the sonic pulse battery projectile for flying units
 ---@class ASonicPulseProjectile02 : SinglePolyTrailProjectile
 ASonicPulseProjectile02 = ClassProjectile(SinglePolyTrailProjectile) {
@@ -600,7 +597,7 @@ ATorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
         -- if we are starting in the water then immediately switch to tracking in water
         if inWater == true then
             self:TrackTarget(true):StayUnderwater(true)
-            self:OnEnterWater(self)
+            self:OnEnterWater()
         else
             self:TrackTarget(false)
         end
