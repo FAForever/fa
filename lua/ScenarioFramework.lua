@@ -912,7 +912,7 @@ end
 
 --- Run teleport effect then delete unit if told to do so
 ---@param unit Unit
----@param killUnit boolean
+---@param killUnit? boolean
 function FakeTeleportUnit(unit, killUnit)
     IssueStop({unit})
     IssueClearCommands({unit})
@@ -934,16 +934,21 @@ end
 
 --- Run teleport effect then delete unit if told to do so
 ---@param units Unit
----@param killUnits boolean
+---@param killUnits? boolean
 function FakeTeleportUnits(units, killUnits)
     IssueStop(units)
     IssueClearCommands(units)
-
+    local buildingUnits = {}
     for _, unit in units do
         if not IsDestroyed(unit) then
             unit.CanBeKilled = false
-            unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
-            unit:PlayUnitSound('GateCharge')
+            -- if an SCU is currently gating in, it's already getting teleport effects
+            if unit:GetFractionComplete() < 1 then
+                buildingUnits[unit] = true
+            else
+                unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
+                unit:PlayUnitSound('GateCharge')
+            end
         end
     end
 
@@ -951,9 +956,11 @@ function FakeTeleportUnits(units, killUnits)
 
     for _, unit in units do
         if not IsDestroyed(unit) then
-            unit:CleanupTeleportChargeEffects()
+            if not buildingUnits[unit] then
+                unit:CleanupTeleportChargeEffects()
+                unit:PlayUnitSound('GateOut')
+            end
             unit:PlayTeleportOutEffects()
-            unit:PlayUnitSound('GateOut')
         end
     end
 
