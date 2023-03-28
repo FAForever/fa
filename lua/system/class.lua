@@ -257,6 +257,25 @@ end
 ---@generic T_Base: fa-class
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
+function ClassDummyProjectile(...)
+    if IsSimpleClass(arg) then
+        local class = arg[1] --[[@as fa-class]]
+        setmetatable(class, DummyProjectileFactory)
+        return ConstructClass(nil, class) --[[@as unknown]]
+    else
+        local bases = { unpack (arg) }
+        return function(specs)
+            local class = specs
+            setmetatable(class, DummyProjectileFactory)
+            return ConstructClass(bases, class)
+        end
+    end
+end
+
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
 function ClassUnit(...)
     if IsSimpleClass(arg) then
         local class = arg[1] --[[@as fa-class]]
@@ -656,6 +675,18 @@ ProjectileFactory = {
         return setmetatable(instance, self)
     end
 }
+
+DummyProjectileFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "ProjectileFactory", tostring(self.__name)))
+        -- needs a hash part of one for the _c_object field
+        local instance = {&3 &0}
+        return setmetatable(instance, self)
+    end
+}
+
 
 UnitFactory = {
     ---@param self any

@@ -463,81 +463,46 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
 -----------------------------------------------------------------
 
 -- upvalued for performance
-local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
-local GetTerrainType = GetTerrainType
-
--- upvalued read-only values
-local DefaultTerrainTypeFxImpact = GetTerrainType(-1, -1).FXImpact
-
--- moho functions for performance
-local EntityMethods = _G.moho.entity_methods
-local EntityDestroy = EntityMethods.Destroy
-local EntityPlaySound = EntityMethods.PlaySound
-local EntityGetBlueprint = EntityMethods.GetBlueprint
-local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
-
-local EmitterMethods = _G.moho.IEffect
-local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
 
 ---@class BaseGenericDebris : DummyProjectile
-BaseGenericDebris = ClassProjectile(DummyProjectile) {
+BaseGenericDebris = ClassDummyProjectile(DummyProjectile) {
+
+    FxImpactLand = import("/lua/effecttemplates.lua").GenericDebrisLandImpact01,
+    FxImpactWater = import("/lua/effecttemplates.lua").WaterSplash01,
+    FxTrails = import("/lua/effecttemplates.lua").GenericDebrisTrails01,
+
+    ---@param self BaseGenericDebris
+    OnCreate = function(self)
+        DummyProjectile.OnCreate(self)
+
+        local army = self.Army
+        for k, effect in self.FxTrails do
+            CreateEmitterOnEntity(self, army, effect)
+        end
+    end,
 
     ---@param self BaseGenericDebris
     ---@param targetType string
-    ---@param targetEntity Unit
+    ---@param targetEntity Unit | Shield | Projectile
     OnImpact = function(self, targetType, targetEntity)
+        local army = self.Army
 
-        -- cache values
-        local blueprint = EntityGetBlueprint(self)
-        local blueprintDisplayImpactEffects = blueprint.Display.ImpactEffects
-        local impactEffectType = blueprintDisplayImpactEffects.Type or 'Default'
-
-        -- determine sound value
-        local impactSnd = "Impact"
+        -- default impact effect for land
         if targetType == 'Terrain' then
-            impactSnd = "ImpactTerrain"
+            for _, effect in self.FxImpactLand do
+                local emit = CreateEmitterAtEntity(self, army, effect)
+                emit:ScaleEmitter(0.05 + 0.15 * Random())
+            end
+        -- default impact for water
         elseif targetType == 'Water' then
-            impactSnd = "ImpactWater"
-        end
-
-        -- play impact sound
-        local snd = blueprint.Audio[impactSnd]
-        if snd then 
-            EntityPlaySound(self, snd)
-        end
-
-        -- Inlined GetTerrainEffects --
-
-        -- get x / z position
-        local x, _, z = EntityGetPositionXYZ(self)
-
-        -- get terrain at that location and try and get some effects
-        local terrainTypeFxImpact = GetTerrainType(x, z).FXImpact
-        local terrainEffects = terrainTypeFxImpact[targetType][impactEffectType] or DefaultTerrainTypeFxImpact[targetType][impactEffectType] or false
-
-        -- Inlined CreateTerrainEffects --
-
-        -- check if table exists, can be set to false
-        if terrainEffects then 
-
-            -- store values in cache
-            local emit = false
-            local army = self.Army
-            local effectScale = blueprintDisplayImpactEffects.Scale or 1
-
-            for _, v in terrainEffects do
-
-                -- create emitter and scale accordingly
-                emit = CreateEmitterAtBone(self, -2, army, v)
-                if effectScale ~= 1 then
-                    EmitterScaleEmitter(emit, effectScale)
-                end
+            for _, effect in self.FxImpactWater do
+                local emit = CreateEmitterAtEntity(self, army, effect)
+                emit:ScaleEmitter(0.4 + 0.4 * Random())
             end
         end
 
-        -- destroy ourselves :(
-        EntityDestroy(self)
+        self:Destroy()
     end,
 }
 

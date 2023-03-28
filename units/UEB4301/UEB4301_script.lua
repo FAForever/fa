@@ -4,12 +4,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 local TShieldStructureUnit = import("/lua/terranunits.lua").TShieldStructureUnit
+local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
 ---@class UEB4301 : TShieldStructureUnit
 ---@field Rotator1? moho.RotateManipulator
 ---@field Rotator2? moho.RotateManipulator
 ---@field ShieldEffectsBag TrashBag
-UEB4301 = ClassUnit(TShieldStructureUnit) {
+UEB4301 = ClassUnit(TShieldStructureUnit, ShieldEffectsComponent) {
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_t2_01_emit.bp',
         '/effects/emitters/terran_shield_generator_T3_02_emit.bp',
@@ -18,8 +19,7 @@ UEB4301 = ClassUnit(TShieldStructureUnit) {
     ---@param self UEB4301
     OnCreate = function(self)
         TShieldStructureUnit.OnCreate(self)
-        self.ShieldEffectsBag = TrashBag()
-        self.Trash:Add(self.ShieldEffectsBag)
+        ShieldEffectsComponent.OnCreate(self)        
     end,
 
     ---@param self UEB4301
@@ -36,25 +36,21 @@ UEB4301 = ClassUnit(TShieldStructureUnit) {
     ---@param self UEB4301
     OnShieldEnabled = function(self)
         TShieldStructureUnit.OnShieldEnabled(self)
+        ShieldEffectsComponent.OnShieldEnabled(self)
         if self.Rotator1 then
             self.Rotator1:SetTargetSpeed(10)
         end
         if self.Rotator2 then
             self.Rotator2:SetTargetSpeed(-10)
         end
-        
-        self.ShieldEffectsBag:Destroy()
-        for k, v in self.ShieldEffects do
-            self.ShieldEffectsBag:Add(CreateAttachedEmitter(self, 0, self.Army, v))
-        end
     end,
 
     ---@param self UEB4301
     OnShieldDisabled = function(self)
         TShieldStructureUnit.OnShieldDisabled(self)
+        ShieldEffectsComponent.OnShieldDisabled(self)
         self.Rotator1:SetTargetSpeed(0)
         self.Rotator2:SetTargetSpeed(0)
-        self.ShieldEffectsBag:Destroy()
     end,
 }
 

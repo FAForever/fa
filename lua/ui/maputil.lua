@@ -211,7 +211,7 @@ function GetStartPositions(scenario)
     if not table.empty(armyPositions) then
         for army, position in armyPositions do
             if saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers[army] then
-                pos = saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers[army].position
+                local pos = saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers[army].position
                 -- x and z value are of interest so ignore y (index 2)
                 position[1] = pos[1]
                 position[2] = pos[3]
