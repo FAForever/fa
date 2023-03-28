@@ -1,6 +1,6 @@
 EmitterBlueprint {
 	BlueprintId = 'destruction_explosion_debris_trail_01',
-	Lifetime = 15.00,
+	Lifetime = 25.00,
 	Repeattime = 15.00,
 	TextureFramecount = 1.00,
 	Blendmode = 0.00,
@@ -42,7 +42,7 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 15.00,
 		Keys = {
-			{ x=0.040,y=4.140,z=2.000 },
+			{ x=0.040,y=8.140,z=2.000 },
 			{ x=14.800,y=1.630,z=2.000 },
 		},
 	},
