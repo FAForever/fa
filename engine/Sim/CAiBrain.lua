@@ -376,13 +376,13 @@ end
 
 --- Gives resources to brain.
 ---@param type ResourceType
----@param amount number @ how much to give.
+---@param amount number # how much to give.
 function CAiBrain:GiveResource(type, amount)
 end
 
 --- Gives storage to brain.
 ---@param type ResourceType
----@param amount number @ how much to give.
+---@param amount number # how much to give.
 function CAiBrain:GiveStorage(type, amount)
 end
 
@@ -396,15 +396,15 @@ function CAiBrain:IsOpponentAIRunning()
 end
 
 --- Creates a new platoon.
----@param name string @ custom platoon name
----@param aiPlan string @ to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
+---@param name string # custom platoon name
+---@param aiPlan string # to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
 ---@return Platoon
 function CAiBrain:MakePlatoon(name, aiPlan)
 end
 
 --- Return number of unit's categories being built.
----@param entityCategoryOfBeingBuilt EntityCategory @ Unit's category that is being built.
----@param entityCategoryOfBuilder EntityCategory @ Unit's category of the unit building, example: categories.CONSTRUCTION .
+---@param entityCategoryOfBeingBuilt EntityCategory # Unit's category that is being built.
+---@param entityCategoryOfBuilder EntityCategory # Unit's category of the unit building, example: categories.CONSTRUCTION .
 ---@return integer
 function CAiBrain:NumCurrentlyBuilding(entityCategoryOfBeingBuilt, entityCategoryOfBuilder)
 end
@@ -464,7 +464,7 @@ end
 
 --- Removes resources from brain.
 ---@param type ResourceType
----@param amount number @ how much to take.
+---@param amount number # how much to take.
 function CAiBrain:TakeResource(type, amount)
 end
 
