@@ -893,8 +893,7 @@ Projectile = ClassProjectile(moho.projectile_methods) {
 ---@class DummyProjectile : moho.projectile_methods
 ---@field Blueprint ProjectileBlueprint
 ---@field Army Army
-DummyProjectile = Class(moho.projectile_methods) {
-
+DummyProjectile = ClassDummyProjectile(moho.projectile_methods) {
     ---@param self DummyProjectile
     ---@param inWater? boolean
     OnCreate = function(self, inWater)
