@@ -3198,7 +3198,8 @@ CalculateTeamdata = function(aiBrain)
                     if not teamStarts[armyIndex] then
                         teamStarts[armyIndex] = {
                             StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = army.Team
+                            Team = army.Team,
+                            Ally = true
                         }
                     end
                 elseif not teamTable[teamKey] then
@@ -3207,7 +3208,8 @@ CalculateTeamdata = function(aiBrain)
                     if not teamStarts[armyIndex] then
                         teamStarts[armyIndex] = {
                             StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = teamKey
+                            Team = teamKey,
+                            Ally = true
                         }
                     end
                     teamKey = teamKey + 1
@@ -3216,7 +3218,8 @@ CalculateTeamdata = function(aiBrain)
                     if not teamStarts[armyIndex] then
                         teamStarts[armyIndex] = {
                             StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = teamKey
+                            Team = teamKey,
+                            Ally = true
                         }
                     end
                     teamTable[teamKey] = true
@@ -3229,7 +3232,8 @@ CalculateTeamdata = function(aiBrain)
                     if not teamStarts[armyIndex] then
                         teamStarts[armyIndex] = {
                             StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = army.Team
+                            Team = army.Team,
+                            Ally = false
                         }
                     end
                 elseif not teamTable[teamKey] then
@@ -3238,7 +3242,8 @@ CalculateTeamdata = function(aiBrain)
                     if not teamStarts[armyIndex] then
                         teamStarts[armyIndex] = {
                             StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = teamKey
+                            Team = teamKey,
+                            Ally = false
                         }
                     end
                     teamKey = teamKey + 1
@@ -3246,7 +3251,8 @@ CalculateTeamdata = function(aiBrain)
                     if not teamStarts[armyIndex] then
                         teamStarts[armyIndex] = {
                             StartPosition = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = teamKey
+                            Team = teamKey,
+                            Ally = false
                         }
                     end
                     teamKey = teamKey + 1

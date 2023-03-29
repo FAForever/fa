@@ -34,7 +34,8 @@ GridIntel = Class (Grid) {
         for k = 1, cellCount do
             for l = 1, cellCount do
                 local cell = cells[k][l]
-                cell.AssignedScout = false
+                cell.LandScoutsAssigned = { }
+                cell.AirScoutsAssigned = { }
                 cell.LastScouted = 0
                 cell.MustScout = false
                 cell.ScoutPriority = 0
@@ -60,6 +61,47 @@ GridIntel = Class (Grid) {
         local gridSizeX, gridSizeZ = self:ToCellIndices((playableArea[3] - 16), (playableArea[4] - 16))
         self.IntelGridXRes = gridSizeX
         self.IntelGridZRes = gridSizeZ
+    end,
+
+    --- Registers a scout in a given cell
+    ---@param self AIGridBrain
+    ---@param cell AIGridBrainCell
+    ---@param scout Unit
+    AddAssignedScout = function(self, cell, scout, type)
+        if type == 1 then
+            cell.LandScoutsAssigned[scout.EntityId] = scout
+        elseif type == 2 then
+            cell.AirScoutsAssigned[scout.EntityId] = scout
+        else
+            WARN('IntelFramework unable to assign scout, invalid type')
+        end
+    end,
+
+    --- Unregisters a scout in a given cell
+    ---@param self AIGridBrain
+    ---@param cell AIGridBrainCell
+    ---@param scout Unit
+    RemoveAssignedScout = function(self, cell, scout, type)
+        if type == 1 then
+            cell.LandScoutsAssigned[scout.EntityId] = nil
+        elseif type == 2 then
+            cell.AirScoutsAssigned[scout.EntityId] = nil
+        else
+            WARN('IntelFramework unable to unassign scout, invalid type')
+        end
+    end,
+
+    --- Counts the number of scouts assigned to a cell
+    ---@param self AIGridBrain
+    ---@param cell AIGridBrainCell
+    CountAssignedScouts = function(self, cell, type)
+        if type == 1 then
+            return table.getsize(cell.LandScoutsAssigned)
+        elseif type == 2 then
+            return table.getsize(cell.AirScoutsAssigned)
+        else
+            WARN('IntelFramework unable to get scout count, invalid type')
+        end
     end,
 }
 
