@@ -9318,21 +9318,14 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
     float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float3 albedo = tex2D( albedoSampler, vertex.texcoord0.xy).rgb;
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+    float fullTeamColor = saturate(specular.a * 2.5);
 
     float metallic = 0;
     if (specular.r < 0.4)
         metallic = saturate(mapRange(specular.r, 0.2267, 0.3643, 0, 1));
     else
         metallic = min(max(mapRange(specular.r, 0.4129, 0.5384, 1, 0), 0.3), 1);
-    metallic = saturate(metallic - specular.a);
-
-    albedo = pow(albedo, (1 - metallic * 0.8));
-    // We need to make the dark areas darker
-    // Should find something that offers more control over the result
-    float x = albedo.r;
-    albedo = (pow(x, 3) - 3 * pow(x, 2) + 3 * x) * albedo;
-
-    albedo = lerp(albedo, vertex.color.rgb * 0.8, teamColorFactor * specular.a);
+    metallic = saturate(metallic - fullTeamColor);
 
     if (specular.g < 0.45)
         specular.g = 0.022 * (exp(6 * specular.g) - 1) + 0.023 + specular.a * 0.2;
@@ -9343,14 +9336,19 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
     float roughness = lerp(specular.g, 0.03, teamcolorBorder);
     roughness = saturate(roughness + darkAreas);
 
+    albedo *= (specular.r + 0.3) * 1.05;
+    albedo = pow(albedo, (1 - metallic * 0.99));
+    albedo = lerp(albedo, vertex.color.rgb * specular.a * 0.4, teamColorFactor * fullTeamColor);
+
     float specularAmount = lerp(0.08, 0, darkAreas);
-    specularAmount = lerp(specularAmount, 0.04, saturate(specular.a * 3));
+    specularAmount = lerp(specularAmount, 0.04, fullTeamColor);
 
     float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount).rgb;
 
-    float emission = specular.b + (pow(specular.a, 2) * 0.13);
+    float3 emission = specular.b + specular.a * vertex.color.rgb * 0.25;
     color += emission;
-    float alpha = mirrored ? 0.5 : emission * 0.5;
+    float teamColGlowCompensation = ((vertex.color.r + vertex.color.g + vertex.color.b) / 3);
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + specular.a * 0.1 * (1.4 - teamColGlowCompensation);
 
     return float4(color, alpha);
 }
@@ -9473,7 +9471,7 @@ float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : 
     float3 secondary2 = tex2D( secondarySampler, texcoord2 );
     color += float3(0.2,0.7,1) * (secondary.b + secondary2.g )* (1-albedo.a);
 
-    float alpha = mirrored ? 0.5 : specular.b + ((secondary.b + secondary2.g )* (1-albedo.a))+ glowMinimum;
+    float alpha = mirrored ? 0.5 : specular.b + ((secondary.b + secondary2.g ) * (1-albedo.a)) + glowMinimum;
     return float4(color, alpha);
 }
 
