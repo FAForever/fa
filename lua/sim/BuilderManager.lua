@@ -9,7 +9,18 @@
 
 local Builder = import("/lua/sim/builder.lua")
 
+-- upvalue scope for performance
+local ForkThread = ForkThread
+
 ---@class BuilderManager
+---@field Trash TrashBag
+---@field Brain AIBrain
+---@field BuilderData table
+---@field BuilderCheckInterval number
+---@field BuilderList boolean
+---@field BuilderThread? thread             # Is defined when manager is enabled
+---@field Active boolean                    # True when manager is enabled
+---@field NumBuilders number
 BuilderManager = ClassSimple {
     ---@param self BuilderManager
     ---@param brain AIBrain
@@ -22,33 +33,11 @@ BuilderManager = ClassSimple {
         self.Active = false
         self.NumBuilders = 0
         self:SetEnabled(true)
-
-        self.NumGet = 0
     end,
 
     ---@param self BuilderManager
     Destroy = function(self)
-        for _,bType in self.BuilderData do
-            for k,v in bType do
-                v = nil
-            end
-        end
         self.Trash:Destroy()
-    end,
-
-    -- forking and storing a thread on the monitor
-    ---@param self BuilderManager
-    ---@param fn function
-    ---@param ... any
-    ---@return thread|nil
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
-        end
     end,
 
     ---@param self BuilderManager
@@ -68,11 +57,14 @@ BuilderManager = ClassSimple {
     ---@param bType string
     ---@return boolean
     SortBuilderList = function(self, bType)
+        LOG("SortBuilderList")
         -- Make sure there is a type
         if not self.BuilderData[bType] then
             error('*BUILDMANAGER ERROR: Trying to sort platoons of invalid builder type - ' .. bType)
             return false
         end
+
+        -- TODO: use the built-in sort
         local sortedList = {}
         --Simple selection sort, this can be made faster later if we decide we need it.
         for i = 1, table.getn(self.BuilderData[bType].Builders) do
@@ -112,7 +104,7 @@ BuilderManager = ClassSimple {
     end,
 
     ---@param self BuilderManager
-    ---@param builderData number
+    ---@param builderData BuilderSpec
     ---@param locationType string
     ---@param builderType string
     AddBuilder = function(self, builderData, locationType, builderType)
@@ -121,29 +113,37 @@ BuilderManager = ClassSimple {
     end,
 
     ---@param self BuilderManager
-    ---@param newBuilder Unit
+    ---@param newBuilder Builder
     ---@param builderType string
-    AddInstancedBuilder = function(self,newBuilder, builderType)
+    AddInstancedBuilder = function(self, newBuilder, builderType)
+        -- can't proceed without a builder
+        if not newBuilder then
+            WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: Invalid builder!')
+            return
+        end
+
+        -- can't proceed without a builder type
         builderType = builderType or newBuilder:GetBuilderType()
         if not builderType then
-            -- Warn the programmer that something is wrong. We can continue, hopefully the builder is not too important for the AI ;)
-            -- But good for testing, and the case that a mod has bad builders.
-            -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
             WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: Invalid builder type: ' .. repr(builderType) .. ' - in builder: ' .. newBuilder.BuilderName)
             return
         end
-        if newBuilder then
-            if not self.BuilderData[builderType] then
-                -- Warn the programmer that something is wrong here. Same here, we can continue.
-                -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
-                WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. newBuilder.BuilderName)
-                return
-            end
-            table.insert(self.BuilderData[builderType].Builders, newBuilder)
-            self.BuilderData[builderType].NeedSort = true
-            self.BuilderList = true
+
+        -- can't proceed without a valid builder type
+        if not self.BuilderData[builderType] then
+            WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. newBuilder.BuilderName)
+            return
         end
+
+        -- register the builder
+        table.insert(self.BuilderData[builderType].Builders, newBuilder)
+        self.BuilderData[builderType].NeedSort = true
+
+        -- update internal state
+        self.BuilderList = true
         self.NumBuilders = self.NumBuilders + 1
+
+        -- process the builder
         if newBuilder.InstantCheck then
             self:ManagerLoopBody(newBuilder)
         end
@@ -216,6 +216,7 @@ BuilderManager = ClassSimple {
         if not self.Location then
             return false
         end
+
         local height = GetTerrainHeight(self.Location[1], self.Location[3])
         if GetSurfaceHeight(self.Location[1], self.Location[3]) > height then
             height = GetSurfaceHeight(self.Location[1], self.Location[3])
@@ -308,7 +309,7 @@ BuilderManager = ClassSimple {
         if not self.Brain.BuilderManagers[self.LocationType] then
             return false
         end
-        self.NumGet = self.NumGet + 1
+        
         local found = false
         local possibleBuilders = {}
         for k,v in self.BuilderData[bType].Builders do
@@ -360,12 +361,7 @@ BuilderManager = ClassSimple {
                     numTested = numTested + 1
                     if numTested >= numPerTick then
                         WaitTicks(1)
-                        if self.NumGet > 1 then
-                            --LOG('*AI STAT: NumGet = ' .. self.NumGet)
-                        end
-                        self.NumGet = 0
                         numTicks = numTicks + 1
-                        numTest = 0
                     end
                     self:ManagerLoopBody(bData,bType)
                 end
@@ -380,6 +376,7 @@ BuilderManager = ClassSimple {
     ---@param oldtable, Table
     ---@return tempTable, Table
     RebuildTable = function(self, oldtable)
+        LOG("RebuildTable")
         local temptable = {}
         for k, v in oldtable do
             if v ~= nil then
@@ -391,6 +388,22 @@ BuilderManager = ClassSimple {
             end
         end
         return temptable
+    end,
+
+    -- forking and storing a thread on the monitor
+    ---@deprecated
+    ---@param self BuilderManager
+    ---@param fn function
+    ---@param ... any
+    ---@return thread|nil
+    ForkThread = function(self, fn, ...)
+        if fn then
+            local thread = ForkThread(fn, self, unpack(arg))
+            self.Trash:Add(thread)
+            return thread
+        else
+            return nil
+        end
     end,
 }
 

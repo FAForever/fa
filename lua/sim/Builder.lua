@@ -12,21 +12,24 @@
 ---@field Priority number
 ---@field OriginalPriority number
 ---@field BuilderName string 
----@field BuilderType string 
----@field BuilderData table 
+---@field BuilderType BuilderType 
 ---@field BuilderConditions function[]
+---@field InstantCheck boolean
+---@field NeedSort boolean
 Builder = ClassSimple {
-    
+
     ---@param self Builder
     ---@param brain AIBrain
-    ---@param data table
+    ---@param data BuilderSpec
     ---@param locationType string
     ---@return boolean
     Create = function(self, brain, data, locationType)
         -- make sure the table of strings exist, they are required for the builder
         local verifyDictionary = { 'Priority', 'BuilderName' }
         for k,v in verifyDictionary do
-            if not self:VerifyDataName(v, data) then return false end
+            if not self:VerifyDataName(v, data) then
+                return false
+            end
         end
 
         self.Priority = data.Priority
