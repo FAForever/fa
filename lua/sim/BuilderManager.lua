@@ -57,7 +57,6 @@ BuilderManager = ClassSimple {
     ---@param bType string
     ---@return boolean
     SortBuilderList = function(self, bType)
-        LOG("SortBuilderList")
         -- Make sure there is a type
         if not self.BuilderData[bType] then
             error('*BUILDMANAGER ERROR: Trying to sort platoons of invalid builder type - ' .. bType)
@@ -309,7 +308,7 @@ BuilderManager = ClassSimple {
         if not self.Brain.BuilderManagers[self.LocationType] then
             return false
         end
-        
+
         local found = false
         local possibleBuilders = {}
         for k,v in self.BuilderData[bType].Builders do
