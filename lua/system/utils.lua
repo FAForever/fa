@@ -387,7 +387,7 @@ function table.reverse(t)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
     local items = table.indexize(t) -- convert from hash table
-    local itemsCount = table.getsize(t)
+    local itemsCount = table.getn(t)
     for k, v in ipairs(items) do
         r[itemsCount + 1 - k] = v
     end
