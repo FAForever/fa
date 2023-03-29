@@ -12,6 +12,8 @@ local Builder = import("/lua/sim/builder.lua")
 local TableGetn = table.getn
 
 ---@class EngineerManager : BuilderManager
+---@field Location Vector
+---@field Radius number
 EngineerManager = Class(BuilderManager) {
     ---@param self EngineerManager
     ---@param brain AIBrain

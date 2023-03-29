@@ -357,50 +357,36 @@ function WaterMassMarkersPresent(aiBrain)
     return false
 end
 
----@param aiBrain AIBrain
+---@param aiBrain BaseAIBrain
 ---@param locationType string
 ---@return true | nil
 function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
-    if not aiBrain.GridReclaim then
-        WARN('AI WARNING: Reclaim grid does not exist on AI brain '..aiBrain.Nickname)
+    -- this condition won't work without a reference to the reclaim grid
+    local gridReclaim = aiBrain.GridReclaim
+    if not gridReclaim then
+        WARN(string.format("Build condition ('ReclaimAvailableInGrid') requires a reference to the reclaim grid in the brain (of %s)", aiBrain.Nickname))
         return false
     end
-    -- Placeholders this part is temporary until the ReclaimGrid defines the playable area min and max grid sizes
-    local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
-    local minCellX = 0
-    local minCellZ = 0
-    local maxCellX = 16
-    local maxCellZ = 16
-    if maxmapdimension == 256 then
-        maxCellX = 8
-        maxCellZ = 8
+
+    -- this condition won't work without a reference to the engineer manager
+    local manager = aiBrain.BuilderManagers[locationType].EngineerManager --[[@type EngineerManager]]
+    if not manager then
+        return false
     end
-    ---
-    if aiBrain.BuilderManagers[locationType].EngineerManager then
-        local searchRange
-        local reclaimGridInstance = aiBrain.GridReclaim
-        local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
-        if not mapSearch then
-            searchRange = math.floor(engineerManager.Radius / reclaimGridInstance.CellSize)
-        else
-            searchRange = math.floor((engineerManager.Radius * 2) / reclaimGridInstance.CellSize)
-        end
-        local cellX, cellZ = reclaimGridInstance:ToGridSpace(engineerManager.Location[1],engineerManager.Location[3])
-        local gridSize = 0
-        if aiBrain:GetEconomyStoredRatio("MASS") <= 0.7 then
-            while gridSize < searchRange do
-                for x = math.max(minCellX, cellX - gridSize), math.min(maxCellX, cellX + gridSize), 1 do
-                    for z = math.max(minCellZ, cellZ - gridSize), math.min(maxCellZ, cellZ + gridSize), 1 do
-                        if reclaimGridInstance.Cells[x][z].TotalMass > 10 then
-                            return true
-                        end
-                        gridSize = gridSize + 1
-                    end
-                end
-            end
-        end
+
+    -- no need to reclaim when we have too much mass
+    if aiBrain:GetEconomyStoredRatio("MASS") > 0.7 then
+        return false
     end
-    return false
+
+    -- no need to reclaim when there's nothing around us to reclaim
+    local bx, bz = gridReclaim:ToGridSpace(manager.Location[1], manager.Location[3])
+    local maximumCell = gridReclaim:MaximumInRadius(bx, bz, 3)
+    if maximumCell.TotalMass < 10 then
+        return false
+    end
+
+    return true
 end
 
 -- unused imports kept for mod support
