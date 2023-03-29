@@ -172,11 +172,6 @@ end
 function CPlatoon:GetSquadPosition(squad)
 end
 
---- Returns platoon position
----@return Vector
-function CPlatoon:GetPosition()
-end
-
 --- Returns units table of <squad>
 ---@param squad PlatoonSquadType
 ---@return Unit[]
