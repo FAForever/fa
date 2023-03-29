@@ -84,25 +84,6 @@ BuilderManager = ClassSimple {
     end,
 
     ---@param self BuilderManager
-    ---@param builderName string
-    ---@param changeTable table
-    AlterBuilder = function(self, builderName, changeTable)
-        for k,v in self.BuilderData do
-            for num,builder in v.Builders do
-                if builder.BuilderName == builderName then
-                    for key,change in changeTable do
-                        builder.key = change
-                        if key == BuilderConditions then
-                            ChangeState(builder, builder.SetupState)
-                        end
-                    end
-                end
-                break
-            end
-        end
-    end,
-
-    ---@param self BuilderManager
     ---@param builderData BuilderSpec
     ---@param locationType string
     ---@param builderType string
