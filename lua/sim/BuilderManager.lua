@@ -187,11 +187,6 @@ BuilderManager = ClassSimple {
     end,
 
     ---@param self BuilderManager
-    GetLocationType = function(self)
-        return self.LocationType
-    end,
-
-    ---@param self BuilderManager
     GetLocationCoords = function(self)
         if not self.Location then
             return false
