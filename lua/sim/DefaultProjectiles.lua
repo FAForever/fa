@@ -466,7 +466,7 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 
 ---@class BaseGenericDebris : DummyProjectile
-BaseGenericDebris = ClassProjectile(DummyProjectile) {
+BaseGenericDebris = ClassDummyProjectile(DummyProjectile) {
 
     FxImpactLand = import("/lua/effecttemplates.lua").GenericDebrisLandImpact01,
     FxImpactWater = import("/lua/effecttemplates.lua").WaterSplash01,

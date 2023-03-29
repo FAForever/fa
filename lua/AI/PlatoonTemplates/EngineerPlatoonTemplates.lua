@@ -158,7 +158,7 @@ PlatoonTemplate {
     Name = 'T123EngineerBuilder',
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
-        { categories.ENGINEER - categories.ENGINEERSTATION - categories.COMMAND, 1, 1, 'support', 'none' },
+        { categories.ENGINEER * (categories.TECH1 + categories.TECH2 + categories.TECH3) - categories.ENGINEERSTATION - categories.COMMAND, 1, 1, 'support', 'none' },
     },
 }
 
