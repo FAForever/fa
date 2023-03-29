@@ -165,7 +165,6 @@ function State(...)
 end
 
 --- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
----construct a class
 ---@generic T: fa-class
 ---@generic T_Base: fa-class
 ---@param ... T_Base
@@ -197,28 +196,15 @@ function Class(...)
     end
 end
 
---- Prepares the construction of a UI class, referring to the paragraphs of text at the top of this file.
 ---@generic T: fa-class
 ---@generic T_Base: fa-class
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassUI(...)
-    -- arg = { 
-    --     { 
-    --         -- { table with information of base 1 } OR { specifications }
-    --         -- { table with information of base 2 }
-    --         -- ...
-    --         -- { table with information of base n }
-    --     }, 
-    --     n=1 -- number of bases
-    -- }
-
-    -- Class ({ field=value, field=value, ... })
     if IsSimpleClass(arg) then
         local class = arg[1] --[[@as fa-class]]
         setmetatable(class, UIFactory)
         return ConstructClass(nil, class) --[[@as unknown]]
-    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
     else
         local bases = { unpack (arg) }
         return function(specs)
@@ -234,22 +220,10 @@ end
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassShield(...)
-    -- arg = { 
-    --     { 
-    --         -- { table with information of base 1 } OR { specifications }
-    --         -- { table with information of base 2 }
-    --         -- ...
-    --         -- { table with information of base n }
-    --     }, 
-    --     n=1 -- number of bases
-    -- }
-
-    -- Class ({ field=value, field=value, ... })
     if IsSimpleClass(arg) then
         local class = arg[1] --[[@as fa-class]]
         setmetatable(class, ShieldFactory)
         return ConstructClass(nil, class) --[[@as unknown]]
-    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
     else
         local bases = { unpack (arg) }
         return function(specs)
@@ -260,29 +234,15 @@ function ClassShield(...)
     end
 end
 
---- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
----construct a class
 ---@generic T: fa-class
 ---@generic T_Base: fa-class
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassProjectile(...)
-    -- arg = { 
-    --     { 
-    --         -- { table with information of base 1 } OR { specifications }
-    --         -- { table with information of base 2 }
-    --         -- ...
-    --         -- { table with information of base n }
-    --     }, 
-    --     n=1 -- number of bases
-    -- }
-
-    -- Class ({ field=value, field=value, ... })
     if IsSimpleClass(arg) then
         local class = arg[1] --[[@as fa-class]]
         setmetatable(class, ProjectileFactory)
         return ConstructClass(nil, class) --[[@as unknown]]
-    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
     else
         local bases = { unpack (arg) }
         return function(specs)
@@ -297,23 +257,30 @@ end
 ---@generic T_Base: fa-class
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
-function ClassUnit(...)
-    -- arg = { 
-    --     { 
-    --         -- { table with information of base 1 } OR { specifications }
-    --         -- { table with information of base 2 }
-    --         -- ...
-    --         -- { table with information of base n }
-    --     }, 
-    --     n=1 -- number of bases
-    -- }
+function ClassDummyProjectile(...)
+    if IsSimpleClass(arg) then
+        local class = arg[1] --[[@as fa-class]]
+        setmetatable(class, DummyProjectileFactory)
+        return ConstructClass(nil, class) --[[@as unknown]]
+    else
+        local bases = { unpack (arg) }
+        return function(specs)
+            local class = specs
+            setmetatable(class, DummyProjectileFactory)
+            return ConstructClass(bases, class)
+        end
+    end
+end
 
-    -- Class ({ field=value, field=value, ... })
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
+function ClassUnit(...)
     if IsSimpleClass(arg) then
         local class = arg[1] --[[@as fa-class]]
         setmetatable(class, UnitFactory)
         return ConstructClass(nil, class) --[[@as unknown]]
-    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
     else
         local bases = { unpack (arg) }
         return function(specs)
@@ -329,22 +296,10 @@ end
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassDummyUnit(...)
-    -- arg = { 
-    --     { 
-    --         -- { table with information of base 1 } OR { specifications }
-    --         -- { table with information of base 2 }
-    --         -- ...
-    --         -- { table with information of base n }
-    --     }, 
-    --     n=1 -- number of bases
-    -- }
-
-    -- Class ({ field=value, field=value, ... })
     if IsSimpleClass(arg) then
         local class = arg[1] --[[@as fa-class]]
         setmetatable(class, DummyUnitFactory)
         return ConstructClass(nil, class) --[[@as unknown]]
-    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
     else
         local bases = { unpack (arg) }
         return function(specs)
@@ -360,22 +315,10 @@ end
 ---@param ... T_Base
 ---@return fun(specs: T): T|T_Base
 function ClassWeapon(...)
-    -- arg = { 
-    --     { 
-    --         -- { table with information of base 1 } OR { specifications }
-    --         -- { table with information of base 2 }
-    --         -- ...
-    --         -- { table with information of base n }
-    --     }, 
-    --     n=1 -- number of bases
-    -- }
-
-    -- Class ({ field=value, field=value, ... })
     if IsSimpleClass(arg) then
         local class = arg[1] --[[@as fa-class]]
         setmetatable(class, WeaponFactory)
         return ConstructClass(nil, class) --[[@as unknown]]
-    -- Class(Base1, Base2, ...) ({field = value, field = value, ...})
     else
         local bases = { unpack (arg) }
         return function(specs)
@@ -386,12 +329,14 @@ function ClassWeapon(...)
     end
 end
 
+---@generic T
+---@param specs T
+---@return T
 function ClassTrashBag(specs)
     setmetatable(specs, TrashBagFactory)
     return ConstructClass(nil, specs)
 end
 
----create a simple class which does not inherit from anything
 ---@generic T
 ---@param specs T
 ---@return T
@@ -651,7 +596,6 @@ UIFactory = {
     ---@return table
     __call = function (self, ...)
         -- LOG(string.format("%s -> %s", "UIFactory", tostring(self.__name)))
-        -- needs a hash part of atleast 8 for all the lazy var fields, the _c_object reference and the _disabled field
 
         local instance = {&15 &0}
         setmetatable(instance, self)
@@ -674,7 +618,6 @@ CFactory = {
     ---@return table
     __call = function (self)
         -- LOG(string.format("%s -> %s", "CFactory", tostring(self.__name)))
-        -- needs a hash part of one for the _c_object field
         local instance = {&1 &0}
         return setmetatable(instance, self)
     end
@@ -728,11 +671,22 @@ ProjectileFactory = {
     ---@return table
     __call = function (self)
         -- LOG(string.format("%s -> %s", "ProjectileFactory", tostring(self.__name)))
-        -- needs a hash part of one for the _c_object field
-        local instance = {&15 &0}
+        local instance = {&7 &0}
         return setmetatable(instance, self)
     end
 }
+
+DummyProjectileFactory = {
+    ---@param self any
+    ---@return table
+    __call = function (self)
+        -- LOG(string.format("%s -> %s", "ProjectileFactory", tostring(self.__name)))
+        -- needs a hash part of one for the _c_object field
+        local instance = {&3 &0}
+        return setmetatable(instance, self)
+    end
+}
+
 
 UnitFactory = {
     ---@param self any
@@ -762,7 +716,6 @@ DummyUnitFactory = {
     ---@return table
     __call = function (self)
         -- LOG(string.format("%s -> %s", "UnitFactory", tostring(self.__name)))
-        -- needs a hash part of one for the _c_object field
         local instance = {&15 &0}
         return setmetatable(instance, self)
     end
@@ -773,7 +726,6 @@ WeaponFactory = {
     ---@return table
     __call = function (self, owner)
         -- LOG(string.format("%s -> %s", "WeaponFactory", tostring(self.__name)))
-        -- needs a hash part of one for the _c_object field
         local instance = {&15 &0}
         setmetatable(instance, self)
 
@@ -791,7 +743,6 @@ ShieldFactory = {
     ---@return table
     __call = function (self, spec, owner)
         -- LOG(string.format("%s -> %s", "ShieldFactory", tostring(self.__name)))
-
         local instance = {&63 &0}
         setmetatable(instance, self)
 

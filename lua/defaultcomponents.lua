@@ -1,3 +1,5 @@
+local Buff = import("/lua/sim/buff.lua")
+
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
 ---@field ShieldEffectsBag TrashBag
@@ -11,15 +13,21 @@ ShieldEffectsComponent = ClassSimple {
 
     ---@param self ShieldEffectsComponent
     OnCreate = function(self)
-        self.ShieldEffectsBag = TrashBag()
-        self.Trash:Add(self.ShieldEffectsBag)
+        local bag = TrashBag()
+        self.ShieldEffectsBag = bag
+        self.Trash:Add(bag)
     end,
 
     ---@param self ShieldEffectsComponent
     OnShieldEnabled = function(self)
-        self.ShieldEffectsBag:Destroy()
-        for _, v in self.ShieldEffects do
-            self.ShieldEffectsBag:Add(CreateAttachedEmitter(self, self.ShieldEffectsBone, self.Army, v):ScaleEmitter(self.ShieldEffectsScale))
+        local bag = self.ShieldEffectsBag
+        local bone = self.ShieldEffectsBone
+        local scale = self.ShieldEffectsScale
+        local army = self.Army
+
+        bag:Destroy()
+        for _, effect in self.ShieldEffects do
+            bag:Add(CreateAttachedEmitter(self, bone, army, effect):ScaleEmitter(scale))
         end
     end,
 
@@ -488,5 +496,257 @@ TreadComponent = ClassSimple {
             self.TreadSuspend = nil
             WaitTicks(1)
         end
+    end,
+}
+
+local MathMin = math.min
+
+local VeterancyToTech = {
+    TECH1 = 1,
+    TECH2 = 2,
+    TECH3 = 3,
+    COMMAND = 3,
+    SUBCOMMANDER = 4,
+    EXPERIMENTAL = 5,
+}
+
+---Regen values by tech level and veterancy level
+local VeterancyRegenBuffs = {
+    { 1, 2, 3, 4, 5 }, -- T1
+    { 3, 6, 9, 12, 15 }, -- T2
+    { 6, 12, 18, 24, 30 }, -- T3 / ACU
+    { 9, 18, 27, 36, 45 }, -- SACU
+    { 25, 50, 75, 100, 125 }, -- Experimental
+}
+
+---@class VeterancyComponent
+---@field VetDamage table<EntityId, number>
+---@field VetDamageTaken number
+---@field VetInstigators table<EntityId, Unit>
+---@field VetExperience? number
+---@field VetLevel? number
+VeterancyComponent = ClassSimple {
+
+    ---@param self VeterancyComponent | Unit
+    OnCreate = function(self)
+        local blueprint = self.Blueprint
+
+        -- these fields are always required
+        self.VetDamageTaken = 0
+        self.VetDamage = {}
+        self.VetInstigators = setmetatable({}, { __mode = 'v' })
+
+        -- optionally, these fields are defined too to inform UI of our veterancy status
+        if blueprint.VetEnabled then
+            self:SetStat('VetLevel', self:GetStat('VetLevel', 0).Value)
+            self:SetStat('VetExperience', self:GetStat('VetExperience', 0).Value)
+            self.VetExperience = 0
+            self.VetLevel = 0
+        end
+    end,
+
+    ---@param self VeterancyComponent | Unit
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        amount = MathMin(amount, self:GetMaxHealth())
+        self.VetDamageTaken = self.VetDamageTaken + amount
+        if instigator and instigator.IsUnit and not IsDestroyed(instigator) then
+            local entityId = instigator.EntityId
+            local vetInstigators = self.VetInstigators
+            local vetDamage = self.VetDamage
+
+            vetInstigators[entityId] = instigator
+            vetDamage[entityId] = (vetDamage[entityId] or 0) + amount
+        end
+    end,
+
+    --- Disperses the veterancy, expects to be only called once
+    ---@param self VeterancyComponent | Unit
+    VeterancyDispersal = function(self)
+        local vetWorth = self:GetFractionComplete() * self:GetTotalMassCost()
+        local vetDamage = self.VetDamage
+        local vetInstigators = self.VetInstigators
+        local vetDamageTaken = self.VetDamageTaken
+        for id, unit in vetInstigators do
+            if unit.Blueprint.VetEnabled and (not IsDestroyed(unit)) then
+                local proportion = vetWorth * (vetDamage[id] / vetDamageTaken)
+                unit:AddVetExperience(proportion)
+            end
+        end
+    end,
+
+    -- Adds experience to a unit
+    ---@param self Unit | VeterancyComponent
+    ---@param experience number
+    ---@param noLimit boolean
+    AddVetExperience = function(self, experience, noLimit)
+        local blueprint = self.Blueprint
+        if not blueprint.VetEnabled then
+            return
+        end
+
+        local currExperience = self.VetExperience
+        local currLevel = self.VetLevel
+
+        -- case where we're at max vet: just add the experience and be done
+
+        if currLevel > 4 then
+            currExperience = currExperience + experience
+            self.VetExperience = currExperience
+            self:SetStat('VetExperience', currExperience)
+            return
+        end
+
+        ---@type UnitBlueprint
+        local vetThresholds = blueprint.VetThresholds
+        local lowerThreshold = vetThresholds[currLevel] or 0
+        local upperThreshold = vetThresholds[currLevel + 1]
+        local diffThreshold = upperThreshold - lowerThreshold
+
+        -- case where we have no limit (after gifting / spawning)
+        if noLimit then
+
+            currExperience = currExperience + experience
+            self.VetExperience = currExperience
+            self:SetStat('VetExperience', currExperience)
+
+            while currLevel < 5 and upperThreshold and upperThreshold <= experience do
+                self:AddVetLevel()
+                currLevel = currLevel + 1
+                upperThreshold = vetThresholds[currLevel + 1]
+            end
+
+        -- case where we do have a limit (usual gameplay approach)
+        else
+            if experience > diffThreshold then
+                experience = diffThreshold
+            end
+
+            currExperience = currExperience + experience
+            self.VetExperience = currExperience
+            self:SetStat('VetExperience', currExperience)
+
+            if upperThreshold <= currExperience then
+                self:AddVetLevel()
+            end
+        end
+    end,
+
+    --- Adds a single level of veterancy
+    ---@param self Unit | VeterancyComponent
+    AddVetLevel = function(self)
+        local blueprint = self.Blueprint
+        if not blueprint.VetEnabled then
+            return
+        end
+
+        local nextLevel = self.VetLevel + 1
+        self.VetLevel = nextLevel
+        self:SetStat('VetLevel', nextLevel)
+
+        -- shared across all units
+        Buff.ApplyBuff(self, 'VeterancyMaxHealth' .. nextLevel)
+
+        -- unique to all units... but not quite
+        local regenBuffName = self.UnitId .. 'VeterancyRegen' .. nextLevel
+        if not Buffs[regenBuffName] then
+            local techLevel = VeterancyToTech[blueprint.TechCategory] or 1
+            if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
+                techLevel = techLevel + 1
+            end
+
+            BuffBlueprint {
+                Name = regenBuffName,
+                DisplayName = regenBuffName,
+                BuffType = 'VeterancyRegen',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    Regen = {
+                        Add = VeterancyRegenBuffs[techLevel][nextLevel],
+                    },
+                },
+            }
+        end
+
+        Buff.ApplyBuff(self, regenBuffName)
+
+        -- one time health injection
+
+        local maxHealth = blueprint.Defense.MaxHealth
+        local mult = blueprint.VeteranHealingMult[nextLevel] or 0.1
+        self:AdjustHealth(self, maxHealth * mult)
+
+        -- callbacks
+
+        self:DoUnitCallbacks('OnVeteran')
+        self.Brain:OnBrainUnitVeterancyLevel(self, nextLevel)
+    end,
+
+    ---@param self Unit | VeterancyComponent
+    ---@param level number
+    SetVeterancy = function(self, level)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level, 5)] or 0, true)
+    end,
+
+    ---@param self Unit | VeterancyComponent
+    ---@param massKilled number
+    ---@param noLimit boolean
+    CalculateVeterancyLevelAfterTransfer = function(self, massKilled, noLimit)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(massKilled, noLimit)
+    end,
+
+    -- kept for backwards compatibility with mods, but should really not be used anymore
+
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
+    ---@param instigator Unit
+    OnKilledUnit = function (self, unitThatIsDying, experience)
+        if not experience then
+            return
+        end
+
+        if not IsDestroyed(unitThatIsDying) then
+            local vetWorth = unitThatIsDying:GetFractionComplete() * unitThatIsDying:GetTotalMassCost()
+            self:AddVetExperience(vetWorth, false)
+        end
+    end,
+
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
+    ---@param massKilled number
+    ---@param noLimit boolean
+    CalculateVeterancyLevel = function(self, massKilled, noLimit)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(massKilled, noLimit)
+    end,
+
+    ---@see AddVetLevel
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
+    ---@param level number
+    SetVeteranLevel = function(self, level)
+        self.VetExperience = 0
+        self.VetLevel = 0
+        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level, 5)] or 0, true)
+    end,
+
+    ---@deprecated
+    ---@param self Unit | VeterancyComponent
+    GetVeterancyValue = function(self)
+        local fractionComplete = self:GetFractionComplete()
+        local unitMass = self:GetTotalMassCost()
+        local vetMult = self.Blueprint.VeteranImportanceMult or 1
+        local cargoMass = self.cargoMass or 0
+        -- Allow units to count for more or less than their real mass if needed
+        return fractionComplete * unitMass * vetMult + cargoMass
     end,
 }

@@ -660,7 +660,7 @@ function AddPingGroups(groupData, onload)
             end
             local modeData = {
                 name="RULEUCC_Script",
-                cursor=cursor,
+                Cursor=cursor,
                 pingtype=self.Data.Type,
                 groupID=self.Data.ID,
             }

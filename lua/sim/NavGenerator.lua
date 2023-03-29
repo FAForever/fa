@@ -21,6 +21,7 @@
 --******************************************************************************************************
 
 local Shared = import("/lua/shared/navgenerator.lua")
+local MarkerGenerator = import("/lua/sim/markergenerator.lua")
 
 ---@alias NavTerrainCache number[][]
 ---@alias NavDepthCache number[][]
@@ -67,13 +68,8 @@ NavGrids = {}
 ---@field Layer NavLayers
 ---@field NumberOfExtractors number
 ---@field NumberOfHydrocarbons number
----@field ExtractorMarkers MarkerData[]
----@field HydrocarbonMarkers MarkerData[]
--- ---@field NumberOfSpawns number
--- ---@field NumberOfExpansions number
--- ---@field NumberOfDefensePoints number
--- ---@field ExpansionMarkers MarkerData[]
--- ---@field DefensePointMarkers MarkerData[]
+---@field ExtractorMarkers MarkerResource[]
+---@field HydrocarbonMarkers MarkerResource[]
 
 ---@type table<number, NavLabelMetadata>
 NavLabels = {}
@@ -82,13 +78,6 @@ local Generated = false
 ---@return boolean
 function IsGenerated()
     return Generated
-end
-
-local CompressedTreeIdentifier = 0
----@return number
-local function GenerateCompressedTreeIdentifier()
-    CompressedTreeIdentifier = CompressedTreeIdentifier + 1
-    return CompressedTreeIdentifier
 end
 
 local LabelIdentifier = 0
@@ -101,7 +90,7 @@ end
 -- Shared data with UI
 
 ---@type NavLayerData
-local NavLayerData = Shared.CreateEmptyNavLayerData()
+NavLayerData = Shared.CreateEmptyNavLayerData()
 
 local tl = { 0, 0, 0 }
 local tr = { 0, 0, 0 }
@@ -473,7 +462,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
         -- scan left-top -> left-bottom
         for k = z1, z2 - 1 do
-            z = k + 0.5
+            local z = k + 0.5
             -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x1Outside, z)
             if neighbor then
@@ -489,7 +478,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
         -- scan right-top -> right-bottom
         for k = z1, z2 - 1 do
-            z = k + 0.5
+            local z = k + 0.5
             -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x2Outside, z)
             if neighbor then
@@ -1058,7 +1047,7 @@ local function GenerateCullLabels()
     local count = 1
     for k, _ in navLabels do
         local metadata = navLabels[k]
-        if metadata.Area < 0.2 and metadata.NumberOfExtractors == 0 and metadata.NumberOfHydrocarbons == 0 then
+        if metadata.Area < 0.16 and metadata.NumberOfExtractors == 0 and metadata.NumberOfHydrocarbons == 0 then
             culledLabels = culledLabels + 1
 
             -- cull node
@@ -1092,12 +1081,15 @@ local function GenerateMarkerMetadata()
 
     local grids = {
         Land = NavGrids['Land'],
-        Amphibious = NavGrids['Amphibious']
+        Amphibious = NavGrids['Amphibious'],
+        Hover = NavGrids['Hover'],
+
+        -- also tackled with amphibious layer 
+        -- Naval = NavGrids['Naval'],
     }
 
-    local extractors, en = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
-    for k = 1, en do
-        local extractor = extractors[k]
+    local extractors = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    for id, extractor in extractors do
         for layer, grid in grids do
             local label = grid:FindLeaf(extractor.position).Label
 
@@ -1113,9 +1105,8 @@ local function GenerateMarkerMetadata()
         end
     end
 
-    local hydrocarbons, hn = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
-    for k = 1, hn do
-        local hydro = hydrocarbons[k]
+    local hydrocarbons = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
+    for id, hydro in hydrocarbons do
         for layer, grid in grids do
             local label = grid:FindLeaf(hydro.position).Label
 
@@ -1131,6 +1122,8 @@ local function GenerateMarkerMetadata()
         end
     end
 end
+
+
 
 --- Generates a navigational mesh based on the heightmap
 function Generate()
@@ -1191,6 +1184,11 @@ function Generate()
     then
         SPEW("Hover grid equals land grid - ditching hover grid")
         NavGrids['Hover'] = NavGrids['Land']
+        NavLayerData['Hover'].Labels = 0
+        NavLayerData['Hover'].Neighbors = 0
+        NavLayerData['Hover'].PathableLeafs = 0
+        NavLayerData['Hover'].Subdivisions = 0
+        NavLayerData['Hover'].UnpathableLeafs = 0
     end
 
     if  NavLayerData['Land'].Labels == NavLayerData['Amphibious'].Labels and
@@ -1201,6 +1199,11 @@ function Generate()
     then
         SPEW("Amphibious grid equals land grid - ditching amphibious grid")
         NavGrids['Amphibious'] = NavGrids['Land']
+        NavLayerData['Amphibious'].Labels = 0
+        NavLayerData['Amphibious'].Neighbors = 0
+        NavLayerData['Amphibious'].PathableLeafs = 0
+        NavLayerData['Amphibious'].Subdivisions = 0
+        NavLayerData['Amphibious'].UnpathableLeafs = 0
     end
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
@@ -1216,4 +1219,8 @@ function Generate()
 
     -- allows debugging tools to function
     import("/lua/sim/navdebug.lua")
+end
+
+function GenerateMarkers()
+    MarkerGenerator.GenerateExpansions()
 end

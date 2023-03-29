@@ -15,7 +15,19 @@ local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
+local Quaternion = import("/lua/shared/quaternions.lua").Quaternion
 
+local MathAbs = math.abs
+
+local FactionToTarmacIndex = {
+    UEF = 1,
+    AEON = 2,
+    CYBRAN = 3,
+    SERAPHIM = 4,
+    NOMADS = 5,
+}
+
+local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 local TreadComponent = import("/lua/defaultcomponents.lua").TreadComponent
 
 
@@ -30,9 +42,17 @@ local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.
 local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
 local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
 
+---@class StructureTarmacBag
+---@field Decals TrashBag
+---@field Orientation number
+---@field CurrentBP UnitBlueprintTarmac
+---@field Lifetime number
+---@field OwnedByEntity EntityId
+
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
 ---@field AdjacentUnits? Unit[]
+---@field TarmacBag StructureTarmacBag
 StructureUnit = ClassUnit(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
@@ -50,30 +70,50 @@ StructureUnit = ClassUnit(Unit) {
         Unit.OnCreate(self)
         self:HideLandBones()
         self.FxBlinkingLightsBag = { }
-        if self.Blueprint.Physics.FlattenSkirt then
+
+        local layer = self.Layer
+        local blueprint = self.Blueprint
+        local physicsBlueprint = blueprint.Physics
+        local flatten = physicsBlueprint.FlattenSkirt
+        if flatten then
             self:FlattenSkirt()
         end
 
         -- check for terrain orientation
-        local bp = self.Blueprint
         if not (
-                bp.Physics.AltitudeToTerrain or
-                bp.Physics.StandUpright
-            ) and self.Layer == 'Land'
+                physicsBlueprint.AltitudeToTerrain or
+                physicsBlueprint.StandUpright
+            ) and (flatten or physicsBlueprint.AlwaysAlignToTerrain)
+            and (layer == 'Land' or layer == 'Seabed')
         then
             -- rotate structure to match terrain gradient
-            local a1, a2 = TerrainUtils.GetTerrainSlopeAngles(
+            local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
                 self:GetPosition(),
-                bp.Footprint.SizeX or bp.Physics.SkirtSizeX,
-                bp.Footprint.SizeZ or bp.Physics.SkirtSizeZ
+                blueprint.Footprint.SizeX or physicsBlueprint.SkirtSizeX,
+                blueprint.Footprint.SizeZ or physicsBlueprint.SkirtSizeZ
             )
 
-            self:SetOrientation(EulerToQuaternion(-1 * a1, a2, 0), true)
+            -- do not orientate structures that are on flat ground
+            if a1 != 0 or a2 != 0 then
+                -- quaternion magic incoming, be prepared! Note that the yaw axis is inverted, but then
+                -- re-inverted again by multiplying it with the original orientation
+                local quatSlope = Quaternion.fromAngle(0, 0 - a2,-1 * a1)
+                local quatOrient = setmetatable(self:GetOrientation(), Quaternion)
+                local quat = quatOrient * quatSlope
+                self:SetOrientation(quat, true)
 
-            -- technically obsolete, but as this is part of an integration we don't want to break
-            -- the mod package that it originates from. Originates from the BrewLan mod suite
-            if not bp.Physics.FlattenSkirt then
+                -- technically obsolete, but as this is part of an integration we don't want to break
+                -- the mod package that it originates from. Originates from the BrewLan mod suite
                 self.TerrainSlope = {}
+            end
+        end
+
+        -- create decal below structure
+        if flatten and not self:HasTarmac() and blueprint.General.FactionName ~= "Seraphim" then
+            if self.TarmacBag then
+                self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
+            else
+                self:CreateTarmac(true, true, true, false, false)
             end
         end
     end,
@@ -160,18 +200,8 @@ StructureUnit = ClassUnit(Unit) {
         Unit.OnStartBeingBuilt(self, builder, layer)
 
         -- rotate weaponry towards enemy
-        local bp = self.Blueprint
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
-        end
-
-        -- create decal below structure
-        if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
-            if self.TarmacBag then
-                self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
-            else
-                self:CreateTarmac(true, true, true, false, false)
-            end
         end
     end,
 
@@ -187,22 +217,11 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         self:PlayActiveAnimation()
-
-        -- remove land bones if the structure has them
-        self:HideLandBones()
-    end,
-
-    ---@param self StructureUnit
-    OnFailedToBeBuilt = function(self)
-        Unit.OnFailedToBeBuilt(self)
-        self:DestroyTarmac()
     end,
 
     ---@param self StructureUnit
     FlattenSkirt = function(self)
-        local x, y, z = self:GetPositionXYZ()
         local x0, z0, x1, z1 = self:GetSkirtRect()
-
         import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
 
@@ -210,109 +229,211 @@ StructureUnit = ClassUnit(Unit) {
     ---@param albedo string
     ---@param normal string
     ---@param glow string
-    ---@param orientation number
-    ---@param specTarmac string
+    ---@param orientation? number
+    ---@param tarmac? UnitBlueprintTarmac
     ---@param lifeTime number
     ---@return boolean
-    CreateTarmac = function(self, albedo, normal, glow, orientation, specTarmac, lifeTime)
-        if self.Layer ~= 'Land' then return end
-        local tarmac
-        local bp = self.Blueprint.Display.Tarmacs
-        if not specTarmac then
-            if bp and not table.empty(bp) then
-                local num = Random(1, table.getn(bp))
-                tarmac = bp[num]
-            else
-                return false
-            end
-        else
-            tarmac = specTarmac
+    CreateTarmac = function(self, albedo, normal, glow, orientation, tarmac, lifeTime)
+        self.Trash:Add(
+            ForkThread(
+                self.CreateTarmacThread,
+                self,
+                albedo,
+                normal,
+                glow, 
+                orientation,
+                tarmac,
+                lifeTime
+            )
+        )
+    end,
+
+    ---@param self StructureUnit
+    ---@param albedo string
+    ---@param normal string
+    ---@param glow string
+    ---@param orientation? number
+    ---@param tarmac? UnitBlueprintTarmac
+    ---@param lifeTime number
+    CreateTarmacThread = function(self, albedo, normal, glow, orientation, tarmac, lifeTime)
+        -- hold up one tick to allow upgrades to pass the tarmac bag
+        WaitTicks(1)
+
+        -- upgrades pass the tarmac bag, in which case we take ownership and do nothing
+        if self:HasTarmac() then
+            self.TarmacBag.OwnedByEntity = self.EntityId
+            return
         end
 
+        -- no tarmacs underwater
+        if self.Layer ~= 'Land' then
+            return
+        end
+
+        -- bring into local scope for performance
+        local CreateDecal = CreateDecal
+        local GetTarmac = GetTarmac
+        local TableEmpty = table.empty
+        local TableRandom = table.random
+
+        -- determine tarmac to place
+        if not tarmac then
+            local tarmacBlueprints = self.Blueprint.Display.Tarmacs
+            if tarmacBlueprints and not TableEmpty(tarmacBlueprints) then
+                tarmac = TableRandom(tarmacBlueprints)
+            else
+                return
+            end
+        end
+
+        -- determine lod cutoff
+        local meshBlueprint = self.Blueprint.Display.Mesh
+        local cutoffOthers = meshBlueprint.LODs[1].LODCutoff
+        local cutoffAlbedo = meshBlueprint.LODs[2].LODCutoff
+        if not cutoffAlbedo then
+            cutoffAlbedo = cutoffOthers
+            cutoffOthers = 0.4 * cutoffOthers
+        else
+            cutoffOthers = 0.8 * cutoffOthers
+        end
+
+        -- take into account the fading of the decal
+        cutoffAlbedo = 1.1 * cutoffAlbedo
+        cutoffOthers = 1.1 * cutoffOthers
+
+        -- determine orientation
+        if not orientation then
+            if tarmac.Orientations and not TableEmpty(tarmac.Orientations) then
+                orientation = TableRandom(tarmac.Orientations)
+                -- convert to radians
+                orientation = (0.01745 * orientation)
+            else
+                orientation = 0
+            end
+        end
+
+        -- determine size
         local w = tarmac.Width
         local l = tarmac.Length
-        local fadeout = tarmac.FadeOut
 
-        local x, y, z = self:GetPositionXYZ()
+        -- determine faction
+        local factionIndex  = FactionToTarmacIndex[self.Blueprint.FactionCategory]
 
-        -- I'm disabling this for now since there are so many things wrong with it
-        local orient = orientation
-        if not orientation then
-            if tarmac.Orientations and not table.empty(tarmac.Orientations) then
-                orient = table.random(tarmac.Orientations)
-                orient = (0.01745 * orient)
-            else
-                orient = 0
-            end
-        end
-
-        if not self.TarmacBag then
-            self.TarmacBag = {
-                Decals = {},
-                Orientation = orient,
-                CurrentBP = tarmac,
-            }
-        end
-
-        local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
-
-        local terrain = GetTerrainType(x, z)
-        local terrainName
+        -- determine terrain name for tarmacs based on terrain type
+        local position = self:GetPosition()
+        local terrain = GetTerrainType(position[1], position[3])
+        local terrainName = ''
         if terrain then
             terrainName = terrain.Name
         end
 
-        -- Players and AI can build buildings outside of their faction. Get the *building's* faction to determine the correct tarrain-specific tarmac
-        local factionTable = {e = 1, a = 2, r = 3, s = 4}
-        local faction  = factionTable[string.sub(self.UnitId, 2, 2)]
+        -- create a new bag
+        self.TarmacBag = {
+            Decals = TrashBag(),
+            OwnedByEntity = self.EntityId,
+            Orientation = orientation,
+            CurrentBP = tarmac,
+            Lifetime = cutoffOthers,
+        }
+        local bag = self.TarmacBag.Decals
+
+        -- create albedo tarmac, note that it may have a 2nd texture for specular properties
         if albedo and tarmac.Albedo then
             local albedo2 = tarmac.Albedo2
             if albedo2 then
-                albedo2 = albedo2 .. GetTarmac(faction, terrain)
+                albedo2 = albedo2 .. GetTarmac(factionIndex, terrain)
             end
 
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Albedo .. GetTarmac(faction, terrainName) , albedo2 or '', 'Albedo', w, l, fadeout, lifeTime or 0, self.Army, 0)
-            table.insert(self.TarmacBag.Decals, tarmacHndl)
+            local handle = CreateDecal(
+                position,
+                orientation,
+                tarmac.Albedo .. GetTarmac(factionIndex, terrainName),
+                albedo2 or '',
+                'Albedo',
+                w,
+                l,
+                cutoffAlbedo, 
+                lifeTime or 0,
+                self.Army,
+                0
+            )
+
+            bag:Add(handle)
             if tarmac.RemoveWhenDead then
-                self.Trash:Add(tarmacHndl)
+                self.Trash:Add(handle)
             end
         end
 
+        -- create normals tarmac, note not the usual normals shader
         if normal and tarmac.Normal then
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Normal .. GetTarmac(faction, terrainName), '', 'Alpha Normals', w, l, fadeout, lifeTime or 0, self.Army, 0)
+            local handle = CreateDecal(
+                position,
+                orientation,
+                tarmac.Normal .. GetTarmac(factionIndex, terrainName),
+                '',
+                'Alpha Normals',
+                w,
+                l,
+                cutoffOthers,
+                lifeTime or 0,
+                self.Army,
+                0
+            )
 
-            table.insert(self.TarmacBag.Decals, tarmacHndl)
+            bag:Add(handle)
             if tarmac.RemoveWhenDead then
-                self.Trash:Add(tarmacHndl)
+                self.Trash:Add(handle)
             end
         end
 
+        -- create glow tarmacs, not used by the base game
         if glow and tarmac.Glow then
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Glow .. GetTarmac(faction, terrainName), '', 'Glow', w, l, fadeout, lifeTime or 0, self.Army, 0)
+            local handle = CreateDecal(
+                position,
+                orientation,
+                tarmac.Glow .. GetTarmac(factionIndex, terrainName),
+                '',
+                'Glow',
+                w,
+                l,
+                cutoffOthers,
+                lifeTime or 0,
+                self.Army,
+                0
+            )
 
-            table.insert(self.TarmacBag.Decals, tarmacHndl)
+            bag:Add(handle)
             if tarmac.RemoveWhenDead then
-                self.Trash:Add(tarmacHndl)
+                self.Trash:Add(handle)
             end
         end
     end,
 
     ---@param self StructureUnit
     DestroyTarmac = function(self)
-        if not self.TarmacBag then return end
-
-        for k, v in self.TarmacBag.Decals do
-            v:Destroy()
+        -- no bag to clean up
+        local bag = self.TarmacBag
+        if not bag then
+            return
         end
 
-        self.TarmacBag.Orientation = nil
-        self.TarmacBag.CurrentBP = nil
+        -- not our responsibility to clean up
+        if not bag.OwnedByEntity == self.EntityId then
+            return
+        end
+
+        -- ok, clean the bag
+        bag.Decals:Destroy()
     end,
 
     ---@param self StructureUnit
     HasTarmac = function(self)
-        if not self.TarmacBag then return false end
-        return not table.empty(self.TarmacBag.Decals)
+        local bag = self.TarmacBag
+        if not bag then
+            return false
+        end
+
+        return not bag.Decals:Empty()
     end,
 
     ---@param self StructureUnit
@@ -393,14 +514,19 @@ StructureUnit = ClassUnit(Unit) {
 
     UpgradingState = State {
         Main = function(self)
-            self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
             self:DisableDefaultToggleCaps()
 
+            -- give ownership of tarmac bag
+            local unitBuilding = self.UnitBeingBuilt
+            if self.TarmacBag then
+                local tarmacBag = self.TarmacBag
+                tarmacBag.OwnedByEntity = unitBuilding.EntityId
+                unitBuilding.TarmacBag = tarmacBag
+            end
+
             local animation = self:GetUpgradeAnimation(self.UnitBeingBuilt)
             if animation then
-
-                local unitBuilding = self.UnitBeingBuilt
                 self.AnimatorUpgradeManip = CreateAnimator(self)
                 self.Trash:Add(self.AnimatorUpgradeManip)
                 local fractionOfComplete = 0
@@ -435,13 +561,16 @@ StructureUnit = ClassUnit(Unit) {
             Unit.OnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
 
+            if self.TarmacBag then
+                self.TarmacBag.OwnedByEntity = self.EntityId
+            end
+
             if self.AnimatorUpgradeManip then
                 self.AnimatorUpgradeManip:Destroy()
             end
 
             self:PlayUnitSound('UpgradeFailed')
             self:PlayActiveAnimation()
-            self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
             ChangeState(self, self.IdleState)
         end,
     },
@@ -512,7 +641,6 @@ StructureUnit = ClassUnit(Unit) {
 
     ---@param self StructureUnit
     PlayActiveAnimation = function(self)
-
     end,
 
     ---@param self StructureUnit
@@ -529,12 +657,14 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         Unit.OnKilled(self, instigator, type, overkillRatio)
-        -- Adding into OnKilled the ability to destroy the tarmac but put a new one down that looks exactly like it but
-        -- will time out over the time spec'd or 300 seconds.
-        local orient = self.TarmacBag.Orientation
-        local currentBP = self.TarmacBag.CurrentBP
+
+        -- re-create tarmac bag, but with a life time
+        local bag = self.TarmacBag
+        local orient = bag.Orientation
+        local currentBP = bag.CurrentBP
+        local lifetime = bag.Lifetime
         self:DestroyTarmac()
-        self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
+        self:CreateTarmac(true, true, true, orient, currentBP, lifetime or 300)
     end,
 
     ---@param self StructureUnit
@@ -764,6 +894,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildBoneRotator = CreateRotator(self, self.Blueprint.Display.BuildAttachBone or 0, 'y', 0, 10000)
+        self.BuildBoneRotator:SetPrecedence(1000)
+
         self.Trash:Add(self.BuildBoneRotator)
         self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         self.BuildingUnit = false
@@ -1154,15 +1286,23 @@ FactoryUnit = ClassUnit(StructureUnit) {
     BuildingState = State {
         ---@param self FactoryUnit
         Main = function(self)
+            -- to help prevent a 1-tick rotation on most units
+            local hasEnhancements = self.UnitBeingBuilt.Blueprint.Enhancements
+            if not hasEnhancements then
+                self.UnitBeingBuilt:HideBone(0, true)
+            end
+
             local spin = self:CalculateRollOffPoint()
             self.BuildBoneRotator:SetGoal(spin)
-
-            WaitTicks(1)
-
-            local bone = self.Blueprint.Display.BuildAttachBone or 0
-            self:DetachAll(bone)
-            self.UnitBeingBuilt:AttachBoneTo(-2, self, bone)
+            self.UnitBeingBuilt:AttachBoneTo(-2, self, self.Blueprint.Display.BuildAttachBone or 0)
             self:StartBuildFx(self.UnitBeingBuilt)
+
+            -- prevents a 1-tick rotating visual 'glitch' of unit
+            -- as it is being attached and the rotator is applied
+            WaitTicks(3)
+            if not hasEnhancements then
+                self.UnitBeingBuilt:ShowBone(0, true)
+            end
         end,
     },
 
@@ -1575,7 +1715,6 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self SeaFactoryUnit
     CalculateRollOffPoint = function(self)
-
         -- backwards compatible, don't try and fix mods that rely on the old logic
         if not self.Blueprint.Physics.ComputeRollOffPoint then
             return FactoryUnit.CalculateRollOffPoint(self)
@@ -2045,9 +2184,7 @@ AirUnit = ClassUnit(MobileUnit) {
             proj:Start(self, 0)
             self.Trash:Add(proj)
 
-            if self.totalDamageTaken > 0 and not self.veterancyDispersed then
-                self:VeterancyDispersal(not instigator or not IsUnit(instigator))
-            end
+            self:VeterancyDispersal()
         else
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
@@ -2790,6 +2927,21 @@ ACUUnit = ClassUnit(CommandUnit) {
                 WARN('Teamkill detected')
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
             end
+
+            -- prepare sync
+            local sync = Sync
+            local events = sync.Events or { }
+            sync.Events = events
+            local acuDestroyed = events.ACUDestroyed or { }
+            events.ACUDestroyed = acuDestroyed
+
+            -- sync the event
+            table.insert(acuDestroyed, {
+                Timestamp = GetGameTimeSeconds(),
+                InstigatorArmy = instigator.Army,
+                KilledArmy = self.Army
+            })
+
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
     end,
