@@ -110,8 +110,8 @@ function safecall(msg, fn, ...)
 end
 
 --- Returns actual size of a table, including string keys
-table.getsize = table.getsize2
-table.empty = table.empty2
+table.getsize = table.getsize2 or table.getsize
+table.empty = table.empty2 or table.empty
 
 --- table.copy(t) returns a shallow copy of t.
 function table.copy(t)
