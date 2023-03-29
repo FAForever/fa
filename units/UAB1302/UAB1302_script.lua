@@ -1,13 +1,8 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UAB1202/UAB1202_script.lua
---**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
---**
---**  Summary  :  Aeon Tier 2 Mass Extractor Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/UAB1202/UAB1202_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix
+-- Summary  :  Aeon Tier 2 Mass Extractor Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local AMassCollectionUnit = import("/lua/aeonunits.lua").AMassCollectionUnit
 
 ---@class UAB1302 : AMassCollectionUnit
@@ -18,10 +13,10 @@ UAB1302 = ClassUnit(AMassCollectionUnit) {
         self.ExtractionAnimManip = CreateAnimator(self)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
         self.ExtractionAnimManip:PlayAnim(self.Blueprint.Display.AnimationActivate):SetRate(1)
         self.Trash:Add(self.ExtractionAnimManip)
-        AMassCollectionUnit.OnStopBeingBuilt(self,builder,layer)
+        AMassCollectionUnit.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.ActiveState)
     end,
 
@@ -29,7 +24,6 @@ UAB1302 = ClassUnit(AMassCollectionUnit) {
         Main = function(self)
             WaitFor(self.ExtractionAnimManip)
             while not self:IsDead() do
-                
                 self.ExtractionAnimManip:PlayAnim(self.Blueprint.Display.AnimationActivate):SetRate(1)
                 WaitFor(self.ExtractionAnimManip)
             end
@@ -58,6 +52,4 @@ UAB1302 = ClassUnit(AMassCollectionUnit) {
         end,
     },
 }
-
-
 TypeClass = UAB1302

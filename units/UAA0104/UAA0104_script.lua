@@ -1,13 +1,8 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UAA0104/UAA0104_script.lua
---**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
---**
---**  Summary  :  Aeon T2 Transport Script
---**
---**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/UAA0104/UAA0104_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
+-- Summary  :  Aeon T2 Transport Script
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------
 local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local explosion = import("/lua/defaultexplosions.lua")
 local util = import("/lua/utilities.lua")

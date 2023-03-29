@@ -21,7 +21,7 @@ UAA0310 = ClassUnit(AirTransport) {
     BuildAttachBone = 'UAA0310',
 
     Weapons = {
-        QuantumBeamGeneratorWeapon = ClassWeapon(AQuantumBeamGenerator){},
+        QuantumBeamGeneratorWeapon = ClassWeapon(AQuantumBeamGenerator) {},
         SonicPulseBattery1 = ClassWeapon(AAAZealotMissileWeapon) {},
         SonicPulseBattery2 = ClassWeapon(AAAZealotMissileWeapon) {},
         SonicPulseBattery3 = ClassWeapon(AAAZealotMissileWeapon) {},
@@ -63,15 +63,16 @@ UAA0310 = ClassUnit(AirTransport) {
         AirTransport.OnKilled(self, instigator, type, overkillRatio)
     end,
 
-    OnAnimTerrainCollision = function(self, bone,x,y,z)
+    OnAnimTerrainCollision = function(self, bone, x, y, z)
         local blueprint = self.Blueprint
-        DamageArea(self, {x,y,z}, 5, 1000, 'Default', true, false)
+        DamageArea(self, { x, y, z }, 5, 1000, 'Default', true, false)
         explosion.CreateDefaultHitExplosionAtBone(self, bone, 5.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self),
+            { blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ })
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AirTransport.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AirTransport.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
     end,
 
@@ -79,7 +80,7 @@ UAA0310 = ClassUnit(AirTransport) {
         AirTransport.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
-	
+
     CreateShield = function(self, bpShield)
         local bpShield = table.deepcopy(bpShield)
         self:DestroyShield()
@@ -127,9 +128,9 @@ UAA0310 = ClassUnit(AirTransport) {
             if self:TransportHasAvailableStorage() then
                 self:AddUnitToStorage(unitBuilding)
             else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
+                local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -20 })
+                IssueMoveOffFactory({ unitBuilding }, worldPos)
+                unitBuilding:ShowBone(0, true)
             end
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
