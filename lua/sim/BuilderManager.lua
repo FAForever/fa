@@ -243,7 +243,6 @@ BuilderManager = ClassSimple {
     ---@return boolean
     SortBuilderList = function(self, bType)
         -- Make sure there is a type
-        local
         if not self.BuilderData[bType] then
             error('*BUILDMANAGER ERROR: Trying to sort platoons of invalid builder type - ' .. bType)
             return false
