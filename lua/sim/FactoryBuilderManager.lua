@@ -13,7 +13,17 @@ local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
 
+
+
 ---@class FactoryBuilderManager : BuilderManager
+---@field Location Vector
+---@field Radius number
+---@field LocationType LocationType
+---@field RallyPoint Vector | false
+---@field LocationActive boolean
+---@field RandomSamePriority boolean
+---@field PlatoonListEmpty boolean
+---@field UseCenterPoint boolean
 FactoryBuilderManager = Class(BuilderManager) {
     ---@param self FactoryBuilderManager
     ---@param brain AIBrain
@@ -92,8 +102,8 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param builderData table
-    ---@param locationType string
+    ---@param builderData BuilderSpec
+    ---@param locationType LocationType
     ---@return boolean
     AddBuilder = function(self, builderData, locationType)
         local newBuilder = Builder.CreateFactoryBuilder(self.Brain, builderData, locationType)
@@ -108,7 +118,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@return Platoon
+    ---@return boolean
     HasPlatoonList = function(self)
         return self.PlatoonListEmpty
     end,
@@ -456,7 +466,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             self.Brain.BuilderManagers[self.LocationType].EngineerManager:AddUnit(finishedUnit)
         elseif EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit ) then
 			if finishedUnit:GetFractionComplete() == 1 then
-				self:AddFactory(finishedUnit )			
+				self:AddFactory(finishedUnit )
 				factory.Dead = true
                 factory.Trash:Destroy()
 				return self:FactoryDestroyed(factory)
