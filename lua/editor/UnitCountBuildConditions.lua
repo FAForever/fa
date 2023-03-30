@@ -1510,3 +1510,13 @@ function CanBuildOnHydroLessThanDistance(aiBrain, locationType, distance, threat
     end
     return false
 end
+
+-----------------------------------------
+--- deprecated conditions
+
+--- The following build conditions no longer have the logic foundation to be supported. They
+--- will always return true
+
+function CheckBuildPlattonDelay(aiBrain, PlatoonName)
+    return true
+end
