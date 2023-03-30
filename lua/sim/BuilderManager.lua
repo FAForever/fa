@@ -38,7 +38,7 @@ end
 ---@class BuilderManager
 ---@field Brain AIBrain                                     # A reference to the brain that this manager belongs to
 ---@field BuilderData table<BuilderType, AIBuilderData>     # List of builders that is managed by this manager
----@field BuilderCheckInterval number   # Interval (in seconds) 
+---@field BuilderCheckInterval number   # Interval (in seconds)
 ---@field BuilderList boolean           # Is true when there is at least one builder in this manager
 ---@field BuilderThread? thread         # Thread that runs the loop, does not exist when the manager is not active
 ---@field Active boolean                # Is true when the manager is enabled, use `SetEnabled` to toggle it
@@ -83,21 +83,21 @@ BuilderManager = ClassSimple {
     -- builder interface
 
     -- This is where the majority of the magic happens. There are two main phases:
-    -- 
+    --
     -- 1. Initialisation
     --
-    -- During initialisation the builders are introduced. Usually no builders are introduced 
+    -- During initialisation the builders are introduced. Usually no builders are introduced
     -- after the manager is created. Note that all builders have unique instances in memory.
     --
     -- 2. Retrieving the highest priority builder
     --
     -- Once all builders are in place we constantly look for the highest possible builder. We
     -- consider the name 'Builder' to be poorly choosen, one should rather read it as a 'Task'
-    -- 
+    --
     -- A task has a priority. The tasks with the highest priority are evaluated first. Each
     -- task has a series of conditions attached to it. These conditions are evaluated as
     -- we are searching for a task.
-    -- 
+    --
     -- Once a task is found it can be assigned. This abstract manager does not manage that, it
     -- is merely an abstraction to interact with the various builders.
 
