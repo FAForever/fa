@@ -29,28 +29,46 @@ local function BuilderSortLambda(a, b)
     return a.Priority > b.Priority
 end
 
---- Abstract manager that contains shared logic between the various managers that inherit from it
+---@class AIBuilderData
+---@field Builders Builder[]
+---@field NeedSort boolean
+
+--- An abstract class of the various managers. Introduces the logic to maintain
+--- and find builders as the base is trying to figure out what to do
 ---@class BuilderManager
----@field Brain AIBrain
----@field BuilderData table
----@field BuilderCheckInterval number
----@field BuilderList boolean
----@field BuilderThread? thread             # is defined when manager is enabled
----@field Active boolean                    # true when manager is enabled
----@field Location Vector
+---@field Brain AIBrain                                     # A reference to the brain that this manager belongs to
+---@field BuilderData table<BuilderType, AIBuilderData>     # List of builders that is managed by this manager
+---@field BuilderCheckInterval number   # Interval (in seconds) 
+---@field BuilderList boolean           # Is true when there is at least one builder in this manager
+---@field BuilderThread? thread         # Thread that runs the loop, does not exist when the manager is not active
+---@field Active boolean                # Is true when the manager is enabled, use `SetEnabled` to toggle it
+---@field Location Vector               # Tthe center of this base
+--- The base name or the base identifier. It is used as an identifier in the brain
+--- to be able to find the various managers that belong to a base
+---
+--- The name of this field does not do it any justice, it should rather be 'LocationName'
 ---@field LocationType LocationType
----@field NumBuilders number
----@field Trash TrashBag
+---@field NumBuilders number            # Number of builders in this manager
+---@field Radius number                 # Radius of this manager
+---@field Trash TrashBag                # Trashbag of this manager
 BuilderManager = ClassSimple {
 
     ---@param self BuilderManager
     ---@param brain AIBrain
-    Create = function(self, brain)
+    Create = function(self, brain, locationType, location, radius)
         self.Trash = TrashBag()
         self.Brain = brain
         self.BuilderData = {}
         self.BuilderCheckInterval = 13
         self.BuilderList = false
+
+        self.Radius = radius
+        self.LocationType = locationType
+        self.Location = location
+        if self.Location then
+            self.Location[2] = GetSurfaceHeight(self.Location[1], self.Location[3])
+        end
+
         self.Active = false
         self.NumBuilders = 0
         self:SetEnabled(true)
@@ -61,9 +79,31 @@ BuilderManager = ClassSimple {
         self.Trash:Destroy()
     end,
 
-    -----------------------
-    -- builder interface --
+    --------------------------------------------------------------------------------------------
+    -- builder interface
 
+    -- This is where the majority of the magic happens. There are two main phases:
+    -- 
+    -- 1. Initialisation
+    --
+    -- During initialisation the builders are introduced. Usually no builders are introduced 
+    -- after the manager is created. Note that all builders have unique instances in memory.
+    --
+    -- 2. Retrieving the highest priority builder
+    --
+    -- Once all builders are in place we constantly look for the highest possible builder. We
+    -- consider the name 'Builder' to be poorly choosen, one should rather read it as a 'Task'
+    -- 
+    -- A task has a priority. The tasks with the highest priority are evaluated first. Each
+    -- task has a series of conditions attached to it. These conditions are evaluated as
+    -- we are searching for a task.
+    -- 
+    -- Once a task is found it can be assigned. This abstract manager does not manage that, it
+    -- is merely an abstraction to interact with the various builders.
+
+    --- Adds a builder type to this manager
+    ---@param self BuilderManager
+    ---@param type BuilderType
     AddBuilderType = function(self, type)
         self.BuilderData[type] = { Builders = {}, NeedSort = false }
     end,
@@ -218,13 +258,15 @@ BuilderManager = ClassSimple {
         end
     end,
 
-    --------------------------------
-    -- builder list interface --
+    --------------------------------------------------------------------------------------------
+    -- builder list interface
+
+
 
     --- Clears all builders
     ---@param self BuilderManager
     ClearBuilderLists = function(self)
-        for k, v in self.Builders do
+        for k, v in self.BuilderData do
             v.Builders = {}
             v.NeedSort = false
         end
@@ -252,19 +294,6 @@ BuilderManager = ClassSimple {
         self.BuilderData[bType].NeedSort = false
     end,
 
-    ---@param self BuilderManager
-    ---@param enable boolean
-    SetEnabled = function(self, enable)
-        if not self.BuilderThread and enable then
-            self.BuilderThread = self:ForkThread(self.ManagerThread)
-            self.Active = true
-        else
-            KillThread(self.BuilderThread)
-            self.BuilderThread = nil
-            self.Active = false
-        end
-    end,
-
     -- We delay buildplatoons to give engineers the time to move and start building before we call this builder again.
     ---@param self BuilderManager
     ---@param DelayEqualBuildPlattons integer
@@ -285,6 +314,22 @@ BuilderManager = ClassSimple {
         end
     end,
 
+    ---@param self BuilderManager
+    ---@param enable boolean
+    SetEnabled = function(self, enable)
+        if not self.BuilderThread and enable then
+            self.BuilderThread = self:ForkThread(self.ManagerThread)
+            self.Active = true
+        else
+            KillThread(self.BuilderThread)
+            self.BuilderThread = nil
+            self.Active = false
+        end
+    end,
+
+    --------------------------------------------------------------------------------------------
+    -- manager interface
+
     -- Called every 13 seconds to perform any cleanup; Provides better inheritance
     ---@param self BuilderManager
     ManagerThreadCleanup = function(self)
@@ -302,7 +347,6 @@ BuilderManager = ClassSimple {
         if builder:CalculatePriority(self) then
             self.BuilderData[bType].NeedSort = true
         end
-        --builder:CheckBuilderConditions(self.Brain)
     end,
 
     ---@param self BuilderManager
@@ -328,20 +372,17 @@ BuilderManager = ClassSimple {
         end
     end,
 
-    ----------------
-    -- properties --
+    --------------------------------------------------------------------------------------------
+    -- properties
 
     ---@param self BuilderManager
     GetLocationCoords = function(self)
-        if not self.Location then
+        local location = self.Location
+        if not location then
             return false
         end
 
-        local height = GetTerrainHeight(self.Location[1], self.Location[3])
-        if GetSurfaceHeight(self.Location[1], self.Location[3]) > height then
-            height = GetSurfaceHeight(self.Location[1], self.Location[3])
-        end
-        return { self.Location[1], height, self.Location[3] }
+        return location
     end,
 
     ---@param self BuilderManager
@@ -356,8 +397,11 @@ BuilderManager = ClassSimple {
         self.BuildCheckInterval = interval
     end,
 
-    ------------------------------
-    -- deprecated functionality --
+    --------------------------------------------------------------------------------------------
+    --- deprecated functionality
+
+    --- This section contains functionality that is either deprecated (unmaintained) or
+    --- functionality that is considered bad practice for performance
 
     ---@deprecated
     ---@param self BuilderManager
@@ -374,6 +418,7 @@ BuilderManager = ClassSimple {
         return false
     end,
 
+    --- This function should not be required
     ---@deprecated
     ---@param self BuilderManager
     ---@param oldtable table
@@ -392,8 +437,7 @@ BuilderManager = ClassSimple {
         return temptable
     end,
 
-
-    -- Root of all performance evil, do not use - inline the function instead
+    --- Root of all performance evil, do not use - inline the function instead
     ---@deprecated
     ---@param self BuilderManager
     ---@param fn function

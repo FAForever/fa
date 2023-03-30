@@ -33,7 +33,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     ---@param useCenterPoint boolean
     ---@return boolean
     Create = function(self, brain, lType, location, radius, useCenterPoint)
-        BuilderManager.Create(self,brain)
+        BuilderManager.Create(self,brain, lType, location, radius)
 
         if not lType or not location or not radius then
             error('*FACTORY BUILDER MANAGER ERROR: Invalid parameters; requires locationType, location, and radius')
@@ -45,9 +45,11 @@ FactoryBuilderManager = Class(BuilderManager) {
             self:AddBuilderType(v)
         end
 
-        self.Location = location
-        self.Radius = radius
-        self.LocationType = lType
+        -- backwards compatibility for mods
+        self.Location = self.Location or location
+        self.Radius = self.Radius or radius
+        self.LocationType = self.LocationType or lType
+
         self.RallyPoint = false
 
         self.FactoryList = {}
