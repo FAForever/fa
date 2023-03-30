@@ -15,7 +15,6 @@
 ---@field BuilderType BuilderType 
 ---@field BuilderConditions function[]
 ---@field InstantCheck boolean
----@field NeedSort boolean
 Builder = ClassSimple {
 
     ---@param self Builder

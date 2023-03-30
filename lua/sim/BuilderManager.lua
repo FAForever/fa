@@ -11,7 +11,7 @@ local Builder = import("/lua/sim/builder.lua")
 
 -- upvalue scope for performance
 local TableSort = table.sort
-local TableInsert =
+local TableInsert = table.insert
 
 local ForkThread = ForkThread
 
@@ -63,6 +63,10 @@ BuilderManager = ClassSimple {
 
     -----------------------
     -- builder interface --
+
+    AddBuilderType = function(self, type)
+        self.BuilderData[type] = { Builders = {}, NeedSort = false }
+    end,
 
     --- Adds a builder to the manager, usually this function is overwritten by the managers that inherit this builder
     ---@param self BuilderManager
