@@ -132,7 +132,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@return 'Air'|'Any'|'Land'|'Sea'
+    ---@return BuilderType
     GetBuilderType = function(self)
         return Builders[self.BuilderName].BuilderType
     end,
