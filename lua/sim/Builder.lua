@@ -146,9 +146,6 @@ Builder = ClassSimple {
     ---@param self Builder
     ---@return boolean
     GetBuilderStatus = function(self)
-        if self.GetStatusFunction then
-            self.GetStatusFunction()
-        end
         self:CheckBuilderConditions()
         return self.BuilderStatus
     end,
