@@ -63,6 +63,10 @@ GridIntel = Class (Grid) {
         self.IntelGridZRes = gridSizeZ
     end,
 
+    ToCellFromGridSpace = function(self, gx, gz)
+        return self.Cells[gx][gz]
+    end,
+
     --- Registers a scout in a given cell
     ---@param self AIGridBrain
     ---@param cell AIGridBrainCell

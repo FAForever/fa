@@ -1165,6 +1165,67 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---## Function: LandScoutingAI
+    --- Handles sending land scouts to important locations.
+    ---@param self Platoon
+    ---@return nil
+    LandGridScoutingAI = function(self)
+        local deathFunction = function(unit)
+            LOG('Scout Death '..repr(unit.CellAssigned))
+            if unit.CellAssigned then
+                -- Brain is assigned on unit create, if issues use eng:GetAIBrain()
+                local brainGridInstance = unit.Brain.IntelFramework.IntelGrid
+                local brainCell = brainGridInstance:ToCellFromGridSpace(unit.CellAssigned[1], unit.CellAssigned[2])
+                -- confirm engineer is removed from cell during debug
+                LOG('Scout unassigned from '..repr(unit.CellAssigned))
+                brainGridInstance:RemoveAssignedScout(brainCell, unit, 1)
+            end
+        end
+    
+        AIAttackUtils.GetMostRestrictiveLayer(self)
+        local aiBrain = self:GetBrain()
+        local scout = self:GetPlatoonUnits()[1]
+        import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(deathFunction, scout)
+        --If we have cloaking (are cybran), then turn on our cloaking
+        --DUNCAN - Fixed to use same bits
+        if scout:TestToggleCaps('RULEUTC_CloakToggle') then
+            scout:SetScriptBit('RULEUTC_CloakToggle', false)
+        end
+        
+        while not scout.Dead do
+            --Head towards the the area that has not had a scout sent to it in a while
+            local targetData = aiBrain.IntelFramework:QueryScoutLocation(aiBrain, scout)
+            LOG('Scout Target Data was '..repr(targetData))
+
+            --Is there someplace we should scout?
+            if targetData then
+                scout.CellAssigned = {targetData.X, targetData.Z}
+                aiBrain.IntelFramework.IntelGrid:AddAssignedScout(targetData, scout, 1)
+                LOG('Scout Assigned to '..repr(scout.CellAssigned))
+                --Can we get there safely?
+                local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 400) --DUNCAN - Increase threatwieght from 100
+                IssueClearCommands(self:GetPlatoonUnits())
+
+                if path then
+                    local pathLength = table.getn(path)
+                    for i=1, pathLength-1 do
+                        self:MoveToLocation(path[i], false)
+                    end
+                end
+
+                self:MoveToLocation(targetData.Position, false)
+                
+
+                --Scout until we reach our destination
+                while not scout.Dead and not scout:IsIdleState() do
+                    WaitSeconds(2.5)
+                end
+            end
+
+            WaitSeconds(1)
+        end
+    end,
+
     ---## Function: DoAirScoutVecs
     --- Creates an attack vector that will cause the scout to fly by the target at a distance of its visual range.
     --- Whether to fly by on the left or right is decided randomly. This whole affair should hopefully extend the
@@ -1316,6 +1377,18 @@ Platoon = Class(moho.platoon_methods) {
             return self:AirScoutingAI()
         else
             return self:LandScoutingAI()
+        end
+    end,
+
+    ---@param self Platoon
+    ---@return nil
+    GridScoutingAI = function(self)
+        AIAttackUtils.GetMostRestrictiveLayer(self)
+
+        if self.MovementLayer == 'Air' then
+            return self:AirScoutingAI()
+        else
+            return self:LandGridScoutingAI()
         end
     end,
 
