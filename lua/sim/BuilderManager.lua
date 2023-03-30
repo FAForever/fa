@@ -15,6 +15,8 @@ local TableInsert = table.insert
 
 local ForkThread = ForkThread
 
+local BuilderCache = { }
+
 ---@alias LocationType
 --- can only be applied to the main base
 --- | 'MAIN'
@@ -181,38 +183,54 @@ BuilderManager = ClassSimple {
         end
     end,
 
-    --- Retrieves the highest builder that is valid with the given parameters, or false if there is none
+    --- Retrieves the highest builder that is valid with the given parameters
     ---@param self BuilderManager
     ---@param bType BuilderType
-    ---@param params any
-    ---@return Builder | false
+    ---@param params table
+    ---@return Builder?
     GetHighestBuilder = function(self, bType, params)
-        if not self.BuilderData[bType] then
+        local builderData = self.BuilderData[bType]
+        if not builderData then
             error('*BUILDERMANAGER ERROR: Invalid builder type - ' .. bType)
         end
-        if not self.Brain.BuilderManagers[self.LocationType] then
-            return false
-        end
 
-        local found = false
-        local possibleBuilders = {}
-        for k, v in self.BuilderData[bType].Builders do
-            if v.Priority >= 1 and self:BuilderParamCheck(v, params) and (not found or v.Priority == found) and
-                v:GetBuilderStatus() then
-                if not self:IsPlattonBuildDelayed(v.DelayEqualBuildPlattons) then
-                    found = v.Priority
-                    TableInsert(possibleBuilders, k)
+        local candidates = BuilderCache
+        local candidateNext = 1
+        local candidatePriority = -1
+
+        -- list of builders that is sorted on priority
+        local builders = builderData.Builders
+        for k in builders do
+            local builder = builders[k] --[[@as Builder]]
+
+            -- builders with no priority are ignored
+            local priority = builder.Priority
+            if priority >= 1 then
+                -- break when we have found a builder and the next builder has a lower priority
+                if priority < candidatePriority then
+                    break
                 end
-            elseif found and v.Priority < found then
-                break
+
+                -- check builder conditions
+                if self:BuilderParamCheck(builder, params) then
+                    -- check task conditions
+                    if builder:GetBuilderStatus() then
+                        candidates[candidateNext] = builder
+                        candidateNext = candidateNext + 1
+                        candidatePriority = priority
+                    end
+                end
             end
         end
 
-        if found and found > 0 then
-            local whichBuilder = Random(1, table.getn(possibleBuilders))
-            return self.BuilderData[bType].Builders[ possibleBuilders[whichBuilder] ]
+        -- only one candidate
+        if candidateNext == 2 then
+            return candidates[1]
+
+        -- multiple candidates, choose one at random
+        elseif candidateNext > 2 then
+            return candidates[Random(1, candidateNext - 1)]
         end
-        return false
     end,
 
     --- Returns true if the given builders matches the manager-specific parameters
@@ -261,8 +279,6 @@ BuilderManager = ClassSimple {
     --------------------------------------------------------------------------------------------
     -- builder list interface
 
-
-
     --- Clears all builders
     ---@param self BuilderManager
     ClearBuilderLists = function(self)
@@ -292,26 +308,6 @@ BuilderManager = ClassSimple {
 
         TableSort(self.BuilderData[bType].Builders, BuilderSortLambda)
         self.BuilderData[bType].NeedSort = false
-    end,
-
-    -- We delay buildplatoons to give engineers the time to move and start building before we call this builder again.
-    ---@param self BuilderManager
-    ---@param DelayEqualBuildPlattons integer
-    ---@return boolean
-    IsPlattonBuildDelayed = function(self, DelayEqualBuildPlattons)
-        if DelayEqualBuildPlattons then
-            local CheckDelayTime = GetGameTimeSeconds()
-            local PlatoonName = DelayEqualBuildPlattons[1]
-            if not self.Brain.DelayEqualBuildPlattons[PlatoonName] or
-                self.Brain.DelayEqualBuildPlattons[PlatoonName] < CheckDelayTime then
-                --LOG('Setting '..DelayEqualBuildPlattons[2]..' sec. delaytime for builder ['..PlatoonName..']')
-                self.Brain.DelayEqualBuildPlattons[PlatoonName] = CheckDelayTime + DelayEqualBuildPlattons[2]
-                return false
-            else
-                --LOG('Builder ['..PlatoonName..'] still delayed for '..(CheckDelayTime - self.Brain.DelayEqualBuildPlattons[PlatoonName])..' seconds.')
-                return true
-            end
-        end
     end,
 
     ---@param self BuilderManager

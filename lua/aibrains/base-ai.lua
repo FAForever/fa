@@ -128,7 +128,6 @@ AIBrain = Class(StandardBrain) {
 
         self.UnitBuiltTriggerList = {}
         self.FactoryAssistList = {}
-        self.DelayEqualBuildPlattons = {}
     end,
 
     ---@param self AIBrain

@@ -479,10 +479,11 @@ FactoryBuilderManager = Class(BuilderManager) {
 
     -- Check if given factory can build the builder
     ---@param self FactoryBuilderManager
-    ---@param builder Unit
-    ---@param params any
+    ---@param builder Builder
+    ---@param params FactoryUnit[]
     ---@return boolean
-    BuilderParamCheck = function(self,builder,params)
+    BuilderParamCheck = function(self, builder, params)
+
         -- params[1] is factory, no other params
         local template = self:GetFactoryTemplate(builder:GetPlatoonTemplate(), params[1])
         if not template then

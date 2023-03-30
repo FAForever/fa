@@ -1419,17 +1419,6 @@ function GetGuards(aiBrain, Unit)
     return count
 end
 
---- Buildcondition to check if a platoon is still delayed
----@param aiBrain AIBrain
----@param PlatoonName string
----@return boolean
-function CheckBuildPlattonDelay(aiBrain, PlatoonName)
-    if aiBrain.DelayEqualBuildPlattons[PlatoonName] and aiBrain.DelayEqualBuildPlattons[PlatoonName] > GetGameTimeSeconds() then
-        return false
-    end
-    return true
-end
-
 --- Buildcondition to limit the number of factories 
 ---@param aiBrain AIBrain
 ---@param locationType string

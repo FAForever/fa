@@ -38,8 +38,6 @@ Builder = ClassSimple {
 
         self.BuilderName = data.BuilderName
 
-        self.DelayEqualBuildPlattons = data.DelayEqualBuildPlattons
-
         self.ReportFailure = data.ReportFailure
 
         self:SetupBuilderConditions(data, locationType)
