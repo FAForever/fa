@@ -1185,6 +1185,10 @@ Platoon = Class(moho.platoon_methods) {
         local aiBrain = self:GetBrain()
         local scout = self:GetPlatoonUnits()[1]
         import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(deathFunction, scout)
+        local radarRange = scout.Blueprint.Intel.RadarRadius
+        if radarRange then
+            scout.RadarRange = radarRange
+        end
         local brainGridInstance = scout.Brain.IntelFramework.IntelGrid
         --If we have cloaking (are cybran), then turn on our cloaking
         --DUNCAN - Fixed to use same bits
@@ -1207,26 +1211,116 @@ Platoon = Class(moho.platoon_methods) {
                 IssueClearCommands(self:GetPlatoonUnits())
 
                 if path then
-                    local pathLength = table.getn(path)
-                    for i=1, pathLength-1 do
-                        self:MoveToLocation(path[i], false)
-                    end
+                    self.ScoutMoveToLocation(scout, aiBrain, path)
                 end
-
-                self:MoveToLocation(targetData.Position, false)
-                
-
-                --Scout until we reach our destination
-                while not scout.Dead and not scout:IsIdleState() do
-                    WaitSeconds(2.5)
-                end
+                IssueMove({scout}, targetData.Position)
                 if scout.CellAssigned[1] then
                     scout.CellAssigned = nil
                     brainGridInstance:RemoveAssignedScout(targetData, scout, 1)
                 end
             end
+            WaitTicks(10)
+        end
+    end,
 
-            WaitSeconds(1)
+    ScoutMoveToLocation = function(scout, aiBrain, path)
+        -- I've tried to split out the platoon movement function as its getting too messy and hard to maintain
+        --RNGLOG('Scout starts ScoutMoveWithMicro')
+
+        if not path then
+            WARN('No path passed to ScoutMoveWithMicro')
+            return false
+        end
+
+        local function VariableKite(unit,target)
+            local function KiteDist(pos1,pos2,distance)
+                local vec={}
+                local dist=VDist3(pos1,pos2)
+                for i,k in pos2 do
+                    if type(k)~='number' then continue end
+                    vec[i]=k+distance/dist*(pos1[i]-k)
+                end
+                return vec
+            end
+            local function CheckRetreat(pos1,pos2,target)
+                local vel = {}
+                vel[1], vel[2], vel[3]=target:GetVelocity()
+                local dotp=0
+                for i,k in pos2 do
+                    if type(k)~='number' then continue end
+                    dotp=dotp+(pos1[i]-k)*vel[i]
+                end
+                return dotp<0
+            end
+            if target.Dead then return end
+            if unit.Dead then return end
+                
+            local pos=unit:GetPosition()
+            local tpos=target:GetPosition()
+            local dest
+            local mod=3
+            if CheckRetreat(pos,tpos,target) then
+                mod=8
+            end
+            if unit.MaxWeaponRange then
+                dest=KiteDist(pos,tpos,unit.MaxWeaponRange-math.random(1,3)-mod)
+            else
+                dest=KiteDist(pos,tpos,self.MaxWeaponRange+5-math.random(1,3)-mod)
+            end
+            if VDist3Sq(pos,dest)>6 then
+                IssueMove({unit},dest)
+                coroutine.yield(2)
+                return mod
+            else
+                coroutine.yield(2)
+                return mod
+            end
+        end
+        local ScoutDangerCategory = categories.MOBILE * categories.LAND * (categories.DIRECTFIRE + categories.INDIRECTFIRE) - categories.SCOUT
+        local brainGridInstance = scout.Brain.IntelFramework.IntelGrid
+        local pathLength = table.getn(path)
+        for i=1, pathLength do
+            IssueMove({scout}, path[i])
+            local Lastdist
+            local dist
+            local Stuck = 0
+            while not scout.Dead do
+                coroutine.yield(1)
+                local scoutPosition = scout:GetPosition()
+                dist = VDist2Sq(path[i][1], path[i][3], scoutPosition[1], scoutPosition[3])
+                if dist < 400 then
+                    local cx, cz = brainGridInstance:ToCellIndices(scoutPosition[1], scoutPosition[3])
+                    local cell = brainGridInstance:ToCellFromGridSpace(cx, cz)
+                    cell.LastScouted = GetGameTick()
+                    if cell.MustScout then
+                        cell.MustScout = false
+                    end
+                    IssueClearCommands({scout})
+                    break
+                end
+                if Lastdist ~= dist then
+                    Stuck = 0
+                    Lastdist = dist
+                else
+                    Stuck = Stuck + 1
+                    if Stuck > 15 then
+                        IssueClearCommands({scout})
+                        break
+                    end
+                end
+                local enemyUnitCheck = aiBrain:GetUnitsAroundPoint(ScoutDangerCategory, scoutPosition, scout.RadarRange, 'Enemy')
+                if next(enemyUnitCheck) then
+                    for _, v in enemyUnitCheck do
+                        if not v.Dead then
+                            IssueClearCommands({scout})
+                            IssueMove({scout}, AIUtils.ShiftPosition(v:GetPosition(), scoutPosition, scout.RadarRange - 1, false))
+                            coroutine.yield(30)
+                            break
+                        end
+                    end
+                end
+                coroutine.yield(20)
+            end
         end
     end,
 

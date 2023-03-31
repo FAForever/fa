@@ -89,12 +89,13 @@ IntelFramework = ClassSimple {
         local cells = self.IntelGrid.Cells
         local candidate = nil
         local value = 0
+        local currentTick = GetGameTick()
         for lx = -maxCells, maxCells do
             local column = cells[bx + lx]
             if column then
                 for lz = -maxCells, maxCells do
                     local cell = column[bz + lz]
-                    if cell and cell.ScoutPriority > 0 then
+                    if cell and cell.ScoutPriority > 0 and currentTick - cell.LastScouted > 450 then
                         if self.IntelGrid:CountAssignedScouts(cell, 1) < 1 then
                             -- any candidate is a good candidate
                             if not candidate then
