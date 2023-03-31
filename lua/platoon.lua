@@ -1181,11 +1181,11 @@ Platoon = Class(moho.platoon_methods) {
                 brainGridInstance:RemoveAssignedScout(brainCell, unit, 1)
             end
         end
-    
         AIAttackUtils.GetMostRestrictiveLayer(self)
         local aiBrain = self:GetBrain()
         local scout = self:GetPlatoonUnits()[1]
         import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(deathFunction, scout)
+        local brainGridInstance = scout.Brain.IntelFramework.IntelGrid
         --If we have cloaking (are cybran), then turn on our cloaking
         --DUNCAN - Fixed to use same bits
         if scout:TestToggleCaps('RULEUTC_CloakToggle') then
@@ -1200,7 +1200,7 @@ Platoon = Class(moho.platoon_methods) {
             --Is there someplace we should scout?
             if targetData then
                 scout.CellAssigned = {targetData.X, targetData.Z}
-                aiBrain.IntelFramework.IntelGrid:AddAssignedScout(targetData, scout, 1)
+                brainGridInstance:AddAssignedScout(targetData, scout, 1)
                 LOG('Scout Assigned to '..repr(scout.CellAssigned))
                 --Can we get there safely?
                 local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 400) --DUNCAN - Increase threatwieght from 100
@@ -1219,6 +1219,10 @@ Platoon = Class(moho.platoon_methods) {
                 --Scout until we reach our destination
                 while not scout.Dead and not scout:IsIdleState() do
                     WaitSeconds(2.5)
+                end
+                if scout.CellAssigned[1] then
+                    scout.CellAssigned = nil
+                    brainGridInstance:RemoveAssignedScout(targetData, scout, 1)
                 end
             end
 
