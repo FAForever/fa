@@ -367,21 +367,17 @@ function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
         WARN(string.format("Build condition ('ReclaimAvailableInGrid') requires a reference to the reclaim grid in the brain (of %s)", aiBrain.Nickname))
         return false
     end
-
+    
     -- this condition won't work without a reference to the engineer manager
     local manager = aiBrain.BuilderManagers[locationType].EngineerManager --[[@type EngineerManager]]
     if not manager then
         return false
     end
-
-    -- no need to reclaim when we have too much mass
-    if aiBrain:GetEconomyStoredRatio("MASS") > 0.7 then
-        return false
-    end
-
+    local rings = 3
+    if mapSearch then rings = 8 end
     -- no need to reclaim when there's nothing around us to reclaim
     local bx, bz = gridReclaim:ToGridSpace(manager.Location[1], manager.Location[3])
-    local maximumCell = gridReclaim:MaximumInRadius(bx, bz, 3)
+    local maximumCell = gridReclaim:MaximumInRadius(bx, bz, rings)
     if maximumCell.TotalMass < 10 then
         return false
     end

@@ -1325,6 +1325,7 @@ BuilderGroup {
         Priority = 1000,
         InstanceCount = 2,
         BuilderConditions = {
+                { EBC, 'LessThanEconStorageRatio', { 0.75, 2.0}},
                 { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', }},
             },
         BuilderData = {
@@ -1339,6 +1340,7 @@ BuilderGroup {
         Priority = 3, --DUNCAN - was 1
         InstanceCount = 10,
         BuilderConditions = {
+                { EBC, 'LessThanEconStorageRatio', { 0.75, 2.0}},
                 { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', true}},
             },
         BuilderData = {
@@ -1603,6 +1605,7 @@ BuilderGroup {
         Priority = 2, --DUNCAN - was 1
         InstanceCount = 10,
         BuilderConditions = {
+                { EBC, 'LessThanEconStorageRatio', { 0.75, 2.0}},
                 { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', true}},
             },
         BuilderData = {
@@ -1756,6 +1759,7 @@ BuilderGroup {
         Priority = 0, --DUNCAN - was 1
         InstanceCount = 2, --DUNCAN - was 10
         BuilderConditions = {
+            { EBC, 'LessThanEconStorageRatio', { 0.75, 2.0}},
             { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', true}},
         },
         BuilderData = {
