@@ -1511,12 +1511,14 @@ function CanBuildOnHydroLessThanDistance(aiBrain, locationType, distance, threat
     return false
 end
 
------------------------------------------
---- deprecated conditions
-
---- The following build conditions no longer have the logic foundation to be supported. They
---- will always return true
-
+--- Checks whether the builder / task is intentionally delayed
+---@param aiBrain AIBrain
+---@param PlatoonName string
+---@return boolean
 function CheckBuildPlattonDelay(aiBrain, PlatoonName)
+    local timeToDelay = aiBrain.DelayEqualBuildPlattons[PlatoonName]
+    if timeToDelay and timeToDelay > GetGameTimeSeconds() then
+        return false
+    end
     return true
 end

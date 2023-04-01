@@ -211,13 +211,16 @@ BuilderManager = ClassSimple {
                     break
                 end
 
-                -- check builder conditions
-                if self:BuilderParamCheck(builder, params) then
-                    -- check task conditions
-                    if builder:GetBuilderStatus() then
-                        candidates[candidateNext] = builder
-                        candidateNext = candidateNext + 1
-                        candidatePriority = priority
+                -- check if we're intentionally delaying this builder
+                if not self:IsPlattonBuildDelayed(builder.DelayEqualBuildPlattons) then
+                    -- check builder conditions
+                    if self:BuilderParamCheck(builder, params) then
+                        -- check task conditions
+                        if builder:GetBuilderStatus() then
+                            candidates[candidateNext] = builder
+                            candidateNext = candidateNext + 1
+                            candidatePriority = priority
+                        end
                     end
                 end
             end
@@ -274,6 +277,30 @@ BuilderManager = ClassSimple {
         if builder then
             builder:ResetPriority()
         end
+    end,
+
+    --- We can delay builders / tasks to give engineers the time to move and start building. The first argument of the 
+    --- specs is an idenfitier, which can be shared across several builders / tasks. This allows us to delay a group of
+    --- platoons that we consider expensive
+    --- 
+    --- We're aware that the there is a typo in the name: we can't fix it without breaking backwards compatibility with mods
+    ---@param self BuilderManager
+    ---@param specs { [1]: string, [2]: number }
+    ---@return boolean
+    IsPlattonBuildDelayed = function(self, specs)
+        if specs then
+            local CheckDelayTime = GetGameTimeSeconds()
+            local PlatoonName = specs[1] --[[@as string]]
+            local timeThreshold = self.Brain.DelayEqualBuildPlattons[PlatoonName]
+            if not timeThreshold or timeThreshold < CheckDelayTime then
+                self.Brain.DelayEqualBuildPlattons[PlatoonName] = CheckDelayTime + specs[2]
+                return false
+            else
+                return true
+            end
+        end
+
+        return false
     end,
 
     --------------------------------------------------------------------------------------------

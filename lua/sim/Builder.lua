@@ -14,6 +14,7 @@
 ---@field BuilderName string 
 ---@field BuilderType BuilderType 
 ---@field BuilderConditions function[]
+---@field DelayEqualBuildPlattons { [1]: string, [2]: number }
 ---@field InstantCheck boolean
 Builder = ClassSimple {
 
@@ -39,6 +40,8 @@ Builder = ClassSimple {
         self.BuilderName = data.BuilderName
 
         self.ReportFailure = data.ReportFailure
+
+        self.DelayEqualBuildPlattons = data.DelayEqualBuildPlattons
 
         self:SetupBuilderConditions(data, locationType)
 
