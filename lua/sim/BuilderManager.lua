@@ -292,7 +292,7 @@ BuilderManager = ClassSimple {
             local CheckDelayTime = GetGameTimeSeconds()
             local PlatoonName = specs[1] --[[@as string]]
             local timeThreshold = self.Brain.DelayEqualBuildPlattons[PlatoonName]
-            if not timeThreshold or timeThreshold < CheckDelayTime then
+            if (not timeThreshold) or (timeThreshold < CheckDelayTime) then
                 self.Brain.DelayEqualBuildPlattons[PlatoonName] = CheckDelayTime + specs[2]
                 return false
             else
