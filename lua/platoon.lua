@@ -1242,38 +1242,19 @@ Platoon = Class(moho.platoon_methods) {
                 end
                 return vec
             end
-            local function CheckRetreat(pos1,pos2,target)
-                local vel = {}
-                vel[1], vel[2], vel[3]=target:GetVelocity()
-                local dotp=0
-                for i,k in pos2 do
-                    if type(k)~='number' then continue end
-                    dotp=dotp+(pos1[i]-k)*vel[i]
-                end
-                return dotp<0
-            end
             if target.Dead then return end
             if unit.Dead then return end
                 
             local pos=unit:GetPosition()
             local tpos=target:GetPosition()
-            local dest
-            local mod=3
-            if CheckRetreat(pos,tpos,target) then
-                mod=8
-            end
-            if unit.MaxWeaponRange then
-                dest=KiteDist(pos,tpos,unit.MaxWeaponRange-math.random(1,3)-mod)
-            else
-                dest=KiteDist(pos,tpos,self.MaxWeaponRange+5-math.random(1,3)-mod)
-            end
+            local dest=KiteDist(pos,tpos,unit.RadarRange)
             if VDist3Sq(pos,dest)>6 then
                 IssueMove({unit},dest)
                 coroutine.yield(2)
-                return mod
+                return
             else
                 coroutine.yield(2)
-                return mod
+                return
             end
         end
         local ScoutDangerCategory = categories.MOBILE * categories.LAND * (categories.DIRECTFIRE + categories.INDIRECTFIRE) - categories.SCOUT

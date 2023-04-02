@@ -181,7 +181,7 @@ BuilderGroup {
         BuilderData = {
             LocationType = 'LocationType',
         },
-        BuilderType = 'Land',
+        BuilderType = 'Any',
     },
 }
 

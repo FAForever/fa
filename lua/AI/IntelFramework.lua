@@ -47,6 +47,9 @@ IntelFramework = ClassSimple {
                 local cx, cz = self.IntelGrid:ToCellIndices(v.StartPosition[1], v.StartPosition[3])
                 self.IntelGrid.Cells[cx][cz].ScoutPriority = 1000
                 self.IntelGrid.Cells[cx][cz].MustScout = true
+            elseif v.Ally and v.StartPosition[1] then
+                local cx, cz = self.IntelGrid:ToCellIndices(v.StartPosition[1], v.StartPosition[3])
+                self.IntelGrid.Cells[cx][cz].AllyStart = true
             end
         end
         local startLocations = GetMarkersByType('Start Location')
@@ -80,11 +83,17 @@ IntelFramework = ClassSimple {
     
     QueryScoutLocation = function(self, aiBrain, scout)
         local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
-        local bestPosition
+        local enemyPositionBias
         local maxCells
         if maxmapdimension <= 256 then maxCells = 8 else maxCells = 16 end
         local currentPosition = scout:GetPosition()
         --local enemy = aiBrain:GetCurrentEnemy()
+        if aiBrain:GetCurrentEnemy() then
+            enemyPositionBias = self.StartPositions[aiBrain:GetCurrentEnemy():GetArmyIndex()].Position
+        else
+            enemyPositionBias = self.MapCenterPoint
+        end
+        LOG('Enemy Position bias '..repr(enemyPositionBias))
         local bx, bz = self.IntelGrid:ToCellIndices(currentPosition[1], currentPosition[3])
         local cells = self.IntelGrid.Cells
         local candidate = nil
@@ -95,15 +104,18 @@ IntelFramework = ClassSimple {
             if column then
                 for lz = -maxCells, maxCells do
                     local cell = column[bz + lz]
-                    if cell and cell.ScoutPriority > 0 and currentTick - cell.LastScouted > 450 then
+                    if cell.AllyStart then
+                        LOG('Ignore this cell')
+                    end
+                    if cell and cell.ScoutPriority > 0 and currentTick - cell.LastScouted > 900 and not cell.AllyStart then
                         if self.IntelGrid:CountAssignedScouts(cell, 1) < 1 then
                             -- any candidate is a good candidate
                             if not candidate then
                                 candidate = cell
-                                value = cell.ScoutPriority * VDist2(self.StartPosition[1], self.StartPosition[3], currentPosition[1], currentPosition[3])
+                                value = (10 * cell.ScoutPriority) + ( 100 / VDist2(cell.Position[1], cell.Position[3], currentPosition[1], currentPosition[3])) + (1000 / VDist2(enemyPositionBias[1], enemyPositionBias[3], cell.Position[1], cell.Position[3]))
                             -- compare if the cell we're evaluating is better
                             else
-                                local alt = cell.ScoutPriority * VDist2(self.StartPosition[1], self.StartPosition[3], currentPosition[1], currentPosition[3])
+                                local alt = (10 * cell.ScoutPriority) + ( 100 / VDist2(cell.Position[1], cell.Position[3], currentPosition[1], currentPosition[3])) + (1000 / VDist2(enemyPositionBias[1], enemyPositionBias[3], cell.Position[1], cell.Position[3]))
                                 if alt > value then
                                     candidate = cell
                                     value = alt
@@ -115,12 +127,35 @@ IntelFramework = ClassSimple {
             end
         end
         if value then
+            LOG('Returning position '..repr(candidate.Position))
+            LOG('Value of position '..value)
+            self:DebugUpdate(candidate.X,candidate.Z)
             return candidate
         else
             WARN('No scout query location returned')
             return false
         end
     end,
+
+    --- Contains various debug logic
+    ---@param self AIGridReclaim
+    DebugUpdate = function(self, cx,cz)
+        ForkThread(
+            self.DebugUpdateThread,
+            self, cx, cz
+        )
+    end,
+
+    DebugUpdateThread = function(self, cx, cz)
+        local count = 0
+        while count < 900 do
+            WaitTicks(1)
+            self.IntelGrid:DrawCell(cx, cz, 20 - 1, 'ffffff')
+            count = count + 1
+        end
+    end,
+
+
 }
 
 Setup = function(brain)
