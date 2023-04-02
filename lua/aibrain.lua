@@ -38,6 +38,14 @@ local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 local CoroutineYield = coroutine.yield
 
+local mapFactionIndex = {
+    "UEF",
+    "AEON",
+    "CYBRAN",
+    "SERAPHIM",
+    "NOMADS"
+}
+
 ---@class AIBrainHQComponent
 ---@field HQs table
 local AIBrainHQComponent = ClassSimple {
@@ -1352,6 +1360,13 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
     end,
 
+    ---@param self AIBrain
+    ---@return HqFaction
+    GetFactionName = function(self)
+        local index = self:GetFactionIndex()
+        return mapFactionIndex[index]
+    end,
+
     -- deprecated
 
     ---@deprecated
@@ -1364,4 +1379,6 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param result AIResult
     SetResult = function(self, result)
     end,
+
+
 }

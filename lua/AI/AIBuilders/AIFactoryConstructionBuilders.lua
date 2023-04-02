@@ -22,6 +22,7 @@ local PCBC = '/lua/editor/platooncountbuildconditions.lua'
 local SAI = '/lua/scenarioplatoonai.lua'
 local TBC = '/lua/editor/threatbuildconditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
+local FactoryConditions = '/lua/editor/factoryconditions.lua'
 
 local ExtractorToFactoryRatio = 2.2
 
@@ -359,4 +360,58 @@ BuilderGroup {
             }
         }
     },
+
+
+    -- =================================
+    --     Support factory builders
+    -- =================================
+
+    Builder {
+        BuilderName = 'Tech 2 land support factory',
+        PlatoonTemplate = 'T2EngineerBuilder',
+        Priority = 0,
+        ---@param builder Builder
+        ---@param aiBrain AIBrain
+        PriorityFunction = function(builder, aiBrain)
+            local faction = aiBrain:GetFactionName()
+
+            local tech2HQs = aiBrain:CountHQs(faction, 'LAND', 'TECH2')
+            local tech3HQs = aiBrain:CountHQs(faction, 'LAND', 'TECH3')
+
+            -- we can't build them at this point
+            if tech2HQs == 0 and tech3HQs == 0 then
+                LOG("No HQs")
+                return 0
+            end
+
+            -- we have one or more tech 3 HQs -> decrease the priority
+            if tech3HQs > 0 then
+                LOG("Tech 3 HQ")
+                return 700
+            end
+
+            -- we have one or more tech 2 HQs -> increase the priority
+            LOG("Tech 2 HQ")
+            return 1100
+        end,
+        BuilderConditions = {
+            -- cheap conditions
+            { IBC, 'BrainNotLowPowerMode', {} },
+            { FactoryConditions, 'HasHQ', { 'LAND', 'TECH2' }},
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.9, 1.2 }},
+
+            -- expensive conditions
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, categories.MASSEXTRACTION * ( categories.TECH2 + categories.TECH3 )}}, --DUNCAN - was 2
+        },
+        BuilderType = 'Any',
+        BuilderData = {
+            Construction = {
+                BuildStructures = {
+                    'T2SupportLandFactory',
+                },
+                Location = 'LocationType',
+                AdjacencyCategory = categories.ENERGYPRODUCTION,
+            }
+        }
+    }
 }
