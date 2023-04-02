@@ -9198,6 +9198,7 @@ float4 PBR_PS(
 
     float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
     float3 sunLight = sunDiffuse * lightMultiplier;
+    // We need to do this to stay consistent with ComputeLight()
     sunLight += (1 - sunLight) * shadowFill;
     sunLight *= shadow;
 
@@ -9207,6 +9208,7 @@ float4 PBR_PS(
     float3 F0 = lerp(float3(facingSpecular, facingSpecular, facingSpecular), albedo, metallic);
     float3 l = sunDirection;
     float3 h = normalize(v + l);
+    float nDotL = max(dot(n, l), 0.0);
 
     // Cook-Torrance BRDF
     float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
@@ -9215,7 +9217,7 @@ float4 PBR_PS(
 
     float3 numerator = NDF * G * F;
     // add 0.0001 to avoid division by zero
-    float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.0001;
+    float denominator = 4.0 * max(dot(n, v), 0.0) * nDotL + 0.0001;
     float3 reflected = numerator / denominator;
     
     float3 kD = float3(1.0, 1.0, 1.0) - F;
@@ -9225,7 +9227,7 @@ float4 PBR_PS(
     // We divide the diffuse from point lights by pi, so to get the same response like we 
     // would get from the environment light where we don't need to divide by pi, we need
     // to multiply the radiance here with pi.
-    float3 irradiance = sunLight * max(dot(n, l), 0.0) * PI;
+    float3 irradiance = sunLight * nDotL * PI;
     float3 color = (refracted + reflected) * irradiance;
 
     //////////////////////////////
@@ -9235,9 +9237,12 @@ float4 PBR_PS(
     kD = float3(1.0, 1.0, 1.0) - kS;
     kD *= 1.0 - metallic;
 
-    // As maps were not created with this shader in mind we get too much ambient lighting in general.
-    // So we need to tune it down, so the darkness of the shadows matches with the terrain.
-    float shadowCorrection = 0.8;
+    // As maps were not created with this shader in mind we would get too much ambient lighting.
+    // So we need to tune it down, especially in the shadows, so the darkness of the shadows
+    // matches with the terrain. This is very non-physical and uses empirical values.
+    float shadowCorrection = min(max((ambient.r + ambient.g + ambient.b) / 3, 0.2), 0.8);
+    shadowCorrection = lerp(shadowCorrection, 0.8, shadow * nDotL);
+
     float3 diffuse = env_irradiance * albedo;
     float3 specular = env_reflection * (kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g);
     color += (kD * diffuse + specular) * ao * shadowCorrection;
