@@ -42,7 +42,7 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 ---@field OnceOnly boolean
 ---@field TargetAIBrain AIBrain
 
----@class OldAIBrain: AIBrain
+---@class BaseAIBrain: AIBrain
 ---@field Army number
 ---@field AIPlansList string[][]
 ---@field AirAttackPoints? table
@@ -80,13 +80,18 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 ---@field T4ThreatFound? table
 ---@field TacticalBases? table
 ---@field targetoveride boolean
+---@field GridReclaim AIGridReclaim
+---@field GridBrain AIGridBrain
 ---@field Team number The team this brain's army belongs to. Note that games with unlocked teams behave like free-for-alls.
 ---@field DelayEqualBuildPlattons table<string, number>     # Used to delay builders, the key is the builder name and the number is the game time in seconds that the builder remains delayed
 AIBrain = Class(StandardBrain) {
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param planName string
     OnCreateAI = function(self, planName)
         StandardBrain.OnCreateAI(self, planName)
+
+        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
 
         local civilian = false
         for name, data in ScenarioInfo.ArmySetup do
@@ -132,7 +137,7 @@ AIBrain = Class(StandardBrain) {
         self.DelayEqualBuildPlattons = {}
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param planName string
     CreateBrainShared = function(self, planName)
         StandardBrain.CreateBrainShared(self, planName)
@@ -156,7 +161,7 @@ AIBrain = Class(StandardBrain) {
 
     -- AI BRAIN FUNCTIONS HANDLED HERE --
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param planName FileName
     ---@return string[]|nil
     ImportScenarioArmyPlans = function(self, planName)
@@ -167,7 +172,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     OnDestroy = function(self)
         StandardBrain.OnDestroy(self)
 
@@ -185,7 +190,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param bestPlan string
     SetCurrentPlan = function(self, bestPlan)
         if not bestPlan then
@@ -198,7 +203,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param eval boolean
     SetConstantEvaluate = function(self, eval)
         if eval == true and self.ConstantEval == false then
@@ -208,7 +213,7 @@ AIBrain = Class(StandardBrain) {
         self.ConstantEval = eval
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     InitialAIThread = function(self)
         -- delay the AI so it can't reclaim the start area before it's cleared from the ACU landing blast.
         WaitTicks(30)
@@ -216,7 +221,7 @@ AIBrain = Class(StandardBrain) {
         self.ExecuteThread = self:ForkThread(self.ExecuteAIThread)
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     EvaluateAIThread = function(self)
         local personality = self:GetPersonality()
         local factionIndex = self:GetFactionIndex()
@@ -232,7 +237,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     EvaluateAIPlanList = function(self)
         local factionIndex = self:GetFactionIndex()
         local bestPlan = nil
@@ -255,7 +260,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ExecuteAIThread = function(self)
         local personality = self:GetPersonality()
 
@@ -268,7 +273,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param planName FileName
     ---@return number
     EvaluatePlan = function(self, planName)
@@ -281,23 +286,23 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ExecutePlan = function(self)
         self.CurrentPlanScript.ExecutePlan(self)
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     SetRepeatExecution = function(self, repeatEx)
         self.RepeatExecution = repeatEx
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     GetCurrentPlanScript = function(self)
         return self.CurrentPlanScript
     end,
 
     ---SKIRMISH AI HELPER SYSTEMS
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     InitializeSkirmishSystems = function(self)
         -- Make sure we don't do anything for the human player!!!
         if self.BrainType == 'Human' then
@@ -354,7 +359,7 @@ AIBrain = Class(StandardBrain) {
 
     ---Removes bases that have no engineers or factories.  This is a sorian AI function
     ---Helps reduce the load on the game.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     DeadBaseMonitor = function(self)
         while true do
             WaitSeconds(5)
@@ -383,7 +388,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---Used to get rid of nil table entries. Sorian ai function
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param oldtable table
     ---@return table
     RebuildTable = function(self, oldtable)
@@ -400,7 +405,7 @@ AIBrain = Class(StandardBrain) {
         return temptable
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param locationType string
     ---@return boolean
     GetLocationPosition = function(self, locationType)
@@ -411,7 +416,7 @@ AIBrain = Class(StandardBrain) {
         return self.BuilderManagers[locationType].Position
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param position Vector
     ---@return Vector
     FindClosestBuilderManagerPosition = function(self, position)
@@ -436,7 +441,7 @@ AIBrain = Class(StandardBrain) {
         return closest
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ForceManagerSort = function(self)
         for _, v in self.BuilderManagers do
             v.EngineerManager:SortBuilderList('Any')
@@ -447,7 +452,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param type string
     ---@return integer
     GetManagerCount = function(self, type)
@@ -475,7 +480,7 @@ AIBrain = Class(StandardBrain) {
         return count
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     SelfMonitorCheck = function(self)
         if not self.BaseMonitor.AlertSounded then
             local startlocx, startlocz = self:GetArmyStartPos()
@@ -532,7 +537,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param position Vector
     ---@param radius number
     ---@param baseName string
@@ -559,7 +564,7 @@ AIBrain = Class(StandardBrain) {
         self.NumBases = self.NumBases + 1
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param category EntityCategory
     ---@return integer
     GetEngineerManagerUnitsBeingBuilt = function(self, category)
@@ -570,7 +575,7 @@ AIBrain = Class(StandardBrain) {
         return unitCount
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     GetFactoriesBeingBuilt = function(self)
         local unitCount = 0
 
@@ -581,7 +586,7 @@ AIBrain = Class(StandardBrain) {
         return unitCount
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     UnderEnergyThreshold = function(self)
         self:SetupOverEnergyStatTrigger(0.1)
         for k, v in self.BuilderManagers do
@@ -589,7 +594,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     OverEnergyThreshold = function(self)
         self:SetupUnderEnergyStatTrigger(0.05)
         for k, v in self.BuilderManagers do
@@ -597,7 +602,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     UnderMassThreshold = function(self)
         self:SetupOverMassStatTrigger(0.1)
         for k, v in self.BuilderManagers do
@@ -605,7 +610,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     OverMassThreshold = function(self)
         self:SetupUnderMassStatTrigger(0.05)
         for k, v in self.BuilderManagers do
@@ -613,7 +618,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param threshold number
     SetupUnderEnergyStatTrigger = function(self, threshold)
         import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderEnergyThreshold, self, 'SkirmishUnderEnergyThreshold',
@@ -627,7 +632,7 @@ AIBrain = Class(StandardBrain) {
         )
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param threshold number
     SetupOverEnergyStatTrigger = function(self, threshold)
         import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverEnergyThreshold, self, 'SkirmishOverEnergyThreshold',
@@ -641,7 +646,7 @@ AIBrain = Class(StandardBrain) {
         )
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param threshold number
     SetupUnderMassStatTrigger = function(self, threshold)
         import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderMassThreshold, self, 'SkirmishUnderMassThreshold',
@@ -655,7 +660,7 @@ AIBrain = Class(StandardBrain) {
         )
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param threshold number
     SetupOverMassStatTrigger = function(self, threshold)
         import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverMassThreshold, self, 'SkirmishOverMassThreshold',
@@ -669,13 +674,13 @@ AIBrain = Class(StandardBrain) {
         )
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     GetStartVector3f = function(self)
         local startX, startZ = self:GetArmyStartPos()
         return {startX, 0, startZ}
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     CalculateLayerPreference = function(self)
         local personality = self:GetPersonality()
         local factionIndex = self:GetFactionIndex()
@@ -703,14 +708,14 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     AIGetLayerPreference = function(self)
         return self.LayerPref
     end,
 
     --- ## ECONOMY MONITOR
     --- Monitors the economy over time for skirmish; allows better trend analysis
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     EconomyMonitor = function(self)
         -- This over time thread is based on Sprouto's LOUD AI.
         self.EconomyData = { ['EnergyIncome'] = {}, ['EnergyRequested'] = {}, ['EnergyStorage'] = {}, ['EnergyTrend'] = {}, ['MassIncome'] = {}, ['MassRequested'] = {}, ['MassStorage'] = {}, ['MassTrend'] = {}, ['Period'] = self.EconomyTicksMonitor }
@@ -814,7 +819,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@return table
     GetEconomyOverTime = function(self)
 
@@ -827,20 +832,20 @@ AIBrain = Class(StandardBrain) {
         return retTable
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param attackDataTable table
     InitializeAttackManager = function(self, attackDataTable)
         self.AttackManager = import("/lua/ai/attackmanager.lua").AttackManager(self, attackDataTable)
         self.AttackData = self.AttackManager
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param spec any
     AMAddPlatoon = function(self, spec)
         self.AttackManager:AddPlatoon(spec)
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     AMPauseAttackManager = function(self)
         self.AttackManager:PauseAttackManager()
     end,
@@ -849,7 +854,7 @@ AIBrain = Class(StandardBrain) {
     ---### New PlatoonBuildManager
     ---This system is meant to be able to give some data about the platoon you want and have them
     ---built and formed into platoons at will.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     InitializePlatoonBuildManager = function(self)
         if not self.PBM then
             ---@class AiPlatoonBuildManager
@@ -894,7 +899,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param enable boolean
     PBMSetEnabled = function(self, enable)
         if not self.PBMThread and enable then
@@ -931,7 +936,7 @@ AIBrain = Class(StandardBrain) {
     ---}
     ---},
     --- ```
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param pltnTable PlatoonTable
     PBMAddPlatoon = function(self, pltnTable)
         if not pltnTable.PlatoonTemplate then
@@ -1000,7 +1005,7 @@ AIBrain = Class(StandardBrain) {
         self.HasPlatoonList = true
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param builderName string
     PBMRemoveBuilder = function(self, builderName)
         for pType, builders in self.PBM.Platoons do
@@ -1016,7 +1021,7 @@ AIBrain = Class(StandardBrain) {
 
     --- Function to clear all the platoon lists so you can feed it a bunch more.
     --- - formPlatoons - Gives you the option to form all the platoons in the list before its cleaned up so that you don't have units hanging around.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param formPlatoons? Platoon
     PBMClearPlatoonList = function(self, formPlatoons)
         if formPlatoons then
@@ -1037,7 +1042,7 @@ AIBrain = Class(StandardBrain) {
         }
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param location string
     ---@return boolean
     PBMFormAllPlatoons = function(self, location)
@@ -1050,13 +1055,13 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@return boolean
     PBMHasPlatoonList = function(self)
         return self.HasPlatoonList
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PBMResetPrimaryFactories = function(self)
         for _, v in self.PBM.Locations do
             v.PrimaryFactories.Air = nil
@@ -1067,7 +1072,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---Goes through the location areas, finds the factories, sets a primary then tells all the others to guard.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PBMSetPrimaryFactories = function(self)
         for _, v in self.PBM.Locations do
             local factories = self:GetAvailableFactories(v.Location, v.Radius)
@@ -1135,7 +1140,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param factories Unit
     ---@param primary Unit
     PBMAssistGivenFactory = function(self, factories, primary)
@@ -1150,7 +1155,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param factories Unit
     ---@param location Vector
     ---@param rallyLoc Vector
@@ -1198,7 +1203,7 @@ AIBrain = Class(StandardBrain) {
         return true
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param factory Unit
     ---@param location Vector
     ---@return boolean
@@ -1241,7 +1246,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param factories Unit
     ---@param primary Unit[]
     ---@return boolean
@@ -1267,7 +1272,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---Picks the first tech 3, tech 2 or tech 1 factory to make primary
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param factories Unit
     ---@return Unit
     PBMGetPrimaryFactory = function(self, factories)
@@ -1281,7 +1286,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoon Platoon
     ---@return number
     PBMGetPriority = function(self, platoon)
@@ -1298,7 +1303,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoon Platoon
     ---@param amount number
     ---@return boolean
@@ -1325,7 +1330,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoon Platoon
     ---@param amount number
     ---@return boolean
@@ -1353,7 +1358,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---Adds a new build location
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param loc Vector
     ---@param radius number
     ---@param locType string
@@ -1393,7 +1398,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param locationName string
     ---@return boolean
     PBMGetLocation = function(self, locationName)
@@ -1407,7 +1412,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param loc Vector
     ---@return Vector | false
     PBMGetLocationCoords = function(self, loc)
@@ -1430,7 +1435,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param loc Vector
     ---@return boolean
     PBMGetLocationRadius = function(self, loc)
@@ -1449,7 +1454,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param location Vector
     ---@return boolean
     PBMGetLocationFactories = function(self, location)
@@ -1464,7 +1469,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param location Vector
     ---@return FactoryUnit[] | false
     PBMGetAllFactories = function(self, location)
@@ -1493,7 +1498,7 @@ AIBrain = Class(StandardBrain) {
     --- Removes a build location based on it area
     --- IF either is nil, then it will do the other.
     --- This way you can remove all of one type or all of one rectangle
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param loc Vector
     ---@param locType string
     PBMRemoveBuildLocation = function(self, loc, locType)
@@ -1505,7 +1510,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     --- Sort platoon list
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoonType PlatoonType
     ---@return boolean
     PBMSortPlatoonsViaPriority = function(self, platoonType)
@@ -1533,23 +1538,23 @@ AIBrain = Class(StandardBrain) {
         self.PBM.NeedSort[platoonType] = false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param interval number
     PBMSetCheckInterval = function(self, interval)
         self.PBM.BuildCheckInterval = interval
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PBMEnableRandomSamePriority = function(self)
         self.PBM.RandomSamePriority = true
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PBMDisableRandomSamePriority = function(self)
         self.PBM.RandomSamePriority = false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PBMCheckBusyFactories = function(self)
         local busyPlat = self:GetPlatoonUniquelyNamed('BusyFactories')
         if not busyPlat then
@@ -1578,13 +1583,13 @@ AIBrain = Class(StandardBrain) {
         self:AssignUnitsToPlatoon(busyPlat, poolTransfer, 'Unassigned', 'None')
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PBMUnlockStartThread = function(self)
         WaitSeconds(1)
         ScenarioInfo.PBMStartLock = false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PBMUnlockStart = function(self)
         while ScenarioInfo.PBMStartLock do
             WaitTicks(1)
@@ -1595,7 +1600,7 @@ AIBrain = Class(StandardBrain) {
         self:ForkThread(self.PBMUnlockStartThread)
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param builderData table
     ---@return boolean
     PBMHandleAvailable = function(self, builderData)
@@ -1610,7 +1615,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoon Platoon
     ---@param builderData table
     ---@return boolean
@@ -1635,7 +1640,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoon Platoon
     ---@return boolean
     PBMRemoveHandle = function(self, platoon)
@@ -1654,7 +1659,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param builder Unit
     ---@return boolean
     PBMSetHandleBuilding = function(self, builder)
@@ -1673,7 +1678,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param builder Unit
     ---@return boolean
     PBMCheckHandleBuilding = function(self, builder)
@@ -1689,7 +1694,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param builder Unit
     ---@return boolean
     PBMSetBuildingHandleFalse = function(self, builder)
@@ -1706,7 +1711,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param builder Unit
     ---@return integer
     PBMNumHandlesAvailable = function(self, builder)
@@ -1720,7 +1725,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     -- Main building and forming platoon thread for the Platoon Build Manager
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PlatoonBuildManagerThread = function(self)
         local personality = self:GetPersonality()
         local armyIndex = self:GetArmyIndex()
@@ -1841,7 +1846,7 @@ AIBrain = Class(StandardBrain) {
 
     --- ## Form platoons
     --- Extracted as it's own function so you can call this to try and form platoons to clean up the pool
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param requireBuilding boolean `true` = platoon must have `'BUILDING'` has its handle, `false` = it'll form any platoon it can
     ---@param platoonType PlatoonType Platoontype is just `'Air'/'Land'/'Sea'`, those are found in the platoon build manager table template.
     ---@param location Vector Location/Radius are where to do this.  If they aren't specified they will grab from anywhere.
@@ -1981,7 +1986,7 @@ AIBrain = Class(StandardBrain) {
 
     --- Get the primary factory with the lowest order count
     --- This is used for the 'Any' platoon type so we can find any primary factory to build from.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param location Vector
     ---@return Vector
     GetLowestOrderPrimaryFactory = function(self, location)
@@ -2001,7 +2006,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---Set number of units to be built as the number of factories in a location
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param template any
     ---@param location Vector
     ---@param pType PlatoonType
@@ -2084,7 +2089,7 @@ AIBrain = Class(StandardBrain) {
         return retTemplate
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoon Platoon
     ---@param factories Unit
     ---@param location Vector
@@ -2123,7 +2128,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param location Vector
     ---@param pType PlatoonType
     ---@return integer
@@ -2160,7 +2165,7 @@ AIBrain = Class(StandardBrain) {
         return numFactories
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoon any
     PBMPlatoonTimeOutThread = function(self, platoon)
         local minWait = 5 -- 240 CAMPAIGNS
@@ -2172,7 +2177,7 @@ AIBrain = Class(StandardBrain) {
         self:PBMSetBuildingHandleFalse(platoon)
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoonTemplate any
     ---@param factory Unit
     ---@return boolean
@@ -2185,7 +2190,7 @@ AIBrain = Class(StandardBrain) {
         return true
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoon Platoon
     PBMPlatoonDestroyed = function(self, platoon)
         self:PBMRemoveHandle(platoon)
@@ -2194,7 +2199,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param bCs table
     ---@param index number
     ---@return boolean
@@ -2258,16 +2263,16 @@ AIBrain = Class(StandardBrain) {
         return true
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PBMClearBuildConditionsCache = function(self)
         for k, v in self.PBM.BuildConditionsTable do
             v.Cached[self:GetArmyIndex()] = false
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoonList Platoon[]
-    ---@param ai AIBrain
+    ---@param ai BaseAIBrain
     ---@return nil|Platoon
     CombinePlatoons = function(self, platoonList, ai)
         local squadTypes = {'Unassigned', 'Attack', 'Artillery', 'Support', 'Scout', 'Guard'}
@@ -2292,7 +2297,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---# BASE MONITORING SYSTEM
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param spec any
     BaseMonitorInitialization = function(self, spec)
         ---@class AiBaseMonitor
@@ -2335,7 +2340,7 @@ AIBrain = Class(StandardBrain) {
         self:ForkThread(self.CanPathToCurrentEnemy)
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param platoon Platoon
     ---@param threat number
     BaseMonitorPlatoonDistress = function(self, platoon, threat)
@@ -2361,7 +2366,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     BaseMonitorPlatoonDistressThread = function(self)
         self.BaseMonitor.PlatoonAlertSounded = true
         while true do
@@ -2394,7 +2399,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param position Vector
     ---@param radius number
     ---@param threshold number
@@ -2470,7 +2475,7 @@ AIBrain = Class(StandardBrain) {
         return returnPos
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     BaseMonitorThread = function(self)
         while true do
             if self.BaseMonitor.BaseMonitorStatus == 'ACTIVE' then
@@ -2480,7 +2485,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param pos Vector
     ---@param threattype string
     BaseMonitorAlertTimeout = function(self, pos, threattype)
@@ -2520,7 +2525,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     BaseMonitorCheck = function(self)
         local vecs = self:GetStructureVectors()
         if not table.empty(vecs) then
@@ -2580,7 +2585,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param threattypes string
     T4ThreatMonitorTimeout = function(self, threattypes)
         WaitSeconds(180)
@@ -2589,7 +2594,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@return Vector[]
     GetBaseVectors = function(self)
         local enemy = self:GetCurrentEnemy()
@@ -2621,7 +2626,7 @@ AIBrain = Class(StandardBrain) {
         return returnPoints
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@return table
     GetStructureVectors = function(self)
         local structures = self:GetListOfUnits(categories.STRUCTURE - categories.WALL, false)
@@ -2648,7 +2653,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     -- ENEMY PICKER AI
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PickEnemy = function(self)
         while true do
             self:PickEnemyLogic()
@@ -2656,7 +2661,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param strengthTable table
     ---@return boolean
     GetAllianceEnemy = function(self, strengthTable)
@@ -2681,7 +2686,7 @@ AIBrain = Class(StandardBrain) {
         return returnEnemy
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     PickEnemyLogic = function(self)
         local armyStrengthTable = {}
         local selfIndex = self:GetArmyIndex()
@@ -2761,14 +2766,14 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     GetNewAttackVectors = function(self)
         if not self.AttackVectorsThread then
             self.AttackVectorsThread = self:ForkThread(self.SetupAttackVectorsThread)
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     SetupAttackVectorsThread = function(self)
         self.AttackVectorUpdate = 0
         while true do
@@ -2782,14 +2787,14 @@ AIBrain = Class(StandardBrain) {
     end,
 
     -- Skirmish expansion help
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param eng Unit
     ---@param reference string
     ExpansionHelp = function(self, eng, reference)
         self:ForkThread(self.ExpansionHelpThread, eng, reference)
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param eng Unit
     ---@param reference string
     ExpansionHelpThread = function(self, eng, reference)
@@ -2809,7 +2814,7 @@ AIBrain = Class(StandardBrain) {
         self:ForkThread(self.GroupHelpThread, landHelp, reference)
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param units Unit
     ---@param reference string
     GroupHelpThread = function(self, units, reference)
@@ -2828,7 +2833,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
             if ScenarioInfo.Options.AIReplacement == 'On' then
@@ -2871,7 +2876,7 @@ AIBrain = Class(StandardBrain) {
 
     ---## Scouting help...
     --- Creates an influence map threat at enemy bases so the AI will start sending attacks before scouting gets up.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param amount number amount of threat to add to each enemy start area
     ---@param decay number rate that the threat should decay
     ---@return nil
@@ -2899,7 +2904,7 @@ AIBrain = Class(StandardBrain) {
 
     ---##  Function: ParseIntelThread
     ---Once per second, checks imap for enemy expansion bases.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@return nil  #loops forever
     ParseIntelThread = function(self)
         if not self.InterestList or not self.InterestList.MustScout then
@@ -2958,7 +2963,7 @@ AIBrain = Class(StandardBrain) {
 
     ---## Function: GetUntaggedMustScoutArea
     --- Gets an area that has been flagged with the AddScoutArea function that does not have a unit heading to scout it already.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@return Vector location
     ---@return number index
     GetUntaggedMustScoutArea = function(self)
@@ -2976,7 +2981,7 @@ AIBrain = Class(StandardBrain) {
 
     ---## Function: AddScoutArea
     --- Sets an area to be scouted once by air scouts at the next opportunity.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param location Vector
     ---@return nil
     AddScoutArea = function(self, location)
@@ -3003,7 +3008,7 @@ AIBrain = Class(StandardBrain) {
     ---  Sets up the initial low-priority scouting areas. If playing with fixed starting locations,
     ---  also sets up high-priority scouting areas. This function may be called multiple times, but only
     ---  has an effect the first time it is called per brain.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@return nil
     BuildScoutLocations = function(self)
         local aiBrain = self
@@ -3124,7 +3129,7 @@ AIBrain = Class(StandardBrain) {
 
     ---## Function: SortScoutingAreas
     --- Sorts the brain's list of scouting areas by time since scouted, and then distance from main base.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param list table
     ---@return nil
     SortScoutingAreas = function(self, list)
@@ -3141,7 +3146,7 @@ AIBrain = Class(StandardBrain) {
         end)
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param pingData table
     DoAIPing = function(self, pingData)
         if self.Sorian then
@@ -3151,7 +3156,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param pos Vector
     AttackPointsTimeout = function(self, pos)
         WaitSeconds(300)
@@ -3163,7 +3168,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     ---@param pos Vector
     ---@param enemy Army
     AirAttackPointsTimeout = function(self, pos, enemy)
@@ -3210,7 +3215,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     --- Monitors pathing from each AI base to the current enemy start position. Used for determining which movement layers can attack an enemy.
-    ---@param self AIBrain
+    ---@param self BaseAIBrain
     CanPathToCurrentEnemy = function(self)
         -- Validate Pathing to enemies based on navmesh queries
         -- Removed from build conditions so it can run on a slower loop
