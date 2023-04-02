@@ -21,6 +21,19 @@ function NoHeadquarters (aiBrain, layer, tech)
     return false
 end
 
+--- Returns true when there is one or more headquarters of a given layer and tech
+---@param aiBrain AIBrain
+---@param layer HqLayer
+---@param tech HqTech
+function HasHeadquarter (aiBrain, layer, tech)
+    local faction = mapFactionIndex[aiBrain:GetFactionIndex()] --[[@as HqFaction]]
+    if aiBrain.HQs[faction][layer][tech] > 0 then
+        return true
+    end
+
+    return false
+end
+
 --- Returns true when there are not sufficient redundant head quarters
 ---@param aiBrain AIBrain
 ---@param layer HqLayer
