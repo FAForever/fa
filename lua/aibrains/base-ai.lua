@@ -83,6 +83,7 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 ---@field GridReclaim AIGridReclaim
 ---@field GridBrain AIGridBrain
 ---@field Team number The team this brain's army belongs to. Note that games with unlocked teams behave like free-for-alls.
+---@field DelayEqualBuildPlattons table<string, number>     # Used to delay builders, the key is the builder name and the number is the game time in seconds that the builder remains delayed
 AIBrain = Class(StandardBrain) {
     ---@param self BaseAIBrain
     ---@param planName string

@@ -14,16 +14,16 @@ local StrategyBuilder = import("/lua/sim/strategybuilder.lua")
 StrategyManager = Class(BuilderManager) {
     ---@param self StrategyManager
     ---@param brain AIBrain
-    ---@param lType any
+    ---@param lType LocationType
     ---@param location Vector
     ---@param radius number
     ---@param useCenterPoint boolean
     Create = function(self, brain, lType, location, radius, useCenterPoint)
-        BuilderManager.Create(self,brain)
+        BuilderManager.Create(self, brain, lType, location, radius)
 
-        self.Location = location
-        self.Radius = radius
-        self.LocationType = lType
+        self.Location = self.Location or location
+        self.Radius = self.Radius or radius
+        self.LocationType = self.LocationType or lType
 
         self.LastChange = 0
         self.NextChange = 300
