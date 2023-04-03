@@ -83,7 +83,6 @@ PlatoonTemplate {
     GlobalSquads = {
         --DUNCAN - was 15 to 25
         { categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.ENGINEER, 5, 25, 'Attack', 'none' },
-        { categories.ENGINEER - categories.COMMAND, 1, 1, 'Attack', 'none' },
     },
 }
 PlatoonTemplate {

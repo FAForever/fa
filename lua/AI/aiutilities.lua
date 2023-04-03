@@ -3172,99 +3172,92 @@ function ShiftPosition(pos1, pos2, dist, reverse)
     return {x,GetSurfaceHeight(x,z),z}
 end
 
-CalculateTeamdata = function(aiBrain)
-    local allyCount = 0
-    local enemyCount = 0
-    local teamTable = {}
-    local teamKey = 1
-    local teams = 0
-    local teamStarts = {}
-    local selfIndex = aiBrain:GetArmyIndex()
-    for _, v in ArmyBrains do
-        local armyIndex = v:GetArmyIndex()
-        local army
-        for _,b in ScenarioInfo.ArmySetup do
-            if b.ArmyIndex == armyIndex then
-                army = b
+function GetBuildLocation(aiBrain, buildingTemplate, baseTemplate, buildUnit, eng, adjacent, category, radius, relative)
+    -- This will get a build location based on the parameters
+    -- Wil take into account any adjacency reqest and will check map borders
+    local buildLocation = false
+    local borderWarning = false
+    local whatToBuild = aiBrain:DecideWhatToBuild(eng, buildUnit, buildingTemplate)
+    local engPos = eng:GetPosition()
+    local playableArea = ScenarioInfo.PlayableArea or {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
+    local function normalposition(vec)
+        return {vec[1],GetTerrainHeight(vec[1],vec[2]),vec[2]}
+    end
+    local function heightbuildpos(vec)
+        return {vec[1],vec[2],0}
+    end
+    
+    if adjacent then
+        local unitSize = aiBrain:GetUnitBlueprint(whatToBuild).Physics
+        local testUnits  = aiBrain:GetUnitsAroundPoint(category, engPos, radius, 'Ally')
+        local index = aiBrain:GetArmyIndex()
+        local closeUnits = {}
+        for _, v in testUnits do
+            if not v.Dead and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
+                table.insert(closeUnits, v)
             end
         end
-        if not ArmyIsCivilian(armyIndex) then
-            local startx, startz = v:GetArmyStartPos()
-            if IsAlly(selfIndex, armyIndex) then
-                allyCount = allyCount + 1
-                LOG(allyCount..' Ally '..v.Nickname)
-                if army.Team and army.Team ~= 1 then
-                    teamTable[army.Team] = true
-                    if not teamStarts[armyIndex] then
-                        teamStarts[armyIndex] = {
-                            Position = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = army.Team,
-                            Ally = true
-                        }
+        local template = {}
+        table.insert(template, {})
+        table.insert(template[1], { buildUnit })
+        for _,unit in closeUnits do
+            local targetSize = unit:GetBlueprint().Physics
+            local targetPos = unit:GetPosition()
+            local differenceX=math.abs(targetSize.SkirtSizeX-unitSize.SkirtSizeX)
+            local offsetX=math.floor(differenceX/2)
+            local differenceZ=math.abs(targetSize.SkirtSizeZ-unitSize.SkirtSizeZ)
+            local offsetZ=math.floor(differenceZ/2)
+            local offsetfactory=0
+            if EntityCategoryContains(categories.FACTORY, unit) and (buildUnit=='T1LandFactory' or buildUnit=='T1AirFactory' or buildUnit=='T2SupportLandFactory' or buildUnit=='T3SupportLandFactory') then
+                offsetfactory=2
+            end
+            -- Top/bottom of unit
+            for i=-offsetX,offsetX do
+                local testPos = { targetPos[1] + (i * 1), targetPos[3]-targetSize.SkirtSizeZ/2-(unitSize.SkirtSizeZ/2)-offsetfactory, 0 }
+                local testPos2 = { targetPos[1] + (i * 1), targetPos[3]+targetSize.SkirtSizeZ/2+(unitSize.SkirtSizeZ/2)+offsetfactory, 0 }
+                -- check if the buildplace is to close to the border or inside buildable area
+                if testPos[1] > 8 and testPos[1] < ScenarioInfo.size[1] - 8 and testPos[2] > 8 and testPos[2] < ScenarioInfo.size[2] - 8 then
+                    if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos)) and VDist3Sq(engPos,normalposition(testPos)) < radius * radius then
+                        return heightbuildpos(testPos), whatToBuild
                     end
-                elseif not teamTable[teamKey] then
-                    --RNGLOG('Settings teams index 2 to true')
-                    teamTable[teamKey] = true
-                    if not teamStarts[armyIndex] then
-                        teamStarts[armyIndex] = {
-                            Position = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = teamKey,
-                            Ally = true
-                        }
-                    end
-                    teamKey = teamKey + 1
-                else
-                    teamKey = teamKey + 1
-                    if not teamStarts[armyIndex] then
-                        teamStarts[armyIndex] = {
-                            Position = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = teamKey,
-                            Ally = true
-                        }
-                    end
-                    teamTable[teamKey] = true
                 end
-            elseif IsEnemy(selfIndex, armyIndex) then
-                enemyCount = enemyCount + 1
-                LOG(enemyCount..' Enemy '..v.Nickname)
-                if army.Team and army.Team ~= 1 then
-                    teamTable[army.Team] = true
-                    if not teamStarts[armyIndex] then
-                        teamStarts[armyIndex] = {
-                            Position = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = army.Team,
-                            Ally = false
-                        }
+                if testPos2[1] > 8 and testPos2[1] < ScenarioInfo.size[1] - 8 and testPos2[2] > 8 and testPos2[2] < ScenarioInfo.size[2] - 8 then
+                    if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos2)) then
+                        if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos2)) and VDist3Sq(engPos,normalposition(testPos2)) < radius * radius then
+                            return heightbuildpos(testPos2), whatToBuild
+                        end
                     end
-                elseif not teamTable[teamKey] then
-                    --RNGLOG('Settings teams index 2 to true')
-                    teamTable[teamKey] = true
-                    if not teamStarts[armyIndex] then
-                        teamStarts[armyIndex] = {
-                            Position = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = teamKey,
-                            Ally = false
-                        }
+                end
+            end
+            -- Sides of unit
+            for i=-offsetZ,offsetZ do
+                local testPos = { targetPos[1]-targetSize.SkirtSizeX/2-(unitSize.SkirtSizeX/2)-offsetfactory, targetPos[3] + (i * 1), 0 }
+                local testPos2 = { targetPos[1]+targetSize.SkirtSizeX/2+(unitSize.SkirtSizeX/2)+offsetfactory, targetPos[3] + (i * 1), 0 }
+                if testPos[1] > 8 and testPos[1] < ScenarioInfo.size[1] - 8 and testPos[2] > 8 and testPos[2] < ScenarioInfo.size[2] - 8 then
+                    if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos)) and VDist3Sq(engPos,normalposition(testPos)) < radius * radius then
+                        return heightbuildpos(testPos), whatToBuild
                     end
-                    teamKey = teamKey + 1
-                else
-                    if not teamStarts[armyIndex] then
-                        teamStarts[armyIndex] = {
-                            Position = {startx, GetTerrainHeight(startx, startz), startz},
-                            Team = teamKey,
-                            Ally = false
-                        }
+                end
+                if testPos2[1] > 8 and testPos2[1] < ScenarioInfo.size[1] - 8 and testPos2[2] > 8 and testPos2[2] < ScenarioInfo.size[2] - 8 then
+                    if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos2)) then
+                        if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos2)) and VDist3Sq(engPos,normalposition(testPos2)) < radius * radius then
+                            return heightbuildpos(testPos2), whatToBuild
+                        end
                     end
-                    teamKey = teamKey + 1
-                    teamTable[teamKey] = true
                 end
             end
         end
-    end
-    for _, v in teamTable do
-        if v then
-            teams = teams + 1
+    else
+        local location = aiBrain:FindPlaceToBuild(buildUnit, whatToBuild, baseTemplate, relative, eng, nil, engPos[1], engPos[3])
+        if location and relative then
+            local relativeLoc = {location[1] + engPos[1], location[3] + engPos[3], 0}
+            if relativeLoc[1] - playableArea[1] <= 8 or relativeLoc[1] >= playableArea[3] - 8 or relativeLoc[2] - playableArea[2] <= 8 or relativeLoc[2] >= playableArea[4] - 8 then
+                borderWarning = true
+            end
+            return relativeLoc, whatToBuild, borderWarning
+        else
+            return location, whatToBuild, borderWarning
         end
     end
-    return teams, teamStarts, allyCount, enemyCount
+    return false
 end
