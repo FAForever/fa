@@ -357,5 +357,33 @@ function WaterMassMarkersPresent(aiBrain)
     return false
 end
 
+---@param aiBrain BaseAIBrain
+---@param locationType string
+---@return true | nil
+function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
+    -- this condition won't work without a reference to the reclaim grid
+    local gridReclaim = aiBrain.GridReclaim
+    if not gridReclaim then
+        WARN(string.format("Build condition ('ReclaimAvailableInGrid') requires a reference to the reclaim grid in the brain (of %s)", aiBrain.Nickname))
+        return false
+    end
+    
+    -- this condition won't work without a reference to the engineer manager
+    local manager = aiBrain.BuilderManagers[locationType].EngineerManager --[[@type EngineerManager]]
+    if not manager then
+        return false
+    end
+    local rings = 3
+    if mapSearch then rings = 8 end
+    -- no need to reclaim when there's nothing around us to reclaim
+    local bx, bz = gridReclaim:ToGridSpace(manager.Location[1], manager.Location[3])
+    local maximumCell = gridReclaim:MaximumInRadius(bx, bz, rings)
+    if maximumCell.TotalMass < 10 then
+        return false
+    end
+
+    return true
+end
+
 -- unused imports kept for mod support
 local Utils = import("/lua/utilities.lua")
