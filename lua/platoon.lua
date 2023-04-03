@@ -1270,7 +1270,7 @@ Platoon = Class(moho.platoon_methods) {
                 local scoutPosition = scout:GetPosition()
                 dist = VDist2Sq(path[i][1], path[i][3], scoutPosition[1], scoutPosition[3])
                 if dist < 400 then
-                    local cx, cz = brainGridInstance:ToCellIndices(scoutPosition[1], scoutPosition[3])
+                    local cx, cz = brainGridInstance:ToGridSpace(scoutPosition[1], scoutPosition[3])
                     local cell = brainGridInstance:ToCellFromGridSpace(cx, cz)
                     cell.LastScouted = GetGameTick()
                     if cell.MustScout then

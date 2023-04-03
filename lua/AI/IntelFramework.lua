@@ -44,37 +44,37 @@ IntelFramework = ClassSimple {
         local GetMarkersByType = import("/lua/sim/markerutilities.lua").GetMarkersByType
         for _, v in self.StartPositions do
             if not v.Ally and v.StartPosition[1] then
-                local cx, cz = self.IntelGrid:ToCellIndices(v.StartPosition[1], v.StartPosition[3])
+                local cx, cz = self.IntelGrid:ToGridSpace(v.StartPosition[1], v.StartPosition[3])
                 self.IntelGrid.Cells[cx][cz].ScoutPriority = 1000
                 self.IntelGrid.Cells[cx][cz].MustScout = true
             elseif v.Ally and v.StartPosition[1] then
-                local cx, cz = self.IntelGrid:ToCellIndices(v.StartPosition[1], v.StartPosition[3])
+                local cx, cz = self.IntelGrid:ToGridSpace(v.StartPosition[1], v.StartPosition[3])
                 self.IntelGrid.Cells[cx][cz].AllyStart = true
             end
         end
         local startLocations = GetMarkersByType('Start Location')
         for _, v in startLocations do
-            local cx, cz = self.IntelGrid:ToCellIndices(v.position[1], v.position[3])
+            local cx, cz = self.IntelGrid:ToGridSpace(v.position[1], v.position[3])
             if self.IntelGrid.Cells[cx][cz].ScoutPriority < 1000 then
                 self.IntelGrid.Cells[cx][cz].ScoutPriority = 750
             end
         end
         local largeExpansionLocations = GetMarkersByType('Large Expansion Area')
         for _, v in largeExpansionLocations do
-            local cx, cz = self.IntelGrid:ToCellIndices(v.position[1], v.position[3])
+            local cx, cz = self.IntelGrid:ToGridSpace(v.position[1], v.position[3])
             if self.IntelGrid.Cells[cx][cz].ScoutPriority < 750 then
                 self.IntelGrid.Cells[cx][cz].ScoutPriority = 500
             end
         end
         local expansionLocations = GetMarkersByType('Expansion Area')
         for _, v in expansionLocations do
-            local cx, cz = self.IntelGrid:ToCellIndices(v.position[1], v.position[3])
+            local cx, cz = self.IntelGrid:ToGridSpace(v.position[1], v.position[3])
             if self.IntelGrid.Cells[cx][cz].ScoutPriority < 500 then
                 self.IntelGrid.Cells[cx][cz].ScoutPriority = 250
             end
         end
         for _, v in massPoints do
-            local cx, cz = self.IntelGrid:ToCellIndices(v.position[1], v.position[3])
+            local cx, cz = self.IntelGrid:ToGridSpace(v.position[1], v.position[3])
             if self.IntelGrid.Cells[cx][cz].ScoutPriority < 250 then
                 self.IntelGrid.Cells[cx][cz].ScoutPriority = 25
             end
@@ -94,7 +94,7 @@ IntelFramework = ClassSimple {
             enemyPositionBias = self.MapCenterPoint
         end
         LOG('Enemy Position bias '..repr(enemyPositionBias))
-        local bx, bz = self.IntelGrid:ToCellIndices(currentPosition[1], currentPosition[3])
+        local bx, bz = self.IntelGrid:ToGridSpace(currentPosition[1], currentPosition[3])
         local cells = self.IntelGrid.Cells
         local candidate = nil
         local value = 0

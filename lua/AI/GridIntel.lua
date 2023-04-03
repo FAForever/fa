@@ -58,7 +58,7 @@ GridIntel = Class (Grid) {
         self.IntelGridXMax = endingGridx
         self.IntelGridZMin = startingGridz
         self.IntelGridZMax = endingGridz
-        local gridSizeX, gridSizeZ = self:ToCellIndices((playableArea[3] - 16), (playableArea[4] - 16))
+        local gridSizeX, gridSizeZ = self:ToGridSpace((playableArea[3] - 16), (playableArea[4] - 16))
         self.IntelGridXRes = gridSizeX
         self.IntelGridZRes = gridSizeZ
     end,
