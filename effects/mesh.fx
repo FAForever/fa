@@ -9196,7 +9196,7 @@ float4 PBR_PS(
     float3 ambient = sunAmbient + shadowFill;
     env_irradiance += ambient;
 
-    float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
+    float shadow = ComputeShadow(vertex.shadow, hiDefShadows);
     float3 sunLight = sunDiffuse * lightMultiplier;
     // We need to do this to stay consistent with ComputeLight()
     sunLight += (1 - sunLight) * shadowFill;
