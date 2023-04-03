@@ -2231,7 +2231,7 @@ BaseTransport = ClassSimple {
         end
 
         --any ACU : Cybran, Aeon, Seraphim, Uef
-        if SessionIsReplay()  and (unit.UnitId == 'url0001' or unit.UnitId == 'ual0001' or unit.UnitId == 'xsl0001' or unit.UnitId == 'uel0001') then
+        if SessionIsReplay() and EntityCategoryContains(categories.COMMAND, unit) then
             -- prepare sync
             local sync = Sync
             local events = sync.Events or { }
