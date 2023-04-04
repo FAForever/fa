@@ -53,6 +53,8 @@ BaseAIEngineerManager = Class(BuilderManager) {
         }
 
         self:AddBuilderType('Any')
+        
+        return true
     end,
 
     --------------------------------------------------------------------------------------------
