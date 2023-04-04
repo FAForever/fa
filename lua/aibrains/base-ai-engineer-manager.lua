@@ -27,12 +27,12 @@ BaseAIEngineerManager = Class(BuilderManager) {
 
     ---@param self BaseAIEngineerManager
     ---@param brain AIBrain
-    ---@param lType LocationType
+    ---@param locationType LocationType
     ---@param location Vector
     ---@param radius number
     ---@return boolean
-    Create = function(self, brain, lType, location, radius)
-        BuilderManager.Create(self,brain, lType, location, radius)
+    Create = function(self, brain, locationType, location, radius)
+        BuilderManager.Create(self,brain, locationType, location, radius)
 
         self.Engineers = {
             TECH1 = setmetatable({ }, WeakValues),
@@ -53,7 +53,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
         }
 
         self:AddBuilderType('Any')
-        
+
         return true
     end,
 
