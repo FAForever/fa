@@ -5,11 +5,11 @@
 --****************************************************************************
 
 local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
-local SUtils = import("/lua/ai/sorianutilities.lua")
-local AIUtils = import("/lua/ai/aiutilities.lua")
 local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
+
+local WeakValues = { __mode = 'v' }
 
 ---@class BaseAIEngineerManager : BuilderManager
 ---@field Location Vector
@@ -35,21 +35,21 @@ BaseAIEngineerManager = Class(BuilderManager) {
         BuilderManager.Create(self,brain, lType, location, radius)
 
         self.Engineers = {
-            TECH1 = { },
-            TECH2 = { },
-            TECH3 = { },
-            EXPERIMENTAL = { },
-            SUBCOMMANDER = { },
-            COMMAND = { },
+            TECH1 = setmetatable({ }, WeakValues),
+            TECH2 = setmetatable({ }, WeakValues),
+            TECH3 = setmetatable({ }, WeakValues),
+            EXPERIMENTAL = setmetatable({ }, WeakValues),
+            SUBCOMMANDER = setmetatable({ }, WeakValues),
+            COMMAND = setmetatable({ }, WeakValues),
         }
 
         self.EngineersBeingBuilt = {
-            TECH1 = { },
-            TECH2 = { },
-            TECH3 = { },
-            EXPERIMENTAL = { },
-            SUBCOMMANDER = { },
-            COMMAND = { },
+            TECH1 = setmetatable({ }, WeakValues),
+            TECH2 = setmetatable({ }, WeakValues),
+            TECH3 = setmetatable({ }, WeakValues),
+            EXPERIMENTAL = setmetatable({ }, WeakValues),
+            SUBCOMMANDER = setmetatable({ }, WeakValues),
+            COMMAND = setmetatable({ }, WeakValues),
         }
 
         self:AddBuilderType('Any')
@@ -61,7 +61,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     -- This is where the majority of the magic happens. See the description of the same section
     -- in the file BuilderManager class for an extensive description
 
-
+    --- TODO
     ---@param self BaseAIEngineerManager
     ---@param builderData BuilderSpec
     ---@param locationType LocationType
@@ -73,6 +73,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
         return newBuilder
     end,
 
+    --- TODO
     ---@param self BaseAIEngineerManager
     ---@param templateName string
     ---@return table
@@ -95,6 +96,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
         return template
     end,
 
+    --- TODO
     ---@param self BaseAIEngineerManager
     ---@param builder BuilderSpec
     ---@param params { [1]: Unit }
