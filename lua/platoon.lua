@@ -4615,7 +4615,6 @@ Platoon = Class(moho.platoon_methods) {
                 buildMassPoints = aiBrain:RebuildTable(buildMassPoints)
             else
                 for i=1, 2 do
-                    --LOG('CommanderInitializeAIRNG : MassPoint '..repr(buildMassPoints[i]))
                     if buildMassPoints[i].position[1] - playableArea[1] <= 8 or buildMassPoints[i].position[1] >= playableArea[3] - 8 or buildMassPoints[i].position[3] - playableArea[2] <= 8 or buildMassPoints[i].position[3] >= playableArea[4] - 8 then
                         borderWarning = true
                     end
@@ -4628,12 +4627,10 @@ Platoon = Class(moho.platoon_methods) {
                         WARN('No buildLocation or whatToBuild during ACU initialization')
                     end
                     aiBrain:BuildStructure(eng, whatToBuild, {buildMassPoints[i].position[1], buildMassPoints[i].position[3], 0}, false)
-                    --RNGINSERT(eng.EngineerBuildQueue, {whatToBuild, {buildMassPoints[i].Position[1], buildMassPoints[i].Position[3], 0}, false})
                     buildMassPoints[i] = nil
                 end
                 buildMassPoints = aiBrain:RebuildTable(buildMassPoints)
                 buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1EnergyProduction', eng, true, categories.STRUCTURE * categories.FACTORY, 12, true)
-                --LOG('CommanderInitializeAIRNG : Insert Second energy production '..whatToBuild.. ' at '..repr(buildLocation))
                 if borderWarning and buildLocation and whatToBuild then
                     IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
                     borderWarning = false
@@ -4642,7 +4639,6 @@ Platoon = Class(moho.platoon_methods) {
                 else
                     WARN('No buildLocation or whatToBuild during ACU initialization')
                 end
-                --RNGINSERT(eng.EngineerBuildQueue, {whatToBuild, buildLocation, false})
                 if table.getn(buildMassPoints) < 2 then
                     whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
                     for k, v in buildMassPoints do
@@ -4663,11 +4659,9 @@ Platoon = Class(moho.platoon_methods) {
                 end
             end
         elseif table.getn(buildMassDistantPoints) > 0 then
-            LOG('CommanderInitializeAI : Distancemasspoints has '..table.getn(buildMassDistantPoints))
             whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
             if table.getn(buildMassDistantPoints) < 3 then
                 for k, v in buildMassDistantPoints do
-                    LOG('CommanderInitializeAIR : MassPoint '..repr(v))
                     if aiBrain:CanBuildStructureAt('ueb1103', v.position) then
                         IssueMove({eng}, v.position )
                         while VDist2Sq(engPos[1],engPos[3],v.position[1],v.position[3]) > 165 do
@@ -4689,7 +4683,6 @@ Platoon = Class(moho.platoon_methods) {
                         else
                             WARN('No buildLocation or whatToBuild during ACU initialization')
                         end
-                        --RNGINSERT(eng.EngineerBuildQueue, {whatToBuild, {v.Position[1], v.Position[3], 0}, false})
                         coroutine.yield(5)
                         while eng:IsUnitState('Building') or 0<table.getn(eng:GetCommandQueue()) do
                             coroutine.yield(5)
@@ -4876,7 +4869,6 @@ Platoon = Class(moho.platoon_methods) {
                         end
                         aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
                         if playableArea[3] > 256 or playableArea[4] > 256 and aiBrain:GetEngineerManagerUnitsBeingBuilt(categories.FACTORY * categories.AIR) < 1 then
-                            LOG("Attempt to build air factory")
                             buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1AirFactory', eng, true, categories.HYDROCARBON, 25, true)
                             if borderWarning and buildLocation and whatToBuild then
                                 IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
