@@ -3547,7 +3547,7 @@ Platoon = Class(moho.platoon_methods) {
     EngineerBuildDone = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAI' then return end
-        LOG("*AI DEBUG: Build done " .. unit.Sync.id)
+        --LOG("*AI DEBUG: Build done " .. unit.Sync.id)
         if not unit.ProcessBuild then
             unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, true)
             unit.ProcessBuildDone = true
@@ -4426,12 +4426,16 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
-    CommanderInitializeAI = function(self)
+    CommanderInitialBOAI = function(self)
         -- This is an adaptive initial build order function for the ACU
+        -- Fully scripted with decision points
+        -- Takes into account maps where the spawn location is very close to the map border (think theta passage)
+
+        -- The small build logic code loop should be put into a utility function rather than repeating it.
 
         local aiBrain = self:GetBrain()
-        local buildingTmpl, buildingTmplFile, baseTmpl, baseTmplFile, baseTmplDefault
-        local whatToBuild, location, relativeLoc
+        local buildingTmpl, buildingTmplFile, baseTmplFile, baseTmplDefault
+        local whatToBuild
         local hydroPresent = false
         local buildLocation = false
         local buildMassPoints = {}
@@ -4441,7 +4445,7 @@ Platoon = Class(moho.platoon_methods) {
         local factionIndex = aiBrain:GetFactionIndex()
         local platoonUnits = self:GetPlatoonUnits()
         local eng
-        for k, v in platoonUnits do
+        for _, v in platoonUnits do
             if not v.Dead and EntityCategoryContains(categories.ENGINEER, v) then
                 IssueClearCommands({v})
                 if not eng then
@@ -4449,20 +4453,26 @@ Platoon = Class(moho.platoon_methods) {
                 end
             end
         end
-        eng.Active = true
+        -- Setting flags on the ACU to stop other threads from disbanding its platoon
         eng.Combat = true
         eng.Initializing = true
+        -- Small note on the base template file. This is using a custom one so the acu doesnt try to select 
+        -- a build location that causes it to move from its spawn position. But there are maps where it wont quite work and he'll move.
         baseTmplFile = import(self.PlatoonData.Construction.BaseTemplateFile or '/lua/BaseTemplates.lua')
         baseTmplDefault = import('/lua/BaseTemplates.lua')
         buildingTmplFile = import(self.PlatoonData.Construction.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
         buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
+        -- This is where we would want to have personality modifiers being setup.
+        -- Putting the acu into a statemachine after this would allow some interesting personality based long term build outs.
+        -- For now we'll just use the personality that the FirstBaseFunction might spit out (check AIBaseTemplates for more info).
+        local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         
         local engPos = eng:GetPosition()
         local massMarkers = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
         local closeMarkers = 0
         local distantMarkers = 0
-        local closestMarker = false
-        for k, marker in massMarkers do
+        -- Create mass point tables for points within build range and points outside of build range.
+        for _, marker in massMarkers do
             if VDist2Sq(marker.position[1], marker.position[3],engPos[1], engPos[3]) < 165 then
                 closeMarkers = closeMarkers + 1
                 table.insert(buildMassPoints, marker)
@@ -4476,30 +4486,25 @@ Platoon = Class(moho.platoon_methods) {
                     break
                 end
             end
-            if not closestMarker or closestMarker > VDist2Sq(marker.position[1], marker.position[3],engPos[1], engPos[3]) then
-                closestMarker = VDist2Sq(marker.position[1], marker.position[3],engPos[1], engPos[3])
-            end
         end
-
-        LOG('Number of close mass points '..table.getn(buildMassPoints))
-        LOG('Number of distant mass points '..table.getn(buildMassDistantPoints))
-
+        -- Check if there is a hydrocarbon marker within 65 units. The distance is based on the open palms hydro distance from spawn if your wondering.
+        -- 65 units can be far if the hydro is behind the spawn point, we could check angles if we are thinking of alternatives.
         local closestHydro = AIUtils.GetResourceMarkerWithinRadius(aiBrain, engPos, 'Hydrocarbon', 65, false, false, false)
         if closestHydro then
-            LOG('Hydro within 65 units')
             hydroPresent = true
         end
+        -- Check if we spawned in water. In which case we want a naval factory first up, and hope for the best.
         local inWater = GetTerrainHeight(engPos[1], engPos[3]) < GetSurfaceHeight(engPos[1], engPos[3])
         if inWater then
             buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplFile['ACUBaseTemplate'][factionIndex], 'T1SeaFactory', eng, false, nil, nil, true)
         else
-            if aiBrain.RNGEXP then
+            -- If our personality is rushair then we will go air first else land.
+            if personality ==  'rushair' then
                 buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplFile['ACUBaseTemplate'][factionIndex], 'T1AirFactory', eng, false, nil, nil, true)
             else
                 buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplFile['ACUBaseTemplate'][factionIndex], 'T1LandFactory', eng, false, nil, nil, true)
             end
         end
-        LOG('ACU wants to build '..whatToBuild)
         if borderWarning and buildLocation and whatToBuild then
             IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
             borderWarning = false
@@ -4508,16 +4513,11 @@ Platoon = Class(moho.platoon_methods) {
         else
             WARN('No buildLocation or whatToBuild during ACU initialization')
         end
-        LOG('CommanderInitializeAIRNG : Attempt structure build')
-        LOG('CommanderInitializeAIRNG : Number of close mass markers '..closeMarkers)
-        LOG('CommanderInitializeAIRNG : Number of distant mass markers '..distantMarkers)
-        LOG('CommanderInitializeAIRNG : Close Mass Point table has '..table.getn(buildMassPoints)..' items in it')
-        LOG('CommanderInitializeAIRNG : Distant Mass Point table has '..table.getn(buildMassDistantPoints)..' items in it')
-        LOG('CommanderInitializeAIRNG : Mex build stage 1')
+        -- First factory is up, now we queue any close mass points, there is an upper limit of 4 so we don't stall our power
+        -- if we have no close mass points we will look at more distant ones (22 units max)
         if next(buildMassPoints) then
             whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
             for k, v in buildMassPoints do
-                --LOG('CommanderInitializeAIRNG : MassPoint '..repr(v))
                 if v.position[1] - playableArea[1] <= 8 or v.position[1] >= playableArea[3] - 8 or v.position[3] - playableArea[2] <= 8 or v.position[3] >= playableArea[4] - 8 then
                     borderWarning = true
                 end
@@ -4525,23 +4525,18 @@ Platoon = Class(moho.platoon_methods) {
                     IssueBuildMobile({eng}, v.position, whatToBuild, {})
                     borderWarning = false
                 elseif buildLocation and whatToBuild then
-                    LOG('CommanderInitializeAIRNG : Building Mex')
                     aiBrain:BuildStructure(eng, whatToBuild, {v.position[1], v.position[3], 0}, false)
                 else
                     WARN('No buildLocation or whatToBuild during ACU initialization')
                 end
-                LOG('CommanderInitializeAIRNG : Building another Mex')
                 aiBrain:BuildStructure(eng, whatToBuild, {v.position[1], v.position[3], 0}, false)
-                --RNGINSERT(eng.EngineerBuildQueue, {whatToBuild, {v.Position[1], v.Position[3], 0}, false})
                 buildMassPoints[k] = nil
                 break
             end
             buildMassPoints = aiBrain:RebuildTable(buildMassPoints)
         elseif next(buildMassDistantPoints) then
-            --LOG('CommanderInitializeAIRNG : Try build distant mass point marker')
             whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
             for k, v in buildMassDistantPoints do
-                --LOG('CommanderInitializeAIRNG : MassPoint '..repr(v))
                 IssueMove({eng}, v.position )
                 while VDist2Sq(engPos[1],engPos[3],v.position[1],v.position[3]) > 165 do
                     coroutine.yield(5)
@@ -4562,20 +4557,19 @@ Platoon = Class(moho.platoon_methods) {
                 else
                     WARN('No buildLocation or whatToBuild during ACU initialization')
                 end
-                --RNGINSERT(eng.EngineerBuildQueue, {whatToBuild, {v.Position[1], v.Position[3], 0}, false})
                 buildMassDistantPoints[k] = nil
                 break
             end
             buildMassDistantPoints = aiBrain:RebuildTable(buildMassDistantPoints)
         end
+        -- Wait for everything to be built
         coroutine.yield(5)
         while eng:IsUnitState('Building') or 0<table.getn(eng:GetCommandQueue()) do
             coroutine.yield(5)
         end
-        --LOG('CommanderInitializeAIRNG : Close Mass Point table has '..table.getn(buildMassPoints)..' after initial build')
-        LOG('CommanderInitializeAI : Distant Mass Point table has '..table.getn(buildMassDistantPoints)..' after initial build')
+        -- If we found a hydro marker then we are going to just queue a few pgens
+        -- mainly incase something goes wrong and no engineer goes to build a hydro
         if hydroPresent then
-            LOG('Hydro is present, build failback pgens')
             buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1EnergyProduction', eng, true, categories.STRUCTURE * categories.FACTORY, 12, true)
             if borderWarning and buildLocation and whatToBuild then
                 IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
@@ -4598,12 +4592,13 @@ Platoon = Class(moho.platoon_methods) {
                 end
             end
         end
+        -- queue the rest of the mass points, if there are more than 2 close mass points we will only do a couple
+        -- so that we can build more power should we have no hydro available, if they are distant then
+        -- we won't build pgens during this phase as we don't know how long it might take to build the extractors
         if next(buildMassPoints) then
             whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
             if table.getn(buildMassPoints) < 3 then
-                --LOG('CommanderInitializeAIRNG : Less than 4 total mass points close')
                 for k, v in buildMassPoints do
-                    --LOG('CommanderInitializeAIRNG : MassPoint '..repr(v))
                     if v.position[1] - playableArea[1] <= 8 or v.position[1] >= playableArea[3] - 8 or v.position[3] - playableArea[2] <= 8 or v.position[3] >= playableArea[4] - 8 then
                         borderWarning = true
                     end
@@ -4615,12 +4610,10 @@ Platoon = Class(moho.platoon_methods) {
                     else
                         WARN('No buildLocation or whatToBuild during ACU initialization')
                     end
-                    --RNGINSERT(eng.EngineerBuildQueue, {whatToBuild, {v.Position[1], v.Position[3], 0}, false})
                     buildMassPoints[k] = nil
                 end
                 buildMassPoints = aiBrain:RebuildTable(buildMassPoints)
             else
-                --LOG('CommanderInitializeAIRNG : Greater than 3 total mass points close')
                 for i=1, 2 do
                     --LOG('CommanderInitializeAIRNG : MassPoint '..repr(buildMassPoints[i]))
                     if buildMassPoints[i].position[1] - playableArea[1] <= 8 or buildMassPoints[i].position[1] >= playableArea[3] - 8 or buildMassPoints[i].position[3] - playableArea[2] <= 8 or buildMassPoints[i].position[3] >= playableArea[4] - 8 then
@@ -4707,16 +4700,13 @@ Platoon = Class(moho.platoon_methods) {
                 buildMassDistantPoints = aiBrain:RebuildTable(buildMassDistantPoints)
             end
         end
-        LOG('CommanderInitializeAIR : Exiting mass build')
-        LOG('Current Command Queue '..table.getn(eng:GetCommandQueue()))
-        if eng:IsUnitState('Building') then
-            LOG('ACU Is Building')
-        end
+        -- wait for the build queue to complete
         coroutine.yield(5)
         while eng:IsUnitState('Building') or 0<table.getn(eng:GetCommandQueue()) do
             coroutine.yield(5)
         end
-        LOG('CommanderInitializeAIR : MassPoint build complete')
+        -- if we still have close mass points to build then we'll queue them.
+        -- Then we try to work out how many pgens we'll need to not stall anything if a hydro isnt present and queue them up.
         if next(buildMassPoints) then
             whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
             for k, v in buildMassPoints do
@@ -4731,7 +4721,6 @@ Platoon = Class(moho.platoon_methods) {
                 else
                     WARN('No buildLocation or whatToBuild during ACU initialization')
                 end
-                --RNGINSERT(eng.EngineerBuildQueue, {whatToBuild, {v.Position[1], v.Position[3], 0}, false})
                 buildMassPoints[k] = nil
             end
             coroutine.yield(5)
@@ -4740,10 +4729,8 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
         local energyCount = 3
-        LOG('CommanderInitializeAI : Energy Production stage 2')
         if not hydroPresent then
             IssueClearCommands({eng})
-            --LOG('CommanderInitializeAIRNG : No hydro present, we should be building a little more power')
             if closeMarkers > 0 then
                 if closeMarkers < 4 then
                     if closeMarkers < 4 and distantMarkers > 1 then
@@ -4759,9 +4746,6 @@ Platoon = Class(moho.platoon_methods) {
             for i=1, energyCount do
                 buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1EnergyProduction', eng, true, categories.STRUCTURE * categories.FACTORY, 12, true)
                 if buildLocation and whatToBuild then
-                    --LOG('CommanderInitializeAIRNG : Execute Build Structure with the following data')
-                    --LOG('CommanderInitializeAIRNG : whatToBuild '..whatToBuild)
-                    --LOG('CommanderInitializeAIRNG : Build Location '..repr(buildLocation))
                     if borderWarning and buildLocation and whatToBuild then
                         IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
                         borderWarning = false
@@ -4771,7 +4755,7 @@ Platoon = Class(moho.platoon_methods) {
                         WARN('No buildLocation or whatToBuild during ACU initialization')
                     end
                 else
-                    -- This is a backup to avoid a power stall
+                    -- This is a backup to avoid a power stall should the GetBuildLocation fail with adjacency
                     buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1EnergyProduction', eng, false, categories.STRUCTURE * categories.FACTORY, 12, true)
                     if borderWarning and buildLocation and whatToBuild then
                         IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
@@ -4784,11 +4768,9 @@ Platoon = Class(moho.platoon_methods) {
                     aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
                 end
             end
-        else
-           LOG('Hydro is present we shouldnt need any more pgens during initialization')
         end
+        -- If there is no hydro and we had enough mass points to support a second land factory this is where we build it
         if not hydroPresent and closeMarkers > 3 then
-            --LOG('CommanderInitializeAIRNG : not hydro and close markers greater than 3, Try to build land factory')
             buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1LandFactory', eng, true, categories.MASSEXTRACTION, 15, true)
             if borderWarning and buildLocation and whatToBuild then
                 IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
@@ -4800,15 +4782,18 @@ Platoon = Class(moho.platoon_methods) {
             end
             aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
         end
+        -- wait for the build to complete
         if not hydroPresent then
             while eng:IsUnitState('Building') or 0<table.getn(eng:GetCommandQueue()) do
                 coroutine.yield(5)
             end
         end
-        --LOG('CommanderInitializeAIRNG : CDR Initialize almost done, should have just finished final t1 land')
+        -- if we had a hydro and we also had mass points we will walk to it then try find an engineer that might be building it
+        -- we will assist that engineer until the hydro is finished
+        -- If no engineer is building a hydro the acu will wait for a while to give an engineer a chance.
+        -- Note the builder manager that the engineer came from must be called MAIN
         if hydroPresent and (closeMarkers > 0 or distantMarkers > 0) then
             engPos = eng:GetPosition()
-            LOG('CommanderInitializeAI : Hydro Distance is '..VDist3Sq(engPos,closestHydro.Position))
             if VDist3Sq(engPos,closestHydro.Position) > 144 then
                 IssueMove({eng}, closestHydro.Position )
                 while VDist3Sq(engPos,closestHydro.Position) > 100 do
@@ -4817,37 +4802,29 @@ Platoon = Class(moho.platoon_methods) {
                     if eng:IsIdleState() and VDist3Sq(engPos,closestHydro.Position) > 100 then
                         break
                     end
-                    LOG('CommanderInitializeAIRNG : Still inside movement loop')
-                    LOG('Distance is '..VDist3Sq(engPos,closestHydro.Position))
                 end
-                LOG('CommanderInitializeAIRNG : We should be close to the hydro now')
             end
             IssueClearCommands({eng})
             local assistList = AIUtils.GetAssistees(aiBrain, 'MAIN', 'Engineer', categories.HYDROCARBON, categories.ALLUNITS)
             local assistee = false
-            LOG('CommanderInitializeAIR : AssistList is '..table.getn(assistList)..' in length')
             local assistListCount = 0
             while not next(assistList) do
                 coroutine.yield( 15 )
                 assistList = AIUtils.GetAssistees(aiBrain, 'MAIN', 'Engineer', categories.HYDROCARBON, categories.ALLUNITS)
                 assistListCount = assistListCount + 1
-                --LOG('CommanderInitializeAIRNG : AssistList is '..table.getn(assistList)..' in length')
                 if assistListCount > 10 then
-                    --LOG('assistListCount is still empty after 7.5 seconds')
                     break
                 end
             end
             if next(assistList) then
-                -- only have one unit in the list; assist it
+                -- we have something in the assistList
                 local low = false
                 local bestUnit = false
                 for k,v in assistList do
-                    --DUNCAN - check unit is inside assist range 
                     local unitPos = v:GetPosition()
                     local UnitAssist = v.UnitBeingBuilt or v.UnitBeingAssist or v
                     local NumAssist = table.getn(UnitAssist:GetGuards())
                     local dist = VDist2Sq(engPos[1], engPos[3], unitPos[1], unitPos[3])
-                    --LOG('CommanderInitializeAIRNG : Assist distance for commander assist is '..dist)
                     -- Find the closest unit to assist
                     if (not low or dist < low) and NumAssist < 20 and dist < 225 then
                         low = dist
@@ -4859,7 +4836,6 @@ Platoon = Class(moho.platoon_methods) {
             if assistee  then
                 IssueClearCommands({eng})
                 eng.UnitBeingAssist = assistee.UnitBeingBuilt or assistee.UnitBeingAssist or assistee
-                --LOG('* EconAssistBody: Assisting now: ['..eng.UnitBeingAssist:GetBlueprint().BlueprintId..'] ('..eng.UnitBeingAssist:GetBlueprint().Description..')')
                 IssueGuard({eng}, eng.UnitBeingAssist)
                 coroutine.yield(30)
                 while eng and not eng.Dead and not eng:IsIdleState() do
@@ -4873,9 +4849,11 @@ Platoon = Class(moho.platoon_methods) {
                     end
                     coroutine.yield(30)
                 end
-                if ((closeMarkers + distantMarkers > 2) or (closeMarkers + distantMarkers > 1 and GetEconomyStored(aiBrain, 'MASS') > 120)) and eng.UnitBeingAssist:GetFractionComplete() == 1 then
-                    LOG('FactoryBuild playable area x '..playableArea[3]..' playable area z '..playableArea[4])
-                    if (playableArea[3] > 512 or playableArea[4] > 512) or aiBrain.BrainIntel.AirPlayer then
+                -- the hydro should be finished, now we will try build an adjacent air factory if the map is 20km or larger or this is the rush air personality.
+                -- otherwise build another land first then an air factory, try to make them adjacent but it gets a little tricky here without having the move the acu
+                -- we do a quick storage check to make sure we can afford at least half a factory if we had a low count of mass markers.
+                if ((closeMarkers + distantMarkers > 2) or (closeMarkers + distantMarkers > 1 and aiBrain:GetEconomyStored('MASS') > 120)) and eng.UnitBeingAssist:GetFractionComplete() == 1 then
+                    if (playableArea[3] > 512 or playableArea[4] > 512) or personality == 'rushair' then
                         buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1AirFactory', eng, true, categories.HYDROCARBON, 15, true)
                         if borderWarning and buildLocation and whatToBuild then
                             IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})
@@ -4914,15 +4892,9 @@ Platoon = Class(moho.platoon_methods) {
                     while eng:IsUnitState('Building') or 0<table.getn(eng:GetCommandQueue()) do
                         coroutine.yield(5)
                     end
-                else
-                    --LOG('CommanderInitializeAIRNG : closeMarkers 2 or less or UnitBeingAssist is not complete')
-                    --LOG('CommanderInitializeAIRNG : closeMarkers '..closeMarkers)
-                    --LOG('CommanderInitializeAIRNG : Fraction complete is '..eng.UnitBeingAssist:GetFractionComplete())
                 end
             end
         end
-        --LOG('CommanderInitializeAIRNG : CDR Initialize done, setting flags')
-        eng.Active = false
         eng.Combat = false
         eng.Initializing = false
         self:PlatoonDisband()

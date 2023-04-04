@@ -3378,7 +3378,8 @@ end
 
 function GetBuildLocation(aiBrain, buildingTemplate, baseTemplate, buildUnit, eng, adjacent, category, radius, relative)
     -- This will get a build location based on the parameters
-    -- Wil take into account any adjacency reqest and will check map borders
+    -- Will take into account any adjacency request
+    -- Note: borderWarning (too close to map border) will be returned, make sure your build functions can support it
     local buildLocation = false
     local borderWarning = false
     local whatToBuild = aiBrain:DecideWhatToBuild(eng, buildUnit, buildingTemplate)

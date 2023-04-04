@@ -252,7 +252,6 @@ function CDRReturnHome(aiBrain, cdr)
     local distSqAway = 1600
     local loc = cdr.CDRHome
     if not cdr.Initializing and not cdr.Dead and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) > distSqAway then
-        LOG('ACU is too far from base, interupt')
         local plat = aiBrain:MakePlatoon('', '')
         aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
         repeat
