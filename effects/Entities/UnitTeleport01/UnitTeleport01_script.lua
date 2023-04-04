@@ -19,10 +19,12 @@ UnitTeleportEffect01 = Class(NullShell) {
         local pos = self:GetPosition()
         pos[2] = GetSurfaceHeight(pos[1], pos[3]) - 2
 
+        -- initial effect
         for k, v in EffectTemplate.CSGTestEffect2 do
             CreateEmitterOnEntity( self, army, v )
         end
 
+        -- initial light flash
         CreateLightParticleIntel( self, -1, army, 22, 4, 'flare_lens_add_02', 'ramp_blue_13' )
         DamageRing(self, pos, 0.1, 4, 1, 'Fire', false, false)
         DamageRing(self, pos, 2, 6, 1, 'Fire', false, false)
@@ -37,6 +39,7 @@ UnitTeleportEffect01 = Class(NullShell) {
         CreateLightParticleIntel( self, -1, army, 38, 10, 'flare_lens_add_02', 'ramp_blue_13' )
         self:CreateQuantumEnergy(army)
 
+        -- knockdown trees
         for k = 1, 4 do 
             DamageRing(self, pos, 0.1, 1 + k * 1, 1, 'Force', false, false)
             WaitSeconds(0.1)
@@ -44,6 +47,7 @@ UnitTeleportEffect01 = Class(NullShell) {
 
         DamageRing(self, pos, 2, 7, 1, 'Fire', false, false)
 
+        -- Wait till we want the commander to appear visibily
 		WaitSeconds(1.4)
 
         CreateLightParticleIntel( self, -1, army, 35, 10, 'glow_02', 'ramp_blue_13' )
@@ -63,20 +67,25 @@ UnitTeleportEffect01 = Class(NullShell) {
         DamageRing(self, pos, .1, 11, 100, 'Disintegrate', false, false)
         WaitSeconds(0.2)
 
+        -- light some trees on fire
         DamageRing(self, pos, 1, 16, 1, 'TreeFire', false, false)
 
+        -- knockdown trees
         for k = 1, 2 do 
             DamageRing(self, pos, 11, 11 + k, 1, 'TreeForce', false, false)
             WaitSeconds(0.1)
         end
 
+        -- light some trees on fire
         DamageRing(self, pos, 13, 21, 1, 'TreeFire', false, false)
 
+        -- knockdown trees
         for k = 1, 4 do 
             DamageRing(self, pos, 11, 13 + k * 2, 1, 'TreeForce', false, false)
             WaitSeconds(0.1)
         end
 
+        -- light some trees on fire
         DamageRing(self, pos, 12, 22, 1, 'TreeFire', false, false)
     end,
 
