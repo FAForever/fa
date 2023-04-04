@@ -576,17 +576,6 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---@param self BaseAIBrain
-    GetFactoriesBeingBuilt = function(self)
-        local unitCount = 0
-
-        -- Units queued up
-        for k, v in self.BuilderManagers do
-            unitCount = unitCount + TableGetn(v.EngineerManager:GetEngineersQueued('T1LandFactory'))
-        end
-        return unitCount
-    end,
-
-    ---@param self BaseAIBrain
     GetStartVector3f = function(self)
         local startX, startZ = self:GetArmyStartPos()
         return {startX, 0, startZ}
