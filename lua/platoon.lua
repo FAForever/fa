@@ -4283,7 +4283,150 @@ Platoon = Class(moho.platoon_methods) {
         return commands
     end,
 
-    CommanderInitialBOAI = function(self)
+    ---@param self Platoon
+    ReclaimGridAI = function(self)
+        -- note ReclaimEngineerAssigned is currently disabled as we need a method of assigning engineers to the reclaim grid.
+        -- Waiting a few days to see if Jip has ideas to making this possible via the gridinstance. If not then I can design a method.
+        -- Note where state machine actions would happen.
+        AIAttackUtils.GetMostRestrictiveLayer(self)
+        local locationType = self.PlatoonData.LocationType
+
+        local aiBrain = self:GetBrain()
+        local reclaimGridInstance = aiBrain.GridReclaim
+        local brainGridInstance = aiBrain.GridBrain
+        local eng = self:GetPlatoonUnits()[1]
+
+        -- we don't have the datastructures to run this platoon
+        if not (reclaimGridInstance and brainGridInstance) then
+            return
+        end
+        -- @Jip this is the callback I think I can use for removal of assignment on death.
+        local deathFunction = function(unit)
+            if unit.CellAssigned then
+                -- Brain is assigned on unit create, if issues use eng:GetAIBrain()
+                local brainGridInstance = unit.Brain.GridBrain
+                local brainCell = brainGridInstance:ToCellFromGridSpace(unit.CellAssigned[1], unit.CellAssigned[2])
+                -- confirm engineer is removed from cell during debug
+                brainGridInstance:RemoveReclaimingEngineer(brainCell, unit)
+            end
+        end
+
+        import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(deathFunction, eng)
+
+        local gridSize = reclaimGridInstance.CellSize * reclaimGridInstance.CellSize
+        local searchType = self.PlatoonData.SearchType
+            -- Placeholders this part is temporary until the ReclaimGrid defines the playable area min and max grid sizes
+
+        eng.CellAssigned = false
+        -- Combat is added to stop the engineer manager from doing anything with the engineer
+        eng.Combat = true
+        while aiBrain:PlatoonExists(self) do
+            WaitTicks(10)
+            IssueClearCommands({eng})
+            -- Find a cell we want to reclaim from
+            local reclaimTargetX, reclaimTargetZ = AIUtils.EngFindReclaimCell(aiBrain, eng, self.MovementLayer, searchType)
+            if reclaimTargetX and reclaimTargetZ then
+                local brainCell = brainGridInstance:ToCellFromGridSpace(reclaimTargetX, reclaimTargetZ)
+                -- Assign engineer to cell
+                eng.CellAssigned = {reclaimTargetX, reclaimTargetZ}
+                brainGridInstance:AddReclaimingEngineer(brainCell, eng)
+                local moveLocation = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
+                IssueMove({eng}, moveLocation)
+                local engStuckCount = 0
+                local Lastdist
+                local dist = VDist3Sq(eng:GetPosition(), moveLocation)
+
+                -- Statemachine switch for engineer moving to location
+                while not IsDestroyed(eng) and dist > gridSize do
+                    WaitTicks(25)
+                    if aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.MOBILE, eng:GetPosition(), 45, 'Enemy') > 0 then
+                        -- Statemachine switch to avoiding/reclaiming danger
+                        local actionTaken = AIUtils.EngAvoidLocalDanger(aiBrain, eng)
+                        if actionTaken then
+                            -- Statemachine switch to evaluating next action to take
+                            IssueMove({eng}, moveLocation)
+                        end
+                    else
+                        -- Jip discussed potentially getting navmesh to return mass points along the path rather than this.
+                        -- Potential Statemachine switch to building extractors
+                        if not eng:IsUnitState('Reclaiming') then
+                            local reclaimAction = AIUtils.EngPerformReclaim(eng, 10)
+                            if reclaimAction then
+                                WaitTicks(45)
+                                -- Statemachine switch to evaluating next action to take
+                                IssueMove({eng}, moveLocation)
+                            end
+                        end
+                        local extractorAction = AIUtils.EngLocalExtractorBuild(aiBrain, eng)
+                        if extractorAction then
+                            -- Statemachine switch to evaluating next action to take
+                            IssueMove({eng}, moveLocation)
+                        end
+                    end
+                    dist = VDist3Sq(eng:GetPosition(), moveLocation)
+                    if Lastdist ~= dist then
+                        engStuckCount = 0
+                        Lastdist = dist
+                    elseif not eng:IsUnitState('Reclaiming') then
+                        engStuckCount = engStuckCount + 1
+                        if engStuckCount > 15 then
+                            break
+                        end
+                    end
+                end
+                if IsDestroyed(eng) then
+                    return
+                end
+                if dist <= gridSize then
+                    -- Statemachine switch to reclaiming state
+                    local time = 0
+                    IssueClearCommands({eng})
+                    while time < 30 do
+                        IssueAggressiveMove({eng}, moveLocation)
+                        time = time + 1
+                        WaitTicks(50)
+                        local engPos = eng:GetPosition()
+                        if aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.MOBILE, engPos, 45, 'Enemy') > 0 then
+                            -- Statemachine switch to avoiding/reclaiming danger
+                            local actionTaken = AIUtils.EngAvoidLocalDanger(aiBrain, eng)
+                            if actionTaken then
+                                -- Statemachine switch to evaluating next action to take
+                                IssueAggressiveMove({eng}, moveLocation)
+                            end
+                        end
+                        if reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass < 10  or aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
+                            break
+                        end
+                        if VDist3Sq(engPos, moveLocation) < 4 and reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass > 5 then
+                            for _, v in reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].Reclaim do
+                                if IsProp(v) and v.MaxMassReclaim > 0 then
+                                    moveLocation = v:GetPosition()
+                                    IssueClearCommands({eng})
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+            if reclaimTargetX and reclaimTargetZ then
+                local brainCell = brainGridInstance:ToCellFromGridSpace(eng.CellAssigned[1], eng.CellAssigned[2])
+                brainGridInstance:RemoveReclaimingEngineer(brainCell, eng)
+                eng.CellAssigned = false
+            end
+
+            if aiBrain:GetEconomyStoredRatio('MASS') > 0.95 then
+                -- Combat is back to false so the engineer manager can assign things to the engineer
+                eng.Combat = false
+                self:PlatoonDisband()
+            end
+
+            WaitTicks(100)
+        end
+    end,
+
+    CommanderInitializeAI = function(self)
         -- This is an adaptive initial build order function for the ACU
 
         local aiBrain = self:GetBrain()
