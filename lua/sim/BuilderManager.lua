@@ -74,6 +74,7 @@ BuilderManager = ClassSimple {
         self.Active = false
         self.NumBuilders = 0
         self:SetEnabled(true)
+        self:ForkThread(self.DebugThread)
     end,
 
     ---@param self BuilderManager
@@ -418,6 +419,37 @@ BuilderManager = ClassSimple {
     ---@param interval number
     SetCheckInterval = function(self, interval)
         self.BuildCheckInterval = interval
+    end,
+
+    --------------------------------------------------------------------------------------------
+    -- unit events
+
+    --- Called by a unit as it starts being built
+    ---@param self BaseAIBrain
+    ---@param unit Unit
+    OnUnitStartBeingBuilt = function(self, unit)
+    end,
+
+    --- Called by a unit as it is finished being built
+    ---@param self BaseAIBrain
+    ---@param unit Unit
+    OnUnitFinishedBeingBuilt = function(self, unit)
+    end,
+
+    --- Called by a unit as it is destroyed
+    ---@param self BaseAIBrain
+    ---@param unit Unit
+    OnUnitDestroyed = function(self, unit)
+    end,
+
+    --------------------------------------------------------------------------------------------
+    --- debug functionality
+
+    DebugThread = function(self)
+        while true do
+            WaitTicks(1)
+            DrawCircle(self.Location, self.Radius, 'ffffff')
+        end
     end,
 
     --------------------------------------------------------------------------------------------

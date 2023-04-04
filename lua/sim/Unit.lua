@@ -85,6 +85,7 @@ SyncMeta = {
 
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent
+---@field AIManagerIdentifier? string
 ---@field Brain AIBrain
 ---@field Blueprint UnitBlueprint
 ---@field Trash TrashBag
@@ -1912,6 +1913,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     OnDestroy = function(self)
         self.Dead = true
 
+        self.Brain:OnUnitDestroyed(self)
+
         if self:GetFractionComplete() < 1 then
             self:SendNotifyMessage('cancelled')
         end
@@ -1950,6 +1953,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.Brain:UntrackJammer(self)
         end
         
+
         ChangeState(self, self.DeadState)
     end,
 
@@ -2101,6 +2105,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StartBeingBuiltEffects(builder, layer)
 
         local aiBrain = self:GetAIBrain()
+        aiBrain:OnUnitStartBeingBuilt(self)
         if not table.empty(aiBrain.UnitBuiltTriggerList) then
             for _, v in aiBrain.UnitBuiltTriggerList do
                 if EntityCategoryContains(v.Category, self) then
@@ -2140,6 +2145,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:Kill()
             return false
         end
+
+        self.Brain:OnUnitFinishedBeingBuilt(self)
 
         -- Create any idle effects on unit
         if TrashEmpty(self.IdleEffectsBag) then

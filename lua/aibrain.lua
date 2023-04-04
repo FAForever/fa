@@ -13,6 +13,8 @@ local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUn
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
+local CoroutineYield = coroutine.yield
+
 ---@class TriggerSpec
 ---@field Callback function
 ---@field ReconTypes ReconTypes
@@ -1351,6 +1353,31 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
     end,
 
+    ---------------------------------------------
+    -- Unit callbacks
+
+    --- Called by a unit as it starts being built
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitStartBeingBuilt = function(self, unit)
+        LOG(string.format('OnUnitStartBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
+    end,
+
+    --- Called by a unit as it is finished being built
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitFinishedBeingBuilt = function(self, unit)
+        LOG(string.format('OnUnitFinishedBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
+    end,
+
+    --- Called by a unit as it is destroyed
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitDestroyed = function(self, unit)
+        LOG(string.format('OnUnitDestroyed: %s', unit.Blueprint.BlueprintId or ''))
+    end,
+
+    ---------------------------------------------
     -- deprecated
 
     ---@deprecated
