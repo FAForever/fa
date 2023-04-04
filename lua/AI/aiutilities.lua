@@ -3217,13 +3217,13 @@ function GetBuildLocation(aiBrain, buildingTemplate, baseTemplate, buildUnit, en
                 local testPos2 = { targetPos[1] + (i * 1), targetPos[3]+targetSize.SkirtSizeZ/2+(unitSize.SkirtSizeZ/2)+offsetfactory, 0 }
                 -- check if the buildplace is to close to the border or inside buildable area
                 if testPos[1] > 8 and testPos[1] < ScenarioInfo.size[1] - 8 and testPos[2] > 8 and testPos[2] < ScenarioInfo.size[2] - 8 then
-                    if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos)) and VDist3Sq(engPos,normalposition(testPos)) < radius * radius then
+                    if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos)) and VDist3Sq(engPos,normalposition(testPos)) < radius * radius then
                         return heightbuildpos(testPos), whatToBuild
                     end
                 end
                 if testPos2[1] > 8 and testPos2[1] < ScenarioInfo.size[1] - 8 and testPos2[2] > 8 and testPos2[2] < ScenarioInfo.size[2] - 8 then
-                    if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos2)) then
-                        if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos2)) and VDist3Sq(engPos,normalposition(testPos2)) < radius * radius then
+                    if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos2)) then
+                        if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos2)) and VDist3Sq(engPos,normalposition(testPos2)) < radius * radius then
                             return heightbuildpos(testPos2), whatToBuild
                         end
                     end
@@ -3234,13 +3234,13 @@ function GetBuildLocation(aiBrain, buildingTemplate, baseTemplate, buildUnit, en
                 local testPos = { targetPos[1]-targetSize.SkirtSizeX/2-(unitSize.SkirtSizeX/2)-offsetfactory, targetPos[3] + (i * 1), 0 }
                 local testPos2 = { targetPos[1]+targetSize.SkirtSizeX/2+(unitSize.SkirtSizeX/2)+offsetfactory, targetPos[3] + (i * 1), 0 }
                 if testPos[1] > 8 and testPos[1] < ScenarioInfo.size[1] - 8 and testPos[2] > 8 and testPos[2] < ScenarioInfo.size[2] - 8 then
-                    if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos)) and VDist3Sq(engPos,normalposition(testPos)) < radius * radius then
+                    if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos)) and VDist3Sq(engPos,normalposition(testPos)) < radius * radius then
                         return heightbuildpos(testPos), whatToBuild
                     end
                 end
                 if testPos2[1] > 8 and testPos2[1] < ScenarioInfo.size[1] - 8 and testPos2[2] > 8 and testPos2[2] < ScenarioInfo.size[2] - 8 then
-                    if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos2)) then
-                        if CanBuildStructureAt(aiBrain, whatToBuild, normalposition(testPos2)) and VDist3Sq(engPos,normalposition(testPos2)) < radius * radius then
+                    if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos2)) then
+                        if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos2)) and VDist3Sq(engPos,normalposition(testPos2)) < radius * radius then
                             return heightbuildpos(testPos2), whatToBuild
                         end
                     end
@@ -3257,6 +3257,46 @@ function GetBuildLocation(aiBrain, buildingTemplate, baseTemplate, buildUnit, en
             return relativeLoc, whatToBuild, borderWarning
         else
             return location, whatToBuild, borderWarning
+        end
+    end
+    return false
+end
+
+function GetResourceMarkerWithinRadius(aiBrain, pos, markerType, radius, canBuild, maxThreat, threatType)
+    local markers = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
+    local markerTable = {}
+    local radiusLimit = radius * radius
+    local structureID
+    if markerType == 'Hydrocarbon' then
+        structureID = 'ueb1102'
+    elseif markerType == 'Mass' then
+        structureID = 'ueb1103'
+    else
+        WARN('*AI: Warning invalid markerType passed to function GetResourceMarkerWithinRadious')
+        return
+    end
+    for k, v in markers do
+        if v.type == markerType then
+            table.insert(markerTable, {Position = v.position, Name = k, Distance = VDist2Sq(pos[1], pos[3], v.position[1], v.position[3])})
+        end
+    end
+    table.sort(markerTable, function(a,b) return a.Distance < b.Distance end)
+    for _, v in markerTable do
+        if v.Distance <= radiusLimit then
+            if canBuild then
+                if aiBrain:CanBuildStructureAt(structureID, v.Position) then
+                    if maxThreat and threatType then
+                        if aiBrain:GetThreatAtPosition(v.Position, aiBrain.IMAPConfig.Rings, true, threatType) < maxThreat then
+                            return v
+                        end
+                    else
+                        return v
+                    end
+                end
+            else
+                return v
+            end
+            
         end
     end
     return false
