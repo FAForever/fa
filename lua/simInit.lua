@@ -228,6 +228,8 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     if (not info.Human) and (info.AIPersonality != '') then
         local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
         local instance = keyToBrain[info.AIPersonality]
+        LOG(info.AIPersonality)
+        LOG(instance)
 
         if instance then
             setmetatable(brain, instance)

@@ -1362,7 +1362,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param builder Unit  
     ---@param layer Layer
     OnUnitStartBeingBuilt = function(self, unit, builder, layer)
-        LOG(string.format('OnUnitStartBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
+        -- LOG(string.format('OnUnitStartBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
     end,
 
     --- Called by a unit as it is finished being built
@@ -1371,14 +1371,14 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        LOG(string.format('OnUnitStopBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
+        -- LOG(string.format('OnUnitStopBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
     end,
 
     --- Called by a unit as it is destroyed
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitDestroyed = function(self, unit)
-        LOG(string.format('OnUnitDestroyed: %s', unit.Blueprint.BlueprintId or ''))
+        -- LOG(string.format('OnUnitDestroyed: %s', unit.Blueprint.BlueprintId or ''))
     end,
 
     --- Called by a unit as it starts building
@@ -1386,7 +1386,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     ---@param built Unit
     OnUnitStartBuilding = function(self, unit, built)
-        LOG(string.format('OnUnitStartBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
+        -- LOG(string.format('OnUnitStartBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
     end,
 
     --- Called by a unit as it stops building
@@ -1394,7 +1394,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)
-        LOG(string.format('OnUnitStopBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
+        -- LOG(string.format('OnUnitStopBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
     end,
 
     ---------------------------------------------

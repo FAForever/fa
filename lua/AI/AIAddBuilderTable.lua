@@ -10,6 +10,7 @@
 ---@param locationType string
 ---@param baseBuilderName string
 function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
+    WARN("AddGlobalBaseTemplate")
     if not BaseBuilderTemplates[baseBuilderName] then
         error('*AI ERROR: Invalid BaseBuilderTemplate: none found named - ' .. baseBuilderName)
     end
@@ -33,6 +34,7 @@ end
 ---@param locationType string
 ---@param builderGroupName string
 function AddGlobalBuilderGroup(aiBrain, locationType, builderGroupName)
+    WARN("AddGlobalBuilderGroup")
     if BuilderGroups[builderGroupName] then
         AddBuilderTable(aiBrain, locationType, BuilderGroups[builderGroupName], builderGroupName)
     else
@@ -45,6 +47,8 @@ end
 ---@param builderTable table
 ---@param tableName string
 function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
+    WARN("AddBuilderTable")
+
     aiBrain.BuilderManagers[locationType].BuilderHandles = aiBrain.BuilderManagers[locationType].BuilderHandles or {}
     aiBrain.BuilderManagers[locationType].BuilderHandles[tableName] = {}
 

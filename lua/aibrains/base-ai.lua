@@ -11,14 +11,9 @@ local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
 local FactoryManager = import("/lua/sim/factorybuildermanager.lua")
 local PlatoonFormManager = import("/lua/sim/platoonformmanager.lua")
 local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
-local EngineerManager = import("/lua/aibrains/base-ai-engineer-manager.lua")
+local EngineerManager = import("/lua/sim/engineermanager.lua")
 
 local SUtils = import("/lua/ai/sorianutilities.lua")
-local StratManager = import("/lua/sim/strategymanager.lua")
-local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
-local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
-local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
-local Factions = import('/lua/factions.lua').GetFactions(true)
 
 -- upvalue for performance
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
@@ -372,10 +367,6 @@ AIBrain = Class(StandardBrain) {
                     v.FactoryManager:Destroy()
                     v.PlatoonFormManager:SetEnabled(false)
                     v.PlatoonFormManager:Destroy()
-                    if v.StrategyManager then
-                        v.StrategyManager:SetEnabled(false)
-                        v.StrategyManager:Destroy()
-                    end
                     self.BuilderManagers[k] = nil
                     self.NumBases = self.NumBases - 1
                     needSort = true
@@ -555,7 +546,6 @@ AIBrain = Class(StandardBrain) {
             FactoryManager = FactoryManager.CreateFactoryBuilderManager(self, baseName, position, radius, useCenter),
             PlatoonFormManager = PlatoonFormManager.CreatePlatoonFormManager(self, baseName, position, radius, useCenter),
             EngineerManager = EngineerManager.CreateEngineerManager(self, baseName, position, radius),
-            StrategyManager = StratManager.CreateStrategyManager(self, baseName, position, radius),
             BuilderHandles = {},
             Position = position,
             BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
@@ -3267,8 +3257,9 @@ AIBrain = Class(StandardBrain) {
 
         -- register unit at managers of base
         local managers = self.BuilderManagers[nearestBaseIdentifier]
-        managers.EngineerManager:OnUnitStartBeingBuilt(unit, builder, layer)
-
+        if managers then
+            managers.EngineerManager:OnUnitStartBeingBuilt(unit, builder, layer)
+        end
     end,
 
     --- Called by a unit as it is finished being built
@@ -3286,7 +3277,9 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        managers.EngineerManager:OnUnitStopBeingBuilt(unit, builder, layer)
+        if managers then
+            managers.EngineerManager:OnUnitStopBeingBuilt(unit, builder, layer)
+        end
     end,
 
     --- Called by a unit as it is destroyed
@@ -3301,7 +3294,9 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        managers.EngineerManager:OnUnitStopBeingBuilt(unit)
+        if managers then
+            managers.EngineerManager:OnUnitStopBeingBuilt(unit)
+        end
     end,
 
     --- Called by a unit as it starts building
@@ -3317,7 +3312,9 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        managers.EngineerManager:OnUnitStartBuilding(unit)
+        if managers then
+            managers.EngineerManager:OnUnitStartBuilding(unit)
+        end
     end,
 
     --- Called by a unit as it stops building
@@ -3326,14 +3323,16 @@ AIBrain = Class(StandardBrain) {
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)
         StandardBrain.OnUnitStopBuilding(self, unit, built)
-
+        
         local baseIdentifier = unit.AIManagerIdentifier
         if not baseIdentifier then
             return
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        managers.EngineerManager:OnUnitStopBuilding(unit)
+        if managers then
+            managers.EngineerManager:OnUnitStopBuilding(unit)
+        end
     end,
 }
 

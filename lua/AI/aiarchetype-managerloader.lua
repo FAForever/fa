@@ -13,6 +13,7 @@ local AIAddBuilderTable = import("/lua/ai/aiaddbuildertable.lua")
 ---@return integer
 ---@return boolean
 function GetHighestBuilder(aiBrain)
+    WARN("GetHighestBuilder")
     local base = false
     local returnVal = 0
     local aiType = false
@@ -20,7 +21,7 @@ function GetHighestBuilder(aiBrain)
     for k,v in BaseBuilderTemplates do
         if v.FirstBaseFunction then
             local baseVal, baseType = v.FirstBaseFunction(aiBrain)
-            --LOG('*DEBUG: testing ' .. k .. ' - Val ' .. baseVal)
+            LOG('*DEBUG: testing ' .. k .. ' - Val ' .. baseVal)
             if baseVal > returnVal then
                 returnVal = baseVal
                 base = k
@@ -45,6 +46,7 @@ end
 
 ---@param aiBrain AIBrain
 function ExecutePlan(aiBrain)
+    WARN("ExecutePlan")
     aiBrain:SetConstantEvaluate(false)
     local behaviors = import("/lua/ai/aibehaviors.lua")
     WaitSeconds(1)
@@ -71,6 +73,7 @@ end
 
 ---@param aiBrain AIBrain
 function SetupMainBase(aiBrain)
+    WARN("SetupMainBase")
     local base, returnVal, baseType = GetHighestBuilder(aiBrain)
 
     local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality

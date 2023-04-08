@@ -206,6 +206,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+        LOG("OnUnitStopBeingBuilt")
         local tech = unit.Blueprint.TechCategory
         local id = unit.EntityId
         self.EngineersBeingBuilt[tech][id] = nil
@@ -523,6 +524,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
         end
 
         local builder = self:GetHighestBuilder('Any', { unit })
+        LOG(builder.BuilderName)
         if builder then
             -- Fork off the platoon here
             local template = self:GetEngineerPlatoonTemplate(builder:GetPlatoonTemplate())
