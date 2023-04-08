@@ -2063,6 +2063,8 @@ BaseManager = ClassSimple {
 ---@return BaseManager
 function CreateBaseManager(brain, baseName, markerName, radius, levelTable)
 
+    reprsl(debug.traceback('CreateBaseManager'))
+
     ---@type BaseManager
     local bManager = BaseManager()
     bManager:Create()

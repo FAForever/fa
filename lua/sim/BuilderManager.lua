@@ -425,21 +425,35 @@ BuilderManager = ClassSimple {
     -- unit events
 
     --- Called by a unit as it starts being built
-    ---@param self BaseAIBrain
+    ---@param self BuilderManager
     ---@param unit Unit
     OnUnitStartBeingBuilt = function(self, unit)
     end,
 
     --- Called by a unit as it is finished being built
-    ---@param self BaseAIBrain
+    ---@param self BuilderManager
     ---@param unit Unit
-    OnUnitFinishedBeingBuilt = function(self, unit)
+    OnUnitStopBeingBuilt = function(self, unit)
     end,
 
     --- Called by a unit as it is destroyed
-    ---@param self BaseAIBrain
+    ---@param self BuilderManager
     ---@param unit Unit
     OnUnitDestroyed = function(self, unit)
+    end,
+
+    --- Called by a unit as it starts building
+    ---@param self BuilderManager
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStartBuilding = function(self, unit, built)
+    end,
+
+    --- Called by a unit as it stops building
+    ---@param self BuilderManager
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStopBuilding = function(self, unit, built)
     end,
 
     --------------------------------------------------------------------------------------------

@@ -22,6 +22,7 @@ local PCBC = '/lua/editor/platooncountbuildconditions.lua'
 local SAI = '/lua/scenarioplatoonai.lua'
 local TBC = '/lua/editor/threatbuildconditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
+local BaseAIEngineerManagerConditions = '/lua/editor/BaseAIEngineerManagerConditions.lua'
 
 ---@alias BuilderGroupsEconomic 'EngineerFactoryBuilders' | 'Engineer Transfers' | 'Land Rush Initial ACU Builders' | 'Balanced Rush Initial ACU Builders' | 'Air Rush Initial ACU Builders' | 'Naval Rush Initial ACU Builders' | 'Default Initial ACU Builders' | 'ACUBuilders' | 'ACUUpgrades - Gun improvements' | 'ACUUpgrades - Tech 2 Engineering' | 'ACUUpgrades - Shields' | 'ACUUpgrades' | 'T1EngineerBuilders' | 'T2EngineerBuilders' | 'T3EngineerBuilders' | 'EngineerMassBuildersHighPri' | 'EngineerMassBuilders - Naval' | 'EngineerMassBuildersLowerPri' | 'EngineerMassBuildersMidPriSingle' | 'EngineerEnergyBuilders' | 'EngineerEnergyBuildersExpansions' | 'EngineeringSupportBuilder'
 
@@ -36,7 +37,7 @@ BuilderGroup {
         PlatoonTemplate = 'T1BuildEngineer',
         Priority = 900,
         BuilderConditions = {
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 4, categories.ENGINEER * categories.TECH1 }}, --DUNCAN - was 3
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 4, 'TECH1' }},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER * categories.TECH1 } },
             { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech1' } },
         },
@@ -58,7 +59,7 @@ BuilderGroup {
         PlatoonTemplate = 'T1BuildEngineer',
         Priority = 800,
         BuilderConditions = {
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 9, categories.ENGINEER * categories.TECH1 }},
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 9, 'TECH1' }},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER * categories.TECH1 } },
             { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech1' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
@@ -87,7 +88,7 @@ BuilderGroup {
         PlatoonTemplate = 'T2BuildEngineer',
         Priority = 925,
         BuilderConditions = {
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * categories.TECH2 }},
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 3, 'TECH2' }},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER * categories.TECH2 } },
             { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech2' } },
         },
@@ -109,7 +110,7 @@ BuilderGroup {
         PlatoonTemplate = 'T2BuildEngineer',
         Priority = 800,
         BuilderConditions = {
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 6, categories.ENGINEER * categories.TECH2 }},
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 6, 'TECH2' }},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER * categories.TECH2 } },
             { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech2' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.95, 1.2 } },
@@ -139,7 +140,7 @@ BuilderGroup {
         PlatoonTemplate = 'T3BuildEngineer',
         Priority = 950,
         BuilderConditions = {
-            { UCBC,'EngineerLessAtLocation', { 'LocationType', 6, categories.ENGINEER * categories.TECH3 }},
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 6, 'TECH3' }},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER * categories.TECH3 } },
             { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech3' } },
         },
@@ -161,7 +162,7 @@ BuilderGroup {
         PlatoonTemplate = 'T3BuildEngineer',
         Priority = 900,
         BuilderConditions = {
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 9, categories.ENGINEER * categories.TECH3 }},
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 9, 'TECH3' }},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER * categories.TECH3 } },
             { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech3' } },
             --{ UCBC, 'UnitCapCheckLess', { .8 } },
@@ -173,7 +174,7 @@ BuilderGroup {
         PlatoonTemplate = 'T3BuildEngineer',
         Priority = 800,
         BuilderConditions = {
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 12, categories.ENGINEER * categories.TECH3 }},
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 12, 'TECH3' }},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ENGINEER * categories.TECH3 } },
             { UCBC, 'EngineerCapCheck', { 'LocationType', 'Tech3' } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.95, 1.2 } },
@@ -590,7 +591,7 @@ BuilderGroup {
         BuilderConditions = {
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.5, 0.5 }}, --DUNCAN - was 0.8 mass check
             { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }},
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER * ( categories.TECH2 + categories.TECH3 ) } },
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTechList', { 'LocationType', 1, {'TECH2', 'TECH3'} } },
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -1952,7 +1953,6 @@ BuilderGroup {
         Priority = 1000,
         InstanceCount = 3,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 150, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -1972,7 +1972,6 @@ BuilderGroup {
         Priority = 970,
         InstanceCount = 3,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 250, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -1992,7 +1991,6 @@ BuilderGroup {
         Priority = 800,
         InstanceCount = 3,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 450, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2012,7 +2010,6 @@ BuilderGroup {
         Priority = 850,
         InstanceCount = 1,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 1000, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2032,7 +2029,7 @@ BuilderGroup {
         Priority = 975,
         InstanceCount = 1,
         BuilderConditions = {
-                { UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * categories.TECH3 }},
+                { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 3, 'TECH3' }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 100, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2052,7 +2049,7 @@ BuilderGroup {
         Priority = 0,
         InstanceCount = 1,
         BuilderConditions = {
-                { UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * categories.TECH3}},
+                { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 3, 'TECH3' }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 1000, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2120,7 +2117,6 @@ BuilderGroup {
         Priority = 1000,
         InstanceCount = 4,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 150, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2140,7 +2136,6 @@ BuilderGroup {
         Priority = 980,
         InstanceCount = 4,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 250, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2160,7 +2155,6 @@ BuilderGroup {
         Priority = 970,
         InstanceCount = 4,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 450, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2180,7 +2174,6 @@ BuilderGroup {
         Priority = 850,
         InstanceCount = 1,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * (categories.TECH2 + categories.TECH3) }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 1000, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2200,7 +2193,7 @@ BuilderGroup {
         Priority = 975,
         InstanceCount = 1,
         BuilderConditions = {
-                { UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * categories.TECH3 }},
+                { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 3, 'TECH3' }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 250, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2220,7 +2213,7 @@ BuilderGroup {
         Priority = 0,
         InstanceCount = 1,
         BuilderConditions = {
-                { UCBC, 'EngineerLessAtLocation', { 'LocationType', 3, categories.ENGINEER * categories.TECH3 }},
+                { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 3, 'TECH3' }},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 1000, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2304,7 +2297,6 @@ BuilderGroup {
         Priority = 1000,
         InstanceCount = 2,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 4, categories.ENGINEER * (categories.TECH2 + categories.TECH3)}},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 150, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2324,7 +2316,6 @@ BuilderGroup {
         Priority = 700,
         InstanceCount = 2,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 4, categories.ENGINEER * (categories.TECH2 + categories.TECH3)}},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 350, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2344,7 +2335,6 @@ BuilderGroup {
         Priority = 650,
         InstanceCount = 2,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 4, categories.ENGINEER * (categories.TECH2 + categories.TECH3)}},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 1000, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2364,7 +2354,6 @@ BuilderGroup {
         Priority = 1000,
         InstanceCount = 2,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 4, categories.ENGINEER * (categories.TECH2 + categories.TECH3)}},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 150, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2385,7 +2374,6 @@ BuilderGroup {
         Priority = 0,
         InstanceCount = 1,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 4, 'ENGINEER TECH3'}},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 350, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2405,7 +2393,6 @@ BuilderGroup {
         Priority = 0,
         InstanceCount = 1,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 4, 'ENGINEER TECH3'}},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 1000, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2463,7 +2450,6 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 750,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER * (categories.TECH2 + categories.TECH3)}},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 1000, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2482,7 +2468,6 @@ BuilderGroup {
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 750,
         BuilderConditions = {
-                --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, 'ENGINEER TECH3'}},
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 1000, -500, 1, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
@@ -2566,8 +2551,8 @@ BuilderGroup {
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 950,
         BuilderConditions = {
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 1, 'TECH3' }},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.ENERGYPRODUCTION * categories.TECH2}}, --DUNCAN - Added
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.TECH3 * categories.ENGINEER }},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.5, 0.1 }},
             { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }}, --DUNCAN - Moved check from 1.7
         },

@@ -83,14 +83,26 @@ SyncMeta = {
     end,
 }
 
+---@class AIUnitProperties
+---@field ForkedEngineerTask? thread    # used by the engineer manager
+---@field DesiresAssist? boolean         # used by the engineer manager
+---@field NumAssistees? number           # used by the engineer manager
+---@field MinNumAssistees? number
+---@field BuilderManagerData? { EngineerManager: BaseAIEngineerManager, LocationType: LocationType }
+---@field UnitBeingAssist? Unit
+---@field UnitBeingBuilt? Unit
+---@field UnitBeingBuiltBehavior? thread
+---@field Combat? boolean
+
 local cUnit = moho.unit_methods
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties
 ---@field AIManagerIdentifier? string
 ---@field Brain AIBrain
 ---@field Blueprint UnitBlueprint
 ---@field Trash TrashBag
 ---@field Layer Layer
 ---@field Army Army
+---@field Dead? boolean
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
@@ -2105,7 +2117,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StartBeingBuiltEffects(builder, layer)
 
         local aiBrain = self:GetAIBrain()
-        aiBrain:OnUnitStartBeingBuilt(self)
+        aiBrain:OnUnitStartBeingBuilt(self, builder, layer)
         if not table.empty(aiBrain.UnitBuiltTriggerList) then
             for _, v in aiBrain.UnitBuiltTriggerList do
                 if EntityCategoryContains(v.Category, self) then
@@ -2146,13 +2158,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return false
         end
 
-        self.Brain:OnUnitFinishedBeingBuilt(self)
+        self.Brain:OnUnitStopBeingBuilt(self, builder, layer)
 
         -- Create any idle effects on unit
         if TrashEmpty(self.IdleEffectsBag) then
             self:CreateIdleEffects()
         end
-        
+
         IntelComponent.OnStopBeingBuilt(self, builder, layer)
 
         local bp = self.Blueprint
@@ -2583,7 +2595,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:PlayUnitAmbientSound('ConstructLoop')
 
         self:DoOnStartBuildCallbacks(built)
-
+        self.Brain:OnUnitStartBuilding(self, built)
 
         if order == 'Upgrade' and bp.General.UpgradesFrom == self.UnitId then
             built.DisallowCollisions = true
@@ -2606,6 +2618,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
         self:DoOnUnitBuiltCallbacks(built)
+        self.Brain:OnUnitStopBuilding(self, built)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
         self.TransferUpgradeProgress = nil

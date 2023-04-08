@@ -1359,15 +1359,19 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- Called by a unit as it starts being built
     ---@param self AIBrain
     ---@param unit Unit
-    OnUnitStartBeingBuilt = function(self, unit)
+    ---@param builder Unit  
+    ---@param layer Layer
+    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
         LOG(string.format('OnUnitStartBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
     end,
 
     --- Called by a unit as it is finished being built
     ---@param self AIBrain
     ---@param unit Unit
-    OnUnitFinishedBeingBuilt = function(self, unit)
-        LOG(string.format('OnUnitFinishedBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
+    ---@param builder Unit
+    ---@param layer Layer
+    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+        LOG(string.format('OnUnitStopBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
     end,
 
     --- Called by a unit as it is destroyed
@@ -1375,6 +1379,22 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     OnUnitDestroyed = function(self, unit)
         LOG(string.format('OnUnitDestroyed: %s', unit.Blueprint.BlueprintId or ''))
+    end,
+
+    --- Called by a unit as it starts building
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStartBuilding = function(self, unit, built)
+        LOG(string.format('OnUnitStartBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
+    end,
+
+    --- Called by a unit as it stops building
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStopBuilding = function(self, unit, built)
+        LOG(string.format('OnUnitStopBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
     end,
 
     ---------------------------------------------

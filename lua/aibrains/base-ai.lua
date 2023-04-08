@@ -11,7 +11,7 @@ local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
 local FactoryManager = import("/lua/sim/factorybuildermanager.lua")
 local PlatoonFormManager = import("/lua/sim/platoonformmanager.lua")
 local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
-local EngineerManager = import("/lua/sim/engineermanager.lua")
+local EngineerManager = import("/lua/aibrains/base-ai-engineer-manager.lua")
 
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local StratManager = import("/lua/sim/strategymanager.lua")
@@ -3256,45 +3256,28 @@ AIBrain = Class(StandardBrain) {
     --- Called by a unit as it starts being built
     ---@param self BaseAIBrain
     ---@param unit Unit
-    OnUnitStartBeingBuilt = function(self, unit)
-        StandardBrain.OnUnitStartBeingBuilt(self, unit)
+    ---@param builder Unit  
+    ---@param layer Layer
+    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
+        StandardBrain.OnUnitStartBeingBuilt(self, unit, builder, layer)
 
         -- find nearest base
-        local nearestBaseIdentifier = self:FindNearestBaseIdentifier(unit:GetPosition())
+        local nearestBaseIdentifier = builder.AIManagerIdentifier or self:FindNearestBaseIdentifier(unit:GetPosition())
         unit.AIManagerIdentifier = nearestBaseIdentifier
 
         -- register unit at managers of base
         local managers = self.BuilderManagers[nearestBaseIdentifier]
-        managers.EngineerManager:OnUnitStartBeingBuilt(unit)
-
-        ForkThread(
-            function ()
-                DrawLine(unit:GetPosition(), managers.FactoryManager.Location, 'ffffff')
-                WaitTicks(1)
-                DrawLine(unit:GetPosition(), managers.FactoryManager.Location, 'ffffff')
-                WaitTicks(1)
-                DrawLine(unit:GetPosition(), managers.FactoryManager.Location, 'ffffff')
-                WaitTicks(1)
-                DrawLine(unit:GetPosition(), managers.FactoryManager.Location, 'ffffff')
-                WaitTicks(1)
-                DrawLine(unit:GetPosition(), managers.FactoryManager.Location, 'ffffff')
-                WaitTicks(1)
-                DrawLine(unit:GetPosition(), managers.FactoryManager.Location, 'ffffff')
-                WaitTicks(1)
-                DrawLine(unit:GetPosition(), managers.FactoryManager.Location, 'ffffff')
-                WaitTicks(1)
-                DrawLine(unit:GetPosition(), managers.FactoryManager.Location, 'ffffff')
-                WaitTicks(1)
-            end
-        )
+        managers.EngineerManager:OnUnitStartBeingBuilt(unit, builder, layer)
 
     end,
 
     --- Called by a unit as it is finished being built
     ---@param self BaseAIBrain
     ---@param unit Unit
-    OnUnitFinishedBeingBuilt = function(self, unit)
-        StandardBrain.OnUnitFinishedBeingBuilt(self, unit)
+    ---@param builder Unit
+    ---@param layer Layer
+    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+        StandardBrain.OnUnitStopBeingBuilt(self, unit, builder, layer)
 
         local baseIdentifier = unit.AIManagerIdentifier
         if not baseIdentifier then
@@ -3303,7 +3286,7 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        managers.EngineerManager:OnUnitFinishedBeingBuilt(unit)
+        managers.EngineerManager:OnUnitStopBeingBuilt(unit, builder, layer)
     end,
 
     --- Called by a unit as it is destroyed
@@ -3318,7 +3301,39 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        managers.EngineerManager:OnUnitFinishedBeingBuilt(unit)
+        managers.EngineerManager:OnUnitStopBeingBuilt(unit)
+    end,
+
+    --- Called by a unit as it starts building
+    ---@param self BaseAIBrain
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStartBuilding = function(self, unit, built)
+        StandardBrain.OnUnitStartBuilding(self, unit, built)
+
+        local baseIdentifier = unit.AIManagerIdentifier
+        if not baseIdentifier then
+            return
+        end
+
+        local managers = self.BuilderManagers[baseIdentifier]
+        managers.EngineerManager:OnUnitStartBuilding(unit)
+    end,
+
+    --- Called by a unit as it stops building
+    ---@param self BaseAIBrain
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStopBuilding = function(self, unit, built)
+        StandardBrain.OnUnitStopBuilding(self, unit, built)
+
+        local baseIdentifier = unit.AIManagerIdentifier
+        if not baseIdentifier then
+            return
+        end
+
+        local managers = self.BuilderManagers[baseIdentifier]
+        managers.EngineerManager:OnUnitStopBuilding(unit)
     end,
 }
 

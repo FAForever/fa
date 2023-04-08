@@ -23,6 +23,8 @@ local TBC = '/lua/editor/threatbuildconditions.lua'
 local IBC = '/lua/editor/instantbuildconditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
+local BaseAIEngineerManagerConditions = '/lua/editor/BaseAIEngineerManagerConditions.lua'
+
 ---@alias BuilderGroupsIntel 'AirScoutFactoryBuilders' | 'AirScoutFormBuilders' | 'LandScoutFactoryBuilders' | 'LandScoutFormBuilders' | 'RadarEngineerBuilders' | 'RadarUpgradeBuildersMain' | 'SonarEngineerBuilders' | 'SonarUpgradeBuilders' | 'CounterIntelBuilders' | 'RadarUpgradeBuildersExpansion' | 'SonarUpgradeBuildersSmall' | 'AeonOpticsEngineerBuilders' | 'CybranOpticsEngineerBuilders' | 
 
 BuilderGroup {
@@ -191,8 +193,6 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 930,
         BuilderConditions = {
-            --DUNCAN - commented out
-            --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER - categories.COMMAND - categories.TECH1 } },
             { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, (categories.RADAR + categories.OMNI) * categories.STRUCTURE}},
             { EBC, 'GreaterThanEconIncomeOverTime',  { 0.5, 15 } },
             { IBC, 'BrainNotLowPowerMode', {} },
@@ -213,7 +213,7 @@ BuilderGroup {
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER - categories.TECH3 } },
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTechList', { 'LocationType', 1, {'TECH1', 'TECH2'} } },
             { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, (categories.RADAR + categories.OMNI) * categories.STRUCTURE}},
             { EBC, 'GreaterThanEconIncomeOverTime',  { 7.5, 100}},
             { IBC, 'BrainNotLowPowerMode', {} },
@@ -293,7 +293,7 @@ BuilderGroup {
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER - categories.COMMAND - categories.TECH1} },
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTechList', { 'LocationType', 1, {'TECH2', 'TECH3'}} },
             { MABC, 'MarkerLessThanDistance',  { 'Naval Area', 200} },
             { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, categories.SONAR * categories.STRUCTURE } },
             { EBC, 'GreaterThanEconIncomeOverTime',  { 0.5, 150 } },
@@ -315,7 +315,7 @@ BuilderGroup {
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-            { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER * categories.TECH3 } },
+            { BaseAIEngineerManagerConditions, 'LessEngineersByTech', { 'LocationType', 1, 'TECH3' } },
             { MABC, 'MarkerLessThanDistance',  { 'Naval Area', 200}},
             { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, categories.SONAR * categories.STRUCTURE } },
             { EBC, 'GreaterThanEconIncomeOverTime',  { 0.5, 15 } },
