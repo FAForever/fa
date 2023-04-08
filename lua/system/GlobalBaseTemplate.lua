@@ -86,6 +86,5 @@ BaseBuilderTemplate = function(spec)
         BaseBuilderTemplates[spec.BaseTemplateName] = spec
     end
 
-    LOG("Registered: " .. spec.BaseTemplateName)
     return spec.BaseTemplateName
 end

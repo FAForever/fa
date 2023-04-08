@@ -21,7 +21,7 @@ function GetHighestBuilder(aiBrain)
     for k,v in BaseBuilderTemplates do
         if v.FirstBaseFunction then
             local baseVal, baseType = v.FirstBaseFunction(aiBrain)
-            LOG('*DEBUG: testing ' .. k .. ' - Val ' .. baseVal)
+            -- LOG('*DEBUG: testing ' .. k .. ' - Val ' .. baseVal)
             if baseVal > returnVal then
                 returnVal = baseVal
                 base = k
