@@ -1,15 +1,11 @@
 local FactoryManager = import("/lua/sim/factorybuildermanager.lua")
 local PlatoonFormManager = import("/lua/sim/platoonformmanager.lua")
 local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
-local EngineerManager = import("/lua/aibrains/easy-ai-engineer-manager.lua")
-local StructureManager = import("/lua/aibrains/easy-ai-structure-manager.lua")
-
--- upvalue for performance
-local GetEconomyIncome = moho.aibrain_methods.GetEconomyIncome
-local GetEconomyRequested = moho.aibrain_methods.GetEconomyRequested
-local GetEconomyTrend = moho.aibrain_methods.GetEconomyTrend
+local EngineerManager = import("/lua/aibrains/managers/engineer.lua")
+local StructureManager = import("/lua/aibrains/managers/structure.lua")
 
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
+local EconomyComponent = import("/lua/aibrains/components/economy.lua").AIBrainEconomyComponent
 
 ---@class TriggerSpec
 ---@field Callback function
@@ -20,8 +16,8 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 ---@field OnceOnly boolean
 ---@field TargetAIBrain AIBrain
 
----@class EasyAIBrain: AIBrain
-AIBrain = Class(StandardBrain) {
+---@class EasyAIBrain: AIBrain, AIBrainEconomyComponent
+AIBrain = Class(StandardBrain, EconomyComponent) {
 
     SkirmishSystems = true,
 
@@ -60,13 +56,6 @@ AIBrain = Class(StandardBrain) {
         -- Condition monitor for the whole brain
         self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
 
-        -- Economy monitor for new skirmish - stores out econ over time to get trend over 10 seconds
-        self.EconomyData = {}
-        self.EconomyOverTimeCurrent = {}
-        self.EconomyTicksMonitor = 300
-        self.EconomyMonitorThread = self:ForkThread(self.EconomyMonitor)
-        self.LowEnergyMode = false
-
         -- Add default main location and setup the builder managers
         self.NumBases = 0 -- AddBuilderManagers will increase the number
 
@@ -82,12 +71,14 @@ AIBrain = Class(StandardBrain) {
         self:IMAPConfiguration()
 
         ForkThread(
-            function ()
+            function()
                 WaitTicks(30)
                 local loader = import("/lua/ai/aiarchetype-managerloader.lua")
                 loader.ExecutePlan(self)
             end
         )
+
+        EconomyComponent.OnCreateAI(self)
     end,
 
     ---@param self EasyAIBrain
@@ -140,141 +131,6 @@ AIBrain = Class(StandardBrain) {
         self.NumBases = self.NumBases + 1
     end,
 
-    --- ## ECONOMY MONITOR
-    --- Monitors the economy over time for skirmish; allows better trend analysis
-    ---@param self EasyAIBrain
-    EconomyMonitor = function(self)
-        -- This over time thread is based on Sprouto's LOUD AI.
-        self.EconomyData = { ['EnergyIncome'] = {}, ['EnergyRequested'] = {}, ['EnergyStorage'] = {},
-            ['EnergyTrend'] = {}, ['MassIncome'] = {}, ['MassRequested'] = {}, ['MassStorage'] = {}, ['MassTrend'] = {},
-            ['Period'] = self.EconomyTicksMonitor }
-        -- number of sample points
-        -- local point
-        local samplerate = 10
-        local samples = self.EconomyData['Period'] / samplerate
-
-        -- create the table to store the samples
-        for point = 1, samples do
-            self.EconomyData['EnergyIncome'][point] = 0
-            self.EconomyData['EnergyRequested'][point] = 0
-            self.EconomyData['EnergyStorage'][point] = 0
-            self.EconomyData['EnergyTrend'][point] = 0
-            self.EconomyData['MassIncome'][point] = 0
-            self.EconomyData['MassRequested'][point] = 0
-            self.EconomyData['MassStorage'][point] = 0
-            self.EconomyData['MassTrend'][point] = 0
-        end
-
-        -- array totals
-        local eIncome = 0
-        local mIncome = 0
-        local eRequested = 0
-        local mRequested = 0
-        local eStorage = 0
-        local mStorage = 0
-        local eTrend = 0
-        local mTrend = 0
-
-        -- this will be used to multiply the totals
-        -- to arrive at the averages
-        local samplefactor = 1 / samples
-
-        local EcoData = self.EconomyData
-
-        local EcoDataEnergyIncome = EcoData['EnergyIncome']
-        local EcoDataMassIncome = EcoData['MassIncome']
-        local EcoDataEnergyRequested = EcoData['EnergyRequested']
-        local EcoDataMassRequested = EcoData['MassRequested']
-        local EcoDataEnergyTrend = EcoData['EnergyTrend']
-        local EcoDataMassTrend = EcoData['MassTrend']
-        local EcoDataEnergyStorage = EcoData['EnergyStorage']
-        local EcoDataMassStorage = EcoData['MassStorage']
-
-        local e, m
-
-        while true do
-
-            for point = 1, samples do
-
-                -- remove this point from the totals
-                eIncome = eIncome - EcoDataEnergyIncome[point]
-                mIncome = mIncome - EcoDataMassIncome[point]
-                eRequested = eRequested - EcoDataEnergyRequested[point]
-                mRequested = mRequested - EcoDataMassRequested[point]
-                eTrend = eTrend - EcoDataEnergyTrend[point]
-                mTrend = mTrend - EcoDataMassTrend[point]
-
-                -- insert the new data --
-                EcoDataEnergyIncome[point] = GetEconomyIncome(self, 'ENERGY')
-                EcoDataMassIncome[point] = GetEconomyIncome(self, 'MASS')
-                EcoDataEnergyRequested[point] = GetEconomyRequested(self, 'ENERGY')
-                EcoDataMassRequested[point] = GetEconomyRequested(self, 'MASS')
-
-                e = GetEconomyTrend(self, 'ENERGY')
-                m = GetEconomyTrend(self, 'MASS')
-
-                if e then
-                    EcoDataEnergyTrend[point] = e
-                else
-                    EcoDataEnergyTrend[point] = 0.1
-                end
-
-                if m then
-                    EcoDataMassTrend[point] = m
-                else
-                    EcoDataMassTrend[point] = 0.1
-                end
-
-                -- add the new data to totals
-                eIncome = eIncome + EcoDataEnergyIncome[point]
-                mIncome = mIncome + EcoDataMassIncome[point]
-                eRequested = eRequested + EcoDataEnergyRequested[point]
-                mRequested = mRequested + EcoDataMassRequested[point]
-                eTrend = eTrend + EcoDataEnergyTrend[point]
-                mTrend = mTrend + EcoDataMassTrend[point]
-
-                -- calculate new OverTime values --
-                self.EconomyOverTimeCurrent.EnergyIncome = eIncome * samplefactor
-                self.EconomyOverTimeCurrent.MassIncome = mIncome * samplefactor
-                self.EconomyOverTimeCurrent.EnergyRequested = eRequested * samplefactor
-                self.EconomyOverTimeCurrent.MassRequested = mRequested * samplefactor
-                self.EconomyOverTimeCurrent.EnergyEfficiencyOverTime = math.min((eIncome * samplefactor) /
-                    (eRequested * samplefactor), 2)
-                self.EconomyOverTimeCurrent.MassEfficiencyOverTime = math.min((mIncome * samplefactor) /
-                    (mRequested * samplefactor), 2)
-                self.EconomyOverTimeCurrent.EnergyTrendOverTime = eTrend * samplefactor
-                self.EconomyOverTimeCurrent.MassTrendOverTime = mTrend * samplefactor
-
-                coroutine.yield(samplerate)
-            end
-        end
-    end,
-
-    ---@param self EasyAIBrain
-    ---@return table
-    GetEconomyOverTime = function(self)
-
-        local retTable = {}
-        retTable.EnergyIncome = self.EconomyOverTimeCurrent.EnergyIncome or 0
-        retTable.MassIncome = self.EconomyOverTimeCurrent.MassIncome or 0
-        retTable.EnergyRequested = self.EconomyOverTimeCurrent.EnergyRequested or 0
-        retTable.MassRequested = self.EconomyOverTimeCurrent.MassRequested or 0
-
-        return retTable
-    end,
-
-    ---@param self EasyAIBrain
-    SetupAttackVectorsThread = function(self)
-        self.AttackVectorUpdate = 0
-        while true do
-            self:SetUpAttackVectorsToArmy(categories.STRUCTURE - (categories.MASSEXTRACTION))
-            while self.AttackVectorUpdate < 30 do
-                WaitSeconds(1)
-                self.AttackVectorUpdate = self.AttackVectorUpdate + 1
-            end
-            self.AttackVectorUpdate = 0
-        end
-    end,
 
     IMAPConfiguration = function(self)
         -- Used to configure imap values, used for setting threat ring sizes depending on map size to try and get a somewhat decent radius
@@ -436,7 +292,7 @@ AIBrain = Class(StandardBrain) {
     ----------------------------------------------------------------------------------------
     --- legacy functionality
     ---
-    --- All functions below solely exist because the code is too tightly coupled. We can't 
+    --- All functions below solely exist because the code is too tightly coupled. We can't
     --- remove them without drastically changing how the code base works. We can't do that
     --- because it would break mod compatibility
 
